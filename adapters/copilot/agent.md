@@ -2,6 +2,9 @@
 
 > This file configures GitHub Copilot as a LiveSpec-aware agent.
 > It registers all `/spec.*` commands and instructs the agent to follow the spec system.
+>
+> **Installation:** This file is installed to `.github/copilot-instructions.md` by `/spec.link copilot`
+> or `bash scripts/link.sh --tool copilot`.
 
 ---
 
@@ -28,7 +31,7 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 
 **Description:** Initialize LiveSpec in this project through a 3-phase conversational brainstorm.
 
-**Full instructions:** See `commands/init.md` in the LiveSpec repository.
+**Full instructions:** See `.specs/commands/init.md` in this project (or `commands/init.md` in the LiveSpec repository).
 
 **Summary:**
 1. Phase A — Ask 6 questions to understand the project (conversational)
@@ -43,7 +46,7 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 
 **Description:** Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
 
-**Full instructions:** See `commands/specify.md` in the LiveSpec repository.
+**Full instructions:** See `.specs/commands/specify.md` in this project.
 
 **Summary:**
 1. Parse feature description
@@ -60,7 +63,7 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 
 **Description:** Generate technical plan with sequence, state, and ER diagrams.
 
-**Full instructions:** See `commands/plan.md` in the LiveSpec repository.
+**Full instructions:** See `.specs/commands/plan.md` in this project.
 
 **Summary:**
 1. Read spec.md + constitution.md + stack + testing strategy
@@ -76,7 +79,7 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 
 **Description:** APEX-style auto-pipeline: implement → test → visual baselines → map to spec.
 
-**Full instructions:** See `commands/implement.md` in the LiveSpec repository.
+**Full instructions:** See `.specs/commands/implement.md` in this project.
 
 **Summary:**
 1. Analyze codebase and read plan.md
@@ -94,11 +97,11 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 
 **Description:** Compare spec vs actual code — find gaps, verify AC coverage, detect visual drift.
 
-**Full instructions:** See `commands/check.md` in the LiveSpec repository.
+**Full instructions:** See `.specs/commands/check.md` in this project.
 
 **Summary:**
 1. Read spec.md (extract all AC and FR)
-2. Read implementation.md (find mapped files)
+2. Read implementation.md (find mapped files and `@spec` anchors)
 3. Read actual code — verify each requirement
 4. Compare screenshots with Playwright baselines
 5. Produce gap report with ✅ ⚠️ ❌ 🔄 status
@@ -111,7 +114,7 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 
 **Description:** Living documentation — understand how a feature works without reading code.
 
-**Full instructions:** See `commands/explain.md` in the LiveSpec repository.
+**Full instructions:** See `.specs/commands/explain.md` in this project.
 
 **Summary:**
 1. Accept feature name or natural language question
@@ -130,7 +133,7 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 
 **Description:** Evolve your stack and analyze impact on existing features.
 
-**Full instructions:** See `commands/stack.md` in the LiveSpec repository.
+**Full instructions:** See `.specs/commands/stack.md` in this project.
 
 **Summary:**
 1. Show current stack (from `.specs/stacks/_default.md`)
@@ -144,6 +147,24 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 - `/spec.stack` — show current stack
 - `/spec.stack change "we need Edge deployment"`
 - `/spec.stack decisions` — list all ADRs
+
+---
+
+### `/spec.link`
+
+**Description:** Install AI tool adapters and make LiveSpec commands discoverable in your project.
+
+**Full instructions:** See `.specs/commands/link.md` in this project.
+
+**Summary:**
+1. Copy all command docs to `.specs/commands/` so the AI can read them locally
+2. Install the adapter for the specified tool (copilot, claude-code, cursor, or all)
+3. Auto-detect which tools are present if no tool specified
+
+**Usage:**
+- `/spec.link` — auto-detect and link all found tools
+- `/spec.link copilot`
+- `/spec.link all --force`
 
 ---
 

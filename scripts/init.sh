@@ -227,6 +227,40 @@ See the available presets for guidance:
   # Features directory (empty)
   create_dir "$PROJECT_DIR/.specs/features"
 
+  # Ask which AI tool(s) to link
+  header "Which AI tool(s) do you use?"
+  echo ""
+  echo -e "  1) GitHub Copilot"
+  echo -e "  2) Claude Code"
+  echo -e "  3) Cursor"
+  echo -e "  4) All"
+  echo -e "  5) Skip"
+  echo ""
+  echo -n "  Enter choice (1-5): "
+  read -r tool_choice
+
+  local link_tool=""
+  case "$tool_choice" in
+    1) link_tool="copilot" ;;
+    2) link_tool="claude-code" ;;
+    3) link_tool="cursor" ;;
+    4) link_tool="all" ;;
+    5) link_tool="" ;;
+    *) warn "Invalid choice, skipping AI tool linking." ;;
+  esac
+
+  if [[ -n "$link_tool" ]]; then
+    local link_script="$SCRIPT_DIR/link.sh"
+    if [[ -f "$link_script" ]]; then
+      local dry_flag=""
+      [[ "$DRY_RUN" == true ]] && dry_flag="--dry-run"
+      bash "$link_script" --tool "$link_tool" --livespec-dir "$LIVESPEC_ROOT" $dry_flag "$PROJECT_DIR"
+    else
+      warn "link.sh not found at $link_script — skipping adapter installation."
+      info "Run 'bash scripts/link.sh --tool $link_tool' manually to install the adapter."
+    fi
+  fi
+
   # Summary
   header "✅ LiveSpec installed successfully!"
   echo ""
@@ -245,6 +279,12 @@ See the available presets for guidance:
   echo -e "  3. ${YELLOW}Create your first feature spec:${RESET}"
   echo -e "     ${BOLD}/spec.specify \"User can [action]\"${RESET}"
   echo ""
+  if [[ -z "$link_tool" ]]; then
+    echo -e "  4. ${YELLOW}Link your AI tool (skipped):${RESET}"
+    echo -e "     Run ${BOLD}/spec.link [copilot|claude-code|cursor|all]${RESET} to install adapters"
+    echo -e "     OR run ${BOLD}bash scripts/link.sh --tool all${RESET}"
+    echo ""
+  fi
   echo -e "  ${BLUE}Documentation:${RESET} https://github.com/julien-m/livespec"
 }
 

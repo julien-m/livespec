@@ -34,6 +34,16 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 ├── constitution.md          ← Architecture principles for this project
 ├── project.md               ← Vision, users, constraints
 │
+├── commands/                ← LiveSpec command docs (installed by /spec.link)
+│   ├── init.md
+│   ├── specify.md
+│   ├── plan.md
+│   ├── implement.md
+│   ├── check.md
+│   ├── explain.md
+│   ├── stack.md
+│   └── link.md
+│
 ├── stacks/
 │   ├── _default.md          ← Chosen stack + rationale
 │   └── decisions/           ← Architecture Decision Records
@@ -149,6 +159,11 @@ Playwright screenshot baselines for visual features. Filenames match the test sc
 ---
 
 ## Rules for AI Tools
+
+### Command discovery
+
+Detailed step-by-step instructions for each `/spec.*` command are available in `.specs/commands/`.
+If that directory is missing, run `/spec.link` or `bash scripts/link.sh` to install it.
 
 ### When CREATING a new feature
 
