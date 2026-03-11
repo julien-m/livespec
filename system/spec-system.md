@@ -20,7 +20,7 @@
    Every user story in a spec.md must include a Mermaid flowchart. Text-only specs are incomplete.
 
 5. **Code is linked to specs — every implementation is traceable.**
-   After implementation, `implementation.md` maps every FR and AC to the specific `file:line` where it is implemented.
+   After implementation, `implementation.md` maps every FR and AC to the `@spec` anchor comment placed directly in the source code (e.g. `// @spec FR-001`). Use `grep -rn "@spec FR-001"` to find the exact location regardless of line number changes.
 
 ---
 
@@ -112,7 +112,7 @@ Created AFTER implementation, not before. Maps every requirement to actual code.
 
 **Required sections:**
 
-- **Requirement Mapping table:** `| Requirement | File(s) | Lines | Status | Last Verified |`
+- **Requirement Mapping table:** `| Requirement | File(s) | @spec Anchor | Status | Last Verified |`
 - **Status values:**
   - ✅ Implemented — fully implemented and tested
   - ⚠️ Partial — partially implemented
@@ -155,7 +155,7 @@ Playwright screenshot baselines for visual features. Filenames match the test sc
 1. Create the directory `.specs/features/NNN-feature-name/`
 2. Generate `spec.md` with all required sections including **Mermaid flowcharts for each user story**
 3. Generate `plan.md` with sequence/state/ER diagrams as appropriate
-4. After implementation: create `implementation.md` mapping FR/AC to files:lines
+4. After implementation: create `implementation.md` mapping FR/AC to `@spec` anchor comments in source files
 5. Add first entry to `changelog.md`
 
 ### When MODIFYING existing code
@@ -163,7 +163,7 @@ Playwright screenshot baselines for visual features. Filenames match the test sc
 1. **Read the spec FIRST** — locate the feature's spec.md
 2. **Verify conformity** — does the requested change conform to the AC?
 3. **If behavior changes** — update spec.md first, then code
-4. After modification: update `implementation.md` with new file:line references
+4. After modification: update `implementation.md` with new `@spec` anchor references
 5. Add changelog entry describing what changed and why
 
 ### When DEBUGGING

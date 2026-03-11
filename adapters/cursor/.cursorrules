@@ -87,7 +87,7 @@ When LiveSpec is active in a project:
     └── NNN-feature-name/
         ├── spec.md          ← WHAT and WHY (user stories, AC, FR, Mermaid)
         ├── plan.md          ← HOW (diagrams, file-by-file plan)
-        ├── implementation.md ← WHERE (FR/AC → file:line mapping)
+        ├── implementation.md ← WHERE (FR/AC → @spec mapping)
         ├── changelog.md     ← WHEN (history of every change)
         ├── contracts/       ← API contracts (OpenAPI)
         └── baselines/       ← Playwright visual baselines
@@ -114,7 +114,7 @@ When LiveSpec is active in a project:
 - [ ] Testing strategy table
 
 ### Implementation must have:
-- [ ] implementation.md with all FR/AC mapped to file:line
+- [ ] implementation.md with all FR/AC mapped to `@spec` anchors
 - [ ] All tests passing
 - [ ] changelog.md updated
 - [ ] Visual baselines captured (if UI feature)

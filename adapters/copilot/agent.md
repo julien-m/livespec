@@ -83,7 +83,7 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 2. Execute implementation file-by-file
 3. Run tests (max 3 iterations for unit, 5 for visual)
 4. Capture Playwright visual baselines
-5. Create/update `implementation.md` with FR/AC → file:line mapping
+5. Create/update `implementation.md` with FR/AC → `@spec` anchor mapping
 6. Update `changelog.md`
 
 **Usage:** `/spec.implement notifications`
@@ -156,7 +156,7 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 4. If behavior changes: update `spec.md` first
 
 ### After any code change:
-1. Update `implementation.md` with new/changed file:line references
+1. Update `implementation.md` with new/changed `@spec` anchor references
 2. Add entry to `changelog.md` with type, description, files changed, AC impacted
 
 ### When debugging:

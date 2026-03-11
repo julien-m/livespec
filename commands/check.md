@@ -32,7 +32,7 @@ From `.specs/features/NNN-feature-name/spec.md`, extract:
 ### Step 3 — Read Implementation Map
 
 From `.specs/features/NNN-feature-name/implementation.md`, get:
-- FR → file:line mappings
+- FR → `@spec` anchor mappings
 - AC → test file mappings
 - Visual baselines list
 - Known gaps from last check
@@ -83,20 +83,20 @@ Output a structured gap report:
 
 | FR | Description | Status | Location | Notes |
 |---|---|---|---|---|
-| FR-001 | Fetch unread notification count | ✅ Verified | `src/data/notifications.ts:12-34` | |
-| FR-002 | Real-time count updates | ✅ Verified | `src/hooks/useNotificationSubscription.ts:8-52` | |
-| FR-003 | Mark notification as read | ✅ Verified | `src/data/notifications.ts:36-48` | |
-| FR-004 | Navigate to notification target | ⚠️ Partial | `src/components/notifications/NotificationItem.tsx:22-31` | No fallback for missing target_url |
-| FR-005 | Notification preferences endpoint | 🔄 Drifted | `src/api/notifications/route.ts:78-112` | Added new fields not in spec |
+| FR-001 | Fetch unread notification count | ✅ Verified | `src/data/notifications.ts` (`@spec FR-001`) | |
+| FR-002 | Real-time count updates | ✅ Verified | `src/hooks/useNotificationSubscription.ts` (`@spec FR-002`) | |
+| FR-003 | Mark notification as read | ✅ Verified | `src/data/notifications.ts` (`@spec FR-003`) | |
+| FR-004 | Navigate to notification target | ⚠️ Partial | `src/components/notifications/NotificationItem.tsx` (`@spec FR-004`) | No fallback for missing target_url |
+| FR-005 | Notification preferences endpoint | 🔄 Drifted | `src/api/notifications/route.ts` (`@spec FR-005`) | Added new fields not in spec |
 | FR-006 | Mark all notifications as read | ❌ Missing | — | Not implemented |
 
 ### Acceptance Criteria
 
 | AC | Description | Status | Test | Notes |
 |---|---|---|---|---|
-| AC-001 | Unread count displays as badge | ✅ Verified | `tests/api/notifications.test.ts:18` | |
-| AC-002 | Click marks as read and navigates | ✅ Verified | `tests/e2e/notifications.spec.ts:34` | |
-| AC-003 | User can disable email notifications | ⚠️ Partial | `tests/api/notifications.test.ts:67` | Test exists but doesn't cover all cases |
+| AC-001 | Unread count displays as badge | ✅ Verified | `tests/api/notifications.test.ts` | |
+| AC-002 | Click marks as read and navigates | ✅ Verified | `tests/e2e/notifications.spec.ts` | |
+| AC-003 | User can disable email notifications | ⚠️ Partial | `tests/api/notifications.test.ts` | Test exists but doesn't cover all cases |
 | AC-004 | Preference change takes effect immediately | ❌ Missing | — | No test found |
 | AC-005 | Mark all as read in single action | ❌ Missing | — | FR-006 missing |
 
