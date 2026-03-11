@@ -1,0 +1,137 @@
+# LiveSpec Rules for Cursor
+
+## READ THIS FIRST ON EVERY PROJECT LOAD
+
+When you open a project that contains a `.specs/` directory:
+
+1. **Read `.specs/spec-system.md` immediately.** This file contains all the rules for how specs work in this project. Follow them.
+2. **Read `.specs/constitution.md`** to understand the architecture principles and conventions.
+3. **Read `.specs/stacks/_default.md`** to understand the tech stack and why choices were made.
+
+If `.specs/spec-system.md` does not exist, suggest running `/spec.init` to initialize LiveSpec.
+
+---
+
+## Core Rules
+
+### Before modifying any code
+
+1. Check if a spec exists for the feature you're modifying: `.specs/features/*/spec.md`
+2. Read the spec to understand the expected behavior
+3. Verify that your change conforms to the Acceptance Criteria (AC-001, etc.)
+4. If your change modifies **behavior** (not just internals): update `spec.md` first
+
+### After implementing any code
+
+1. Update `.specs/features/NNN-feature-name/implementation.md` with the files you modified and line numbers
+2. Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
+   - Date, Type (Feature/Bugfix/Refactor/Spec Update), Description
+   - Files modified, AC impacted, Author
+
+### When creating a new feature
+
+ALWAYS follow this sequence:
+```
+1. /spec.specify — create the spec first
+2. /spec.plan    — generate technical plan with diagrams
+3. /spec.implement — implement according to the plan
+4. /spec.check   — verify spec vs code
+```
+
+Do NOT skip steps. Do NOT implement without a spec.
+
+---
+
+## Spec Commands
+
+Type these in the Cursor command palette or chat to trigger LiveSpec workflows:
+
+| Command | What it does |
+|---|---|
+| `/spec.init` | 3-phase brainstorm to initialize LiveSpec in this project |
+| `/spec.specify "feature description"` | Create a new feature spec with Mermaid flows |
+| `/spec.plan [feature]` | Generate technical plan with sequence/state/ER diagrams |
+| `/spec.implement [feature]` | Full implementation pipeline with testing |
+| `/spec.check [feature]` | Compare spec vs code, find gaps |
+| `/spec.explain [feature or question]` | Living documentation with visual diagrams |
+| `/spec.stack` | View or evolve the project stack |
+
+---
+
+## Mermaid Diagram Rules
+
+- Every user story in `spec.md` **MUST** have a Mermaid flowchart
+- Every `plan.md` with API calls **MUST** have a Mermaid sequence diagram
+- Every entity with lifecycle states **MUST** have a Mermaid state diagram
+- Every new database schema **MUST** have a Mermaid ER diagram
+
+These are not optional. If they're missing, the spec is incomplete.
+
+---
+
+## File Structure
+
+When LiveSpec is active in a project:
+
+```
+.specs/
+├── spec-system.md          ← READ FIRST — universal rules
+├── constitution.md         ← Architecture principles
+├── project.md              ← Vision, users, constraints
+├── stacks/
+│   ├── _default.md         ← Chosen stack + reasoning
+│   └── decisions/          ← ADRs (why each choice was made)
+├── testing/
+│   └── strategy.md         ← Testing approach
+└── features/
+    └── NNN-feature-name/
+        ├── spec.md          ← WHAT and WHY (user stories, AC, FR, Mermaid)
+        ├── plan.md          ← HOW (diagrams, file-by-file plan)
+        ├── implementation.md ← WHERE (FR/AC → file:line mapping)
+        ├── changelog.md     ← WHEN (history of every change)
+        ├── contracts/       ← API contracts (OpenAPI)
+        └── baselines/       ← Playwright visual baselines
+```
+
+---
+
+## Quality Standards
+
+### Spec must have:
+- [ ] User stories with priorities (P1/P2/P3)
+- [ ] Mermaid flowchart for EVERY user story
+- [ ] Acceptance Criteria (AC-001, ...)
+- [ ] Functional Requirements (FR-001, ...)
+- [ ] Key Entities, Edge Cases, Success Criteria
+
+### Plan must have:
+- [ ] Technical Context table (stack-aware)
+- [ ] Constitution Check gates
+- [ ] Mermaid sequence diagrams (if API calls exist)
+- [ ] Mermaid state diagrams (if entities have states)
+- [ ] Mermaid ER diagrams (if new tables created)
+- [ ] File-by-file implementation steps
+- [ ] Testing strategy table
+
+### Implementation must have:
+- [ ] implementation.md with all FR/AC mapped to file:line
+- [ ] All tests passing
+- [ ] changelog.md updated
+- [ ] Visual baselines captured (if UI feature)
+
+---
+
+## Do Not
+
+- ❌ Write code without a spec
+- ❌ Leave specs stale after behavior changes
+- ❌ Skip updating `implementation.md`
+- ❌ Skip updating `changelog.md`
+- ❌ Create a spec without Mermaid flowcharts
+- ❌ Create a plan without diagrams for API/stateful/data features
+- ❌ Make silent architectural decisions — document them as ADRs
+
+---
+
+*LiveSpec Cursor Adapter v1.0*
+*Source: https://github.com/julien-m/livespec*
