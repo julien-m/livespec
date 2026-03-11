@@ -212,7 +212,7 @@ STEP 5 — Validate
   5.4 npx playwright test (if applicable)
 
 STEP 6 — Document
-  6.1 Create/update implementation.md with FR/AC → file:line mapping
+  6.1 Create/update implementation.md with FR/AC → @spec anchor mapping
   6.2 Add changelog entry with type, files, AC impacted, author
 
 STEP 7 — Report
@@ -236,7 +236,7 @@ STEP 1 — Resolve Feature
 
 STEP 2 — Extract Requirements
   2.1 Read spec.md → extract all AC and FR
-  2.2 Read implementation.md → get file:line mappings
+  2.2 Read implementation.md → get @spec anchor mappings
 
 STEP 3 — Verify Implementation
   3.1 For each FR: read mapped code, verify it satisfies the requirement

@@ -29,20 +29,22 @@
 
 ## Requirement Mapping
 
-> Maps each Functional Requirement to the files and lines where it is implemented.
+> Maps each Functional Requirement to the files and `@spec` anchor comments where it is implemented.
 
-| Requirement | File(s) | Lines | Status | Last Verified |
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
-| FR-001: [Brief FR description] | `src/data/notifications.ts` | 12–34 | ✅ Implemented | YYYY-MM-DD |
-| FR-002: [Brief FR description] | `src/hooks/useNotificationSubscription.ts` | 8–52 | ✅ Implemented | YYYY-MM-DD |
-| FR-003: [Brief FR description] | `src/data/notifications.ts` | 36–48 | ✅ Implemented | YYYY-MM-DD |
-| FR-004: [Brief FR description] | `src/components/notifications/NotificationItem.tsx` | 22–31 | ✅ Implemented | YYYY-MM-DD |
-| FR-005: [Brief FR description] | `src/api/notifications/route.ts` | 78–112 | ⚠️ Partial | YYYY-MM-DD |
+| FR-001: [Brief FR description] | `src/data/notifications.ts` | `@spec FR-001` | ✅ Implemented | YYYY-MM-DD |
+| FR-002: [Brief FR description] | `src/hooks/useNotificationSubscription.ts` | `@spec FR-002` | ✅ Implemented | YYYY-MM-DD |
+| FR-003: [Brief FR description] | `src/data/notifications.ts` | `@spec FR-003` | ✅ Implemented | YYYY-MM-DD |
+| FR-004: [Brief FR description] | `src/components/notifications/NotificationItem.tsx` | `@spec FR-004` | ✅ Implemented | YYYY-MM-DD |
+| FR-005: [Brief FR description] | `src/api/notifications/route.ts` | `@spec FR-005` | ⚠️ Partial | YYYY-MM-DD |
 | FR-006: [Brief FR description] | — | — | ❌ Missing | YYYY-MM-DD |
 
 **Notes:**
 - FR-005 is partial: endpoint exists but preference validation is incomplete (see issue #42)
 - FR-006 is not yet implemented — scheduled for next sprint
+
+> **How `@spec` anchors work:** Place an inline comment in the source file next to the implementing function/class (e.g. `// @spec FR-001` in TypeScript/JavaScript, `# @spec FR-001` in Python, `-- @spec FR-001` in SQL). Use `grep -rn "@spec FR-001"` to locate any requirement instantly, regardless of line number changes. Multiple requirements can share one anchor: `// @spec FR-001 FR-003`.
 
 ---
 

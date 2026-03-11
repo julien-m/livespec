@@ -142,8 +142,8 @@ Create or update `.specs/features/NNN-feature-name/implementation.md`:
 For every FR and AC, fill in:
 
 ```markdown
-| FR-001 | src/data/notifications.ts | 12–34 | ✅ Implemented | 2024-03-15 |
-| FR-002 | src/hooks/useNotificationSubscription.ts | 8–52 | ✅ Implemented | 2024-03-15 |
+| FR-001 | src/data/notifications.ts | `@spec FR-001` | ✅ Implemented | 2024-03-15 |
+| FR-002 | src/hooks/useNotificationSubscription.ts | `@spec FR-002` | ✅ Implemented | 2024-03-15 |
 ```
 
 For every visual baseline:
@@ -178,7 +178,7 @@ Also add a summary entry to `.specs/changelog.md` (global).
 .specs/features/004-notifications/
 ├── spec.md              ← Unchanged
 ├── plan.md              ← Unchanged
-├── implementation.md    ← Created/updated with FR→file:line mapping
+├── implementation.md    ← Created/updated with FR→@spec mapping
 ├── changelog.md         ← Updated with new entry
 └── baselines/           ← Playwright screenshots (if UI feature)
     ├── panel-empty.png

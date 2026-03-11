@@ -23,7 +23,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | Problem | LiveSpec Solution |
 |---|---|
 | No visuals | **Mermaid diagrams mandatory** in every spec and plan |
-| No traceability | **Implementation mapping** — every spec requirement links to `file:line` |
+| No traceability | **Implementation mapping** — every spec requirement links to `@spec` anchors in code |
 | Specs rot after launch | **Living docs** — specs updated when behavior changes |
 | No history | **Per-feature changelogs** — every change is recorded |
 | No visual testing | **Playwright baselines** built into implementation + check |
@@ -96,7 +96,7 @@ bash /tmp/livespec-init.sh
 │   └── 001-notifications/
 │       ├── spec.md          ← WHAT and WHY (user stories, Mermaid flows, AC, FR)
 │       ├── plan.md          ← HOW (sequence/state/ER diagrams, file-by-file plan)
-│       ├── implementation.md ← WHERE in code (FR/AC → file:line mapping)
+│       ├── implementation.md ← WHERE in code (FR/AC → @spec mapping)
 │       ├── changelog.md     ← WHEN (every change recorded)
 │       ├── contracts/       ← API contracts (OpenAPI/GraphQL)
 │       └── baselines/       ← Playwright visual screenshots
@@ -124,7 +124,7 @@ LiveSpec is **tool-agnostic**. All commands are written as Markdown skills that 
 | Feature | LiveSpec | Spec Kit (GitHub) | APEX (aiblueprint) |
 |---|---|---|---|
 | Mermaid diagrams | ✅ Mandatory | ❌ None | ❌ None |
-| Spec-to-code traceability | ✅ FR/AC → file:line | ❌ None | ⚠️ Partial |
+| Spec-to-code traceability | ✅ FR/AC → `@spec` anchors | ❌ None | ⚠️ Partial |
 | Per-feature changelogs | ✅ Yes | ❌ No | ❌ No |
 | Visual testing baselines | ✅ Playwright | ❌ None | ❌ None |
 | Stack presets + decision trees | ✅ Yes | ❌ No | ⚠️ Minimal |
