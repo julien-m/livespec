@@ -2,6 +2,9 @@
 
 > APEX-compatible skill file for Claude Code.
 > Registers all `/spec.*` commands following the APEX skill format.
+>
+> **Installation:** This file is installed to `CLAUDE.md` at project root by `/spec.link claude-code`
+> or globally to `~/.claude/skills/livespec.md` with `/spec.link claude-code --global`.
 
 ---
 
@@ -73,7 +76,7 @@ STEP 3 — Phase C: Installation
   3.10 Report: list all created files with descriptions
 ```
 
-**Reference:** `commands/init.md`
+**Reference:** `.specs/commands/init.md` (or `commands/init.md` in the LiveSpec repository)
 
 ---
 
@@ -119,7 +122,7 @@ STEP 5 — Report
   5.3 Suggest next: /spec.plan [feature]
 ```
 
-**Reference:** `commands/specify.md`
+**Reference:** `.specs/commands/specify.md` (or `commands/specify.md` in the LiveSpec repository)
 
 ---
 
@@ -171,7 +174,7 @@ STEP 8 — Report
   8.3 Suggest next: /spec.implement [feature]
 ```
 
-**Reference:** `commands/plan.md`
+**Reference:** `.specs/commands/plan.md` (or `commands/plan.md` in the LiveSpec repository)
 
 ---
 
@@ -220,7 +223,7 @@ STEP 7 — Report
   7.2 Suggest: /spec.check [feature] to verify
 ```
 
-**Reference:** `commands/implement.md`
+**Reference:** `.specs/commands/implement.md` (or `commands/implement.md` in the LiveSpec repository)
 
 ---
 
@@ -254,7 +257,7 @@ STEP 5 — Report
   5.3 Ask if implementation.md should be updated with current status
 ```
 
-**Reference:** `commands/check.md`
+**Reference:** `.specs/commands/check.md` (or `commands/check.md` in the LiveSpec repository)
 
 ---
 
@@ -289,7 +292,7 @@ STEP 3 — Generate Summary
   3.9 History (recent changelog entries)
 ```
 
-**Reference:** `commands/explain.md`
+**Reference:** `.specs/commands/explain.md` (or `commands/explain.md` in the LiveSpec repository)
 
 ---
 
@@ -319,7 +322,40 @@ STEP 3 — Confirm and Execute
   3.4 Optionally generate migration specs for affected features
 ```
 
-**Reference:** `commands/stack.md`
+**Reference:** `.specs/commands/stack.md` (or `commands/stack.md` in the LiveSpec repository)
+
+---
+
+### `/spec.link` — Install AI Tool Adapters
+
+**Description:** Copy command docs to `.specs/commands/` and install the adapter for the specified AI tool.
+
+**Steps:**
+
+```
+STEP 1 — Determine Tool(s)
+  1.1 If tool argument provided: use it (copilot | claude-code | cursor | all)
+  1.2 If no argument: auto-detect from project files
+      - .github/ present → include copilot
+      - CLAUDE.md present → include claude-code
+      - .cursorrules present → include cursor
+
+STEP 2 — Copy Command Files
+  2.1 Create .specs/commands/ directory
+  2.2 Copy all 8 command docs (init, specify, plan, implement, check, explain, stack, link)
+  2.3 Skip files that already exist unless --force passed
+
+STEP 3 — Install Adapter
+  3.1 copilot: create .github/copilot-instructions.md from adapters/copilot/agent.md
+  3.2 claude-code: create CLAUDE.md from adapters/claude-code/SKILL.md
+               OR with --global: symlink ~/.claude/skills/livespec.md
+  3.3 cursor: copy/append adapters/cursor/.cursorrules to .cursorrules
+
+STEP 4 — Report
+  4.1 Print summary of files created, updated, or skipped
+```
+
+**Reference:** `.specs/commands/link.md` (or `commands/link.md` in the LiveSpec repository)
 
 ---
 

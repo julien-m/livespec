@@ -1,5 +1,8 @@
 # LiveSpec Rules for Cursor
 
+> **Installation:** This file is installed to `.cursorrules` at project root by `/spec.link cursor`
+> or `bash scripts/link.sh --tool cursor`.
+
 ## READ THIS FIRST ON EVERY PROJECT LOAD
 
 When you open a project that contains a `.specs/` directory:
@@ -46,15 +49,18 @@ Do NOT skip steps. Do NOT implement without a spec.
 
 Type these in the Cursor command palette or chat to trigger LiveSpec workflows:
 
-| Command | What it does |
-|---|---|
-| `/spec.init` | 3-phase brainstorm to initialize LiveSpec in this project |
-| `/spec.specify "feature description"` | Create a new feature spec with Mermaid flows |
-| `/spec.plan [feature]` | Generate technical plan with sequence/state/ER diagrams |
-| `/spec.implement [feature]` | Full implementation pipeline with testing |
-| `/spec.check [feature]` | Compare spec vs code, find gaps |
-| `/spec.explain [feature or question]` | Living documentation with visual diagrams |
-| `/spec.stack` | View or evolve the project stack |
+For detailed steps for each command, read the corresponding file in `.specs/commands/`.
+
+| Command | What it does | Detailed instructions |
+|---|---|---|
+| `/spec.init` | 3-phase brainstorm to initialize LiveSpec in this project | `.specs/commands/init.md` |
+| `/spec.specify "feature description"` | Create a new feature spec with Mermaid flows | `.specs/commands/specify.md` |
+| `/spec.plan [feature]` | Generate technical plan with sequence/state/ER diagrams | `.specs/commands/plan.md` |
+| `/spec.implement [feature]` | Full implementation pipeline with testing | `.specs/commands/implement.md` |
+| `/spec.check [feature]` | Compare spec vs code, find gaps | `.specs/commands/check.md` |
+| `/spec.explain [feature or question]` | Living documentation with visual diagrams | `.specs/commands/explain.md` |
+| `/spec.stack` | View or evolve the project stack | `.specs/commands/stack.md` |
+| `/spec.link [tool]` | Install AI tool adapters and copy command docs | `.specs/commands/link.md` |
 
 ---
 
@@ -78,6 +84,15 @@ When LiveSpec is active in a project:
 ├── spec-system.md          ← READ FIRST — universal rules
 ├── constitution.md         ← Architecture principles
 ├── project.md              ← Vision, users, constraints
+├── commands/               ← LiveSpec command docs (installed by /spec.link)
+│   ├── init.md
+│   ├── specify.md
+│   ├── plan.md
+│   ├── implement.md
+│   ├── check.md
+│   ├── explain.md
+│   ├── stack.md
+│   └── link.md
 ├── stacks/
 │   ├── _default.md         ← Chosen stack + reasoning
 │   └── decisions/          ← ADRs (why each choice was made)
