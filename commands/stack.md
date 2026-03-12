@@ -1,3 +1,8 @@
+---
+description: "View current stack, analyze change impact, create ADRs"
+argument-hint: "[change description]"
+---
+
 # Command: /spec.stack
 
 > Evolve your stack and analyze the impact on existing features.

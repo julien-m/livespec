@@ -1,3 +1,8 @@
+---
+description: "Generate technical plan with sequence, state, and ER diagrams"
+argument-hint: "<feature-name>"
+---
+
 # Command: /spec.plan
 
 > Generate a technical plan with sequence, state, and ER diagrams from a feature spec.

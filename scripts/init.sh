@@ -250,14 +250,14 @@ See the available presets for guidance:
   esac
 
   if [[ -n "$link_tool" ]]; then
-    local link_script="$SCRIPT_DIR/link.sh"
-    if [[ -f "$link_script" ]]; then
-      local dry_flag=""
-      [[ "$DRY_RUN" == true ]] && dry_flag="--dry-run"
-      bash "$link_script" --tool "$link_tool" --livespec-dir "$LIVESPEC_ROOT" $dry_flag "$PROJECT_DIR"
+    local install_script="$SCRIPT_DIR/install.sh"
+    if [[ -f "$install_script" ]]; then
+      local flags="--tool $link_tool"
+      [[ "$DRY_RUN" == true ]] && flags="$flags --dry-run"
+      bash "$install_script" $flags
     else
-      warn "link.sh not found at $link_script — skipping adapter installation."
-      info "Run 'bash scripts/link.sh --tool $link_tool' manually to install the adapter."
+      warn "install.sh not found at $install_script — skipping adapter installation."
+      info "Run 'bash scripts/install.sh --tool $link_tool' manually to install the adapter."
     fi
   fi
 
@@ -281,8 +281,7 @@ See the available presets for guidance:
   echo ""
   if [[ -z "$link_tool" ]]; then
     echo -e "  4. ${YELLOW}Link your AI tool (skipped):${RESET}"
-    echo -e "     Run ${BOLD}/spec.link [copilot|claude-code|cursor|all]${RESET} to install adapters"
-    echo -e "     OR run ${BOLD}bash scripts/link.sh --tool all${RESET}"
+    echo -e "     Run ${BOLD}bash scripts/install.sh${RESET} to install adapters"
     echo ""
   fi
   echo -e "  ${BLUE}Documentation:${RESET} https://github.com/julien-m/livespec"

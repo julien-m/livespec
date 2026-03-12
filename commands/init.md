@@ -1,3 +1,7 @@
+---
+description: "Initialize LiveSpec in a project through a 3-phase conversational brainstorm"
+---
+
 # Command: /spec.init
 
 > Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
@@ -223,6 +227,21 @@ After confirmation, the AI creates the `.specs/` directory structure:
 │
 └── changelog.md            ← Global changelog (initial entry)
 ```
+
+### Step 3.11 — Install LiveSpec section in CLAUDE.md
+
+After creating the `.specs/` structure, install the LiveSpec section in the project's `CLAUDE.md`:
+
+1. **If `CLAUDE.md` does not exist** → create it with the LiveSpec section (from the SKILL.md "CLAUDE.md Template")
+2. **If `CLAUDE.md` exists but does NOT contain `<!-- livespec:start -->`** → append the LiveSpec section at the end
+3. **If `CLAUDE.md` exists and contains `<!-- livespec:start -->`** → replace everything between `<!-- livespec:start -->` and `<!-- livespec:end -->` markers (idempotent update)
+
+The content of the section is defined in the LiveSpec skill file (`adapters/claude-code/SKILL.md`, section "CLAUDE.md Template"). It includes:
+- Mandatory rules summary
+- Available commands list
+- Key files reference
+
+This ensures that Claude Code automatically follows LiveSpec rules when working in the project.
 
 **Installation output:**
 

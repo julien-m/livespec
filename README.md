@@ -33,34 +33,33 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
-## The 8 Commands
+## The 7 Commands
 
 | Command | What it does |
 |---|---|
-| `/spec.init` | 3-phase conversational brainstorm → generates project profile, stack, and `.specs/` structure |
+| `/spec.init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md |
 | `/spec.specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
 | `/spec.plan` | Generate technical plan with sequence, state, and ER diagrams |
 | `/spec.implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec |
 | `/spec.check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
 | `/spec.explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
-| `/spec.link` | Install AI tool adapters and make commands discoverable in your project |
 
 ---
 
 ## Quick Start
 
+### Claude Code (recommended)
+
 ```bash
-# 1. Install LiveSpec in your project
-# Tip: review the script before running: https://github.com/julien-m/livespec/blob/main/scripts/init.sh
-curl -s https://raw.githubusercontent.com/julien-m/livespec/main/scripts/init.sh -o /tmp/livespec-init.sh
-bash /tmp/livespec-init.sh
+# 1. Clone LiveSpec
+git clone https://github.com/julien-m/livespec.git ~/livespec
 
-# 2. Link your AI tool (installs adapter + copies command docs)
-/spec.link copilot    # or claude-code, cursor, all
-# OR: bash /path/to/livespec/scripts/link.sh --tool copilot
+# 2. Install skill + commands globally
+bash ~/livespec/scripts/install.sh
 
-# 3. Or initialize via your AI tool (includes linking prompt)
+# 3. Initialize LiveSpec in your project (creates .specs/ + CLAUDE.md)
+cd your-project
 /spec.init
 
 # 4. Create your first feature spec
@@ -79,6 +78,18 @@ bash /tmp/livespec-init.sh
 /spec.explain "how do notifications work?"
 ```
 
+### Other AI tools (Copilot, Cursor)
+
+```bash
+# Run install.sh — interactive selector auto-detects your tools
+bash ~/livespec/scripts/install.sh
+
+# Or specify tools directly (non-interactive / CI)
+bash ~/livespec/scripts/install.sh --tool copilot
+bash ~/livespec/scripts/install.sh --tool cursor
+bash ~/livespec/scripts/install.sh --tool all
+```
+
 ---
 
 ## Project Structure Created by `/spec.init`
@@ -88,16 +99,6 @@ bash /tmp/livespec-init.sh
 ├── spec-system.md          ← The rules (READ FIRST — every tool reads this)
 ├── constitution.md         ← Project architecture principles
 ├── project.md              ← Vision, users, constraints (from brainstorm)
-│
-├── commands/               ← LiveSpec command docs (installed by /spec.link)
-│   ├── init.md
-│   ├── specify.md
-│   ├── plan.md
-│   ├── implement.md
-│   ├── check.md
-│   ├── explain.md
-│   ├── stack.md
-│   └── link.md
 │
 ├── stacks/
 │   ├── _default.md         ← Your chosen stack + reasoning
@@ -125,32 +126,25 @@ bash /tmp/livespec-init.sh
 
 LiveSpec is **tool-agnostic**. All commands are written as Markdown skills that any AI can follow.
 
-| Tool | Adapter | Location | Installed to |
-|---|---|---|---|
-| GitHub Copilot | Agent config | `adapters/copilot/agent.md` | `.github/copilot-instructions.md` |
-| Claude Code / APEX | Skill file | `adapters/claude-code/SKILL.md` | `CLAUDE.md` (or `~/.claude/skills/livespec.md`) |
-| Cursor | Rules file | `adapters/cursor/.cursorrules` | `.cursorrules` |
-| Any AI | Paste `system/spec-system.md` | Works universally | — |
+| Tool | Installation | What it installs |
+|---|---|---|
+| **Claude Code** | `bash scripts/install.sh` | 1 skill (`~/.claude/skills/livespec/`) + 7 commands (`~/.claude/commands/spec.*.md`) via symlinks |
+| GitHub Copilot | `bash scripts/install.sh` | `.github/copilot-instructions.md` via symlink |
+| Cursor | `bash scripts/install.sh` | `.cursorrules` via symlink |
+| Any AI | Paste `system/spec-system.md` | Works universally |
 
-### Linking adapters with `/spec.link`
-
-After running `/spec.init`, link your AI tool so it knows where to find LiveSpec commands:
+### `install.sh`
 
 ```bash
-/spec.link copilot       # Creates .github/copilot-instructions.md
-/spec.link claude-code   # Creates CLAUDE.md at project root
-/spec.link cursor        # Copies/appends to .cursorrules
-/spec.link all           # All of the above
+bash scripts/install.sh              # Interactive selector (auto-detects tools)
+bash scripts/install.sh --tool all   # Install all tools (non-interactive)
+bash scripts/install.sh --tool claude-code --tool copilot  # Specific tools
+bash scripts/install.sh --dry-run    # Preview without changes
+bash scripts/install.sh --force      # Overwrite existing files
+bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-This also copies all command documentation into `.specs/commands/` so your AI tool can read detailed instructions locally without accessing the LiveSpec repository.
-
-To run as a shell script directly:
-
-```bash
-bash /path/to/livespec/scripts/link.sh --tool copilot
-bash /path/to/livespec/scripts/link.sh --tool all --force
-```
+All installations use symlinks — changes to the LiveSpec repo are immediately reflected, no re-install needed.
 
 ---
 
@@ -178,7 +172,7 @@ livespec/
 ├── README.md
 ├── system/
 │   ├── spec-system.md              ← Core rules (install in .specs/)
-│   ├── constitution-template.md   ← Constitution template
+│   ├── constitution-template.md    ← Constitution template
 │   └── templates/
 │       ├── spec-template.md
 │       ├── plan-template.md
@@ -191,22 +185,21 @@ livespec/
 │       ├── web-realtime.md
 │       ├── web-static.md
 │       └── api-rest.md
-├── commands/
+├── commands/                       ← Command docs (symlinked by install.sh)
 │   ├── init.md
 │   ├── specify.md
 │   ├── plan.md
 │   ├── implement.md
 │   ├── check.md
 │   ├── explain.md
-│   ├── stack.md
-│   └── link.md                    ← /spec.link command
+│   └── stack.md
 ├── scripts/
-│   ├── init.sh                    ← Bootstrap .specs/ structure
-│   └── link.sh                    ← Install adapters + command docs
+│   ├── install.sh                  ← Unified installer (Claude Code + Copilot + Cursor)
+│   └── init.sh                     ← Bootstrap .specs/ structure (shell)
 └── adapters/
-    ├── copilot/agent.md           ← → .github/copilot-instructions.md
-    ├── claude-code/SKILL.md       ← → CLAUDE.md or ~/.claude/skills/livespec.md
-    └── cursor/.cursorrules        ← → .cursorrules
+    ├── copilot/agent.md            ← → .github/copilot-instructions.md
+    ├── claude-code/SKILL.md        ← → ~/.claude/skills/livespec/SKILL.md
+    └── cursor/.cursorrules         ← → .cursorrules
 ```
 
 ---

@@ -1,3 +1,8 @@
+---
+description: "Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR"
+argument-hint: "<feature description>"
+---
+
 # Command: /spec.specify
 
 > Create a new feature spec with user stories, Mermaid flowcharts, acceptance criteria, and functional requirements.

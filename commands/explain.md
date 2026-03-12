@@ -1,3 +1,8 @@
+---
+description: "Living documentation — understand how a feature works"
+argument-hint: "<feature-name or question>"
+---
+
 # Command: /spec.explain
 
 > Living documentation — understand how any feature works without reading code.

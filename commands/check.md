@@ -1,3 +1,8 @@
+---
+description: "Verify spec vs code alignment and produce gap report"
+argument-hint: "<feature-name>"
+---
+
 # Command: /spec.check
 
 > Compare spec vs actual code — find gaps, verify AC coverage, detect visual drift.

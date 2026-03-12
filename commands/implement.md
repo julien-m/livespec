@@ -1,3 +1,8 @@
+---
+description: "Auto-implement from plan: analyze, code, test, map"
+argument-hint: "<feature-name>"
+---
+
 # Command: /spec.implement
 
 > APEX-style auto-pipeline: implement → test → visual baselines → map to spec.

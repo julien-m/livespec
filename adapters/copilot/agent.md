@@ -3,8 +3,7 @@
 > This file configures GitHub Copilot as a LiveSpec-aware agent.
 > It registers all `/spec.*` commands and instructs the agent to follow the spec system.
 >
-> **Installation:** This file is installed to `.github/copilot-instructions.md` by `/spec.link copilot`
-> or `bash scripts/link.sh --tool copilot`.
+> **Installation:** This file is installed to `.github/copilot-instructions.md` by `bash scripts/install.sh`.
 
 ---
 
@@ -147,24 +146,6 @@ If `.specs/spec-system.md` does not exist, suggest running `bash <(curl -s https
 - `/spec.stack` — show current stack
 - `/spec.stack change "we need Edge deployment"`
 - `/spec.stack decisions` — list all ADRs
-
----
-
-### `/spec.link`
-
-**Description:** Install AI tool adapters and make LiveSpec commands discoverable in your project.
-
-**Full instructions:** See `.specs/commands/link.md` in this project.
-
-**Summary:**
-1. Copy all command docs to `.specs/commands/` so the AI can read them locally
-2. Install the adapter for the specified tool (copilot, claude-code, cursor, or all)
-3. Auto-detect which tools are present if no tool specified
-
-**Usage:**
-- `/spec.link` — auto-detect and link all found tools
-- `/spec.link copilot`
-- `/spec.link all --force`
 
 ---
 
