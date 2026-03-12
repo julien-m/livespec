@@ -50,6 +50,20 @@ From the spec, extract:
 - User Stories with API interactions (for sequence diagrams)
 - Entities with states/lifecycle (for state diagrams)
 
+### Step 3.5 — Scope Sizing (Avoid Over-Planning)
+
+Classify feature size before generating artifacts:
+
+- **S (small):** <= 3 FR, no new entity, single API route
+- **M (medium):** 4-8 FR, 1-2 entities, multiple interactions
+- **L (large):** > 8 FR, cross-domain dependencies, migration risk
+
+Apply output budget:
+
+- S: 1 sequence diagram max, no ER unless new entity exists
+- M: 1-2 sequence + state if lifecycle exists + ER if needed
+- L: full set + explicit risk section with phased delivery
+
 ### Step 4 — Generate Technical Context
 
 Auto-fill from `.specs/stacks/_default.md`:
@@ -176,6 +190,21 @@ If the feature introduces new API endpoints:
 | `--auto` | Skip confirmation, generate plan silently |
 | `--no-contracts` | Skip API contract generation |
 | `--diagram-only` | Regenerate only the Mermaid diagrams in an existing plan |
+
+---
+
+## Definition of Done (Command-Level)
+
+`/spec.plan` is complete only if all are true:
+
+- [ ] `plan.md` generated in target feature directory
+- [ ] Every FR appears in implementation plan mapping
+- [ ] Diagram set matches feature size and real needs (not boilerplate)
+- [ ] Constitution check contains explicit pass/deviation notes
+- [ ] Testing strategy maps AC/FR to concrete test files
+- [ ] Next action is proposed (`/spec.implement [feature]`)
+
+If a requirement cannot be planned safely, mark it `[DECISION NEEDED]` with owner and unblock options.
 
 ---
 

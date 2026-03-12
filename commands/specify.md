@@ -33,6 +33,15 @@ Extract from user input:
 /spec.specify "As a designer, I want to bid on jobs"
 ```
 
+### Step 1.5 — Ambiguous Input Protocol
+
+If input is ambiguous, run this protocol before generating files:
+
+1. If request contains **multiple independent features**, propose splitting into separate specs and ask for confirmation.
+2. If request is primarily a **bugfix**, route to existing feature and ask whether to update current spec or create a dedicated bugfix feature.
+3. If user mentions implementation details only ("use Redis", "add endpoint") without user outcome, ask for the user-facing behavior first.
+4. Limit clarification to **max 2 questions**, then proceed with explicit assumptions marked `[ASSUMED]` in `spec.md`.
+
 ### Step 2 — Auto-Number the Feature
 
 1. Scan `.specs/features/` for existing directories
@@ -161,7 +170,7 @@ git checkout -b feature/004-notifications
 - **Branch:** feature/004-notification-preferences
 - **Date:** 2024-03-15
 - **Status:** Draft
-- **Input:** User can manage their notification preferences...
+- **Input:** User can manage leur notification preferences...
 - **Feature Number:** 004
 
 ## User Scenarios & Testing
@@ -194,6 +203,21 @@ flowchart TD
 | `--branch` | Automatically create git branch after spec creation |
 | `--no-branch` | Skip branch creation prompt |
 | `--priority [P1|P2|P3]` | Override all stories to specified priority |
+
+---
+
+## Definition of Done (Command-Level)
+
+`/spec.specify` is complete only if all are true:
+
+- [ ] Feature directory `NNN-feature-name/` exists
+- [ ] `spec.md` exists and contains required sections
+- [ ] Every user story has a Mermaid flowchart
+- [ ] Every FR maps to >= 1 AC
+- [ ] `spec.md` includes either explicit values or `[ASSUMED]` markers for missing context
+- [ ] Next action is proposed (`/spec.plan [feature]`)
+
+If any item fails, fix before returning final output.
 
 ---
 

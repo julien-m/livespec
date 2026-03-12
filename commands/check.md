@@ -42,6 +42,25 @@ From `.specs/features/NNN-feature-name/implementation.md`, get:
 - Visual baselines list
 - Known gaps from last check
 
+### Step 3.5 — Mapping Recovery Mode
+
+If `implementation.md` is missing or incomplete:
+
+1. Build a temporary mapping by searching `@spec FR-*` anchors in source files.
+2. Infer AC coverage from test names/assertions and test metadata.
+3. Mark inferred links as `~ Inferred` (never as fully verified mapping).
+4. Recommend updating `implementation.md` at end of run.
+
+### Evidence Standard (No Guessing)
+
+A requirement can be marked ✅ only if at least one of these is present:
+
+- Direct code evidence at mapped location + behavior alignment
+- Passing test explicitly tied to the AC/FR
+- Explicit `@spec` anchor and coherent implementation
+
+If evidence is weak, use ⚠️ Partial with a short reason.
+
 ### Step 4 — Verify Implementation
 
 For each FR and AC:

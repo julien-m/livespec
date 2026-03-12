@@ -129,16 +129,40 @@ npm install -D vitest @playwright/test
 
 ---
 
-## Deployment Configuration
+## Deterministic Selection Profile
 
-```yaml
-# vercel.json (minimal config — most settings auto-detected)
+When this preset is selected, `_default.md` must include:
+
+- `Rendering Mode`: SSG / ISR
+- `Content Source`: git-mdx / headless-cms
+- `Interactivity Budget`: minimal / moderate
+- `Search Strategy`: Pagefind / Algolia
+- `Analytics Strategy`: Plausible / provider-native
+- `Deploy Target`: Vercel / Cloudflare Pages / Netlify
+
+If any field is unknown, set `[ASSUMED]` and list one follow-up question per unknown.
+
+### Dynamic Escalation Rule
+
+If personalization, auth complexity, or update frequency increases beyond static assumptions:
+
+- mark `Escalation Suggested: web-realtime`
+- list impacted pages/features
+- recommend running `/spec.stack impact "web-static -> web-realtime"`
+
+---
+
+## Deployment Configuration (Copy-Paste Safe)
+
+```json
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",  // or .next for Next.js
-  "framework": "astro"        // or nextjs
+  "outputDirectory": "dist",
+  "framework": "astro"
 }
 ```
+
+For Next.js static export, set `"framework": "nextjs"` and ensure static export is configured in `next.config.js`.
 
 ---
 

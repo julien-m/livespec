@@ -240,6 +240,45 @@ erDiagram
 
 ---
 
+## Deterministic Query Resolution
+
+Before reading all sources, classify the user request:
+
+- `how` -> behavior + flow explanation
+- `why` -> ADR-first explanation
+- `what changed` -> changelog-first explanation
+- `where` -> implementation mapping first
+
+If multiple features match:
+
+1. Return top 3 candidates with one-line rationale each.
+2. Ask user to pick one.
+3. If user does not pick, explain best match and label as `[ASSUMED FEATURE]`.
+
+### Output Size Control
+
+Default output mode: **concise executive explain**
+
+- Max 8 sections
+- Max 2 diagrams embedded inline
+- Remaining diagrams listed as references
+
+If user wants full detail, use `--full` (or `--history`, `--diagrams-only`, `--code`, `--why`).
+
+## Definition of Done (Command-Level)
+
+`/spec.explain` is complete only if all are true:
+
+- [ ] Question intent is explicitly identified (`how`/`why`/`what changed`/`where`)
+- [ ] Sources used are listed
+- [ ] Explanation answers user question directly in first section
+- [ ] At least one traceability reference is included (spec/plan/implementation/changelog/ADR)
+- [ ] Next useful action is suggested when relevant (`/spec.check`, `/spec.plan`, `/spec.stack`)
+
+If confidence is low, state uncertainty and ask one follow-up question.
+
+---
+
 ## Flags
 
 | Flag | Behavior |

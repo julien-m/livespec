@@ -293,4 +293,37 @@ Before implementation is considered complete:
 
 ---
 
+## Universal Command Reliability Standard
+
+Every `/spec.*` command must follow these execution rules:
+
+1. **Intent check first**
+   Confirm the command matches user intent; if not, propose the correct `/spec.*` command.
+
+2. **Ambiguity cap**
+   Ask at most 2 clarifying questions. If ambiguity remains, proceed with explicit `[ASSUMED]` markers.
+
+3. **Prerequisite gate**
+   Validate required files before writing. If missing, stop and provide the minimal recovery command.
+
+4. **Evidence-based reporting**
+   Do not mark items as complete without file/test evidence.
+
+5. **Definition of done**
+   End each command with:
+   - artifacts created/updated
+   - unresolved blockers (if any)
+   - next recommended command
+
+### Minimum Failure Report Format
+
+If command cannot complete safely, return:
+
+- `Blocked By:` exact reason
+- `Missing/Failing Artifact:` file or command
+- `Recovery:` minimal actionable steps
+- `Resume With:` exact `/spec.*` command or flag
+
+---
+
 *LiveSpec v1.0 — The spec is the source of truth.*

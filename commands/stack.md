@@ -140,6 +140,29 @@ A data migration script will be needed to move:
 ⚠️ This is a significant change. Are you sure you want to proceed?
 ```
 
+#### Step 2.5 — Migration Strategy Modes
+
+After impact analysis, classify strategy before proceeding:
+
+- **Big-bang**: full switch in one release window
+- **Phased**: dual-run and progressive feature migration
+- **Hybrid**: migrate one layer only (e.g., auth) and keep others
+
+For `Phased` and `Hybrid`, include:
+
+- Compatibility layer requirements
+- Data sync direction and cutoff point
+- Rollback trigger and rollback steps
+
+### Rollback Requirements (Mandatory)
+
+Any accepted stack change must include:
+
+1. Trigger conditions (what failure threshold causes rollback)
+2. Max rollback window (e.g., 30 min / 24h)
+3. Owner and command sequence
+4. Post-rollback validation checklist
+
 #### Step 3 — Confirm Change
 
 > I've analyzed the impact. This migration affects 4 features and will take approximately 9–12 days.
@@ -229,6 +252,21 @@ Lists all ADRs chronologically with summaries:
 | `--no-adr` | Skip ADR creation (not recommended) |
 | `--no-migration-specs` | Skip generating migration feature specs |
 | `--force` | Skip confirmation prompts |
+
+---
+
+## Definition of Done (Command-Level)
+
+`/spec.stack` is complete only if all are true:
+
+- [ ] Requested change is clearly scoped (layer(s), before/after, reason)
+- [ ] Impact analysis lists affected features with severity
+- [ ] ADR is created/updated unless `--no-adr`
+- [ ] `_default.md` reflects the active decision state
+- [ ] Migration or rollback path is documented for non-trivial changes
+- [ ] Next action is proposed (e.g., migration specs or `/spec.plan`)
+
+If uncertainty remains high, default to `--dry-run` style output and request explicit confirmation.
 
 ---
 

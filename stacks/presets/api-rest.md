@@ -247,4 +247,31 @@ app.get('/docs', Scalar({ spec: { url: '/openapi.json' } }))
 
 ---
 
+## Deterministic Preset Selection
+
+When choosing this preset, decide each axis explicitly (no implicit defaults):
+
+| Axis | Option A | Option B | Selection Rule |
+|---|---|---|---|
+| Framework | Hono | Fastify | Hono for edge/serverless, Fastify for long-lived container APIs |
+| Runtime | Node.js | Bun | Node.js unless startup latency is a strict requirement and ecosystem fit is validated |
+| Database | PostgreSQL | MongoDB | PostgreSQL by default; MongoDB only for document-first domain with low relational joins |
+| Auth | JWT middleware | OAuth adapter | JWT for service-to-service/internal APIs, OAuth for user-facing auth federation |
+| Deploy | Serverless | Containerized | Serverless for bursty workloads, containerized for stable high-throughput |
+
+Record all chosen axes in `.specs/stacks/_default.md` with one-line rationale each.
+
+### Operational Readiness Checks
+
+Before considering stack decision complete:
+
+- OpenAPI strategy chosen (generation + serving path)
+- Migration strategy selected (Drizzle or equivalent)
+- Rate limiting strategy selected (Redis or edge-native)
+- Testing scope mapped (unit/integration/smoke)
+
+If any is missing, mark `Decision Pending` and do not finalize.
+
+---
+
 *LiveSpec Stack Preset v1.0*

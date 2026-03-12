@@ -169,4 +169,29 @@ See `testing-strategy-template.md` for detailed test examples.
 
 ---
 
+## Deterministic Selection Profile
+
+When this preset is selected, generate `_default.md` with these required fields:
+
+- `Project Type`: web-realtime
+- `Primary Latency Target`: `<500ms live events` or explicit alternative
+- `Data Model`: relational/document/ephemeral
+- `Auth Mode`: Supabase Auth / custom JWT / Auth.js
+- `Deployment Mode`: edge-first / single-region
+- `Cost Posture`: low-start / balanced / performance-first
+
+If any field is unknown, set `[ASSUMED]` and list follow-up questions.
+
+### Fallback Variants
+
+If Supabase or Vercel is constrained by policy/cost/region, choose one variant explicitly:
+
+1. `Next.js + PostgreSQL + Pusher + Auth.js`
+2. `Remix + Postgres + SSE + custom JWT`
+3. `SPA + API REST backend + polling/SSE` (near-real-time only)
+
+Always document chosen variant and rejection reason for non-selected options.
+
+---
+
 *LiveSpec Stack Preset v1.0*

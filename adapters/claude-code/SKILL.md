@@ -61,3 +61,28 @@ This project uses [LiveSpec](https://github.com/julien-m/livespec).
 - `.specs/project.md` — Project vision and constraints
 - `.specs/stacks/_default.md` — Tech stack decisions
 <!-- livespec:end -->
+
+## Execution Guardrails (Deterministic)
+
+Before acting, run this mini-protocol:
+
+1. **Classify intent**
+   - New feature request -> `/spec.specify`
+   - Existing feature technical design -> `/spec.plan`
+   - Code/build task for an approved feature -> `/spec.implement`
+   - Audit/spec-code alignment -> `/spec.check`
+   - Understanding/history/"why" question -> `/spec.explain`
+   - Stack or ADR change -> `/spec.stack`
+
+2. **Resolve ambiguity first (max 2 questions)**
+   If request maps to multiple features, asks both bugfix+feature, or references missing context, ask concise disambiguation questions before writing files.
+
+3. **Fail safe on missing prerequisites**
+   - Missing `.specs/` -> run `/spec.init`
+   - Missing feature `spec.md` -> run `/spec.specify`
+   - Missing `plan.md` before implementation -> run `/spec.plan`
+
+4. **Definition of done (every command run)**
+   - Output files are explicitly listed
+   - Next command is suggested
+   - If blocked, report exact blocker and minimal recovery step

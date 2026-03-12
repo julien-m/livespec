@@ -39,6 +39,35 @@ Executes a full implementation pipeline from `plan.md` to working, tested, docum
 - Does the plan.md exist? If not, prompt to run `/spec.plan` first
 - Are there any `[DECISION NEEDED]` markers in the plan? Surface them before starting
 
+## Preflight Safety Contract
+
+Before Phase 1, run a preflight check and stop early on blockers:
+
+- [ ] Target feature directory exists
+- [ ] `spec.md` exists and status is not Deprecated
+- [ ] `plan.md` exists and contains no unresolved `[DECISION NEEDED]`
+- [ ] Project test command is known (from package scripts or project convention)
+- [ ] Required tooling is available for chosen steps (`node`, package manager, Playwright if visual)
+
+If one check fails, do not start implementation. Report blocker + minimal recovery command.
+
+### Environment Failure Protocol
+
+When tooling is broken (install failure, missing binary, config crash):
+
+1. Stop code edits after current safe checkpoint.
+2. Record `Blocked by Environment` section in execution output.
+3. Provide minimal unblock plan with exact commands.
+4. Offer `/spec.implement [feature] --resume` once unblocked.
+
+### Change Scope Guard
+
+To avoid large accidental edits:
+
+- Maximum initial touch set: 12 files.
+- If plan requires more, split into phases and ask for confirmation.
+- For each phase, list exact files before editing.
+
 ### Phase 2 — Plan Execution
 
 Create an ordered todo list from `plan.md`:
@@ -219,6 +248,21 @@ db/migrations/           ← New migration files
 | E2E tests | 5 | Stop, report failure with diffs, ask human |
 | Visual tests | 5 | Stop, report diff images, ask human to review |
 | TypeScript errors | 3 | Stop, show errors, ask human |
+
+---
+
+## Definition of Done (Command-Level)
+
+`/spec.implement` is complete only if all are true:
+
+- [ ] Planned FR scope for this run is implemented or explicitly deferred
+- [ ] Relevant tests pass for touched scope (or blocker documented)
+- [ ] `implementation.md` updated with FR/AC -> `@spec` mappings
+- [ ] Feature `changelog.md` updated
+- [ ] Global `.specs/changelog.md` updated
+- [ ] Resume point is saved when incomplete work remains
+
+If not complete, return a resumable status report instead of a success message.
 
 ---
 

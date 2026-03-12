@@ -288,4 +288,40 @@ This ensures that Claude Code automatically follows LiveSpec rules when working 
 
 ---
 
+## Execution Reliability Addendum
+
+### Ambiguity and Contradiction Handling
+
+If user answers are vague or contradictory, do not continue with hidden assumptions.
+
+1. Ask up to **2 targeted questions** to resolve conflicts.
+2. If conflict remains, present **2 explicit options** with trade-offs and ask for selection.
+3. If user says "not sure", apply conservative defaults and mark them as `[ASSUMED]` in `project.md` and `_default.md`.
+
+Common conflict examples:
+- "Global users" + "single-region low cost"
+- "No backend" + "real-time collaborative editing"
+- "Under $100/month" + "high-throughput multi-region"
+
+### Fast-Path Mode (Short Interview)
+
+If user already knows their stack, allow a compact flow:
+
+- Ask only 3 questions: project type, expected scale, must-have constraints.
+- Confirm preset and generate files.
+- Record skipped interview fields as `[NOT PROVIDED]` in `project.md`.
+
+### Exit Criteria (Must Pass)
+
+Before declaring success, verify:
+
+- [ ] `.specs/spec-system.md` exists
+- [ ] `.specs/project.md` contains users, scale, geography (or explicit placeholders)
+- [ ] `.specs/stacks/_default.md` contains chosen stack + rationale
+- [ ] At least 1 ADR exists in `.specs/stacks/decisions/`
+- [ ] `.specs/testing/strategy.md` exists
+- [ ] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block
+
+If any check fails, report the exact missing artifact and create/fix it before finishing.
+
 *LiveSpec Command v1.0*
