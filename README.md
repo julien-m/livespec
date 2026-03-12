@@ -29,7 +29,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | No visual testing | **Playwright baselines** built into implementation + check |
 | Stack decisions lost | **Stack presets with decision trees** — know WHY you chose each tool |
 | One-time init | **Brainstorm-driven init** — AI interviews you before generating anything |
-| Tool-specific | **Tool-agnostic** — works with Copilot, Claude Code, Cursor, or any AI |
+| Tool-specific | **Tool-agnostic** — works with Claude Code or any AI that reads Markdown |
 
 ---
 
@@ -55,7 +55,7 @@ Six months later, nobody knows **why** something was built the way it was.
 # 1. Clone LiveSpec
 git clone https://github.com/julien-m/livespec.git ~/livespec
 
-# 2. Install skill + commands globally
+# 2. Install /spec.* commands globally
 bash ~/livespec/scripts/install.sh
 
 # 3. Initialize LiveSpec in your project (creates .specs/ + CLAUDE.md)
@@ -78,17 +78,9 @@ cd your-project
 /spec.explain "how do notifications work?"
 ```
 
-### Other AI tools (Copilot, Cursor)
+### Other AI tools
 
-```bash
-# Run install.sh — interactive selector auto-detects your tools
-bash ~/livespec/scripts/install.sh
-
-# Or specify tools directly (non-interactive / CI)
-bash ~/livespec/scripts/install.sh --tool copilot
-bash ~/livespec/scripts/install.sh --tool cursor
-bash ~/livespec/scripts/install.sh --tool all
-```
+For any AI tool that reads Markdown, paste the content of `system/spec-system.md` into your tool's context. The spec system is tool-agnostic — any AI that can read `.specs/` will follow the rules.
 
 ---
 
@@ -122,29 +114,18 @@ bash ~/livespec/scripts/install.sh --tool all
 
 ---
 
-## Multi-Tool Support
-
-LiveSpec is **tool-agnostic**. All commands are written as Markdown skills that any AI can follow.
-
-| Tool | Installation | What it installs |
-|---|---|---|
-| **Claude Code** | `bash scripts/install.sh` | 1 skill (`~/.claude/skills/livespec/`) + 7 commands (`~/.claude/commands/spec.*.md`) via symlinks |
-| GitHub Copilot | `bash scripts/install.sh` | `.github/copilot-instructions.md` via symlink |
-| Cursor | `bash scripts/install.sh` | `.cursorrules` via symlink |
-| Any AI | Paste `system/spec-system.md` | Works universally |
-
-### `install.sh`
+## Installation
 
 ```bash
-bash scripts/install.sh              # Interactive selector (auto-detects tools)
-bash scripts/install.sh --tool all   # Install all tools (non-interactive)
-bash scripts/install.sh --tool claude-code --tool copilot  # Specific tools
+bash scripts/install.sh              # Install /spec.* commands
 bash scripts/install.sh --dry-run    # Preview without changes
-bash scripts/install.sh --force      # Overwrite existing files
+bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-All installations use symlinks — changes to the LiveSpec repo are immediately reflected, no re-install needed.
+Installs 7 commands (`~/.claude/commands/spec.*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+
+For other AI tools, paste `system/spec-system.md` into your tool's context.
 
 ---
 
@@ -161,7 +142,7 @@ All installations use symlinks — changes to the LiveSpec repo are immediately 
 | Gap detection (spec vs code) | ✅ `/spec.check` | ❌ None | ❌ None |
 | Living documentation | ✅ `/spec.explain` | ❌ None | ❌ None |
 | Stack evolution + impact | ✅ `/spec.stack` | ❌ None | ❌ None |
-| Tool-agnostic | ✅ Yes | ⚠️ GitHub only | ⚠️ Claude only |
+| Tool-agnostic | ✅ Yes (Markdown-based) | ⚠️ GitHub only | ⚠️ Claude only |
 
 ---
 
@@ -193,13 +174,9 @@ livespec/
 │   ├── check.md
 │   ├── explain.md
 │   └── stack.md
-├── scripts/
-│   ├── install.sh                  ← Unified installer (Claude Code + Copilot + Cursor)
-│   └── init.sh                     ← Bootstrap .specs/ structure (shell)
-└── adapters/
-    ├── copilot/agent.md            ← → .github/copilot-instructions.md
-    ├── claude-code/SKILL.md        ← → ~/.claude/skills/livespec/SKILL.md
-    └── cursor/.cursorrules         ← → .cursorrules
+└── scripts/
+    ├── install.sh                  ← Install /spec.* commands into ~/.claude/commands/
+    └── init.sh                     ← Bootstrap .specs/ structure (shell)
 ```
 
 ---
