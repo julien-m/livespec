@@ -293,12 +293,30 @@ Before implementation is considered complete:
 
 ---
 
+## Intent Classification
+
+Before acting on a user request, classify the intent to determine the correct command:
+
+| User intent | Command |
+|---|---|
+| New feature request | `/spec.specify` |
+| Technical design for an existing feature | `/spec.plan` |
+| Code/build task for an approved feature | `/spec.implement` |
+| Audit / spec-code alignment | `/spec.check` |
+| Understanding / history / "why" question | `/spec.explain` |
+| Stack or ADR change | `/spec.stack` |
+| No `.specs/` directory exists | `/spec.init` |
+| Feature exists but no `spec.md` | `/spec.specify` |
+| Feature has `spec.md` but no `plan.md` | `/spec.plan` |
+
+---
+
 ## Universal Command Reliability Standard
 
 Every `/spec.*` command must follow these execution rules:
 
 1. **Intent check first**
-   Confirm the command matches user intent; if not, propose the correct `/spec.*` command.
+   Confirm the command matches user intent; if not, propose the correct `/spec.*` command (see Intent Classification above).
 
 2. **Ambiguity cap**
    Ask at most 2 clarifying questions. If ambiguity remains, proceed with explicit `[ASSUMED]` markers.

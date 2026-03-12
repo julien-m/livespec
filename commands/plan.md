@@ -133,17 +133,40 @@ For each file:
 - List the functions/components to create
 - Reference which FR it satisfies
 
+### Step 7.5 — Test Resolution
+
+Before generating the testing strategy, resolve the project's test infrastructure:
+
+1. **Read `.specs/testing/strategy.md`** — check if test commands are already resolved
+2. **If not resolved**, follow the discovery procedure in `system/testing/test-protocol.md` Section 1:
+   - Detect language/runtime
+   - Detect test runners, linters, type checkers, visual testing tools
+3. **Verify availability** of detected tools
+4. **Record** resolved commands in the plan:
+
+| Action | Command | Tool | Status |
+|---|---|---|---|
+| Unit tests | `[resolved]` | `[resolved]` | Verified / Not verified |
+| Integration tests | `[resolved]` | `[resolved]` | Verified / Not verified |
+| E2E tests | `[resolved]` | `[resolved]` | Verified / Not available |
+| Visual tests | `[resolved]` | `[resolved]` | Verified / Not available |
+| Type check | `[resolved]` | `[resolved]` | Verified / N/A |
+| Lint | `[resolved]` | `[resolved]` | Verified / Not verified |
+| Full suite | `[resolved]` | `[resolved]` | Verified / Not verified |
+
+5. If a tool is missing → mark `[TOOL NEEDED: install command]` in the plan
+
 ### Step 8 — Generate Testing Strategy
 
-Based on `.specs/testing/strategy.md`, map each test type to specific files:
+Using the commands resolved in Step 7.5, map each test type to specific files based on `.specs/testing/strategy.md`:
 
 ```markdown
-| Test Type | What | File | FR/AC |
-|---|---|---|---|
-| Unit | getUnreadNotifications() | src/data/notifications.test.ts | FR-001 |
-| Integration | GET /api/notifications | tests/api/notifications.test.ts | AC-001 |
-| E2E | Full notification flow | tests/e2e/notifications.spec.ts | AC-001, AC-002 |
-| Visual | Notification panel states | tests/e2e/notifications.spec.ts | SC-004 |
+| Test Type | What | File | Command | FR/AC |
+|---|---|---|---|---|
+| Unit | getUnreadNotifications() | src/data/notifications.test.ts | `[resolved unit command] -- src/data/notifications.test.ts` | FR-001 |
+| Integration | GET /api/notifications | tests/api/notifications.test.ts | `[resolved integration command] -- tests/api/notifications.test.ts` | AC-001 |
+| E2E | Full notification flow | tests/e2e/notifications.spec.ts | `[resolved E2E command]` | AC-001, AC-002 |
+| Visual | Notification panel states | tests/e2e/notifications.spec.ts | `[resolved visual command]` | SC-004 |
 ```
 
 ### Step 9 — Generate API Contracts (if applicable)
@@ -201,6 +224,7 @@ If the feature introduces new API endpoints:
 - [ ] Every FR appears in implementation plan mapping
 - [ ] Diagram set matches feature size and real needs (not boilerplate)
 - [ ] Constitution check contains explicit pass/deviation notes
+- [ ] Test commands are resolved (Resolved Test Commands table filled)
 - [ ] Testing strategy maps AC/FR to concrete test files
 - [ ] Next action is proposed (`/spec.implement [feature]`)
 

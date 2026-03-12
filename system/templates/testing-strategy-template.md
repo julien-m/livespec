@@ -10,19 +10,38 @@
 
 | Feature Type | Test Types | Tools | When to Run |
 |---|---|---|---|
-| Business logic (pure functions) | Unit | Vitest | On every commit |
-| API endpoints | Contract + Integration | Vitest + supertest | On every commit |
-| UI Components (isolated) | Unit + Visual snapshot | Vitest + Storybook | On every commit |
-| User flows (pages) | E2E + Visual regression | Playwright | On PR + nightly |
-| Real-time features | E2E + WebSocket mocks | Playwright | On PR + nightly |
-| Database queries | Integration | Vitest + test DB | On every commit |
-| Authentication flows | E2E | Playwright | On PR |
+| Business logic (pure functions) | Unit | [Unit runner] | On every commit |
+| API endpoints | Contract + Integration | [Unit runner + HTTP testing tool] | On every commit |
+| UI Components (isolated) | Unit + Visual snapshot | [Unit runner + Visual tool] | On every commit |
+| User flows (pages) | E2E + Visual regression | [E2E runner] | On PR + nightly |
+| Real-time features | E2E + WebSocket mocks | [E2E runner] | On PR + nightly |
+| Database queries | Integration | [Unit runner + test DB] | On every commit |
+| Authentication flows | E2E | [E2E runner] | On PR |
+
+> The concrete tools are resolved by the discovery procedure in `system/testing/test-protocol.md`.
+
+---
+
+## Resolved Test Commands
+
+> Filled during `/spec.init` Phase B or `/spec.plan` Step 7.5.
+> Resolution procedure: see `system/testing/test-protocol.md`.
+
+| Action | Command | Tool | Status |
+|---|---|---|---|
+| Unit tests | [to resolve] | [to resolve] | Pending |
+| Integration tests | [to resolve] | [to resolve] | Pending |
+| E2E tests | [to resolve] | [to resolve] | Pending |
+| Visual tests | [to resolve] | [to resolve] | Pending |
+| Type check | [to resolve] | [to resolve] | Pending |
+| Lint | [to resolve] | [to resolve] | Pending |
+| Full suite | [to resolve] | [to resolve] | Pending |
 
 ---
 
 ## Unit Testing
 
-**Framework:** Vitest (or Jest)
+**Framework:** [Resolved unit runner]
 
 **What to test:**
 - All pure functions in `src/data/` and `src/lib/`
@@ -39,7 +58,7 @@
 - Test file lives next to source file: `notifications.ts` → `notifications.test.ts`
 - Test names reference the AC: `"AC-001: returns unread notification count"`
 
-**Example:**
+**Example (JavaScript/TypeScript — adapt to project stack):**
 
 ```typescript
 // src/data/notifications.test.ts
@@ -66,7 +85,7 @@ describe('getUnreadNotifications', () => {
 
 ## Integration Testing
 
-**Framework:** Vitest + supertest (or your project's HTTP testing tool)
+**Framework:** [Resolved unit runner + HTTP testing tool]
 
 **What to test:**
 - Every API endpoint: happy path + error paths
@@ -79,7 +98,7 @@ describe('getUnreadNotifications', () => {
 - Seed test data per test (not global state)
 - Clean up after each test
 
-**Example:**
+**Example (JavaScript/TypeScript — adapt to project stack):**
 
 ```typescript
 // tests/api/notifications.test.ts
@@ -113,7 +132,7 @@ describe('GET /api/notifications', () => {
 
 ## E2E Testing
 
-**Framework:** Playwright
+**Framework:** [Resolved E2E runner]
 
 **What to test:**
 - All primary user flows (one E2E test per user story P1 and P2)
@@ -132,18 +151,18 @@ describe('GET /api/notifications', () => {
 
 ---
 
-## Visual Testing (Playwright)
+## Visual Testing
 
 > Visual tests capture and compare screenshots to detect unintended UI regressions.
 
 ### How It Works
 
-1. **Baseline capture:** On first run, Playwright captures a screenshot and saves it as the baseline
-2. **Comparison:** On subsequent runs, Playwright takes a new screenshot and diffs it against the baseline
+1. **Baseline capture:** On first run, the visual testing tool captures a screenshot and saves it as the baseline
+2. **Comparison:** On subsequent runs, a new screenshot is taken and diffed against the baseline
 3. **Threshold:** If diff > 2% → test FAILS and reports the diff image
-4. **Update baseline:** When UI is intentionally changed, run `npx playwright test --update-snapshots`
+4. **Update baseline:** When UI is intentionally changed, run the update command from Resolved Test Commands
 
-### Visual Test Example
+### Visual Test Example (Playwright)
 
 ```typescript
 // tests/e2e/notifications.spec.ts
@@ -200,19 +219,18 @@ test.describe('Notification Panel — Visual Tests', () => {
 
 - Baselines are stored in `.specs/features/NNN-feature-name/baselines/`
 - Baselines are committed to version control
-- When a spec changes intentionally: run `npx playwright test --update-snapshots`, commit new baselines
+- When a spec changes intentionally: run the baseline update command from Resolved Test Commands, commit new baselines
 - Old baselines are moved to `baselines/archived/YYYY-MM-DD/` before deletion
 
-### Playwright Configuration
+### Example Configuration (Playwright)
 
 ```typescript
-// playwright.config.ts
+// playwright.config.ts — adapt to your project's visual testing tool
 import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests/e2e',
-  snapshotDir: './.specs/features', // Playwright uses {snapshotDir}/{testFilePath}/{testName}-{platform}.png
-  // Individual baselines land in .specs/features/NNN-feature-name/baselines/ via test file path structure
+  snapshotDir: './.specs/features',
   use: {
     baseURL: process.env.TEST_BASE_URL || 'http://localhost:3000',
     screenshot: 'only-on-failure',
@@ -230,13 +248,7 @@ export default defineConfig({
 
 ## Iteration Rule
 
-When tests fail during `/spec.implement`:
-
-- **Unit tests:** Max 3 fix iterations → then flag for human review
-- **Integration tests:** Max 3 fix iterations → then flag for human review
-- **E2E / Visual tests:** Max 5 fix iterations → then flag for human review
-
-After max iterations, the AI stops, reports the failure with context, and asks the human to intervene.
+See `system/testing/test-protocol.md` Sections 3-5 for iteration limits, failure handling, and error reporting format.
 
 ---
 
@@ -245,14 +257,14 @@ After max iterations, the AI stops, reports the failure with context, and asks t
 Tests run in CI on every PR and every push to main:
 
 ```yaml
-# .github/workflows/test.yml (example)
+# .github/workflows/test.yml (example — adapt commands to Resolved Test Commands)
 test:
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v4
-    - run: npm ci
-    - run: npm run test:unit       # Vitest unit + integration
-    - run: npm run test:e2e        # Playwright E2E + visual
+    - run: [install dependencies command]
+    - run: [resolved unit test command]
+    - run: [resolved E2E test command]
 ```
 
 ---

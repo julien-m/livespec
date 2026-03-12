@@ -269,6 +269,7 @@ Before considering stack decision complete:
 - Migration strategy selected (Drizzle or equivalent)
 - Rate limiting strategy selected (Redis or edge-native)
 - Testing scope mapped (unit/integration/smoke)
+- See `system/testing/test-protocol.md` for the stack-agnostic discovery and execution protocol
 
 If any is missing, mark `Decision Pending` and do not finalize.
 

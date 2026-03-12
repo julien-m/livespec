@@ -227,38 +227,16 @@ See the available presets for guidance:
   # Features directory (empty)
   create_dir "$PROJECT_DIR/.specs/features"
 
-  # Ask which AI tool(s) to link
-  header "Which AI tool(s) do you use?"
-  echo ""
-  echo -e "  1) GitHub Copilot"
-  echo -e "  2) Claude Code"
-  echo -e "  3) Cursor"
-  echo -e "  4) All"
-  echo -e "  5) Skip"
-  echo ""
-  echo -n "  Enter choice (1-5): "
-  read -r tool_choice
-
-  local link_tool=""
-  case "$tool_choice" in
-    1) link_tool="copilot" ;;
-    2) link_tool="claude-code" ;;
-    3) link_tool="cursor" ;;
-    4) link_tool="all" ;;
-    5) link_tool="" ;;
-    *) warn "Invalid choice, skipping AI tool linking." ;;
-  esac
-
-  if [[ -n "$link_tool" ]]; then
-    local install_script="$SCRIPT_DIR/install.sh"
-    if [[ -f "$install_script" ]]; then
-      local flags="--tool $link_tool"
-      [[ "$DRY_RUN" == true ]] && flags="$flags --dry-run"
-      bash "$install_script" $flags
-    else
-      warn "install.sh not found at $install_script — skipping adapter installation."
-      info "Run 'bash scripts/install.sh --tool $link_tool' manually to install the adapter."
-    fi
+  # Install Claude Code commands
+  header "Installing Claude Code commands..."
+  local install_script="$SCRIPT_DIR/install.sh"
+  if [[ -f "$install_script" ]]; then
+    local flags=""
+    [[ "$DRY_RUN" == true ]] && flags="--dry-run"
+    bash "$install_script" $flags
+  else
+    warn "install.sh not found at $install_script — skipping command installation."
+    info "Run 'bash scripts/install.sh' manually to install /spec.* commands."
   fi
 
   # Summary

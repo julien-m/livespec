@@ -232,16 +232,23 @@ After confirmation, the AI creates the `.specs/` directory structure:
 
 After creating the `.specs/` structure, install the LiveSpec section in the project's `CLAUDE.md`:
 
-1. **If `CLAUDE.md` does not exist** → create it with the LiveSpec section (from the SKILL.md "CLAUDE.md Template")
+1. **If `CLAUDE.md` does not exist** → create it with the LiveSpec section
 2. **If `CLAUDE.md` exists but does NOT contain `<!-- livespec:start -->`** → append the LiveSpec section at the end
 3. **If `CLAUDE.md` exists and contains `<!-- livespec:start -->`** → replace everything between `<!-- livespec:start -->` and `<!-- livespec:end -->` markers (idempotent update)
 
-The content of the section is defined in the LiveSpec skill file (`adapters/claude-code/SKILL.md`, section "CLAUDE.md Template"). It includes:
-- Mandatory rules summary
-- Available commands list
-- Key files reference
+The section content is minimal — a boot pointer to `spec-system.md` plus the command list:
 
-This ensures that Claude Code automatically follows LiveSpec rules when working in the project.
+```markdown
+<!-- livespec:start -->
+## LiveSpec
+
+This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
+
+Commands: `/spec.init` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack`
+<!-- livespec:end -->
+```
+
+This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails are in `.specs/spec-system.md`.
 
 **Installation output:**
 

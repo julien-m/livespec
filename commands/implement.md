@@ -46,8 +46,8 @@ Before Phase 1, run a preflight check and stop early on blockers:
 - [ ] Target feature directory exists
 - [ ] `spec.md` exists and status is not Deprecated
 - [ ] `plan.md` exists and contains no unresolved `[DECISION NEEDED]`
-- [ ] Project test command is known (from package scripts or project convention)
-- [ ] Required tooling is available for chosen steps (`node`, package manager, Playwright if visual)
+- [ ] Project test commands are resolved in plan.md Resolved Test Commands (use `system/testing/test-protocol.md` discovery procedure if not)
+- [ ] Required tooling is available for chosen steps (verified during test discovery)
 
 If one check fails, do not start implementation. Report blocker + minimal recovery command.
 
@@ -86,15 +86,48 @@ Create an ordered todo list from `plan.md`:
 [ ] Step 11: Update changelog.md
 ```
 
+### Step Gate (Blocking) — obligatoire avant passage au step suivant
+
+Règle globale: un step ne peut passer à `Done` que si ses vérifications sont vertes (ou `Blocked` documenté).
+
+Pour chaque `Step N`:
+
+1. Exécuter les checks ciblés du step (tests unitaires/intégration/E2E selon le scope).
+2. Exécuter les checks transverses impactés (au minimum lint/typecheck sur fichiers touchés).
+3. Si échec: corriger et re-tester dans les limites d'itération.
+4. Si limite atteinte: marquer `Blocked`, enregistrer le contexte, arrêter la progression.
+5. Écrire le checkpoint dans `.specs/features/NNN-feature-name/progress.md`.
+6. Passer au `Step N+1` uniquement si statut `Done`.
+
+#### Statuts autorisés par step
+
+- `Todo`
+- `In Progress`
+- `Done`
+- `Blocked`
+
+#### Format de checkpoint (persistant, utilisé par `--resume`)
+
+| Step | Status | Files | Tests run | Result | Updated at |
+|---|---|---|---|---|---|
+| 1 | Done | `db/migrations/2026xxxx.sql` | [resolved test command] | Pass | 2026-03-12 10:42 |
+| 2 | Blocked | `src/data/notifications.ts` | [resolved test command] | Fail (3/3) | 2026-03-12 11:03 |
+
+#### Règle `--resume`
+
+`--resume` lit `.specs/features/NNN-feature-name/progress.md` et reprend au premier step non `Done`.
+
 ### Phase 3 — Execute
 
-Work through each step:
+Work through each step, respecting the Step Gate above:
 
 1. **Read before write** — always read the target file before modifying it
 2. **One step at a time** — complete each step fully before moving to next
-3. **Follow existing patterns** — match the style and structure of surrounding code
-4. **Track todos** — mark each step complete as it's done
-5. **Constitution check** — verify each file follows constitution rules
+3. **Run step checks** — execute targeted tests + lint/typecheck on touched files
+4. **Gate before advancing** — step must be `Done` or `Blocked` before moving on
+5. **Write checkpoint** — update `progress.md` after each step completion
+6. **Follow existing patterns** — match the style and structure of surrounding code
+7. **Constitution check** — verify each file follows constitution rules
 
 **File naming and structure:**
 - Follow conventions from `.specs/constitution.md`
@@ -103,71 +136,29 @@ Work through each step:
 
 ### Phase 4 — Test
 
-After each implementation step, run the relevant tests immediately:
+After each implementation step, run the relevant tests immediately.
 
-```bash
-# After data layer
-npm run test -- src/data/notifications.test.ts
-
-# After API layer
-npm run test -- tests/api/notifications.test.ts
-
-# After UI components
-npm run test -- src/components/notifications
-
-# Full suite before proceeding to visual tests
-npm run test
-```
-
-**On test failure:**
-- Read the error message carefully
-- Check if the spec/AC covers this case
-- Fix the issue
-- Re-run tests
-- Max 3 iterations for unit/integration tests → then flag for human review
+- Follow the test protocol in `system/testing/test-protocol.md`
+- Use the commands resolved in the **Resolved Test Commands** section of `plan.md`
+- If no commands are resolved yet → execute the discovery procedure from `system/testing/test-protocol.md` Section 1
+- On test failure → follow the failure and iteration rules in `system/testing/test-protocol.md` Sections 3-5
 
 ### Phase 5 — Visual Baselines (UI features only)
 
 For features with UI components specified in the spec:
 
-1. Run the Playwright E2E tests
-2. On first run, Playwright captures screenshots as baselines:
-   - Empty states
-   - Loaded states with data
-   - Interactive states (hover, open, etc.)
-   - Error states
-3. Baselines are saved to `.specs/features/NNN-feature-name/baselines/`
-4. Commit baselines with the implementation
-
-```bash
-# Capture baselines
-npx playwright test tests/e2e/notifications.spec.ts --update-snapshots
-
-# On subsequent runs, compare against baselines
-npx playwright test tests/e2e/notifications.spec.ts
-```
-
-**Max 5 iterations** for visual tests — then flag for human review with diff images.
+- Follow the visual baselines protocol in `system/testing/test-protocol.md` Section 6
+- Use the visual test command from `plan.md` **Resolved Test Commands**
+- If no visual testing tool is available → skip and log: "Visual baselines skipped — no visual testing tool resolved"
+- Baselines are saved to `.specs/features/NNN-feature-name/baselines/` and committed with the implementation
 
 ### Phase 6 — Validate
 
 Before declaring implementation complete:
 
-```bash
-# Type check
-npx tsc --noEmit
-
-# Lint
-npx eslint src/ tests/
-
-# All tests
-npm run test
-
-# E2E
-npx playwright test
-```
-
-All must pass. Fix any issues found.
+- Execute the final validation sequence from `system/testing/test-protocol.md` Section 7
+- All commands come from `plan.md` **Resolved Test Commands** — no hardcoded commands
+- All checks must pass. Fix any issues found within iteration limits.
 
 ### Phase 7 — Update implementation.md
 
@@ -212,6 +203,7 @@ Also add a summary entry to `.specs/changelog.md` (global).
 .specs/features/004-notifications/
 ├── spec.md              ← Unchanged
 ├── plan.md              ← Unchanged
+├── progress.md          ← Step-by-step checkpoint (used by --resume)
 ├── implementation.md    ← Created/updated with FR→@spec mapping
 ├── changelog.md         ← Updated with new entry
 └── baselines/           ← Playwright screenshots (if UI feature)
@@ -233,7 +225,7 @@ db/migrations/           ← New migration files
 | `--auto` | Skip all confirmation prompts, full automatic pipeline |
 | `--save` | Save execution logs to `.specs/features/NNN/logs/YYYY-MM-DD.md` |
 | `--economy` | No subagents, direct tools only (slower but uses less tokens) |
-| `--resume` | Resume an interrupted implementation (reads last todo checkpoint) |
+| `--resume` | Resume an interrupted implementation (reads `progress.md`, restarts at first non-`Done` step) |
 | `--no-visual` | Skip visual baseline capture even if UI components are created |
 | `--step [N]` | Start from step N (skip earlier steps, useful for partial re-runs) |
 
@@ -241,13 +233,7 @@ db/migrations/           ← New migration files
 
 ## Iteration Limits
 
-| Test Type | Max Iterations | On Limit Exceeded |
-|---|---|---|
-| Unit tests | 3 | Stop, report failure with context, ask human |
-| Integration tests | 3 | Stop, report failure with context, ask human |
-| E2E tests | 5 | Stop, report failure with diffs, ask human |
-| Visual tests | 5 | Stop, report diff images, ask human to review |
-| TypeScript errors | 3 | Stop, show errors, ask human |
+See `system/testing/test-protocol.md` Section 3 for iteration limits per test type.
 
 ---
 
@@ -268,32 +254,7 @@ If not complete, return a resumable status report instead of a success message.
 
 ## Error Reporting Format
 
-When max iterations are exceeded:
-
-> ⛔ **Max iterations reached for [test type]**
->
-> **Feature:** 004-notifications
-> **Step:** Phase 4 — Test
-> **Test:** `tests/api/notifications.test.ts:42`
->
-> **Failing test:** `"AC-003: updates email notification preference"`
->
-> **Error:**
-> ```
-> AssertionError: expected 200, received 422
-> Response body: { error: "Invalid preference value" }
-> ```
->
-> **What I tried:**
-> 1. Iteration 1: Added Zod validation schema
-> 2. Iteration 2: Fixed schema to accept boolean values
-> 3. Iteration 3: Added request body parsing middleware
->
-> **Likely cause:** The API route doesn't have the body parser middleware applied.
->
-> **Suggested fix:** Apply `express.json()` middleware before the preferences route.
->
-> **Action needed:** Please review and fix, then run `/spec.implement notifications --resume`
+See `system/testing/test-protocol.md` Section 5 for the structured error reporting template.
 
 ---
 

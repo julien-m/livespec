@@ -142,6 +142,8 @@ When this preset is selected, `_default.md` must include:
 
 If any field is unknown, set `[ASSUMED]` and list one follow-up question per unknown.
 
+See `system/testing/test-protocol.md` for the stack-agnostic discovery and execution protocol.
+
 ### Dynamic Escalation Rule
 
 If personalization, auth complexity, or update frequency increases beyond static assumptions:

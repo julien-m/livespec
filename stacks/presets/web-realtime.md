@@ -166,6 +166,7 @@ npm install -D vitest @vitejs/plugin-react @playwright/test
 - **Real-time tests:** Playwright with WebSocket mocking — subscription behavior
 
 See `testing-strategy-template.md` for detailed test examples.
+See `system/testing/test-protocol.md` for the stack-agnostic discovery and execution protocol.
 
 ---
 

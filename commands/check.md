@@ -81,17 +81,13 @@ For each FR and AC:
 
 For each baseline in `.specs/features/NNN-feature-name/baselines/`:
 
-1. Run Playwright to capture current screenshots
-2. Compare with stored baselines using pixel diff
-3. Report:
+1. Run the visual test command from `.specs/testing/strategy.md` or `plan.md` **Resolved Test Commands**
+2. If no visual testing tool is resolved → skip and report: "Visual drift detection skipped — no visual testing tool resolved"
+3. Compare with stored baselines using pixel diff
+4. Report:
    - ✅ Match — within threshold (< 2% diff)
    - 🖼️ Drift — exceeds threshold, show diff percentage
    - ❌ Missing — baseline file not found (capture needed)
-
-```bash
-# Run visual comparison
-npx playwright test tests/e2e/notifications.spec.ts --reporter=html
-```
 
 ### Step 6 — Produce Gap Report
 
@@ -172,7 +168,7 @@ To implement: `/spec.implement notifications --step 6`
 
 **Detected change:** Badge background color changed from `#EF4444` to `#DC2626`
 
-**If intentional:** Run `npx playwright test --update-snapshots` to update the baseline, then commit.
+**If intentional:** Run the baseline update command from Resolved Test Commands to update the baseline, then commit.
 **If unintentional:** Revert the CSS change in `NotificationBell.tsx`.
 ```
 

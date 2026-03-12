@@ -49,19 +49,20 @@
 - **Visual tests:** All screens with defined UI specifications
 
 ### How to Test
-- Tests live next to the code they test (`*.test.ts` beside `*.ts`)
-- E2E tests live in `tests/e2e/`
+- Test files live next to the source they test, following the project's stack convention
+- E2E tests live in a dedicated directory (e.g. `tests/e2e/`)
 - Visual baselines live in `.specs/features/NNN/baselines/`
 - Every test description references the AC it validates
 
 ### Visual Testing Rules
-- Playwright baselines are captured on first successful implementation
+- Visual baselines (via the project's visual testing tool) are captured on first successful implementation
 - If a visual test diff exceeds 2% threshold → test FAILS
 - Baselines are archived (not deleted) when spec changes
 - Visual tests run in CI on every PR
 
 ### Testing Reference
-See `.specs/testing/strategy.md` for the full project testing strategy.
+- See `.specs/testing/strategy.md` for the full project testing strategy
+- Concrete test commands are resolved in `.specs/testing/strategy.md` (Resolved Test Commands table)
 
 ---
 
