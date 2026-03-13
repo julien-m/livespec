@@ -194,12 +194,30 @@ flowchart TD
 > Visual tests will capture baselines for all key screens (job listing, profile, messaging).
 > Threshold: 2% diff = FAIL.
 
-### Step 4 — Architecture Decision Records
+### Step 4 — Architecture Decision Records (MANDATORY)
+
+> **At least 1 ADR is REQUIRED before proceeding to Phase C.**
+> Every significant stack choice (framework, database, auth, deploy) must have a corresponding ADR.
+> An ADR documents WHAT was chosen, WHAT alternatives were considered, and WHY.
+> Without ADRs, future developers (and AI tools) cannot understand the reasoning behind the stack.
 
 > I'll create ADRs for the key choices:
 > - ADR-001: Supabase over Firebase (reasons: PostgreSQL, RLS, built-in realtime)
 > - ADR-002: Next.js over Remix (reasons: larger ecosystem, Vercel integration)
 > - ADR-003: Stripe Connect for marketplace payments (reasons: built-in split payments)
+
+ADR files are written to `.specs/stacks/decisions/ADR-NNN-short-name.md` with this structure:
+
+```markdown
+# ADR-NNN: [Choice] over [Alternative]
+
+- **Date:** YYYY-MM-DD
+- **Status:** Accepted
+- **Context:** [What problem are we solving?]
+- **Decision:** [What did we choose?]
+- **Alternatives considered:** [What else was evaluated?]
+- **Consequences:** [What are the trade-offs?]
+```
 
 ---
 

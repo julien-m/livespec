@@ -227,6 +227,41 @@ See the available presets for guidance:
   # Features directory (empty)
   create_dir "$PROJECT_DIR/.specs/features"
 
+  # Install LiveSpec section in CLAUDE.md
+  header "Installing CLAUDE.md section..."
+  local claude_md="$PROJECT_DIR/CLAUDE.md"
+  local livespec_section='<!-- livespec:start -->
+## LiveSpec
+
+This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
+
+Commands: `/spec.init` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack`
+<!-- livespec:end -->'
+
+  if [[ "$DRY_RUN" == true ]]; then
+    echo -e "  ${YELLOW}[dry-run]${RESET} Would install LiveSpec section in CLAUDE.md"
+  elif [[ ! -f "$claude_md" ]]; then
+    printf '%s\n' "$livespec_section" > "$claude_md"
+    success "Created CLAUDE.md with LiveSpec section"
+  elif ! grep -q '<!-- livespec:start -->' "$claude_md"; then
+    printf '\n%s\n' "$livespec_section" >> "$claude_md"
+    success "Appended LiveSpec section to existing CLAUDE.md"
+  else
+    # Replace existing section (idempotent update)
+    local tmp_file
+    tmp_file="$(mktemp)"
+    awk '
+      /<!-- livespec:start -->/ { skip=1; next }
+      /<!-- livespec:end -->/   { skip=0; next }
+      !skip { print }
+    ' "$claude_md" > "$tmp_file"
+    # Remove trailing blank lines before appending
+    sed -i '' -e :a -e '/^\n*$/{$d;N;ba' -e '}' "$tmp_file" 2>/dev/null || true
+    printf '\n%s\n' "$livespec_section" >> "$tmp_file"
+    mv "$tmp_file" "$claude_md"
+    success "Updated LiveSpec section in existing CLAUDE.md"
+  fi
+
   # Install Claude Code commands
   header "Installing Claude Code commands..."
   local install_script="$SCRIPT_DIR/install.sh"
@@ -257,11 +292,6 @@ See the available presets for guidance:
   echo -e "  3. ${YELLOW}Create your first feature spec:${RESET}"
   echo -e "     ${BOLD}/spec.specify \"User can [action]\"${RESET}"
   echo ""
-  if [[ -z "$link_tool" ]]; then
-    echo -e "  4. ${YELLOW}Link your AI tool (skipped):${RESET}"
-    echo -e "     Run ${BOLD}bash scripts/install.sh${RESET} to install adapters"
-    echo ""
-  fi
   echo -e "  ${BLUE}Documentation:${RESET} https://github.com/julien-m/livespec"
 }
 

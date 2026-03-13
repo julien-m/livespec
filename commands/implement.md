@@ -90,13 +90,17 @@ Create an ordered todo list from `plan.md`:
 
 Règle globale: un step ne peut passer à `Done` que si ses vérifications sont vertes (ou `Blocked` documenté).
 
+> **MANDATORY: `progress.md` must be created at Step 1 and updated after EVERY step.**
+> This file is the only mechanism enabling `--resume`. Skipping it is NOT allowed.
+> If the implementation is interrupted without `progress.md`, all progress is lost.
+
 Pour chaque `Step N`:
 
 1. Exécuter les checks ciblés du step (tests unitaires/intégration/E2E selon le scope).
 2. Exécuter les checks transverses impactés (au minimum lint/typecheck sur fichiers touchés).
 3. Si échec: corriger et re-tester dans les limites d'itération.
 4. Si limite atteinte: marquer `Blocked`, enregistrer le contexte, arrêter la progression.
-5. Écrire le checkpoint dans `.specs/features/NNN-feature-name/progress.md`.
+5. **Écrire le checkpoint dans `.specs/features/NNN-feature-name/progress.md` (BLOCKING — do NOT proceed without writing this).**
 6. Passer au `Step N+1` uniquement si statut `Done`.
 
 #### Statuts autorisés par step
@@ -241,6 +245,7 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 
 `/spec.implement` is complete only if all are true:
 
+- [ ] `progress.md` exists with a checkpoint row for every step executed
 - [ ] Planned FR scope for this run is implemented or explicitly deferred
 - [ ] Relevant tests pass for touched scope (or blocker documented)
 - [ ] `implementation.md` updated with FR/AC -> `@spec` mappings

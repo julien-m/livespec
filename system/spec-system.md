@@ -20,7 +20,11 @@
    Every user story in a spec.md must include a Mermaid flowchart. Text-only specs are incomplete.
 
 5. **Code is linked to specs — every implementation is traceable.**
-   After implementation, `implementation.md` maps every FR and AC to the `@spec` anchor comment placed directly in the source code (e.g. `// @spec FR-001`). Use `grep -rn "@spec FR-001"` to find the exact location regardless of line number changes.
+   After implementation, `implementation.md` maps every FR and AC to the `@spec` anchor comment placed directly in the source code. Anchor comments include the **relative path to the spec file** so developers can Cmd/Ctrl+click to navigate:
+   ```
+   // @spec FR-001 — .specs/features/NNN-feature-name/spec.md
+   ```
+   Use `grep -rn "@spec FR-001"` to find the exact location regardless of line number changes.
 
 ---
 
@@ -56,6 +60,7 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │   └── NNN-feature-name/
 │       ├── spec.md
 │       ├── plan.md
+│       ├── progress.md          ← Step-by-step checkpoint (MANDATORY during implement)
 │       ├── implementation.md
 │       ├── changelog.md
 │       ├── contracts/
@@ -286,10 +291,16 @@ Before a plan is considered complete:
 - [ ] All FR are covered in the implementation plan
 
 Before implementation is considered complete:
+- [ ] `progress.md` exists with a checkpoint row for **every** step (BLOCKING — enables `--resume`)
 - [ ] `implementation.md` is created and all FR/AC have status ✅
 - [ ] All tests pass
 - [ ] `changelog.md` has an entry
 - [ ] For visual features: Playwright baselines captured in `baselines/`
+
+Before `/spec.init` is considered complete:
+- [ ] At least 1 ADR exists in `.specs/stacks/decisions/` (BLOCKING — every stack choice must be justified)
+- [ ] `project.md` contains real values, not template placeholders
+- [ ] `_default.md` contains the chosen stack with rationale, not `[TBD]`
 
 ---
 
