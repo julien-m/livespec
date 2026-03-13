@@ -138,7 +138,7 @@ For each file:
 Before generating the testing strategy, resolve the project's test infrastructure:
 
 1. **Read `.specs/testing/strategy.md`** — check if test commands are already resolved
-2. **If not resolved**, follow the discovery procedure in `system/testing/test-protocol.md` Section 1:
+2. **If not resolved**, follow the discovery procedure in `system/testing/discovery.md`:
    - Detect language/runtime
    - Detect test runners, linters, type checkers, visual testing tools
 3. **Verify availability** of detected tools

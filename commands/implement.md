@@ -46,7 +46,7 @@ Before Phase 1, run a preflight check and stop early on blockers:
 - [ ] Target feature directory exists
 - [ ] `spec.md` exists and status is not Deprecated
 - [ ] `plan.md` exists and contains no unresolved `[DECISION NEEDED]`
-- [ ] Project test commands are resolved in plan.md Resolved Test Commands (use `system/testing/test-protocol.md` discovery procedure if not)
+- [ ] Project test commands are resolved in plan.md Resolved Test Commands (use `system/testing/discovery.md` if not)
 - [ ] Required tooling is available for chosen steps (verified during test discovery)
 
 If one check fails, do not start implementation. Report blocker + minimal recovery command.
@@ -138,16 +138,16 @@ Work through each step, respecting the Step Gate above:
 
 After each implementation step, run the relevant tests immediately.
 
-- Follow the test protocol in `system/testing/test-protocol.md`
+- Follow the test protocol in `system/testing/`
 - Use the commands resolved in the **Resolved Test Commands** section of `plan.md`
-- If no commands are resolved yet → execute the discovery procedure from `system/testing/test-protocol.md` Section 1
-- On test failure → follow the failure and iteration rules in `system/testing/test-protocol.md` Sections 3-5
+- If no commands are resolved yet → execute the discovery procedure from `system/testing/discovery.md`
+- On test failure → follow `system/testing/failure-handling.md`
 
 ### Phase 5 — Visual Baselines (UI features only)
 
 For features with UI components specified in the spec:
 
-- Follow the visual baselines protocol in `system/testing/test-protocol.md` Section 6
+- Follow the visual baselines protocol in `system/testing/visual-baselines.md`
 - Use the visual test command from `plan.md` **Resolved Test Commands**
 - If no visual testing tool is available → skip and log: "Visual baselines skipped — no visual testing tool resolved"
 - Baselines are saved to `.specs/features/NNN-feature-name/baselines/` and committed with the implementation
@@ -156,7 +156,7 @@ For features with UI components specified in the spec:
 
 Before declaring implementation complete:
 
-- Execute the final validation sequence from `system/testing/test-protocol.md` Section 7
+- Execute the final validation sequence from `system/testing/execution-rules.md`
 - All commands come from `plan.md` **Resolved Test Commands** — no hardcoded commands
 - All checks must pass. Fix any issues found within iteration limits.
 
@@ -233,7 +233,7 @@ db/migrations/           ← New migration files
 
 ## Iteration Limits
 
-See `system/testing/test-protocol.md` Section 3 for iteration limits per test type.
+See `system/testing/failure-handling.md` for iteration limits per test type.
 
 ---
 
@@ -254,7 +254,7 @@ If not complete, return a resumable status report instead of a success message.
 
 ## Error Reporting Format
 
-See `system/testing/test-protocol.md` Section 5 for the structured error reporting template.
+See `system/testing/failure-handling.md` for the structured error reporting template.
 
 ---
 

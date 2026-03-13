@@ -18,14 +18,14 @@
 | Database queries | Integration | [Unit runner + test DB] | On every commit |
 | Authentication flows | E2E | [E2E runner] | On PR |
 
-> The concrete tools are resolved by the discovery procedure in `system/testing/test-protocol.md`.
+> The concrete tools are resolved by the discovery procedure in `system/testing/discovery.md`.
 
 ---
 
 ## Resolved Test Commands
 
 > Filled during `/spec.init` Phase B or `/spec.plan` Step 7.5.
-> Resolution procedure: see `system/testing/test-protocol.md`.
+> Resolution procedure: see `system/testing/discovery.md`.
 
 | Action | Command | Tool | Status |
 |---|---|---|---|
@@ -248,7 +248,7 @@ export default defineConfig({
 
 ## Iteration Rule
 
-See `system/testing/test-protocol.md` Sections 3-5 for iteration limits, failure handling, and error reporting format.
+See `system/testing/failure-handling.md` for iteration limits, failure handling, and error reporting format.
 
 ---
 
