@@ -6,35 +6,193 @@ argument-hint: "<feature-name>"
 # Command: /spec.check
 
 > Compare spec vs actual code — find gaps, verify AC coverage, detect visual drift.
+> Validate `.specs/` tree structure, spec quality gates, and multi-feature alignment.
 
 ---
 
 ## Overview
 
-`/spec.check [feature-name]`
-
-Reads the spec, reads the code, and produces a gap report showing what's implemented, what's missing, and what has drifted.
-
-This is the "living document" enforcement command — it keeps specs and code in sync.
+```
+/spec.check                       → Steps 1-2 → [per feature: Steps 3-10] → Step 11
+/spec.check feature-name          → Step 1 → Steps 3-10
+/spec.check --tree-only           → Step 1 only
+/spec.check --quality feature     → Step 1 → Steps 3-4 only
+```
 
 ---
 
 ## Steps
 
-### Step 1 — Resolve Feature
+### Step 1 — Validate Tree Structure
+
+Always executed first (unless `--skip-tree`).
+
+#### A. System Files
+
+Verify existence of required system files in `.specs/`:
+
+| File | Required | Rule |
+|---|---|---|
+| `spec-system.md` | ✅ | Must exist |
+| `constitution.md` | ✅ | Must exist |
+| `project.md` | ✅ | Must exist |
+| `README.md` | ✅ | Must exist |
+| `changelog.md` | ✅ | Must exist |
+| `stacks/_default.md` | ✅ | Must exist and contain no `[TBD]` markers |
+| `testing/strategy.md` | ✅ | Must exist |
+| `stacks/decisions/*.md` | ✅ | At least 1 ADR must exist |
+
+#### B. Feature Naming
+
+Each directory in `features/` must match: `^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$`
+
+- **ERROR**: Directory name doesn't match pattern
+- **WARNING**: Gap in numbering sequence (e.g., 001, 002, 005)
+- **ERROR**: Duplicate feature number (e.g., two `003-*` directories)
+
+#### C. Feature Completeness
+
+For each feature directory in `features/`:
+
+| File | Condition | Severity |
+|---|---|---|
+| `spec.md` | Always required | ❌ BLOCKING |
+| `changelog.md` | Always expected | ⚠️ WARNING |
+| `implementation.md` | Required if status is `Implemented` or `In Progress` | ❌ BLOCKING |
+| `plan.md` | Required if status is `Planned` or beyond | ❌ BLOCKING |
+
+#### D. Orphan Files
+
+Detect any files or directories directly under `features/` that are not inside a `NNN-*` directory. Report as warnings.
+
+#### E. README Sync
+
+Compare the Features table in `.specs/README.md` with actual directories on disk:
+
+- Features on disk but missing from README
+- Features in README but not on disk
+- Status mismatch between README and `spec.md`
+
+#### Output
+
+```markdown
+## Tree Validation
+
+| Check | Status | Details |
+|---|---|---|
+| System files | ✅ Pass | All 7 system files present |
+| Stack config | ✅ Pass | `_default.md` has no [TBD] |
+| ADRs | ✅ Pass | 3 ADRs found |
+| Feature naming | ⚠️ Warning | Gap: 001, 002, 005 (missing 003-004) |
+| 001-user-auth | ✅ Pass | spec.md, plan.md, implementation.md present |
+| 004-notifications | ⚠️ Warning | Missing changelog.md |
+| Orphan files | ✅ Pass | No orphans detected |
+| README sync | ❌ Fail | 005-search on disk but not in README |
+```
+
+If `--tree-only`, stop here. Otherwise continue.
+
+---
+
+### Step 2 — Multi-Spec Selection (no argument only)
+
+Only when `/spec.check` is invoked without a feature name argument.
+
+1. Scan all `features/NNN-*` directories
+2. For each feature, collect:
+   - **Name**: from the `# ` header in `spec.md`, or directory name as fallback
+   - **Status**: from `spec.md` metadata
+   - **Last modified**: `git log -1 --format="%ai" -- .specs/features/NNN-*/`
+3. **Sort by last modification date, most recent first**
+4. Present selection table:
+
+```
+| # | Feature              | Status      | Last Modified |
+|---|----------------------|-------------|---------------|
+| 1 | 004-notifications    | Implemented | 2026-03-12    |
+| 2 | 001-user-auth        | Implemented | 2026-03-10    |
+| 3 | 003-messaging        | Approved    | 2026-03-05    |
+| 4 | 002-job-listings     | Draft       | 2026-02-28    |
+
+Selection: numbers (1,3), range (1-3), combined (1,3-5), or "all"
+Enter = most recent feature only
+```
+
+5. Execute Steps 3–10 for each selected feature
+6. Then Step 11 (consolidated report) if multiple features selected
+
+---
+
+### Step 3 — Resolve Feature
 
 1. If feature name provided: find `.specs/features/NNN-feature-name/`
 2. If no feature name: detect from current git branch (`feature/NNN-feature-name`)
 3. If still ambiguous: list all features and ask user to choose
 
-### Step 2 — Read Spec Requirements
+### Step 4 — Validate Spec Quality
+
+Applies quality gates from `spec-system.md` to the resolved feature.
+
+#### spec.md Quality Gates
+
+| Gate | Rule |
+|---|---|
+| Flowcharts | Every user story has a Mermaid flowchart |
+| AC format | All Acceptance Criteria use Given/When/Then format |
+| FR→AC mapping | Every FR references at least 1 AC |
+| Clarification markers | No more than 3 `[NEEDS CLARIFICATION]` markers |
+
+#### plan.md Quality Gates (if file exists)
+
+| Gate | Rule |
+|---|---|
+| Sequence diagrams | API interactions have sequence diagrams |
+| State diagrams | Stateful entities have state diagrams |
+| ER diagrams | New data models have ER diagrams |
+| Constitution Check | Section is filled (not empty/placeholder) |
+| FR coverage | All FR from spec.md are covered in the plan |
+
+#### Implementation Quality Gates (if applicable)
+
+| Gate | Rule |
+|---|---|
+| `implementation.md` | Exists with status for each FR/AC |
+| `changelog.md` | Has at least one entry |
+| `progress.md` | Exists if status is `Implemented` |
+
+#### Output
+
+```markdown
+## Spec Quality: 004-notifications
+
+| Gate | Status | Details |
+|---|---|---|
+| User story flowcharts | ✅ Pass | 3/3 stories have flowcharts |
+| AC Given/When/Then | ⚠️ Partial | AC-004 missing Given/When/Then |
+| FR→AC mapping | ✅ Pass | All 6 FR reference at least 1 AC |
+| Clarification markers | ✅ Pass | 0 markers found |
+| Sequence diagrams | ✅ Pass | 2 API interactions covered |
+| State diagrams | ⚠️ N/A | No stateful entities identified |
+| ER diagrams | ✅ Pass | NOTIFICATION entity diagrammed |
+| Constitution Check | ✅ Pass | Section filled |
+| Plan FR coverage | ✅ Pass | 6/6 FR covered |
+| implementation.md | ✅ Pass | All FR/AC have status |
+| changelog.md | ✅ Pass | 4 entries |
+| progress.md | ❌ Missing | Required for Implemented status |
+```
+
+If `--quality`, stop here. Otherwise continue.
+
+---
+
+### Step 5 — Read Spec Requirements
 
 From `.specs/features/NNN-feature-name/spec.md`, extract:
 - All Acceptance Criteria (AC-001, AC-002, ...)
 - All Functional Requirements (FR-001, FR-002, ...)
 - All Success Criteria (SC-001, SC-002, ...)
 
-### Step 3 — Read Implementation Map
+### Step 6 — Read Implementation Map
 
 From `.specs/features/NNN-feature-name/implementation.md`, get:
 - FR → `@spec` anchor mappings
@@ -42,7 +200,7 @@ From `.specs/features/NNN-feature-name/implementation.md`, get:
 - Visual baselines list
 - Known gaps from last check
 
-### Step 3.5 — Mapping Recovery Mode
+### Step 6.5 — Mapping Recovery Mode
 
 If `implementation.md` is missing or incomplete:
 
@@ -61,7 +219,7 @@ A requirement can be marked ✅ only if at least one of these is present:
 
 If evidence is weak, use ⚠️ Partial with a short reason.
 
-### Step 4 — Verify Implementation
+### Step 7 — Verify Implementation
 
 For each FR and AC:
 
@@ -77,7 +235,7 @@ For each FR and AC:
    - ❌ Missing — no implementation found at mapped location or mapping is absent
    - 🔄 Drifted — code changed but implementation.md not updated
 
-### Step 5 — Detect Visual Drift (UI features)
+### Step 8 — Detect Visual Drift (UI features)
 
 For each baseline in `.specs/features/NNN-feature-name/baselines/`:
 
@@ -89,15 +247,24 @@ For each baseline in `.specs/features/NNN-feature-name/baselines/`:
    - 🖼️ Drift — exceeds threshold, show diff percentage
    - ❌ Missing — baseline file not found (capture needed)
 
-### Step 6 — Produce Gap Report
+### Step 9 — Produce Gap Report
 
-Output a structured gap report:
+Output a structured gap report. When spec quality was validated (Step 4), include a **Spec Quality** section before the FR/AC/Visual tables.
 
 ```markdown
 ## Gap Report: notifications (004)
 
 **Checked:** 2024-03-20
 **Feature:** `.specs/features/004-notifications/`
+
+### Spec Quality
+
+| Gate | Status | Details |
+|---|---|---|
+| User story flowcharts | ✅ Pass | 3/3 |
+| AC Given/When/Then | ⚠️ Partial | AC-004 missing format |
+| FR→AC mapping | ✅ Pass | 6/6 |
+| Clarification markers | ✅ Pass | 0 found |
 
 ### Functional Requirements
 
@@ -147,7 +314,7 @@ If the `checks/` directory does not exist, create it.
 
 This enables historical comparison: "did the gap get worse or better since last check?"
 
-### Step 6.5 — Update Changelog
+### Step 9.5 — Update Changelog
 
 Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 
@@ -165,7 +332,7 @@ Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 Also add a summary entry to `.specs/changelog.md` (global):
 `[Feature NNN] Check: X% verified (N/M FR, N/M AC)`
 
-### Step 7 — Suggest Fixes
+### Step 10 — Suggest Fixes + Update implementation.md
 
 For each gap, provide a specific, actionable suggestion:
 
@@ -198,12 +365,68 @@ To implement: `/spec.implement notifications --step 6`
 **If unintentional:** Revert the CSS change in `NotificationBell.tsx`.
 ```
 
-### Step 8 — Update implementation.md (optional)
+#### Update implementation.md (optional)
 
 > Would you like me to update `implementation.md` with the current status from this check?
 > This will mark drifted/partial items accurately.
 >
 > Type **yes** to update, **no** to skip.
+
+---
+
+### Step 11 — Consolidated Multi-Spec Report
+
+Only produced when multiple features are checked in a single run. Displayed after all individual feature checks complete.
+
+#### 1. Health per Feature
+
+```markdown
+## Consolidated Report
+
+### Feature Health
+
+| Feature | Spec Quality | Code Alignment | Visual | Overall |
+|---|---|---|---|---|
+| 004-notifications | ⚠️ 8/10 | ⚠️ 50% verified | 🖼️ 1 drift | ⚠️ Needs attention |
+| 001-user-auth | ✅ 10/10 | ✅ 95% verified | ✅ All match | ✅ Healthy |
+| 003-messaging | ✅ 9/10 | ❌ 30% verified | N/A | ❌ Critical |
+```
+
+#### 2. Cross-Feature Dependencies
+
+Detect source files referenced in multiple `implementation.md` files. Signal coupling:
+
+```markdown
+### Cross-Feature Dependencies
+
+| File | Referenced by | Risk |
+|---|---|---|
+| `src/data/notifications.ts` | 004-notifications, 001-user-auth | ⚠️ Shared module |
+| `src/lib/auth.ts` | 001-user-auth, 003-messaging | ⚠️ Shared module |
+```
+
+#### 3. Aggregated Stats
+
+```markdown
+### Stats
+
+- **Quality gates**: 27/30 passing (90%)
+- **Requirements verified**: 18/25 (72%)
+- **Visual baselines**: 8/10 matching (80%)
+```
+
+#### 4. Priorities
+
+Ordered list of the most urgent actions across all checked features:
+
+```markdown
+### Priorities
+
+1. ❌ **003-messaging**: 70% of requirements missing — needs implementation
+2. ❌ **004-notifications**: FR-006 not implemented, AC-004/AC-005 untested
+3. ⚠️ **004-notifications**: AC-004 missing Given/When/Then format in spec
+4. 🖼️ **004-notifications**: `panel-unread.png` visual drift (4.2%)
+```
 
 ---
 
@@ -226,25 +449,11 @@ To implement: `/spec.implement notifications --step 6`
 | `--no-visual` | Skip visual diff comparison |
 | `--fix` | After reporting, attempt to fix ❌ Missing items automatically |
 | `--report [path]` | Save gap report to specified file instead of printing |
-| `--ci` | Exit with non-zero code if any ❌ or 🖼️ found (for CI use) |
-
----
-
-## CI Integration
-
-Add to your CI pipeline to prevent spec drift:
-
-```yaml
-# .github/workflows/spec-check.yml
-name: Spec Check
-on: [pull_request]
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: /spec.check --ci --no-visual
-```
+| `--tree-only` | Only validate tree structure, skip per-feature checks |
+| `--skip-tree` | Skip tree validation (for quick single-feature check) |
+| `--quality` | Only validate spec quality gates, skip code alignment |
+| `--all` | Check all features without prompting for selection |
+| `--summary` | Multi-spec: only display the consolidated report |
 
 ---
 
@@ -252,12 +461,15 @@ jobs:
 
 `/spec.check` is complete only if all are true:
 
+- [ ] Tree validation passed (or `--skip-tree`)
+- [ ] Spec quality gates evaluated (per feature)
 - [ ] Gap report produced and displayed
 - [ ] Gap report saved to `checks/YYYY-MM-DD.md`
 - [ ] Feature `changelog.md` has a check entry
 - [ ] Global `.specs/changelog.md` has a summary entry
 - [ ] If `--update`: `implementation.md` status values refreshed
+- [ ] If multi-spec: consolidated report produced
 
 ---
 
-*LiveSpec Command v1.0*
+*LiveSpec Command v1.1*
