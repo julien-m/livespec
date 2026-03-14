@@ -40,7 +40,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | `/spec.init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md |
 | `/spec.specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
 | `/spec.plan` | Generate technical plan with sequence, state, and ER diagrams |
-| `/spec.implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec |
+| `/spec.implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
 | `/spec.check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
 | `/spec.explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
@@ -124,7 +124,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 7 commands (`~/.claude/commands/spec.*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 7 commands (`~/.claude/commands/spec.*.md`) and 5 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -144,6 +144,42 @@ For other AI tools, paste `system/spec-system.md` into your tool's context.
 | Living documentation | ✅ `/spec.explain` | ❌ None | ❌ None |
 | Stack evolution + impact | ✅ `/spec.stack` | ❌ None | ❌ None |
 | Tool-agnostic | ✅ Yes (Markdown-based) | ⚠️ GitHub only | ⚠️ Claude only |
+
+---
+
+## Multi-Agent Mode (default)
+
+`/spec.implement` uses multi-agent orchestration by default — a supervisor dispatches work to 4 specialized agents:
+
+```
+                  +-----------------+
+                  |   SUPERVISOR    |
+                  |  (orchestrator) |
+                  +--------+--------+
+                           |
+         +---------+-------+-------+---------+
+         |         |               |         |
+   +-----+----+ +-+--------+ +----+-----+ +-+----------+
+   | IMPLEMENT| |  VERIFY   | |   TEST   | |    DOC     |
+   | (coder)  | | (devil's  | | (tester) | | (writer)   |
+   |          | |  advocate) | |          | |            |
+   +----------+ +----------+ +----------+ +------------+
+```
+
+```bash
+# Multi-agent implementation (default)
+/spec.implement notifications
+
+# Single-agent mode (original APEX pipeline)
+/spec.implement notifications --mono
+
+# Resume an interrupted run
+/spec.implement notifications --resume
+```
+
+**Per-step cycle:** Implement → Verify (adversarial) → Test → Document checkpoint. The verifier acts as a devil's advocate — no rubber-stamping. Blocking findings are re-dispatched to the implementer (max 3 iterations). Each agent can spawn sub-agents for intra-step parallelism (e.g., writing independent files simultaneously).
+
+Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: 1` in settings.
 
 ---
 
@@ -167,6 +203,12 @@ livespec/
 │       ├── web-realtime.md
 │       ├── web-static.md
 │       └── api-rest.md
+├── agents/                         ← Agent definitions (symlinked by install.sh)
+│   ├── livespec-supervisor.md      ← Orchestrator — decomposes plan, dispatches agents
+│   ├── livespec-implementer.md     ← Writes production code
+│   ├── livespec-verifier.md        ← Adversarial reviewer (read-only)
+│   ├── livespec-tester.md          ← Runs/creates tests
+│   └── livespec-documenter.md      ← Updates spec artifacts
 ├── commands/                       ← Command docs (symlinked by install.sh)
 │   ├── init.md
 │   ├── specify.md
@@ -176,7 +218,7 @@ livespec/
 │   ├── explain.md
 │   └── stack.md
 └── scripts/
-    ├── install.sh                  ← Install /spec.* commands into ~/.claude/commands/
+    ├── install.sh                  ← Install commands + agents into ~/.claude/
     └── init.sh                     ← Bootstrap .specs/ structure (shell)
 ```
 

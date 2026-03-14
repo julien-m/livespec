@@ -13,7 +13,7 @@ argument-hint: "<feature-name>"
 
 `/spec.implement [feature-name]`
 
-Executes a full implementation pipeline from `plan.md` to working, tested, documented code.
+Executes a full implementation pipeline from `plan.md` to working, tested, documented code. By default, uses multi-agent orchestration (supervisor + implementer, verifier, tester, documenter). Use `--mono` for single-agent mode.
 
 ---
 
@@ -250,10 +250,39 @@ db/migrations/           ← New migration files
 |---|---|
 | `--auto` | Skip all confirmation prompts, full automatic pipeline |
 | `--no-save` | Do not save execution logs (by default, logs are saved to `.specs/features/NNN/logs/YYYY-MM-DD.md`) |
+| `--mono` | Single-agent mode — no orchestration, all phases executed directly (original APEX pipeline) |
 | `--economy` | No subagents, direct tools only (slower but uses less tokens) |
 | `--resume` | Resume an interrupted implementation (reads `progress.md`, restarts at first non-`Done` step) |
 | `--no-visual` | Skip visual baseline capture even if UI components are created |
 | `--step [N]` | Start from step N (skip earlier steps, useful for partial re-runs) |
+
+---
+
+## Multi-Agent Mode (default)
+
+By default, the pipeline is orchestrated by a **supervisor agent** that dispatches work to 4 specialized agents:
+
+```
+Supervisor (orchestrator — never codes)
+  ├── Implementer (writes code, places @spec anchors)
+  ├── Verifier (adversarial review — read-only, never rubber-stamps)
+  ├── Tester (runs/creates tests — never modifies production code)
+  └── Documenter (updates progress, implementation.md, changelogs, README)
+```
+
+**Per-step cycle:**
+1. Implementer writes code for the step
+2. Verifier reviews (BLOCKING findings → re-dispatch to implementer, max 3 iterations)
+3. Tester runs targeted tests (failures → re-dispatch to implementer, max 3/5 iterations)
+4. Documenter updates `progress.md` checkpoint
+
+**Final phase:** Tester runs full suite, Documenter finalizes all artifacts.
+
+All existing flags (`--resume`, `--auto`, `--no-save`, `--no-visual`, `--step`) work in multi-agent mode.
+
+Use `--mono` to disable orchestration and run all phases directly in a single agent (original APEX pipeline).
+
+Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: 1` in settings.
 
 ---
 

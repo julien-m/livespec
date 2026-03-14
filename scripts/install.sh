@@ -12,8 +12,10 @@ set -euo pipefail
 
 LIVESPEC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 COMMANDS_DIR="$HOME/.claude/commands"
+AGENTS_DIR="$HOME/.claude/agents"
 
 COMMANDS=(init specify plan implement check explain stack)
+AGENTS=(livespec-supervisor livespec-implementer livespec-verifier livespec-tester livespec-documenter)
 
 # --- Flags ---
 
@@ -30,7 +32,7 @@ while [[ $# -gt 0 ]]; do
       cat <<'EOF'
 Usage: bash scripts/install.sh [OPTIONS]
 
-Installs LiveSpec /spec.* commands into ~/.claude/commands/.
+Installs LiveSpec /spec.* commands and agents into ~/.claude/.
 
 Options:
   --force         Overwrite existing files/symlinks
@@ -39,8 +41,8 @@ Options:
   --help          Show this help message
 
 Examples:
-  bash scripts/install.sh              # Install commands
-  bash scripts/install.sh --uninstall  # Remove commands
+  bash scripts/install.sh              # Install commands + agents
+  bash scripts/install.sh --uninstall  # Remove commands + agents
   bash scripts/install.sh --dry-run    # Preview
   bash scripts/install.sh --force      # Overwrite existing
 EOF
@@ -133,14 +135,26 @@ for cmd in "${COMMANDS[@]}"; do
   fi
 done
 
+for agent in "${AGENTS[@]}"; do
+  local_src="$LIVESPEC_ROOT/agents/$agent.md"
+  if [[ ! -f "$local_src" ]]; then
+    echo "ERROR: Missing source file: $local_src" >&2
+    echo "Is this script running from the LiveSpec repository?" >&2
+    exit 1
+  fi
+done
+
 # --- Main ---
 
 if [[ "$UNINSTALL" == true ]]; then
   echo ""
-  echo "Uninstalling LiveSpec commands..."
+  echo "Uninstalling LiveSpec commands and agents..."
   echo ""
   for cmd in "${COMMANDS[@]}"; do
     remove_link "$COMMANDS_DIR/spec.$cmd.md" "commands/spec.$cmd.md"
+  done
+  for agent in "${AGENTS[@]}"; do
+    remove_link "$AGENTS_DIR/$agent.md" "agents/$agent.md"
   done
   echo ""
   echo "Done."
@@ -148,15 +162,20 @@ if [[ "$UNINSTALL" == true ]]; then
 fi
 
 echo ""
-echo "Installing LiveSpec commands..."
+echo "Installing LiveSpec commands and agents..."
 echo ""
 
 if [[ "$DRY_RUN" == false ]]; then
   mkdir -p "$COMMANDS_DIR"
+  mkdir -p "$AGENTS_DIR"
 fi
 
 for cmd in "${COMMANDS[@]}"; do
   create_link "$LIVESPEC_ROOT/commands/$cmd.md" "$COMMANDS_DIR/spec.$cmd.md" "commands/spec.$cmd.md"
+done
+
+for agent in "${AGENTS[@]}"; do
+  create_link "$LIVESPEC_ROOT/agents/$agent.md" "$AGENTS_DIR/$agent.md" "agents/$agent.md"
 done
 
 # --- Verify ---
@@ -166,6 +185,12 @@ if [[ "$DRY_RUN" == false ]]; then
   for cmd in "${COMMANDS[@]}"; do
     if [[ ! -L "$COMMANDS_DIR/spec.$cmd.md" ]]; then
       warn "Verification failed: commands/spec.$cmd.md is not a symlink"
+      errors=$((errors + 1))
+    fi
+  done
+  for agent in "${AGENTS[@]}"; do
+    if [[ ! -L "$AGENTS_DIR/$agent.md" ]]; then
+      warn "Verification failed: agents/$agent.md is not a symlink"
       errors=$((errors + 1))
     fi
   done
@@ -180,3 +205,4 @@ echo ""
 echo "Done! LiveSpec is ready."
 echo ""
 echo "Next: run /spec.init in your project to set up .specs/ and CLAUDE.md."
+echo "Tip: /spec.implement uses multi-agent orchestration by default (--mono for single-agent)."
