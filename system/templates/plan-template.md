@@ -174,9 +174,27 @@ erDiagram
 
 ---
 
+## API Error Contract
+
+> **Include this section when the plan defines API routes.** Omit for non-API features.
+
+Define the error response shape used by all API endpoints in this feature:
+
+| Status Code | When | Response Body |
+|---|---|---|
+| 400 | Validation error (bad input) | `{ error: string, field?: string }` |
+| 404 | Resource not found | `{ error: string }` |
+| 500 | Unexpected server error | `{ error: string }` |
+
+> 💡 **Example above is generic.** Adapt to the feature's needs. The goal is a **single consistent shape** across all routes — not per-route ad hoc formats.
+
+---
+
 ## Implementation Plan
 
 > File-by-file, step-by-step. Each step should be independently executable.
+>
+> **@spec anchors:** Every file implementing a FR/AC must include `// @spec FR-NNN: description — spec.md#fr-nnn` next to the implementing function. Place anchors as code is written, not retroactively.
 
 ### Step 1 — Database Schema
 

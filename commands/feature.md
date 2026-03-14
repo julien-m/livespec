@@ -146,7 +146,9 @@ The specify gate is **always active**. The spec is the functional contract — i
    - Path to `plan.md`
    - Path to `.specs/constitution.md`
 3. Present the Plan Review Report to the user
-4. Update `pipeline.md`: Plan Review → `Done` with timestamp
+4. If verdict is PASS (or user overrides BLOCKING):
+   - Update `plan.md` header: `Status: Draft` → `Status: Approved`
+5. Update `pipeline.md`: Plan Review → `Done` with timestamp
 
 **If verdict is BLOCKING:**
 

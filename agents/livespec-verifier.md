@@ -147,6 +147,8 @@ You receive from the caller:
 - Are edge cases listed in spec.md addressed in the plan?
 - Are error handling strategies defined for each step that touches external systems?
 - Are concurrency, race conditions, or data integrity risks considered where relevant?
+- Do operations that mutate multiple stores (database + cache, blob storage + metadata store, etc.) handle partial failure? Is the failure mode documented (rollback, orphan accepted, compensating action)?
+- Are there API operations whose scope is asymmetric? (e.g., DELETE removes from one store but not another — this must be explicitly flagged as intentional or treated as a gap)
 
 ### Output Format
 
