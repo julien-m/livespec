@@ -135,7 +135,7 @@ For other AI tools, paste `system/spec-system.md` into your tool's context.
 | Feature | LiveSpec | Spec Kit (GitHub) | APEX (aiblueprint) |
 |---|---|---|---|
 | Mermaid diagrams | ✅ Mandatory | ❌ None | ❌ None |
-| Spec-to-code traceability | ✅ FR/AC → `@spec` anchors | ❌ None | ⚠️ Partial |
+| Spec-to-code traceability | ✅ FR/AC → `@spec` anchors with deep-links | ❌ None | ⚠️ Partial |
 | Per-feature changelogs | ✅ Yes | ❌ No | ❌ No |
 | Visual testing baselines | ✅ Playwright | ❌ None | ❌ None |
 | Stack presets + decision trees | ✅ Yes | ❌ No | ⚠️ Minimal |

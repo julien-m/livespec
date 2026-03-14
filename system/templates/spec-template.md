@@ -152,6 +152,33 @@ flowchart TD
 | AC-004 | Preference change takes effect immediately (no page reload required) | P2 | Story 2 |
 | AC-005 | User can mark all notifications as read in a single action | P3 | Story 3 |
 
+> **Deep-link anchors:** Each AC below has a heading anchor (`#ac-001`, `#ac-002`, ...) enabling direct navigation from `implementation.md` and `@spec` comments.
+
+### AC-001
+
+**Criterion:** Unread notification count is displayed as a badge on the bell icon
+**Priority:** P1 | **Story:** Story 1
+
+### AC-002
+
+**Criterion:** Clicking a notification marks it as read and navigates to related content
+**Priority:** P1 | **Story:** Story 1
+
+### AC-003
+
+**Criterion:** User can disable email notifications from settings
+**Priority:** P2 | **Story:** Story 2
+
+### AC-004
+
+**Criterion:** Preference change takes effect immediately (no page reload required)
+**Priority:** P2 | **Story:** Story 2
+
+### AC-005
+
+**Criterion:** User can mark all notifications as read in a single action
+**Priority:** P3 | **Story:** Story 3
+
 ---
 
 ## Functional Requirements
@@ -175,6 +202,38 @@ flowchart TD
 | FR-004 | System must navigate to the notification's target URL after marking as read | AC-002 |
 | FR-005 | System must expose an endpoint to update notification preferences | AC-003, AC-004 |
 | FR-006 | System must expose an endpoint to mark all notifications as read | AC-005 |
+
+> **Deep-link anchors:** Each FR below has a heading anchor (`#fr-001`, `#fr-002`, ...) enabling direct navigation from `implementation.md` and `@spec` comments.
+
+### FR-001
+
+**Requirement:** System must fetch unread notification count for the authenticated user
+**AC References:** [AC-001](#ac-001)
+
+### FR-002
+
+**Requirement:** System must update the unread count in real-time via WebSocket or polling
+**AC References:** [AC-001](#ac-001)
+
+### FR-003
+
+**Requirement:** System must mark a notification as read when clicked
+**AC References:** [AC-002](#ac-002)
+
+### FR-004
+
+**Requirement:** System must navigate to the notification's target URL after marking as read
+**AC References:** [AC-002](#ac-002)
+
+### FR-005
+
+**Requirement:** System must expose an endpoint to update notification preferences
+**AC References:** [AC-003](#ac-003), [AC-004](#ac-004)
+
+### FR-006
+
+**Requirement:** System must expose an endpoint to mark all notifications as read
+**AC References:** [AC-005](#ac-005)
 
 ---
 

@@ -33,18 +33,23 @@
 
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
-| FR-001: [Brief FR description] | `src/data/notifications.ts` | `@spec FR-001` | ✅ Implemented | YYYY-MM-DD |
-| FR-002: [Brief FR description] | `src/hooks/useNotificationSubscription.ts` | `@spec FR-002` | ✅ Implemented | YYYY-MM-DD |
-| FR-003: [Brief FR description] | `src/data/notifications.ts` | `@spec FR-003` | ✅ Implemented | YYYY-MM-DD |
-| FR-004: [Brief FR description] | `src/components/notifications/NotificationItem.tsx` | `@spec FR-004` | ✅ Implemented | YYYY-MM-DD |
-| FR-005: [Brief FR description] | `src/api/notifications/route.ts` | `@spec FR-005` | ⚠️ Partial | YYYY-MM-DD |
-| FR-006: [Brief FR description] | — | — | ❌ Missing | YYYY-MM-DD |
+| [FR-001: Fetch unread count](spec.md#fr-001) | `src/data/notifications.ts` | `@spec FR-001: Fetch unread count` | ✅ Implemented | YYYY-MM-DD |
+| [FR-002: Real-time count updates](spec.md#fr-002) | `src/hooks/useNotificationSubscription.ts` | `@spec FR-002: Real-time count updates` | ✅ Implemented | YYYY-MM-DD |
+| [FR-003: Mark as read on click](spec.md#fr-003) | `src/data/notifications.ts` | `@spec FR-003: Mark as read on click` | ✅ Implemented | YYYY-MM-DD |
+| [FR-004: Navigate to target](spec.md#fr-004) | `src/components/notifications/NotificationItem.tsx` | `@spec FR-004: Navigate to target` | ✅ Implemented | YYYY-MM-DD |
+| [FR-005: Update preferences](spec.md#fr-005) | `src/api/notifications/route.ts` | `@spec FR-005: Update preferences` | ⚠️ Partial | YYYY-MM-DD |
+| [FR-006: Mark all as read](spec.md#fr-006) | — | — | ❌ Missing | YYYY-MM-DD |
 
 **Notes:**
 - FR-005 is partial: endpoint exists but preference validation is incomplete (see issue #42)
 - FR-006 is not yet implemented — scheduled for next sprint
 
-> **How `@spec` anchors work:** Place an inline comment in the source file next to the implementing function/class (e.g. `// @spec FR-001` in TypeScript/JavaScript, `# @spec FR-001` in Python, `-- @spec FR-001` in SQL). Use `grep -rn "@spec FR-001"` to locate any requirement instantly, regardless of line number changes. Multiple requirements can share one anchor: `// @spec FR-001 FR-003`.
+> **How `@spec` anchors work:** Place an inline comment in the source file next to the implementing function/class:
+> - TypeScript/JavaScript: `// @spec FR-001: Brief description — .specs/features/NNN-feature-name/spec.md#fr-001`
+> - Python: `# @spec FR-001: Brief description — .specs/features/NNN-feature-name/spec.md#fr-001`
+> - SQL: `-- @spec FR-001: Brief description — .specs/features/NNN-feature-name/spec.md#fr-001`
+>
+> The description (after `:`) is a short summary (<50 chars) providing inline context. The `#fr-001` fragment enables deep-linking in the Markdown ecosystem. Use `grep -rn "@spec FR-001"` to locate any requirement instantly. Multiple requirements: `// @spec FR-001: Fetch count, FR-003: Mark as read — spec.md#fr-001`.
 
 ---
 
@@ -52,13 +57,13 @@
 
 > Maps each Acceptance Criterion to the test(s) that verify it.
 
-| AC | Description | Test File | Test Name | Status |
-|---|---|---|---|---|
-| AC-001 | [AC description] | `tests/api/notifications.test.ts` | `"returns unread count for user"` | ✅ Passing |
-| AC-002 | [AC description] | `tests/e2e/notifications.spec.ts` | `"marks notification as read on click"` | ✅ Passing |
-| AC-003 | [AC description] | `tests/api/notifications.test.ts` | `"updates email notification preference"` | ⚠️ Partial |
-| AC-004 | [AC description] | `tests/e2e/notifications.spec.ts` | `"preference change takes effect immediately"` | ❌ Missing |
-| AC-005 | [AC description] | `tests/e2e/notifications.spec.ts` | `"marks all notifications as read"` | ❌ Missing |
+| AC | Test File | Test Name | Status |
+|---|---|---|---|
+| [AC-001: Unread count badge](spec.md#ac-001) | `tests/api/notifications.test.ts` | `"returns unread count for user"` | ✅ Passing |
+| [AC-002: Click marks read + navigates](spec.md#ac-002) | `tests/e2e/notifications.spec.ts` | `"marks notification as read on click"` | ✅ Passing |
+| [AC-003: Disable email notifications](spec.md#ac-003) | `tests/api/notifications.test.ts` | `"updates email notification preference"` | ⚠️ Partial |
+| [AC-004: Immediate preference effect](spec.md#ac-004) | `tests/e2e/notifications.spec.ts` | `"preference change takes effect immediately"` | ❌ Missing |
+| [AC-005: Mark all as read](spec.md#ac-005) | `tests/e2e/notifications.spec.ts` | `"marks all notifications as read"` | ❌ Missing |
 
 ---
 

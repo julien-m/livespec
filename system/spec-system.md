@@ -20,11 +20,14 @@
    Every user story in a spec.md must include a Mermaid flowchart. Text-only specs are incomplete.
 
 5. **Code is linked to specs — every implementation is traceable.**
-   After implementation, `implementation.md` maps every FR and AC to the `@spec` anchor comment placed directly in the source code. Anchor comments include the **relative path to the spec file** so developers can Cmd/Ctrl+click to navigate:
+   After implementation, `implementation.md` maps every FR and AC to the `@spec` anchor comment placed directly in the source code. Anchor comments include a **brief description** and the **relative path to the spec file with a fragment anchor** for deep-linking:
    ```
-   // @spec FR-001 — .specs/features/NNN-feature-name/spec.md
+   // @spec FR-001: Brief description — .specs/features/NNN-feature-name/spec.md#fr-001
    ```
-   Use `grep -rn "@spec FR-001"` to find the exact location regardless of line number changes.
+   - The description (after `:`) is a short summary (<50 chars) of the FR/AC
+   - The fragment `#fr-001` enables deep-linking within the Markdown ecosystem (GitHub, preview, `implementation.md` → `spec.md`)
+   - `grep -rn "@spec FR-001"` continues to work regardless of line number changes
+   - Multi-requirements: list each `ID: description` separated by commas (e.g. `// @spec FR-001: Fetch count, FR-003: Mark as read — spec.md#fr-001`)
 
 ---
 

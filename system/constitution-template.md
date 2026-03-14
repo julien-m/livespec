@@ -96,7 +96,7 @@
 
 ### Living Documentation
 - Specs are updated when behavior changes — never let them become stale
-- implementation.md is updated after every code change, with `@spec` anchor comments placed in source files to maintain resilient spec-to-code traceability
+- implementation.md is updated after every code change, with `@spec ID: description` anchor comments placed in source files to maintain resilient spec-to-code traceability
 - changelog.md gets an entry for every feature/bugfix/refactor
 
 ### Update Rules

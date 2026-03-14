@@ -171,9 +171,11 @@ Create or update `.specs/features/NNN-feature-name/implementation.md`:
 For every FR and AC, fill in:
 
 ```markdown
-| FR-001 | src/data/notifications.ts | `@spec FR-001` | ✅ Implemented | 2024-03-15 |
-| FR-002 | src/hooks/useNotificationSubscription.ts | `@spec FR-002` | ✅ Implemented | 2024-03-15 |
+| [FR-001: Fetch unread count](spec.md#fr-001) | src/data/notifications.ts | `@spec FR-001: Fetch unread count` | ✅ Implemented | 2024-03-15 |
+| [FR-002: Real-time count updates](spec.md#fr-002) | src/hooks/useNotificationSubscription.ts | `@spec FR-002: Real-time count updates` | ✅ Implemented | 2024-03-15 |
 ```
+
+The `@spec` anchor in source code must include `: description` extracted from the FR text in `spec.md`. The Requirement column deep-links to `spec.md#fr-nnn` for direct navigation.
 
 For every visual baseline:
 

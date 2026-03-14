@@ -46,7 +46,7 @@ From `.specs/features/NNN-feature-name/implementation.md`, get:
 
 If `implementation.md` is missing or incomplete:
 
-1. Build a temporary mapping by searching `@spec FR-*` anchors in source files.
+1. Build a temporary mapping by searching `@spec FR-*` and `@spec AC-*` anchors in source files. Extract descriptions from the `@spec ID: description` format when present.
 2. Infer AC coverage from test names/assertions and test metadata.
 3. Mark inferred links as `~ Inferred` (never as fully verified mapping).
 4. Recommend updating `implementation.md` at end of run.
@@ -103,12 +103,12 @@ Output a structured gap report:
 
 | FR | Description | Status | Location | Notes |
 |---|---|---|---|---|
-| FR-001 | Fetch unread notification count | ✅ Verified | `src/data/notifications.ts` (`@spec FR-001`) | |
-| FR-002 | Real-time count updates | ✅ Verified | `src/hooks/useNotificationSubscription.ts` (`@spec FR-002`) | |
-| FR-003 | Mark notification as read | ✅ Verified | `src/data/notifications.ts` (`@spec FR-003`) | |
-| FR-004 | Navigate to notification target | ⚠️ Partial | `src/components/notifications/NotificationItem.tsx` (`@spec FR-004`) | No fallback for missing target_url |
-| FR-005 | Notification preferences endpoint | 🔄 Drifted | `src/api/notifications/route.ts` (`@spec FR-005`) | Added new fields not in spec |
-| FR-006 | Mark all notifications as read | ❌ Missing | — | Not implemented |
+| [FR-001](spec.md#fr-001) | Fetch unread notification count | ✅ Verified | `src/data/notifications.ts` (`@spec FR-001: Fetch unread count`) | |
+| [FR-002](spec.md#fr-002) | Real-time count updates | ✅ Verified | `src/hooks/useNotificationSubscription.ts` (`@spec FR-002: Real-time count updates`) | |
+| [FR-003](spec.md#fr-003) | Mark notification as read | ✅ Verified | `src/data/notifications.ts` (`@spec FR-003: Mark as read on click`) | |
+| [FR-004](spec.md#fr-004) | Navigate to notification target | ⚠️ Partial | `src/components/notifications/NotificationItem.tsx` (`@spec FR-004: Navigate to target`) | No fallback for missing target_url |
+| [FR-005](spec.md#fr-005) | Notification preferences endpoint | 🔄 Drifted | `src/api/notifications/route.ts` (`@spec FR-005: Update preferences`) | Added new fields not in spec |
+| [FR-006](spec.md#fr-006) | Mark all notifications as read | ❌ Missing | — | Not implemented |
 
 ### Acceptance Criteria
 
