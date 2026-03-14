@@ -34,6 +34,7 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 
 ```
 .specs/
+├── README.md                ← Spec registry and artifact index
 ├── spec-system.md           ← This file (rules)
 ├── constitution.md          ← Architecture principles for this project
 ├── project.md               ← Vision, users, constraints
@@ -160,6 +161,25 @@ OpenAPI YAML or GraphQL schemas for any API endpoints introduced by the feature.
 ### baselines/ — Visual test baselines
 
 Playwright screenshot baselines for visual features. Filenames match the test scenario names.
+
+---
+
+## README.md — Spec Registry
+
+`.specs/README.md` is the centralized index of all spec artifacts. It is maintained automatically by spec commands.
+
+**Update rules:**
+- `/spec.init` creates it with initial content
+- `/spec.specify` adds a feature row (Status: Draft)
+- `/spec.plan` updates feature status to Planned
+- `/spec.implement` updates feature status to Implemented/In Progress + regenerates Recent Activity from changelog.md
+- `/spec.stack` adds ADR rows + regenerates Recent Activity
+- `/spec.check` and `/spec.explain` do not modify it
+- Every update also refreshes the `Last updated` date in the header
+
+**Section markers:** Updatable sections use `<!-- readme:features:start/end -->`, `<!-- readme:decisions:start/end -->`, `<!-- readme:activity:start/end -->` HTML comments. Do not remove these markers.
+
+**Recovery:** If README.md is missing, any updating command rebuilds it by scanning existing `.specs/features/*/spec.md`, `.specs/stacks/decisions/ADR-*.md`, and `.specs/changelog.md`.
 
 ---
 

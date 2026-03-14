@@ -199,6 +199,22 @@ Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 
 Also add a summary entry to `.specs/changelog.md` (global).
 
+### Phase 8.5 — Update README.md
+
+1. Update the feature row in `.specs/README.md`:
+   - If all steps completed successfully: set Status to `Implemented`
+   - If blocked or partial: set Status to `In Progress`
+   - Update the `Updated` date to today
+
+2. Regenerate the Recent Activity section:
+   - Read `.specs/changelog.md`
+   - Extract the last 10 entries (most recent first)
+   - Rewrite the content between `<!-- readme:activity:start -->` and `<!-- readme:activity:end -->`
+
+3. Update the `Last updated` date in the header.
+
+If `.specs/README.md` does not exist, create it by scanning existing artifacts (see spec-system.md README.md Recovery).
+
 ---
 
 ## Output
@@ -251,6 +267,8 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 - [ ] `implementation.md` updated with FR/AC -> `@spec` mappings
 - [ ] Feature `changelog.md` updated
 - [ ] Global `.specs/changelog.md` updated
+- [ ] `.specs/README.md` feature row Status updated (Implemented or In Progress)
+- [ ] `.specs/README.md` Recent Activity regenerated from changelog
 - [ ] Resume point is saved when incomplete work remains
 
 If not complete, return a resumable status report instead of a success message.

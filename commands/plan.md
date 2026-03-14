@@ -176,6 +176,17 @@ If the feature introduces new API endpoints:
 2. Generate `openapi.yaml` with endpoint specifications
 3. Include request/response schemas based on the ER diagram
 
+### Step 9.5 — Update README.md
+
+Update the feature row in `.specs/README.md`:
+- Set Status to `Planned`
+- Update the `Updated` date to today
+
+Find the row by matching the feature number (column 1) between `<!-- readme:features:start -->` and `<!-- readme:features:end -->`.
+Update the `Last updated` date in the header.
+
+If `.specs/README.md` does not exist, create it by scanning existing artifacts (see spec-system.md README.md Recovery).
+
 ### Step 10 — Present for Approval
 
 > ✅ **Plan generated:** `.specs/features/004-notifications/plan.md`
@@ -226,6 +237,7 @@ If the feature introduces new API endpoints:
 - [ ] Constitution check contains explicit pass/deviation notes
 - [ ] Test commands are resolved (Resolved Test Commands table filled)
 - [ ] Testing strategy maps AC/FR to concrete test files
+- [ ] `.specs/README.md` feature row Status is `Planned`
 - [ ] Next action is proposed (`/spec.implement [feature]`)
 
 If a requirement cannot be planned safely, mark it `[DECISION NEEDED]` with owner and unblock options.

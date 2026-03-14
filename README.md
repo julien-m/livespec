@@ -88,6 +88,7 @@ For any AI tool that reads Markdown, paste the content of `system/spec-system.md
 
 ```
 .specs/
+├── README.md               ← Spec registry and artifact index (auto-maintained)
 ├── spec-system.md          ← The rules (READ FIRST — every tool reads this)
 ├── constitution.md         ← Project architecture principles
 ├── project.md              ← Vision, users, constraints (from brainstorm)

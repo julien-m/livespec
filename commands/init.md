@@ -227,6 +227,7 @@ After confirmation, the AI creates the `.specs/` directory structure:
 
 ```
 .specs/
+├── README.md               ← Spec registry and artifact index
 ├── spec-system.md          ← Copied from livespec system/spec-system.md
 ├── constitution.md         ← Generated from conversation
 ├── project.md              ← Generated from Phase A brainstorm
@@ -245,6 +246,75 @@ After confirmation, the AI creates the `.specs/` directory structure:
 │
 └── changelog.md            ← Global changelog (initial entry)
 ```
+
+### Step 3.10 — Create README.md
+
+Create `.specs/README.md` as the centralized spec registry and artifact index.
+
+**Template:**
+
+```markdown
+# .specs — [Project Name]
+
+> Specification registry for [Project Name]. All artifacts produced by LiveSpec are indexed here.
+>
+> Last updated: YYYY-MM-DD
+
+---
+
+## System Files
+
+| Document | Description |
+|---|---|
+| [spec-system.md](spec-system.md) | Universal spec rules (read first) |
+| [constitution.md](constitution.md) | Architecture principles |
+| [project.md](project.md) | Project profile (vision, users, constraints) |
+| [stacks/_default.md](stacks/_default.md) | Current tech stack |
+| [testing/strategy.md](testing/strategy.md) | Testing strategy |
+| [changelog.md](changelog.md) | Global changelog |
+
+---
+
+## Features
+
+<!-- readme:features:start -->
+| # | Feature | Status | Created | Updated | Spec |
+|---|---|---|---|---|---|
+<!-- readme:features:end -->
+
+> No features yet. Create your first with `/spec.specify "feature description"`.
+
+---
+
+## Architecture Decisions
+
+<!-- readme:decisions:start -->
+| ADR | Decision | Date | Status |
+|---|---|---|---|
+<!-- readme:decisions:end -->
+
+---
+
+## Recent Activity
+
+> Latest entries from [changelog.md](changelog.md).
+
+<!-- readme:activity:start -->
+| Date | Type | Description |
+|---|---|---|
+| YYYY-MM-DD | Setup | LiveSpec initialized |
+<!-- readme:activity:end -->
+
+---
+
+*Maintained automatically by LiveSpec commands. Do not remove section markers.*
+```
+
+**Fill instructions:**
+- Replace `[Project Name]` with the project name from Phase A brainstorm
+- Replace `YYYY-MM-DD` with today's date
+- Populate the Architecture Decisions table with all ADRs created in Phase B Step 4 (one row per ADR, Status: Active)
+- The Features table starts empty (only header row between markers)
 
 ### Step 3.11 — Install LiveSpec section in CLAUDE.md
 
@@ -280,6 +350,7 @@ This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails 
 > - `.specs/stacks/decisions/` — 3 Architecture Decision Records
 > - `.specs/testing/strategy.md` — your testing strategy
 > - `.specs/features/` — ready for your first feature spec
+> - `.specs/README.md` — spec registry and artifact index
 > - `.specs/changelog.md` — global changelog
 >
 > **Next step:** Create your first feature spec with:
@@ -309,6 +380,7 @@ This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails 
 | `.specs/project.md` | `system/templates/project-template.md` | Filled from Phase A answers |
 | `.specs/stacks/_default.md` | Stack preset (e.g., `stacks/presets/web-realtime.md`) | Customized with project-specific choices |
 | `.specs/testing/strategy.md` | `system/templates/testing-strategy-template.md` | Tailored to project type and stack |
+| `.specs/README.md` | Inline (template) | Filled with project name, initial ADRs |
 | `.specs/changelog.md` | Inline | Empty global changelog with first entry |
 
 ---
@@ -345,6 +417,7 @@ Before declaring success, verify:
 - [ ] `.specs/stacks/_default.md` contains chosen stack + rationale
 - [ ] At least 1 ADR exists in `.specs/stacks/decisions/`
 - [ ] `.specs/testing/strategy.md` exists
+- [ ] `.specs/README.md` exists with project name and initial ADRs
 - [ ] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block
 
 If any check fails, report the exact missing artifact and create/fix it before finishing.

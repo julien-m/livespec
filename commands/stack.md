@@ -213,6 +213,20 @@ Migrate from Supabase (PostgreSQL + Auth + Realtime) to Firebase (Firestore + Au
 See `.specs/features/migration-supabase-to-firebase/spec.md`
 ```
 
+**After creating the ADR file, update `.specs/README.md`:**
+
+1. Add a new row to the Architecture Decisions table (between `<!-- readme:decisions:start -->` and `<!-- readme:decisions:end -->`):
+
+   | [ADR-NNN](stacks/decisions/ADR-NNN-short-name.md) | Decision title | YYYY-MM-DD | Active |
+
+2. If the new ADR supersedes an existing one, update the superseded ADR's Status to `Superseded`.
+
+3. Regenerate the Recent Activity section from `.specs/changelog.md` (last 10 entries).
+
+4. Update the `Last updated` date in the header.
+
+If `.specs/README.md` does not exist, create it by scanning existing artifacts (see spec-system.md README.md Recovery).
+
 #### Step 5 — Update _default.md
 
 Update `.specs/stacks/_default.md` to reflect the new stack decisions.
@@ -264,6 +278,7 @@ Lists all ADRs chronologically with summaries:
 - [ ] ADR is created/updated unless `--no-adr`
 - [ ] `_default.md` reflects the active decision state
 - [ ] Migration or rollback path is documented for non-trivial changes
+- [ ] `.specs/README.md` Architecture Decisions table updated with new ADR
 - [ ] Next action is proposed (e.g., migration specs or `/spec.plan`)
 
 If uncertainty remains high, default to `--dry-run` style output and request explicit confirmation.

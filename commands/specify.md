@@ -135,6 +135,18 @@ Show the generated spec and ask for confirmation:
 > 2. Review and edit the spec first
 > 3. Create a git branch: `feature/004-notifications`
 
+### Step 7.5 — Update README.md
+
+Add a new row to the Features table in `.specs/README.md` (between `<!-- readme:features:start -->` and `<!-- readme:features:end -->` markers):
+
+| NNN | Feature Name | Draft | YYYY-MM-DD | YYYY-MM-DD | [spec](features/NNN-feature-name/spec.md) |
+
+Maintain ascending order by feature number. Update the `Last updated` date in the header.
+
+If this is the first feature, remove the `> No features yet.` hint line below the table.
+
+If `.specs/README.md` does not exist, create it by scanning existing artifacts (see spec-system.md README.md Recovery).
+
 ### Step 8 — Optionally Create Git Branch
 
 If user confirms branch creation:
@@ -215,6 +227,7 @@ flowchart TD
 - [ ] Every user story has a Mermaid flowchart
 - [ ] Every FR maps to >= 1 AC
 - [ ] `spec.md` includes either explicit values or `[ASSUMED]` markers for missing context
+- [ ] `.specs/README.md` Features table contains the new feature row with Status: Draft
 - [ ] Next action is proposed (`/spec.plan [feature]`)
 
 If any item fails, fix before returning final output.
