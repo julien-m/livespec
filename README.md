@@ -33,7 +33,7 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
-## The 7 Commands
+## The 8 Commands
 
 | Command | What it does |
 |---|---|
@@ -44,6 +44,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | `/spec.check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
 | `/spec.explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
+| `/spec.feature` | Full pipeline: specify → plan → plan review → implement, with validation gates |
 
 ---
 
@@ -76,11 +77,145 @@ cd your-project
 
 # 8. Explain the feature (living docs)
 /spec.explain "how do notifications work?"
+
+# Alternative: full pipeline in one command
+/spec.feature "User can receive real-time notifications"
 ```
 
 ### Other AI tools
 
 For any AI tool that reads Markdown, paste the content of `system/spec-system.md` into your tool's context. The spec system is tool-agnostic — any AI that can read `.specs/` will follow the rules.
+
+---
+
+## Workflow Guide
+
+### Manual flow (step by step)
+
+Run each command individually with full control at every stage:
+
+```bash
+/spec.specify "User can filter by date"   # 1. Generate spec.md
+/spec.plan date-filter                     # 2. Generate plan.md
+/spec.implement date-filter                # 3. Implement from plan
+/spec.check date-filter                    # 4. Verify spec vs code
+```
+
+### Pipeline flow (`/spec.feature`)
+
+Run the full pipeline in one command with validation gates between each phase:
+
+```bash
+# Interactive (default) — pauses for your approval between phases
+/spec.feature "User can filter by date"
+
+# Automatic — no pauses, auto-retries if plan review fails
+/spec.feature "User can filter by date" --auto
+
+# Resume an interrupted pipeline
+/spec.feature --resume date-filter
+```
+
+### After implementation
+
+```bash
+/spec.check date-filter                    # Verify spec-code alignment
+/spec.explain "how does date filtering work?"  # Living documentation
+/spec.stack                                # View or evolve the stack
+```
+
+---
+
+## Command Reference
+
+### `/spec.init`
+
+Initialize LiveSpec in a project. Runs a 3-phase conversational brainstorm (interview → stack decisions → file generation).
+
+```bash
+/spec.init                    # Full interactive setup
+/spec.init --auto             # Use defaults, skip questions
+/spec.init --stack web-realtime  # Skip interview, use preset
+```
+
+Key flags: `--auto`, `--stack [preset]`, `--dir [path]`, `--dry-run`
+
+### `/spec.specify`
+
+Create a feature spec with user stories, Mermaid flowcharts, AC, and FR.
+
+```bash
+/spec.specify "User can upload profile photos"
+/spec.specify "Payment processing" --branch --priority P1
+```
+
+Key flags: `--branch`, `--no-branch`, `--priority`
+
+### `/spec.plan`
+
+Generate a technical plan with sequence, state, and ER diagrams from a spec.
+
+```bash
+/spec.plan profile-photos
+/spec.plan profile-photos --no-contracts
+```
+
+Key flags: `--no-contracts`
+
+### `/spec.implement`
+
+Auto-implement from plan: code, test, verify, document. Multi-agent by default.
+
+```bash
+/spec.implement profile-photos            # Multi-agent (default)
+/spec.implement profile-photos --mono     # Single-agent
+/spec.implement profile-photos --resume   # Resume interrupted run
+```
+
+Key flags: `--mono`, `--economy`, `--resume`, `--no-visual`, `--no-save`, `--step`
+
+### `/spec.check`
+
+Compare spec vs actual code — find gaps, verify AC, detect visual drift.
+
+```bash
+/spec.check profile-photos
+/spec.check                               # Check all features
+```
+
+### `/spec.explain`
+
+Living documentation — understand how a feature works from spec + code + history.
+
+```bash
+/spec.explain "how do notifications work?"
+/spec.explain profile-photos
+```
+
+### `/spec.stack`
+
+View current stack, analyze change impact, create Architecture Decision Records.
+
+```bash
+/spec.stack                               # View current stack
+/spec.stack "migrate from Supabase to Prisma"
+```
+
+### `/spec.feature`
+
+Full pipeline: specify → plan → plan review → implement, with validation gates.
+
+```bash
+/spec.feature "Real-time notifications"              # Interactive
+/spec.feature "CSV export" --auto                     # Automatic
+/spec.feature --resume csv-export                     # Resume
+/spec.feature "Dark mode" --mono                      # Single-agent implementation
+/spec.feature "Payment processing" --branch --priority P1  # With branch + priority
+```
+
+Key flags: `--auto`, `--resume`, `--branch`, `--priority`, `--mono`, `--economy`, `--step`
+
+> Full command documentation is in `commands/*.md`.
 
 ---
 
@@ -124,7 +259,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 7 commands (`~/.claude/commands/spec.*.md`) and 5 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 8 commands (`~/.claude/commands/spec.*.md`) and 5 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -216,7 +351,8 @@ livespec/
 │   ├── implement.md
 │   ├── check.md
 │   ├── explain.md
-│   └── stack.md
+│   ├── stack.md
+│   └── feature.md
 └── scripts/
     ├── install.sh                  ← Install commands + agents into ~/.claude/
     └── init.sh                     ← Bootstrap .specs/ structure (shell)

@@ -50,6 +50,7 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │   ├── check.md
 │   ├── explain.md
 │   ├── stack.md
+│   ├── feature.md
 │   └── link.md
 │
 ├── stacks/
@@ -380,6 +381,7 @@ Before acting on a user request, classify the intent to determine the correct co
 | No `.specs/` directory exists | `/spec.init` |
 | Feature exists but no `spec.md` | `/spec.specify` |
 | Feature has `spec.md` but no `plan.md` | `/spec.plan` |
+| Full feature pipeline (specify → plan → implement) | `/spec.feature` |
 
 ---
 
