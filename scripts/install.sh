@@ -14,7 +14,7 @@ LIVESPEC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 COMMANDS_DIR="$HOME/.claude/commands"
 AGENTS_DIR="$HOME/.claude/agents"
 
-COMMANDS=(init specify plan implement check explain stack feature refine)
+COMMANDS=(init propose specify plan implement check explain stack feature refine)
 AGENTS=(livespec-supervisor livespec-implementer livespec-verifier livespec-tester livespec-documenter)
 
 # --- Flags ---

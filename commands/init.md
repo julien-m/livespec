@@ -332,7 +332,7 @@ The section content is minimal — a boot pointer to `spec-system.md` plus the c
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec.init` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature`
+Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature`
 <!-- livespec:end -->
 ```
 
@@ -353,10 +353,11 @@ This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails 
 > - `.specs/README.md` — spec registry and artifact index
 > - `.specs/changelog.md` — global changelog
 >
-> **Next step:** Create your first feature spec with:
+> **Next step:** Discover what to build first:
 > ```
-> /spec.specify "User can post a job listing"
+> /spec.propose
 > ```
+> Or create a specific feature directly: `/spec.specify "feature description"`
 
 ---
 

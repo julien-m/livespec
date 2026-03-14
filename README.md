@@ -33,11 +33,12 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
-## The 9 Commands
+## The 10 Commands
 
 | Command | What it does |
 |---|---|
 | `/spec.init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md |
+| `/spec.propose` | Analyze project context and intelligently propose the next feature(s) to build |
 | `/spec.specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
 | `/spec.plan` | Generate technical plan with sequence, state, and ER diagrams |
 | `/spec.implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
@@ -64,19 +65,22 @@ bash ~/livespec/scripts/install.sh
 cd your-project
 /spec.init
 
-# 4. Create your first feature spec
+# 4. Discover what to build first
+/spec.propose
+
+# 5. Create your first feature spec
 /spec.specify "User can receive real-time notifications"
 
-# 5. Generate technical plan
+# 6. Generate technical plan
 /spec.plan notifications
 
-# 6. Implement with auto-pipeline
+# 7. Implement with auto-pipeline
 /spec.implement notifications
 
-# 7. Verify spec vs code
+# 8. Verify spec vs code
 /spec.check notifications
 
-# 8. Explain the feature (living docs)
+# 9. Explain the feature (living docs)
 /spec.explain "how do notifications work?"
 
 # Alternative: full pipeline in one command
@@ -140,6 +144,19 @@ Initialize LiveSpec in a project. Runs a 3-phase conversational brainstorm (inte
 ```
 
 Key flags: `--auto`, `--stack [preset]`, `--dir [path]`, `--dry-run`
+
+### `/spec.propose`
+
+Analyze project context (vision, users, existing features, roadmap) and propose the next feature(s) to build. Read-only — no files created.
+
+```bash
+/spec.propose                     # Propose the next feature
+/spec.propose --count 3           # Propose 3 ranked features
+/spec.propose --role admin        # Focus on admin features
+/spec.propose --mvp               # Only MVP-critical suggestions
+```
+
+Key flags: `--count N`, `--role [name]`, `--mvp`, `--auto`
 
 ### `/spec.specify`
 
@@ -273,7 +290,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 9 commands (`~/.claude/commands/spec.*.md`) and 5 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 10 commands (`~/.claude/commands/spec.*.md`) and 5 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -360,6 +377,7 @@ livespec/
 │   └── livespec-documenter.md      ← Updates spec artifacts
 ├── commands/                       ← Command docs (symlinked by install.sh)
 │   ├── init.md
+│   ├── propose.md
 │   ├── specify.md
 │   ├── plan.md
 │   ├── implement.md

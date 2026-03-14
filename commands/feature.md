@@ -206,7 +206,9 @@ When all phases are done, display:
 > - Review: PASS (or SKIPPED)
 > - Implementation: Done
 >
-> **Next:** Run `/spec.check NNN-feature-name` to verify spec-code alignment.
+> **Next:**
+> - Verify: `/spec.check NNN-feature-name`
+> - Next feature: `/spec.propose`
 
 ---
 

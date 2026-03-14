@@ -44,6 +44,7 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │
 ├── commands/                ← LiveSpec command docs
 │   ├── init.md
+│   ├── propose.md
 │   ├── specify.md
 │   ├── plan.md
 │   ├── implement.md
@@ -193,6 +194,7 @@ Detailed execution logs from `/spec.implement` runs. Each file is named `YYYY-MM
 - `/spec.implement` updates feature status to Implemented/In Progress + regenerates Recent Activity from changelog.md
 - `/spec.stack` adds ADR rows + regenerates Recent Activity
 - `/spec.refine` updates the `Last updated` date (does not modify feature rows)
+- `/spec.propose` does not modify it (read-only command)
 - `/spec.check` and `/spec.explain` do not modify it
 - Every update also refreshes the `Last updated` date in the header
 
@@ -383,6 +385,7 @@ Before acting on a user request, classify the intent to determine the correct co
 | No `.specs/` directory exists | `/spec.init` |
 | Feature exists but no `spec.md` | `/spec.specify` |
 | Feature has `spec.md` but no `plan.md` | `/spec.plan` |
+| What should I build next? / Propose next feature | `/spec.propose` |
 | Full feature pipeline (specify → plan → implement) | `/spec.feature` |
 | Refine or update project-level artifacts | `/spec.refine project` |
 | Refine or update an existing feature spec | `/spec.refine [feature]` |
