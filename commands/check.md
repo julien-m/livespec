@@ -139,6 +139,32 @@ Output a structured gap report:
 **Overall health:** ⚠️ Needs attention
 ```
 
+#### Persist Gap Report
+
+Save the gap report to `.specs/features/NNN-feature-name/checks/YYYY-MM-DD.md`.
+
+If the `checks/` directory does not exist, create it.
+
+This enables historical comparison: "did the gap get worse or better since last check?"
+
+### Step 6.5 — Update Changelog
+
+Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
+
+```markdown
+### YYYY-MM-DD — Check: Spec-code alignment verified
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **Coverage:** N/M verified (X%), N partial, N missing
+- **Report:** `checks/YYYY-MM-DD.md`
+- **Author:** [tool name]
+```
+
+Also add a summary entry to `.specs/changelog.md` (global):
+`[Feature NNN] Check: X% verified (N/M FR, N/M AC)`
+
 ### Step 7 — Suggest Fixes
 
 For each gap, provide a specific, actionable suggestion:
@@ -184,10 +210,10 @@ To implement: `/spec.implement notifications --step 6`
 ## Output
 
 ```
-Gap report printed to console.
-
-Optionally updated:
-.specs/features/004-notifications/implementation.md  ← Status updated
+.specs/features/004-notifications/
+├── checks/
+│   └── 2024-03-20.md   ← Gap report saved
+└── implementation.md    ← Status updated (if --update)
 ```
 
 ---
@@ -219,6 +245,18 @@ jobs:
       - uses: actions/checkout@v4
       - run: /spec.check --ci --no-visual
 ```
+
+---
+
+## Definition of Done (Command-Level)
+
+`/spec.check` is complete only if all are true:
+
+- [ ] Gap report produced and displayed
+- [ ] Gap report saved to `checks/YYYY-MM-DD.md`
+- [ ] Feature `changelog.md` has a check entry
+- [ ] Global `.specs/changelog.md` has a summary entry
+- [ ] If `--update`: `implementation.md` status values refreshed
 
 ---
 

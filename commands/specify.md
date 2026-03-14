@@ -147,6 +147,23 @@ If this is the first feature, remove the `> No features yet.` hint line below th
 
 If `.specs/README.md` does not exist, create it by scanning existing artifacts (see spec-system.md README.md Recovery).
 
+### Step 7.6 — Update Changelog
+
+Add a first entry to `.specs/features/NNN-feature-name/changelog.md`:
+
+```markdown
+### YYYY-MM-DD — Spec: Feature specification created
+
+- **Type:** Spec Update
+- **Spec modified:** Yes (created — all sections)
+- **Code modified:** None
+- **AC impacted:** AC-001 through AC-NNN (all defined)
+- **Author:** [tool name]
+```
+
+Also add a summary entry to `.specs/changelog.md` (global):
+`[Feature NNN] Spec created: [Feature Name] — N stories, N AC, N FR`
+
 ### Step 8 — Optionally Create Git Branch
 
 If user confirms branch creation:
@@ -228,6 +245,8 @@ flowchart TD
 - [ ] Every FR maps to >= 1 AC
 - [ ] `spec.md` includes either explicit values or `[ASSUMED]` markers for missing context
 - [ ] `.specs/README.md` Features table contains the new feature row with Status: Draft
+- [ ] Feature `changelog.md` has an initial entry
+- [ ] Global `.specs/changelog.md` has a summary entry
 - [ ] Next action is proposed (`/spec.plan [feature]`)
 
 If any item fails, fix before returning final output.

@@ -133,6 +133,8 @@ Work through each step, respecting the Step Gate above:
 6. **Follow existing patterns** — match the style and structure of surrounding code
 7. **Constitution check** — verify each file follows constitution rules
 
+**Execution logs:** By default, a detailed execution log is saved to `.specs/features/NNN-feature-name/logs/YYYY-MM-DD.md` after completion. Use `--no-save` to disable.
+
 **File naming and structure:**
 - Follow conventions from `.specs/constitution.md`
 - Match patterns from existing code (read similar files first)
@@ -228,6 +230,8 @@ If `.specs/README.md` does not exist, create it by scanning existing artifacts (
 ├── progress.md          ← Step-by-step checkpoint (used by --resume)
 ├── implementation.md    ← Created/updated with FR→@spec mapping
 ├── changelog.md         ← Updated with new entry
+├── logs/                ← Execution logs (default, use --no-save to disable)
+│   └── YYYY-MM-DD.md
 └── baselines/           ← Playwright screenshots (if UI feature)
     ├── panel-empty.png
     ├── panel-unread.png
@@ -245,7 +249,7 @@ db/migrations/           ← New migration files
 | Flag | Behavior |
 |---|---|
 | `--auto` | Skip all confirmation prompts, full automatic pipeline |
-| `--save` | Save execution logs to `.specs/features/NNN/logs/YYYY-MM-DD.md` |
+| `--no-save` | Do not save execution logs (by default, logs are saved to `.specs/features/NNN/logs/YYYY-MM-DD.md`) |
 | `--economy` | No subagents, direct tools only (slower but uses less tokens) |
 | `--resume` | Resume an interrupted implementation (reads `progress.md`, restarts at first non-`Done` step) |
 | `--no-visual` | Skip visual baseline capture even if UI components are created |
@@ -271,6 +275,7 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 - [ ] Global `.specs/changelog.md` updated
 - [ ] `.specs/README.md` feature row Status updated (Implemented or In Progress)
 - [ ] `.specs/README.md` Recent Activity regenerated from changelog
+- [ ] Execution log saved to `logs/YYYY-MM-DD.md` (unless `--no-save`)
 - [ ] Resume point is saved when incomplete work remains
 
 If not complete, return a resumable status report instead of a success message.

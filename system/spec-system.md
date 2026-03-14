@@ -67,10 +67,15 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │       ├── progress.md          ← Step-by-step checkpoint (MANDATORY during implement)
 │       ├── implementation.md
 │       ├── changelog.md
+│       ├── checks/              ← Gap report history
+│       ├── logs/                ← Execution logs (auto-saved)
 │       ├── contracts/
 │       └── baselines/
 │
-└── changelog.md             ← Global changelog
+├── changelog.md             ← Global changelog (current year)
+├── archive/                 ← Rotated changelogs by year
+│   ├── changelog-2025.md
+│   └── changelog-2024.md
 ```
 
 ---
@@ -165,6 +170,14 @@ OpenAPI YAML or GraphQL schemas for any API endpoints introduced by the feature.
 
 Playwright screenshot baselines for visual features. Filenames match the test scenario names.
 
+### checks/ — Audit trail
+
+Gap reports from `/spec.check` runs. Each file is named `YYYY-MM-DD.md` and contains the full gap report from that date. Enables historical tracking of spec-code alignment over time.
+
+### logs/ — Execution logs
+
+Detailed execution logs from `/spec.implement` runs. Each file is named `YYYY-MM-DD.md`. Saved by default (use `--no-save` to disable).
+
 ---
 
 ## README.md — Spec Registry
@@ -200,6 +213,31 @@ If that directory is missing, run `bash scripts/install.sh` to install it.
 3. Generate `plan.md` with sequence/state/ER diagrams as appropriate
 4. After implementation: create `implementation.md` mapping FR/AC to `@spec` anchor comments in source files
 5. Add first entry to `changelog.md`
+
+### Changelog Convention
+
+Every `/spec.*` command that creates or modifies an artifact MUST add an entry to:
+1. The feature's `changelog.md` (detailed entry)
+2. The global `.specs/changelog.md` (summary line)
+
+Read-only commands (`/spec.explain`) are exempt.
+
+### Changelog Rotation
+
+To prevent changelogs from growing unbounded:
+
+**Global `.specs/changelog.md`:**
+- Keeps entries for the **current year** only
+- When adding an entry, if entries from previous years exist, move them to `.specs/archive/changelog-YYYY.md` (one file per year)
+- Add a "Previous years" link section at the bottom: `> Archive: [2025](archive/changelog-2025.md) | [2024](archive/changelog-2024.md)`
+- The `archive/` directory is created on first rotation
+
+**Per-feature `changelog.md`:**
+- No automatic rotation (features are naturally scoped)
+- If a feature changelog exceeds 50 entries, the feature is likely too large — consider splitting into sub-features
+
+**README.md Recent Activity:**
+- Already capped at 10 entries (self-managing, no rotation needed)
 
 ### When MODIFYING existing code
 

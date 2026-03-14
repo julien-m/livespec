@@ -187,6 +187,23 @@ Update the `Last updated` date in the header.
 
 If `.specs/README.md` does not exist, create it by scanning existing artifacts (see spec-system.md README.md Recovery).
 
+### Step 9.6 — Update Changelog
+
+Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
+
+```markdown
+### YYYY-MM-DD — Plan: Technical plan generated
+
+- **Type:** Feature
+- **Spec modified:** No
+- **Code modified:** None (plan.md created)
+- **AC impacted:** None (pre-implementation)
+- **Author:** [tool name]
+```
+
+Also add a summary entry to `.specs/changelog.md` (global):
+`[Feature NNN] Plan created: [Feature Name] — N implementation steps, N diagrams`
+
 ### Step 10 — Present for Approval
 
 > ✅ **Plan generated:** `.specs/features/004-notifications/plan.md`
@@ -238,6 +255,8 @@ If `.specs/README.md` does not exist, create it by scanning existing artifacts (
 - [ ] Test commands are resolved (Resolved Test Commands table filled)
 - [ ] Testing strategy maps AC/FR to concrete test files
 - [ ] `.specs/README.md` feature row Status is `Planned`
+- [ ] Feature `changelog.md` has a plan entry
+- [ ] Global `.specs/changelog.md` has a summary entry
 - [ ] Next action is proposed (`/spec.implement [feature]`)
 
 If a requirement cannot be planned safely, mark it `[DECISION NEEDED]` with owner and unblock options.
