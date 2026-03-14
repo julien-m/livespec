@@ -16,9 +16,10 @@ argument-hint: "<feature description>"
 Runs the full LiveSpec pipeline in a single command:
 
 ```
-Phase 1: Specify  →  Gate: user validates spec.md
-Phase 2: Plan     →  Phase 2.5: Plan Review (verifier)
-                  →  Gate: user validates plan + review
+Phase 1: Specify     →  Phase 1.5: Spec Review (verifier)
+                     →  Gate: user validates spec + review
+Phase 2: Plan        →  Phase 2.5: Plan Review (verifier)
+                     →  Gate: user validates plan + review
 Phase 3: Implement
 ```
 
@@ -58,6 +59,7 @@ This file is **distinct from `progress.md`** (which tracks individual implementa
 | Phase | Status | Completed At |
 |-------|--------|--------------|
 | Specify | Pending | — |
+| Spec Review | Pending | — |
 | Plan | Pending | — |
 | Plan Review | Pending | — |
 | Implement | Pending | — |
@@ -89,12 +91,39 @@ After the spec is created, determine whether a git branch is needed:
 > [One sentence explaining why a branch is needed for this feature.]
 > Create branch `feature/NNN-name`? (yes / no)
 
+---
+
+## Phase 1.5 — Spec Review
+
+1. Update `pipeline.md`: Spec Review → `In Progress`
+2. Dispatch the **livespec-verifier** agent in `spec-review` mode with:
+   - Path to `spec.md`
+   - Path to `.specs/constitution.md`
+   - Path to `.specs/project.md`
+   - Path to the stack file (e.g., `.specs/stacks/_default.md`)
+3. Collect the Spec Review Report
+
+The review findings are **embedded in the specify gate prompt** — the user sees both the spec and the review at once.
+
 **Gate (always active, even with `--auto`):**
 
 > Phase 1 complete. Review the generated spec:
 > `.specs/features/NNN-feature-name/spec.md`
 >
+> ### Spec Review Findings
+> [Verifier report inserted here — findings table with severity]
+>
+> N BLOCKING, N WARNING, N INFO finding(s).
 > Type **continue** to proceed to planning, or describe changes needed.
+
+4. Update `pipeline.md`: Spec Review → `Done` with timestamp
+
+**If verdict is BLOCKING:**
+
+- The user sees the BLOCKING findings in the gate prompt. They can:
+  1. **Fix** — describe changes, the spec is regenerated and re-reviewed
+  2. **Override** — proceed to planning despite blocking findings
+  3. **Abort** — stop the pipeline
 
 The specify gate is **always active**. The spec is the functional contract — it must be validated before launching plan + implement. `--auto` takes effect starting from Phase 2 (plan → review → implement without pause).
 
