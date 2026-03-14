@@ -114,7 +114,7 @@ You receive from the caller:
 - Path to `plan.md` (technical implementation plan)
 - Path to `constitution.md` (architecture principles)
 
-### Five Review Axes
+### Six Review Axes
 
 #### 1. FR Coverage
 
@@ -149,6 +149,15 @@ You receive from the caller:
 - Are concurrency, race conditions, or data integrity risks considered where relevant?
 - Do operations that mutate multiple stores (database + cache, blob storage + metadata store, etc.) handle partial failure? Is the failure mode documented (rollback, orphan accepted, compensating action)?
 - Are there API operations whose scope is asymmetric? (e.g., DELETE removes from one store but not another — this must be explicitly flagged as intentional or treated as a gap)
+
+#### 6. Infrastructure Readiness
+
+- Are all resources from the spec's "Infrastructure Requirements" accounted for in the plan's "Infrastructure Setup"?
+- Does the plan include provisioning commands with verification for each resource?
+- Are provisioning steps ordered before implementation steps that depend on them?
+- Are there placeholder values (`<your-id>`, `TODO`, `xxx`) that should be real values or resolved from provisioning output?
+- Are step gates runtime-based where infrastructure is involved? (e.g., "dev server responds" not just "build passes")
+- If no Infrastructure Requirements in spec but the plan references external resources: flag as WARNING
 
 ### Output Format
 
@@ -209,6 +218,8 @@ You receive from the caller:
 - Do spec assumptions align with stack constraints? (rate limits, body size limits, storage quotas, runtime limits)
 - Are technology choices in the spec compatible with the declared stack?
 - Are there implicit performance assumptions that conflict with the stack's known limitations?
+- Does the spec reference external cloud resources (KV, R2, D1, S3, databases, queues) in FR/stories without listing them in an "Infrastructure Requirements" section?
+- If external resources are implied but not listed: flag as WARNING — recommend adding the section
 
 #### 2. Behavioral Ambiguity
 

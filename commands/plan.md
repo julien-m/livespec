@@ -49,6 +49,9 @@ From the spec, extract:
 - Key Entities (for ER diagram)
 - User Stories with API interactions (for sequence diagrams)
 - Entities with states/lifecycle (for state diagrams)
+- Infrastructure dependencies (databases, KV stores, object storage, queues, CDN, external APIs requiring credentials)
+  - If spec has an "Infrastructure Requirements" section, extract directly
+  - If spec mentions external resources in FR/stories but lacks the section, flag: `[INFRA DETECTED — consider adding Infrastructure Requirements section to spec]`
 
 ### Step 3.5 — Scope Sizing (Avoid Over-Planning)
 
@@ -85,6 +88,7 @@ For each principle in `.specs/constitution.md`, verify the planned approach:
 - Separation: are UI, logic, and data properly separated?
 - Testing: are all business logic functions unit-testable?
 - Naming: do proposed file names follow conventions?
+- Infrastructure: every cloud resource referenced in code has a provisioning step (if applicable)
 
 Mark each gate as ✅ or add a note if deviation is needed.
 
@@ -121,6 +125,7 @@ Mark each gate as ✅ or add a note if deviation is needed.
 
 For each FR, map to specific files:
 
+0. **Infrastructure layer** (if detected) — provisioning commands, binding configuration, verification. Generates an "Infrastructure Setup" section in the plan before Step 1.
 1. **Database layer** — migrations, schema changes
 2. **Data access layer** — query functions
 3. **Business logic layer** — services
@@ -251,6 +256,7 @@ Also add a summary entry to `.specs/changelog.md` (global):
 - [ ] `plan.md` generated in target feature directory
 - [ ] Every FR appears in implementation plan mapping
 - [ ] Diagram set matches feature size and real needs (not boilerplate)
+- [ ] If spec has Infrastructure Requirements: plan includes Infrastructure Setup section with provisioning and verification for every listed resource
 - [ ] Constitution check contains explicit pass/deviation notes
 - [ ] Test commands are resolved (Resolved Test Commands table filled)
 - [ ] Testing strategy maps AC/FR to concrete test files

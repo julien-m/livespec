@@ -27,6 +27,18 @@ You receive from the supervisor:
    ```
 5. **Report back** — list files created/modified and FR/AC addressed
 
+## Infrastructure Steps
+
+When implementing an infrastructure step (Step 0 / Infrastructure Setup):
+
+1. **Provision resources** — run the provisioning commands from the plan
+2. **Verify existence** — run verification commands; all must succeed
+3. **Configure bindings** — update config files with real IDs from provisioning output (no placeholders)
+4. **Verify runtime** — start dev server and confirm it starts without binding errors
+5. **Report blocked** — if any resource cannot be provisioned (account needed, permissions missing), report `Blocked by Infrastructure` with the specific blocker and do not proceed
+
+**Never silently skip a failing infrastructure verification.** A missing resource is BLOCKING.
+
 ## Rules
 
 - Follow conventions from `.specs/constitution.md` (naming, structure, patterns)

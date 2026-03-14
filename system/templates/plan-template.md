@@ -190,6 +190,28 @@ Define the error response shape used by all API endpoints in this feature:
 
 ---
 
+## Infrastructure Setup
+
+> **Include this section only when the spec defines Infrastructure Requirements.** This phase runs before Step 1. Omit for features with no infrastructure dependencies.
+
+### Resources to Provision
+
+| Resource | Type | Provisioning Command | Verification Command | Config Update | Status |
+|---|---|---|---|---|---|
+| [Name] | [Type] | `[create command]` | `[verify command]` | `[file + binding]` | Pending |
+
+### Infrastructure Gate
+
+Before proceeding to Step 1, verify:
+- [ ] All resources provisioned (verification commands return success)
+- [ ] All bindings configured with real values (no placeholders)
+- [ ] Dev server starts without binding errors
+- [ ] Health check endpoint responds (if applicable): `[command]`
+
+> If any resource cannot be provisioned (account setup, billing, permissions), mark feature as `Blocked by Infrastructure` with the specific blocker.
+
+---
+
 ## Implementation Plan
 
 > File-by-file, step-by-step. Each step should be independently executable.

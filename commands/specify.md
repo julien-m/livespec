@@ -104,6 +104,10 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
 - Extract entities from the feature (data objects involved)
 - List realistic edge cases (what could go wrong?)
 - Write measurable success criteria (SC-001, SC-002, ...)
+- If the feature involves external cloud resources (storage, databases, queues, CDN, edge workers, external APIs with credentials):
+  - Generate an "Infrastructure Requirements" section after Key Entities
+  - List each resource with type, provider, environment, and when it's needed
+  - If unsure whether a resource is needed, mark it `[ASSUMED]` in the table
 
 ### Step 6 — Quality Validation
 
@@ -115,6 +119,7 @@ Before presenting the spec, check:
 - [ ] Key Entities section is not empty
 - [ ] At least 2 Edge Cases listed
 - [ ] At least 2 Success Criteria defined
+- [ ] If feature references external resources in stories/FR: Infrastructure Requirements section exists
 
 If validation fails, fix the issues before presenting.
 

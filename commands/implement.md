@@ -48,6 +48,7 @@ Before Phase 1, run a preflight check and stop early on blockers:
 - [ ] `plan.md` exists and contains no unresolved `[DECISION NEEDED]`
 - [ ] Project test commands are resolved in plan.md Resolved Test Commands (use `system/testing/discovery.md` if not)
 - [ ] Required tooling is available for chosen steps (verified during test discovery)
+- [ ] If plan has "Infrastructure Setup" section: infrastructure provisioning tools are available (e.g., `wrangler` for Cloudflare, `aws` CLI for AWS)
 
 If one check fails, do not start implementation. Report blocker + minimal recovery command.
 
@@ -73,6 +74,7 @@ To avoid large accidental edits:
 Create an ordered todo list from `plan.md`:
 
 ```
+[ ] Step 0: Infrastructure setup (provision, bind, verify) — only if plan has Infrastructure Setup
 [ ] Step 1: Create database migration
 [ ] Step 2: Create data access functions
 [ ] Step 3: Create API endpoints

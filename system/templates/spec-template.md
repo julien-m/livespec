@@ -254,6 +254,18 @@ flowchart TD
 
 ---
 
+## Infrastructure Requirements
+
+> **Include this section only when the feature depends on external cloud resources** (databases, object storage, KV stores, queues, CDN, edge workers, etc.). Omit entirely for features with no infrastructure dependencies.
+
+| Resource | Type | Provider | Environment | Required Before | Provisioning |
+|---|---|---|---|---|---|
+| [Name] | [KV / R2 / D1 / S3 / Queue / etc.] | [Cloudflare / AWS / Supabase / etc.] | [dev (auto) / prod / both] | [Step N in plan] | [CLI command or action] |
+
+> **Rule:** Every resource listed here must have a provisioning step in the plan and a binding in config. No placeholders in implementation output.
+
+---
+
 ## Edge Cases
 
 > Scenarios that aren't in the happy path but must be handled correctly.

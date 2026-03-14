@@ -38,6 +38,12 @@
 - Return errors early, don't propagate invalid state
 - Use TypeScript strict mode / strong typing always
 
+### 5. Infrastructure as Code
+- Every cloud resource referenced in code must be declared in the spec and provisioned in the plan
+- No placeholder bindings or uncreated resources in implementation output
+- Runtime verification (dev server starts, health check passes) required — not just compilation
+- If a resource cannot be provisioned, the feature is blocked — not silently stubbed
+
 ---
 
 ## Testing Standards

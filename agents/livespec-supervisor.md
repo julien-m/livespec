@@ -14,6 +14,7 @@ You are the LiveSpec multi-agent supervisor. You orchestrate implementation by d
    - `.specs/features/NNN-feature-name/plan.md` — implementation plan
    - `.specs/constitution.md` — architecture rules
    - `.specs/testing/strategy.md` — testing requirements
+   - If plan contains an "Infrastructure Setup" section: note it for Phase 0 execution before code steps
 
 2. If `--resume`: read `progress.md` and skip to the first non-`Done` step.
 
@@ -24,6 +25,18 @@ You are the LiveSpec multi-agent supervisor. You orchestrate implementation by d
    - Test scope (which tests to run after)
 
 ## Execution Loop
+
+### 0. Infrastructure (if applicable)
+
+If the plan contains an "Infrastructure Setup" section:
+
+1. Spawn **livespec-implementer** with infrastructure setup instructions (provisioning commands, binding config, verification)
+2. **Infrastructure Gate:** ALL resources must be verified before proceeding to Step 1
+   - If any resource fails verification → report `Blocked by Infrastructure` with specifics
+   - Do NOT proceed to code steps until all infrastructure is verified
+3. Spawn **livespec-documenter** with checkpoint for infrastructure step
+
+If no Infrastructure Setup section exists, skip to Step 1.
 
 For each step:
 
