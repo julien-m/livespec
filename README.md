@@ -33,7 +33,7 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
-## The 8 Commands
+## The 9 Commands
 
 | Command | What it does |
 |---|---|
@@ -45,6 +45,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | `/spec.explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
 | `/spec.feature` | Full pipeline: specify → plan → plan review → implement, with validation gates |
+| `/spec.refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
 
 ---
 
@@ -215,6 +216,19 @@ Full pipeline: specify → plan → plan review → implement, with validation g
 
 Key flags: `--auto`, `--resume`, `--branch`, `--priority`, `--mono`, `--economy`, `--step`
 
+### `/spec.refine`
+
+Iteratively refine existing artifacts through guided conversation. Enforces eligibility rules — blocks refinement on specs/plans that already have downstream code.
+
+```bash
+/spec.refine                        # Interactive menu
+/spec.refine project                # Refine project profile, constitution, or testing strategy
+/spec.refine notifications          # Refine a feature spec
+/spec.refine 002 plan              # Refine a feature plan
+```
+
+Key flags: `--auto`, `--dry-run`
+
 > Full command documentation is in `commands/*.md`.
 
 ---
@@ -259,7 +273,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 8 commands (`~/.claude/commands/spec.*.md`) and 5 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 9 commands (`~/.claude/commands/spec.*.md`) and 5 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -352,7 +366,8 @@ livespec/
 │   ├── check.md
 │   ├── explain.md
 │   ├── stack.md
-│   └── feature.md
+│   ├── feature.md
+│   └── refine.md
 └── scripts/
     ├── install.sh                  ← Install commands + agents into ~/.claude/
     └── init.sh                     ← Bootstrap .specs/ structure (shell)
