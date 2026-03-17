@@ -55,34 +55,42 @@ Assemble the following payload for the current step:
 - Stack and patterns from `.specs/stacks/_default.md`.
 
 **LiveSpec Mandatory Rules**
-- Every source file implementing a FR **must** include an inline anchor:
+- Every source file implementing a FR **must** include an inline anchor with a deep-link to the spec:
   ```
-  // @spec FR-NNN: <description>   ← JS/TS/C-style
-  # @spec FR-NNN: <description>      ← Python/Ruby/Shell
-  -- @spec FR-NNN: <description>     ← SQL
-  <!-- @spec FR-NNN: <description> --> ← HTML/XML
+  // @spec FR-NNN: <description> — .specs/features/NNN-feature-name/spec.md#fr-nnn   ← JS/TS/C-style
+  # @spec FR-NNN: <description> — .specs/features/NNN-feature-name/spec.md#fr-nnn     ← Python/Ruby/Shell
+  -- @spec FR-NNN: <description> — .specs/features/NNN-feature-name/spec.md#fr-nnn    ← SQL
+  <!-- @spec FR-NNN: <description> — .specs/features/NNN-feature-name/spec.md#fr-nnn --> ← HTML/XML
   ```
+- Description must be < 50 chars, extracted from the FR text in `spec.md`.
+- When a single block implements multiple FRs, combine them: `// @spec FR-001: Fetch count, FR-003: Mark read — .specs/features/NNN-feature-name/spec.md#fr-001`
 - Anchor must be placed on the line immediately above the function/class/block that implements the requirement.
-- The Spec Reviewer must **block** approval if any anchor is missing.
+- The Spec Reviewer must **block** approval if any anchor is missing or lacks the deep-link.
 
 **Strict TDD Protocol**
 - Tests **must** be written before production code (RED → GREEN → REFACTOR).
 - Exact **Resolved Test Commands** that the Implementer must run to validate the step (from `plan.md` Resolved Test Commands section):
   - List each command verbatim (e.g. `npx vitest run src/...`, `npx playwright test`, `npm run lint`, `npm run typecheck`).
 - For any step that creates or modifies UI components: include the visual test command (e.g. `npx playwright test`) as a **mandatory** check.
+- Visual baselines must be saved to `.specs/features/NNN-feature-name/baselines/`.
 
 **Definition of Done**
 
 The **Spec Reviewer** must confirm before approving:
 - [ ] All FR/AC assigned to this step are implemented
-- [ ] Every implemented FR has a `@spec FR-NNN: description` anchor (using the language's comment syntax) in the source file
+- [ ] Every implemented FR has a `@spec FR-NNN: description — path/to/spec.md#fr-nnn` anchor (with deep-link) in the source file
 - [ ] No FR is implemented partially
 
 The **Code Quality Reviewer** must confirm before approving:
 - [ ] All resolved test commands pass (unit, integration, E2E, visual as applicable)
 - [ ] Lint and typecheck pass on all touched files
 - [ ] No God files (max 300 lines per file)
+- [ ] No function exceeds 50 lines
 - [ ] Code follows existing patterns and constitution rules
+- [ ] No SQL/XSS/command injection risks
+- [ ] No secrets or credentials in code
+- [ ] No sensitive data in logs or error messages
+- [ ] Input validation on user-facing boundaries
 
 ### 2. Dispatch to Superpowers
 
@@ -123,6 +131,20 @@ If Superpowers returns a failure or block:
 ## Final Phase
 
 After all steps are `Done` (or `Blocked` with documented reasons):
+
+### Final Validation
+
+Before finalizing documentation, run a full regression check across all implemented steps:
+
+1. Spawn a Superpowers subagent with a **Final Validation** Task Payload:
+   - All resolved test commands from `plan.md` (full suite, not per-step)
+   - Lint and typecheck on all files touched during the implementation
+   - Purpose: detect inter-step regressions that per-step validation cannot catch
+2. If any test fails: record `Blocked` in `progress.md` with the regression details and continue to documentation.
+
+> **Note:** Iteration limits for test-fix cycles are managed by Superpowers' internal convergence mechanisms. LiveSpec does not impose additional limits on the Superpowers execution engine.
+
+### Finalize Documentation
 
 1. Spawn **livespec-documenter** with `finalize` instruction:
    - Create/update `implementation.md` (FR/AC to @spec mapping)

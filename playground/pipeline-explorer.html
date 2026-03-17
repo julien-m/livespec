@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveSpec Pipeline Explorer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0f1117;
+    color: #e1e4ea;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #161822;
+    border-bottom: 1px solid #262a3a;
+    flex-shrink: 0;
+  }
+
+  .topbar h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #c4b5fd;
+    white-space: nowrap;
+  }
+
+  .view-tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .view-tab {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: #8b8fa7;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .view-tab:hover { color: #c4b5fd; background: #1e2035; }
+  .view-tab.active { color: #c4b5fd; background: #1e2035; border-color: #4338ca; }
+
+  /* Main layout */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 340px;
+    min-width: 340px;
+    background: #161822;
+    border-right: 1px solid #262a3a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-section {
+    padding: 12px 14px;
+    border-bottom: 1px solid #262a3a;
+  }
+
+  .sidebar-section h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #6b6f8a;
+    margin-bottom: 8px;
+  }
+
+  .detail-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+  }
+
+  .detail-panel::-webkit-scrollbar { width: 5px; }
+  .detail-panel::-webkit-scrollbar-track { background: transparent; }
+  .detail-panel::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 3px; }
+
+  .detail-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin-bottom: 4px;
+  }
+
+  .detail-subtitle {
+    font-size: 12px;
+    color: #6b6f8a;
+    margin-bottom: 12px;
+  }
+
+  .detail-body {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #b0b4cc;
+  }
+
+  .detail-body h4 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #e1e4ea;
+    margin: 12px 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .detail-body ul {
+    padding-left: 16px;
+    margin: 4px 0;
+  }
+
+  .detail-body li {
+    margin: 2px 0;
+  }
+
+  .detail-body code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    background: #1e2035;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #a5b4fc;
+  }
+
+  .detail-body .tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 1px 2px;
+  }
+
+  .tag-agent { background: #1e3a5f; color: #60a5fa; }
+  .tag-artifact { background: #3b1f4e; color: #c084fc; }
+  .tag-command { background: #1a3330; color: #34d399; }
+  .tag-superpowers { background: #4a2000; color: #fb923c; }
+
+  /* Comments section */
+  .comments-section {
+    border-top: 1px solid #262a3a;
+    max-height: 240px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .comments-section::-webkit-scrollbar { width: 5px; }
+  .comments-section::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 3px; }
+
+  .comments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px 6px;
+    position: sticky;
+    top: 0;
+    background: #161822;
+    z-index: 1;
+  }
+
+  .comments-header h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #6b6f8a;
+  }
+
+  .comment-count {
+    font-size: 10px;
+    background: #4338ca;
+    color: white;
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  .comment-item {
+    padding: 8px 14px;
+    border-bottom: 1px solid #1e2035;
+    font-size: 12px;
+  }
+
+  .comment-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+  }
+
+  .comment-item-target {
+    font-weight: 600;
+    color: #c4b5fd;
+    font-size: 11px;
+  }
+
+  .comment-delete {
+    cursor: pointer;
+    color: #ef4444;
+    font-size: 14px;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+    background: none;
+    border: none;
+    padding: 0 2px;
+  }
+
+  .comment-delete:hover { opacity: 1; }
+
+  .comment-item-text {
+    color: #8b8fa7;
+    line-height: 1.4;
+  }
+
+  /* Canvas area */
+  .canvas-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .svg-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+  }
+
+  .svg-container:active { cursor: grabbing; }
+
+  .svg-container svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Zoom controls */
+  .zoom-controls {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .zoom-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #1e2035;
+    border: 1px solid #2a2e42;
+    color: #8b8fa7;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .zoom-btn:hover { background: #262a3a; color: #c4b5fd; }
+
+  /* Legend */
+  .legend {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: #161822ee;
+    border: 1px solid #262a3a;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #8b8fa7;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  .legend-line {
+    width: 20px;
+    height: 2px;
+  }
+
+  /* Prompt output */
+  .prompt-bar {
+    background: #161822;
+    border-top: 1px solid #262a3a;
+    padding: 10px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex-shrink: 0;
+    max-height: 120px;
+  }
+
+  .prompt-text {
+    flex: 1;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    color: #8b8fa7;
+    line-height: 1.5;
+    max-height: 100px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  .prompt-text::-webkit-scrollbar { width: 4px; }
+  .prompt-text::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 2px; }
+
+  .copy-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: #4338ca;
+    color: white;
+    border: none;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+
+  .copy-btn:hover { background: #5145e5; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #1e2035;
+    border: 1px solid #2a2e42;
+    border-radius: 12px;
+    padding: 20px;
+    width: 420px;
+    max-width: 90vw;
+  }
+
+  .modal h3 {
+    font-size: 15px;
+    color: #c4b5fd;
+    margin-bottom: 4px;
+  }
+
+  .modal .modal-sub {
+    font-size: 12px;
+    color: #6b6f8a;
+    margin-bottom: 12px;
+  }
+
+  .modal textarea {
+    width: 100%;
+    height: 80px;
+    background: #0f1117;
+    border: 1px solid #2a2e42;
+    border-radius: 8px;
+    color: #e1e4ea;
+    font-size: 13px;
+    padding: 10px;
+    resize: vertical;
+    font-family: inherit;
+  }
+
+  .modal textarea:focus { outline: none; border-color: #4338ca; }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+
+  .modal-btn {
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .modal-btn-cancel {
+    background: transparent;
+    color: #8b8fa7;
+    border-color: #2a2e42;
+  }
+
+  .modal-btn-cancel:hover { background: #262a3a; }
+
+  .modal-btn-save {
+    background: #4338ca;
+    color: white;
+  }
+
+  .modal-btn-save:hover { background: #5145e5; }
+
+  /* Step counter badge on view */
+  .view-desc {
+    font-size: 11px;
+    color: #6b6f8a;
+    padding: 0 14px 8px;
+  }
+
+  /* Node tooltip */
+  .node-tooltip {
+    position: absolute;
+    background: #1e2035;
+    border: 1px solid #4338ca;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #b0b4cc;
+    pointer-events: none;
+    z-index: 50;
+    max-width: 250px;
+    display: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  .empty-state {
+    color: #4a4e6a;
+    font-size: 13px;
+    text-align: center;
+    padding: 24px 14px;
+    line-height: 1.6;
+  }
+
+  .phase-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li::before { content: "[ ] "; font-family: monospace; color: #6b6f8a; }
+  .checklist li.done::before { content: "[x] "; color: #34d399; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>LiveSpec Pipeline Explorer</h1>
+  <div class="view-tabs" id="viewTabs"></div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="detail-panel" id="detailPanel">
+      <div class="empty-state">
+        Click on any node in the diagram to see its details.<br><br>
+        Right-click a node to add a comment.
+      </div>
+    </div>
+    <div class="comments-section" id="commentsSection">
+      <div class="comments-header">
+        <h3>Comments</h3>
+        <span class="comment-count" id="commentCount">0</span>
+      </div>
+      <div id="commentsList"></div>
+    </div>
+  </div>
+
+  <div class="canvas-area">
+    <div class="svg-container" id="svgContainer">
+      <svg id="mainSvg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow-flow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#3b82f6"/></marker>
+          <marker id="arrow-dispatch" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#fb923c"/></marker>
+          <marker id="arrow-agent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#34d399"/></marker>
+          <marker id="arrow-artifact" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#a78bfa"/></marker>
+          <marker id="arrow-review" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#f87171"/></marker>
+          <marker id="arrow-gate" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#fbbf24"/></marker>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+      </svg>
+      <div class="node-tooltip" id="tooltip"></div>
+      <div class="legend" id="legend"></div>
+      <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomIn()">+</button>
+        <button class="zoom-btn" onclick="zoomOut()">&minus;</button>
+        <button class="zoom-btn" onclick="zoomReset()" style="font-size:12px">R</button>
+      </div>
+    </div>
+    <div class="prompt-bar">
+      <div class="prompt-text" id="promptText">Select a view and add comments to generate a discussion prompt about the LiveSpec pipeline.</div>
+      <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- Comment modal -->
+<div class="modal-overlay" id="commentModal">
+  <div class="modal">
+    <h3 id="modalTitle">Add Comment</h3>
+    <div class="modal-sub" id="modalSub"></div>
+    <textarea id="modalText" placeholder="Your comment or question about this step..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-btn-save" onclick="saveComment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const state = {
+  currentView: 'pipeline',
+  selectedNode: null,
+  comments: [],
+  pan: { x: 0, y: 0 },
+  zoom: 1,
+  dragging: false,
+  dragStart: { x: 0, y: 0 },
+  modalTarget: null
+};
+
+// ═══════════════════════════════════════════
+// VIEWS DEFINITION
+// ═══════════════════════════════════════════
+const VIEWS = {
+  pipeline: {
+    label: 'Full Pipeline',
+    desc: 'The complete LiveSpec workflow from project init to living documentation',
+    legend: [
+      { type: 'dot', color: '#34d399', label: 'Command' },
+      { type: 'dot', color: '#60a5fa', label: 'Artifact' },
+      { type: 'line', color: '#3b82f6', label: 'Flow' },
+      { type: 'line', color: '#a78bfa', label: 'Creates/Updates', dash: true },
+    ]
+  },
+  feature: {
+    label: 'Feature Pipeline',
+    desc: '/spec.feature end-to-end: specify → review → plan → review → implement with gates',
+    legend: [
+      { type: 'dot', color: '#34d399', label: 'Phase' },
+      { type: 'dot', color: '#f87171', label: 'Review' },
+      { type: 'dot', color: '#fbbf24', label: 'Gate' },
+      { type: 'dot', color: '#60a5fa', label: 'Artifact' },
+      { type: 'line', color: '#3b82f6', label: 'Flow' },
+      { type: 'line', color: '#f87171', label: 'Review loop', dash: true },
+    ]
+  },
+  implement: {
+    label: 'Implementation Engine',
+    desc: 'Supervisor → SuperPowers → Subagents: the multi-agent orchestration',
+    legend: [
+      { type: 'dot', color: '#fb923c', label: 'SuperPowers' },
+      { type: 'dot', color: '#34d399', label: 'Agent' },
+      { type: 'dot', color: '#60a5fa', label: 'Artifact' },
+      { type: 'line', color: '#fb923c', label: 'Dispatch' },
+      { type: 'line', color: '#34d399', label: 'Agent call' },
+      { type: 'line', color: '#f87171', label: 'Review loop', dash: true },
+    ]
+  },
+  commands: {
+    label: 'All Commands',
+    desc: 'The 10 LiveSpec commands organized by function',
+    legend: [
+      { type: 'dot', color: '#34d399', label: 'Create' },
+      { type: 'dot', color: '#60a5fa', label: 'Analyze' },
+      { type: 'dot', color: '#fb923c', label: 'Execute' },
+      { type: 'dot', color: '#c084fc', label: 'Evolve' },
+      { type: 'line', color: '#3b82f6', label: 'Depends on' },
+    ]
+  },
+  artifacts: {
+    label: 'Artifact Map',
+    desc: '.specs/ directory: what each command creates and updates',
+    legend: [
+      { type: 'dot', color: '#34d399', label: 'Command (writer)' },
+      { type: 'dot', color: '#a78bfa', label: 'Artifact' },
+      { type: 'line', color: '#34d399', label: 'Creates', dash: false },
+      { type: 'line', color: '#fbbf24', label: 'Updates', dash: true },
+    ]
+  },
+  agents: {
+    label: 'Agent System',
+    desc: 'The 4 LiveSpec agents and how they collaborate during implementation',
+    legend: [
+      { type: 'dot', color: '#34d399', label: 'LiveSpec Agent' },
+      { type: 'dot', color: '#fb923c', label: 'SuperPowers Subagent' },
+      { type: 'dot', color: '#60a5fa', label: 'Input/Output' },
+      { type: 'line', color: '#3b82f6', label: 'Flow' },
+      { type: 'line', color: '#fb923c', label: 'Dispatch' },
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════
+// NODE & EDGE DEFINITIONS PER VIEW
+// ═══════════════════════════════════════════
+
+function getViewData(viewId) {
+  switch(viewId) {
+    case 'pipeline': return getPipelineData();
+    case 'feature': return getFeatureData();
+    case 'implement': return getImplementData();
+    case 'commands': return getCommandsData();
+    case 'artifacts': return getArtifactsData();
+    case 'agents': return getAgentsData();
+  }
+}
+
+function getPipelineData() {
+  const nodes = [
+    { id: 'init', label: '/spec.init', subtitle: 'Project Initialization', x: 120, y: 60, w: 160, h: 52, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: {
+        title: '/spec.init',
+        subtitle: 'Phase A → B → C: Brainstorm → Stack Decisions → Installation',
+        body: `<h4>What it does</h4>
+<p>Initialize LiveSpec in a project through a <strong>3-phase conversational brainstorm</strong>.</p>
+<h4>Phase A — Brainstorm</h4>
+<ul>
+<li>6 questions: What? Who? Where? Real-time? Geography? Budget?</li>
+<li>Captures vision, users, roles, constraints</li>
+</ul>
+<h4>Phase B — Stack Decisions</h4>
+<ul>
+<li>AI-guided infrastructure decision tree</li>
+<li>Creates <span class="tag tag-artifact">ADR</span> records (min 1)</li>
+<li>Visual decision flowchart (Mermaid)</li>
+</ul>
+<h4>Phase C — Installation</h4>
+<ul>
+<li>Creates <code>.specs/</code> directory structure</li>
+<li>Generates: spec-system.md, constitution.md, project.md, stacks/, testing/strategy.md</li>
+</ul>
+<h4>Flags</h4>
+<p><code>--auto</code> <code>--stack [preset]</code> <code>--dir [path]</code> <code>--dry-run</code></p>` }},
+    { id: 'propose', label: '/spec.propose', subtitle: 'Feature Suggestions', x: 120, y: 170, w: 160, h: 52, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: {
+        title: '/spec.propose',
+        subtitle: 'Read-only analysis — discover what to build next',
+        body: `<h4>What it does</h4>
+<p>Analyze project context and propose the <strong>next feature(s)</strong> to build.</p>
+<h4>Gap Analysis (5 dimensions)</h4>
+<ul>
+<li><strong>Role Coverage</strong> — which user roles have no features?</li>
+<li><strong>User Journey</strong> — which workflows are incomplete?</li>
+<li><strong>Platform</strong> — missing on mobile/desktop?</li>
+<li><strong>Dependency Closure</strong> — which features enable others?</li>
+<li><strong>MVP Completeness</strong> — what's MVP-critical?</li>
+</ul>
+<h4>Output</h4>
+<p>Ranked feature proposals with priority, impact, dependencies, estimated scope (S/M/L)</p>
+<h4>Flags</h4>
+<p><code>--count N</code> <code>--role [name]</code> <code>--mvp</code> <code>--auto</code></p>` }},
+    { id: 'specify', label: '/spec.specify', subtitle: 'Create Feature Spec', x: 120, y: 280, w: 160, h: 52, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: {
+        title: '/spec.specify',
+        subtitle: 'User stories + Mermaid flowcharts + AC + FR',
+        body: `<h4>What it does</h4>
+<p>Create a complete feature specification with user stories, <strong>mandatory Mermaid flowcharts</strong>, acceptance criteria, and functional requirements.</p>
+<h4>Generated Content</h4>
+<ul>
+<li><strong>User Stories</strong> — prioritized P1/P2/P3 with Given/When/Then</li>
+<li><strong>Mermaid flowchart</strong> per story (MANDATORY)</li>
+<li><strong>Acceptance Criteria</strong> — AC-001...AC-NNN</li>
+<li><strong>Functional Requirements</strong> — FR-001...FR-NNN (each maps to ≥1 AC)</li>
+<li><strong>Key Entities, Edge Cases, Success Criteria</strong></li>
+<li><strong>Infrastructure Requirements</strong> (if external resources)</li>
+</ul>
+<h4>Quality Gates</h4>
+<ul>
+<li>Every story has Mermaid flowchart</li>
+<li>All AC in Given/When/Then</li>
+<li>All FR reference ≥1 AC</li>
+<li>≤3 [NEEDS CLARIFICATION] markers</li>
+</ul>
+<h4>Creates</h4>
+<p><code>.specs/features/NNN-name/spec.md</code> + <code>changelog.md</code></p>` }},
+    { id: 'plan', label: '/spec.plan', subtitle: 'Technical Planning', x: 120, y: 390, w: 160, h: 52, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: {
+        title: '/spec.plan',
+        subtitle: 'Sequence + State + ER diagrams → file-by-file implementation plan',
+        body: `<h4>What it does</h4>
+<p>Generate a technical plan with <strong>Mermaid diagrams</strong> and a step-by-step file-by-file implementation plan.</p>
+<h4>Mermaid Diagrams</h4>
+<ul>
+<li><strong>Sequence diagram</strong> — MANDATORY if API/service interactions</li>
+<li><strong>State diagram</strong> — MANDATORY if stateful entity</li>
+<li><strong>ER diagram</strong> — MANDATORY if new tables</li>
+</ul>
+<h4>Plan Structure</h4>
+<ul>
+<li><strong>Step 0:</strong> Infrastructure provisioning (if applicable)</li>
+<li><strong>Steps 1-6:</strong> Database → Data Access → Business Logic → API → UI → Tests</li>
+<li>Each step: files to create/modify, functions, FR mappings</li>
+</ul>
+<h4>Also Includes</h4>
+<ul>
+<li>Constitution check (verify against architectural rules)</li>
+<li>Test command resolution (discover available test runners)</li>
+<li>Testing strategy (map AC/FR to test files)</li>
+<li>API contracts (openapi.yaml if endpoints)</li>
+</ul>
+<h4>Creates</h4>
+<p><code>.specs/features/NNN/plan.md</code> + optional <code>contracts/openapi.yaml</code></p>` }},
+    { id: 'implement', label: '/spec.implement', subtitle: 'Multi-Agent Execution', x: 120, y: 500, w: 160, h: 52, color: '#4a2000', stroke: '#fb923c', category: 'command',
+      detail: {
+        title: '/spec.implement',
+        subtitle: 'Supervisor → SuperPowers → Subagents (default: multi-agent)',
+        body: `<h4>What it does</h4>
+<p>Execute the <strong>full implementation pipeline</strong> from plan.md to working, tested, documented code via <strong>multi-agent orchestration</strong>.</p>
+<h4>Architecture</h4>
+<ul>
+<li><span class="tag tag-agent">Supervisor</span> orchestrates, NEVER codes</li>
+<li><span class="tag tag-superpowers">SuperPowers</span> executes each step with isolated subagents</li>
+<li><span class="tag tag-agent">Documenter</span> updates progress.md after each step</li>
+<li><span class="tag tag-agent">Implementer</span> handles infra provisioning (Phase 0)</li>
+</ul>
+<h4>Per Step Flow</h4>
+<ol>
+<li>Supervisor builds <strong>Task Payload</strong> (FR/AC, instructions, TDD, Definition of Done)</li>
+<li>Dispatch to <code>superpowers:subagent-driven-development</code></li>
+<li>SuperPowers runs: Implementer → Spec Reviewer → Code Quality Reviewer</li>
+<li>Documenter writes progress.md checkpoint</li>
+</ol>
+<h4>Key Rules</h4>
+<ul>
+<li>Strict TDD: tests BEFORE code (RED → GREEN → REFACTOR)</li>
+<li>@spec anchors mandatory on every FR implementation</li>
+<li>Max 12 files per step (Change Scope Guard)</li>
+</ul>
+<h4>Flags</h4>
+<p><code>--auto</code> <code>--mono</code> <code>--economy</code> <code>--resume</code> <code>--step [N]</code> <code>--no-visual</code></p>` }},
+    { id: 'check', label: '/spec.check', subtitle: 'Alignment Verification', x: 120, y: 610, w: 160, h: 52, color: '#1e3a5f', stroke: '#60a5fa', category: 'command',
+      detail: {
+        title: '/spec.check',
+        subtitle: 'Spec vs Code gap detection, visual drift, structure validation',
+        body: `<h4>What it does</h4>
+<p>Compare spec vs actual code: find gaps, verify AC coverage, detect visual drift, validate project structure.</p>
+<h4>11 Steps</h4>
+<ol>
+<li><strong>Validate Tree Structure</strong> — system files, naming, completeness</li>
+<li><strong>Multi-Spec Selection</strong> — choose features to check</li>
+<li><strong>Resolve Feature</strong></li>
+<li><strong>Validate Spec Quality</strong> — flowcharts, AC format, FR→AC mapping</li>
+<li><strong>Read Spec Requirements</strong> — extract AC/FR/SC</li>
+<li><strong>Read Implementation Map</strong> — FR → @spec anchors</li>
+<li><strong>Grep @spec Anchors</strong> — find in codebase</li>
+<li><strong>Verify AC Coverage</strong> — locate test files</li>
+<li><strong>Visual Baselines</strong> — compare screenshots</li>
+<li><strong>Generate Gap Report</strong></li>
+<li><strong>Consolidated Report</strong> (multi-spec)</li>
+</ol>
+<h4>Modes</h4>
+<p><code>/spec.check</code> <code>/spec.check feature</code> <code>--tree-only</code> <code>--quality</code></p>` }},
+    { id: 'explain', label: '/spec.explain', subtitle: 'Living Documentation', x: 120, y: 720, w: 160, h: 52, color: '#1e3a5f', stroke: '#60a5fa', category: 'command',
+      detail: {
+        title: '/spec.explain',
+        subtitle: '"How does X work?" — synthesize spec + code + history',
+        body: `<h4>What it does</h4>
+<p>Answer "How does X work?" by synthesizing spec, diagrams, implementation map, changelog, and ADRs.</p>
+<h4>Understands</h4>
+<ul>
+<li>Feature names: <code>/spec.explain notifications</code></li>
+<li>Numbers: <code>/spec.explain 004-notifications</code></li>
+<li>Questions: <code>"how do notifications work?"</code></li>
+<li>ADR questions: <code>"why Supabase over Firebase?"</code></li>
+<li>Temporal: <code>"what changed in auth last month?"</code></li>
+</ul>
+<h4>Output Structure</h4>
+<ul>
+<li>What it does (from spec.md)</li>
+<li>Who uses it (roles)</li>
+<li>How it flows (Mermaid from spec.md)</li>
+<li>How it works technically (diagrams from plan.md)</li>
+<li>Where it lives in code (implementation.md)</li>
+<li>Why built this way (ADRs)</li>
+<li>What changed recently (changelog)</li>
+</ul>` }},
+    // Artifacts column
+    { id: 'specs-dir', label: '.specs/', subtitle: 'Spec Directory', x: 420, y: 60, w: 140, h: 44, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: '.specs/ Directory', subtitle: 'All specification artifacts live here', body: `<h4>Structure</h4>
+<ul>
+<li><code>spec-system.md</code> — universal rules</li>
+<li><code>constitution.md</code> — architecture principles</li>
+<li><code>project.md</code> — vision, users, constraints</li>
+<li><code>stacks/_default.md</code> — chosen stack</li>
+<li><code>stacks/decisions/ADR-*.md</code></li>
+<li><code>testing/strategy.md</code></li>
+<li><code>features/NNN-name/</code> — per-feature</li>
+<li><code>changelog.md</code> — global</li>
+<li><code>README.md</code> — spec registry</li>
+</ul>` }},
+    { id: 'spec-md', label: 'spec.md', subtitle: 'Feature Specification', x: 420, y: 150, w: 140, h: 44, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'spec.md', subtitle: 'WHAT: user stories, AC, FR, Mermaid flowcharts', body: `<h4>Sections</h4>
+<ul>
+<li>User Stories (P1/P2/P3) with Mermaid flowcharts</li>
+<li>Acceptance Criteria (AC-001...)</li>
+<li>Functional Requirements (FR-001...)</li>
+<li>Key Entities</li>
+<li>Edge Cases</li>
+<li>Success Criteria</li>
+<li>Infrastructure Requirements</li>
+</ul>
+<h4>Created by</h4><p><code>/spec.specify</code></p>
+<h4>Consumed by</h4><p><code>/spec.plan</code>, <code>/spec.implement</code>, <code>/spec.check</code>, <code>/spec.explain</code></p>` }},
+    { id: 'plan-md', label: 'plan.md', subtitle: 'Technical Plan', x: 420, y: 240, w: 140, h: 44, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'plan.md', subtitle: 'HOW: diagrams + file-by-file implementation steps', body: `<h4>Sections</h4>
+<ul>
+<li>Summary (one-line approach)</li>
+<li>Technical Context</li>
+<li>Constitution Check</li>
+<li>Mermaid Sequence/State/ER Diagrams</li>
+<li>Infrastructure Setup (if applicable)</li>
+<li>Implementation Plan (step-by-step)</li>
+<li>Testing Strategy</li>
+<li>Risks & Considerations</li>
+</ul>
+<h4>Created by</h4><p><code>/spec.plan</code></p>
+<h4>Consumed by</h4><p><code>/spec.implement</code> (Supervisor reads steps)</p>` }},
+    { id: 'progress-md', label: 'progress.md', subtitle: 'Step Checkpoints', x: 420, y: 330, w: 140, h: 44, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'progress.md', subtitle: 'Step-by-step status during implementation', body: `<h4>Format</h4>
+<p><code>| Step | Status | Files | Tests run | Result | Updated at |</code></p>
+<h4>Key Role</h4>
+<ul>
+<li>Enables <code>--resume</code> after interruption</li>
+<li>Written by <span class="tag tag-agent">Documenter</span> after each step</li>
+<li>Step Gate: step N+1 only if status "Done"</li>
+</ul>` }},
+    { id: 'impl-md', label: 'implementation.md', subtitle: 'FR/AC → Code Map', x: 420, y: 420, w: 140, h: 44, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'implementation.md', subtitle: 'WHERE: FR/AC → @spec anchor mapping', body: `<h4>Content</h4>
+<ul>
+<li>FR Requirement Mapping table (FR → file → @spec anchor → status)</li>
+<li>AC Mapping table (AC → test file → status)</li>
+<li>Files Created/Modified list</li>
+</ul>
+<h4>Created by</h4><p><span class="tag tag-agent">Documenter</span> (finalize mode)</p>
+<h4>Used by</h4><p><code>/spec.check</code>, <code>/spec.explain</code></p>` }},
+    { id: 'changelog', label: 'changelog.md', subtitle: 'History', x: 420, y: 510, w: 140, h: 44, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'changelog.md', subtitle: 'Per-feature + global change history', body: `<h4>Levels</h4>
+<ul>
+<li><strong>Per-feature:</strong> <code>.specs/features/NNN/changelog.md</code></li>
+<li><strong>Global:</strong> <code>.specs/changelog.md</code> (current year, rotated)</li>
+</ul>
+<h4>Entry Format</h4>
+<p><code>## YYYY-MM-DD — [Type]: Description</code></p>
+<p>Fields: Type, Spec modified, Code modified, AC impacted, Author</p>` }},
+    // Side commands
+    { id: 'refine', label: '/spec.refine', subtitle: 'Iterative Refinement', x: 660, y: 150, w: 150, h: 48, color: '#3b1f4e', stroke: '#c084fc', category: 'command',
+      detail: { title: '/spec.refine', subtitle: 'Refine artifacts through guided conversation', body: `<h4>What it does</h4>
+<p>Refine existing artifacts (project, spec, plan) through guided conversation <strong>without breaking downstream consistency</strong>.</p>
+<h4>Eligibility Rules</h4>
+<ul>
+<li><strong>Draft/Review/Approved spec:</strong> yes</li>
+<li><strong>Planned spec:</strong> yes with warning (plan needs regen)</li>
+<li><strong>In Progress/Implemented:</strong> BLOCKED (code exists)</li>
+<li><strong>Plan without implementation.md:</strong> yes</li>
+<li><strong>Plan with implementation.md:</strong> BLOCKED</li>
+<li><strong>project.md / constitution.md:</strong> always yes</li>
+</ul>` }},
+    { id: 'stack', label: '/spec.stack', subtitle: 'Stack Evolution', x: 660, y: 260, w: 150, h: 48, color: '#3b1f4e', stroke: '#c084fc', category: 'command',
+      detail: { title: '/spec.stack', subtitle: 'View/change stack, impact analysis, create ADRs', body: `<h4>Modes</h4>
+<ul>
+<li><code>/spec.stack</code> — show current stack</li>
+<li><code>/spec.stack change "desc"</code> — propose change</li>
+<li><code>/spec.stack impact "desc"</code> — dry-run impact</li>
+<li><code>/spec.stack decisions</code> — show all ADRs</li>
+</ul>
+<h4>Change Process</h4>
+<ol>
+<li>Parse change request</li>
+<li>Identify affected layers</li>
+<li>Impact analysis on existing features</li>
+<li>Generate ADR</li>
+<li>Propose implementation phases</li>
+</ol>` }},
+    { id: 'feature', label: '/spec.feature', subtitle: 'Full Pipeline', x: 660, y: 370, w: 150, h: 48, color: '#4a2000', stroke: '#fb923c', category: 'command',
+      detail: { title: '/spec.feature', subtitle: 'End-to-end: specify → review → plan → review → implement', body: `<h4>What it does</h4>
+<p>Chains the entire pipeline in one command with <strong>validation gates</strong> and <strong>adversarial reviews</strong>.</p>
+<h4>Phases</h4>
+<ol>
+<li><strong>Phase 1:</strong> Specify (generate spec.md)</li>
+<li><strong>Phase 1.5:</strong> Spec Review (<span class="tag tag-agent">Verifier</span>)</li>
+<li><strong>Gate:</strong> User validates spec + review</li>
+<li><strong>Phase 2:</strong> Plan (generate plan.md)</li>
+<li><strong>Phase 2.5:</strong> Plan Review (<span class="tag tag-agent">Verifier</span>)</li>
+<li><strong>Gate:</strong> User validates plan + review</li>
+<li><strong>Phase 3:</strong> Implement (<span class="tag tag-agent">Supervisor</span> + <span class="tag tag-superpowers">SuperPowers</span>)</li>
+</ol>
+<h4>Flags</h4>
+<p><code>--auto</code> <code>--resume</code> <code>--branch</code> <code>--mono</code> <code>--economy</code> <code>--step</code></p>` }},
+  ];
+
+  const edges = [
+    { from: 'init', to: 'propose', type: 'flow' },
+    { from: 'propose', to: 'specify', type: 'flow' },
+    { from: 'specify', to: 'plan', type: 'flow' },
+    { from: 'plan', to: 'implement', type: 'flow' },
+    { from: 'implement', to: 'check', type: 'flow' },
+    { from: 'check', to: 'explain', type: 'flow' },
+    // artifact creation
+    { from: 'init', to: 'specs-dir', type: 'artifact', label: 'creates' },
+    { from: 'specify', to: 'spec-md', type: 'artifact', label: 'creates' },
+    { from: 'plan', to: 'plan-md', type: 'artifact', label: 'creates' },
+    { from: 'implement', to: 'progress-md', type: 'artifact', label: 'creates' },
+    { from: 'implement', to: 'impl-md', type: 'artifact', label: 'creates' },
+    { from: 'implement', to: 'changelog', type: 'artifact', label: 'updates' },
+    // side commands
+    { from: 'refine', to: 'spec-md', type: 'artifact', label: 'refines' },
+    { from: 'refine', to: 'plan-md', type: 'artifact', label: 'refines' },
+    { from: 'stack', to: 'specs-dir', type: 'artifact', label: 'updates' },
+    { from: 'feature', to: 'implement', type: 'flow', label: 'chains to' },
+  ];
+
+  return { nodes, edges };
+}
+
+function getFeatureData() {
+  const nodes = [
+    { id: 'start', label: 'Start', subtitle: '/spec.feature "description"', x: 400, y: 30, w: 180, h: 44, color: '#1e2035', stroke: '#4a4e6a', category: 'meta',
+      detail: { title: '/spec.feature', subtitle: 'Full pipeline entry point', body: `<p>User describes a feature in natural language. The pipeline runs all phases with validation gates.</p>
+<h4>Example</h4>
+<p><code>/spec.feature "user notification system with real-time bell icon"</code></p>` }},
+
+    { id: 'phase1', label: 'Phase 1: Specify', subtitle: 'Generate spec.md', x: 400, y: 110, w: 180, h: 52, color: '#064e3b', stroke: '#34d399', category: 'phase',
+      detail: { title: 'Phase 1 — Specify', subtitle: 'Generate feature specification', body: `<h4>Process</h4>
+<ul>
+<li>Auto-number feature (scan .specs/features/ for highest NNN)</li>
+<li>Resolve ambiguity (max 2 questions)</li>
+<li>Generate spec.md with user stories, Mermaid flowcharts, AC, FR</li>
+<li>Create <code>.specs/features/NNN-name/</code> directory</li>
+<li>Update README.md (Status: Draft)</li>
+</ul>` }},
+
+    { id: 'review1', label: 'Phase 1.5: Spec Review', subtitle: 'Verifier (6 axes)', x: 400, y: 200, w: 180, h: 52, color: '#3b1515', stroke: '#f87171', category: 'review',
+      detail: { title: 'Phase 1.5 — Spec Review', subtitle: 'Adversarial review by livespec-verifier', body: `<h4>6 Review Axes</h4>
+<ol>
+<li><strong>Infra/Stack Coherence</strong> — spec vs stack constraints</li>
+<li><strong>Behavioral Ambiguity</strong> — edge cases, failure modes</li>
+<li><strong>Entity/AC Completeness</strong> — all fields covered?</li>
+<li><strong>AC ↔ FR Cross-Coverage</strong> — every FR has AC?</li>
+<li><strong>Constraint Propagation</strong> — project.md constraints reflected?</li>
+<li><strong>Testability</strong> — every AC automatable?</li>
+</ol>
+<h4>Output</h4>
+<p>Verdict: <strong>PASS</strong> or <strong>BLOCKING</strong> with findings table</p>
+<h4>Agent</h4>
+<p><span class="tag tag-agent">livespec-verifier</span> (spec-review mode)</p>` }},
+
+    { id: 'gate1', label: 'User Gate', subtitle: 'Validate spec + review', x: 400, y: 290, w: 160, h: 44, color: '#4a3a00', stroke: '#fbbf24', category: 'gate',
+      detail: { title: 'Spec Validation Gate', subtitle: 'User must approve before planning', body: `<h4>Purpose</h4>
+<p>User reviews the spec and the verifier's findings. This gate is <strong>always active</strong> (even with <code>--auto</code>).</p>
+<h4>Options</h4>
+<ul>
+<li><strong>Approve</strong> → proceed to Phase 2</li>
+<li><strong>Request changes</strong> → regenerate spec</li>
+<li><strong>Abort</strong> → stop pipeline</li>
+</ul>` }},
+
+    { id: 'phase2', label: 'Phase 2: Plan', subtitle: 'Generate plan.md', x: 400, y: 375, w: 180, h: 52, color: '#064e3b', stroke: '#34d399', category: 'phase',
+      detail: { title: 'Phase 2 — Plan', subtitle: 'Generate technical plan with diagrams', body: `<h4>Process</h4>
+<ul>
+<li>Read spec.md, constitution, stack, testing strategy</li>
+<li>Generate Mermaid diagrams (sequence, state, ER)</li>
+<li>Create file-by-file implementation plan</li>
+<li>Resolve test commands</li>
+<li>Constitution check</li>
+<li>Update README.md (Status: Planned)</li>
+</ul>` }},
+
+    { id: 'review2', label: 'Phase 2.5: Plan Review', subtitle: 'Verifier (6 axes)', x: 400, y: 465, w: 180, h: 52, color: '#3b1515', stroke: '#f87171', category: 'review',
+      detail: { title: 'Phase 2.5 — Plan Review', subtitle: 'Adversarial review by livespec-verifier', body: `<h4>6 Review Axes</h4>
+<ol>
+<li><strong>FR Coverage</strong> — every FR in plan?</li>
+<li><strong>Step Decomposition</strong> — logical order? scope?</li>
+<li><strong>Constitution Compliance</strong> — architecture aligned?</li>
+<li><strong>Simpler Alternatives</strong> — over-engineering?</li>
+<li><strong>Edge Cases</strong> — error handling? concurrency?</li>
+<li><strong>Infrastructure Readiness</strong> — all resources in plan?</li>
+</ol>
+<h4>Output</h4>
+<p>Verdict: PASS or BLOCKING</p>
+<h4>With --auto</h4>
+<p>If BLOCKING → auto-regen max 2 times, then abort</p>` }},
+
+    { id: 'gate2', label: 'User Gate', subtitle: 'Validate plan + review', x: 400, y: 555, w: 160, h: 44, color: '#4a3a00', stroke: '#fbbf24', category: 'gate',
+      detail: { title: 'Plan Validation Gate', subtitle: 'User must approve before implementation', body: `<p>User reviews plan and verifier findings.</p>
+<h4>With --auto</h4>
+<p>If plan review PASS → skip gate and proceed. If BLOCKING → auto-regenerate plan max 2 times, then abort if still BLOCKING.</p>` }},
+
+    { id: 'phase3', label: 'Phase 3: Implement', subtitle: 'Supervisor + SuperPowers', x: 400, y: 645, w: 180, h: 52, color: '#4a2000', stroke: '#fb923c', category: 'phase',
+      detail: { title: 'Phase 3 — Implement', subtitle: 'Multi-agent execution via SuperPowers', body: `<h4>Orchestration</h4>
+<ul>
+<li><span class="tag tag-agent">Supervisor</span> reads plan, builds Task Payloads</li>
+<li><span class="tag tag-superpowers">SuperPowers</span> executes each step (isolated subagents)</li>
+<li><span class="tag tag-agent">Documenter</span> updates progress.md per step</li>
+</ul>
+<h4>Per Step</h4>
+<ol>
+<li>Build Task Payload (FR/AC + instructions + TDD + DoD)</li>
+<li>Dispatch to superpowers:subagent-driven-development</li>
+<li>Implementer → Spec Reviewer → Code Quality Reviewer</li>
+<li>Progress checkpoint</li>
+</ol>
+<h4>Final</h4>
+<ul>
+<li>Full test suite regression</li>
+<li>Create implementation.md, update changelogs, README</li>
+</ul>` }},
+
+    { id: 'done', label: 'Done', subtitle: 'Feature implemented + documented', x: 400, y: 740, w: 160, h: 44, color: '#064e3b', stroke: '#34d399', category: 'meta',
+      detail: { title: 'Pipeline Complete', subtitle: 'Feature shipped with full traceability', body: `<h4>Deliverables</h4>
+<ul>
+<li>Working code with @spec anchors</li>
+<li>All tests passing</li>
+<li>implementation.md with FR/AC mapping</li>
+<li>progress.md with all step checkpoints</li>
+<li>Feature + global changelogs updated</li>
+<li>README.md status: Implemented</li>
+<li>Execution log saved</li>
+</ul>` }},
+
+    // Side artifacts
+    { id: 'f-spec', label: 'spec.md', subtitle: '', x: 160, y: 130, w: 110, h: 36, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'spec.md', subtitle: 'Created in Phase 1', body: '<p>Feature specification with user stories, Mermaid flowcharts, AC, FR.</p>' }},
+    { id: 'f-plan', label: 'plan.md', subtitle: '', x: 160, y: 395, w: 110, h: 36, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'plan.md', subtitle: 'Created in Phase 2', body: '<p>Technical plan with diagrams, step-by-step implementation, test strategy.</p>' }},
+    { id: 'f-progress', label: 'progress.md', subtitle: '', x: 160, y: 645, w: 110, h: 36, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'progress.md', subtitle: 'Updated during Phase 3', body: '<p>Step-by-step checkpoint table. Enables --resume.</p>' }},
+    { id: 'f-impl', label: 'implementation.md', subtitle: '', x: 660, y: 700, w: 140, h: 36, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'implementation.md', subtitle: 'Created at end of Phase 3', body: '<p>FR/AC → @spec anchor mapping. Where every requirement lives in code.</p>' }},
+
+    // Verifier agent
+    { id: 'verifier', label: 'livespec-verifier', subtitle: 'Adversarial Reviewer', x: 660, y: 240, w: 160, h: 44, color: '#3b1515', stroke: '#f87171', category: 'agent',
+      detail: { title: 'livespec-verifier', subtitle: 'Finds problems. Not a rubber stamp.', body: `<h4>Modes</h4>
+<ul>
+<li><strong>Spec Review:</strong> 6 axes (infra, ambiguity, entity/AC, FR/AC, constraints, testability)</li>
+<li><strong>Plan Review:</strong> 6 axes (FR coverage, decomposition, constitution, simpler alternatives, edge cases, infra)</li>
+</ul>
+<h4>Key Rule</h4>
+<p>"If everything passes, document explicitly what was verified and why."</p>` }},
+  ];
+
+  const edges = [
+    { from: 'start', to: 'phase1', type: 'flow' },
+    { from: 'phase1', to: 'review1', type: 'flow' },
+    { from: 'review1', to: 'gate1', type: 'flow' },
+    { from: 'gate1', to: 'phase2', type: 'flow' },
+    { from: 'phase2', to: 'review2', type: 'flow' },
+    { from: 'review2', to: 'gate2', type: 'flow' },
+    { from: 'gate2', to: 'phase3', type: 'flow' },
+    { from: 'phase3', to: 'done', type: 'flow' },
+    // artifacts
+    { from: 'phase1', to: 'f-spec', type: 'artifact' },
+    { from: 'phase2', to: 'f-plan', type: 'artifact' },
+    { from: 'phase3', to: 'f-progress', type: 'artifact' },
+    { from: 'phase3', to: 'f-impl', type: 'artifact' },
+    // verifier connections
+    { from: 'verifier', to: 'review1', type: 'review', label: 'spec-review mode' },
+    { from: 'verifier', to: 'review2', type: 'review', label: 'plan-review mode' },
+    // review loops
+    { from: 'gate1', to: 'phase1', type: 'review', label: 'rework' },
+    { from: 'gate2', to: 'phase2', type: 'review', label: 'rework (max 2x with --auto)' },
+  ];
+
+  return { nodes, edges };
+}
+
+function getImplementData() {
+  const nodes = [
+    { id: 'supervisor', label: 'Supervisor', subtitle: 'livespec-supervisor', x: 400, y: 40, w: 180, h: 52, color: '#064e3b', stroke: '#34d399', category: 'agent',
+      detail: { title: 'livespec-supervisor', subtitle: 'Orchestrator/Translator — NEVER codes', body: `<h4>Responsibilities</h4>
+<ul>
+<li>Read feature context (spec.md, plan.md, constitution, stack, testing)</li>
+<li>Decompose plan into ordered steps</li>
+<li>Build Task Payloads per step</li>
+<li>Dispatch to SuperPowers</li>
+<li>Coordinate Documenter for checkpoints</li>
+<li>Handle --resume (read progress.md)</li>
+</ul>
+<h4>Rules</h4>
+<ul>
+<li>NEVER writes code, tests, or documentation</li>
+<li>NEVER skips Task Payload construction</li>
+<li>NEVER exceeds 12 files per step</li>
+<li>ALWAYS updates progress.md after every step</li>
+</ul>` }},
+
+    { id: 'context', label: 'Read Context', subtitle: 'spec.md + plan.md + constitution + stack', x: 100, y: 40, w: 180, h: 52, color: '#1e3a5f', stroke: '#60a5fa', category: 'input',
+      detail: { title: 'Context Loading', subtitle: 'All specification artifacts', body: `<h4>Files Read</h4>
+<ul>
+<li><code>spec.md</code> — FR/AC requirements</li>
+<li><code>plan.md</code> — implementation steps</li>
+<li><code>constitution.md</code> — architecture rules</li>
+<li><code>stacks/_default.md</code> — stack patterns</li>
+<li><code>testing/strategy.md</code> — test approach</li>
+<li><code>progress.md</code> — if --resume</li>
+</ul>` }},
+
+    { id: 'infra-check', label: 'Phase 0: Infrastructure', subtitle: 'livespec-implementer', x: 400, y: 130, w: 180, h: 48, color: '#064e3b', stroke: '#34d399', category: 'agent',
+      detail: { title: 'Phase 0 — Infrastructure', subtitle: 'livespec-implementer provisions resources', body: `<h4>When Triggered</h4>
+<p>Only if plan.md has "Infrastructure Setup" section.</p>
+<h4>Process</h4>
+<ol>
+<li>Provision resources (run commands from plan)</li>
+<li>Verify existence</li>
+<li>Configure bindings (real IDs, no placeholders)</li>
+<li>Verify runtime (dev server starts without errors)</li>
+</ol>
+<h4>Infrastructure Gate (BLOCKING)</h4>
+<p>ALL resources must verify before Step 1. If fails → "Blocked by Infrastructure"</p>` }},
+
+    { id: 'payload', label: 'Build Task Payload', subtitle: 'Context + Instructions + TDD + DoD', x: 400, y: 225, w: 180, h: 52, color: '#064e3b', stroke: '#34d399', category: 'process',
+      detail: { title: 'Task Payload Construction', subtitle: 'The bridge between LiveSpec and SuperPowers', body: `<h4>5 Sections</h4>
+<ol>
+<li><strong>Context</strong> — FR/AC from spec.md for this step, plan overview</li>
+<li><strong>Implementation Instructions</strong> — exact step from plan.md, files, patterns, constitution rules</li>
+<li><strong>LiveSpec Mandatory Rules</strong> — @spec anchor format, deep-link requirement</li>
+<li><strong>Strict TDD Protocol</strong> — tests BEFORE code, resolved test commands</li>
+<li><strong>Definition of Done</strong> — checkboxes for Spec Reviewer + Code Quality Reviewer</li>
+</ol>
+<h4>@spec Anchor Format</h4>
+<p><code>// @spec FR-NNN: &lt;description&gt; — .specs/features/NNN-name/spec.md#fr-nnn</code></p>` }},
+
+    { id: 'superpowers', label: 'SuperPowers Bridge', subtitle: 'superpowers:subagent-driven-development', x: 400, y: 330, w: 200, h: 52, color: '#4a2000', stroke: '#fb923c', category: 'superpowers',
+      detail: { title: 'SuperPowers Execution Engine', subtitle: 'Isolated subagents with TDD + multi-phase review', body: `<h4>What It Is</h4>
+<p>An execution engine skill (<code>superpowers:subagent-driven-development</code>) that provides isolated, context-specialized subagents for implementation with review cycles.</p>
+<h4>Key Advantages</h4>
+<ul>
+<li><strong>Context isolation</strong> — each subagent is fresh</li>
+<li><strong>Specialized roles</strong> — Implementer, Spec Reviewer, Code Quality Reviewer</li>
+<li><strong>Automatic convergence</strong> — manages iteration limits</li>
+<li><strong>TDD enforcement</strong> — tests must pass</li>
+</ul>` }},
+
+    { id: 'implementer-sub', label: 'Implementer', subtitle: 'Write code + tests (TDD)', x: 200, y: 430, w: 160, h: 48, color: '#4a2000', stroke: '#fb923c', category: 'subagent',
+      detail: { title: 'Implementer Subagent', subtitle: 'Writes production code and tests', body: `<h4>Process</h4>
+<ol>
+<li>Read Task Payload context</li>
+<li>Write tests FIRST (RED)</li>
+<li>Write production code (GREEN)</li>
+<li>Refactor if needed</li>
+<li>Place @spec anchors</li>
+<li>Run resolved test commands</li>
+</ol>
+<h4>Key</h4>
+<p>Fresh context per step — no pollution from previous steps</p>` }},
+
+    { id: 'spec-reviewer', label: 'Spec Reviewer', subtitle: 'Verify FR/AC + @spec anchors', x: 400, y: 430, w: 160, h: 48, color: '#4a2000', stroke: '#fb923c', category: 'subagent',
+      detail: { title: 'Spec Reviewer Subagent', subtitle: 'Verifies spec compliance — BLOCKS if missing', body: `<h4>Checks</h4>
+<ul>
+<li>All FR/AC assigned to step are implemented</li>
+<li>Every FR has @spec anchor with deep-link</li>
+<li>No FR is partial</li>
+<li>Description &lt;50 chars</li>
+</ul>
+<h4>Verdict</h4>
+<p>PASS or BLOCK (with specific findings)</p>` }},
+
+    { id: 'quality-reviewer', label: 'Code Quality', subtitle: 'Tests + lint + security', x: 600, y: 430, w: 160, h: 48, color: '#4a2000', stroke: '#fb923c', category: 'subagent',
+      detail: { title: 'Code Quality Reviewer Subagent', subtitle: 'Tests, lint, typecheck, security, constitution', body: `<h4>Checks</h4>
+<ul>
+<li>All test commands pass</li>
+<li>Lint and typecheck pass</li>
+<li>No God files (&gt;300 lines)</li>
+<li>No function &gt;50 lines</li>
+<li>Constitution rules followed</li>
+<li>No SQL/XSS/command injection</li>
+<li>No secrets or credentials</li>
+<li>No sensitive data in logs</li>
+<li>Input validation on boundaries</li>
+</ul>` }},
+
+    { id: 'documenter', label: 'Documenter', subtitle: 'livespec-documenter', x: 700, y: 225, w: 160, h: 48, color: '#064e3b', stroke: '#34d399', category: 'agent',
+      detail: { title: 'livespec-documenter', subtitle: 'Updates .specs/ documentation — NEVER writes code', body: `<h4>Checkpoint Mode</h4>
+<p>Add/update row in progress.md after each step</p>
+<h4>Finalize Mode</h4>
+<ul>
+<li>Create implementation.md (FR/AC → @spec mapping)</li>
+<li>Update feature changelog.md</li>
+<li>Update global .specs/changelog.md</li>
+<li>Write execution log</li>
+<li>Update .specs/README.md (status + Recent Activity)</li>
+</ul>` }},
+
+    { id: 'progress', label: 'progress.md', subtitle: 'Step checkpoints', x: 700, y: 330, w: 140, h: 40, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'progress.md', subtitle: 'Step checkpoint table', body: `<p><code>| Step | Status | Files | Tests | Result | Updated |</code></p>
+<p>Enables <code>--resume</code> after interruption. Step N+1 only if Status = "Done".</p>` }},
+
+    { id: 'final-val', label: 'Final Validation', subtitle: 'Full test suite regression', x: 400, y: 540, w: 180, h: 48, color: '#4a2000', stroke: '#fb923c', category: 'superpowers',
+      detail: { title: 'Final Validation', subtitle: 'Run ALL test commands', body: `<p>SuperPowers runs the complete test suite regression check:</p>
+<ul>
+<li>All resolved unit test commands</li>
+<li>All integration test commands</li>
+<li>E2E tests</li>
+<li>Lint + typecheck on all touched files</li>
+<li>Detect inter-step regressions</li>
+</ul>` }},
+
+    { id: 'finalize', label: 'Finalize Docs', subtitle: 'Documenter (finalize mode)', x: 400, y: 630, w: 180, h: 48, color: '#064e3b', stroke: '#34d399', category: 'agent',
+      detail: { title: 'Finalize Documentation', subtitle: 'Documenter creates all final artifacts', body: `<h4>Created/Updated</h4>
+<ul>
+<li>implementation.md — FR/AC → @spec mapping</li>
+<li>Feature changelog.md — detailed entry</li>
+<li>Global changelog.md — summary</li>
+<li>Execution log — .specs/features/NNN/logs/</li>
+<li>.specs/README.md — status + Recent Activity</li>
+</ul>` }},
+  ];
+
+  const edges = [
+    { from: 'context', to: 'supervisor', type: 'flow' },
+    { from: 'supervisor', to: 'infra-check', type: 'agent', label: 'if infra needed' },
+    { from: 'supervisor', to: 'payload', type: 'flow', label: 'per step' },
+    { from: 'payload', to: 'superpowers', type: 'dispatch', label: 'dispatch' },
+    { from: 'superpowers', to: 'implementer-sub', type: 'dispatch', label: '1. code' },
+    { from: 'superpowers', to: 'spec-reviewer', type: 'dispatch', label: '2. review' },
+    { from: 'superpowers', to: 'quality-reviewer', type: 'dispatch', label: '3. quality' },
+    { from: 'spec-reviewer', to: 'implementer-sub', type: 'review', label: 'fix' },
+    { from: 'quality-reviewer', to: 'implementer-sub', type: 'review', label: 'fix' },
+    { from: 'supervisor', to: 'documenter', type: 'agent', label: 'checkpoint' },
+    { from: 'documenter', to: 'progress', type: 'artifact' },
+    { from: 'superpowers', to: 'final-val', type: 'flow', label: 'all steps done' },
+    { from: 'final-val', to: 'finalize', type: 'flow' },
+    { from: 'finalize', to: 'documenter', type: 'agent', label: 'finalize mode' },
+  ];
+
+  return { nodes, edges };
+}
+
+function getCommandsData() {
+  const nodes = [
+    // Group headers (invisible, just for organization)
+    { id: 'init', label: '/spec.init', subtitle: '3-phase brainstorm', x: 100, y: 60, w: 170, h: 52, color: '#064e3b', stroke: '#34d399', category: 'create',
+      detail: { title: '/spec.init', subtitle: 'Initialize LiveSpec project', body: `<p>3-phase conversational brainstorm: Brainstorm → Stack Decisions → Installation</p>
+<p>Creates the entire <code>.specs/</code> directory structure.</p>
+<h4>Flags</h4><p><code>--auto</code> <code>--stack [preset]</code> <code>--dir</code> <code>--dry-run</code></p>` }},
+
+    { id: 'propose', label: '/spec.propose', subtitle: '5-dimension gap analysis', x: 100, y: 170, w: 170, h: 52, color: '#064e3b', stroke: '#34d399', category: 'create',
+      detail: { title: '/spec.propose', subtitle: 'Discover what to build next (read-only)', body: `<p>Gap analysis across 5 dimensions: role coverage, user journey, platform, dependency closure, MVP completeness.</p>
+<h4>Flags</h4><p><code>--count N</code> <code>--role</code> <code>--mvp</code> <code>--auto</code></p>` }},
+
+    { id: 'specify', label: '/spec.specify', subtitle: 'Stories + AC + FR + Mermaid', x: 100, y: 280, w: 170, h: 52, color: '#064e3b', stroke: '#34d399', category: 'create',
+      detail: { title: '/spec.specify', subtitle: 'Create feature specification', body: `<p>User stories with mandatory Mermaid flowcharts, acceptance criteria, functional requirements.</p>
+<h4>Creates</h4><p><code>.specs/features/NNN-name/spec.md</code></p>` }},
+
+    { id: 'plan', label: '/spec.plan', subtitle: 'Diagrams + file-by-file steps', x: 400, y: 60, w: 170, h: 52, color: '#1e3a5f', stroke: '#60a5fa', category: 'analyze',
+      detail: { title: '/spec.plan', subtitle: 'Technical planning with Mermaid diagrams', body: `<p>Sequence, state, ER diagrams. File-by-file implementation plan. Test command resolution.</p>
+<h4>Creates</h4><p><code>.specs/features/NNN-name/plan.md</code></p>` }},
+
+    { id: 'check', label: '/spec.check', subtitle: 'Spec vs code alignment', x: 400, y: 170, w: 170, h: 52, color: '#1e3a5f', stroke: '#60a5fa', category: 'analyze',
+      detail: { title: '/spec.check', subtitle: '11-step verification pipeline', body: `<p>Validate tree structure, spec quality, @spec anchors, AC coverage, visual baselines, generate gap report.</p>
+<h4>Modes</h4><p><code>/spec.check</code> <code>/spec.check feature</code> <code>--tree-only</code> <code>--quality</code></p>` }},
+
+    { id: 'explain', label: '/spec.explain', subtitle: '"How does X work?"', x: 400, y: 280, w: 170, h: 52, color: '#1e3a5f', stroke: '#60a5fa', category: 'analyze',
+      detail: { title: '/spec.explain', subtitle: 'Living documentation synthesis', body: `<p>Answers questions by combining spec + diagrams + implementation map + changelog + ADRs.</p>
+<p>Understands feature names, numbers, natural questions, temporal queries.</p>` }},
+
+    { id: 'implement', label: '/spec.implement', subtitle: 'Supervisor + SuperPowers', x: 700, y: 60, w: 170, h: 52, color: '#4a2000', stroke: '#fb923c', category: 'execute',
+      detail: { title: '/spec.implement', subtitle: 'Multi-agent implementation engine', body: `<p>Supervisor orchestrates. SuperPowers executes with isolated subagents. TDD enforced. @spec anchors verified.</p>
+<h4>Flags</h4><p><code>--auto</code> <code>--mono</code> <code>--economy</code> <code>--resume</code> <code>--step [N]</code></p>` }},
+
+    { id: 'feature', label: '/spec.feature', subtitle: 'Full end-to-end pipeline', x: 700, y: 170, w: 170, h: 52, color: '#4a2000', stroke: '#fb923c', category: 'execute',
+      detail: { title: '/spec.feature', subtitle: 'specify → review → plan → review → implement', body: `<p>Chains all phases with validation gates and adversarial reviews. One command for the entire pipeline.</p>
+<h4>Flags</h4><p><code>--auto</code> <code>--resume</code> <code>--branch</code> <code>--mono</code> <code>--economy</code></p>` }},
+
+    { id: 'refine', label: '/spec.refine', subtitle: 'Safe iterative refinement', x: 700, y: 330, w: 170, h: 52, color: '#3b1f4e', stroke: '#c084fc', category: 'evolve',
+      detail: { title: '/spec.refine', subtitle: 'Refine without breaking downstream', body: `<p>Guided conversation to refine project, spec, or plan artifacts. Blocks if code already exists (preserves traceability).</p>` }},
+
+    { id: 'stack', label: '/spec.stack', subtitle: 'Impact analysis + ADRs', x: 700, y: 440, w: 170, h: 52, color: '#3b1f4e', stroke: '#c084fc', category: 'evolve',
+      detail: { title: '/spec.stack', subtitle: 'Stack evolution and impact analysis', body: `<p>View current stack, propose changes, analyze impact on features, create ADRs.</p>
+<h4>Modes</h4><p><code>/spec.stack</code> <code>change</code> <code>impact</code> <code>decisions</code></p>` }},
+
+    // Group labels
+    { id: 'g-create', label: 'CREATE', subtitle: '', x: 100, y: 370, w: 170, h: 30, color: '#0a1a15', stroke: '#34d39966', category: 'label',
+      detail: { title: 'Create Commands', subtitle: '', body: '<p>Initialize project, discover features, write specs.</p>' }},
+    { id: 'g-analyze', label: 'ANALYZE', subtitle: '', x: 400, y: 370, w: 170, h: 30, color: '#0d1929', stroke: '#60a5fa66', category: 'label',
+      detail: { title: 'Analyze Commands', subtitle: '', body: '<p>Plan, verify, explain. Read-heavy, insight-producing.</p>' }},
+    { id: 'g-execute', label: 'EXECUTE', subtitle: '', x: 700, y: 280, w: 170, h: 30, color: '#1a1200', stroke: '#fb923c66', category: 'label',
+      detail: { title: 'Execute Commands', subtitle: '', body: '<p>Implementation and full pipelines. Write-heavy, multi-agent.</p>' }},
+    { id: 'g-evolve', label: 'EVOLVE', subtitle: '', x: 700, y: 530, w: 170, h: 30, color: '#170d24', stroke: '#c084fc66', category: 'label',
+      detail: { title: 'Evolve Commands', subtitle: '', body: '<p>Iterate on existing artifacts safely.</p>' }},
+  ];
+
+  const edges = [
+    { from: 'init', to: 'propose', type: 'flow' },
+    { from: 'propose', to: 'specify', type: 'flow' },
+    { from: 'specify', to: 'plan', type: 'flow' },
+    { from: 'plan', to: 'implement', type: 'flow' },
+    { from: 'implement', to: 'check', type: 'flow' },
+    { from: 'check', to: 'explain', type: 'flow' },
+    { from: 'specify', to: 'feature', type: 'flow', label: 'or use /spec.feature' },
+    { from: 'refine', to: 'specify', type: 'flow', label: 'refines spec' },
+    { from: 'refine', to: 'plan', type: 'flow', label: 'refines plan' },
+    { from: 'stack', to: 'init', type: 'flow', label: 'updates stack' },
+  ];
+
+  return { nodes, edges };
+}
+
+function getArtifactsData() {
+  const nodes = [
+    // Commands (left)
+    { id: 'c-init', label: '/spec.init', subtitle: '', x: 60, y: 60, w: 130, h: 38, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: { title: '/spec.init', subtitle: 'Creates project structure', body: '' }},
+    { id: 'c-specify', label: '/spec.specify', subtitle: '', x: 60, y: 150, w: 130, h: 38, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: { title: '/spec.specify', subtitle: 'Creates feature spec', body: '' }},
+    { id: 'c-plan', label: '/spec.plan', subtitle: '', x: 60, y: 240, w: 130, h: 38, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: { title: '/spec.plan', subtitle: 'Creates technical plan', body: '' }},
+    { id: 'c-implement', label: '/spec.implement', subtitle: '', x: 60, y: 330, w: 130, h: 38, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: { title: '/spec.implement', subtitle: 'Creates implementation artifacts', body: '' }},
+    { id: 'c-check', label: '/spec.check', subtitle: '', x: 60, y: 420, w: 130, h: 38, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: { title: '/spec.check', subtitle: 'Reads all, writes gap reports', body: '' }},
+    { id: 'c-refine', label: '/spec.refine', subtitle: '', x: 60, y: 510, w: 130, h: 38, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: { title: '/spec.refine', subtitle: 'Updates existing artifacts', body: '' }},
+    { id: 'c-stack', label: '/spec.stack', subtitle: '', x: 60, y: 600, w: 130, h: 38, color: '#064e3b', stroke: '#34d399', category: 'command',
+      detail: { title: '/spec.stack', subtitle: 'Creates/updates ADRs and stack', body: '' }},
+
+    // System artifacts (middle)
+    { id: 'a-system', label: 'spec-system.md', subtitle: 'Universal rules', x: 340, y: 30, w: 150, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'spec-system.md', subtitle: 'Installed from LiveSpec — universal rules', body: '' }},
+    { id: 'a-constitution', label: 'constitution.md', subtitle: 'Architecture principles', x: 340, y: 80, w: 150, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'constitution.md', subtitle: 'Project-specific architecture rules', body: '' }},
+    { id: 'a-project', label: 'project.md', subtitle: 'Vision, users, constraints', x: 340, y: 130, w: 150, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'project.md', subtitle: 'Vision, users, roles, constraints, scale', body: '' }},
+    { id: 'a-stack', label: 'stacks/_default.md', subtitle: 'Chosen stack', x: 550, y: 30, w: 150, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'stacks/_default.md', subtitle: 'Technology stack + rationale', body: '' }},
+    { id: 'a-adr', label: 'ADR-NNN-*.md', subtitle: 'Decisions', x: 550, y: 80, w: 150, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'ADR-NNN-*.md', subtitle: 'Architecture Decision Records', body: '' }},
+    { id: 'a-testing', label: 'testing/strategy.md', subtitle: 'Test approach', x: 550, y: 130, w: 150, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'testing/strategy.md', subtitle: 'Testing approach + tools', body: '' }},
+    { id: 'a-readme', label: 'README.md', subtitle: 'Spec registry', x: 750, y: 30, w: 140, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'README.md', subtitle: 'Auto-maintained spec registry', body: '' }},
+    { id: 'a-gchangelog', label: 'changelog.md', subtitle: 'Global history', x: 750, y: 80, w: 140, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'Global changelog.md', subtitle: 'Current year, rotated yearly', body: '' }},
+
+    // Feature artifacts (bottom)
+    { id: 'a-spec', label: 'spec.md', subtitle: 'WHAT', x: 340, y: 240, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/spec.md', subtitle: 'Feature specification', body: '' }},
+    { id: 'a-plan', label: 'plan.md', subtitle: 'HOW', x: 340, y: 310, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/plan.md', subtitle: 'Technical plan with diagrams', body: '' }},
+    { id: 'a-progress', label: 'progress.md', subtitle: 'STATUS', x: 340, y: 380, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/progress.md', subtitle: 'Step checkpoints', body: '' }},
+    { id: 'a-impl', label: 'implementation.md', subtitle: 'WHERE', x: 340, y: 450, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/implementation.md', subtitle: 'FR/AC → @spec mapping', body: '' }},
+    { id: 'a-fchangelog', label: 'changelog.md', subtitle: 'WHEN', x: 340, y: 520, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/changelog.md', subtitle: 'Feature change history', body: '' }},
+    { id: 'a-contracts', label: 'contracts/', subtitle: 'openapi.yaml', x: 550, y: 240, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/contracts/', subtitle: 'API specifications (OpenAPI)', body: '' }},
+    { id: 'a-baselines', label: 'baselines/', subtitle: 'Screenshots', x: 550, y: 310, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/baselines/', subtitle: 'Visual test screenshots (Playwright)', body: '' }},
+    { id: 'a-logs', label: 'logs/', subtitle: 'Execution logs', x: 550, y: 380, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/logs/', subtitle: 'YYYY-MM-DD.md execution logs', body: '' }},
+    { id: 'a-checks', label: 'checks/', subtitle: 'Gap reports', x: 550, y: 450, w: 130, h: 38, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: 'features/NNN/checks/', subtitle: 'Gap report snapshots', body: '' }},
+  ];
+
+  const edges = [
+    // init creates
+    { from: 'c-init', to: 'a-system', type: 'agent' },
+    { from: 'c-init', to: 'a-constitution', type: 'agent' },
+    { from: 'c-init', to: 'a-project', type: 'agent' },
+    { from: 'c-init', to: 'a-stack', type: 'agent' },
+    { from: 'c-init', to: 'a-adr', type: 'agent' },
+    { from: 'c-init', to: 'a-testing', type: 'agent' },
+    { from: 'c-init', to: 'a-readme', type: 'agent' },
+    // specify creates
+    { from: 'c-specify', to: 'a-spec', type: 'agent' },
+    { from: 'c-specify', to: 'a-fchangelog', type: 'gate', },
+    // plan creates
+    { from: 'c-plan', to: 'a-plan', type: 'agent' },
+    { from: 'c-plan', to: 'a-contracts', type: 'agent' },
+    // implement creates
+    { from: 'c-implement', to: 'a-progress', type: 'agent' },
+    { from: 'c-implement', to: 'a-impl', type: 'agent' },
+    { from: 'c-implement', to: 'a-baselines', type: 'agent' },
+    { from: 'c-implement', to: 'a-logs', type: 'agent' },
+    { from: 'c-implement', to: 'a-fchangelog', type: 'gate' },
+    { from: 'c-implement', to: 'a-gchangelog', type: 'gate' },
+    { from: 'c-implement', to: 'a-readme', type: 'gate' },
+    // check creates
+    { from: 'c-check', to: 'a-checks', type: 'agent' },
+    // refine updates
+    { from: 'c-refine', to: 'a-spec', type: 'gate' },
+    { from: 'c-refine', to: 'a-plan', type: 'gate' },
+    { from: 'c-refine', to: 'a-project', type: 'gate' },
+    { from: 'c-refine', to: 'a-constitution', type: 'gate' },
+    // stack updates
+    { from: 'c-stack', to: 'a-stack', type: 'gate' },
+    { from: 'c-stack', to: 'a-adr', type: 'agent' },
+  ];
+
+  return { nodes, edges };
+}
+
+function getAgentsData() {
+  const nodes = [
+    { id: 'supervisor', label: 'livespec-supervisor', subtitle: 'Orchestrator/Translator', x: 400, y: 50, w: 200, h: 52, color: '#064e3b', stroke: '#34d399', category: 'agent',
+      detail: { title: 'livespec-supervisor', subtitle: 'Central coordinator — NEVER writes code', body: `<h4>Role</h4>
+<p>Orchestrates the entire /spec.implement pipeline. Reads specs, decomposes plans, builds Task Payloads, dispatches to SuperPowers, coordinates documentation.</p>
+<h4>Key Rules</h4>
+<ul>
+<li>NEVER writes code, tests, or documentation itself</li>
+<li>Builds Task Payloads with FR/AC, instructions, TDD protocol, Definition of Done</li>
+<li>Max 12 files per step (Change Scope Guard)</li>
+<li>Updates progress.md after every step via Documenter</li>
+</ul>` }},
+
+    { id: 'verifier', label: 'livespec-verifier', subtitle: 'Adversarial Reviewer', x: 100, y: 180, w: 200, h: 52, color: '#3b1515', stroke: '#f87171', category: 'agent',
+      detail: { title: 'livespec-verifier', subtitle: 'Finds problems. Not a rubber stamp.', body: `<h4>Modes</h4>
+<ul>
+<li><strong>Spec Review</strong> (Phase 1.5) — 6 axes: infra/stack coherence, behavioral ambiguity, entity/AC completeness, AC↔FR coverage, constraint propagation, testability</li>
+<li><strong>Plan Review</strong> (Phase 2.5) — 6 axes: FR coverage, step decomposition, constitution compliance, simpler alternatives, edge cases, infrastructure readiness</li>
+</ul>
+<h4>Output</h4>
+<p>Structured review report with findings table, severity, recommendations. Verdict: PASS or BLOCKING.</p>
+<h4>Never modifies code</h4>` }},
+
+    { id: 'implementer', label: 'livespec-implementer', subtitle: 'Infrastructure Provisioning', x: 400, y: 180, w: 200, h: 52, color: '#064e3b', stroke: '#34d399', category: 'agent',
+      detail: { title: 'livespec-implementer', subtitle: 'Phase 0 only — infrastructure provisioning', body: `<h4>When Used</h4>
+<p>Only during /spec.implement if plan has "Infrastructure Setup" section.</p>
+<h4>Process</h4>
+<ol>
+<li>Provision resources (run commands from plan)</li>
+<li>Verify existence (all must succeed)</li>
+<li>Configure bindings (real IDs, no placeholders)</li>
+<li>Verify runtime (dev server starts)</li>
+</ol>
+<h4>Infrastructure Gate (BLOCKING)</h4>
+<p>ALL resources must verify. Missing resource = BLOCKED.</p>` }},
+
+    { id: 'documenter', label: 'livespec-documenter', subtitle: 'Spec Documentation Updates', x: 700, y: 180, w: 200, h: 52, color: '#064e3b', stroke: '#34d399', category: 'agent',
+      detail: { title: 'livespec-documenter', subtitle: 'Updates .specs/ — NEVER writes code', body: `<h4>Checkpoint Mode</h4>
+<p>Add/update row in progress.md (step, status, files, tests, result).</p>
+<h4>Finalize Mode</h4>
+<ul>
+<li>Create implementation.md</li>
+<li>Update feature changelog.md</li>
+<li>Update global changelog.md</li>
+<li>Write execution log</li>
+<li>Update README.md (status + Recent Activity)</li>
+</ul>` }},
+
+    { id: 'sp-bridge', label: 'SuperPowers', subtitle: 'superpowers:subagent-driven-development', x: 400, y: 330, w: 220, h: 52, color: '#4a2000', stroke: '#fb923c', category: 'superpowers',
+      detail: { title: 'SuperPowers Execution Engine', subtitle: 'Isolated subagents for TDD implementation', body: `<h4>How It Works</h4>
+<p>Receives Task Payload from Supervisor. Spawns isolated subagents for each role. Manages iteration limits and convergence.</p>
+<h4>Key Advantages</h4>
+<ul>
+<li>Context isolation per step</li>
+<li>Specialized roles (Implementer, Spec Reviewer, Quality Reviewer)</li>
+<li>Automatic convergence with retry logic</li>
+<li>TDD enforcement</li>
+</ul>` }},
+
+    { id: 'sp-impl', label: 'Implementer', subtitle: 'Write code + tests (TDD)', x: 180, y: 450, w: 170, h: 48, color: '#4a2000', stroke: '#fb923c', category: 'subagent',
+      detail: { title: 'Implementer Subagent', subtitle: 'Fresh context per step', body: `<p>Writes tests FIRST (RED), then production code (GREEN), then refactors. Places @spec anchors. Runs test commands.</p>` }},
+
+    { id: 'sp-spec', label: 'Spec Reviewer', subtitle: 'FR/AC + @spec anchors', x: 400, y: 450, w: 170, h: 48, color: '#4a2000', stroke: '#fb923c', category: 'subagent',
+      detail: { title: 'Spec Reviewer Subagent', subtitle: 'BLOCKS if @spec missing', body: `<p>Verifies: all FR/AC implemented, every FR has @spec anchor with deep-link, no partial FR.</p>` }},
+
+    { id: 'sp-quality', label: 'Code Quality', subtitle: 'Tests + lint + security', x: 620, y: 450, w: 170, h: 48, color: '#4a2000', stroke: '#fb923c', category: 'subagent',
+      detail: { title: 'Code Quality Reviewer Subagent', subtitle: 'Tests, lint, constitution, security', body: `<p>Verifies: tests pass, lint/typecheck pass, no God files, no functions >50 lines, constitution compliance, no security risks.</p>` }},
+
+    // Inputs/outputs
+    { id: 'spec-input', label: 'spec.md + plan.md', subtitle: 'Feature context', x: 100, y: 50, w: 160, h: 40, color: '#1e3a5f', stroke: '#60a5fa', category: 'input',
+      detail: { title: 'Feature Specification Context', subtitle: 'Input for the entire pipeline', body: '' }},
+    { id: 'code-output', label: 'Working Code', subtitle: '@spec anchors + tests passing', x: 400, y: 560, w: 180, h: 44, color: '#1e3a5f', stroke: '#60a5fa', category: 'output',
+      detail: { title: 'Working Code', subtitle: 'The final deliverable', body: `<ul>
+<li>Production code with @spec anchors</li>
+<li>All tests passing (TDD)</li>
+<li>Lint + typecheck clean</li>
+<li>implementation.md with full mapping</li>
+<li>progress.md with all checkpoints</li>
+<li>Changelogs and README updated</li>
+</ul>` }},
+    { id: 'docs-output', label: '.specs/ Updated', subtitle: 'Full documentation', x: 700, y: 50, w: 160, h: 40, color: '#2d1b69', stroke: '#a78bfa', category: 'artifact',
+      detail: { title: '.specs/ Documentation', subtitle: 'All artifacts updated', body: '' }},
+  ];
+
+  const edges = [
+    { from: 'spec-input', to: 'supervisor', type: 'flow', label: 'reads' },
+    { from: 'supervisor', to: 'implementer', type: 'agent', label: 'Phase 0 (infra)' },
+    { from: 'supervisor', to: 'sp-bridge', type: 'dispatch', label: 'Task Payload per step' },
+    { from: 'supervisor', to: 'documenter', type: 'agent', label: 'checkpoint + finalize' },
+    { from: 'documenter', to: 'docs-output', type: 'artifact' },
+    { from: 'sp-bridge', to: 'sp-impl', type: 'dispatch', label: '1. code' },
+    { from: 'sp-bridge', to: 'sp-spec', type: 'dispatch', label: '2. review' },
+    { from: 'sp-bridge', to: 'sp-quality', type: 'dispatch', label: '3. quality' },
+    { from: 'sp-spec', to: 'sp-impl', type: 'review', label: 'fix' },
+    { from: 'sp-quality', to: 'sp-impl', type: 'review', label: 'fix' },
+    { from: 'sp-bridge', to: 'code-output', type: 'flow', label: 'delivers' },
+    // verifier used by /spec.feature
+    { from: 'verifier', to: 'spec-input', type: 'review', label: 'reviews spec + plan' },
+  ];
+
+  return { nodes, edges };
+}
+
+// ═══════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════
+
+function renderView() {
+  const svg = document.getElementById('mainSvg');
+  const data = getViewData(state.currentView);
+  const { nodes, edges } = data;
+
+  // Clear SVG (keep defs)
+  const defs = svg.querySelector('defs');
+  svg.innerHTML = '';
+  svg.appendChild(defs);
+
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('id', 'viewGroup');
+  svg.appendChild(g);
+
+  // Draw edges first
+  edges.forEach(edge => {
+    const from = nodes.find(n => n.id === edge.from);
+    const to = nodes.find(n => n.id === edge.to);
+    if (!from || !to) return;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const { d, mx, my } = calcEdgePath(from, to);
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+
+    const colors = { flow: '#3b82f6', dispatch: '#fb923c', agent: '#34d399', artifact: '#a78bfa', review: '#f87171', gate: '#fbbf24' };
+    const color = colors[edge.type] || '#3b82f6';
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '1.5');
+    path.setAttribute('marker-end', `url(#arrow-${edge.type})`);
+
+    if (edge.type === 'artifact' || edge.type === 'review' || edge.type === 'gate') {
+      path.setAttribute('stroke-dasharray', '6,3');
+    }
+
+    path.setAttribute('opacity', '0.6');
+    g.appendChild(path);
+
+    // Edge label
+    if (edge.label) {
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', mx);
+      text.setAttribute('y', my - 6);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('fill', color);
+      text.setAttribute('font-size', '9');
+      text.setAttribute('opacity', '0.7');
+      text.textContent = edge.label;
+      g.appendChild(text);
+    }
+  });
+
+  // Draw nodes
+  nodes.forEach(node => {
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('class', 'node');
+    group.setAttribute('data-id', node.id);
+    group.style.cursor = 'pointer';
+
+    const hasComment = state.comments.some(c => c.targetId === node.id);
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', node.x - node.w/2);
+    rect.setAttribute('y', node.y - node.h/2);
+    rect.setAttribute('width', node.w);
+    rect.setAttribute('height', node.h);
+    rect.setAttribute('rx', 8);
+    rect.setAttribute('fill', node.color);
+    rect.setAttribute('stroke', hasComment ? '#fbbf24' : node.stroke);
+    rect.setAttribute('stroke-width', hasComment ? 2.5 : 1.5);
+    if (state.selectedNode === node.id) {
+      rect.setAttribute('filter', 'url(#glow)');
+      rect.setAttribute('stroke-width', '2.5');
+    }
+    group.appendChild(rect);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', node.x);
+    label.setAttribute('y', node.subtitle ? node.y - 4 : node.y + 4);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('fill', '#e1e4ea');
+    label.setAttribute('font-size', '12');
+    label.setAttribute('font-weight', '600');
+    label.textContent = node.label;
+    group.appendChild(label);
+
+    if (node.subtitle) {
+      const sub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      sub.setAttribute('x', node.x);
+      sub.setAttribute('y', node.y + 12);
+      sub.setAttribute('text-anchor', 'middle');
+      sub.setAttribute('fill', '#6b6f8a');
+      sub.setAttribute('font-size', '10');
+      sub.textContent = node.subtitle;
+      group.appendChild(sub);
+    }
+
+    // Comment indicator
+    if (hasComment) {
+      const badge = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      badge.setAttribute('cx', node.x + node.w/2 - 6);
+      badge.setAttribute('cy', node.y - node.h/2 + 6);
+      badge.setAttribute('r', 6);
+      badge.setAttribute('fill', '#fbbf24');
+      group.appendChild(badge);
+
+      const num = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      num.setAttribute('x', node.x + node.w/2 - 6);
+      num.setAttribute('y', node.y - node.h/2 + 10);
+      num.setAttribute('text-anchor', 'middle');
+      num.setAttribute('fill', '#0f1117');
+      num.setAttribute('font-size', '9');
+      num.setAttribute('font-weight', '700');
+      num.textContent = state.comments.filter(c => c.targetId === node.id).length;
+      group.appendChild(num);
+    }
+
+    // Events
+    group.addEventListener('click', () => selectNode(node));
+    group.addEventListener('contextmenu', (e) => { e.preventDefault(); openCommentModal(node); });
+    group.addEventListener('mouseenter', (e) => showTooltip(e, node));
+    group.addEventListener('mouseleave', hideTooltip);
+
+    g.appendChild(group);
+  });
+
+  applyTransform();
+  renderLegend();
+  updatePrompt();
+}
+
+function calcEdgePath(from, to) {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+
+  // Find exit/entry points on node boundaries
+  let fx = from.x, fy = from.y, tx = to.x, ty = to.y;
+
+  // Simple: exit from closest edge
+  const angle = Math.atan2(dy, dx);
+  fx = from.x + Math.cos(angle) * Math.min(from.w/2, Math.abs(dx) > Math.abs(dy) ? from.w/2 : from.h/2);
+  fy = from.y + Math.sin(angle) * Math.min(from.h/2, Math.abs(dy) > Math.abs(dx) ? from.h/2 : from.w/2);
+  tx = to.x - Math.cos(angle) * Math.min(to.w/2, Math.abs(dx) > Math.abs(dy) ? to.w/2 : to.h/2);
+  ty = to.y - Math.sin(angle) * Math.min(to.h/2, Math.abs(dy) > Math.abs(dx) ? to.h/2 : to.w/2);
+
+  // Curved path
+  const mx = (fx + tx) / 2;
+  const my = (fy + ty) / 2;
+  const cx = mx + (fy - ty) * 0.15;
+  const cy = my + (tx - fx) * 0.15;
+
+  return { d: `M${fx},${fy} Q${cx},${cy} ${tx},${ty}`, mx: (fx+tx)/2, my: (fy+ty)/2 };
+}
+
+function applyTransform() {
+  const g = document.getElementById('viewGroup');
+  if (g) {
+    g.setAttribute('transform', `translate(${state.pan.x},${state.pan.y}) scale(${state.zoom})`);
+  }
+}
+
+// ═══════════════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════════════
+
+function selectNode(node) {
+  state.selectedNode = node.id;
+  renderDetail(node);
+  renderView();
+}
+
+function renderDetail(node) {
+  const panel = document.getElementById('detailPanel');
+  if (!node.detail) {
+    panel.innerHTML = '<div class="empty-state">No details available.</div>';
+    return;
+  }
+  panel.innerHTML = `
+    <div class="detail-title">${node.detail.title}</div>
+    <div class="detail-subtitle">${node.detail.subtitle}</div>
+    <div class="detail-body">${node.detail.body}</div>
+    <div style="margin-top:14px">
+      <button class="modal-btn modal-btn-save" onclick="openCommentModalById('${node.id}')" style="width:100%">
+        Add Comment
+      </button>
+    </div>
+  `;
+}
+
+function showTooltip(e, node) {
+  const tooltip = document.getElementById('tooltip');
+  tooltip.textContent = node.subtitle || node.label;
+  tooltip.style.display = 'block';
+  tooltip.style.left = (e.clientX + 12) + 'px';
+  tooltip.style.top = (e.clientY - 30) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════
+// COMMENTS
+// ═══════════════════════════════════════════
+
+function openCommentModal(node) {
+  state.modalTarget = node;
+  document.getElementById('modalTitle').textContent = `Comment on: ${node.label}`;
+  document.getElementById('modalSub').textContent = node.subtitle || '';
+  document.getElementById('modalText').value = '';
+  document.getElementById('commentModal').classList.add('open');
+  setTimeout(() => document.getElementById('modalText').focus(), 50);
+}
+
+function openCommentModalById(id) {
+  const data = getViewData(state.currentView);
+  const node = data.nodes.find(n => n.id === id);
+  if (node) openCommentModal(node);
+}
+
+function closeModal() {
+  document.getElementById('commentModal').classList.remove('open');
+  state.modalTarget = null;
+}
+
+function saveComment() {
+  const text = document.getElementById('modalText').value.trim();
+  if (!text || !state.modalTarget) return;
+
+  state.comments.push({
+    id: Date.now(),
+    targetId: state.modalTarget.id,
+    targetLabel: state.modalTarget.label,
+    targetSubtitle: state.modalTarget.subtitle || '',
+    text,
+    view: state.currentView
+  });
+
+  closeModal();
+  renderComments();
+  renderView();
+}
+
+function deleteComment(id) {
+  state.comments = state.comments.filter(c => c.id !== id);
+  renderComments();
+  renderView();
+}
+
+function renderComments() {
+  const list = document.getElementById('commentsList');
+  const count = document.getElementById('commentCount');
+  count.textContent = state.comments.length;
+
+  if (state.comments.length === 0) {
+    list.innerHTML = '<div class="empty-state" style="padding:12px 14px; font-size:11px;">Right-click a node or click "Add Comment" to discuss a step.</div>';
+    return;
+  }
+
+  list.innerHTML = state.comments.map(c => `
+    <div class="comment-item">
+      <div class="comment-item-header">
+        <span class="comment-item-target">${c.targetLabel}</span>
+        <button class="comment-delete" onclick="deleteComment(${c.id})">×</button>
+      </div>
+      <div class="comment-item-text">${c.text}</div>
+    </div>
+  `).join('');
+
+  updatePrompt();
+}
+
+// ═══════════════════════════════════════════
+// PROMPT OUTPUT
+// ═══════════════════════════════════════════
+
+function updatePrompt() {
+  const promptEl = document.getElementById('promptText');
+  const view = VIEWS[state.currentView];
+
+  if (state.comments.length === 0) {
+    promptEl.textContent = `Currently viewing: ${view.label} — ${view.desc}\n\nAdd comments on specific nodes to generate a discussion prompt about the LiveSpec pipeline.`;
+    return;
+  }
+
+  let parts = [`I'm reviewing the LiveSpec pipeline (${view.label} view).\n`];
+
+  // Group comments by node
+  const grouped = {};
+  state.comments.forEach(c => {
+    if (!grouped[c.targetLabel]) grouped[c.targetLabel] = [];
+    grouped[c.targetLabel].push(c.text);
+  });
+
+  parts.push('Here are my comments and questions:\n');
+
+  Object.entries(grouped).forEach(([label, texts]) => {
+    parts.push(`**${label}:**`);
+    texts.forEach(t => parts.push(`- ${t}`));
+    parts.push('');
+  });
+
+  parts.push('Please address each comment. For optimizations, explain trade-offs. For questions, reference the relevant spec artifacts.');
+
+  promptEl.textContent = parts.join('\n');
+}
+
+function copyPrompt() {
+  const text = document.getElementById('promptText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+  });
+}
+
+// ═══════════════════════════════════════════
+// LEGEND
+// ═══════════════════════════════════════════
+
+function renderLegend() {
+  const legend = document.getElementById('legend');
+  const view = VIEWS[state.currentView];
+  legend.innerHTML = view.legend.map(item => {
+    if (item.type === 'dot') {
+      return `<div class="legend-item"><div class="legend-dot" style="background:${item.color}"></div>${item.label}</div>`;
+    } else {
+      const style = item.dash ? `background:repeating-linear-gradient(90deg,${item.color} 0,${item.color} 5px,transparent 5px,transparent 8px)` : `background:${item.color}`;
+      return `<div class="legend-item"><div class="legend-line" style="${style}"></div>${item.label}</div>`;
+    }
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// VIEW TABS
+// ═══════════════════════════════════════════
+
+function initTabs() {
+  const container = document.getElementById('viewTabs');
+  Object.entries(VIEWS).forEach(([id, view]) => {
+    const tab = document.createElement('button');
+    tab.className = 'view-tab' + (id === state.currentView ? ' active' : '');
+    tab.textContent = view.label;
+    tab.onclick = () => switchView(id);
+    container.appendChild(tab);
+  });
+}
+
+function switchView(viewId) {
+  state.currentView = viewId;
+  state.selectedNode = null;
+  state.pan = { x: 0, y: 0 };
+  state.zoom = 1;
+
+  // Update tabs
+  document.querySelectorAll('.view-tab').forEach((tab, i) => {
+    tab.className = 'view-tab' + (Object.keys(VIEWS)[i] === viewId ? ' active' : '');
+  });
+
+  // Reset detail panel
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="view-desc" style="margin-bottom:8px; font-size:12px; color:#8b8fa7; line-height:1.5">${VIEWS[viewId].desc}</div>
+    <div class="empty-state">Click on any node to see details.<br>Right-click to add a comment.</div>
+  `;
+
+  renderView();
+}
+
+// ═══════════════════════════════════════════
+// PAN & ZOOM
+// ═══════════════════════════════════════════
+
+function zoomIn() { state.zoom = Math.min(3, state.zoom * 1.2); applyTransform(); }
+function zoomOut() { state.zoom = Math.max(0.3, state.zoom / 1.2); applyTransform(); }
+function zoomReset() { state.zoom = 1; state.pan = { x: 0, y: 0 }; applyTransform(); }
+
+const svgContainer = document.getElementById('svgContainer');
+
+svgContainer.addEventListener('mousedown', (e) => {
+  if (e.target.closest('.node')) return;
+  state.dragging = true;
+  state.dragStart = { x: e.clientX - state.pan.x, y: e.clientY - state.pan.y };
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!state.dragging) return;
+  state.pan.x = e.clientX - state.dragStart.x;
+  state.pan.y = e.clientY - state.dragStart.y;
+  applyTransform();
+});
+
+window.addEventListener('mouseup', () => { state.dragging = false; });
+
+svgContainer.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  state.zoom = Math.max(0.3, Math.min(3, state.zoom * delta));
+  applyTransform();
+}, { passive: false });
+
+// Handle Escape for modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && e.metaKey && document.getElementById('commentModal').classList.contains('open')) {
+    saveComment();
+  }
+});
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+initTabs();
+renderComments();
+renderView();
+</script>
+</body>
+</html>

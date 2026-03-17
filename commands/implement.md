@@ -141,15 +141,17 @@ For each step, assemble the following payload:
 - Stack and patterns from `.specs/stacks/_default.md`.
 
 **3. LiveSpec Mandatory Rules**
-- Every source file that implements a FR **must** contain an inline `@spec` anchor comment in the form:
+- Every source file that implements a FR **must** contain an inline `@spec` anchor comment with a deep-link to the spec:
   ```
-  // @spec FR-NNN: <description extracted from spec.md FR text>   ← JS/TS/C-style
-  # @spec FR-NNN: <description>                                    ← Python/Ruby/Shell
-  -- @spec FR-NNN: <description>                                   ← SQL
-  <!-- @spec FR-NNN: <description> -->                             ← HTML/XML
+  // @spec FR-NNN: <description> — .specs/features/NNN-feature-name/spec.md#fr-nnn   ← JS/TS/C-style
+  # @spec FR-NNN: <description> — .specs/features/NNN-feature-name/spec.md#fr-nnn     ← Python/Ruby/Shell
+  -- @spec FR-NNN: <description> — .specs/features/NNN-feature-name/spec.md#fr-nnn    ← SQL
+  <!-- @spec FR-NNN: <description> — .specs/features/NNN-feature-name/spec.md#fr-nnn --> ← HTML/XML
   ```
   Use the comment syntax appropriate to the target language.
-- These anchors are **non-negotiable** — the Spec Reviewer must verify their presence before approving.
+- Description must be < 50 chars, extracted from the FR text in `spec.md`.
+- When a single block implements multiple FRs, combine them: `// @spec FR-001: Fetch count, FR-003: Mark read — .specs/features/NNN-feature-name/spec.md#fr-001`
+- These anchors are **non-negotiable** — the Spec Reviewer must verify their presence and deep-link before approving.
 - Anchors must be placed on the line immediately above the function, class, or block that implements the requirement.
 
 **4. Strict TDD Protocol**
@@ -157,20 +159,26 @@ For each step, assemble the following payload:
 - The following **Resolved Test Commands** from `plan.md` must be executed to validate the step:
   - (List the exact commands — e.g. `npx vitest run src/...`, `npx playwright test`, `npm run lint`, `npm run typecheck`)
 - For UI/visual steps: `npx playwright test` (or the resolved visual test command) is **mandatory**.
+- Visual baselines must be saved to `.specs/features/NNN-feature-name/baselines/`.
 - All commands must pass before the step can be declared `Done`.
 
 **5. Definition of Done (for Superpowers reviewers)**
 
 The **Spec Reviewer** must confirm:
 - [ ] All FR/AC assigned to this step are implemented
-- [ ] Every implemented FR has a `@spec FR-NNN: description` anchor (using the language's comment syntax) in the source file
+- [ ] Every implemented FR has a `@spec FR-NNN: description — path/to/spec.md#fr-nnn` anchor (with deep-link) in the source file
 - [ ] No FR from `spec.md` is implemented partially (all-or-nothing per FR)
 
 The **Code Quality Reviewer** must confirm:
 - [ ] All resolved test commands pass (unit, integration, E2E, visual as applicable)
 - [ ] Lint and typecheck pass on all touched files
 - [ ] No God files (max 300 lines per file)
+- [ ] No function exceeds 50 lines
 - [ ] Code follows existing patterns and constitution rules
+- [ ] No SQL/XSS/command injection risks
+- [ ] No secrets or credentials in code
+- [ ] No sensitive data in logs or error messages
+- [ ] Input validation on user-facing boundaries
 
 #### 3.2 — Dispatch to Superpowers
 
@@ -218,8 +226,8 @@ Create or update `.specs/features/NNN-feature-name/implementation.md`:
 For every FR and AC, fill in:
 
 ```markdown
-| [FR-001: Fetch unread count](spec.md#fr-001) | src/data/notifications.ts | `@spec FR-001: Fetch unread count` | ✅ Implemented | 2024-03-15 |
-| [FR-002: Real-time count updates](spec.md#fr-002) | src/hooks/useNotificationSubscription.ts | `@spec FR-002: Real-time count updates` | ✅ Implemented | 2024-03-15 |
+| [FR-001: Fetch unread count](spec.md#fr-001) | src/data/notifications.ts | `@spec FR-001: Fetch unread count — .specs/features/004-notifications/spec.md#fr-001` | ✅ Implemented | 2024-03-15 |
+| [FR-002: Real-time count updates](spec.md#fr-002) | src/hooks/useNotificationSubscription.ts | `@spec FR-002: Real-time count updates — .specs/features/004-notifications/spec.md#fr-002` | ✅ Implemented | 2024-03-15 |
 ```
 
 The `@spec` anchor in source code must include `: description` extracted from the FR text in `spec.md`. The Requirement column deep-links to `spec.md#fr-nnn` for direct navigation.
@@ -324,7 +332,9 @@ Supervisor (Orchestrator/Translator — never codes, never tests)
 3. Superpowers executes: Implementer → Spec Review → Quality Review (with fix loops)
 4. Supervisor receives results, updates `progress.md` via Documenter
 
-**Final phase:** Supervisor spawns Documenter to finalize `implementation.md`, changelogs, and README.
+**Final phase:**
+1. Supervisor dispatches a Final Validation to Superpowers (full test suite regression check)
+2. Supervisor spawns Documenter to finalize `implementation.md`, changelogs, and README
 
 > **Note:** The `livespec-implementer` agent is only used for infrastructure provisioning (Phase 0). The `livespec-verifier` agent is only used for spec/plan review in `/spec.feature`. All feature code implementation, testing, and code review are handled by Superpowers' isolated subagents. The `livespec-documenter` agent is retained for post-implementation traceability.
 
