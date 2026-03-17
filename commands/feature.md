@@ -34,7 +34,7 @@ Phase 3: Implement
 | `--branch` | Create a git branch `feature/NNN-name` automatically after spec creation (no question asked) |
 | `--no-branch` | Skip the branch proposal entirely |
 | `--priority P1\|P2\|P3` | Force all user stories in the spec to the given priority (P1=critical/MVP, P2=important, P3=nice-to-have) |
-| `--mono` | Use a single agent for implementation instead of the 4 specialized agents (implementer, verifier, tester, documenter) |
+| `--mono` | Use a single agent for implementation instead of multi-agent orchestration (supervisor + superpowers + documenter) |
 | `--economy` | No sub-agents, direct tools only — uses fewer tokens but slower |
 | `--step` | Pause after each implementation step for manual validation |
 

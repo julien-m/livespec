@@ -13,7 +13,7 @@ argument-hint: "<feature-name>"
 
 `/spec.implement [feature-name]`
 
-Executes a full implementation pipeline from `plan.md` to working, tested, documented code. By default, uses multi-agent orchestration (supervisor + implementer, verifier, tester, documenter). Use `--mono` for single-agent mode.
+Executes a full implementation pipeline from `plan.md` to working, tested, documented code. By default, uses multi-agent orchestration (supervisor + superpowers + documenter). Use `--mono` for single-agent mode.
 
 ---
 
@@ -326,7 +326,7 @@ Supervisor (Orchestrator/Translator — never codes, never tests)
 
 **Final phase:** Supervisor spawns Documenter to finalize `implementation.md`, changelogs, and README.
 
-> **Note:** The internal `livespec-implementer`, `livespec-verifier`, and `livespec-tester` agents are **no longer used in the execution loop**. Their roles are now handled by Superpowers' isolated subagents. The `livespec-documenter` agent is retained for post-implementation traceability.
+> **Note:** The `livespec-implementer` agent is only used for infrastructure provisioning (Phase 0). The `livespec-verifier` agent is only used for spec/plan review in `/spec.feature`. All feature code implementation, testing, and code review are handled by Superpowers' isolated subagents. The `livespec-documenter` agent is retained for post-implementation traceability.
 
 All existing flags (`--resume`, `--auto`, `--no-save`, `--no-visual`, `--step`) work in multi-agent mode.
 

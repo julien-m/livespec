@@ -290,7 +290,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 10 commands (`~/.claude/commands/spec.*.md`) and 5 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 10 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -381,10 +381,9 @@ livespec/
 │       ├── web-static.md
 │       └── api-rest.md
 ├── agents/                         ← Agent definitions (symlinked by install.sh)
-│   ├── livespec-supervisor.md      ← Orchestrator — decomposes plan, dispatches agents
-│   ├── livespec-implementer.md     ← Writes production code
-│   ├── livespec-verifier.md        ← Adversarial reviewer (read-only)
-│   ├── livespec-tester.md          ← Runs/creates tests
+│   ├── livespec-supervisor.md      ← Orchestrator — builds Task Payloads, dispatches to Superpowers
+│   ├── livespec-implementer.md     ← Infrastructure provisioning (Phase 0 only)
+│   ├── livespec-verifier.md        ← Spec review + plan review (code review via Superpowers)
 │   └── livespec-documenter.md      ← Updates spec artifacts
 ├── commands/                       ← Command docs (symlinked by install.sh)
 │   ├── init.md

@@ -15,7 +15,7 @@ COMMANDS_DIR="$HOME/.claude/commands"
 AGENTS_DIR="$HOME/.claude/agents"
 
 COMMANDS=(init propose specify plan implement check explain stack feature refine)
-AGENTS=(livespec-supervisor livespec-implementer livespec-verifier livespec-tester livespec-documenter)
+AGENTS=(livespec-supervisor livespec-implementer livespec-verifier livespec-documenter)
 
 # --- Flags ---
 
