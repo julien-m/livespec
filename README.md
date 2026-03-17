@@ -315,21 +315,32 @@ For other AI tools, paste `system/spec-system.md` into your tool's context.
 
 ## Multi-Agent Mode (default)
 
-`/spec.implement` uses multi-agent orchestration by default — a supervisor dispatches work to 4 specialized agents:
+`/spec.implement` uses multi-agent orchestration by default — a supervisor acts as **Orchestrator/Translator**, building a Task Payload per step and delegating execution to the `superpowers:subagent-driven-development` skill:
 
 ```
                   +-----------------+
                   |   SUPERVISOR    |
-                  |  (orchestrator) |
+                  | (Orchestrator/  |
+                  |  Translator)    |
                   +--------+--------+
                            |
-         +---------+-------+-------+---------+
-         |         |               |         |
-   +-----+----+ +-+--------+ +----+-----+ +-+----------+
-   | IMPLEMENT| |  VERIFY   | |   TEST   | |    DOC     |
-   | (coder)  | | (devil's  | | (tester) | | (writer)   |
-   |          | |  advocate) | |          | |            |
-   +----------+ +----------+ +----------+ +------------+
+             +-------------+-----------+
+             |                         |
+   +---------+----------+    +---------+----------+
+   | superpowers:        |    |      DOCUMENTER     |
+   | subagent-driven-dev |    | (progress.md, impl. |
+   |                     |    |  changelog, README) |
+   | ┌─────────────────┐ |    +--------------------+
+   | │  Implementer    │ |
+   | │  (TDD, @spec)   │ |
+   | ├─────────────────┤ |
+   | │  Spec Reviewer  │ |
+   | │  (FR/AC + anchors│ |
+   | ├─────────────────┤ |
+   | │ Quality Reviewer│ |
+   | │ (tests + quality│ |
+   | └─────────────────┘ |
+   +--------------------+
 ```
 
 ```bash
@@ -343,7 +354,7 @@ For other AI tools, paste `system/spec-system.md` into your tool's context.
 /spec.implement notifications --resume
 ```
 
-**Per-step cycle:** Implement → Verify (adversarial) → Test → Document checkpoint. The verifier acts as a devil's advocate — no rubber-stamping. Blocking findings are re-dispatched to the implementer (max 3 iterations). Each agent can spawn sub-agents for intra-step parallelism (e.g., writing independent files simultaneously).
+**Per-step cycle:** Supervisor builds Task Payload (FR/AC context, TDD commands, `@spec` rules, Definition of Done) → dispatches to `superpowers:subagent-driven-development` → Documenter writes `progress.md` checkpoint. Superpowers handles the full TDD loop, spec compliance review, and code quality review with isolated subagents (no context pollution).
 
 Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: 1` in settings.
 

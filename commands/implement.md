@@ -123,33 +123,76 @@ Pour chaque `Step N`:
 
 `--resume` lit `.specs/features/NNN-feature-name/progress.md` et reprend au premier step non `Done`.
 
-### Phase 3 — Execute
+### Phase 3 — Convert & Dispatch (Superpowers Bridge)
 
-Work through each step, respecting the Step Gate above:
+Instead of coding directly, construct a **Task Payload** for the current step and dispatch it to Superpowers.
 
-1. **Read before write** — always read the target file before modifying it
-2. **One step at a time** — complete each step fully before moving to next
-3. **Run step checks** — execute targeted tests + lint/typecheck on touched files
-4. **Gate before advancing** — step must be `Done` or `Blocked` before moving on
-5. **Write checkpoint** — update `progress.md` after each step completion
-6. **Follow existing patterns** — match the style and structure of surrounding code
-7. **Constitution check** — verify each file follows constitution rules
+#### 3.1 — Build the Task Payload
+
+For each step, assemble the following payload:
+
+**1. Context**
+- Functional Requirements (FR) and Acceptance Criteria (AC) from `spec.md` that are addressed by this step.
+- A summary of how this step fits into the overall plan (reference `plan.md` step description and diagrams).
+
+**2. Implementation Instructions**
+- Exact step description from `plan.md` (files to create/modify, patterns to follow, exact code structure if specified).
+- Relevant rules from `.specs/constitution.md` that apply to the files being touched.
+- Stack and patterns from `.specs/stacks/_default.md`.
+
+**3. LiveSpec Mandatory Rules**
+- Every source file that implements a FR **must** contain an inline `@spec` anchor comment in the form:
+  ```
+  // @spec FR-NNN: <description extracted from spec.md FR text>   ← JS/TS/C-style
+  # @spec FR-NNN: <description>                                    ← Python/Ruby/Shell
+  -- @spec FR-NNN: <description>                                   ← SQL
+  <!-- @spec FR-NNN: <description> -->                             ← HTML/XML
+  ```
+  Use the comment syntax appropriate to the target language.
+- These anchors are **non-negotiable** — the Spec Reviewer must verify their presence before approving.
+- Anchors must be placed on the line immediately above the function, class, or block that implements the requirement.
+
+**4. Strict TDD Protocol**
+- Tests **must** be written before production code (RED → GREEN → REFACTOR).
+- The following **Resolved Test Commands** from `plan.md` must be executed to validate the step:
+  - (List the exact commands — e.g. `npx vitest run src/...`, `npx playwright test`, `npm run lint`, `npm run typecheck`)
+- For UI/visual steps: `npx playwright test` (or the resolved visual test command) is **mandatory**.
+- All commands must pass before the step can be declared `Done`.
+
+**5. Definition of Done (for Superpowers reviewers)**
+
+The **Spec Reviewer** must confirm:
+- [ ] All FR/AC assigned to this step are implemented
+- [ ] Every implemented FR has a `@spec FR-NNN: description` anchor (using the language's comment syntax) in the source file
+- [ ] No FR from `spec.md` is implemented partially (all-or-nothing per FR)
+
+The **Code Quality Reviewer** must confirm:
+- [ ] All resolved test commands pass (unit, integration, E2E, visual as applicable)
+- [ ] Lint and typecheck pass on all touched files
+- [ ] No God files (max 300 lines per file)
+- [ ] Code follows existing patterns and constitution rules
+
+#### 3.2 — Dispatch to Superpowers
+
+Spawn a subagent with the following instruction, passing the Task Payload assembled in 3.1:
+
+```
+Spawn subagent with prompt:
+  "Use the `superpowers:subagent-driven-development` skill to implement the following task.
+
+   <Task Payload from 3.1>"
+```
+
+The subagent will auto-activate the `superpowers:subagent-driven-development` skill, which will:
+1. Spin up a fresh **Implementer** subagent to write code and tests (TDD, context-isolated).
+2. Spin up a **Spec Reviewer** subagent to verify FR/AC compliance and `@spec` anchors.
+3. Spin up a **Code Quality Reviewer** subagent to verify test passage and code quality.
+4. Loop back to the Implementer if either review fails (with findings).
+5. Apply `systematic-debugging` if tests fail after the implementation loop.
+
+**On Superpowers completion:** receive the list of files created/modified, FR/AC addressed, and test results. Feed these into the Step Gate (Phase 2) to write the `progress.md` checkpoint.
 
 **Execution logs:** By default, a detailed execution log is saved to `.specs/features/NNN-feature-name/logs/YYYY-MM-DD.md` after completion. Use `--no-save` to disable.
-
-**File naming and structure:**
-- Follow conventions from `.specs/constitution.md`
-- Match patterns from existing code (read similar files first)
-- Never create God files — split at 300 lines
-
-### Phase 4 — Test
-
-After each implementation step, run the relevant tests immediately.
-
-- Follow the test protocol in `system/testing/`
-- Use the commands resolved in the **Resolved Test Commands** section of `plan.md`
-- If no commands are resolved yet → execute the discovery procedure from `system/testing/discovery.md`
-- On test failure → follow `system/testing/failure-handling.md`
 
 ### Phase 5 — Visual Baselines (UI features only)
 
@@ -262,23 +305,28 @@ db/migrations/           ← New migration files
 
 ## Multi-Agent Mode (default)
 
-By default, the pipeline is orchestrated by a **supervisor agent** that dispatches work to 4 specialized agents:
+By default, the pipeline is orchestrated by a **supervisor agent** acting as **Orchestrator/Translator**. The supervisor no longer writes code or runs tests itself — it delegates all execution to Superpowers' isolated subagents.
 
 ```
-Supervisor (orchestrator — never codes)
-  ├── Implementer (writes code, places @spec anchors)
-  ├── Verifier (adversarial review — read-only, never rubber-stamps)
-  ├── Tester (runs/creates tests — never modifies production code)
-  └── Documenter (updates progress, implementation.md, changelogs, README)
+Supervisor (Orchestrator/Translator — never codes, never tests)
+  │
+  ├── [Per step] superpowers:subagent-driven-development
+  │     ├── Implementer subagent  (writes code + tests, places @spec anchors)
+  │     ├── Spec Reviewer subagent (verifies FR/AC compliance + @spec presence)
+  │     └── Code Quality Reviewer subagent (verifies tests pass + code quality)
+  │
+  └── Documenter (updates progress.md, implementation.md, changelogs, README)
 ```
 
 **Per-step cycle:**
-1. Implementer writes code for the step
-2. Verifier reviews (BLOCKING findings → re-dispatch to implementer, max 3 iterations)
-3. Tester runs targeted tests (failures → re-dispatch to implementer, max 3/5 iterations)
-4. Documenter updates `progress.md` checkpoint
+1. Supervisor builds the Task Payload (FR/AC, instructions, TDD commands, Definition of Done)
+2. Supervisor dispatches to `superpowers:subagent-driven-development`
+3. Superpowers executes: Implementer → Spec Review → Quality Review (with fix loops)
+4. Supervisor receives results, updates `progress.md` via Documenter
 
-**Final phase:** Tester runs full suite, Documenter finalizes all artifacts.
+**Final phase:** Supervisor spawns Documenter to finalize `implementation.md`, changelogs, and README.
+
+> **Note:** The internal `livespec-implementer`, `livespec-verifier`, and `livespec-tester` agents are **no longer used in the execution loop**. Their roles are now handled by Superpowers' isolated subagents. The `livespec-documenter` agent is retained for post-implementation traceability.
 
 All existing flags (`--resume`, `--auto`, `--no-save`, `--no-visual`, `--step`) work in multi-agent mode.
 
