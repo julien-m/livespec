@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveSpec Spec Coverage</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0f1117;
+    color: #e1e4ea;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 20px;
+    background: #161822;
+    border-bottom: 1px solid #262a3a;
+    flex-shrink: 0;
+  }
+
+  .topbar h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #c4b5fd;
+    white-space: nowrap;
+  }
+
+  .topbar-score {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+  }
+
+  .topbar-score-text {
+    font-size: 13px;
+    color: #8b8fa7;
+  }
+
+  .topbar-score-text strong {
+    color: #e1e4ea;
+    font-weight: 600;
+  }
+
+  /* Circular progress gauge */
+  .gauge-container {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+
+  .gauge-svg {
+    transform: rotate(-90deg);
+    width: 44px;
+    height: 44px;
+  }
+
+  .gauge-bg {
+    fill: none;
+    stroke: #262a3a;
+    stroke-width: 4;
+  }
+
+  .gauge-fill {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s;
+  }
+
+  .gauge-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: #e1e4ea;
+  }
+
+  /* Main layout */
+  .main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 380px;
+    min-width: 380px;
+    background: #161822;
+    border-right: 1px solid #262a3a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-section {
+    padding: 12px 14px;
+    border-bottom: 1px solid #262a3a;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .sidebar-section:last-of-type {
+    border-bottom: none;
+  }
+
+  .sidebar-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8b8fa7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sidebar-label .optional {
+    font-weight: 400;
+    color: #6b6f8a;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 10px;
+  }
+
+  .sidebar textarea {
+    flex: 1;
+    width: 100%;
+    background: #0f1117;
+    border: 1px solid #262a3a;
+    border-radius: 6px;
+    color: #b0b4cc;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 8px 10px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .sidebar textarea:focus {
+    border-color: #4338ca;
+  }
+
+  .sidebar textarea::placeholder {
+    color: #6b6f8a;
+  }
+
+  /* Main content area */
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .main-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .main-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .main-content::-webkit-scrollbar-thumb {
+    background: #262a3a;
+    border-radius: 3px;
+  }
+
+  /* FR Cards Grid */
+  .fr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+  }
+
+  .fr-card {
+    background: #161822;
+    border: 1px solid #262a3a;
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+    position: relative;
+  }
+
+  .fr-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .fr-card.status-full {
+    border-color: #166534;
+  }
+
+  .fr-card.status-full:hover {
+    border-color: #4ade80;
+  }
+
+  .fr-card.status-partial {
+    border-color: #854d0e;
+  }
+
+  .fr-card.status-partial:hover {
+    border-color: #facc15;
+  }
+
+  .fr-card.status-missing {
+    border-color: #991b1b;
+  }
+
+  .fr-card.status-missing:hover {
+    border-color: #f87171;
+  }
+
+  .fr-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .fr-card-id {
+    font-size: 13px;
+    font-weight: 700;
+    color: #c4b5fd;
+  }
+
+  .fr-card-desc {
+    font-size: 12px;
+    color: #b0b4cc;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .fr-card-indicators {
+    display: flex;
+    gap: 16px;
+  }
+
+  .indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #6b6f8a;
+  }
+
+  .indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .indicator-dot.green { background: #4ade80; }
+  .indicator-dot.red { background: #f87171; }
+  .indicator-dot.yellow { background: #facc15; }
+  .indicator-dot.gray { background: #6b7280; }
+
+  /* Bottom panel — Gaps Report */
+  .gaps-panel {
+    flex-shrink: 0;
+  }
+
+  .gaps-panel-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e1e4ea;
+    margin-bottom: 12px;
+  }
+
+  .gap-section {
+    background: #161822;
+    border: 1px solid #262a3a;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .gap-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .gap-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .gap-section-header:hover {
+    background: #1a1d2e;
+  }
+
+  .gap-section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #e1e4ea;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gap-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .gap-count.red { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+  .gap-count.yellow { background: rgba(250, 204, 21, 0.15); color: #facc15; }
+  .gap-count.green { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+
+  .gap-chevron {
+    color: #6b6f8a;
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+
+  .gap-section.open .gap-chevron {
+    transform: rotate(90deg);
+  }
+
+  .gap-section-body {
+    display: none;
+    padding: 0 14px 12px;
+  }
+
+  .gap-section.open .gap-section-body {
+    display: block;
+  }
+
+  .gap-item {
+    font-size: 11px;
+    color: #b0b4cc;
+    padding: 4px 0;
+    line-height: 1.5;
+  }
+
+  .gap-item code {
+    background: #0f1117;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 10.5px;
+    color: #c4b5fd;
+  }
+
+  .gap-empty {
+    font-size: 11px;
+    color: #6b6f8a;
+    font-style: italic;
+    padding: 4px 0;
+  }
+
+  /* Blockers banner */
+  .blockers-banner {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #f59e0b;
+    text-align: center;
+  }
+
+  .blockers-banner .blocked-count {
+    color: #f87171;
+    font-weight: 700;
+  }
+
+  /* Gap type badges */
+  .gap-type-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .gap-type-badge.blocked { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+  .gap-type-badge.deferred { background: rgba(250, 204, 21, 0.15); color: #facc15; }
+  .gap-type-badge.todo { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+  .gap-type-badge.info { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+  .gap-type-badge.gap { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+
+  .gap-item-checkbox {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 6px;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  .gap-item-checkbox input {
+    accent-color: #c4b5fd;
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+  }
+
+  .gap-step-link { color: #c4b5fd; text-decoration: underline; cursor: pointer; }
+  .gap-step-link:hover { color: #e1d5ff; }
+
+  .progress-highlight { background: rgba(196, 181, 253, 0.15); border-left: 3px solid #c4b5fd; transition: background 0.3s; }
+
+  /* Sidebar toggle */
+  .sidebar-toggle {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 20px;
+    height: 48px;
+    border: 1px solid #262a3a;
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    background: #1e2035;
+    color: #8b8fa7;
+    cursor: pointer;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .sidebar-toggle:hover { background: #4338ca; color: #e1e4ea; }
+
+  .main-layout { position: relative; }
+
+  .sidebar {
+    transition: width 0.25s ease, min-width 0.25s ease, border-right-width 0.25s ease, padding 0.25s ease;
+  }
+
+  .sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden;
+    border-right: none;
+    padding: 0;
+  }
+
+  /* Summary stats row */
+  .summary-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .summary-stat {
+    background: #161822;
+    border: 1px solid #262a3a;
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .summary-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .summary-stat-value.green { color: #4ade80; }
+  .summary-stat-value.yellow { color: #facc15; }
+  .summary-stat-value.red { color: #f87171; }
+
+  .summary-stat-label {
+    font-size: 11px;
+    color: #8b8fa7;
+  }
+
+  /* Info button */
+  .info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    color: #c4b5fd;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, 'Times New Roman', serif;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .info-btn:hover { background: #4338ca; color: #e1e4ea; border-color: #4338ca; }
+
+  .info-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .info-overlay.open { display: flex; }
+
+  .info-modal {
+    background: #161822;
+    border: 1px solid #262a3a;
+    border-radius: 12px;
+    width: 680px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 32px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  }
+  .info-modal::-webkit-scrollbar { width: 5px; }
+  .info-modal::-webkit-scrollbar-track { background: transparent; }
+  .info-modal::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 3px; }
+  .info-modal h2 { font-size: 20px; font-weight: 700; color: #c4b5fd; margin-bottom: 8px; }
+  .info-modal .info-subtitle { font-size: 13px; color: #6b6f8a; margin-bottom: 24px; }
+  .info-modal h3 { font-size: 14px; font-weight: 600; color: #e1e4ea; margin-top: 20px; margin-bottom: 8px; }
+  .info-modal p, .info-modal li { font-size: 13px; line-height: 1.7; color: #b0b4cc; }
+  .info-modal ul, .info-modal ol { padding-left: 20px; margin-bottom: 12px; }
+  .info-modal li { margin-bottom: 4px; }
+  .info-modal code { background: #1e2035; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #c4b5fd; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+  .info-modal .info-step { display: flex; gap: 12px; margin-bottom: 16px; padding: 12px; background: #0f1117; border-radius: 8px; border: 1px solid #262a3a; }
+  .info-modal .info-step-num { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #4338ca; color: #e1e4ea; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .info-modal .info-step-content { flex: 1; }
+  .info-modal .info-step-content strong { display: block; font-size: 13px; color: #e1e4ea; margin-bottom: 4px; }
+  .info-modal .info-close { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; margin-top: 24px; border-radius: 8px; border: 1px solid #262a3a; background: #1e2035; color: #8b8fa7; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+  .info-modal .info-close:hover { background: #262a3a; color: #e1e4ea; }
+  .info-lang-toggle { display: flex; gap: 4px; margin-bottom: 20px; }
+  .info-lang-btn { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; background: transparent; color: #8b8fa7; border: 1px solid #262a3a; transition: all 0.15s; }
+  .info-lang-btn:hover { color: #c4b5fd; background: #1e2035; }
+  .info-lang-btn.active { color: #c4b5fd; background: #1e2035; border-color: #4338ca; }
+  .info-modal [data-lang] { display: none; }
+  .info-modal [data-lang].visible { display: block; }
+
+  /* Project loader */
+  .project-loader { padding: 10px 14px; border-bottom: 1px solid #262a3a; }
+  .project-load-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px dashed #262a3a; background: transparent; color: #8b8fa7; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+  .project-load-btn:hover { border-color: #4338ca; color: #c4b5fd; background: #1e2035; }
+  .project-load-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .project-info { margin-top: 8px; }
+  .project-name { display: block; font-size: 11px; color: #6b6f8a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .feature-select { width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid #262a3a; background: #1e2035; color: #e1e4ea; font-size: 12px; font-family: inherit; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b8fa7' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 28px; }
+  .feature-select:focus { outline: none; border-color: #4338ca; }
+  .project-status { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 11px; flex-wrap: wrap; }
+  .project-file-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; }
+  .project-file-tag.found { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .project-file-tag.missing { background: rgba(248,113,113,0.15); color: #f87171; }
+  .project-reload-btn { margin-left: auto; padding: 2px 8px; border-radius: 4px; border: 1px solid #262a3a; background: transparent; color: #8b8fa7; cursor: pointer; font-size: 11px; transition: all 0.15s; }
+  .project-reload-btn:hover { color: #c4b5fd; border-color: #4338ca; }
+  .grep-hint { font-size: 10px; color: #6b6f8a; margin-top: 4px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+  .grep-hint code { color: #8b8fa7; background: #0f1117; padding: 1px 4px; border-radius: 3px; }
+
+  /* Empty state overlay */
+  .empty-state-overlay { position: absolute; inset: 0; background: #0f1117; display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .empty-state-overlay.hidden { display: none; }
+  .empty-state-box { text-align: center; max-width: 360px; }
+  .empty-state-box svg { margin-bottom: 16px; opacity: 0.6; }
+  .empty-state-box h2 { font-size: 18px; font-weight: 600; color: #e1e4ea; margin-bottom: 8px; }
+  .empty-state-box p { font-size: 13px; color: #6b6f8a; line-height: 1.6; margin-bottom: 20px; }
+  .empty-state-btn { padding: 10px 24px; border-radius: 8px; border: 1px solid #4338ca; background: #4338ca; color: #e1e4ea; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .empty-state-btn:hover { background: #5145e5; }
+
+  /* MD preview */
+  .md-preview { padding: 12px 14px; font-size: 13px; line-height: 1.7; color: #b0b4cc; overflow-y: auto; }
+  .md-preview h2 { font-size: 16px; font-weight: 700; color: #c4b5fd; margin: 16px 0 8px; }
+  .md-preview h3 { font-size: 14px; font-weight: 600; color: #e1e4ea; margin: 14px 0 6px; }
+  .md-preview h4 { font-size: 13px; font-weight: 600; color: #e1e4ea; margin: 12px 0 4px; }
+  .md-preview p { margin-bottom: 8px; }
+  .md-preview strong { color: #e1e4ea; }
+  .md-preview code { background: #1e2035; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #c4b5fd; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+  .md-preview pre { background: #1e2035; border: 1px solid #262a3a; border-radius: 6px; padding: 10px 12px; margin: 8px 0; overflow-x: auto; }
+  .md-preview pre code { background: none; padding: 0; font-size: 12px; color: #b0b4cc; }
+  .md-preview ul, .md-preview ol { padding-left: 20px; margin-bottom: 8px; }
+  .md-preview li { margin-bottom: 2px; }
+  .md-preview hr { border: none; border-top: 1px solid #262a3a; margin: 16px 0; }
+  .md-preview table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }
+  .md-preview td { padding: 6px 10px; border: 1px solid #262a3a; }
+  .md-preview tr:nth-child(even) { background: #1a1c2e; }
+  .md-preview .empty-msg { color: #6b6f8a; font-style: italic; }
+
+  /* Center tabs */
+  .center-tabs { display: flex; gap: 2px; padding: 10px 20px 0; flex-shrink: 0; }
+  .center-tab { padding: 7px 16px; border-radius: 6px 6px 0 0; border: 1px solid transparent; border-bottom: none; background: transparent; color: #6b6f8a; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+  .center-tab:hover { color: #b0b4cc; background: #1a1d2e; }
+  .center-tab.active { color: #e1e4ea; background: #161822; border-color: #262a3a; }
+  .center-file-view { display: none; flex: 1; overflow-y: auto; background: #161822; border: 1px solid #262a3a; border-radius: 0 8px 8px 8px; margin: 0 20px 20px; }
+  .center-file-view.visible { display: flex; flex-direction: column; }
+
+  /* --- FR Card Checkbox --- */
+  .fr-card {
+    position: relative;
+  }
+  .fr-card-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .fr-card-checkbox input {
+    width: 16px;
+    height: 16px;
+    accent-color: #c4b5fd;
+    cursor: pointer;
+  }
+  .fr-card-checkbox input:checked ~ .checkbox-mark {
+    color: #c4b5fd;
+  }
+
+  /* --- Selection Toolbar --- */
+  .selection-toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1e2035;
+    border-top: 1px solid #363a52;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+    transform: translateY(100%);
+    transition: transform 0.25s ease;
+  }
+  .selection-toolbar.visible {
+    transform: translateY(0);
+  }
+  .selection-toolbar span {
+    font-size: 13px;
+    color: #c4b5fd;
+    font-weight: 600;
+    margin-right: auto;
+  }
+  .selection-toolbar button {
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid #363a52;
+    background: #262a3a;
+    color: #e1e4ea;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .selection-toolbar button:hover {
+    background: #363a52;
+  }
+  .selection-toolbar button.primary {
+    background: #7c3aed;
+    border-color: #7c3aed;
+    color: white;
+    font-weight: 600;
+  }
+  .selection-toolbar button.primary:hover {
+    background: #6d28d9;
+  }
+
+  /* --- Task Modal --- */
+  .task-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .task-overlay.open {
+    display: flex;
+  }
+  .task-modal {
+    background: #1a1c2e;
+    border: 1px solid #363a52;
+    border-radius: 12px;
+    padding: 28px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .task-modal h2 {
+    font-size: 18px;
+    color: #c4b5fd;
+    margin-bottom: 4px;
+  }
+  .task-subtitle {
+    font-size: 13px;
+    color: #8b8fa7;
+    margin-bottom: 16px;
+  }
+  .task-prompt {
+    background: #0f1117;
+    border: 1px solid #262a3a;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #e1e4ea;
+    overflow-y: auto;
+    flex: 1;
+    white-space: pre-wrap;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .task-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  .task-actions button {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: 1px solid #363a52;
+    background: #262a3a;
+    color: #e1e4ea;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .task-actions button:hover {
+    background: #363a52;
+  }
+  .copy-btn {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+    color: white !important;
+    font-weight: 600;
+  }
+  .copy-btn:hover {
+    background: #6d28d9 !important;
+  }
+  .copy-btn.copied {
+    background: #059669 !important;
+    border-color: #059669 !important;
+  }
+  .mermaid-container { background: #161822; border-radius: 8px; padding: 16px; margin: 12px 0; overflow-x: auto; }
+  .mermaid-container svg { max-width: 100%; height: auto; }
+</style>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false, theme: 'dark', themeVariables: { primaryColor: '#4338ca', primaryTextColor: '#e1e4ea', lineColor: '#6b6f8a', secondaryColor: '#1e2035', tertiaryColor: '#262a3a' } });
+  window.__mermaidRender = async () => {
+    const els = document.querySelectorAll('.mermaid[data-processed]');
+    els.forEach(el => el.removeAttribute('data-processed'));
+    try { await mermaid.run({ querySelector: '.mermaid' }); } catch(e) { console.warn('Mermaid render:', e); }
+  };
+</script>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <h1>LiveSpec Spec Coverage</h1>
+  <button class="info-btn" onclick="toggleInfo()" title="About this playground">i</button>
+  <div class="topbar-score" id="topbar-score" style="display: none;">
+    <div class="gauge-container" id="gauge-container">
+      <svg class="gauge-svg" viewBox="0 0 44 44">
+        <circle class="gauge-bg" cx="22" cy="22" r="18" />
+        <circle class="gauge-fill" id="gauge-fill" cx="22" cy="22" r="18"
+          stroke-dasharray="113.1" stroke-dashoffset="113.1" />
+      </svg>
+      <span class="gauge-label" id="gauge-label">0%</span>
+    </div>
+    <span class="topbar-score-text" id="score-text"></span>
+  </div>
+</div>
+
+<!-- Main layout -->
+<div class="main-layout">
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9664;</button>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="project-loader" id="projectLoader">
+      <button class="project-load-btn" onclick="loadProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 4.5V12a1 1 0 001 1h10a1 1 0 001-1V6.5a1 1 0 00-1-1H8.5L7 4H3a1 1 0 00-1 .5z"/>
+        </svg>
+        Load .specs project
+      </button>
+      <div class="project-info" id="projectInfo" style="display:none">
+        <span class="project-name" id="projectName"></span>
+        <select class="feature-select" id="featureSelect" onchange="selectFeature(this.value)"></select>
+        <div class="project-status" id="projectStatus"></div>
+      </div>
+    </div>
+    <div class="sidebar-section" style="flex: 0 0 auto; max-height: 160px;">
+      <div class="sidebar-label">Grep output <span class="optional">(optional — manual input)</span></div>
+      <textarea id="input-grep" placeholder="Paste result of: grep -rn &quot;@spec FR-&quot; src/&#10;&#10;src/data/notifications.ts:42: // @spec FR-001: Fetch unread count" style="max-height: 100px;"></textarea>
+      <div class="grep-hint">Run: <code>grep -rn "@spec FR-" src/</code> or use <code>/spec.play-coverage</code> in Claude Code</div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div style="flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative;">
+    <div class="empty-state-overlay" id="emptyState">
+      <div class="empty-state-box">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+          <path d="M6 12v24a3 3 0 003 3h30a3 3 0 003-3V18a3 3 0 00-3-3H25l-5-6H9a3 3 0 00-3 3z"/>
+        </svg>
+        <h2>Open a .specs project</h2>
+        <p>Load a project directory to analyze your spec coverage.</p>
+        <button class="empty-state-btn" onclick="loadProject()">Load Project</button>
+      </div>
+    </div>
+    <div class="center-tabs" id="centerTabs" style="display:none;">
+      <button class="center-tab active" data-view="viz" onclick="setCenterView('viz')">Coverage</button>
+      <button class="center-tab" data-view="spec" onclick="setCenterView('spec')" style="display:none" id="tabSpec">spec.md</button>
+      <button class="center-tab" data-view="impl" onclick="setCenterView('impl')" style="display:none" id="tabImpl">implementation.md</button>
+      <button class="center-tab" data-view="progress" onclick="setCenterView('progress')" style="display:none" id="tabProgress">progress.md</button>
+      <button class="center-tab" data-view="plan" onclick="setCenterView('plan')" style="display:none" id="tabPlan">plan.md</button>
+    </div>
+    <div class="center-file-view" id="centerFileView">
+      <div class="md-preview" id="centerMdPreview"></div>
+    </div>
+    <div class="main-content" id="main-content">
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Stored file contents ─────────────────────────────────────────────────────
+let storedSpecMd = '';
+let storedImplMd = '';
+let storedProgressMd = '';
+let storedPlanMd = '';
+
+// ─── Markdown Renderer ────────────────────────────────────────────────────────
+
+function renderMarkdown(md) {
+  if (!md) return '<span class="empty-msg">Not loaded</span>';
+
+  // Phase 1: Extract all fenced code blocks before markdown transforms.
+  // Placeholders use <div data-cb="N"> which starts with <[a-z] so the paragraph
+  // regex skips them, and no other markdown regex can match them.
+  const codeBlocks = [];
+  md = md.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push({ lang, code });
+    return `<div data-cb="${idx}"></div>`;
+  });
+
+  // Phase 2: Markdown transforms (safe — no code block content left)
+  let html = md
+    .replace(/^#### (.+)$/gm, '<h5>$1</h5>')
+    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/^\|(.+)\|$/gm, (m, c) => { const cells = c.split('|').map(x=>x.trim()); if(cells.every(x=>/^[-:]+$/.test(x))) return ''; return '<tr>'+cells.map(x=>`<td>${x}</td>`).join('')+'</tr>'; })
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    .replace(/^(?!<[a-z])((?!^\s*$).+)$/gm, '<p>$1</p>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+    .replace(/(<tr>.*<\/tr>\n?)+/g, '<table>$&</table>')
+    .replace(/<p>\s*<\/p>/g, '');
+
+  // Phase 3: Restore code blocks — mermaid as renderable diagrams, others as <pre><code>
+  for (let i = 0; i < codeBlocks.length; i++) {
+    const { lang, code } = codeBlocks[i];
+    let replacement;
+    if (lang === 'mermaid') {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      replacement = `<div class="mermaid-container"><pre class="mermaid">${escaped}</pre></div>`;
+    } else {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      replacement = `<pre><code>${escaped}</code></pre>`;
+    }
+    html = html.replace(`<div data-cb="${i}"></div>`, replacement);
+  }
+  return html;
+}
+
+// ─── Center View Tabs ─────────────────────────────────────────────────────────
+
+let currentCenterView = 'viz';
+
+function setCenterView(view) {
+  currentCenterView = view;
+  const tabs = document.querySelectorAll('.center-tab');
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.view === view));
+
+  const mainContent = document.getElementById('main-content');
+  const fileView = document.getElementById('centerFileView');
+  const preview = document.getElementById('centerMdPreview');
+
+  if (view === 'viz') {
+    mainContent.style.display = 'flex';
+    fileView.classList.remove('visible');
+  } else {
+    mainContent.style.display = 'none';
+    fileView.classList.add('visible');
+    if (view === 'spec') {
+      preview.innerHTML = renderMarkdown(storedSpecMd);
+    } else if (view === 'impl') {
+      preview.innerHTML = renderMarkdown(storedImplMd);
+    } else if (view === 'progress') {
+      preview.innerHTML = renderMarkdown(storedProgressMd);
+    } else if (view === 'plan') {
+      preview.innerHTML = renderMarkdown(storedPlanMd);
+    }
+    if (window.__mermaidRender) requestAnimationFrame(() => window.__mermaidRender());
+  }
+}
+
+// ─── Parsing ───────────────────────────────────────────────────────────────────
+
+/**
+ * Extract FR entries from spec.md.
+ * Matches table rows: | FR-NNN | description | AC refs |
+ * and heading-based blocks: ### FR-NNN ... **Requirement:** ...
+ */
+function parseSpec(text) {
+  const frs = new Map();
+  const acs = new Map();
+
+  // Parse FR table rows
+  const frTablePattern = /\|\s*(FR-\d+)\s*\|\s*([^|]+)\s*\|\s*([^|]*)\s*\|/g;
+  let match;
+  while ((match = frTablePattern.exec(text)) !== null) {
+    const id = match[1].trim();
+    const desc = match[2].trim();
+    const acRefs = match[3].trim();
+    if (!frs.has(id)) {
+      frs.set(id, { id, description: desc, acRefs: [], fullText: "" });
+    }
+    if (acRefs) {
+      const refs = acRefs.match(/AC-\d+/g) || [];
+      frs.get(id).acRefs = refs;
+    }
+  }
+
+  // Parse FR heading blocks for full text
+  const frBlockPattern = /###\s+(FR-\d+)\s*\n([\s\S]*?)(?=###\s+FR-\d+|---|\n##\s|$)/g;
+  while ((match = frBlockPattern.exec(text)) !== null) {
+    const id = match[1].trim();
+    const body = match[2].trim();
+    if (frs.has(id)) {
+      frs.get(id).fullText = body;
+    } else {
+      // Extract requirement line
+      const reqMatch = body.match(/\*\*Requirement:\*\*\s*(.+)/);
+      frs.set(id, {
+        id,
+        description: reqMatch ? reqMatch[1].trim() : body.split("\n")[0],
+        acRefs: [],
+        fullText: body,
+      });
+    }
+  }
+
+  // Parse AC table rows
+  const acTablePattern = /\|\s*(AC-\d+)\s*\|\s*([^|]+)\s*\|/g;
+  while ((match = acTablePattern.exec(text)) !== null) {
+    const id = match[1].trim();
+    const desc = match[2].trim();
+    if (!acs.has(id)) {
+      acs.set(id, { id, description: desc });
+    }
+  }
+
+  // Parse AC heading blocks
+  const acBlockPattern = /###\s+(AC-\d+)\s*\n([\s\S]*?)(?=###\s+AC-\d+|---|\n##\s|$)/g;
+  while ((match = acBlockPattern.exec(text)) !== null) {
+    const id = match[1].trim();
+    const body = match[2].trim();
+    const critMatch = body.match(/\*\*Criterion:\*\*\s*(.+)/);
+    if (critMatch && !acs.has(id)) {
+      acs.set(id, { id, description: critMatch[1].trim() });
+    }
+  }
+
+  return { frs, acs };
+}
+
+/**
+ * Extract FR references from implementation.md.
+ * Returns a map: FR-NNN -> { files, status, anchor }
+ */
+function parseImpl(text) {
+  const implMap = new Map();
+  if (!text.trim()) return implMap;
+
+  // Parse table rows from Requirement Mapping
+  const rowPattern = /\|\s*(?:\[)?(FR-\d+)[^\]]*\]?[^|]*\|([^|]*)\|([^|]*)\|([^|]*)\|/g;
+  let match;
+  while ((match = rowPattern.exec(text)) !== null) {
+    const id = match[1].trim();
+    const file = match[2].trim().replace(/`/g, "");
+    const anchor = match[3].trim().replace(/`/g, "");
+    const statusRaw = match[4].trim();
+
+    // Normalize status
+    let status = "unknown";
+    const lower = statusRaw.toLowerCase();
+    if (lower.includes("implemented") || lower.includes("passing")) status = "implemented";
+    else if (lower.includes("partial")) status = "partial";
+    else if (lower.includes("missing")) status = "missing";
+    else if (lower.includes("modified")) status = "modified";
+
+    implMap.set(id, {
+      file: file === "—" || file === "-" ? null : file,
+      anchor: anchor === "—" || anchor === "-" ? null : anchor,
+      status,
+    });
+  }
+
+  return implMap;
+}
+
+/**
+ * Parse Known Gaps section from implementation.md.
+ * Supports bullet format (- **Topic:** detail) and table format (| Gap | ... |).
+ * Returns { items: [{ title, detail, type }], hasBlockers: boolean }
+ */
+function parseKnownGaps(text) {
+  const result = { items: [], hasBlockers: false };
+  if (!text.trim()) return result;
+
+  // Find ## Known Gaps section
+  const headerMatch = text.match(/^##\s+Known\s+Gaps/mi);
+  if (!headerMatch) return result;
+
+  // Extract section content until next ## or --- or end
+  const startIdx = headerMatch.index + headerMatch[0].length;
+  const rest = text.slice(startIdx);
+  const endMatch = rest.match(/\n(?:##\s|---)/);
+  const section = endMatch ? rest.slice(0, endMatch.index) : rest;
+
+  // Classify detail text
+  function classify(detail) {
+    const lower = detail.toLowerCase();
+    if (lower.includes("blocked")) return "blocked";
+    if (lower.includes("not captured") || lower.includes("deferred")) return "deferred";
+    if (lower.includes("todo")) return "todo";
+    return "info";
+  }
+
+  // Try table format: detect header row with "Gap" column
+  const tableHeaderMatch = section.match(/\|[^|]*Gap[^|]*\|/i);
+  if (tableHeaderMatch) {
+    // Find separator line (|---|...) then parse data rows
+    const tableStart = section.indexOf(tableHeaderMatch[0]);
+    const tableLines = section.slice(tableStart).split("\n");
+    let pastSeparator = false;
+    for (const line of tableLines) {
+      if (!line.trim().startsWith("|")) continue;
+      if (/\|\s*-+\s*\|/.test(line)) { pastSeparator = true; continue; }
+      if (!pastSeparator) continue;
+      const cells = line.split("|").filter(c => c.trim()).map(c => c.trim());
+      if (cells.length >= 1) {
+        const title = cells[0];
+        const detail = cells.slice(1).join(" — ");
+        result.items.push({ title, detail, type: "gap" });
+      }
+    }
+  }
+
+  // Try bullet format: handles colon inside bold (**Topic:**) or after bold (**Topic**:)
+  const bulletPattern = /^[-*]\s+\*\*(.+?)\*\*[.:]*\s*(.*)/gm;
+  let match;
+  while ((match = bulletPattern.exec(section)) !== null) {
+    const title = match[1].trim().replace(/:$/, "");
+    const detail = match[2].trim();
+    result.items.push({ title, detail, type: classify(detail) });
+  }
+
+  result.hasBlockers = result.items.some(i => i.type === "blocked" || i.type === "gap");
+  return result;
+}
+
+/**
+ * Parse grep output lines.
+ * Expected format: filepath:line: // @spec FR-NNN: description — spec-path
+ * Returns a map: FR-NNN -> [{ file, line, description }]
+ */
+function parseGrep(text) {
+  const grepMap = new Map();
+  if (!text.trim()) return grepMap;
+
+  const lines = text.split("\n").filter((l) => l.trim());
+
+  for (const line of lines) {
+    // Match: file:linenum: ...@spec FR-NNN...
+    const lineMatch = line.match(/^([^:]+):(\d+):\s*.*/);
+    if (!lineMatch) continue;
+
+    const file = lineMatch[1].trim();
+    const lineNum = parseInt(lineMatch[2], 10);
+
+    // Find all FR-NNN references in the line
+    const frPattern = /FR-\d+/g;
+    let frMatch;
+    while ((frMatch = frPattern.exec(line)) !== null) {
+      const frId = frMatch[0];
+      if (!grepMap.has(frId)) {
+        grepMap.set(frId, []);
+      }
+      // Extract description after FR-NNN: if present
+      const descPattern = new RegExp(frId + ":\\s*([^,—\\-]+)");
+      const descMatch = line.match(descPattern);
+      const desc = descMatch ? descMatch[1].trim() : "";
+
+      grepMap.get(frId).push({ file, line: lineNum, description: desc });
+    }
+  }
+
+  return grepMap;
+}
+
+// ─── Analysis ──────────────────────────────────────────────────────────────────
+
+function analyze() {
+  const specText = storedSpecMd;
+  const implText = storedImplMd;
+  const grepText = document.getElementById("input-grep").value;
+
+  if (!specText.trim()) {
+    return;
+  }
+
+  const { frs, acs } = parseSpec(specText);
+  const implMap = parseImpl(implText);
+  const grepMap = parseGrep(grepText);
+  const knownGaps = parseKnownGaps(implText);
+
+  // Build combined FR data
+  const frList = [];
+  for (const [id, fr] of frs) {
+    const inSpec = true;
+    const inImpl = implMap.has(id);
+    const inCode = grepMap.has(id);
+    const implInfo = implMap.get(id) || null;
+    const grepInfo = grepMap.get(id) || [];
+
+    // Determine coverage status
+    let coverageStatus;
+    if (inSpec && inImpl && inCode) {
+      coverageStatus = "full";
+    } else if (inSpec && (inImpl || inCode)) {
+      coverageStatus = "partial";
+    } else {
+      coverageStatus = "missing";
+    }
+
+    frList.push({
+      id,
+      description: fr.description,
+      acRefs: fr.acRefs,
+      fullText: fr.fullText,
+      inSpec,
+      inImpl,
+      inCode,
+      implInfo,
+      grepInfo,
+      coverageStatus,
+    });
+  }
+
+  // Sort by FR number
+  frList.sort((a, b) => {
+    const numA = parseInt(a.id.replace("FR-", ""), 10);
+    const numB = parseInt(b.id.replace("FR-", ""), 10);
+    return numA - numB;
+  });
+
+  // Compute gaps
+  const missingAnchors = frList.filter((fr) => fr.inSpec && !fr.inCode);
+  const unmappedFRs = frList.filter((fr) => fr.inSpec && !fr.inImpl);
+
+  // Orphan anchors: @spec references in grep that don't match any FR in spec
+  const orphanAnchors = [];
+  for (const [frId, entries] of grepMap) {
+    if (!frs.has(frId)) {
+      for (const entry of entries) {
+        orphanAnchors.push({ frId, ...entry });
+      }
+    }
+  }
+
+  // Compute coverage score
+  const totalFRs = frList.length;
+  const fullyCovered = frList.filter((fr) => fr.coverageStatus === "full").length;
+  const coveragePercent = totalFRs > 0 ? Math.round((fullyCovered / totalFRs) * 100) : 0;
+
+  lastAnalyzedFRList = frList;
+  lastAnalyzedKnownGaps = knownGaps ? knownGaps.items : [];
+
+  render(frList, acs, { missingAnchors, unmappedFRs, orphanAnchors }, coveragePercent, fullyCovered, totalFRs, knownGaps);
+}
+
+// ─── Rendering ─────────────────────────────────────────────────────────────────
+
+function render(frList, acs, gaps, coveragePercent, fullyCovered, totalFRs, knownGaps) {
+  const mainContent = document.getElementById("main-content");
+  const topbarScore = document.getElementById("topbar-score");
+  const scoreText = document.getElementById("score-text");
+
+  // Show score
+  topbarScore.style.display = "flex";
+  scoreText.innerHTML = `<strong>${coveragePercent}% coverage</strong> — ${fullyCovered}/${totalFRs} FR fully traced`;
+
+  // Animate gauge
+  animateGauge(coveragePercent);
+
+  // Build HTML
+  let html = "";
+
+  // Summary stats
+  const partialCount = frList.filter((fr) => fr.coverageStatus === "partial").length;
+  const missingCount = frList.filter((fr) => fr.coverageStatus === "missing").length;
+
+  html += `<div class="summary-row">
+    <div class="summary-stat">
+      <div class="summary-stat-value green">${fullyCovered}</div>
+      <div class="summary-stat-label">Fully traced</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-value yellow">${partialCount}</div>
+      <div class="summary-stat-label">Partially traced</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-value red">${missingCount}</div>
+      <div class="summary-stat-label">Not traced</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-stat-value" style="color: #c4b5fd;">${totalFRs}</div>
+      <div class="summary-stat-label">Total FRs</div>
+    </div>
+  </div>`;
+
+  // Blockers banner
+  if (knownGaps && knownGaps.items.length > 0) {
+    const blockedCount = knownGaps.items.filter(i => i.type === "blocked" || i.type === "gap").length;
+    html += `<div class="blockers-banner">&#9888; ${knownGaps.items.length} known gap(s)${blockedCount > 0 ? ` — <span class="blocked-count">${blockedCount} blocked</span>` : ""}</div>`;
+  }
+
+  // FR grid
+  html += `<div class="fr-grid">`;
+  for (const fr of frList) {
+    const implDotClass = fr.inImpl ? "green" : "red";
+    const codeDotClass = fr.inCode ? "green" : "red";
+
+    html += `<div class="fr-card status-${fr.coverageStatus}" data-fr="${fr.id}">
+      <label class="fr-card-checkbox" onclick="event.stopPropagation()">
+        <input type="checkbox" data-fr="${fr.id}" onchange="updateSelection()">
+        <span class="checkbox-mark"></span>
+      </label>
+      <div class="fr-card-header">
+        <span class="fr-card-id">${fr.id}</span>
+      </div>
+      <div class="fr-card-desc">${escapeHtml(fr.description)}</div>
+      <div class="fr-card-indicators">
+        <div class="indicator">
+          <span class="indicator-dot green"></span>
+          <span>In Spec</span>
+        </div>
+        <div class="indicator">
+          <span class="indicator-dot ${implDotClass}"></span>
+          <span>In Impl</span>
+        </div>
+        <div class="indicator">
+          <span class="indicator-dot ${codeDotClass}"></span>
+          <span>In Code</span>
+        </div>
+      </div>
+    </div>`;
+  }
+  html += `</div>`;
+
+  // Gaps panel
+  html += `<div class="gaps-panel">
+    <div class="gaps-panel-title">Gaps Report</div>`;
+
+  // Missing @spec anchors
+  html += buildGapSection(
+    "Missing @spec anchors",
+    gaps.missingAnchors.length,
+    gaps.missingAnchors.length > 0 ? "red" : "green",
+    gaps.missingAnchors.length > 0
+      ? gaps.missingAnchors.map((fr) => `<div class="gap-item"><strong>${fr.id}</strong>: ${escapeHtml(fr.description)} — no <code>@spec</code> anchor found in codebase</div>`).join("")
+      : `<div class="gap-empty">All FRs have @spec anchors in code.</div>`
+  );
+
+  // Unmapped FRs
+  html += buildGapSection(
+    "Unmapped FRs",
+    gaps.unmappedFRs.length,
+    gaps.unmappedFRs.length > 0 ? "yellow" : "green",
+    gaps.unmappedFRs.length > 0
+      ? gaps.unmappedFRs.map((fr) => `<div class="gap-item"><strong>${fr.id}</strong>: ${escapeHtml(fr.description)} — not referenced in implementation.md</div>`).join("")
+      : `<div class="gap-empty">All FRs are mapped in implementation.md.</div>`
+  );
+
+  // Orphan anchors
+  html += buildGapSection(
+    "Orphan anchors",
+    gaps.orphanAnchors.length,
+    gaps.orphanAnchors.length > 0 ? "yellow" : "green",
+    gaps.orphanAnchors.length > 0
+      ? gaps.orphanAnchors.map((o) => `<div class="gap-item"><code>${escapeHtml(o.file)}:${o.line}</code> references <strong>${o.frId}</strong> which does not exist in spec.md</div>`).join("")
+      : `<div class="gap-empty">No orphan @spec anchors found.</div>`
+  );
+
+  // Known Gaps from implementation.md
+  const gapItems = knownGaps ? knownGaps.items : [];
+  const gapBadgeMap = { blocked: "BLOCKED", deferred: "DEFERRED", todo: "TODO", info: "INFO", gap: "GAP" };
+  const gapCountColor = gapItems.some(i => i.type === "blocked" || i.type === "gap") ? "red" : gapItems.length > 0 ? "yellow" : "green";
+  html += buildGapSection(
+    "Known Gaps",
+    gapItems.length,
+    gapCountColor,
+    gapItems.length > 0
+      ? gapItems.map((g, idx) => {
+          const detailHtml = g.detail ? ": " + linkifyStepRefs(escapeHtml(g.detail)) : "";
+          return `<div class="gap-item"><label class="gap-item-checkbox" onclick="event.stopPropagation()"><input type="checkbox" data-gap-idx="${idx}" onchange="updateSelection()"></label><span class="gap-type-badge ${g.type}">${gapBadgeMap[g.type] || "INFO"}</span><strong>${escapeHtml(g.title)}</strong>${detailHtml}</div>`;
+        }).join("")
+      : `<div class="gap-empty">No known gaps.</div>`
+  );
+
+  html += `</div>`;
+
+  mainContent.innerHTML = html;
+
+  // Attach gap section toggle handlers
+  document.querySelectorAll(".gap-section-header").forEach((header) => {
+    header.addEventListener("click", () => {
+      header.parentElement.classList.toggle("open");
+    });
+  });
+}
+
+function buildGapSection(title, count, countClass, bodyHtml) {
+  return `<div class="gap-section${count > 0 ? " open" : ""}">
+    <div class="gap-section-header">
+      <span class="gap-section-label">
+        ${title}
+        <span class="gap-count ${countClass}">${count}</span>
+      </span>
+      <span class="gap-chevron">&#9654;</span>
+    </div>
+    <div class="gap-section-body">${bodyHtml}</div>
+  </div>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ─── Gauge Animation ───────────────────────────────────────────────────────────
+
+function animateGauge(percent) {
+  const fill = document.getElementById("gauge-fill");
+  const label = document.getElementById("gauge-label");
+  const circumference = 2 * Math.PI * 18; // r=18
+
+  // Determine color
+  let color;
+  if (percent >= 80) color = "#4ade80";
+  else if (percent >= 50) color = "#facc15";
+  else color = "#f87171";
+
+  fill.style.stroke = color;
+
+  // Calculate offset
+  const offset = circumference - (percent / 100) * circumference;
+
+  // Reset first for animation
+  fill.style.transition = "none";
+  fill.setAttribute("stroke-dashoffset", circumference);
+
+  // Animate after a frame
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      fill.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)";
+      fill.setAttribute("stroke-dashoffset", offset);
+    });
+  });
+
+  // Animate label counter
+  animateCounter(label, 0, percent, 1000);
+}
+
+function animateCounter(element, from, to, duration) {
+  const startTime = performance.now();
+
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(from + (to - from) * eased);
+    element.textContent = current + "%";
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+
+// ─── Project Loader ──────────────────────────────────────────────────────────
+
+let projectHandle = null;
+let featuresMap = {};
+
+async function loadProject() {
+  try {
+    projectHandle = await window.showDirectoryPicker({ mode: 'read' });
+    const specsDir = await projectHandle.getDirectoryHandle('.specs');
+    const featuresDir = await specsDir.getDirectoryHandle('features');
+
+    featuresMap = {};
+    for await (const entry of featuresDir.values()) {
+      if (entry.kind === 'directory') featuresMap[entry.name] = entry;
+    }
+
+    const featureNames = Object.keys(featuresMap).sort();
+    if (!featureNames.length) { alert('No features found in .specs/features/'); return; }
+
+    document.getElementById('projectInfo').style.display = 'block';
+    document.getElementById('projectName').textContent = projectHandle.name;
+
+    const select = document.getElementById('featureSelect');
+    select.innerHTML = featureNames.map(f => `<option value="${f}">${f}</option>`).join('');
+
+    localStorage.setItem('livespec-playground-project', projectHandle.name);
+
+    const lastFeature = localStorage.getItem('livespec-playground-feature');
+    const selected = featureNames.includes(lastFeature) ? lastFeature : featureNames[0];
+    select.value = selected;
+    await selectFeature(selected);
+  } catch (e) {
+    if (e.name !== 'AbortError') console.error('Load project error:', e);
+  }
+}
+
+async function selectFeature(featureName) {
+  if (!projectHandle || !featuresMap[featureName]) return;
+
+  try {
+    const featureDir = featuresMap[featureName];
+    const files = {};
+    for await (const entry of featureDir.values()) {
+      if (entry.kind === 'file') {
+        const file = await entry.getFile();
+        files[entry.name] = await file.text();
+      }
+    }
+
+    // Store file contents
+    storedSpecMd = files['spec.md'] || '';
+    storedImplMd = files['implementation.md'] || '';
+    storedProgressMd = files['progress.md'] || '';
+    storedPlanMd = files['plan.md'] || '';
+
+    // Show/hide center tabs for files
+    const tabSpec = document.getElementById('tabSpec');
+    const tabImpl = document.getElementById('tabImpl');
+    const tabProgress = document.getElementById('tabProgress');
+    const tabPlan = document.getElementById('tabPlan');
+    tabSpec.style.display = storedSpecMd ? '' : 'none';
+    tabImpl.style.display = storedImplMd ? '' : 'none';
+    tabProgress.style.display = storedProgressMd ? '' : 'none';
+    tabPlan.style.display = storedPlanMd ? '' : 'none';
+    document.getElementById('centerTabs').style.display = 'flex';
+
+    // Update status tags
+    const statusEl = document.getElementById('projectStatus');
+    const fileChecks = [
+      { name: 'spec.md', found: !!files['spec.md'] },
+      { name: 'implementation.md', found: !!files['implementation.md'] },
+      { name: 'progress.md', found: !!files['progress.md'] },
+      { name: 'plan.md', found: !!files['plan.md'] },
+    ];
+    statusEl.innerHTML = fileChecks.map(f =>
+      `<span class="project-file-tag ${f.found ? 'found' : 'missing'}">${f.found ? '\u2713' : '\u2717'} ${f.name}</span>`
+    ).join('') + `<button class="project-reload-btn" onclick="loadProject()">Change</button>`;
+
+    localStorage.setItem('livespec-playground-feature', featureName);
+
+    // Hide empty state overlay
+    document.getElementById('emptyState').classList.add('hidden');
+
+    // Ensure coverage view is active
+    setCenterView('viz');
+
+    // Auto-analyze
+    analyze();
+  } catch (e) {
+    console.error('Select feature error:', e);
+  }
+}
+
+// ─── Event Listeners ───────────────────────────────────────────────────────────
+
+// Re-analyze automatically when grep textarea changes
+document.getElementById("input-grep").addEventListener("input", () => {
+  if (storedSpecMd.trim()) analyze();
+});
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('sidebarToggle');
+  const collapsed = sidebar.classList.toggle('collapsed');
+  btn.innerHTML = collapsed ? '&#9654;' : '&#9664;';
+  localStorage.setItem('spec-coverage-sidebar-collapsed', collapsed ? '1' : '0');
+}
+
+// Restore sidebar state on load
+(function() {
+  if (localStorage.getItem('spec-coverage-sidebar-collapsed') === '1') {
+    const sidebar = document.getElementById('sidebar');
+    const btn = document.getElementById('sidebarToggle');
+    if (sidebar && btn) {
+      sidebar.classList.add('collapsed');
+      btn.innerHTML = '&#9654;';
+    }
+  }
+})();
+
+function toggleInfo() {
+  document.getElementById('infoOverlay').classList.toggle('open');
+}
+function setInfoLang(lang) {
+  document.querySelectorAll('.info-modal [data-lang]').forEach(el => {
+    el.classList.toggle('visible', el.dataset.lang === lang);
+  });
+  document.querySelectorAll('.info-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === (lang === 'en' ? 'English' : 'Français'));
+  });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const taskOv = document.getElementById('taskOverlay');
+    if (taskOv && taskOv.classList.contains('open')) { closeTaskModal(); e.stopPropagation(); return; }
+    const ov = document.getElementById('infoOverlay');
+    if (ov.classList.contains('open')) { ov.classList.remove('open'); e.stopPropagation(); }
+  }
+});
+
+// --- URL Fragment Data Loading ---
+let lastAnalyzedFRList = [];
+
+function loadFromFragment() {
+  const hash = window.location.hash;
+  if (!hash.startsWith('#data=')) return false;
+  try {
+    const json = atob(hash.slice(6));
+    const payload = JSON.parse(json);
+    if (payload.grep) document.getElementById('input-grep').value = payload.grep;
+    if (payload.feature) window.__preloadedFeature = payload.feature;
+    if (payload.sourceDir) window.__sourceDir = payload.sourceDir;
+    return true;
+  } catch (e) { console.error('Fragment parse error:', e); return false; }
+}
+const fragmentLoaded = loadFromFragment();
+if (fragmentLoaded) {
+  const hint = document.querySelector('.grep-hint');
+  if (hint) hint.innerHTML = '&#10003; Grep data pre-loaded from Claude Code. Load your .specs project to see full coverage.';
+}
+
+// --- Selection & Task Generation ---
+let selectedFRs = new Set();
+let selectedGaps = new Set();
+let lastAnalyzedKnownGaps = [];
+
+function updateSelection() {
+  selectedFRs.clear();
+  document.querySelectorAll('.fr-card-checkbox input:checked').forEach(cb => {
+    selectedFRs.add(cb.dataset.fr);
+  });
+  selectedGaps.clear();
+  document.querySelectorAll('.gap-item-checkbox input:checked').forEach(cb => {
+    selectedGaps.add(parseInt(cb.dataset.gapIdx));
+  });
+  const total = selectedFRs.size + selectedGaps.size;
+  const toolbar = document.getElementById('selectionToolbar');
+  const count = document.getElementById('selectionCount');
+  if (total > 0) {
+    toolbar.classList.add('visible');
+    count.textContent = total + ' selected';
+  } else {
+    toolbar.classList.remove('visible');
+  }
+}
+
+function selectAllGaps() {
+  document.querySelectorAll('.fr-card.status-partial .fr-card-checkbox input, .fr-card.status-missing .fr-card-checkbox input').forEach(cb => {
+    cb.checked = true;
+  });
+  // Also select blocked/todo/gap known gaps
+  document.querySelectorAll('.gap-item-checkbox input').forEach(cb => {
+    const idx = parseInt(cb.dataset.gapIdx);
+    const gap = lastAnalyzedKnownGaps[idx];
+    if (gap && (gap.type === 'blocked' || gap.type === 'todo' || gap.type === 'gap')) {
+      cb.checked = true;
+    }
+  });
+  updateSelection();
+}
+
+function clearSelection() {
+  document.querySelectorAll('.fr-card-checkbox input').forEach(cb => {
+    cb.checked = false;
+  });
+  document.querySelectorAll('.gap-item-checkbox input').forEach(cb => {
+    cb.checked = false;
+  });
+  updateSelection();
+}
+
+function generateTasks() {
+  if (selectedFRs.size === 0 && selectedGaps.size === 0) return;
+
+  const featureName = window.__preloadedFeature ||
+    document.getElementById('featureSelect')?.value || 'unknown-feature';
+
+  let prompt = '## Spec Coverage Gaps \u2014 ' + featureName + '\n\n';
+
+  if (selectedFRs.size > 0) {
+    prompt += 'The following FRs have coverage gaps that need to be addressed:\n\n';
+
+    for (const frId of selectedFRs) {
+      const fr = lastAnalyzedFRList.find(f => f.id === frId);
+      if (!fr) continue;
+
+      const gaps = [];
+      if (!fr.inImpl) gaps.push('Not referenced in implementation.md');
+      if (!fr.inCode) gaps.push('No @spec anchor found in code');
+
+      prompt += '### ' + fr.id + ': ' + fr.description + '\n';
+      if (gaps.length > 0) {
+        prompt += '**Gaps:**\n';
+        for (const gap of gaps) {
+          prompt += '- ' + gap + '\n';
+        }
+      }
+      if (fr.acRefs && fr.acRefs.length > 0) {
+        prompt += '**Related ACs:** ' + fr.acRefs.join(', ') + '\n';
+      }
+      prompt += '\n';
+    }
+  }
+
+  if (selectedGaps.size > 0) {
+    const gapBadgeMap = { blocked: "BLOCKED", deferred: "DEFERRED", todo: "TODO", info: "INFO", gap: "GAP" };
+    prompt += '## Known Gaps\n\nThe following known gaps/blockers need resolution:\n\n';
+
+    for (const idx of selectedGaps) {
+      const g = lastAnalyzedKnownGaps[idx];
+      if (!g) continue;
+      prompt += '### ' + g.title + '\n';
+      prompt += '**Type:** ' + (gapBadgeMap[g.type] || 'INFO') + '\n';
+      if (g.detail) {
+        prompt += '**Detail:** ' + g.detail + '\n';
+        const stepMatch = g.detail.match(/\bStep\s+(\d+)\b/i);
+        if (stepMatch) {
+          prompt += '**Progress reference:** See Step ' + stepMatch[1] + ' in progress.md\n';
+        }
+      }
+      prompt += '\n';
+    }
+  }
+
+  prompt += '---\n\n';
+  prompt += '**Action:** For each item listed above:\n';
+  if (selectedFRs.size > 0) {
+    prompt += '1. Implement the missing functionality if not yet done\n';
+    prompt += '2. Add `// @spec FR-ID: description` anchors in the source code\n';
+    prompt += '3. Update `.specs/features/' + featureName + '/implementation.md` with the mapping\n';
+  }
+  if (selectedGaps.size > 0) {
+    const startNum = selectedFRs.size > 0 ? 4 : 1;
+    prompt += startNum + '. Resolve the known gaps and blockers listed above\n';
+    prompt += (startNum + 1) + '. Update progress.md with resolution status\n';
+  }
+
+  document.getElementById('taskPrompt').textContent = prompt;
+  document.getElementById('taskOverlay').classList.add('open');
+  document.getElementById('copyBtn').textContent = 'Copy to Clipboard';
+  document.getElementById('copyBtn').classList.remove('copied');
+}
+
+function copyTaskPrompt() {
+  const text = document.getElementById('taskPrompt').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy to Clipboard';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function linkifyStepRefs(html) {
+  if (!storedProgressMd) return html;
+  return html.replace(/\bStep\s+(\d+)\b/gi, (match, num) => {
+    return `<a class="gap-step-link" onclick="event.preventDefault();event.stopPropagation();showProgressStep(${num})">${match}</a>`;
+  });
+}
+
+function showProgressStep(stepNum) {
+  setCenterView('progress');
+  requestAnimationFrame(() => {
+    const preview = document.getElementById('centerMdPreview');
+    const rows = preview.querySelectorAll('tr');
+    for (const row of rows) {
+      const firstCell = row.querySelector('td');
+      if (firstCell && firstCell.textContent.trim() === String(stepNum)) {
+        row.classList.add('progress-highlight');
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => row.classList.remove('progress-highlight'), 3000);
+        return;
+      }
+    }
+  });
+}
+
+function closeTaskModal() {
+  document.getElementById('taskOverlay').classList.remove('open');
+}
+</script>
+
+<div class="info-overlay" id="infoOverlay" onclick="if(event.target===this)toggleInfo()">
+  <div class="info-modal">
+    <div class="info-lang-toggle">
+      <button class="info-lang-btn active" onclick="setInfoLang('en')">English</button>
+      <button class="info-lang-btn" onclick="setInfoLang('fr')">Français</button>
+    </div>
+
+    <div data-lang="en" class="visible">
+      <h2>Spec Coverage Dashboard</h2>
+      <p class="info-subtitle">LiveSpec Playground — Spec-to-code traceability dashboard</p>
+
+      <h3>What is this playground for?</h3>
+      <p>The Spec Coverage Dashboard measures the <strong>traceability between your specification and your code</strong>. For each Functional Requirement (FR), it checks three coverage levels:</p>
+      <ul>
+        <li><strong>In Spec</strong> — the FR exists in <code>spec.md</code> (always true by definition)</li>
+        <li><strong>In implementation.md</strong> — the FR is mapped in the traceability file</li>
+        <li><strong>In Code (@spec)</strong> — a <code>@spec FR-NNN</code> anchor exists in the source code</li>
+      </ul>
+      <p>An FR is "fully traced" only when all 3 levels are green. The dashboard also identifies orphan anchors: <code>@spec</code> references in code that don't match any FR in the spec.</p>
+
+      <h3>How to use — step by step</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Load a project (required)</strong>
+          Click <strong>Load .specs project</strong> in the sidebar and select a <code>.specs</code> folder. This loads <code>spec.md</code> (source of truth for all FRs and ACs) and optionally <code>implementation.md</code> (FR &rarr; source file &rarr; status mapping). You can view both files via the central tabs.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Paste the grep output (optional)</strong>
+          In the sidebar textarea, paste the result of:<br>
+          <code>grep -rn "@spec FR-" src/</code><br>
+          Each line is parsed to extract the file, line number, and referenced FR.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Run the analysis</strong>
+          Click <strong>Analyze</strong>. The dashboard cross-references all 3 sources and generates the FR card grid, the global score, and the gaps report.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Read the global score</strong>
+          The circular gauge at the top right shows the percentage of "fully traced" FRs (all 3 indicators green). The text provides the exact ratio.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Explore FR cards</strong>
+          Each card displays 3 colored dots (green = OK, red = missing). The card border reflects overall status: green, yellow, or red. Click a card to expand it and see the full text, ACs, mapped file, and <code>@spec</code> line from the grep output.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">6</div>
+        <div class="info-step-content">
+          <strong>Review the Gaps Report</strong>
+          The bottom panel lists issues in 3 categories:
+          <ul>
+            <li><strong>Missing @spec anchors</strong> — FRs in the spec but absent from the code</li>
+            <li><strong>Unmapped FRs</strong> — FRs in the spec but absent from implementation.md</li>
+            <li><strong>Orphan anchors</strong> — <code>@spec</code> in the code that don't match any FR</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div data-lang="fr">
+      <h2>Spec Coverage Dashboard</h2>
+      <p class="info-subtitle">LiveSpec Playground — Tableau de bord de la traçabilité spec-to-code</p>
+
+      <h3>A quoi sert ce playground ?</h3>
+      <p>Le Spec Coverage Dashboard mesure la <strong>traçabilité entre votre spécification et votre code</strong>. Pour chaque Functional Requirement (FR), il vérifie trois niveaux de couverture :</p>
+      <ul>
+        <li><strong>In Spec</strong> — le FR existe dans <code>spec.md</code> (toujours vrai par définition)</li>
+        <li><strong>In implementation.md</strong> — le FR est mappé dans le fichier de traçabilité</li>
+        <li><strong>In Code (@spec)</strong> — une ancre <code>@spec FR-NNN</code> existe dans le code source</li>
+      </ul>
+      <p>Un FR est "fully traced" uniquement si les 3 niveaux sont verts. Le dashboard identifie aussi les ancres orphelines : des <code>@spec</code> dans le code qui ne correspondent à aucun FR dans la spec.</p>
+
+      <h3>Comment l'utiliser — étape par étape</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Charger un projet (obligatoire)</strong>
+          Cliquez <strong>Load .specs project</strong> dans la sidebar et sélectionnez un dossier <code>.specs</code>. Cela charge <code>spec.md</code> (source de vérité pour tous les FR et AC) et optionnellement <code>implementation.md</code> (mapping FR &rarr; fichier source &rarr; statut). Les deux fichiers sont consultables via les onglets centraux.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Coller le résultat du grep (optionnel)</strong>
+          Dans le textarea de la sidebar, collez le résultat de :<br>
+          <code>grep -rn "@spec FR-" src/</code><br>
+          Chaque ligne sera parsée pour extraire le fichier, la ligne, et le FR référencé.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Lancer l'analyse</strong>
+          Cliquez <strong>Analyze</strong>. Le dashboard croise les 3 sources et génère la grille de cartes FR, le score global, et le rapport de gaps.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Lire le score global</strong>
+          La jauge circulaire en haut à droite indique le pourcentage de FR "fully traced" (3 indicateurs verts). Le texte détaille le ratio exact.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Explorer les cartes FR</strong>
+          Chaque carte affiche 3 points de couleur (vert = OK, rouge = manquant). La bordure de la carte reflète le statut global : vert, jaune ou rouge. Cliquez sur une carte pour l'ouvrir et voir le texte complet, les AC, le fichier mappé, et la ligne <code>@spec</code> trouvée dans le grep.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">6</div>
+        <div class="info-step-content">
+          <strong>Consulter le Gaps Report</strong>
+          Le panneau du bas liste les problèmes en 3 catégories :
+          <ul>
+            <li><strong>Missing @spec anchors</strong> — FR dans la spec mais absents du code</li>
+            <li><strong>Unmapped FRs</strong> — FR dans la spec mais absents d'implementation.md</li>
+            <li><strong>Orphan anchors</strong> — <code>@spec</code> dans le code qui ne correspondent à aucun FR</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <button class="info-close" onclick="toggleInfo()">Fermer</button>
+  </div>
+</div>
+
+<div class="selection-toolbar" id="selectionToolbar">
+  <span id="selectionCount">0 selected</span>
+  <button onclick="selectAllGaps()">Select all gaps</button>
+  <button onclick="clearSelection()">Clear</button>
+  <button class="primary" onclick="generateTasks()">Generate Tasks</button>
+</div>
+
+<div class="task-overlay" id="taskOverlay" onclick="if(event.target===this)closeTaskModal()">
+  <div class="task-modal">
+    <h2>Generated Tasks</h2>
+    <p class="task-subtitle">Copy this prompt and paste it into Claude Code</p>
+    <pre class="task-prompt" id="taskPrompt"></pre>
+    <div class="task-actions">
+      <button class="copy-btn" id="copyBtn" onclick="copyTaskPrompt()">Copy to Clipboard</button>
+      <button onclick="closeTaskModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

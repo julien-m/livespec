@@ -479,12 +479,80 @@
   .checklist { list-style: none; padding-left: 0; }
   .checklist li::before { content: "[ ] "; font-family: monospace; color: #6b6f8a; }
   .checklist li.done::before { content: "[x] "; color: #34d399; }
+
+  /* Info button */
+  .info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    color: #c4b5fd;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, 'Times New Roman', serif;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .info-btn:hover { background: #4338ca; color: #e1e4ea; border-color: #4338ca; }
+
+  .info-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .info-overlay.open { display: flex; }
+
+  .info-modal {
+    background: #161822;
+    border: 1px solid #262a3a;
+    border-radius: 12px;
+    width: 680px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 32px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  }
+  .info-modal::-webkit-scrollbar { width: 5px; }
+  .info-modal::-webkit-scrollbar-track { background: transparent; }
+  .info-modal::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 3px; }
+  .info-modal h2 { font-size: 20px; font-weight: 700; color: #c4b5fd; margin-bottom: 8px; }
+  .info-modal .info-subtitle { font-size: 13px; color: #6b6f8a; margin-bottom: 24px; }
+  .info-modal h3 { font-size: 14px; font-weight: 600; color: #e1e4ea; margin-top: 20px; margin-bottom: 8px; }
+  .info-modal p, .info-modal li { font-size: 13px; line-height: 1.7; color: #b0b4cc; }
+  .info-modal ul, .info-modal ol { padding-left: 20px; margin-bottom: 12px; }
+  .info-modal li { margin-bottom: 4px; }
+  .info-modal code { background: #1e2035; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #c4b5fd; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+  .info-modal .info-step { display: flex; gap: 12px; margin-bottom: 16px; padding: 12px; background: #0f1117; border-radius: 8px; border: 1px solid #262a3a; }
+  .info-modal .info-step-num { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #4338ca; color: #e1e4ea; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .info-modal .info-step-content { flex: 1; }
+  .info-modal .info-step-content strong { display: block; font-size: 13px; color: #e1e4ea; margin-bottom: 4px; }
+  .info-modal .info-close { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; margin-top: 24px; border-radius: 8px; border: 1px solid #262a3a; background: #1e2035; color: #8b8fa7; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+  .info-modal .info-close:hover { background: #262a3a; color: #e1e4ea; }
+  .info-lang-toggle { display: flex; gap: 4px; margin-bottom: 20px; }
+  .info-lang-btn { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; background: transparent; color: #8b8fa7; border: 1px solid #262a3a; transition: all 0.15s; }
+  .info-lang-btn:hover { color: #c4b5fd; background: #1e2035; }
+  .info-lang-btn.active { color: #c4b5fd; background: #1e2035; border-color: #4338ca; }
+  .info-modal [data-lang] { display: none; }
+  .info-modal [data-lang].visible { display: block; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <h1>LiveSpec Pipeline Explorer</h1>
+  <button class="info-btn" onclick="toggleInfo()" title="About this playground">i</button>
   <div class="view-tabs" id="viewTabs"></div>
 </div>
 
@@ -530,6 +598,158 @@
       <div class="prompt-text" id="promptText">Select a view and add comments to generate a discussion prompt about the LiveSpec pipeline.</div>
       <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy</button>
     </div>
+  </div>
+</div>
+
+<!-- Info modal -->
+<div class="info-overlay" id="infoOverlay" onclick="if(event.target===this)toggleInfo()">
+  <div class="info-modal">
+    <div class="info-lang-toggle">
+      <button class="info-lang-btn active" onclick="setInfoLang('en')">English</button>
+      <button class="info-lang-btn" onclick="setInfoLang('fr')">Français</button>
+    </div>
+
+    <div data-lang="en" class="visible">
+      <h2>Pipeline Explorer</h2>
+      <p class="info-subtitle">LiveSpec Playground — Interactive visualization of the pipeline architecture</p>
+
+      <h3>What is this playground for?</h3>
+      <p>The Pipeline Explorer is an <strong>interactive map of the LiveSpec architecture</strong>. It visualizes the entire framework as navigable SVG diagrams: the implementation pipeline, produced artifacts, involved agents, and data flows between them.</p>
+      <p>It's the reference tool for understanding how LiveSpec works — ideal for onboarding, documentation, or discussing architecture with the team.</p>
+
+      <h3>How to use — step by step</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Choose a view</strong>
+          The top bar offers several views. Each shows a different aspect of the framework:
+          <ul>
+            <li><strong>Pipeline</strong> — the full flow of <code>/spec.feature</code> (specify → plan → review → implement)</li>
+            <li><strong>Artifacts</strong> — files produced by the pipeline (spec.md, plan.md, progress.md, etc.)</li>
+            <li><strong>Agents</strong> — Claude Code agents involved (Supervisor, Implementer, Verifier, Documenter)</li>
+            <li><strong>Implementation</strong> — the implementation cycle via Superpowers</li>
+            <li>and other views depending on configuration</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Explore the diagram</strong>
+          <ul>
+            <li><strong>Zoom</strong> — +/- buttons at bottom right or mouse wheel</li>
+            <li><strong>Pan</strong> — click-drag on the canvas background</li>
+            <li><strong>Reset</strong> — R button to return to the initial view</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Inspect a node</strong>
+          Click on any node in the diagram. The <strong>detail panel</strong> (left sidebar) shows a detailed description: what the node represents, its inputs/outputs, responsibilities, and applicable rules.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Add comments</strong>
+          <strong>Right-click</strong> on a node to open the comment dialog. Comments are saved in the session and appear in the "Comments" section of the sidebar. Useful for noting questions or observations during an architecture review.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Generate a discussion prompt</strong>
+          The bottom bar automatically generates a <strong>structured prompt</strong> based on the active view and added comments. Click <strong>Copy</strong> to copy it — you can paste it into a Claude conversation to discuss a specific aspect of the architecture.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">6</div>
+        <div class="info-step-content">
+          <strong>Legend</strong>
+          The legend at the bottom left of the canvas explains the node color coding: commands, agents, artifacts, phases, etc. Each node type has a distinct color and shape.
+        </div>
+      </div>
+    </div>
+
+    <div data-lang="fr">
+      <h2>Pipeline Explorer</h2>
+      <p class="info-subtitle">LiveSpec Playground — Visualisation interactive de l'architecture du pipeline</p>
+
+      <h3>A quoi sert ce playground ?</h3>
+      <p>Le Pipeline Explorer est une <strong>carte interactive de l'architecture LiveSpec</strong>. Il visualise l'ensemble du framework sous forme de diagrammes SVG navigables : le pipeline d'implémentation, les artefacts produits, les agents impliqués, et les flux de données entre eux.</p>
+      <p>C'est l'outil de référence pour comprendre comment LiveSpec fonctionne — idéal pour l'onboarding, la documentation, ou pour discuter de l'architecture avec l'équipe.</p>
+
+      <h3>Comment l'utiliser — étape par étape</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Choisir une vue</strong>
+          La barre du haut propose plusieurs vues. Chacune montre un aspect différent du framework :
+          <ul>
+            <li><strong>Pipeline</strong> — le flux complet de <code>/spec.feature</code> (specify → plan → review → implement)</li>
+            <li><strong>Artifacts</strong> — les fichiers produits par le pipeline (spec.md, plan.md, progress.md, etc.)</li>
+            <li><strong>Agents</strong> — les agents Claude Code impliqués (Supervisor, Implementer, Verifier, Documenter)</li>
+            <li><strong>Implementation</strong> — le cycle d'implémentation via Superpowers</li>
+            <li>et d'autres vues selon la configuration</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Explorer le diagramme</strong>
+          <ul>
+            <li><strong>Zoom</strong> — boutons +/- en bas à droite ou molette de souris</li>
+            <li><strong>Pan</strong> — cliquer-glisser sur le fond du canvas</li>
+            <li><strong>Reset</strong> — bouton R pour revenir à la vue initiale</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Inspecter un noeud</strong>
+          Cliquez sur n'importe quel noeud du diagramme. Le <strong>panneau de détail</strong> (sidebar gauche) affiche une description détaillée : ce que représente le noeud, ses inputs/outputs, ses responsabilités, et les règles qui s'y appliquent.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Ajouter des commentaires</strong>
+          <strong>Clic droit</strong> sur un noeud pour ouvrir le dialogue de commentaire. Les commentaires sont sauvegardés dans la session et apparaissent dans la section "Comments" de la sidebar. Utile pour noter des questions ou des observations lors d'une review d'architecture.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Générer un prompt de discussion</strong>
+          La barre du bas génère automatiquement un <strong>prompt structuré</strong> basé sur la vue active et les commentaires ajoutés. Cliquez <strong>Copy</strong> pour le copier — vous pouvez le coller dans une conversation Claude pour discuter d'un aspect spécifique de l'architecture.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">6</div>
+        <div class="info-step-content">
+          <strong>Légende</strong>
+          La légende en bas à gauche du canvas explique le code couleur des noeuds : commandes, agents, artefacts, phases, etc. Chaque type de noeud a une couleur et une forme distincte.
+        </div>
+      </div>
+    </div>
+
+    <button class="info-close" onclick="toggleInfo()">Fermer</button>
   </div>
 </div>
 
@@ -1943,7 +2163,14 @@ svgContainer.addEventListener('wheel', (e) => {
 
 // Handle Escape for modal
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') {
+    const infoOv = document.getElementById('infoOverlay');
+    if (infoOv.classList.contains('open')) {
+      infoOv.classList.remove('open');
+      return;
+    }
+    closeModal();
+  }
   if (e.key === 'Enter' && e.metaKey && document.getElementById('commentModal').classList.contains('open')) {
     saveComment();
   }
@@ -1952,6 +2179,19 @@ document.addEventListener('keydown', (e) => {
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
+function setInfoLang(lang) {
+  document.querySelectorAll('.info-modal [data-lang]').forEach(el => {
+    el.classList.toggle('visible', el.dataset.lang === lang);
+  });
+  document.querySelectorAll('.info-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === (lang === 'en' ? 'English' : 'Français'));
+  });
+}
+
+function toggleInfo() {
+  document.getElementById('infoOverlay').classList.toggle('open');
+}
+
 initTabs();
 renderComments();
 renderView();
