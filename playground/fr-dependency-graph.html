@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveSpec FR Dependency Graph</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0f1117;
+    color: #e1e4ea;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    background: #161822;
+    border-bottom: 1px solid #262a3a;
+    flex-shrink: 0;
+  }
+
+  .topbar h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #c4b5fd;
+    white-space: nowrap;
+  }
+
+  .metrics-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .metric {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #8b8fa7;
+  }
+
+  .metric .value {
+    font-weight: 700;
+    font-size: 14px;
+    color: #e1e4ea;
+  }
+
+  .metric .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .metric .dot.green { background: #4ade80; }
+  .metric .dot.yellow { background: #facc15; }
+  .metric .dot.red { background: #f87171; }
+  .metric .dot.gray { background: #6b7280; }
+
+  .progress-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .progress-bar {
+    width: 120px;
+    height: 6px;
+    background: #262a3a;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4338ca, #c4b5fd);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #c4b5fd;
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* ── Main layout ── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Left sidebar ── */
+  .sidebar-left {
+    width: 360px;
+    min-width: 360px;
+    background: #161822;
+    border-right: 1px solid #262a3a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: #4338ca;
+    color: #e1e4ea;
+    width: 100%;
+  }
+
+  .btn-primary:hover {
+    background: #5349d6;
+  }
+
+  .btn-small {
+    padding: 5px 10px;
+    font-size: 11px;
+    border-radius: 5px;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: #8b8fa7;
+    border: 1px solid #262a3a;
+  }
+
+  .btn-outline:hover {
+    border-color: #c4b5fd;
+    color: #c4b5fd;
+  }
+
+  .btn-outline.active {
+    border-color: #c4b5fd;
+    color: #c4b5fd;
+    background: rgba(196, 181, 253, 0.08);
+  }
+
+  /* FR list */
+  .fr-list-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .fr-list-header {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    background: #0f1117;
+    border: 1px solid #262a3a;
+    border-radius: 6px;
+    color: #e1e4ea;
+    font-size: 12px;
+    padding: 6px 10px;
+    outline: none;
+    font-family: inherit;
+  }
+
+  .search-input:focus {
+    border-color: #4338ca;
+  }
+
+  .search-input::placeholder {
+    color: #6b6f8a;
+  }
+
+  .fr-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fr-list::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .fr-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .fr-list::-webkit-scrollbar-thumb {
+    background: #262a3a;
+    border-radius: 3px;
+  }
+
+  .fr-card {
+    background: #0f1117;
+    border: 1px solid #262a3a;
+    border-radius: 6px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .fr-card:hover {
+    border-color: #4338ca;
+  }
+
+  .fr-card.selected {
+    border-color: #c4b5fd;
+    background: rgba(196, 181, 253, 0.05);
+  }
+
+  .fr-card-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .fr-card-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .fr-card-id {
+    font-size: 11px;
+    font-weight: 700;
+    color: #c4b5fd;
+  }
+
+  .fr-card-desc {
+    font-size: 11px;
+    color: #8b8fa7;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fr-card-meta {
+    font-size: 10px;
+    color: #6b6f8a;
+    margin-top: 2px;
+  }
+
+  /* ── Summary panel ── */
+  .summary-panel {
+    flex-shrink: 0;
+    height: 130px;
+    overflow-y: auto;
+    background: #161822;
+    border-top: 1px solid #262a3a;
+    padding: 12px 16px;
+    display: none;
+  }
+  .summary-panel.visible { display: flex; gap: 16px; }
+  .summary-block { flex: 1; min-width: 0; }
+  .summary-block-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b6f8a;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .summary-block-content {
+    font-size: 12px;
+    color: #b0b4cc;
+    line-height: 1.5;
+  }
+  .summary-ok { color: #4ade80; }
+  .summary-warn { color: #facc15; }
+  .summary-bad { color: #f87171; }
+
+  /* ── Center canvas ── */
+  .canvas-area {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  #graphContainer svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .canvas-controls {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    z-index: 10;
+  }
+
+  .canvas-hint {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    font-size: 11px;
+    color: #6b6f8a;
+    pointer-events: none;
+  }
+
+  /* ── Right panel ── */
+  .sidebar-right {
+    width: 340px;
+    min-width: 340px;
+    background: #161822;
+    border-left: 1px solid #262a3a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .detail-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  .detail-panel::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .detail-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .detail-panel::-webkit-scrollbar-thumb {
+    background: #262a3a;
+    border-radius: 3px;
+  }
+
+  .detail-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6b6f8a;
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+    line-height: 1.6;
+  }
+
+  .detail-header {
+    margin-bottom: 16px;
+  }
+
+  .detail-id {
+    font-size: 18px;
+    font-weight: 700;
+    color: #c4b5fd;
+  }
+
+  .detail-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-top: 6px;
+  }
+
+  .detail-status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .status-implemented { background: rgba(74, 222, 128, 0.12); color: #4ade80; }
+  .status-implemented .dot { background: #4ade80; }
+  .status-in-progress { background: rgba(250, 204, 21, 0.12); color: #facc15; }
+  .status-in-progress .dot { background: #facc15; }
+  .status-blocked { background: rgba(248, 113, 113, 0.12); color: #f87171; }
+  .status-blocked .dot { background: #f87171; }
+  .status-todo { background: rgba(107, 114, 128, 0.15); color: #6b7280; }
+  .status-todo .dot { background: #6b7280; }
+
+  .detail-desc {
+    font-size: 13px;
+    color: #b0b4cc;
+    line-height: 1.5;
+    margin-top: 8px;
+  }
+
+  .detail-section {
+    margin-top: 16px;
+  }
+
+  .detail-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8b8fa7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .detail-ac-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .detail-ac-item {
+    font-size: 12px;
+    color: #b0b4cc;
+    padding: 5px 8px;
+    background: #0f1117;
+    border-radius: 4px;
+    border-left: 3px solid #4338ca;
+  }
+
+  .detail-ac-item .ac-id {
+    font-weight: 700;
+    color: #c4b5fd;
+  }
+
+  .detail-dep-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .detail-dep-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #b0b4cc;
+    padding: 5px 8px;
+    background: #0f1117;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .detail-dep-item:hover {
+    border-color: #4338ca;
+  }
+
+  .detail-dep-item .dep-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .detail-dep-item .dep-id {
+    font-weight: 700;
+    color: #c4b5fd;
+  }
+
+  .detail-info-row {
+    font-size: 12px;
+    color: #b0b4cc;
+    margin-bottom: 4px;
+  }
+
+  .detail-info-row .label {
+    color: #6b6f8a;
+  }
+
+  .detail-info-row .val {
+    color: #e1e4ea;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 11px;
+  }
+
+  /* ── SVG styles ── */
+  .node-circle {
+    cursor: grab;
+    transition: opacity 0.2s;
+  }
+
+  .node-circle:active {
+    cursor: grabbing;
+  }
+
+  .node-label {
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-weight: 700;
+    fill: #e1e4ea;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .edge-line {
+    stroke-width: 1.5;
+    fill: none;
+    transition: opacity 0.2s;
+  }
+
+  .edge-arrow {
+    transition: opacity 0.2s;
+  }
+
+  .ac-circle {
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .ac-label {
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 8px;
+    font-weight: 600;
+    fill: #e1e4ea;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .ac-link {
+    stroke: #262a3a;
+    stroke-width: 1;
+    transition: opacity 0.2s;
+  }
+
+  .dimmed {
+    opacity: 0.08 !important;
+  }
+
+  .critical-highlight {
+    stroke: #c4b5fd !important;
+    stroke-width: 3 !important;
+  }
+
+  .critical-node {
+    filter: drop-shadow(0 0 8px rgba(196, 181, 253, 0.5));
+  }
+
+  .cluster-rect {
+    pointer-events: none;
+  }
+
+  .cluster-label {
+    pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .step-edge-line {
+    fill: none;
+  }
+
+  .fallback-banner {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e2035;
+    border: 1px solid #262a3a;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #8b8fa7;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+  }
+
+  /* Info button */
+  .info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    color: #c4b5fd;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, 'Times New Roman', serif;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .info-btn:hover { background: #4338ca; color: #e1e4ea; border-color: #4338ca; }
+
+  .info-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .info-overlay.open { display: flex; }
+
+  .info-modal {
+    background: #161822;
+    border: 1px solid #262a3a;
+    border-radius: 12px;
+    width: 680px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 32px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  }
+  .info-modal::-webkit-scrollbar { width: 5px; }
+  .info-modal::-webkit-scrollbar-track { background: transparent; }
+  .info-modal::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 3px; }
+  .info-modal h2 { font-size: 20px; font-weight: 700; color: #c4b5fd; margin-bottom: 8px; }
+  .info-modal .info-subtitle { font-size: 13px; color: #6b6f8a; margin-bottom: 24px; }
+  .info-modal h3 { font-size: 14px; font-weight: 600; color: #e1e4ea; margin-top: 20px; margin-bottom: 8px; }
+  .info-modal p, .info-modal li { font-size: 13px; line-height: 1.7; color: #b0b4cc; }
+  .info-modal ul, .info-modal ol { padding-left: 20px; margin-bottom: 12px; }
+  .info-modal li { margin-bottom: 4px; }
+  .info-modal code { background: #1e2035; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #c4b5fd; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+  .info-modal .info-step { display: flex; gap: 12px; margin-bottom: 16px; padding: 12px; background: #0f1117; border-radius: 8px; border: 1px solid #262a3a; }
+  .info-modal .info-step-num { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #4338ca; color: #e1e4ea; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .info-modal .info-step-content { flex: 1; }
+  .info-modal .info-step-content strong { display: block; font-size: 13px; color: #e1e4ea; margin-bottom: 4px; }
+  .info-modal .info-close { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; margin-top: 24px; border-radius: 8px; border: 1px solid #262a3a; background: #1e2035; color: #8b8fa7; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+  .info-modal .info-close:hover { background: #262a3a; color: #e1e4ea; }
+  .info-lang-toggle { display: flex; gap: 4px; margin-bottom: 20px; }
+  .info-lang-btn { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; background: transparent; color: #8b8fa7; border: 1px solid #262a3a; transition: all 0.15s; }
+  .info-lang-btn:hover { color: #c4b5fd; background: #1e2035; }
+  .info-lang-btn.active { color: #c4b5fd; background: #1e2035; border-color: #4338ca; }
+  .info-modal [data-lang] { display: none; }
+  .info-modal [data-lang].visible { display: block; }
+
+  /* ── Empty state overlay ── */
+  .empty-state-overlay { position: absolute; inset: 0; background: #0f1117; display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .empty-state-overlay.hidden { display: none; }
+  .empty-state-box { text-align: center; max-width: 360px; }
+  .empty-state-box svg { margin-bottom: 16px; opacity: 0.6; }
+  .empty-state-box h2 { font-size: 18px; font-weight: 600; color: #e1e4ea; margin-bottom: 8px; }
+  .empty-state-box p { font-size: 13px; color: #6b6f8a; line-height: 1.6; margin-bottom: 20px; }
+  .empty-state-btn { padding: 10px 24px; border-radius: 8px; border: 1px solid #4338ca; background: #4338ca; color: #e1e4ea; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .empty-state-btn:hover { background: #5145e5; }
+
+  /* ── MD preview ── */
+  .md-preview { padding: 12px 14px; font-size: 13px; line-height: 1.7; color: #b0b4cc; overflow-y: auto; }
+  .md-preview h2 { font-size: 16px; font-weight: 700; color: #c4b5fd; margin: 16px 0 8px; }
+  .md-preview h3 { font-size: 14px; font-weight: 600; color: #e1e4ea; margin: 14px 0 6px; }
+  .md-preview h4 { font-size: 13px; font-weight: 600; color: #e1e4ea; margin: 12px 0 4px; }
+  .md-preview p { margin-bottom: 8px; }
+  .md-preview strong { color: #e1e4ea; }
+  .md-preview code { background: #1e2035; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #c4b5fd; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+  .md-preview pre { background: #1e2035; border: 1px solid #262a3a; border-radius: 6px; padding: 10px 12px; margin: 8px 0; overflow-x: auto; }
+  .md-preview pre code { background: none; padding: 0; font-size: 12px; color: #b0b4cc; }
+  .md-preview ul, .md-preview ol { padding-left: 20px; margin-bottom: 8px; }
+  .md-preview li { margin-bottom: 2px; }
+  .md-preview hr { border: none; border-top: 1px solid #262a3a; margin: 16px 0; }
+  .md-preview table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }
+  .md-preview td { padding: 6px 10px; border: 1px solid #262a3a; }
+  .md-preview tr:nth-child(even) { background: #1a1c2e; }
+  .md-preview .empty-msg { color: #6b6f8a; font-style: italic; }
+
+  /* ── Center tabs ── */
+  .center-tabs { display: flex; gap: 4px; padding: 8px 12px; background: #161822; border-bottom: 1px solid #262a3a; flex-shrink: 0; }
+  .center-tab { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; background: transparent; color: #8b8fa7; border: 1px solid transparent; transition: all 0.15s; }
+  .center-tab:hover { color: #c4b5fd; background: #1e2035; }
+  .center-tab.active { color: #c4b5fd; background: #1e2035; border-color: #4338ca; }
+  .center-file-view { display: none; flex: 1; overflow-y: auto; padding: 20px 24px; background: #0f1117; }
+  .center-file-view.visible { display: block; }
+
+  /* ── Project loader ── */
+  .project-loader { padding: 10px 14px; border-bottom: 1px solid #262a3a; }
+  .project-load-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px dashed #262a3a; background: transparent; color: #8b8fa7; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+  .project-load-btn:hover { border-color: #4338ca; color: #c4b5fd; background: #1e2035; }
+  .project-load-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .project-info { margin-top: 8px; }
+  .project-name { display: block; font-size: 11px; color: #6b6f8a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .feature-select { width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid #262a3a; background: #1e2035; color: #e1e4ea; font-size: 12px; font-family: inherit; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b8fa7' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 28px; }
+  .feature-select:focus { outline: none; border-color: #4338ca; }
+  .project-status { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 11px; color: #4ade80; flex-wrap: wrap; }
+  .project-status .dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; }
+  .project-reload-btn { margin-left: auto; padding: 2px 8px; border-radius: 4px; border: 1px solid #262a3a; background: transparent; color: #8b8fa7; cursor: pointer; font-size: 11px; transition: all 0.15s; }
+  .project-reload-btn:hover { color: #c4b5fd; border-color: #4338ca; }
+  .project-file-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; }
+  .project-file-tag.found { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .project-file-tag.missing { background: rgba(248,113,113,0.15); color: #f87171; }
+  .mermaid-container { background: #161822; border-radius: 8px; padding: 16px; margin: 12px 0; overflow-x: auto; }
+  .mermaid-container svg { max-width: 100%; height: auto; }
+</style>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false, theme: 'dark', themeVariables: { primaryColor: '#4338ca', primaryTextColor: '#e1e4ea', lineColor: '#6b6f8a', secondaryColor: '#1e2035', tertiaryColor: '#262a3a' } });
+  window.__mermaidRender = async () => {
+    const els = document.querySelectorAll('.mermaid[data-processed]');
+    els.forEach(el => el.removeAttribute('data-processed'));
+    try { await mermaid.run({ querySelector: '.mermaid' }); } catch(e) { console.warn('Mermaid render:', e); }
+  };
+</script>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <h1>LiveSpec FR Dependency Graph</h1>
+  <button class="info-btn" onclick="toggleInfo()" title="About this playground">i</button>
+  <div class="metrics-bar" id="metricsBar">
+    <div class="metric">
+      <span class="value" id="metricTotal">0</span>
+      <span>Total FRs</span>
+    </div>
+    <div class="metric" id="metricStepsWrap" style="display:none">
+      <span class="value" id="metricSteps">0</span>
+      <span>Steps</span>
+    </div>
+    <div class="metric">
+      <span class="dot green"></span>
+      <span class="value" id="metricImplemented">0</span>
+      <span>Implemented</span>
+    </div>
+    <div class="metric">
+      <span class="dot yellow"></span>
+      <span class="value" id="metricPending">0</span>
+      <span>Pending</span>
+    </div>
+    <div class="metric">
+      <span class="dot red"></span>
+      <span class="value" id="metricBlocked">0</span>
+      <span>Blocked</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar">
+        <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <span class="progress-label" id="progressLabel">0%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main layout ── -->
+<div class="main">
+
+  <!-- Left sidebar -->
+  <div class="sidebar-left">
+
+    <!-- Project loader -->
+    <div class="project-loader" id="projectLoader">
+      <button class="project-load-btn" onclick="loadProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 4.5V12a1 1 0 001 1h10a1 1 0 001-1V6.5a1 1 0 00-1-1H8.5L7 4H3a1 1 0 00-1 .5z"/>
+        </svg>
+        Load .specs project
+      </button>
+      <div class="project-info" id="projectInfo" style="display:none">
+        <span class="project-name" id="projectName"></span>
+        <select class="feature-select" id="featureSelect" onchange="selectFeature(this.value)"></select>
+        <div class="project-status" id="projectStatus"></div>
+      </div>
+    </div>
+
+    <!-- FR list -->
+    <div class="fr-list-section" id="frListSection">
+      <div class="fr-list-header">
+        <input type="text" class="search-input" id="frSearch" placeholder="Search FRs...">
+      </div>
+      <div class="fr-list" id="frList"></div>
+    </div>
+  </div>
+
+  <!-- Center canvas -->
+  <div class="canvas-area" id="canvasArea" style="display:flex;flex-direction:column;">
+    <div class="center-tabs" id="centerTabs">
+      <button class="center-tab active" data-view="viz" onclick="setCenterView('viz')">Graph</button>
+      <button class="center-tab" data-view="spec" onclick="setCenterView('spec')" style="display:none" id="tabSpec">spec.md</button>
+      <button class="center-tab" data-view="plan" onclick="setCenterView('plan')" style="display:none" id="tabPlan">plan.md</button>
+      <button class="center-tab" data-view="impl" onclick="setCenterView('impl')" style="display:none" id="tabImpl">implementation.md</button>
+    </div>
+    <div id="graphContainer" style="flex:1;position:relative;overflow:hidden;">
+      <div class="canvas-controls">
+        <button class="btn btn-small btn-outline" id="toggleAcBtn">Show ACs</button>
+        <button class="btn btn-small btn-outline" id="criticalPathBtn">Critical Path</button>
+        <button class="btn btn-small btn-outline" id="resetViewBtn">Reset View</button>
+      </div>
+      <svg id="graphSvg">
+        <defs>
+          <marker id="arrowGray" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,3 L0,6 Z" fill="#6b6f8a"/>
+          </marker>
+          <marker id="arrowPurple" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,3 L0,6 Z" fill="#c4b5fd"/>
+          </marker>
+          <marker id="arrowIndigo" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,3 L0,6 Z" fill="#4338ca"/>
+          </marker>
+        </defs>
+        <g id="graphGroup">
+          <g id="clustersGroup"></g>
+          <g id="stepEdgesGroup"></g>
+          <g id="edgesGroup"></g>
+          <g id="acLinksGroup"></g>
+          <g id="acNodesGroup"></g>
+          <g id="nodesGroup"></g>
+        </g>
+      </svg>
+      <div class="canvas-hint">Scroll to zoom &middot; Drag to pan &middot; Drag nodes to reposition</div>
+      <div class="fallback-banner" id="fallbackBanner" style="display:none">&#x2139; Load plan.md to see step-based dependency clusters</div>
+      <div class="empty-state-overlay" id="emptyState">
+        <div class="empty-state-box">
+          <svg viewBox="0 0 48 48" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+            <path d="M6 12v24a3 3 0 003 3h30a3 3 0 003-3V18a3 3 0 00-3-3H25l-5-6H9a3 3 0 00-3 3z"/>
+          </svg>
+          <h2>Open a .specs project</h2>
+          <p>Load a project directory to explore your FR dependency graph.</p>
+          <button class="empty-state-btn" onclick="loadProject()">Load Project</button>
+        </div>
+      </div>
+    </div>
+    <div class="summary-panel" id="summaryPanel">
+      <div class="summary-block" id="summaryOverview"></div>
+      <div class="summary-block" id="summaryDeps"></div>
+      <div class="summary-block" id="summaryBottlenecks"></div>
+      <div class="summary-block" id="summaryCoverage"></div>
+    </div>
+    <div class="center-file-view" id="centerFileView">
+      <div class="md-preview" id="centerMdPreview"></div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="sidebar-right">
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-empty" id="detailEmpty">
+        Click a node in the graph<br>to view its details
+      </div>
+      <div id="detailContent" style="display:none"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================================
+ * LiveSpec FR Dependency Graph — Vanilla JS
+ * Single-file, zero dependencies
+ * ========================================================================= */
+
+// ── State ──
+let graphData = { frs: [], acs: [], edges: [] };
+let selectedFr = null;
+let showAcs = false;
+let criticalPathActive = false;
+let criticalPathNodes = new Set();
+let criticalPathEdges = new Set();
+let criticalPathClusters = new Set();
+
+// Cluster state
+let stepClusters = [];
+let stepEdgesData = [];
+let hasPlan = false;
+
+// ── Project loader ──
+let projectHandle = null;
+let featuresMap = {};
+let loadedFiles = {};
+
+async function loadProject() {
+  try {
+    projectHandle = await window.showDirectoryPicker({ mode: 'read' });
+    const specsDir = await projectHandle.getDirectoryHandle('.specs');
+    const featuresDir = await specsDir.getDirectoryHandle('features');
+
+    featuresMap = {};
+    for await (const entry of featuresDir.values()) {
+      if (entry.kind === 'directory') featuresMap[entry.name] = entry;
+    }
+
+    const featureNames = Object.keys(featuresMap).sort();
+    if (!featureNames.length) { alert('No features found in .specs/features/'); return; }
+
+    document.getElementById('projectInfo').style.display = 'block';
+    document.getElementById('projectName').textContent = projectHandle.name;
+
+    const select = document.getElementById('featureSelect');
+    select.innerHTML = featureNames.map(f => `<option value="${f}">${f}</option>`).join('');
+
+    localStorage.setItem('livespec-playground-project', projectHandle.name);
+
+    const lastFeature = localStorage.getItem('livespec-playground-feature');
+    const selected = featureNames.includes(lastFeature) ? lastFeature : featureNames[0];
+    select.value = selected;
+    await selectFeature(selected);
+  } catch (e) {
+    if (e.name !== 'AbortError') console.error('Load project error:', e);
+  }
+}
+
+async function selectFeature(featureName) {
+  if (!projectHandle || !featuresMap[featureName]) return;
+
+  try {
+    const featureDir = featuresMap[featureName];
+    const files = {};
+    for await (const entry of featureDir.values()) {
+      if (entry.kind === 'file') {
+        const file = await entry.getFile();
+        files[entry.name] = await file.text();
+      }
+    }
+
+    // Store files for center tabs
+    loadedFiles = files;
+
+    // Show/hide center tabs
+    document.getElementById('tabSpec').style.display = files['spec.md'] ? '' : 'none';
+    document.getElementById('tabPlan').style.display = files['plan.md'] ? '' : 'none';
+    document.getElementById('tabImpl').style.display = files['implementation.md'] ? '' : 'none';
+
+    const statusEl = document.getElementById('projectStatus');
+    const fileChecks = [
+      { name: 'spec.md', found: !!files['spec.md'] },
+      { name: 'plan.md', found: !!files['plan.md'] },
+      { name: 'implementation.md', found: !!files['implementation.md'] },
+    ];
+    statusEl.innerHTML = fileChecks.map(f =>
+      `<span class="project-file-tag ${f.found ? 'found' : 'missing'}">${f.found ? '\u2713' : '\u2717'} ${f.name}</span>`
+    ).join('') + `<button class="project-reload-btn" onclick="loadProject()">Change</button>`;
+
+    localStorage.setItem('livespec-playground-feature', featureName);
+
+    // Auto-parse and generate graph
+    parseAndGenerate(files['spec.md'] || '', files['plan.md'] || '', files['implementation.md'] || '');
+
+    // Hide empty state
+    document.getElementById('emptyState').classList.add('hidden');
+
+  } catch (e) {
+    console.error('Select feature error:', e);
+  }
+}
+
+// ── Color maps ──
+const STATUS_COLORS = {
+  implemented: "#4ade80",
+  partial: "#facc15",
+  "in-progress": "#facc15",
+  blocked: "#f87171",
+  missing: "#f87171",
+  todo: "#6b7280",
+  modified: "#facc15",
+};
+
+const STATUS_CLASS = {
+  implemented: "status-implemented",
+  partial: "status-in-progress",
+  "in-progress": "status-in-progress",
+  blocked: "status-blocked",
+  missing: "status-blocked",
+  todo: "status-todo",
+  modified: "status-in-progress",
+};
+
+function statusColor(status) {
+  return STATUS_COLORS[status] || STATUS_COLORS.todo;
+}
+
+function statusClass(status) {
+  return STATUS_CLASS[status] || STATUS_CLASS.todo;
+}
+
+function statusLabel(status) {
+  const labels = {
+    implemented: "Implemented",
+    partial: "Partial",
+    "in-progress": "In Progress",
+    blocked: "Blocked",
+    missing: "Missing",
+    todo: "Todo",
+    modified: "Modified",
+  };
+  return labels[status] || "Todo";
+}
+
+// ── Parsing ──
+
+function parseSpec(text) {
+  const frs = [];
+  const acs = [];
+  const lines = text.split("\n");
+
+  // Parse FRs: "FR-NNN" followed by some text
+  // Patterns: table rows like "| FR-001 | description |", heading blocks "### FR-001", or inline "FR-001: description"
+  const frTableRegex = /\|\s*(FR-\d{3})\s*\|\s*(.+?)\s*\|/;
+  const frHeadingRegex = /^#{2,4}\s*(FR-\d{3})\s*$/;
+  const frInlineRegex = /^\*\*Requirement:\*\*\s*(.+)/;
+
+  let currentFr = null;
+  let currentFrForAc = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Check for FR heading
+    const headingMatch = line.match(frHeadingRegex);
+    if (headingMatch) {
+      currentFr = headingMatch[1];
+      continue;
+    }
+
+    // Check for requirement line under FR heading
+    if (currentFr) {
+      const reqMatch = line.match(frInlineRegex);
+      if (reqMatch) {
+        const existing = frs.find((f) => f.id === currentFr);
+        if (existing) {
+          existing.description = reqMatch[1].trim();
+        } else {
+          frs.push({ id: currentFr, description: reqMatch[1].trim(), acs: [], status: "todo", file: null, anchor: null, step: null });
+        }
+        currentFrForAc = currentFr;
+        currentFr = null;
+        continue;
+      }
+    }
+
+    // Check FR table row
+    const tableMatch = line.match(frTableRegex);
+    if (tableMatch && tableMatch[1].startsWith("FR-")) {
+      // Clean description of markdown links and trailing pipes
+      let desc = tableMatch[2].replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\|.*$/, "").trim();
+      const existing = frs.find((f) => f.id === tableMatch[1]);
+      if (!existing) {
+        frs.push({ id: tableMatch[1], description: desc, acs: [], status: "todo", file: null, anchor: null, step: null });
+        currentFrForAc = tableMatch[1];
+      }
+      continue;
+    }
+
+    // Check for AC table row
+    const acTableRegex = /\|\s*(AC-\d{3})\s*\|\s*(.+?)\s*\|/;
+    const acMatch = line.match(acTableRegex);
+    if (acMatch) {
+      let acDesc = acMatch[2].replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\|.*$/, "").trim();
+      const existing = acs.find((a) => a.id === acMatch[1]);
+      if (!existing) {
+        acs.push({ id: acMatch[1], description: acDesc, parentFr: null });
+      }
+      continue;
+    }
+
+    // Check for AC heading
+    const acHeadingRegex = /^#{2,4}\s*(AC-\d{3})\s*$/;
+    const acHeadMatch = line.match(acHeadingRegex);
+    if (acHeadMatch) {
+      // Look ahead for criterion
+      for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
+        const critMatch = lines[j].match(/^\*\*Criterion:\*\*\s*(.+)/);
+        if (critMatch) {
+          const existing = acs.find((a) => a.id === acHeadMatch[1]);
+          if (existing) {
+            existing.description = critMatch[1].trim();
+          } else {
+            acs.push({ id: acHeadMatch[1], description: critMatch[1].trim(), parentFr: null });
+          }
+          break;
+        }
+      }
+      continue;
+    }
+  }
+
+  // Link ACs to FRs via AC References
+  for (const fr of frs) {
+    const acRefs = fr.description.match(/AC-\d{3}/g) || [];
+    // Also scan original text for FR -> AC mapping in table
+    const frRow = text.match(new RegExp(`\\|\\s*${fr.id}\\s*\\|[^|]*\\|([^|]*)\\|`));
+    if (frRow) {
+      const refs = frRow[1].match(/AC-\d{3}/g) || [];
+      acRefs.push(...refs);
+    }
+    // Search for AC References line after FR heading
+    const frBlockRegex = new RegExp(`### ${fr.id}[\\s\\S]*?\\*\\*AC References:\\*\\*\\s*(.+?)\\n`, "m");
+    const blockMatch = text.match(frBlockRegex);
+    if (blockMatch) {
+      const refs = blockMatch[1].match(/AC-\d{3}/g) || [];
+      acRefs.push(...refs);
+    }
+    const uniqueAcRefs = [...new Set(acRefs)];
+    fr.acs = uniqueAcRefs;
+    for (const acId of uniqueAcRefs) {
+      const ac = acs.find((a) => a.id === acId);
+      if (ac && !ac.parentFr) {
+        ac.parentFr = fr.id;
+      }
+    }
+  }
+
+  // Detect dependencies between FRs
+  const edges = [];
+  for (const fr of frs) {
+    // Search for mentions of other FRs in this FR's description and surrounding text
+    const frBlockRegex = new RegExp(`### ${fr.id}[\\s\\S]*?(?=### FR-|## |$)`, "m");
+    const block = text.match(frBlockRegex);
+    const searchText = fr.description + (block ? block[0] : "");
+
+    for (const other of frs) {
+      if (other.id === fr.id) continue;
+      // Check if this FR mentions the other FR
+      const mentionRegex = new RegExp(`(?:depends\\s+on|requires|uses|after|needs|see|builds\\s+on)?\\s*${other.id}`, "i");
+      if (mentionRegex.test(searchText)) {
+        edges.push({ from: fr.id, to: other.id });
+      }
+    }
+  }
+
+  return { frs, acs, edges };
+}
+
+let allPlanStepNums = [];
+
+function parsePlan(text, frs) {
+  allPlanStepNums = [];
+  if (!text.trim()) return;
+  // Find "Step N" blocks and extract FR covered
+  const stepRegex = /### Step (\d+)[^\n]*\n([\s\S]*?)(?=### Step|\n## |$)/g;
+  let match;
+  while ((match = stepRegex.exec(text)) !== null) {
+    const stepNum = parseInt(match[1], 10);
+    allPlanStepNums.push(stepNum);
+    const block = match[2];
+    const coveredFrs = block.match(/FR-\d{3}/g) || [];
+    for (const frId of coveredFrs) {
+      const fr = frs.find((f) => f.id === frId);
+      if (fr && !fr.step) {
+        fr.step = `Step ${stepNum}`;
+      }
+    }
+  }
+}
+
+function parseImplementation(text, frs) {
+  if (!text.trim()) return;
+  // Parse the requirement mapping table
+  const rowRegex = /\|\s*\[?(FR-\d{3})[^\]]*\]?[^|]*\|\s*`?([^|`]*)`?\s*\|\s*`?([^|`]*)`?\s*\|\s*([^|]*?)\s*\|/g;
+  let match;
+  while ((match = rowRegex.exec(text)) !== null) {
+    const frId = match[1];
+    const file = match[2].trim().replace(/`/g, "");
+    const anchor = match[3].trim().replace(/`/g, "");
+    let statusRaw = match[4].trim().toLowerCase();
+
+    // Parse status from emoji or text
+    let status = "todo";
+    if (statusRaw.includes("implemented") || statusRaw.includes("\u2705")) status = "implemented";
+    else if (statusRaw.includes("partial") || statusRaw.includes("\u26a0")) status = "partial";
+    else if (statusRaw.includes("missing") || statusRaw.includes("\u274c")) status = "missing";
+    else if (statusRaw.includes("modified") || statusRaw.includes("\ud83d\udd04")) status = "modified";
+    else if (statusRaw.includes("blocked")) status = "blocked";
+    else if (statusRaw.includes("progress")) status = "in-progress";
+
+    const fr = frs.find((f) => f.id === frId);
+    if (fr) {
+      fr.status = status;
+      fr.file = file || null;
+      fr.anchor = anchor || null;
+    }
+  }
+}
+
+// ── Metrics ──
+
+function updateMetrics() {
+  const total = graphData.frs.length;
+  const implemented = graphData.frs.filter((f) => f.status === "implemented").length;
+  const pending = graphData.frs.filter((f) => ["todo", "partial", "modified", "in-progress"].includes(f.status)).length;
+  const blocked = graphData.frs.filter((f) => ["blocked", "missing"].includes(f.status)).length;
+
+  document.getElementById("metricTotal").textContent = total;
+  document.getElementById("metricImplemented").textContent = implemented;
+  document.getElementById("metricPending").textContent = pending;
+  document.getElementById("metricBlocked").textContent = blocked;
+
+  // Steps metric
+  const stepsWrap = document.getElementById("metricStepsWrap");
+  const realStepCount = stepClusters.filter(c => c.stepNum !== -1).length;
+  if (realStepCount > 0) {
+    stepsWrap.style.display = "";
+    document.getElementById("metricSteps").textContent = realStepCount;
+  } else {
+    stepsWrap.style.display = "none";
+  }
+
+  const pct = total > 0 ? Math.round((implemented / total) * 100) : 0;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressLabel").textContent = pct + "%";
+}
+
+// ── Summary Panel ──
+
+function renderSummary() {
+  const panel = document.getElementById("summaryPanel");
+  const total = graphData.frs.length;
+  if (total === 0) {
+    panel.classList.remove("visible");
+    return;
+  }
+  panel.classList.add("visible");
+
+  const implemented = graphData.frs.filter(f => f.status === "implemented").length;
+  const blocked = graphData.frs.filter(f => ["blocked", "missing"].includes(f.status)).length;
+  const realSteps = stepClusters.filter(c => c.stepNum !== -1);
+  const stepCount = realSteps.length;
+  const explicitEdgeCount = graphData.edges.length;
+  const pct = Math.round((implemented / total) * 100);
+
+  // Block 1: Overview
+  const overviewEl = document.getElementById("summaryOverview");
+  const stepInfo = stepCount > 0 ? `${total} FRs across ${stepCount} steps` : `${total} FRs, no plan loaded`;
+  let progressLine;
+  if (implemented === total) {
+    progressLine = `<span class="summary-ok">All FRs implemented</span>`;
+  } else {
+    progressLine = `${implemented}/${total} implemented (${pct}%)`;
+  }
+  overviewEl.innerHTML = `<div class="summary-block-title">Overview</div><div class="summary-block-content">${stepInfo}<br>${progressLine}</div>`;
+
+  // Block 2: Dependencies & Critical Path
+  const depsEl = document.getElementById("summaryDeps");
+  let depsContent;
+  if (!hasPlan && explicitEdgeCount === 0) {
+    depsContent = `Load plan.md for step-based analysis`;
+  } else if (explicitEdgeCount > 0) {
+    const path = findCriticalPath();
+    const pathLen = path.length;
+    const pathStr = path.length > 5 ? path.slice(0, 3).join(" → ") + " → … → " + path[path.length - 1] : path.join(" → ");
+    depsContent = `${explicitEdgeCount} explicit dependenc${explicitEdgeCount === 1 ? 'y' : 'ies'} — critical path: ${pathStr} (${pathLen} steps)`;
+  } else {
+    depsContent = `No cross-FR dependencies detected — FRs are independent within each step`;
+  }
+  depsEl.innerHTML = `<div class="summary-block-title">Dependencies</div><div class="summary-block-content">${depsContent}</div>`;
+
+  // Block 3: Bottlenecks
+  const bnEl = document.getElementById("summaryBottlenecks");
+  const issues = [];
+  // Steps with blocked/missing FRs
+  for (const cluster of realSteps) {
+    const blockedInStep = cluster.frIds.filter(id => {
+      const fr = graphData.frs.find(f => f.id === id);
+      return fr && ["blocked", "missing"].includes(fr.status);
+    }).length;
+    if (blockedInStep > 0) {
+      issues.push(`<span class="summary-bad">${cluster.label} has ${blockedInStep} blocked FR${blockedInStep > 1 ? 's' : ''}</span>`);
+    }
+  }
+  // Largest step
+  if (realSteps.length > 0) {
+    const largest = realSteps.reduce((a, b) => a.frIds.length >= b.frIds.length ? a : b);
+    if (largest.frIds.length > 2) {
+      issues.push(`${largest.label} is the largest step (${largest.frIds.length} FRs)`);
+    }
+  }
+  const bnContent = issues.length > 0 ? issues.join("<br>") : `<span class="summary-ok">No bottlenecks detected</span>`;
+  bnEl.innerHTML = `<div class="summary-block-title">Bottlenecks</div><div class="summary-block-content">${bnContent}</div>`;
+
+  // Block 4: Step coverage — compact per-step breakdown
+  const covEl = document.getElementById("summaryCoverage");
+  let covContent;
+  if (stepCount === 0) {
+    covContent = blocked > 0
+      ? `<span class="summary-bad">${blocked} blocked/missing FR${blocked > 1 ? 's' : ''}</span>`
+      : `No step data — load plan.md`;
+  } else {
+    const chips = realSteps.map(cluster => {
+      const implCount = cluster.frIds.filter(id => {
+        const fr = graphData.frs.find(f => f.id === id);
+        return fr && fr.status === "implemented";
+      }).length;
+      const t = cluster.frIds.length;
+      const ratio = t > 0 ? implCount / t : 0;
+      const cls = ratio === 1 ? "summary-ok" : ratio === 0 ? "summary-bad" : "summary-warn";
+      const num = cluster.label.replace("Step ", "S");
+      return `<span class="${cls}">${num}: ${implCount}/${t}</span>`;
+    });
+    covContent = chips.join(" &nbsp; ");
+  }
+  covEl.innerHTML = `<div class="summary-block-title">Step Coverage</div><div class="summary-block-content">${covContent}</div>`;
+}
+
+// ── FR List ──
+
+function renderFrList(filter = "") {
+  const container = document.getElementById("frList");
+  container.innerHTML = "";
+  const lower = filter.toLowerCase();
+
+  for (const fr of graphData.frs) {
+    if (lower && !fr.id.toLowerCase().includes(lower) && !fr.description.toLowerCase().includes(lower)) {
+      continue;
+    }
+
+    const card = document.createElement("div");
+    card.className = "fr-card" + (selectedFr === fr.id ? " selected" : "");
+    card.dataset.frId = fr.id;
+
+    const dot = document.createElement("div");
+    dot.className = "fr-card-dot";
+    dot.style.background = statusColor(fr.status);
+
+    const content = document.createElement("div");
+    content.className = "fr-card-content";
+
+    const idSpan = document.createElement("div");
+    idSpan.className = "fr-card-id";
+    idSpan.textContent = fr.id;
+
+    const descSpan = document.createElement("div");
+    descSpan.className = "fr-card-desc";
+    descSpan.textContent = fr.description;
+
+    const metaSpan = document.createElement("div");
+    metaSpan.className = "fr-card-meta";
+    const parts = [];
+    parts.push(`${fr.acs.length} AC`);
+    if (fr.step) parts.push(fr.step);
+    parts.push(statusLabel(fr.status));
+    metaSpan.textContent = parts.join(" \u00b7 ");
+
+    content.appendChild(idSpan);
+    content.appendChild(descSpan);
+    content.appendChild(metaSpan);
+    card.appendChild(dot);
+    card.appendChild(content);
+    container.appendChild(card);
+
+    card.addEventListener("click", () => {
+      selectFr(fr.id);
+    });
+  }
+}
+
+// ── Detail Panel ──
+
+function showDetail(frId) {
+  const fr = graphData.frs.find((f) => f.id === frId);
+  if (!fr) return;
+
+  document.getElementById("detailEmpty").style.display = "none";
+  const content = document.getElementById("detailContent");
+  content.style.display = "block";
+
+  let html = `<div class="detail-header">
+    <div class="detail-id">${fr.id}</div>
+    <div class="detail-status ${statusClass(fr.status)}"><span class="dot"></span>${statusLabel(fr.status)}</div>
+    <div class="detail-desc">${fr.description}</div>
+  </div>`;
+
+  // Acceptance criteria
+  if (fr.acs.length > 0) {
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Acceptance Criteria (${fr.acs.length})</div>
+      <ul class="detail-ac-list">`;
+    for (const acId of fr.acs) {
+      const ac = graphData.acs.find((a) => a.id === acId);
+      html += `<li class="detail-ac-item"><span class="ac-id">${acId}</span> ${ac ? ac.description : ""}</li>`;
+    }
+    html += `</ul></div>`;
+  }
+
+  // Source file & anchor
+  if (fr.file || fr.anchor) {
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Implementation</div>`;
+    if (fr.file) {
+      html += `<div class="detail-info-row"><span class="label">File: </span><span class="val">${fr.file}</span></div>`;
+    }
+    if (fr.anchor) {
+      html += `<div class="detail-info-row"><span class="label">Anchor: </span><span class="val">${fr.anchor}</span></div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Plan step
+  if (fr.step) {
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Plan</div>
+      <div class="detail-info-row"><span class="val">${fr.step}</span></div>
+    </div>`;
+  }
+
+  // Dependencies (outgoing: this FR depends on)
+  const outgoing = graphData.edges.filter((e) => e.from === frId);
+  if (outgoing.length > 0) {
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Depends On (${outgoing.length})</div>
+      <div class="detail-dep-list">`;
+    for (const edge of outgoing) {
+      const target = graphData.frs.find((f) => f.id === edge.to);
+      html += `<div class="detail-dep-item" data-fr-id="${edge.to}">
+        <div class="dep-dot" style="background:${statusColor(target?.status)}"></div>
+        <span class="dep-id">${edge.to}</span>
+        <span>${target ? target.description.substring(0, 50) : ""}</span>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  // Incoming: FRs that depend on this one
+  const incoming = graphData.edges.filter((e) => e.to === frId);
+  if (incoming.length > 0) {
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Required By (${incoming.length})</div>
+      <div class="detail-dep-list">`;
+    for (const edge of incoming) {
+      const source = graphData.frs.find((f) => f.id === edge.from);
+      html += `<div class="detail-dep-item" data-fr-id="${edge.from}">
+        <div class="dep-dot" style="background:${statusColor(source?.status)}"></div>
+        <span class="dep-id">${edge.from}</span>
+        <span>${source ? source.description.substring(0, 50) : ""}</span>
+      </div>`;
+    }
+    html += `</div></div>`;
+  }
+
+  content.innerHTML = html;
+
+  // Attach click handlers to dep items
+  content.querySelectorAll(".detail-dep-item").forEach((el) => {
+    el.addEventListener("click", () => {
+      selectFr(el.dataset.frId);
+    });
+  });
+}
+
+function clearDetail() {
+  document.getElementById("detailEmpty").style.display = "flex";
+  document.getElementById("detailContent").style.display = "none";
+}
+
+function selectFr(frId) {
+  selectedFr = frId;
+  showDetail(frId);
+  renderFrList(document.getElementById("frSearch").value);
+  // Highlight is handled by the render loop reading selectedFr
+}
+
+// ── Force-directed graph ──
+
+const svg = document.getElementById("graphSvg");
+const graphGroup = document.getElementById("graphGroup");
+const nodesGroup = document.getElementById("nodesGroup");
+const edgesGroup = document.getElementById("edgesGroup");
+const acNodesGroup = document.getElementById("acNodesGroup");
+const acLinksGroup = document.getElementById("acLinksGroup");
+const clustersGroup = document.getElementById("clustersGroup");
+const stepEdgesGroup = document.getElementById("stepEdgesGroup");
+const canvasArea = document.getElementById("graphContainer");
+
+// Transform state
+let transform = { x: 0, y: 0, k: 1 };
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+
+// Simulation state
+let nodes = [];
+let acNodes = [];
+let simEdges = [];
+let simRunning = false;
+let alpha = 1;
+let alphaDecay = 0.005;
+let alphaMin = 0.001;
+let dragNode = null;
+let dragOffset = { x: 0, y: 0 };
+let dragStartPos = null;
+let panStartPos = null;
+let hoveredNode = null;
+
+function nodeRadius(fr) {
+  const acCount = fr.acs.length;
+  return Math.max(20, Math.min(45, 16 + acCount * 6));
+}
+
+function initSimulation() {
+  const rect = canvasArea.getBoundingClientRect();
+  const cx = rect.width / 2;
+  const cy = rect.height / 2;
+
+  nodes = graphData.frs.map((fr) => ({
+    id: fr.id,
+    x: cx,
+    y: cy,
+    vx: 0,
+    vy: 0,
+    radius: nodeRadius(fr),
+    fr: fr,
+    pinned: false,
+  }));
+
+  if (stepClusters.length > 0) {
+    // Cluster mode: position nodes by cluster, horizontal layout
+    const clusterSpacing = 220;
+    const totalWidth = (stepClusters.length - 1) * clusterSpacing;
+    const startX = cx - totalWidth / 2;
+
+    for (let ci = 0; ci < stepClusters.length; ci++) {
+      const cluster = stepClusters[ci];
+      cluster.centerX = startX + ci * clusterSpacing;
+      cluster.centerY = cy;
+
+      const clusterFrs = cluster.frIds;
+      for (let fi = 0; fi < clusterFrs.length; fi++) {
+        const node = nodes.find(n => n.id === clusterFrs[fi]);
+        if (node) {
+          const angle = (2 * Math.PI * fi) / Math.max(clusterFrs.length, 1);
+          const spread = Math.min(60, 25 + clusterFrs.length * 12);
+          node.x = cluster.centerX + Math.cos(angle) * spread + (Math.random() - 0.5) * 15;
+          node.y = cluster.centerY + Math.sin(angle) * spread + (Math.random() - 0.5) * 15;
+        }
+      }
+    }
+  } else {
+    // Free layout: circular initial positioning
+    for (let i = 0; i < nodes.length; i++) {
+      const angle = (2 * Math.PI * i) / nodes.length;
+      const spread = Math.min(rect.width, rect.height) * 0.3;
+      nodes[i].x = cx + Math.cos(angle) * spread + (Math.random() - 0.5) * 40;
+      nodes[i].y = cy + Math.sin(angle) * spread + (Math.random() - 0.5) * 40;
+    }
+  }
+
+  // AC nodes positioned around their parent FR
+  acNodes = [];
+  for (const ac of graphData.acs) {
+    const parentNode = nodes.find((n) => n.id === ac.parentFr);
+    if (!parentNode) continue;
+    const idx = acNodes.filter((a) => a.parentId === ac.parentFr).length;
+    const totalAcs = graphData.acs.filter((a) => a.parentFr === ac.parentFr).length;
+    const angle = ((2 * Math.PI) / Math.max(totalAcs, 1)) * idx - Math.PI / 2;
+    const dist = parentNode.radius + 20;
+    acNodes.push({
+      id: ac.id,
+      parentId: ac.parentFr,
+      x: parentNode.x + Math.cos(angle) * dist,
+      y: parentNode.y + Math.sin(angle) * dist,
+      vx: 0,
+      vy: 0,
+      radius: 8,
+      ac: ac,
+      angle: angle,
+    });
+  }
+
+  simEdges = graphData.edges.map((e) => ({
+    from: e.from,
+    to: e.to,
+  }));
+
+  // Center transform
+  transform = { x: 0, y: 0, k: 1 };
+  applyTransform();
+
+  alpha = 1;
+  simRunning = true;
+  requestAnimationFrame(simLoop);
+}
+
+function simLoop() {
+  if (!simRunning) return;
+
+  // Decay alpha
+  alpha -= alphaDecay;
+  if (alpha < alphaMin) {
+    alpha = alphaMin;
+  }
+
+  const strength = alpha;
+
+  // Force: node repulsion (Coulomb)
+  const repulsionStrength = 3000;
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i];
+      const b = nodes[j];
+      let dx = b.x - a.x;
+      let dy = b.y - a.y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) { dist = 1; dx = Math.random() - 0.5; dy = Math.random() - 0.5; }
+      const force = (repulsionStrength * strength) / (dist * dist);
+      const fx = (dx / dist) * force;
+      const fy = (dy / dist) * force;
+      if (!a.pinned) { a.vx -= fx; a.vy -= fy; }
+      if (!b.pinned) { b.vx += fx; b.vy += fy; }
+    }
+  }
+
+  // Force: spring attraction for edges
+  const springStrength = 0.08;
+  const idealLength = 160;
+  for (const edge of simEdges) {
+    const a = nodes.find((n) => n.id === edge.from);
+    const b = nodes.find((n) => n.id === edge.to);
+    if (!a || !b) continue;
+    let dx = b.x - a.x;
+    let dy = b.y - a.y;
+    let dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 1) dist = 1;
+    const displacement = dist - idealLength;
+    const force = displacement * springStrength * strength;
+    const fx = (dx / dist) * force;
+    const fy = (dy / dist) * force;
+    if (!a.pinned) { a.vx += fx; a.vy += fy; }
+    if (!b.pinned) { b.vx -= fx; b.vy -= fy; }
+  }
+
+  // Force: gravity (cluster-aware or center)
+  if (stepClusters.length > 0) {
+    const clusterGravity = 0.06 * strength;
+    for (const node of nodes) {
+      if (node.pinned) continue;
+      const cluster = stepClusters.find(c => c.frIds.includes(node.id));
+      if (cluster) {
+        node.vx += (cluster.centerX - node.x) * clusterGravity;
+        node.vy += (cluster.centerY - node.y) * clusterGravity;
+      }
+    }
+  } else {
+    const rect = canvasArea.getBoundingClientRect();
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const gravityStrength = 0.02 * strength;
+    for (const node of nodes) {
+      if (node.pinned) continue;
+      node.vx += (cx - node.x) * gravityStrength;
+      node.vy += (cy - node.y) * gravityStrength;
+    }
+  }
+
+  // Apply velocity with damping
+  const damping = 0.85;
+  for (const node of nodes) {
+    if (node.pinned) continue;
+    node.vx *= damping;
+    node.vy *= damping;
+    node.x += node.vx;
+    node.y += node.vy;
+  }
+
+  // Update AC node positions: orbit around parent
+  for (const acNode of acNodes) {
+    const parent = nodes.find((n) => n.id === acNode.parentId);
+    if (!parent) continue;
+    const totalAcs = acNodes.filter((a) => a.parentId === acNode.parentId).length;
+    const idx = acNodes.filter((a) => a.parentId === acNode.parentId).indexOf(acNode);
+    const angle = ((2 * Math.PI) / Math.max(totalAcs, 1)) * idx - Math.PI / 2;
+    const dist = parent.radius + 20;
+    acNode.x = parent.x + Math.cos(angle) * dist;
+    acNode.y = parent.y + Math.sin(angle) * dist;
+  }
+
+  render();
+  requestAnimationFrame(simLoop);
+}
+
+function render() {
+  // Dimming only for critical path mode (not for hover/selection)
+  const dimForCritical = criticalPathActive && criticalPathNodes.size > 0;
+
+  // Render clusters and step edges
+  let clusterHtml = "";
+  let stepEdgeHtml = "";
+  const clusterBounds = {};
+
+  if (stepClusters.length > 0) {
+    const clusterPadding = 30;
+
+    for (const cluster of stepClusters) {
+      const clusterNodes = nodes.filter(n => cluster.frIds.includes(n.id));
+
+      let minX, minY, maxX, maxY;
+      if (clusterNodes.length === 0) {
+        // Empty cluster: render a small box at the cluster center
+        const emptyW = 80, emptyH = 50;
+        minX = cluster.centerX - emptyW / 2;
+        minY = cluster.centerY - emptyH / 2;
+        maxX = cluster.centerX + emptyW / 2;
+        maxY = cluster.centerY + emptyH / 2;
+      } else {
+        minX = Infinity; minY = Infinity; maxX = -Infinity; maxY = -Infinity;
+        for (const n of clusterNodes) {
+          minX = Math.min(minX, n.x - n.radius);
+          minY = Math.min(minY, n.y - n.radius);
+          maxX = Math.max(maxX, n.x + n.radius);
+          maxY = Math.max(maxY, n.y + n.radius);
+        }
+        minX -= clusterPadding;
+        minY -= clusterPadding - 4;
+        maxX += clusterPadding;
+        maxY += clusterPadding;
+      }
+
+      // Minimum cluster size
+      const minWidth = 100;
+      const minHeight = 80;
+      if (maxX - minX < minWidth) { const mid = (minX + maxX) / 2; minX = mid - minWidth / 2; maxX = mid + minWidth / 2; }
+      if (maxY - minY < minHeight) { const mid = (minY + maxY) / 2; minY = mid - minHeight / 2; maxY = mid + minHeight / 2; }
+
+      const width = maxX - minX;
+      const height = maxY - minY;
+      clusterBounds[cluster.stepNum] = { x1: minX, y1: minY, x2: maxX, y2: maxY };
+
+      const isCriticalCluster = criticalPathActive && criticalPathClusters.has(cluster.stepNum);
+      const borderColor = isCriticalCluster ? "#c4b5fd" : "#262a3a";
+      const strokeWidth = isCriticalCluster ? 2 : 1;
+
+      clusterHtml += `<rect class="cluster-rect" x="${minX}" y="${minY}" width="${width}" height="${height}" rx="12" fill="rgba(30,32,53,0.5)" stroke="${borderColor}" stroke-width="${strokeWidth}"/>`;
+      clusterHtml += `<text class="cluster-label" x="${minX + 12}" y="${minY + 16}" font-size="11" fill="${isCriticalCluster ? '#c4b5fd' : '#6b6f8a'}">${cluster.label}</text>`;
+    }
+
+    // Step-to-step arrows
+    for (const se of stepEdgesData) {
+      const fromBounds = clusterBounds[se.from];
+      const toBounds = clusterBounds[se.to];
+      if (!fromBounds || !toBounds) continue;
+
+      const x1 = fromBounds.x2;
+      const y1 = (fromBounds.y1 + fromBounds.y2) / 2;
+      const x2 = toBounds.x1;
+      const y2 = (toBounds.y1 + toBounds.y2) / 2;
+
+      const isCritical = criticalPathActive && criticalPathClusters.has(se.from) && criticalPathClusters.has(se.to);
+      const color = isCritical ? "#c4b5fd" : "#4338ca";
+      const marker = isCritical ? "url(#arrowPurple)" : "url(#arrowIndigo)";
+
+      stepEdgeHtml += `<line class="step-edge-line" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2" marker-end="${marker}"/>`;
+    }
+  }
+
+  clustersGroup.innerHTML = clusterHtml;
+  stepEdgesGroup.innerHTML = stepEdgeHtml;
+
+  // Render edges
+  let edgeHtml = "";
+  for (const edge of simEdges) {
+    const a = nodes.find((n) => n.id === edge.from);
+    const b = nodes.find((n) => n.id === edge.to);
+    if (!a || !b) continue;
+
+    // Shorten line to stop at node boundary
+    let dx = b.x - a.x;
+    let dy = b.y - a.y;
+    let dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 1) continue;
+    const ux = dx / dist;
+    const uy = dy / dist;
+    const x1 = a.x + ux * a.radius;
+    const y1 = a.y + uy * a.radius;
+    const x2 = b.x - ux * (b.radius + 8);
+    const y2 = b.y - uy * (b.radius + 8);
+
+    const edgeKey = `${edge.from}->${edge.to}`;
+    const isCritical = criticalPathActive && criticalPathEdges.has(edgeKey);
+
+    let dimClass = "";
+    if (dimForCritical && !isCritical) dimClass = " dimmed";
+
+    const cls = (isCritical ? "edge-line critical-highlight" : "edge-line") + dimClass;
+    const marker = isCritical ? "url(#arrowPurple)" : "url(#arrowGray)";
+    const color = isCritical ? "#c4b5fd" : "#6b6f8a";
+
+    edgeHtml += `<line class="${cls}" data-from="${edge.from}" data-to="${edge.to}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" marker-end="${marker}"/>`;
+  }
+  edgesGroup.innerHTML = edgeHtml;
+
+  // Render AC links and nodes
+  if (showAcs) {
+    let acLinkHtml = "";
+    let acNodeHtml = "";
+    for (const acNode of acNodes) {
+      const parent = nodes.find((n) => n.id === acNode.parentId);
+      if (!parent) continue;
+      const dimAc = (dimForCritical && !criticalPathNodes.has(acNode.parentId)) ? " dimmed" : "";
+      acLinkHtml += `<line class="ac-link${dimAc}" x1="${parent.x}" y1="${parent.y}" x2="${acNode.x}" y2="${acNode.y}"/>`;
+      acNodeHtml += `<circle class="ac-circle${dimAc}" cx="${acNode.x}" cy="${acNode.y}" r="${acNode.radius}" fill="#4338ca" stroke="#262a3a" stroke-width="1" data-ac-id="${acNode.id}"/>`;
+      acNodeHtml += `<text class="ac-label${dimAc}" x="${acNode.x}" y="${acNode.y}">${acNode.id.replace("AC-", "")}</text>`;
+    }
+    acLinksGroup.innerHTML = acLinkHtml;
+    acNodesGroup.innerHTML = acNodeHtml;
+  } else {
+    acLinksGroup.innerHTML = "";
+    acNodesGroup.innerHTML = "";
+  }
+
+  // Render FR nodes
+  let nodeHtml = "";
+  for (const node of nodes) {
+    const color = statusColor(node.fr.status);
+    const isCritical = criticalPathActive && criticalPathNodes.has(node.id);
+    const isSelected = node.id === selectedFr;
+    const isHovered = node.id === hoveredNode;
+    const dimNode = (dimForCritical && !criticalPathNodes.has(node.id)) ? " dimmed" : "";
+    const critClass = isCritical ? " critical-node" : "";
+
+    // Glow for selected or hovered node
+    let strokeW = 2.5;
+    let filterAttr = "";
+    if (isSelected) {
+      strokeW = 3.5;
+      filterAttr = ` filter="drop-shadow(0 0 10px ${color})"`;
+    } else if (isHovered) {
+      strokeW = 3;
+      filterAttr = ` filter="drop-shadow(0 0 6px ${color})"`;
+    }
+
+    nodeHtml += `<circle class="node-circle${critClass}${dimNode}" cx="${node.x}" cy="${node.y}" r="${node.radius}" fill="#1a1d2e" stroke="${color}" stroke-width="${strokeW}" data-fr-id="${node.id}"${filterAttr}/>`;
+    nodeHtml += `<circle class="${dimNode}" cx="${node.x}" cy="${node.y - node.radius * 0.3}" r="4" fill="${color}" pointer-events="none"/>`;
+    const fontSize = node.radius < 25 ? 9 : 11;
+    nodeHtml += `<text class="node-label${dimNode}" x="${node.x}" y="${node.y + 4}" font-size="${fontSize}">${node.id}</text>`;
+  }
+  nodesGroup.innerHTML = nodeHtml;
+}
+
+function applyTransform() {
+  graphGroup.setAttribute("transform", `translate(${transform.x},${transform.y}) scale(${transform.k})`);
+}
+
+// ── Zoom & Pan ──
+
+canvasArea.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const rect = canvasArea.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  const oldK = transform.k;
+  const delta = e.deltaY > 0 ? 0.92 : 1.08;
+  const newK = Math.max(0.1, Math.min(5, oldK * delta));
+
+  // Zoom toward mouse position
+  transform.x = mx - ((mx - transform.x) / oldK) * newK;
+  transform.y = my - ((my - transform.y) / oldK) * newK;
+  transform.k = newK;
+  applyTransform();
+}, { passive: false });
+
+svg.addEventListener("mousedown", (e) => {
+  const target = e.target;
+
+  // Check if clicking on a node
+  if (target.classList.contains("node-circle")) {
+    const frId = target.dataset.frId;
+    const node = nodes.find((n) => n.id === frId);
+    if (node) {
+      dragNode = node;
+      dragNode.pinned = true;
+      const rect = canvasArea.getBoundingClientRect();
+      const mx = (e.clientX - rect.left - transform.x) / transform.k;
+      const my = (e.clientY - rect.top - transform.y) / transform.k;
+      dragOffset.x = mx - node.x;
+      dragOffset.y = my - node.y;
+      dragStartPos = { x: e.clientX, y: e.clientY };
+      alpha = Math.max(alpha, 0.1);
+      e.preventDefault();
+      return;
+    }
+  }
+
+  // Otherwise, start panning
+  isPanning = true;
+  panStart.x = e.clientX - transform.x;
+  panStart.y = e.clientY - transform.y;
+  panStartPos = { x: e.clientX, y: e.clientY };
+  svg.style.cursor = "grabbing";
+});
+
+window.addEventListener("mousemove", (e) => {
+  if (dragNode) {
+    const rect = canvasArea.getBoundingClientRect();
+    const mx = (e.clientX - rect.left - transform.x) / transform.k;
+    const my = (e.clientY - rect.top - transform.y) / transform.k;
+    dragNode.x = mx - dragOffset.x;
+    dragNode.y = my - dragOffset.y;
+    dragNode.vx = 0;
+    dragNode.vy = 0;
+    return;
+  }
+  if (isPanning) {
+    transform.x = e.clientX - panStart.x;
+    transform.y = e.clientY - panStart.y;
+    applyTransform();
+  }
+});
+
+window.addEventListener("mouseup", (e) => {
+  if (dragNode) {
+    // Detect click vs drag: select node if mouse barely moved
+    if (dragStartPos) {
+      const dx = e.clientX - dragStartPos.x;
+      const dy = e.clientY - dragStartPos.y;
+      if (Math.sqrt(dx * dx + dy * dy) < 5) {
+        selectFr(dragNode.id);
+      }
+    }
+    dragNode.pinned = false;
+    dragNode = null;
+    dragStartPos = null;
+  } else if (isPanning && panStartPos) {
+    // Detect click on background: deselect if mouse barely moved
+    const dx = e.clientX - panStartPos.x;
+    const dy = e.clientY - panStartPos.y;
+    if (Math.sqrt(dx * dx + dy * dy) < 5) {
+      selectedFr = null;
+      clearDetail();
+      renderFrList(document.getElementById("frSearch").value);
+    }
+    panStartPos = null;
+  }
+  isPanning = false;
+  svg.style.cursor = "";
+});
+
+// ── Hover highlight ──
+
+svg.addEventListener("mouseover", (e) => {
+  const target = e.target;
+  if (target.classList.contains("node-circle")) {
+    hoveredNode = target.dataset.frId;
+  }
+});
+
+svg.addEventListener("mouseout", (e) => {
+  const target = e.target;
+  if (target.classList.contains("node-circle")) {
+    hoveredNode = null;
+  }
+});
+
+// Highlighting is now handled directly in the render() loop via hoveredNode/selectedFr state
+
+// ── Critical path ──
+
+function findCriticalPath() {
+  // Find the longest path in the DAG using DFS
+  const adj = {};
+  for (const fr of graphData.frs) {
+    adj[fr.id] = [];
+  }
+  // Explicit FR-FR edges
+  for (const edge of graphData.edges) {
+    if (adj[edge.from]) {
+      adj[edge.from].push(edge.to);
+    }
+  }
+  // Step-based edges: FRs in step N connect to FRs in step N+1
+  if (stepClusters.length > 0) {
+    for (const se of stepEdgesData) {
+      const fromCluster = stepClusters.find(c => c.stepNum === se.from);
+      const toCluster = stepClusters.find(c => c.stepNum === se.to);
+      if (fromCluster && toCluster) {
+        for (const fromId of fromCluster.frIds) {
+          for (const toId of toCluster.frIds) {
+            if (adj[fromId] && !adj[fromId].includes(toId)) {
+              adj[fromId].push(toId);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  let longestPath = [];
+
+  function dfs(node, path, visited) {
+    if (path.length > longestPath.length) {
+      longestPath = [...path];
+    }
+    for (const neighbor of (adj[node] || [])) {
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor);
+        path.push(neighbor);
+        dfs(neighbor, path, visited);
+        path.pop();
+        visited.delete(neighbor);
+      }
+    }
+  }
+
+  for (const fr of graphData.frs) {
+    const visited = new Set([fr.id]);
+    dfs(fr.id, [fr.id], visited);
+  }
+
+  return longestPath;
+}
+
+function toggleCriticalPath() {
+  criticalPathActive = !criticalPathActive;
+  const btn = document.getElementById("criticalPathBtn");
+
+  if (criticalPathActive) {
+    btn.classList.add("active");
+    const path = findCriticalPath();
+    criticalPathNodes = new Set(path);
+    criticalPathEdges = new Set();
+    for (let i = 0; i < path.length - 1; i++) {
+      criticalPathEdges.add(`${path[i]}->${path[i + 1]}`);
+    }
+    // Determine which clusters are on the critical path
+    criticalPathClusters = new Set();
+    for (const cluster of stepClusters) {
+      if (cluster.frIds.some(id => criticalPathNodes.has(id))) {
+        criticalPathClusters.add(cluster.stepNum);
+      }
+    }
+  } else {
+    btn.classList.remove("active");
+    criticalPathNodes = new Set();
+    criticalPathEdges = new Set();
+    criticalPathClusters = new Set();
+  }
+}
+
+// ── Buttons ──
+
+function parseAndGenerate(specText, planText, implText) {
+  if (!specText.trim()) return;
+
+  graphData = parseSpec(specText);
+  parsePlan(planText, graphData.frs);
+  parseImplementation(implText, graphData.frs);
+
+  // Build step clusters from plan data
+  hasPlan = !!planText.trim();
+  stepClusters = [];
+  stepEdgesData = [];
+
+  if (hasPlan) {
+    const stepMap = new Map();
+    // Ensure all steps from the plan exist (even if empty)
+    for (const num of allPlanStepNums) {
+      if (!stepMap.has(num)) stepMap.set(num, []);
+    }
+    for (const fr of graphData.frs) {
+      if (fr.step) {
+        const num = parseInt(fr.step.replace("Step ", ""), 10);
+        if (!stepMap.has(num)) stepMap.set(num, []);
+        stepMap.get(num).push(fr.id);
+      }
+    }
+    const unassigned = graphData.frs.filter(f => !f.step).map(f => f.id);
+    if (unassigned.length > 0) {
+      stepMap.set(-1, unassigned);
+    }
+
+    const sortedSteps = [...stepMap.keys()].sort((a, b) => a - b);
+    stepClusters = sortedSteps.map(num => ({
+      stepNum: num,
+      label: num === -1 ? "Unassigned" : `Step ${num}`,
+      frIds: stepMap.get(num),
+      centerX: 0,
+      centerY: 0,
+    }));
+
+    // Generate inter-step edges (consecutive non-unassigned steps)
+    const realSteps = sortedSteps.filter(n => n !== -1);
+    for (let i = 0; i < realSteps.length - 1; i++) {
+      stepEdgesData.push({ from: realSteps[i], to: realSteps[i + 1] });
+    }
+  }
+
+  // Fallback banner
+  const fallbackBanner = document.getElementById("fallbackBanner");
+  if (fallbackBanner) {
+    fallbackBanner.style.display = (graphData.frs.length > 0 && stepClusters.length === 0) ? "" : "none";
+  }
+
+  updateMetrics();
+  renderSummary();
+  renderFrList();
+  selectedFr = null;
+  clearDetail();
+  criticalPathActive = false;
+  criticalPathNodes = new Set();
+  criticalPathEdges = new Set();
+  criticalPathClusters = new Set();
+  const critBtn = document.getElementById("criticalPathBtn");
+  critBtn.classList.remove("active");
+  // Hide Critical Path button when there are no explicit FR-FR dependencies
+  // (step-only sequential graphs make the critical path trivially all nodes)
+  critBtn.style.display = graphData.edges.length > 0 ? "" : "none";
+
+  initSimulation();
+}
+
+document.getElementById("toggleAcBtn").addEventListener("click", () => {
+  showAcs = !showAcs;
+  const btn = document.getElementById("toggleAcBtn");
+  btn.textContent = showAcs ? "Hide ACs" : "Show ACs";
+  btn.classList.toggle("active", showAcs);
+});
+
+document.getElementById("criticalPathBtn").addEventListener("click", () => {
+  toggleCriticalPath();
+});
+
+document.getElementById("resetViewBtn").addEventListener("click", () => {
+  transform = { x: 0, y: 0, k: 1 };
+  applyTransform();
+  alpha = 0.5;
+});
+
+document.getElementById("frSearch").addEventListener("input", (e) => {
+  renderFrList(e.target.value);
+});
+
+// ── Markdown renderer ──
+
+function renderMarkdown(md) {
+  if (!md) return '<span class="empty-msg">Not loaded</span>';
+
+  // Phase 1: Extract all fenced code blocks before markdown transforms.
+  const codeBlocks = [];
+  md = md.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push({ lang, code });
+    return `<div data-cb="${idx}"></div>`;
+  });
+
+  // Phase 2: Markdown transforms (safe — no code block content left)
+  let html = md
+    .replace(/^#### (.+)$/gm, '<h5>$1</h5>')
+    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/^\|(.+)\|$/gm, (m, c) => { const cells = c.split('|').map(x=>x.trim()); if(cells.every(x=>/^[-:]+$/.test(x))) return ''; return '<tr>'+cells.map(x=>`<td>${x}</td>`).join('')+'</tr>'; })
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    .replace(/^(?!<[a-z])((?!^\s*$).+)$/gm, '<p>$1</p>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+    .replace(/(<tr>.*<\/tr>\n?)+/g, '<table>$&</table>')
+    .replace(/<p>\s*<\/p>/g, '');
+
+  // Phase 3: Restore code blocks — mermaid as renderable diagrams, others as <pre><code>
+  for (let i = 0; i < codeBlocks.length; i++) {
+    const { lang, code } = codeBlocks[i];
+    let replacement;
+    if (lang === 'mermaid') {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      replacement = `<div class="mermaid-container"><pre class="mermaid">${escaped}</pre></div>`;
+    } else {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      replacement = `<pre><code>${escaped}</code></pre>`;
+    }
+    html = html.replace(`<div data-cb="${i}"></div>`, replacement);
+  }
+  return html;
+}
+
+// ── Center view tabs ──
+
+function setCenterView(view) {
+  document.querySelectorAll('.center-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+  const fileView = document.getElementById('centerFileView');
+  const graphEl = document.getElementById('graphContainer');
+  const summaryEl = document.getElementById('summaryPanel');
+
+  if (view === 'viz') {
+    fileView.classList.remove('visible');
+    graphEl.style.display = '';
+    if (graphData.frs.length > 0) summaryEl.classList.add('visible');
+  } else {
+    fileView.classList.add('visible');
+    graphEl.style.display = 'none';
+    summaryEl.classList.remove('visible');
+    const fileMap = { spec: 'spec.md', plan: 'plan.md', impl: 'implementation.md' };
+    document.getElementById('centerMdPreview').innerHTML = renderMarkdown(loadedFiles[fileMap[view]] || '');
+    if (window.__mermaidRender) requestAnimationFrame(() => window.__mermaidRender());
+  }
+}
+
+function toggleInfo() {
+  document.getElementById('infoOverlay').classList.toggle('open');
+}
+function setInfoLang(lang) {
+  document.querySelectorAll('.info-modal [data-lang]').forEach(el => {
+    el.classList.toggle('visible', el.dataset.lang === lang);
+  });
+  document.querySelectorAll('.info-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === (lang === 'en' ? 'English' : 'Français'));
+  });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const ov = document.getElementById('infoOverlay');
+    if (ov.classList.contains('open')) { ov.classList.remove('open'); e.stopPropagation(); }
+  }
+});
+
+</script>
+
+<div class="info-overlay" id="infoOverlay" onclick="if(event.target===this)toggleInfo()">
+  <div class="info-modal">
+    <div class="info-lang-toggle">
+      <button class="info-lang-btn active" onclick="setInfoLang('en')">English</button>
+      <button class="info-lang-btn" onclick="setInfoLang('fr')">Français</button>
+    </div>
+
+    <div data-lang="en" class="visible">
+      <h2>FR Dependency Graph</h2>
+      <p class="info-subtitle">LiveSpec Playground — Interactive dependency graph of Functional Requirements</p>
+
+      <h3>What is this playground for?</h3>
+      <p>The FR Dependency Graph generates an <strong>interactive force-directed graph</strong> from a <code>spec.md</code> file. It visualizes the relationships between Functional Requirements (FR), their Acceptance Criteria (AC), and their implementation status.</p>
+      <p>The main goal is to <strong>identify critical dependencies</strong> before splitting a plan into steps: which FRs are prerequisites for others, where the bottlenecks are, and what the longest dependency chain (critical path) looks like.</p>
+
+      <h3>How to use — step by step</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Load a .specs project</strong>
+          Click <strong>Load Project</strong> to open a directory containing a <code>.specs/features/</code> folder. Select a feature from the dropdown. The graph is generated automatically from the feature's <code>spec.md</code>, <code>plan.md</code>, and <code>implementation.md</code> files.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Explore the graph</strong>
+          <ul>
+            <li><strong>Zoom</strong> — mouse wheel</li>
+            <li><strong>Pan</strong> — click-drag on the background</li>
+            <li><strong>Move a node</strong> — click-drag on a node</li>
+            <li><strong>Hover</strong> — highlights the node and its direct neighbors, dims everything else</li>
+            <li><strong>Click</strong> — selects the node and shows its details in the right panel</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Show/hide ACs</strong>
+          Use the <strong>Show ACs</strong> button to display Acceptance Criteria as small satellite nodes around each FR. Useful for seeing the relative complexity of each requirement.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Identify the Critical Path</strong>
+          Click <strong>Critical Path</strong> to highlight the longest dependency chain in the graph. This is the sequence that determines the minimum implementation order.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>View FR details</strong>
+          The right panel shows for each selected FR: its ID, full description, ACs, source file with <code>@spec</code> anchor (if implementation.md provided), plan step, and incoming/outgoing dependencies (clickable to navigate).
+        </div>
+      </div>
+
+      <h3>Metrics (top bar)</h3>
+      <p>The metrics bar shows in real-time: total FR count, implemented, in progress, blocked, and a progress bar for overall coverage.</p>
+    </div>
+
+    <div data-lang="fr">
+      <h2>FR Dependency Graph</h2>
+      <p class="info-subtitle">LiveSpec Playground — Graphe interactif des dépendances entre Functional Requirements</p>
+
+      <h3>A quoi sert ce playground ?</h3>
+      <p>Le FR Dependency Graph génère un <strong>graphe force-directed interactif</strong> à partir d'un fichier <code>spec.md</code>. Il visualise les relations entre les Functional Requirements (FR), leurs Acceptance Criteria (AC), et leur statut d'implémentation.</p>
+      <p>L'objectif principal est d'<strong>identifier les dépendances critiques</strong> avant de découper un plan en steps : quelles FR sont des prérequis pour d'autres, où sont les goulots d'étranglement, et quelle est la chaîne de dépendances la plus longue (critical path).</p>
+
+      <h3>Comment l'utiliser — étape par étape</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Charger un projet .specs</strong>
+          Cliquez sur <strong>Load Project</strong> pour ouvrir un dossier contenant <code>.specs/features/</code>. Sélectionnez une feature dans le menu déroulant. Le graphe est généré automatiquement à partir des fichiers <code>spec.md</code>, <code>plan.md</code> et <code>implementation.md</code> de la feature.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Explorer le graphe</strong>
+          <ul>
+            <li><strong>Zoom</strong> — molette de souris</li>
+            <li><strong>Pan</strong> — cliquer-glisser sur le fond</li>
+            <li><strong>Déplacer un noeud</strong> — cliquer-glisser sur un noeud</li>
+            <li><strong>Survol</strong> — met en surbrillance le noeud et ses voisins directs, atténue le reste</li>
+            <li><strong>Click</strong> — sélectionne le noeud et affiche ses détails dans le panneau droit</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Afficher/masquer les AC</strong>
+          Utilisez le bouton <strong>Show ACs</strong> pour afficher les Acceptance Criteria comme des petits noeuds satellites autour de chaque FR. Utile pour voir la complexité relative de chaque requirement.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Identifier le Critical Path</strong>
+          Cliquez sur <strong>Critical Path</strong> pour mettre en surbrillance la chaîne de dépendances la plus longue dans le graphe. C'est la séquence qui détermine l'ordre minimal d'implémentation.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Consulter les détails d'un FR</strong>
+          Le panneau droit affiche pour chaque FR sélectionné : son ID, sa description complète, ses AC, le fichier source avec l'ancre <code>@spec</code> (si implementation.md fourni), le step du plan, et la liste des dépendances entrantes/sortantes (cliquables pour naviguer).
+        </div>
+      </div>
+
+      <h3>Métriques (barre du haut)</h3>
+      <p>La barre de métriques affiche en temps réel : le nombre total de FR, le nombre implémenté, en cours, bloqué, et une barre de progression du coverage global.</p>
+    </div>
+
+    <button class="info-close" onclick="toggleInfo()">Fermer</button>
+  </div>
+</div>
+
+</body>
+</html>

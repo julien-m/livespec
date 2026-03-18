@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveSpec Plan Simulator</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0f1117;
+    color: #e1e4ea;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 3px; }
+
+  /* ── Top bar ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    background: #161822;
+    border-bottom: 1px solid #262a3a;
+    flex-shrink: 0;
+  }
+
+  .topbar h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #c4b5fd;
+    white-space: nowrap;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .ctrl-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    color: #8b8fa7;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+  }
+
+  .ctrl-btn:hover { color: #c4b5fd; border-color: #4338ca; }
+  .ctrl-btn.active { color: #c4b5fd; background: #4338ca; border-color: #4338ca; }
+  .ctrl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .speed-select {
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 6px;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    color: #8b8fa7;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    margin-left: 4px;
+  }
+
+  .speed-select:focus { border-color: #4338ca; }
+
+  .sim-status {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  .sim-status.idle { background: #1e2035; color: #6b6f8a; }
+  .sim-status.running { background: #1a3330; color: #4ade80; }
+  .sim-status.paused { background: #3b2e00; color: #facc15; }
+  .sim-status.done { background: #1e3a5f; color: #60a5fa; }
+
+  /* ── Main layout ── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Left panel ── */
+  .left-panel {
+    width: 340px;
+    min-width: 340px;
+    background: #161822;
+    border-right: 1px solid #262a3a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .panel-section {
+    padding: 12px 14px;
+    border-bottom: 1px solid #262a3a;
+  }
+
+  .panel-section h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #6b6f8a;
+    margin-bottom: 8px;
+  }
+
+  .steps-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+  }
+
+  .step-card {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .step-card:hover { border-color: #4338ca; }
+  .step-card.selected { border-color: #c4b5fd; background: #252845; }
+
+  .step-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .step-num {
+    font-size: 10px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-num.todo { background: #1f2937; color: #6b7280; }
+  .step-num.in-progress { background: #3b2e00; color: #facc15; }
+  .step-num.done { background: #0d3320; color: #4ade80; }
+  .step-num.blocked { background: #3b1111; color: #f87171; }
+
+  .step-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #e1e4ea;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .step-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .step-status-dot.todo { background: #6b7280; }
+  .step-status-dot.in-progress { background: #facc15; animation: pulse-dot 1s infinite; }
+  .step-status-dot.done { background: #4ade80; }
+  .step-status-dot.blocked { background: #f87171; }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .step-card-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .step-badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .badge-fr { background: #1e3a5f; color: #60a5fa; }
+  .badge-ac { background: #3b1f4e; color: #c084fc; }
+  .badge-files { background: #1a3330; color: #34d399; }
+  .badge-warn { background: #4a2000; color: #fb923c; }
+  .badge-fail { background: #3b1111; color: #f87171; }
+
+  .step-card .fail-indicator {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 9px;
+    color: #f87171;
+    opacity: 0.7;
+  }
+
+  /* ── Center area ── */
+  .center-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Agent flow diagram */
+  .agent-flow {
+    height: 200px;
+    min-height: 200px;
+    border-bottom: 1px solid #262a3a;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .agent-flow svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .agent-node {
+    cursor: default;
+  }
+
+  .agent-node rect {
+    rx: 10;
+    ry: 10;
+    fill: #1e2035;
+    stroke: #262a3a;
+    stroke-width: 1.5;
+    transition: all 0.3s;
+  }
+
+  .agent-node.active rect {
+    fill: #252845;
+    stroke: #c4b5fd;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 12px rgba(196, 181, 253, 0.35));
+  }
+
+  .agent-node text {
+    fill: #8b8fa7;
+    font-size: 12px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+    transition: fill 0.3s;
+  }
+
+  .agent-node.active text {
+    fill: #c4b5fd;
+  }
+
+  .agent-node .agent-sub {
+    fill: #6b6f8a;
+    font-size: 9px;
+    font-weight: 400;
+  }
+
+  .agent-node.active .agent-sub {
+    fill: #8b8fa7;
+  }
+
+  .flow-arrow {
+    stroke: #262a3a;
+    stroke-width: 1.5;
+    fill: none;
+    marker-end: url(#arrowhead);
+    transition: stroke 0.3s;
+  }
+
+  .flow-arrow.active {
+    stroke: #4338ca;
+    stroke-width: 2;
+  }
+
+  .flow-label {
+    fill: #6b6f8a;
+    font-size: 9px;
+    text-anchor: middle;
+  }
+
+  /* Timeline area */
+  .timeline-area {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .timeline-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #6b6f8a;
+    margin-bottom: 4px;
+  }
+
+  .timeline-track {
+    display: flex;
+    gap: 8px;
+    min-height: 70px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .tl-card {
+    width: 130px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .tl-card:hover { border-color: #4338ca; }
+  .tl-card.selected { border-color: #c4b5fd; }
+
+  .tl-card.todo { border-left: 3px solid #6b7280; }
+  .tl-card.in-progress { border-left: 3px solid #facc15; }
+  .tl-card.done { border-left: 3px solid #4ade80; }
+  .tl-card.blocked { border-left: 3px solid #f87171; }
+
+  .tl-card-num {
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .tl-card.todo .tl-card-num { color: #6b7280; }
+  .tl-card.in-progress .tl-card-num { color: #facc15; }
+  .tl-card.done .tl-card-num { color: #4ade80; }
+  .tl-card.blocked .tl-card-num { color: #f87171; }
+
+  .tl-card-title {
+    font-size: 11px;
+    color: #b0b4cc;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tl-card-status {
+    font-size: 9px;
+    font-weight: 600;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Special final phase cards */
+  .tl-card.final-validation { border-left: 3px solid #60a5fa; }
+  .tl-card.final-validation .tl-card-num { color: #60a5fa; }
+  .tl-card.documenter { border-left: 3px solid #c084fc; }
+  .tl-card.documenter .tl-card-num { color: #c084fc; }
+
+  /* ── Right panel ── */
+  .right-panel {
+    width: 340px;
+    min-width: 340px;
+    background: #161822;
+    border-left: 1px solid #262a3a;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .detail-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+  }
+
+  .detail-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin-bottom: 4px;
+  }
+
+  .detail-subtitle {
+    font-size: 12px;
+    color: #6b6f8a;
+    margin-bottom: 14px;
+  }
+
+  .detail-body {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #b0b4cc;
+  }
+
+  .detail-body h4 {
+    font-size: 11px;
+    font-weight: 600;
+    color: #e1e4ea;
+    margin: 14px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .detail-body ul {
+    padding-left: 16px;
+    margin: 4px 0;
+  }
+
+  .detail-body li {
+    margin: 3px 0;
+    font-size: 12px;
+  }
+
+  .detail-body code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    background: #1e2035;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #a5b4fc;
+  }
+
+  .detail-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+
+  .detail-status-bar.todo { background: #1f2937; }
+  .detail-status-bar.in-progress { background: #3b2e00; }
+  .detail-status-bar.done { background: #0d3320; }
+  .detail-status-bar.blocked { background: #3b1111; }
+
+  .detail-status-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .detail-status-bar.todo .detail-status-label { color: #6b7280; }
+  .detail-status-bar.in-progress .detail-status-label { color: #facc15; }
+  .detail-status-bar.done .detail-status-label { color: #4ade80; }
+  .detail-status-bar.blocked .detail-status-label { color: #f87171; }
+
+  .detail-agent-phase {
+    font-size: 10px;
+    color: #8b8fa7;
+    margin-left: auto;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6b6f8a;
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+    gap: 8px;
+  }
+
+  .empty-state-icon {
+    font-size: 32px;
+    opacity: 0.5;
+    margin-bottom: 4px;
+  }
+
+  /* ── Bottom bar (progress.md preview) ── */
+  .bottom-bar {
+    height: 160px;
+    min-height: 100px;
+    background: #161822;
+    border-top: 1px solid #262a3a;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .bottom-bar-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px 4px;
+    gap: 8px;
+  }
+
+  .bottom-bar-header h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #6b6f8a;
+  }
+
+  .bottom-bar-header .progress-pct {
+    font-size: 10px;
+    font-weight: 600;
+    color: #4ade80;
+    background: #0d3320;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: auto;
+  }
+
+  .progress-preview {
+    flex: 1;
+    overflow: auto;
+    padding: 4px 16px 10px;
+  }
+
+  .progress-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .progress-table th {
+    text-align: left;
+    color: #6b6f8a;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-bottom: 1px solid #262a3a;
+    white-space: nowrap;
+  }
+
+  .progress-table td {
+    padding: 3px 10px;
+    color: #b0b4cc;
+    border-bottom: 1px solid #1e2035;
+    white-space: nowrap;
+  }
+
+  .progress-table .status-cell {
+    font-weight: 600;
+  }
+
+  .progress-table .status-cell.todo { color: #6b7280; }
+  .progress-table .status-cell.in-progress { color: #facc15; }
+  .progress-table .status-cell.done { color: #4ade80; }
+  .progress-table .status-cell.blocked { color: #f87171; }
+
+  /* ── Tooltip ── */
+  .tooltip {
+    position: fixed;
+    background: #252845;
+    border: 1px solid #4338ca;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #e1e4ea;
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+    max-width: 240px;
+  }
+
+  /* ── Pulse animation for active agent ── */
+  @keyframes agent-glow {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(196, 181, 253, 0.35)); }
+    50% { filter: drop-shadow(0 0 20px rgba(196, 181, 253, 0.6)); }
+  }
+
+  .agent-node.active rect {
+    animation: agent-glow 1.5s ease-in-out infinite;
+  }
+
+  /* ── Context menu ── */
+  .context-menu {
+    position: fixed;
+    background: #252845;
+    border: 1px solid #4338ca;
+    border-radius: 8px;
+    padding: 4px;
+    z-index: 1000;
+    display: none;
+    min-width: 180px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  .context-menu-item {
+    padding: 7px 12px;
+    font-size: 12px;
+    color: #e1e4ea;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.1s;
+  }
+
+  .context-menu-item:hover {
+    background: #4338ca;
+  }
+
+  .context-menu-item.danger {
+    color: #f87171;
+  }
+
+  .context-menu-item.danger:hover {
+    background: #3b1111;
+  }
+
+  /* Info button */
+  .info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    color: #c4b5fd;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, 'Times New Roman', serif;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .info-btn:hover { background: #4338ca; color: #e1e4ea; border-color: #4338ca; }
+
+  /* Info modal overlay */
+  .info-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .info-overlay.open { display: flex; }
+
+  .info-modal {
+    background: #161822;
+    border: 1px solid #262a3a;
+    border-radius: 12px;
+    width: 680px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 32px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  }
+  .info-modal::-webkit-scrollbar { width: 5px; }
+  .info-modal::-webkit-scrollbar-track { background: transparent; }
+  .info-modal::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 3px; }
+
+  .info-modal h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin-bottom: 8px;
+  }
+  .info-modal .info-subtitle {
+    font-size: 13px;
+    color: #6b6f8a;
+    margin-bottom: 24px;
+  }
+  .info-modal h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e1e4ea;
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+  .info-modal p, .info-modal li {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #b0b4cc;
+  }
+  .info-modal ul, .info-modal ol {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+  .info-modal li { margin-bottom: 4px; }
+  .info-modal code {
+    background: #1e2035;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #c4b5fd;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .info-modal .info-step {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #0f1117;
+    border-radius: 8px;
+    border: 1px solid #262a3a;
+  }
+  .info-modal .info-step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #4338ca;
+    color: #e1e4ea;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .info-modal .info-step-content { flex: 1; }
+  .info-modal .info-step-content strong {
+    display: block;
+    font-size: 13px;
+    color: #e1e4ea;
+    margin-bottom: 4px;
+  }
+  .info-modal .info-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    margin-top: 24px;
+    border-radius: 8px;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    color: #8b8fa7;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .info-modal .info-close:hover { background: #262a3a; color: #e1e4ea; }
+  .info-modal .kbd {
+    display: inline-block;
+    background: #262a3a;
+    border: 1px solid #363a52;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 11px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    color: #b0b4cc;
+  }
+  .info-lang-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+  .info-lang-btn {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: #8b8fa7;
+    border: 1px solid #262a3a;
+    transition: all 0.15s;
+  }
+  .info-lang-btn:hover { color: #c4b5fd; background: #1e2035; }
+  .info-lang-btn.active { color: #c4b5fd; background: #1e2035; border-color: #4338ca; }
+  .info-modal [data-lang] { display: none; }
+  .info-modal [data-lang].visible { display: block; }
+
+  /* ── Empty state overlay ── */
+  .empty-state-overlay {
+    position: absolute;
+    inset: 0;
+    background: #0f1117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  .empty-state-overlay.hidden { display: none; }
+  .empty-state-box {
+    text-align: center;
+    max-width: 360px;
+  }
+  .empty-state-box svg { margin-bottom: 16px; opacity: 0.6; }
+  .empty-state-box h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #e1e4ea;
+    margin-bottom: 8px;
+  }
+  .empty-state-box p {
+    font-size: 13px;
+    color: #6b6f8a;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .empty-state-btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: 1px solid #4338ca;
+    background: #4338ca;
+    color: #e1e4ea;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .empty-state-btn:hover { background: #5145e5; }
+
+  /* ── MD preview ── */
+  .md-preview {
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #b0b4cc;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .md-preview h2 { font-size: 16px; font-weight: 700; color: #c4b5fd; margin: 16px 0 8px; }
+  .md-preview h3 { font-size: 14px; font-weight: 600; color: #e1e4ea; margin: 14px 0 6px; }
+  .md-preview h4 { font-size: 13px; font-weight: 600; color: #e1e4ea; margin: 12px 0 4px; }
+  .md-preview p { margin-bottom: 8px; }
+  .md-preview strong { color: #e1e4ea; }
+  .md-preview code { background: #1e2035; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #c4b5fd; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+  .md-preview pre { background: #1e2035; border: 1px solid #262a3a; border-radius: 6px; padding: 10px 12px; margin: 8px 0; overflow-x: auto; }
+  .md-preview pre code { background: none; padding: 0; font-size: 12px; color: #b0b4cc; }
+  .md-preview ul, .md-preview ol { padding-left: 20px; margin-bottom: 8px; }
+  .md-preview li { margin-bottom: 2px; }
+  .md-preview hr { border: none; border-top: 1px solid #262a3a; margin: 16px 0; }
+  .md-preview table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }
+  .md-preview td, .md-preview th { padding: 6px 10px; border: 1px solid #262a3a; text-align: left; }
+  .md-preview tr:nth-child(even) { background: #1a1c2e; }
+  .md-preview .empty-msg { color: #6b6f8a; font-style: italic; }
+
+  /* ── Center tabs ── */
+  .center-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+    background: #161822;
+    border-bottom: 1px solid #262a3a;
+  }
+  .center-tab {
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: #8b8fa7;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+  .center-tab:hover { color: #c4b5fd; background: #1e2035; }
+  .center-tab.active { color: #c4b5fd; background: #1e2035; border-color: #4338ca; }
+
+  .center-file-view {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    background: #0f1117;
+  }
+  .center-file-view.visible { display: block; }
+
+  /* ── Project loader ── */
+  .project-loader {
+    padding: 10px 14px;
+    border-bottom: 1px solid #262a3a;
+  }
+  .project-load-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px dashed #262a3a;
+    background: transparent;
+    color: #8b8fa7;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .project-load-btn:hover { border-color: #4338ca; color: #c4b5fd; background: #1e2035; }
+  .project-load-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .project-info {
+    margin-top: 8px;
+  }
+  .project-name {
+    display: block;
+    font-size: 11px;
+    color: #6b6f8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .feature-select {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #262a3a;
+    background: #1e2035;
+    color: #e1e4ea;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238b8fa7' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+  }
+  .feature-select:focus { outline: none; border-color: #4338ca; }
+  .project-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #4ade80;
+  }
+  .project-status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+  }
+  .project-reload-btn {
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #262a3a;
+    background: transparent;
+    color: #8b8fa7;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .project-reload-btn:hover { color: #c4b5fd; border-color: #4338ca; }
+  .mermaid-container { background: #161822; border-radius: 8px; padding: 16px; margin: 12px 0; overflow-x: auto; }
+  .mermaid-container svg { max-width: 100%; height: auto; }
+</style>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false, theme: 'dark', themeVariables: { primaryColor: '#4338ca', primaryTextColor: '#e1e4ea', lineColor: '#6b6f8a', secondaryColor: '#1e2035', tertiaryColor: '#262a3a' } });
+  window.__mermaidRender = async () => {
+    const els = document.querySelectorAll('.mermaid[data-processed]');
+    els.forEach(el => el.removeAttribute('data-processed'));
+    try { await mermaid.run({ querySelector: '.mermaid' }); } catch(e) { console.warn('Mermaid render:', e); }
+  };
+</script>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <h1>LiveSpec Plan Simulator</h1>
+  <button class="info-btn" onclick="toggleInfo()" title="About this playground">i</button>
+  <div class="controls">
+    <span class="sim-status idle" id="simStatus">Idle</span>
+    <button class="ctrl-btn" id="btnReset" title="Reset" disabled>&#8634;</button>
+    <button class="ctrl-btn" id="btnStepBack" title="Step Back" disabled>&#9664;&#9664;</button>
+    <button class="ctrl-btn" id="btnPlay" title="Play" disabled>&#9654;</button>
+    <button class="ctrl-btn" id="btnPause" title="Pause" disabled style="display:none">&#9646;&#9646;</button>
+    <button class="ctrl-btn" id="btnStepFwd" title="Step Forward" disabled>&#9654;&#9664;</button>
+    <select class="speed-select" id="speedSelect">
+      <option value="0.5">0.5x</option>
+      <option value="1" selected>1x</option>
+      <option value="2">2x</option>
+    </select>
+  </div>
+</div>
+
+<!-- Main layout -->
+<div class="main">
+
+  <!-- Left panel -->
+  <div class="left-panel">
+    <div class="project-loader" id="projectLoader">
+      <button class="project-load-btn" onclick="loadProject()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 4.5V12a1 1 0 001 1h10a1 1 0 001-1V6.5a1 1 0 00-1-1H8.5L7 4H3a1 1 0 00-1 .5z"/>
+        </svg>
+        Load .specs project
+      </button>
+      <div class="project-info" id="projectInfo" style="display:none">
+        <span class="project-name" id="projectName"></span>
+        <select class="feature-select" id="featureSelect" onchange="selectFeature(this.value)"></select>
+        <div class="project-status">
+          <span class="dot"></span>
+          <span id="projectFileStatus">plan.md loaded</span>
+          <button class="project-reload-btn" onclick="loadProject()">Change</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-section" style="padding-bottom:6px;">
+      <h3>Steps</h3>
+    </div>
+    <div class="steps-list" id="stepsList">
+      <div class="empty-state">
+        <div class="empty-state-icon">&#9776;</div>
+        <div>Parse a plan to see steps</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center area -->
+  <div class="center-area" style="position:relative;">
+
+    <!-- Empty state overlay -->
+    <div class="empty-state-overlay" id="emptyState">
+      <div class="empty-state-box">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#4338ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
+          <path d="M6 12v24a3 3 0 003 3h30a3 3 0 003-3V18a3 3 0 00-3-3H25l-5-6H9a3 3 0 00-3 3z"/>
+        </svg>
+        <h2>Open a .specs project</h2>
+        <p>Load a project directory to start simulating your implementation plan.</p>
+        <button class="empty-state-btn" onclick="loadProject()">Load Project</button>
+      </div>
+    </div>
+
+    <!-- Center tabs -->
+    <div class="center-tabs" id="centerTabs">
+      <button class="center-tab active" data-view="viz" onclick="setCenterView('viz')">Simulation</button>
+      <button class="center-tab" data-view="plan" onclick="setCenterView('plan')" style="display:none" id="tabPlan">plan.md</button>
+    </div>
+
+    <!-- Center file view (plan.md large format) -->
+    <div class="center-file-view" id="centerFileView">
+      <div class="md-preview" id="centerMdPreview"></div>
+    </div>
+
+    <!-- Simulation visualization container -->
+    <div id="vizContainer" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+
+    <!-- Agent flow diagram -->
+    <div class="agent-flow" id="agentFlow">
+      <svg viewBox="0 0 900 200" id="flowSvg">
+        <defs>
+          <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#262a3a" />
+          </marker>
+          <marker id="arrowhead-active" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#4338ca" />
+          </marker>
+        </defs>
+
+        <!-- Arrows (drawn first, behind nodes) -->
+        <path id="arrow-0-1" class="flow-arrow" d="M 170,85 L 245,85" />
+        <path id="arrow-1-2" class="flow-arrow" d="M 365,85 L 430,85" />
+        <path id="arrow-2-3" class="flow-arrow" d="M 550,85 L 610,85" />
+        <path id="arrow-3-4" class="flow-arrow" d="M 550,145 L 490,145 Q 430,145 430,130 L 430,105" />
+        <path id="arrow-4-5" class="flow-arrow" d="M 310,145 L 240,145 Q 200,145 200,125 L 200,105" />
+
+        <!-- Supervisor -->
+        <g class="agent-node" id="agent-supervisor" transform="translate(50, 55)">
+          <rect width="120" height="60" />
+          <text x="60" y="25">Supervisor</text>
+          <text class="agent-sub" x="60" y="42">orchestrate</text>
+        </g>
+
+        <!-- Build Payload -->
+        <g class="agent-node" id="agent-payload" transform="translate(245, 55)">
+          <rect width="120" height="60" />
+          <text x="60" y="25">Build Payload</text>
+          <text class="agent-sub" x="60" y="42">prepare context</text>
+        </g>
+
+        <!-- Superpowers -->
+        <g class="agent-node" id="agent-superpowers" transform="translate(430, 55)">
+          <rect width="120" height="60" />
+          <text x="60" y="25">Superpowers</text>
+          <text class="agent-sub" x="60" y="42">execute code</text>
+        </g>
+
+        <!-- Implementer (below superpowers) -->
+        <g class="agent-node" id="agent-implementer" transform="translate(430, 125)">
+          <rect width="120" height="50" rx="8" />
+          <text x="60" y="22">Implementer</text>
+          <text class="agent-sub" x="60" y="36">write code</text>
+        </g>
+
+        <!-- Spec Reviewer -->
+        <g class="agent-node" id="agent-spec-reviewer" transform="translate(610, 55)">
+          <rect width="130" height="60" />
+          <text x="65" y="25">Spec Reviewer</text>
+          <text class="agent-sub" x="65" y="42">check spec</text>
+        </g>
+
+        <!-- Quality Reviewer -->
+        <g class="agent-node" id="agent-quality-reviewer" transform="translate(610, 125)">
+          <rect width="130" height="50" />
+          <text x="65" y="22">Quality Rev.</text>
+          <text class="agent-sub" x="65" y="36">check quality</text>
+        </g>
+
+        <!-- Checkpoint (back to supervisor) -->
+        <path id="arrow-5-0" class="flow-arrow" d="M 610,155 Q 580,180 400,185 Q 120,185 110,120 L 110,115" />
+        <text class="flow-label" x="380" y="197">checkpoint</text>
+
+        <!-- Arrows from Spec Reviewer to Quality Reviewer -->
+        <path id="arrow-sr-qr" class="flow-arrow" d="M 675,115 L 675,125" />
+
+        <!-- Arrow from Superpowers down to Implementer -->
+        <path id="arrow-sp-impl" class="flow-arrow" d="M 490,115 L 490,125" />
+      </svg>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-area" id="timelineArea">
+      <div class="timeline-label">Execution Timeline</div>
+      <div class="timeline-track" id="timelineTrack">
+        <div class="empty-state" style="height:auto;padding:24px;">
+          <div class="empty-state-icon">&#9202;</div>
+          <div>Parse a plan to begin simulation</div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /vizContainer -->
+
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+    <div class="detail-panel" id="detailPanel">
+      <div class="empty-state">
+        <div class="empty-state-icon">&#9432;</div>
+        <div>Select a step to view details</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom bar: progress.md preview -->
+<div class="bottom-bar">
+  <div class="bottom-bar-header">
+    <h3>progress.md Preview</h3>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+  <div class="progress-preview" id="progressPreview">
+    <table class="progress-table" id="progressTable">
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>FR/AC</th>
+          <th>Files</th>
+        </tr>
+      </thead>
+      <tbody id="progressBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Context menu -->
+<div class="context-menu" id="contextMenu">
+  <div class="context-menu-item" id="ctxToggleFail">Toggle Simulate Failure</div>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+(function() {
+  "use strict";
+
+  // ── State ──
+  let steps = [];
+  let selectedStepIdx = null;
+  let simState = "idle"; // idle | running | paused | done
+  let currentStepIdx = -1;
+  let currentAgentPhase = -1;
+  let simTimer = null;
+  let phaseTimer = null;
+
+  const AGENTS = [
+    "supervisor",
+    "payload",
+    "superpowers",
+    "implementer",
+    "spec-reviewer",
+    "quality-reviewer"
+  ];
+
+  const AGENT_LABELS = {
+    "supervisor": "Supervisor",
+    "payload": "Build Payload",
+    "superpowers": "Superpowers",
+    "implementer": "Implementer",
+    "spec-reviewer": "Spec Reviewer",
+    "quality-reviewer": "Quality Reviewer"
+  };
+
+  const ARROW_MAP = [
+    ["arrow-0-1"],
+    ["arrow-1-2"],
+    ["arrow-sp-impl"],
+    ["arrow-2-3"],
+    ["arrow-sr-qr"],
+    ["arrow-5-0"]
+  ];
+
+  // Final phases after all steps
+  let finalPhases = [];
+  let finalPhaseIdx = -1;
+
+  // ── DOM references ──
+  const stepsList = document.getElementById("stepsList");
+  const timelineTrack = document.getElementById("timelineTrack");
+  const detailPanel = document.getElementById("detailPanel");
+  const progressBody = document.getElementById("progressBody");
+  const progressPct = document.getElementById("progressPct");
+  const simStatusEl = document.getElementById("simStatus");
+  const btnPlay = document.getElementById("btnPlay");
+  const btnPause = document.getElementById("btnPause");
+  const btnStepFwd = document.getElementById("btnStepFwd");
+  const btnStepBack = document.getElementById("btnStepBack");
+  const btnReset = document.getElementById("btnReset");
+  const speedSelect = document.getElementById("speedSelect");
+  const contextMenu = document.getElementById("contextMenu");
+  const ctxToggleFail = document.getElementById("ctxToggleFail");
+
+  let contextStepIdx = null;
+
+  // ── Parsing ──
+  function parsePlan(text) {
+    const parsed = [];
+    const stepRegex = /^(?:#{1,3}\s*Step\s+(\d+)[:\s]*(.*))|^(\d+)\.\s+(.+)/gm;
+    const lines = text.split("\n");
+
+    let currentStep = null;
+    let stepBodyLines = [];
+
+    function finalizeStep() {
+      if (!currentStep) return;
+      const body = stepBodyLines.join("\n");
+      currentStep.description = extractDescription(stepBodyLines);
+      currentStep.files = extractFiles(body);
+      currentStep.refs = extractRefs(body);
+      currentStep.testCommands = extractTests(body);
+      currentStep.scopeWarning = currentStep.files.length > 12;
+      currentStep.status = "todo";
+      currentStep.simulateFailure = false;
+      currentStep.agentPhase = -1;
+      parsed.push(currentStep);
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Check for step header
+      const headerMatch = line.match(/^#{1,3}\s*Step\s+(\d+)[:\s]*(.*)/i);
+      const numberedMatch = line.match(/^(\d+)\.\s+(.+)/);
+
+      if (headerMatch) {
+        finalizeStep();
+        currentStep = {
+          num: parseInt(headerMatch[1]),
+          title: headerMatch[2].trim() || "Untitled Step"
+        };
+        stepBodyLines = [];
+      } else if (numberedMatch && !currentStep) {
+        finalizeStep();
+        currentStep = {
+          num: parseInt(numberedMatch[1]),
+          title: numberedMatch[2].trim()
+        };
+        stepBodyLines = [];
+      } else if (currentStep) {
+        stepBodyLines.push(line);
+      }
+    }
+    finalizeStep();
+
+    return parsed;
+  }
+
+  function extractDescription(lines) {
+    const desc = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("-") || trimmed.startsWith("*")) continue;
+      if (/^(Files|References|Tests|Commands):/i.test(trimmed)) continue;
+      desc.push(trimmed);
+    }
+    return desc.join(" ").substring(0, 300) || "";
+  }
+
+  function extractFiles(text) {
+    const files = [];
+    const fileRegex = /(?:^|\s)([\w./\-]+\/[\w.\-]+\.\w+)/gm;
+    let m;
+    while ((m = fileRegex.exec(text)) !== null) {
+      const f = m[1].trim();
+      if (!files.includes(f)) files.push(f);
+    }
+    return files;
+  }
+
+  function extractRefs(text) {
+    const refs = [];
+    const refRegex = /(FR-\d+|AC-\d+)/gi;
+    let m;
+    while ((m = refRegex.exec(text)) !== null) {
+      const r = m[1].toUpperCase();
+      if (!refs.includes(r)) refs.push(r);
+    }
+    return refs;
+  }
+
+  function extractTests(text) {
+    const cmds = [];
+    const lines = text.split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim().replace(/^-\s*/, "");
+      if (/^(npx|npm run|cargo test|pytest|go test|vitest|jest)\b/.test(trimmed)) {
+        cmds.push(trimmed);
+      }
+      // Also detect after "Tests:" prefix
+      const testMatch = trimmed.match(/^Tests?:\s*(.+)/i);
+      if (testMatch) {
+        const cmd = testMatch[1].trim();
+        if (!cmds.includes(cmd)) cmds.push(cmd);
+      }
+    }
+    return cmds;
+  }
+
+  // ── Render ──
+  function renderStepsList() {
+    if (steps.length === 0) {
+      stepsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#9776;</div><div>Parse a plan to see steps</div></div>';
+      return;
+    }
+
+    stepsList.innerHTML = steps.map((s, i) => {
+      const frRefs = s.refs.filter(r => r.startsWith("FR-"));
+      const acRefs = s.refs.filter(r => r.startsWith("AC-"));
+      const selected = i === selectedStepIdx ? " selected" : "";
+      return `
+        <div class="step-card${selected}" data-idx="${i}"
+             oncontextmenu="window._onStepContext(event, ${i})"
+             onclick="window._onStepClick(${i})">
+          ${s.simulateFailure ? '<span class="fail-indicator">FAIL</span>' : ''}
+          <div class="step-card-header">
+            <div class="step-num ${s.status}">${s.num}</div>
+            <div class="step-title">${escHtml(s.title)}</div>
+            <div class="step-status-dot ${s.status}"></div>
+          </div>
+          <div class="step-card-meta">
+            ${frRefs.length ? `<span class="step-badge badge-fr">${frRefs.length} FR</span>` : ''}
+            ${acRefs.length ? `<span class="step-badge badge-ac">${acRefs.length} AC</span>` : ''}
+            ${s.files.length ? `<span class="step-badge badge-files">${s.files.length} files</span>` : ''}
+            ${s.scopeWarning ? `<span class="step-badge badge-warn">Scope Guard!</span>` : ''}
+            ${s.simulateFailure ? `<span class="step-badge badge-fail">Failure</span>` : ''}
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderTimeline() {
+    if (steps.length === 0) {
+      timelineTrack.innerHTML = '<div class="empty-state" style="height:auto;padding:24px;"><div class="empty-state-icon">&#9202;</div><div>Parse a plan to begin simulation</div></div>';
+      return;
+    }
+
+    let html = steps.map((s, i) => {
+      const selected = i === selectedStepIdx ? " selected" : "";
+      const statusLabel = s.status === "in-progress"
+        ? "In Progress" + (s.agentPhase >= 0 ? " \u2014 " + AGENT_LABELS[AGENTS[s.agentPhase]] : "")
+        : s.status.charAt(0).toUpperCase() + s.status.slice(1);
+      return `
+        <div class="tl-card ${s.status}${selected}" data-idx="${i}"
+             onclick="window._onStepClick(${i})"
+             oncontextmenu="window._onStepContext(event, ${i})">
+          <div class="tl-card-num">Step ${s.num}</div>
+          <div class="tl-card-title">${escHtml(s.title)}</div>
+          <div class="tl-card-status">${statusLabel}</div>
+        </div>`;
+    }).join("");
+
+    // Final phases
+    if (finalPhases.length > 0) {
+      for (const fp of finalPhases) {
+        const cls = fp.type === "validation" ? "final-validation" : "documenter";
+        const statusCls = fp.status === "done" ? " done" : fp.status === "in-progress" ? " in-progress" : "";
+        html += `
+          <div class="tl-card ${cls}${statusCls}">
+            <div class="tl-card-num">${fp.label}</div>
+            <div class="tl-card-title">${fp.desc}</div>
+            <div class="tl-card-status">${fp.status === "in-progress" ? "In Progress" : fp.status === "done" ? "Done" : "Pending"}</div>
+          </div>`;
+      }
+    }
+
+    timelineTrack.innerHTML = html;
+  }
+
+  function renderDetail() {
+    if (selectedStepIdx === null || !steps[selectedStepIdx]) {
+      detailPanel.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#9432;</div><div>Select a step to view details</div></div>';
+      return;
+    }
+
+    const s = steps[selectedStepIdx];
+    const frRefs = s.refs.filter(r => r.startsWith("FR-"));
+    const acRefs = s.refs.filter(r => r.startsWith("AC-"));
+    const agentLabel = s.agentPhase >= 0 ? AGENT_LABELS[AGENTS[s.agentPhase]] : "";
+
+    let html = `
+      <div class="detail-title">Step ${s.num}</div>
+      <div class="detail-subtitle">${escHtml(s.title)}</div>
+      <div class="detail-status-bar ${s.status}">
+        <span class="detail-status-label">${formatStatus(s.status)}</span>
+        ${agentLabel ? `<span class="detail-agent-phase">${agentLabel}</span>` : ''}
+      </div>
+      <div class="detail-body">`;
+
+    if (s.description) {
+      html += `<p>${escHtml(s.description)}</p>`;
+    }
+
+    if (frRefs.length || acRefs.length) {
+      html += `<h4>Requirements</h4><div style="display:flex;gap:4px;flex-wrap:wrap;">`;
+      for (const r of frRefs) {
+        html += `<span class="step-badge badge-fr">${r}</span>`;
+      }
+      for (const r of acRefs) {
+        html += `<span class="step-badge badge-ac">${r}</span>`;
+      }
+      html += `</div>`;
+    }
+
+    if (s.files.length) {
+      html += `<h4>Files Touched (${s.files.length})</h4>`;
+      if (s.scopeWarning) {
+        html += `<div style="margin-bottom:6px;"><span class="step-badge badge-warn">Change Scope Guard exceeded (${s.files.length} files)</span></div>`;
+      }
+      html += `<ul>${s.files.map(f => `<li><code>${escHtml(f)}</code></li>`).join("")}</ul>`;
+    }
+
+    if (s.testCommands.length) {
+      html += `<h4>Test Commands</h4><ul>${s.testCommands.map(c => `<li><code>${escHtml(c)}</code></li>`).join("")}</ul>`;
+    }
+
+    if (s.simulateFailure) {
+      html += `<h4>Failure Simulation</h4><p style="color:#f87171;">This step is set to simulate a failure. It will end as Blocked.</p>`;
+    }
+
+    html += `</div>`;
+    detailPanel.innerHTML = html;
+  }
+
+  function renderProgressTable() {
+    if (steps.length === 0) {
+      progressBody.innerHTML = "";
+      progressPct.textContent = "0%";
+      return;
+    }
+
+    const done = steps.filter(s => s.status === "done").length;
+    const blocked = steps.filter(s => s.status === "blocked").length;
+    const total = steps.length;
+    const pct = Math.round(((done + blocked) / total) * 100);
+    progressPct.textContent = pct + "%";
+
+    progressBody.innerHTML = steps.map(s => {
+      const refs = s.refs.join(", ") || "\u2014";
+      const files = s.files.length ? s.files.length + " files" : "\u2014";
+      return `<tr>
+        <td>${s.num}</td>
+        <td>${escHtml(s.title.substring(0, 50))}${s.title.length > 50 ? '...' : ''}</td>
+        <td class="status-cell ${s.status}">${formatStatus(s.status)}</td>
+        <td>${refs}</td>
+        <td>${files}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  function renderAgentFlow() {
+    // Reset all agents
+    AGENTS.forEach(a => {
+      const el = document.getElementById("agent-" + a);
+      if (el) el.classList.remove("active");
+    });
+
+    // Reset all arrows
+    document.querySelectorAll(".flow-arrow").forEach(a => {
+      a.classList.remove("active");
+      a.setAttribute("marker-end", "url(#arrowhead)");
+    });
+
+    // Determine active agent
+    let activeAgent = null;
+    if (simState === "running" || simState === "paused") {
+      const step = steps[currentStepIdx];
+      if (step && step.status === "in-progress" && step.agentPhase >= 0) {
+        activeAgent = AGENTS[step.agentPhase];
+      }
+      // Final phases
+      if (finalPhaseIdx >= 0 && finalPhases[finalPhaseIdx]) {
+        const fp = finalPhases[finalPhaseIdx];
+        if (fp.status === "in-progress") {
+          activeAgent = fp.agent;
+        }
+      }
+    }
+
+    if (activeAgent) {
+      const el = document.getElementById("agent-" + activeAgent);
+      if (el) el.classList.add("active");
+
+      // Activate the arrow leading to this agent
+      const agentIdx = AGENTS.indexOf(activeAgent);
+      if (agentIdx >= 0 && ARROW_MAP[agentIdx]) {
+        ARROW_MAP[agentIdx].forEach(arrowId => {
+          const arrow = document.getElementById(arrowId);
+          if (arrow) {
+            arrow.classList.add("active");
+            arrow.setAttribute("marker-end", "url(#arrowhead-active)");
+          }
+        });
+      }
+    }
+  }
+
+  function renderAll() {
+    renderStepsList();
+    renderTimeline();
+    renderDetail();
+    renderProgressTable();
+    renderAgentFlow();
+    updateControlStates();
+  }
+
+  // ── Simulation engine ──
+  function getPhaseDelay() {
+    const speed = parseFloat(speedSelect.value);
+    return 2000 / speed;
+  }
+
+  function setSimState(state) {
+    simState = state;
+    simStatusEl.className = "sim-status " + state;
+    const labels = { idle: "Idle", running: "Running", paused: "Paused", done: "Complete" };
+    simStatusEl.textContent = labels[state] || state;
+    updateControlStates();
+  }
+
+  function updateControlStates() {
+    const hasSteps = steps.length > 0;
+    const isRunning = simState === "running";
+    const isPaused = simState === "paused";
+    const isDone = simState === "done";
+    const isIdle = simState === "idle";
+
+    btnPlay.disabled = !hasSteps || isRunning || isDone;
+    btnPlay.style.display = isRunning ? "none" : "flex";
+    btnPause.style.display = isRunning ? "flex" : "none";
+    btnPause.disabled = !isRunning;
+    btnStepFwd.disabled = !hasSteps || isRunning || isDone;
+    btnStepBack.disabled = !hasSteps || isRunning || currentStepIdx < 0;
+    btnReset.disabled = !hasSteps || (isIdle && currentStepIdx < 0);
+
+    if (isRunning) {
+      btnPause.classList.add("active");
+    } else {
+      btnPause.classList.remove("active");
+    }
+  }
+
+  function startSimulation() {
+    if (steps.length === 0) return;
+    setSimState("running");
+    if (currentStepIdx < 0) {
+      currentStepIdx = 0;
+    }
+    runCurrentStep();
+  }
+
+  function pauseSimulation() {
+    setSimState("paused");
+    clearTimeout(simTimer);
+    clearTimeout(phaseTimer);
+  }
+
+  function resetSimulation() {
+    clearTimeout(simTimer);
+    clearTimeout(phaseTimer);
+    currentStepIdx = -1;
+    currentAgentPhase = -1;
+    finalPhaseIdx = -1;
+    finalPhases = [];
+    steps.forEach(s => {
+      s.status = "todo";
+      s.agentPhase = -1;
+    });
+    selectedStepIdx = null;
+    setSimState("idle");
+    renderAll();
+  }
+
+  function stepForward() {
+    if (simState === "done") return;
+    clearTimeout(simTimer);
+    clearTimeout(phaseTimer);
+
+    if (currentStepIdx < 0) {
+      currentStepIdx = 0;
+    }
+
+    // If we are in a step, complete it
+    const step = steps[currentStepIdx];
+    if (step) {
+      if (step.status === "todo" || step.status === "in-progress") {
+        completeStep(currentStepIdx);
+      }
+      // Move to next
+      if (currentStepIdx < steps.length - 1) {
+        currentStepIdx++;
+        selectedStepIdx = currentStepIdx;
+        steps[currentStepIdx].status = "in-progress";
+        steps[currentStepIdx].agentPhase = 0;
+      } else if (finalPhases.length === 0) {
+        // Start final phases
+        initFinalPhases();
+        if (finalPhases.length > 0) {
+          finalPhaseIdx = 0;
+          finalPhases[0].status = "in-progress";
+        }
+      } else if (finalPhaseIdx < finalPhases.length - 1) {
+        if (finalPhases[finalPhaseIdx]) finalPhases[finalPhaseIdx].status = "done";
+        finalPhaseIdx++;
+        finalPhases[finalPhaseIdx].status = "in-progress";
+      } else {
+        // Finish
+        if (finalPhases[finalPhaseIdx]) finalPhases[finalPhaseIdx].status = "done";
+        setSimState("done");
+      }
+    }
+
+    renderAll();
+  }
+
+  function stepBack() {
+    if (currentStepIdx < 0) return;
+    clearTimeout(simTimer);
+    clearTimeout(phaseTimer);
+
+    // Reset final phases
+    if (finalPhaseIdx >= 0) {
+      finalPhases.forEach(fp => fp.status = "pending");
+      finalPhaseIdx = -1;
+      finalPhases = [];
+      // Make sure last step is current
+      if (steps[currentStepIdx]) {
+        steps[currentStepIdx].status = "in-progress";
+        steps[currentStepIdx].agentPhase = 0;
+        selectedStepIdx = currentStepIdx;
+      }
+    } else if (currentStepIdx > 0) {
+      // Undo current step
+      steps[currentStepIdx].status = "todo";
+      steps[currentStepIdx].agentPhase = -1;
+      currentStepIdx--;
+      steps[currentStepIdx].status = "in-progress";
+      steps[currentStepIdx].agentPhase = 0;
+      selectedStepIdx = currentStepIdx;
+    } else {
+      steps[currentStepIdx].status = "todo";
+      steps[currentStepIdx].agentPhase = -1;
+      currentStepIdx = -1;
+      selectedStepIdx = null;
+    }
+
+    if (simState === "done") setSimState("paused");
+    renderAll();
+  }
+
+  function completeStep(idx) {
+    const s = steps[idx];
+    if (!s) return;
+    s.status = s.simulateFailure ? "blocked" : "done";
+    s.agentPhase = -1;
+  }
+
+  function runCurrentStep() {
+    if (simState !== "running") return;
+    if (currentStepIdx >= steps.length) {
+      // All steps done, run final phases
+      initFinalPhases();
+      if (finalPhases.length > 0) {
+        finalPhaseIdx = 0;
+        finalPhases[0].status = "in-progress";
+        renderAll();
+        runFinalPhase();
+      } else {
+        setSimState("done");
+        renderAll();
+      }
+      return;
+    }
+
+    const step = steps[currentStepIdx];
+    step.status = "in-progress";
+    step.agentPhase = 0;
+    selectedStepIdx = currentStepIdx;
+    renderAll();
+
+    // Cycle through agent phases
+    runAgentPhase(currentStepIdx, 0);
+  }
+
+  function runAgentPhase(stepIdx, phase) {
+    if (simState !== "running") return;
+    if (stepIdx !== currentStepIdx) return;
+
+    const step = steps[stepIdx];
+    if (phase >= AGENTS.length) {
+      // Step complete
+      completeStep(stepIdx);
+      currentStepIdx++;
+      renderAll();
+      simTimer = setTimeout(() => runCurrentStep(), 400 / parseFloat(speedSelect.value));
+      return;
+    }
+
+    step.agentPhase = phase;
+    renderAll();
+
+    phaseTimer = setTimeout(() => {
+      runAgentPhase(stepIdx, phase + 1);
+    }, getPhaseDelay());
+  }
+
+  function initFinalPhases() {
+    if (finalPhases.length > 0) return;
+    finalPhases = [
+      { type: "validation", label: "Final Validation", desc: "Superpowers full test suite", agent: "superpowers", status: "pending" },
+      { type: "documenter", label: "Documenter", desc: "Finalize documentation", agent: "supervisor", status: "pending" }
+    ];
+  }
+
+  function runFinalPhase() {
+    if (simState !== "running") return;
+    if (finalPhaseIdx >= finalPhases.length) {
+      setSimState("done");
+      renderAll();
+      return;
+    }
+
+    finalPhases[finalPhaseIdx].status = "in-progress";
+    renderAll();
+
+    phaseTimer = setTimeout(() => {
+      finalPhases[finalPhaseIdx].status = "done";
+      finalPhaseIdx++;
+      if (finalPhaseIdx < finalPhases.length) {
+        finalPhases[finalPhaseIdx].status = "in-progress";
+        renderAll();
+        phaseTimer = setTimeout(() => runFinalPhase(), getPhaseDelay());
+      } else {
+        setSimState("done");
+        renderAll();
+      }
+    }, getPhaseDelay() * 2);
+  }
+
+  // ── Event handlers ──
+  window._onStepClick = function(idx) {
+    selectedStepIdx = idx;
+    renderStepsList();
+    renderTimeline();
+    renderDetail();
+  };
+
+  window._onStepContext = function(event, idx) {
+    event.preventDefault();
+    contextStepIdx = idx;
+
+    const s = steps[idx];
+    ctxToggleFail.textContent = s.simulateFailure
+      ? "Remove Failure Simulation"
+      : "Simulate Failure on This Step";
+    ctxToggleFail.className = s.simulateFailure
+      ? "context-menu-item"
+      : "context-menu-item danger";
+
+    contextMenu.style.display = "block";
+    contextMenu.style.left = event.clientX + "px";
+    contextMenu.style.top = event.clientY + "px";
+  };
+
+  // Shift-click to toggle failure
+  document.addEventListener("click", (e) => {
+    // Close context menu
+    contextMenu.style.display = "none";
+
+    // Shift-click on step cards
+    if (e.shiftKey) {
+      const card = e.target.closest(".step-card, .tl-card");
+      if (card) {
+        const idx = parseInt(card.dataset.idx);
+        if (!isNaN(idx) && steps[idx]) {
+          steps[idx].simulateFailure = !steps[idx].simulateFailure;
+          renderAll();
+        }
+      }
+    }
+  });
+
+  ctxToggleFail.addEventListener("click", () => {
+    if (contextStepIdx !== null && steps[contextStepIdx]) {
+      steps[contextStepIdx].simulateFailure = !steps[contextStepIdx].simulateFailure;
+      contextMenu.style.display = "none";
+      renderAll();
+    }
+  });
+
+  btnPlay.addEventListener("click", () => {
+    if (simState === "paused") {
+      setSimState("running");
+      // Resume from current position
+      const step = steps[currentStepIdx];
+      if (step && step.status === "in-progress") {
+        runAgentPhase(currentStepIdx, Math.max(step.agentPhase, 0));
+      } else if (finalPhaseIdx >= 0) {
+        runFinalPhase();
+      } else {
+        runCurrentStep();
+      }
+    } else {
+      startSimulation();
+    }
+  });
+
+  btnPause.addEventListener("click", pauseSimulation);
+  btnStepFwd.addEventListener("click", stepForward);
+  btnStepBack.addEventListener("click", stepBack);
+  btnReset.addEventListener("click", resetSimulation);
+
+  // Keyboard shortcuts
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const overlay = document.getElementById('infoOverlay');
+      if (overlay.classList.contains('open')) {
+        overlay.classList.remove('open');
+        e.stopPropagation();
+        return;
+      }
+    }
+    if (e.key === " " || e.key === "k") {
+      e.preventDefault();
+      if (simState === "running") pauseSimulation();
+      else if (!btnPlay.disabled) btnPlay.click();
+    }
+    if (e.key === "ArrowRight" || e.key === "l") {
+      if (!btnStepFwd.disabled) stepForward();
+    }
+    if (e.key === "ArrowLeft" || e.key === "j") {
+      if (!btnStepBack.disabled) stepBack();
+    }
+    if (e.key === "r") {
+      if (!btnReset.disabled) resetSimulation();
+    }
+  });
+
+  // ── Utilities ──
+  function escHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatStatus(status) {
+    const map = {
+      "todo": "Todo",
+      "in-progress": "In Progress",
+      "done": "Done",
+      "blocked": "Blocked"
+    };
+    return map[status] || status;
+  }
+
+  // ── Expose parse function for external callers (project loader) ──
+  window._doParsePlan = function(text) {
+    resetSimulation();
+    steps = parsePlan(text);
+    if (steps.length > 0) {
+      selectedStepIdx = 0;
+    }
+    renderAll();
+  };
+
+  // ── Initialize empty ──
+  renderAll();
+
+})();
+
+// ── Markdown renderer ──
+function renderMarkdown(md) {
+  if (!md) return '';
+
+  // Phase 1: Extract all fenced code blocks before markdown transforms.
+  const codeBlocks = [];
+  md = md.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push({ lang, code });
+    return `<div data-cb="${idx}"></div>`;
+  });
+
+  // Phase 2: Markdown transforms (safe — no code block content left)
+  let html = md
+    .replace(/^#### (.+)$/gm, '<h5>$1</h5>')
+    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/^\|(.+)\|$/gm, (m, c) => { const cells = c.split('|').map(x=>x.trim()); if(cells.every(x=>/^[-:]+$/.test(x))) return ''; return '<tr>'+cells.map(x=>`<td>${x}</td>`).join('')+'</tr>'; })
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    .replace(/^(?!<[a-z])((?!^\s*$).+)$/gm, '<p>$1</p>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+    .replace(/(<tr>.*<\/tr>\n?)+/g, '<table>$&</table>')
+    .replace(/<p>\s*<\/p>/g, '');
+
+  // Phase 3: Restore code blocks — mermaid as renderable diagrams, others as <pre><code>
+  for (let i = 0; i < codeBlocks.length; i++) {
+    const { lang, code } = codeBlocks[i];
+    let replacement;
+    if (lang === 'mermaid') {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      replacement = `<div class="mermaid-container"><pre class="mermaid">${escaped}</pre></div>`;
+    } else {
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      replacement = `<pre><code>${escaped}</code></pre>`;
+    }
+    html = html.replace(`<div data-cb="${i}"></div>`, replacement);
+  }
+  return html;
+}
+
+// ── Center tabs ──
+let planMdContent = '';
+
+function setCenterView(view) {
+  // Update tab active state
+  document.querySelectorAll('.center-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.view === view);
+  });
+
+  // Toggle visibility
+  const fileView = document.getElementById('centerFileView');
+  const vizContainer = document.getElementById('vizContainer');
+
+  if (view === 'viz') {
+    fileView.classList.remove('visible');
+    if (vizContainer) vizContainer.style.display = 'flex';
+  } else {
+    fileView.classList.add('visible');
+    if (vizContainer) vizContainer.style.display = 'none';
+    document.getElementById('centerMdPreview').innerHTML = renderMarkdown(planMdContent);
+    if (window.__mermaidRender) requestAnimationFrame(() => window.__mermaidRender());
+  }
+}
+
+// ── Project Loader ──
+let projectHandle = null;
+let featuresMap = {};
+
+async function loadProject() {
+  try {
+    projectHandle = await window.showDirectoryPicker({ mode: 'read' });
+    const specsDir = await projectHandle.getDirectoryHandle('.specs');
+    const featuresDir = await specsDir.getDirectoryHandle('features');
+
+    featuresMap = {};
+    for await (const entry of featuresDir.values()) {
+      if (entry.kind === 'directory') {
+        featuresMap[entry.name] = entry;
+      }
+    }
+
+    const featureNames = Object.keys(featuresMap).sort();
+    if (featureNames.length === 0) {
+      alert('No features found in .specs/features/');
+      return;
+    }
+
+    // Update UI
+    document.getElementById('projectInfo').style.display = 'block';
+    document.getElementById('projectName').textContent = projectHandle.name;
+
+    const select = document.getElementById('featureSelect');
+    select.innerHTML = featureNames.map(f => `<option value="${f}">${f}</option>`).join('');
+
+    // Remember project
+    localStorage.setItem('livespec-playground-project', projectHandle.name);
+
+    // Auto-select last feature or first
+    const lastFeature = localStorage.getItem('livespec-playground-feature');
+    const selected = featureNames.includes(lastFeature) ? lastFeature : featureNames[0];
+    select.value = selected;
+    await selectFeature(selected);
+  } catch (e) {
+    if (e.name !== 'AbortError') console.error('Load project error:', e);
+  }
+}
+
+async function selectFeature(featureName) {
+  if (!projectHandle || !featuresMap[featureName]) return;
+
+  try {
+    const featureDir = featuresMap[featureName];
+    const files = {};
+    for await (const entry of featureDir.values()) {
+      if (entry.kind === 'file') {
+        const file = await entry.getFile();
+        files[entry.name] = await file.text();
+      }
+    }
+
+    // Store raw plan content for center tab
+    planMdContent = files['plan.md'] || '';
+
+    // Show/hide plan.md center tab
+    document.getElementById('tabPlan').style.display = planMdContent ? '' : 'none';
+
+    // Update status
+    const status = document.getElementById('projectFileStatus');
+    if (planMdContent) {
+      status.textContent = 'plan.md loaded';
+      status.parentElement.querySelector('.dot').style.background = '#4ade80';
+    } else {
+      status.textContent = 'plan.md not found';
+      status.parentElement.querySelector('.dot').style.background = '#f87171';
+    }
+
+    // Hide empty state overlay
+    document.getElementById('emptyState').classList.add('hidden');
+
+    // Auto-parse the plan
+    if (planMdContent) {
+      window._doParsePlan(planMdContent);
+    }
+
+    // Make sure we are on the simulation tab
+    setCenterView('viz');
+
+    localStorage.setItem('livespec-playground-feature', featureName);
+  } catch (e) {
+    console.error('Select feature error:', e);
+  }
+}
+
+function toggleInfo() {
+  const overlay = document.getElementById('infoOverlay');
+  overlay.classList.toggle('open');
+}
+
+function setInfoLang(lang) {
+  document.querySelectorAll('.info-modal [data-lang]').forEach(el => {
+    el.classList.toggle('visible', el.dataset.lang === lang);
+  });
+  document.querySelectorAll('.info-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === (lang === 'en' ? 'English' : 'Français'));
+  });
+}
+</script>
+
+<div class="info-overlay" id="infoOverlay" onclick="if(event.target===this)toggleInfo()">
+  <div class="info-modal">
+    <div class="info-lang-toggle">
+      <button class="info-lang-btn active" onclick="setInfoLang('en')">English</button>
+      <button class="info-lang-btn" onclick="setInfoLang('fr')">Français</button>
+    </div>
+
+    <div data-lang="en" class="visible">
+      <h2>Plan Simulator</h2>
+      <p class="info-subtitle">LiveSpec Playground — Visual dry-run of the implementation pipeline</p>
+
+      <h3>What is this playground for?</h3>
+      <p>The Plan Simulator lets you <strong>visually simulate the execution of a LiveSpec plan</strong> before running <code>/spec.implement</code>. It reproduces the full Supervisor cycle: decomposition into steps, Task Payload construction, dispatch to Superpowers, reviewer passes, and checkpoint to <code>progress.md</code>.</p>
+      <p>It's a verification and learning tool — spot a poorly structured plan, visualize step dependencies, simulate failures, and understand how the pipeline reacts.</p>
+
+      <h3>How to use — step by step</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Load a .specs project</strong>
+          Click <strong>Load Project</strong> and select your project directory. The simulator reads the <code>.specs/features/</code> folder and lists available features.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Select a feature</strong>
+          Pick a feature from the dropdown. The <code>plan.md</code> is loaded and parsed automatically. The simulator extracts steps, files touched, FR/AC references, and test commands. If a step touches more than 12 files, a <em>Change Scope Guard</em> warning appears.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Run the simulation</strong>
+          Click <strong>Play</strong> or press <span class="kbd">Space</span>. Each step animates through the agent diagram: Supervisor → Build Payload → Superpowers → Implementer → Spec Reviewer → Quality Reviewer → Checkpoint.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Control playback</strong>
+          <ul>
+            <li><span class="kbd">Space</span> / <span class="kbd">K</span> — Play / Pause</li>
+            <li><span class="kbd">→</span> / <span class="kbd">L</span> — Step Forward</li>
+            <li><span class="kbd">←</span> / <span class="kbd">J</span> — Step Back</li>
+            <li><span class="kbd">R</span> — Reset</li>
+            <li>Speed selector: 0.5x, 1x, 2x</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Simulate a failure</strong>
+          <strong>Shift+click</strong> or <strong>right-click</strong> on a step card to toggle "Simulate Failure". That step will end as <em>Blocked</em> instead of <em>Done</em>, letting you see how the pipeline handles blockages.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">6</div>
+        <div class="info-step-content">
+          <strong>Inspect the detail panel</strong>
+          Click on a step to see in the right panel: its description, FR/AC addressed, files touched, TDD commands, and current status.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">7</div>
+        <div class="info-step-content">
+          <strong>Watch the final phase</strong>
+          After the last step, the simulator automatically animates <em>Final Validation</em> (Superpowers full suite) then <em>Documenter</em> (finalize). A summary appears: N steps Done, M Blocked.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">8</div>
+        <div class="info-step-content">
+          <strong>Review progress.md</strong>
+          The bottom panel generates the <code>progress.md</code> table in real-time as steps complete, exactly as the Documenter would produce it. You can copy it to pre-populate your feature directory.
+        </div>
+      </div>
+    </div>
+
+    <div data-lang="fr">
+      <h2>Plan Simulator</h2>
+      <p class="info-subtitle">LiveSpec Playground — Dry-run visual du pipeline d'implémentation</p>
+
+      <h3>A quoi sert ce playground ?</h3>
+      <p>Le Plan Simulator permet de <strong>simuler visuellement l'exécution d'un plan LiveSpec</strong> avant de lancer <code>/spec.implement</code>. Il reproduit le cycle complet du Supervisor : décomposition en steps, construction du Task Payload, dispatch vers Superpowers, passage des reviewers, et checkpoint dans <code>progress.md</code>.</p>
+      <p>C'est un outil de vérification et de compréhension : on peut repérer un plan mal découpé, visualiser les dépendances entre steps, simuler des échecs, et comprendre comment le pipeline réagit.</p>
+
+      <h3>Comment l'utiliser — étape par étape</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Charger un projet .specs</strong>
+          Cliquez <strong>Load Project</strong> et sélectionnez le répertoire de votre projet. Le simulateur lit le dossier <code>.specs/features/</code> et liste les features disponibles.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Sélectionner une feature</strong>
+          Choisissez une feature dans le menu déroulant. Le <code>plan.md</code> est chargé et parsé automatiquement. Le simulateur extrait les steps, les fichiers touchés, les FR/AC référencés et les commandes de test. Si un step touche plus de 12 fichiers, un warning <em>Change Scope Guard</em> s'affiche.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Lancer la simulation</strong>
+          Cliquez <strong>Play</strong> ou appuyez sur <span class="kbd">Space</span>. Chaque step s'anime dans le diagramme d'agents : Supervisor → Build Payload → Superpowers → Implementer → Spec Reviewer → Quality Reviewer → Checkpoint.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Contrôler le déroulement</strong>
+          <ul>
+            <li><span class="kbd">Space</span> / <span class="kbd">K</span> — Play / Pause</li>
+            <li><span class="kbd">→</span> / <span class="kbd">L</span> — Step Forward</li>
+            <li><span class="kbd">←</span> / <span class="kbd">J</span> — Step Back</li>
+            <li><span class="kbd">R</span> — Reset</li>
+            <li>Sélecteur de vitesse : 0.5x, 1x, 2x</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Simuler un échec</strong>
+          <strong>Shift+click</strong> ou <strong>clic droit</strong> sur une carte de step pour activer "Simulate Failure". Ce step terminera en <em>Blocked</em> au lieu de <em>Done</em>, permettant de voir comment le pipeline gère les blocages.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">6</div>
+        <div class="info-step-content">
+          <strong>Observer le panneau détail</strong>
+          Cliquez sur un step pour voir dans le panneau de droite : sa description, les FR/AC adressés, les fichiers touchés, les commandes TDD, et son statut actuel.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">7</div>
+        <div class="info-step-content">
+          <strong>Suivre la phase finale</strong>
+          Après le dernier step, le simulateur anime automatiquement la <em>Final Validation</em> (Superpowers full suite) puis le <em>Documenter</em> (finalize). Un résumé s'affiche : N steps Done, M Blocked.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">8</div>
+        <div class="info-step-content">
+          <strong>Consulter le progress.md</strong>
+          Le panneau du bas génère en temps réel la table <code>progress.md</code> au format Markdown, exactement comme le Documenter la produirait. Vous pouvez la copier pour pré-alimenter votre feature.
+        </div>
+      </div>
+    </div>
+
+    <button class="info-close" onclick="toggleInfo()">Fermer</button>
+  </div>
+</div>
+
+</body>
+</html>

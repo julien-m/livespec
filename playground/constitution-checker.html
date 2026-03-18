@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiveSpec Constitution Checker</title>
+<style>
+*, *::before, *::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+:root {
+	--bg: #0f1117;
+	--panel: #161822;
+	--border: #262a3a;
+	--accent: #c4b5fd;
+	--accent-dark: #4338ca;
+	--text-primary: #e1e4ea;
+	--text-secondary: #8b8fa7;
+	--text-muted: #6b6f8a;
+	--text-body: #b0b4cc;
+	--green: #4ade80;
+	--yellow: #facc15;
+	--red: #f87171;
+	--gray: #6b7280;
+	--font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	--mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
+}
+
+html, body {
+	height: 100%;
+	background: var(--bg);
+	color: var(--text-primary);
+	font-family: var(--font);
+	overflow: hidden;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ── Top bar ── */
+.topbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 52px;
+	padding: 0 20px;
+	background: var(--panel);
+	border-bottom: 1px solid var(--border);
+	flex-shrink: 0;
+}
+
+.topbar-title {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--text-primary);
+	letter-spacing: -0.2px;
+}
+
+.topbar-title span {
+	color: var(--accent);
+}
+
+.topbar-right {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.score-badge {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 12px;
+	font-weight: 500;
+	padding: 5px 14px;
+	background: rgba(255,255,255,0.04);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+}
+
+.score-badge .pass { color: var(--green); }
+.score-badge .warn { color: var(--yellow); }
+.score-badge .fail { color: var(--red); }
+.score-badge .sep {
+	width: 1px;
+	height: 14px;
+	background: var(--border);
+}
+
+/* ── Main layout ── */
+.main-container {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.editors-area {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+/* ── Editor panels ── */
+.editor-panel {
+	display: flex;
+	flex-direction: column;
+	min-width: 200px;
+	overflow: hidden;
+}
+
+.editor-panel.left {
+	flex: 1;
+}
+
+.editor-panel.right {
+	flex: 1;
+}
+
+.panel-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 36px;
+	padding: 0 14px;
+	background: var(--panel);
+	border-bottom: 1px solid var(--border);
+	flex-shrink: 0;
+}
+
+.panel-label {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.6px;
+	color: var(--text-secondary);
+}
+
+.panel-info {
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.editor-wrapper {
+	flex: 1;
+	position: relative;
+	overflow: hidden;
+}
+
+.editor-container {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	overflow: auto;
+}
+
+.line-numbers {
+	flex-shrink: 0;
+	padding: 12px 0;
+	padding-right: 10px;
+	text-align: right;
+	font-family: var(--mono);
+	font-size: 12px;
+	line-height: 20px;
+	color: var(--text-muted);
+	user-select: none;
+	min-width: 40px;
+	background: var(--panel);
+	border-right: 1px solid var(--border);
+}
+
+.line-number {
+	padding: 0 8px 0 10px;
+	position: relative;
+}
+
+.line-number.flagged-red {
+	background: rgba(248, 113, 113, 0.08);
+}
+
+.line-number.flagged-red::after {
+	content: '';
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	background: var(--red);
+}
+
+.line-number.flagged-yellow {
+	background: rgba(250, 204, 21, 0.06);
+}
+
+.line-number.flagged-yellow::after {
+	content: '';
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 2px;
+	background: var(--yellow);
+}
+
+.code-area {
+	flex: 1;
+	position: relative;
+	min-width: 0;
+}
+
+.code-highlight {
+	position: absolute;
+	inset: 0;
+	padding: 12px;
+	font-family: var(--mono);
+	font-size: 12px;
+	line-height: 20px;
+	white-space: pre;
+	color: var(--text-body);
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.code-textarea {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	padding: 12px;
+	font-family: var(--mono);
+	font-size: 12px;
+	line-height: 20px;
+	color: transparent;
+	caret-color: var(--text-primary);
+	background: transparent;
+	border: none;
+	outline: none;
+	resize: none;
+	white-space: pre;
+	overflow: auto;
+	tab-size: 2;
+	-moz-tab-size: 2;
+}
+
+.code-textarea::placeholder {
+	color: var(--text-muted);
+}
+
+/* Sync highlight scroll with textarea scroll */
+.code-area .code-highlight {
+	overflow: hidden;
+}
+
+/* ── Highlighted line backgrounds (in code area) ── */
+.hl-line-red {
+	background: rgba(248, 113, 113, 0.08);
+	display: inline-block;
+	min-width: 100%;
+}
+
+.hl-line-yellow {
+	background: rgba(250, 204, 21, 0.06);
+	display: inline-block;
+	min-width: 100%;
+}
+
+/* ── Syntax highlighting colors ── */
+.syn-keyword { color: #c4b5fd; }
+.syn-string { color: #86efac; }
+.syn-number { color: #fbbf24; }
+.syn-comment { color: #6b6f8a; font-style: italic; }
+.syn-type { color: #93c5fd; }
+.syn-function { color: #f0abfc; }
+.syn-operator { color: #94a3b8; }
+.syn-heading { color: #c4b5fd; font-weight: 700; }
+.syn-bullet { color: #8b8fa7; }
+.syn-strong { color: #e1e4ea; font-weight: 700; }
+.syn-rule-keyword { color: #f87171; font-weight: 600; }
+
+/* ── Resize handle (vertical, between editors) ── */
+.resize-handle-v {
+	width: 5px;
+	cursor: col-resize;
+	background: var(--border);
+	flex-shrink: 0;
+	position: relative;
+	transition: background 0.15s;
+}
+
+.resize-handle-v:hover,
+.resize-handle-v.active {
+	background: var(--accent-dark);
+}
+
+/* ── Resize handle (horizontal, between editors and results) ── */
+.resize-handle-h {
+	height: 5px;
+	cursor: row-resize;
+	background: var(--border);
+	flex-shrink: 0;
+	transition: background 0.15s;
+}
+
+.resize-handle-h:hover,
+.resize-handle-h.active {
+	background: var(--accent-dark);
+}
+
+/* ── Results panel ── */
+.results-panel {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background: var(--panel);
+	border-top: 1px solid var(--border);
+}
+
+.results-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 36px;
+	padding: 0 14px;
+	border-bottom: 1px solid var(--border);
+	flex-shrink: 0;
+}
+
+.results-header-left {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.results-label {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.6px;
+	color: var(--text-secondary);
+}
+
+.results-count {
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.collapse-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	background: none;
+	border: 1px solid var(--border);
+	border-radius: 4px;
+	color: var(--text-secondary);
+	cursor: pointer;
+	font-size: 12px;
+	transition: all 0.15s;
+}
+
+.collapse-btn:hover {
+	background: rgba(255,255,255,0.05);
+	color: var(--text-primary);
+}
+
+.collapse-btn.collapsed svg {
+	transform: rotate(180deg);
+}
+
+.results-body {
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.results-body::-webkit-scrollbar {
+	width: 6px;
+}
+
+.results-body::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.results-body::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 3px;
+}
+
+.result-row {
+	display: grid;
+	grid-template-columns: 28px 1fr auto;
+	align-items: start;
+	padding: 8px 14px;
+	border-bottom: 1px solid rgba(38, 42, 58, 0.5);
+	cursor: pointer;
+	transition: background 0.1s;
+	gap: 10px;
+}
+
+.result-row:hover {
+	background: rgba(255,255,255,0.02);
+}
+
+.result-row.highlighted {
+	background: rgba(255,255,255,0.04);
+}
+
+.result-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	font-size: 11px;
+	font-weight: 700;
+	flex-shrink: 0;
+	margin-top: 1px;
+}
+
+.result-icon.pass {
+	color: var(--green);
+	background: rgba(74, 222, 128, 0.1);
+}
+
+.result-icon.warn {
+	color: var(--yellow);
+	background: rgba(250, 204, 21, 0.1);
+}
+
+.result-icon.fail {
+	color: var(--red);
+	background: rgba(248, 113, 113, 0.1);
+}
+
+.result-icon.na {
+	color: var(--gray);
+	background: rgba(107, 114, 128, 0.1);
+}
+
+.result-info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.result-title {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--text-primary);
+}
+
+.result-detail {
+	font-size: 11px;
+	color: var(--text-muted);
+	line-height: 1.4;
+}
+
+.result-detail code {
+	font-family: var(--mono);
+	font-size: 10.5px;
+	background: rgba(255,255,255,0.06);
+	padding: 1px 4px;
+	border-radius: 3px;
+	color: var(--text-secondary);
+}
+
+.result-line {
+	font-size: 11px;
+	font-family: var(--mono);
+	color: var(--text-muted);
+	white-space: nowrap;
+	padding-top: 2px;
+}
+
+.no-results {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--text-muted);
+	font-size: 13px;
+	gap: 6px;
+	padding: 40px;
+}
+
+.no-results svg {
+	width: 32px;
+	height: 32px;
+	opacity: 0.4;
+}
+
+/* ── Scrollbars for editors ── */
+.editor-container::-webkit-scrollbar,
+.code-textarea::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+.editor-container::-webkit-scrollbar-track,
+.code-textarea::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.editor-container::-webkit-scrollbar-thumb,
+.code-textarea::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 3px;
+}
+
+/* Filter tabs */
+.filter-tabs {
+	display: flex;
+	gap: 2px;
+	margin-left: 12px;
+}
+
+.filter-tab {
+	padding: 3px 10px;
+	font-size: 11px;
+	font-weight: 500;
+	font-family: var(--font);
+	color: var(--text-muted);
+	background: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.filter-tab:hover {
+	color: var(--text-secondary);
+	background: rgba(255,255,255,0.03);
+}
+
+.filter-tab.active {
+	color: var(--text-primary);
+	background: rgba(255,255,255,0.06);
+	border-color: var(--border);
+}
+
+/* Info button */
+.info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: #1e2035;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, 'Times New Roman', serif;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.info-btn:hover { background: var(--accent-dark); color: var(--text-primary); border-color: var(--accent-dark); }
+
+.info-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.info-overlay.open { display: flex; }
+
+.info-modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 680px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+}
+.info-modal::-webkit-scrollbar { width: 5px; }
+.info-modal::-webkit-scrollbar-track { background: transparent; }
+.info-modal::-webkit-scrollbar-thumb { background: #2a2e42; border-radius: 3px; }
+.info-modal h2 { font-size: 20px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+.info-modal .info-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.info-modal h3 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 20px; margin-bottom: 8px; }
+.info-modal p, .info-modal li { font-size: 13px; line-height: 1.7; color: var(--text-body); }
+.info-modal ul, .info-modal ol { padding-left: 20px; margin-bottom: 12px; }
+.info-modal li { margin-bottom: 4px; }
+.info-modal code { background: #1e2035; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: var(--accent); font-family: var(--mono); }
+.info-modal .info-step { display: flex; gap: 12px; margin-bottom: 16px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); }
+.info-modal .info-step-num { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-dark); color: var(--text-primary); font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.info-modal .info-step-content { flex: 1; }
+.info-modal .info-step-content strong { display: block; font-size: 13px; color: var(--text-primary); margin-bottom: 4px; }
+.info-modal .info-close { display: flex; align-items: center; justify-content: center; width: 100%; padding: 10px; margin-top: 24px; border-radius: 8px; border: 1px solid var(--border); background: #1e2035; color: var(--text-secondary); cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; }
+.info-modal .info-close:hover { background: var(--border); color: var(--text-primary); }
+.info-lang-toggle { display: flex; gap: 4px; margin-bottom: 20px; }
+.info-lang-btn { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; background: transparent; color: var(--text-secondary); border: 1px solid var(--border); transition: all 0.15s; }
+.info-lang-btn:hover { color: var(--accent); background: #1e2035; }
+.info-lang-btn.active { color: var(--accent); background: #1e2035; border-color: var(--accent-dark); }
+.info-modal [data-lang] { display: none; }
+.info-modal [data-lang].visible { display: block; }
+
+/* ── Project loader ── */
+.project-loader { padding: 8px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--panel); }
+.project-load-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px dashed var(--border); background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+.project-load-btn:hover { border-color: var(--accent-dark); color: var(--accent); background: #1e2035; }
+.project-load-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.project-info { margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.project-name-tag { font-size: 11px; color: var(--accent); background: rgba(67,56,202,0.15); padding: 2px 8px; border-radius: 4px; }
+.project-file-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; }
+.project-file-tag.found { background: rgba(74,222,128,0.15); color: var(--green); }
+.project-file-tag.missing { background: rgba(248,113,113,0.15); color: var(--red); }
+.project-reload-btn { padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 11px; transition: all 0.15s; }
+.project-reload-btn:hover { color: var(--accent); border-color: var(--accent-dark); }
+
+/* ── Empty state overlay ── */
+.empty-state-overlay { position: absolute; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.empty-state-overlay.hidden { display: none; }
+.empty-state-box { text-align: center; max-width: 360px; }
+.empty-state-box svg { margin-bottom: 16px; opacity: 0.6; }
+.empty-state-box h2 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+.empty-state-box p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+.empty-state-btn { padding: 10px 24px; border-radius: 8px; border: 1px solid var(--accent-dark); background: var(--accent-dark); color: var(--text-primary); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.empty-state-btn:hover { background: #5145e5; }
+
+/* ── Markdown preview ── */
+.md-preview { padding: 12px 14px; font-size: 13px; line-height: 1.7; color: var(--text-body); }
+.md-preview h2 { font-size: 16px; font-weight: 700; color: var(--accent); margin: 16px 0 8px; }
+.md-preview h3 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 14px 0 6px; }
+.md-preview h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 12px 0 4px; }
+.md-preview p { margin-bottom: 8px; }
+.md-preview strong { color: var(--text-primary); }
+.md-preview code { background: #1e2035; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: var(--accent); font-family: var(--mono); }
+.md-preview pre { background: #1e2035; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; margin: 8px 0; overflow-x: auto; }
+.md-preview pre code { background: none; padding: 0; font-size: 12px; color: var(--text-body); }
+.md-preview ul, .md-preview ol { padding-left: 20px; margin-bottom: 8px; }
+.md-preview li { margin-bottom: 2px; }
+.md-preview hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.md-preview table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }
+.md-preview td { padding: 6px 10px; border: 1px solid var(--border); }
+.md-preview tr:nth-child(even) { background: #1a1c2e; }
+.md-preview .empty-msg { color: var(--text-muted); font-style: italic; }
+.mermaid-container { background: #161822; border-radius: 8px; padding: 16px; margin: 12px 0; overflow-x: auto; }
+.mermaid-container svg { max-width: 100%; height: auto; }
+</style>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false, theme: 'dark', themeVariables: { primaryColor: '#4338ca', primaryTextColor: '#e1e4ea', lineColor: '#6b6f8a', secondaryColor: '#1e2035', tertiaryColor: '#262a3a' } });
+  window.__mermaidRender = async () => {
+    const els = document.querySelectorAll('.mermaid[data-processed]');
+    els.forEach(el => el.removeAttribute('data-processed'));
+    try { await mermaid.run({ querySelector: '.mermaid' }); } catch(e) { console.warn('Mermaid render:', e); }
+  };
+</script>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+	<div class="topbar-title"><span>LiveSpec</span> Constitution Checker</div>
+	<button class="info-btn" onclick="toggleInfo()" title="About this playground">i</button>
+	<div class="topbar-right">
+		<div class="score-badge" id="scoreBadge">
+			<span class="pass" id="scorePass">0 pass</span>
+			<span class="sep"></span>
+			<span class="warn" id="scoreWarn">0 warnings</span>
+			<span class="sep"></span>
+			<span class="fail" id="scoreFail">0 violations</span>
+		</div>
+	</div>
+</div>
+
+<!-- Project loader -->
+<div class="project-loader" id="projectLoader">
+	<button class="project-load-btn" onclick="loadProject()">
+		<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M2 4.5V12a1 1 0 001 1h10a1 1 0 001-1V6.5a1 1 0 00-1-1H8.5L7 4H3a1 1 0 00-1 .5z"/>
+		</svg>
+		Load .specs project
+	</button>
+	<div class="project-info" id="projectInfo" style="display:none">
+		<span class="project-name-tag" id="projectName"></span>
+		<span class="project-file-tag found" id="constitutionTag" style="display:none">&#10003; constitution.md</span>
+		<span class="project-file-tag found" id="stackTag" style="display:none">&#10003; _default.md</span>
+		<button class="project-reload-btn" onclick="loadProject()">Change</button>
+	</div>
+</div>
+
+<!-- Main -->
+<div class="main-container" style="position:relative;">
+	<!-- Empty state overlay -->
+	<div class="empty-state-overlay" id="emptyState">
+		<div class="empty-state-box">
+			<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48" style="color: var(--accent-dark)">
+				<path d="M6 12v24a3 3 0 003 3h30a3 3 0 003-3V18a3 3 0 00-3-3H25l-5-6H9a3 3 0 00-3 3z"/>
+			</svg>
+			<h2>Open a .specs project</h2>
+			<p>Load a project to check code against its constitution rules.</p>
+			<button class="empty-state-btn" onclick="loadProject()">Load Project</button>
+		</div>
+	</div>
+
+	<!-- Editors -->
+	<div class="editors-area" id="editorsArea">
+		<!-- Left: Constitution (read-only preview) -->
+		<div class="editor-panel left" id="panelLeft">
+			<div class="panel-header">
+				<span class="panel-label">Constitution Rules (constitution.md)</span>
+				<span class="panel-info" id="ruleCount">0 rules</span>
+			</div>
+			<div class="md-preview" id="constitutionPreview" style="flex:1; overflow-y:auto;">
+				<span class="empty-msg">No constitution loaded</span>
+			</div>
+		</div>
+
+		<!-- Resize handle -->
+		<div class="resize-handle-v" id="resizeV"></div>
+
+		<!-- Right: Code -->
+		<div class="editor-panel right" id="panelRight">
+			<div class="panel-header">
+				<span class="panel-label">Code Snippet</span>
+				<span class="panel-info" id="langDetect">No language detected</span>
+			</div>
+			<div class="editor-wrapper">
+				<div class="editor-container" id="codeEditorContainer">
+					<div class="line-numbers" id="codeLineNumbers"></div>
+					<div class="code-area">
+						<div class="code-highlight" id="codeHighlight"></div>
+						<textarea class="code-textarea" id="codeTextarea" spellcheck="false" placeholder="Paste code to check against constitution rules..."></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Horizontal resize handle -->
+	<div class="resize-handle-h" id="resizeH"></div>
+
+	<!-- Results panel -->
+	<div class="results-panel" id="resultsPanel">
+		<div class="results-header">
+			<div class="results-header-left">
+				<span class="results-label">Analysis Results</span>
+				<span class="results-count" id="resultsCount"></span>
+				<div class="filter-tabs" id="filterTabs">
+					<button class="filter-tab active" data-filter="all">All</button>
+					<button class="filter-tab" data-filter="fail">Violations</button>
+					<button class="filter-tab" data-filter="warn">Warnings</button>
+					<button class="filter-tab" data-filter="pass">Pass</button>
+					<button class="filter-tab" data-filter="na">N/A</button>
+				</div>
+			</div>
+			<button class="collapse-btn" id="collapseBtn" title="Toggle results panel">
+				<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="2 8 6 4 10 8"/>
+				</svg>
+			</button>
+		</div>
+		<div class="results-body" id="resultsBody">
+			<div class="no-results">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+					<rect x="9" y="3" width="6" height="4" rx="1"/>
+					<path d="M9 14l2 2 4-4"/>
+				</svg>
+				<span>Load a project and paste code to check</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+"use strict";
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Markdown renderer
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function renderMarkdown(md) {
+	if (!md) return '<span class="empty-msg">Not loaded</span>';
+
+	// Phase 1: Extract all fenced code blocks before markdown transforms.
+	const codeBlocks = [];
+	md = md.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+		const idx = codeBlocks.length;
+		codeBlocks.push({ lang, code });
+		return `<div data-cb="${idx}"></div>`;
+	});
+
+	// Phase 2: Markdown transforms (safe — no code block content left)
+	let html = md
+		.replace(/^#### (.+)$/gm, '<h5>$1</h5>')
+		.replace(/^### (.+)$/gm, '<h4>$1</h4>')
+		.replace(/^## (.+)$/gm, '<h3>$1</h3>')
+		.replace(/^# (.+)$/gm, '<h2>$1</h2>')
+		.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+		.replace(/\*(.+?)\*/g, '<em>$1</em>')
+		.replace(/`([^`]+)`/g, '<code>$1</code>')
+		.replace(/^---$/gm, '<hr>')
+		.replace(/^\|(.+)\|$/gm, (m, c) => { const cells = c.split('|').map(x=>x.trim()); if(cells.every(x=>/^[-:]+$/.test(x))) return ''; return '<tr>'+cells.map(x=>`<td>${x}</td>`).join('')+'</tr>'; })
+		.replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+		.replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+		.replace(/^(?!<[a-z])((?!^\s*$).+)$/gm, '<p>$1</p>')
+		.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+		.replace(/(<tr>.*<\/tr>\n?)+/g, '<table>$&</table>')
+		.replace(/<p>\s*<\/p>/g, '');
+
+	// Phase 3: Restore code blocks — mermaid as renderable diagrams, others as <pre><code>
+	for (let i = 0; i < codeBlocks.length; i++) {
+		const { lang, code } = codeBlocks[i];
+		let replacement;
+		if (lang === 'mermaid') {
+			const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+			replacement = `<div class="mermaid-container"><pre class="mermaid">${escaped}</pre></div>`;
+		} else {
+			const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+			replacement = `<pre><code>${escaped}</code></pre>`;
+		}
+		html = html.replace(`<div data-cb="${i}"></div>`, replacement);
+	}
+	return html;
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * State
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+let analysisResults = [];
+let activeFilter = "all";
+let flaggedLines = {};
+let resultsPanelCollapsed = false;
+let resultsPanelHeight = 0;
+let debounceTimer = null;
+let constitutionRaw = "";
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * DOM references
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+const constitutionPreview = document.getElementById("constitutionPreview");
+const codeTextarea = document.getElementById("codeTextarea");
+const codeHighlight = document.getElementById("codeHighlight");
+const codeLineNumbers = document.getElementById("codeLineNumbers");
+const codeEditorContainer = document.getElementById("codeEditorContainer");
+const emptyState = document.getElementById("emptyState");
+const resultsBody = document.getElementById("resultsBody");
+const resultsPanel = document.getElementById("resultsPanel");
+const collapseBtn = document.getElementById("collapseBtn");
+const ruleCountEl = document.getElementById("ruleCount");
+const langDetectEl = document.getElementById("langDetect");
+const resultsCountEl = document.getElementById("resultsCount");
+const scorePass = document.getElementById("scorePass");
+const scoreWarn = document.getElementById("scoreWarn");
+const scoreFail = document.getElementById("scoreFail");
+const panelLeft = document.getElementById("panelLeft");
+const panelRight = document.getElementById("panelRight");
+const resizeV = document.getElementById("resizeV");
+const resizeH = document.getElementById("resizeH");
+const editorsArea = document.getElementById("editorsArea");
+const filterTabs = document.getElementById("filterTabs");
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Language detection
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function detectLanguage(code) {
+	if (!code.trim()) return null;
+
+	const indicators = {
+		typescript: 0,
+		javascript: 0,
+		python: 0,
+		go: 0,
+		sql: 0,
+	};
+
+	if (/\binterface\s+\w+\s*\{/.test(code)) indicators.typescript += 3;
+	if (/:\s*(string|number|boolean|any)\b/.test(code)) indicators.typescript += 3;
+	if (/\btype\s+\w+\s*=/.test(code)) indicators.typescript += 2;
+	if (/<\w+(\[\])?>\s*/.test(code)) indicators.typescript += 1;
+	if (/Promise</.test(code)) indicators.typescript += 2;
+	if (/\basync\b.*=>\s*\{/.test(code)) indicators.typescript += 1;
+
+	if (/\b(import|export|require|module\.exports)\b/.test(code)) indicators.javascript += 2;
+	if (/\b(const|let|var)\s+\w+\s*=/.test(code)) indicators.javascript += 1;
+	if (/\bconsole\.\w+/.test(code)) indicators.javascript += 2;
+	if (/\bprocess\.env\b/.test(code)) indicators.javascript += 1;
+	if (/\bawait\b/.test(code)) indicators.javascript += 1;
+
+	if (/\bdef\s+\w+\(/.test(code)) indicators.python += 3;
+	if (/\bimport\s+\w+\b/.test(code) && !/from\s+["']/.test(code)) indicators.python += 1;
+	if (/\bprint\s*\(/.test(code)) indicators.python += 2;
+	if (/:\s*$/.test(code)) indicators.python += 1;
+	if (/\bself\.\w+/.test(code)) indicators.python += 3;
+
+	if (/\bfunc\s+\w+\(/.test(code)) indicators.go += 3;
+	if (/\bpackage\s+\w+/.test(code)) indicators.go += 4;
+	if (/\bfmt\.\w+/.test(code)) indicators.go += 3;
+	if (/\bif\s+err\s*!=\s*nil/.test(code)) indicators.go += 4;
+	if (/:=/.test(code)) indicators.go += 2;
+
+	if (/\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)\b/i.test(code)) indicators.sql += 3;
+	if (/\b(FROM|WHERE|JOIN|GROUP BY|ORDER BY|HAVING)\b/i.test(code)) indicators.sql += 2;
+
+	if (indicators.typescript > 0 && indicators.javascript > 0) {
+		indicators.typescript += indicators.javascript;
+	}
+
+	let best = null;
+	let bestScore = 0;
+	for (const [lang, score] of Object.entries(indicators)) {
+		if (score > bestScore) {
+			bestScore = score;
+			best = lang;
+		}
+	}
+
+	return bestScore >= 2 ? best : null;
+}
+
+const LANG_LABELS = {
+	typescript: "TypeScript",
+	javascript: "JavaScript",
+	python: "Python",
+	go: "Go",
+	sql: "SQL",
+};
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Syntax highlighting
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function escapeHtml(str) {
+	return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function highlightMarkdown(text) {
+	const lines = text.split("\n");
+	return lines.map((line) => {
+		let escaped = escapeHtml(line);
+
+		if (/^#{1,6}\s/.test(line)) {
+			escaped = `<span class="syn-heading">${escaped}</span>`;
+		} else if (/^\s*[-*]\s/.test(line)) {
+			escaped = escaped.replace(/^(\s*[-*]\s)/, '<span class="syn-bullet">$1</span>');
+			escaped = escaped.replace(/\b(MUST NOT|MUST|NEVER|ALWAYS|SHOULD NOT|SHOULD|AVOID|FORBIDDEN|REQUIRED)\b/g, '<span class="syn-rule-keyword">$1</span>');
+		} else {
+			escaped = escaped.replace(/\b(MUST NOT|MUST|NEVER|ALWAYS|SHOULD NOT|SHOULD|AVOID|FORBIDDEN|REQUIRED)\b/g, '<span class="syn-rule-keyword">$1</span>');
+		}
+
+		escaped = escaped.replace(/`([^`]+)`/g, '<span class="syn-string">`$1`</span>');
+		escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<span class="syn-strong">**$1**</span>');
+
+		return escaped;
+	}).join("\n");
+}
+
+function highlightCode(text, lang) {
+	const lines = text.split("\n");
+	const highlighted = lines.map((line) => {
+		let escaped = escapeHtml(line);
+
+		escaped = escaped.replace(/(\/\/.*$)/gm, '<span class="syn-comment">$1</span>');
+
+		escaped = escaped.replace(/(&quot;[^&]*&quot;|&apos;[^&]*&apos;|"[^"]*"|'[^']*'|`[^`]*`)/g, '<span class="syn-string">$1</span>');
+
+		if (lang === "typescript" || lang === "javascript") {
+			escaped = escaped.replace(/\b(import|export|from|const|let|var|function|class|interface|type|return|if|else|for|while|do|switch|case|break|continue|new|this|async|await|try|catch|throw|finally|typeof|instanceof|default|extends|implements|private|public|protected|readonly|static|void|null|undefined|true|false)\b/g, '<span class="syn-keyword">$1</span>');
+			escaped = escaped.replace(/\b(string|number|boolean|any|void|never|unknown|Promise|Array|Record|Partial|Required|Readonly)\b/g, '<span class="syn-type">$1</span>');
+		} else if (lang === "python") {
+			escaped = escaped.replace(/\b(import|from|def|class|return|if|elif|else|for|while|try|except|finally|raise|with|as|pass|break|continue|and|or|not|in|is|None|True|False|self|async|await|yield|lambda)\b/g, '<span class="syn-keyword">$1</span>');
+		} else if (lang === "go") {
+			escaped = escaped.replace(/\b(package|import|func|type|struct|interface|return|if|else|for|range|switch|case|break|continue|go|defer|chan|select|var|const|nil|true|false|err|map|make|append|len|cap)\b/g, '<span class="syn-keyword">$1</span>');
+			escaped = escaped.replace(/\b(string|int|int64|float64|bool|error|byte|rune|context\.Context)\b/g, '<span class="syn-type">$1</span>');
+		} else if (lang === "sql") {
+			escaped = escaped.replace(/\b(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|ON|AND|OR|NOT|IN|IS|NULL|AS|ORDER|BY|GROUP|HAVING|LIMIT|OFFSET|INTO|VALUES|SET|TABLE|INDEX|RETURNING|DESC|ASC|DISTINCT|COUNT|SUM|AVG|MAX|MIN|EXISTS|BETWEEN|LIKE|UNION|ALL)\b/gi, '<span class="syn-keyword">$1</span>');
+		}
+
+		escaped = escaped.replace(/\b(\d+\.?\d*)\b/g, '<span class="syn-number">$1</span>');
+
+		return escaped;
+	}).join("\n");
+
+	return highlighted;
+}
+
+function applyLineFlagging(highlightedHtml) {
+	const lines = highlightedHtml.split("\n");
+	return lines.map((line, i) => {
+		const lineNum = i + 1;
+		const flag = flaggedLines[lineNum];
+		if (flag === "fail") {
+			return `<span class="hl-line-red">${line}</span>`;
+		} else if (flag === "warn") {
+			return `<span class="hl-line-yellow">${line}</span>`;
+		}
+		return line;
+	}).join("\n");
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Line numbers
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function updateLineNumbers(textarea, lineNumbersEl, flags) {
+	const lineCount = textarea.value.split("\n").length;
+	let html = "";
+	for (let i = 1; i <= lineCount; i++) {
+		let cls = "line-number";
+		if (flags && flags[i] === "fail") cls += " flagged-red";
+		else if (flags && flags[i] === "warn") cls += " flagged-yellow";
+		html += `<div class="${cls}">${i}</div>`;
+	}
+	lineNumbersEl.innerHTML = html;
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Scroll sync
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function syncScroll(textarea, highlightEl, lineNumbersEl) {
+	highlightEl.scrollTop = textarea.scrollTop;
+	highlightEl.scrollLeft = textarea.scrollLeft;
+	lineNumbersEl.scrollTop = textarea.scrollTop;
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Constitution parser
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function parseConstitution(text) {
+	const rules = [];
+	const lines = text.split("\n");
+
+	let currentRule = null;
+	let currentSection = "";
+
+	for (const line of lines) {
+		const sectionMatch = line.match(/^#\s+(.+)/);
+		if (sectionMatch) {
+			currentSection = sectionMatch[1].trim();
+			continue;
+		}
+
+		const ruleMatch = line.match(/^#{2,3}\s+(?:Rule\s+)?(\d+)[\s:.—\-]+(.+)/i);
+		if (ruleMatch) {
+			if (currentRule) rules.push(currentRule);
+			currentRule = {
+				number: parseInt(ruleMatch[1], 10),
+				title: ruleMatch[2].trim(),
+				section: currentSection,
+				body: "",
+				keywords: [],
+			};
+			continue;
+		}
+
+		if (currentRule) {
+			currentRule.body += line + "\n";
+		}
+	}
+
+	if (currentRule) rules.push(currentRule);
+
+	for (const rule of rules) {
+		const kwRegex = /\b(MUST NOT|MUST|NEVER|ALWAYS|SHOULD NOT|SHOULD|AVOID|FORBIDDEN|REQUIRED)\b/g;
+		let m;
+		while ((m = kwRegex.exec(rule.body)) !== null) {
+			rule.keywords.push(m[1]);
+		}
+	}
+
+	return rules;
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Heuristic analysis engine
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function analyzeCode(rules, code, lang) {
+	const codeLines = code.split("\n");
+	const results = [];
+	flaggedLines = {};
+
+	const detections = runDetections(codeLines, lang);
+
+	for (const rule of rules) {
+		const ruleText = (rule.title + " " + rule.body).toLowerCase();
+		const matchedDetections = findMatchingDetections(rule, ruleText, detections);
+
+		if (matchedDetections.length === 0) {
+			const positiveCheck = checkPositivePatterns(rule, ruleText, codeLines, lang);
+			if (positiveCheck) {
+				results.push(positiveCheck);
+			} else {
+				results.push({
+					rule,
+					status: "na",
+					detail: "No relevant patterns detected in code",
+					matches: [],
+				});
+			}
+		} else {
+			const worstSeverity = matchedDetections.reduce((worst, d) => {
+				if (d.severity === "fail") return "fail";
+				if (d.severity === "warn" && worst !== "fail") return "warn";
+				return worst;
+			}, "pass");
+
+			results.push({
+				rule,
+				status: worstSeverity,
+				detail: matchedDetections.map((d) => d.message).join("; "),
+				matches: matchedDetections,
+			});
+
+			for (const d of matchedDetections) {
+				for (const lineNum of d.lines) {
+					const existing = flaggedLines[lineNum];
+					if (!existing || (d.severity === "fail" && existing !== "fail")) {
+						flaggedLines[lineNum] = d.severity;
+					}
+				}
+			}
+		}
+	}
+
+	return results;
+}
+
+function runDetections(codeLines, lang) {
+	const detections = [];
+
+	for (let i = 0; i < codeLines.length; i++) {
+		const line = codeLines[i];
+		const lineNum = i + 1;
+		const trimmed = line.trim();
+
+		if (/\bany\b/.test(line) && (lang === "typescript" || lang === "javascript")) {
+			if (/:\s*any\b/.test(line) || /\bany\s*[>\])]/.test(line) || /<any>/.test(line) || /\bany\[\]/.test(line)) {
+				detections.push({
+					category: "type-safety",
+					severity: "fail",
+					message: `\`any\` type used`,
+					pattern: trimmed,
+					lines: [lineNum],
+				});
+			}
+		}
+
+		if (/\binterface\s*\{\s*\}/.test(line) && lang === "go") {
+			detections.push({
+				category: "type-safety",
+				severity: "fail",
+				message: "`interface{}` used",
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/\bconsole\.(log|warn|error|info|debug|trace)\b/.test(line)) {
+			detections.push({
+				category: "logging",
+				severity: "fail",
+				message: `\`console.${line.match(/console\.(\w+)/)[1]}\` used`,
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/\bprint\s*\(/.test(line) && lang === "python") {
+			detections.push({
+				category: "logging",
+				severity: "warn",
+				message: "`print()` used",
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/\bfmt\.(Print|Println|Printf)\b/.test(line) && lang === "go") {
+			detections.push({
+				category: "logging",
+				severity: "warn",
+				message: "`fmt.Print*` used",
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/\bSELECT\s+\*/i.test(line)) {
+			detections.push({
+				category: "select-star",
+				severity: "fail",
+				message: "`SELECT *` found",
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/\b(TODO|FIXME|HACK|XXX)\b/i.test(line)) {
+			const tag = line.match(/\b(TODO|FIXME|HACK|XXX)\b/i)[1].toUpperCase();
+			detections.push({
+				category: "todo",
+				severity: "warn",
+				message: `${tag} comment found`,
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/eslint-disable|@ts-ignore|@ts-expect-error|#nosec|noinspection|noqa/.test(line)) {
+			const tag = line.match(/(eslint-disable[^\s]*|@ts-ignore|@ts-expect-error|#nosec|noinspection|noqa)/)[1];
+			detections.push({
+				category: "lint-suppress",
+				severity: "warn",
+				message: `Lint suppression: \`${tag}\``,
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/\bvar\s+\w+/.test(line) && (lang === "typescript" || lang === "javascript")) {
+			detections.push({
+				category: "immutability",
+				severity: "fail",
+				message: "`var` used instead of `const`/`let`",
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/\bprocess\.env\b/.test(line) && (lang === "typescript" || lang === "javascript")) {
+			detections.push({
+				category: "config",
+				severity: "warn",
+				message: "Direct `process.env` access",
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/\bos\.Getenv\b/.test(line) && lang === "go") {
+			detections.push({
+				category: "config",
+				severity: "warn",
+				message: "Direct `os.Getenv` access",
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/export\s+default\b/.test(line) && (lang === "typescript" || lang === "javascript")) {
+			detections.push({
+				category: "named-exports",
+				severity: "warn",
+				message: "`export default` used",
+				pattern: trimmed,
+				lines: [lineNum],
+			});
+		}
+
+		if (/["'`]\s*\+\s*\w+/.test(line) || /\w+\s*\+\s*["'`]/.test(line)) {
+			if (/SELECT|INSERT|UPDATE|DELETE|FROM|WHERE/i.test(line)) {
+				detections.push({
+					category: "sql-concat",
+					severity: "fail",
+					message: "SQL built via string concatenation",
+					pattern: trimmed,
+					lines: [lineNum],
+				});
+			}
+		}
+
+		const numMatch = line.match(/(?<![a-zA-Z_$])(\d+)(?![a-zA-Z_$\d.])/g);
+		if (numMatch) {
+			for (const n of numMatch) {
+				const num = parseInt(n, 10);
+				if (num > 1 && !trimmed.startsWith("//") && !trimmed.startsWith("#") && !trimmed.startsWith("*")) {
+					if (!/^\s*(const|let|var|export|import|\/\/|#|\*|return\s+\d|case\s+\d)/.test(trimmed)) {
+						if (!/\$\d+/.test(trimmed) && !/\[\d+\]/.test(trimmed)) {
+							if (/===?\s*\d+|!==?\s*\d+|\b\d+\s*[><=]/.test(line)) {
+								detections.push({
+									category: "magic-numbers",
+									severity: "warn",
+									message: `Magic number \`${num}\` in comparison`,
+									pattern: trimmed,
+									lines: [lineNum],
+								});
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Empty catch blocks
+	for (let i = 0; i < codeLines.length; i++) {
+		const line = codeLines[i].trim();
+		if (/catch\s*\([^)]*\)\s*\{\s*\}/.test(line)) {
+			detections.push({
+				category: "error-handling",
+				severity: "fail",
+				message: "Empty catch block",
+				pattern: line,
+				lines: [i + 1],
+			});
+		}
+		if (/catch\s*\([^)]*\)\s*\{/.test(line) && i + 1 < codeLines.length) {
+			const nextLine = codeLines[i + 1].trim();
+			if (nextLine === "}") {
+				detections.push({
+					category: "error-handling",
+					severity: "fail",
+					message: "Empty catch block",
+					pattern: line + " }",
+					lines: [i + 1, i + 2],
+				});
+			}
+		}
+	}
+
+	// Function length
+	const funcStarts = [];
+	let braceDepth = 0;
+	for (let i = 0; i < codeLines.length; i++) {
+		const line = codeLines[i];
+		if (/\b(function|async\s+function|async\s+\w+|(?:get|set)\s+\w+)\s*\(/.test(line) ||
+			/\b\w+\s*(?:=\s*)?(?:async\s+)?\(.*\)\s*(?::\s*\w+[^{]*)?\s*(?:=>)?\s*\{/.test(line) ||
+			/^\s*(?:async\s+)?\w+\s*\([^)]*\)\s*(?::\s*[^{]+)?\s*\{/.test(line)) {
+			if (line.includes("{")) {
+				funcStarts.push({ line: i + 1, depth: braceDepth });
+			}
+		}
+		for (const ch of line) {
+			if (ch === "{") braceDepth++;
+			else if (ch === "}") {
+				braceDepth--;
+				for (let j = funcStarts.length - 1; j >= 0; j--) {
+					if (funcStarts[j].depth === braceDepth) {
+						const funcLen = (i + 1) - funcStarts[j].line;
+						if (funcLen > 40) {
+							detections.push({
+								category: "function-length",
+								severity: "warn",
+								message: `Function starting at line ${funcStarts[j].line} is ${funcLen} lines long (> 40)`,
+								pattern: codeLines[funcStarts[j].line - 1].trim(),
+								lines: [funcStarts[j].line],
+							});
+						}
+						funcStarts.splice(j, 1);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	// File length
+	if (codeLines.length > 300) {
+		detections.push({
+			category: "file-length",
+			severity: "warn",
+			message: `File is ${codeLines.length} lines (> 300)`,
+			pattern: `${codeLines.length} lines total`,
+			lines: [codeLines.length],
+		});
+	}
+
+	// Missing type annotations on function params (TS)
+	if (lang === "typescript" || lang === "javascript") {
+		for (let i = 0; i < codeLines.length; i++) {
+			const line = codeLines[i];
+			const funcMatch = line.match(/(?:async\s+)?(?:\w+\s*)?(?:=\s*)?(?:async\s+)?\(([^)]+)\)/);
+			if (funcMatch && (line.includes("function") || line.includes("=>") || line.includes("async") || /^\s*\w+\s*\(/.test(line))) {
+				const params = funcMatch[1];
+				const paramList = params.split(",").map((p) => p.trim()).filter((p) => p);
+				for (const param of paramList) {
+					if (param && !param.includes(":") && !param.startsWith("...") && !/^\s*\{/.test(param) && !/^\s*\[/.test(param)) {
+						if (!/^(e|err|error|_)$/.test(param.trim())) {
+							detections.push({
+								category: "type-safety",
+								severity: "warn",
+								message: `Parameter \`${param.trim()}\` lacks type annotation`,
+								pattern: codeLines[i].trim(),
+								lines: [i + 1],
+							});
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return detections;
+}
+
+function findMatchingDetections(rule, ruleText, detections) {
+	const matched = [];
+
+	const categoryMap = {
+		"type-safety": ["type", "any", "typed", "type safety", "unknown", "interface{}"],
+		"logging": ["console", "log", "logger", "logging", "print", "fmt.print"],
+		"select-star": ["select *", "select star", "columns", "query"],
+		"todo": ["todo", "fixme", "hack"],
+		"lint-suppress": ["eslint-disable", "ts-ignore", "nosec", "lint", "suppress"],
+		"immutability": ["const", "let", "var", "immutab", "mutab"],
+		"config": ["process.env", "os.getenv", "config", "environment", "env var"],
+		"named-exports": ["named export", "default export", "export default"],
+		"sql-concat": ["parameterized", "concatenat", "sql inject", "bind param", "string concat"],
+		"magic-numbers": ["magic number", "bare numeric", "constant", "hardcoded", "magic"],
+		"error-handling": ["catch", "error handl", "empty catch", "propagate", "handle error"],
+		"function-length": ["function length", "40 lines", "50 lines", "small", "focused function", "single responsibility"],
+		"file-length": ["file length", "300 lines", "file size", "split"],
+	};
+
+	for (const detection of detections) {
+		const keywords = categoryMap[detection.category] || [];
+		const matches = keywords.some((kw) => ruleText.includes(kw));
+		if (matches) {
+			matched.push(detection);
+		}
+	}
+
+	return matched;
+}
+
+function checkPositivePatterns(rule, ruleText, codeLines, lang) {
+	if (ruleText.includes("error handl")) {
+		const hasTryCatch = codeLines.some((l) => /\b(try|catch)\b/.test(l));
+		const hasIfErr = codeLines.some((l) => /if\s+err\s*!=\s*nil/.test(l));
+		if (hasTryCatch || hasIfErr) {
+			return {
+				rule,
+				status: "pass",
+				detail: "Error handling patterns detected",
+				matches: [],
+			};
+		}
+	}
+
+	if (ruleText.includes("type") && (lang === "typescript")) {
+		const hasAnnotations = codeLines.some((l) => /:\s*(string|number|boolean|Promise)\b/.test(l));
+		if (hasAnnotations) {
+			return null;
+		}
+	}
+
+	return null;
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Rendering
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function updateEditors() {
+	const lang = detectLanguage(codeTextarea.value);
+	langDetectEl.textContent = lang ? LANG_LABELS[lang] || lang : "No language detected";
+
+	const codeHtml = highlightCode(codeTextarea.value, lang);
+	codeHighlight.innerHTML = applyLineFlagging(codeHtml);
+
+	updateLineNumbers(codeTextarea, codeLineNumbers, flaggedLines);
+
+	const rules = parseConstitution(constitutionRaw);
+	ruleCountEl.textContent = `${rules.length} rule${rules.length !== 1 ? "s" : ""}`;
+}
+
+function renderResults() {
+	const filtered = activeFilter === "all"
+		? analysisResults
+		: analysisResults.filter((r) => r.status === activeFilter);
+
+	if (filtered.length === 0) {
+		resultsBody.innerHTML = `<div class="no-results">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+				<rect x="9" y="3" width="6" height="4" rx="1"/>
+				<path d="M9 14l2 2 4-4"/>
+			</svg>
+			<span>${analysisResults.length === 0 ? "Load a project and paste code to check" : "No results match this filter"}</span>
+		</div>`;
+		return;
+	}
+
+	const statusIcons = {
+		pass: "\u2713",
+		warn: "!",
+		fail: "\u2717",
+		na: "\u2014",
+	};
+
+	resultsBody.innerHTML = filtered.map((r) => {
+		const lineRef = r.matches.length > 0
+			? r.matches.map((m) => m.lines.map((l) => `L${l}`).join(", ")).join(", ")
+			: "";
+		const firstLine = r.matches.length > 0 ? r.matches[0].lines[0] : null;
+
+		return `<div class="result-row" data-line="${firstLine || ""}">
+			<div class="result-icon ${r.status}">${statusIcons[r.status]}</div>
+			<div class="result-info">
+				<div class="result-title">Rule ${r.rule.number}: ${escapeHtml(r.rule.title)}</div>
+				<div class="result-detail">${escapeHtml(r.detail)}${r.matches.length > 0 ? " — " + r.matches.map((m) => `<code>${escapeHtml(truncate(m.pattern, 60))}</code>`).join(", ") : ""}</div>
+			</div>
+			<div class="result-line">${lineRef}</div>
+		</div>`;
+	}).join("");
+
+	resultsBody.querySelectorAll(".result-row").forEach((row) => {
+		row.addEventListener("click", () => {
+			const lineNum = parseInt(row.dataset.line, 10);
+			if (!lineNum) return;
+			scrollToCodeLine(lineNum);
+			resultsBody.querySelectorAll(".result-row").forEach((r) => r.classList.remove("highlighted"));
+			row.classList.add("highlighted");
+		});
+	});
+}
+
+function truncate(str, max) {
+	return str.length > max ? str.slice(0, max) + "\u2026" : str;
+}
+
+function updateScore() {
+	let pass = 0, warn = 0, fail = 0;
+	for (const r of analysisResults) {
+		if (r.status === "pass") pass++;
+		else if (r.status === "warn") warn++;
+		else if (r.status === "fail") fail++;
+	}
+
+	const total = analysisResults.filter((r) => r.status !== "na").length;
+	scorePass.textContent = `${pass}/${total} pass`;
+	scoreWarn.textContent = `${warn} warning${warn !== 1 ? "s" : ""}`;
+	scoreFail.textContent = `${fail} violation${fail !== 1 ? "s" : ""}`;
+
+	resultsCountEl.textContent = `${analysisResults.length} rules checked`;
+}
+
+function scrollToCodeLine(lineNum) {
+	const lineHeight = 20;
+	const targetScroll = (lineNum - 1) * lineHeight - codeTextarea.clientHeight / 2 + lineHeight;
+	codeTextarea.scrollTop = Math.max(0, targetScroll);
+	syncScroll(codeTextarea, codeHighlight, codeLineNumbers);
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Run check
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function runCheck() {
+	const constitutionText = constitutionRaw;
+	const codeText = codeTextarea.value;
+
+	if (!constitutionText.trim() || !codeText.trim()) {
+		analysisResults = [];
+		flaggedLines = {};
+		updateEditors();
+		renderResults();
+		updateScore();
+		return;
+	}
+
+	const rules = parseConstitution(constitutionText);
+	const lang = detectLanguage(codeText);
+	analysisResults = analyzeCode(rules, codeText, lang);
+
+	analysisResults.sort((a, b) => {
+		const order = { fail: 0, warn: 1, pass: 2, na: 3 };
+		return order[a.status] - order[b.status];
+	});
+
+	updateEditors();
+	renderResults();
+	updateScore();
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Resize: vertical (between editors)
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+let isResizingV = false;
+
+resizeV.addEventListener("mousedown", (e) => {
+	isResizingV = true;
+	resizeV.classList.add("active");
+	e.preventDefault();
+});
+
+document.addEventListener("mousemove", (e) => {
+	if (!isResizingV) return;
+	const rect = editorsArea.getBoundingClientRect();
+	const x = e.clientX - rect.left;
+	const totalWidth = rect.width;
+	const pct = Math.max(15, Math.min(85, (x / totalWidth) * 100));
+
+	panelLeft.style.flex = "none";
+	panelLeft.style.width = pct + "%";
+	panelRight.style.flex = "1";
+});
+
+document.addEventListener("mouseup", () => {
+	if (isResizingV) {
+		isResizingV = false;
+		resizeV.classList.remove("active");
+	}
+});
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Resize: horizontal (between editors and results)
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+let isResizingH = false;
+
+resizeH.addEventListener("mousedown", (e) => {
+	isResizingH = true;
+	resizeH.classList.add("active");
+	e.preventDefault();
+});
+
+document.addEventListener("mousemove", (e) => {
+	if (!isResizingH) return;
+	const containerRect = document.querySelector(".main-container").getBoundingClientRect();
+	const y = e.clientY - containerRect.top;
+	const totalHeight = containerRect.height;
+	const resultHeight = totalHeight - y;
+	const pct = Math.max(10, Math.min(70, (resultHeight / totalHeight) * 100));
+
+	resultsPanel.style.height = pct + "%";
+	resultsPanel.style.flex = "none";
+	editorsArea.style.flex = "1";
+});
+
+document.addEventListener("mouseup", () => {
+	if (isResizingH) {
+		isResizingH = false;
+		resizeH.classList.remove("active");
+	}
+});
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Collapse results
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+collapseBtn.addEventListener("click", () => {
+	resultsPanelCollapsed = !resultsPanelCollapsed;
+	collapseBtn.classList.toggle("collapsed", resultsPanelCollapsed);
+
+	if (resultsPanelCollapsed) {
+		resultsPanelHeight = resultsPanel.style.height || resultsPanel.offsetHeight + "px";
+		resultsBody.style.display = "none";
+		resultsPanel.style.height = "36px";
+		resultsPanel.style.flex = "none";
+		resizeH.style.display = "none";
+	} else {
+		resultsBody.style.display = "";
+		resultsPanel.style.height = resultsPanelHeight || "40%";
+		resultsPanel.style.flex = "none";
+		resizeH.style.display = "";
+	}
+});
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Filter tabs
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+filterTabs.addEventListener("click", (e) => {
+	const btn = e.target.closest(".filter-tab");
+	if (!btn) return;
+	filterTabs.querySelectorAll(".filter-tab").forEach((b) => b.classList.remove("active"));
+	btn.classList.add("active");
+	activeFilter = btn.dataset.filter;
+	renderResults();
+});
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Event listeners
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function debouncedCheck() {
+	clearTimeout(debounceTimer);
+	updateEditors();
+	debounceTimer = setTimeout(runCheck, 500);
+}
+
+codeTextarea.addEventListener("input", debouncedCheck);
+
+codeTextarea.addEventListener("scroll", () => syncScroll(codeTextarea, codeHighlight, codeLineNumbers));
+
+// Handle tab key in code textarea
+codeTextarea.addEventListener("keydown", (e) => {
+	if (e.key === "Tab") {
+		e.preventDefault();
+		const start = codeTextarea.selectionStart;
+		const end = codeTextarea.selectionEnd;
+		codeTextarea.value = codeTextarea.value.substring(0, start) + "\t" + codeTextarea.value.substring(end);
+		codeTextarea.selectionStart = codeTextarea.selectionEnd = start + 1;
+		codeTextarea.dispatchEvent(new Event("input"));
+	}
+});
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Project loader (File System Access API)
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+let projectHandle = null;
+
+async function loadProject() {
+	try {
+		projectHandle = await window.showDirectoryPicker({ mode: "read" });
+		const specsDir = await projectHandle.getDirectoryHandle(".specs");
+
+		let constitutionContent = "";
+		let stackContent = "";
+		let hasConstitution = false;
+		let hasStack = false;
+
+		// Load constitution.md
+		try {
+			const constitutionFile = await specsDir.getFileHandle("constitution.md");
+			const file = await constitutionFile.getFile();
+			constitutionContent = await file.text();
+			hasConstitution = true;
+		} catch (e) { /* not found */ }
+
+		// Load stacks/_default.md
+		try {
+			const stacksDir = await specsDir.getDirectoryHandle("stacks");
+			const stackFile = await stacksDir.getFileHandle("_default.md");
+			const file = await stackFile.getFile();
+			stackContent = await file.text();
+			hasStack = true;
+		} catch (e) { /* not found */ }
+
+		// Store raw constitution and render MD preview
+		let content = constitutionContent;
+		if (stackContent) {
+			content += "\n\n---\n\n<!-- Stack & Patterns (_default.md) -->\n\n" + stackContent;
+		}
+		constitutionRaw = content;
+		constitutionPreview.innerHTML = renderMarkdown(content);
+		if (window.__mermaidRender) requestAnimationFrame(() => window.__mermaidRender());
+
+		// Hide empty state
+		emptyState.classList.add("hidden");
+
+		// Update UI
+		document.getElementById("projectInfo").style.display = "flex";
+		document.getElementById("projectName").textContent = projectHandle.name;
+
+		const constitutionTag = document.getElementById("constitutionTag");
+		constitutionTag.style.display = "inline-flex";
+		constitutionTag.className = "project-file-tag " + (hasConstitution ? "found" : "missing");
+		constitutionTag.textContent = (hasConstitution ? "\u2713" : "\u2717") + " constitution.md";
+
+		const stackTag = document.getElementById("stackTag");
+		stackTag.style.display = "inline-flex";
+		stackTag.className = "project-file-tag " + (hasStack ? "found" : "missing");
+		stackTag.textContent = (hasStack ? "\u2713" : "\u2717") + " _default.md";
+
+		localStorage.setItem("livespec-playground-project", projectHandle.name);
+
+		// Auto-analyze if code is present
+		runCheck();
+	} catch (e) {
+		if (e.name !== "AbortError") console.error("Load project error:", e);
+	}
+}
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Initialization
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+function init() {
+	resultsPanel.style.height = "40%";
+	resultsPanel.style.flex = "none";
+	editorsArea.style.flex = "1";
+
+	// Restore last project name display (handle cannot be persisted)
+	const lastProject = localStorage.getItem("livespec-playground-project");
+	if (lastProject) {
+		document.getElementById("projectInfo").style.display = "flex";
+		document.getElementById("projectName").textContent = lastProject;
+	}
+
+	updateEditors();
+}
+
+init();
+
+function setInfoLang(lang) {
+  document.querySelectorAll('.info-modal [data-lang]').forEach(el => {
+    el.classList.toggle('visible', el.dataset.lang === lang);
+  });
+  document.querySelectorAll('.info-lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim() === (lang === 'en' ? 'English' : 'Français'));
+  });
+}
+function toggleInfo() {
+  document.getElementById('infoOverlay').classList.toggle('open');
+}
+// Info modal Escape — check before other handlers
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const ov = document.getElementById('infoOverlay');
+    if (ov.classList.contains('open')) { ov.classList.remove('open'); e.stopPropagation(); e.preventDefault(); }
+  }
+}, true);
+</script>
+
+<div class="info-overlay" id="infoOverlay" onclick="if(event.target===this)toggleInfo()">
+  <div class="info-modal">
+    <div class="info-lang-toggle">
+      <button class="info-lang-btn active" onclick="setInfoLang('en')">English</button>
+      <button class="info-lang-btn" onclick="setInfoLang('fr')">Français</button>
+    </div>
+
+    <div data-lang="en" class="visible">
+      <h2>Constitution Rule Checker</h2>
+      <p class="info-subtitle">LiveSpec Playground — Heuristic architecture rule checker</p>
+
+      <h3>What is this playground for?</h3>
+      <p>The Constitution Rule Checker analyzes a code snippet against the rules defined in your <code>constitution.md</code>. It uses <strong>heuristic analysis</strong> (pattern matching, no AI) to detect potential violations: <code>any</code> types, <code>console.log</code>, <code>SELECT *</code>, overly long functions, magic numbers, etc.</p>
+      <p>It's a quick feedback tool — it doesn't replace a linter, but it verifies that code follows the project-specific architectural conventions defined in your LiveSpec constitution.</p>
+
+      <h3>How to use — step by step</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Load a project</strong>
+          Click "Load Project" and select a directory containing a <code>.specs/</code> folder. The constitution rules are loaded from <code>constitution.md</code> and displayed as a read-only preview in the left panel.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Paste a code snippet (right panel)</strong>
+          Paste the source code to check. The language is auto-detected (JS/TS, Python, Go, SQL).
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Auto-analysis</strong>
+          Analysis runs automatically when the project is loaded and whenever you edit the code (500ms debounce). The score appears immediately in the top bar.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Read the score</strong>
+          The badge at the top right summarizes: <em>N pass, M warnings, K violations</em>. Violations are blocking issues (MUST NOT / NEVER), warnings are recommendations (SHOULD / AVOID).
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Explore the results</strong>
+          The bottom panel lists each rule with its status:
+          <ul>
+            <li>Green (pass) — no problematic pattern detected</li>
+            <li>Yellow (warning) — suspicious pattern, check manually</li>
+            <li>Red (violation) — anti-pattern detected, must fix</li>
+            <li>Gray (N/A) — rule not applicable to the provided code</li>
+          </ul>
+          Click a row to navigate to the relevant code line.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">6</div>
+        <div class="info-step-content">
+          <strong>Filter results</strong>
+          The filter tabs (All / Violations / Warnings / Pass / N/A) let you focus on one category. Useful when there are many rules.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">7</div>
+        <div class="info-step-content">
+          <strong>Iterate</strong>
+          Edit the code directly in the right panel. The analysis re-runs automatically after 500ms. Fix violations and watch the score go up in real-time.
+        </div>
+      </div>
+
+      <h3>Detected patterns</h3>
+      <p>The analyzer looks for: <code>any</code> usage, <code>console.log</code>, <code>SELECT *</code>, <code>TODO/FIXME/HACK</code>, <code>eslint-disable</code>, <code>@ts-ignore</code>, <code>var</code> instead of <code>const/let</code>, empty catch blocks, magic numbers, direct <code>process.env</code> access, <code>export default</code>, SQL concatenation, functions > 50 lines, files > 300 lines.</p>
+    </div>
+
+    <div data-lang="fr">
+      <h2>Constitution Rule Checker</h2>
+      <p class="info-subtitle">LiveSpec Playground — Vérificateur heuristique des règles d'architecture</p>
+
+      <h3>A quoi sert ce playground ?</h3>
+      <p>Le Constitution Rule Checker analyse un snippet de code par rapport aux règles définies dans votre <code>constitution.md</code>. Il détecte par <strong>analyse heuristique</strong> (pattern matching, pas d'IA) les violations potentielles : types <code>any</code>, <code>console.log</code>, <code>SELECT *</code>, fonctions trop longues, magic numbers, etc.</p>
+      <p>C'est un outil de feedback rapide — il ne remplace pas un linter, mais il vérifie que le code respecte les conventions architecturales spécifiques de votre projet, telles que définies dans la constitution LiveSpec.</p>
+
+      <h3>Comment l'utiliser — étape par étape</h3>
+
+      <div class="info-step">
+        <div class="info-step-num">1</div>
+        <div class="info-step-content">
+          <strong>Charger un projet</strong>
+          Cliquez sur "Load Project" et sélectionnez un dossier contenant un répertoire <code>.specs/</code>. Les règles de la constitution sont chargées depuis <code>constitution.md</code> et affichées en lecture seule dans le panneau gauche.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">2</div>
+        <div class="info-step-content">
+          <strong>Coller un snippet de code (panneau droit)</strong>
+          Collez le code source à vérifier. Le langage est détecté automatiquement (JS/TS, Python, Go, SQL).
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">3</div>
+        <div class="info-step-content">
+          <strong>Analyse automatique</strong>
+          L'analyse se lance automatiquement au chargement du projet et à chaque modification du code (500ms debounce). Le score s'affiche immédiatement dans la barre du haut.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">4</div>
+        <div class="info-step-content">
+          <strong>Lire le score</strong>
+          Le badge en haut à droite résume : <em>N pass, M warnings, K violations</em>. Les violations sont des problèmes bloquants (MUST NOT / NEVER), les warnings sont des recommandations (SHOULD / AVOID).
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">5</div>
+        <div class="info-step-content">
+          <strong>Explorer les résultats</strong>
+          Le panneau du bas liste chaque règle avec son statut :
+          <ul>
+            <li>Vert (pass) — aucun pattern problématique détecté</li>
+            <li>Jaune (warning) — pattern douteux, à vérifier manuellement</li>
+            <li>Rouge (violation) — anti-pattern détecté, à corriger</li>
+            <li>Gris (N/A) — règle non applicable au code fourni</li>
+          </ul>
+          Cliquez sur une ligne pour naviguer à la ligne de code concernée.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">6</div>
+        <div class="info-step-content">
+          <strong>Filtrer les résultats</strong>
+          Les onglets de filtre (All / Violations / Warnings / Pass / N/A) permettent de se concentrer sur une catégorie. Utile quand il y a beaucoup de règles.
+        </div>
+      </div>
+
+      <div class="info-step">
+        <div class="info-step-num">7</div>
+        <div class="info-step-content">
+          <strong>Itérer</strong>
+          Modifiez le code directement dans le panneau droit. L'analyse se relance automatiquement après 500ms. Corrigez les violations et regardez le score monter en temps réel.
+        </div>
+      </div>
+
+      <h3>Patterns détectés</h3>
+      <p>L'analyseur cherche entre autres : usage de <code>any</code>, <code>console.log</code>, <code>SELECT *</code>, <code>TODO/FIXME/HACK</code>, <code>eslint-disable</code>, <code>@ts-ignore</code>, <code>var</code> au lieu de <code>const/let</code>, catch vides, magic numbers, accès direct à <code>process.env</code>, <code>export default</code>, concaténation SQL, fonctions > 50 lignes, fichiers > 300 lignes.</p>
+    </div>
+
+    <button class="info-close" onclick="toggleInfo()">Fermer</button>
+  </div>
+</div>
+
+</body>
+</html>
