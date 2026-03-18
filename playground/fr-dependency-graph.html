@@ -277,6 +277,58 @@
     margin-top: 2px;
   }
 
+  .subtask-list {
+    margin: 2px 0 0 18px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .subtask-item {
+    font-size: 11px;
+    color: #8b8fa7;
+    padding: 2px 6px;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .subtask-item:hover {
+    background: rgba(67, 56, 202, 0.15);
+    color: #c4b5fd;
+  }
+
+  .subtask-item.selected {
+    background: rgba(196, 181, 253, 0.1);
+    color: #c4b5fd;
+  }
+
+  .subtask-item .st-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .subtask-item .st-num {
+    font-weight: 700;
+    min-width: 18px;
+  }
+
+  .subtask-item .st-desc {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .subtask-item .st-meta {
+    font-size: 10px;
+    color: #6b6f8a;
+    white-space: nowrap;
+  }
+
   /* ── Summary panel ── */
   .summary-panel {
     flex-shrink: 0;
@@ -1150,10 +1202,22 @@ function parseSpec(text) {
 }
 
 let allPlanStepNums = [];
+let hasSubtasks = false;
 
 function parsePlan(text, frs) {
   allPlanStepNums = [];
+  hasSubtasks = false;
   if (!text.trim()) return;
+
+  // Initialize subtasks array on all FRs
+  for (const fr of frs) {
+    fr.subtasks = [];
+  }
+
+  // First pass: detect if the plan uses the FR-NNN.N sub-task format
+  const subtaskDetect = /FR-\d{3}\.\d+:\s*[^,\n]+/;
+  const useSubtasks = subtaskDetect.test(text);
+
   // Find "Step N" blocks and extract FR covered
   const stepRegex = /### Step (\d+)[^\n]*\n([\s\S]*?)(?=### Step|\n## |$)/g;
   let match;
@@ -1161,14 +1225,43 @@ function parsePlan(text, frs) {
     const stepNum = parseInt(match[1], 10);
     allPlanStepNums.push(stepNum);
     const block = match[2];
-    const coveredFrs = block.match(/FR-\d{3}/g) || [];
-    for (const frId of coveredFrs) {
-      const fr = frs.find((f) => f.id === frId);
-      if (fr && !fr.step) {
-        fr.step = `Step ${stepNum}`;
+
+    if (useSubtasks) {
+      // Sub-task mode: parse FR-NNN.N: description
+      const stRegex = /FR-(\d{3})\.(\d+):\s*([^,\n]+)/g;
+      let stMatch;
+      while ((stMatch = stRegex.exec(block)) !== null) {
+        const frId = `FR-${stMatch[1]}`;
+        const subNum = parseInt(stMatch[2], 10);
+        const description = stMatch[3].trim();
+        const fr = frs.find((f) => f.id === frId);
+        if (fr) {
+          fr.subtasks.push({
+            subId: `${frId}.${subNum}`,
+            num: subNum,
+            description: description,
+            step: `Step ${stepNum}`,
+            status: "todo",
+          });
+          // Keep fr.step as first sub-task's step for backward compat
+          if (!fr.step) {
+            fr.step = `Step ${stepNum}`;
+          }
+        }
+      }
+    } else {
+      // Legacy mode: FR-NNN only, first step wins
+      const coveredFrs = block.match(/FR-\d{3}/g) || [];
+      for (const frId of coveredFrs) {
+        const fr = frs.find((f) => f.id === frId);
+        if (fr && !fr.step) {
+          fr.step = `Step ${stepNum}`;
+        }
       }
     }
   }
+
+  hasSubtasks = useSubtasks && frs.some(f => f.subtasks.length > 0);
 }
 
 function parseImplementation(text, frs) {
@@ -1196,11 +1289,26 @@ function parseImplementation(text, frs) {
       fr.status = status;
       fr.file = file || null;
       fr.anchor = anchor || null;
+
+      // Propagate status to sub-tasks
+      if (hasSubtasks && fr.subtasks.length > 0) {
+        for (const st of fr.subtasks) {
+          st.status = status;
+        }
+      }
     }
   }
 }
 
 // ── Metrics ──
+
+function getAllSubtasks() {
+  const all = [];
+  for (const fr of graphData.frs) {
+    for (const st of fr.subtasks) all.push(st);
+  }
+  return all;
+}
 
 function updateMetrics() {
   const total = graphData.frs.length;
@@ -1223,7 +1331,15 @@ function updateMetrics() {
     stepsWrap.style.display = "none";
   }
 
-  const pct = total > 0 ? Math.round((implemented / total) * 100) : 0;
+  // Progress based on sub-tasks when available, FRs otherwise
+  let pct;
+  if (hasSubtasks) {
+    const allSt = getAllSubtasks();
+    const stImpl = allSt.filter(st => st.status === "implemented").length;
+    pct = allSt.length > 0 ? Math.round((stImpl / allSt.length) * 100) : 0;
+  } else {
+    pct = total > 0 ? Math.round((implemented / total) * 100) : 0;
+  }
   document.getElementById("progressFill").style.width = pct + "%";
   document.getElementById("progressLabel").textContent = pct + "%";
 }
@@ -1244,16 +1360,28 @@ function renderSummary() {
   const realSteps = stepClusters.filter(c => c.stepNum !== -1);
   const stepCount = realSteps.length;
   const explicitEdgeCount = graphData.edges.length;
-  const pct = Math.round((implemented / total) * 100);
 
-  // Block 1: Overview
+  // Block 1: Overview — sub-task-aware
   const overviewEl = document.getElementById("summaryOverview");
-  const stepInfo = stepCount > 0 ? `${total} FRs across ${stepCount} steps` : `${total} FRs, no plan loaded`;
-  let progressLine;
-  if (implemented === total) {
-    progressLine = `<span class="summary-ok">All FRs implemented</span>`;
+  let stepInfo, progressLine;
+  if (hasSubtasks) {
+    const allSt = getAllSubtasks();
+    const stImpl = allSt.filter(st => st.status === "implemented").length;
+    const stPct = allSt.length > 0 ? Math.round((stImpl / allSt.length) * 100) : 0;
+    stepInfo = stepCount > 0 ? `${total} FRs (${allSt.length} sub-tasks) across ${stepCount} steps` : `${total} FRs (${allSt.length} sub-tasks), no plan loaded`;
+    if (stImpl === allSt.length && allSt.length > 0) {
+      progressLine = `<span class="summary-ok">All sub-tasks implemented</span>`;
+    } else {
+      progressLine = `${stImpl}/${allSt.length} sub-tasks implemented (${stPct}%)`;
+    }
   } else {
-    progressLine = `${implemented}/${total} implemented (${pct}%)`;
+    const pct = Math.round((implemented / total) * 100);
+    stepInfo = stepCount > 0 ? `${total} FRs across ${stepCount} steps` : `${total} FRs, no plan loaded`;
+    if (implemented === total) {
+      progressLine = `<span class="summary-ok">All FRs implemented</span>`;
+    } else {
+      progressLine = `${implemented}/${total} implemented (${pct}%)`;
+    }
   }
   overviewEl.innerHTML = `<div class="summary-block-title">Overview</div><div class="summary-block-content">${stepInfo}<br>${progressLine}</div>`;
 
@@ -1273,23 +1401,37 @@ function renderSummary() {
   depsEl.innerHTML = `<div class="summary-block-title">Dependencies</div><div class="summary-block-content">${depsContent}</div>`;
 
   // Block 3: Bottlenecks
+  // Helper: resolve status for a cluster item (sub-task ID or FR ID)
+  function clusterItemStatus(id) {
+    if (hasSubtasks) {
+      // id is a sub-task ID like FR-001.1
+      for (const fr of graphData.frs) {
+        const st = fr.subtasks.find(s => s.subId === id);
+        if (st) return st.status;
+      }
+      // Fallback: check if it's an unassigned FR
+      const fr = graphData.frs.find(f => f.id === id);
+      return fr ? fr.status : "todo";
+    }
+    const fr = graphData.frs.find(f => f.id === id);
+    return fr ? fr.status : "todo";
+  }
+
   const bnEl = document.getElementById("summaryBottlenecks");
   const issues = [];
-  // Steps with blocked/missing FRs
+  // Steps with blocked/missing items
+  const itemLabel = hasSubtasks ? "sub-task" : "FR";
   for (const cluster of realSteps) {
-    const blockedInStep = cluster.frIds.filter(id => {
-      const fr = graphData.frs.find(f => f.id === id);
-      return fr && ["blocked", "missing"].includes(fr.status);
-    }).length;
+    const blockedInStep = cluster.frIds.filter(id => ["blocked", "missing"].includes(clusterItemStatus(id))).length;
     if (blockedInStep > 0) {
-      issues.push(`<span class="summary-bad">${cluster.label} has ${blockedInStep} blocked FR${blockedInStep > 1 ? 's' : ''}</span>`);
+      issues.push(`<span class="summary-bad">${cluster.label} has ${blockedInStep} blocked ${itemLabel}${blockedInStep > 1 ? 's' : ''}</span>`);
     }
   }
   // Largest step
   if (realSteps.length > 0) {
     const largest = realSteps.reduce((a, b) => a.frIds.length >= b.frIds.length ? a : b);
     if (largest.frIds.length > 2) {
-      issues.push(`${largest.label} is the largest step (${largest.frIds.length} FRs)`);
+      issues.push(`${largest.label} is the largest step (${largest.frIds.length} ${itemLabel}s)`);
     }
   }
   const bnContent = issues.length > 0 ? issues.join("<br>") : `<span class="summary-ok">No bottlenecks detected</span>`;
@@ -1304,10 +1446,7 @@ function renderSummary() {
       : `No step data — load plan.md`;
   } else {
     const chips = realSteps.map(cluster => {
-      const implCount = cluster.frIds.filter(id => {
-        const fr = graphData.frs.find(f => f.id === id);
-        return fr && fr.status === "implemented";
-      }).length;
+      const implCount = cluster.frIds.filter(id => clusterItemStatus(id) === "implemented").length;
       const t = cluster.frIds.length;
       const ratio = t > 0 ? implCount / t : 0;
       const cls = ratio === 1 ? "summary-ok" : ratio === 0 ? "summary-bad" : "summary-warn";
@@ -1328,11 +1467,18 @@ function renderFrList(filter = "") {
 
   for (const fr of graphData.frs) {
     if (lower && !fr.id.toLowerCase().includes(lower) && !fr.description.toLowerCase().includes(lower)) {
-      continue;
+      // Also check sub-task descriptions for filter match
+      const stMatch = hasSubtasks && fr.subtasks.some(st => st.description.toLowerCase().includes(lower) || st.subId.toLowerCase().includes(lower));
+      if (!stMatch) continue;
     }
 
+    // In sub-task mode, card is "selected" if any of its sub-tasks is selected
+    const isCardSelected = hasSubtasks
+      ? (fr.subtasks.some(st => st.subId === selectedFr) || (fr.subtasks.length === 0 && selectedFr === fr.id))
+      : selectedFr === fr.id;
+
     const card = document.createElement("div");
-    card.className = "fr-card" + (selectedFr === fr.id ? " selected" : "");
+    card.className = "fr-card" + (isCardSelected ? " selected" : "");
     card.dataset.frId = fr.id;
 
     const dot = document.createElement("div");
@@ -1354,40 +1500,128 @@ function renderFrList(filter = "") {
     metaSpan.className = "fr-card-meta";
     const parts = [];
     parts.push(`${fr.acs.length} AC`);
-    if (fr.step) parts.push(fr.step);
+    if (hasSubtasks && fr.subtasks.length > 0) {
+      parts.push(`${fr.subtasks.length} sub-tasks`);
+    } else if (fr.step) {
+      parts.push(fr.step);
+    }
     parts.push(statusLabel(fr.status));
     metaSpan.textContent = parts.join(" \u00b7 ");
 
     content.appendChild(idSpan);
     content.appendChild(descSpan);
     content.appendChild(metaSpan);
+
+    // Sub-task nested list
+    if (hasSubtasks && fr.subtasks.length > 0) {
+      const stList = document.createElement("div");
+      stList.className = "subtask-list";
+      for (const st of fr.subtasks) {
+        const stItem = document.createElement("div");
+        stItem.className = "subtask-item" + (selectedFr === st.subId ? " selected" : "");
+        stItem.innerHTML = `<div class="st-dot" style="background:${statusColor(st.status)}"></div><span class="st-num">.${st.num}</span><span class="st-desc">${st.description}</span><span class="st-meta">${st.step} \u00b7 ${statusLabel(st.status)}</span>`;
+        stItem.addEventListener("click", (e) => {
+          e.stopPropagation();
+          selectFr(st.subId);
+        });
+        stList.appendChild(stItem);
+      }
+      content.appendChild(stList);
+    }
+
     card.appendChild(dot);
     card.appendChild(content);
     container.appendChild(card);
 
     card.addEventListener("click", () => {
-      selectFr(fr.id);
+      if (hasSubtasks && fr.subtasks.length > 0) {
+        // Click on FR parent: select first sub-task
+        selectFr(fr.subtasks[0].subId);
+      } else {
+        selectFr(fr.id);
+      }
     });
   }
 }
 
 // ── Detail Panel ──
 
-function showDetail(frId) {
-  const fr = graphData.frs.find((f) => f.id === frId);
+function showDetail(nodeId) {
+  // Resolve: nodeId can be a sub-task ID (FR-001.1) or a FR ID (FR-001)
+  let fr = null;
+  let subtask = null;
+
+  if (hasSubtasks && /^FR-\d{3}\.\d+$/.test(nodeId)) {
+    // Sub-task ID — find parent FR and the sub-task
+    const parentId = nodeId.replace(/\.\d+$/, "");
+    fr = graphData.frs.find((f) => f.id === parentId);
+    if (fr) subtask = fr.subtasks.find((st) => st.subId === nodeId);
+  } else {
+    fr = graphData.frs.find((f) => f.id === nodeId);
+  }
   if (!fr) return;
 
   document.getElementById("detailEmpty").style.display = "none";
   const content = document.getElementById("detailContent");
   content.style.display = "block";
 
-  let html = `<div class="detail-header">
-    <div class="detail-id">${fr.id}</div>
-    <div class="detail-status ${statusClass(fr.status)}"><span class="dot"></span>${statusLabel(fr.status)}</div>
-    <div class="detail-desc">${fr.description}</div>
-  </div>`;
+  let html = "";
 
-  // Acceptance criteria
+  if (subtask) {
+    // Sub-task detail view
+    html += `<div class="detail-header">
+      <div class="detail-id">${subtask.subId}</div>
+      <div class="detail-status ${statusClass(subtask.status)}"><span class="dot"></span>${statusLabel(subtask.status)}</div>
+      <div class="detail-desc">${subtask.description}</div>
+      <div class="detail-info-row" style="margin-top:4px"><span class="label">${subtask.step}</span></div>
+    </div>`;
+
+    // Parent FR section
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Parent FR</div>
+      <div class="detail-info-row"><span class="label">${fr.id}</span> <span class="val">${fr.description}</span></div>
+    </div>`;
+
+    // Sibling sub-tasks
+    if (fr.subtasks.length > 1) {
+      html += `<div class="detail-section">
+        <div class="detail-section-title">All Sub-tasks (${fr.subtasks.length})</div>
+        <div class="detail-dep-list">`;
+      for (const st of fr.subtasks) {
+        const isCurrent = st.subId === nodeId;
+        html += `<div class="detail-dep-item${isCurrent ? '' : ''}" data-fr-id="${st.subId}">
+          <div class="dep-dot" style="background:${statusColor(st.status)}"></div>
+          <span class="dep-id" style="${isCurrent ? 'font-weight:800' : ''}">${st.subId}</span>
+          <span>${st.description} (${st.step})</span>
+        </div>`;
+      }
+      html += `</div></div>`;
+    }
+  } else {
+    // Legacy FR detail view
+    html += `<div class="detail-header">
+      <div class="detail-id">${fr.id}</div>
+      <div class="detail-status ${statusClass(fr.status)}"><span class="dot"></span>${statusLabel(fr.status)}</div>
+      <div class="detail-desc">${fr.description}</div>
+    </div>`;
+
+    // Sub-tasks section (when viewing FR parent directly)
+    if (hasSubtasks && fr.subtasks.length > 0) {
+      html += `<div class="detail-section">
+        <div class="detail-section-title">Sub-tasks (${fr.subtasks.length})</div>
+        <div class="detail-dep-list">`;
+      for (const st of fr.subtasks) {
+        html += `<div class="detail-dep-item" data-fr-id="${st.subId}">
+          <div class="dep-dot" style="background:${statusColor(st.status)}"></div>
+          <span class="dep-id">${st.subId}</span>
+          <span>${st.description} (${st.step})</span>
+        </div>`;
+      }
+      html += `</div></div>`;
+    }
+  }
+
+  // Acceptance criteria (always from parent FR)
   if (fr.acs.length > 0) {
     html += `<div class="detail-section">
       <div class="detail-section-title">Acceptance Criteria (${fr.acs.length})</div>
@@ -1399,7 +1633,7 @@ function showDetail(frId) {
     html += `</ul></div>`;
   }
 
-  // Source file & anchor
+  // Source file & anchor (from parent FR)
   if (fr.file || fr.anchor) {
     html += `<div class="detail-section">
       <div class="detail-section-title">Implementation</div>`;
@@ -1412,8 +1646,8 @@ function showDetail(frId) {
     html += `</div>`;
   }
 
-  // Plan step
-  if (fr.step) {
+  // Plan step (only in legacy mode)
+  if (!subtask && fr.step) {
     html += `<div class="detail-section">
       <div class="detail-section-title">Plan</div>
       <div class="detail-info-row"><span class="val">${fr.step}</span></div>
@@ -1421,6 +1655,7 @@ function showDetail(frId) {
   }
 
   // Dependencies (outgoing: this FR depends on)
+  const frId = fr.id;
   const outgoing = graphData.edges.filter((e) => e.from === frId);
   if (outgoing.length > 0) {
     html += `<div class="detail-section">
@@ -1428,7 +1663,8 @@ function showDetail(frId) {
       <div class="detail-dep-list">`;
     for (const edge of outgoing) {
       const target = graphData.frs.find((f) => f.id === edge.to);
-      html += `<div class="detail-dep-item" data-fr-id="${edge.to}">
+      const clickId = (hasSubtasks && target && target.subtasks.length > 0) ? target.subtasks[0].subId : edge.to;
+      html += `<div class="detail-dep-item" data-fr-id="${clickId}">
         <div class="dep-dot" style="background:${statusColor(target?.status)}"></div>
         <span class="dep-id">${edge.to}</span>
         <span>${target ? target.description.substring(0, 50) : ""}</span>
@@ -1445,7 +1681,8 @@ function showDetail(frId) {
       <div class="detail-dep-list">`;
     for (const edge of incoming) {
       const source = graphData.frs.find((f) => f.id === edge.from);
-      html += `<div class="detail-dep-item" data-fr-id="${edge.from}">
+      const clickId = (hasSubtasks && source && source.subtasks.length > 0) ? source.subtasks[0].subId : edge.from;
+      html += `<div class="detail-dep-item" data-fr-id="${clickId}">
         <div class="dep-dot" style="background:${statusColor(source?.status)}"></div>
         <span class="dep-id">${edge.from}</span>
         <span>${source ? source.description.substring(0, 50) : ""}</span>
@@ -1517,16 +1754,54 @@ function initSimulation() {
   const cx = rect.width / 2;
   const cy = rect.height / 2;
 
-  nodes = graphData.frs.map((fr) => ({
-    id: fr.id,
-    x: cx,
-    y: cy,
-    vx: 0,
-    vy: 0,
-    radius: nodeRadius(fr),
-    fr: fr,
-    pinned: false,
-  }));
+  if (hasSubtasks) {
+    // Sub-task mode: each sub-task is a node
+    nodes = [];
+    for (const fr of graphData.frs) {
+      if (fr.subtasks.length > 0) {
+        for (const st of fr.subtasks) {
+          nodes.push({
+            id: st.subId,
+            parentFrId: fr.id,
+            x: cx,
+            y: cy,
+            vx: 0,
+            vy: 0,
+            radius: 22,
+            fr: fr,
+            subtask: st,
+            pinned: false,
+          });
+        }
+      } else {
+        // FR without sub-tasks: render as legacy node
+        nodes.push({
+          id: fr.id,
+          x: cx,
+          y: cy,
+          vx: 0,
+          vy: 0,
+          radius: nodeRadius(fr),
+          fr: fr,
+          subtask: null,
+          pinned: false,
+        });
+      }
+    }
+  } else {
+    // Legacy mode: one node per FR
+    nodes = graphData.frs.map((fr) => ({
+      id: fr.id,
+      x: cx,
+      y: cy,
+      vx: 0,
+      vy: 0,
+      radius: nodeRadius(fr),
+      fr: fr,
+      subtask: null,
+      pinned: false,
+    }));
+  }
 
   if (stepClusters.length > 0) {
     // Cluster mode: position nodes by cluster, horizontal layout
@@ -1539,12 +1814,12 @@ function initSimulation() {
       cluster.centerX = startX + ci * clusterSpacing;
       cluster.centerY = cy;
 
-      const clusterFrs = cluster.frIds;
-      for (let fi = 0; fi < clusterFrs.length; fi++) {
-        const node = nodes.find(n => n.id === clusterFrs[fi]);
+      const clusterItems = cluster.frIds;
+      for (let fi = 0; fi < clusterItems.length; fi++) {
+        const node = nodes.find(n => n.id === clusterItems[fi]);
         if (node) {
-          const angle = (2 * Math.PI * fi) / Math.max(clusterFrs.length, 1);
-          const spread = Math.min(60, 25 + clusterFrs.length * 12);
+          const angle = (2 * Math.PI * fi) / Math.max(clusterItems.length, 1);
+          const spread = Math.min(60, 25 + clusterItems.length * 12);
           node.x = cluster.centerX + Math.cos(angle) * spread + (Math.random() - 0.5) * 15;
           node.y = cluster.centerY + Math.sin(angle) * spread + (Math.random() - 0.5) * 15;
         }
@@ -1560,18 +1835,25 @@ function initSimulation() {
     }
   }
 
-  // AC nodes positioned around their parent FR
+  // AC nodes positioned around their parent FR (or first sub-task in sub-task mode)
   acNodes = [];
   for (const ac of graphData.acs) {
-    const parentNode = nodes.find((n) => n.id === ac.parentFr);
+    let parentNode;
+    if (hasSubtasks) {
+      // Find the first sub-task node of the parent FR
+      parentNode = nodes.find((n) => n.fr && n.fr.id === ac.parentFr);
+    } else {
+      parentNode = nodes.find((n) => n.id === ac.parentFr);
+    }
     if (!parentNode) continue;
-    const idx = acNodes.filter((a) => a.parentId === ac.parentFr).length;
+    const parentKey = parentNode.id;
+    const idx = acNodes.filter((a) => a.parentId === parentKey).length;
     const totalAcs = graphData.acs.filter((a) => a.parentFr === ac.parentFr).length;
     const angle = ((2 * Math.PI) / Math.max(totalAcs, 1)) * idx - Math.PI / 2;
     const dist = parentNode.radius + 20;
     acNodes.push({
       id: ac.id,
-      parentId: ac.parentFr,
+      parentId: parentKey,
       x: parentNode.x + Math.cos(angle) * dist,
       y: parentNode.y + Math.sin(angle) * dist,
       vx: 0,
@@ -1582,10 +1864,22 @@ function initSimulation() {
     });
   }
 
-  simEdges = graphData.edges.map((e) => ({
-    from: e.from,
-    to: e.to,
-  }));
+  if (hasSubtasks) {
+    // Map FR-level edges to sub-task nodes (use first sub-task of each FR)
+    simEdges = [];
+    for (const e of graphData.edges) {
+      const fromFr = graphData.frs.find(f => f.id === e.from);
+      const toFr = graphData.frs.find(f => f.id === e.to);
+      const fromId = (fromFr && fromFr.subtasks.length > 0) ? fromFr.subtasks[fromFr.subtasks.length - 1].subId : e.from;
+      const toId = (toFr && toFr.subtasks.length > 0) ? toFr.subtasks[0].subId : e.to;
+      simEdges.push({ from: fromId, to: toId });
+    }
+  } else {
+    simEdges = graphData.edges.map((e) => ({
+      from: e.from,
+      to: e.to,
+    }));
+  }
 
   // Center transform
   transform = { x: 0, y: 0, k: 1 };
@@ -1822,10 +2116,11 @@ function render() {
     acNodesGroup.innerHTML = "";
   }
 
-  // Render FR nodes
+  // Render nodes (FR or sub-task)
   let nodeHtml = "";
   for (const node of nodes) {
-    const color = statusColor(node.fr.status);
+    const st = node.subtask;
+    const color = st ? statusColor(st.status) : statusColor(node.fr.status);
     const isCritical = criticalPathActive && criticalPathNodes.has(node.id);
     const isSelected = node.id === selectedFr;
     const isHovered = node.id === hoveredNode;
@@ -1845,8 +2140,17 @@ function render() {
 
     nodeHtml += `<circle class="node-circle${critClass}${dimNode}" cx="${node.x}" cy="${node.y}" r="${node.radius}" fill="#1a1d2e" stroke="${color}" stroke-width="${strokeW}" data-fr-id="${node.id}"${filterAttr}/>`;
     nodeHtml += `<circle class="${dimNode}" cx="${node.x}" cy="${node.y - node.radius * 0.3}" r="4" fill="${color}" pointer-events="none"/>`;
-    const fontSize = node.radius < 25 ? 9 : 11;
-    nodeHtml += `<text class="node-label${dimNode}" x="${node.x}" y="${node.y + 4}" font-size="${fontSize}">${node.id}</text>`;
+
+    if (st) {
+      // Sub-task node: two-line label — FR-NNN (small, grey) + .N (main)
+      const frNum = node.fr.id.replace("FR-", "");
+      nodeHtml += `<text class="node-label${dimNode}" x="${node.x}" y="${node.y}" font-size="8" fill="#6b6f8a" pointer-events="none">${frNum}</text>`;
+      nodeHtml += `<text class="node-label${dimNode}" x="${node.x}" y="${node.y + 11}" font-size="11" pointer-events="none">.${st.num}</text>`;
+    } else {
+      // Legacy FR node: single label
+      const fontSize = node.radius < 25 ? 9 : 11;
+      nodeHtml += `<text class="node-label${dimNode}" x="${node.x}" y="${node.y + 4}" font-size="${fontSize}">${node.id}</text>`;
+    }
   }
   nodesGroup.innerHTML = nodeHtml;
 }
@@ -1972,17 +2276,20 @@ svg.addEventListener("mouseout", (e) => {
 
 function findCriticalPath() {
   // Find the longest path in the DAG using DFS
+  // Build adjacency using actual node IDs (sub-task IDs or FR IDs)
   const adj = {};
-  for (const fr of graphData.frs) {
-    adj[fr.id] = [];
+  for (const node of nodes) {
+    adj[node.id] = [];
   }
-  // Explicit FR-FR edges
-  for (const edge of graphData.edges) {
+
+  // Explicit edges (already mapped to correct IDs in simEdges)
+  for (const edge of simEdges) {
     if (adj[edge.from]) {
       adj[edge.from].push(edge.to);
     }
   }
-  // Step-based edges: FRs in step N connect to FRs in step N+1
+
+  // Step-based edges: nodes in step N connect to nodes in step N+1
   if (stepClusters.length > 0) {
     for (const se of stepEdgesData) {
       const fromCluster = stepClusters.find(c => c.stepNum === se.from);
@@ -2016,9 +2323,9 @@ function findCriticalPath() {
     }
   }
 
-  for (const fr of graphData.frs) {
-    const visited = new Set([fr.id]);
-    dfs(fr.id, [fr.id], visited);
+  for (const node of nodes) {
+    const visited = new Set([node.id]);
+    dfs(node.id, [node.id], visited);
   }
 
   return longestPath;
@@ -2071,16 +2378,37 @@ function parseAndGenerate(specText, planText, implText) {
     for (const num of allPlanStepNums) {
       if (!stepMap.has(num)) stepMap.set(num, []);
     }
-    for (const fr of graphData.frs) {
-      if (fr.step) {
-        const num = parseInt(fr.step.replace("Step ", ""), 10);
-        if (!stepMap.has(num)) stepMap.set(num, []);
-        stepMap.get(num).push(fr.id);
+
+    if (hasSubtasks) {
+      // Sub-task mode: each sub-task belongs to its own step
+      for (const fr of graphData.frs) {
+        for (const st of fr.subtasks) {
+          const num = parseInt(st.step.replace("Step ", ""), 10);
+          if (!stepMap.has(num)) stepMap.set(num, []);
+          stepMap.get(num).push(st.subId);
+        }
       }
-    }
-    const unassigned = graphData.frs.filter(f => !f.step).map(f => f.id);
-    if (unassigned.length > 0) {
-      stepMap.set(-1, unassigned);
+      // FRs with no sub-tasks go to unassigned
+      const unassignedFrs = graphData.frs.filter(f => f.subtasks.length === 0);
+      if (unassignedFrs.length > 0) {
+        if (!stepMap.has(-1)) stepMap.set(-1, []);
+        for (const fr of unassignedFrs) {
+          stepMap.get(-1).push(fr.id);
+        }
+      }
+    } else {
+      // Legacy mode: FR-level, first step wins
+      for (const fr of graphData.frs) {
+        if (fr.step) {
+          const num = parseInt(fr.step.replace("Step ", ""), 10);
+          if (!stepMap.has(num)) stepMap.set(num, []);
+          stepMap.get(num).push(fr.id);
+        }
+      }
+      const unassigned = graphData.frs.filter(f => !f.step).map(f => f.id);
+      if (unassigned.length > 0) {
+        stepMap.set(-1, unassigned);
+      }
     }
 
     const sortedSteps = [...stepMap.keys()].sort((a, b) => a - b);

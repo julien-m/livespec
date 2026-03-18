@@ -217,6 +217,8 @@ Before proceeding to Step 1, verify:
 > File-by-file, step-by-step. Each step should be independently executable.
 >
 > **@spec anchors:** Every file implementing a FR/AC must include `// @spec FR-NNN: description — spec.md#fr-nnn` next to the implementing function. Place anchors as code is written, not retroactively.
+>
+> **FR sub-tasks:** Each FR mentioned in a step must have a sequential sub-task number and a short description (< 50 chars). Format: `FR-001.1: Brief task description`. The sub-task number increments per FR across the entire plan.
 
 ### Step 1 — Database Schema
 
@@ -239,7 +241,7 @@ CREATE TABLE notifications (
 CREATE INDEX idx_notifications_user_unread ON notifications(user_id, read) WHERE read = false;
 ```
 
-**FR covered:** FR-001, FR-002
+**FR covered:** FR-001.1: Schema creation, FR-002.1: Preference table schema
 
 ---
 
@@ -253,7 +255,7 @@ CREATE INDEX idx_notifications_user_unread ON notifications(user_id, read) WHERE
 - Function `getUserNotificationPreferences(userId: string)` — fetches preferences
 - Function `updateNotificationPreferences(userId: string, prefs: Partial<NotificationPreference>)`
 
-**FR covered:** FR-001, FR-003, FR-005, FR-006
+**FR covered:** FR-001.2: Notification queries, FR-003.1: Read status mutations, FR-005.1: Preference data access, FR-006.1: Preference queries
 
 ---
 
@@ -267,7 +269,7 @@ CREATE INDEX idx_notifications_user_unread ON notifications(user_id, read) WHERE
 - `GET /api/notifications/preferences` — get preferences
 - `PUT /api/notifications/preferences` — update preferences
 
-**FR covered:** FR-001, FR-003, FR-005, FR-006
+**FR covered:** FR-001.3: Notification API routes, FR-003.2: Mark-as-read endpoint, FR-005.2: Preference API endpoints, FR-006.2: Preference update route
 
 ---
 
@@ -292,7 +294,7 @@ CREATE INDEX idx_notifications_user_unread ON notifications(user_id, read) WHERE
 - Read/unread visual distinction
 - Click handler
 
-**FR covered:** FR-001, FR-002, FR-003, FR-004, FR-006
+**FR covered:** FR-001.4: Notification list UI, FR-002.2: Unread badge display, FR-003.3: Mark-read click handler, FR-004.1: Notification panel empty state, FR-006.3: Preference toggle components
 
 ---
 
@@ -304,7 +306,7 @@ CREATE INDEX idx_notifications_user_unread ON notifications(user_id, read) WHERE
 - Update local count and list on new notification
 - Unsubscribe on component unmount
 
-**FR covered:** FR-002
+**FR covered:** FR-002.3: Real-time subscription hook
 
 ---
 

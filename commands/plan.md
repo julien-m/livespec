@@ -133,6 +133,16 @@ For each FR, map to specific files:
 5. **UI layer** — components, pages, hooks
 6. **Test files** — unit, integration, E2E
 
+**FR sub-task format:** Each FR mentioned in a step's `**FR covered:**` line must include a sequential sub-task number and a short description of the work done in that step:
+
+```markdown
+**FR covered:** FR-001.1: Schema creation, FR-003.1: Read status mutations
+```
+
+- Sub-task numbers increment per FR across the entire plan (e.g., FR-001.1 in Step 1, FR-001.2 in Step 3, FR-001.3 in Step 5)
+- Description is mandatory and must be < 50 characters
+- This enables the FR Dependency Graph playground to assign each sub-task to its correct step
+
 For each file:
 - State whether it's new or modified
 - List the functions/components to create

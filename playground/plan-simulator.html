@@ -1338,11 +1338,24 @@
 
   function extractRefs(text) {
     const refs = [];
-    const refRegex = /(FR-\d+|AC-\d+)/gi;
+    // First pass: match FR sub-task format FR-NNN.N: description
+    const subTaskRegex = /FR-\d+\.\d+/gi;
     let m;
-    while ((m = refRegex.exec(text)) !== null) {
-      const r = m[1].toUpperCase();
+    while ((m = subTaskRegex.exec(text)) !== null) {
+      const r = m[0].toUpperCase();
       if (!refs.includes(r)) refs.push(r);
+    }
+    // Second pass: match plain FR-NNN and AC-NNN (only add FR if no sub-task already captured for that FR)
+    const plainRegex = /(FR-\d+|AC-\d+)/gi;
+    while ((m = plainRegex.exec(text)) !== null) {
+      const r = m[1].toUpperCase();
+      if (r.startsWith("AC-")) {
+        if (!refs.includes(r)) refs.push(r);
+      } else {
+        // Only add plain FR-NNN if no sub-task FR-NNN.X was already found
+        const hasSubtask = refs.some(ref => ref.startsWith(r + "."));
+        if (!hasSubtask && !refs.includes(r)) refs.push(r);
+      }
     }
     return refs;
   }
