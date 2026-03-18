@@ -357,6 +357,7 @@
   .summary-ok { color: #4ade80; }
   .summary-warn { color: #facc15; }
   .summary-bad { color: #f87171; }
+  .summary-neutral { color: #6b7280; }
 
   /* ── Center canvas ── */
   .canvas-area {
@@ -1202,10 +1203,12 @@ function parseSpec(text) {
 }
 
 let allPlanStepNums = [];
+let planStepTitles = new Map();
 let hasSubtasks = false;
 
 function parsePlan(text, frs) {
   allPlanStepNums = [];
+  planStepTitles = new Map();
   hasSubtasks = false;
   if (!text.trim()) return;
 
@@ -1224,6 +1227,12 @@ function parsePlan(text, frs) {
   while ((match = stepRegex.exec(text)) !== null) {
     const stepNum = parseInt(match[1], 10);
     allPlanStepNums.push(stepNum);
+    // Extract step title from heading line (e.g. "### Step 1: Setup config")
+    const headerLine = match[0].split('\n')[0];
+    const titleMatch = headerLine.match(/### Step \d+[:.]\s*(.*)/);
+    if (titleMatch && titleMatch[1].trim()) {
+      planStepTitles.set(stepNum, titleMatch[1].trim());
+    }
     const block = match[2];
 
     if (useSubtasks) {
@@ -1267,7 +1276,7 @@ function parsePlan(text, frs) {
 function parseImplementation(text, frs) {
   if (!text.trim()) return;
   // Parse the requirement mapping table
-  const rowRegex = /\|\s*\[?(FR-\d{3})[^\]]*\]?[^|]*\|\s*`?([^|`]*)`?\s*\|\s*`?([^|`]*)`?\s*\|\s*([^|]*?)\s*\|/g;
+  const rowRegex = /\|\s*\[?(FR-\d{3})[^\]]*\]?[^|]*\|([^|]*)\|([^|]*)\|([^|]*)\|/g;
   let match;
   while ((match = rowRegex.exec(text)) !== null) {
     const frId = match[1];
@@ -1449,7 +1458,7 @@ function renderSummary() {
       const implCount = cluster.frIds.filter(id => clusterItemStatus(id) === "implemented").length;
       const t = cluster.frIds.length;
       const ratio = t > 0 ? implCount / t : 0;
-      const cls = ratio === 1 ? "summary-ok" : ratio === 0 ? "summary-bad" : "summary-warn";
+      const cls = t === 0 ? "summary-neutral" : ratio === 1 ? "summary-ok" : ratio === 0 ? "summary-bad" : "summary-warn";
       const num = cluster.label.replace("Step ", "S");
       return `<span class="${cls}">${num}: ${implCount}/${t}</span>`;
     });
@@ -2040,6 +2049,11 @@ function render() {
 
       clusterHtml += `<rect class="cluster-rect" x="${minX}" y="${minY}" width="${width}" height="${height}" rx="12" fill="rgba(30,32,53,0.5)" stroke="${borderColor}" stroke-width="${strokeWidth}"/>`;
       clusterHtml += `<text class="cluster-label" x="${minX + 12}" y="${minY + 16}" font-size="11" fill="${isCriticalCluster ? '#c4b5fd' : '#6b6f8a'}">${cluster.label}</text>`;
+      // Show title in empty clusters so they aren't blank
+      if (clusterNodes.length === 0 && cluster.title) {
+        const titleText = cluster.title.length > 18 ? cluster.title.slice(0, 17) + "…" : cluster.title;
+        clusterHtml += `<text x="${minX + width / 2}" y="${minY + height / 2 + 4}" font-size="9" fill="#4b5563" text-anchor="middle" font-style="italic">${titleText}</text>`;
+      }
     }
 
     // Step-to-step arrows
@@ -2415,6 +2429,7 @@ function parseAndGenerate(specText, planText, implText) {
     stepClusters = sortedSteps.map(num => ({
       stepNum: num,
       label: num === -1 ? "Unassigned" : `Step ${num}`,
+      title: planStepTitles.get(num) || "",
       frIds: stepMap.get(num),
       centerX: 0,
       centerY: 0,
