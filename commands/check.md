@@ -137,7 +137,9 @@ Applies quality gates from `spec-system.md` to the resolved feature.
 
 | Gate | Rule |
 |---|---|
+| Gherkin scenarios | Every acceptance scenario uses ```gherkin blocks |
 | Flowcharts | Every user story has a Mermaid flowchart |
+| Gherkin↔Mermaid | Gherkin scenarios and Mermaid flowcharts describe the same flow |
 | AC format | All Acceptance Criteria use Given/When/Then format |
 | FR→AC mapping | Every FR references at least 1 AC |
 | Clarification markers | No more than 3 `[NEEDS CLARIFICATION]` markers |

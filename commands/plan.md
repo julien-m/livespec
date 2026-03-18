@@ -96,12 +96,12 @@ Mark each gate as ✅ or add a note if deviation is needed.
 
 #### Decision: Which diagrams to generate?
 
-| Condition | Diagram to Generate |
-|---|---|
-| Feature has API calls or service interactions | ✅ Sequence diagram (MANDATORY) |
-| Feature has an entity with multiple states | ✅ State diagram (MANDATORY) |
-| Feature introduces new database tables | ✅ ER diagram (MANDATORY) |
-| Feature is UI-only with no state or API | Only flowchart in spec (already done) |
+| Condition | Gherkin | Mermaid |
+|---|---|---|
+| Feature has API calls or service interactions | ✅ Gherkin interaction scenarios (MANDATORY) | ✅ Sequence diagram (MANDATORY) |
+| Feature has an entity with multiple states | ✅ Gherkin state transition scenarios (MANDATORY) | ✅ State diagram (MANDATORY) |
+| Feature introduces new database tables | — | ✅ ER diagram only (no behavioral flow) |
+| Feature is UI-only with no state or API | Already in spec (Gherkin scenarios) | Only flowchart in spec (already done) |
 
 #### Sequence Diagrams
 - Map out every API call in the feature
@@ -265,7 +265,7 @@ Also add a summary entry to `.specs/changelog.md` (global):
 
 - [ ] `plan.md` generated in target feature directory
 - [ ] Every FR appears in implementation plan mapping
-- [ ] Diagram set matches feature size and real needs (not boilerplate)
+- [ ] Diagram set matches feature size — Gherkin scenarios paired with Mermaid diagrams (except ER)
 - [ ] If spec has Infrastructure Requirements: plan includes Infrastructure Setup section with provisioning and verification for every listed resource
 - [ ] Constitution check contains explicit pass/deviation notes
 - [ ] Test commands are resolved (Resolved Test Commands table filled)

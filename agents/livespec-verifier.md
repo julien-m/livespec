@@ -252,7 +252,8 @@ You receive from the caller:
 
 - Can every AC be verified with a concrete, automatable test?
 - Are there ACs using subjective language ("should work well", "fast enough", "user-friendly")?
-- Are Given/When/Then scenarios specific enough to derive test cases?
+- Are Gherkin scenarios (```gherkin blocks) specific enough to derive Playwright test steps?
+- Do Gherkin blocks exist for every acceptance scenario?
 
 ### Output Format
 

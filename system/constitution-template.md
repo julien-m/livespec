@@ -95,10 +95,14 @@
 
 ## Spec Conventions
 
-### Mermaid Required
-- Every user story in a spec.md MUST have a Mermaid flowchart
-- Every plan.md with API calls MUST have sequence diagrams
-- Diagrams are not optional — they are part of the spec
+### Gherkin + Mermaid Required
+- Every user story in a spec.md MUST have Gherkin scenarios (```gherkin blocks) — source of truth for AI and test scaffolding
+- Every user story MUST have a matching Mermaid flowchart — visual representation of the same flow
+- Every plan.md with API calls MUST have Gherkin interaction scenarios + sequence diagrams
+- Every plan.md with stateful entities MUST have Gherkin transition scenarios + state diagrams
+- ER diagrams use Mermaid only (no behavioral flow)
+- Diagrams are not optional — Gherkin + Mermaid pairs are part of the spec
+- All tests (unit, integration, E2E, visual) are derived from Gherkin scenarios, never from Mermaid
 
 ### Living Documentation
 - Specs are updated when behavior changes — never let them become stale

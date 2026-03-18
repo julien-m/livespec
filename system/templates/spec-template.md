@@ -1,6 +1,6 @@
 # Feature Spec: [Feature Name]
 
-> **Instructions for AI:** Replace all `[placeholders]` with real content. Mermaid flowcharts are MANDATORY for every user story — do not omit them. Use the Notifications feature below as a model.
+> **Instructions for AI:** Replace all `[placeholders]` with real content. Gherkin scenarios AND Mermaid flowcharts are MANDATORY for every user story — do not omit them. Gherkin is the source of truth for test scaffolding; Mermaid is the visual representation. Use the Notifications feature below as a model.
 
 ---
 
@@ -27,24 +27,27 @@
 
 **Independent test:** [How do you manually verify this story works, independent of other stories?]
 
-#### Acceptance Scenarios
+#### Acceptance Scenarios (Gherkin — source of truth for tests)
 
-**Scenario 1.1 — [Happy path name]**
-```
-Given [precondition — what is true before]
-When  [action — what the user does]
-Then  [outcome — what the system does]
-And   [additional outcome if needed]
-```
+> These Gherkin blocks are the source of truth for test scaffolding. All tests (unit, integration, E2E, visual) are derived from these scenarios, never from Mermaid diagrams.
 
-**Scenario 1.2 — [Edge case or error path]**
-```
-Given [precondition]
-When  [action]
-Then  [outcome — typically an error or validation message]
+```gherkin
+Feature: [Story name]
+  Scenario: [Happy path name]
+    Given [precondition — what is true before]
+    When  [action — what the user does]
+    Then  [outcome — what the system does]
+    And   [additional outcome if needed]
+
+  Scenario: [Edge case or error path]
+    Given [precondition]
+    When  [action]
+    Then  [outcome — typically an error or validation message]
 ```
 
 #### User Flow
+
+> The Mermaid flowchart below visualizes the same flow defined in the Gherkin scenarios above.
 
 ```mermaid
 flowchart TD
@@ -60,7 +63,7 @@ flowchart TD
     I --> J[Badge count decreases]
 ```
 
-> 💡 **Example above is for a Notifications feature.** Replace with a flowchart relevant to your feature.
+> 💡 **Example above is for a Notifications feature.** Replace with Gherkin scenarios and a flowchart relevant to your feature.
 
 ---
 
@@ -72,16 +75,19 @@ flowchart TD
 
 **Independent test:** [Manual verification]
 
-#### Acceptance Scenarios
+#### Acceptance Scenarios (Gherkin — source of truth for tests)
 
-**Scenario 2.1 — [Happy path]**
-```
-Given [precondition]
-When  [action]
-Then  [outcome]
+```gherkin
+Feature: [Story 2 name]
+  Scenario: [Happy path]
+    Given [precondition]
+    When  [action]
+    Then  [outcome]
 ```
 
 #### User Flow
+
+> The Mermaid flowchart below visualizes the same flow defined in the Gherkin scenarios above.
 
 ```mermaid
 flowchart TD
@@ -93,7 +99,7 @@ flowchart TD
     E --> G[No future email notifications sent]
 ```
 
-> 💡 Replace with your Story 2 flowchart.
+> 💡 Replace with your Story 2 Gherkin scenarios and flowchart.
 
 ---
 
@@ -105,16 +111,19 @@ flowchart TD
 
 **Independent test:** [Manual verification]
 
-#### Acceptance Scenarios
+#### Acceptance Scenarios (Gherkin — source of truth for tests)
 
-**Scenario 3.1 — [Happy path]**
-```
-Given [precondition]
-When  [action]
-Then  [outcome]
+```gherkin
+Feature: [Story 3 name]
+  Scenario: [Happy path]
+    Given [precondition]
+    When  [action]
+    Then  [outcome]
 ```
 
 #### User Flow
+
+> The Mermaid flowchart below visualizes the same flow defined in the Gherkin scenarios above.
 
 ```mermaid
 flowchart TD
@@ -126,7 +135,7 @@ flowchart TD
     D --> G[All items show read style]
 ```
 
-> 💡 Replace with your Story 3 flowchart.
+> 💡 Replace with your Story 3 Gherkin scenarios and flowchart.
 
 ---
 

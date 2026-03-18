@@ -16,8 +16,8 @@
 3. **Specs are living — updated when behavior changes.**
    When a feature's behavior is modified, the spec.md is updated first (or simultaneously). Specs never become stale.
 
-4. **Specs are visual — Mermaid user flows are mandatory.**
-   Every user story in a spec.md must include a Mermaid flowchart. Text-only specs are incomplete.
+4. **Specs are visual and testable — Gherkin scenarios and Mermaid flows are mandatory.**
+   Every user story in a spec.md must include Gherkin scenarios (source of truth for AI and test scaffolding) and a Mermaid flowchart (visual representation of the same flow). Text-only specs are incomplete.
 
 5. **Code is linked to specs — every implementation is traceable.**
    After implementation, `implementation.md` maps every FR and AC to the `@spec` anchor comment placed directly in the source code. Anchor comments include a **brief description** and the **relative path to the spec file with a fragment anchor** for deep-linking:
@@ -103,8 +103,8 @@ Each feature lives in `.specs/features/NNN-feature-name/` where `NNN` is a zero-
   - Description
   - Priority reason
   - Independent test
-  - Given/When/Then acceptance scenarios
-  - **Mermaid flowchart (MANDATORY)**
+  - Gherkin scenarios (```gherkin blocks) — source of truth for AI and test scaffolding
+  - **Mermaid flowchart (MANDATORY)** — visual representation of the same flow
 
 **Acceptance Criteria:**
 - Numbered AC-001, AC-002, ...
@@ -126,9 +126,9 @@ Each feature lives in `.specs/features/NNN-feature-name/` where `NNN` is a zero-
 - **Summary** — one-line technical approach
 - **Technical Context** — language, deps, storage, testing framework, platform, project type
 - **Constitution Check** — verify decisions against constitution.md principles
-- **Mermaid Sequence Diagrams** — for API/service interactions (MANDATORY when API calls exist)
-- **Mermaid State Diagrams** — for entities with states (MANDATORY when entity has lifecycle)
-- **Mermaid ER Diagrams** — for data model (MANDATORY when new entities are created)
+- **Gherkin Scenarios + Mermaid Sequence Diagrams** — for API/service interactions (MANDATORY when API calls exist)
+- **Gherkin Scenarios + Mermaid State Diagrams** — for entities with states (MANDATORY when entity has lifecycle)
+- **Mermaid ER Diagrams** — for data model (MANDATORY when new entities are created) — no Gherkin (no behavioral flow)
 - **Implementation Plan** — file-by-file, step-by-step
 - **Testing Strategy** — which test types for which parts
 - **Risks & Considerations**
@@ -214,7 +214,7 @@ If that directory is missing, run `bash scripts/install.sh` to install it.
 ### When CREATING a new feature
 
 1. Create the directory `.specs/features/NNN-feature-name/`
-2. Generate `spec.md` with all required sections including **Mermaid flowcharts for each user story**
+2. Generate `spec.md` with all required sections including **Gherkin scenarios for each user story** (source of truth for tests) and **Mermaid flowcharts** (visual representation)
 3. Generate `plan.md` with sequence/state/ER diagrams as appropriate
 4. After implementation: create `implementation.md` mapping FR/AC to `@spec` anchor comments in source files
 5. Add first entry to `changelog.md`
@@ -270,11 +270,41 @@ To prevent changelogs from growing unbounded:
 
 ---
 
-## Mermaid Diagram Requirements
+## Diagram Requirements (Gherkin + Mermaid)
 
-### In spec.md — User Flow (flowchart)
+Every behavioral flow requires **two representations**:
+1. **Gherkin** (```gherkin blocks) — the canonical, machine-parseable format. Source of truth for AI test scaffolding and all test derivation (unit, integration, E2E, visual).
+2. **Mermaid** — the visual representation of the same flow, for human comprehension.
 
-Every user story requires a flowchart:
+**All tests are derived from Gherkin scenarios, never from Mermaid diagrams.** Mermaid is purely a visualization aid.
+
+**Exception:** ER diagrams (data model) have no behavioral flow — they use Mermaid only, no Gherkin.
+
+### Gherkin Syntax Rules
+
+- Use proper `Feature:` / `Scenario:` / `Given` / `When` / `Then` / `And` keywords
+- Each story must have at least 2 scenarios (happy path + edge case)
+- Scenarios must be specific enough to derive Playwright test steps directly
+- Use present tense, third person
+- Fenced with ````gherkin` (not plain ``` blocks)
+
+### In spec.md — User Flow (Gherkin + flowchart)
+
+Every user story requires Gherkin scenarios (source of truth for tests) followed by a Mermaid flowchart (visual aid):
+
+```gherkin
+Feature: User action
+  Scenario: Happy path
+    Given a precondition is true
+    When  the user performs the action
+    Then  the system produces outcome A
+    And   the state is updated
+
+  Scenario: Alternative path
+    Given a different precondition
+    When  the user performs the action
+    Then  the system produces outcome B
+```
 
 ```mermaid
 flowchart TD
@@ -285,9 +315,24 @@ flowchart TD
     D --> E
 ```
 
-### In plan.md — Sequence Diagram
+### In plan.md — Sequence Diagram (Gherkin + sequenceDiagram)
 
 For any feature involving API calls or service interactions:
+
+```gherkin
+Feature: Resource creation
+  Scenario: Successful creation
+    Given an authenticated user
+    When  the user submits a new resource
+    Then  the system persists the resource
+    And   returns a 201 Created response
+
+  Scenario: Validation failure
+    Given an authenticated user
+    When  the user submits invalid data
+    Then  the system returns a 400 error
+    And   the resource is not created
+```
 
 ```mermaid
 sequenceDiagram
@@ -304,9 +349,23 @@ sequenceDiagram
     C-->>U: Shows confirmation
 ```
 
-### In plan.md — State Diagram
+### In plan.md — State Diagram (Gherkin + stateDiagram)
 
 For any entity with a lifecycle:
+
+```gherkin
+Feature: Entity lifecycle
+  Scenario: Publish draft
+    Given a draft entity exists
+    When  the user publishes the entity
+    Then  the entity state changes to Active
+
+  Scenario: Archive active entity
+    Given an active entity exists
+    When  the user archives the entity
+    Then  the entity state changes to Archived
+    And   it is no longer visible in the active list
+```
 
 ```mermaid
 stateDiagram-v2
@@ -317,9 +376,9 @@ stateDiagram-v2
     Archived --> [*]: delete()
 ```
 
-### In plan.md — ER Diagram
+### In plan.md — ER Diagram (Mermaid only)
 
-For any feature introducing new database entities:
+For any feature introducing new database entities. **No Gherkin** — ER diagrams represent data structure, not behavioral flow.
 
 ```mermaid
 erDiagram
@@ -344,7 +403,9 @@ erDiagram
 ## Quality Gates
 
 Before a spec is considered complete:
-- [ ] All user stories have Mermaid flowcharts
+- [ ] All user stories have Gherkin scenarios (```gherkin blocks) — source of truth for tests
+- [ ] All user stories have Mermaid flowcharts — visual representation of the same flow
+- [ ] Gherkin scenarios and Mermaid flowcharts describe the same flow
 - [ ] All AC are testable (Given/When/Then format)
 - [ ] All FR map to at least one AC
 - [ ] No more than 3 `[NEEDS CLARIFICATION]` markers

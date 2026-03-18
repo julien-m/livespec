@@ -78,8 +78,16 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
 - Identify 3-5 user stories from the feature description
 - Assign priorities: P1 (critical), P2 (important), P3 (nice-to-have)
 - For each story: write description, priority reason, and independent test
-- Write Given/When/Then acceptance scenarios (at least 2 per story)
-- **Generate Mermaid flowchart for EVERY user story** (MANDATORY — do not omit)
+- Write Gherkin scenarios (```gherkin blocks) for every acceptance scenario — source of truth for all test scaffolding
+- **Generate Mermaid flowchart for EVERY user story** (MANDATORY — visualizes the Gherkin scenarios)
+
+#### Gherkin Scenario Rules
+- Use proper `Feature:` / `Scenario:` / `Given` / `When` / `Then` / `And` keywords
+- Fenced with ````gherkin` (not plain ``` blocks)
+- Each story must have at least 2 scenarios (happy path + edge case)
+- Scenarios must be specific enough to derive Playwright test steps directly
+- Use present tense, third person
+- All tests (unit, integration, E2E, visual) are derived from Gherkin, never from Mermaid
 
 #### Mermaid Flowchart Rules
 - Use `flowchart TD` (top-down) for linear flows
@@ -87,6 +95,7 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
 - Include decision diamonds `{condition?}` for branching paths
 - Show error/failure paths in addition to happy paths
 - Label branches clearly: `-- Yes -->` and `-- No -->`
+- The flowchart visualizes the same flow defined in the Gherkin scenarios above
 
 #### Acceptance Criteria
 - Number sequentially: AC-001, AC-002, AC-003, ...
@@ -112,7 +121,9 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
 ### Step 6 — Quality Validation
 
 Before presenting the spec, check:
-- [ ] Every user story has a Mermaid flowchart
+- [ ] Every acceptance scenario uses ```gherkin fenced blocks (source of truth for tests)
+- [ ] Every user story has a Mermaid flowchart (visual representation)
+- [ ] Gherkin scenarios and Mermaid flowcharts describe the same flow
 - [ ] All AC are in Given/When/Then format or specific testable statements
 - [ ] All FR reference at least one AC
 - [ ] No more than 3 `[NEEDS CLARIFICATION]` markers (if unclear input)
@@ -246,6 +257,7 @@ flowchart TD
 
 - [ ] Feature directory `NNN-feature-name/` exists
 - [ ] `spec.md` exists and contains required sections
+- [ ] Every acceptance scenario uses proper Gherkin syntax (```gherkin blocks)
 - [ ] Every user story has a Mermaid flowchart
 - [ ] Every FR maps to >= 1 AC
 - [ ] `spec.md` includes either explicit values or `[ASSUMED]` markers for missing context
