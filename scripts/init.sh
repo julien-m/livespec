@@ -54,6 +54,7 @@ ${BOLD}What it creates:${RESET}
   ├── constitution.md         ← Architecture principles template
   ├── project.md              ← Project profile template
   ├── changelog.md            ← Global changelog
+  ├── hooks/                  ← Lifecycle hooks (before/after commands)
   ├── stacks/
   │   ├── _default.md         ← Stack placeholder (fill with /spec.init or manually)
   │   └── decisions/          ← Architecture Decision Records
@@ -224,8 +225,27 @@ See the available presets for guidance:
   create_file "$PROJECT_DIR/.specs/testing/strategy.md" \
     "$LIVESPEC_ROOT/system/templates/testing-strategy-template.md"
 
+  # Hooks directory (empty)
+  create_dir "$PROJECT_DIR/.specs/hooks"
+
   # Features directory (empty)
   create_dir "$PROJECT_DIR/.specs/features"
+
+  # Add .specs/hooks/*.local.md to .gitignore
+  header "Updating .gitignore..."
+  local gitignore="$PROJECT_DIR/.gitignore"
+  local hooks_pattern=".specs/hooks/*.local.md"
+  if [[ "$DRY_RUN" == true ]]; then
+    echo -e "  ${YELLOW}[dry-run]${RESET} Would add '$hooks_pattern' to .gitignore"
+  elif [[ ! -f "$gitignore" ]]; then
+    printf '# LiveSpec local hooks (personal, not committed)\n%s\n' "$hooks_pattern" > "$gitignore"
+    success "Created .gitignore with hooks pattern"
+  elif ! grep -qF "$hooks_pattern" "$gitignore"; then
+    printf '\n# LiveSpec local hooks (personal, not committed)\n%s\n' "$hooks_pattern" >> "$gitignore"
+    success "Added hooks pattern to .gitignore"
+  else
+    info "hooks pattern already in .gitignore"
+  fi
 
   # Install LiveSpec section in CLAUDE.md
   header "Installing CLAUDE.md section..."

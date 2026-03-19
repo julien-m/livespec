@@ -14,7 +14,7 @@ LIVESPEC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 COMMANDS_DIR="$HOME/.claude/commands"
 AGENTS_DIR="$HOME/.claude/agents"
 
-COMMANDS=(init propose specify plan implement check explain stack feature refine play-coverage preflight)
+COMMANDS=(init propose specify plan implement check explain stack feature refine play-coverage preflight hooks)
 AGENTS=(livespec-supervisor livespec-implementer livespec-verifier livespec-documenter)
 
 # --- Flags ---
@@ -165,9 +165,12 @@ echo ""
 echo "Installing LiveSpec commands and agents..."
 echo ""
 
+HOOKS_DIR="$HOME/.claude/livespec/hooks"
+
 if [[ "$DRY_RUN" == false ]]; then
   mkdir -p "$COMMANDS_DIR"
   mkdir -p "$AGENTS_DIR"
+  mkdir -p "$HOOKS_DIR"
 fi
 
 for cmd in "${COMMANDS[@]}"; do
@@ -204,5 +207,8 @@ fi
 echo ""
 echo "Done! LiveSpec is ready."
 echo ""
+echo "  Global hooks dir: $HOOKS_DIR"
+echo ""
 echo "Next: run /spec.init in your project to set up .specs/ and CLAUDE.md."
 echo "Tip: /spec.implement uses multi-agent orchestration by default (--mono for single-agent)."
+echo "Tip: add hooks in ~/.claude/livespec/hooks/ or .specs/hooks/ to customize commands."

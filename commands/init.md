@@ -232,6 +232,8 @@ After confirmation, the AI creates the `.specs/` directory structure:
 ├── constitution.md         ← Generated from conversation
 ├── project.md              ← Generated from Phase A brainstorm
 │
+├── hooks/                  ← Lifecycle hooks directory (empty — add hooks to customize commands)
+│
 ├── stacks/
 │   ├── _default.md         ← Generated from Phase B decisions
 │   └── decisions/
@@ -363,6 +365,7 @@ If the user declines to resolve blockers during init, the manifest is still comm
 > - `.specs/stacks/_default.md` — your recommended stack
 > - `.specs/stacks/decisions/` — 3 Architecture Decision Records
 > - `.specs/testing/strategy.md` — your testing strategy
+> - `.specs/hooks/` — lifecycle hooks (customize commands with before/after hooks)
 > - `.specs/features/` — ready for your first feature spec
 > - `.specs/README.md` — spec registry and artifact index
 > - `.specs/changelog.md` — global changelog
@@ -398,6 +401,7 @@ If the user declines to resolve blockers during init, the manifest is still comm
 | `.specs/stacks/_default.md` | Stack preset (e.g., `stacks/presets/web-realtime.md`) | Customized with project-specific choices |
 | `.specs/testing/strategy.md` | `system/templates/testing-strategy-template.md` | Tailored to project type and stack |
 | `.specs/README.md` | Inline (template) | Filled with project name, initial ADRs |
+| `.specs/hooks/` | — (empty directory) | Lifecycle hooks — add `before-*.md` / `after-*.md` to customize commands |
 | `.specs/changelog.md` | Inline | Empty global changelog with first entry |
 
 ---
@@ -436,6 +440,8 @@ Before declaring success, verify:
 - [ ] `.specs/testing/strategy.md` exists
 - [ ] `.specs/README.md` exists with project name and initial ADRs
 - [ ] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block
+- [ ] `.specs/hooks/` directory exists
+- [ ] `.gitignore` contains `.specs/hooks/*.local.md`
 - [ ] `.specs/preflight.md` exists with checks generated from stack
 - [ ] `.specs/preflight-report.md` exists with execution results
 

@@ -77,6 +77,11 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │       ├── contracts/
 │       └── baselines/
 │
+├── hooks/                   ← Lifecycle hooks (before/after commands)
+│   ├── before-plan.md       ← Team hooks (committed)
+│   ├── before-plan.local.md ← Personal hooks (gitignored)
+│   └── ...
+│
 ├── changelog.md             ← Global changelog (current year)
 ├── archive/                 ← Rotated changelogs by year
 │   ├── changelog-2025.md
@@ -203,6 +208,23 @@ Detailed execution logs from `/spec.implement` runs. Each file is named `YYYY-MM
 **Section markers:** Updatable sections use `<!-- readme:features:start/end -->`, `<!-- readme:decisions:start/end -->`, `<!-- readme:activity:start/end -->` HTML comments. Do not remove these markers.
 
 **Recovery:** If README.md is missing, any updating command rebuilds it by scanning existing `.specs/features/*/spec.md`, `.specs/stacks/decisions/ADR-*.md`, and `.specs/changelog.md`.
+
+---
+
+## Lifecycle Hooks
+
+LiveSpec supports **lifecycle hooks** — Markdown files with instructions injected before/after each command. Hooks enable customizing LiveSpec behavior without modifying core commands.
+
+**Full protocol:** Read [`system/hooks.md`](../system/hooks.md) for the complete resolution protocol, naming conventions, and inheritance model.
+
+**Quick reference:**
+- 3 resolution levels: global (`~/.claude/livespec/hooks/`) → project (`.specs/hooks/`) → local (`.specs/hooks/*.local.md`)
+- Naming: `{before|after}-{command}.md` and `{before|after}-{command}.local.md`
+- Inheritance: `mode: extend` (default, accumulate) or `mode: override` (replace chain)
+- Step-level hooks: `before-implement-step.md` / `after-implement-step.md`
+- Discovery: `/spec.hooks [command]` to see active hooks
+
+**All `/spec.*` commands resolve hooks automatically** before and after execution. No command-level opt-in is required.
 
 ---
 
