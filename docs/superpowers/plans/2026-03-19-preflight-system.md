@@ -29,7 +29,7 @@
 | `commands/init.md` | Add Phase D after Phase C — generate manifest, execute full preflight, update exit criteria |
 | `commands/specify.md` | Add post-generation hook — detect Infrastructure Requirements, propose manifest additions |
 | `commands/implement.md` | Add Phase 0.5 before Phase 1 — light preflight check before implementation |
-| `commands/feature.md` | Add Phase 0.5 before Phase 3 — light preflight check before implementation phase |
+| `commands/feature.md` | Add Phase 2.7 before Phase 3 — light preflight check before implementation phase |
 | `commands/stack.md` | Add Step 7 after Step 6 — regenerate manifest on stack change |
 | `scripts/install.sh` | Add `preflight` to COMMANDS array |
 | `system/spec-system.md` | Add `preflight.md` and `preflight-report.md` to `.specs/` layout |
@@ -530,8 +530,8 @@ COMMANDS=(init propose specify plan implement check explain stack feature refine
 
 > **Dependency:** Task 3 must be complete — `commands/preflight.md` must exist before `install.sh` integrity check (line 129-136) will pass.
 
-Run: `bash scripts/install.sh --dry-run`
-Expected: Output includes `→ [dry-run] commands/spec.preflight.md → /Users/.../livespec/commands/preflight.md` with no errors
+Run: `bash scripts/install.sh --dry-run 2>&1 | grep preflight`
+Expected: Output includes a line matching `→ [dry-run] commands/spec.preflight.md → <repo-root>/commands/preflight.md` (where `<repo-root>` is the absolute path to the livespec repo on this machine). No errors from the integrity check.
 
 - [ ] **Step 3: Commit**
 
@@ -564,15 +564,24 @@ In the Project Layout tree diagram (around line 38-82), add `preflight.md` and `
 ...
 ```
 
-- [ ] **Step 2: Verify the layout is consistent**
+- [ ] **Step 2: Add preflight to `/spec.init` exit criteria**
 
-Read `system/spec-system.md` lines 34-90 to confirm the tree includes both new files.
+In `system/spec-system.md` around line 427, find the "Before `/spec.init` is considered complete:" checklist. Add:
 
-- [ ] **Step 3: Commit**
+```markdown
+- [ ] `preflight.md` exists with checks generated from stack
+- [ ] `preflight-report.md` exists with execution results
+```
+
+- [ ] **Step 3: Verify consistency**
+
+Read `system/spec-system.md` lines 34-90 (layout tree) and lines 427-435 (init checklist) to confirm both sections include the preflight files.
+
+- [ ] **Step 4: Commit**
 
 ```bash
 git add system/spec-system.md
-git commit -m "feat(preflight): add preflight.md and preflight-report.md to canonical .specs/ layout"
+git commit -m "feat(preflight): add preflight.md and preflight-report.md to canonical .specs/ layout and init checklist"
 ```
 
 ---
@@ -620,7 +629,19 @@ In the installation output block (around line 341-360), add to the "Created:" li
 
 - [ ] **Step 4: Update CLAUDE.md commands list**
 
-In `commands/init.md`, find the inline CLAUDE.md template that lists available commands (the line containing `Commands: /spec.init · /spec.propose · ...`). Add `/spec.preflight` to the list.
+In `commands/init.md` line 335, replace the commands list with the complete set:
+
+From:
+```
+Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature`
+```
+
+To:
+```
+Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.refine` · `/spec.preflight`
+```
+
+This adds both `/spec.refine` (which was missing) and `/spec.preflight` (new).
 
 - [ ] **Step 5: Verify init.md is consistent**
 
@@ -642,10 +663,10 @@ git commit -m "feat(preflight): add Phase D (preflight setup) to /spec.init"
 
 - [ ] **Step 1: Add preflight manifest update hook**
 
-After the last step of spec generation (before the Flags section, around line 240), add:
+After Step 8 (Optionally Create Git Branch), before the Flags section. This becomes **Step 9**. Add:
 
 ```markdown
-### Step N — Preflight Manifest Update
+### Step 9 — Preflight Manifest Update
 
 After `spec.md` is generated, check if it contains an "Infrastructure Requirements" section with content:
 
@@ -687,26 +708,26 @@ git commit -m "feat(preflight): add post-generation hook to /spec.specify for In
 
 - [ ] **Step 1: Add Phase 0.5 section**
 
-Before the "Phase 1 — Analyze" section (around line 22), add:
+After the "Preflight Safety Contract" section (which checks file existence) and before "Phase 2 — Plan Execution" (around line 72), add:
 
 ```markdown
 ### Phase 0.5 — Preflight Check (Light)
 
-Before reading spec/plan files, run a light preflight check to verify tools and access are ready:
+After verifying spec/plan files exist (Preflight Safety Contract), run a light preflight check to verify tools and access are ready:
 
-1. If `.specs/preflight.md` does not exist → log warning: "No preflight manifest found. Run `/spec.preflight --regenerate` to create one." and continue to Phase 1
+1. If `.specs/preflight.md` does not exist → log warning: "No preflight manifest found. Run `/spec.preflight --regenerate` to create one." and continue to Phase 2
 2. Run `/spec.preflight --light` with the current feature name as context
 3. Gate behavior:
    - Any `critical` check failed → **STOP**. Write `preflight-report.md` with BLOCKED verdict. Report blocker + recovery command. Do not start implementation.
-   - Only `warning` checks failed → write `preflight-report.md` with WARNINGS verdict, display warning, continue to Phase 1
-   - All pass → write `preflight-report.md` with READY verdict, continue to Phase 1
+   - Only `warning` checks failed → write `preflight-report.md` with WARNINGS verdict, display warning, continue to Phase 2
+   - All pass → write `preflight-report.md` with READY verdict, continue to Phase 2
 
-This phase ensures tools, OAuth sessions, and API tokens are available before autonomous work begins. It is distinct from the existing Preflight Safety Contract (which checks spec/plan file existence) and from the Infrastructure Gate (which checks cloud resource existence).
+This phase ensures tools, OAuth sessions, and API tokens are available before autonomous work begins. It runs AFTER the Preflight Safety Contract (which checks spec/plan file existence) and BEFORE the Infrastructure Gate (Phase 2 Step 0, which checks cloud resource existence).
 ```
 
 - [ ] **Step 2: Verify the phase ordering makes sense**
 
-Read the updated file to confirm: Phase 0.5 (preflight) → Preflight Safety Contract (file checks) → Phase 1 (Analyze) → Phase 2 (Plan Execution).
+Read the updated file to confirm ordering: Preflight Safety Contract (file checks) → Phase 0.5 (preflight tooling check) → Phase 2 (Plan Execution with Step 0 infra gate).
 
 - [ ] **Step 3: Commit**
 
