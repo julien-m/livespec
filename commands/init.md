@@ -332,11 +332,25 @@ The section content is minimal — a boot pointer to `spec-system.md` plus the c
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature`
+Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.refine` · `/spec.preflight`
 <!-- livespec:end -->
 ```
 
 This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails are in `.specs/spec-system.md`.
+
+---
+
+## Phase D — Preflight Setup
+
+After `.specs/` structure is installed, generate and execute the preflight manifest:
+
+1. **Generate manifest:** Read `.specs/stacks/_default.md`, match stack technologies against the catalog defined in `/spec.preflight`, generate `.specs/preflight.md` using `system/templates/preflight-manifest-template.md` as base structure
+2. **Detect `.env` tokens:** If a `.env` file exists at project root, scan for `creds:*` entries and add them as Token checks
+3. **Execute full preflight:** Run the 3-pass execution engine (Pass 1: verify all → Pass 2: auto-resolve → Pass 3: human blockers)
+4. **Present blockers:** The user is present during init — present all human-required actions (OAuth login, `creds set`) grouped together
+5. **Commit:** Add `preflight.md` and `preflight-report.md` to the init commit
+
+If the user declines to resolve blockers during init, the manifest is still committed with the checks marked as failing in the report. They can re-run `/spec.preflight` later.
 
 **Installation output:**
 
@@ -352,6 +366,8 @@ This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails 
 > - `.specs/features/` — ready for your first feature spec
 > - `.specs/README.md` — spec registry and artifact index
 > - `.specs/changelog.md` — global changelog
+> - `.specs/preflight.md` — preflight manifest (tooling, auth, tokens)
+> - `.specs/preflight-report.md` — preflight execution report
 >
 > **Next step:** Discover what to build first:
 > ```
@@ -420,6 +436,8 @@ Before declaring success, verify:
 - [ ] `.specs/testing/strategy.md` exists
 - [ ] `.specs/README.md` exists with project name and initial ADRs
 - [ ] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block
+- [ ] `.specs/preflight.md` exists with checks generated from stack
+- [ ] `.specs/preflight-report.md` exists with execution results
 
 If any check fails, report the exact missing artifact and create/fix it before finishing.
 
