@@ -41,6 +41,8 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 ├── spec-system.md           ← This file (rules)
 ├── constitution.md          ← Architecture principles for this project
 ├── project.md               ← Vision, users, constraints
+├── preflight.md             ← Preflight manifest (tooling, auth, tokens)
+├── preflight-report.md      ← Latest preflight execution report
 │
 ├── commands/                ← LiveSpec command docs
 │   ├── init.md
@@ -428,6 +430,8 @@ Before `/spec.init` is considered complete:
 - [ ] At least 1 ADR exists in `.specs/stacks/decisions/` (BLOCKING — every stack choice must be justified)
 - [ ] `project.md` contains real values, not template placeholders
 - [ ] `_default.md` contains the chosen stack with rationale, not `[TBD]`
+- [ ] `preflight.md` exists with checks generated from stack
+- [ ] `preflight-report.md` exists with execution results
 
 ---
 
