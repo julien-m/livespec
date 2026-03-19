@@ -33,7 +33,7 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
-## The 10 Commands
+## The 11 Commands
 
 | Command | What it does |
 |---|---|
@@ -46,6 +46,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | `/spec.explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
 | `/spec.feature` | Full pipeline: specify → plan → plan review → implement, with validation gates |
+| `/spec.preflight` | Verify tooling, auth, and API tokens before starting implementation — runs auto-install, detects blockers, gates feature work |
 | `/spec.refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
 
 ---
@@ -233,6 +234,20 @@ Full pipeline: specify → plan → plan review → implement, with validation g
 
 Key flags: `--auto`, `--resume`, `--branch`, `--priority`, `--mono`, `--economy`, `--step`
 
+### `/spec.preflight`
+
+Verify tooling, authentication, and API tokens are ready before implementation. Auto-installs what it can, groups human blockers, gates feature work until all critical checks pass.
+
+```bash
+/spec.preflight                     # Full preflight check
+/spec.preflight --light             # Light check (only new items since last run)
+/spec.preflight --regenerate        # Regenerate manifest from stack
+```
+
+Key flags: `--light`, `--regenerate`, `--save`, `--no-save`
+
+Runs automatically as part of `/spec.init` (Phase D), `/spec.implement` (Phase 0.5), and `/spec.feature` (Phase 2.7).
+
 ### `/spec.refine`
 
 Iteratively refine existing artifacts through guided conversation. Enforces eligibility rules — blocks refinement on specs/plans that already have downstream code.
@@ -290,7 +305,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 10 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 11 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -395,6 +410,7 @@ livespec/
 │   ├── explain.md
 │   ├── stack.md
 │   ├── feature.md
+│   ├── preflight.md
 │   └── refine.md
 └── scripts/
     ├── install.sh                  ← Install commands + agents into ~/.claude/

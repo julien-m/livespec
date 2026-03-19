@@ -7,6 +7,8 @@ allowed-tools: Bash(cc-hub :*), Bash(ls :*), Read, Glob
 
 # Link all LiveSpec commands
 
+**IMPORTANT:** This skill is invoked automatically whenever a new command or agent is created in the `commands/` or `agents/` directories. See `.claude/rules/commands-agents-must-be-linked.md` for the linking policy.
+
 Link every command from the `commands/` directory as a global Claude Code command using `cc-hub command link`, with the naming convention `spec.<command_name>`.
 
 ## Context
