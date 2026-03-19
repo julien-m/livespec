@@ -393,7 +393,7 @@ Preflight dry run — 12 checks would be executed:
 | `commands/spec.stack.md` | Add post-modification hook for manifest regeneration |
 | `scripts/install.sh` | Add `preflight` to COMMANDS array (script adds `spec.` prefix automatically) — `commands/preflight.md` must exist first |
 | `system/spec-system.md` | Add `preflight.md` and `preflight-report.md` to the canonical `.specs/` layout section; add preflight check to `/spec.init` exit criteria checklist |
-| `system/` | Add `preflight-manifest-template.md` and `preflight-report-template.md` (flat, alongside existing templates) |
+| `system/templates/` | Add `preflight-manifest-template.md` and `preflight-report-template.md` (inside `templates/`, alongside existing templates) |
 
 ## Security
 
