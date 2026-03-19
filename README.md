@@ -33,7 +33,7 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
-## The 11 Commands
+## The 13 Commands
 
 | Command | What it does |
 |---|---|
@@ -47,6 +47,8 @@ Six months later, nobody knows **why** something was built the way it was.
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
 | `/spec.feature` | Full pipeline: specify → plan → plan review → implement, with validation gates |
 | `/spec.preflight` | Verify tooling, auth, and API tokens before starting implementation — runs auto-install, detects blockers, gates feature work |
+| `/spec.hooks` | Show which lifecycle hooks are active for a command |
+| `/spec.play-coverage` | Open spec coverage playground with live grep data |
 | `/spec.refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
 
 ---
@@ -305,7 +307,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 11 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 13 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -411,6 +413,8 @@ livespec/
 │   ├── stack.md
 │   ├── feature.md
 │   ├── preflight.md
+│   ├── hooks.md
+│   ├── play-coverage.md
 │   └── refine.md
 └── scripts/
     ├── install.sh                  ← Install commands + agents into ~/.claude/

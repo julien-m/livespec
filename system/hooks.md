@@ -101,6 +101,10 @@ Local before-plan.local.md (alone) → COMMAND → after hooks...
 
 **Important:** `override` only affects the hook that declares it. A `before-plan.local.md` with `mode: override` does not affect `after-plan` hooks.
 
+**Invalid mode values:** If `mode` has an unrecognized value (anything other than `extend` or `override`), treat it as `extend` and emit a warning in stderr (e.g., `⚠ Unknown hook mode "merge" in before-plan.local.md — falling back to "extend"`).
+
+**Override scope:** `mode: override` is only honored on `.local.md` hooks. Project-level hooks (`.specs/hooks/{before|after}-{command}.md`) always extend global hooks — they cannot override them. This keeps team conventions additive and predictable. Personal overrides via `.local.md` cover the primary use case: a developer needing full control over a specific hook event.
+
 ---
 
 ## Resolution Algorithm
