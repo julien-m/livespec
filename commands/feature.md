@@ -62,6 +62,7 @@ This file is **distinct from `progress.md`** (which tracks individual implementa
 | Spec Review | Pending | — |
 | Plan | Pending | — |
 | Plan Review | Pending | — |
+| Preflight | Pending | — |
 | Implement | Pending | — |
 ```
 
@@ -168,6 +169,21 @@ The specify gate is **always active**. The spec is the functional contract — i
 > Type **continue** to proceed to implementation, or describe changes needed.
 
 In `--auto` mode: skip gate, proceed immediately.
+
+---
+
+## Phase 2.7 — Preflight Check (Light)
+
+Before starting implementation, run a light preflight check:
+
+1. If `.specs/preflight.md` does not exist → log warning and continue
+2. Run `/spec.preflight --light` with the current feature name as context
+3. Gate behavior:
+   - Any `critical` check failed → **STOP**. Write `preflight-report.md` with BLOCKED verdict. Report blocker + recovery command. Update `pipeline.md`: Preflight → `Blocked`
+   - Only `warning` checks failed → write `preflight-report.md` with WARNINGS verdict, display warning, continue
+   - All pass → write `preflight-report.md` with READY verdict, continue to Phase 3
+
+This ensures all tools and credentials are available before the autonomous implementation phase begins.
 
 ---
 

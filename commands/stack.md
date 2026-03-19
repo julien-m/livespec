@@ -238,6 +238,18 @@ Update `.specs/stacks/_default.md` to reflect the new stack decisions.
 
 If yes, run `/spec.specify "Migrate [feature] from Supabase to Firebase"` for each high/medium impact feature.
 
+#### Step 7 — Regenerate Preflight Manifest
+
+After creating the ADR and updating `_default.md`:
+
+1. If `.specs/preflight.md` exists:
+   a. Run the generator in merge mode: re-read `_default.md`, match against catalog, generate new checks
+   b. Preserve Custom section (between `<!-- preflight:custom:start/end -->` markers)
+   c. Deduplicate — do not overwrite existing checks
+   d. Show diff: "Stack modified. Preflight updated: 2 checks added (vercel CLI, vercel-oauth), 1 check removed (heroku)."
+   e. Commit updated `preflight.md`
+2. If `.specs/preflight.md` does not exist → skip silently (project may not use preflight yet)
+
 ---
 
 ### `/spec.stack decisions`
@@ -279,6 +291,7 @@ Lists all ADRs chronologically with summaries:
 - [ ] `_default.md` reflects the active decision state
 - [ ] Migration or rollback path is documented for non-trivial changes
 - [ ] `.specs/README.md` Architecture Decisions table updated with new ADR
+- [ ] `.specs/preflight.md` regenerated with new stack checks (if manifest exists)
 - [ ] Next action is proposed (e.g., migration specs or `/spec.plan`)
 
 If uncertainty remains high, default to `--dry-run` style output and request explicit confirmation.

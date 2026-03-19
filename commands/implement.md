@@ -69,6 +69,19 @@ To avoid large accidental edits:
 - If plan requires more, split into phases and ask for confirmation.
 - For each phase, list exact files before editing.
 
+### Phase 0.5 — Preflight Check (Light)
+
+After verifying spec/plan files exist (Preflight Safety Contract), run a light preflight check to verify tools and access are ready:
+
+1. If `.specs/preflight.md` does not exist → log warning: "No preflight manifest found. Run `/spec.preflight --regenerate` to create one." and continue to Phase 2
+2. Run `/spec.preflight --light` with the current feature name as context
+3. Gate behavior:
+   - Any `critical` check failed → **STOP**. Write `preflight-report.md` with BLOCKED verdict. Report blocker + recovery command. Do not start implementation.
+   - Only `warning` checks failed → write `preflight-report.md` with WARNINGS verdict, display warning, continue to Phase 2
+   - All pass → write `preflight-report.md` with READY verdict, continue to Phase 2
+
+This phase ensures tools, OAuth sessions, and API tokens are available before autonomous work begins. It runs AFTER the Preflight Safety Contract (which checks spec/plan file existence) and BEFORE the Infrastructure Gate (Phase 2 Step 0, which checks cloud resource existence).
+
 ### Phase 2 — Plan Execution
 
 Create an ordered todo list from `plan.md`:
