@@ -188,6 +188,27 @@ If user confirms branch creation:
 git checkout -b feature/004-notifications
 ```
 
+### Step 9 — Preflight Manifest Update
+
+After `spec.md` is generated, check if it contains an "Infrastructure Requirements" section with content:
+
+1. If the section is empty or absent → skip this step
+2. If the section has content:
+   a. Read `.specs/preflight.md` (if it exists)
+   b. Compute which new checks would be needed based on the infrastructure requirements (new CLI tools, new OAuth sessions, new tokens)
+   c. Show the proposed additions as a diff:
+      ```
+      Preflight manifest — 2 checks to add:
+
+        [TOOLING]  redis-cli (verify: redis-cli ping, install: brew install redis)
+        [TOKEN]    project/dev/redis_url (verify: creds get ..., resolve: human)
+
+      Add to preflight manifest? (y/n)
+      ```
+   d. If confirmed → add entries to the appropriate sections in `preflight.md`, commit
+   e. If declined → no change. User can run `/spec.preflight --regenerate` later
+3. No execution — this step only updates the manifest, it does not run checks
+
 ---
 
 ## Output
