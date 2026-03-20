@@ -47,7 +47,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
 | `/spec.feature` | Full pipeline: specify → plan → plan review → implement, with validation gates |
 | `/spec.preflight` | Verify tooling, auth, and API tokens before starting implementation — runs auto-install, detects blockers, gates feature work |
-| `/spec.hooks` | Show which lifecycle hooks are active for a command |
+| `/spec.hooks` | Show, create, or edit lifecycle hooks for a command |
 | `/spec.play-coverage` | Open spec coverage playground with live grep data |
 | `/spec.refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
 

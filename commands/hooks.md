@@ -1,19 +1,18 @@
 ---
-description: "Show which lifecycle hooks are active for a command"
+description: "Show, create, or edit lifecycle hooks for a command"
 argument-hint: "[command-name]"
 ---
 
 # Command: /spec.hooks
 
-> Display which lifecycle hooks would be loaded for a given command, with their resolution order and mode.
+> Display which lifecycle hooks are active, or create/edit hooks for any `/spec.*` command.
 
 ---
 
 ## Overview
 
-`/spec.hooks [command-name]`
-
-Diagnostic command that shows the hook resolution chain for any `/spec.*` command without executing anything.
+`/spec.hooks [command-name]` — show active hooks (diagnostic)
+`/spec.hooks <command-name> --create <before|after>` — create a new hook
 
 ---
 
@@ -140,12 +139,130 @@ Hooks for /spec.plan:
 | Flag | Behavior |
 |------|----------|
 | `--verbose` | Show first 10 lines of each active hook file |
+| `--create <before\|after>` | Create a new hook for the specified command |
+| `--global` | Target the global hooks directory (`~/.claude/livespec/hooks/`) |
+| `--local` | Target the local level (`.specs/hooks/*.local.md`, gitignored) |
+| `--edit` | Open an existing hook for modification (show current content, accept changes) |
+
+When `--create` or `--edit` is absent, the command is **read-only** (diagnostic mode).
+
+---
+
+## Create Mode
+
+### Trigger
+
+`/spec.hooks <command-name> --create <before|after> [--global|--local]`
+
+### Step C1 — Resolve Target Path
+
+Determine the target file based on level:
+
+| Flag | Target path | Level |
+|------|-------------|-------|
+| _(default, no flag)_ | `.specs/hooks/{timing}-{command}.md` | Project (committed) |
+| `--local` | `.specs/hooks/{timing}-{command}.local.md` | Local (gitignored) |
+| `--global` | `~/.claude/livespec/hooks/{timing}-{command}.md` | Global (all projects) |
+
+Where `{timing}` = `before` or `after`, `{command}` = the resolved command name.
+
+For `implement`, also accept `--step` to target step-level hooks:
+- `--step` → `{timing}-implement-step.md` instead of `{timing}-implement.md`
+
+### Step C2 — Check Existing
+
+If the target file already exists:
+1. Display its current content
+2. Ask: `This hook already exists. Do you want to edit it?`
+3. If yes → enter edit mode (show content, accept modifications)
+4. If no → abort
+
+### Step C3 — Create Directory
+
+If `.specs/hooks/` does not exist (for project/local level):
+- Create it: `mkdir -p .specs/hooks`
+- Verify `.specs/hooks/*.local.md` is in `.gitignore`. If not, add it.
+
+If `~/.claude/livespec/hooks/` does not exist (for global level):
+- Create it: `mkdir -p ~/.claude/livespec/hooks`
+
+### Step C4 — Generate Template
+
+Create the hook file with the following template:
+
+```markdown
+---
+mode: extend
+---
+
+# {Timing} {Command} — [describe your hook purpose]
+
+## Instructions
+
+<!-- Write your hook instructions here in natural language. -->
+<!-- The agent will read and follow these instructions at execution time. -->
+
+## Available Template Variables
+
+<!-- Use these in your instructions — they are resolved at runtime: -->
+<!-- {{feature_name}}   — current feature name (kebab-case) -->
+<!-- {{feature_path}}   — full path to feature directory -->
+<!-- {{feature_number}} — zero-padded feature number -->
+<!-- {{stack}}          — primary stack from _default.md -->
+<!-- {{command}}        — current command being executed -->
+<!-- {{project_name}}   — project name -->
+```
+
+For `--local` hooks, use `mode: extend` by default but add a comment:
+
+```yaml
+---
+mode: extend    # change to "override" to replace all parent hooks for this event
+---
+```
+
+### Step C5 — Confirm
+
+Display:
+
+```
+Hook created: .specs/hooks/before-plan.md (project level)
+
+Levels for /spec.plan before:
+  ✓ ~/.claude/livespec/hooks/before-plan.md    (global)
+  ★ .specs/hooks/before-plan.md                (project — NEW)
+
+Fill in your instructions, then verify with: /spec.hooks plan --verbose
+```
+
+### Step C6 — Guide Content
+
+After creating the file, ask the user what the hook should do. Based on their answer, fill in the `## Instructions` section with the appropriate content.
+
+---
+
+## Edit Mode
+
+### Trigger
+
+`/spec.hooks <command-name> --edit <before|after> [--global|--local]`
+
+### Behavior
+
+1. Resolve the target file (same logic as Create Step C1)
+2. If the file does not exist → suggest `--create` instead
+3. Read and display the current content
+4. Ask the user what to change
+5. Apply the modifications
+6. Display the updated content and the hook resolution chain
 
 ---
 
 ## Output
 
-This command produces no files. It is read-only and diagnostic.
+- **Diagnostic mode** (no `--create`/`--edit`): produces no files, read-only
+- **Create mode**: creates one hook file + optionally the hooks directory
+- **Edit mode**: modifies one existing hook file
 
 ---
 
@@ -157,8 +274,13 @@ This command produces no files. It is read-only and diagnostic.
 - [ ] Step-level hooks are shown for `implement` command
 - [ ] Override mode is correctly reflected (parent hooks marked as SKIPPED)
 - [ ] Summary view shows all commands when no argument provided
-- [ ] No files are created or modified
+- [ ] `--create` generates a well-formed hook with frontmatter and template
+- [ ] `--create` handles existing files (shows content, offers edit)
+- [ ] `--create` creates `.specs/hooks/` directory if missing
+- [ ] `--create --local` verifies `.gitignore` includes `*.local.md`
+- [ ] `--edit` shows current content and accepts modifications
+- [ ] `--step` flag targets step-level hooks for implement
 
 ---
 
-*LiveSpec Command v1.0*
+*LiveSpec Command v1.1*

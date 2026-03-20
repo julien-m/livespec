@@ -222,7 +222,7 @@ LiveSpec supports **lifecycle hooks** — Markdown files with instructions injec
 - Naming: `{before|after}-{command}.md` and `{before|after}-{command}.local.md`
 - Inheritance: `mode: extend` (default, accumulate) or `mode: override` (replace chain)
 - Step-level hooks: `before-implement-step.md` / `after-implement-step.md`
-- Discovery: `/spec.hooks [command]` to see active hooks
+- Discovery: `/spec.hooks [command]` to see active hooks; use `--create`/`--edit` to manage hooks
 
 **All `/spec.*` commands resolve hooks automatically** before and after execution. No command-level opt-in is required.
 

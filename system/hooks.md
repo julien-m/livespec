@@ -282,7 +282,7 @@ The following pattern must be present in the project's `.gitignore` (added by `/
 
 ## Discovery
 
-Use `/spec.hooks [command]` to see which hooks would be loaded for a given command. See `commands/hooks.md` for details.
+Use `/spec.hooks [command]` to see which hooks would be loaded for a given command, or `--create`/`--edit` to manage them. See `commands/hooks.md` for details.
 
 ---
 
