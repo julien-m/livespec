@@ -33,6 +33,9 @@
 
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
+
+> **Visual features:** When the feature has screens in spec.md, add a "Visual Ref" column: `| Requirement | File(s) | @spec Anchor | Visual Ref | Status | Last Verified |`
+
 | [FR-001: Fetch unread count](spec.md#fr-001) | `src/data/notifications.ts` | `@spec FR-001: Fetch unread count` | ✅ Implemented | YYYY-MM-DD |
 | [FR-002: Real-time count updates](spec.md#fr-002) | `src/hooks/useNotificationSubscription.ts` | `@spec FR-002: Real-time count updates` | ✅ Implemented | YYYY-MM-DD |
 | [FR-003: Mark as read on click](spec.md#fr-003) | `src/data/notifications.ts` | `@spec FR-003: Mark as read on click` | ✅ Implemented | YYYY-MM-DD |

@@ -41,6 +41,25 @@ Read ALL of these before generating anything:
 .specs/project.md                           ← Project context (users, scale)
 ```
 
+### Step 2.5 — Design Reference (UI features only)
+
+If the feature's `spec.md` contains a `## Screens` section:
+
+1. Read the screen references and their linked PNG files from `.specs/design/screens/`
+2. Generate a `## Design Reference` section in the plan, mapping each screen to its component breakdown:
+
+   ```markdown
+   ## Design Reference
+
+   | Screen | Component Breakdown | Reference |
+   |--------|-------------------|-----------|
+   | [screen-name] | [Components identified from mockup] | [screen-name.png](../../design/screens/screen-name.png) |
+   ```
+
+3. Use the mockups to inform the implementation plan — component hierarchy, layout structure, responsive breakpoints
+
+If no `## Screens` section exists → skip this step.
+
 ### Step 3 — Analyze Requirements
 
 From the spec, extract:

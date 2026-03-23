@@ -194,6 +194,37 @@ flowchart TD
 > Visual tests will capture baselines for all key screens (job listing, profile, messaging).
 > Threshold: 2% diff = FAIL.
 
+### Step 3.5 — Design Tool Check
+
+1. Read `~/.claude/livespec/design.md` (loaded by `before-init` hook if it exists)
+2. If config exists and `tool != none`:
+   - Add a "Design" row to the recommended stack table:
+     ```
+     | Design | [Tool name] ([MCP status]) | [Design system], [export formats] |
+     ```
+   - Record choice in `.specs/stacks/_default.md` under a `## Design` section
+3. If config does not exist:
+   - Display the design gate prompt:
+     ```
+     ⚠️  No design tool configured.
+
+     LiveSpec generates visual mockups for UI features.
+     Without a configured tool, interfaces won't be validated visually before implementation.
+
+     Supported tools:
+       • Pencil    — browser-based design, MCP integration, export PNG/PDF (.pen)
+       • Figma     — collaborative design, API available (.fig)
+       • Excalidraw — sketch-style wireframes, CLI available (.excalidraw)
+       • HTML      — AI-generated playground, zero dependency (.html)
+       • Other     — any tool that exports PNG per screen
+
+     → Configure now? (recommended)
+     → Continue without design? (mockups will be skipped)
+     ```
+   - If "configure now": run interactive wizard (tool → MCP → design system → write `~/.claude/livespec/design.md` with `configured: YYYY-MM-DD`)
+   - If "continue without": write `design.md` with `tool: none` and `confirmed: YYYY-MM-DD`
+4. If config exists and `tool == none` → skip silently
+
 ### Step 4 — Architecture Decision Records (MANDATORY)
 
 > **At least 1 ADR is REQUIRED before proceeding to Phase C.**
@@ -233,6 +264,10 @@ After confirmation, the AI creates the `.specs/` directory structure:
 ├── project.md              ← Generated from Phase A brainstorm
 │
 ├── hooks/                  ← Lifecycle hooks directory (empty — add hooks to customize commands)
+│
+├── design/
+│   ├── screens/            ← empty, ready for mockups
+│   └── changelog.md        ← initial entry
 │
 ├── stacks/
 │   ├── _default.md         ← Generated from Phase B decisions
@@ -274,6 +309,15 @@ Create `.specs/README.md` as the centralized spec registry and artifact index.
 | [stacks/_default.md](stacks/_default.md) | Current tech stack |
 | [testing/strategy.md](testing/strategy.md) | Testing strategy |
 | [changelog.md](changelog.md) | Global changelog |
+
+---
+
+## Design
+
+| Document | Description |
+|---|---|
+| [design/](design/) | UI mockups and screen references |
+| [design/changelog.md](design/changelog.md) | Design change history |
 
 ---
 
@@ -366,6 +410,7 @@ If the user declines to resolve blockers during init, the manifest is still comm
 > - `.specs/stacks/decisions/` — 3 Architecture Decision Records
 > - `.specs/testing/strategy.md` — your testing strategy
 > - `.specs/hooks/` — lifecycle hooks (customize commands with before/after hooks)
+> - `.specs/design/` — design mockups and screen references
 > - `.specs/features/` — ready for your first feature spec
 > - `.specs/README.md` — spec registry and artifact index
 > - `.specs/changelog.md` — global changelog
@@ -441,6 +486,7 @@ Before declaring success, verify:
 - [ ] `.specs/README.md` exists with project name and initial ADRs
 - [ ] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block
 - [ ] `.specs/hooks/` directory exists
+- [ ] `.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`
 - [ ] `.gitignore` contains `.specs/hooks/*.local.md`
 - [ ] `.specs/preflight.md` exists with checks generated from stack
 - [ ] `.specs/preflight-report.md` exists with execution results

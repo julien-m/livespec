@@ -263,6 +263,24 @@ flowchart TD
 
 ---
 
+## Screens
+
+> **Include this section only when the feature involves user-facing interfaces.** Omit entirely for API-only or backend features.
+> Screens are generated during `/spec.specify` using the configured design tool (see `~/.claude/livespec/design.md`).
+
+| Screen | Status | Reference |
+|--------|--------|-----------|
+| [screen-name] | New / Modified | [screen-name.png](../../design/screens/screen-name.png) |
+
+**Example (Notifications):**
+
+| Screen | Status | Reference |
+|--------|--------|-----------|
+| notification-panel | New | [notification-panel.png](../../design/screens/notification-panel.png) |
+| dashboard | Modified | [dashboard.png](../../design/screens/dashboard.png) |
+
+---
+
 ## Infrastructure Requirements
 
 > **Include this section only when the feature depends on external cloud resources** (databases, object storage, KV stores, queues, CDN, edge workers, etc.). Omit entirely for features with no infrastructure dependencies.

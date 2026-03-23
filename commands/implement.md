@@ -28,6 +28,7 @@ Executes a full implementation pipeline from `plan.md` to working, tested, docum
 3. `.specs/constitution.md` — architectural rules
 4. `.specs/stacks/_default.md` — stack and patterns to follow
 5. `.specs/testing/strategy.md` — testing requirements
+6. `.specs/design/screens/*.png` — if feature has a `## Screens` section in spec.md, read the referenced mockup PNGs as visual targets for UI implementation
 
 **Explore the codebase:**
 - Find existing patterns matching what needs to be built
@@ -38,6 +39,8 @@ Executes a full implementation pipeline from `plan.md` to working, tested, docum
 **Verify prerequisites:**
 - Does the plan.md exist? If not, prompt to run `/spec.plan` first
 - Are there any `[DECISION NEEDED]` markers in the plan? Surface them before starting
+
+**Design fidelity:** When implementing UI components, reference the corresponding mockup PNG from `.specs/design/screens/`. Match the layout, colors, and spacing from the mockup. When creating `implementation.md`, add a "Visual Ref" column linking each UI-related FR to its mockup.
 
 ## Preflight Safety Contract
 

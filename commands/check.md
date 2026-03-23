@@ -249,6 +249,33 @@ For each baseline in `.specs/features/NNN-feature-name/baselines/`:
    - 🖼️ Drift — exceeds threshold, show diff percentage
    - ❌ Missing — baseline file not found (capture needed)
 
+#### Design Fidelity Check (UI features with mockups)
+
+If the feature's `spec.md` contains a `## Screens` section:
+
+1. For each referenced screen:
+   a. Look for a Playwright baseline in `baselines/` matching the screen name
+   b. If baseline exists → compare baseline vs mockup PNG from `.specs/design/screens/`
+   c. Report fidelity status:
+      - ✅ Faithful — implementation matches mockup (< 5% diff)
+      - 🎨 Diverged — implementation differs from mockup (> 5% diff)
+      - ❌ No baseline — cannot compare (Playwright screenshot not captured)
+
+2. Add to gap report after Visual Tests section:
+
+```markdown
+### Design Fidelity
+
+| Screen | Mockup | Baseline | Diff | Status |
+|--------|--------|----------|------|--------|
+| login | [mockup](../../design/screens/login.png) | [baseline](baselines/login.png) | 2.1% | ✅ Faithful |
+| dashboard | [mockup](../../design/screens/dashboard.png) | [baseline](baselines/dashboard.png) | 8.4% | 🎨 Diverged |
+```
+
+**Threshold distinction:**
+- Visual regression (code vs previous code): 2% — catches unintended changes
+- Design fidelity (code vs mockup): 5% — allows minor implementation differences while catching major layout drift
+
 ### Step 9 — Produce Gap Report
 
 Output a structured gap report. When spec quality was validated (Step 4), include a **Spec Quality** section before the FR/AC/Visual tables.
@@ -387,11 +414,11 @@ Only produced when multiple features are checked in a single run. Displayed afte
 
 ### Feature Health
 
-| Feature | Spec Quality | Code Alignment | Visual | Overall |
-|---|---|---|---|---|
-| 004-notifications | ⚠️ 8/10 | ⚠️ 50% verified | 🖼️ 1 drift | ⚠️ Needs attention |
-| 001-user-auth | ✅ 10/10 | ✅ 95% verified | ✅ All match | ✅ Healthy |
-| 003-messaging | ✅ 9/10 | ❌ 30% verified | N/A | ❌ Critical |
+| Feature | Spec Quality | Code Alignment | Visual | Design | Overall |
+|---|---|---|---|---|---|
+| 004-notifications | ⚠️ 8/10 | ⚠️ 50% verified | 🖼️ 1 drift | 🎨 1 diverged | ⚠️ Needs attention |
+| 001-user-auth | ✅ 10/10 | ✅ 95% verified | ✅ All match | ✅ Faithful | ✅ Healthy |
+| 003-messaging | ✅ 9/10 | ❌ 30% verified | N/A | N/A | ❌ Critical |
 ```
 
 #### 2. Cross-Feature Dependencies

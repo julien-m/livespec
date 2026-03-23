@@ -82,6 +82,13 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │   ├── before-plan.local.md ← Personal hooks (gitignored)
 │   └── ...
 │
+├── design/
+│   ├── ui.<ext>            ← Design source file (tool-specific)
+│   ├── ui.pdf              ← Full PDF export
+│   ├── screens/            ← Per-screen PNG exports
+│   │   └── *.png
+│   └── changelog.md        ← Design change history
+│
 ├── changelog.md             ← Global changelog (current year)
 ├── archive/                 ← Rotated changelogs by year
 │   ├── changelog-2025.md
@@ -284,6 +291,15 @@ To prevent changelogs from growing unbounded:
 4. Fix the issue
 5. Update `changelog.md` with a Bugfix entry
 
+### When working with DESIGN mockups
+
+1. Design mockups are centralized in `.specs/design/` — one source file per project
+2. PNGs in `screens/` are the reference for implementation — always the latest version
+3. The design source file (`ui.pen`, `ui.fig`, etc.) is saved manually by the user
+4. When a feature modifies existing screens, overwrite the PNG — git tracks history
+5. The `## Screens` section in `spec.md` links features to their visual references
+6. Design fidelity threshold is 5% (more permissive than visual regression at 2%)
+
 ### When REVIEWING a feature
 
 1. Run `/spec.check [feature]` to compare spec vs code
@@ -433,6 +449,8 @@ Before a spec is considered complete:
 - [ ] All AC are testable (Given/When/Then format)
 - [ ] All FR map to at least one AC
 - [ ] No more than 3 `[NEEDS CLARIFICATION]` markers
+- [ ] If feature has UI screens: `## Screens` section exists with PNG references
+- [ ] If design tool configured: referenced PNGs exist in `.specs/design/screens/`
 
 Before a plan is considered complete:
 - [ ] Sequence diagrams exist for API interactions
@@ -447,6 +465,7 @@ Before implementation is considered complete:
 - [ ] All tests pass
 - [ ] `changelog.md` has an entry
 - [ ] For visual features: Playwright baselines captured in `baselines/`
+- [ ] For visual features with design mockups: design fidelity check performed
 
 Before `/spec.init` is considered complete:
 - [ ] At least 1 ADR exists in `.specs/stacks/decisions/` (BLOCKING — every stack choice must be justified)

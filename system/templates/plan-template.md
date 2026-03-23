@@ -29,6 +29,17 @@
 
 ---
 
+## Design Reference
+
+> **Include this section only when the feature has screens defined in spec.md.** Omit for non-UI features.
+> Use these mockups to identify components, determine hierarchy, and plan responsive breakpoints.
+
+| Screen | Component Breakdown | Reference |
+|--------|-------------------|-----------|
+| [screen-name] | [Component1, Component2, ...] | [screen-name.png](../../design/screens/screen-name.png) |
+
+---
+
 ## Constitution Check
 
 > Verify this plan against `.specs/constitution.md` principles before proceeding.

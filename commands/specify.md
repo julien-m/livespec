@@ -118,6 +118,64 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
   - List each resource with type, provider, environment, and when it's needed
   - If unsure whether a resource is needed, mark it `[ASSUMED]` in the table
 
+### Step 5.5 — Generate Mockups (UI features only)
+
+After generating spec.md, determine if the feature involves UI:
+
+1. **Detect UI feature:** Scan the generated spec.md for user stories that mention screens, pages, forms, buttons, navigation, or visual elements. If no UI detected → skip this step entirely.
+
+2. **Check design config:** Read `~/.claude/livespec/design.md`.
+   - If missing → trigger design gate (see `/spec.init` Step 3.5 for the gate prompt and wizard)
+   - If `tool: none` → skip silently
+   - If tool configured → proceed
+
+3. **Identify screens:** From user stories and flowcharts, list all unique screens/views the feature requires (new screens) and modifies (existing screens).
+
+4. **Generate mockups:**
+   - If MCP available (`mcp: true` in design config) → use the tool's MCP to generate mockups programmatically, applying the configured design system
+   - If MCP not available → instruct user to create mockups manually and provide the screen list as guidance
+
+5. **Export assets:**
+   - Via MCP: export each screen as PNG to `.specs/design/screens/<screen-name>.png`
+   - Via MCP: export PDF to `.specs/design/ui.pdf`
+   - The source file (`ui.pen`, etc.) must be saved manually by the user
+
+6. **User validation gate:**
+   ```
+   🎨 Mockups generated for [feature name]:
+     • screen-name.png (new)
+     • other-screen.png (modified — description of change)
+
+   Exported to .specs/design/screens/
+
+   → Open the design tool to review and save the source file:
+     open .specs/design/ui.<ext>
+
+   → Approve mockups to continue, or describe changes needed.
+   ```
+
+7. **Add screen references to spec.md:** After validation, add a `## Screens` section to the feature's `spec.md`:
+
+   ```markdown
+   ## Screens
+
+   | Screen | Status | Reference |
+   |--------|--------|-----------|
+   | screen-name | New | [screen-name.png](../../design/screens/screen-name.png) |
+   | other-screen | Modified | [other-screen.png](../../design/screens/other-screen.png) |
+   ```
+
+8. **Update design changelog:** Add entry to `.specs/design/changelog.md`:
+
+   ```markdown
+   ### YYYY-MM-DD — Feature NNN: [feature name]
+
+   - **screen-name.png** — new screen (description)
+   - **other-screen.png** — modified (description of change)
+   ```
+
+**Re-modification:** When `/spec.specify` is run on a feature that already has mockups (screens listed in existing spec.md), the AI detects existing screens, determines which need updating based on spec changes, regenerates via MCP (or instructs manual update), re-exports PNGs (overwriting previous versions), and updates the design changelog.
+
 ### Step 6 — Quality Validation
 
 Before presenting the spec, check:
@@ -131,6 +189,8 @@ Before presenting the spec, check:
 - [ ] At least 2 Edge Cases listed
 - [ ] At least 2 Success Criteria defined
 - [ ] If feature references external resources in stories/FR: Infrastructure Requirements section exists
+- [ ] If feature has UI: `## Screens` section exists in spec.md with references to PNG files
+- [ ] If feature has UI and design tool configured: PNG files exist in `.specs/design/screens/`
 
 If validation fails, fix the issues before presenting.
 
@@ -145,6 +205,7 @@ Show the generated spec and ask for confirmation:
 > - 5 acceptance criteria (AC-001 → AC-005)
 > - 6 functional requirements (FR-001 → FR-006)
 > - 3 Mermaid flowcharts generated
+> - N screen mockups generated (if applicable)
 >
 > Would you like to:
 > 1. Proceed to planning: `/spec.plan notifications`
@@ -285,6 +346,8 @@ flowchart TD
 - [ ] `.specs/README.md` Features table contains the new feature row with Status: Draft
 - [ ] Feature `changelog.md` has an initial entry
 - [ ] Global `.specs/changelog.md` has a summary entry
+- [ ] If feature has UI and design tool configured: mockups generated and validated
+- [ ] If feature has UI: `## Screens` section in spec.md with PNG references
 - [ ] Next action is proposed (`/spec.plan [feature]`)
 
 If any item fails, fix before returning final output.
