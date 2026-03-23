@@ -15,7 +15,7 @@ LiveSpec currently has no visual design validation in its pipeline. Features wit
 - No visual regression against a design reference (only against previous code screenshots)
 - No mechanism to leverage design tools (Pencil, Figma, Excalidraw) programmatically
 
-Additionally, the `/spec.init` Phase B (stack decisions) operates without access to the user's curated stack reference database (`ai-ressources/stack-ref/`) or their personal preferences, leading to generic recommendations.
+Additionally, the `/spec.init` Phase B (stack decisions) operates without access to the user's curated stack reference database (`ai-ressources/stack-ref/`) or their personal preferences, leading to generic recommendations. **Note:** The stack-ref and user-memory loading in the `before-init.md` hook are bundled here for completeness but are independent improvements — they can be implemented or reverted separately from the design integration.
 
 ---
 
@@ -46,8 +46,9 @@ extension: .pen | .fig | .excalidraw | .html
 mcp: true | false
 exports: [png, pdf]
 open_command: open
-theme: shadcn | material | custom
-theme_tokens: path/to/tokens.json  # optional — design system color/spacing tokens
+design_system: shadcn | material | custom
+design_system_tokens: path/to/tokens.json  # optional — design system color/spacing tokens
+configured: YYYY-MM-DD  # when this config was created/last updated
 ---
 
 # Design Tool Configuration
@@ -65,7 +66,7 @@ When `~/.claude/livespec/design.md` does not exist and the current feature invol
 
 **Trigger points:**
 - `/spec.init` Phase B (after stack decisions, before installation)
-- `/spec.specify` Step 4.5 (after reading context, before generating spec)
+- `/spec.specify` after Step 4 (Read Context Files) and before Step 5 (Generate spec.md)
 
 **Behavior:**
 
@@ -122,14 +123,14 @@ Created by `/spec.init` (Phase C) or on first `/spec.specify` with UI.
 ```
 
 **Rules:**
-- `ui.<ext>` — one source file per project, extension from `design.md`
+- `ui.<ext>` — one source file per project by default, extension from `design.md`. For large projects with many screens, the user can organize by feature (`design/features/NNN-feature.pen`) as a project-level convention. The pipeline only cares about `screens/*.png` — the source file organization is the user's choice.
 - `screens/*.png` — one PNG per screen, always overwritten (latest version only)
 - `ui.pdf` — complete PDF export, always overwritten
-- `changelog.md` — human-readable log of design changes
+- `changelog.md` — cross-feature design change log. This exists separately from per-feature changelogs because a single screen can be modified by multiple features over time. The feature changelog records "feature X updated dashboard.png" but `design/changelog.md` records the full history of dashboard.png across all features — useful for designers tracking screen evolution.
 
 **Git behavior:**
-- All files tracked in git (including PNGs — they're small reference screenshots)
-- `.specs/design/ui.<ext>` may be large → add to `.gitattributes` with LFS if needed (user decision, not automated)
+- All files tracked in git. PNGs in `screens/` are small reference screenshots (typically < 500KB each) — standard git tracking is appropriate.
+- `.specs/design/ui.<ext>` may be large (especially `.pen` or `.fig` files) → add to `.gitattributes` with LFS if needed (user decision, not automated)
 
 ### 3.4 Before-Init Hook (`~/.claude/livespec/hooks/before-init.md`)
 
@@ -163,7 +164,7 @@ If a preferred technology is suboptimal for the project's constraints, explain w
 
 If this file exists and `tool` is not `none`:
 - Include the design tool in the stack summary during Phase B
-- Note the design system (theme) for future reference in the constitution
+- Note the design system for future reference in the constitution
 - Add a "Design" row to the recommended stack table
 
 If this file does not exist:
@@ -402,10 +403,10 @@ Content as described in Section 3.4.
 
 ### 5.2 Update: `~/.claude/livespec/hooks/before-specify.md`
 
-Add after existing content:
+Add a new section after the current last section:
 
 ```markdown
-## 3. Design Tool Config
+## Design Tool Config
 
 **Read** [`design.md`](~/.claude/livespec/design.md) — load the design tool configuration.
 
@@ -416,10 +417,10 @@ If tool is configured and not `none`:
 
 ### 5.3 Update: `~/.claude/livespec/hooks/before-plan.md`
 
-Add after existing content:
+Add a new section after the current last section:
 
 ```markdown
-## 5. Design Mockup Validation
+## Design Mockup Validation
 
 If the feature spec.md contains a `## Screens` section:
 - Verify that all referenced PNG files exist in `.specs/design/screens/`
@@ -428,10 +429,10 @@ If the feature spec.md contains a `## Screens` section:
 
 ### 5.4 Update: `~/.claude/livespec/hooks/before-implement.md`
 
-Add after existing "5. Diagram Conventions" section:
+Add a new section after the current last section:
 
 ```markdown
-## 7. Design Reference
+## Design Reference
 
 If the feature spec.md contains a `## Screens` section:
 - **Read** each referenced PNG from `.specs/design/screens/` as the visual target
@@ -495,6 +496,7 @@ New subsection after "When REVIEWING a feature":
 - **Multiple features modifying the same screen:** Both features reference the same PNG. The second feature to run specify will update the PNG, overwriting the first version. The design changelog tracks which feature caused each change.
 - **Switching design tools mid-project:** The user updates `~/.claude/livespec/design.md`. The source file extension changes. Old source file remains in git history. New screens are generated with the new tool. PNGs are still PNGs — the rest of the pipeline doesn't care about the source format.
 - **Large .pen/.fig files:** Not automated — the user decides whether to use Git LFS. LiveSpec does not enforce this.
+- **Large projects with many screens:** A single source file may become impractical. The user can organize by feature (`design/features/NNN-feature.pen`) as a project-level convention. The pipeline only cares about `screens/*.png` — the source file organization is the user's choice.
 
 ---
 
@@ -516,6 +518,8 @@ New subsection after "When REVIEWING a feature":
 | `system/templates/implementation-template.md` | Add "Visual Ref" column note |
 | `commands/init.md` | Add design gate in Phase B, add `.specs/design/` creation in Phase C, update exit criteria |
 | `commands/specify.md` | Add Step 5.5 (mockup generation), update quality gates, add re-modification workflow |
+| `commands/plan.md` | Add Design Reference section generation after Technical Context |
+| `commands/implement.md` | Add mockup reference during UI steps, visual fidelity check, Visual Ref column in implementation.md |
 | `commands/check.md` | Add design fidelity sub-step in Step 8, add to gap report format |
 | `~/.claude/livespec/hooks/before-specify.md` | Add design tool config loading |
 | `~/.claude/livespec/hooks/before-plan.md` | Add mockup existence validation |
