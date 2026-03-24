@@ -330,6 +330,21 @@ For other AI tools, paste `system/spec-system.md` into your tool's context.
 
 ---
 
+## Portability
+
+LiveSpec separates **format** from **automation**:
+
+| Layer | Portable? | Details |
+|---|---|---|
+| **Spec format** (`.specs/`, Markdown, Mermaid, Gherkin) | ✅ Universal | Any AI tool that reads Markdown can follow the rules in `spec-system.md` |
+| **Commands** (`/spec.*`) | ⚠️ Claude Code | Installed as `~/.claude/commands/` symlinks — Claude Code specific |
+| **Agents** (multi-agent orchestration) | ⚠️ Claude Code | Requires Claude Code agent teams + Superpowers skills |
+| **Shell scripts** (`install.sh`, `init.sh`) | ⚠️ macOS | Uses `sed -i ''` (BSD), `open` (macOS), `mktemp` — not tested on Linux |
+
+**For non-Claude AI tools:** paste the content of `system/spec-system.md` into your tool's context. The spec format and rules are tool-agnostic — the automation layer is Claude Code specific.
+
+---
+
 ## Multi-Agent Mode (default)
 
 `/spec.implement` uses multi-agent orchestration by default — a supervisor acts as **Orchestrator/Translator**, building a Task Payload per step and delegating execution to the `superpowers:subagent-driven-development` skill:

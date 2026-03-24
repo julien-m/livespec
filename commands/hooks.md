@@ -22,7 +22,7 @@ argument-hint: "[command-name]"
 
 If `command-name` is provided:
 - Strip `spec.` prefix if present (e.g., `spec.plan` → `plan`)
-- Validate it matches a known command: `init`, `propose`, `specify`, `plan`, `implement`, `check`, `explain`, `stack`, `feature`, `refine`, `preflight`
+- Validate it matches a known command: `init`, `propose`, `specify`, `plan`, `implement`, `check`, `explain`, `stack`, `feature`, `refine`, `preflight`, `play-coverage`
 
 If no `command-name` is provided:
 - Show hooks for ALL commands (summary view)

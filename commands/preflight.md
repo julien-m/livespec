@@ -109,8 +109,47 @@ Regeneration preserves the Custom section:
 | Stripe | `stripe` CLI (tooling) + `stripe-login` (auth) + `creds:*/stripe_secret_key` (token) |
 | AWS | `aws` CLI (tooling) + `aws-sso` or `creds:*/aws_*` |
 | GitHub API | `gh` CLI (tooling) + `gh-auth` (auth) |
+| `creds` (token checks) | `creds` CLI (tooling, critical) — required when any `type: creds` check exists in manifest |
+| Multi-agent mode | `superpowers:subagent-driven-development` skill (tooling, warning) + `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` env var (tooling, warning) — required for default `/spec.implement` mode |
 
 This catalog is extensible — new mappings can be added as new stacks are supported.
+
+### `creds` CLI Detection
+
+When the manifest contains any `type: creds` check, a `creds` binary check is **automatically prepended** to the Tooling section:
+
+```markdown
+### creds CLI
+- **binary:** `creds`
+- **verify:** `creds --version`
+- **install:** `git clone https://github.com/julien-m/keychain-creds.git ~/keychain-creds && cd ~/keychain-creds && bun install && bun run build && bun link`
+- **severity:** critical
+- **source:** auto (required by token checks)
+```
+
+If `creds` is not installed, all `type: creds` checks will fail. The preflight report should surface this clearly: "Install `creds` first — see https://github.com/julien-m/keychain-creds".
+
+### Multi-Agent Prerequisites
+
+When the project uses LiveSpec multi-agent mode (default for `/spec.implement`), preflight auto-generates these checks:
+
+```markdown
+### Superpowers plugin
+- **binary:** —
+- **verify:** `ls ~/.claude/plugins/marketplaces/superpowers-marketplace/SKILL.md 2>/dev/null`
+- **install:** human
+- **severity:** warning
+- **source:** auto (required by multi-agent mode)
+
+### Agent Teams config
+- **binary:** —
+- **verify:** `grep -q 'CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS' ~/.claude/settings.json 2>/dev/null`
+- **install:** human
+- **severity:** warning
+- **source:** auto (required by multi-agent mode)
+```
+
+If these checks fail, preflight emits a warning: "Multi-agent mode requires Superpowers skills and CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1. Use `--mono` flag as fallback."
 
 ### Generation Rules
 

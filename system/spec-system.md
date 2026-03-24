@@ -44,19 +44,6 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 ├── preflight.md             ← Preflight manifest (tooling, auth, tokens)
 ├── preflight-report.md      ← Latest preflight execution report
 │
-├── commands/                ← LiveSpec command docs
-│   ├── init.md
-│   ├── propose.md
-│   ├── specify.md
-│   ├── plan.md
-│   ├── implement.md
-│   ├── check.md
-│   ├── explain.md
-│   ├── stack.md
-│   ├── feature.md
-│   ├── refine.md
-│   └── link.md
-│
 ├── stacks/
 │   ├── _default.md          ← Chosen stack + rationale
 │   └── decisions/           ← Architecture Decision Records
@@ -239,8 +226,7 @@ LiveSpec supports **lifecycle hooks** — Markdown files with instructions injec
 
 ### Command discovery
 
-Detailed step-by-step instructions for each `/spec.*` command are available in `.specs/commands/`.
-If that directory is missing, run `bash scripts/install.sh` to install it.
+Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 13 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.check`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`.
 
 ### When CREATING a new feature
 

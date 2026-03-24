@@ -82,23 +82,24 @@ If the project has a graphical interface (frontend, full-stack web app), visual 
 
 **Detection sequence (run once, during discovery):**
 
-1. Run `playwright-cli --help`
-2. If the command succeeds → Playwright CLI is installed, resolve visual commands via `playwright-cli`
-3. If the command fails → **propose installation to the user:**
+1. Check if `@playwright/test` is in `devDependencies` (from `package.json`)
+2. If present → run `npx playwright --version` to verify installation
+3. If the command succeeds → Playwright is installed, resolve visual commands via `npx playwright`
+4. If the command fails or `@playwright/test` is missing → **propose installation to the user:**
 
 ```
-Visual testing requires Playwright CLI, which is not installed.
+Visual testing requires Playwright, which is not installed.
 
 Install command:
-  npm install -g @playwright/cli@latest
+  npm install -D @playwright/test
 
 Then install browser engines:
-  playwright-cli install --with-deps
+  npx playwright install --with-deps
 
 Run these commands and re-run discovery.
 ```
 
-4. If the user declines → mark visual tests as `Not available` in Resolved Test Commands, log: "Visual testing unavailable — Playwright CLI not installed"
+5. If the user declines → mark visual tests as `Not available` in Resolved Test Commands, log: "Visual testing unavailable — Playwright not installed"
 
 This check is done **once** during discovery. The result is recorded in the Resolved Test Commands table. All subsequent phases (implement, check) use that recorded status — no re-detection.
 

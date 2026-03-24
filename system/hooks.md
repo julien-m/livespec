@@ -24,7 +24,7 @@ Hooks allow customizing LiveSpec behavior **without modifying core commands**:
 ```
 
 Where `{command}` matches the LiveSpec command name (without `spec.` prefix):
-- `init`, `propose`, `specify`, `plan`, `implement`, `check`, `explain`, `stack`, `feature`, `refine`, `preflight`
+- `init`, `propose`, `specify`, `plan`, `implement`, `check`, `explain`, `stack`, `feature`, `refine`, `preflight`, `play-coverage`
 
 **Step-level hooks** for `/spec.implement`:
 - `before-implement-step.md` — injected before EACH implementation step
