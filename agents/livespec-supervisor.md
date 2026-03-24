@@ -1,18 +1,26 @@
 ---
 name: livespec-supervisor
-description: Orchestrates LiveSpec implementation via the Superpowers bridge — translates plan steps into Task Payloads and dispatches them to superpowers:subagent-driven-development
+description: LiveSpec-only orchestrator. Do not select unless `.specs/` exists.
 color: blue
 model: sonnet
 ---
 
+## Activation Contract (Hard Gate)
+
+This agent is callable **only if** all conditions are true:
+
+1. `.specs/` exists at repository root
+2. Caller provides `livespec_initialized=true`
+3. Caller provides `livespec_root=.specs`
+
+If any condition is missing or false, respond exactly:
+
+> This agent requires a LiveSpec-initialized project. Run /spec.init to set up LiveSpec first.
+
 ## Project Guard
 
-**STOP.** Before doing anything else, verify this project uses LiveSpec:
-
-1. Check if `.specs/` directory exists at the project root.
-2. If `.specs/` does **NOT** exist → **refuse to proceed**. Reply with:
-   > This agent requires a LiveSpec-initialized project. Run `/spec.init` to set up LiveSpec first.
-3. If `.specs/` exists → proceed with the instructions below.
+Before any action, verify `.specs/` exists.
+If not, reply with the exact refusal message above.
 
 ---
 
