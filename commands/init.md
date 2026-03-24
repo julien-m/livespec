@@ -23,6 +23,75 @@ description: "Initialize LiveSpec in a project through a 3-phase conversational 
 
 The AI asks questions one at a time, waits for answers, and builds a PROJECT PROFILE.
 
+### Pre-Check: Brainstorm Detection
+
+Before starting the interview, check if a brainstorm from `project-brainstorm` already exists.
+
+**Detection logic:**
+
+1. Check if the file `.brainstorm/project-profile.md` exists in the current directory
+2. If the file does NOT exist or is unreadable (broken symlink, empty, malformed) → skip this section entirely, proceed to **Conversation Flow** below
+3. If the file exists and is readable:
+   a. Read `.brainstorm/project-profile.md`
+   b. Glob `.brainstorm/*.md` to discover additional brainstorm files
+   c. Display the import summary (see format below)
+   d. Wait for user response
+
+**Import summary format:**
+
+> 🔗 **Brainstorm detected** (`.brainstorm/project-profile.md`)
+>
+> **Vision:** [First line of "What the project does" from the Vision section]
+> **Users:** [N] roles ([comma-separated role names from the Users table])
+> **Scale:** [year 1 value] → [year 3 value] (from Constraints table)
+> **Region:** [Primary region value from Constraints table]
+> **Budget:** [Budget value from Constraints table]
+> **Real-time:** [N] features requiring real-time (from Real-Time Requirements table)
+>
+> 📂 **Additional brainstorm files available:**
+>    [list discovered files by display name: exploration · market-research · challenge · definition · plan]
+>    _(usable as context for stack decisions in Phase B)_
+>
+> → Type **go** to use this profile and skip to Phase B (Stack Decisions)
+> → Type **modify** to adjust sections before continuing
+> → Type **ignore** to run the full interview instead
+
+**Display name mapping for discovered files:**
+
+| Filename pattern | Display name |
+|---|---|
+| `01-exploration.md` | exploration |
+| `02-market-research.md` | market-research |
+| `03-challenge.md` | challenge |
+| `04-definition.md` | definition |
+| `05-plan.md` | plan |
+
+Only list files that actually exist in `.brainstorm/`.
+
+**User response handling:**
+
+- **"go"** (or equivalent confirmation):
+  - Pre-fill `project.md` with the brainstorm data using direct section-by-section copy (Vision, Users, Constraints, Real-Time Requirements, Geographic Requirements — formats are identical)
+  - Do NOT copy the "Stack Reference" or "Brainstorm Source" sections into `project.md` — these are brainstorm metadata
+  - Pass the "Stack Reference" section content as context hint to Phase B (inform the decision tree, but do not skip Phase B)
+  - **Skip the entire Conversation Flow (Q1-Q6) and Project Profile Summary below** → jump directly to **Phase B — Stack Decisions**
+
+- **"modify"** (or equivalent):
+  - Display the full imported content organized by section (Vision, Users, Constraints, Real-Time Requirements, Geographic Requirements)
+  - Let the user edit any section
+  - Once confirmed, write `project.md` and proceed to **Phase B — Stack Decisions** (skip Q1-Q6)
+
+- **"ignore"** (or equivalent):
+  - Discard the brainstorm data entirely
+  - Proceed to **Conversation Flow** below as if no brainstorm existed
+
+**Flag interaction:**
+
+- `--auto` flag: if brainstorm is detected, brainstorm data takes priority over `--auto` defaults (brainstorm data is richer). Behaves as if user typed "go".
+- `--stack` flag: brainstorm fills Phase A (project profile), `--stack` still overrides Phase B as normal.
+
+---
+
 ### Conversation Flow
 
 **Opening:**
