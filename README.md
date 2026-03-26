@@ -275,6 +275,7 @@ Key flags: `--auto`, `--dry-run`
 ├── spec-system.md          ← The rules (READ FIRST — every tool reads this)
 ├── constitution.md         ← Project architecture principles
 ├── project.md              ← Vision, users, constraints (from brainstorm)
+├── roadmap.md              ← Feature backlog (MVP / Post-MVP / Future)
 │
 ├── stacks/
 │   ├── _default.md         ← Your chosen stack + reasoning
@@ -406,7 +407,8 @@ livespec/
 │       ├── implementation-template.md
 │       ├── changelog-template.md
 │       ├── project-template.md
-│       └── testing-strategy-template.md
+│       ├── testing-strategy-template.md
+│       └── roadmap-template.md
 ├── stacks/
 │   └── presets/
 │       ├── web-realtime.md
