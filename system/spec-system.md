@@ -250,7 +250,7 @@ LiveSpec supports **lifecycle hooks** — Markdown files with instructions injec
 
 ### Command discovery
 
-Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 13 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.check`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`.
+Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 14 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.check`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`.
 
 ### When CREATING a new feature
 

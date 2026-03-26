@@ -33,7 +33,7 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
-## The 13 Commands
+## The 14 Commands
 
 | Command | What it does |
 |---|---|
@@ -50,6 +50,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | `/spec.hooks` | Show, create, or edit lifecycle hooks for a command |
 | `/spec.play-coverage` | Open spec coverage playground with live grep data |
 | `/spec.refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
+| `/spec.status` | Display factual status overview of roadmap and features |
 
 ---
 
@@ -263,6 +264,19 @@ Iteratively refine existing artifacts through guided conversation. Enforces elig
 
 Key flags: `--auto`, `--dry-run`
 
+### `/spec.status`
+
+Factual status overview — roadmap items, feature statuses, next actions. Read-only.
+
+```bash
+/spec.status                  # Full status
+/spec.status --roadmap        # Roadmap only
+/spec.status --features       # Features only
+/spec.status --json           # Machine-readable output
+```
+
+Key flags: `--roadmap`, `--features`, `--json`
+
 > Full command documentation is in `commands/*.md`.
 
 ---
@@ -308,7 +322,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 13 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 14 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
