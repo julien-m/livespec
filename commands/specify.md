@@ -174,7 +174,59 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
   - List each resource with type, provider, environment, and when it's needed
   - If unsure whether a resource is needed, mark it `[ASSUMED]` in the table
 
-### Step 5.5 — Generate Mockups (UI features only)
+### Step 5.5 — Emerging Dependencies & Absorption Detection
+
+After generating spec.md, analyze it for roadmap interactions. Skip silently if `.specs/roadmap.md` does not exist.
+
+#### Detection A — Emerging Dependencies
+
+1. Extract all referenced entities, services, and capabilities from the just-generated spec:
+   - Key Entities section
+   - Functional Requirements (references to external systems)
+   - User stories (mentions of features the user expects to exist)
+   - Infrastructure Requirements (if present)
+2. Read `.specs/features/*/spec.md` headers — build list of existing feature names and key entities
+3. Read `.specs/roadmap.md` — build list of roadmap items (all tiers + Deferred)
+4. For each referenced entity/capability NOT found in existing features OR roadmap → it's an **emerging dependency**
+
+5. If emerging dependencies found:
+
+```
+📋 Emerging dependencies detected in this spec:
+
+| Dependency | Found in | Suggested tier | Source in spec |
+|-----------|----------|---------------|----------------|
+| Push notifications | — (nowhere) | Post-MVP | FR-003: message alerts |
+| Organization entity | — (nowhere) | MVP | Key Entities: multi-tenant |
+
+→ Add to roadmap? (y/n)
+```
+
+6. If confirmed: add items to appropriate tier in `roadmap.md`
+7. If no emerging dependencies found: skip silently (no output)
+
+#### Detection B — Absorption
+
+8. For each existing unchecked roadmap item, check if the current spec **covers it** — the spec's key entities or FR descriptions contain the roadmap item's bold name or primary domain keyword (case-insensitive)
+
+9. If absorption detected:
+
+```
+📋 This spec appears to cover existing roadmap items:
+
+| Roadmap item | Tier | Overlap |
+|-------------|------|---------|
+| Push notifications | Post-MVP | Covered by FR-003 + Story 3 |
+
+→ Check these items as covered? (y/n)
+```
+
+10. If confirmed: check the item in roadmap (`- [ ]` → `- [x]`) and link to this spec
+11. If no absorption detected: skip silently (no output)
+
+**Flag interaction:** `--auto` → add emerging deps and check absorbed items without confirmation.
+
+### Step 5.6 — Generate Mockups (UI features only)
 
 After generating spec.md, determine if the feature involves UI:
 
@@ -418,6 +470,8 @@ flowchart TD
 - [ ] If feature has UI: `## Screens` section in spec.md with PNG references
 - [ ] If `.specs/roadmap.md` exists: matching item checked OR no match (skip)
 - [ ] If split performed: deferred items added to roadmap.md Deferred section
+- [ ] If `.specs/roadmap.md` exists: emerging dependencies detected and proposed (or none found)
+- [ ] If `.specs/roadmap.md` exists: absorption detection run (or no overlap found)
 - [ ] Next action is proposed (`/spec.plan [feature]`)
 
 If any item fails, fix before returning final output.

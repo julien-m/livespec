@@ -137,7 +137,8 @@ What would you like to refine?
 1. Users, roles, or constraints (project.md)
 2. Architecture principles (constitution.md)
 3. Testing strategy (testing/strategy.md)
-4. Describe your change freely
+4. Roadmap (roadmap.md)
+5. Describe your change freely
 ```
 
 ### Step 3 — Targeted Conversation
@@ -189,6 +190,86 @@ impact analysis and ADR creation logic.
 2. Add entry to `.specs/changelog.md`:
    `[Project] Refined: [description of change]`
 3. Update the `Last updated` date in `.specs/README.md`
+
+### Step 5.5 — Roadmap Re-evaluation
+
+After applying project-level changes, re-evaluate the roadmap. Skipped if `.specs/roadmap.md` does not exist. Not triggered when option 4 (direct roadmap refinement) is selected.
+
+1. Read the updated `project.md` (post-change)
+2. Re-run the inference matrix from `/spec.init` Step 3.9 on the updated profile
+3. Compare inferred items against existing roadmap items (all tiers + Deferred)
+4. Compute the delta:
+   - **New items** (`+`): inferred but not in roadmap → propose adding
+   - **Stale items** (`?`): in roadmap (unchecked) but no longer inferred → mark `[STALE?]` and propose removal
+   - **Modified items** (`~`): scope or dependencies changed → propose update
+   - **Checked items** are never marked stale — they exist as specs regardless of profile changes
+
+5. If no delta detected → display "Roadmap is up to date" and skip
+
+6. Present the delta:
+
+```
+📋 Roadmap re-evaluation after project change:
+
+  + **Reviewer dashboard** — new role needs management tools · Scope: M · Tier: Post-MVP
+  ~ **Admin dashboard** — scope updated: now includes Reviewer moderation · Scope: M → L
+  ? **Mobile-optimized views** [STALE?] — "mobile" no longer mentioned in vision
+
+  Apply these changes to roadmap.md? (y/n/modify)
+```
+
+7. If confirmed: apply changes to `roadmap.md`
+8. If "modify": let user adjust individual items before applying
+9. If declined: no changes
+
+**Flag interactions:**
+- `--auto`: apply delta without confirmation
+- `--dry-run`: show delta but don't apply
+
+### Step 5.6 — Roadmap Refinement Flow (option 4)
+
+When the user selects option 4 from the Step 2 menu, enter this flow instead of the standard Steps 3-5.
+
+**Note:** Step 5.5 (automatic re-evaluation) is skipped for this option since the user is directly editing the roadmap.
+
+1. Read `.specs/roadmap.md` (if it doesn't exist, suggest `/spec.init` to generate it)
+2. Present the current roadmap state:
+
+```
+## Current Roadmap
+
+### MVP (3 items — 1 ✅, 2 ⬜)
+  ✅ User auth → 001-user-auth
+  ⬜ Job listings · Scope: M · Deps: auth
+  ⬜ Designer profiles · Scope: M · Deps: auth
+
+### Post-MVP (2 items — 0 ✅, 2 ⬜)
+  ⬜ Notifications · Scope: M · Deps: messaging
+  ⬜ Payments · Scope: L · Deps: job-listings
+
+### Future (1 item)
+  ⬜ Search & discovery · Scope: M
+
+### Deferred (1 item)
+  Audit trail (from "auth + audit") · Scope: S
+
+What would you like to do?
+1. Remove items
+2. Move items between tiers
+3. Add a new item
+4. Modify an item (scope, deps, description)
+5. Describe your change
+```
+
+3. Execute the selected action with before/after diff and confirmation
+4. Apply changes + update `Last updated` date in `roadmap.md`
+5. Add changelog entry: `[Project] Roadmap refined: [description]` to `.specs/changelog.md`
+6. Update the `Last updated` date in `.specs/README.md`
+
+**Edge cases:**
+- Remove a checked item: warn "This item has a spec (NNN-name). Removing from roadmap does not delete the spec." Allow removal.
+- Move a checked item between tiers: allow — preserves the check and link.
+- Roadmap doesn't exist: display message and suggest `/spec.init`.
 
 ---
 
@@ -451,6 +532,8 @@ If the project refinement involves adding/replacing a technology, redirect to `/
 - [ ] `.specs/README.md` Last updated date refreshed
 - [ ] Downstream warnings displayed when applicable
 - [ ] Next action proposed
+- [ ] If `roadmap.md` exists and project-level changes applied: roadmap re-evaluation executed
+- [ ] If roadmap option selected: changes applied with before/after diff
 
 If no changes were made during the session, none of the above are required.
 

@@ -219,6 +219,8 @@ Persistent backlog of specs to build, organized in tiers (MVP / Post-MVP / Futur
 - `/spec.init` creates `roadmap.md` with inferred feature backlog
 - `/spec.specify` checks matching roadmap items + adds deferred splits to `roadmap.md`
 - `/spec.propose` reads `roadmap.md` including Deferred section (read-only)
+- `/spec.refine project` re-evaluates roadmap after project profile changes + supports direct roadmap refinement
+- `/spec.specify` detects emerging dependencies and roadmap item absorption
 - Every update also refreshes the `Last updated` date in the header
 
 **Section markers:** Updatable sections use `<!-- readme:features:start/end -->`, `<!-- readme:decisions:start/end -->`, `<!-- readme:activity:start/end -->` HTML comments. Do not remove these markers.
