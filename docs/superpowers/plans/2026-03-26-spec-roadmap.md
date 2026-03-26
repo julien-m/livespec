@@ -136,7 +136,7 @@ In the Phase C installation output message (around line 472-493), add:
 > - `.specs/roadmap.md` — feature roadmap (N items across MVP/Post-MVP/Future)
 ```
 
-Insert after the `changelog.md` line and before the "Next step" section.
+Insert after the `.specs/changelog.md` line (line 485) and before the `.specs/preflight.md` line (line 486).
 
 - [ ] **Step 5: Add roadmap row to Generated Files Reference table**
 
@@ -148,15 +148,25 @@ In the Generated Files Reference table (around line 509-519), add:
 
 - [ ] **Step 6: Update Definition of Done**
 
-Find the existing DoD section for `/spec.init` (or add to the implied DoD from Phase C). Add:
+Add to the Exit Criteria section in `commands/init.md` (around line 548-562):
 
 ```markdown
 - [ ] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)
 ```
 
-- [ ] **Step 7: Verify step numbering**
+- [ ] **Step 7: Add `--auto` and `--dry-run` handling**
 
-Read the final file. Confirm Step 3.9 appears before Step 3.10 and the numbering flows correctly: ... → 3.5 (Design Gate) → 3.9 (Roadmap) → 3.10 (README) → 3.11 (CLAUDE.md).
+In Step 3.9, add a note at the end:
+
+```markdown
+**Flag interactions:**
+- `--auto`: Roadmap is generated using AI inference with no user review of items.
+- `--dry-run`: Roadmap is listed in the dry-run output but not created.
+```
+
+- [ ] **Step 8: Verify step numbering**
+
+Read the final file. Confirm Step 3.9 appears before Step 3.10 and the numbering flows correctly: ... → 3.5 (Design Gate) → 3.9 (Roadmap) → 3.10 (README) → 3.11 (CLAUDE.md). Note: Steps 3.6-3.8 are intentionally absent; 3.9 is the next available number.
 
 ---
 
