@@ -33,14 +33,70 @@ Extract from user input:
 /spec.specify "As a designer, I want to bid on jobs"
 ```
 
-### Step 1.5 — Ambiguous Input Protocol
+### Step 1.5 — Scope Analysis & Split Detection
 
-If input is ambiguous, run this protocol before generating files:
+Before generating spec.md, analyze the request scope:
 
-1. If request contains **multiple independent features**, propose splitting into separate specs and ask for confirmation.
-2. If request is primarily a **bugfix**, route to existing feature and ask whether to update current spec or create a dedicated bugfix feature.
-3. If user mentions implementation details only ("use Redis", "add endpoint") without user outcome, ask for the user-facing behavior first.
-4. Limit clarification to **max 2 questions**, then proceed with explicit assumptions marked `[ASSUMED]` in `spec.md`.
+#### 1.5.1 — Extract Functional Domains
+
+- Each action verb + object = 1 candidate domain
+- Junction words ("and", "with", "plus", "also", "et aussi") signal domain boundaries
+- Example: "auth with SSO, role management, and audit trail" → 3 domains
+
+#### 1.5.2 — Test Independence
+
+Two domains are independent if:
+- They serve different user stories (different actors or goals)
+- They can be delivered and tested separately
+- They touch different primary entities
+
+#### 1.5.3 — Evaluate Complexity
+
+Flag if the combined request would produce:
+- More than 5 P1 user stories
+- More than 3 distinct primary entities
+- More than 8 acceptance criteria
+
+#### 1.5.4 — Split Proposal
+
+If split detected (≥2 independent domains OR complexity exceeded):
+
+```
+🔀 Split detected — your request covers multiple independent areas:
+
+| # | Domain | Scope | Independent? |
+|---|--------|-------|-------------|
+| 1 | Auth + SSO | M | — (core) |
+| 2 | Role management (RBAC) | M | Yes |
+| 3 | Audit trail | S | Yes |
+
+Proposal: I specify **Auth + SSO** now.
+The others go into the roadmap for next specifications.
+
+→ OK? Or do you prefer to keep everything together?
+```
+
+#### 1.5.5 — User Accepts Split
+
+- Proceed with domain #1 as the spec to create
+- Add remaining domains to `.specs/roadmap.md` Deferred section with: source request, item name, context from the original request, date
+- If a domain matches an existing unchecked roadmap item, update that item's context instead of duplicating
+
+#### 1.5.6 — User Declines Split
+
+- Proceed with the full request as a single spec (current behavior)
+
+#### 1.5.7 — Bugfix Routing
+
+If request is primarily a **bugfix**, route to existing feature and ask whether to update current spec or create a dedicated bugfix feature.
+
+#### 1.5.8 — Implementation Details Only
+
+If user mentions implementation details only ("use Redis", "add endpoint") without user outcome, ask for the user-facing behavior first.
+
+#### 1.5.9 — Clarification Limit
+
+Limit clarification to **max 2 questions**, then proceed with explicit assumptions marked `[ASSUMED]` in `spec.md`.
 
 ### Step 2 — Auto-Number the Feature
 
@@ -241,6 +297,18 @@ Add a first entry to `.specs/features/NNN-feature-name/changelog.md`:
 Also add a summary entry to `.specs/changelog.md` (global):
 `[Feature NNN] Spec created: [Feature Name] — N stories, N AC, N FR`
 
+### Step 7.7 — Update Roadmap
+
+1. Read `.specs/roadmap.md` (if it exists; if not, skip silently)
+2. **Tier match:** Search all tier sections (MVP, Post-MVP, Future) for an unchecked item matching the new feature. Match criteria: case-insensitive substring match on the item's bold name OR shared primary entity/domain keyword (e.g., "auth" matches "**User authentication**")
+3. If tier match found: check the checkbox (`- [ ]` → `- [x]`) + append spec link (`→ [NNN-name](features/NNN-name/spec.md)`)
+4. **Deferred match:** Search the Deferred table for a row matching the new feature (same matching criteria). If found:
+   a. Remove the row from the Deferred table
+   b. Add a checked+linked item to the appropriate tier (MVP if no tier preference is obvious, otherwise infer from scope/dependencies)
+5. If split was performed in Step 1.5: add deferred items to Deferred table
+6. Update the `Last updated` date
+7. Remove `> No items yet.` hint from the tier if it now has checked or unchecked items
+
 ### Step 8 — Optionally Create Git Branch
 
 If user confirms branch creation:
@@ -348,6 +416,8 @@ flowchart TD
 - [ ] Global `.specs/changelog.md` has a summary entry
 - [ ] If feature has UI and design tool configured: mockups generated and validated
 - [ ] If feature has UI: `## Screens` section in spec.md with PNG references
+- [ ] If `.specs/roadmap.md` exists: matching item checked OR no match (skip)
+- [ ] If split performed: deferred items added to roadmap.md Deferred section
 - [ ] Next action is proposed (`/spec.plan [feature]`)
 
 If any item fails, fix before returning final output.

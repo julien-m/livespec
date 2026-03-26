@@ -350,8 +350,65 @@ After confirmation, the AI creates the `.specs/` directory structure:
 │
 ├── features/               ← Empty, ready for /spec.specify
 │
+├── roadmap.md              ← Feature backlog (MVP / Post-MVP / Future)
+│
 └── changelog.md            ← Global changelog (initial entry)
 ```
+
+### Step 3.9 — Generate Roadmap
+
+Generate `.specs/roadmap.md` as the feature backlog for the project.
+
+**Template:** `system/templates/roadmap-template.md`
+
+**Logic:**
+
+1. Read `project.md` — extract roles, vision, real-time needs, scale
+2. Read `constitution.md` + `_default.md` — understand stack capabilities
+3. Infer expected feature domains using this matrix:
+
+| Signal from project profile | Expected domain |
+|---|---|
+| Any project with users | Authentication (signup, login, password reset) |
+| Multiple roles with different access | Role management / RBAC |
+| Role has "post", "create", "manage" actions | CRUD for that entity |
+| Real-time messaging mentioned | Messaging system |
+| Real-time notifications mentioned | Notification system |
+| "Search", "browse", "discover" in vision | Search & discovery |
+| "Pay", "invoice", "billing", "monetize" | Payments / billing |
+| Admin role exists | Admin dashboard |
+| "Mobile" or "responsive" mentioned | Mobile-optimized views |
+| "Analytics", "reports", "metrics" | Reporting & analytics |
+| "Settings", "preferences", "profile" | User settings / profiles |
+
+4. Classify each inferred feature into tiers:
+   - **MVP**: Features required for core value proposition + auth + primary entity CRUD
+   - **Post-MVP**: Enhancement features (search, notifications, analytics, admin tools)
+   - **Future**: Nice-to-have (advanced analytics, integrations, i18n)
+
+5. Estimate scope per item:
+   - **S**: single entity, few stories (settings, preferences)
+   - **M**: 1-2 entities, standard CRUD + some logic (auth, messaging)
+   - **L**: multiple entities, complex workflows (payments, bidding system)
+
+6. Infer dependencies:
+   - Everything depends on auth (if present)
+   - Messaging depends on user profiles
+   - Payments depend on core entity CRUD
+   - Admin dashboard depends on the features it moderates
+
+7. Generate `.specs/roadmap.md` from template, filling tier sections with inferred items
+8. Remove `> No items yet.` hints from tiers that have items
+
+**Item format:**
+
+```markdown
+- [ ] **Feature name** — short description · Roles: X, Y · Scope: S/M/L · Deps: feature-a, feature-b
+```
+
+**Flag interactions:**
+- `--auto`: Roadmap is generated using AI inference with no user review of items.
+- `--dry-run`: Roadmap is listed in the dry-run output but not created.
 
 ### Step 3.10 — Create README.md
 
@@ -378,6 +435,7 @@ Create `.specs/README.md` as the centralized spec registry and artifact index.
 | [stacks/_default.md](stacks/_default.md) | Current tech stack |
 | [testing/strategy.md](testing/strategy.md) | Testing strategy |
 | [changelog.md](changelog.md) | Global changelog |
+| [roadmap.md](roadmap.md) | Feature backlog (MVP / Post-MVP / Future) |
 
 ---
 
@@ -483,6 +541,7 @@ If the user declines to resolve blockers during init, the manifest is still comm
 > - `.specs/features/` — ready for your first feature spec
 > - `.specs/README.md` — spec registry and artifact index
 > - `.specs/changelog.md` — global changelog
+> - `.specs/roadmap.md` — feature roadmap (N items across MVP/Post-MVP/Future)
 > - `.specs/preflight.md` — preflight manifest (tooling, auth, tokens)
 > - `.specs/preflight-report.md` — preflight execution report
 >
@@ -517,6 +576,7 @@ If the user declines to resolve blockers during init, the manifest is still comm
 | `.specs/README.md` | Inline (template) | Filled with project name, initial ADRs |
 | `.specs/hooks/` | — (empty directory) | Lifecycle hooks — add `before-*.md` / `after-*.md` to customize commands |
 | `.specs/changelog.md` | Inline | Empty global changelog with first entry |
+| `.specs/roadmap.md` | `system/templates/roadmap-template.md` | Filled from Phase A project profile inference |
 
 ---
 
@@ -557,6 +617,7 @@ Before declaring success, verify:
 - [ ] `.specs/hooks/` directory exists
 - [ ] `.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`
 - [ ] `.gitignore` contains `.specs/hooks/*.local.md`
+- [ ] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)
 - [ ] `.specs/preflight.md` exists with checks generated from stack
 - [ ] `.specs/preflight-report.md` exists with execution results
 

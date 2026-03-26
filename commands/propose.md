@@ -61,6 +61,9 @@ Check for `.specs/roadmap.md`. If present:
 - Parse priority tiers (MVP / Post-MVP / Future)
 - Identify unchecked items (not yet specified)
 - Cross-reference with existing features to find gaps
+- Parse the Deferred section table
+- For each deferred item, extract: source request, item name, context, date added
+- Deferred items are **high-context candidates** — they carry the user's original intent
 
 If absent, skip and rely on AI inference in Step 4.
 
@@ -121,6 +124,7 @@ Rank proposed features using this priority order:
 3. **Role coverage** — Does it serve an underserved role?
 4. **Scope fit** — Is it appropriately sized (prefer S/M over L)?
 5. **Roadmap alignment** — Is it on the roadmap (if one exists)?
+6. **Deferred intent** — Was this item explicitly deferred from a prior `/spec.specify` request? Deferred items get a +1 priority boost because the user already expressed intent to build them.
 
 ### Step 6 — Present Proposal(s)
 
@@ -163,6 +167,12 @@ Present the top N proposals (default: 1, configurable via `--count`).
 > ```
 > /spec.specify "[Feature 1 description]"
 > ```
+
+**Deferred item presentation:**
+
+When presenting a proposal that originated from the Deferred section, include the origin context:
+
+> *Originally split from: "auth + audit" — "Track all admin actions with timestamps, exportable logs"*
 
 ### Step 7 — Offer Actions
 
@@ -228,6 +238,19 @@ When features are stuck in intermediate states:
 
 > **Note:** 1 feature has a spec but no plan. Consider completing it first:
 > - `/spec.plan 003-messaging`
+
+### Deferred items exist
+
+When the Deferred section of `roadmap.md` has entries:
+
+- Mention deferred items prominently (they represent explicit user intent)
+- Cross-reference with tier items to avoid suggesting duplicates
+- If a deferred item matches a tier item, note the overlap
+
+> **Note:** 2 deferred items from previous `/spec.specify` splits are available.
+> Consider specifying them next:
+> - Audit trail (from "auth + audit")
+> - Role management (from "auth + roles + audit")
 
 ---
 
