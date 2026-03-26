@@ -15,6 +15,37 @@ argument-hint: "<feature-name>"
 
 Executes a full implementation pipeline from `plan.md` to working, tested, documented code. By default, uses multi-agent orchestration (supervisor + superpowers + documenter). Use `--mono` for single-agent mode.
 
+```mermaid
+flowchart TD
+    START(["/spec.implement"]) --> PREFLIGHT["Preflight Safety\nContract"]
+    PREFLIGHT -->|"fail"| BLOCKED(["Blocked —\nreport + recovery"])
+    PREFLIGHT -->|"pass"| P05["Phase 0.5\nLight preflight\n(/spec.preflight --light)"]
+    P05 -->|"critical fail"| BLOCKED
+    P05 -->|"pass / warnings"| P1["Phase 1 — Analyze\nRead spec + plan +\nconstitution + stack"]
+    P1 --> P2["Phase 2 — Execute Plan\n(step-by-step from plan.md)"]
+
+    subgraph P2_LOOP ["Per-step cycle"]
+        CODE["Code step\n(TDD + @spec anchors)"]
+        TEST["Run targeted\ntests + lint"]
+        CKPT["Write\nprogress.md\ncheckpoint"]
+        CODE --> TEST --> CKPT
+    end
+
+    P2 --> P2_LOOP
+    P2_LOOP --> P5{"UI\nfeature?"}
+    P5 -->|"yes"| VIS["Phase 5\nVisual baselines\n(Playwright)"]
+    P5 -->|"no"| P6
+    VIS --> P6["Phase 6\nFull test suite"]
+    P6 --> P7["Phase 7\nUpdate\nimplementation.md"]
+    P7 --> P8["Phase 8\nUpdate changelogs\n+ README"]
+    P8 --> DONE(["Done"])
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style BLOCKED fill:#ffebee,stroke:#F44336
+    style P2 fill:#fff3e0,stroke:#FF9800
+    style DONE fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Pipeline Phases

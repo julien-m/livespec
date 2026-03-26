@@ -20,6 +20,18 @@ Use cases:
 - View roadmap completion state
 - Machine-readable status for external tools (`--json`)
 
+```mermaid
+flowchart LR
+    CTX["Read\nproject.md"] --> ROAD["Parse roadmap\n(checked/unchecked\nper tier)"]
+    ROAD --> FEAT["Scan features\n(status, plan?,\nimpl?)"]
+    FEAT --> GAPS["Detect gaps\n(stale specs,\nmissing plans)"]
+    GAPS --> OUTPUT["Formatted\nstatus overview\nor --json"]
+
+    style CTX fill:#e8f4f8,stroke:#2196F3
+    style GAPS fill:#fff3e0,stroke:#FF9800
+    style OUTPUT fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Steps

@@ -15,6 +15,30 @@ argument-hint: "[change description]"
 
 Manages infrastructure stack decisions: shows the current stack, proposes changes, analyzes impact, creates ADRs, and optionally generates migration specs for affected features.
 
+```mermaid
+flowchart TD
+    START(["/spec.stack"]) --> MODE{"Action?"}
+    MODE -->|"no arg"| SHOW["Show current\nstack table\n+ ADRs"]
+    MODE -->|"change description"| CLARIFY["Clarify scope\n(layers, from/to)"]
+
+    CLARIFY --> IMPACT["Impact analysis\nper feature\n(High/Med/Low)"]
+    IMPACT --> STRATEGY["Migration\nstrategy\n(big-bang / phased)"]
+    STRATEGY --> ADR["Create ADR\n(decision +\nalternatives)"]
+    ADR --> UPDATE["Update\n_default.md"]
+    UPDATE --> PREFLIGHT["Regenerate\npreflight.md"]
+    PREFLIGHT --> MIGRATE{"Generate\nmigration specs?"}
+    MIGRATE -->|"yes"| SPECS["/spec.specify\nper affected feature"]
+    MIGRATE -->|"no"| DONE(["Done"])
+    SPECS --> DONE
+
+    SHOW --> DONE
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style IMPACT fill:#fff3e0,stroke:#FF9800
+    style ADR fill:#fff3e0,stroke:#FF9800
+    style DONE fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Usage

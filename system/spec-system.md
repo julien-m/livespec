@@ -216,6 +216,7 @@ Persistent backlog of specs to build, organized in tiers (MVP / Post-MVP / Futur
 - `/spec.refine` updates the `Last updated` date (does not modify feature rows)
 - `/spec.propose` does not modify it (read-only command)
 - `/spec.check` and `/spec.explain` do not modify it
+- `/spec.status` does not modify any files (read-only command)
 - `/spec.init` creates `roadmap.md` with inferred feature backlog
 - `/spec.specify` checks matching roadmap items + adds deferred splits to `roadmap.md`
 - `/spec.propose` reads `roadmap.md` including Deferred section (read-only)
@@ -266,7 +267,7 @@ Every `/spec.*` command that creates or modifies an artifact MUST add an entry t
 1. The feature's `changelog.md` (detailed entry)
 2. The global `.specs/changelog.md` (summary line)
 
-Read-only commands (`/spec.explain`) are exempt.
+Read-only commands (`/spec.explain`, `/spec.status`) are exempt.
 
 ### Changelog Rotation
 

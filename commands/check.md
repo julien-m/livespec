@@ -19,6 +19,33 @@ argument-hint: "<feature-name>"
 /spec.check --quality feature     → Step 1 → Steps 3-4 only
 ```
 
+```mermaid
+flowchart TD
+    START(["/spec.check"]) --> TREE["Step 1\nValidate tree\n(system files,\nnaming, completeness)"]
+    TREE --> FEAT{"Feature\nspecified?"}
+    FEAT -->|"yes"| RESOLVE["Resolve\nfeature"]
+    FEAT -->|"no"| SELECT["Step 2\nList features\n→ user selects"]
+    SELECT --> RESOLVE
+
+    RESOLVE --> QUALITY["Steps 3-4\nSpec quality gates\n(Gherkin, Mermaid,\nAC, FR mapping)"]
+    QUALITY --> READ["Steps 5-6\nRead requirements\n+ implementation map"]
+    READ --> VERIFY["Step 7\nVerify each FR/AC\nvs actual code"]
+    VERIFY --> VISUAL{"UI +\nbaselines?"}
+    VISUAL -->|"yes"| DRIFT["Step 8\nVisual drift\ndetection"]
+    VISUAL -->|"no"| REPORT
+    DRIFT --> REPORT["Step 9\nGap report\n(FR/AC/visual tables)"]
+    REPORT --> SAVE["Step 10\nSave report +\nupdate changelogs"]
+    SAVE --> MULTI{"Multiple\nfeatures?"}
+    MULTI -->|"yes"| CONSOL["Step 11\nConsolidated report\n(cross-feature)"]
+    MULTI -->|"no"| DONE(["Done"])
+    CONSOL --> DONE
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style VERIFY fill:#fff3e0,stroke:#FF9800
+    style REPORT fill:#fff3e0,stroke:#FF9800
+    style DONE fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Steps

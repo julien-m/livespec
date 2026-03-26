@@ -9,6 +9,18 @@ argument-hint: "[feature-name]"
 
 ---
 
+```mermaid
+flowchart LR
+    RESOLVE["Resolve\nfeature"] --> DETECT["Auto-detect\nsource dir"]
+    DETECT --> SCRIPT["Run\nplay-coverage.sh\n(grep @spec anchors)"]
+    SCRIPT --> BROWSER["Open playground\nin browser"]
+
+    style RESOLVE fill:#e8f4f8,stroke:#2196F3
+    style BROWSER fill:#e8f5e9,stroke:#4CAF50
+```
+
+---
+
 ## Steps
 
 ### Step 1 — Resolve Feature

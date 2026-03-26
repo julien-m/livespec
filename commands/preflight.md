@@ -16,6 +16,29 @@ Reads `.specs/preflight.md` (the manifest), executes verification checks, auto-r
 
 Can also generate/regenerate the manifest from the project stack and feature specs.
 
+```mermaid
+flowchart TD
+    START(["/spec.preflight"]) --> MODE{"--regenerate?"}
+    MODE -->|"yes"| GEN["Generate manifest\nfrom _default.md\n+ feature specs\n+ .env creds"]
+    MODE -->|"no"| READ["Read existing\npreflight.md"]
+    GEN --> EXEC
+
+    READ --> LIGHT{"--light?"}
+    LIGHT -->|"yes"| DELTA["Verify only\nexpired + new\n+ feature-source"]
+    LIGHT -->|"no"| EXEC
+
+    DELTA --> REPORT
+    EXEC["Pass 1\nVerify all\n(parallel)"] --> P2["Pass 2\nAuto-resolve\nfailures"]
+    P2 --> P3["Pass 3\nPresent human\nblockers (grouped)"]
+    P3 --> REPORT["Write\npreflight-report.md\n(READY / WARNINGS\n/ BLOCKED)"]
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style EXEC fill:#fff3e0,stroke:#FF9800
+    style P2 fill:#fff3e0,stroke:#FF9800
+    style P3 fill:#fff3e0,stroke:#FF9800
+    style REPORT fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Manifest Format

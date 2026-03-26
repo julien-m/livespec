@@ -17,6 +17,35 @@ description: "Initialize LiveSpec in a project through a 3-phase conversational 
 2. **Phase B — Stack Decisions:** AI-guided infrastructure decisions with visual decision trees
 3. **Phase C — Installation:** Automatic creation of the `.specs/` directory structure
 
+```mermaid
+flowchart TD
+    START(["/spec.init"]) --> PRE{"Brainstorm\ndetected?"}
+    PRE -->|"go"| SKIP["Pre-fill project.md\nfrom brainstorm"]
+    PRE -->|"ignore / none"| Q["Phase A\n6 questions\n(interview)"]
+    PRE -->|"modify"| EDIT["Edit imported\nsections"] --> Q
+
+    SKIP --> B
+    Q --> PROFILE["Project Profile\nSummary"] --> B
+
+    B["Phase B\nStack Decisions\n(decision tree + ADRs)"] --> TEST["Testing\nStrategy"]
+    TEST --> DESIGN{"Design tool\nconfigured?"}
+    DESIGN -->|"yes"| C
+    DESIGN -->|"configure"| WIZARD["Design tool\nwizard"] --> C
+    DESIGN -->|"skip"| C
+
+    C["Phase C\nInstallation\n(create .specs/)"] --> ROAD["Generate\nroadmap.md"]
+    ROAD --> README["Create\n.specs/README.md"]
+    README --> CLAUDE["Install LiveSpec\nin CLAUDE.md"]
+    CLAUDE --> D["Phase D\nPreflight Setup\n(3-pass engine)"]
+    D --> DONE(["Done"])
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style DONE fill:#e8f5e9,stroke:#4CAF50
+    style B fill:#fff3e0,stroke:#FF9800
+    style C fill:#fff3e0,stroke:#FF9800
+    style D fill:#fff3e0,stroke:#FF9800
+```
+
 ---
 
 ## Phase A — Brainstorm (Conversational)
@@ -505,7 +534,7 @@ The section content is minimal — a boot pointer to `spec-system.md` plus the c
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.refine` · `/spec.preflight`
+Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.refine` · `/spec.preflight` · `/spec.hooks` · `/spec.play-coverage` · `/spec.status`
 <!-- livespec:end -->
 ```
 

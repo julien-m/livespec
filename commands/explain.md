@@ -17,6 +17,33 @@ Answers "how does X work?" by synthesizing information from spec, plan, implemen
 
 This is the **"6 months later"** command. When someone new joins the team, or when you've forgotten why something was built the way it was, this command gives you the full picture in seconds.
 
+```mermaid
+flowchart LR
+    INPUT["Feature name\nor question"] --> RESOLVE{"Exact match\nor search?"}
+    RESOLVE -->|"exact"| READ
+    RESOLVE -->|"search"| SEARCH["Keyword search\nacross specs,\nADRs, changelogs"]
+    SEARCH --> RANK["Rank candidates\n→ top 3"]
+    RANK --> READ["Read all sources\n(spec, plan, impl,\nchangelog, ADRs)"]
+    READ --> SYNTH["Synthesize\nvisual summary"]
+
+    subgraph SYNTH_SECTIONS ["8 sections (scaled)"]
+        direction TB
+        S1["What it does"]
+        S2["Who uses it"]
+        S3["How it flows (Mermaid)"]
+        S4["How it works"]
+        S5["Data model"]
+        S6["Where it lives"]
+        S7["Why (ADRs)"]
+        S8["What changed"]
+    end
+
+    SYNTH --> SYNTH_SECTIONS
+
+    style INPUT fill:#e8f4f8,stroke:#2196F3
+    style SYNTH fill:#fff3e0,stroke:#FF9800
+```
+
 ---
 
 ## Usage

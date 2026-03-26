@@ -14,6 +14,23 @@ argument-hint: "[command-name]"
 `/spec.hooks [command-name]` — show active hooks (diagnostic)
 `/spec.hooks <command-name> --create <before|after>` — create a new hook
 
+```mermaid
+flowchart TD
+    START(["/spec.hooks"]) --> MODE{"Mode?"}
+    MODE -->|"no --create"| SCAN["Scan 3 levels\n(global → project\n→ local)"]
+    SCAN --> CHAIN["Resolve\nbefore/after chain\n(extend / override)"]
+    CHAIN --> DISPLAY["Display hook\nsummary"]
+
+    MODE -->|"--create before|after"| TARGET["Create hook file\n(project-level)"]
+    TARGET --> TEMPLATE["Write YAML\nfrontmatter +\ntemplate"]
+
+    MODE -->|"--edit"| SHOW["Show current\ncontent"] --> ACCEPT["Accept\nmodifications"]
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style SCAN fill:#fff3e0,stroke:#FF9800
+    style DISPLAY fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Steps

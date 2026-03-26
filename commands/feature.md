@@ -15,12 +15,28 @@ argument-hint: "<feature description>"
 
 Runs the full LiveSpec pipeline in a single command:
 
-```
-Phase 1: Specify     →  Phase 1.5: Spec Review (verifier)
-                     →  Gate: user validates spec + review
-Phase 2: Plan        →  Phase 2.5: Plan Review (verifier)
-                     →  Gate: user validates plan + review
-Phase 3: Implement
+```mermaid
+flowchart TD
+    START(["/spec.feature"]) --> P1["Phase 1\nSpecify"]
+    P1 --> P15["Phase 1.5\nSpec Review\n(verifier agent)"]
+    P15 --> G1{"Gate\nSpec OK?"}
+    G1 -->|"fix"| P1
+    G1 -->|"abort"| ABORT(["Aborted"])
+    G1 -->|"continue"| P2["Phase 2\nPlan"]
+    P2 --> P25["Phase 2.5\nPlan Review\n(verifier agent)"]
+    P25 --> G2{"Gate\nPlan OK?"}
+    G2 -->|"fix / --auto retry"| P2
+    G2 -->|"abort"| ABORT
+    G2 -->|"continue"| P27["Phase 2.7\nPreflight\n(light)"]
+    P27 -->|"critical fail"| ABORT
+    P27 -->|"pass"| P3["Phase 3\nImplement"]
+    P3 --> DONE(["Pipeline\ncomplete"])
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style G1 fill:#fff9c4,stroke:#FFC107
+    style G2 fill:#fff9c4,stroke:#FFC107
+    style ABORT fill:#ffebee,stroke:#F44336
+    style DONE fill:#e8f5e9,stroke:#4CAF50
 ```
 
 ---

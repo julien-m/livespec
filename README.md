@@ -33,6 +33,28 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ---
 
+## How It Works
+
+```mermaid
+flowchart LR
+    P["/spec.propose\nDiscover what\nto build"] --> S["/spec.specify\nWrite the spec\n(stories, AC, FR)"]
+    S --> PL["/spec.plan\nTechnical plan\n(diagrams, steps)"]
+    PL --> I["/spec.implement\nCode, test,\nmap to spec"]
+    I --> C["/spec.check\nVerify spec\nvs code"]
+    C --> E["/spec.explain\nLiving\ndocumentation"]
+
+    style P fill:#e8f4f8,stroke:#2196F3
+    style S fill:#e8f4f8,stroke:#2196F3
+    style PL fill:#e8f4f8,stroke:#2196F3
+    style I fill:#e8f4f8,stroke:#2196F3
+    style C fill:#e8f4f8,stroke:#2196F3
+    style E fill:#e8f4f8,stroke:#2196F3
+```
+
+Each command works standalone, or chain them all with `/spec.feature` for an end-to-end pipeline with validation gates.
+
+---
+
 ## The 14 Commands
 
 | Command | What it does |
@@ -364,30 +386,33 @@ LiveSpec separates **format** from **automation**:
 
 `/spec.implement` uses multi-agent orchestration by default — a supervisor acts as **Orchestrator/Translator**, building a Task Payload per step and delegating execution to the `superpowers:subagent-driven-development` skill:
 
-```
-                  +-----------------+
-                  |   SUPERVISOR    |
-                  | (Orchestrator/  |
-                  |  Translator)    |
-                  +--------+--------+
-                           |
-             +-------------+-----------+
-             |                         |
-   +---------+----------+    +---------+----------+
-   | superpowers:        |    |      DOCUMENTER     |
-   | subagent-driven-dev |    | (progress.md, impl. |
-   |                     |    |  changelog, README) |
-   | ┌─────────────────┐ |    +--------------------+
-   | │  Implementer    │ |
-   | │  (TDD, @spec)   │ |
-   | ├─────────────────┤ |
-   | │  Spec Reviewer  │ |
-   | │  (FR/AC + anchors│ |
-   | ├─────────────────┤ |
-   | │ Quality Reviewer│ |
-   | │ (tests + quality│ |
-   | └─────────────────┘ |
-   +--------------------+
+```mermaid
+flowchart TD
+    SUP["SUPERVISOR\n(Orchestrator / Translator)"]
+
+    SUP -->|"Task Payload\n(FR/AC, TDD, @spec rules)"| SPW
+    SUP -->|"Checkpoint\nafter each step"| DOC
+
+    subgraph SPW ["Superpowers: Subagent-Driven Dev"]
+        IMP["Implementer\n(TDD, @spec anchors)"]
+        SR["Spec Reviewer\n(FR/AC coverage)"]
+        QR["Quality Reviewer\n(tests + code quality)"]
+        IMP --> SR --> QR
+    end
+
+    subgraph DOC ["Documenter"]
+        PROG["progress.md"]
+        IMPL["implementation.md"]
+        CL["changelog.md"]
+    end
+
+    style SUP fill:#fff3e0,stroke:#FF9800
+    style IMP fill:#e8f4f8,stroke:#2196F3
+    style SR fill:#e8f4f8,stroke:#2196F3
+    style QR fill:#e8f4f8,stroke:#2196F3
+    style PROG fill:#f3e5f5,stroke:#9C27B0
+    style IMPL fill:#f3e5f5,stroke:#9C27B0
+    style CL fill:#f3e5f5,stroke:#9C27B0
 ```
 
 ```bash

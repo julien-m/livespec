@@ -15,6 +15,29 @@ argument-hint: "<feature description>"
 
 Takes a feature description and generates a complete `spec.md` in `.specs/features/NNN-feature-name/`.
 
+```mermaid
+flowchart TD
+    START(["/spec.specify"]) --> PARSE["Parse feature\ndescription"]
+    PARSE --> SCOPE{"Scope\nanalysis"}
+    SCOPE -->|"too broad"| SPLIT["Propose split\n+ defer remainder\nto roadmap"]
+    SCOPE -->|"OK"| NUM["Auto-number\nNNN"]
+
+    SPLIT --> NUM
+    NUM --> DIR["Create feature\ndirectory"]
+    DIR --> CTX["Read context\n(project, constitution,\nstack)"]
+    CTX --> GEN["Generate spec.md\n(stories + Gherkin\n+ Mermaid + AC + FR)"]
+    GEN --> MOCK{"UI feature +\ndesign tool?"}
+    MOCK -->|"yes"| MCP["Generate mockups\nvia MCP"] --> VALID
+    MOCK -->|"no"| VALID["Quality\nvalidation"]
+    VALID --> PRESENT["Present spec\nfor confirmation"]
+    PRESENT --> SYNC["Update README\n+ changelogs\n+ roadmap"]
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style GEN fill:#fff3e0,stroke:#FF9800
+    style VALID fill:#fff3e0,stroke:#FF9800
+    style SYNC fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Steps

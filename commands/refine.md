@@ -20,6 +20,39 @@ argument-hint: "<target>"
 /spec.refine feature-name plan     → Refine feature plan
 ```
 
+```mermaid
+flowchart TD
+    START(["/spec.refine"]) --> TARGET{"Target?"}
+    TARGET -->|"no arg"| MENU["Interactive menu\n(scan .specs/)"]
+    TARGET -->|"project"| PROJ
+    TARGET -->|"feature"| ELIG
+    TARGET -->|"feature plan"| ELIG_PLAN
+
+    MENU --> PROJ["Read context\n→ present summary\n→ targeted questions"]
+    PROJ --> DIFF["Show diff\n→ apply changes"]
+    DIFF --> CL["Update\nchangelogs"]
+    CL --> ROAD{"Project\nchange?"}
+    ROAD -->|"yes"| REEVAL["Re-evaluate\nroadmap"]
+    ROAD -->|"no"| DONE(["Done"])
+    REEVAL --> DONE
+
+    ELIG{"Eligibility\ncheck"}
+    ELIG -->|"Draft/Review/Approved"| SPEC_REFINE["Read context\n→ targeted questions\n→ show diff"]
+    ELIG -->|"In Progress/Implemented"| REJECT(["Blocked —\ndownstream exists"])
+    SPEC_REFINE --> QUALITY["Quality gates\n+ numbering check"]
+    QUALITY --> CL
+
+    ELIG_PLAN{"Plan\neligibility"}
+    ELIG_PLAN -->|"no implementation.md"| PLAN_REFINE["Read plan + spec\n→ targeted questions\n→ show diff"]
+    ELIG_PLAN -->|"implementation.md exists"| REJECT
+    PLAN_REFINE --> VALIDATE["FR coverage\n+ constitution check"]
+    VALIDATE --> CL
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style REJECT fill:#ffebee,stroke:#F44336
+    style DONE fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Refine Eligibility Rules

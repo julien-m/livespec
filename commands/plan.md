@@ -19,6 +19,38 @@ Reads the spec.md and generates a complete `plan.md` with:
 - File-by-file implementation plan
 - Testing strategy
 
+```mermaid
+flowchart TD
+    START(["/spec.plan"]) --> RESOLVE["Resolve feature\nname"]
+    RESOLVE --> READ["Read spec.md +\nconstitution + stack\n+ testing strategy"]
+    READ --> DESIGN{"UI feature +\nmockups?"}
+    DESIGN -->|"yes"| SCREENS["Map screens →\ncomponent breakdown"]
+    DESIGN -->|"no"| EXTRACT
+    SCREENS --> EXTRACT["Extract FR, AC,\nentities, API needs"]
+    EXTRACT --> SIZE{"Scope\nS / M / L"}
+    SIZE --> CONST["Constitution\ncheck"]
+    CONST --> DIAGRAMS["Generate Mermaid\ndiagrams"]
+
+    subgraph DIAGRAMS_SUB ["Mermaid Diagrams"]
+        SEQ["sequenceDiagram\n(if API interactions)"]
+        STATE["stateDiagram-v2\n(if stateful entities)"]
+        ER["erDiagram\n(if new DB tables)"]
+    end
+
+    DIAGRAMS --> DIAGRAMS_SUB
+    DIAGRAMS_SUB --> PLAN["File-by-file\nimplementation plan\n(by layer)"]
+    PLAN --> TESTS["Test resolution\n+ testing strategy"]
+    TESTS --> CONTRACTS{"API\ncontracts?"}
+    CONTRACTS -->|"yes"| OAS["Generate\nopenapi.yaml"]
+    CONTRACTS -->|"no"| SYNC
+    OAS --> SYNC["Update README\n+ changelog"]
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style DIAGRAMS fill:#fff3e0,stroke:#FF9800
+    style PLAN fill:#fff3e0,stroke:#FF9800
+    style SYNC fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Steps

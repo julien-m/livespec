@@ -19,6 +19,20 @@ Use cases:
 - After completing a feature — propose what's next
 - Manual invocation anytime — reassess priorities
 
+```mermaid
+flowchart LR
+    CTX["Read project\ncontext"] --> SCAN["Scan existing\nfeatures"]
+    SCAN --> ROAD["Read\nroadmap"]
+    ROAD --> GAP["Gap analysis\n(roles, domains,\ndeps, status, MVP)"]
+    GAP --> RANK["Rank\ncandidates"]
+    RANK --> PRESENT["Present top N\nproposals"]
+
+    style CTX fill:#e8f4f8,stroke:#2196F3
+    style GAP fill:#fff3e0,stroke:#FF9800
+    style RANK fill:#fff3e0,stroke:#FF9800
+    style PRESENT fill:#e8f5e9,stroke:#4CAF50
+```
+
 ---
 
 ## Steps
