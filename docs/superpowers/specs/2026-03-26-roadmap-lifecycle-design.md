@@ -95,6 +95,8 @@ What would you like to refine?
 5. Describe your change freely
 ```
 
+**Note:** When option 4 is selected, Step 5.5 (automatic re-evaluation) is skipped since the user is directly editing the roadmap. Step 5.5 only triggers after changes to project.md, constitution.md, or testing/strategy.md.
+
 **When option 4 is selected — Roadmap Refinement Flow:**
 
 1. Read `.specs/roadmap.md`
@@ -197,10 +199,7 @@ New step inserted in `specify.md` between Step 5 (Generate spec.md) and the exis
 
 ### 4. Specify — Step 5.5 renumbering
 
-The current Step 5.5 (Generate Mockups) becomes **Step 5.6**. All references to "Step 5.5" in the file must be updated to "Step 5.6". This affects:
-- The step header itself
-- Any cross-references within the file (Step 6 Quality Validation references to mockups)
-- The Definition of Done checklist items referencing Step 5.5
+The current Step 5.5 (Generate Mockups) becomes **Step 5.6**. The only change needed is renaming the step header — the current specify.md does not reference "Step 5.5" by number in either the Quality Validation step or the DoD (they reference mockups by content, not step number).
 
 ---
 
