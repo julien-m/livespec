@@ -292,6 +292,39 @@ flowchart TD
 > Visual tests will capture baselines for all key screens (job listing, profile, messaging).
 > Threshold: 2% diff = FAIL.
 
+### Step 3.1 — Dev Tooling (Optional)
+
+After confirming the testing strategy, offer dev tooling choices:
+
+> I have a few quick tooling questions. These help generate accurate coding conventions. Skip any you don't have a preference on.
+>
+> **Package manager?**
+> - npm (default)
+> - pnpm (fast, disk-efficient)
+> - bun (fastest, native TypeScript)
+> - yarn
+>
+> **Linter / Formatter?**
+> - ESLint + Prettier (classic, wide plugin support)
+> - Biome (fast, unified lint + format)
+> - None
+
+If the user skips or has no preference, use sensible defaults based on the stack:
+- TypeScript project → ESLint + Prettier (unless Biome detected in existing config)
+- Bun runtime → bun as package manager
+
+Add the chosen tools as rows in the stack table under a "Dev Tooling" separator comment:
+
+| Layer | Choice | Reason |
+|---|---|---|
+| ... existing layers ... |
+| <!-- Dev Tooling --> |  |  |
+| Package Manager | bun | User choice |
+| Linter | Biome | User choice |
+| Formatter | Biome | Same tool as linter |
+
+These rows are optional — they appear in `_default.md` only if the user provided preferences or defaults were applied.
+
 ### Step 3.5 — Design Tool Check
 
 1. Read `~/.claude/livespec/design.md` (loaded by `before-init` hook if it exists)
@@ -368,7 +401,7 @@ After confirmation, the AI creates the `.specs/` directory structure:
 │   └── changelog.md        ← initial entry
 │
 ├── stacks/
-│   ├── _default.md         ← Generated from Phase B decisions
+│   ├── _default.md         ← Generated from Phase B decisions (with `updated` frontmatter)
 │   └── decisions/
 │       ├── ADR-001-supabase-over-firebase.md
 │       ├── ADR-002-nextjs-over-remix.md
@@ -383,6 +416,18 @@ After confirmation, the AI creates the `.specs/` directory structure:
 │
 └── changelog.md            ← Global changelog (initial entry)
 ```
+
+### Step 3.8 — Add Frontmatter to `_default.md`
+
+When generating `.specs/stacks/_default.md` from Phase B decisions, **always** include a YAML frontmatter block at the top of the file:
+
+```yaml
+---
+updated: {today's date YYYY-MM-DD}
+---
+```
+
+This `updated` field is used by LiveSpec hooks to determine if `.conventions/conventions.md` needs refreshing. It is bumped by `/spec.stack` on every stack change.
 
 ### Step 3.9 — Generate Roadmap
 

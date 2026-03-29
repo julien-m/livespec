@@ -70,6 +70,10 @@ flowchart TD
 | File Storage | **Supabase Storage** | S3-compatible, integrated with auth |
 | Testing | **Vitest + Playwright** | Fast unit tests + full E2E + visual regression |
 | CI/CD | **GitHub Actions** | Native GitHub integration |
+| **Dev Tooling** | | |
+| Package Manager | npm / pnpm / bun | User preference — ask during init |
+| Linter | ESLint / Biome | ESLint: wider ecosystem; Biome: faster, unified |
+| Formatter | Prettier / Biome | Prettier: standard; Biome: unified with linter |
 
 ---
 

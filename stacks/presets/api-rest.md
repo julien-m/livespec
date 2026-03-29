@@ -69,6 +69,10 @@ flowchart TD
 | Testing | **Vitest + supertest** | Fast unit + integration tests |
 | Containerization | **Docker** + **docker-compose** | Reproducible environments |
 | CI/CD | **GitHub Actions** | Automated test + deploy pipeline |
+| **Dev Tooling** | | |
+| Package Manager | npm / pnpm / bun | User preference — ask during init |
+| Linter | ESLint / Biome | ESLint: wider ecosystem; Biome: faster, unified |
+| Formatter | Prettier / Biome | Prettier: standard; Biome: unified with linter |
 
 ---
 

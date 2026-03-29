@@ -17,6 +17,9 @@ AGENTS_DIR="$HOME/.claude/agents"
 COMMANDS=(init propose specify plan implement check explain stack feature refine play-coverage preflight hooks status)
 AGENTS=(livespec-supervisor livespec-implementer livespec-verifier livespec-documenter)
 
+HOOKS_SRC_DIR="$LIVESPEC_ROOT/hooks"
+HOOKS_DST_DIR="$HOME/.claude/livespec/hooks"
+
 # --- Flags ---
 
 FORCE=false
@@ -32,7 +35,7 @@ while [[ $# -gt 0 ]]; do
       cat <<'EOF'
 Usage: bash scripts/install.sh [OPTIONS]
 
-Installs LiveSpec /spec.* commands and agents into ~/.claude/.
+Installs LiveSpec /spec.* commands, agents, and hooks into ~/.claude/.
 
 Options:
   --force         Overwrite existing files/symlinks
@@ -156,6 +159,17 @@ if [[ "$UNINSTALL" == true ]]; then
   for agent in "${AGENTS[@]}"; do
     remove_link "$AGENTS_DIR/$agent.md" "agents/$agent.md"
   done
+
+  # --- Uninstall Hooks ---
+
+  if [[ -d "$HOOKS_SRC_DIR" ]]; then
+    for hook_file in "$HOOKS_SRC_DIR"/*.md; do
+      [[ -f "$hook_file" ]] || continue
+      hook_name="$(basename "$hook_file")"
+      remove_link "$HOOKS_DST_DIR/$hook_name" "hooks/$hook_name"
+    done
+  fi
+
   echo ""
   echo "Done."
   exit 0
@@ -165,12 +179,10 @@ echo ""
 echo "Installing LiveSpec commands and agents..."
 echo ""
 
-HOOKS_DIR="$HOME/.claude/livespec/hooks"
-
 if [[ "$DRY_RUN" == false ]]; then
   mkdir -p "$COMMANDS_DIR"
   mkdir -p "$AGENTS_DIR"
-  mkdir -p "$HOOKS_DIR"
+  mkdir -p "$HOOKS_DST_DIR"
 fi
 
 for cmd in "${COMMANDS[@]}"; do
@@ -180,6 +192,16 @@ done
 for agent in "${AGENTS[@]}"; do
   create_link "$LIVESPEC_ROOT/agents/$agent.md" "$AGENTS_DIR/$agent.md" "agents/$agent.md"
 done
+
+# --- Install Hooks ---
+
+if [[ -d "$HOOKS_SRC_DIR" ]]; then
+  for hook_file in "$HOOKS_SRC_DIR"/*.md; do
+    [[ -f "$hook_file" ]] || continue
+    hook_name="$(basename "$hook_file")"
+    create_link "$hook_file" "$HOOKS_DST_DIR/$hook_name" "hooks/$hook_name"
+  done
+fi
 
 # --- Verify ---
 
@@ -197,6 +219,16 @@ if [[ "$DRY_RUN" == false ]]; then
       errors=$((errors + 1))
     fi
   done
+  if [[ -d "$HOOKS_SRC_DIR" ]]; then
+    for hook_file in "$HOOKS_SRC_DIR"/*.md; do
+      [[ -f "$hook_file" ]] || continue
+      hook_name="$(basename "$hook_file")"
+      if [[ ! -L "$HOOKS_DST_DIR/$hook_name" ]]; then
+        warn "Verification failed: hooks/$hook_name is not a symlink"
+        errors=$((errors + 1))
+      fi
+    done
+  fi
 
   if [[ "$errors" -gt 0 ]]; then
     echo "$errors symlink(s) failed verification." >&2
@@ -207,7 +239,7 @@ fi
 echo ""
 echo "Done! LiveSpec is ready."
 echo ""
-echo "  Global hooks dir: $HOOKS_DIR"
+echo "  Global hooks dir: $HOOKS_DST_DIR"
 echo ""
 echo "Next: run /spec.init in your project to set up .specs/ and CLAUDE.md."
 echo "Tip: /spec.implement uses multi-agent orchestration by default (--mono for single-agent)."

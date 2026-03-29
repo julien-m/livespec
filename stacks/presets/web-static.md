@@ -63,6 +63,10 @@ flowchart TD
 | Search | **Pagefind** (static) or **Algolia** (managed) | Pagefind is zero-server; Algolia scales to millions |
 | Analytics | **Plausible** (privacy-first) or **Vercel Analytics** | No cookies, GDPR-friendly |
 | Testing | **Vitest + Playwright** | Component tests + E2E for critical paths |
+| **Dev Tooling** | | |
+| Package Manager | npm / pnpm / bun | User preference — ask during init |
+| Linter | ESLint / Biome | ESLint: wider ecosystem; Biome: faster, unified |
+| Formatter | Prettier / Biome | Prettier: standard; Biome: unified with linter |
 
 ---
 

@@ -255,6 +255,16 @@ If `.specs/README.md` does not exist, create it by scanning existing artifacts (
 
 Update `.specs/stacks/_default.md` to reflect the new stack decisions.
 
+**Always bump the `updated` field in the YAML frontmatter to today's date.** If the file does not have a frontmatter block, add one:
+
+```yaml
+---
+updated: {today's date YYYY-MM-DD}
+---
+```
+
+This date is compared against `.conventions/conventions.md`'s `generated` date by the `before-plan` and `before-implement` hooks to determine if conventions need refreshing.
+
 #### Step 6 — Generate Migration Specs (optional)
 
 > Would you like me to create migration specs for the 4 affected features?
