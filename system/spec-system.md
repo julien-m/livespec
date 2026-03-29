@@ -74,8 +74,10 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │   ├── ui.<ext>            ← Design source file (tool-specific)
 │   ├── ui.pdf              ← Full PDF export
 │   ├── screens/            ← Per-screen PNG exports
-│   │   └── *.png
-│   └── changelog.md        ← Design change history
+│   │   ├── *.png           ← Latest version of each screen
+│   │   └── NNN-feature-name/  ← Versioned PNGs per feature
+│   │       └── *.png
+│   └── changelog.md        ← Screen-centric visual history
 │
 ├── changelog.md             ← Global changelog (current year)
 ├── archive/                 ← Rotated changelogs by year
@@ -307,7 +309,7 @@ To prevent changelogs from growing unbounded:
 1. Design mockups are centralized in `.specs/design/` — one source file per project
 2. PNGs in `screens/` are the reference for implementation — always the latest version
 3. The design source file (`ui.pen`, `ui.fig`, etc.) is saved manually by the user
-4. When a feature modifies existing screens, overwrite the PNG — git tracks history
+4. When a feature modifies existing screens, save the versioned PNG in `screens/<NNN-feature-name>/` and update the latest copy at `screens/<name>.png`
 5. The `## Screens` section in `spec.md` links features to their visual references
 6. Design fidelity threshold is 5% (more permissive than visual regression at 2%)
 

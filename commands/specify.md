@@ -267,17 +267,22 @@ After generating spec.md, determine if the feature involves UI:
    - If MCP not available → instruct user to create mockups manually and provide the screen list as guidance
 
 5. **Export assets:**
-   - Via MCP: export each screen as PNG to `.specs/design/screens/<screen-name>.png`
+   - Create feature subfolder: `.specs/design/screens/<NNN-feature-name>/`
+   - Via MCP: export each screen as PNG to `.specs/design/screens/<NNN-feature-name>/<screen-name>.png` (immutable versioned copy)
+   - Copy each PNG to `.specs/design/screens/<screen-name>.png` (latest copy — used by plan/implement/check)
    - Via MCP: export PDF to `.specs/design/ui.pdf`
    - The source file (`ui.pen`, etc.) must be saved manually by the user
 
 6. **User validation gate:**
+   For each screen, check `.specs/design/changelog.md` for previous entries. If a screen was modified by a previous feature, show the link to the last version:
+
    ```
    🎨 Mockups generated for [feature name]:
-     • screen-name.png (new)
-     • other-screen.png (modified — description of change)
+     • screen-name.png (modified — description of change)
+       ↳ Previous: NNN-prev-feature (YYYY-MM-DD) — [📸](screens/NNN-prev-feature/screen-name.png)
+     • other-screen.png (new)
 
-   Exported to .specs/design/screens/
+   Exported to .specs/design/screens/<NNN-feature-name>/
 
    → Open the design tool to review and save the source file:
      open .specs/design/ui.<ext>
@@ -285,27 +290,42 @@ After generating spec.md, determine if the feature involves UI:
    → Approve mockups to continue, or describe changes needed.
    ```
 
-7. **Add screen references to spec.md:** After validation, add a `## Screens` section to the feature's `spec.md`:
+7. **Add screen references to spec.md:** After validation, add a `## Screens` section to the feature's `spec.md`. References point to the **versioned** path (immutable — this spec always shows the mockup validated for THIS feature):
 
    ```markdown
    ## Screens
 
    | Screen | Status | Reference |
    |--------|--------|-----------|
-   | screen-name | New | [screen-name.png](../../design/screens/screen-name.png) |
-   | other-screen | Modified | [other-screen.png](../../design/screens/other-screen.png) |
+   | screen-name | Modified | [screen-name.png](../../design/screens/NNN-feature-name/screen-name.png) |
+   | other-screen | New | [other-screen.png](../../design/screens/NNN-feature-name/other-screen.png) |
    ```
 
-8. **Update design changelog:** Add entry to `.specs/design/changelog.md`:
+   **Path divergence (by design):** `spec.md` and `plan.md` reference the immutable versioned path. `implement.md` and `check.md` reference the latest copy (`screens/<name>.png`). See design spec for rationale.
+
+8. **Update design changelog:** Update `.specs/design/changelog.md` (screen-centric format):
+
+   For each screen generated:
+   - If screen already has a `##` section → append a new row to its table
+   - If screen is new → create a new `##` section with a single-row table, inserted in alphabetical order among existing sections
+   - Update the `**Latest:**` link after the table
+   - Date = the date when `/spec.specify` runs
+
+   Entry format per screen section:
 
    ```markdown
-   ### YYYY-MM-DD — Feature NNN: [feature name]
+   ## screen-name
 
-   - **screen-name.png** — new screen (description)
-   - **other-screen.png** — modified (description of change)
+   | Spec | Date | Mockup | Notes |
+   |------|------|--------|-------|
+   | [NNN-feature-name](../features/NNN-feature-name/spec.md) | YYYY-MM-DD | [📸](screens/NNN-feature-name/screen-name.png) | Description of what changed |
+
+   **Latest:** [screen-name.png](screens/screen-name.png)
    ```
 
-**Re-modification:** When `/spec.specify` is run on a feature that already has mockups (screens listed in existing spec.md), the AI detects existing screens, determines which need updating based on spec changes, regenerates via MCP (or instructs manual update), re-exports PNGs (overwriting previous versions), and updates the design changelog.
+   If the changelog doesn't exist yet, create it from the template (`system/templates/design-changelog-template.md`).
+
+**Re-modification:** When `/spec.specify` is run on a feature that already has mockups (screens listed in existing spec.md), the AI detects existing screens, determines which need updating based on spec changes, regenerates via MCP (or instructs manual update), re-exports PNGs in the feature's own subfolder (`screens/<NNN-feature-name>/`), updates the latest copies, and updates the existing changelog row for this feature+screen pair (same spec = update row, not append).
 
 ### Step 6 — Quality Validation
 

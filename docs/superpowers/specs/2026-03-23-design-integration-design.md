@@ -27,7 +27,7 @@ Additionally, the `/spec.init` Phase B (stack decisions) operates without access
 | Design assets location | `.specs/design/` (centralized per project) | Single `.pen`/`.fig` file, one place to open, git tracks history |
 | Naming convention | `ui.<ext>` + `screens/<name>.png` + `ui.pdf` | Universal prefix regardless of tool |
 | Mockup generation timing | During `/spec.specify` (before plan) | User stories define screens; plan needs validated mockups |
-| Versioning strategy | Latest only, git handles history | No `v1`/`v2` files; `git show` for past versions |
+| Versioning strategy | Per-feature versioned + latest copy | Immutable PNGs in `screens/<NNN-feature-name>/`, latest copy at `screens/<name>.png` |
 | No-config behavior | Gate with wizard on first UI feature | Explicit `tool: none` recorded if user opts out |
 | Stack knowledge in init | `before-init.md` hook loads decision-matrix + user memory | Anchors recommendations in curated data, not LLM general knowledge |
 
@@ -115,16 +115,20 @@ Created by `/spec.init` (Phase C) or on first `/spec.specify` with UI.
 ├── ui.pen                  ← source file (saved manually by user)
 ├── ui.pdf                  ← full export (all screens, generated via MCP)
 ├── screens/
-│   ├── login.png           ← per-screen export (generated via MCP)
+│   ├── login.png           ← latest version of each screen
 │   ├── dashboard.png
-│   ├── settings.png
-│   └── ...
-└── changelog.md            ← tracks which screens changed and why
+│   ├── 001-user-auth/      ← versioned PNGs per feature
+│   │   ├── login.png
+│   │   └── dashboard.png
+│   └── 003-notifications/
+│       ├── dashboard.png
+│       └── notification-panel.png
+└── changelog.md            ← screen-centric visual history
 ```
 
 **Rules:**
 - `ui.<ext>` — one source file per project by default, extension from `design.md`. For large projects with many screens, the user can organize by feature (`design/features/NNN-feature.pen`) as a project-level convention. The pipeline only cares about `screens/*.png` — the source file organization is the user's choice.
-- `screens/*.png` — one PNG per screen, always overwritten (latest version only)
+- `screens/*.png` — latest copy of each screen (overwritten when a newer version is generated). Immutable versioned copies in `screens/<NNN-feature-name>/<name>.png`
 - `ui.pdf` — complete PDF export, always overwritten
 - `changelog.md` — cross-feature design change log. This exists separately from per-feature changelogs because a single screen can be modified by multiple features over time. The feature changelog records "feature X updated dashboard.png" but `design/changelog.md` records the full history of dashboard.png across all features — useful for designers tracking screen evolution.
 
@@ -230,7 +234,8 @@ After Step 5 (generate spec.md) and before Step 6 (quality validation), add:
    - If MCP not available → instruct user to create mockups manually and provide the screen list as guidance
 
 5. **Export assets:**
-   - Via MCP: export each screen as PNG to `.specs/design/screens/<screen-name>.png`
+   - Via MCP: export each screen as PNG to `.specs/design/screens/<NNN-feature-name>/<screen-name>.png` (immutable versioned copy)
+   - Via MCP: copy each exported PNG to `.specs/design/screens/<screen-name>.png` (latest)
    - Via MCP: export PDF to `.specs/design/ui.pdf`
    - The source file (`ui.pen`, etc.) must be saved manually by the user
 
@@ -256,19 +261,21 @@ After Step 5 (generate spec.md) and before Step 6 (quality validation), add:
 
    | Screen | Status | Reference |
    |--------|--------|-----------|
-   | login | New | [login.png](../../design/screens/login.png) |
-   | dashboard | Modified | [dashboard.png](../../design/screens/dashboard.png) |
-   | notification-panel | New | [notification-panel.png](../../design/screens/notification-panel.png) |
+   | login | New | [login.png](../../design/screens/NNN-feature-name/login.png) |
+   | dashboard | Modified | [dashboard.png](../../design/screens/NNN-feature-name/dashboard.png) |
+   | notification-panel | New | [notification-panel.png](../../design/screens/NNN-feature-name/notification-panel.png) |
    ```
 
 8. **Update design changelog:** Add entry to `.specs/design/changelog.md`:
 
    ```markdown
-   ### YYYY-MM-DD — Feature NNN: [feature name]
+   ## screen-name
 
-   - **login.png** — new screen (login form with social auth buttons)
-   - **dashboard.png** — modified (added notification widget top-right)
-   - **notification-panel.png** — new screen (slide-out panel with notification list)
+   | Spec | Date | Mockup | Notes |
+   |------|------|--------|-------|
+   | [NNN-feature-name](../features/NNN-feature-name/spec.md) | YYYY-MM-DD | [📸](screens/NNN-feature-name/screen-name.png) | Description of what changed |
+
+   **Latest:** [screen-name.png](screens/screen-name.png)
    ```
 
 **New quality gate addition (Step 6):**
@@ -283,7 +290,7 @@ When `/spec.specify` is run on a feature that already has mockups (screens liste
 1. Detect existing screens from the current spec's `## Screens` section
 2. Determine which screens need updating based on spec changes
 3. If MCP available → open the source file (`ui.pen`) via MCP, modify affected screens
-4. Re-export updated PNGs, overwriting the previous versions
+4. Re-export PNGs in the feature's own subfolder (`screens/<NNN-feature-name>/`), update latest copies, update existing changelog row
 5. Present the user with the list of changes for validation
 6. User saves the source file manually
 7. Update design changelog
@@ -482,7 +489,7 @@ New subsection after "When REVIEWING a feature":
 1. Design mockups are centralized in `.specs/design/` — one source file per project
 2. PNGs in `screens/` are the reference for implementation — always the latest version
 3. The design source file (`ui.pen`, `ui.fig`, etc.) is saved manually by the user
-4. When a feature modifies existing screens, overwrite the PNG — git tracks history
+4. When a feature modifies existing screens, save versioned PNG in `screens/<NNN-feature-name>/` and update latest copy at `screens/<name>.png`
 5. The `## Screens` section in `spec.md` links features to their visual references
 6. Design fidelity threshold is 5% (more permissive than visual regression at 2%)
 ```
