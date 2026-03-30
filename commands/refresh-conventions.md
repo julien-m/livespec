@@ -49,11 +49,19 @@ Verify `.specs/` directory exists. If not:
 
 Stop.
 
-### Step 2 — Run Conventions Sync
+### Step 2 — Read Stack (Primary Source)
 
-**Read** [`~/.claude/livespec/references/conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) and follow its algorithm.
+**Read** `.specs/stacks/_default.md` fully — this is the **authoritative source** for the project's stack. Extract all technologies, frameworks, languages, databases, services, and design tools declared in it.
 
-### Step 3 — Verbose Report
+Also **Read** `.specs/project.md` if it exists — extract project type and target platforms.
+
+**Do NOT scan repo files for stack detection.** The repo may be empty (greenfield). The `.specs/` directory is the truth.
+
+### Step 3 — Run Conventions Sync
+
+**Read** [`~/.claude/livespec/references/conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) and follow its algorithm. When it requires invoking `/conventions.init` or `/conventions.refresh`, pass the stack data extracted in Step 2 as explicit context.
+
+### Step 4 — Verbose Report
 
 Regardless of the outcome (even on skip), display a verbose report:
 
@@ -91,7 +99,7 @@ If no stack file:
   Action: None — run /spec.init to define a stack
 ```
 
-### Step 4 — Flags
+### Step 5 — Flags
 
 | Flag | Behavior |
 |------|----------|
