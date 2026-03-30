@@ -53,6 +53,22 @@ flowchart TD
 > **Before each step:** Resolve `before-implement-step` hooks.
 > **After each step:** Resolve `after-implement-step` hooks.
 
+## Feature Resolution
+
+1. If feature name provided: find `.specs/features/NNN-feature-name/`
+2. If no feature name: use current git branch (parse NNN from branch name)
+3. If still no match: scan `.specs/features/*/spec.md` for the first feature with status `Approved` or `Planned` (has plan.md, not yet implemented — lifecycle: Draft → Planned → Approved → Implemented). If found, display:
+   ```
+   Next to implement: **NNN-feature-name** (Approved)
+   → Proceed? (yes / no / list all)
+   ```
+   - **yes** → use this feature
+   - **no** → abort
+   - **list all** → display all implementable features (Approved/Planned with plan.md), let user pick
+4. Verify `spec.md` and `plan.md` exist — if not, prompt user to run the appropriate command first
+
+---
+
 ## Pipeline Phases
 
 ### Phase 1 — Analyze

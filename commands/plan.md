@@ -62,7 +62,15 @@ flowchart TD
 
 1. If feature name provided: find `.specs/features/NNN-feature-name/`
 2. If no feature name: use current git branch (parse NNN from branch name)
-3. Verify `spec.md` exists — if not, prompt user to run `/spec.specify` first
+3. If still no match: scan `.specs/features/*/spec.md` for the first feature with status `Draft` that has no `plan.md` (lifecycle: Draft → Planned → Approved → Implemented). If found, display:
+   ```
+   Next to plan: **NNN-feature-name** (Draft)
+   → Proceed? (yes / no / list all)
+   ```
+   - **yes** → use this feature
+   - **no** → abort
+   - **list all** → display all plannable features (Draft, no plan.md), let user pick
+4. Verify `spec.md` exists — if not, prompt user to run `/spec.specify` first
 
 ### Step 2 — Read Context Files
 

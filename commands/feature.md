@@ -1,6 +1,6 @@
 ---
 description: "Full feature pipeline: specify → plan → review → implement"
-argument-hint: "<feature description>"
+argument-hint: "[feature description]"
 ---
 
 # Command: /spec.feature
@@ -17,7 +17,13 @@ Runs the full LiveSpec pipeline in a single command:
 
 ```mermaid
 flowchart TD
-    START(["/spec.feature"]) --> P1["Phase 1\nSpecify"]
+    START(["/spec.feature"]) --> ARG{"Argument\nprovided?"}
+    ARG -->|"yes"| P1
+    ARG -->|"no"| RESOLVE["Phase 0\nRead roadmap\nFirst [ ] item"]
+    RESOLVE --> CONFIRM{"User\nconfirms?"}
+    CONFIRM -->|"yes"| P1
+    CONFIRM -->|"no / empty"| ABORT
+    P1["Phase 1\nSpecify"]
     P1 --> P15["Phase 1.5\nSpec Review\n(verifier agent)"]
     P15 --> G1{"Gate\nSpec OK?"}
     G1 -->|"fix"| P1
@@ -49,7 +55,7 @@ flowchart TD
 
 | Flag | What it does |
 |------|-------------|
-| `--auto` | Skip gates after plan and implement. The gate after specify is **always active** (the spec must be validated). If plan review is BLOCKING → re-generates the plan (max 2 iterations), then aborts if still blocking |
+| `--auto` | Skip gates after plan and implement. The gate after specify is **always active** (the spec must be validated). If plan review is BLOCKING → re-generates the plan (max 2 iterations), then aborts if still blocking. **Also commits automatically** at the end when audit + tests pass (see § Auto-Commit) |
 | `--resume` | Resume the pipeline where it stopped (reads `pipeline.md`). Also passed to implement for step-level resume via `progress.md` |
 | `--branch` | Create a git branch `feature/NNN-name` automatically after spec creation (no question asked) |
 | `--no-branch` | Skip the branch proposal entirely |
@@ -92,11 +98,32 @@ Update the status and timestamp after each phase completes.
 
 ---
 
+## Phase 0 — Resolve Feature (when no argument)
+
+When no feature description is provided:
+
+1. Read `.specs/roadmap.md`
+2. Parse tier sections in order: MVP → Post-MVP → Future (skip Deferred)
+3. Find the first unchecked item (`- [ ]`) across tiers
+4. If found, display:
+   ```
+   Next up from roadmap: **<feature name>** (<tier>, Scope: <scope>)
+   → Proceed? (yes / no / list all)
+   ```
+   - **yes** → use this item's description as the feature description, continue to Phase 1
+   - **no** → abort
+   - **list all** → display all unchecked items across tiers, let user pick one
+5. If no unchecked items found → display "Roadmap is empty or fully shipped. Provide a feature description or run `/spec.propose`." and abort
+
+When a feature description is provided → skip this phase entirely, proceed to Phase 1 as before.
+
+---
+
 ## Phase 1 — Specify
 
 1. Update `pipeline.md`: Specify → `In Progress`
 2. Execute the steps described in `commands/specify.md`, passing:
-   - The feature description from the user
+   - The feature description (from user argument or resolved from roadmap)
    - `--priority` if provided
 3. Update `pipeline.md`: Specify → `Done` with timestamp
 
@@ -233,6 +260,49 @@ When `--resume` is provided:
 
 ---
 
+## Auto-Commit (`--auto` only)
+
+When `--auto` is active and Phase 3 (Implement) completes successfully:
+
+1. Run `/audit` — if fail, attempt fix (max 3 retries). If still failing → abort (no commit)
+2. Verify all tests pass
+3. Stage all changes: spec, plan, implementation, progress, changelogs, roadmap updates
+4. Commit with message: `feat(NNN-feature-name): <short description>`
+5. Update `pipeline.md`: all phases → `Done`
+
+**Without `--auto`:** no commit is made. The user commits manually.
+
+---
+
+## Ship Result
+
+When `/spec.feature` is called by `/spec.ship` (via a spawned agent), the pipeline **must** end with a structured result block that the ship orchestrator can parse:
+
+**On success:**
+
+```
+SHIP_RESULT: OK
+FEATURE: NNN-feature-name
+BRANCH: feature/NNN-feature-name
+COMMIT: <commit hash>
+FILES_CHANGED: <count>
+TESTS: <passed> passed, <failed> failed
+```
+
+**On failure:**
+
+```
+SHIP_RESULT: BLOCKED
+FEATURE: NNN-feature-name
+BRANCH: feature/NNN-feature-name
+PHASE: <phase that failed>
+ERROR: <one-line description>
+```
+
+This block is the **last thing output** by the agent. The ship orchestrator reads `SHIP_RESULT:` to decide whether to merge or stop.
+
+---
+
 ## Completion
 
 When all phases are done, display:
@@ -243,6 +313,7 @@ When all phases are done, display:
 > - Plan: `.specs/features/NNN-feature-name/plan.md`
 > - Review: PASS (or SKIPPED)
 > - Implementation: Done
+> - Commit: `<hash>` (if `--auto`)
 >
 > **Next:**
 > - Verify: `/spec.check NNN-feature-name`
@@ -260,6 +331,7 @@ If any phase fails:
    >
    > Resume with: `/spec.feature --resume [feature-name]`
 3. Do **not** continue to subsequent phases
+4. If called from `/spec.ship` → output `SHIP_RESULT: BLOCKED` block (see § Ship Result)
 
 ---
 
