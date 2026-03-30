@@ -10,7 +10,7 @@
 
 LiveSpec's hooks system has 3 interconnected problems:
 
-1. **Global hooks call `/ai-res`** — The 5 `before-*` hooks in `~/.claude/livespec/hooks/` load conventions via the `/ai-res` skill, which is now obsolete. The conventions system (`.conventions/conventions.md`) replaces `/ai-res` for all materialized domains.
+1. **Global hooks call `/ai-res`** — The 6 `before-*` hooks in `~/.claude/livespec/hooks/` load conventions via the `/ai-res` skill, which is now obsolete. The conventions system (`.conventions/conventions.md`) replaces `/ai-res` for all materialized domains.
 
 2. **Orphan hooks in wrong location** — 4 hooks (`after-init`, `after-stack`, `before-plan`, `before-implement`) were created in `projects/livespec/hooks/` instead of the global directory `~/.claude/livespec/hooks/`. These contain the correct conventions-based approach but are never discovered.
 
@@ -107,7 +107,7 @@ Single source of truth for the conventions freshness check algorithm. Referenced
 
 ## Part 2 — Rewrite Global Hooks
 
-All 5 `before-*` hooks in `~/.claude/livespec/hooks/` are rewritten to remove `/ai-res` calls and use the conventions system instead.
+All 6 `before-*` hooks in `~/.claude/livespec/hooks/` are rewritten to remove `/ai-res` calls and use the conventions system instead.
 
 ### Common pattern
 
@@ -172,7 +172,7 @@ For each hook event, Read files at 3 levels in order:
 
 Resolution: if local hook has `mode: override` → use only local. Otherwise → load all existing in order (extend).
 
-**Exhaustive hook table — all 14 commands:**
+**Exhaustive hook table — all hookable commands + sub-events:**
 
 | Command | Before hooks | After hooks |
 |---------|-------------|-------------|
@@ -199,7 +199,7 @@ Resolution: if local hook has `mode: override` → use only local. Otherwise →
 
 ## Part 5 — Command Hooks Reminder
 
-Add 2 lines to each of the 14 hookable commands (init, propose, specify, plan, implement, check, explain, stack, feature, refine, preflight):
+Add 2 lines to each of the 11 hookable commands (init, propose, specify, plan, implement, check, explain, stack, feature, refine, preflight):
 
 ```markdown
 > **Before starting:** Resolve `before-{command}` hooks — see `spec-system.md` § Hooks Resolution.
@@ -323,7 +323,7 @@ Add:
 ## Definition of Done
 
 - [ ] `conventions-sync.md` exists with complete freshness algorithm
-- [ ] All 5 global before-hooks rewritten (no `/ai-res` calls)
+- [ ] All 6 global before-hooks addressed (5 rewritten, 1 unchanged)
 - [ ] `after-init.md` and `after-stack.md` in global hooks directory
 - [ ] `projects/livespec/hooks/` deleted
 - [ ] `spec-system.md` has imperative hooks resolution table

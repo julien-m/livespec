@@ -583,7 +583,7 @@ The section content is minimal — a boot pointer to `spec-system.md` plus the c
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.refine` · `/spec.preflight` · `/spec.hooks` · `/spec.play-coverage` · `/spec.status`
+Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.refine` · `/spec.preflight` · `/spec.hooks` · `/spec.play-coverage` · `/spec.status` · `/spec.refresh-conventions`
 <!-- livespec:end -->
 ```
 
