@@ -41,6 +41,9 @@ flowchart TD
 
 ---
 
+> **Before starting:** Resolve `before-stack` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-stack` hooks — see `spec-system.md` § Hooks Resolution. The `after-stack` hook refreshes conventions when the stack changes.
+
 ## Usage
 
 ```bash

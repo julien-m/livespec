@@ -245,15 +245,57 @@ LiveSpec supports **lifecycle hooks** — Markdown files with instructions injec
 - Step-level hooks: `before-implement-step.md` / `after-implement-step.md`
 - Discovery: `/spec.hooks [command]` to see active hooks; use `--create`/`--edit` to manage hooks
 
-**All `/spec.*` commands resolve hooks automatically** before and after execution. No command-level opt-in is required.
-
 ---
 
 ## Rules for AI Tools
 
+### MANDATORY — Hooks Resolution Protocol
+
+**You MUST resolve hooks before and after EVERY `/spec.*` command execution.** This is not optional. Failure to resolve hooks means conventions are not loaded and the command runs without context.
+
+**Before starting any command:** resolve `before-{command}` hooks.
+**After completing any command:** resolve `after-{command}` hooks.
+
+#### Resolution algorithm (for each hook event)
+
+For a given event (e.g., `before-plan`), Read files at 3 levels in order:
+
+| Level | Path | Scope |
+|-------|------|-------|
+| 1. Global | `~/.claude/livespec/hooks/before-plan.md` | All LiveSpec projects |
+| 2. Project | `.specs/hooks/before-plan.md` | This project (committed, team-shared) |
+| 3. Local | `.specs/hooks/before-plan.local.md` | Personal (gitignored) |
+
+- If a file does not exist at a level → skip that level silently.
+- If the **local** hook has `mode: override` in its YAML frontmatter → execute **only** the local hook, skip global and project.
+- Otherwise (`mode: extend`, the default) → execute **all** existing hooks in order: global → project → local.
+
+#### Exhaustive hook table — all commands
+
+| Command | Before hooks to resolve | After hooks to resolve |
+|---------|------------------------|----------------------|
+| `init` | `before-init` (global, project, local) | `after-init` (global, project, local) |
+| `propose` | `before-propose` (global, project, local) | `after-propose` (global, project, local) |
+| `specify` | `before-specify` (global, project, local) | `after-specify` (global, project, local) |
+| `plan` | `before-plan` (global, project, local) | `after-plan` (global, project, local) |
+| `implement` | `before-implement` (global, project, local) | `after-implement` (global, project, local) |
+| `implement` (each step) | `before-implement-step` (global, project, local) | `after-implement-step` (global, project, local) |
+| `check` | `before-check` (global, project, local) | `after-check` (global, project, local) |
+| `explain` | `before-explain` (global, project, local) | `after-explain` (global, project, local) |
+| `stack` | `before-stack` (global, project, local) | `after-stack` (global, project, local) |
+| `feature` | `before-feature` (global, project, local) | `after-feature` (global, project, local) |
+| `refine` | `before-refine` (global, project, local) | `after-refine` (global, project, local) |
+| `preflight` | `before-preflight` (global, project, local) | `after-preflight` (global, project, local) |
+
+**No hooks:** `hooks`, `play-coverage`, `status`, `refresh-conventions` — these are diagnostic/utility commands.
+
+**`feature` sub-commands:** `/spec.feature` wraps a pipeline (specify → plan → implement). Resolve `before-feature`/`after-feature` around the full pipeline AND resolve each sub-command's own hooks (before-specify, before-plan, before-implement, etc.) at each phase.
+
+**`implement` step hooks:** In addition to `before-implement`/`after-implement` (once), resolve `before-implement-step`/`after-implement-step` before and after EACH implementation step.
+
 ### Command discovery
 
-Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 14 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.check`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`.
+Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 15 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.check`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`, `/spec.refresh-conventions`.
 
 ### When CREATING a new feature
 

@@ -40,6 +40,9 @@ flowchart TD
 
 ---
 
+> **Before starting:** Resolve `before-specify` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-specify` hooks — see `spec-system.md` § Hooks Resolution.
+
 ## Steps
 
 ### Step 1 — Parse Feature Description

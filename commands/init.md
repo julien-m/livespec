@@ -37,16 +37,20 @@ flowchart TD
     ROAD --> README["Create\n.specs/README.md"]
     README --> CLAUDE["Install LiveSpec\nin CLAUDE.md"]
     CLAUDE --> D["Phase D\nPreflight Setup\n(3-pass engine)"]
-    D --> DONE(["Done"])
+    D --> E["Phase E\nPost-Init Hooks\n(conventions generation)"]
+    E --> DONE(["Done"])
 
     style START fill:#e8f4f8,stroke:#2196F3
     style DONE fill:#e8f5e9,stroke:#4CAF50
     style B fill:#fff3e0,stroke:#FF9800
     style C fill:#fff3e0,stroke:#FF9800
     style D fill:#fff3e0,stroke:#FF9800
+    style E fill:#fff3e0,stroke:#FF9800
 ```
 
 ---
+
+> **Before starting:** Resolve `before-init` hooks — see `spec-system.md` § Hooks Resolution.
 
 ## Phase A — Brainstorm (Conversational)
 
@@ -599,6 +603,45 @@ After `.specs/` structure is installed, generate and execute the preflight manif
 
 If the user declines to resolve blockers during init, the manifest is still committed with the checks marked as failing in the report. They can re-run `/spec.preflight` later.
 
+---
+
+## Phase E — Post-Init Hooks
+
+After Phase D completes, resolve and execute after-init hooks. This phase is critical — it triggers conventions generation.
+
+```mermaid
+flowchart TD
+    D["Phase D completed"] --> SCAN["Scan 3 levels for after-init hooks:\n1. ~/.claude/livespec/hooks/after-init.md\n2. .specs/hooks/after-init.md\n3. .specs/hooks/after-init.local.md"]
+    SCAN --> EXISTS{"Any hooks\nfound?"}
+    EXISTS -->|no| SKIP["No after-init hooks — skip"]
+    EXISTS -->|yes| MODE{"Local has\nmode: override?"}
+    MODE -->|yes| LOCAL["Execute local hook only"]
+    MODE -->|no| ALL["Execute all found hooks\n(global → project → local)"]
+    LOCAL --> DONE["Continue to output"]
+    ALL --> DONE
+    SKIP --> DONE
+
+    style SCAN fill:#fff3e0,stroke:#FF9800
+    style DONE fill:#e8f5e9,stroke:#4CAF50
+```
+
+### Steps
+
+1. **Scan** for `after-init` hook files at 3 levels:
+   - `~/.claude/livespec/hooks/after-init.md` (global)
+   - `.specs/hooks/after-init.md` (project)
+   - `.specs/hooks/after-init.local.md` (local)
+
+2. **Resolve** the hook chain:
+   - If local hook exists and has `mode: override` → execute only the local hook
+   - Otherwise → execute all found hooks in order: global → project → local
+
+3. **Execute** each hook: Read the file and follow its instructions sequentially.
+
+4. **Expected outcome:** The global `after-init` hook runs `conventions-sync.md`, which detects that `.conventions/conventions.md` does not exist and triggers `/conventions.init` to generate it from the stack.
+
+---
+
 **Installation output:**
 
 > ✅ **LiveSpec installed successfully!**
@@ -618,6 +661,7 @@ If the user declines to resolve blockers during init, the manifest is still comm
 > - `.specs/roadmap.md` — feature roadmap (N items across MVP/Post-MVP/Future)
 > - `.specs/preflight.md` — preflight manifest (tooling, auth, tokens)
 > - `.specs/preflight-report.md` — preflight execution report
+> - `.conventions/conventions.md` — coding conventions (generated from stack)
 >
 > **Next step:** Discover what to build first:
 > ```
@@ -694,7 +738,9 @@ Before declaring success, verify:
 - [ ] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)
 - [ ] `.specs/preflight.md` exists with checks generated from stack
 - [ ] `.specs/preflight-report.md` exists with execution results
+- [ ] After-init hooks resolved and executed (Phase E)
+- [ ] `.conventions/conventions.md` exists (generated from stack by after-init hook)
 
 If any check fails, report the exact missing artifact and create/fix it before finishing.
 
-*LiveSpec Command v1.0*
+*LiveSpec Command v1.1*

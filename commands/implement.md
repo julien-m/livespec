@@ -48,6 +48,11 @@ flowchart TD
 
 ---
 
+> **Before starting:** Resolve `before-implement` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-implement` hooks — see `spec-system.md` § Hooks Resolution.
+> **Before each step:** Resolve `before-implement-step` hooks.
+> **After each step:** Resolve `after-implement-step` hooks.
+
 ## Pipeline Phases
 
 ### Phase 1 — Analyze

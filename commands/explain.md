@@ -46,6 +46,9 @@ flowchart LR
 
 ---
 
+> **Before starting:** Resolve `before-explain` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-explain` hooks — see `spec-system.md` § Hooks Resolution.
+
 ## Usage
 
 ```bash

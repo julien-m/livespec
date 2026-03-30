@@ -53,6 +53,9 @@ flowchart TD
 
 ---
 
+> **Before starting:** Resolve `before-plan` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-plan` hooks — see `spec-system.md` § Hooks Resolution.
+
 ## Steps
 
 ### Step 1 — Resolve Feature

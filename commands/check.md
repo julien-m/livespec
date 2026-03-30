@@ -48,6 +48,9 @@ flowchart TD
 
 ---
 
+> **Before starting:** Resolve `before-check` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-check` hooks — see `spec-system.md` § Hooks Resolution.
+
 ## Steps
 
 ### Step 1 — Validate Tree Structure

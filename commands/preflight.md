@@ -41,6 +41,9 @@ flowchart TD
 
 ---
 
+> **Before starting:** Resolve `before-preflight` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-preflight` hooks — see `spec-system.md` § Hooks Resolution.
+
 ## Manifest Format
 
 The manifest (`.specs/preflight.md`) has 4 sections. Each check is a `###` heading with bullet-point fields.

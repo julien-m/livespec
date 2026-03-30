@@ -55,6 +55,9 @@ flowchart TD
 
 ---
 
+> **Before starting:** Resolve `before-refine` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-refine` hooks — see `spec-system.md` § Hooks Resolution.
+
 ## Refine Eligibility Rules
 
 Not all artifacts can be refined. Once an artifact has been consumed by the next pipeline stage, modifying it upstream would create inconsistencies with existing code.

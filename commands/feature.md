@@ -41,6 +41,10 @@ flowchart TD
 
 ---
 
+> **Before starting:** Resolve `before-feature` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-feature` hooks — see `spec-system.md` § Hooks Resolution.
+> **Sub-commands:** Each phase (specify, plan, implement) resolves its own before/after hooks in addition to the feature-level hooks.
+
 ## Flags
 
 | Flag | What it does |

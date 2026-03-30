@@ -35,6 +35,9 @@ flowchart LR
 
 ---
 
+> **Before starting:** Resolve `before-propose` hooks — see `spec-system.md` § Hooks Resolution.
+> **After completing:** Resolve `after-propose` hooks — see `spec-system.md` § Hooks Resolution.
+
 ## Steps
 
 ### Step 1 — Read Project Context
