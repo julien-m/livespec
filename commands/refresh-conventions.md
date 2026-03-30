@@ -103,8 +103,8 @@ If no stack file:
 
 | Flag | Behavior |
 |------|----------|
-| `--force` | Skip freshness check, always run `/conventions.refresh --full` |
-| `--dry-run` | Show what would happen without executing |
+| `--force`, `-f` | Skip freshness check, always run `/conventions.refresh --full` |
+| `--dry-run`, `-d` | Show what would happen without executing |
 
 If `--force` is passed, skip Step 2's date comparisons and directly run `/conventions.refresh --full`.
 If `--dry-run` is passed, display the report but do not execute `/conventions.init` or `/conventions.refresh`.

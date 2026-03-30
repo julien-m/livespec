@@ -60,14 +60,14 @@ flowchart TD
 
 | Flag | What it does |
 |------|-------------|
-| `--auto` | Skip gates after plan and implement. If spec review or plan review reports **any findings** (BLOCKING, WARNING, or INFO) → re-generates the spec/plan with findings as context (max 2 iterations each). Aborts if BLOCKING findings remain after 2 attempts; proceeds if only WARNING/INFO remain. **Also commits automatically** at the end when audit + tests pass (see § Auto-Commit) |
-| `--resume` | Resume the pipeline where it stopped (reads `pipeline.md`). Also passed to implement for step-level resume via `progress.md` |
-| `--branch` | Create a git branch `feature/NNN-name` automatically after spec creation (no question asked) |
-| `--no-branch` | Skip the branch proposal entirely |
-| `--priority P1\|P2\|P3` | Force all user stories in the spec to the given priority (P1=critical/MVP, P2=important, P3=nice-to-have) |
-| `--mono` | Use a single agent for implementation instead of multi-agent orchestration (supervisor + superpowers + documenter) |
-| `--economy` | No sub-agents, direct tools only — uses fewer tokens but slower |
-| `--step` | Pause after each implementation step for manual validation |
+| `--auto`, `-a` | Skip gates after plan and implement. If spec review or plan review reports **any findings** (BLOCKING, WARNING, or INFO) → re-generates the spec/plan with findings as context (max 2 iterations each). Aborts if BLOCKING findings remain after 2 attempts; proceeds if only WARNING/INFO remain. **Also commits automatically** at the end when audit + tests pass (see § Auto-Commit) |
+| `--resume`, `-r` | Resume the pipeline where it stopped (reads `pipeline.md`). Also passed to implement for step-level resume via `progress.md` |
+| `--branch`, `-b` | Create a git branch `feature/NNN-name` automatically after spec creation (no question asked) |
+| `--no-branch`, `-B` | Skip the branch proposal entirely |
+| `--priority`, `-p` `P1\|P2\|P3` | Force all user stories in the spec to the given priority (P1=critical/MVP, P2=important, P3=nice-to-have) |
+| `--mono`, `-m` | Use a single agent for implementation instead of multi-agent orchestration (supervisor + superpowers + documenter) |
+| `--economy`, `-e` | No sub-agents, direct tools only — uses fewer tokens but slower |
+| `--step`, `-s` | Pause after each implementation step for manual validation |
 
 > **Note:** Flags like `--no-review`, `--no-visual`, `--no-save`, and `--no-contracts` are intentionally **not** available on `/spec.feature`. This pipeline enforces all safety gates. These flags remain available on their respective sub-commands (`/spec.plan --no-contracts`, `/spec.implement --no-visual`, etc.) for power users running manual flows.
 

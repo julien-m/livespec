@@ -317,11 +317,11 @@ If confidence is low, state uncertainty and ask one follow-up question.
 
 | Flag | Behavior |
 |---|---|
-| `--diagrams-only` | Show only Mermaid diagrams, no prose |
-| `--history` | Show full changelog history for the feature |
-| `--code` | Include file paths and line numbers from implementation.md |
-| `--why` | Focus on ADR/decision explanations |
-| `--since [date]` | Show only changes since a specific date |
+| `--diagrams-only`, `-D` | Show only Mermaid diagrams, no prose |
+| `--history`, `-H` | Show full changelog history for the feature |
+| `--code`, `-c` | Include file paths and line numbers from implementation.md |
+| `--why`, `-w` | Focus on ADR/decision explanations |
+| `--since`, `-S` `[date]` | Show only changes since a specific date |
 
 ---
 

@@ -155,11 +155,11 @@ Hooks for /spec.plan:
 
 | Flag | Behavior |
 |------|----------|
-| `--verbose` | Show first 10 lines of each active hook file |
-| `--create <before\|after>` | Create a new hook for the specified command |
-| `--global` | Target the global hooks directory (`~/.claude/livespec/hooks/`) |
-| `--local` | Target the local level (`.specs/hooks/*.local.md`, gitignored) |
-| `--edit` | Open an existing hook for modification (show current content, accept changes) |
+| `--verbose`, `-v` | Show first 10 lines of each active hook file |
+| `--create`, `-c` `<before\|after>` | Create a new hook for the specified command |
+| `--global`, `-g` | Target the global hooks directory (`~/.claude/livespec/hooks/`) |
+| `--local`, `-l` | Target the local level (`.specs/hooks/*.local.md`, gitignored) |
+| `--edit`, `-e` | Open an existing hook for modification (show current content, accept changes) |
 
 When `--create` or `--edit` is absent, the command is **read-only** (diagnostic mode).
 

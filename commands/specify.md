@@ -496,10 +496,10 @@ flowchart TD
 
 | Flag | Behavior |
 |---|---|
-| `--auto` | Skip confirmation, create spec and proceed silently |
-| `--branch` | Automatically create git branch after spec creation |
-| `--no-branch` | Skip branch creation prompt |
-| `--priority [P1|P2|P3]` | Override all stories to specified priority |
+| `--auto`, `-a` | Skip confirmation, create spec and proceed silently |
+| `--branch`, `-b` | Automatically create git branch after spec creation |
+| `--no-branch`, `-B` | Skip branch creation prompt |
+| `--priority`, `-p` `[P1\|P2\|P3]` | Override all stories to specified priority |
 
 ---
 

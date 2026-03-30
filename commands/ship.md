@@ -65,11 +65,11 @@ The agent commits on its feature branch. The main context merges into the target
 
 | Flag | Behavior |
 |------|----------|
-| `--tier mvp\|postmvp\|future` | Ship only features from this roadmap tier |
-| `--count N` | Ship the next N features (across tiers, in roadmap order) |
-| `--resume` | Resume from last incomplete feature in `ship.md` |
-| `--mono` | Pass `--mono` to each `/spec.feature` call |
-| `--economy` | Pass `--economy` to each `/spec.feature` call |
+| `--tier`, `-t` `mvp\|postmvp\|future` | Ship only features from this roadmap tier |
+| `--count`, `-n` `N` | Ship the next N features (across tiers, in roadmap order) |
+| `--resume`, `-r` | Resume from last incomplete feature in `ship.md` |
+| `--mono`, `-m` | Pass `--mono` to each `/spec.feature` call |
+| `--economy`, `-e` | Pass `--economy` to each `/spec.feature` call |
 
 When no flag is provided → interactive selection (Phase 0).
 

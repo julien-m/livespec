@@ -319,9 +319,9 @@ Also add a summary entry to `.specs/changelog.md` (global):
 
 | Flag | Behavior |
 |---|---|
-| `--auto` | Skip confirmation, generate plan silently |
-| `--no-contracts` | Skip API contract generation |
-| `--diagram-only` | Regenerate only the Mermaid diagrams in an existing plan |
+| `--auto`, `-a` | Skip confirmation, generate plan silently |
+| `--no-contracts`, `-C` | Skip API contract generation |
+| `--diagram-only`, `-D` | Regenerate only the Mermaid diagrams in an existing plan |
 
 ---
 

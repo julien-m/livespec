@@ -213,10 +213,10 @@ With `--auto`: display the proposal(s) and exit — no action prompt.
 
 | Flag | Behavior |
 |------|----------|
-| `--count N` | Number of proposals to generate (default: 1, max: 5) |
-| `--role [name]` | Focus proposals on a specific user role |
-| `--mvp` | Only propose MVP-critical features |
-| `--auto` | Display proposals and exit (no action prompt) |
+| `--count`, `-n` `N` | Number of proposals to generate (default: 1, max: 5) |
+| `--role`, `-r` `[name]` | Focus proposals on a specific user role |
+| `--mvp`, `-M` | Only propose MVP-critical features |
+| `--auto`, `-a` | Display proposals and exit (no action prompt) |
 
 ---
 

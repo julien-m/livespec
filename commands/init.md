@@ -678,10 +678,10 @@ flowchart TD
 
 | Flag | Behavior |
 |---|---|
-| `--auto` | Use defaults, skip all questions (generates generic constitution) |
-| `--stack [preset]` | Skip Phase A, use specified preset (web-realtime / web-static / api-rest) |
-| `--dir [path]` | Install in specified directory instead of current directory |
-| `--dry-run` | Show what would be created without creating files |
+| `--auto`, `-a` | Use defaults, skip all questions (generates generic constitution) |
+| `--stack`, `-s` `[preset]` | Skip Phase A, use specified preset (web-realtime / web-static / api-rest) |
+| `--dir`, `-D` `[path]` | Install in specified directory instead of current directory |
+| `--dry-run`, `-d` | Show what would be created without creating files |
 
 ---
 

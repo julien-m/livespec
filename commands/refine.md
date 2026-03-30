@@ -553,8 +553,8 @@ If the project refinement involves adding/replacing a technology, redirect to `/
 
 | Flag | Behavior |
 |---|---|
-| `--auto` | Apply changes without confirmation prompts |
-| `--dry-run` | Show proposed changes without applying them |
+| `--auto`, `-a` | Apply changes without confirmation prompts |
+| `--dry-run`, `-d` | Show proposed changes without applying them |
 
 ---
 

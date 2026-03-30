@@ -353,10 +353,10 @@ Preflight dry run — N checks would be executed:
 
 | Flag | Behavior |
 |------|----------|
-| `--light` | Light check — only expires, feature-source, and new items |
-| `--regenerate` | Regenerate manifest from stack + specs (preserves Custom) |
-| `--regenerate --force` | Regenerate manifest and reset Custom section |
-| `--dry-run` | Show what would be checked without executing |
+| `--light`, `-l` | Light check — only expires, feature-source, and new items |
+| `--regenerate`, `-r` | Regenerate manifest from stack + specs (preserves Custom) |
+| `--regenerate --force`, `-r -f` | Regenerate manifest and reset Custom section |
+| `--dry-run`, `-d` | Show what would be checked without executing |
 
 ---
 

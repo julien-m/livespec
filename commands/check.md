@@ -508,15 +508,15 @@ Ordered list of the most urgent actions across all checked features:
 
 | Flag | Behavior |
 |---|---|
-| `--update` | Automatically update `implementation.md` without asking |
-| `--no-visual` | Skip visual diff comparison |
-| `--fix` | After reporting, attempt to fix ❌ Missing items automatically |
-| `--report [path]` | Save gap report to specified file instead of printing |
-| `--tree-only` | Only validate tree structure, skip per-feature checks |
-| `--skip-tree` | Skip tree validation (for quick single-feature check) |
-| `--quality` | Only validate spec quality gates, skip code alignment |
-| `--all` | Check all features without prompting for selection |
-| `--summary` | Multi-spec: only display the consolidated report |
+| `--update`, `-u` | Automatically update `implementation.md` without asking |
+| `--no-visual`, `-V` | Skip visual diff comparison |
+| `--fix`, `-x` | After reporting, attempt to fix ❌ Missing items automatically |
+| `--report`, `-R` `[path]` | Save gap report to specified file instead of printing |
+| `--tree-only`, `-t` | Only validate tree structure, skip per-feature checks |
+| `--skip-tree`, `-T` | Skip tree validation (for quick single-feature check) |
+| `--quality`, `-q` | Only validate spec quality gates, skip code alignment |
+| `--all`, `-A` | Check all features without prompting for selection |
+| `--summary`, `-S` | Multi-spec: only display the consolidated report |
 
 ---
 

@@ -315,10 +315,10 @@ Lists all ADRs chronologically with summaries:
 
 | Flag | Behavior |
 |---|---|
-| `--dry-run` | Show impact analysis without making any changes |
-| `--no-adr` | Skip ADR creation (not recommended) |
-| `--no-migration-specs` | Skip generating migration feature specs |
-| `--force` | Skip confirmation prompts |
+| `--dry-run`, `-d` | Show impact analysis without making any changes |
+| `--no-adr`, `-A` | Skip ADR creation (not recommended) |
+| `--no-migration-specs`, `-M` | Skip generating migration feature specs |
+| `--force`, `-f` | Skip confirmation prompts |
 
 ---
 

@@ -211,6 +211,7 @@ For each step, assemble the following payload:
 - Exact step description from `plan.md` (files to create/modify, patterns to follow, exact code structure if specified).
 - Relevant rules from `.specs/constitution.md` that apply to the files being touched.
 - Stack and patterns from `.specs/stacks/_default.md`.
+- **Full content of `.conventions/conventions.md`** — include the entire file in the payload so the subagent has all code conventions (general, architecture, logging, testing, language delta, framework deltas) without needing to read them itself. This is critical: subagents have fresh context and no access to prior convention reads.
 
 **3. LiveSpec Mandatory Rules**
 - Every source file that implements a FR **must** contain an inline `@spec` anchor comment with a deep-link to the spec:
@@ -373,13 +374,13 @@ db/migrations/           ← New migration files
 
 | Flag | Behavior |
 |---|---|
-| `--auto` | Skip all confirmation prompts, full automatic pipeline |
-| `--no-save` | Do not save execution logs (by default, logs are saved to `.specs/features/NNN/logs/YYYY-MM-DD.md`) |
-| `--mono` | Single-agent mode — no orchestration, all phases executed directly (original APEX pipeline) |
-| `--economy` | No subagents, direct tools only (slower but uses less tokens) |
-| `--resume` | Resume an interrupted implementation (reads `progress.md`, restarts at first non-`Done` step) |
-| `--no-visual` | Skip visual baseline capture even if UI components are created |
-| `--step [N]` | Start from step N (skip earlier steps, useful for partial re-runs) |
+| `--auto`, `-a` | Skip all confirmation prompts, full automatic pipeline |
+| `--no-save`, `-N` | Do not save execution logs (by default, logs are saved to `.specs/features/NNN/logs/YYYY-MM-DD.md`) |
+| `--mono`, `-m` | Single-agent mode — no orchestration, all phases executed directly (original APEX pipeline) |
+| `--economy`, `-e` | No subagents, direct tools only (slower but uses less tokens) |
+| `--resume`, `-r` | Resume an interrupted implementation (reads `progress.md`, restarts at first non-`Done` step) |
+| `--no-visual`, `-V` | Skip visual baseline capture even if UI components are created |
+| `--step`, `-s` `[N]` | Start from step N (skip earlier steps, useful for partial re-runs) |
 
 ---
 

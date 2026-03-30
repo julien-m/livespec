@@ -188,9 +188,9 @@ Only shown when there are actionable gaps. Silent if everything is progressing n
 
 | Flag | Behavior |
 |------|----------|
-| `--roadmap` | Show roadmap section only |
-| `--features` | Show features section only |
-| `--json` | Output as JSON (machine-readable) |
+| `--roadmap`, `-R` | Show roadmap section only |
+| `--features`, `-F` | Show features section only |
+| `--json`, `-j` | Output as JSON (machine-readable) |
 
 Flags are combinable: `--json --roadmap` outputs roadmap JSON only.
 
