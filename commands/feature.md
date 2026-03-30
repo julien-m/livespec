@@ -26,7 +26,7 @@ flowchart TD
     P1["Phase 1\nSpecify"]
     P1 --> P15["Phase 1.5\nSpec Review\n(verifier agent)"]
     P15 --> G1{"Gate\nSpec OK?"}
-    G1 -->|"fix"| P1
+    G1 -->|"fix / --auto retry"| P1
     G1 -->|"abort"| ABORT(["Aborted"])
     G1 -->|"continue"| P2["Phase 2\nPlan"]
     P2 --> P25["Phase 2.5\nPlan Review\n(verifier agent)"]
@@ -55,7 +55,7 @@ flowchart TD
 
 | Flag | What it does |
 |------|-------------|
-| `--auto` | Skip gates after plan and implement. The gate after specify is **always active** (the spec must be validated). If plan review is BLOCKING → re-generates the plan (max 2 iterations), then aborts if still blocking. **Also commits automatically** at the end when audit + tests pass (see § Auto-Commit) |
+| `--auto` | Skip gates after plan and implement. If spec review or plan review reports **any findings** (BLOCKING, WARNING, or INFO) → re-generates the spec/plan with findings as context (max 2 iterations each). Aborts if BLOCKING findings remain after 2 attempts; proceeds if only WARNING/INFO remain. **Also commits automatically** at the end when audit + tests pass (see § Auto-Commit) |
 | `--resume` | Resume the pipeline where it stopped (reads `pipeline.md`). Also passed to implement for step-level resume via `progress.md` |
 | `--branch` | Create a git branch `feature/NNN-name` automatically after spec creation (no question asked) |
 | `--no-branch` | Skip the branch proposal entirely |
@@ -153,7 +153,7 @@ After the spec is created, determine whether a git branch is needed:
 
 The review findings are **embedded in the specify gate prompt** — the user sees both the spec and the review at once.
 
-**Gate (always active, even with `--auto`):**
+**Gate (interactive mode):**
 
 > Phase 1 complete. Review the generated spec:
 > `.specs/features/NNN-feature-name/spec.md`
@@ -164,16 +164,18 @@ The review findings are **embedded in the specify gate prompt** — the user see
 > N BLOCKING, N WARNING, N INFO finding(s).
 > Type **continue** to proceed to planning, or describe changes needed.
 
-4. Update `pipeline.md`: Spec Review → `Done` with timestamp
+**If verdict has findings (BLOCKING, WARNING, or INFO):**
 
-**If verdict is BLOCKING:**
-
-- The user sees the BLOCKING findings in the gate prompt. They can:
+- **Interactive mode:** The user sees the findings in the gate prompt. They can:
   1. **Fix** — describe changes, the spec is regenerated and re-reviewed
-  2. **Override** — proceed to planning despite blocking findings
+  2. **Override** — proceed to planning despite findings
   3. **Abort** — stop the pipeline
 
-The specify gate is **always active**. The spec is the functional contract — it must be validated before launching plan + implement. `--auto` takes effect starting from Phase 2 (plan → review → implement without pause).
+- **`--auto` mode:** Automatically regenerate the spec (go back to Phase 1) with **all** review findings as additional context. Maximum 2 re-generation attempts. If BLOCKING findings remain after 2 attempts, abort the pipeline with error. If only WARNING/INFO remain after 2 attempts, proceed to planning.
+
+**If verdict is PASS (no findings):** proceed to Phase 2 immediately (both modes).
+
+4. Update `pipeline.md`: Spec Review → `Done` with timestamp
 
 ---
 
@@ -198,15 +200,17 @@ The specify gate is **always active**. The spec is the functional contract — i
    - Update `plan.md` header: `Status: Draft` → `Status: Approved`
 5. Update `pipeline.md`: Plan Review → `Done` with timestamp
 
-**If verdict is BLOCKING:**
+**If verdict has findings (BLOCKING, WARNING, or INFO):**
 
 - **Interactive mode:** Present findings and ask user how to proceed:
-  > Plan review found N BLOCKING issue(s). Options:
+  > Plan review found N BLOCKING, N WARNING, N INFO issue(s). Options:
   > 1. **Fix** — I'll regenerate the plan addressing the findings
-  > 2. **Override** — proceed to implementation despite blocking findings
+  > 2. **Override** — proceed to implementation despite findings
   > 3. **Abort** — stop the pipeline
 
-- **`--auto` mode:** Automatically regenerate the plan (go back to Phase 2) with the review findings as additional context. Maximum 2 re-generation attempts. If still BLOCKING after 2 attempts, abort the pipeline with error.
+- **`--auto` mode:** Automatically regenerate the plan (go back to Phase 2) with **all** review findings (BLOCKING, WARNING, and INFO) as additional context. Maximum 2 re-generation attempts. If BLOCKING findings remain after 2 attempts, abort the pipeline with error. If only WARNING/INFO remain after 2 attempts, proceed to implementation.
+
+**If verdict is PASS (no findings):** proceed immediately (both modes).
 
 **Gate (interactive mode, verdict PASS):**
 
