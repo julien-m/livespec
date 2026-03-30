@@ -49,17 +49,17 @@ Verify `.specs/` directory exists. If not:
 
 Stop.
 
-### Step 2 — Read Stack (Primary Source)
+### Step 2 — Extract Signals from Stack
 
-**Read** `.specs/stacks/_default.md` fully — this is the **authoritative source** for the project's stack. Extract all technologies, frameworks, languages, databases, services, and design tools declared in it.
+**Read** `.specs/stacks/_default.md` fully. **Read** `.specs/project.md` if it exists.
 
-Also **Read** `.specs/project.md` if it exists — extract project type and target platforms.
+Extract a flat list of keyword signals: technology names, dependency names, architecture keywords, project type keywords, platform keywords. These are **raw signals** — do not attempt to map them to convention domains yourself.
 
-**Do NOT scan repo files for stack detection.** The repo may be empty (greenfield). The `.specs/` directory is the truth.
+Example: for a Bun + TypeScript + cron-parser project → `typescript, bun, cron-parser, parseArgs, cli`
 
 ### Step 3 — Run Conventions Sync
 
-**Read** [`~/.claude/livespec/references/conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) and follow its algorithm. When it requires invoking `/conventions.init` or `/conventions.refresh`, pass the stack data extracted in Step 2 as explicit context.
+**Read** [`~/.claude/livespec/references/conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) and follow its algorithm. When invoking `/conventions.init` or `/conventions.refresh`, pass the extracted signals from Step 2 so the skill can resolve them via `domain-catalog.md`.
 
 ### Step 4 — Verbose Report
 
