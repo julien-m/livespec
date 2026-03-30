@@ -47,9 +47,14 @@ flowchart TD
 
 ---
 
-> **Before starting:** Resolve `before-feature` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-feature` hooks — see `spec-system.md` § Hooks Resolution.
-> **Sub-commands:** Each phase (specify, plan, implement) resolves its own before/after hooks in addition to the feature-level hooks.
+> **Hooks — before starting:** **Read** `before-feature` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-feature.md`
+> 2. `.specs/hooks/before-feature.md`
+> 3. `.specs/hooks/before-feature.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-feature` at all 3 levels.
+>
+> **Sub-commands:** Each phase (specify, plan, implement) resolves its own before/after hooks at all 3 levels, in addition to feature-level hooks. For implement, also resolve `before-implement-step` / `after-implement-step` at all 3 levels for each step.
 
 ## Flags
 

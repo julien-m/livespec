@@ -55,8 +55,12 @@ flowchart TD
 
 ---
 
-> **Before starting:** Resolve `before-refine` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-refine` hooks — see `spec-system.md` § Hooks Resolution.
+> **Hooks — before starting:** **Read** `before-refine` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-refine.md`
+> 2. `.specs/hooks/before-refine.md`
+> 3. `.specs/hooks/before-refine.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-refine` at all 3 levels.
 
 ## Refine Eligibility Rules
 

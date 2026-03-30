@@ -53,8 +53,12 @@ flowchart TD
 
 ---
 
-> **Before starting:** Resolve `before-plan` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-plan` hooks — see `spec-system.md` § Hooks Resolution.
+> **Hooks — before starting:** **Read** `before-plan` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-plan.md`
+> 2. `.specs/hooks/before-plan.md`
+> 3. `.specs/hooks/before-plan.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-plan` at all 3 levels.
 
 ## Steps
 

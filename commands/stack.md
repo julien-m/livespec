@@ -41,8 +41,12 @@ flowchart TD
 
 ---
 
-> **Before starting:** Resolve `before-stack` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-stack` hooks — see `spec-system.md` § Hooks Resolution. The `after-stack` hook refreshes conventions when the stack changes.
+> **Hooks — before starting:** **Read** `before-stack` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-stack.md`
+> 2. `.specs/hooks/before-stack.md`
+> 3. `.specs/hooks/before-stack.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-stack` at all 3 levels. The `after-stack` hook refreshes conventions when the stack changes.
 
 ## Usage
 

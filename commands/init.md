@@ -50,7 +50,10 @@ flowchart TD
 
 ---
 
-> **Before starting:** Resolve `before-init` hooks — see `spec-system.md` § Hooks Resolution.
+> **Hooks — before starting:** **Read** `before-init` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-init.md`
+> 2. `.specs/hooks/before-init.md`
+> 3. `.specs/hooks/before-init.local.md` (if `mode: override` → use only this one)
 
 ## Phase A — Brainstorm (Conversational)
 

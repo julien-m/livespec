@@ -46,8 +46,12 @@ flowchart LR
 
 ---
 
-> **Before starting:** Resolve `before-explain` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-explain` hooks — see `spec-system.md` § Hooks Resolution.
+> **Hooks — before starting:** **Read** `before-explain` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-explain.md`
+> 2. `.specs/hooks/before-explain.md`
+> 3. `.specs/hooks/before-explain.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-explain` at all 3 levels.
 
 ## Usage
 

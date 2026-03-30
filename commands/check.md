@@ -48,8 +48,12 @@ flowchart TD
 
 ---
 
-> **Before starting:** Resolve `before-check` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-check` hooks — see `spec-system.md` § Hooks Resolution.
+> **Hooks — before starting:** **Read** `before-check` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-check.md`
+> 2. `.specs/hooks/before-check.md`
+> 3. `.specs/hooks/before-check.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-check` at all 3 levels.
 
 ## Steps
 

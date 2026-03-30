@@ -35,8 +35,12 @@ flowchart LR
 
 ---
 
-> **Before starting:** Resolve `before-propose` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-propose` hooks — see `spec-system.md` § Hooks Resolution.
+> **Hooks — before starting:** **Read** `before-propose` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-propose.md`
+> 2. `.specs/hooks/before-propose.md`
+> 3. `.specs/hooks/before-propose.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-propose` at all 3 levels.
 
 ## Steps
 

@@ -41,8 +41,12 @@ flowchart TD
 
 ---
 
-> **Before starting:** Resolve `before-preflight` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-preflight` hooks — see `spec-system.md` § Hooks Resolution.
+> **Hooks — before starting:** **Read** `before-preflight` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-preflight.md`
+> 2. `.specs/hooks/before-preflight.md`
+> 3. `.specs/hooks/before-preflight.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-preflight` at all 3 levels.
 
 ## Manifest Format
 

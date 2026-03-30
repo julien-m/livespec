@@ -202,21 +202,25 @@ Resolution: if local hook has `mode: override` → use only local. Otherwise →
 Add 2 lines to each of the 11 hookable commands (init, propose, specify, plan, implement, check, explain, stack, feature, refine, preflight):
 
 ```markdown
-> **Before starting:** Resolve `before-{command}` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-{command}` hooks — see `spec-system.md` § Hooks Resolution.
+> **Hooks — before starting:** **Read** `before-{command}` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-{command}.md`
+> 2. `.specs/hooks/before-{command}.md`
+> 3. `.specs/hooks/before-{command}.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-{command}` at all 3 levels.
 ```
 
 For `implement`, add additionally:
 
 ```markdown
-> **Before each step:** Resolve `before-implement-step` hooks.
-> **After each step:** Resolve `after-implement-step` hooks.
+> **Hooks — before each step:** Same resolution with `before-implement-step` at all 3 levels.
+> **Hooks — after each step:** Same resolution with `after-implement-step` at all 3 levels.
 ```
 
 For `feature`, add additionally:
 
 ```markdown
-> **Sub-commands:** Each phase (specify, plan, implement) resolves its own hooks in addition to `before-feature`/`after-feature`.
+> **Sub-commands:** Each phase (specify, plan, implement) resolves its own before/after hooks at all 3 levels, in addition to feature-level hooks. For implement, also resolve `before-implement-step` / `after-implement-step` at all 3 levels for each step.
 ```
 
 Diagnostic commands (`hooks`, `play-coverage`, `status`, `refresh-conventions`) get no reminder.

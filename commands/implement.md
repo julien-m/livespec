@@ -48,10 +48,14 @@ flowchart TD
 
 ---
 
-> **Before starting:** Resolve `before-implement` hooks — see `spec-system.md` § Hooks Resolution.
-> **After completing:** Resolve `after-implement` hooks — see `spec-system.md` § Hooks Resolution.
-> **Before each step:** Resolve `before-implement-step` hooks.
-> **After each step:** Resolve `after-implement-step` hooks.
+> **Hooks — before starting:** **Read** `before-implement` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-implement.md`
+> 2. `.specs/hooks/before-implement.md`
+> 3. `.specs/hooks/before-implement.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-implement` at all 3 levels.
+> **Hooks — before each step:** Same resolution with `before-implement-step` at all 3 levels.
+> **Hooks — after each step:** Same resolution with `after-implement-step` at all 3 levels.
 
 ## Feature Resolution
 
