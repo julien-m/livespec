@@ -407,9 +407,10 @@ Also add a summary entry to `.specs/changelog.md` (global):
 4. **Deferred match:** Search the Deferred table for a row matching the new feature (same matching criteria). If found:
    a. Remove the row from the Deferred table
    b. Add a checked+linked item to the appropriate tier (MVP if no tier preference is obvious, otherwise infer from scope/dependencies)
-5. If split was performed in Step 1.5: add deferred items to Deferred table
-6. Update the `Last updated` date
-7. Remove `> No items yet.` hint from the tier if it now has checked or unchecked items
+5. **No match (ad-hoc feature):** If neither tier match (step 2) nor deferred match (step 4) found a corresponding item, add a new checked+linked item to the MVP tier: `- [x] **Feature Name** → [NNN-name](features/NNN-name/spec.md)`
+6. If split was performed in Step 1.5: add deferred items to Deferred table
+7. Update the `Last updated` date
+8. Remove `> No items yet.` hint from the tier if it now has checked or unchecked items
 
 ### Step 8 — Optionally Create Git Branch
 
@@ -518,7 +519,7 @@ flowchart TD
 - [ ] Global `.specs/changelog.md` has a summary entry
 - [ ] If feature has UI and design tool configured: mockups generated and validated
 - [ ] If feature has UI: `## Screens` section in spec.md with PNG references
-- [ ] If `.specs/roadmap.md` exists: matching item checked OR no match (skip)
+- [ ] If `.specs/roadmap.md` exists: matching item checked OR ad-hoc feature added as checked item in MVP
 - [ ] If split performed: deferred items added to roadmap.md Deferred section
 - [ ] If `.specs/roadmap.md` exists: emerging dependencies detected and proposed (or none found)
 - [ ] If `.specs/roadmap.md` exists: absorption detection run (or no overlap found)
