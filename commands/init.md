@@ -17,9 +17,16 @@ description: "Initialize LiveSpec in a project through a 3-phase conversational 
 2. **Phase B — Stack Decisions:** AI-guided infrastructure decisions with visual decision trees
 3. **Phase C — Installation:** Automatic creation of the `.specs/` directory structure
 
+**Alternative: `--from-code` mode** — reverse-engineers an existing codebase into LiveSpec specs. See [From-Code Flow](#from-code-mode) below.
+
 ```mermaid
 flowchart TD
-    START(["/spec.init"]) --> PRE{"Brainstorm\ndetected?"}
+    START(["/spec.init"]) --> FC{"--from-code?"}
+    FC -->|yes| FROM["From-Code Flow\n(system/from-code.md)"]
+    FC -->|no| PRE{"Brainstorm\ndetected?"}
+
+    FROM --> C
+
     PRE -->|"go"| SKIP["Pre-fill project.md\nfrom brainstorm"]
     PRE -->|"ignore / none"| Q["Phase A\n6 questions\n(interview)"]
     PRE -->|"modify"| EDIT["Edit imported\nsections"] --> Q
@@ -641,7 +648,9 @@ flowchart TD
 
 3. **Execute** each hook: Read the file and follow its instructions sequentially.
 
-4. **Expected outcome:** The global `after-init` hook runs `conventions-sync.md`, which detects that `.conventions/conventions.md` does not exist and triggers `/conventions.init` to generate it from the stack.
+4. **Convention guard (--from-code):** If `.conventions/` directory already exists AND contains `conventions.md`, skip `conventions.init`. The project already has conventions configured — do not overwrite them.
+
+5. **Expected outcome (standard mode):** The global `after-init` hook runs `conventions-sync.md`, which detects that `.conventions/conventions.md` does not exist and triggers `/conventions.init` to generate it from the stack.
 
 ---
 
@@ -682,6 +691,38 @@ flowchart TD
 | `--stack`, `-s` `[preset]` | Skip Phase A, use specified preset (web-realtime / web-static / api-rest) |
 | `--dir`, `-D` `[path]` | Install in specified directory instead of current directory |
 | `--dry-run`, `-d` | Show what would be created without creating files |
+| `--from-code`, `-f` | Reverse-engineer an existing codebase into LiveSpec specs (see below) |
+| `--deep` | Include Tier 4 scan: git history, CI configs, env files (only with `--from-code`) |
+| `--force`, `-F` | Backup existing `.specs/` and/or overwrite existing `bootstrap-recap.md` (only with `--from-code`) |
+
+### Flag Interactions
+
+| Combination | Behavior |
+|---|---|
+| `--from-code` alone | Scan → generate recap → wait for human → Phase C/D/E |
+| `--from-code --auto` | Scan → generate recap → skip human validation → Phase C/D/E immediately |
+| `--from-code --deep` | Extended scan (Tier 4: git history, CI, env). Budget: 60K tokens |
+| `--from-code --force` | Backup `.specs/` to `.specs.bak-YYYYMMDD-HHMMSS/`, overwrite recap if exists |
+| `--from-code --stack` | Warning: "--stack ignored in --from-code mode (stack detected from code)." |
+| `--from-code --dry-run` | Show what would be scanned and generated, without writing files |
+
+---
+
+## From-Code Mode
+
+When `--from-code` is set, **Read** [`system/from-code.md`](../system/from-code.md) and follow it instead of Phase A and Phase B.
+
+The from-code flow:
+1. Checks `.specs/` existence (refuses or backs up with `--force`)
+2. Checks `bootstrap-recap.md` state (none / draft / validated / malformed)
+3. If no recap: scans the codebase in 3-4 tiers and auto-generates answers to the 6 brainstorm questions
+4. Generates `bootstrap-recap.md` with confidence tags (`[OBSERVED]`, `[INFERRED]`, `[SPECULATIVE]`)
+5. Human reviews and edits the recap, sets `status: validated`
+6. On re-run: validates the recap, then enters Phase C with the recap data
+
+**After Phase C/D/E:** moves `bootstrap-recap.md` into `.specs/bootstrap-recap.md` with `status: completed`.
+
+All details (tier system, token budget, scan patterns, validation rules, edge cases) are in **Read** [`system/from-code.md`](../system/from-code.md).
 
 ---
 
@@ -698,6 +739,7 @@ flowchart TD
 | `.specs/hooks/` | — (empty directory) | Lifecycle hooks — add `before-*.md` / `after-*.md` to customize commands |
 | `.specs/changelog.md` | Inline | Empty global changelog with first entry |
 | `.specs/roadmap.md` | `system/templates/roadmap-template.md` | Filled from Phase A project profile inference |
+| `.specs/bootstrap-recap.md` | `system/templates/bootstrap-recap-template.md` | Only with `--from-code` — provenance doc |
 
 ---
 
@@ -742,7 +784,9 @@ Before declaring success, verify:
 - [ ] `.specs/preflight.md` exists with checks generated from stack
 - [ ] `.specs/preflight-report.md` exists with execution results
 - [ ] After-init hooks resolved and executed (Phase E)
-- [ ] `.conventions/conventions.md` exists (generated from stack by after-init hook)
+- [ ] `.conventions/conventions.md` exists (generated from stack by after-init hook, OR pre-existing in --from-code mode)
+- [ ] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`
+- [ ] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)
 
 If any check fails, report the exact missing artifact and create/fix it before finishing.
 

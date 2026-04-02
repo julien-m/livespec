@@ -59,7 +59,7 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 
 | Command | What it does |
 |---|---|
-| `/spec.init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md |
+| `/spec.init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md. `--from-code`: reverse-engineer existing codebase. |
 | `/spec.propose` | Analyze project context and intelligently propose the next feature(s) to build |
 | `/spec.specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
 | `/spec.plan` | Generate technical plan with sequence, state, and ER diagrams |
@@ -164,12 +164,14 @@ Run the full pipeline in one command with validation gates between each phase:
 Initialize LiveSpec in a project. Runs a 3-phase conversational brainstorm (interview → stack decisions → file generation).
 
 ```bash
-/spec.init                    # Full interactive setup
-/spec.init --auto             # Use defaults, skip questions
+/spec.init                       # Full interactive setup
+/spec.init --auto                # Use defaults, skip questions
 /spec.init --stack web-realtime  # Skip interview, use preset
+/spec.init --from-code           # Reverse-engineer existing codebase into specs
+/spec.init --from-code --deep    # Extended scan (git history, CI, env)
 ```
 
-Key flags: `--auto`, `--stack [preset]`, `--dir [path]`, `--dry-run`
+Key flags: `--auto`, `--stack [preset]`, `--from-code`, `--deep`, `--force`, `--dir [path]`, `--dry-run`
 
 ### `/spec.propose`
 
