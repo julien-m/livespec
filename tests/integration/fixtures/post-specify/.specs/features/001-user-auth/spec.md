@@ -48,6 +48,23 @@ Feature: Email/Password Login
     And the login attempt is logged for rate-limiting
 ```
 
+```gherkin
+Feature: Account Lockout on Repeated Failures
+  Scenario: Account locks after 5 failed attempts
+    Given a registered user with email "dev@taskflow.io"
+    And 4 previous failed login attempts within 15 minutes
+    When the user submits a 5th incorrect password
+    Then the account is locked for 15 minutes
+    And subsequent login attempts return 423 Locked
+
+  Scenario: Lock expires after cooldown period
+    Given a locked account for email "dev@taskflow.io"
+    And 15 minutes have passed since the lock
+    When the user submits valid credentials
+    Then the system returns a JWT access token
+    And the failed attempt counter is reset
+```
+
 ```mermaid
 flowchart TD
     A[User opens login page] --> B[Enter email and password]
@@ -81,6 +98,21 @@ Feature: User Registration
     And no duplicate account is created
 ```
 
+```gherkin
+Feature: Registration Input Validation
+  Scenario: Registration with weak password
+    Given the user is on the registration page
+    When the user submits a password shorter than 8 characters
+    Then the system returns a 422 Validation Error
+    And the error message specifies the minimum password length
+
+  Scenario: Registration with invalid email format
+    Given the user is on the registration page
+    When the user submits "not-an-email" as the email address
+    Then the system returns a 422 Validation Error
+    And the error message specifies the email format requirement
+```
+
 ```mermaid
 flowchart TD
     A[User opens registration page] --> B[Fill email, password, display name]
@@ -110,6 +142,22 @@ Feature: Password Reset
     When the user clicks the expired reset link
     Then the system shows an expiration error
     And prompts the user to request a new reset link
+```
+
+```gherkin
+Feature: Password Reset Security
+  Scenario: Reset token is single-use
+    Given a user has received a valid password reset link
+    And the user has already used the link to set a new password
+    When the user clicks the same reset link again
+    Then the system shows a token-already-used error
+    And prompts the user to request a new reset if needed
+
+  Scenario: Password reset for non-existent email
+    Given no user is registered with email "ghost@taskflow.io"
+    When someone requests a password reset for that email
+    Then the system shows a generic success message
+    And no email is sent
 ```
 
 ```mermaid
