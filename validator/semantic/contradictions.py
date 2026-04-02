@@ -40,27 +40,111 @@ class ContradictionReport:
     suspicions: list[ContradictionResult] = field(default_factory=list)
 
 
-def extract_assertions(content: str, source_file: str) -> list[Assertion]:
-    """Extract semantic assertions from spec content.
+_EXTRACT_PROMPT = """You are a technical spec auditor. Extract normative assertions from this document.
+Return JSON: {{"assertions": [{{"id": "A1", "theme": "...", "assertion": "...", "polarity": "must|must-not|may", "source_line": N}}]}}
 
-    STUB: requires LLM-based assertion extraction.
-    """
-    raise NotImplementedError(
-        "LLM assertion extraction not configured. "
-        "This feature requires an LLM API to parse natural-language requirements "
-        "into structured assertions."
+Only extract assertions that state what MUST be, MUST NOT be, IS required, or IS forbidden.
+Skip descriptive or informational text.
+
+Document ({source_file}):
+{content}"""
+
+_COMPARE_PROMPT = """These two assertions on the theme "{theme}" come from different documents.
+Are they contradictory? Answer with strict JSON:
+{{"contradicts": true/false, "confidence": 0.0-1.0, "explanation": "...", "severity": "blocking|warning|info"}}
+
+Assertion A (from {source_a}): {text_a}
+Assertion B (from {source_b}): {text_b}"""
+
+
+def extract_assertions(
+    content: str, source_file: str, model: str | None = None
+) -> list[Assertion]:
+    """Extract semantic assertions from spec content via LLM."""
+    from validator.llm_provider import call_llm
+
+    prompt = _EXTRACT_PROMPT.format(source_file=source_file, content=content[:8000])
+    schema = {
+        "name": "assertions",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "assertions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "string"},
+                            "theme": {"type": "string"},
+                            "assertion": {"type": "string"},
+                            "polarity": {"type": "string", "enum": ["must", "must-not", "may"]},
+                            "source_line": {"type": "integer"},
+                        },
+                        "required": ["id", "theme", "assertion", "polarity", "source_line"],
+                    },
+                }
+            },
+            "required": ["assertions"],
+        },
+    }
+
+    import json
+    raw = call_llm(prompt, json_schema=schema, model=model)
+    data = json.loads(raw)
+
+    return [
+        Assertion(
+            id=a["id"],
+            theme=a["theme"],
+            assertion_text=a["assertion"],
+            polarity=a["polarity"],
+            source_file=source_file,
+            source_line=a.get("source_line", 0),
+        )
+        for a in data.get("assertions", [])
+    ]
+
+
+def compare_assertions(
+    a: Assertion, b: Assertion, model: str | None = None
+) -> ContradictionResult:
+    """Compare two assertions for semantic contradiction via LLM."""
+    from validator.llm_provider import call_llm
+
+    prompt = _COMPARE_PROMPT.format(
+        theme=a.theme,
+        source_a=a.source_file,
+        text_a=a.assertion_text,
+        source_b=b.source_file,
+        text_b=b.assertion_text,
     )
+    schema = {
+        "name": "contradiction",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "contradicts": {"type": "boolean"},
+                "confidence": {"type": "number"},
+                "explanation": {"type": "string"},
+                "severity": {"type": "string", "enum": ["blocking", "warning", "info"]},
+            },
+            "required": ["contradicts", "confidence", "explanation", "severity"],
+        },
+    }
 
+    import json
+    raw = call_llm(prompt, json_schema=schema, model=model)
+    data = json.loads(raw)
 
-def compare_assertions(a: Assertion, b: Assertion) -> ContradictionResult:
-    """Compare two assertions for semantic contradiction.
+    severity_map = {"blocking": Severity.ERROR, "warning": Severity.WARNING, "info": Severity.INFO}
 
-    STUB: requires LLM-based semantic comparison.
-    """
-    raise NotImplementedError(
-        "LLM assertion comparison not configured. "
-        "This feature requires an LLM API to detect semantic contradictions "
-        "between assertions."
+    return ContradictionResult(
+        contradicts=data["contradicts"],
+        confidence=data["confidence"],
+        explanation=data["explanation"],
+        severity=severity_map.get(data["severity"], Severity.WARNING),
     )
 
 

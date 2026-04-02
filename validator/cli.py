@@ -67,18 +67,67 @@ def validate(
         typer.echo("Error: --staged and PATH are mutually exclusive", err=True)
         raise typer.Exit(1)
 
-    # Layer 4 stubs
+    # Layer 4 — LLM-dependent features
     if contradiction_only:
-        typer.echo("Not yet implemented", err=True)
-        raise typer.Exit(0)
+        from .llm_provider import LLMProviderNotConfigured, is_available
+
+        if not is_available():
+            typer.echo(
+                "Error: No LLM provider configured.\n"
+                "Create ~/.config/livespec/provider.py with a call_llm() function.\n"
+                "See examples/provider-cchub.py for a template.",
+                err=True,
+            )
+            raise typer.Exit(1)
+
+        from .coherence.graph_builder import build_graph
+        from .semantic.contradictions import extract_assertions, compare_assertions, get_comparison_pairs
+
+        specs_root_for_l4 = _find_specs_root(Path(path) if path else None)
+        graph = build_graph(specs_root_for_l4)
+        pairs = get_comparison_pairs(graph)
+        typer.echo(f"Contradiction check: {len(pairs)} pairs to compare", err=True)
+
+        all_assertions: dict[str, list] = {}
+        for pair in pairs:
+            for doc in pair:
+                if doc not in all_assertions:
+                    doc_path = specs_root_for_l4 / doc
+                    if doc_path.exists():
+                        content = doc_path.read_text()
+                        try:
+                            all_assertions[doc] = extract_assertions(content, doc)
+                        except Exception as e:
+                            typer.echo(f"  Warning: failed to extract from {doc}: {e}", err=True)
+                            all_assertions[doc] = []
+
+        contradictions = []
+        for doc_a, doc_b in pairs:
+            for a in all_assertions.get(doc_a, []):
+                for b in all_assertions.get(doc_b, []):
+                    if a.theme == b.theme:
+                        try:
+                            result = compare_assertions(a, b)
+                            if result.contradicts and result.confidence >= 0.75:
+                                contradictions.append((a, b, result))
+                                typer.echo(
+                                    f"  [{result.severity.value}] {doc_a} × {doc_b}: {result.explanation}",
+                                    err=True,
+                                )
+                        except Exception as e:
+                            typer.echo(f"  Warning: comparison failed: {e}", err=True)
+
+        typer.echo(f"\n{len(contradictions)} contradiction(s) found.", err=True)
+        raise typer.Exit(1 if contradictions else 0)
+
     if reindex:
-        typer.echo("Not yet implemented", err=True)
+        typer.echo("Embedding reindex requires OpenAI API (not yet integrated).", err=True)
         raise typer.Exit(0)
     if mutate:
-        typer.echo("Not yet implemented", err=True)
+        typer.echo("Mutation testing: run `pytest tests/ -k mutation` for available tests.", err=True)
         raise typer.Exit(0)
     if experimental_multi_model:
-        typer.echo("Not yet implemented", err=True)
+        typer.echo("Multi-model validation is experimental and not yet integrated.", err=True)
         raise typer.Exit(0)
 
     # Pass 2 stub

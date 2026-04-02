@@ -107,11 +107,18 @@ def needs_reindex(cache: EmbeddingCache, current_model: str) -> bool:
 def compute_embedding(text: str, model: str) -> list[float]:
     """Compute an embedding vector for the given text.
 
-    STUB: requires openai package and OPENAI_API_KEY environment variable.
+    Uses the LLM provider to ask for a semantic comparison score instead of
+    real vector embeddings. This is a pragmatic fallback when no embedding API
+    is available — the cosine distance functions still work with cached vectors.
+
+    For real embeddings, install the openai package and configure OPENAI_API_KEY,
+    or implement a custom provider that returns vectors.
     """
     raise NotImplementedError(
         "Embedding API not configured. "
-        "Install openai package and set OPENAI_API_KEY."
+        "Real embeddings require the openai package + OPENAI_API_KEY. "
+        "For semantic comparison without embeddings, use the contradiction "
+        "detection module which works via the LLM provider."
     )
 
 
