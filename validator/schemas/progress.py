@@ -1,0 +1,1 @@
+"""Progress — no frontmatter schema."""

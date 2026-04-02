@@ -1,0 +1,1 @@
+"""Generic — no frontmatter schema."""

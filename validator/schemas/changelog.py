@@ -1,0 +1,1 @@
+"""Changelog — no frontmatter schema."""

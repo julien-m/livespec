@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Ne s'exécute que si .specs/ existe
+if [ ! -d ".specs" ]; then
+    exit 0
+fi
+
+# Failsafe si livespec non installé
+if ! command -v livespec &>/dev/null; then
+    echo "livespec non trouvé dans PATH — validation ignorée"
+    echo "   Installer: pip install -e ./validator/"
+    exit 0
+fi
+
+# Fichiers .specs/*.md stagés
+STAGED_SPECS=$(git diff --cached --name-only --diff-filter=ACM | grep "^\.specs/.*\.md$" || true)
+
+if [ -z "$STAGED_SPECS" ]; then
+    exit 0
+fi
+
+echo "LiveSpec: validation des fichiers .specs/ modifiés..."
+
+if ! timeout 10 livespec validate --staged --format compact; then
+    echo ""
+    echo "Validation LiveSpec échouée."
+    echo "   Pour ignorer: utilisez --no-verify"
+    echo "   Pour détail: livespec validate [fichier]"
+    exit 1
+fi

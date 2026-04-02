@@ -1,0 +1,1 @@
+"""Preflight — no frontmatter schema."""
