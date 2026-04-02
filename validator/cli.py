@@ -47,6 +47,13 @@ def validate(
     auto: bool = typer.Option(False, "--auto", help="Skip confirmation prompts"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Preview fixes without modifying files"),
     list_excluded: bool = typer.Option(False, "--list-excluded", help="Show excluded files"),
+    coherence: bool = typer.Option(False, "--coherence", help="Run Layer 2 coherence validation"),
+    coherence_only: bool = typer.Option(False, "--coherence-only", help="Run only Layer 2 (skip Layer 1)"),
+    rules: Optional[str] = typer.Option(None, "--rules", help="Specific rules to run (e.g., R1,R2)"),
+    wave_num: Optional[int] = typer.Option(None, "--wave", help="Only run rules up to this wave"),
+    ignore_rules: Optional[str] = typer.Option(None, "--ignore", help="Rules to ignore (e.g., R3.2,R5.1)"),
+    strict: bool = typer.Option(False, "--strict", help="Block on coherence errors"),
+    no_suppress: bool = typer.Option(False, "--no-suppress", help="Disable suppress_if_creating"),
 ) -> None:
     """Validate .specs/ files structurally."""
     # Mutual exclusion
@@ -90,17 +97,49 @@ def validate(
         else:
             typer.echo("\nAuto-fix: nothing to fix.", err=True)
 
-    # Output
-    if score_only:
-        report_score_only(results, specs_root)
-    else:
-        json_output = report(results, excluded, format=format, specs_root=specs_root)
-        if json_output:
-            typer.echo(json_output)
+    # Output Layer 1 results (skip if coherence-only)
+    if not coherence_only:
+        if score_only:
+            report_score_only(results, specs_root)
+        else:
+            json_output = report(results, excluded, format=format, specs_root=specs_root)
+            if json_output:
+                typer.echo(json_output)
+
+    # Layer 2 coherence validation
+    coherence_result = None
+    if coherence or coherence_only:
+        from .coherence.report import report_coherence
+        from .coherence.rule_engine import run_coherence
+
+        rule_id_list = rules.split(",") if rules else None
+        ignore_list = ignore_rules.split(",") if ignore_rules else None
+
+        coherence_result = run_coherence(
+            specs_root,
+            rule_ids=rule_id_list,
+            wave=wave_num,
+            ignore=ignore_list,
+            no_suppress=no_suppress,
+            strict=strict,
+        )
+
+        if format == "json":
+            json_out = report_coherence(coherence_result, format="json")
+            if json_out:
+                typer.echo(json_out)
+        else:
+            report_coherence(coherence_result, format=format)
 
     # Exit code
-    has_errors = any(r.has_errors for r in results)
-    has_warnings = any(r.has_warnings for r in results)
+    has_errors = any(r.has_errors for r in results) if not coherence_only else False
+    has_warnings = any(r.has_warnings for r in results) if not coherence_only else False
+
+    if coherence_result:
+        if coherence_result.has_errors:
+            has_errors = True
+        if strict and coherence_result.warnings:
+            has_errors = True
 
     if warn_only:
         raise typer.Exit(0)
