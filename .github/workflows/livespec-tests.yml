@@ -1,0 +1,29 @@
+name: LiveSpec Validator Tests
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    name: "Unit Tests (Layers 1-4)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/ --ignore=tests/integration -v --tb=short
+
+  integration-3a:
+    name: "Integration 3A — Static invariants (no LLM)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -e ".[dev]" && pip install pyyaml jsonschema anyio
+      - run: pytest tests/integration/ -m level_3a -v --tb=short
