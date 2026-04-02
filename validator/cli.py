@@ -54,12 +54,32 @@ def validate(
     ignore_rules: Optional[str] = typer.Option(None, "--ignore", help="Rules to ignore (e.g., R3.2,R5.1)"),
     strict: bool = typer.Option(False, "--strict", help="Block on coherence errors"),
     no_suppress: bool = typer.Option(False, "--no-suppress", help="Disable suppress_if_creating"),
+    semantic: bool = typer.Option(False, "--semantic", help="Run Layer 4 semantic validation"),
+    scorecard: bool = typer.Option(False, "--scorecard", help="Run scorecard only"),
+    contradiction_only: bool = typer.Option(False, "--contradiction-only", help="Run contradiction detection only"),
+    reindex: bool = typer.Option(False, "--reindex", help="Reindex embeddings"),
+    mutate: bool = typer.Option(False, "--mutate", help="Run mutation testing"),
+    experimental_multi_model: bool = typer.Option(False, "--experimental-multi-model", help="Enable multi-model consensus"),
 ) -> None:
     """Validate .specs/ files structurally."""
     # Mutual exclusion
     if staged and path:
         typer.echo("Error: --staged and PATH are mutually exclusive", err=True)
         raise typer.Exit(1)
+
+    # Layer 4 stubs
+    if contradiction_only:
+        typer.echo("Not yet implemented", err=True)
+        raise typer.Exit(0)
+    if reindex:
+        typer.echo("Not yet implemented", err=True)
+        raise typer.Exit(0)
+    if mutate:
+        typer.echo("Not yet implemented", err=True)
+        raise typer.Exit(0)
+    if experimental_multi_model:
+        typer.echo("Not yet implemented", err=True)
+        raise typer.Exit(0)
 
     # Pass 2 stub
     if smart:
@@ -130,6 +150,22 @@ def validate(
                 typer.echo(json_out)
         else:
             report_coherence(coherence_result, format=format)
+
+    # Layer 4 scorecard
+    if scorecard or semantic:
+        from .coherence.graph_builder import build_graph
+        from .semantic.report import report_scorecard
+        from .semantic.scorecard import score_project
+
+        graph = build_graph(specs_root)
+        project_score = score_project(graph.features, specs_root)
+
+        if format == "json":
+            json_out = report_scorecard(project_score, format="json")
+            if json_out:
+                typer.echo(json_out)
+        else:
+            report_scorecard(project_score, format="compact")
 
     # Exit code
     has_errors = any(r.has_errors for r in results) if not coherence_only else False
