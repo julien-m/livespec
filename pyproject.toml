@@ -18,6 +18,12 @@ dev = [
     "pytest>=8.0",
     "pytest-tmp-files>=0.0.2",
 ]
+integration = [
+    "claude-agent-sdk>=0.1.0",
+    "pytest-asyncio>=0.24",
+    "pytest-xdist>=3.6",
+    "jsonschema>=4.23",
+]
 
 [project.scripts]
 livespec = "validator.cli:app"
@@ -25,6 +31,16 @@ livespec = "validator.cli:app"
 [build-system]
 requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "level_3a: tests without LLM on static fixtures",
+    "level_3b: tests with SDK isolated commands",
+    "level_3c: tests full pipeline end-to-end",
+    "chaos: tests on broken fixtures",
+    "slow: tests > 30s",
+]
 
 [tool.setuptools.packages.find]
 include = ["validator*"]
