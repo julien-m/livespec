@@ -22,6 +22,7 @@ class SemanticConfig:
         embedding_dimension: Dimension of embedding vectors.
         mutation_acceptable_score: Minimum mutation kill score (0.0-1.0).
         multi_model_divergence_threshold: Maximum divergence allowed in multi-model consensus.
+        review_confidence_threshold: Minimum reviewer confidence (1-5 scale) to skip cascade retry.
     """
 
     # Embedding thresholds (cosine distance)
@@ -42,6 +43,10 @@ class SemanticConfig:
 
     # Multi-model
     multi_model_divergence_threshold: float = 0.25
+
+    # Plan review
+    review_reviewers: list[str] = field(default_factory=list)
+    review_confidence_threshold: float = 3.0
 
 
 def load_semantic_config(specs_root: Path) -> SemanticConfig:

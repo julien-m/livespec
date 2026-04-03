@@ -53,6 +53,18 @@ flowchart TD
 
 ---
 
+## Flags
+
+| Flag | Behavior |
+|---|---|
+| `--auto`, `-a` | Skip confirmation, generate plan silently |
+| `--no-contracts`, `-C` | Skip API contract generation |
+| `--diagram-only`, `-D` | Regenerate only the Mermaid diagrams in an existing plan |
+| `--review`, `-r` | Run LLM plan review after generation (advisory, never blocks) |
+| `--all-reviewers`, `-R` | Use all configured reviewers (default: first only) |
+
+---
+
 > **Hooks — before starting:** **Read** `before-plan` hooks from all 3 levels (skip missing files):
 > 1. `~/.claude/livespec/hooks/before-plan.md`
 > 2. `.specs/hooks/before-plan.md`
@@ -285,6 +297,35 @@ Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 Also add a summary entry to `.specs/changelog.md` (global):
 `[Feature NNN] Plan created: [Feature Name] — N implementation steps, N diagrams`
 
+### Step 9.7 — LLM Plan Review (if `--review`)
+
+If the `--review` flag is set:
+
+1. Read the generated `plan.md` content
+2. Load reviewer models from `.specs/semantic/config.yaml` → `review_reviewers` list
+3. If no reviewers configured, use the provider's default model
+4. Send the plan + spec + stack + constitution to the first reviewer via `call_llm()`
+5. Display findings inline with severity markers:
+   ```
+   Plan Review (google/gemini-3.1-pro):
+     [ERROR] Coverage gap: AC-003 has no corresponding implementation step
+       → Add a step covering notification preferences (FR-005)
+     [WARNING] Ordering: Step 3 depends on Step 5's migration output
+       → Move database migration before business logic layer
+     Confidence: 4/5 | Findings: 2 | Complexity: 6 FR, 9 files, 5 AC, 3 diagrams
+   ```
+6. If `--all-reviewers` is set and multiple reviewers are configured, run each reviewer sequentially and display all findings
+7. If confidence is low (< threshold) and findings are empty, display warning:
+   ```
+   ⚠ Review suspiciously empty for a plan of this complexity. Consider using a different reviewer model.
+   ```
+8. If blocking findings exist, display note before approval prompt:
+   ```
+   ⚠ Review found blocking issues. Consider revising the plan before implementation.
+   ```
+
+This step is **advisory only** — it never prevents plan.md from being written or blocks the workflow.
+
 ### Step 10 — Present for Approval
 
 > ✅ **Plan generated:** `.specs/features/004-notifications/plan.md`
@@ -312,16 +353,6 @@ Also add a summary entry to `.specs/changelog.md` (global):
 └── contracts/
     └── openapi.yaml ← Generated if API endpoints exist
 ```
-
----
-
-## Flags
-
-| Flag | Behavior |
-|---|---|
-| `--auto`, `-a` | Skip confirmation, generate plan silently |
-| `--no-contracts`, `-C` | Skip API contract generation |
-| `--diagram-only`, `-D` | Regenerate only the Mermaid diagrams in an existing plan |
 
 ---
 

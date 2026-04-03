@@ -35,7 +35,7 @@ Short aliases for all `/spec.*` command flags. Each alias is unique within its c
 
 ### spec.plan
 
-`-a` auto, `-C` no-contracts, `-D` diagram-only
+`-a` auto, `-r` review, `-R` all-reviewers, `-C` no-contracts, `-D` diagram-only
 
 ### spec.check
 

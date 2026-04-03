@@ -203,10 +203,12 @@ Generate a technical plan with sequence, state, and ER diagrams from a spec.
 
 ```bash
 /spec.plan profile-photos
+/spec.plan profile-photos --review          # LLM plan review (advisory)
+/spec.plan profile-photos -r -R             # Review with all configured reviewers
 /spec.plan profile-photos --no-contracts
 ```
 
-Key flags: `--no-contracts`
+Key flags: `--review` (`-r`), `--all-reviewers` (`-R`), `--no-contracts` (`-C`), `--diagram-only` (`-D`), `--auto` (`-a`)
 
 ### `/spec.implement`
 
@@ -431,6 +433,40 @@ flowchart TD
 **Per-step cycle:** Supervisor builds Task Payload (FR/AC context, TDD commands, `@spec` rules, Definition of Done) → dispatches to `superpowers:subagent-driven-development` → Documenter writes `progress.md` checkpoint. Superpowers handles the full TDD loop, spec compliance review, and code quality review with isolated subagents (no context pollution).
 
 Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: 1` in settings.
+
+---
+
+## Validator CLI
+
+LiveSpec includes a Python-based validator (`livespec validate`) for structural, coherence, and semantic validation of `.specs/` files.
+
+```bash
+# Install
+pip install -e .
+
+# Layer 1 — structural validation
+livespec validate
+
+# Layer 2 — cross-file coherence
+livespec validate --coherence
+
+# Layer 4 — LLM-based plan review
+livespec validate --plan-review          # Review with first configured reviewer
+livespec validate -r -R                  # Review with all configured reviewers
+livespec validate --scorecard            # Quality scorecard
+livespec validate --contradiction-only   # Contradiction detection
+```
+
+Plan review configuration (`.specs/semantic/config.yaml`):
+
+```yaml
+review_reviewers:
+  - google/gemini-3.1-pro
+  - openai/gpt-5.4
+review_confidence_threshold: 3.0
+```
+
+When a single reviewer returns a suspiciously empty review on a complex plan, the validator automatically cascades to the next configured reviewer. If both agree there are no issues, the plan is validated with high confidence.
 
 ---
 

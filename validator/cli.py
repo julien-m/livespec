@@ -59,6 +59,12 @@ def validate(
     reindex: bool = typer.Option(False, "--reindex", help="Reindex embeddings"),
     mutate: bool = typer.Option(False, "--mutate", help="Run mutation testing"),
     experimental_multi_model: bool = typer.Option(False, "--experimental-multi-model", help="Enable multi-model consensus"),
+    plan_review: bool = typer.Option(
+        False, "--plan-review", "-r", help="Run LLM plan substance review",
+    ),
+    all_reviewers: bool = typer.Option(
+        False, "--all-reviewers", "-R", help="Use all configured reviewers",
+    ),
 ) -> None:
     """Validate .specs/ files structurally.
 
@@ -86,6 +92,8 @@ def validate(
         reindex: Reindex embeddings.
         mutate: Run mutation testing.
         experimental_multi_model: Enable multi-model consensus.
+        plan_review: Run LLM-based plan substance review.
+        all_reviewers: Use all configured reviewer models.
 
     Returns:
         None (exits via typer.Exit with appropriate code).
@@ -99,6 +107,77 @@ def validate(
         raise typer.Exit(1)
 
     # Layer 4 — LLM-dependent features
+    if plan_review:
+        from .llm_provider import is_available
+        from .orchestrator import run_plan_review
+        from .semantic.config import load_semantic_config
+
+        if not is_available():
+            typer.echo(
+                "Error: No LLM provider configured.\n"
+                "Create ~/.config/livespec/provider.py with a call_llm() function.\n"
+                "See examples/provider-cchub.py for a template.",
+                err=True,
+            )
+            raise typer.Exit(1)
+
+        specs_root_for_review = _find_specs_root(Path(path) if path else None)
+        sem_config = load_semantic_config(specs_root_for_review)
+        models = sem_config.review_reviewers or None
+
+        review_result = run_plan_review(
+            specs_root_for_review,
+            models=models,
+            all_reviewers=all_reviewers,
+            confidence_threshold=sem_config.review_confidence_threshold,
+        )
+
+        has_blocking = False
+        for entry in review_result.reviews:
+            name = entry.feature_name
+            model = entry.result.reviewer_model
+            typer.echo(
+                f"\nPlan Review: {name} ({model})", err=True,
+            )
+            for finding in entry.result.findings:
+                marker = finding.severity.value
+                typer.echo(f"  [{marker}] {finding.category}: {finding.description}", err=True)
+                if finding.suggestion:
+                    typer.echo(f"    → {finding.suggestion}", err=True)
+                if finding.severity.value == "ERROR":
+                    has_blocking = True
+
+            cx = entry.result.complexity
+            typer.echo(
+                f"  Confidence: {entry.result.confidence}/5 | "
+                f"Findings: {len(entry.result.findings)} | "
+                f"Complexity: {cx.get('fr_count', 0)} FR, {cx.get('file_count', 0)} files, "
+                f"{cx.get('ac_count', 0)} AC, {cx.get('diagram_count', 0)} diagrams",
+                err=True,
+            )
+
+            # Low confidence warning
+            if (
+                entry.result.confidence < sem_config.review_confidence_threshold
+                and len(entry.result.findings) == 0
+                and sum(cx.values()) > 5
+            ):
+                typer.echo(
+                    "  ⚠ Review suspiciously empty for a plan of this complexity.",
+                    err=True,
+                )
+
+        for error in review_result.errors:
+            typer.echo(f"  Error: {error}", err=True)
+
+        total = sum(len(e.result.findings) for e in review_result.reviews)
+        count = len(review_result.reviews)
+        typer.echo(
+            f"\n{total} finding(s) across {count} review(s).",
+            err=True,
+        )
+        raise typer.Exit(1 if has_blocking else 0)
+
     if contradiction_only:
         from .llm_provider import is_available
         from .orchestrator import run_contradiction_check
