@@ -7,6 +7,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .coherence.graph_builder import build_graph
+from .exceptions import (
+    AssertionExtractionError,
+    ContradictionComparisonError,
+    PlanReviewError,
+)
 from .semantic.contradictions import (
     Assertion,
     ContradictionResult,
@@ -68,9 +73,10 @@ def run_contradiction_check(
                     content = doc_path.read_text()
                     try:
                         all_assertions[doc] = extract_assertions(content, doc)
-                    except Exception as exc:  # Broad catch: LLM extraction can fail unpredictably
-                        logger.warning("Failed to extract assertions from %s: %s", doc, exc)
-                        check_result.extraction_errors.append(f"{doc}: {exc}")
+                    except Exception as exc:
+                        err = AssertionExtractionError(doc, str(exc))
+                        logger.warning("%s", err)
+                        check_result.extraction_errors.append(str(err))
                         all_assertions[doc] = []
 
     for doc_a, doc_b in pairs:
@@ -87,9 +93,10 @@ def run_contradiction_check(
                                     result=result,
                                 )
                             )
-                    except Exception as exc:  # Broad catch: LLM comparison can fail unpredictably
-                        logger.warning("Comparison failed for %s x %s: %s", doc_a, doc_b, exc)
-                        check_result.comparison_errors.append(f"{doc_a} x {doc_b}: {exc}")
+                    except Exception as exc:
+                        err = ContradictionComparisonError(doc_a, doc_b, str(exc))
+                        logger.warning("%s", err)
+                        check_result.comparison_errors.append(str(err))
 
     return check_result
 
@@ -142,8 +149,9 @@ def run_plan_review(
     models: list[str] | None = None,
     all_reviewers: bool = False,
     confidence_threshold: float = 3.0,
+    feature_filter: str | None = None,
 ) -> PlanReviewCheckResult:
-    """Run LLM plan review on all features with both spec.md and plan.md.
+    """Run LLM plan review on features with both spec.md and plan.md.
 
     When not in all_reviewers mode, cascades to the next configured reviewer
     if the first one returns a soft review (0 findings + low confidence on a
@@ -155,12 +163,20 @@ def run_plan_review(
         models: Reviewer model IDs. If None, uses provider default.
         all_reviewers: If True, run all models. If False, use first only.
         confidence_threshold: Confidence below which to consider a review soft.
+        feature_filter: If set, only review this feature dir_name.
 
     Returns:
         Result containing reviews per feature and any errors.
     """
     graph = build_graph(specs_root)
     check_result = PlanReviewCheckResult()
+
+    # Validate feature filter against graph
+    if feature_filter and not graph.get_feature(feature_filter):
+        check_result.errors.append(
+            f"{feature_filter}: feature not found in spec graph"
+        )
+        return check_result
 
     # Read global context files
     constitution_path = specs_root / "constitution.md"
@@ -178,10 +194,21 @@ def run_plan_review(
         review_models = list(models) if all_reviewers else [models[0]]
 
     for feature in graph.features:
+        if feature_filter and feature.dir_name != feature_filter:
+            continue
         has_spec = feature.files.get("spec", False)
         has_plan = feature.files.get("plan", False)
 
         if not has_spec or not has_plan:
+            if feature_filter:
+                missing = []
+                if not has_spec:
+                    missing.append("spec.md")
+                if not has_plan:
+                    missing.append("plan.md")
+                check_result.errors.append(
+                    f"{feature.dir_name}: missing {', '.join(missing)}"
+                )
             continue
 
         spec_path = specs_root / "features" / feature.dir_name / "spec.md"
@@ -191,22 +218,28 @@ def run_plan_review(
         plan_content = plan_path.read_text()
 
         if all_reviewers:
-            # Run all reviewers independently
             for model in review_models:
-                _run_single_review(
-                    feature.dir_name, spec_content, plan_content,
-                    stack_content, constitution_content, model,
-                    check_result,
-                )
+                try:
+                    _run_single_review(
+                        feature.dir_name, spec_content, plan_content,
+                        stack_content, constitution_content, model,
+                        check_result,
+                    )
+                except PlanReviewError as exc:
+                    logger.warning("%s", exc)
+                    check_result.errors.append(str(exc))
         else:
-            # Cascade: try first, if soft try next, stop when satisfied
-            _run_cascade_review(
-                feature.dir_name, spec_content, plan_content,
-                stack_content, constitution_content,
-                review_models if models else [None],
-                models or [],
-                confidence_threshold, check_result,
-            )
+            try:
+                _run_cascade_review(
+                    feature.dir_name, spec_content, plan_content,
+                    stack_content, constitution_content,
+                    review_models if models else [None],
+                    models or [],
+                    confidence_threshold, check_result,
+                )
+            except PlanReviewError as exc:
+                logger.warning("%s", exc)
+                check_result.errors.append(str(exc))
 
     return check_result
 
@@ -232,7 +265,10 @@ def _run_single_review(
         check_result: Result accumulator to append to.
 
     Returns:
-        The review result, or None if the review failed.
+        The review result.
+
+    Raises:
+        PlanReviewError: If the LLM review fails.
     """
     try:
         result = review_plan(
@@ -246,10 +282,8 @@ def _run_single_review(
             PlanReviewEntry(feature_name=feature_name, result=result)
         )
         return result
-    except Exception as exc:  # Broad catch: LLM review can fail unpredictably
-        logger.warning("Plan review failed for %s: %s", feature_name, exc)
-        check_result.errors.append(f"{feature_name}: {exc}")
-        return None
+    except Exception as exc:
+        raise PlanReviewError(feature_name, str(exc)) from exc
 
 
 def _run_cascade_review(
@@ -287,9 +321,6 @@ def _run_cascade_review(
         review_models[0], check_result,
     )
 
-    if result is None:
-        return
-
     # Cascade: if soft review and more models available, try next
     if _is_review_soft(result, confidence_threshold) and len(all_models) > 1:
         cascade_model = all_models[1]
@@ -305,9 +336,8 @@ def _run_cascade_review(
 
         # If second reviewer also finds nothing, mark confidence as validated
         # and remove the soft first review to avoid displaying warning
-        if cascade_result and not cascade_result.findings:
+        if not cascade_result.findings:
             cascade_result.confidence = 5  # Both agree: high confidence
-            # Remove the soft first review from results (keep only validated cascade)
             check_result.reviews = [
                 e for e in check_result.reviews
                 if e.feature_name != feature_name or e.result.confidence == 5

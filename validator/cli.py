@@ -9,6 +9,7 @@ import typer
 
 from .config import load_config
 from .engine import validate_all
+from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
 from .reporter import report, report_excluded, report_score_only
 
@@ -16,12 +17,21 @@ app = typer.Typer(name="livespec", help="LiveSpec structural validator")
 
 
 def _find_specs_root(start: Path | None = None) -> Path:
-    """Find the .specs/ directory starting from the given path or cwd."""
+    """Find the .specs/ directory starting from the given path or cwd.
+
+    Args:
+        start: Starting path to search from, or None for cwd.
+
+    Returns:
+        Path to the .specs/ directory.
+
+    Raises:
+        SpecsRootNotFoundError: If .specs/ cannot be found.
+    """
     search = start or Path.cwd()
     if search.is_file():
         search = search.parent
 
-    # Check if path is inside .specs/
     for parent in [search, *search.parents]:
         if parent.name == ".specs":
             return parent
@@ -29,8 +39,52 @@ def _find_specs_root(start: Path | None = None) -> Path:
         if specs_dir.is_dir():
             return specs_dir
 
-    typer.echo("Error: .specs/ directory not found", err=True)
-    raise typer.Exit(1)
+    raise SpecsRootNotFoundError(str(search))
+
+
+def _require_specs_root(start: Path | None = None) -> Path:
+    """Find .specs/ or exit with a user-friendly error.
+
+    CLI boundary wrapper around _find_specs_root. Converts domain
+    exceptions into typer.Exit for the command layer.
+
+    Args:
+        start: Starting path to search from, or None for cwd.
+
+    Returns:
+        Path to the .specs/ directory.
+
+    Raises:
+        typer.Exit: If .specs/ cannot be found.
+    """
+    try:
+        return _find_specs_root(start)
+    except SpecsRootNotFoundError:
+        typer.echo("Error: .specs/ directory not found", err=True)
+        raise typer.Exit(1)  # noqa: B904 — intentional exit, not re-raise
+
+
+def _resolve_feature_filter(
+    target: Path | None, specs_root: Path,
+) -> str | None:
+    """Resolve a path to a feature dir_name for plan-review scoping.
+
+    Args:
+        target: User-provided path (file or directory), or None.
+        specs_root: Root of the .specs/ tree.
+
+    Returns:
+        Feature dir_name if path resolves to a feature, None otherwise.
+    """
+    if target is None:
+        return None
+    try:
+        rel = target.resolve().relative_to(
+            (specs_root / "features").resolve(),
+        )
+    except ValueError:
+        return None
+    return rel.parts[0] if rel.parts else None
 
 
 @app.command()
@@ -138,15 +192,20 @@ def validate(
             )
             raise typer.Exit(1)
 
-        specs_root_for_review = _find_specs_root(Path(path) if path else None)
+        target_path = Path(path) if path else None
+        specs_root_for_review = _require_specs_root(target_path)
         sem_config = load_semantic_config(specs_root_for_review)
         models = sem_config.review_reviewers or None
+        feature_filter = _resolve_feature_filter(
+            target_path, specs_root_for_review,
+        )
 
         review_result = run_plan_review(
             specs_root_for_review,
             models=models,
             all_reviewers=all_reviewers,
             confidence_threshold=sem_config.review_confidence_threshold,
+            feature_filter=feature_filter,
         )
 
         has_blocking = False
@@ -187,13 +246,16 @@ def validate(
         for error in review_result.errors:
             typer.echo(f"  Error: {error}", err=True)
 
+        if review_result.errors:
+            has_blocking = True
+
         total = sum(len(e.result.findings) for e in review_result.reviews)
         count = len(review_result.reviews)
         typer.echo(
             f"\n{total} finding(s) across {count} review(s).",
             err=True,
         )
-        raise typer.Exit(1 if has_blocking else 0)
+        raise typer.Exit(0 if warn_only else (1 if has_blocking else 0))
 
     if contradiction_only:
         from .llm_provider import is_available
@@ -208,7 +270,7 @@ def validate(
             )
             raise typer.Exit(1)
 
-        specs_root_for_l4 = _find_specs_root(Path(path) if path else None)
+        specs_root_for_l4 = _require_specs_root(Path(path) if path else None)
         check_result = run_contradiction_check(specs_root_for_l4)
 
         typer.echo(f"Contradiction check: {check_result.pairs_count} pairs compared", err=True)
@@ -246,7 +308,7 @@ def validate(
 
     # Resolve paths
     target = Path(path) if path else None
-    specs_root = _find_specs_root(target)
+    specs_root = _require_specs_root(target)
     config = load_config(specs_root)
 
     paths = [target] if target else None

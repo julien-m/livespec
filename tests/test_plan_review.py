@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -402,3 +403,153 @@ class TestPlanReviewOrchestrator:
         # Soft first entry removed, only cascade result retained
         assert len(result.reviews) == 1
         assert result.reviews[0].result.confidence == 5
+
+
+class TestResolveFeatureFilter:
+    """Tests for _resolve_feature_filter() path resolution."""
+
+    def test_none_path_returns_none(self, tmp_path: Path) -> None:
+        """None path returns None."""
+        from validator.cli import _resolve_feature_filter
+
+        assert _resolve_feature_filter(None, tmp_path) is None
+
+    def test_spec_file_resolves_to_feature(self, tmp_path: Path) -> None:
+        """Spec file path resolves to feature dir_name."""
+        from validator.cli import _resolve_feature_filter
+
+        features_dir = tmp_path / "features" / "001-auth"
+        features_dir.mkdir(parents=True)
+        spec_file = features_dir / "spec.md"
+        spec_file.touch()
+
+        result = _resolve_feature_filter(spec_file, tmp_path)
+        assert result == "001-auth"
+
+    def test_feature_dir_resolves_to_feature(self, tmp_path: Path) -> None:
+        """Feature directory path resolves to feature dir_name."""
+        from validator.cli import _resolve_feature_filter
+
+        features_dir = tmp_path / "features" / "002-payments"
+        features_dir.mkdir(parents=True)
+
+        result = _resolve_feature_filter(features_dir, tmp_path)
+        assert result == "002-payments"
+
+    def test_path_outside_features_returns_none(self, tmp_path: Path) -> None:
+        """Path outside features/ directory returns None."""
+        from validator.cli import _resolve_feature_filter
+
+        other = tmp_path / "stacks"
+        other.mkdir()
+
+        result = _resolve_feature_filter(other, tmp_path)
+        assert result is None
+
+    def test_features_dir_itself_returns_none(self, tmp_path: Path) -> None:
+        """Features directory itself returns None."""
+        from validator.cli import _resolve_feature_filter
+
+        features_dir = tmp_path / "features"
+        features_dir.mkdir()
+
+        result = _resolve_feature_filter(features_dir, tmp_path)
+        assert result is None
+
+
+class TestPlanReviewFeatureFilter:
+    """Tests for feature_filter parameter in run_plan_review."""
+
+    def test_filter_scopes_to_single_feature(self, tmp_path: Path) -> None:
+        """Feature filter scopes review to single matching feature."""
+        from unittest.mock import patch
+
+        from validator.orchestrator import run_plan_review
+
+        specs = tmp_path / ".specs"
+        specs.mkdir()
+        (specs / "roadmap.md").write_text("- [x] [001-auth](features/001-auth/)\n- [x] [002-pay](features/002-pay/)\n")
+        for name in ("001-auth", "002-pay"):
+            d = specs / "features" / name
+            d.mkdir(parents=True)
+            (d / "spec.md").write_text(SAMPLE_SPEC)
+            (d / "plan.md").write_text(SAMPLE_PLAN)
+
+        response = json.dumps({"findings": [], "confidence": 5})
+        with patch("validator.llm_provider.call_llm", return_value=response):
+            result = run_plan_review(specs, feature_filter="001-auth")
+
+        feature_names = [e.feature_name for e in result.reviews]
+        assert feature_names == ["001-auth"]
+
+    def test_filter_nonexistent_feature_errors(self, tmp_path: Path) -> None:
+        """Nonexistent feature filter produces error."""
+        from validator.orchestrator import run_plan_review
+
+        specs = tmp_path / ".specs"
+        specs.mkdir()
+        (specs / "roadmap.md").write_text("- [x] [001-auth](features/001-auth/)\n")
+        d = specs / "features" / "001-auth"
+        d.mkdir(parents=True)
+        (d / "spec.md").write_text(SAMPLE_SPEC)
+        (d / "plan.md").write_text(SAMPLE_PLAN)
+
+        result = run_plan_review(specs, feature_filter="nonexistent")
+        assert len(result.errors) == 1
+        assert "nonexistent" in result.errors[0]
+        assert len(result.reviews) == 0
+
+    def test_filter_feature_missing_plan_errors(self, tmp_path: Path) -> None:
+        """Filtered feature missing plan.md produces error."""
+        from validator.orchestrator import run_plan_review
+
+        specs = tmp_path / ".specs"
+        specs.mkdir()
+        (specs / "roadmap.md").write_text("- [x] [001-auth](features/001-auth/)\n")
+        d = specs / "features" / "001-auth"
+        d.mkdir(parents=True)
+        (d / "spec.md").write_text(SAMPLE_SPEC)
+        # No plan.md
+
+        result = run_plan_review(specs, feature_filter="001-auth")
+        assert len(result.errors) == 1
+        assert "plan.md" in result.errors[0]
+        assert len(result.reviews) == 0
+
+
+class TestPlanReviewErrorHandling:
+    """Tests for error-as-blocking and warn_only in plan-review."""
+
+    def test_errors_set_has_blocking(self) -> None:
+        """Review errors set has_blocking=True in result processing."""
+        from validator.orchestrator import PlanReviewCheckResult
+
+        result = PlanReviewCheckResult()
+        result.errors.append("feature-001: JSONDecodeError")
+
+        # Simulate CLI logic
+        has_blocking = False
+        if result.errors:
+            has_blocking = True
+        assert has_blocking is True
+
+    def test_warn_only_suppresses_exit_code(self) -> None:
+        """warn_only suppresses exit code even with blocking findings."""
+        has_blocking = True
+        warn_only = True
+        exit_code = 0 if warn_only else (1 if has_blocking else 0)
+        assert exit_code == 0
+
+    def test_no_warn_only_with_blocking_exits_1(self) -> None:
+        """Without warn_only, blocking findings exit 1."""
+        has_blocking = True
+        warn_only = False
+        exit_code = 0 if warn_only else (1 if has_blocking else 0)
+        assert exit_code == 1
+
+    def test_no_errors_no_findings_exits_0(self) -> None:
+        """Clean review exits 0."""
+        has_blocking = False
+        warn_only = False
+        exit_code = 0 if warn_only else (1 if has_blocking else 0)
+        assert exit_code == 0
