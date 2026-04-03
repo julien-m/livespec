@@ -11,7 +11,18 @@ from pathlib import Path
 
 
 def cosine_distance(u: list[float], v: list[float]) -> float:
-    """Compute cosine distance between two vectors. Returns 0.0 (identical) to 2.0 (opposite)."""
+    """Compute cosine distance between two vectors. Returns 0.0 (identical) to 2.0 (opposite).
+
+    Args:
+        u: First embedding vector.
+        v: Second embedding vector.
+
+    Returns:
+        Cosine distance in [0.0, 2.0].
+
+    Raises:
+        ValueError: If vectors have different dimensions.
+    """
     if len(u) != len(v):
         raise ValueError(f"Vector dimension mismatch: {len(u)} vs {len(v)}")
 
@@ -48,7 +59,14 @@ class EmbeddingCache:
 
 
 def load_cache(path: Path) -> EmbeddingCache | None:
-    """Load embedding cache from a JSON file. Returns None if missing or corrupt."""
+    """Load embedding cache from a JSON file. Returns None if missing or corrupt.
+
+    Args:
+        path: Path to the JSON cache file.
+
+    Returns:
+        Deserialized cache, or None if the file is missing or malformed.
+    """
     if not path.exists():
         return None
 
@@ -80,7 +98,12 @@ def load_cache(path: Path) -> EmbeddingCache | None:
 
 
 def save_cache(cache: EmbeddingCache, path: Path) -> None:
-    """Persist embedding cache to a JSON file."""
+    """Persist embedding cache to a JSON file.
+
+    Args:
+        cache: The cache to serialize.
+        path: Destination file path (parent dirs created if needed).
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
 
     serialized = {
@@ -100,7 +123,15 @@ def save_cache(cache: EmbeddingCache, path: Path) -> None:
 
 
 def needs_reindex(cache: EmbeddingCache, current_model: str) -> bool:
-    """Check whether the cache was built with a different model."""
+    """Check whether the cache was built with a different model.
+
+    Args:
+        cache: Existing embedding cache.
+        current_model: Model name to compare against.
+
+    Returns:
+        True if the cache model differs from current_model.
+    """
     return cache.model != current_model
 
 
@@ -113,6 +144,16 @@ def compute_embedding(text: str, model: str) -> list[float]:
 
     For real embeddings, install the openai package and configure OPENAI_API_KEY,
     or implement a custom provider that returns vectors.
+
+    Args:
+        text: Content to embed.
+        model: Embedding model identifier.
+
+    Returns:
+        Float vector of dimension matching the configured model.
+
+    Raises:
+        NotImplementedError: Always — embedding API is not yet configured.
     """
     raise NotImplementedError(
         "Embedding API not configured. "
@@ -142,8 +183,13 @@ _SECTION_PATTERNS: dict[str, re.Pattern[str]] = {
 def extract_sections(spec_content: str) -> dict[str, str]:
     """Extract known sections from spec markdown content.
 
-    Returns a dict mapping section name to its content body.
     Looks for: user-stories, acceptance-criteria, functional-requirements.
+
+    Args:
+        spec_content: Raw markdown of a spec file.
+
+    Returns:
+        Mapping of section name to its content body.
     """
     results: dict[str, str] = {}
 
@@ -158,5 +204,12 @@ def extract_sections(spec_content: str) -> dict[str, str]:
 
 
 def content_hash(text: str) -> str:
-    """Compute SHA-256 hash of text content."""
+    """Compute SHA-256 hash of text content.
+
+    Args:
+        text: Content to hash.
+
+    Returns:
+        Hex-encoded SHA-256 digest.
+    """
     return hashlib.sha256(text.encode()).hexdigest()

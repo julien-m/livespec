@@ -10,7 +10,19 @@ import yaml
 
 @dataclass
 class SemanticConfig:
-    """Configuration for Layer 4 semantic validation."""
+    """Configuration for Layer 4 semantic validation.
+
+    Attributes:
+        drift_info_threshold: Cosine distance threshold for info-level drift.
+        drift_warning_threshold: Cosine distance threshold for warning-level drift.
+        drift_blocking_threshold: Cosine distance threshold for blocking drift.
+        confidence_threshold: Minimum confidence to report a contradiction.
+        suspicion_threshold: Minimum confidence for potential contradictions.
+        embedding_model: Embedding model name for semantic analysis.
+        embedding_dimension: Dimension of embedding vectors.
+        mutation_acceptable_score: Minimum mutation kill score (0.0-1.0).
+        multi_model_divergence_threshold: Maximum divergence allowed in multi-model consensus.
+    """
 
     # Embedding thresholds (cosine distance)
     drift_info_threshold: float = 0.05
@@ -33,7 +45,14 @@ class SemanticConfig:
 
 
 def load_semantic_config(specs_root: Path) -> SemanticConfig:
-    """Load from .specs/semantic/config.yaml if present, else defaults."""
+    """Load from .specs/semantic/config.yaml if present, else defaults.
+
+    Args:
+        specs_root: Path to the .specs directory.
+
+    Returns:
+        Populated config if config.yaml exists and is valid, else defaults.
+    """
     config_path = specs_root / "semantic" / "config.yaml"
     if not config_path.exists():
         return SemanticConfig()

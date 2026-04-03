@@ -11,7 +11,16 @@ from validator.coherence.violation import Severity
 
 @dataclass
 class Assertion:
-    """A single extracted assertion from a spec artifact."""
+    """A single extracted assertion from a spec artifact.
+
+    Attributes:
+        id: Unique identifier for the assertion.
+        theme: Topic or area the assertion addresses.
+        assertion_text: The actual assertion statement.
+        polarity: Assertion type (must, must-not, or may).
+        source_file: Path to the file containing the assertion.
+        source_line: Line number where the assertion appears.
+    """
 
     id: str
     theme: str
@@ -23,7 +32,14 @@ class Assertion:
 
 @dataclass
 class ContradictionResult:
-    """Result of comparing two assertions."""
+    """Result of comparing two assertions.
+
+    Attributes:
+        contradicts: Whether the assertions contradict each other.
+        confidence: Confidence level (0.0 to 1.0) of the contradiction determination.
+        explanation: Human-readable explanation of the contradiction.
+        severity: Impact level (ERROR, WARNING, or INFO).
+    """
 
     contradicts: bool
     confidence: float
@@ -33,7 +49,13 @@ class ContradictionResult:
 
 @dataclass
 class ContradictionReport:
-    """Summary of contradiction analysis across a spec tree."""
+    """Summary of contradiction analysis across a spec tree.
+
+    Attributes:
+        pairs_checked: Total number of assertion pairs compared.
+        contradictions: List of confirmed contradictions (confidence >= threshold).
+        suspicions: List of potential contradictions (confidence < threshold).
+    """
 
     pairs_checked: int
     contradictions: list[ContradictionResult] = field(default_factory=list)
@@ -60,7 +82,19 @@ Assertion B (from {source_b}): {text_b}"""
 def extract_assertions(
     content: str, source_file: str, model: str | None = None
 ) -> list[Assertion]:
-    """Extract semantic assertions from spec content via LLM."""
+    """Extract semantic assertions from spec content via LLM.
+
+    Args:
+        content: Raw markdown content of the spec artifact.
+        source_file: Relative path used to tag each assertion's origin.
+        model: Optional LLM model override.
+
+    Returns:
+        Parsed assertions with theme, polarity, and source location.
+
+    Raises:
+        json.JSONDecodeError: If the LLM response is not valid JSON.
+    """
     from validator.llm_provider import call_llm
 
     prompt = _EXTRACT_PROMPT.format(source_file=source_file, content=content[:8000])
@@ -109,7 +143,16 @@ def extract_assertions(
 def compare_assertions(
     a: Assertion, b: Assertion, model: str | None = None
 ) -> ContradictionResult:
-    """Compare two assertions for semantic contradiction via LLM."""
+    """Compare two assertions for semantic contradiction via LLM.
+
+    Args:
+        a: First assertion to compare.
+        b: Second assertion to compare.
+        model: Optional LLM model override.
+
+    Returns:
+        Contradiction result with confidence score and severity.
+    """
     from validator.llm_provider import call_llm
 
     prompt = _COMPARE_PROMPT.format(
@@ -156,6 +199,12 @@ def get_comparison_pairs(graph: SpecGraph) -> list[tuple[str, str]]:
     - stack x every spec and plan
     - spec x plan for the same feature
     - spec x spec when features share themes (adjacent numbering as proxy)
+
+    Args:
+        graph: Parsed spec graph with feature metadata.
+
+    Returns:
+        De-duplicated list of (file_a, file_b) pairs to compare.
     """
     pairs: list[tuple[str, str]] = []
     seen: set[tuple[str, str]] = set()

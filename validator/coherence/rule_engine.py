@@ -20,18 +20,22 @@ class CoherenceResult:
 
     @property
     def errors(self) -> list[Violation]:
+        """Filter violations by ERROR severity."""
         return [v for v in self.violations if v.severity == Severity.ERROR]
 
     @property
     def warnings(self) -> list[Violation]:
+        """Filter violations by WARNING severity."""
         return [v for v in self.violations if v.severity == Severity.WARNING]
 
     @property
     def infos(self) -> list[Violation]:
+        """Filter violations by INFO severity."""
         return [v for v in self.violations if v.severity == Severity.INFO]
 
     @property
     def has_errors(self) -> bool:
+        """Return True if any ERROR-level violations exist."""
         return len(self.errors) > 0
 
 
@@ -52,6 +56,9 @@ def run_coherence(
         ignore: Skip these rules (e.g., ["R3.2", "R5.1"])
         no_suppress: Disable suppress_if_creating
         strict: Treat warnings as errors for exit code
+
+    Returns:
+        CoherenceResult with all violations and suppressed items.
     """
     from .rules import get_rules
 
@@ -65,17 +72,12 @@ def run_coherence(
     rules.sort(key=lambda r: r.wave)
 
     result = CoherenceResult(graph=graph)
-    flagged_features: set[str] = set()
 
     now = time.time()
     suppress_threshold = 30 * 60  # 30 minutes
 
     for rule in rules:
-        # Set specs_root on rules that need filesystem access
-        if hasattr(rule, "specs_root"):
-            rule.specs_root = specs_root
-
-        violations = rule.check(graph)
+        violations = rule.check(graph, specs_root)
 
         for v in violations:
             # Apply suppress_if_creating

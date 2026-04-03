@@ -41,13 +41,20 @@ class ValidatorConfig:
 
 
 def load_config(specs_root: Path) -> ValidatorConfig:
-    """Load validator.yml from specs_root if present, else return defaults."""
+    """Load validator.yml from specs_root if present, else return defaults.
+
+    Args:
+        specs_root: Root directory of the .specs/ tree.
+
+    Returns:
+        Parsed config or defaults if no validator.yml found.
+    """
     config_path = specs_root / "validator.yml"
 
     if not config_path.exists():
         return ValidatorConfig()
 
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
     if not isinstance(data, dict):
@@ -61,7 +68,15 @@ def load_config(specs_root: Path) -> ValidatorConfig:
 
 
 def is_excluded(rel_path: str, config: ValidatorConfig) -> bool:
-    """Check if a relative path matches any exclusion pattern."""
+    """Check if a relative path matches any exclusion pattern.
+
+    Args:
+        rel_path: Path relative to .specs/ root.
+        config: Validator configuration with exclusion patterns.
+
+    Returns:
+        True if the path matches any exclusion glob.
+    """
     for pattern in config.exclude:
         if fnmatch(rel_path, pattern):
             return True
@@ -71,8 +86,13 @@ def is_excluded(rel_path: str, config: ValidatorConfig) -> bool:
 def resolve_file_type(path: Path, specs_root: Path) -> str:
     """Determine the file type from its path relative to specs_root.
 
-    Returns one of: spec, plan, implementation, roadmap, changelog,
-    stack, preflight, progress, constitution, project, unknown.
+    Args:
+        path: Absolute path to the Markdown file.
+        specs_root: Root directory of the .specs/ tree.
+
+    Returns:
+        File type string: spec, plan, implementation, roadmap, changelog,
+        stack, preflight, progress, constitution, project, or unknown.
     """
     try:
         rel = path.relative_to(specs_root)

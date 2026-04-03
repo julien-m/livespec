@@ -1,16 +1,19 @@
 """Base frontmatter model shared by all spec types."""
 from __future__ import annotations
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class BaseFrontmatter(BaseModel):
-    model_config = {"extra": "allow"}
+    """Base frontmatter model shared by all spec types."""
+
+    model_config = ConfigDict(extra="ignore")
     title: str
 
     @field_validator("title")
     @classmethod
-    def title_not_empty(cls, v: str) -> str:
+    def validate_title_not_empty(cls, v: str) -> str:
+        """Ensure title is not empty or whitespace."""
         if not v.strip():
             raise ValueError("title cannot be empty")
         return v

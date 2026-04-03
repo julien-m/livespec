@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from validator.coherence.violation import CoherenceRule
 from validator.coherence.rules.r1_roadmap_features import (
     R1_1_RoadmapFeatureMissing,
     R1_2_OrphanFeature,
@@ -25,7 +26,8 @@ from validator.coherence.rules.r4_readme_sync import (
 from validator.coherence.rules.r5_stack_preflight import R5_1_StackNoPreflight
 from validator.coherence.rules.r6_changelog_refs import R6_1_ChangelogFeatureMissing
 
-ALL_RULES: list = [
+# Immutable by convention — do not mutate at runtime
+ALL_RULES: list[CoherenceRule] = [
     R1_1_RoadmapFeatureMissing(),
     R1_2_OrphanFeature(),
     R1_3_StatusRoadmapMismatch(),
@@ -47,8 +49,17 @@ def get_rules(
     wave: int | None = None,
     rule_ids: list[str] | None = None,
     ignore: list[str] | None = None,
-) -> list:
-    """Filter rules by wave, explicit IDs, or ignore list."""
+) -> list[CoherenceRule]:
+    """Filter rules by wave, explicit IDs, or ignore list.
+
+    Args:
+        wave: Only include rules up to this wave number.
+        rule_ids: Only include rules matching these IDs or prefixes.
+        ignore: Exclude rules matching these IDs.
+
+    Returns:
+        Filtered list of CoherenceRule instances.
+    """
     rules = ALL_RULES
 
     if wave is not None:

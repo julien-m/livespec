@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -42,7 +43,16 @@ class FileResult:
 
 
 def validate_file(path: Path, specs_root: Path, config: ValidatorConfig) -> FileResult:
-    """Run the full validation pipeline on a single file."""
+    """Run the full validation pipeline on a single file.
+
+    Args:
+        path: Absolute path to the Markdown file.
+        specs_root: Root directory of the .specs/ tree.
+        config: Validator configuration.
+
+    Returns:
+        Validation result with errors, warnings, and score.
+    """
     file_type = resolve_file_type(path, specs_root)
     result = FileResult(path=path, file_type=file_type)
 
@@ -57,7 +67,8 @@ def validate_file(path: Path, specs_root: Path, config: ValidatorConfig) -> File
     # Parse file
     try:
         parsed = parse_file(path)
-    except Exception as e:
+    except Exception as e:  # Broad catch: parse can fail with YAML, encoding, or permission errors
+        logging.warning("Parse error for %s: %s", path, e)
         result.errors.append(ValidationMessage("frontmatter", f"Parse error: {e}"))
         result.score = 0
         return result
@@ -123,6 +134,12 @@ def collect_files(
 ) -> tuple[list[Path], list[str]]:
     """Collect files to validate, applying exclusions.
 
+    Args:
+        specs_root: Root directory of the .specs/ tree.
+        config: Validator configuration with exclusion patterns.
+        paths: Explicit file or directory paths to validate (overrides discovery).
+        staged_only: If True, only validate git-staged files.
+
     Returns (files_to_validate, excluded_paths).
     """
     if staged_only:
@@ -160,7 +177,16 @@ def validate_all(
     paths: list[Path] | None = None,
     staged_only: bool = False,
 ) -> tuple[list[FileResult], list[str]]:
-    """Validate all matching files. Returns (results, excluded_paths)."""
+    """Validate all matching files.
+
+    Args:
+        specs_root: Root directory of the .specs/ tree.
+        config: Validator configuration (loaded from specs_root if None).
+        paths: Explicit file or directory paths to validate.
+        staged_only: If True, only validate git-staged files.
+
+    Returns (results, excluded_paths).
+    """
     if config is None:
         config = load_config(specs_root)
 

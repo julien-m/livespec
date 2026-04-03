@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from validator.coherence.graph_builder import SpecGraph
 from validator.coherence.violation import Severity, Violation
 
@@ -13,7 +15,16 @@ class R5_1_StackNoPreflight:
     description = "Stack technology has no corresponding preflight check"
     wave = 3
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that stack technologies have preflight checks.
+
+        Args:
+            graph: SpecGraph containing stack and preflight data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for stack technologies without preflight checks.
+        """
         if not graph.stack_technologies:
             return []
 

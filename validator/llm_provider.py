@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import importlib.util
+import logging
 import sys
 from pathlib import Path
 from typing import Any
 
 PROVIDER_PATH = Path.home() / ".config" / "livespec" / "provider.py"
 
+# Mutable global: lazy-load cache for singleton provider module (DI not feasible for dynamic file-based plugin)
 _provider_module: Any = None
 _load_attempted: bool = False
 
@@ -24,7 +26,7 @@ class LLMProviderNotConfigured(Exception):
         )
 
 
-def _load_provider() -> Any:
+def _load_provider() -> Any:  # Any: dynamically loaded module type unknown at import time
     """Dynamically load the provider module from disk."""
     global _provider_module, _load_attempted
 
@@ -51,8 +53,8 @@ def _load_provider() -> Any:
 
         _provider_module = module
         return module
-    except Exception as e:
-        print(f"Warning: failed to load LLM provider from {PROVIDER_PATH}: {e}", file=sys.stderr)
+    except Exception as e:  # Broad catch: provider loading can fail with any error (SyntaxError, ImportError, AttributeError)
+        logging.warning("Failed to load LLM provider from %s: %s", PROVIDER_PATH, e)
         return None
 
 

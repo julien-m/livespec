@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-# Format: { file_type: { key: (keywords, required) } }
-# A section is present if any keyword appears (case-insensitive) in any heading.
+# Immutable by convention — do not mutate at runtime
 SECTION_RULES: dict[str, dict[str, tuple[list[str], bool]]] = {
     "spec": {
         "stories": (["User Scenarios", "User Stories", "Scenarios"], True),
@@ -34,7 +33,15 @@ SECTION_RULES: dict[str, dict[str, tuple[list[str], bool]]] = {
 
 
 def section_present(headings: list[str], keywords: list[str]) -> bool:
-    """Return True if any keyword appears in any heading (case-insensitive)."""
+    """Return True if any keyword appears in any heading (case-insensitive).
+
+    Args:
+        headings: List of heading texts extracted from the markdown.
+        keywords: Keyword patterns to search for.
+
+    Returns:
+        True if at least one keyword matches a heading.
+    """
     lower_headings = [h.lower() for h in headings]
     return any(
         kw.lower() in heading
@@ -48,7 +55,12 @@ def validate_sections(
 ) -> tuple[list[str], list[str]]:
     """Validate section presence for a given file type.
 
-    Returns (errors, warnings).
+    Args:
+        headings: Heading texts from the parsed markdown.
+        file_type: Spec file type to look up in SECTION_RULES.
+
+    Returns:
+        Tuple of (errors, warnings) — each a list of message strings.
     """
     errors: list[str] = []
     warnings: list[str] = []

@@ -5,7 +5,6 @@ from __future__ import annotations
 import shutil
 import sys
 from pathlib import Path
-from typing import Optional
 
 import typer
 
@@ -37,9 +36,9 @@ def _find_specs_root(start: Path | None = None) -> Path:
 
 @app.command()
 def validate(
-    path: Optional[str] = typer.Argument(None, help="File or directory to validate"),
+    path: str | None = typer.Argument(None, help="File or directory to validate"),
     staged: bool = typer.Option(False, "--staged", help="Validate git staged files only"),
-    format: str = typer.Option("compact", "--format", "-f", help="Output format: compact, full, json"),
+    output_format: str = typer.Option("compact", "--format", "-f", help="Output format: compact, full, json"),
     warn_only: bool = typer.Option(False, "--warn-only", help="Don't exit with error code"),
     score_only: bool = typer.Option(False, "--score-only", help="Show scores only"),
     fix: bool = typer.Option(False, "--fix", help="Apply Pass 1 mechanical fixes"),
@@ -49,9 +48,9 @@ def validate(
     list_excluded: bool = typer.Option(False, "--list-excluded", help="Show excluded files"),
     coherence: bool = typer.Option(False, "--coherence", help="Run Layer 2 coherence validation"),
     coherence_only: bool = typer.Option(False, "--coherence-only", help="Run only Layer 2 (skip Layer 1)"),
-    rules: Optional[str] = typer.Option(None, "--rules", help="Specific rules to run (e.g., R1,R2)"),
-    wave_num: Optional[int] = typer.Option(None, "--wave", help="Only run rules up to this wave"),
-    ignore_rules: Optional[str] = typer.Option(None, "--ignore", help="Rules to ignore (e.g., R3.2,R5.1)"),
+    rules: str | None = typer.Option(None, "--rules", help="Specific rules to run (e.g., R1,R2)"),
+    wave_num: int | None = typer.Option(None, "--wave", help="Only run rules up to this wave"),
+    ignore_rules: str | None = typer.Option(None, "--ignore", help="Rules to ignore (e.g., R3.2,R5.1)"),
     strict: bool = typer.Option(False, "--strict", help="Block on coherence errors"),
     no_suppress: bool = typer.Option(False, "--no-suppress", help="Disable suppress_if_creating"),
     semantic: bool = typer.Option(False, "--semantic", help="Run Layer 4 semantic validation"),
@@ -61,7 +60,39 @@ def validate(
     mutate: bool = typer.Option(False, "--mutate", help="Run mutation testing"),
     experimental_multi_model: bool = typer.Option(False, "--experimental-multi-model", help="Enable multi-model consensus"),
 ) -> None:
-    """Validate .specs/ files structurally."""
+    """Validate .specs/ files structurally.
+
+    Args:
+        path: Explicit file or directory to validate (auto-detects .specs/ if omitted).
+        staged: Validate only git-staged files.
+        output_format: Output format (compact, full, or json).
+        warn_only: Don't exit with error code.
+        score_only: Show only validation scores per file.
+        list_excluded: List excluded files and exit.
+        fix: Run Pass 1 mechanical auto-fixes.
+        smart: Enable Pass 2 Claude SDK fixes (not yet implemented).
+        auto: Skip confirmation prompts.
+        dry_run: Show fixes without applying them.
+        coherence: Run Layer 2 coherence validation.
+        coherence_only: Run only Layer 2 coherence checks (skip Layer 1).
+        rules: Specific coherence rules to run (e.g., R1,R2).
+        wave_num: Only run rules up to this wave.
+        ignore_rules: Rules to ignore (e.g., R3.2,R5.1).
+        strict: Block on coherence errors.
+        no_suppress: Disable suppress_if_creating.
+        semantic: Run Layer 4 semantic validation.
+        scorecard: Run scorecard only.
+        contradiction_only: Run contradiction detection only.
+        reindex: Reindex embeddings.
+        mutate: Run mutation testing.
+        experimental_multi_model: Enable multi-model consensus.
+
+    Returns:
+        None (exits via typer.Exit with appropriate code).
+
+    Raises:
+        typer.Exit: On validation failure or configuration error.
+    """
     # Mutual exclusion
     if staged and path:
         typer.echo("Error: --staged and PATH are mutually exclusive", err=True)
@@ -69,7 +100,8 @@ def validate(
 
     # Layer 4 — LLM-dependent features
     if contradiction_only:
-        from .llm_provider import LLMProviderNotConfigured, is_available
+        from .llm_provider import is_available
+        from .orchestrator import run_contradiction_check
 
         if not is_available():
             typer.echo(
@@ -80,45 +112,19 @@ def validate(
             )
             raise typer.Exit(1)
 
-        from .coherence.graph_builder import build_graph
-        from .semantic.contradictions import extract_assertions, compare_assertions, get_comparison_pairs
-
         specs_root_for_l4 = _find_specs_root(Path(path) if path else None)
-        graph = build_graph(specs_root_for_l4)
-        pairs = get_comparison_pairs(graph)
-        typer.echo(f"Contradiction check: {len(pairs)} pairs to compare", err=True)
+        check_result = run_contradiction_check(specs_root_for_l4)
 
-        all_assertions: dict[str, list] = {}
-        for pair in pairs:
-            for doc in pair:
-                if doc not in all_assertions:
-                    doc_path = specs_root_for_l4 / doc
-                    if doc_path.exists():
-                        content = doc_path.read_text()
-                        try:
-                            all_assertions[doc] = extract_assertions(content, doc)
-                        except Exception as e:
-                            typer.echo(f"  Warning: failed to extract from {doc}: {e}", err=True)
-                            all_assertions[doc] = []
-
-        contradictions = []
-        for doc_a, doc_b in pairs:
-            for a in all_assertions.get(doc_a, []):
-                for b in all_assertions.get(doc_b, []):
-                    if a.theme == b.theme:
-                        try:
-                            result = compare_assertions(a, b)
-                            if result.contradicts and result.confidence >= 0.75:
-                                contradictions.append((a, b, result))
-                                typer.echo(
-                                    f"  [{result.severity.value}] {doc_a} × {doc_b}: {result.explanation}",
-                                    err=True,
-                                )
-                        except Exception as e:
-                            typer.echo(f"  Warning: comparison failed: {e}", err=True)
-
-        typer.echo(f"\n{len(contradictions)} contradiction(s) found.", err=True)
-        raise typer.Exit(1 if contradictions else 0)
+        typer.echo(f"Contradiction check: {check_result.pairs_count} pairs compared", err=True)
+        for entry in check_result.contradictions:
+            typer.echo(
+                f"  [{entry.result.severity.value}] "
+                f"{entry.assertion_a.source_file} x {entry.assertion_b.source_file}: "
+                f"{entry.result.explanation}",
+                err=True,
+            )
+        typer.echo(f"\n{len(check_result.contradictions)} contradiction(s) found.", err=True)
+        raise typer.Exit(1 if check_result.contradictions else 0)
 
     if reindex:
         typer.echo("Embedding reindex requires OpenAI API (not yet integrated).", err=True)
@@ -166,12 +172,12 @@ def validate(
         else:
             typer.echo("\nAuto-fix: nothing to fix.", err=True)
 
-    # Output Layer 1 results (skip if coherence-only)
-    if not coherence_only:
+    # Output Layer 1 results (skip if coherence-only or scorecard-only)
+    if not coherence_only and not (scorecard and not semantic):
         if score_only:
             report_score_only(results, specs_root)
         else:
-            json_output = report(results, excluded, format=format, specs_root=specs_root)
+            json_output = report(results, excluded, output_format=output_format, specs_root=specs_root)
             if json_output:
                 typer.echo(json_output)
 
@@ -193,12 +199,12 @@ def validate(
             strict=strict,
         )
 
-        if format == "json":
-            json_out = report_coherence(coherence_result, format="json")
+        if output_format == "json":
+            json_out = report_coherence(coherence_result, output_format="json")
             if json_out:
                 typer.echo(json_out)
         else:
-            report_coherence(coherence_result, format=format)
+            report_coherence(coherence_result, output_format=output_format)
 
     # Layer 4 scorecard
     if scorecard or semantic:
@@ -209,12 +215,12 @@ def validate(
         graph = build_graph(specs_root)
         project_score = score_project(graph.features, specs_root)
 
-        if format == "json":
-            json_out = report_scorecard(project_score, format="json")
+        if output_format == "json":
+            json_out = report_scorecard(project_score, output_format="json")
             if json_out:
                 typer.echo(json_out)
         else:
-            report_scorecard(project_score, format="compact")
+            report_scorecard(project_score, output_format="compact")
 
     # Exit code
     has_errors = any(r.has_errors for r in results) if not coherence_only else False
@@ -242,7 +248,14 @@ def validate(
 def install_hook(
     target_dir: str = typer.Option(".", "--target-dir", "-t", help="Target project directory"),
 ) -> None:
-    """Install the pre-commit hook in a project."""
+    """Install the pre-commit hook in a project.
+
+    Args:
+        target_dir: Target project directory containing .git (default: current directory).
+
+    Raises:
+        typer.Exit: If the directory is not a git repository or hook installation fails.
+    """
     target = Path(target_dir).resolve()
     hooks_dir = target / ".git" / "hooks"
 

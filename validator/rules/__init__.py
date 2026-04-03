@@ -16,7 +16,16 @@ _PLACEHOLDER_PATTERN = re.compile(r"\[(?:TBD|PLACEHOLDER|TODO)\]", re.IGNORECASE
 def validate_by_type(
     content: str, file_type: str, code_blocks: list[dict]
 ) -> list[str]:
-    """Run type-specific validation rules and return errors."""
+    """Run type-specific validation rules and return errors.
+
+    Args:
+        content: Raw markdown content of the file.
+        file_type: Spec file type (e.g. "roadmap", "changelog", "plan").
+        code_blocks: Parsed code blocks with at least a "lang" key each.
+
+    Returns:
+        List of validation error messages (empty if valid).
+    """
     errors: list[str] = []
 
     if file_type == "roadmap":

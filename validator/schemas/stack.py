@@ -7,4 +7,6 @@ from .base import BaseFrontmatter
 
 
 class StackFrontmatter(BaseFrontmatter):
+    """Frontmatter schema for stack.md files."""
+
     updated: date

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -11,7 +12,14 @@ from ..coherence.graph_builder import FeatureInfo
 
 @dataclass
 class FeatureScore:
-    """Score for a single feature across all axes."""
+    """Score for a single feature across all axes.
+
+    Attributes:
+        feature_name: Name of the feature being scored.
+        axes: Scores for each scoring axis (structural_completeness, artifact_quality, etc.).
+        weights: Weight factors for each axis.
+        total: Weighted aggregate score for this feature.
+    """
 
     feature_name: str
     axes: dict[str, int] = field(default_factory=dict)
@@ -21,13 +29,18 @@ class FeatureScore:
 
 @dataclass
 class ProjectScore:
-    """Aggregate score across all features."""
+    """Aggregate score across all features.
+
+    Attributes:
+        features: List of per-feature scores.
+        total: Overall project quality score (0.0-100.0).
+    """
 
     features: list[FeatureScore] = field(default_factory=list)
     total: float = 0.0
 
 
-# Axis weights
+# Immutable by convention — do not mutate at runtime
 AXIS_WEIGHTS: dict[str, float] = {
     "structural_completeness": 0.20,
     "artifact_quality": 0.25,
@@ -112,8 +125,8 @@ def _score_axis1(feature: FeatureInfo, specs_root: Path) -> int:
                 score += 20
             elif has_frontmatter:
                 score += 10
-        except Exception:
-            pass
+        except (OSError, ValueError) as exc:
+            logging.warning("Failed to parse %s for scoring: %s", spec_path, exc)
 
     return min(score, 100)
 
@@ -258,7 +271,15 @@ def _score_axis5(feature: FeatureInfo, specs_root: Path) -> int:
 
 
 def score_feature(feature: FeatureInfo, specs_root: Path) -> FeatureScore:
-    """Score a single feature across all 5 axes."""
+    """Score a single feature across all 5 axes.
+
+    Args:
+        feature: Feature metadata from the spec graph.
+        specs_root: Path to the .specs directory.
+
+    Returns:
+        Weighted score with per-axis breakdown.
+    """
     axes = {
         "structural_completeness": _score_axis1(feature, specs_root),
         "artifact_quality": _score_axis2(feature, specs_root),
@@ -278,7 +299,15 @@ def score_feature(feature: FeatureInfo, specs_root: Path) -> FeatureScore:
 
 
 def score_project(features: list[FeatureInfo], specs_root: Path) -> ProjectScore:
-    """Score all features and compute project average."""
+    """Score all features and compute project average.
+
+    Args:
+        features: All features discovered in the spec graph.
+        specs_root: Path to the .specs directory.
+
+    Returns:
+        Aggregate score with per-feature breakdown.
+    """
     feature_scores = [score_feature(f, specs_root) for f in features]
 
     if feature_scores:

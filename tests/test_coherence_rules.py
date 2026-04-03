@@ -75,7 +75,7 @@ class TestR1_1_RoadmapFeatureMissing:
             roadmap=[_make_roadmap_item(checked=True, link="features/001-auth/")],
             features=[],
         )
-        violations = R1_1_RoadmapFeatureMissing().check(graph)
+        violations = R1_1_RoadmapFeatureMissing().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.ERROR
         assert "001-auth" in violations[0].message
@@ -85,7 +85,7 @@ class TestR1_1_RoadmapFeatureMissing:
             roadmap=[_make_roadmap_item(checked=True, link="features/001-auth/")],
             features=[_make_feature()],
         )
-        violations = R1_1_RoadmapFeatureMissing().check(graph)
+        violations = R1_1_RoadmapFeatureMissing().check(graph, Path("."))
         assert violations == []
 
     def test_unchecked_item_ignored(self) -> None:
@@ -93,7 +93,7 @@ class TestR1_1_RoadmapFeatureMissing:
             roadmap=[_make_roadmap_item(checked=False, link="features/001-auth/")],
             features=[],
         )
-        violations = R1_1_RoadmapFeatureMissing().check(graph)
+        violations = R1_1_RoadmapFeatureMissing().check(graph, Path("."))
         assert violations == []
 
     def test_no_link_ignored(self) -> None:
@@ -101,7 +101,7 @@ class TestR1_1_RoadmapFeatureMissing:
             roadmap=[_make_roadmap_item(checked=True, link=None)],
             features=[],
         )
-        violations = R1_1_RoadmapFeatureMissing().check(graph)
+        violations = R1_1_RoadmapFeatureMissing().check(graph, Path("."))
         assert violations == []
 
 
@@ -111,7 +111,7 @@ class TestR1_2_OrphanFeature:
             roadmap=[],
             features=[_make_feature(dir_name="001-auth", slug="auth")],
         )
-        violations = R1_2_OrphanFeature().check(graph)
+        violations = R1_2_OrphanFeature().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.WARNING
 
@@ -120,7 +120,7 @@ class TestR1_2_OrphanFeature:
             roadmap=[_make_roadmap_item(link="features/001-auth/")],
             features=[_make_feature()],
         )
-        violations = R1_2_OrphanFeature().check(graph)
+        violations = R1_2_OrphanFeature().check(graph, Path("."))
         assert violations == []
 
     def test_feature_in_roadmap_via_slug(self) -> None:
@@ -129,7 +129,7 @@ class TestR1_2_OrphanFeature:
             roadmap=[_make_roadmap_item(slug="001-auth", link=None)],
             features=[_make_feature(dir_name="001-auth", slug="auth")],
         )
-        violations = R1_2_OrphanFeature().check(graph)
+        violations = R1_2_OrphanFeature().check(graph, Path("."))
         assert violations == []
 
     def test_feature_truly_orphan(self) -> None:
@@ -137,7 +137,7 @@ class TestR1_2_OrphanFeature:
             roadmap=[_make_roadmap_item(slug="other", link=None, name="Other")],
             features=[_make_feature(dir_name="001-auth", slug="auth")],
         )
-        violations = R1_2_OrphanFeature().check(graph)
+        violations = R1_2_OrphanFeature().check(graph, Path("."))
         assert len(violations) == 1
 
 
@@ -147,7 +147,7 @@ class TestR1_3_StatusRoadmapMismatch:
             roadmap=[_make_roadmap_item(checked=False, link="features/001-auth/")],
             features=[_make_feature(status="Implemented")],
         )
-        violations = R1_3_StatusRoadmapMismatch().check(graph)
+        violations = R1_3_StatusRoadmapMismatch().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.ERROR
         assert "Implemented" in violations[0].message
@@ -157,7 +157,7 @@ class TestR1_3_StatusRoadmapMismatch:
             roadmap=[_make_roadmap_item(checked=True, link="features/001-auth/")],
             features=[_make_feature(status="Draft")],
         )
-        violations = R1_3_StatusRoadmapMismatch().check(graph)
+        violations = R1_3_StatusRoadmapMismatch().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.ERROR
 
@@ -166,7 +166,7 @@ class TestR1_3_StatusRoadmapMismatch:
             roadmap=[_make_roadmap_item(checked=True, link="features/001-auth/")],
             features=[_make_feature(status="Implemented")],
         )
-        violations = R1_3_StatusRoadmapMismatch().check(graph)
+        violations = R1_3_StatusRoadmapMismatch().check(graph, Path("."))
         assert violations == []
 
     def test_deprecated_status_skipped(self) -> None:
@@ -174,7 +174,7 @@ class TestR1_3_StatusRoadmapMismatch:
             roadmap=[_make_roadmap_item(checked=False, link="features/001-auth/")],
             features=[_make_feature(status="Deprecated")],
         )
-        violations = R1_3_StatusRoadmapMismatch().check(graph)
+        violations = R1_3_StatusRoadmapMismatch().check(graph, Path("."))
         assert violations == []
 
 
@@ -183,7 +183,7 @@ class TestR1_4_CheckedNoLink:
         graph = SpecGraph(
             roadmap=[_make_roadmap_item(checked=True, link=None)],
         )
-        violations = R1_4_CheckedNoLink().check(graph)
+        violations = R1_4_CheckedNoLink().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.WARNING
 
@@ -191,7 +191,7 @@ class TestR1_4_CheckedNoLink:
         graph = SpecGraph(
             roadmap=[_make_roadmap_item(checked=True, link="https://example.com")],
         )
-        violations = R1_4_CheckedNoLink().check(graph)
+        violations = R1_4_CheckedNoLink().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.WARNING
 
@@ -199,14 +199,14 @@ class TestR1_4_CheckedNoLink:
         graph = SpecGraph(
             roadmap=[_make_roadmap_item(checked=True, link="features/001-auth/")],
         )
-        violations = R1_4_CheckedNoLink().check(graph)
+        violations = R1_4_CheckedNoLink().check(graph, Path("."))
         assert violations == []
 
     def test_unchecked_ignored(self) -> None:
         graph = SpecGraph(
             roadmap=[_make_roadmap_item(checked=False, link=None)],
         )
-        violations = R1_4_CheckedNoLink().check(graph)
+        violations = R1_4_CheckedNoLink().check(graph, Path("."))
         assert violations == []
 
 
@@ -223,7 +223,7 @@ class TestR2_1_RequiredFileAbsent:
                 files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
             )],
         )
-        violations = R2_1_RequiredFileAbsent().check(graph)
+        violations = R2_1_RequiredFileAbsent().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.ERROR
         assert "plan.md" in violations[0].message
@@ -235,12 +235,12 @@ class TestR2_1_RequiredFileAbsent:
                 files={"spec": True, "plan": True, "implementation": False, "progress": False, "changelog": False},
             )],
         )
-        violations = R2_1_RequiredFileAbsent().check(graph)
+        violations = R2_1_RequiredFileAbsent().check(graph, Path("."))
         assert violations == []
 
     def test_no_status_skipped(self) -> None:
         graph = SpecGraph(features=[_make_feature(status=None)])
-        violations = R2_1_RequiredFileAbsent().check(graph)
+        violations = R2_1_RequiredFileAbsent().check(graph, Path("."))
         assert violations == []
 
 
@@ -252,7 +252,7 @@ class TestR2_2_AdvancedFileForLowStatus:
                 files={"spec": True, "plan": False, "implementation": True, "progress": False, "changelog": False},
             )],
         )
-        violations = R2_2_AdvancedFileForLowStatus().check(graph)
+        violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.WARNING
 
@@ -263,7 +263,7 @@ class TestR2_2_AdvancedFileForLowStatus:
                 files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
             )],
         )
-        violations = R2_2_AdvancedFileForLowStatus().check(graph)
+        violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
         assert violations == []
 
     def test_implemented_with_implementation_is_valid(self) -> None:
@@ -273,14 +273,14 @@ class TestR2_2_AdvancedFileForLowStatus:
                 files={"spec": True, "plan": True, "implementation": True, "progress": False, "changelog": False},
             )],
         )
-        violations = R2_2_AdvancedFileForLowStatus().check(graph)
+        violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
         assert violations == []
 
 
 class TestR2_3_InvalidStatus:
     def test_unknown_status(self) -> None:
         graph = SpecGraph(features=[_make_feature(status="Unknown")])
-        violations = R2_3_InvalidStatus().check(graph)
+        violations = R2_3_InvalidStatus().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.ERROR
         assert "Unknown" in violations[0].message
@@ -288,12 +288,12 @@ class TestR2_3_InvalidStatus:
     def test_valid_statuses_pass(self) -> None:
         for status in ("Draft", "Planned", "In Progress", "Approved", "Implemented", "Deprecated", "Review"):
             graph = SpecGraph(features=[_make_feature(status=status)])
-            violations = R2_3_InvalidStatus().check(graph)
+            violations = R2_3_InvalidStatus().check(graph, Path("."))
             assert violations == [], f"Status '{status}' should be valid"
 
     def test_none_status_skipped(self) -> None:
         graph = SpecGraph(features=[_make_feature(status=None)])
-        violations = R2_3_InvalidStatus().check(graph)
+        violations = R2_3_InvalidStatus().check(graph, Path("."))
         assert violations == []
 
 
@@ -311,9 +311,7 @@ class TestR3_1_SourceFileNotFound:
                 implementation_paths={"FR-001": ["src/auth/login.ts"]},
             )],
         )
-        rule = R3_1_SourceFileNotFound()
-        rule.specs_root = specs_root
-        violations = rule.check(graph)
+        violations = R3_1_SourceFileNotFound().check(graph, specs_root)
         assert len(violations) == 1
         assert violations[0].severity == Severity.WARNING
         assert "src/auth/login.ts" in violations[0].message
@@ -329,28 +327,14 @@ class TestR3_1_SourceFileNotFound:
                 implementation_paths={"FR-001": ["src/auth/login.ts"]},
             )],
         )
-        rule = R3_1_SourceFileNotFound()
-        rule.specs_root = specs_root
-        violations = rule.check(graph)
-        assert violations == []
-
-    def test_no_specs_root_returns_empty(self) -> None:
-        graph = SpecGraph(
-            features=[_make_feature(
-                implementation_paths={"FR-001": ["src/auth/login.ts"]},
-            )],
-        )
-        rule = R3_1_SourceFileNotFound()
-        violations = rule.check(graph)
+        violations = R3_1_SourceFileNotFound().check(graph, specs_root)
         assert violations == []
 
     def test_no_implementation_paths_is_valid(self, tmp_path: Path) -> None:
         specs_root = tmp_path / ".specs"
         specs_root.mkdir()
         graph = SpecGraph(features=[_make_feature()])
-        rule = R3_1_SourceFileNotFound()
-        rule.specs_root = specs_root
-        violations = rule.check(graph)
+        violations = R3_1_SourceFileNotFound().check(graph, specs_root)
         assert violations == []
 
 
@@ -366,9 +350,7 @@ class TestR3_2_SpecAnchorMissing:
                 implementation_paths={"FR-001": ["src/auth.ts"]},
             )],
         )
-        rule = R3_2_SpecAnchorMissing()
-        rule.specs_root = specs_root
-        violations = rule.check(graph)
+        violations = R3_2_SpecAnchorMissing().check(graph, specs_root)
         assert len(violations) == 1
         assert violations[0].severity == Severity.INFO
         assert "@spec(FR-001)" in violations[0].message
@@ -384,9 +366,7 @@ class TestR3_2_SpecAnchorMissing:
                 implementation_paths={"FR-001": ["src/auth.ts"]},
             )],
         )
-        rule = R3_2_SpecAnchorMissing()
-        rule.specs_root = specs_root
-        violations = rule.check(graph)
+        violations = R3_2_SpecAnchorMissing().check(graph, specs_root)
         assert violations == []
 
     def test_file_does_not_exist_skipped(self, tmp_path: Path) -> None:
@@ -397,9 +377,7 @@ class TestR3_2_SpecAnchorMissing:
                 implementation_paths={"FR-001": ["src/missing.ts"]},
             )],
         )
-        rule = R3_2_SpecAnchorMissing()
-        rule.specs_root = specs_root
-        violations = rule.check(graph)
+        violations = R3_2_SpecAnchorMissing().check(graph, specs_root)
         assert violations == []
 
 
@@ -414,7 +392,7 @@ class TestR4_1_ReadmeFeatureMissing:
             readme_entries=["001-auth", "003-missing"],
             features=[_make_feature(dir_name="001-auth")],
         )
-        violations = R4_1_ReadmeFeatureMissing().check(graph)
+        violations = R4_1_ReadmeFeatureMissing().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.ERROR
         assert "003-missing" in violations[0].message
@@ -424,7 +402,7 @@ class TestR4_1_ReadmeFeatureMissing:
             readme_entries=["001-auth"],
             features=[_make_feature(dir_name="001-auth")],
         )
-        violations = R4_1_ReadmeFeatureMissing().check(graph)
+        violations = R4_1_ReadmeFeatureMissing().check(graph, Path("."))
         assert violations == []
 
 
@@ -434,7 +412,7 @@ class TestR4_2_DiskFeatureMissingReadme:
             readme_entries=[],
             features=[_make_feature(dir_name="001-auth")],
         )
-        violations = R4_2_DiskFeatureMissingReadme().check(graph)
+        violations = R4_2_DiskFeatureMissingReadme().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.WARNING
 
@@ -443,7 +421,7 @@ class TestR4_2_DiskFeatureMissingReadme:
             readme_entries=["001-auth"],
             features=[_make_feature(dir_name="001-auth")],
         )
-        violations = R4_2_DiskFeatureMissingReadme().check(graph)
+        violations = R4_2_DiskFeatureMissingReadme().check(graph, Path("."))
         assert violations == []
 
 
@@ -453,7 +431,7 @@ class TestR4_3_ReadmeStatusMismatch:
             readme_statuses={"001-auth": "Draft"},
             features=[_make_feature(dir_name="001-auth", status="Implemented")],
         )
-        violations = R4_3_ReadmeStatusMismatch().check(graph)
+        violations = R4_3_ReadmeStatusMismatch().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.WARNING
         assert "Implemented" in violations[0].message
@@ -464,7 +442,7 @@ class TestR4_3_ReadmeStatusMismatch:
             readme_statuses={"001-auth": "Draft"},
             features=[_make_feature(dir_name="001-auth", status="Draft")],
         )
-        violations = R4_3_ReadmeStatusMismatch().check(graph)
+        violations = R4_3_ReadmeStatusMismatch().check(graph, Path("."))
         assert violations == []
 
     def test_case_insensitive_match(self) -> None:
@@ -472,7 +450,7 @@ class TestR4_3_ReadmeStatusMismatch:
             readme_statuses={"001-auth": "draft"},
             features=[_make_feature(dir_name="001-auth", status="Draft")],
         )
-        violations = R4_3_ReadmeStatusMismatch().check(graph)
+        violations = R4_3_ReadmeStatusMismatch().check(graph, Path("."))
         assert violations == []
 
 
@@ -487,7 +465,7 @@ class TestR5_1_StackNoPreflight:
             stack_technologies=["TypeScript", "Redis"],
             preflight_checks=["TypeScript compiler installed"],
         )
-        violations = R5_1_StackNoPreflight().check(graph)
+        violations = R5_1_StackNoPreflight().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.INFO
         assert "Redis" in violations[0].message
@@ -497,7 +475,7 @@ class TestR5_1_StackNoPreflight:
             stack_technologies=["TypeScript", "Redis"],
             preflight_checks=["TypeScript compiler installed", "Redis server running"],
         )
-        violations = R5_1_StackNoPreflight().check(graph)
+        violations = R5_1_StackNoPreflight().check(graph, Path("."))
         assert violations == []
 
     def test_empty_stack_returns_nothing(self) -> None:
@@ -505,7 +483,7 @@ class TestR5_1_StackNoPreflight:
             stack_technologies=[],
             preflight_checks=["Something"],
         )
-        violations = R5_1_StackNoPreflight().check(graph)
+        violations = R5_1_StackNoPreflight().check(graph, Path("."))
         assert violations == []
 
     def test_case_insensitive_check(self) -> None:
@@ -513,7 +491,7 @@ class TestR5_1_StackNoPreflight:
             stack_technologies=["PostgreSQL"],
             preflight_checks=["postgresql running"],
         )
-        violations = R5_1_StackNoPreflight().check(graph)
+        violations = R5_1_StackNoPreflight().check(graph, Path("."))
         assert violations == []
 
 
@@ -528,7 +506,7 @@ class TestR6_1_ChangelogFeatureMissing:
             changelog_refs=["001-auth", "099-phantom"],
             features=[_make_feature(dir_name="001-auth")],
         )
-        violations = R6_1_ChangelogFeatureMissing().check(graph)
+        violations = R6_1_ChangelogFeatureMissing().check(graph, Path("."))
         assert len(violations) == 1
         assert violations[0].severity == Severity.WARNING
         assert "099-phantom" in violations[0].message
@@ -538,7 +516,7 @@ class TestR6_1_ChangelogFeatureMissing:
             changelog_refs=["001-auth"],
             features=[_make_feature(dir_name="001-auth")],
         )
-        violations = R6_1_ChangelogFeatureMissing().check(graph)
+        violations = R6_1_ChangelogFeatureMissing().check(graph, Path("."))
         assert violations == []
 
     def test_empty_changelog_returns_nothing(self) -> None:
@@ -546,5 +524,5 @@ class TestR6_1_ChangelogFeatureMissing:
             changelog_refs=[],
             features=[_make_feature()],
         )
-        violations = R6_1_ChangelogFeatureMissing().check(graph)
+        violations = R6_1_ChangelogFeatureMissing().check(graph, Path("."))
         assert violations == []

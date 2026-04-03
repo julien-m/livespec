@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import shutil
 from dataclasses import dataclass, field
@@ -28,7 +29,7 @@ class MutationResult:
     details: str = ""
 
 
-# Complete mutation catalogue (M-S01 to M-Lim03)
+# Immutable by convention — do not mutate at runtime
 MUTATION_CATALOGUE: list[Mutation] = [
     # Structure mutations (L1 killers)
     Mutation(
@@ -133,6 +134,17 @@ def apply_mutation(mutation: Mutation, spec_path: Path, work_dir: Path) -> Path:
     Creates a mutated copy in work_dir and returns the path to it.
     Implements real mutations for structure/quality categories.
     Stubs semantic/silent mutations that require LLM understanding.
+
+    Args:
+        mutation: Mutation descriptor to apply.
+        spec_path: Root of the original spec tree.
+        work_dir: Directory where the mutated copy is created.
+
+    Returns:
+        Path to the mutated spec tree root.
+
+    Raises:
+        NotImplementedError: For semantic mutations that require LLM content generation.
     """
     # Copy spec tree to work_dir
     mutated_root = work_dir / f"mutated-{mutation.id}"
@@ -176,7 +188,13 @@ def run_mutation_suite(
     """Run all mutations in the catalogue against the spec tree.
 
     For each mutation: apply it, run validation layers, check if killed.
-    Returns results for all mutations (including skipped ones).
+
+    Args:
+        specs_root: Root of the spec tree to mutate.
+        work_dir: Scratch directory for mutated copies (cleaned up after each run).
+
+    Returns:
+        Results for all mutations, including skipped ones.
     """
     results: list[MutationResult] = []
 
@@ -205,8 +223,11 @@ def run_mutation_suite(
                 killed = True
                 killed_by = "L1"
                 details = f"Killed by L1: {len(structure_errors)} structure error(s)"
-        except (ImportError, Exception) as exc:
+        except ImportError as exc:
             details = f"L1 check unavailable: {exc}"
+        except Exception as exc:  # Broad catch: validation layer can fail in unexpected ways on mutated specs
+            logging.warning("L1 check failed for mutation %s: %s", mutation.id, exc)
+            details = f"L1 check failed: {exc}"
 
         if not killed:
             try:
@@ -218,8 +239,11 @@ def run_mutation_suite(
                     killed = True
                     killed_by = "L2"
                     details = f"Killed by L2: {len(violations)} coherence violation(s)"
-            except (ImportError, Exception) as exc:
+            except ImportError as exc:
                 details += f"; L2 check unavailable: {exc}"
+            except Exception as exc:  # Broad catch: coherence layer can fail in unexpected ways on mutated specs
+                logging.warning("L2 check failed for mutation %s: %s", mutation.id, exc)
+                details += f"; L2 check failed: {exc}"
 
         results.append(MutationResult(
             mutation=mutation,
@@ -237,8 +261,12 @@ def run_mutation_suite(
 def compute_mutation_score(results: list[MutationResult]) -> dict[str, float]:
     """Compute mutation kill score by category.
 
-    Returns a dict with keys: overall, structure, quality, semantic, silent.
-    Each value is a float between 0.0 and 1.0.
+    Args:
+        results: Mutation results from a full suite run.
+
+    Returns:
+        Dict with keys (overall, structure, quality, semantic, silent),
+        each a float between 0.0 and 1.0.
     """
     by_category: dict[str, list[MutationResult]] = {}
     for r in results:

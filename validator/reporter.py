@@ -9,23 +9,30 @@ from typing import TYPE_CHECKING
 from rich.console import Console
 from rich.text import Text
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # Circular: engine imports reporter indirectly
     from .engine import FileResult
 
 
 def report(
     results: list[FileResult],
     excluded: list[str],
-    format: str = "compact",
+    output_format: str = "compact",
     specs_root: Path | None = None,
 ) -> str | None:
     """Format and display validation results.
 
-    Returns JSON string for json format, None for terminal formats.
+    Args:
+        results: Validation results to display.
+        excluded: List of excluded relative paths.
+        output_format: One of "compact", "full", or "json".
+        specs_root: Root directory for relative path display.
+
+    Returns:
+        JSON string for json format, None for terminal formats.
     """
-    if format == "json":
+    if output_format == "json":
         return _report_json(results, excluded, specs_root)
-    elif format == "full":
+    elif output_format == "full":
         _report_full(results, specs_root)
         return None
     else:
@@ -51,7 +58,7 @@ def _report_compact(results: list[FileResult], specs_root: Path | None) -> None:
         rel = _rel_path(r.path, specs_root)
         if r.has_errors:
             line = Text()
-            line.append("ERREUR  ", style="bold red")
+            line.append("ERROR   ", style="bold red")
             line.append(f"{rel} ", style="bold")
             line.append(f"({len(r.errors)} error(s)", style="red")
             if r.has_warnings:
@@ -60,7 +67,7 @@ def _report_compact(results: list[FileResult], specs_root: Path | None) -> None:
             console.print(line)
         elif r.has_warnings:
             line = Text()
-            line.append("AVERT.  ", style="bold yellow")
+            line.append("WARN    ", style="bold yellow")
             line.append(f"{rel} ", style="bold")
             line.append(f"({len(r.warnings)} warning(s)) ", style="yellow")
             line.append(f"Score: {r.score}/100")
@@ -81,9 +88,9 @@ def _report_full(results: list[FileResult], specs_root: Path | None) -> None:
         rel = _rel_path(r.path, specs_root)
 
         if r.has_errors:
-            console.print(f"\n[bold red]ERREUR[/]  [bold]{rel}[/]")
+            console.print(f"\n[bold red]ERROR[/]  [bold]{rel}[/]")
         elif r.has_warnings:
-            console.print(f"\n[bold yellow]AVERT.[/]  [bold]{rel}[/]")
+            console.print(f"\n[bold yellow]WARN[/]  [bold]{rel}[/]")
         else:
             console.print(f"\n[bold green]OK[/]      [bold]{rel}[/]")
             continue
@@ -130,7 +137,12 @@ def _report_json(
 
 
 def report_score_only(results: list[FileResult], specs_root: Path | None) -> None:
-    """Show only scores per file."""
+    """Show only scores per file.
+
+    Args:
+        results: Validation results to display.
+        specs_root: Root directory for relative path display.
+    """
     console = Console(stderr=True)
     for r in results:
         rel = _rel_path(r.path, specs_root)
@@ -139,7 +151,11 @@ def report_score_only(results: list[FileResult], specs_root: Path | None) -> Non
 
 
 def report_excluded(excluded: list[str]) -> None:
-    """Show list of excluded files."""
+    """Show list of excluded files.
+
+    Args:
+        excluded: List of excluded relative paths.
+    """
     console = Console(stderr=True)
     if not excluded:
         console.print("[dim]No files excluded[/]")

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 import frontmatter
 import mistune
@@ -13,16 +14,16 @@ import mistune
 class ParsedFile:
     """Result of parsing a Markdown file."""
 
-    metadata: dict
+    metadata: dict[str, Any]  # Any: YAML frontmatter values have no fixed schema
     content: str
     headings: list[str] = field(default_factory=list)
-    code_blocks: list[dict] = field(default_factory=list)
+    code_blocks: list[dict[str, str]] = field(default_factory=list)
 
 
-def _extract_headings_and_blocks(ast_nodes: list[dict]) -> tuple[list[str], list[dict]]:
+def _extract_headings_and_blocks(ast_nodes: list[dict[str, Any]]) -> tuple[list[str], list[dict[str, str]]]:  # Any: mistune AST nodes are untyped
     """Walk the AST and extract H2/H3 headings and fenced code blocks."""
     headings: list[str] = []
-    code_blocks: list[dict] = []
+    code_blocks: list[dict[str, str]] = []
 
     for node in ast_nodes:
         node_type = node.get("type", "")
@@ -51,7 +52,7 @@ def _extract_headings_and_blocks(ast_nodes: list[dict]) -> tuple[list[str], list
     return headings, code_blocks
 
 
-def _extract_text(children: list[dict]) -> str:
+def _extract_text(children: list[dict[str, Any]]) -> str:
     """Extract raw text from AST children nodes."""
     parts: list[str] = []
     for child in children:
@@ -68,6 +69,12 @@ def parse_file(path: Path) -> ParsedFile:
     """Parse a Markdown file into metadata, content, headings, and code blocks.
 
     Uses python-frontmatter for YAML frontmatter and mistune 3.x for AST.
+
+    Args:
+        path: Absolute path to the Markdown file.
+
+    Returns:
+        Parsed file with metadata, content, headings, and code blocks.
     """
     post = frontmatter.load(str(path))
     metadata = dict(post.metadata)

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from validator.coherence.graph_builder import SpecGraph
 from validator.coherence.violation import Severity, Violation
 
@@ -13,7 +15,16 @@ class R1_1_RoadmapFeatureMissing:
     description = "Roadmap item links to a missing feature directory"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that checked roadmap items link to existing feature directories.
+
+        Args:
+            graph: SpecGraph containing roadmap and feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for roadmap items linking to missing features.
+        """
         violations: list[Violation] = []
         for item in graph.roadmap:
             if not item.checked or not item.link or "features/" not in item.link:
@@ -44,7 +55,16 @@ class R1_2_OrphanFeature:
     description = "Feature directory not referenced in roadmap"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that every feature directory is referenced in the roadmap.
+
+        Args:
+            graph: SpecGraph containing roadmap and feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for orphan feature directories.
+        """
         violations: list[Violation] = []
         # Collect all dir_names and slugs referenced by roadmap items
         roadmap_refs: set[str] = set()
@@ -79,7 +99,16 @@ class R1_3_StatusRoadmapMismatch:
     description = "Feature status conflicts with roadmap checked/unchecked state"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that feature status matches roadmap checked state.
+
+        Args:
+            graph: SpecGraph containing roadmap and feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations where status conflicts with roadmap state.
+        """
         violations: list[Violation] = []
         for item in graph.roadmap:
             if not item.link or "features/" not in item.link:
@@ -140,7 +169,16 @@ class R1_4_CheckedNoLink:
     description = "Checked roadmap item has no feature link"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that checked roadmap items have a feature link.
+
+        Args:
+            graph: SpecGraph containing roadmap and feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for checked items without links.
+        """
         violations: list[Violation] = []
         for item in graph.roadmap:
             if not item.checked:

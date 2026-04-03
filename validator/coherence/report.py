@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING
 from rich.console import Console
 from rich.text import Text
 
-from .violation import Severity
+from .violation import Severity, Violation
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # Circular: rule_engine imports from report indirectly
     from pathlib import Path
 
     from .rule_engine import CoherenceResult
@@ -25,13 +25,18 @@ _SEVERITY_STYLE = {
 
 def report_coherence(
     result: CoherenceResult,
-    format: str = "compact",
+    output_format: str = "compact",
 ) -> str | None:
     """Format and display coherence validation results.
 
-    Returns JSON string for json format, None for terminal formats.
+    Args:
+        result: CoherenceResult containing violations and graph data.
+        output_format: Output format (compact, full, or json).
+
+    Returns:
+        JSON string for json format, None for terminal formats.
     """
-    if format == "json":
+    if output_format == "json":
         return _report_json(result)
     else:
         _report_console(result)
@@ -58,7 +63,7 @@ def _report_console(result: CoherenceResult) -> None:
         return
 
     # Group violations by rule group (R1, R2, etc.)
-    groups: dict[str, list] = {}
+    groups: dict[str, list[Violation]] = {}
     for v in result.violations:
         group = v.rule_id.split(".")[0]
         groups.setdefault(group, []).append(v)

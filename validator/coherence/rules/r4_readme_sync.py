@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from validator.coherence.graph_builder import SpecGraph
 from validator.coherence.violation import Severity, Violation
 
@@ -13,7 +15,16 @@ class R4_1_ReadmeFeatureMissing:
     description = "README references a non-existent feature directory"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that README feature references exist on disk.
+
+        Args:
+            graph: SpecGraph containing README and feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for README references to missing features.
+        """
         violations: list[Violation] = []
         feature_dirs = graph.feature_dirs
         for entry in graph.readme_entries:
@@ -41,7 +52,16 @@ class R4_2_DiskFeatureMissingReadme:
     description = "Feature directory missing from README"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that disk features are listed in README.
+
+        Args:
+            graph: SpecGraph containing README and feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for features missing from README.
+        """
         violations: list[Violation] = []
         readme_set = set(graph.readme_entries)
         for feature in graph.features:
@@ -69,7 +89,16 @@ class R4_3_ReadmeStatusMismatch:
     description = "README status differs from spec.md status"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that README statuses match feature statuses.
+
+        Args:
+            graph: SpecGraph containing README and feature status data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for status mismatches between README and spec.
+        """
         violations: list[Violation] = []
         for dir_name, readme_status in graph.readme_statuses.items():
             feature = graph.get_feature(dir_name)

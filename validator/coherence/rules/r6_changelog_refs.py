@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from validator.coherence.graph_builder import SpecGraph
 from validator.coherence.violation import Severity, Violation
 
@@ -13,7 +15,16 @@ class R6_1_ChangelogFeatureMissing:
     description = "Changelog references a feature that does not exist in features/"
     wave = 2
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that changelog feature references exist on disk.
+
+        Args:
+            graph: SpecGraph containing changelog and feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for changelog references to missing features.
+        """
         if not graph.changelog_refs:
             return []
 

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from validator.coherence.graph_builder import SpecGraph
 from validator.coherence.violation import Severity, Violation
 
@@ -26,7 +28,16 @@ class R2_1_RequiredFileAbsent:
     description = "Required file absent for feature status"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that required files exist for the feature's status.
+
+        Args:
+            graph: SpecGraph containing feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for missing required files.
+        """
         violations: list[Violation] = []
         for feature in graph.features:
             if feature.status is None or feature.status not in _REQUIRED_FILES:
@@ -62,7 +73,16 @@ class R2_2_AdvancedFileForLowStatus:
     description = "Advanced file present for low status"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that advanced files don't exist for low-status features.
+
+        Args:
+            graph: SpecGraph containing feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for premature advanced files.
+        """
         violations: list[Violation] = []
         for feature in graph.features:
             if feature.status != "Draft":
@@ -92,7 +112,16 @@ class R2_3_InvalidStatus:
     description = "Feature has an invalid status"
     wave = 1
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that feature statuses are valid.
+
+        Args:
+            graph: SpecGraph containing feature data.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for invalid feature statuses.
+        """
         violations: list[Violation] = []
         for feature in graph.features:
             if feature.status is None:

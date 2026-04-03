@@ -11,7 +11,14 @@ MARKER_PAIRS = [
 
 
 def validate_roadmap_markers(content: str) -> list[str]:
-    """Return errors for missing roadmap marker pairs."""
+    """Return errors for missing roadmap marker pairs.
+
+    Args:
+        content: Raw markdown content of the roadmap file.
+
+    Returns:
+        List of error messages for each missing start/end marker.
+    """
     errors: list[str] = []
     for start, end in MARKER_PAIRS:
         if start not in content:

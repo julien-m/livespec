@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from pathlib import Path
 
@@ -17,13 +18,18 @@ class R3_1_SourceFileNotFound:
     rule_id = "R3.1"
     description = "Source file referenced in implementation.md does not exist on disk"
     wave = 2
-    specs_root: Path | None = None
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
-        if self.specs_root is None:
-            return []
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that implementation file paths exist on disk.
 
-        project_root = self.specs_root.parent
+        Args:
+            graph: SpecGraph containing feature implementation mappings.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for missing source files.
+        """
+        project_root = specs_root.parent
         violations: list[Violation] = []
 
         for feature in graph.features:
@@ -64,13 +70,18 @@ class R3_2_SpecAnchorMissing:
     rule_id = "R3.2"
     description = "Source file does not contain the expected @spec(anchor) annotation"
     wave = 3
-    specs_root: Path | None = None
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
-        if self.specs_root is None:
-            return []
+    def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
+        """Check that source files contain expected @spec anchors.
 
-        project_root = self.specs_root.parent
+        Args:
+            graph: SpecGraph containing feature implementation mappings.
+            specs_root: Root directory of the .specs/ tree.
+
+        Returns:
+            List of violations for missing @spec annotations.
+        """
+        project_root = specs_root.parent
         violations: list[Violation] = []
 
         for feature in graph.features:
@@ -85,7 +96,8 @@ class R3_2_SpecAnchorMissing:
 
                     try:
                         content = resolved.read_text()
-                    except Exception:
+                    except (OSError, UnicodeDecodeError) as exc:  # Narrow: file read errors only
+                        logging.warning("Failed to read %s: %s", resolved, exc)
                         continue
 
                     found_anchors = _SPEC_ANCHOR_RE.findall(content)

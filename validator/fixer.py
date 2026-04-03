@@ -8,7 +8,10 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 
+import logging
+
 import frontmatter
+import yaml
 
 from .config import ValidatorConfig, resolve_file_type
 from .engine import FileResult, validate_file
@@ -59,7 +62,7 @@ def _title_from_folder(path: Path) -> str:
 
 def _inject_section(content: str, section_name: str, file_type: str) -> str:
     """Inject a skeleton section at the canonical position or end of file."""
-    skeleton = f"\n\n## {section_name}\n\n*A compléter.*\n"
+    skeleton = f"\n\n## {section_name}\n\n*To be completed.*\n"
 
     order = SECTION_ORDER.get(file_type, [])
     if section_name not in order:
@@ -107,7 +110,15 @@ def fix_file(
 ) -> list[FixAction]:
     """Apply Pass 1 mechanical fixes to a file.
 
-    Returns list of actions taken. If dry_run, no files are modified.
+    Args:
+        path: Absolute path to the Markdown file.
+        file_result: Previous validation result for this file.
+        specs_root: Root directory of the .specs/ tree.
+        config: Validator configuration.
+        dry_run: If True, report fixes without modifying files.
+
+    Returns:
+        List of FixAction objects applied. Empty if no errors/warnings or dry_run=True.
     """
     if not file_result.has_errors and not file_result.has_warnings:
         return []
@@ -117,7 +128,8 @@ def fix_file(
 
     try:
         post = frontmatter.load(str(path))
-    except Exception:
+    except (yaml.YAMLError, OSError) as exc:
+        logging.warning("Failed to load %s for fixing: %s", path, exc)
         return []
 
     metadata = dict(post.metadata)
@@ -222,7 +234,7 @@ def fix_file(
     if content_changed:
         post.content = content
 
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(frontmatter.dumps(post))
 
     # Re-validate
@@ -261,7 +273,17 @@ def fix_all(
     config: ValidatorConfig,
     dry_run: bool = False,
 ) -> list[FixAction]:
-    """Apply Pass 1 fixes to all files with errors."""
+    """Apply Pass 1 fixes to all files with errors.
+
+    Args:
+        results: Validation results from a previous validate_all() run.
+        specs_root: Root directory of the .specs/ tree.
+        config: Validator configuration.
+        dry_run: If True, report fixes without modifying files.
+
+    Returns:
+        Combined list of fix actions across all files.
+    """
     all_actions: list[FixAction] = []
     for r in results:
         if r.has_errors:

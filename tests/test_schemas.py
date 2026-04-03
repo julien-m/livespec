@@ -80,7 +80,7 @@ class TestSpecFrontmatter:
                 updated=date(2026, 1, 1),
             )
 
-    def test_extra_fields_allowed(self) -> None:
+    def test_extra_fields_ignored(self) -> None:
         s = SpecFrontmatter(
             title="Test",
             status="Draft",
@@ -89,7 +89,7 @@ class TestSpecFrontmatter:
             updated=date(2026, 1, 1),
             custom_field="hello",
         )
-        assert s.custom_field == "hello"
+        assert not hasattr(s, "custom_field")
 
 
 class TestPlanFrontmatter:

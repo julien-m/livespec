@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import frontmatter
+import yaml
 
 
 @dataclass
 class RoadmapItem:
+    """A single item from the roadmap checklist."""
+
     name: str
     slug: str
     checked: bool
@@ -20,6 +24,8 @@ class RoadmapItem:
 
 @dataclass
 class FeatureInfo:
+    """Metadata for a single feature directory."""
+
     dir_name: str
     num: int
     slug: str
@@ -32,6 +38,18 @@ class FeatureInfo:
 
 @dataclass
 class SpecGraph:
+    """Graph of all spec artifacts and their relationships.
+
+    Attributes:
+        roadmap: Parsed roadmap.md checklist items and feature references.
+        features: All features extracted from features/ directory.
+        readme_entries: Section headers and links found in README.md.
+        readme_statuses: Status badges and their corresponding feature numbers.
+        stack_technologies: Technology choices and version pins from stack.md.
+        preflight_checks: Preflight checks from stack.md.
+        changelog_refs: Feature references found in changelog.md.
+    """
+
     roadmap: list[RoadmapItem] = field(default_factory=list)
     features: list[FeatureInfo] = field(default_factory=list)
     readme_entries: list[str] = field(default_factory=list)
@@ -41,14 +59,23 @@ class SpecGraph:
     changelog_refs: list[str] = field(default_factory=list)
 
     def get_feature(self, dir_name: str) -> FeatureInfo | None:
-        for f in self.features:
-            if f.dir_name == dir_name:
-                return f
+        """Find a feature by directory name.
+
+        Args:
+            dir_name: Feature directory name to search for.
+
+        Returns:
+            FeatureInfo if found, None otherwise.
+        """
+        for feature in self.features:
+            if feature.dir_name == dir_name:
+                return feature
         return None
 
     @property
     def feature_dirs(self) -> set[str]:
-        return {f.dir_name for f in self.features}
+        """Set of all feature directory names."""
+        return {feature.dir_name for feature in self.features}
 
 
 # Regex for roadmap checklist items
@@ -77,17 +104,17 @@ def _parse_roadmap(specs_root: Path) -> list[RoadmapItem]:
     content = roadmap_path.read_text()
     items: list[RoadmapItem] = []
 
-    for i, line in enumerate(content.splitlines(), 1):
-        m = _CHECKLIST_RE.match(line.strip())
-        if not m:
+    for line_number, line in enumerate(content.splitlines(), 1):
+        match = _CHECKLIST_RE.match(line.strip())
+        if not match:
             continue
 
-        checked = m.group(1) in ("x", "X")
-        if m.group(2):  # [name](link)
-            name = m.group(2)
-            link = m.group(3)
+        checked = match.group(1) in ("x", "X")
+        if match.group(2):  # [name](link)
+            name = match.group(2)
+            link = match.group(3)
         else:
-            name = m.group(4).strip()
+            name = match.group(4).strip()
             link = None
 
         # Extract slug from link or name
@@ -97,7 +124,7 @@ def _parse_roadmap(specs_root: Path) -> list[RoadmapItem]:
             slug = parts
 
         items.append(RoadmapItem(
-            name=name, slug=slug, checked=checked, link=link, line_number=i
+            name=name, slug=slug, checked=checked, link=link, line_number=line_number
         ))
 
     return items
@@ -134,8 +161,8 @@ def _parse_features(specs_root: Path) -> list[FeatureInfo]:
             try:
                 post = frontmatter.load(str(spec_path))
                 status = post.metadata.get("status")
-            except Exception:
-                pass
+            except (yaml.YAMLError, OSError) as exc:
+                logging.warning("Failed to parse %s: %s", spec_path, exc)
 
         # Read implementation.md for @spec anchors and file paths
         spec_anchors: list[str] = []
@@ -149,8 +176,8 @@ def _parse_features(specs_root: Path) -> list[FeatureInfo]:
                     anchor_id = pm.group(1)
                     file_path = pm.group(2).strip()
                     impl_paths.setdefault(anchor_id, []).append(file_path)
-            except Exception:
-                pass
+            except (yaml.YAMLError, OSError) as exc:
+                logging.warning("Failed to read %s: %s", impl_path, exc)
 
         features.append(FeatureInfo(
             dir_name=d.name,
@@ -254,7 +281,14 @@ def _parse_changelog(specs_root: Path) -> list[str]:
 
 
 def build_graph(specs_root: Path) -> SpecGraph:
-    """Build the complete SpecGraph from .specs/ on disk."""
+    """Build the complete SpecGraph from .specs/ on disk.
+
+    Args:
+        specs_root: Root directory of the .specs/ tree.
+
+    Returns:
+        SpecGraph containing all parsed artifacts and their relationships.
+    """
     roadmap = _parse_roadmap(specs_root)
     features = _parse_features(specs_root)
     readme_entries, readme_statuses = _parse_readme(specs_root)

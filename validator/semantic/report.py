@@ -38,12 +38,17 @@ def _score_color(value: int | float) -> str:
     return "red"
 
 
-def report_scorecard(project_score: ProjectScore, format: str = "compact") -> str | None:
+def report_scorecard(project_score: ProjectScore, output_format: str = "compact") -> str | None:
     """Format and display the scorecard.
 
-    Returns JSON string for json format, None for compact (printed to terminal).
+    Args:
+        project_score: Computed project-level scores to render.
+        output_format: "compact" for Rich table on stderr, "json" for machine-readable.
+
+    Returns:
+        JSON string for json format, None for compact (printed to terminal).
     """
-    if format == "json":
+    if output_format == "json":
         return _report_json(project_score)
 
     _report_compact(project_score)
