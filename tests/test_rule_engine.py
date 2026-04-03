@@ -2,14 +2,9 @@
 
 from __future__ import annotations
 
-import time
 from pathlib import Path
-from unittest.mock import patch
 
-import pytest
-
-from validator.coherence.graph_builder import FeatureInfo, RoadmapItem, SpecGraph
-from validator.coherence.rule_engine import CoherenceResult, run_coherence
+from validator.coherence.rule_engine import run_coherence
 from validator.coherence.violation import Severity
 
 

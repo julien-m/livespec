@@ -308,9 +308,9 @@ class TestCascadeReview:
 
     def test_findings_blocks_cascade(self):
         """Having findings blocks cascade regardless of confidence."""
+        from validator.coherence.violation import Severity
         from validator.orchestrator import _is_review_soft
         from validator.semantic.plan_review import PlanReviewResult
-        from validator.coherence.violation import Severity
 
         # Has findings, low confidence
         with_findings = PlanReviewResult(
@@ -328,8 +328,9 @@ class TestPlanReviewOrchestrator:
 
     def test_cascade_flow_soft_then_solid(self):
         """Verify cascade: first soft, second solid."""
-        from validator.orchestrator import _run_cascade_review, PlanReviewCheckResult
         from unittest.mock import patch
+
+        from validator.orchestrator import PlanReviewCheckResult, _run_cascade_review
 
         # First review: soft (0 findings, confidence 2, complex)
         soft_response = json.dumps({
@@ -377,9 +378,10 @@ class TestPlanReviewOrchestrator:
         assert len(result.reviews[1].result.findings) == 1
 
     def test_dual_zero_findings_validates(self):
-        """Both reviewers return 0 findings → soft first entry removed, only cascade with confidence=5."""
-        from validator.orchestrator import _run_cascade_review, PlanReviewCheckResult
+        """Both reviewers return 0 findings → soft entry removed, only cascade kept."""
         from unittest.mock import patch
+
+        from validator.orchestrator import PlanReviewCheckResult, _run_cascade_review
 
         response = json.dumps({"findings": [], "confidence": 2})
 

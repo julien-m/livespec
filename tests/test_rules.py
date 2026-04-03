@@ -2,11 +2,7 @@
 
 from __future__ import annotations
 
-import pytest
-
 from validator.rules import validate_by_type, validate_sections
-from validator.rules.changelog_entries import validate_changelog_entries
-from validator.rules.roadmap_markers import validate_roadmap_markers
 from validator.rules.sections import section_present
 
 
@@ -39,13 +35,13 @@ class TestValidateSectionsSpec:
 
     def test_missing_section_returns_error(self) -> None:
         headings = ["User Scenarios", "Acceptance Criteria"]
-        errors, warnings = validate_sections(headings, "spec")
+        errors, _warnings = validate_sections(headings, "spec")
         assert len(errors) == 2  # missing FR and Edge Cases
         assert any("fr" in e.lower() or "functional" in e.lower() for e in errors)
         assert any("edge" in e.lower() for e in errors)
 
     def test_empty_headings_returns_all_errors(self) -> None:
-        errors, warnings = validate_sections([], "spec")
+        errors, _warnings = validate_sections([], "spec")
         assert len(errors) == 4
 
 
@@ -54,7 +50,7 @@ class TestValidateSectionsPlan:
 
     def test_all_sections_present(self) -> None:
         headings = ["Summary", "Implementation Plan", "Testing Strategy", "Risks"]
-        errors, warnings = validate_sections(headings, "plan")
+        errors, _warnings = validate_sections(headings, "plan")
         assert errors == []
 
     def test_missing_section(self) -> None:

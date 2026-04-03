@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-import shutil
-from datetime import date
 from pathlib import Path
 
 import frontmatter
-import pytest
 
 from validator.config import ValidatorConfig
 from validator.engine import validate_file
-from validator.fixer import FixAction, fix_file
+from validator.fixer import fix_file
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 

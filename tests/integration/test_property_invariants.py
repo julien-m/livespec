@@ -3,15 +3,16 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
 import pytest
-from pathlib import Path
+
 from tests.integration.helpers.validators import (
+    validate_ac_fr_links,
     validate_frontmatter,
-    validate_spec_sections,
     validate_gherkin_blocks,
     validate_mermaid_blocks,
-    validate_ac_fr_links,
+    validate_spec_sections,
 )
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"

@@ -11,7 +11,6 @@ from rich.text import Text
 from .violation import Severity, Violation
 
 if TYPE_CHECKING:  # Circular: rule_engine imports from report indirectly
-    from pathlib import Path
 
     from .rule_engine import CoherenceResult
 
@@ -50,7 +49,7 @@ def _report_console(result: CoherenceResult) -> None:
     # Header
     n_features = len(result.graph.features)
     n_roadmap = len(result.graph.roadmap)
-    console.print(f"\n[bold]LiveSpec — Coherence inter-fichiers[/]")
+    console.print("\n[bold]LiveSpec — Coherence inter-fichiers[/]")
     console.print(
         f"Graph : {n_features} features — "
         f"{n_roadmap} roadmap items — "

@@ -141,7 +141,7 @@ class R2_3_InvalidStatus:
                             "status": feature.status,
                             "valid_statuses": sorted(_VALID_STATUSES),
                         },
-                        fix_hint=f"Update spec.md frontmatter to a valid status",
+                        fix_hint="Update spec.md frontmatter to a valid status",
                         suppress_if_creating=False,
                     )
                 )

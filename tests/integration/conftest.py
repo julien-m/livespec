@@ -1,9 +1,10 @@
 """Session-level fixtures and configuration for LiveSpec integration tests."""
 
-import os
 import json
-import pytest
+import os
 from pathlib import Path
+
+import pytest
 
 from tests.integration.helpers.cost_tracker import CostTracker
 

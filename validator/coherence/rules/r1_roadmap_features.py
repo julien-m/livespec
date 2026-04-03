@@ -141,7 +141,13 @@ class R1_3_StatusRoadmapMismatch:
                         suppress_if_creating=True,
                     )
                 )
-            elif status in ("Draft", "Planned", "In Progress", "Approved", "Review") and item.checked:
+            elif (
+                status in (
+                    "Draft", "Planned", "In Progress",
+                    "Approved", "Review",
+                )
+                and item.checked
+            ):
                 violations.append(
                     Violation(
                         rule_id=self.rule_id,
@@ -155,7 +161,10 @@ class R1_3_StatusRoadmapMismatch:
                             "status": status,
                             "checked": item.checked,
                         },
-                        fix_hint="Uncheck the roadmap item or update the feature status to Implemented",
+                        fix_hint=(
+                            "Uncheck the roadmap item or update"
+                            " the feature status to Implemented"
+                        ),
                         suppress_if_creating=True,
                     )
                 )

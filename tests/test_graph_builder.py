@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from validator.coherence.graph_builder import SpecGraph, build_graph
+from validator.coherence.graph_builder import build_graph
 
 
 @pytest.fixture

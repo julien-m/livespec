@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import shutil
-import sys
 from pathlib import Path
 
 import typer
@@ -38,27 +37,45 @@ def _find_specs_root(start: Path | None = None) -> Path:
 def validate(
     path: str | None = typer.Argument(None, help="File or directory to validate"),
     staged: bool = typer.Option(False, "--staged", help="Validate git staged files only"),
-    output_format: str = typer.Option("compact", "--format", "-f", help="Output format: compact, full, json"),
+    output_format: str = typer.Option(
+        "compact", "--format", "-f",
+        help="Output format: compact, full, json",
+    ),
     warn_only: bool = typer.Option(False, "--warn-only", help="Don't exit with error code"),
     score_only: bool = typer.Option(False, "--score-only", help="Show scores only"),
     fix: bool = typer.Option(False, "--fix", help="Apply Pass 1 mechanical fixes"),
-    smart: bool = typer.Option(False, "--smart", help="Apply Pass 2 Claude SDK fixes (not yet implemented)"),
+    smart: bool = typer.Option(
+        False, "--smart",
+        help="Apply Pass 2 Claude SDK fixes (not yet implemented)",
+    ),
     auto: bool = typer.Option(False, "--auto", help="Skip confirmation prompts"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Preview fixes without modifying files"),
     list_excluded: bool = typer.Option(False, "--list-excluded", help="Show excluded files"),
     coherence: bool = typer.Option(False, "--coherence", help="Run Layer 2 coherence validation"),
-    coherence_only: bool = typer.Option(False, "--coherence-only", help="Run only Layer 2 (skip Layer 1)"),
+    coherence_only: bool = typer.Option(
+        False, "--coherence-only",
+        help="Run only Layer 2 (skip Layer 1)",
+    ),
     rules: str | None = typer.Option(None, "--rules", help="Specific rules to run (e.g., R1,R2)"),
     wave_num: int | None = typer.Option(None, "--wave", help="Only run rules up to this wave"),
-    ignore_rules: str | None = typer.Option(None, "--ignore", help="Rules to ignore (e.g., R3.2,R5.1)"),
+    ignore_rules: str | None = typer.Option(
+        None, "--ignore",
+        help="Rules to ignore (e.g., R3.2,R5.1)",
+    ),
     strict: bool = typer.Option(False, "--strict", help="Block on coherence errors"),
     no_suppress: bool = typer.Option(False, "--no-suppress", help="Disable suppress_if_creating"),
     semantic: bool = typer.Option(False, "--semantic", help="Run Layer 4 semantic validation"),
     scorecard: bool = typer.Option(False, "--scorecard", help="Run scorecard only"),
-    contradiction_only: bool = typer.Option(False, "--contradiction-only", help="Run contradiction detection only"),
+    contradiction_only: bool = typer.Option(
+        False, "--contradiction-only",
+        help="Run contradiction detection only",
+    ),
     reindex: bool = typer.Option(False, "--reindex", help="Reindex embeddings"),
     mutate: bool = typer.Option(False, "--mutate", help="Run mutation testing"),
-    experimental_multi_model: bool = typer.Option(False, "--experimental-multi-model", help="Enable multi-model consensus"),
+    experimental_multi_model: bool = typer.Option(
+        False, "--experimental-multi-model",
+        help="Enable multi-model consensus",
+    ),
     plan_review: bool = typer.Option(
         False, "--plan-review", "-r", help="Run LLM plan substance review",
     ),
@@ -209,7 +226,11 @@ def validate(
         typer.echo("Embedding reindex requires OpenAI API (not yet integrated).", err=True)
         raise typer.Exit(0)
     if mutate:
-        typer.echo("Mutation testing: run `pytest tests/ -k mutation` for available tests.", err=True)
+        typer.echo(
+            "Mutation testing: run `pytest tests/ -k mutation`"
+            " for available tests.",
+            err=True,
+        )
         raise typer.Exit(0)
     if experimental_multi_model:
         typer.echo("Multi-model validation is experimental and not yet integrated.", err=True)
@@ -242,12 +263,18 @@ def validate(
         if actions:
             typer.echo(f"\nAuto-fix Pass 1 {'(dry-run)' if dry_run else ''}:", err=True)
             for action in actions:
-                rel = action.file.relative_to(specs_root.parent) if specs_root.parent in action.file.parents else action.file.name
+                rel = (
+                    action.file.relative_to(specs_root.parent)
+                    if specs_root.parent in action.file.parents
+                    else action.file.name
+                )
                 typer.echo(f"  {rel}: {action.description}", err=True)
 
             if not dry_run:
                 # Re-validate after fixes
-                results, excluded = validate_all(specs_root, config, paths=paths, staged_only=staged)
+                results, excluded = validate_all(
+                    specs_root, config, paths=paths, staged_only=staged,
+                )
         else:
             typer.echo("\nAuto-fix: nothing to fix.", err=True)
 
@@ -256,7 +283,11 @@ def validate(
         if score_only:
             report_score_only(results, specs_root)
         else:
-            json_output = report(results, excluded, output_format=output_format, specs_root=specs_root)
+            json_output = report(
+                results, excluded,
+                output_format=output_format,
+                specs_root=specs_root,
+            )
             if json_output:
                 typer.echo(json_output)
 

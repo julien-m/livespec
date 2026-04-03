@@ -8,7 +8,7 @@ from .changelog_entries import validate_changelog_entries
 from .roadmap_markers import validate_roadmap_markers
 from .sections import validate_sections
 
-__all__ = ["validate_sections", "validate_by_type"]
+__all__ = ["validate_by_type", "validate_sections"]
 
 _PLACEHOLDER_PATTERN = re.compile(r"\[(?:TBD|PLACEHOLDER|TODO)\]", re.IGNORECASE)
 

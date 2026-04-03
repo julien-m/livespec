@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import shutil
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-
-import logging
 
 import frontmatter
 import yaml
@@ -139,12 +138,16 @@ def fix_file(
 
     # --- Frontmatter fixes ---
 
-    if file_type in ("spec", "plan", "implementation", "stack"):
-        # Fix empty title
-        if not metadata.get("title", "").strip():
-            metadata["title"] = _title_from_folder(path)
-            metadata_changed = True
-            actions.append(FixAction(path, f"title set to '{metadata['title']}'", "title"))
+    # Fix empty title
+    if (
+        file_type in ("spec", "plan", "implementation", "stack")
+        and not metadata.get("title", "").strip()
+    ):
+        metadata["title"] = _title_from_folder(path)
+        metadata_changed = True
+        actions.append(
+            FixAction(path, f"title set to '{metadata['title']}'", "title"),
+        )
 
     if file_type == "spec":
         # Fix invalid status
@@ -181,14 +184,12 @@ def fix_file(
             metadata_changed = True
             actions.append(FixAction(path, f"updated corrected to {date.today()}", "updated"))
 
-    if file_type == "plan":
-        if "created" not in metadata:
+    if file_type == "plan" and "created" not in metadata:
             metadata["created"] = _file_created_date(path)
             metadata_changed = True
             actions.append(FixAction(path, f"created set to {metadata['created']}", "created"))
 
-    if file_type == "stack":
-        if "updated" not in metadata:
+    if file_type == "stack" and "updated" not in metadata:
             metadata["updated"] = date.today()
             metadata_changed = True
             actions.append(FixAction(path, f"updated set to {metadata['updated']}", "updated"))
@@ -198,7 +199,7 @@ def fix_file(
     from .rules.sections import SECTION_RULES, section_present
 
     rules = SECTION_RULES.get(file_type, {})
-    for key, (keywords, required) in rules.items():
+    for _key, (keywords, required) in rules.items():
         if required and not section_present(
             _extract_headings_from_content(content), keywords
         ):

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from validator.coherence.violation import CoherenceRule
 from validator.coherence.rules.r1_roadmap_features import (
     R1_1_RoadmapFeatureMissing,
     R1_2_OrphanFeature,
@@ -25,6 +24,7 @@ from validator.coherence.rules.r4_readme_sync import (
 )
 from validator.coherence.rules.r5_stack_preflight import R5_1_StackNoPreflight
 from validator.coherence.rules.r6_changelog_refs import R6_1_ChangelogFeatureMissing
+from validator.coherence.violation import CoherenceRule
 
 # Immutable by convention — do not mutate at runtime
 ALL_RULES: list[CoherenceRule] = [

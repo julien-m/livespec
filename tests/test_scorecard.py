@@ -4,20 +4,34 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 from typer.testing import CliRunner
 
 from validator.cli import app
 from validator.coherence.graph_builder import FeatureInfo
 from validator.semantic.scorecard import (
     AXIS_WEIGHTS,
-    FeatureScore,
-    ProjectScore,
     score_feature,
     score_project,
 )
 
 runner = CliRunner()
+
+
+_BASIC_SPEC = (
+    "---\ntitle: Auth\nstatus: Draft\npriority: P1\n"
+    "created: 2026-01-01\nupdated: 2026-01-15\n---\n\n"
+    "## User Scenarios\n\nTest.\n\n"
+    "## Acceptance Criteria\n\nAC-1.\n\n"
+    "## Functional Requirements\n\nFR-1.\n"
+)
+
+_BASIC_SPEC_NO_DIAGRAMS = (
+    "---\ntitle: Auth\nstatus: Draft\npriority: P1\n"
+    "created: 2026-01-01\nupdated: 2026-01-15\n---\n\n"
+    "## User Scenarios\n\nNo diagrams.\n\n"
+    "## Acceptance Criteria\n\nAC-1.\n\n"
+    "## Functional Requirements\n\nFR-1.\n"
+)
 
 
 # --- Helpers ---
@@ -32,7 +46,10 @@ def _make_feature(
 ) -> FeatureInfo:
     """Create a FeatureInfo and write files on disk."""
     if files is None:
-        files = {"spec": False, "plan": False, "implementation": False, "progress": False, "changelog": False}
+        files = {
+            "spec": False, "plan": False, "implementation": False,
+            "progress": False, "changelog": False,
+        }
     return FeatureInfo(
         dir_name=dir_name,
         num=1,
@@ -99,7 +116,10 @@ FR-1: Authentication endpoint.
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": True, "implementation": True, "progress": False, "changelog": True},
+            files={
+                "spec": True, "plan": True, "implementation": True,
+                "progress": False, "changelog": True,
+            },
             status="Draft",
         )
 
@@ -115,7 +135,10 @@ FR-1: Authentication endpoint.
 
         feature = _make_feature(
             specs_root,
-            files={"spec": False, "plan": False, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": False, "plan": False, "implementation": False,
+                "progress": False, "changelog": False,
+            },
             status="Draft",
         )
 
@@ -153,7 +176,10 @@ FR-1: Auth endpoint.
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": False, "implementation": False,
+                "progress": False, "changelog": False,
+            },
             status="Draft",
         )
 
@@ -208,11 +234,15 @@ AC-1: Referenced here.
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": False, "implementation": False,
+                "progress": False, "changelog": False,
+            },
         )
 
         fs = score_feature(feature, specs_root)
-        # mermaid (25) + gherkin (25) + FR+AC both present (20) + no plan seq/state (0) + no entities (15) = 85
+        # mermaid (25) + gherkin (25) + FR+AC (20)
+        # + no plan seq/state (0) + no entities (15) = 85
         assert fs.axes["artifact_quality"] == 85
 
     def test_without_mermaid_or_gherkin(self, tmp_path: Path) -> None:
@@ -244,11 +274,15 @@ FR-1: Authentication endpoint.
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": False, "implementation": False,
+                "progress": False, "changelog": False,
+            },
         )
 
         fs = score_feature(feature, specs_root)
-        # no mermaid (0) + no gherkin (0) + FR+AC both present (20) + no plan (0) + no entities (15) = 35
+        # no mermaid (0) + no gherkin (0) + FR+AC (20)
+        # + no plan (0) + no entities (15) = 35
         assert fs.axes["artifact_quality"] == 35
 
     def test_plan_with_sequence_diagram(self, tmp_path: Path) -> None:
@@ -256,7 +290,7 @@ FR-1: Authentication endpoint.
         feature_dir = specs_root / "features" / "001-auth"
         feature_dir.mkdir(parents=True)
 
-        _write_spec(feature_dir, "---\ntitle: Auth\nstatus: Draft\npriority: P1\ncreated: 2026-01-01\nupdated: 2026-01-15\n---\n\n## User Scenarios\n\nTest.\n\n## Acceptance Criteria\n\nAC-1.\n\n## Functional Requirements\n\nFR-1.\n")
+        _write_spec(feature_dir, _BASIC_SPEC)
 
         plan_content = """---
 title: "Auth Plan"
@@ -274,7 +308,10 @@ sequenceDiagram
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": True, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": True, "implementation": False,
+                "progress": False, "changelog": False,
+            },
         )
 
         fs = score_feature(feature, specs_root)
@@ -328,7 +365,10 @@ FR-2: Logout endpoint.
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": False, "implementation": True, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": False, "implementation": True,
+                "progress": False, "changelog": False,
+            },
             status="Implemented",
             spec_anchors=["FR-1", "FR-2", "AC-1", "AC-2"],
         )
@@ -361,7 +401,10 @@ FR-1: Login endpoint.
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": False, "implementation": False,
+                "progress": False, "changelog": False,
+            },
         )
 
         fs = score_feature(feature, specs_root)
@@ -380,11 +423,14 @@ class TestAxis4:
         feature_dir = specs_root / "features" / "001-auth"
         feature_dir.mkdir(parents=True)
 
-        _write_spec(feature_dir, "---\ntitle: A\nstatus: Draft\npriority: P1\ncreated: 2026-01-01\nupdated: 2026-01-15\n---\n\n## User Scenarios\n\nTest.\n\n## Acceptance Criteria\n\nAC-1.\n\n## Functional Requirements\n\nFR-1.\n")
+        _write_spec(feature_dir, _BASIC_SPEC)
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": False, "implementation": False,
+                "progress": False, "changelog": False,
+            },
         )
 
         fs = score_feature(feature, specs_root)
@@ -440,7 +486,10 @@ sequenceDiagram
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": True, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": True, "implementation": False,
+                "progress": False, "changelog": False,
+            },
         )
 
         fs = score_feature(feature, specs_root)
@@ -452,11 +501,14 @@ sequenceDiagram
         feature_dir = specs_root / "features" / "001-auth"
         feature_dir.mkdir(parents=True)
 
-        _write_spec(feature_dir, "---\ntitle: A\nstatus: Draft\npriority: P1\ncreated: 2026-01-01\nupdated: 2026-01-15\n---\n\n## User Scenarios\n\nNo diagrams.\n\n## Acceptance Criteria\n\nAC-1.\n\n## Functional Requirements\n\nFR-1.\n")
+        _write_spec(feature_dir, _BASIC_SPEC_NO_DIAGRAMS)
 
         feature = _make_feature(
             specs_root,
-            files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
+            files={
+                "spec": True, "plan": False, "implementation": False,
+                "progress": False, "changelog": False,
+            },
         )
 
         fs = score_feature(feature, specs_root)
@@ -473,14 +525,18 @@ class TestProjectScore:
         specs_root = tmp_path / ".specs"
         (specs_root / "features").mkdir(parents=True)
 
-        for i, name in enumerate(["001-auth", "002-billing"], 1):
+        for name in ["001-auth", "002-billing"]:
             feature_dir = specs_root / "features" / name
             feature_dir.mkdir()
-            _write_spec(feature_dir, f"---\ntitle: F{i}\nstatus: Draft\npriority: P1\ncreated: 2026-01-01\nupdated: 2026-01-15\n---\n\n## User Scenarios\n\nTest.\n\n## Acceptance Criteria\n\nAC-1.\n\n## Functional Requirements\n\nFR-1.\n")
+            _write_spec(feature_dir, _BASIC_SPEC)
 
+        spec_files = {
+            "spec": True, "plan": False, "implementation": False,
+            "progress": False, "changelog": False,
+        }
         features = [
-            _make_feature(specs_root, dir_name="001-auth", files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False}),
-            _make_feature(specs_root, dir_name="002-billing", files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False}),
+            _make_feature(specs_root, dir_name="001-auth", files=spec_files),
+            _make_feature(specs_root, dir_name="002-billing", files=spec_files),
         ]
 
         ps = score_project(features, specs_root)
@@ -519,7 +575,7 @@ class TestCLI:
         features_dir = specs_root / "features" / "001-auth"
         features_dir.mkdir(parents=True)
 
-        _write_spec(features_dir, "---\ntitle: Auth\nstatus: Draft\npriority: P1\ncreated: 2026-01-01\nupdated: 2026-01-15\n---\n\n## User Scenarios\n\nTest.\n\n## Acceptance Criteria\n\nAC-1.\n\n## Functional Requirements\n\nFR-1.\n")
+        _write_spec(features_dir, _BASIC_SPEC)
 
         result = runner.invoke(app, ["validate", "--scorecard", "--warn-only", str(specs_root)])
         # Should not crash; output goes to stderr via Rich
@@ -530,9 +586,13 @@ class TestCLI:
         features_dir = specs_root / "features" / "001-auth"
         features_dir.mkdir(parents=True)
 
-        _write_spec(features_dir, "---\ntitle: Auth\nstatus: Draft\npriority: P1\ncreated: 2026-01-01\nupdated: 2026-01-15\n---\n\n## User Scenarios\n\nTest.\n\n## Acceptance Criteria\n\nAC-1.\n\n## Functional Requirements\n\nFR-1.\n")
+        _write_spec(features_dir, _BASIC_SPEC)
 
-        result = runner.invoke(app, ["validate", "--scorecard", "--warn-only", "--format", "json", str(specs_root)])
+        result = runner.invoke(
+            app,
+            ["validate", "--scorecard", "--warn-only",
+             "--format", "json", str(specs_root)],
+        )
         assert result.exit_code == 0
         # Output contains multiple JSON objects (L1 + scorecard). Parse last one.
         import json

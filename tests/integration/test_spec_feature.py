@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import os
 import re
+from pathlib import Path
 
 import anyio
 import pytest
-from pathlib import Path
+
 from tests.integration.helpers.sdk_runner import run_livespec_command
 
 FIXTURES = Path(__file__).parent / "fixtures"

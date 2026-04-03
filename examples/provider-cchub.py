@@ -91,7 +91,7 @@ def _run(cmd: list[str]) -> str:
             print(f"cc-hub error (exit {result.returncode}): {result.stderr}", file=sys.stderr)
             raise RuntimeError(f"cc-hub failed: {result.stderr[:200]}")
         return result.stdout.strip()
-    except FileNotFoundError:
+    except FileNotFoundError as exc:
         raise RuntimeError(
             "cc-hub not found in PATH. Install it first: https://github.com/julien-m/cc-hub"
-        )
+        ) from exc

@@ -105,7 +105,11 @@ def _report_full(results: list[FileResult], specs_root: Path | None) -> None:
     # Summary
     total_errors = sum(len(r.errors) for r in results)
     total_warnings = sum(len(r.warnings) for r in results)
-    console.print(f"\n[bold]Total: {len(results)} file(s), {total_errors} error(s), {total_warnings} warning(s)[/]")
+    console.print(
+        f"\n[bold]Total: {len(results)} file(s),"
+        f" {total_errors} error(s),"
+        f" {total_warnings} warning(s)[/]"
+    )
 
 
 def _report_json(

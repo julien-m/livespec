@@ -310,9 +310,10 @@ def score_project(features: list[FeatureInfo], specs_root: Path) -> ProjectScore
     """
     feature_scores = [score_feature(f, specs_root) for f in features]
 
-    if feature_scores:
-        total = sum(fs.total for fs in feature_scores) / len(feature_scores)
-    else:
-        total = 0.0
+    total = (
+        sum(fs.total for fs in feature_scores) / len(feature_scores)
+        if feature_scores
+        else 0.0
+    )
 
     return ProjectScore(features=feature_scores, total=round(total, 1))

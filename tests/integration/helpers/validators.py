@@ -1,8 +1,9 @@
 """Structural validators for LiveSpec spec artifacts."""
 
 import re
-import yaml
 from dataclasses import dataclass, field
+
+import yaml
 
 
 @dataclass

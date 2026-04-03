@@ -5,10 +5,12 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
-import pytest
-
 from validator.config import ValidatorConfig
-from validator.engine import FileResult, ValidationMessage, collect_files, validate_all, validate_file
+from validator.engine import (
+    collect_files,
+    validate_all,
+    validate_file,
+)
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -90,7 +92,7 @@ class TestValidateAll:
         shutil.copy2(FIXTURES_DIR / "valid_spec.md", feat_dir / "spec.md")
         shutil.copy2(FIXTURES_DIR / "valid_plan.md", feat_dir / "plan.md")
 
-        results, excluded = validate_all(specs_root, default_config)
+        results, _excluded = validate_all(specs_root, default_config)
         assert len(results) >= 2
         types = [r.file_type for r in results]
         assert "spec" in types
@@ -122,7 +124,7 @@ class TestCollectFiles:
         archive.mkdir()
         (archive / "old.md").write_text("# Old\n")
 
-        files, excluded = collect_files(specs_root, default_config)
+        _files, excluded = collect_files(specs_root, default_config)
         assert any("archive" in e for e in excluded)
 
     def test_specific_path(

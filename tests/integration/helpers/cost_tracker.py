@@ -1,7 +1,6 @@
 """Token and cost tracking per test run."""
 
-import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from threading import Lock
 
 

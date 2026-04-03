@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from validator.coherence.graph_builder import FeatureInfo, RoadmapItem, SpecGraph
 from validator.coherence.rules.r1_roadmap_features import (
     R1_1_RoadmapFeatureMissing,
@@ -47,7 +45,10 @@ def _make_feature(
         num=num,
         slug=slug,
         status=status,
-        files=files or {"spec": True, "plan": True, "implementation": False, "progress": False, "changelog": False},
+        files=files or {
+            "spec": True, "plan": True, "implementation": False,
+            "progress": False, "changelog": False,
+        },
         spec_anchors=spec_anchors or [],
         implementation_paths=implementation_paths or {},
         spec_mtime=spec_mtime,
@@ -220,7 +221,10 @@ class TestR2_1_RequiredFileAbsent:
         graph = SpecGraph(
             features=[_make_feature(
                 status="Planned",
-                files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
+                files={
+                    "spec": True, "plan": False, "implementation": False,
+                    "progress": False, "changelog": False,
+                },
             )],
         )
         violations = R2_1_RequiredFileAbsent().check(graph, Path("."))
@@ -232,7 +236,10 @@ class TestR2_1_RequiredFileAbsent:
         graph = SpecGraph(
             features=[_make_feature(
                 status="Planned",
-                files={"spec": True, "plan": True, "implementation": False, "progress": False, "changelog": False},
+                files={
+                    "spec": True, "plan": True, "implementation": False,
+                    "progress": False, "changelog": False,
+                },
             )],
         )
         violations = R2_1_RequiredFileAbsent().check(graph, Path("."))
@@ -249,7 +256,10 @@ class TestR2_2_AdvancedFileForLowStatus:
         graph = SpecGraph(
             features=[_make_feature(
                 status="Draft",
-                files={"spec": True, "plan": False, "implementation": True, "progress": False, "changelog": False},
+                files={
+                    "spec": True, "plan": False, "implementation": True,
+                    "progress": False, "changelog": False,
+                },
             )],
         )
         violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
@@ -260,7 +270,10 @@ class TestR2_2_AdvancedFileForLowStatus:
         graph = SpecGraph(
             features=[_make_feature(
                 status="Draft",
-                files={"spec": True, "plan": False, "implementation": False, "progress": False, "changelog": False},
+                files={
+                    "spec": True, "plan": False, "implementation": False,
+                    "progress": False, "changelog": False,
+                },
             )],
         )
         violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
@@ -270,7 +283,10 @@ class TestR2_2_AdvancedFileForLowStatus:
         graph = SpecGraph(
             features=[_make_feature(
                 status="Implemented",
-                files={"spec": True, "plan": True, "implementation": True, "progress": False, "changelog": False},
+                files={
+                    "spec": True, "plan": True, "implementation": True,
+                    "progress": False, "changelog": False,
+                },
             )],
         )
         violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
@@ -286,7 +302,11 @@ class TestR2_3_InvalidStatus:
         assert "Unknown" in violations[0].message
 
     def test_valid_statuses_pass(self) -> None:
-        for status in ("Draft", "Planned", "In Progress", "Approved", "Implemented", "Deprecated", "Review"):
+        valid_statuses = (
+            "Draft", "Planned", "In Progress", "Approved",
+            "Implemented", "Deprecated", "Review",
+        )
+        for status in valid_statuses:
             graph = SpecGraph(features=[_make_feature(status=status)])
             violations = R2_3_InvalidStatus().check(graph, Path("."))
             assert violations == [], f"Status '{status}' should be valid"

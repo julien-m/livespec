@@ -26,7 +26,7 @@ def cosine_distance(u: list[float], v: list[float]) -> float:
     if len(u) != len(v):
         raise ValueError(f"Vector dimension mismatch: {len(u)} vs {len(v)}")
 
-    dot = sum(a * b for a, b in zip(u, v))
+    dot = sum(a * b for a, b in zip(u, v, strict=True))
     norm_u = math.sqrt(sum(a * a for a in u))
     norm_v = math.sqrt(sum(b * b for b in v))
 

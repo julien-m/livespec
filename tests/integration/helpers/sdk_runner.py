@@ -3,12 +3,12 @@
 import asyncio
 import shutil
 import tempfile
-from pathlib import Path
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from typing import Callable, Awaitable
+from pathlib import Path
 
 try:
-    from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage, AssistantMessage
+    from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, query
     HAS_SDK = True
 except ImportError:
     HAS_SDK = False

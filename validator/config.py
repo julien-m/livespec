@@ -9,7 +9,6 @@ from typing import Literal
 
 import yaml
 
-
 ALL_TYPES = [
     "spec", "plan", "implementation", "roadmap", "changelog",
     "stack", "preflight", "progress", "constitution", "project",
@@ -77,10 +76,7 @@ def is_excluded(rel_path: str, config: ValidatorConfig) -> bool:
     Returns:
         True if the path matches any exclusion glob.
     """
-    for pattern in config.exclude:
-        if fnmatch(rel_path, pattern):
-            return True
-    return False
+    return any(fnmatch(rel_path, pattern) for pattern in config.exclude)
 
 
 def resolve_file_type(path: Path, specs_root: Path) -> str:

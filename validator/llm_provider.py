@@ -10,7 +10,8 @@ from typing import Any
 
 PROVIDER_PATH = Path.home() / ".config" / "livespec" / "provider.py"
 
-# Mutable global: lazy-load cache for singleton provider module (DI not feasible for dynamic file-based plugin)
+# Mutable global: lazy-load cache for singleton provider module
+# (DI not feasible for dynamic file-based plugin)
 _provider_module: Any = None
 _load_attempted: bool = False
 
@@ -53,7 +54,9 @@ def _load_provider() -> Any:  # Any: dynamically loaded module type unknown at i
 
         _provider_module = module
         return module
-    except Exception as e:  # Broad catch: provider loading can fail with any error (SyntaxError, ImportError, AttributeError)
+    # Broad catch: provider loading can fail with any error
+    # (SyntaxError, ImportError, AttributeError)
+    except Exception as e:
         logging.warning("Failed to load LLM provider from %s: %s", PROVIDER_PATH, e)
         return None
 

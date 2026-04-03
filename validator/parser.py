@@ -20,7 +20,10 @@ class ParsedFile:
     code_blocks: list[dict[str, str]] = field(default_factory=list)
 
 
-def _extract_headings_and_blocks(ast_nodes: list[dict[str, Any]]) -> tuple[list[str], list[dict[str, str]]]:  # Any: mistune AST nodes are untyped
+def _extract_headings_and_blocks(
+    ast_nodes: list[dict[str, Any]],
+) -> tuple[list[str], list[dict[str, str]]]:
+    # Any: mistune AST nodes are untyped
     """Walk the AST and extract H2/H3 headings and fenced code blocks."""
     headings: list[str] = []
     code_blocks: list[dict[str, str]] = []

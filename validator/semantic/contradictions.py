@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
 
 from validator.coherence.graph_builder import SpecGraph
 from validator.coherence.violation import Severity
@@ -62,18 +61,27 @@ class ContradictionReport:
     suspicions: list[ContradictionResult] = field(default_factory=list)
 
 
-_EXTRACT_PROMPT = """You are a technical spec auditor. Extract normative assertions from this document.
-Return JSON: {{"assertions": [{{"id": "A1", "theme": "...", "assertion": "...", "polarity": "must|must-not|may", "source_line": N}}]}}
+_EXTRACT_PROMPT = """\
+You are a technical spec auditor.
+Extract normative assertions from this document.
+Return JSON: {{"assertions": [{{
+  "id": "A1", "theme": "...", "assertion": "...",
+  "polarity": "must|must-not|may", "source_line": N
+}}]}}
 
-Only extract assertions that state what MUST be, MUST NOT be, IS required, or IS forbidden.
+Only extract assertions that state what MUST be,
+MUST NOT be, IS required, or IS forbidden.
 Skip descriptive or informational text.
 
 Document ({source_file}):
 {content}"""
 
-_COMPARE_PROMPT = """These two assertions on the theme "{theme}" come from different documents.
+_COMPARE_PROMPT = """\
+These two assertions on the theme "{theme}"
+come from different documents.
 Are they contradictory? Answer with strict JSON:
-{{"contradicts": true/false, "confidence": 0.0-1.0, "explanation": "...", "severity": "blocking|warning|info"}}
+{{"contradicts": true/false, "confidence": 0.0-1.0,
+"explanation": "...", "severity": "blocking|warning|info"}}
 
 Assertion A (from {source_a}): {text_a}
 Assertion B (from {source_b}): {text_b}"""

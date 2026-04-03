@@ -8,7 +8,6 @@ import pytest
 
 from validator.llm_provider import (
     LLMProviderNotConfigured,
-    _load_provider,
     call_llm,
     is_available,
     reset,

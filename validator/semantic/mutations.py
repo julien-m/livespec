@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import re
 import shutil
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 
@@ -225,7 +225,9 @@ def run_mutation_suite(
                 details = f"Killed by L1: {len(structure_errors)} structure error(s)"
         except ImportError as exc:
             details = f"L1 check unavailable: {exc}"
-        except Exception as exc:  # Broad catch: validation layer can fail in unexpected ways on mutated specs
+        # Broad catch: validation layer can fail in
+        # unexpected ways on mutated specs.
+        except Exception as exc:
             logging.warning("L1 check failed for mutation %s: %s", mutation.id, exc)
             details = f"L1 check failed: {exc}"
 
@@ -241,7 +243,9 @@ def run_mutation_suite(
                     details = f"Killed by L2: {len(violations)} coherence violation(s)"
             except ImportError as exc:
                 details += f"; L2 check unavailable: {exc}"
-            except Exception as exc:  # Broad catch: coherence layer can fail in unexpected ways on mutated specs
+            # Broad catch: coherence layer can fail in
+            # unexpected ways on mutated specs.
+            except Exception as exc:
                 logging.warning("L2 check failed for mutation %s: %s", mutation.id, exc)
                 details += f"; L2 check failed: {exc}"
 
