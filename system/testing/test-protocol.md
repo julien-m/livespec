@@ -9,12 +9,14 @@
 
 | File | What it covers | When to read |
 |---|---|---|
-| [`discovery.md`](discovery.md) | Detect ecosystem, test runners, visual tools, verify & record | `/spec.init` Phase B, `/spec.plan` Step 7.5, first `/spec.implement` if not yet resolved |
-| [`execution-rules.md`](execution-rules.md) | When to run tests + final validation checklist | Every `/spec.implement` phase 3, 4, 6 |
-| [`failure-handling.md`](failure-handling.md) | Iteration limits, troubleshooting, error reporting format | On test failure during `/spec.implement` |
+| [`discovery.md`](discovery.md) | Detect ecosystem, test runners, visual tools, verify & record | `/spec.init` Phase B, `/spec.plan` Step 7.5, first `/spec.implement` if not yet resolved, `/spec.test` Phase 0 |
+| [`execution-rules.md`](execution-rules.md) | When to run tests + final validation checklist | Every `/spec.implement` phase 3, 4, 6 and `/spec.test` Phase 4 |
+| [`failure-handling.md`](failure-handling.md) | Iteration limits, troubleshooting, error reporting format | On test failure during `/spec.implement` or `/spec.test` |
 | [`visual-baselines.md`](visual-baselines.md) | Screenshot capture, comparison, thresholds, archival | UI features only (skip with `--no-visual`) |
 
 All commands come from the **Resolved Test Commands** table in `plan.md` or `.specs/testing/strategy.md`. Never hardcode commands.
+
+**Standalone test validation:** `/spec.test` orchestrates the full test lifecycle — audit AC coverage, generate missing tests from Gherkin, execute the suite, capture visual baselines, and produce a report. Referenced by `/spec.implement` Phase 6, `/spec.feature` Phase 3.5, and `/spec.ship` Step 3.5.
 
 ---
 

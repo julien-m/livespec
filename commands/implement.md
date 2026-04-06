@@ -292,6 +292,8 @@ Before declaring implementation complete:
 - All commands come from `plan.md` **Resolved Test Commands** — no hardcoded commands
 - All checks must pass. Fix any issues found within iteration limits.
 
+> **Note:** Phase 6 runs EXISTING tests as a validation gate. For standalone test validation with AC coverage audit, generation of missing tests, and visual fidelity checks, use `/spec.test` after implementation is complete.
+
 ### Phase 7 — Update implementation.md
 
 Create or update `.specs/features/NNN-feature-name/implementation.md`:

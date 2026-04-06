@@ -281,6 +281,7 @@ For a given event (e.g., `before-plan`), Read files at 3 levels in order:
 | `implement` | `before-implement` (global, project, local) | `after-implement` (global, project, local) |
 | `implement` (each step) | `before-implement-step` (global, project, local) | `after-implement-step` (global, project, local) |
 | `check` | `before-check` (global, project, local) | `after-check` (global, project, local) |
+| `test` | `before-test` (global, project, local) | `after-test` (global, project, local) |
 | `explain` | `before-explain` (global, project, local) | `after-explain` (global, project, local) |
 | `stack` | `before-stack` (global, project, local) | `after-stack` (global, project, local) |
 | `feature` | `before-feature` (global, project, local) | `after-feature` (global, project, local) |
@@ -295,7 +296,7 @@ For a given event (e.g., `before-plan`), Read files at 3 levels in order:
 
 ### Command discovery
 
-Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 15 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.check`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`, `/spec.refresh-conventions`.
+Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 16 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.test`, `/spec.check`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`, `/spec.refresh-conventions`.
 
 ### When CREATING a new feature
 

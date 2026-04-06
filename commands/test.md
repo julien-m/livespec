@@ -1,0 +1,512 @@
+---
+description: "Audit test coverage, generate missing tests, execute suite, verify visual fidelity"
+argument-hint: "<feature-name>"
+---
+
+# Command: /spec.test
+
+> Post-implementation test validation — audit AC coverage, generate missing tests from Gherkin, execute the full suite, capture visual baselines, and produce a test report.
+
+---
+
+## Overview
+
+```
+/spec.test                        → Interactive feature selection → Phases 0-5
+/spec.test feature-name           → Phases 0-5 for one feature
+/spec.test --all                  → Phases 0-5 for all implemented features
+/spec.test --audit-only           → Phase 0-1 only (coverage matrix, no generation/execution)
+/spec.test --no-generate          → Phases 0, 1, 4-5 (execute existing tests, don't generate)
+```
+
+```mermaid
+flowchart TD
+    START(["/spec.test"]) --> RESOLVE["Phase 0\nResolve feature(s)\n+ preflight"]
+    RESOLVE -->|"blocked"| BLOCKED(["Blocked —\nreport + recovery"])
+    RESOLVE -->|"pass"| AUDIT["Phase 1 — Audit\nBuild coverage matrix\n(from check report or\nspec + implementation)"]
+    AUDIT --> PLAN["Phase 2 — Plan\nList missing tests\n+ display summary"]
+    PLAN --> AO{"--audit-only?"}
+    AO -->|"yes"| REPORT
+    AO -->|"no"| NG{"--no-generate?"}
+    NG -->|"yes"| EXECUTE
+    NG -->|"no"| GENERATE["Phase 3 — Generate\nCreate missing tests\nfrom Gherkin scenarios"]
+    GENERATE --> EXECUTE["Phase 4 — Execute\nRun full test suite\n(unit + integration +\nE2E)"]
+    EXECUTE --> VIS{"UI feature\n+ missing\nbaselines?"}
+    VIS -->|"yes"| VISUAL["Phase 4.5 — Visual\nCapture missing baselines\n+ design fidelity"]
+    VIS -->|"no"| REPORT
+    VISUAL --> REPORT["Phase 5 — Report\nTest report + update\nimplementation.md"]
+    REPORT --> SAVE["Save to\nchecks/YYYY-MM-DD-test.md"]
+    SAVE --> MULTI{"Multiple\nfeatures?"}
+    MULTI -->|"yes"| CONSOL["Consolidated\nreport"]
+    MULTI -->|"no"| DONE(["Done"])
+    CONSOL --> DONE
+
+    style START fill:#e8f4f8,stroke:#2196F3
+    style BLOCKED fill:#ffebee,stroke:#F44336
+    style GENERATE fill:#fff3e0,stroke:#FF9800
+    style EXECUTE fill:#fff3e0,stroke:#FF9800
+    style DONE fill:#e8f5e9,stroke:#4CAF50
+```
+
+---
+
+> **Hooks — before starting:** **Read** `before-test` hooks from all 3 levels (skip missing files):
+> 1. `~/.claude/livespec/hooks/before-test.md`
+> 2. `.specs/hooks/before-test.md`
+> 3. `.specs/hooks/before-test.local.md` (if `mode: override` → use only this one)
+>
+> **Hooks — after completing:** Same resolution with `after-test` at all 3 levels.
+
+## Relationship with other commands
+
+| Command | Role | What it does with tests |
+|---|---|---|
+| `/spec.implement` | Creates code + tests during TDD | Runs EXISTING tests as validation gate. Does NOT audit coverage, does NOT generate missing tests |
+| `/spec.test` | Post-implementation test validation | AUDITS coverage against AC, GENERATES missing tests from Gherkin, EXECUTES full suite, REPORTS |
+| `/spec.check` | Static alignment verification | Verifies @spec anchors, FR→code mapping, runs visual regression on existing baselines |
+
+`/spec.test` catches what `/spec.implement` misses: AC that have NO test at all, visual baselines that were skipped (`--no-visual`), and partial test coverage.
+
+---
+
+## Phase 0 — Resolve & Preflight
+
+### Feature Resolution
+
+Same pattern as `/spec.check`:
+
+1. If feature name provided → find `.specs/features/NNN-feature-name/`
+2. If no name → detect from current git branch (`feature/NNN-feature-name`)
+3. If still no match → interactive selection (multi-spec, same as check.md Step 2):
+
+```
+| # | Feature              | Status      | Last Modified |
+|---|----------------------|-------------|---------------|
+| 1 | 004-notifications    | Implemented | 2026-03-12    |
+| 2 | 001-user-auth        | Implemented | 2026-03-10    |
+
+Selection: numbers (1,3), range (1-3), combined (1,3-5), or "all"
+Enter = most recent feature only
+```
+
+4. If `--all` → all features with status `Implemented` or `In Progress`
+
+### Preflight Checks (blocking)
+
+- [ ] `.specs/` directory exists
+- [ ] Feature directory exists with `spec.md`
+- [ ] `spec.md` has AC section with at least 1 AC
+- [ ] Resolved Test Commands available (in `plan.md` or `.specs/testing/strategy.md`)
+- [ ] Test framework binary available (verify with `--version`)
+
+**If no Resolved Test Commands:**
+1. Attempt discovery via `system/testing/discovery.md` procedure
+2. If discovery succeeds → write resolved commands to `.specs/testing/strategy.md` and continue
+3. If discovery fails → report: "No test framework — cannot generate or execute tests. Run `/spec.plan` to resolve test commands." Exit with audit-only report.
+
+**Non-testable features:**
+- If all FR are infrastructure-only (no executable code) → report "Infrastructure feature — no executable tests" and skip
+- If 0 AC map to testable behavior → report "0 testable AC" and skip to visual phase (if UI) or exit gracefully
+
+---
+
+## Phase 1 — Audit
+
+**Goal:** Build a coverage matrix — what SHOULD be tested (from spec) vs what IS tested (from code).
+
+### Data Sources (priority order)
+
+1. **Latest check report** — scan `.specs/features/NNN/checks/` for most recent `YYYY-MM-DD.md` (not `-test.md`). If available, extract AC status (✅/⚠️/❌) and test file references. This avoids re-scanning.
+
+2. **If no check report exists**, build the matrix from:
+   - `spec.md` → extract all AC (with Gherkin scenarios) and FR
+   - `implementation.md` → extract AC→test file mappings (Acceptance Criteria Mapping table)
+   - Source files → grep `@spec FR-NNN` anchors for FR→file mappings
+
+3. **If inside /spec.ship agent** (lean mode with `--auto`) → read `progress.md` from just-completed implementation for test results per step.
+
+### Coverage Matrix
+
+For each AC in `spec.md`:
+
+1. **Check if a test exists** — look in `implementation.md` AC Mapping table, or grep test files for the AC identifier (`AC-NNN`)
+2. **Check if a Gherkin scenario exists** — search `spec.md` for a ```gherkin block covering this AC
+3. **Classify:**
+   - ✅ **Covered** — test file exists, references this AC
+   - ⚠️ **Partial** — test exists but doesn't cover all Gherkin steps
+   - ❌ **Missing** — no test found for this AC
+   - 🚫 **No Gherkin** — AC has no Gherkin scenario (cannot auto-generate)
+
+### Visual Audit (UI features only)
+
+If `spec.md` has a `## Screens` section:
+
+For each referenced screen:
+1. Check if a Playwright baseline exists in `baselines/`
+2. Check if a visual test file exists (grep for `toHaveScreenshot` or screen name in test files)
+3. Classify: ✅ Present / ❌ Missing baseline / ❌ Missing test file
+
+### Output
+
+```markdown
+## Test Coverage Audit: NNN-feature-name
+
+### AC Coverage
+
+| AC | Description | Test file | Status | Gherkin? |
+|---|---|---|---|---|
+| AC-001 | Unread count badge | tests/api/notifications.test.ts | ✅ Covered | ✅ |
+| AC-002 | Click marks read | tests/e2e/notifications.spec.ts | ✅ Covered | ✅ |
+| AC-003 | Disable email notifs | tests/api/notifications.test.ts | ⚠️ Partial | ✅ |
+| AC-004 | Immediate effect | — | ❌ Missing | ✅ |
+| AC-005 | Mark all as read | — | ❌ Missing | ✅ |
+
+**Coverage:** 2/5 fully covered (40%), 1 partial, 2 missing
+
+### Visual Audit (if UI)
+
+| Screen | Baseline | Test file | Status |
+|---|---|---|---|
+| login | ✅ baselines/login.png | ✅ tests/e2e/login.spec.ts | ✅ Complete |
+| dashboard | ❌ Missing | ❌ Missing | ❌ Needs both |
+```
+
+---
+
+## Phase 2 — Plan
+
+Display what will be generated/executed before taking action:
+
+```markdown
+## Test Plan
+
+### Tests to generate:
+
+| # | AC | Type | Target file | From Gherkin |
+|---|---|---|---|---|
+| 1 | AC-004 | E2E | tests/e2e/notifications.spec.ts (append) | Scenario: "Preference change takes effect" |
+| 2 | AC-005 | E2E | tests/e2e/notifications.spec.ts (append) | Scenario: "Mark all as read" |
+| 3 | AC-003 | Unit | tests/api/notifications.test.ts (append) | Scenario: "Disable all email notifications" |
+
+### Visual tests to generate:
+
+| # | Screen | Target file | Action |
+|---|---|---|---|
+| 1 | dashboard | tests/e2e/dashboard.spec.ts (create) | New Playwright visual test |
+
+### Suites to execute:
+- Unit: [resolved unit command]
+- Integration: [resolved integration command]
+- E2E: [resolved E2E command]
+- Visual: [resolved visual command]
+- Lint: [resolved lint command]
+- Types: [resolved type check command]
+
+→ Proceed? (yes / no / audit-only)
+```
+
+- In `--auto` mode (from `/spec.ship` or `/spec.feature`): skip confirmation, proceed immediately
+- If user chooses "audit-only": skip to Phase 5 (Report) with audit-only data
+- If nothing to generate and all tests exist: skip Phase 3, go to Phase 4
+
+---
+
+## Phase 3 — Generate
+
+For each missing test identified in Phase 2:
+
+### 3.1 — Detect Framework
+
+Map Resolved Test Commands to test framework:
+
+| Command pattern | Framework | Import style |
+|---|---|---|
+| `npx vitest` / `vitest run` | Vitest | `import { describe, it, expect } from 'vitest'` |
+| `npx jest` / `jest` | Jest | `import { describe, it, expect } from '@jest/globals'` |
+| `npx playwright test` | Playwright | `import { test, expect } from '@playwright/test'` |
+| `pytest` | pytest | `import pytest` |
+| `go test` | Go testing | `import "testing"` |
+| `cargo test` | Rust | `#[cfg(test)]` |
+
+### 3.2 — Read Existing Test Patterns
+
+Before generating any test, read 1-2 existing test files from:
+1. The same feature's test files (from `implementation.md` AC Mapping)
+2. If none → nearest feature's test files
+3. If none → any test file in the project matching the framework
+
+Extract:
+- Import style and dependencies
+- Helper/fixture patterns (`beforeEach`, `afterEach`, seed functions, factories)
+- Assertion style (`expect().toBe()`, `assert`, `assertEqual`)
+- File naming convention (`*.test.ts`, `*.spec.ts`, `test_*.py`)
+- Test organization (`describe` nesting, test name format)
+
+### 3.3 — Translate Gherkin to Test
+
+For each missing AC with a Gherkin scenario:
+
+1. Parse the Gherkin block from `spec.md`
+2. Map steps to test code:
+   - `Given` → setup/arrange (`beforeEach`, seed data, navigate to page, mock dependencies)
+   - `When` → action/act (API call, user click, form submission)
+   - `Then` → assertion/assert (`expect`, `toEqual`, `toHaveText`, `toBeVisible`)
+3. Test name MUST reference the AC: `"AC-004: preference change takes effect immediately"`
+4. Match the patterns extracted in 3.2
+
+### 3.4 — Overwrite Protection
+
+- **Never** overwrite existing test files
+- If target file exists → append new `it()` / `test()` blocks inside existing `describe()` blocks
+- If the file structure is unclear or conflicts → create a new file with `_generated` suffix (e.g., `notifications_generated.spec.ts`)
+- If a test with the same name already exists → skip (already covered)
+
+### 3.5 — Compilation Gate (per generated file)
+
+After writing each test file:
+
+1. Run the file in isolation: e.g., `npx vitest run tests/api/notifications.test.ts` or `pytest tests/test_notifications.py -k "AC_004"`
+2. If **compilation/import error** → read error, fix, and retry (max 3 iterations per file)
+3. If still broken after 3 iterations → **delete the generated code** (revert to pre-generation state), mark as "Generation Failed" in report
+4. If test **compiles but assertion fails** → keep the test (this reveals an implementation gap, not a generation error)
+
+---
+
+## Phase 4 — Execute
+
+Run the full resolved test suite in order:
+
+1. **Type checker** (if resolved) — e.g., `npx tsc --noEmit`
+2. **Linter** (if resolved) — e.g., `npx eslint src/`
+3. **Unit tests** — e.g., `npx vitest run`
+4. **Integration tests** (if resolved) — e.g., `npx vitest run tests/integration/`
+5. **E2E tests** (if resolved) — e.g., `npx playwright test`
+
+All commands come from `plan.md` or `.specs/testing/strategy.md` **Resolved Test Commands**. Never hardcode commands.
+
+### Result Tracking
+
+For each test, map back to the AC it covers:
+
+| Test | AC | Result | Source | Notes |
+|---|---|---|---|---|
+| `"AC-001: returns unread count"` | AC-001 | ✅ Pass | Existing | |
+| `"AC-002: marks as read on click"` | AC-002 | ✅ Pass | Existing | |
+| `"AC-004: preference change"` | AC-004 | ❌ Fail | Generated | assertion: expected 0, got 3 |
+| `"AC-005: mark all as read"` | AC-005 | ✅ Pass | Generated | |
+
+### Failure Handling
+
+- **Generated test fails (assertion):** Report as "Generated — Fail". Do NOT attempt to fix implementation code. This means the implementation is incomplete or buggy — `/spec.test` reveals the gap, `/spec.implement --resume` fixes it.
+- **Existing test fails:** Report as "Regression". Not `/spec.test`'s responsibility to fix.
+- **Test runner crashes or times out:** Report as "Blocked — [error message]". Suggest recovery command.
+- **All tests pass:** Report as "✅ All passing".
+
+---
+
+## Phase 4.5 — Visual (UI features only)
+
+**Only runs when ALL of these are true:**
+- Feature's `spec.md` has a `## Screens` section
+- Missing baselines detected in Phase 1 audit (or missing visual test files)
+- Playwright (or resolved visual tool) is available
+- `--no-visual` is NOT set
+
+### 4.5.1 — Generate Missing Visual Test Files
+
+For each screen in `spec.md` that has no corresponding visual test:
+
+1. Read the mockup PNG from `.specs/design/screens/` (for context on what to capture)
+2. Generate a Playwright test that:
+   - Navigates to the screen's URL/route
+   - Waits for network idle
+   - Captures a screenshot with `toHaveScreenshot()`
+   - Uses descriptive baseline name matching the screen name
+3. Follow existing visual test patterns (same as Phase 3.2 pattern matching)
+4. Apply the same compilation gate as Phase 3.5
+
+### 4.5.2 — Capture Missing Baselines
+
+1. Run the visual test command from Resolved Test Commands
+2. New screenshots are saved to `.specs/features/NNN/baselines/`
+3. If capture fails (server not running, element not found) → max 2 retries, then mark "Blocked"
+
+### 4.5.3 — Design Fidelity Check (new baselines only)
+
+For each **freshly captured** baseline (not pre-existing ones):
+
+1. Find the corresponding mockup PNG in `.specs/design/screens/`
+2. Compare baseline vs mockup using pixel diff
+3. **Threshold:** 5% (allows minor implementation differences while catching major layout drift)
+4. Report:
+   - ✅ **Faithful** (< 5% diff)
+   - 🎨 **Diverged** (> 5% diff) with percentage
+
+**If Playwright is not installed:** Skip entire phase, report:
+```
+Visual tests skipped — Playwright not installed.
+Install: npm install -D @playwright/test && npx playwright install --with-deps
+```
+
+---
+
+## Phase 5 — Report
+
+### Test Report Structure
+
+```markdown
+## Test Report: NNN-feature-name
+
+**Date:** YYYY-MM-DD
+**Feature:** `.specs/features/NNN-feature-name/`
+**Mode:** full | audit-only | no-generate
+
+### AC Coverage
+
+| AC | Description | Test | Result | Source | Notes |
+|---|---|---|---|---|---|
+| AC-001 | Unread count badge | `tests/api/notifications.test.ts` | ✅ Pass | Existing | |
+| AC-002 | Click marks read | `tests/e2e/notifications.spec.ts` | ✅ Pass | Existing | |
+| AC-003 | Disable email notifs | `tests/api/notifications.test.ts` | ⚠️ Partial | Existing | Missing edge cases |
+| AC-004 | Immediate effect | `tests/e2e/notifications.spec.ts` | ❌ Fail | Generated | Impl incomplete |
+| AC-005 | Mark all as read | `tests/e2e/notifications.spec.ts` | ✅ Pass | Generated | |
+
+### Suite Results
+
+| Suite | Command | Result | Duration |
+|---|---|---|---|
+| Types | `npx tsc --noEmit` | ✅ Pass | 2.1s |
+| Lint | `npx eslint src/` | ✅ Pass | 1.4s |
+| Unit | `npx vitest run` | ✅ 12/12 | 3.2s |
+| E2E | `npx playwright test` | ⚠️ 7/8 | 18.4s |
+
+### Visual Baselines (if applicable)
+
+| Screen | Baseline | Mockup diff | Status |
+|---|---|---|---|
+| login | ✅ Existing | — | — |
+| dashboard | ✅ Captured | 3.2% | ✅ Faithful |
+
+### Generation Summary
+
+| Metric | Value |
+|---|---|
+| Tests generated | 3 |
+| Generation passed | 2 |
+| Generation failed (impl bug) | 1 |
+| Generation failed (compile) | 0 |
+
+### Summary
+
+- **AC coverage:** 4/5 (80%) — 1 fail (AC-004)
+- **Test suite:** 19/20 passing
+- **Visual:** 2/2 baselines present
+- **Overall:** ⚠️ Needs attention — AC-004 implementation incomplete
+```
+
+### Persist
+
+1. Save report to `.specs/features/NNN-feature-name/checks/YYYY-MM-DD-test.md`
+2. Update `implementation.md` AC Mapping section with current test status (unless `--no-update`)
+3. Add entry to feature `changelog.md`:
+
+```markdown
+### YYYY-MM-DD — Test: AC coverage validated
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** [list generated test files, if any]
+- **Coverage:** N/M AC covered (X%), N generated, N passing
+- **Report:** `checks/YYYY-MM-DD-test.md`
+- **Author:** [tool name]
+```
+
+4. Add summary entry to `.specs/changelog.md` (global):
+   `[Feature NNN] Test: X% AC covered (N/M), N tests generated`
+
+---
+
+## Multi-Feature Consolidated Report
+
+When multiple features are tested in a single run, display after all individual reports:
+
+```markdown
+## Consolidated Test Report
+
+| Feature | AC Coverage | Suite | Visual | Generated | Overall |
+|---|---|---|---|---|---|
+| 004-notifications | ⚠️ 80% (4/5) | ⚠️ 19/20 | ✅ 2/2 | 3 (2✅ 1❌) | ⚠️ |
+| 001-user-auth | ✅ 100% (5/5) | ✅ 8/8 | N/A | 0 | ✅ |
+| 003-messaging | ❌ 30% (2/7) | ❌ 3/10 | N/A | 5 (3✅ 2❌) | ❌ |
+
+### Priorities
+
+1. ❌ **003-messaging**: 70% of AC missing tests — 2 generated tests reveal impl bugs
+2. ❌ **004-notifications AC-004**: implementation incomplete (generated test reveals bug)
+3. ⚠️ **004-notifications AC-003**: partial test coverage — missing edge cases
+```
+
+---
+
+## Flags
+
+| Flag | Short | Behavior |
+|---|---|---|
+| `--audit-only` | `-a` | Only audit coverage (Phases 0-1), don't generate or execute |
+| `--no-generate` | `-G` | Execute existing tests but don't generate missing ones |
+| `--no-visual` | `-V` | Skip visual baseline capture and design fidelity check |
+| `--all` | `-A` | Test all features with status `Implemented` or `In Progress` |
+| `--auto` | | No confirmation prompts (for `/spec.ship` and `/spec.feature` integration) |
+| `--update` | `-u` | Auto-update `implementation.md` without asking |
+| `--no-update` | `-U` | Skip `implementation.md` update |
+
+---
+
+## Iteration Limits
+
+| Action | Max iterations | On limit reached |
+|---|---|---|
+| Generated test compilation fix | 3 per file | Delete generated code, mark "Generation Failed" |
+| Visual capture retry | 2 | Skip, mark "Blocked — [reason]" |
+
+---
+
+## Integration Points
+
+### /spec.feature pipeline
+
+Added as **Phase 3.5** (after implement, before completion):
+
+```
+Phase 1: specify → Phase 1.5: spec review → Phase 2: plan → Phase 2.5: plan review → Phase 2.7: preflight → Phase 3: implement → Phase 3.5: TEST → Done
+```
+
+`/spec.test` generates missing tests that `/spec.implement`'s Phase 6 could not run because they didn't exist yet. It also captures visual baselines that may have been skipped during implement.
+
+### /spec.ship
+
+After each feature's implementation phase, the spawned agent runs `/spec.test <feature> --auto` before merge. If the test report shows ❌ failures in AC coverage → `SHIP_RESULT: BLOCKED`.
+
+### /spec.check
+
+`/spec.check` can reference the latest test report from `checks/YYYY-MM-DD-test.md` to include dynamic test results alongside its static alignment analysis.
+
+---
+
+## Definition of Done (Command-Level)
+
+`/spec.test` is complete only if all are true:
+
+- [ ] Coverage matrix produced for all AC
+- [ ] Missing tests generated (or `--audit-only` / `--no-generate`)
+- [ ] Full test suite executed (or `--audit-only`)
+- [ ] Visual baselines captured for missing screens (or `--no-visual` / non-UI feature)
+- [ ] Test report saved to `checks/YYYY-MM-DD-test.md`
+- [ ] `implementation.md` AC status updated (or `--no-update`)
+- [ ] Feature `changelog.md` has test entry
+- [ ] Global `.specs/changelog.md` has summary entry
+- [ ] If multi-feature: consolidated report produced
+
+---
+
+*LiveSpec Command v1.0*

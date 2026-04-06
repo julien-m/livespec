@@ -1,5 +1,5 @@
 ---
-description: "Full feature pipeline: specify → plan → review → implement"
+description: "Full feature pipeline: specify → plan → review → implement → test → commit"
 argument-hint: "[feature description]"
 ---
 
@@ -36,7 +36,8 @@ flowchart TD
     G2 -->|"continue"| P27["Phase 2.7\nPreflight\n(light)"]
     P27 -->|"critical fail"| ABORT
     P27 -->|"pass"| P3["Phase 3\nImplement"]
-    P3 --> DONE(["Pipeline\ncomplete"])
+    P3 --> P35["Phase 3.5\nTest\n(/spec.test --auto)"]
+    P35 --> DONE(["Pipeline\ncomplete"])
 
     style START fill:#e8f4f8,stroke:#2196F3
     style G1 fill:#fff9c4,stroke:#FFC107
@@ -95,6 +96,7 @@ This file is **distinct from `progress.md`** (which tracks individual implementa
 | Plan Review | Pending | — |
 | Preflight | Pending | — |
 | Implement | Pending | — |
+| Test | Pending | — |
 ```
 
 **Status values:** `Pending` → `In Progress` → `Done` or `Skipped`
@@ -256,6 +258,20 @@ This ensures all tools and credentials are available before the autonomous imple
 
 ---
 
+## Phase 3.5 — Test
+
+After implementation completes, run `/spec.test` to validate test completeness:
+
+1. Update `pipeline.md`: Test → `In Progress`
+2. Execute `/spec.test <feature-name> --auto --update`
+3. `/spec.test` generates missing tests that `/spec.implement`'s Phase 6 could not run because they didn't exist yet. It also captures visual baselines that may have been skipped during implement (`--no-visual` or tool unavailable).
+4. If test report shows ❌ failures in AC coverage → these reveal implementation gaps. Output `SHIP_RESULT: BLOCKED` with test failure details if called from `/spec.ship`, or report findings in interactive mode. If only ⚠️ partial AC coverage or ✅ passed → proceed.
+5. Update `pipeline.md`: Test → `Done` with timestamp
+
+In `--auto` mode: no confirmation prompts, proceeds automatically.
+
+---
+
 ## Resume (`--resume`)
 
 When `--resume` is provided:
@@ -271,7 +287,7 @@ When `--resume` is provided:
 
 ## Auto-Commit (`--auto` only)
 
-When `--auto` is active and Phase 3 (Implement) completes successfully:
+When `--auto` is active and Phase 3.5 (Test) completes successfully:
 
 1. Run `/audit` — if fail, attempt fix (max 3 retries). If still failing → abort (no commit)
 2. Verify all tests pass

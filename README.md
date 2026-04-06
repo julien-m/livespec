@@ -40,13 +40,15 @@ flowchart LR
     P["/spec.propose\nDiscover what\nto build"] --> S["/spec.specify\nWrite the spec\n(stories, AC, FR)"]
     S --> PL["/spec.plan\nTechnical plan\n(diagrams, steps)"]
     PL --> I["/spec.implement\nCode, test,\nmap to spec"]
-    I --> C["/spec.check\nVerify spec\nvs code"]
+    I --> T["/spec.test\nAudit + generate\n+ run tests"]
+    T --> C["/spec.check\nVerify spec\nvs code"]
     C --> E["/spec.explain\nLiving\ndocumentation"]
 
     style P fill:#e8f4f8,stroke:#2196F3
     style S fill:#e8f4f8,stroke:#2196F3
     style PL fill:#e8f4f8,stroke:#2196F3
     style I fill:#e8f4f8,stroke:#2196F3
+    style T fill:#e8f4f8,stroke:#2196F3
     style C fill:#e8f4f8,stroke:#2196F3
     style E fill:#e8f4f8,stroke:#2196F3
 ```
@@ -55,7 +57,7 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 
 ---
 
-## The 14 Commands
+## The 16 Commands
 
 | Command | What it does |
 |---|---|
@@ -64,10 +66,11 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 | `/spec.specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
 | `/spec.plan` | Generate technical plan with sequence, state, and ER diagrams |
 | `/spec.implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
+| `/spec.test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, capture visual baselines, verify design fidelity |
 | `/spec.check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
 | `/spec.explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
-| `/spec.feature` | Full pipeline: specify → plan → plan review → implement, with validation gates |
+| `/spec.feature` | Full pipeline: specify → plan → implement → test, with validation gates between phases |
 | `/spec.preflight` | Verify tooling, auth, and API tokens before starting implementation — runs auto-install, detects blockers, gates feature work |
 | `/spec.hooks` | Show, create, or edit lifecycle hooks for a command |
 | `/spec.play-coverage` | Open spec coverage playground with live grep data |
@@ -150,6 +153,7 @@ Run the full pipeline in one command with validation gates between each phase:
 ### After implementation
 
 ```bash
+/spec.test date-filter                     # Audit + generate missing tests
 /spec.check date-filter                    # Verify spec-code alignment
 /spec.explain "how does date filtering work?"  # Living documentation
 /spec.stack                                # View or evolve the stack
@@ -221,6 +225,19 @@ Auto-implement from plan: code, test, verify, document. Multi-agent by default.
 ```
 
 Key flags: `--mono`, `--economy`, `--resume`, `--no-visual`, `--no-save`, `--step`
+
+### `/spec.test`
+
+Audit test coverage against AC, generate missing tests from Gherkin scenarios, execute the full suite, and capture visual baselines.
+
+```bash
+/spec.test profile-photos                 # Test one feature
+/spec.test --all                          # Test all implemented features
+/spec.test profile-photos --audit-only   # Coverage audit only (no generation/execution)
+/spec.test profile-photos --no-generate  # Run existing tests, don't generate missing ones
+```
+
+Key flags: `--audit-only`, `--no-generate`, `--no-visual`, `--all`, `--auto`, `--update`
 
 ### `/spec.check`
 
@@ -348,7 +365,7 @@ bash scripts/install.sh --force      # Overwrite existing symlinks
 bash scripts/install.sh --uninstall  # Remove all symlinks
 ```
 
-Installs 14 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+Installs 15 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -361,7 +378,8 @@ For other AI tools, paste `system/spec-system.md` into your tool's context.
 | Mermaid diagrams | ✅ Mandatory | ❌ None | ❌ None |
 | Spec-to-code traceability | ✅ FR/AC → `@spec` anchors with deep-links | ❌ None | ⚠️ Partial |
 | Per-feature changelogs | ✅ Yes | ❌ No | ❌ No |
-| Visual testing baselines | ✅ Playwright | ❌ None | ❌ None |
+| Visual testing baselines | ✅ Playwright + design fidelity | ❌ None | ❌ None |
+| Post-impl test validation | ✅ `/spec.test` (audit + generate + run) | ❌ None | ❌ None |
 | Stack presets + decision trees | ✅ Yes | ❌ No | ⚠️ Minimal |
 | Brainstorm-driven init | ✅ 3-phase conversation | ❌ No | ⚠️ Partial |
 | Gap detection (spec vs code) | ✅ `/spec.check` | ❌ None | ❌ None |
@@ -502,6 +520,7 @@ livespec/
 │   ├── specify.md
 │   ├── plan.md
 │   ├── implement.md
+│   ├── test.md
 │   ├── check.md
 │   ├── explain.md
 │   ├── stack.md

@@ -53,7 +53,7 @@ flowchart TD
 To avoid context window exhaustion, each feature runs in a **separate spawned agent**:
 
 - **Main context (ship orchestrator):** reads roadmap, manages branches, parses agent results, merges, updates ship.md. Stays under ~10k tokens per feature cycle.
-- **Spawned agent (per feature):** executes `/spec.feature --auto --branch` with a fresh context. Handles specify, review, plan, implement, audit, and commit. Returns a structured `SHIP_RESULT` block (see `feature.md` § Ship Result).
+- **Spawned agent (per feature):** executes `/spec.feature --auto --branch` with a fresh context. Handles specify, review, plan, implement, test, audit, and commit. Returns a structured `SHIP_RESULT` block (see `feature.md` § Ship Result).
 
 The agent commits on its feature branch. The main context merges into the target branch after receiving `SHIP_RESULT: OK`.
 
@@ -224,8 +224,18 @@ The agent executes the full pipeline autonomously: specify → spec review → p
 
 Read the agent's output and extract the `SHIP_RESULT` block:
 
-- **`SHIP_RESULT: OK`** → proceed to Step 4
+- **`SHIP_RESULT: OK`** → proceed to Step 3.5
 - **`SHIP_RESULT: BLOCKED`** → STOP (see Error Handling)
+
+### Step 3.5 — Test Gate
+
+After the agent completes implementation, validate test completeness:
+
+1. The spawned agent runs `/spec.test <feature> --auto` as part of `/spec.feature` Phase 3.5
+2. If the test report shows ❌ failures in AC coverage → `SHIP_RESULT: BLOCKED` with test failure details
+3. If all AC are covered (✅ or ⚠️ Partial) → proceed to Step 4
+
+This gate catches AC that have no test at all — `/spec.implement`'s Phase 6 only runs existing tests, while `/spec.test` generates missing ones and reveals implementation gaps.
 
 ### Step 4 — Merge
 
