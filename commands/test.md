@@ -67,6 +67,12 @@ flowchart TD
 
 `/spec.test` catches what `/spec.implement` misses: AC that have NO test at all, visual baselines that were skipped (`--no-visual`), and partial test coverage.
 
+**Lifecycle placement:** `/spec.test` is typically run after `/spec.implement` (in `/spec.feature` Phase 3.5 or `/spec.ship` Step 3.5):
+- **Before `/spec.check`** (most common): no check report exists — Phase 1 builds the coverage matrix from `spec.md` + `implementation.md` directly
+- **After `/spec.check`** (optional): Phase 1 consumes the existing check report for faster audit
+
+Both orders are valid. Choose based on whether you want to audit tests before or after verifying spec↔code alignment.
+
 ---
 
 ## Phase 0 — Resolve & Preflight
@@ -213,6 +219,10 @@ Display what will be generated/executed before taking action:
 
 ## Phase 3 — Generate
 
+### Deduplication (TDD awareness)
+
+When running after `/spec.implement` (typical in `/spec.feature` and `/spec.ship` pipelines), implementation may have already created tests via TDD. Phase 1 detects these as ✅ Covered or ⚠️ Partial. Phase 3 only generates tests for AC classified as ❌ Missing — it never overwrites or duplicates tests that `/spec.implement` already created.
+
 For each missing test identified in Phase 2:
 
 ### 3.1 — Detect Framework
@@ -314,6 +324,8 @@ For each test, map back to the AC it covers:
 
 ### 4.5.1 — Generate Missing Visual Test Files
 
+**Skipped if `--no-generate` is set.** Only baselines for existing visual tests are captured (Phase 4.5.2).
+
 For each screen in `spec.md` that has no corresponding visual test:
 
 1. Read the mockup PNG from `.specs/design/screens/` (for context on what to capture)
@@ -337,10 +349,18 @@ For each **freshly captured** baseline (not pre-existing ones):
 
 1. Find the corresponding mockup PNG in `.specs/design/screens/`
 2. Compare baseline vs mockup using pixel diff
-3. **Threshold:** 5% (allows minor implementation differences while catching major layout drift)
-4. Report:
-   - ✅ **Faithful** (< 5% diff)
-   - 🎨 **Diverged** (> 5% diff) with percentage
+3. Report:
+   - ✅ **Faithful** (< threshold diff)
+   - 🎨 **Diverged** (> threshold diff) with percentage
+
+### Visual Thresholds
+
+| Check type | Threshold | Scope | Owner |
+|---|---|---|---|
+| Design fidelity (baseline vs mockup) | 5% | New baselines only | `/spec.test` Phase 4.5 |
+| Visual regression (baseline vs previous) | 2% | Existing baselines | `/spec.check` Step 8 |
+
+`/spec.test` does NOT evaluate visual regression (pixel-diff against previous baselines). It only performs design fidelity checks on **newly captured** baselines. Visual regression on existing baselines is `/spec.check`'s responsibility.
 
 **If Playwright is not installed:** Skip entire phase, report:
 ```
@@ -453,10 +473,10 @@ When multiple features are tested in a single run, display after all individual 
 | Flag | Short | Behavior |
 |---|---|---|
 | `--audit-only` | `-a` | Only audit coverage (Phases 0-1), don't generate or execute |
-| `--no-generate` | `-G` | Execute existing tests but don't generate missing ones |
+| `--no-generate` | `-G` | Execute existing tests but don't generate missing ones. Skips Phase 3 (AC test generation) and Phase 4.5.1 (visual test file generation) |
 | `--no-visual` | `-V` | Skip visual baseline capture and design fidelity check |
 | `--all` | `-A` | Test all features with status `Implemented` or `In Progress` |
-| `--auto` | | No confirmation prompts (for `/spec.ship` and `/spec.feature` integration) |
+| `--auto` | | No confirmation prompts (for `/spec.feature` Phase 3.5 and `/spec.ship` integration) |
 | `--update` | `-u` | Auto-update `implementation.md` without asking |
 | `--no-update` | `-U` | Skip `implementation.md` update |
 

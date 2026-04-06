@@ -10,11 +10,17 @@ After `/spec.implement` or `/spec.ship`, there is no standalone command to:
 
 Tests are currently embedded in `/spec.implement` phases 2/5/6, but there's no way to re-validate tests independently. `/spec.check` verifies spec↔code alignment statically but doesn't generate or execute tests.
 
-**Lifecycle placement:**
+**Lifecycle placement (flexible):**
 
 ```
-specify → plan → implement → TEST → check → ship
+specify → plan → implement → [TEST] → [check] → ship
 ```
+
+`/spec.test` is typically run after `/spec.implement` (in `/spec.feature` Phase 3.5 or `/spec.ship` Step 3.5):
+- **Before `/spec.check`** (typical): no check report exists — Phase 1 builds the coverage matrix from `spec.md` + `implementation.md` directly
+- **After `/spec.check`** (optional): Phase 1 consumes the existing check report for faster audit
+
+Both orders are valid. Choose based on whether you want to audit tests before or after verifying spec↔code alignment.
 
 ## Scope boundaries
 
@@ -25,10 +31,11 @@ specify → plan → implement → TEST → check → ship
 | Execute test suite | ✅ | — | ✅ (per step) |
 | Verify @spec anchors | — | ✅ | — |
 | Verify code implements FR | — | ✅ | — |
-| Run visual regression | — | ✅ (Step 8) | ✅ (Phase 5) |
+| Run visual regression (existing baselines) | — | ✅ (Step 8, 2% threshold) | ✅ (Phase 5) |
+| Execute visual tests (capture + fidelity) | ✅ (Phase 4.5, 5% threshold) | — | — |
 | Capture missing baselines | ✅ | — | ✅ (Phase 5) |
 | Generate visual test code | ✅ | — | — |
-| Design fidelity (new baselines vs mockup) | ✅ | ✅ (Step 8) | ✅ (Phase 1) |
+| Design fidelity (new baselines vs mockup) | ✅ (Phase 4.5, 5%) | — | — |
 | Fix implementation code | — | — | ✅ |
 
 ## Design
@@ -49,7 +56,7 @@ flowchart TD
     PLAN --> AUDITONLY{"--audit-only?"}
     AUDITONLY -->|"yes"| REPORT_EARLY["Skip to\nReport"]
     AUDITONLY -->|"no"| GENERATE["Phase 3 — Generate\nCreate missing test files\nfrom Gherkin scenarios"]
-    GENERATE --> EXECUTE["Phase 4 — Execute\nRun full test suite\n(unit + integration +\nE2E + visual)"]
+    GENERATE --> EXECUTE["Phase 4 — Execute\nRun full test suite\n(unit + integration +\nE2E)"]
     EXECUTE --> VISUAL{"UI feature\n+ missing\nbaselines?"}
     VISUAL -->|"yes"| CAPTURE["Phase 4.5 — Visual\nCapture missing baselines\n+ design fidelity check"]
     VISUAL -->|"no"| REPORT
@@ -155,9 +162,11 @@ Display what will be generated before writing any code:
 → Proceed? (yes / no / audit-only)
 ```
 
-In `--auto` mode (from `/spec.ship`), skip the confirmation prompt.
+In `--auto` mode (from `/spec.feature` Phase 3.5 or `/spec.ship`), skip the confirmation prompt.
 
 ### Phase 3 — Generate
+
+**Deduplication (TDD awareness):** When running after `/spec.implement` (typical in `/spec.feature` and `/spec.ship` pipelines), implementation may have already created tests via TDD. Phase 1 detects these as ✅ Covered or ⚠️ Partial. Phase 3 only generates tests for AC classified as ❌ Missing — it never overwrites or duplicates tests created during implementation.
 
 **For each missing test identified in Phase 2:**
 
@@ -314,11 +323,12 @@ Same pattern as `/spec.check` Step 11:
 | Flag | Short | Behavior |
 |---|---|---|
 | `--audit-only` | `-a` | Only audit coverage, don't generate or execute |
-| `--no-generate` | `-G` | Execute existing tests but don't generate missing ones |
-| `--no-visual` | `-V` | Skip visual baseline capture |
+| `--no-generate` | `-G` | Execute existing tests but don't generate missing ones. Skips Phase 3 and Phase 4.5.1 (visual test file generation) |
+| `--no-visual` | `-V` | Skip visual baseline capture and design fidelity check |
 | `--all` | `-A` | Test all implemented features without selection prompt |
-| `--auto` | | No confirmation prompts (for /spec.ship integration) |
+| `--auto` | | No confirmation prompts (for /spec.feature Phase 3.5 and /spec.ship integration) |
 | `--update` | `-u` | Auto-update implementation.md without asking |
+| `--no-update` | `-U` | Skip implementation.md update |
 
 ## Iteration limits
 
@@ -330,9 +340,9 @@ Same pattern as `/spec.check` Step 11:
 ## Integration points
 
 ### /spec.feature pipeline
-Add as Phase 4.5 (after implement, before final audit):
+Added as Phase 3.5 (after implement, before completion):
 ```
-Phase 4: implement → Phase 4.5: test → Phase 5: audit → Phase 6: commit
+Phase 1: specify → Phase 1.5: spec review → Phase 2: plan → Phase 2.5: plan review → Phase 2.7: preflight → Phase 3: implement → Phase 3.5: TEST → Done
 ```
 
 ### /spec.ship
@@ -358,7 +368,7 @@ After each feature's implementation phase, the spawned agent runs `/spec.test <f
 ## Non-goals
 
 - /spec.test does NOT fix implementation code (it reveals bugs, doesn't fix them)
-- /spec.test does NOT re-run visual regression on existing baselines (that's /spec.check)
+- /spec.test does NOT evaluate visual drift on existing baselines (pixel-diff comparison against previous baselines is /spec.check's responsibility). It executes visual tests but only performs design fidelity checks on newly captured baselines
 - /spec.test does NOT verify @spec anchors or FR→code alignment (that's /spec.check)
 - /spec.test does NOT run during implementation steps (that's /spec.implement TDD protocol)
 
