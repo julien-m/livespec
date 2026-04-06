@@ -113,6 +113,8 @@ Read **all** of these before any fix attempt:
 | `.specs/features/NNN/progress.md` | Previous implementation state |
 | `.specs/design/screens/index.md` | Current screen inventory |
 | `.specs/design/screens/*.png` | Mockup PNGs (visual reference) |
+| `.specs/design/theme.css` | Theme CSS variables (if exists) |
+| `.specs/design/theme.md` | Theme metadata and color palette (if exists) |
 | `.specs/features/NNN/baselines/*.png` | Current Playwright screenshots |
 | `.conventions/conventions.md` | Code conventions (if exists) |
 
@@ -176,10 +178,11 @@ For each gap, generate a targeted fix plan:
 1. Read the mockup PNG from `.specs/design/screens/` (design intent)
 2. Read the current baseline PNG from `baselines/` (actual state)
 3. Run pixel diff to identify regions of divergence and diff percentage
-4. Feed both images + diff regions + component source code to LLM for visual reasoning:
+4. Feed both images + diff regions + component source code + **theme.css tokens (if exists)** to LLM for visual reasoning:
    - What is different? (layout shift, color mismatch, missing element, spacing error)
    - Which component is responsible? (map to implementation.md)
    - What CSS/layout/props change would fix it?
+   - If theme.css exists: which CSS variables should be used instead of hardcoded values?
 5. Generate targeted correction steps (CSS property changes, component restructuring, prop adjustments)
 
 Pixel diff alone identifies *that* something differs. LLM visual reasoning identifies *what* and *how to fix*. Both are required.
@@ -203,9 +206,11 @@ Execute the fix plan. For each gap:
 
 - Read the mockup PNG as visual target
 - Read the component source code
+- If `.specs/design/theme.css` exists, read theme tokens as the authoritative color/spacing source
 - Modify CSS/layout/styling to match the mockup
 - Reference the mockup explicitly: "Aligning `NotificationPanel.tsx` with mockup `panel-unread.png`"
 - Match: layout structure, spacing, colors, typography, component hierarchy
+- **Theme token enforcement:** When fixing colors or spacing, use CSS variables from `theme.css` (e.g., `var(--destructive)` not `#EF4444`). Replace any hardcoded values discovered during the fix with their corresponding theme tokens.
 - Do NOT modify the mockup — code adapts to design, not the other way
 
 **Execution order:**

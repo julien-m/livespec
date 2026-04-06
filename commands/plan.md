@@ -105,7 +105,8 @@ Read ALL of these before generating anything:
 If the feature's `spec.md` contains a `## Screens` section:
 
 1. Read the screen references and their linked PNG files from `.specs/design/screens/`
-2. Generate a `## Design Reference` section in the plan, mapping each screen to its component breakdown:
+2. Check if `.specs/design/theme.css` exists — if yes, read it and `.specs/design/theme.md`
+3. Generate a `## Design Reference` section in the plan, mapping each screen to its component breakdown:
 
    ```markdown
    ## Design Reference
@@ -115,7 +116,19 @@ If the feature's `spec.md` contains a `## Screens` section:
    | [screen-name] | [Components identified from mockup] | [screen-name.png](../../design/screens/screen-name.png) |
    ```
 
-3. Use the mockups to inform the implementation plan — component hierarchy, layout structure, responsive breakpoints
+4. If theme.css exists, add a `## Theme` subsection:
+
+   ```markdown
+   ### Theme
+
+   - **Source:** [from theme.md]
+   - **Install:** `bunx shadcn@latest add <url>` *(if available)*
+   - **CSS:** [theme.css](../../design/theme.css)
+
+   All UI implementation steps must use CSS variables from `theme.css` (e.g., `var(--primary)`, `var(--background)`). Do not hardcode colors or spacing when a matching theme token exists.
+   ```
+
+5. Use the mockups to inform the implementation plan — component hierarchy, layout structure, responsive breakpoints
 
 If no `## Screens` section exists → skip this step.
 
@@ -248,6 +261,24 @@ Before generating the testing strategy, resolve the project's test infrastructur
 | Full suite | `[resolved]` | `[resolved]` | Verified / Not verified |
 
 5. If a tool is missing → mark `[TOOL NEEDED: install command]` in the plan
+
+### Step 7.6 — Theme Installation Step (UI features with theme)
+
+If `.specs/design/theme.css` exists and the feature has UI components:
+
+1. Check `.specs/design/theme.md` for an install command
+2. If an install command exists (Mode A/C themes), add a **Step 0** to the implementation plan before any UI work:
+
+   ```markdown
+   **Step 0 — Install Theme** (if not already installed)
+   - Check if `theme.css` is already imported in the project's global CSS
+   - If not: run `[install command from theme.md]` (e.g., `bunx shadcn@latest add <url>`)
+   - If install command is unavailable (Mode B): copy `.specs/design/theme.css` to the project's CSS directory and import it in the global stylesheet
+   - Verify: theme CSS variables are accessible in the browser dev tools
+   ```
+
+3. If no install command (Mode B — generated theme), the step instructs to copy the CSS file manually
+4. This step runs only once per project — subsequent features skip it if theme is already installed. Add a guard: "Skip if theme variables are already present in the project's CSS output"
 
 ### Step 8 — Generate Testing Strategy
 

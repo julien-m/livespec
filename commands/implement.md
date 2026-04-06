@@ -85,6 +85,8 @@ flowchart TD
 4. `.specs/stacks/_default.md` — stack and patterns to follow
 5. `.specs/testing/strategy.md` — testing requirements
 6. `.specs/design/screens/*.png` — if feature has a `## Screens` section in spec.md, read the referenced mockup PNGs as visual targets for UI implementation
+7. `.specs/design/theme.css` — if exists, read as the authoritative theme for CSS variables (colors, spacing, typography)
+8. `.specs/design/theme.md` — if exists, read for install command and color palette reference
 
 **Explore the codebase:**
 - Find existing patterns matching what needs to be built
@@ -97,6 +99,8 @@ flowchart TD
 - Are there any `[DECISION NEEDED]` markers in the plan? Surface them before starting
 
 **Design fidelity:** When implementing UI components, reference the corresponding mockup PNG from `.specs/design/screens/`. Match the layout, colors, and spacing from the mockup. When creating `implementation.md`, add a "Visual Ref" column linking each UI-related FR to its mockup.
+
+**Theme enforcement:** If `.specs/design/theme.css` exists, all UI implementation must use its CSS variables (`var(--primary)`, `var(--background)`, etc.) instead of hardcoded color/spacing values. If `theme.md` contains an install command, execute it as Step 0 before any UI code (skip if theme is already installed in the project).
 
 ## Preflight Safety Contract
 
@@ -212,6 +216,7 @@ For each step, assemble the following payload:
 - Relevant rules from `.specs/constitution.md` that apply to the files being touched.
 - Stack and patterns from `.specs/stacks/_default.md`.
 - **Full content of `.conventions/conventions.md`** — include the entire file in the payload so the subagent has all code conventions (general, architecture, logging, testing, language delta, framework deltas) without needing to read them itself. This is critical: subagents have fresh context and no access to prior convention reads.
+- **Full content of `.specs/design/theme.css`** (if exists and step involves UI) — include so the subagent uses theme CSS variables for all color/spacing values. Add instruction: "Use CSS variables from theme.css (e.g., `var(--primary)`, `var(--secondary)`) for all colors and design tokens. Never hardcode colors when a matching CSS variable exists."
 
 **3. LiveSpec Mandatory Rules**
 - Every source file that implements a FR **must** contain an inline `@spec` anchor comment with a deep-link to the spec:

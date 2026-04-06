@@ -310,6 +310,30 @@ If the feature's `spec.md` contains a `## Screens` section:
 - Visual regression (code vs previous code): 2% — catches unintended changes
 - Design fidelity (code vs mockup): 5% — allows minor implementation differences while catching major layout drift
 
+#### Theme Token Compliance (UI features with theme)
+
+If `.specs/design/theme.css` exists:
+
+1. Read `theme.css` to extract all defined CSS custom properties (e.g., `--primary`, `--background`, `--secondary`)
+2. For each source file mapped in `implementation.md` that contains CSS/styling:
+   a. Scan for hardcoded color values (hex `#xxx`, `rgb()`, `hsl()`, `oklch()`) that match or approximate a theme token
+   b. Scan for hardcoded spacing values that could use theme tokens (if theme defines spacing variables)
+3. Report compliance:
+
+```markdown
+### Theme Token Compliance
+
+| File | Hardcoded Value | Expected Token | Status |
+|------|----------------|----------------|--------|
+| src/components/Badge.tsx | `#EF4444` | `var(--destructive)` | 🎨 Hardcoded |
+| src/components/Panel.tsx | — | — | ✅ Compliant |
+```
+
+- ✅ Compliant — all color/spacing values use theme CSS variables
+- 🎨 Hardcoded — found hardcoded values that should use theme tokens
+
+If `.specs/design/theme.css` does not exist → skip this check silently.
+
 ### Step 9 — Produce Gap Report
 
 Output a structured gap report. When spec quality was validated (Step 4), include a **Spec Quality** section before the FR/AC/Visual tables.
@@ -358,6 +382,15 @@ Output a structured gap report. When spec quality was validated (Step 4), includ
 | `panel-unread.png` | 🖼️ Drift | 4.2% | Badge color changed from #EF4444 to #DC2626 |
 | `bell-badge.png` | ✅ Match | 0.8% | |
 | `bell-no-badge.png` | ❌ Missing | — | Baseline not captured |
+
+### Theme Token Compliance
+
+| File | Hardcoded Value | Expected Token | Status |
+|------|----------------|----------------|--------|
+| `src/components/NotificationBell.tsx` | — | — | ✅ Compliant |
+| `src/components/NotificationPanel.tsx` | `#DC2626` | `var(--destructive)` | 🎨 Hardcoded |
+
+> *Only shown when `.specs/design/theme.css` exists. Omit section otherwise.*
 
 ### Summary
 
