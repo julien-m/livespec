@@ -267,6 +267,18 @@ After generating spec.md, determine if the feature involves UI:
    - If `tool: none` → skip silently
    - If tool configured → proceed
 
+2.5. **Brainstorm fallback check:**
+   - If `.specs/design/screens/` exists but contains no PNG files AND brainstorm design artifacts exist (`.brainstorm/mockups/*.png` or `.brainstorm/*.png`):
+     - Display: "Design screens directory is empty but brainstorm mockups were found. Import into `.specs/design/`? [yes/no]"
+     - On **yes** → run the brainstorm import procedure:
+       1. Copy source file (`.brainstorm/.../ui.<ext>` → `.specs/design/ui.<ext>`)
+       2. Export via MCP or copy PNGs to `.specs/design/screens/` (strip numeric prefix: `01-dashboard.png` → `dashboard.png`)
+       3. Generate `screens/index.md` from template with Source = `Brainstorm import`
+       4. Initialize `changelog.md` sections for imported screens
+     - On **no** → proceed with new mockup generation
+     - With `--auto` → auto-import if brainstorm exists and screens/ is empty
+   - If screens/ already has PNGs → skip this check
+
 3. **Identify screens:** From user stories and flowcharts, list all unique screens/views the feature requires (new screens) and modifies (existing screens).
 
 4. **Generate mockups:**
@@ -279,6 +291,11 @@ After generating spec.md, determine if the feature involves UI:
    - Copy each PNG to `.specs/design/screens/<screen-name>.png` (latest copy — used by plan/implement/check)
    - Via MCP: export PDF to `.specs/design/ui.pdf`
    - The source file (`ui.pen`, etc.) must be saved manually by the user
+
+5.5. **Update screen index:** After exporting PNGs, update `.specs/design/screens/index.md`:
+   - For each **new** screen: add a row with Source = `spec.specify (NNN-feature-name)`, First Added = today, Last Modified = today
+   - For each **modified** screen: update Last Modified = today
+   - If `index.md` does not exist: create from `system/templates/screen-index-template.md` first
 
 6. **User validation gate:**
    For each screen, check `.specs/design/changelog.md` for previous entries. If a screen was modified by a previous feature, show the link to the last version:

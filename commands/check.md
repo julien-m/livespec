@@ -426,6 +426,12 @@ To implement: `/spec.implement notifications --step 6`
 
 **If intentional:** Run the baseline update command from Resolved Test Commands to update the baseline, then commit.
 **If unintentional:** Revert the CSS change in `NotificationBell.tsx`.
+
+---
+
+→ To auto-fix these gaps: `/spec.fix [feature-name]`
+→ To fix visual only: `/spec.fix [feature-name] --visual`
+→ To fix a specific FR: `/spec.fix [feature-name] --fr FR-NNN`
 ```
 
 #### Update implementation.md (optional)

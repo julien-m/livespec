@@ -370,6 +370,88 @@ These rows are optional — they appear in `_default.md` only if the user provid
    - If "continue without": write `design.md` with `tool: none` and `confirmed: YYYY-MM-DD`
 4. If config exists and `tool == none` → skip silently
 
+### Step 3.6 — Brainstorm Design Import
+
+Detection and confirmation happen here (Phase B context — decisions). File copy happens during Phase C (automatic).
+
+**Detection logic:**
+
+1. Check if `.brainstorm/mockups/` directory exists
+2. If not, check if `.brainstorm/ui.pen` (or `ui.fig`, `ui.excalidraw`, `ui.html`) exists at root level
+3. If neither → skip silently
+4. If found:
+   a. Glob `.brainstorm/mockups/*.png` (or `.brainstorm/*.png` if no `mockups/` dir)
+   b. Check for `.brainstorm/mockups/index.md` (or `.brainstorm/index.md`)
+   c. Check for source file: `.brainstorm/mockups/ui.<ext>` (or `.brainstorm/ui.<ext>`)
+   d. Display import summary
+
+**Design file detection order** (check each, take first match):
+
+```
+.brainstorm/mockups/ui.pen
+.brainstorm/mockups/ui.fig
+.brainstorm/mockups/ui.excalidraw
+.brainstorm/mockups/ui.html
+.brainstorm/ui.pen
+.brainstorm/ui.fig
+.brainstorm/ui.excalidraw
+.brainstorm/ui.html
+```
+
+**PNG detection order:**
+
+```
+.brainstorm/mockups/*.png    (preferred — dedicated mockups dir)
+.brainstorm/*.png            (fallback — PNGs at brainstorm root)
+```
+
+**Import summary format:**
+
+> 🎨 **Brainstorm design artifacts detected:**
+>
+>   📄 Source file: `.brainstorm/mockups/ui.pen`
+>   🖼️  Screens: [N] PNGs found
+>      • [list each PNG by name]
+>   📋 Index: `.brainstorm/mockups/index.md` _(if exists)_
+>
+>   → **Import** into `.specs/design/`? (recommended — design assets join the spec pipeline)
+>   → **Skip**? (import later via `/spec.specify`)
+
+**User response handling:**
+
+- **"import"** (or equivalent confirmation, or `--auto` flag):
+  1. **Copy design source file:** `.brainstorm/.../ui.<ext>` → `.specs/design/ui.<ext>`
+     - If `~/.claude/livespec/design.md` exists, verify extension matches configured tool
+     - If mismatch → warn but still copy
+  2. **Export screens via MCP** (preferred) **or copy PNGs** (fallback):
+     - If MCP available → open `.specs/design/ui.<ext>`, export each screen as PNG to `.specs/design/screens/<screen-name>.png`
+     - If MCP not available → copy PNGs directly to `.specs/design/screens/`, strip numeric prefix (`01-dashboard.png` → `dashboard.png`)
+  3. **Generate screen index:** Create `.specs/design/screens/index.md` from `system/templates/screen-index-template.md`, populate with imported screens (Source = `Brainstorm import`, dates = today)
+  4. **Initialize design changelog:** For each screen, add a section to `.specs/design/changelog.md`:
+     ```markdown
+     ## screen-name
+
+     | Spec | Date | Mockup | Notes |
+     |------|------|--------|-------|
+     | — | YYYY-MM-DD | [📸](screens/screen-name.png) | Imported from brainstorm |
+
+     **Latest:** [screen-name.png](screens/screen-name.png)
+     ```
+  5. **Export PDF** (if MCP available): export to `.specs/design/ui.pdf`
+
+- **"skip"** (or equivalent): skip silently, proceed to Step 4
+
+**Artifact hierarchy:** PNG exports are the canonical design artifacts (required, referenced by all downstream commands). The source file (`.pen`, `.fig`, etc.) is optional — stored for re-editing via design tools. `spec.fix`, `spec.check`, `spec.implement`, and `spec.plan` reference PNGs only, never source files directly.
+
+**Post-import rule:** After import, `.brainstorm/` is never referenced again by any LiveSpec command. All downstream commands read exclusively from `.specs/design/`.
+
+**Flag interaction:**
+
+| Flag | Behavior |
+|------|----------|
+| `--auto` | Auto-import without asking |
+| `--force` | Overwrite existing `.specs/design/ui.<ext>` if present |
+
 ### Step 4 — Architecture Decision Records (MANDATORY)
 
 > **At least 1 ADR is REQUIRED before proceeding to Phase C.**
@@ -411,7 +493,8 @@ After confirmation, the AI creates the `.specs/` directory structure:
 ├── hooks/                  ← Lifecycle hooks directory (empty — add hooks to customize commands)
 │
 ├── design/
-│   ├── screens/            ← empty, ready for mockups
+│   ├── screens/
+│   │   └── index.md        ← screen inventory (empty or from brainstorm import)
 │   └── changelog.md        ← initial entry
 │
 ├── stacks/
@@ -430,6 +513,8 @@ After confirmation, the AI creates the `.specs/` directory structure:
 │
 └── changelog.md            ← Global changelog (initial entry)
 ```
+
+**Screen index creation:** When creating the `.specs/design/screens/` directory, also create `screens/index.md` from `system/templates/screen-index-template.md`. If Step 3.6 (Brainstorm Design Import) imported screens, populate the index with imported screen entries. Otherwise, create an empty index (header only, no rows).
 
 ### Step 3.8 — Add Frontmatter to `_default.md`
 
@@ -593,7 +678,7 @@ The section content is minimal — a boot pointer to `spec-system.md` plus the c
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.check` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.refine` · `/spec.preflight` · `/spec.hooks` · `/spec.play-coverage` · `/spec.status` · `/spec.refresh-conventions`
+Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.test` · `/spec.check` · `/spec.fix` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.ship` · `/spec.refine` · `/spec.preflight` · `/spec.hooks` · `/spec.play-coverage` · `/spec.status` · `/spec.refresh-conventions`
 <!-- livespec:end -->
 ```
 

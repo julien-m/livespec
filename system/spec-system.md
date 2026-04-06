@@ -75,6 +75,7 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │   ├── ui.pdf              ← Full PDF export
 │   ├── screens/            ← Per-screen PNG exports
 │   │   ├── *.png           ← Latest version of each screen
+│   │   ├── index.md        ← Screen inventory (auto-maintained)
 │   │   └── NNN-feature-name/  ← Versioned PNGs per feature
 │   │       └── *.png
 │   └── changelog.md        ← Screen-centric visual history
@@ -287,6 +288,7 @@ For a given event (e.g., `before-plan`), Read files at 3 levels in order:
 | `feature` | `before-feature` (global, project, local) | `after-feature` (global, project, local) |
 | `refine` | `before-refine` (global, project, local) | `after-refine` (global, project, local) |
 | `preflight` | `before-preflight` (global, project, local) | `after-preflight` (global, project, local) |
+| `fix` | `before-fix` (global, project, local) | `after-fix` (global, project, local) |
 
 **No hooks:** `hooks`, `play-coverage`, `status`, `refresh-conventions` — these are diagnostic/utility commands.
 
@@ -296,7 +298,7 @@ For a given event (e.g., `before-plan`), Read files at 3 levels in order:
 
 ### Command discovery
 
-Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 16 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.test`, `/spec.check`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`, `/spec.refresh-conventions`.
+Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 18 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.test`, `/spec.check`, `/spec.fix`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.ship`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`, `/spec.refresh-conventions`.
 
 ### When CREATING a new feature
 

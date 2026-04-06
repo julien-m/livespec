@@ -42,7 +42,8 @@ flowchart LR
     PL --> I["/spec.implement\nCode, test,\nmap to spec"]
     I --> T["/spec.test\nAudit + generate\n+ run tests"]
     T --> C["/spec.check\nVerify spec\nvs code"]
-    C --> E["/spec.explain\nLiving\ndocumentation"]
+    C --> F["/spec.fix\nFix gaps\n(functional + visual)"]
+    F --> E["/spec.explain\nLiving\ndocumentation"]
 
     style P fill:#e8f4f8,stroke:#2196F3
     style S fill:#e8f4f8,stroke:#2196F3
@@ -50,6 +51,7 @@ flowchart LR
     style I fill:#e8f4f8,stroke:#2196F3
     style T fill:#e8f4f8,stroke:#2196F3
     style C fill:#e8f4f8,stroke:#2196F3
+    style F fill:#e8f4f8,stroke:#2196F3
     style E fill:#e8f4f8,stroke:#2196F3
 ```
 
@@ -57,7 +59,7 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 
 ---
 
-## The 16 Commands
+## The 18 Commands
 
 | Command | What it does |
 |---|---|
@@ -68,14 +70,17 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 | `/spec.implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
 | `/spec.test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, capture visual baselines, verify design fidelity |
 | `/spec.check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
+| `/spec.fix` | Fix implementation gaps from spec.check — functional and visual corrections with retry loop |
 | `/spec.explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec.stack` | Evolve your stack and analyze impact on existing features |
 | `/spec.feature` | Full pipeline: specify → plan → implement → test, with validation gates between phases |
 | `/spec.preflight` | Verify tooling, auth, and API tokens before starting implementation — runs auto-install, detects blockers, gates feature work |
 | `/spec.hooks` | Show, create, or edit lifecycle hooks for a command |
 | `/spec.play-coverage` | Open spec coverage playground with live grep data |
+| `/spec.ship` | Batch autopilot: ship multiple features from roadmap end-to-end |
 | `/spec.refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
 | `/spec.status` | Display factual status overview of roadmap and features |
+| `/spec.refresh-conventions` | Manually initialize or refresh project conventions from the LiveSpec stack |
 
 ---
 
