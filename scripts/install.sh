@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ⚠️ DEPRECATED — Replaced by scripts/link-local.sh for local installs.
+# This script installed commands globally to ~/.claude/. LiveSpec v2+ uses
+# project-local symlinks in .claude/ instead. Use /spec.init (new projects)
+# or /spec.migrate (existing projects).
+# Kept for reference only.
+
 # LiveSpec — Installer for Claude Code
 # Usage:
 #   bash scripts/install.sh              # Install commands
