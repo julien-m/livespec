@@ -59,11 +59,12 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 
 ---
 
-## The 18 Commands
+## The 19 Commands
 
 | Command | What it does |
 |---|---|
 | `/spec.init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md. `--from-code`: reverse-engineer existing codebase. |
+| `/spec.migrate` | Upgrade project to latest LiveSpec version — applies pending migrations, updates local symlinks |
 | `/spec.propose` | Analyze project context and intelligently propose the next feature(s) to build |
 | `/spec.specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
 | `/spec.plan` | Generate technical plan with sequence, state, and ER diagrams |
@@ -363,14 +364,19 @@ Key flags: `--roadmap`, `--features`, `--json`
 
 ## Installation
 
+### Global (required once)
+
 ```bash
-bash scripts/install.sh              # Install /spec.* commands
-bash scripts/install.sh --dry-run    # Preview without changes
-bash scripts/install.sh --force      # Overwrite existing symlinks
-bash scripts/install.sh --uninstall  # Remove all symlinks
+# Create global symlinks for spec.init and spec.migrate
+ln -sf ~/projects/livespec/commands/init.md ~/.claude/commands/spec.init.md
+ln -sf ~/projects/livespec/commands/migrate.md ~/.claude/commands/spec.migrate.md
 ```
 
-Installs 15 commands (`~/.claude/commands/spec.*.md`) and 4 agents (`~/.claude/agents/livespec-*.md`) as symlinks. Changes to the LiveSpec repo are immediately reflected — no re-install needed.
+### Per-project (automatic)
+
+When you run `/spec.init` in a project, LiveSpec automatically creates local symlinks in `.claude/commands/` and `.claude/agents/`. No manual installation needed.
+
+For existing projects initialized before v2, run `/spec.migrate` to add local symlinks.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -401,9 +407,9 @@ LiveSpec separates **format** from **automation**:
 | Layer | Portable? | Details |
 |---|---|---|
 | **Spec format** (`.specs/`, Markdown, Mermaid, Gherkin) | ✅ Universal | Any AI tool that reads Markdown can follow the rules in `spec-system.md` |
-| **Commands** (`/spec.*`) | ⚠️ Claude Code | Installed as `~/.claude/commands/` symlinks — Claude Code specific |
+| **Commands** (`/spec.*`) | ⚠️ Claude Code | Symlinked to `.claude/commands/` per project via `link-local.sh` — Claude Code specific |
 | **Agents** (multi-agent orchestration) | ⚠️ Claude Code | Requires Claude Code agent teams + Superpowers skills |
-| **Shell scripts** (`install.sh`, `init.sh`) | ⚠️ macOS | Uses `sed -i ''` (BSD), `open` (macOS), `mktemp` — not tested on Linux |
+| **Shell scripts** (`link-local.sh`, `migrate.sh`, `init.sh`) | ⚠️ macOS | Uses `sed -i ''` (BSD), `open` (macOS), `mktemp` — not tested on Linux |
 
 **For non-Claude AI tools:** paste the content of `system/spec-system.md` into your tool's context. The spec format and rules are tool-agnostic — the automation layer is Claude Code specific.
 
