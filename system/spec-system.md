@@ -296,9 +296,23 @@ For a given event (e.g., `before-plan`), Read files at 3 levels in order:
 
 **`implement` step hooks:** In addition to `before-implement`/`after-implement` (once), resolve `before-implement-step`/`after-implement-step` before and after EACH implementation step.
 
+### Version Check (ADVISORY)
+
+Before executing any `/spec.*` command (except `/spec.init` and `/spec.migrate`):
+
+1. Read `.specs/livespec-version` — if missing, assume v1
+2. Resolve the LiveSpec repo path from `.specs/.livespec-path` (if missing, resolve from command symlink chain)
+3. Read `VERSION` from the LiveSpec repo
+4. If project version < repo version, display:
+
+> ⚠️ This project uses LiveSpec v{project}. Current version is v{repo}.
+> Run `/spec.migrate` to update.
+
+This check is **non-blocking** — the command continues normally after the warning.
+
 ### Command discovery
 
-Detailed step-by-step instructions for each `/spec.*` command are installed globally via `bash scripts/install.sh` (symlinked to `~/.claude/commands/spec.*.md`). The 18 available commands are: `/spec.init`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.test`, `/spec.check`, `/spec.fix`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.ship`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`, `/spec.refresh-conventions`.
+Detailed step-by-step instructions for each `/spec.*` command are symlinked into `.claude/commands/` of each project via `scripts/link-local.sh`. Only `/spec.init` and `/spec.migrate` remain global (`~/.claude/commands/`). The 19 available commands are: `/spec.init`, `/spec.migrate`, `/spec.propose`, `/spec.specify`, `/spec.plan`, `/spec.implement`, `/spec.test`, `/spec.check`, `/spec.fix`, `/spec.explain`, `/spec.stack`, `/spec.feature`, `/spec.ship`, `/spec.preflight`, `/spec.hooks`, `/spec.play-coverage`, `/spec.refine`, `/spec.status`, `/spec.refresh-conventions`.
 
 ### When CREATING a new feature
 
