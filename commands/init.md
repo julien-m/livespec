@@ -748,11 +748,28 @@ The section content is minimal — a boot pointer to `spec-system.md` plus the c
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec.init` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.test` · `/spec.check` · `/spec.fix` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.ship` · `/spec.refine` · `/spec.preflight` · `/spec.hooks` · `/spec.play-coverage` · `/spec.status` · `/spec.refresh-conventions`
+Commands: `/spec.init` · `/spec.migrate` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.test` · `/spec.check` · `/spec.fix` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.ship` · `/spec.refine` · `/spec.preflight` · `/spec.hooks` · `/spec.play-coverage` · `/spec.status` · `/spec.refresh-conventions`
 <!-- livespec:end -->
 ```
 
 This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails are in `.specs/spec-system.md`.
+
+### Step 3.12 — Install Local Commands and Agents
+
+After installing the CLAUDE.md section, create local symlinks for all LiveSpec commands and agents in the project's `.claude/` directory:
+
+1. **Resolve LiveSpec repo path:** Follow the symlink chain of the currently executing `spec.init` command (`readlink` on `~/.claude/commands/spec.init.md`) → extract the repo root by stripping `commands/init.md`
+2. **Write path discovery file:** Write the resolved path to `.specs/.livespec-path`
+3. **Create directories:** `mkdir -p .claude/commands .claude/agents`
+4. **Run link script:** Execute `bash <livespec-dir>/scripts/link-local.sh <project-dir> <livespec-dir>`
+5. **Write version:** Read `VERSION` from the LiveSpec repo, write to `.specs/livespec-version`
+6. **Update .gitignore:** Add the following patterns (if not already present):
+   - `.claude/commands/spec.*.md`
+   - `.claude/agents/livespec-*.md`
+   - `.specs/.livespec-path`
+
+**Output:**
+> Installed 17 spec commands and 4 agents as local symlinks in `.claude/`
 
 ---
 
@@ -829,6 +846,9 @@ flowchart TD
 > - `.specs/preflight.md` — preflight manifest (tooling, auth, tokens)
 > - `.specs/preflight-report.md` — preflight execution report
 > - `.conventions/conventions.md` — coding conventions (generated from stack)
+> - `.claude/commands/` — 17 spec commands (local symlinks)
+> - `.claude/agents/` — 4 LiveSpec agents (local symlinks)
+> - `.specs/livespec-version` — version tracking (v2)
 >
 > **Next step:** Discover what to build first:
 > ```
@@ -940,6 +960,12 @@ Before declaring success, verify:
 - [ ] `.specs/preflight-report.md` exists with execution results
 - [ ] After-init hooks resolved and executed (Phase E)
 - [ ] `.conventions/conventions.md` exists (generated from stack by after-init hook, OR pre-existing in --from-code mode)
+- [ ] `.claude/commands/` exists with symlinks for all spec.* commands (except init/migrate)
+- [ ] `.claude/agents/` exists with symlinks for all livespec-* agents
+- [ ] All symlinks resolve to existing files (no broken links)
+- [ ] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo
+- [ ] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory
+- [ ] `.gitignore` contains `.claude/commands/spec.*.md`, `.claude/agents/livespec-*.md`, `.specs/.livespec-path`
 - [ ] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`
 - [ ] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)
 
