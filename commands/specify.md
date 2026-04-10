@@ -204,6 +204,32 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
   - List each resource with type, provider, environment, and when it's needed
   - If unsure whether a resource is needed, mark it `[ASSUMED]` in the table
 
+### Step 5.1 — Structural Validation
+
+After generating `spec.md`, validate its structure before presenting to the user:
+
+```bash
+livespec validate .specs/features/NNN-feature-name/spec.md --format compact
+```
+
+**Exit 0 — validation passed:** proceed to the next step.
+
+**Exit non-zero — validation failed:**
+
+Inject the verbatim `livespec validate` output as a hard constraint for regeneration:
+
+> "The spec.md you just generated failed structural validation. Regenerate spec.md fixing these issues exactly as listed:
+> `<livespec validate --format compact output verbatim>`"
+
+Regenerate `spec.md` from scratch (original feature description + constitution + stack + error constraints). Increment retry counter.
+
+**Maximum 2 retries.** On 3rd failure:
+```
+ABORT: "spec.md failed structural validation after 2 retries.
+        Last errors: <livespec validate output>
+        Fix manually then re-run /spec.specify."
+```
+
 ### Step 5.5 — Emerging Dependencies & Absorption Detection
 
 After generating spec.md, analyze it for roadmap interactions. Skip silently if `.specs/roadmap.md` does not exist.
