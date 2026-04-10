@@ -76,7 +76,11 @@ flowchart TD
 
 ## State Tracking
 
-Create `.specs/features/NNN-feature-name/pipeline.md` to track pipeline state.
+Create `.specs/features/NNN-feature-name/pipeline.md` to track pipeline state using the CLI:
+
+```
+Run: livespec pipeline init --feature NNN-feature-name
+```
 
 This file is **distinct from `progress.md`** (which tracks individual implementation steps).
 
@@ -128,11 +132,11 @@ When a feature description is provided → skip this phase entirely, proceed to 
 
 ## Phase 1 — Specify
 
-1. Update `pipeline.md`: Specify → `In Progress`
+1. Run: `livespec pipeline update --feature NNN-feature-name --phase specify --status in_progress`
 2. Execute the steps described in `commands/specify.md`, passing:
    - The feature description (from user argument or resolved from roadmap)
    - `--priority` if provided
-3. Update `pipeline.md`: Specify → `Done` with timestamp
+3. Run: `livespec pipeline update --feature NNN-feature-name --phase specify --status done --timestamp`
 
 ### Branch proposal
 
@@ -150,7 +154,7 @@ After the spec is created, determine whether a git branch is needed:
 
 ## Phase 1.5 — Spec Review
 
-1. Update `pipeline.md`: Spec Review → `In Progress`
+1. Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --status in_progress`
 2. Dispatch the **livespec-verifier** agent in `spec-review` mode with:
    - Path to `spec.md`
    - Path to `.specs/constitution.md`
@@ -182,22 +186,22 @@ The review findings are **embedded in the specify gate prompt** — the user see
 
 **If verdict is PASS (no findings):** proceed to Phase 2 immediately (both modes).
 
-4. Update `pipeline.md`: Spec Review → `Done` with timestamp
+4. Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --status done --timestamp`
 
 ---
 
 ## Phase 2 — Plan
 
-1. Update `pipeline.md`: Plan → `In Progress`
+1. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status in_progress`
 2. Execute the steps described in `commands/plan.md`, passing:
    - The resolved feature name
-3. Update `pipeline.md`: Plan → `Done` with timestamp
+3. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status done --timestamp`
 
 ---
 
 ## Phase 2.5 — Plan Review
 
-1. Update `pipeline.md`: Plan Review → `In Progress`
+1. Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status in_progress`
 2. Dispatch the **livespec-verifier** agent in `plan-review` mode with:
    - Path to `spec.md`
    - Path to `plan.md`
@@ -205,7 +209,7 @@ The review findings are **embedded in the specify gate prompt** — the user see
 3. Present the Plan Review Report to the user
 4. If verdict is PASS (or user overrides BLOCKING):
    - Update `plan.md` header: `Status: Draft` → `Status: Approved`
-5. Update `pipeline.md`: Plan Review → `Done` with timestamp
+5. Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status done --timestamp`
 
 **If verdict has findings (BLOCKING, WARNING, or INFO):**
 
@@ -237,7 +241,7 @@ Before starting implementation, run a light preflight check:
 1. If `.specs/preflight.md` does not exist → log warning and continue
 2. Run `/spec.preflight --light` with the current feature name as context
 3. Gate behavior:
-   - Any `critical` check failed → **STOP**. Write `preflight-report.md` with BLOCKED verdict. Report blocker + recovery command. Update `pipeline.md`: Preflight → `Blocked`
+   - Any `critical` check failed → **STOP**. Write `preflight-report.md` with BLOCKED verdict. Report blocker + recovery command. Run: `livespec pipeline update --feature NNN-feature-name --phase preflight --status blocked`
    - Only `warning` checks failed → write `preflight-report.md` with WARNINGS verdict, display warning, continue
    - All pass → write `preflight-report.md` with READY verdict, continue to Phase 3
 
@@ -247,14 +251,14 @@ This ensures all tools and credentials are available before the autonomous imple
 
 ## Phase 3 — Implement
 
-1. Update `pipeline.md`: Implement → `In Progress`
+1. Run: `livespec pipeline update --feature NNN-feature-name --phase implement --status in_progress`
 2. Execute the steps described in `commands/implement.md`, passing:
    - The resolved feature name
    - `--mono` if provided
    - `--economy` if provided
    - `--step` if provided
    - `--resume` if provided (implement uses `progress.md` for its own resume)
-3. Update `pipeline.md`: Implement → `Done` with timestamp
+3. Run: `livespec pipeline update --feature NNN-feature-name --phase implement --status done --timestamp`
 
 ---
 
@@ -262,11 +266,11 @@ This ensures all tools and credentials are available before the autonomous imple
 
 After implementation completes, run `/spec.test` to validate test completeness:
 
-1. Update `pipeline.md`: Test → `In Progress`
+1. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status in_progress`
 2. Execute `/spec.test <feature-name> --auto --update`
 3. `/spec.test` generates missing tests that `/spec.implement`'s Phase 6 could not run because they didn't exist yet. It also captures visual baselines that may have been skipped during implement (`--no-visual` or tool unavailable).
 4. If test report shows ❌ failures in AC coverage → these reveal implementation gaps. Output `SHIP_RESULT: BLOCKED` with test failure details if called from `/spec.ship`, or report findings in interactive mode. If only ⚠️ partial AC coverage or ✅ passed → proceed.
-5. Update `pipeline.md`: Test → `Done` with timestamp
+5. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status done --timestamp`
 
 In `--auto` mode: no confirmation prompts, proceeds automatically.
 
@@ -276,10 +280,10 @@ In `--auto` mode: no confirmation prompts, proceeds automatically.
 
 When `--resume` is provided:
 
-1. Read `.specs/features/NNN-feature-name/pipeline.md`
-2. Find the first phase with status != `Done` and != `Skipped`
+1. Run: `livespec pipeline read --feature NNN-feature-name`
+2. Run: `livespec pipeline next --feature NNN-feature-name` to find the first phase with status != `Done` and != `Skipped`
 3. Resume execution from that phase
-4. If pipeline.md doesn't exist, start from Phase 1
+4. If pipeline.md doesn't exist (exit 1), start from Phase 1
 
 **Feature resolution for resume:** If no feature description is provided with `--resume`, look for the most recently modified `pipeline.md` across all feature directories.
 
@@ -291,27 +295,29 @@ When `--auto` is active and Phase 3.5 (Test) completes successfully:
 
 1. Run `/audit` — if fail, attempt fix (max 3 retries). If still failing → abort (no commit)
 2. Verify all tests pass
-3. Stage all changes: spec, plan, implementation, progress, changelogs, roadmap updates
+3. Run: `livespec git stage --feature NNN-feature-name`
+   (Stages all feature files + modified roadmap.md and changelog.md)
 
 4. **Resolve commit hook** from 3 levels (global → project → local), applying inheritance rules from `system/hooks.md`:
    - `~/.claude/livespec/hooks/commit.md`
    - `.specs/hooks/commit.md`
    - `.specs/hooks/commit.local.md`
 
-5. **Resolve template variables** before injecting hook content:
-   - `{{spec_path}}` → absolute path to `.specs/features/NNN-feature-name/spec.md`
-   - `{{plan_path}}` → absolute path to `.specs/features/NNN-feature-name/plan.md`
-   - `{{adr_paths}}` → comma-separated results of glob `.specs/stacks/decisions/ADR-*.md` from project root (empty string if no files match)
-   - `{{feature_name}}` → full feature directory name (e.g., `003-notifications`)
-   - `{{feature_number}}` → numeric prefix only (e.g., `003`)
+5. Run: `livespec commit-context write --feature NNN-feature-name`
+   (Writes `.specs/hooks/.commit-context.json` with resolved spec/plan/ADR paths)
+
+   Run: `livespec commit-context read`
+   (Read JSON output — use `spec_path`, `plan_path`, `adr_paths` in hook invocation step 6)
 
 6. **If commit hook found:** inject resolved hook content into context, follow its instructions (e.g., invoke `/git.commit "feat({{feature_name}}): <message>" --intent "implements {{feature_name}} — spec: {{spec_path}}, plan: {{plan_path}}, ADRs: {{adr_paths}}"`)
 
 7. **If no commit hook at any level:** invoke `/git.commit` without `--intent` (standard commit with Codex audit, no implementation intent)
 
-8. Update `pipeline.md`: all phases → `Done`
+8. After `/git.commit` succeeds, run: `livespec commit-context clear`
+   (Removes `.specs/hooks/.commit-context.json`)
 
-> **Note (Branch 2):** When the Python pipeline orchestrator is active, step 8 is replaced by `livespec pipeline update` calls and staging is handled by `livespec git stage`. The hook resolution in steps 4–7 remains identical.
+9. Run the following for each phase to mark all complete:
+   `livespec pipeline update --feature NNN-feature-name --phase <phase> --status done --timestamp`
 
 **Without `--auto`:** no commit is made. The user commits manually.
 
@@ -368,7 +374,7 @@ When all phases are done, display:
 
 If any phase fails:
 
-1. Update `pipeline.md` with current status (the failed phase stays `In Progress`)
+1. The failed phase status remains `In Progress` — do not update it further
 2. Display error with recovery instructions:
    > Phase N failed: [reason]
    >

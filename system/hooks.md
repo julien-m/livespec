@@ -187,7 +187,11 @@ If {{adr_paths}} is empty, use: `/git.commit "feat({{feature_name}}): <message>"
 
 `.specs/hooks/commit.local.md` is already covered by the existing `.specs/hooks/*.local.md` pattern.
 
-`.specs/hooks/.commit-context.json` (used in Branch 2) must be added separately — see Branch 2 notes.
+`.specs/hooks/.commit-context.json` is auto-generated at commit time by `livespec commit-context write` and must be gitignored. Add to `.gitignore`:
+
+```
+.specs/hooks/.commit-context.json
+```
 
 ---
 
