@@ -29,3 +29,82 @@ if ! timeout 10 livespec validate --staged --format compact; then
     echo "   Pour détail: livespec validate [fichier]"
     exit 1
 fi
+
+# Visual Test Enforcement (if code files staged and Playwright installed)
+if [ "${LIVESPEC_SKIP_VISUAL:-0}" = "1" ]; then
+    exit 0
+fi
+
+# Check if Playwright is installed
+if ! command -v npx &>/dev/null || ! npm ls @playwright/test &>/dev/null 2>&1; then
+    exit 0
+fi
+
+# Check if any code files are staged
+STAGED_CODE=$(git diff --cached --name-only --diff-filter=ACM | grep -E "^(src|app|styles|components|tests/e2e|public)/" || true)
+
+if [ -z "$STAGED_CODE" ]; then
+    exit 0
+fi
+
+echo ""
+echo "LiveSpec: running visual tests on staged code changes..."
+
+# Resolve visual test command from .specs/testing/strategy.md or package.json
+VISUAL_TIMEOUT=${LIVESPEC_VISUAL_TIMEOUT:-60}
+VISUAL_THRESHOLD=${LIVESPEC_VISUAL_THRESHOLD:-2}
+
+# Detect visual test command
+VISUAL_CMD=""
+if [ -f ".specs/testing/strategy.md" ]; then
+    VISUAL_CMD=$(grep -E "^.*Visual.*:.*npx playwright" ".specs/testing/strategy.md" | head -1 | sed 's/.*\(npx playwright[^|]*\).*/\1/' || true)
+fi
+
+if [ -z "$VISUAL_CMD" ]; then
+    VISUAL_CMD="npx playwright test --reporter=list"
+fi
+
+# Extract visual tests for staged files
+declare -A visual_tests_map=(
+    ["src/components"]="tests/e2e/components/"
+    ["app/"]="tests/e2e/"
+    ["styles/"]="tests/e2e/"
+)
+
+# Build filtered test pattern
+MATCHED_TESTS=""
+for src_dir in "${!visual_tests_map[@]}"; do
+    if echo "$STAGED_CODE" | grep -q "^$src_dir"; then
+        test_dir="${visual_tests_map[$src_dir]}"
+        MATCHED_TESTS="${MATCHED_TESTS} ${test_dir}*"
+    fi
+done
+
+if [ -z "$MATCHED_TESTS" ]; then
+    exit 0
+fi
+
+# Run visual tests with timeout
+echo "   Testing: $VISUAL_CMD $MATCHED_TESTS (timeout: ${VISUAL_TIMEOUT}s, threshold: ${VISUAL_THRESHOLD}%)"
+
+if timeout "$VISUAL_TIMEOUT" $VISUAL_CMD $MATCHED_TESTS 2>/dev/null; then
+    exit 0
+fi
+
+# Visual test failure handling
+echo ""
+echo "Visual test failure detected."
+echo ""
+echo "Options:"
+echo "   1. Fix the visual issue and re-stage:"
+echo "      git add [files]"
+echo "      git commit"
+echo ""
+echo "   2. Skip visual tests for this commit (not recommended):"
+echo "      LIVESPEC_SKIP_VISUAL=1 git commit"
+echo ""
+echo "   3. Run full report:"
+echo "      npx playwright test --reporter=html"
+echo ""
+
+exit 1
