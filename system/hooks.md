@@ -130,6 +130,67 @@ If no hooks exist for an event, nothing is injected — the command runs as norm
 
 ---
 
+## Commit Hook
+
+The `commit` hook is a special hook type that controls how LiveSpec performs git commits during auto-commit pipelines. Unlike lifecycle hooks (before/after), it defines the commit action itself.
+
+### Naming
+
+```
+commit.md           # team-shared (committed)
+commit.local.md     # personal (gitignored)
+```
+
+No `before-`/`after-` prefix — this hook IS the action.
+
+### Resolution (3 levels)
+
+```
+Level 1: ~/.claude/livespec/hooks/commit.md     (global — all projects)
+Level 2: .specs/hooks/commit.md                 (project — committed)
+Level 3: .specs/hooks/commit.local.md           (personal — gitignored)
+```
+
+Same inheritance model as all other hooks (`mode: extend` or `mode: override` in frontmatter).
+
+### Template Variables
+
+| Variable | Resolved value |
+|---|---|
+| `{{spec_path}}` | Absolute path to `spec.md` for the current feature |
+| `{{plan_path}}` | Absolute path to `plan.md` for the current feature |
+| `{{adr_paths}}` | Comma-separated absolute paths matching `.specs/stacks/decisions/ADR-*.md` (empty string if none) |
+| `{{feature_name}}` | Full kebab directory name (e.g., `003-notifications`) |
+| `{{feature_number}}` | Numeric prefix only (e.g., `003`) |
+
+`{{adr_paths}}` glob root: `{project_root}/.specs/stacks/decisions/`
+
+### Fallback
+
+If no `commit.md` exists at any level → invoke `/git.commit` without `--intent`.
+
+**Never use bare `git commit`** — blocked by `commit-via-skill.md`.
+
+### Example Global Hook (`~/.claude/livespec/hooks/commit.md`)
+
+```markdown
+---
+mode: override
+---
+
+Use `/git.commit "feat({{feature_name}}): <message>" --intent "implements {{feature_name}} — spec: {{spec_path}}, plan: {{plan_path}}, ADRs: {{adr_paths}}"` to commit.
+
+If {{adr_paths}} is empty, use: `/git.commit "feat({{feature_name}}): <message>" --intent "implements {{feature_name}} — spec: {{spec_path}}, plan: {{plan_path}}"`
+```
+
+### Gitignore
+
+`.specs/hooks/commit.local.md` is already covered by the existing `.specs/hooks/*.local.md` pattern.
+
+`.specs/hooks/.commit-context.json` (used in Branch 2) must be added separately — see Branch 2 notes.
+
+---
+
 ## Template Variables
 
 Hooks can use template variables that are resolved at execution time:

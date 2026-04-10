@@ -292,8 +292,26 @@ When `--auto` is active and Phase 3.5 (Test) completes successfully:
 1. Run `/audit` — if fail, attempt fix (max 3 retries). If still failing → abort (no commit)
 2. Verify all tests pass
 3. Stage all changes: spec, plan, implementation, progress, changelogs, roadmap updates
-4. Commit with message: `feat(NNN-feature-name): <short description>`
-5. Update `pipeline.md`: all phases → `Done`
+
+4. **Resolve commit hook** from 3 levels (global → project → local), applying inheritance rules from `system/hooks.md`:
+   - `~/.claude/livespec/hooks/commit.md`
+   - `.specs/hooks/commit.md`
+   - `.specs/hooks/commit.local.md`
+
+5. **Resolve template variables** before injecting hook content:
+   - `{{spec_path}}` → absolute path to `.specs/features/NNN-feature-name/spec.md`
+   - `{{plan_path}}` → absolute path to `.specs/features/NNN-feature-name/plan.md`
+   - `{{adr_paths}}` → comma-separated results of glob `.specs/stacks/decisions/ADR-*.md` from project root (empty string if no files match)
+   - `{{feature_name}}` → full feature directory name (e.g., `003-notifications`)
+   - `{{feature_number}}` → numeric prefix only (e.g., `003`)
+
+6. **If commit hook found:** inject resolved hook content into context, follow its instructions (e.g., invoke `/git.commit "feat({{feature_name}}): <message>" --intent "implements {{feature_name}} — spec: {{spec_path}}, plan: {{plan_path}}, ADRs: {{adr_paths}}"`)
+
+7. **If no commit hook at any level:** invoke `/git.commit` without `--intent` (standard commit with Codex audit, no implementation intent)
+
+8. Update `pipeline.md`: all phases → `Done`
+
+> **Note (Branch 2):** When the Python pipeline orchestrator is active, step 8 is replaced by `livespec pipeline update` calls and staging is handled by `livespec git stage`. The hook resolution in steps 4–7 remains identical.
 
 **Without `--auto`:** no commit is made. The user commits manually.
 

@@ -357,6 +357,27 @@ If the `--review` flag is set:
 
 This step is **advisory only** — it never prevents plan.md from being written or blocks the workflow.
 
+### Step 9.8 — Structural Validation
+
+After generating `plan.md`, validate its structure:
+
+```bash
+livespec validate .specs/features/NNN-feature-name/plan.md --format compact
+```
+
+**Exit 0:** proceed to plan gate.
+
+**Exit non-zero:** inject verbatim errors:
+
+> "The plan.md you just generated failed structural validation. Regenerate plan.md fixing these issues:
+> `<livespec validate --format compact output verbatim>`"
+
+Regenerate `plan.md` (spec.md + constitution + stack + error constraints). **Maximum 2 retries.** On 3rd failure:
+```
+ABORT: "plan.md failed structural validation after 2 retries.
+        Last errors: <livespec validate output>"
+```
+
 ### Step 10 — Present for Approval
 
 > ✅ **Plan generated:** `.specs/features/004-notifications/plan.md`
