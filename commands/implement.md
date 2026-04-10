@@ -280,24 +280,41 @@ The subagent will auto-activate the `superpowers:subagent-driven-development` sk
 
 **Execution logs:** By default, a detailed execution log is saved to `.specs/features/NNN-feature-name/logs/YYYY-MM-DD.md` after completion. Use `--no-save` to disable.
 
-### Phase 5 — Visual Baselines (UI features only)
+### Phase 5 — Visual Baselines (TDD Phase 5: UI features only)
 
-For features with UI components specified in the spec:
+**Prerequisite:** Feature spec has a `## Screens` section with visual AC. If absent, skip this phase.
 
-- Follow the visual baselines protocol in `system/testing/visual-baselines.md`
-- Use the visual test command from `plan.md` **Resolved Test Commands**
-- If no visual testing tool is available → skip and log: "Visual baselines skipped — no visual testing tool resolved"
-- Baselines are saved to `.specs/features/NNN-feature-name/baselines/` and committed with the implementation
+During TDD implementation (inside Phase 3 dispatch loop), when a visual step completes:
+
+1. **Capture baselines** using the resolved visual test command from `plan.md`:
+   ```bash
+   Example: npx playwright test --update-snapshots tests/e2e/screens/
+   ```
+2. **Baseline storage:** New screenshots automatically saved to `.specs/features/NNN-feature-name/baselines/`
+3. **Commit strategy:** Only commit baseline PNG files **if Phase 4 non-visual tests pass**. If Phase 4 fails or doesn't exist yet, keep baselines uncommitted until the full test suite passes.
+4. **Reference:** Read [`visual-baselines.md`](../../system/testing/visual-baselines.md) for screenshot lifecycle rules and 3-image format (baseline, diff, previous).
+5. **If Playwright unavailable:** Log "Visual baselines skipped — Playwright not installed" and continue without blocking the phase.
 
 ### Phase 6 — Validate
 
 Before declaring implementation complete:
 
-- Execute the final validation sequence from `system/testing/execution-rules.md`
+**Step 1: Run full test suite** — Execute the final validation sequence from `system/testing/execution-rules.md`:
 - All commands come from `plan.md` **Resolved Test Commands** — no hardcoded commands
+- Order: Types → Linter → Unit → Integration → E2E → Visual (if applicable)
 - All checks must pass. Fix any issues found within iteration limits.
 
-> **Note:** Phase 6 runs EXISTING tests as a validation gate. For standalone test validation with AC coverage audit, generation of missing tests, and visual fidelity checks, use `/spec.test` after implementation is complete.
+**Step 2: Validate visual tests** (if Phase 5 captured baselines):
+- Confirm all baseline PNG files in `.specs/features/NNN-feature-name/baselines/` have corresponding test references in `implementation.md`
+- Confirm diff and previous PNG files exist alongside baselines (3-image format per visual-baselines.md)
+
+**Step 3: Check Phase 4 gate** — If any test suite fails (unit, integration, E2E):
+- DO NOT commit baseline PNG files yet
+- Fix the failing tests first
+- Re-run Phase 6 validation
+- Only commit baselines once Phase 4 fully passes
+
+> **Note:** Phase 6 runs EXISTING tests (created during Phase 3 TDD) as a validation gate. For post-implementation test coverage audit, generation of missing tests, design fidelity checks, and visual baseline review, use `/spec.test` after implementation is complete (see `/spec.feature` Phase 3.5).
 
 ### Phase 7 — Update implementation.md
 
