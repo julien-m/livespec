@@ -293,7 +293,7 @@ When `--resume` is provided:
 
 When `--auto` is active and Phase 3.5 (Test) completes successfully:
 
-1. Run `/audit` — if fail, attempt fix (max 3 retries). If still failing → abort (no commit)
+1. Run `/audit --fix` — Codex audits and fixes in a single pass. If violations remain → abort (no commit)
 2. Verify all tests pass
 3. Run: `livespec git stage --feature NNN-feature-name`
    (Stages all feature files + modified roadmap.md and changelog.md)
