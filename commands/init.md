@@ -771,6 +771,23 @@ After installing the CLAUDE.md section, create local symlinks for all LiveSpec c
 **Output:**
 > Installed 17 spec commands and 4 agents as local symlinks in `.claude/`
 
+### Step 3.13 — Scaffold Visual Testing Helper (Playwright projects)
+
+After `.specs/` is installed, check if Playwright is available and scaffold visual testing helpers.
+
+**Detection:**
+1. Check if `@playwright/test` is listed in `package.json` devDependencies
+2. If found:
+   - Check if `tests/e2e/helpers/visual.ts` already exists (skip if present)
+   - **Create directory** `tests/e2e/helpers/` if absent
+   - **Scaffold `tests/e2e/helpers/visual.ts`** using the template from `system/testing/visual-helper-scaffold.md`
+   - **Ensure dependencies** `pixelmatch` and `sharp` are installed:
+     - Check `package.json` for these packages
+     - If absent, output instruction: "Visual helpers scaffolded. Install missing dependencies: `bun add -d pixelmatch sharp` (or `npm install -D pixelmatch sharp`)"
+   - **Output:** "Visual testing helpers scaffolded at `tests/e2e/helpers/visual.ts`"
+
+3. If Playwright is NOT found → skip silently (visual helpers are optional, can be added later when Playwright is installed)
+
 ---
 
 ## Phase D — Preflight Setup
