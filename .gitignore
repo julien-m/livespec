@@ -149,3 +149,6 @@ __pycache__/
 
 # Materialized conventions
 .conventions/
+
+# LiveSpec commit context bridge (auto-generated at commit time)
+.specs/hooks/.commit-context.json

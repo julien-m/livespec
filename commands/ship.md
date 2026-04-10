@@ -195,7 +195,7 @@ For each feature in the batch (in roadmap order):
 
 1. Update `ship.md`: feature status → `In Progress`, record start time
 2. Ensure on target branch (selected in Phase 0.1): `git checkout <target>`
-3. Create feature branch: `git checkout -b feature/NNN-name`
+3. Create feature branch: `livespec git branch feature/NNN-name`
 4. Update `ship.md`: record branch name
 
 ### Step 2 — Spawn Agent
@@ -242,14 +242,18 @@ This gate catches AC that have no test at all — `/spec.implement`'s Phase 6 on
 The agent has already committed on the feature branch. Now merge:
 
 1. Switch to target branch: `git checkout <target>`
-2. Merge feature branch: `git merge feature/NNN-name --no-ff`
-3. Delete feature branch: `git branch -d feature/NNN-name`
+2. Merge feature branch: `livespec git merge feature/NNN-name --no-ff`
+3. Delete feature branch: `livespec git delete feature/NNN-name`
 
 **Merge conflict handling:**
-- If merge fails with conflicts → abort the merge (`git merge --abort`)
+
+On exit 2 (`livespec git merge` merge conflict):
 - Update `ship.md`: feature status → `Blocked (merge conflict)`
 - Stay on target branch, keep feature branch intact
 - STOP — display: "Merge conflict on **NNN-name**. Resolve manually on `feature/NNN-name`, then `/spec.ship --resume`"
+
+On `livespec git delete` exit 2 (branch not fully merged):
+- Display error and stop — use `livespec git delete --force` only after confirming the branch was actually merged
 
 ### Step 5 — Update Roadmap & Tracking
 

@@ -11,9 +11,16 @@ from .config import load_config
 from .engine import validate_all
 from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
+from .commit_context import commit_context_app
+from .git_ops import git_app
+from .pipeline import pipeline_app
 from .reporter import report, report_excluded, report_score_only
+from .specs_utils import find_specs_root
 
 app = typer.Typer(name="livespec", help="LiveSpec structural validator")
+app.add_typer(pipeline_app, name="pipeline")
+app.add_typer(git_app, name="git")
+app.add_typer(commit_context_app, name="commit-context")
 
 
 def _find_specs_root(start: Path | None = None) -> Path:
@@ -28,18 +35,7 @@ def _find_specs_root(start: Path | None = None) -> Path:
     Raises:
         SpecsRootNotFoundError: If .specs/ cannot be found.
     """
-    search = start or Path.cwd()
-    if search.is_file():
-        search = search.parent
-
-    for parent in [search, *search.parents]:
-        if parent.name == ".specs":
-            return parent
-        specs_dir = parent / ".specs"
-        if specs_dir.is_dir():
-            return specs_dir
-
-    raise SpecsRootNotFoundError(str(search))
+    return find_specs_root(start)
 
 
 def _require_specs_root(start: Path | None = None) -> Path:
