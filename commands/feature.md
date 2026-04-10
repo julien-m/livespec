@@ -19,32 +19,183 @@ Runs the full LiveSpec pipeline in a single command:
 flowchart TD
     START(["/spec.feature"]) --> ARG{"Argument\nprovided?"}
     ARG -->|"yes"| P1
-    ARG -->|"no"| RESOLVE["Phase 0\nRead roadmap\nFirst [ ] item"]
+    ARG -->|"no"| RESOLVE["Phase 0\nRoadmap resolution\n(main context, inline)"]
     RESOLVE --> CONFIRM{"User\nconfirms?"}
     CONFIRM -->|"yes"| P1
     CONFIRM -->|"no / empty"| ABORT
-    P1["Phase 1\nSpecify"]
-    P1 --> P15["Phase 1.5\nSpec Review\n(verifier agent)"]
-    P15 --> G1{"Gate\nSpec OK?"}
-    G1 -->|"fix / --auto retry"| P1
+    P1["Spawn: Specify Agent\n(Phase 1 + 1.5)\nFresh context"]
+    P1 --> PR1{"PHASE_RESULT\nspecify?"}
+    PR1 -->|"BLOCKED"| ABORT
+    PR1 -->|"OK"| G1["Gate 1 + Branch proposal\n(main context)"]
+    G1 -->|"fix → re-spawn"| P1
     G1 -->|"abort"| ABORT(["Aborted"])
-    G1 -->|"continue"| P2["Phase 2\nPlan"]
-    P2 --> P25["Phase 2.5\nPlan Review\n(verifier agent)"]
-    P25 --> G2{"Gate\nPlan OK?"}
-    G2 -->|"fix / --auto retry"| P2
+    G1 -->|"continue"| P2["Spawn: Plan Agent\n(Phase 2 + 2.5)\nFresh context"]
+    P2 --> PR2{"PHASE_RESULT\nplan?"}
+    PR2 -->|"BLOCKED"| ABORT
+    PR2 -->|"OK"| G2["Gate 2\n(main context)"]
+    G2 -->|"fix → re-spawn"| P2
     G2 -->|"abort"| ABORT
-    G2 -->|"continue"| P27["Phase 2.7\nPreflight\n(light)"]
+    G2 -->|"continue"| P27["Phase 2.7\nPreflight\n(main context, inline)"]
     P27 -->|"critical fail"| ABORT
-    P27 -->|"pass"| P3["Phase 3\nImplement"]
-    P3 --> P35["Phase 3.5\nTest\n(/spec.test --auto)"]
+    P27 -->|"pass"| P3["Spawn: Implement Agent\n(Phase 3)\nFresh context"]
+    P3 --> P35["Spawn: Test Agent\n(Phase 3.5)\nFresh context"]
     P35 --> DONE(["Pipeline\ncomplete"])
 
     style START fill:#e8f4f8,stroke:#2196F3
+    style P1 fill:#e3f2fd,stroke:#1565C0
+    style P2 fill:#e3f2fd,stroke:#1565C0
+    style P3 fill:#e3f2fd,stroke:#1565C0
+    style P35 fill:#e3f2fd,stroke:#1565C0
     style G1 fill:#fff9c4,stroke:#FFC107
     style G2 fill:#fff9c4,stroke:#FFC107
     style ABORT fill:#ffebee,stroke:#F44336
     style DONE fill:#e8f5e9,stroke:#4CAF50
 ```
+
+---
+
+## PHASE_RESULT Schemas
+
+Each phase agent **must** output a PHASE_RESULT block as its **last output**. The main context parses these fields to drive gates, branch proposals, and pipeline state updates. Field names are exact — no deviation.
+
+### Universal Agent Contract
+
+Every phase agent prompt receives these named fields:
+
+```
+feature_name: NNN-feature-name          ← exact slug, e.g. 004-notifications
+feature_dir:  .specs/features/NNN-feature-name/
+feature_description: <original feature description text>
+active_flags: --auto --mono (etc.)
+conventions: <full content of .conventions/conventions.md, or NONE if file absent>
+```
+
+The agent uses `feature_name` for all `livespec pipeline update` CLI calls.
+The agent uses `conventions` content directly — it does NOT read the file itself.
+
+### Specify agent schema
+
+```
+PHASE_RESULT: OK | BLOCKED
+PHASE: specify
+FEATURE: NNN-feature-name
+SPEC_PATH: .specs/features/NNN-feature-name/spec.md
+SCOPE: S | M | L
+FR_COUNT: N
+REVIEW: PASS | FINDINGS
+FINDINGS_COUNT: N BLOCKING, N WARNING, N INFO
+FINDINGS_DETAIL:
+  [verbatim verifier findings table — omit entire field if REVIEW: PASS]
+SUMMARY: 2-3 sentences describing what the spec covers
+```
+
+### Plan agent schema
+
+```
+PHASE_RESULT: OK | BLOCKED
+PHASE: plan
+FEATURE: NNN-feature-name
+PLAN_PATH: .specs/features/NNN-feature-name/plan.md
+STEPS_COUNT: N
+REVIEW: PASS | FINDINGS
+FINDINGS_COUNT: N BLOCKING, N WARNING, N INFO
+FINDINGS_DETAIL:
+  [verbatim verifier findings table — omit entire field if REVIEW: PASS]
+SUMMARY: 2-3 sentences describing the implementation approach
+```
+
+### Implement agent schema
+
+```
+PHASE_RESULT: OK | BLOCKED
+PHASE: implement
+FEATURE: NNN-feature-name
+FILES_CHANGED: N
+STEPS_DONE: N/total
+TESTS: N passed, N failed
+BLOCKED_REASON: one line (only if BLOCKED)
+SUMMARY: 2-3 sentences of what was implemented
+```
+
+### Test agent schema
+
+```
+PHASE_RESULT: OK | BLOCKED
+PHASE: test
+FEATURE: NNN-feature-name
+AC_COVERAGE: N/total ACs covered
+TESTS: N passed, N failed
+BLOCKED_REASON: one line (only if BLOCKED)
+SUMMARY: 2-3 sentences of test results
+```
+
+### PHASE_RESULT vs SHIP_RESULT
+
+These are two distinct protocols at different scopes:
+- **PHASE_RESULT** — internal inter-phase communication within a single `/spec.feature` run. Only the `spec.feature` main context reads it. Consumed and discarded by the main context.
+- **SHIP_RESULT** — output of the entire `/spec.feature` pipeline when called by `/spec.ship`. The ship orchestrator reads it. The SHIP_RESULT block is emitted at the very end by the main context after all phases complete.
+
+**Phase 3.5 (Test) dual output:** Phase 3.5 emits PHASE_RESULT for the main context AND preserves the existing `SHIP_RESULT: BLOCKED` when AC failures are detected and the pipeline is called from `/spec.ship`. Both are preserved — they serve different consumers.
+
+### FINDINGS_DETAIL injection on retry
+
+When the main context re-spawns a phase agent due to review findings (in `--auto` mode or when the user requests a fix), `FINDINGS_DETAIL` is injected **directly into the agent prompt text**, appended after the base instructions:
+
+```
+[base agent prompt]
+
+Additionally, address the following review findings in your regeneration:
+<FINDINGS_DETAIL verbatim from prior PHASE_RESULT>
+```
+
+The agent receives this as part of its initial prompt — no file write, no parameter flag. The same mechanism applies when the user describes changes interactively: the change description is appended the same way.
+
+---
+
+## Agent Architecture (Supervisor Pattern)
+
+`/spec.feature` is a **pure supervisor** — it does not execute phase logic itself. It spawns an isolated agent per phase, receives a compact `PHASE_RESULT` block, and handles gates and pipeline state.
+
+```
+spec.feature — Main Context (supervisor)
+  │
+  ├── [Phase 0]   Roadmap resolution (inline — user interaction)
+  ├── [Phase 1]   Spawn → Specify Agent  (fresh context)
+  │     └── Receives PHASE_RESULT (specify)
+  ├── [Gate 1]    Display spec review findings + user decision (inline)
+  ├── [Branch]    Propose/create branch (inline)
+  ├── [Phase 2]   Spawn → Plan Agent  (fresh context)
+  │     └── Receives PHASE_RESULT (plan)
+  ├── [Gate 2]    Display plan review findings + user decision (inline)
+  ├── [Phase 2.7] Preflight CLI call (inline — lightweight)
+  ├── [Phase 3]   Spawn → Implement Agent  (fresh context)
+  │     └── Receives PHASE_RESULT (implement)
+  └── [Phase 3.5] Spawn → Test Agent  (fresh context)
+        └── Receives PHASE_RESULT (test)
+```
+
+**What stays inline (main context):**
+- Phase 0: roadmap read + user confirmation + pipeline.md init
+- Gate 1 and Gate 2: display PHASE_RESULT findings, wait for user decision
+- Branch proposal: `git checkout -b feature/NNN-name` call
+- Phase 2.7: `livespec pipeline update` + `/spec.preflight --light` CLI calls
+- All `livespec pipeline update --status in_progress` calls before spawning each agent
+- Auto-commit sequence after Phase 3.5
+
+**What runs in phase agents (isolated context):**
+- All file reads (spec.md, plan.md, constitution.md, stack.md, conventions.md)
+- All generation (spec, plan, implementation code)
+- All tests and lint runs
+- Verifier dispatches (spec review, plan review)
+- Hook resolution (before/after at all 3 levels)
+- `livespec pipeline update --status done` on success
+
+**`--economy` disables this pattern:** all phases run inline in the main context (original behavior). No sub-agents at any level.
+
+**Context budget:**
+- Main context per phase cycle: ~200 tokens (PHASE_RESULT only)
+- Total main context for full pipeline: ~5-15k
+- Each phase agent: fresh context, 30-60k max
 
 ---
 
@@ -61,14 +212,14 @@ flowchart TD
 
 | Flag | What it does |
 |------|-------------|
-| `--auto`, `-a` | Skip gates after plan and implement. If spec review or plan review reports **any findings** (BLOCKING, WARNING, or INFO) → re-generates the spec/plan with findings as context (max 2 iterations each). Aborts if BLOCKING findings remain after 2 attempts; proceeds if only WARNING/INFO remain. **Also commits automatically** at the end when audit + tests pass (see § Auto-Commit) |
-| `--resume`, `-r` | Resume the pipeline where it stopped (reads `pipeline.md`). Also passed to implement for step-level resume via `progress.md` |
-| `--branch`, `-b` | Create a git branch `feature/NNN-name` automatically after spec creation (no question asked) |
+| `--auto`, `-a` | Skip user gates. If spec or plan review returns findings → re-spawns the phase agent with `FINDINGS_DETAIL` injected into the prompt (max 2 retries each). Aborts if BLOCKING remain after 2 retries; proceeds if only WARNING/INFO remain. **Also commits automatically** at the end when audit + tests pass (see § Auto-Commit) |
+| `--resume`, `-r` | Resume the pipeline where it stopped (reads `pipeline.md`, spawns the first non-Done phase agent with the full resume state envelope — see § Resume) |
+| `--branch`, `-b` | Create a git branch `feature/NNN-name` immediately after spec review gate, no question asked |
 | `--no-branch`, `-B` | Skip the branch proposal entirely |
-| `--priority`, `-p` `P1\|P2\|P3` | Force all user stories in the spec to the given priority (P1=critical/MVP, P2=important, P3=nice-to-have) |
-| `--mono`, `-m` | Use a single agent for implementation instead of multi-agent orchestration (supervisor + superpowers + documenter) |
-| `--economy`, `-e` | No sub-agents, direct tools only — uses fewer tokens but slower |
-| `--step`, `-s` | Pause after each implementation step for manual validation |
+| `--priority`, `-p` `P1\|P2\|P3` | Force all user stories in the spec to the given priority (P1=critical/MVP, P2=important, P3=nice-to-have) — passed to the Specify agent |
+| `--mono`, `-m` | Single-agent mode for the **implement phase's internal orchestration** only (no Superpowers sub-dispatch within implement). Does **not** disable the feature-level supervisor pattern — Specify, Plan, Implement, and Test still run as separate agents. |
+| `--economy`, `-e` | Disable **all** sub-agent dispatch: (1) feature-level supervisor — all phases run inline in the main context; (2) implement-level orchestration — no Superpowers sub-dispatch within implement. Preserves the exact pre-supervisor behavior end-to-end. Use for token-constrained environments. |
+| `--step`, `-s` | Pause after each implementation step for manual validation — passed to the Implement agent |
 
 > **Note:** Flags like `--no-review`, `--no-visual`, `--no-save`, and `--no-contracts` are intentionally **not** available on `/spec.feature`. This pipeline enforces all safety gates. These flags remain available on their respective sub-commands (`/spec.plan --no-contracts`, `/spec.implement --no-visual`, etc.) for power users running manual flows.
 
@@ -91,6 +242,7 @@ This file is **distinct from `progress.md`** (which tracks individual implementa
 
 **Started:** YYYY-MM-DD HH:MM
 **Flags:** `--auto --mono` (or `none`)
+**Feature Description:** <original feature description text, verbatim>
 
 | Phase | Status | Completed At |
 |-------|--------|--------------|
@@ -104,6 +256,8 @@ This file is **distinct from `progress.md`** (which tracks individual implementa
 ```
 
 **Status values:** `Pending` → `In Progress` → `Done` or `Skipped`
+
+> **Note:** The `Feature Description` field is written during Phase 0 (or taken from the CLI argument). It is used by `--resume` to reconstruct the agent prompt without re-asking the user. For backward compatibility, if this field is absent in an older `pipeline.md`, `--resume` falls back to the `title` field in `spec.md` frontmatter, or prompts the user if `spec.md` is also absent.
 
 Update the status and timestamp after each phase completes.
 
@@ -126,111 +280,178 @@ When no feature description is provided:
    - **list all** → display all unchecked items across tiers, let user pick one
 5. If no unchecked items found → display "Roadmap is empty or fully shipped. Provide a feature description or run `/spec.propose`." and abort
 
+After confirming the feature description:
+
+6. Run: `livespec pipeline init --feature NNN-feature-name`
+7. Write `Feature Description: <resolved description>` to the `pipeline.md` header (see § State Tracking). This persists the description for `--resume` without re-asking the user.
+
 When a feature description is provided → skip this phase entirely, proceed to Phase 1 as before.
 
 ---
 
-## Phase 1 — Specify
+## Phase 1 — Specify (Supervisor Dispatch)
+
+> **Economy mode (`--economy`):** execute `commands/specify.md` steps inline in the main context instead of spawning an agent.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase specify --status in_progress`
-2. Execute the steps described in `commands/specify.md`, passing:
-   - The feature description (from user argument or resolved from roadmap)
-   - `--priority` if provided
-3. Run: `livespec pipeline update --feature NNN-feature-name --phase specify --status done --timestamp`
 
-### Branch proposal
+2. Assemble the **Universal Agent Context** (see § PHASE_RESULT Schemas — Universal Agent Contract):
+   - `feature_name`: NNN-feature-name (exact slug)
+   - `feature_dir`: `.specs/features/NNN-feature-name/`
+   - `feature_description`: from CLI argument or from `pipeline.md` Feature Description field
+   - `active_flags`: `--priority P1` (if provided), `--auto` (if active)
+   - `conventions`: read `.conventions/conventions.md` if it exists, else `NONE`
 
-After the spec is created, determine whether a git branch is needed:
+3. Spawn a **Specify agent** with the assembled Universal Agent Context and these instructions:
 
-- **`--branch` provided:** Create `feature/NNN-name` immediately, no question asked.
-- **`--no-branch` provided:** Skip entirely, no proposal.
-- **Neither flag (default):** Analyze the generated spec's scope. Only propose a branch when the feature clearly warrants one (multi-file changes, new feature, breaking change). If the scope is small (single-file fix, documentation-only, minor tweak), do not propose — proceed without a branch.
+   ```
+   Execute the full specify pipeline from `commands/specify.md`.
 
-> **When proposing:**
-> [One sentence explaining why a branch is needed for this feature.]
-> Create branch `feature/NNN-name`? (yes / no)
+   [Universal Agent Context fields: feature_name, feature_dir, feature_description, active_flags, conventions]
+
+   After generating the spec, execute Phase 1.5 (Spec Review) as defined in
+   `commands/feature.md § Phase 1.5`: dispatch the livespec-verifier agent in
+   spec-review mode, collect its report, and include it in your PHASE_RESULT.
+
+   Output a PHASE_RESULT block (Specify agent schema from § PHASE_RESULT Schemas)
+   as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
+   ```
+
+4. Receive PHASE_RESULT from the Specify agent.
+   - If `PHASE_RESULT: BLOCKED` → display error, run `livespec pipeline update --feature NNN-feature-name --phase specify --status blocked`, stop.
+
+5. Run: `livespec pipeline update --feature NNN-feature-name --phase specify --status done --timestamp`
+   *(Only if PHASE_RESULT: OK)*
 
 ---
 
-## Phase 1.5 — Spec Review
+## Phase 1.5 — Spec Review Gate (Main Context)
 
-1. Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --status in_progress`
-2. Dispatch the **livespec-verifier** agent in `spec-review` mode with:
-   - Path to `spec.md`
-   - Path to `.specs/constitution.md`
-   - Path to `.specs/project.md`
-   - Path to the stack file (e.g., `.specs/stacks/_default.md`)
-3. Collect the Spec Review Report
+The Specify agent (Phase 1) runs the spec review internally and returns findings via PHASE_RESULT.
+The main context displays findings and handles the user decision.
 
-The review findings are **embedded in the specify gate prompt** — the user sees both the spec and the review at once.
+**If `REVIEW: PASS` in PHASE_RESULT:**
 
-**Gate (interactive mode):**
+In `--auto` mode: proceed to Branch Proposal immediately.
 
-> Phase 1 complete. Review the generated spec:
-> `.specs/features/NNN-feature-name/spec.md`
+Interactive gate:
+> Phase 1 complete — Spec: `.specs/features/NNN-feature-name/spec.md`
 >
-> ### Spec Review Findings
-> [Verifier report inserted here — findings table with severity]
+> Spec review: **PASS** — no findings.
 >
-> N BLOCKING, N WARNING, N INFO finding(s).
 > Type **continue** to proceed to planning, or describe changes needed.
 
-**If verdict has findings (BLOCKING, WARNING, or INFO):**
+**If `REVIEW: FINDINGS` in PHASE_RESULT:**
 
-- **Interactive mode:** The user sees the findings in the gate prompt. They can:
-  1. **Fix** — describe changes, the spec is regenerated and re-reviewed
-  2. **Override** — proceed to planning despite findings
-  3. **Abort** — stop the pipeline
+Display gate with `FINDINGS_DETAIL` verbatim from PHASE_RESULT:
 
-- **`--auto` mode:** Automatically regenerate the spec (go back to Phase 1) with **all** review findings as additional context. Maximum 2 re-generation attempts. If BLOCKING findings remain after 2 attempts, abort the pipeline with error. If only WARNING/INFO remain after 2 attempts, proceed to planning.
+> Phase 1 complete — Spec: `.specs/features/NNN-feature-name/spec.md`
+>
+> ### Spec Review Findings
+> [FINDINGS_DETAIL verbatim from PHASE_RESULT]
+>
+> N BLOCKING, N WARNING, N INFO finding(s).
+> Type **continue** to proceed, describe changes to fix, or **abort**.
 
-**If verdict is PASS (no findings):** proceed to Phase 2 immediately (both modes).
+**User options (interactive):**
+1. **continue** → proceed to Branch Proposal
+2. **describe changes** → re-spawn Specify agent with the change description appended to the base prompt (per FINDINGS_DETAIL injection mechanism in § PHASE_RESULT Schemas)
+3. **abort** → stop pipeline
 
-4. Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --status done --timestamp`
+**`--auto` mode with FINDINGS:** re-spawn Specify agent with `FINDINGS_DETAIL` injected into prompt (max 2 retries). If BLOCKING remain → abort. If only WARNING/INFO remain → proceed.
+
+Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --status done --timestamp`
 
 ---
 
-## Phase 2 — Plan
+## Branch Proposal (Main Context, after Gate 1)
+
+After Gate 1 resolves (user types **continue** or `--auto` proceeds), determine whether a git branch is needed. Use `SCOPE` and `FEATURE` fields from the Specify agent's PHASE_RESULT.
+
+- **`--branch` provided:** Run `git checkout -b feature/NNN-name` immediately, no question asked.
+- **`--no-branch` provided:** Skip entirely.
+- **Neither flag (default):**
+  - `SCOPE: M` or `SCOPE: L` → propose branch
+  - `SCOPE: S` → skip (no branch needed for small features)
+  - **`SCOPE` field absent or malformed** → default to **propose** (safe default — user can decline)
+
+> **When proposing:**
+> [One sentence explaining why a branch is recommended for this feature.]
+> Create branch `feature/NNN-name`? (yes / no)
+
+Once branch decision is resolved, spawn the Plan agent (Phase 2).
+
+---
+
+## Phase 2 — Plan (Supervisor Dispatch)
+
+> **Economy mode (`--economy`):** execute `commands/plan.md` steps inline in the main context instead of spawning an agent.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status in_progress`
-2. Execute the steps described in `commands/plan.md`, passing:
-   - The resolved feature name
-3. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status done --timestamp`
+
+2. Assemble the **Universal Agent Context**:
+   - `feature_name`: NNN-feature-name
+   - `feature_dir`: `.specs/features/NNN-feature-name/`
+   - `feature_description`: from `pipeline.md` Feature Description field
+   - `active_flags`: `--auto` (if active)
+   - `conventions`: read `.conventions/conventions.md` if it exists, else `NONE`
+
+3. Spawn a **Plan agent** with the assembled Universal Agent Context and these instructions:
+
+   ```
+   Execute the full plan pipeline from `commands/plan.md`.
+
+   [Universal Agent Context fields: feature_name, feature_dir, feature_description, active_flags, conventions]
+
+   After generating the plan, execute Phase 2.5 (Plan Review) as defined in
+   `commands/feature.md § Phase 2.5`: dispatch the livespec-verifier agent in
+   plan-review mode, collect its report, and include it in your PHASE_RESULT.
+
+   Output a PHASE_RESULT block (Plan agent schema from § PHASE_RESULT Schemas)
+   as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
+   ```
+
+4. Receive PHASE_RESULT from the Plan agent.
+   - If `PHASE_RESULT: BLOCKED` → display error, run `livespec pipeline update --feature NNN-feature-name --phase plan --status blocked`, stop.
+
+5. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status done --timestamp`
+   *(Only if PHASE_RESULT: OK)*
 
 ---
 
-## Phase 2.5 — Plan Review
+## Phase 2.5 — Plan Review Gate (Main Context)
 
-1. Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status in_progress`
-2. Dispatch the **livespec-verifier** agent in `plan-review` mode with:
-   - Path to `spec.md`
-   - Path to `plan.md`
-   - Path to `.specs/constitution.md`
-3. Present the Plan Review Report to the user
-4. If verdict is PASS (or user overrides BLOCKING):
-   - Update `plan.md` header: `Status: Draft` → `Status: Approved`
-5. Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status done --timestamp`
+The Plan agent (Phase 2) runs the plan review internally and returns findings via PHASE_RESULT.
 
-**If verdict has findings (BLOCKING, WARNING, or INFO):**
+**If `REVIEW: PASS` in PHASE_RESULT:**
 
-- **Interactive mode:** Present findings and ask user how to proceed:
-  > Plan review found N BLOCKING, N WARNING, N INFO issue(s). Options:
-  > 1. **Fix** — I'll regenerate the plan addressing the findings
-  > 2. **Override** — proceed to implementation despite findings
-  > 3. **Abort** — stop the pipeline
+In `--auto` mode: proceed to Phase 2.7 immediately.
 
-- **`--auto` mode:** Automatically regenerate the plan (go back to Phase 2) with **all** review findings (BLOCKING, WARNING, and INFO) as additional context. Maximum 2 re-generation attempts. If BLOCKING findings remain after 2 attempts, abort the pipeline with error. If only WARNING/INFO remain after 2 attempts, proceed to implementation.
-
-**If verdict is PASS (no findings):** proceed immediately (both modes).
-
-**Gate (interactive mode, verdict PASS):**
-
-> Plan review passed. Review the plan:
-> `.specs/features/NNN-feature-name/plan.md`
+Interactive gate:
+> Plan review passed — Plan: `.specs/features/NNN-feature-name/plan.md`
 >
 > Type **continue** to proceed to implementation, or describe changes needed.
 
-In `--auto` mode: skip gate, proceed immediately.
+**If `REVIEW: FINDINGS` in PHASE_RESULT:**
+
+> Plan review — `.specs/features/NNN-feature-name/plan.md`
+>
+> ### Plan Review Findings
+> [FINDINGS_DETAIL verbatim from PHASE_RESULT]
+>
+> N BLOCKING, N WARNING, N INFO finding(s).
+> Options: **continue** (override) / describe changes to fix / **abort**
+
+**User options (interactive):**
+1. **continue** → proceed to Phase 2.7
+2. **describe changes** → re-spawn Plan agent with the change description appended to the base prompt (per FINDINGS_DETAIL injection mechanism in § PHASE_RESULT Schemas)
+3. **abort** → stop pipeline
+
+**`--auto` mode with FINDINGS:** re-spawn Plan agent with `FINDINGS_DETAIL` injected into prompt (max 2 retries). If BLOCKING remain → abort. If only WARNING/INFO remain → proceed.
+
+If verdict is PASS (or user overrides BLOCKING): update `plan.md` header `Status: Draft` → `Status: Approved`.
+
+Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status done --timestamp`
 
 ---
 
@@ -249,28 +470,67 @@ This ensures all tools and credentials are available before the autonomous imple
 
 ---
 
-## Phase 3 — Implement
+## Phase 3 — Implement (Supervisor Dispatch)
+
+> **Economy mode (`--economy`):** execute `commands/implement.md` steps inline in the main context instead of spawning an agent.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase implement --status in_progress`
-2. Execute the steps described in `commands/implement.md`, passing:
-   - The resolved feature name
-   - `--mono` if provided
-   - `--economy` if provided
-   - `--step` if provided
-   - `--resume` if provided (implement uses `progress.md` for its own resume)
-3. Run: `livespec pipeline update --feature NNN-feature-name --phase implement --status done --timestamp`
+
+2. Assemble the **Universal Agent Context**:
+   - `feature_name`: NNN-feature-name
+   - `feature_dir`: `.specs/features/NNN-feature-name/`
+   - `feature_description`: from `pipeline.md` Feature Description field
+   - `active_flags`: `--mono` (if provided), `--step` (if provided), `--resume` (if provided), `--auto` (if active)
+   - `conventions`: read `.conventions/conventions.md` if it exists, else `NONE`
+
+3. Spawn an **Implement agent** with the assembled Universal Agent Context and these instructions:
+
+   ```
+   Execute the full implement pipeline from `commands/implement.md`.
+
+   [Universal Agent Context fields: feature_name, feature_dir, feature_description, active_flags, conventions]
+
+   Output a PHASE_RESULT block (Implement agent schema from § PHASE_RESULT Schemas)
+   as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
+   ```
+
+4. Receive PHASE_RESULT from the Implement agent.
+   - If `PHASE_RESULT: BLOCKED` → display error with `BLOCKED_REASON`, run `livespec pipeline update --feature NNN-feature-name --phase implement --status blocked`, stop.
+
+5. Run: `livespec pipeline update --feature NNN-feature-name --phase implement --status done --timestamp`
+   *(Only if PHASE_RESULT: OK)*
 
 ---
 
-## Phase 3.5 — Test
+## Phase 3.5 — Test (Supervisor Dispatch)
 
-After implementation completes, run `/spec.test` to validate test completeness:
+> **Economy mode (`--economy`):** execute `/spec.test <feature-name> --auto --update` inline in the main context instead of spawning an agent.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status in_progress`
-2. Execute `/spec.test <feature-name> --auto --update`
-3. `/spec.test` generates missing tests that `/spec.implement`'s Phase 6 could not run because they didn't exist yet. It also captures visual baselines that may have been skipped during implement (`--no-visual` or tool unavailable).
-4. If test report shows ❌ failures in AC coverage → these reveal implementation gaps. Output `SHIP_RESULT: BLOCKED` with test failure details if called from `/spec.ship`, or report findings in interactive mode. If only ⚠️ partial AC coverage or ✅ passed → proceed.
+
+2. Spawn a **Test agent** with `feature_name` and these instructions:
+
+   ```
+   Execute: /spec.test <NNN-feature-name> --auto --update
+
+   feature_name: NNN-feature-name
+
+   This command audits AC coverage, generates missing tests, runs the full test suite,
+   and captures visual baselines if skipped during implement.
+
+   Output a PHASE_RESULT block (Test agent schema from § PHASE_RESULT Schemas)
+   as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
+   ```
+
+3. Receive PHASE_RESULT from the Test agent.
+
+4. If `PHASE_RESULT: BLOCKED` (❌ AC coverage failures):
+   - Interactive mode: report failures, no commit
+   - Called from `/spec.ship`: output `SHIP_RESULT: BLOCKED` with test failure details
+   Note: the Test agent emits PHASE_RESULT for the main context; the `SHIP_RESULT: BLOCKED` signal is the final external output of the entire pipeline when called from ship context. Both are preserved — they serve different consumers (main context vs ship orchestrator).
+
 5. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status done --timestamp`
+   *(Only if PHASE_RESULT: OK or only partial/warning AC coverage)*
 
 In `--auto` mode: no confirmation prompts, proceeds automatically.
 
@@ -281,11 +541,20 @@ In `--auto` mode: no confirmation prompts, proceeds automatically.
 When `--resume` is provided:
 
 1. Run: `livespec pipeline read --feature NNN-feature-name`
-2. Run: `livespec pipeline next --feature NNN-feature-name` to find the first phase with status != `Done` and != `Skipped`
-3. Resume execution from that phase
-4. If pipeline.md doesn't exist (exit 1), start from Phase 1
+2. Run: `livespec pipeline next --feature NNN-feature-name` → find first phase with status != `Done` and != `Skipped`
+3. Read `Feature Description` from the `pipeline.md` header field
+4. Assemble the **resume state envelope**:
+   - `feature_name`: NNN-feature-name
+   - `feature_description`: from `pipeline.md` Feature Description field
+     - If absent (older pipeline.md): fall back to `title` field in `spec.md` frontmatter
+     - If spec.md also absent: prompt user for the feature description
+   - `active_flags`: original flags from `pipeline.md` Flags field + `--resume`
+   - `conventions`: read `.conventions/conventions.md` if it exists, else `NONE`
+5. Spawn the appropriate phase agent (Specify / Plan / Implement / Test) with the resume state envelope and `--resume` in the instructions.
+   - For the **Implement agent**: the agent reads `progress.md` internally to resume at the first non-Done step.
+6. If `pipeline.md` doesn't exist (exit 1) → start fresh from Phase 1 (spawn Specify agent with original description)
 
-**Feature resolution for resume:** If no feature description is provided with `--resume`, look for the most recently modified `pipeline.md` across all feature directories.
+**Feature resolution for resume:** If no feature name is provided with `--resume`, run `livespec pipeline latest` to find the most recently modified `pipeline.md` across all feature directories.
 
 ---
 
