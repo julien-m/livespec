@@ -326,32 +326,53 @@ For each test, map back to the AC it covers:
 
 **Skipped if `--no-generate` is set.** Only baselines for existing visual tests are captured (Phase 4.5.2).
 
-For each screen in `spec.md` that has no corresponding visual test:
+For each screen in `spec.md` without a corresponding visual test file:
 
-1. Read the mockup PNG from `.specs/design/screens/` (for context on what to capture)
-2. Generate a Playwright test that:
-   - Navigates to the screen's URL/route
-   - Waits for network idle
-   - Captures a screenshot with `toHaveScreenshot()`
-   - Uses descriptive baseline name matching the screen name
-3. Follow existing visual test patterns (same as Phase 3.2 pattern matching)
-4. Apply the same compilation gate as Phase 3.5
+1. **Locate mockup reference:** Read mockup PNG from `.specs/design/screens/` (optional, for naming consistency)
+2. **Generate boilerplate test:**
+   ```bash
+   For each missing screen/test:
+     Template: tests/e2e/screens/{screen-name}.spec.ts
+     Content:
+       - import { test, expect } from '@playwright/test'
+       - import { captureBaseline } from '../helpers/visual'
+       - test('Screen: {screen-name}', async ({ page }) => {
+           await page.goto('{screen-route}')
+           await page.waitForLoadState('networkidle')
+           await captureBaseline(page, '{screen-name}')
+         })
+   ```
+3. **Follow existing patterns:** Read 1-2 existing visual test files to match import style, fixture usage, and naming conventions
+4. **Compilation gate:** Run the generated file in isolation with `[resolved visual command] tests/e2e/screens/{screen-name}.spec.ts`. If compile error → fix and retry (max 3 iterations). If still broken → delete generated code, mark "Generation Failed"
 
-### 4.5.2 — Capture Missing Baselines
+### 4.5.2 — Capture Baselines
 
-1. Run the visual test command from Resolved Test Commands
-2. New screenshots are saved to `.specs/features/NNN/baselines/`
-3. If capture fails (server not running, element not found) → max 2 retries, then mark "Blocked"
+Run ONLY if Phase 4 (non-visual tests) passed:
 
-### 4.5.3 — Design Fidelity Check (new baselines only)
+1. **Capture command:** Use resolved visual test command (from `.specs/testing/strategy.md`)
+   ```bash
+   Example: npx playwright test --update-snapshots tests/e2e/screens/
+   ```
+2. **Baseline storage:** New screenshots saved to `.specs/features/NNN/baselines/`
+3. **Commit strategy:** Only commit baseline PNG files if Phase 4 suite passed. If Phase 4 had failures, do NOT commit baselines — they are incomplete
+4. **Retry on failure:** If capture fails (server down, element not found, timeout) → retry up to 2 times, then mark "Blocked — [error]"
 
-For each **freshly captured** baseline (not pre-existing ones):
+### 4.5.3 — Design Fidelity Check
 
-1. Find the corresponding mockup PNG in `.specs/design/screens/`
-2. Compare baseline vs mockup using pixel diff
-3. Report:
-   - ✅ **Faithful** (< threshold diff)
-   - 🎨 **Diverged** (> threshold diff) with percentage
+Run ONLY on freshly captured baselines (skip pre-existing ones):
+
+1. **Pair baseline with mockup:** For each newly captured baseline, find corresponding mockup in `.specs/design/screens/{screen-name}.png`
+2. **Pixel comparison:** Use `compareDesign()` helper from `visual.ts` to compute pixel diff
+3. **Report format:**
+   ```markdown
+   | Screen | Baseline | Mockup | Diff % | Status |
+   |---|---|---|---|---|
+   | dashboard | ✅ Captured | ✅ Found | 3.2% | ✅ Faithful |
+   | settings | ✅ Captured | ❌ Missing | — | 🎨 Mockup not found (skip check) |
+   | profile | ✅ Captured | ✅ Found | 8.1% | 🎨 Diverged (8.1% > 5% threshold) |
+   ```
+4. **Threshold:** 5% (design fidelity only; regression threshold is 2%, handled by `/spec.check`)
+5. **Action on divergence:** Report as 🎨 (informational only — do NOT fail the phase). Designer reviews and updates mockup or implementation as needed
 
 ### Visual Thresholds
 
