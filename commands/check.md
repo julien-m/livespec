@@ -273,15 +273,34 @@ For each FR and AC:
 
 ### Step 8 — Detect Visual Drift (UI features)
 
-For each baseline in `.specs/features/NNN-feature-name/baselines/`:
+**Prerequisite:** Feature's `spec.md` has a `## Screens` section AND baselines exist in `.specs/features/NNN-feature-name/baselines/`. Skip entire step if either is absent.
 
-1. Run the visual test command from `.specs/testing/strategy.md` or `plan.md` **Resolved Test Commands**
-2. If no visual testing tool is resolved → skip and report: "Visual drift detection skipped — no visual testing tool resolved"
-3. Compare with stored baselines using pixel diff
-4. Report:
-   - ✅ Match — within threshold (< 2% diff)
-   - 🖼️ Drift — exceeds threshold, show diff percentage
-   - ❌ Missing — baseline file not found (capture needed)
+#### Visual Regression Detection
+
+Use `compareRegression()` helper from `tests/e2e/helpers/visual.ts` to detect pixel drift:
+
+1. **Check resolved visual test tool** from `.specs/testing/strategy.md` or `plan.md` **Resolved Test Commands**
+   - If absent → skip step, report: "Visual drift detection skipped — no visual testing tool resolved"
+2. **For each baseline PNG in `baselines/`:**
+   - Locate the most recent Playwright test output for that screen
+   - Run pixel diff: `compareRegression(baseline, currentScreenshot, threshold: 2%)`
+3. **Report per baseline:**
+   - ✅ **Match** — diff ≤ 2% (no visual regression detected)
+   - 🖼️ **Drift** — diff > 2% (unintended visual change; show diff % and changed regions)
+   - ❌ **Missing baseline** — baseline file not found (capture required from Phase 4.5)
+
+**Threshold:** 2% (component-level, configured per test via `compareRegression(threshold: 2%)`)
+
+**Report format in gap report:**
+```markdown
+### Visual Tests (Regression Detection)
+
+| Screenshot | Status | Diff % | Notes |
+|---|---|---|---|
+| `login.png` | ✅ Match | 0.3% | |
+| `dashboard.png` | 🖼️ Drift | 4.2% | Badge color changed; diff zones: top-right (5% diff), bottom-left (3% diff) |
+| `settings.png` | ❌ Missing | — | Baseline not captured |
+```
 
 #### Design Fidelity Check (UI features with mockups)
 
