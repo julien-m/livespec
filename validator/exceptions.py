@@ -43,6 +43,22 @@ class AssertionExtractionError(Exception):
         self.reason = reason
 
 
+# @spec FR-009: Domain exception for spec review
+# .specs/features/001-auto-llm-review/spec.md#fr-009
+class SpecReviewError(Exception):
+    """Raised when an LLM spec review fails for a feature.
+
+    Args:
+        feature_name: The feature directory name.
+        reason: Description of the failure.
+    """
+
+    def __init__(self, feature_name: str, reason: str) -> None:
+        super().__init__(f"Spec review failed for {feature_name}: {reason}")
+        self.feature_name = feature_name
+        self.reason = reason
+
+
 class ContradictionComparisonError(Exception):
     """Raised when LLM contradiction comparison fails.
 

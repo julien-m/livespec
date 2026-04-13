@@ -264,6 +264,23 @@ class TestReviewPlan:
         assert "TypeScript + Express" in prompt
         assert "API-first design" in prompt
 
+    def test_prompt_evaluates_all_ac004_aspects(self):
+        """AC-004: Plan review prompt covers FR coverage, feasibility, ordering, stack consistency."""
+        response = self._mock_response([])
+
+        with patch("validator.llm_provider.call_llm", return_value=response) as mock:
+            review_plan(SAMPLE_SPEC, SAMPLE_PLAN)
+
+        prompt = mock.call_args[0][0]
+        # The prompt must address all 4 AC-004 evaluation dimensions
+        assert "coverage" in prompt.lower(), "Prompt must evaluate FR coverage"
+        assert "ordering" in prompt.lower() or "depend" in prompt.lower(), (
+            "Prompt must evaluate step ordering"
+        )
+        assert "stack" in prompt.lower(), "Prompt must evaluate stack consistency"
+        # Feasibility is covered by "missing steps" + "over-engineering" checks
+        assert "missing" in prompt.lower(), "Prompt must evaluate feasibility"
+
 
 class TestCascadeReview:
     """Tests for plan review cascade behavior via orchestrator."""

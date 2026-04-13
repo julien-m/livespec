@@ -11,6 +11,7 @@ from .exceptions import (
     AssertionExtractionError,
     ContradictionComparisonError,
     PlanReviewError,
+    SpecReviewError,
 )
 from .semantic.contradictions import (
     Assertion,
@@ -20,6 +21,7 @@ from .semantic.contradictions import (
     get_comparison_pairs,
 )
 from .semantic.plan_review import PlanReviewResult, review_plan
+from .semantic.spec_review import SpecReviewResult, review_spec
 
 logger = logging.getLogger(__name__)
 
@@ -342,3 +344,100 @@ def _run_cascade_review(
                 e for e in check_result.reviews
                 if e.feature_name != feature_name or e.result.confidence == 5
             ]
+
+
+# @spec FR-003: LLM orchestration, FR-004: Result aggregation
+# .specs/features/001-auto-llm-review/spec.md#fr-003
+@dataclass
+class SpecReviewEntry:
+    """A single feature's spec review result.
+
+    Attributes:
+        feature_name: Directory name of the reviewed feature.
+        result: The spec review result from the LLM.
+    """
+
+    feature_name: str
+    result: SpecReviewResult
+
+
+@dataclass
+class SpecReviewCheckResult:
+    """Result of running spec review across all features.
+
+    Attributes:
+        reviews: List of (feature_name, review_result) pairs.
+        errors: List of error messages from failed reviews.
+    """
+
+    reviews: list[SpecReviewEntry] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
+
+
+def run_spec_review(
+    specs_root: Path,
+    models: list[str] | None = None,
+    all_reviewers: bool = False,
+    confidence_threshold: float = 3.0,
+    feature_filter: str | None = None,
+) -> SpecReviewCheckResult:
+    """Run LLM spec review on features with spec.md.
+
+    Mirrors run_plan_review pattern: discovers features, runs review,
+    handles cascade for soft reviews.
+
+    Args:
+        specs_root: Root directory of the .specs/ tree.
+        models: Reviewer model IDs. If None, uses provider default.
+        all_reviewers: If True, run all models. If False, use first only.
+        confidence_threshold: Confidence below which to consider a review soft.
+        feature_filter: If set, only review this feature dir_name.
+
+    Returns:
+        Result containing reviews per feature and any errors.
+    """
+    graph = build_graph(specs_root)
+    check_result = SpecReviewCheckResult()
+
+    if feature_filter and not graph.get_feature(feature_filter):
+        check_result.errors.append(
+            f"{feature_filter}: feature not found in spec graph"
+        )
+        return check_result
+
+    review_models: list[str | None] = [None]
+    if models:
+        review_models = list(models) if all_reviewers else [models[0]]
+
+    for feature in graph.features:
+        if feature_filter and feature.dir_name != feature_filter:
+            continue
+        has_spec = feature.files.get("spec", False)
+
+        if not has_spec:
+            if feature_filter:
+                check_result.errors.append(
+                    f"{feature.dir_name}: missing spec.md"
+                )
+            continue
+
+        spec_path = specs_root / "features" / feature.dir_name / "spec.md"
+        spec_content = spec_path.read_text()
+
+        for model in review_models:
+            try:
+                result = review_spec(
+                    spec_content=spec_content,
+                    model=model,
+                )
+                check_result.reviews.append(
+                    SpecReviewEntry(
+                        feature_name=feature.dir_name, result=result
+                    )
+                )
+            except Exception as exc:
+                err = SpecReviewError(feature.dir_name, str(exc))
+                logger.warning("%s", err)
+                check_result.errors.append(str(err))
+
+    return check_result
