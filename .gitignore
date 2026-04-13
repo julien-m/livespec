@@ -155,3 +155,9 @@ __pycache__/
 
 # Git worktrees
 .worktrees/
+
+# LiveSpec
+.specs/hooks/*.local.md
+.claude/commands/spec.*.md
+.claude/agents/livespec-*.md
+.specs/.livespec-path
