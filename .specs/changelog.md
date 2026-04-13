@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-04-13 -- Plan: Feature 002 planned
+
+[Feature 002] Plan created: Layer 3 CLI Surface -- 7 implementation steps, 3 diagrams, 1 new file + 2 modified + 2 test files
+
+---
+
+## 2026-04-13 -- Spec: Feature 002 created
+
+[Feature 002] Spec created: Layer 3 CLI Surface -- 4 stories, 10 AC, 9 FR
+
+---
+
 ## 2026-04-13 -- Check: Feature 001 aligned
 
 [Feature 001] Check: 100% verified (11/11 FR, 14/14 AC) — ✅ Healthy

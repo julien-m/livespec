@@ -1,0 +1,50 @@
+---
+type: implementation
+title: Layer 3 CLI Surface
+feature: 002-layer-3-cli-surface
+spec_ref: spec.md
+plan_ref: plan.md
+created: 2026-04-13
+updated: 2026-04-13
+---
+
+# Implementation: Layer 3 CLI Surface
+
+## Files Changed
+
+| File | Action | Description |
+|---|---|---|
+| `validator/exceptions.py` | Modified | Added `SdkDependencyError` and `SdkTestRunError` domain exceptions |
+| `validator/sdk_test_runner.py` | Created | `SdkTestRunner` service — subprocess wrapper for Level 3b pytest invocation |
+| `validator/cli.py` | Modified | Added `--sdk-isolated` flag, `_resolve_feature_slug()`, `_output_sdk_result_json()` |
+| `tests/test_sdk_test_runner.py` | Created | Unit tests for SdkTestRunner with mocked subprocess |
+| `tests/test_cli.py` | Modified | CLI integration tests for `--sdk-isolated` flag |
+
+## Spec Anchor Mappings
+
+| Source | Anchor | Location |
+|---|---|---|
+| @spec FR-001 | `spec.md#fr-001` | `validator/cli.py` — `--sdk-isolated` flag routing block |
+| @spec FR-002 | `spec.md#fr-002` | `validator/cli.py` — SDK dependency check, `validator/exceptions.py` — `SdkDependencyError` |
+| @spec FR-003 | `spec.md#fr-003` | `validator/cli.py` — ANTHROPIC_API_KEY warning |
+| @spec FR-004 | `spec.md#fr-004` | `validator/sdk_test_runner.py` — `SdkTestRunner.run()`, `validator/exceptions.py` — `SdkTestRunError` |
+| @spec FR-005 | `spec.md#fr-005` | `validator/cli.py` — exit code mapping (exit 5 → 0, non-zero → 1) |
+| @spec FR-006 | `spec.md#fr-006` | `validator/cli.py` — `_resolve_feature_slug()`, `validator/sdk_test_runner.py` — `-k` filter |
+| @spec FR-007 | `spec.md#fr-007` | `validator/sdk_test_runner.py` — `_build_subprocess_env()` |
+| @spec FR-008 | `spec.md#fr-008` | `validator/cli.py` — `_output_sdk_result_json()`, `validator/sdk_test_runner.py` — `SdkTestResult` |
+| @spec FR-009 | `spec.md#fr-009` | `validator/sdk_test_runner.py` — stderr streaming via Popen |
+
+## AC Coverage
+
+| AC | Status | Test |
+|---|---|---|
+| AC-001 | Covered | `test_sdk_isolated_flag_calls_runner` |
+| AC-002 | Covered | `test_sdk_isolated_missing_sdk_exits_1` |
+| AC-003 | Covered | `test_sdk_isolated_no_api_key_warns` |
+| AC-004 | Covered | `test_sdk_isolated_budget_exit_2_maps_to_1`, `test_sdk_isolated_flag_calls_runner` |
+| AC-005 | Covered | `test_sdk_isolated_feature_path_adds_k_filter` |
+| AC-006 | Covered | `test_sdk_isolated_exit_5_maps_to_0` |
+| AC-007 | Covered | `test_budget_forwarded_to_env` |
+| AC-008 | Covered | `test_sdk_isolated_format_json` |
+| AC-009 | Covered | `SdkTestRunner.run()` streams to stderr via Popen |
+| AC-010 | Covered | `test_sdk_isolated_help_text_contains_flag` |

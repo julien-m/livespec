@@ -73,3 +73,38 @@ class ContradictionComparisonError(Exception):
         self.doc_a = doc_a
         self.doc_b = doc_b
         self.reason = reason
+
+
+# @spec FR-002: SDK dependency check error + install hint
+# .specs/features/002-layer-3-cli-surface/spec.md#fr-002
+class SdkDependencyError(Exception):
+    """Raised when claude-agent-sdk is not importable.
+
+    Args:
+        install_hint: pip install command to fix the issue.
+    """
+
+    INSTALL_HINT = "pip install -e .[integration]"
+
+    def __init__(self) -> None:
+        super().__init__(
+            f"claude-agent-sdk is required for --sdk-isolated.\n"
+            f"Install it with: {self.INSTALL_HINT}"
+        )
+        self.install_hint: str = self.INSTALL_HINT
+
+
+# @spec FR-004: Subprocess failure error
+# .specs/features/002-layer-3-cli-surface/spec.md#fr-004
+class SdkTestRunError(Exception):
+    """Raised when the pytest subprocess fails to start.
+
+    Args:
+        command: The subprocess command that failed.
+        reason: Description of the failure.
+    """
+
+    def __init__(self, command: list[str], reason: str) -> None:
+        super().__init__(f"pytest subprocess failed ({reason}): {' '.join(command)}")
+        self.command = command
+        self.reason = reason

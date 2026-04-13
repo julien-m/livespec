@@ -4,18 +4,22 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import typer
 
+from .commit_context import commit_context_app
 from .config import load_config
 from .engine import validate_all
 from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
-from .commit_context import commit_context_app
 from .git_ops import git_app
 from .pipeline import pipeline_app
 from .reporter import report, report_excluded, report_score_only
 from .specs_utils import find_specs_root
+
+if TYPE_CHECKING:
+    from .sdk_test_runner import SdkTestResult
 
 app = typer.Typer(name="livespec", help="LiveSpec structural validator")
 app.add_typer(pipeline_app, name="pipeline")
@@ -61,7 +65,8 @@ def _require_specs_root(start: Path | None = None) -> Path:
 
 
 def _resolve_feature_filter(
-    target: Path | None, specs_root: Path,
+    target: Path | None,
+    specs_root: Path,
 ) -> str | None:
     """Resolve a path to a feature dir_name for plan-review scoping.
 
@@ -81,6 +86,32 @@ def _resolve_feature_filter(
     except ValueError:
         return None
     return rel.parts[0] if rel.parts else None
+
+
+def _resolve_feature_slug(path: Path | None, specs_root: Path) -> str | None:
+    """Derive a pytest -k slug from an optional feature directory path.
+
+    Reuses _resolve_feature_filter() for path validation, then converts
+    hyphens to underscores for the pytest -k filter.
+
+    Args:
+        path: User-provided path (file or directory), or None.
+        specs_root: Root of the .specs/ tree.
+
+    Returns:
+        Underscore-normalized slug string, or None (fall back to full suite).
+    """
+    if path is None:
+        return None
+    raw = _resolve_feature_filter(path, specs_root)
+    if raw is None:
+        typer.echo(
+            f"Warning: {path} does not match a .specs/features/ directory"
+            " — running full level_3b suite",
+            err=True,
+        )
+        return None
+    return raw.replace("-", "_")
 
 
 def _display_review_findings(
@@ -105,7 +136,8 @@ def _display_review_findings(
         name = entry.feature_name
         model = entry.result.reviewer_model
         typer.echo(
-            f"\n{review_type} Review: {name} ({model})", err=True,
+            f"\n{review_type} Review: {name} ({model})",
+            err=True,
         )
         for finding in entry.result.findings:
             marker = finding.severity.value
@@ -123,8 +155,7 @@ def _display_review_findings(
             entry.result, "spec_metrics", {}
         )
         metric_parts = [
-            f"{v} {k.replace('_count', '').replace('_', ' ')}"
-            for k, v in metrics.items()
+            f"{v} {k.replace('_count', '').replace('_', ' ')}" for k, v in metrics.items()
         ]
         typer.echo(
             f"  Confidence: {entry.result.confidence}/5 | "
@@ -191,19 +222,43 @@ def _output_review_json(reviews: list, errors: list[str]) -> None:
     typer.echo(json_mod.dumps(data, indent=2))
 
 
+def _output_sdk_result_json(result: SdkTestResult) -> None:
+    """Output SDK test result as JSON to stdout.
+
+    Schema: {"passed": N, "failed": N, "skipped": N, "total": N, "exit_code": N}
+    raw_output is NOT included — it is forwarded to stderr during streaming.
+
+    Args:
+        result: SdkTestResult from the test runner.
+    """
+    import json as json_mod
+
+    data = {
+        "passed": result.passed,
+        "failed": result.failed,
+        "skipped": result.skipped,
+        "total": result.total,
+        "exit_code": result.exit_code,
+    }
+    typer.echo(json_mod.dumps(data))
+
+
 @app.command()
 def validate(
     path: str | None = typer.Argument(None, help="File or directory to validate"),
     staged: bool = typer.Option(False, "--staged", help="Validate git staged files only"),
     output_format: str = typer.Option(
-        "compact", "--format", "-f",
+        "compact",
+        "--format",
+        "-f",
         help="Output format: compact, full, json",
     ),
     warn_only: bool = typer.Option(False, "--warn-only", help="Don't exit with error code"),
     score_only: bool = typer.Option(False, "--score-only", help="Show scores only"),
     fix: bool = typer.Option(False, "--fix", help="Apply Pass 1 mechanical fixes"),
     smart: bool = typer.Option(
-        False, "--smart",
+        False,
+        "--smart",
         help="Apply Pass 2 Claude SDK fixes (not yet implemented)",
     ),
     auto: bool = typer.Option(False, "--auto", help="Skip confirmation prompts"),
@@ -211,13 +266,15 @@ def validate(
     list_excluded: bool = typer.Option(False, "--list-excluded", help="Show excluded files"),
     coherence: bool = typer.Option(False, "--coherence", help="Run Layer 2 coherence validation"),
     coherence_only: bool = typer.Option(
-        False, "--coherence-only",
+        False,
+        "--coherence-only",
         help="Run only Layer 2 (skip Layer 1)",
     ),
     rules: str | None = typer.Option(None, "--rules", help="Specific rules to run (e.g., R1,R2)"),
     wave_num: int | None = typer.Option(None, "--wave", help="Only run rules up to this wave"),
     ignore_rules: str | None = typer.Option(
-        None, "--ignore",
+        None,
+        "--ignore",
         help="Rules to ignore (e.g., R3.2,R5.1)",
     ),
     strict: bool = typer.Option(False, "--strict", help="Block on coherence errors"),
@@ -225,30 +282,49 @@ def validate(
     semantic: bool = typer.Option(False, "--semantic", help="Run Layer 4 semantic validation"),
     scorecard: bool = typer.Option(False, "--scorecard", help="Run scorecard only"),
     contradiction_only: bool = typer.Option(
-        False, "--contradiction-only",
+        False,
+        "--contradiction-only",
         help="Run contradiction detection only",
     ),
     reindex: bool = typer.Option(False, "--reindex", help="Reindex embeddings"),
     mutate: bool = typer.Option(False, "--mutate", help="Run mutation testing"),
     experimental_multi_model: bool = typer.Option(
-        False, "--experimental-multi-model",
+        False,
+        "--experimental-multi-model",
         help="Enable multi-model consensus",
     ),
     plan_review: bool = typer.Option(
-        False, "--plan-review", "--review-plan", "-r",
+        False,
+        "--plan-review",
+        "--review-plan",
+        "-r",
         help="Run LLM plan substance review",
     ),
     review_spec: bool = typer.Option(
-        False, "--review-spec", help="Run LLM spec quality review",
+        False,
+        "--review-spec",
+        help="Run LLM spec quality review",
     ),
     all_reviewers: bool = typer.Option(
-        False, "--all-reviewers", "-R", help="Use all configured reviewers",
+        False,
+        "--all-reviewers",
+        "-R",
+        help="Use all configured reviewers",
     ),
     review_model: str | None = typer.Option(
-        None, "--model", help="Override reviewer model ID",
+        None,
+        "--model",
+        help="Override reviewer model ID",
     ),
     no_review: bool = typer.Option(
-        False, "--no-review", help="Skip automatic review (for hook integration)",
+        False,
+        "--no-review",
+        help="Skip automatic review (for hook integration)",
+    ),
+    sdk_isolated: bool = typer.Option(
+        False,
+        "--sdk-isolated",
+        help="Run Layer 3 SDK-isolated tests (pytest -m level_3b)",
     ),
 ) -> None:
     """Validate .specs/ files structurally.
@@ -282,6 +358,7 @@ def validate(
         all_reviewers: Use all configured reviewer models.
         review_model: Override reviewer model ID.
         no_review: Skip automatic review (for hook integration).
+        sdk_isolated: Run Layer 3 SDK-isolated tests via pytest subprocess.
 
     Returns:
         None (exits via typer.Exit with appropriate code).
@@ -293,6 +370,58 @@ def validate(
     if staged and path:
         typer.echo("Error: --staged and PATH are mutually exclusive", err=True)
         raise typer.Exit(1)
+
+    # @spec FR-001: --sdk-isolated flag routing
+    # .specs/features/002-layer-3-cli-surface/spec.md#fr-001
+    if sdk_isolated:
+        import importlib.util
+        import os
+
+        from .exceptions import SdkDependencyError, SdkTestRunError
+        from .sdk_test_runner import SdkTestRunner
+
+        # @spec FR-002: SDK dependency check
+        if importlib.util.find_spec("claude_agent_sdk") is None:
+            typer.echo(str(SdkDependencyError()), err=True)
+            raise typer.Exit(1)
+
+        # @spec FR-003: API key warning
+        if os.environ.get("ANTHROPIC_API_KEY") is None:
+            typer.echo(
+                "Warning: ANTHROPIC_API_KEY not set"
+                " — level_3b tests will be skipped by pytest.mark.skipif",
+                err=True,
+            )
+
+        specs_root_sdk = _require_specs_root(Path(path) if path else None)
+        project_root = specs_root_sdk.parent
+        feature_slug = _resolve_feature_slug(
+            Path(path) if path else None,
+            specs_root_sdk,
+        )
+        budget_usd = float(os.environ.get("LIVESPEC_TEST_BUDGET_USD", "25.0"))
+
+        try:
+            sdk_result = SdkTestRunner(project_root).run(feature_slug, budget_usd)
+        except SdkTestRunError as exc:
+            typer.echo(f"Error: {exc}", err=True)
+            raise typer.Exit(1)  # noqa: B904
+
+        # @spec FR-005: Exit code mapping — exit 5 = no tests collected
+        if sdk_result.exit_code == 5:
+            typer.echo(
+                "Warning: no level_3b tests collected"
+                " — check the feature slug or marker configuration",
+                err=True,
+            )
+            raise typer.Exit(0)
+
+        # @spec FR-008: JSON output
+        if output_format == "json":
+            _output_sdk_result_json(sdk_result)
+
+        exit_code = 0 if sdk_result.exit_code == 0 else 1
+        raise typer.Exit(exit_code)
 
     # Layer 4 — LLM-dependent features
 
@@ -316,7 +445,8 @@ def validate(
         sem_config = load_semantic_config(specs_root_for_review)
         models = [review_model] if review_model else (sem_config.review_reviewers or None)
         feature_filter = _resolve_feature_filter(
-            target_path, specs_root_for_review,
+            target_path,
+            specs_root_for_review,
         )
 
         spec_review_result = run_spec_review(
@@ -335,9 +465,7 @@ def validate(
                 for e in spec_review_result.reviews
                 for f in e.result.findings
             )
-            raise typer.Exit(
-                1 if (strict and has_blocking) or spec_review_result.errors else 0
-            )
+            raise typer.Exit(1 if (strict and has_blocking) or spec_review_result.errors else 0)
 
         has_blocking = _display_review_findings(
             spec_review_result.reviews,
@@ -367,12 +495,10 @@ def validate(
         target_path = Path(path) if path else None
         specs_root_for_review = _require_specs_root(target_path)
         sem_config = load_semantic_config(specs_root_for_review)
-        models = (
-            [review_model] if review_model
-            else (sem_config.review_reviewers or None)
-        )
+        models = [review_model] if review_model else (sem_config.review_reviewers or None)
         feature_filter = _resolve_feature_filter(
-            target_path, specs_root_for_review,
+            target_path,
+            specs_root_for_review,
         )
 
         review_result = run_plan_review(
@@ -390,9 +516,7 @@ def validate(
                 for e in review_result.reviews
                 for f in e.result.findings
             )
-            raise typer.Exit(
-                1 if (strict and has_blocking) or review_result.errors else 0
-            )
+            raise typer.Exit(1 if (strict and has_blocking) or review_result.errors else 0)
 
         has_blocking = _display_review_findings(
             review_result.reviews,
@@ -401,9 +525,7 @@ def validate(
             sem_config=sem_config,
         )
 
-        raise typer.Exit(
-            0 if warn_only else (1 if (strict and has_blocking) else 0)
-        )
+        raise typer.Exit(0 if warn_only else (1 if (strict and has_blocking) else 0))
 
     if contradiction_only:
         from .llm_provider import is_available
@@ -437,8 +559,7 @@ def validate(
         raise typer.Exit(0)
     if mutate:
         typer.echo(
-            "Mutation testing: run `pytest tests/ -k mutation`"
-            " for available tests.",
+            "Mutation testing: run `pytest tests/ -k mutation` for available tests.",
             err=True,
         )
         raise typer.Exit(0)
@@ -483,7 +604,10 @@ def validate(
             if not dry_run:
                 # Re-validate after fixes
                 results, excluded = validate_all(
-                    specs_root, config, paths=paths, staged_only=staged,
+                    specs_root,
+                    config,
+                    paths=paths,
+                    staged_only=staged,
                 )
         else:
             typer.echo("\nAuto-fix: nothing to fix.", err=True)
@@ -494,7 +618,8 @@ def validate(
             report_score_only(results, specs_root)
         else:
             json_output = report(
-                results, excluded,
+                results,
+                excluded,
                 output_format=output_format,
                 specs_root=specs_root,
             )

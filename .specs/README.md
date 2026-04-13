@@ -35,6 +35,7 @@
 | # | Feature | Status | Created | Updated | Spec |
 |---|---|---|---|---|---|
 | 001 | Auto LLM Review | Implemented | 2026-04-13 | 2026-04-13 | [spec](features/001-auto-llm-review/spec.md) |
+| 002 | Layer 3 CLI Surface | Planned | 2026-04-13 | 2026-04-13 | [spec](features/002-layer-3-cli-surface/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -58,6 +59,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-13 | Plan | [Feature 002] Plan created: Layer 3 CLI Surface -- 7 steps, 3 diagrams |
+| 2026-04-13 | Spec | [Feature 002] Spec created: Layer 3 CLI Surface -- 4 stories, 10 AC, 9 FR |
 | 2026-04-13 | Feature | [Feature 001] Implemented: Auto LLM Review -- 4 new files, 3 modified, 36 new tests |
 | 2026-04-13 | Plan | [Feature 001] Plan created: Auto LLM Review -- 6 implementation steps, 3 diagrams |
 | 2026-04-13 | Spec | [Feature 001] Spec created: Auto LLM Review -- 4 stories, 14 AC, 11 FR |
