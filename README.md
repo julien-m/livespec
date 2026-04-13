@@ -93,7 +93,7 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 # 1. Clone LiveSpec
 git clone https://github.com/julien-m/livespec.git ~/livespec
 
-# 2. Install /spec.* commands globally
+# 2. Install the bootstrap commands globally (required once)
 bash ~/livespec/scripts/install.sh
 
 # 3. Initialize LiveSpec in your project (creates .specs/ + CLAUDE.md)
@@ -364,17 +364,19 @@ Key flags: `--roadmap`, `--features`, `--json`
 
 ## Installation
 
-### Global (required once)
+### Global bootstrap (required once)
+
+Install the two bootstrap commands that must exist before a project can link the rest of LiveSpec locally:
 
 ```bash
-# Create global symlinks for spec.init and spec.migrate
-ln -sf ~/projects/livespec/commands/init.md ~/.claude/commands/spec.init.md
-ln -sf ~/projects/livespec/commands/migrate.md ~/.claude/commands/spec.migrate.md
+bash ~/livespec/scripts/install.sh
 ```
 
-### Per-project (automatic)
+This creates global symlinks for `/spec.init` and `/spec.migrate` in `~/.claude/commands/`.
 
-When you run `/spec.init` in a project, LiveSpec automatically creates local symlinks in `.claude/commands/` and `.claude/agents/`. No manual installation needed.
+### Per-project (automatic after bootstrap)
+
+When you run `/spec.init` in a project, LiveSpec automatically creates local symlinks in `.claude/commands/` and `.claude/agents/` for the rest of the command set. No additional manual installation is needed.
 
 For existing projects initialized before v2, run `/spec.migrate` to add local symlinks.
 
@@ -407,7 +409,7 @@ LiveSpec separates **format** from **automation**:
 | Layer | Portable? | Details |
 |---|---|---|
 | **Spec format** (`.specs/`, Markdown, Mermaid, Gherkin) | ✅ Universal | Any AI tool that reads Markdown can follow the rules in `spec-system.md` |
-| **Commands** (`/spec.*`) | ⚠️ Claude Code | Symlinked to `.claude/commands/` per project via `link-local.sh` — Claude Code specific |
+| **Commands** (`/spec.*`) | ⚠️ Claude Code | `/spec.init` and `/spec.migrate` are bootstrapped globally; the rest are symlinked per project via `link-local.sh` |
 | **Agents** (multi-agent orchestration) | ⚠️ Claude Code | Requires Claude Code agent teams + Superpowers skills |
 | **Shell scripts** (`link-local.sh`, `migrate.sh`, `init.sh`) | ⚠️ macOS | Uses `sed -i ''` (BSD), `open` (macOS), `mktemp` — not tested on Linux |
 
@@ -520,13 +522,14 @@ livespec/
 │       ├── web-realtime.md
 │       ├── web-static.md
 │       └── api-rest.md
-├── agents/                         ← Agent definitions (symlinked by install.sh)
+├── agents/                         ← Agent definitions (symlinked per-project by /spec.init)
 │   ├── livespec-supervisor.md      ← Orchestrator — builds Task Payloads, dispatches to Superpowers
 │   ├── livespec-implementer.md     ← Infrastructure provisioning (Phase 0 only)
 │   ├── livespec-verifier.md        ← Spec review + plan review (code review via Superpowers)
 │   └── livespec-documenter.md      ← Updates spec artifacts
-├── commands/                       ← Command docs (symlinked by install.sh)
+├── commands/                       ← init/migrate bootstrapped globally; other command docs symlinked per-project
 │   ├── init.md
+│   ├── migrate.md
 │   ├── propose.md
 │   ├── specify.md
 │   ├── plan.md
@@ -541,7 +544,8 @@ livespec/
 │   ├── play-coverage.md
 │   └── refine.md
 └── scripts/
-    ├── install.sh                  ← Install commands + agents into ~/.claude/
+    ├── install.sh                  ← Bootstrap global spec.init + spec.migrate symlinks
+    ├── link-local.sh               ← Create per-project symlinks in .claude/ (called by /spec.init)
     └── init.sh                     ← Bootstrap .specs/ structure (shell)
 ```
 
@@ -550,4 +554,3 @@ livespec/
 ## License
 
 MIT — see [LICENSE](LICENSE)
-

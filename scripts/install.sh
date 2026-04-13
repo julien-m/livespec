@@ -1,252 +1,183 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ⚠️ DEPRECATED — Replaced by scripts/link-local.sh for local installs.
-# This script installed commands globally to ~/.claude/. LiveSpec v2+ uses
-# project-local symlinks in .claude/ instead. Use /spec.init (new projects)
-# or /spec.migrate (existing projects).
-# Kept for reference only.
-
-# LiveSpec — Installer for Claude Code
-# Usage:
-#   bash scripts/install.sh              # Install commands
-#   bash scripts/install.sh --uninstall  # Remove symlinks
-#   bash scripts/install.sh --force      # Overwrite existing files
-#   bash scripts/install.sh --dry-run    # Preview without changes
-
-# --- Config ---
+# LiveSpec bootstrap installer for Claude Code.
+#
+# Installs the two global bootstrap commands that must exist before a project
+# can link the rest of the LiveSpec commands locally via /spec.init.
 
 LIVESPEC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 COMMANDS_DIR="$HOME/.claude/commands"
 AGENTS_DIR="$HOME/.claude/agents"
 
-COMMANDS=(init propose specify plan implement test check fix explain stack feature ship refine play-coverage preflight hooks status refresh-conventions)
+COMMANDS=(init migrate propose specify plan implement test check fix explain stack feature ship refine play-coverage preflight hooks status refresh-conventions)
 AGENTS=(livespec-supervisor livespec-implementer livespec-verifier livespec-documenter)
-
-HOOKS_SRC_DIR="$LIVESPEC_ROOT/hooks"
-HOOKS_DST_DIR="$HOME/.claude/livespec/hooks"
-
-# --- Flags ---
+BOOTSTRAP_COMMANDS=(init migrate)
 
 FORCE=false
 DRY_RUN=false
 UNINSTALL=false
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --force)     FORCE=true; shift ;;
-    --dry-run)   DRY_RUN=true; shift ;;
-    --uninstall) UNINSTALL=true; shift ;;
-    --help|-h)
-      cat <<'EOF'
+print_help() {
+  cat <<'EOF'
 Usage: bash scripts/install.sh [OPTIONS]
 
-Installs LiveSpec /spec.* commands, agents, and hooks into ~/.claude/.
+Install the global bootstrap commands required by LiveSpec:
+  /spec.init
+  /spec.migrate
+
+All other /spec.* commands and agents are linked per project by /spec.init.
 
 Options:
-  --force         Overwrite existing files/symlinks
+  --force         Overwrite existing symlinks
   --dry-run       Preview changes without writing anything
-  --uninstall     Remove installed symlinks
+  --uninstall     Remove bootstrap symlinks
   --help          Show this help message
-
-Examples:
-  bash scripts/install.sh              # Install commands + agents
-  bash scripts/install.sh --uninstall  # Remove commands + agents
-  bash scripts/install.sh --dry-run    # Preview
-  bash scripts/install.sh --force      # Overwrite existing
 EOF
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1" >&2
-      echo "Run with --help for usage." >&2
+}
+
+log_ok() {
+  printf '  %s\n' "$1"
+}
+
+log_warn() {
+  printf '  %s\n' "$1" >&2
+}
+
+log_dry_run() {
+  printf '  [dry-run] %s\n' "$1"
+}
+
+ensure_source_files() {
+  local command_name=""
+  for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
+    if [[ ! -f "$LIVESPEC_ROOT/commands/$command_name.md" ]]; then
+      log_warn "ERROR: missing source file: $LIVESPEC_ROOT/commands/$command_name.md"
       exit 1
-      ;;
-  esac
-done
+    fi
+  done
+}
 
-# --- Helpers ---
-
-ok()   { echo "  ✓ $1"; }
-skip() { echo "  · $1 (skipped — already correct)"; }
-warn() { echo "  ! $1" >&2; }
-dry()  { echo "  → [dry-run] $1"; }
-
-create_link() {
-  local src="$1"
-  local target="$2"
+create_symlink() {
+  local source_path="$1"
+  local target_path="$2"
   local label="$3"
 
   if [[ "$DRY_RUN" == true ]]; then
-    dry "$label → $src"
+    log_dry_run "$label -> $source_path"
     return
   fi
 
-  if [[ -L "$target" ]]; then
-    local current
-    current="$(readlink "$target")"
-    if [[ "$current" == "$src" ]]; then
-      skip "$label"
+  if [[ -L "$target_path" ]]; then
+    local current_target=""
+    current_target="$(readlink "$target_path")"
+    if [[ "$current_target" == "$source_path" ]]; then
+      log_ok "$label already up to date"
       return
     fi
-    if [[ "$FORCE" == true ]]; then
-      rm "$target"
-    else
-      warn "$label exists but points to $current (use --force to overwrite)"
+    if [[ "$FORCE" != true ]]; then
+      log_warn "$label exists and points to $current_target (use --force to overwrite)"
       return
     fi
-  elif [[ -e "$target" ]]; then
-    if [[ "$FORCE" == true ]]; then
-      rm "$target"
-    else
-      warn "$label exists as a regular file (use --force to overwrite)"
+    rm -f "$target_path"
+  elif [[ -e "$target_path" ]]; then
+    if [[ "$FORCE" != true ]]; then
+      log_warn "$label exists as a regular file (use --force to overwrite)"
       return
     fi
+    rm -f "$target_path"
   fi
 
-  ln -sf "$src" "$target"
-  ok "$label"
+  ln -s "$source_path" "$target_path"
+  log_ok "linked $label"
 }
 
-remove_link() {
-  local target="$1"
+remove_symlink() {
+  local target_path="$1"
   local label="$2"
 
-  if [[ ! -L "$target" ]]; then
-    if [[ -e "$target" ]]; then
-      warn "$label is not a symlink — skipping (remove manually if needed)"
+  if [[ ! -L "$target_path" ]]; then
+    if [[ -e "$target_path" ]]; then
+      log_warn "$label is not a symlink; leaving it in place"
     fi
     return
   fi
 
-  local current
-  current="$(readlink "$target")"
-  if [[ "$current" == "$LIVESPEC_ROOT"* ]]; then
-    if [[ "$DRY_RUN" == true ]]; then
-      dry "remove $label"
-    else
-      rm "$target"
-      ok "removed $label"
-    fi
-  else
-    warn "$label points to $current (not this repo) — skipping"
+  if [[ "$DRY_RUN" == true ]]; then
+    log_dry_run "remove $label"
+    return
   fi
+
+  rm -f "$target_path"
+  log_ok "removed $label"
 }
 
-# --- Integrity check ---
-
-for cmd in "${COMMANDS[@]}"; do
-  local_src="$LIVESPEC_ROOT/commands/$cmd.md"
-  if [[ ! -f "$local_src" ]]; then
-    echo "ERROR: Missing source file: $local_src" >&2
-    echo "Is this script running from the LiveSpec repository?" >&2
-    exit 1
-  fi
-done
-
-for agent in "${AGENTS[@]}"; do
-  local_src="$LIVESPEC_ROOT/agents/$agent.md"
-  if [[ ! -f "$local_src" ]]; then
-    echo "ERROR: Missing source file: $local_src" >&2
-    echo "Is this script running from the LiveSpec repository?" >&2
-    exit 1
-  fi
-done
-
-# --- Main ---
-
-if [[ "$UNINSTALL" == true ]]; then
-  echo ""
-  echo "Uninstalling LiveSpec commands and agents..."
-  echo ""
-  for cmd in "${COMMANDS[@]}"; do
-    remove_link "$COMMANDS_DIR/spec.$cmd.md" "commands/spec.$cmd.md"
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --force)
+        FORCE=true
+        shift
+        ;;
+      --dry-run)
+        DRY_RUN=true
+        shift
+        ;;
+      --uninstall)
+        UNINSTALL=true
+        shift
+        ;;
+      --help|-h)
+        print_help
+        exit 0
+        ;;
+      *)
+        log_warn "Unknown option: $1"
+        log_warn "Run with --help for usage."
+        exit 1
+        ;;
+    esac
   done
-  for agent in "${AGENTS[@]}"; do
-    remove_link "$AGENTS_DIR/$agent.md" "agents/$agent.md"
-  done
+}
 
-  # --- Uninstall Hooks ---
+install_bootstrap_commands() {
+  local command_name=""
 
-  if [[ -d "$HOOKS_SRC_DIR" ]]; then
-    for hook_file in "$HOOKS_SRC_DIR"/*.md; do
-      [[ -f "$hook_file" ]] || continue
-      hook_name="$(basename "$hook_file")"
-      remove_link "$HOOKS_DST_DIR/$hook_name" "hooks/$hook_name"
-    done
+  if [[ "$DRY_RUN" != true ]]; then
+    mkdir -p "$COMMANDS_DIR"
   fi
 
-  echo ""
-  echo "Done."
-  exit 0
-fi
-
-echo ""
-echo "Installing LiveSpec commands and agents..."
-echo ""
-
-if [[ "$DRY_RUN" == false ]]; then
-  mkdir -p "$COMMANDS_DIR"
-  mkdir -p "$AGENTS_DIR"
-  mkdir -p "$HOOKS_DST_DIR"
-fi
-
-for cmd in "${COMMANDS[@]}"; do
-  create_link "$LIVESPEC_ROOT/commands/$cmd.md" "$COMMANDS_DIR/spec.$cmd.md" "commands/spec.$cmd.md"
-done
-
-for agent in "${AGENTS[@]}"; do
-  create_link "$LIVESPEC_ROOT/agents/$agent.md" "$AGENTS_DIR/$agent.md" "agents/$agent.md"
-done
-
-# --- Install Hooks ---
-
-if [[ -d "$HOOKS_SRC_DIR" ]]; then
-  for hook_file in "$HOOKS_SRC_DIR"/*.md; do
-    [[ -f "$hook_file" ]] || continue
-    hook_name="$(basename "$hook_file")"
-    create_link "$hook_file" "$HOOKS_DST_DIR/$hook_name" "hooks/$hook_name"
+  for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
+    create_symlink \
+      "$LIVESPEC_ROOT/commands/$command_name.md" \
+      "$COMMANDS_DIR/spec.$command_name.md" \
+      "commands/spec.$command_name.md"
   done
-fi
+}
 
-# --- Verify ---
+uninstall_bootstrap_commands() {
+  local command_name=""
+  for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
+    remove_symlink "$COMMANDS_DIR/spec.$command_name.md" "commands/spec.$command_name.md"
+  done
+}
 
-if [[ "$DRY_RUN" == false ]]; then
-  errors=0
-  for cmd in "${COMMANDS[@]}"; do
-    if [[ ! -L "$COMMANDS_DIR/spec.$cmd.md" ]]; then
-      warn "Verification failed: commands/spec.$cmd.md is not a symlink"
-      errors=$((errors + 1))
-    fi
-  done
-  for agent in "${AGENTS[@]}"; do
-    if [[ ! -L "$AGENTS_DIR/$agent.md" ]]; then
-      warn "Verification failed: agents/$agent.md is not a symlink"
-      errors=$((errors + 1))
-    fi
-  done
-  if [[ -d "$HOOKS_SRC_DIR" ]]; then
-    for hook_file in "$HOOKS_SRC_DIR"/*.md; do
-      [[ -f "$hook_file" ]] || continue
-      hook_name="$(basename "$hook_file")"
-      if [[ ! -L "$HOOKS_DST_DIR/$hook_name" ]]; then
-        warn "Verification failed: hooks/$hook_name is not a symlink"
-        errors=$((errors + 1))
-      fi
-    done
+main() {
+  parse_args "$@"
+  ensure_source_files
+
+  if [[ "$UNINSTALL" == true ]]; then
+    printf 'Removing LiveSpec bootstrap commands...\n'
+    uninstall_bootstrap_commands
+    printf 'Done.\n'
+    return
   fi
 
-  if [[ "$errors" -gt 0 ]]; then
-    echo "$errors symlink(s) failed verification." >&2
-    exit 1
-  fi
-fi
+  printf 'Installing LiveSpec bootstrap commands...\n'
+  install_bootstrap_commands
+  printf '\n'
+  printf 'Installed: /spec.init, /spec.migrate\n'
+  printf 'Next: run /spec.init inside a project to link the rest of LiveSpec locally.\n'
+}
 
-echo ""
-echo "Done! LiveSpec is ready."
-echo ""
-echo "  Global hooks dir: $HOOKS_DST_DIR"
-echo ""
-echo "Next: run /spec.init in your project to set up .specs/ and CLAUDE.md."
-echo "Tip: /spec.implement uses multi-agent orchestration by default (--mono for single-agent)."
-echo "Tip: add hooks in ~/.claude/livespec/hooks/ or .specs/hooks/ to customize commands."
+main "$@"
