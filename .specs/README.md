@@ -34,9 +34,8 @@
 <!-- readme:features:start -->
 | # | Feature | Status | Created | Updated | Spec |
 |---|---|---|---|---|---|
+| 001 | Auto LLM Review | Implemented | 2026-04-13 | 2026-04-13 | [spec](features/001-auto-llm-review/spec.md) |
 <!-- readme:features:end -->
-
-> No features yet. Create your first with `/spec.specify "feature description"`.
 
 ---
 
@@ -59,6 +58,9 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-13 | Feature | [Feature 001] Implemented: Auto LLM Review -- 4 new files, 3 modified, 36 new tests |
+| 2026-04-13 | Plan | [Feature 001] Plan created: Auto LLM Review -- 6 implementation steps, 3 diagrams |
+| 2026-04-13 | Spec | [Feature 001] Spec created: Auto LLM Review -- 4 stories, 14 AC, 11 FR |
 | 2026-04-13 | Setup | LiveSpec initialized via spec.init --from-code |
 <!-- readme:activity:end -->
 

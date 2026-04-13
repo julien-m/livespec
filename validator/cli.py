@@ -83,6 +83,114 @@ def _resolve_feature_filter(
     return rel.parts[0] if rel.parts else None
 
 
+def _display_review_findings(
+    reviews: list,
+    errors: list[str],
+    review_type: str,
+    sem_config: object,
+) -> bool:
+    """Display review findings to stderr and return blocking status.
+
+    Args:
+        reviews: List of review entry objects (PlanReviewEntry or SpecReviewEntry).
+        errors: List of error messages.
+        review_type: "Spec" or "Plan" for display labels.
+        sem_config: Semantic config with review_confidence_threshold.
+
+    Returns:
+        True if any blocking finding or error exists.
+    """
+    has_blocking = False
+    for entry in reviews:
+        name = entry.feature_name
+        model = entry.result.reviewer_model
+        typer.echo(
+            f"\n{review_type} Review: {name} ({model})", err=True,
+        )
+        for finding in entry.result.findings:
+            marker = finding.severity.value
+            typer.echo(
+                f"  [{marker}] {finding.category}: {finding.description}",
+                err=True,
+            )
+            if finding.suggestion:
+                typer.echo(f"    -> {finding.suggestion}", err=True)
+            if finding.severity.value == "ERROR":
+                has_blocking = True
+
+        # Display metrics (complexity for plan, spec_metrics for spec)
+        metrics = getattr(entry.result, "complexity", None) or getattr(
+            entry.result, "spec_metrics", {}
+        )
+        metric_parts = [
+            f"{v} {k.replace('_count', '').replace('_', ' ')}"
+            for k, v in metrics.items()
+        ]
+        typer.echo(
+            f"  Confidence: {entry.result.confidence}/5 | "
+            f"Findings: {len(entry.result.findings)} | "
+            f"Metrics: {', '.join(metric_parts)}",
+            err=True,
+        )
+
+        threshold = getattr(sem_config, "review_confidence_threshold", 3.0)
+        if (
+            entry.result.confidence < threshold
+            and len(entry.result.findings) == 0
+            and sum(metrics.values()) > 5
+        ):
+            typer.echo(
+                "  Warning: Review suspiciously empty for this complexity.",
+                err=True,
+            )
+
+    for error in errors:
+        typer.echo(f"  Error: {error}", err=True)
+
+    if errors:
+        has_blocking = True
+
+    total = sum(len(e.result.findings) for e in reviews)
+    count = len(reviews)
+    typer.echo(
+        f"\n{total} finding(s) across {count} review(s).",
+        err=True,
+    )
+    return has_blocking
+
+
+def _output_review_json(reviews: list, errors: list[str]) -> None:
+    """Output review findings as JSON to stdout.
+
+    Args:
+        reviews: List of review entry objects.
+        errors: List of error messages.
+    """
+    import json as json_mod
+
+    data = {
+        "reviews": [
+            {
+                "feature": e.feature_name,
+                "model": e.result.reviewer_model,
+                "confidence": e.result.confidence,
+                "findings": [
+                    {
+                        "category": f.category,
+                        "severity": f.severity.value,
+                        "description": f.description,
+                        "suggestion": f.suggestion,
+                    }
+                    for f in e.result.findings
+                ],
+            }
+            for e in reviews
+        ],
+        "errors": errors,
+    }
+    typer.echo(json_mod.dumps(data, indent=2))
+
+
 @app.command()
 def validate(
     path: str | None = typer.Argument(None, help="File or directory to validate"),
@@ -127,10 +235,20 @@ def validate(
         help="Enable multi-model consensus",
     ),
     plan_review: bool = typer.Option(
-        False, "--plan-review", "-r", help="Run LLM plan substance review",
+        False, "--plan-review", "--review-plan", "-r",
+        help="Run LLM plan substance review",
+    ),
+    review_spec: bool = typer.Option(
+        False, "--review-spec", help="Run LLM spec quality review",
     ),
     all_reviewers: bool = typer.Option(
         False, "--all-reviewers", "-R", help="Use all configured reviewers",
+    ),
+    review_model: str | None = typer.Option(
+        None, "--model", help="Override reviewer model ID",
+    ),
+    no_review: bool = typer.Option(
+        False, "--no-review", help="Skip automatic review (for hook integration)",
     ),
 ) -> None:
     """Validate .specs/ files structurally.
@@ -160,7 +278,10 @@ def validate(
         mutate: Run mutation testing.
         experimental_multi_model: Enable multi-model consensus.
         plan_review: Run LLM-based plan substance review.
+        review_spec: Run LLM-based spec quality review.
         all_reviewers: Use all configured reviewer models.
+        review_model: Override reviewer model ID.
+        no_review: Skip automatic review (for hook integration).
 
     Returns:
         None (exits via typer.Exit with appropriate code).
@@ -174,6 +295,61 @@ def validate(
         raise typer.Exit(1)
 
     # Layer 4 — LLM-dependent features
+
+    # @spec FR-001: CLI flag routing — .specs/features/001-auto-llm-review/spec.md#fr-001
+    if review_spec:
+        from .llm_provider import is_available
+        from .orchestrator import run_spec_review
+        from .semantic.config import load_semantic_config
+
+        if not is_available():
+            typer.echo(
+                "Error: No LLM provider configured.\n"
+                "Create ~/.config/livespec/provider.py with a call_llm() function.\n"
+                "See examples/provider-cchub.py for a template.",
+                err=True,
+            )
+            raise typer.Exit(1)
+
+        target_path = Path(path) if path else None
+        specs_root_for_review = _require_specs_root(target_path)
+        sem_config = load_semantic_config(specs_root_for_review)
+        models = [review_model] if review_model else (sem_config.review_reviewers or None)
+        feature_filter = _resolve_feature_filter(
+            target_path, specs_root_for_review,
+        )
+
+        spec_review_result = run_spec_review(
+            specs_root_for_review,
+            models=models,
+            all_reviewers=all_reviewers,
+            confidence_threshold=sem_config.review_confidence_threshold,
+            feature_filter=feature_filter,
+        )
+
+        # @spec FR-008: JSON output — .specs/features/001-auto-llm-review/spec.md#fr-008
+        if output_format == "json":
+            _output_review_json(spec_review_result.reviews, spec_review_result.errors)
+            has_blocking = any(
+                f.severity.value == "ERROR"
+                for e in spec_review_result.reviews
+                for f in e.result.findings
+            )
+            raise typer.Exit(
+                1 if (strict and has_blocking) or spec_review_result.errors else 0
+            )
+
+        has_blocking = _display_review_findings(
+            spec_review_result.reviews,
+            spec_review_result.errors,
+            review_type="Spec",
+            sem_config=sem_config,
+        )
+
+        # @spec FR-007: Exit code logic — .specs/features/001-auto-llm-review/spec.md#fr-007
+        raise typer.Exit(1 if strict and has_blocking else 0)
+
+    # @spec FR-005: Plan review CLI alias — .specs/features/001-auto-llm-review/spec.md#fr-005
     if plan_review:
         from .llm_provider import is_available
         from .orchestrator import run_plan_review
@@ -191,7 +367,10 @@ def validate(
         target_path = Path(path) if path else None
         specs_root_for_review = _require_specs_root(target_path)
         sem_config = load_semantic_config(specs_root_for_review)
-        models = sem_config.review_reviewers or None
+        models = (
+            [review_model] if review_model
+            else (sem_config.review_reviewers or None)
+        )
         feature_filter = _resolve_feature_filter(
             target_path, specs_root_for_review,
         )
@@ -204,54 +383,27 @@ def validate(
             feature_filter=feature_filter,
         )
 
-        has_blocking = False
-        for entry in review_result.reviews:
-            name = entry.feature_name
-            model = entry.result.reviewer_model
-            typer.echo(
-                f"\nPlan Review: {name} ({model})", err=True,
+        if output_format == "json":
+            _output_review_json(review_result.reviews, review_result.errors)
+            has_blocking = any(
+                f.severity.value == "ERROR"
+                for e in review_result.reviews
+                for f in e.result.findings
             )
-            for finding in entry.result.findings:
-                marker = finding.severity.value
-                typer.echo(f"  [{marker}] {finding.category}: {finding.description}", err=True)
-                if finding.suggestion:
-                    typer.echo(f"    → {finding.suggestion}", err=True)
-                if finding.severity.value == "ERROR":
-                    has_blocking = True
-
-            cx = entry.result.complexity
-            typer.echo(
-                f"  Confidence: {entry.result.confidence}/5 | "
-                f"Findings: {len(entry.result.findings)} | "
-                f"Complexity: {cx.get('fr_count', 0)} FR, {cx.get('file_count', 0)} files, "
-                f"{cx.get('ac_count', 0)} AC, {cx.get('diagram_count', 0)} diagrams",
-                err=True,
+            raise typer.Exit(
+                1 if (strict and has_blocking) or review_result.errors else 0
             )
 
-            # Low confidence warning
-            if (
-                entry.result.confidence < sem_config.review_confidence_threshold
-                and len(entry.result.findings) == 0
-                and sum(cx.values()) > 5
-            ):
-                typer.echo(
-                    "  ⚠ Review suspiciously empty for a plan of this complexity.",
-                    err=True,
-                )
-
-        for error in review_result.errors:
-            typer.echo(f"  Error: {error}", err=True)
-
-        if review_result.errors:
-            has_blocking = True
-
-        total = sum(len(e.result.findings) for e in review_result.reviews)
-        count = len(review_result.reviews)
-        typer.echo(
-            f"\n{total} finding(s) across {count} review(s).",
-            err=True,
+        has_blocking = _display_review_findings(
+            review_result.reviews,
+            review_result.errors,
+            review_type="Plan",
+            sem_config=sem_config,
         )
-        raise typer.Exit(0 if warn_only else (1 if has_blocking else 0))
+
+        raise typer.Exit(
+            0 if warn_only else (1 if (strict and has_blocking) else 0)
+        )
 
     if contradiction_only:
         from .llm_provider import is_available
