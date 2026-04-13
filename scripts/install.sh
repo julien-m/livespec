@@ -8,10 +8,7 @@ set -euo pipefail
 
 LIVESPEC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 COMMANDS_DIR="$HOME/.claude/commands"
-AGENTS_DIR="$HOME/.claude/agents"
 
-COMMANDS=(init migrate propose specify plan implement test check fix explain stack feature ship refine play-coverage preflight hooks status refresh-conventions)
-AGENTS=(livespec-supervisor livespec-implementer livespec-verifier livespec-documenter)
 BOOTSTRAP_COMMANDS=(init migrate)
 
 FORCE=false
