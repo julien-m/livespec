@@ -24,7 +24,7 @@
 ## MVP
 
 <!-- roadmap:mvp:start -->
-- [ ] **Pass 2 smart fixes** — Claude SDK-powered fix suggestions for structural violations (stubbed: `--smart` flag) · Scope: M · Deps: LLM provider abstraction
+- [ ] **Auto LLM review after spec.specify and spec.plan** — automatic LLM review of the generated spec (testable FRs, measurable ACs, sufficient edge cases) and of the generated plan (FR coverage, feasibility). Triggered automatically after generation, advisory by default. Based on existing LLM provider abstraction. · Scope: M · Deps: LLM provider abstraction
 - [ ] **Layer 3 CLI surface** — Expose Level 3b SDK-isolated validation as a distinct CLI flag (tests exist, flag not yet wired) · Scope: M
 <!-- roadmap:mvp:end -->
 
