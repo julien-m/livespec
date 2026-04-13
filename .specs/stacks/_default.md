@@ -59,7 +59,7 @@ updated: 2026-04-13
 
 ## LLM Provider
 
-The LLM provider is NOT part of the stack — it is user-configured via `~/.config/livespec/provider.py`. This pluggable interface allows any LLM backend (Anthropic API, cc-hub, local model) to be used for Layer 4 features. See `ADR-003` for rationale.
+The LLM provider is NOT part of the stack — it is user-configured via `~/.config/livespec/provider.py`. This pluggable interface allows any LLM backend (Anthropic API, cc-hub, local model) to be used for Layer 4 features.
 
 ---
 

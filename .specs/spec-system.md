@@ -604,4 +604,4 @@ If command cannot complete safely, return:
 
 ---
 
-*LiveSpec v1.0 — The spec is the source of truth.*
+*LiveSpec v3 — The spec is the source of truth.*

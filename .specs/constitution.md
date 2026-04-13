@@ -28,7 +28,7 @@
 - LLM calls are never hardcoded to a specific provider or model
 - The pluggable `call_llm()` interface (`~/.config/livespec/provider.py`) is the only LLM entry point
 - LLM-dependent features (Layer 4) degrade gracefully when no provider is configured — they fail fast with a clear error, never silently
-- See `ADR-003` for the provider abstraction rationale
+- Provider setup details live in `.specs/stacks/_default.md` and `validator/llm_provider.py`
 
 ### 3. File-System as Source of Truth
 - The `.specs/` directory is the sole source of truth for project state — no database, no remote service
@@ -37,7 +37,7 @@
 
 ### 4. Fail Fast, Exit Clearly
 - Validate inputs at the earliest possible point (CLI argument parsing → file existence → YAML parsing → schema validation)
-- Return specific exit codes: 0 (pass), 1 (error), 2 (reserved for future use)
+- Return specific exit codes: 0 (success), 1 (general error), 2 (invalid args), 3 (config error), 130 (Ctrl+C)
 - Error messages always identify: file path, rule ID, and actionable fix
 - No silent swallowing of exceptions; all errors are surfaced to the user
 
