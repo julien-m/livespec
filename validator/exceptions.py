@@ -75,8 +75,7 @@ class ContradictionComparisonError(Exception):
         self.reason = reason
 
 
-# @spec FR-002: SDK dependency check error + install hint
-# .specs/features/002-layer-3-cli-surface/spec.md#fr-002
+# @spec FR-002: SDK dependency check error + install hint — .specs/features/002-layer-3-cli-surface/spec.md#fr-002
 class SdkDependencyError(Exception):
     """Raised when claude-agent-sdk is not importable.
 
@@ -94,8 +93,7 @@ class SdkDependencyError(Exception):
         self.install_hint: str = self.INSTALL_HINT
 
 
-# @spec FR-004: Subprocess failure error
-# .specs/features/002-layer-3-cli-surface/spec.md#fr-004
+# @spec FR-004: Subprocess failure error — .specs/features/002-layer-3-cli-surface/spec.md#fr-004
 class SdkTestRunError(Exception):
     """Raised when the pytest subprocess fails to start.
 

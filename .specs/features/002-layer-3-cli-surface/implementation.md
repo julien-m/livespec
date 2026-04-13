@@ -29,10 +29,10 @@ updated: 2026-04-13
 | @spec FR-003 | `spec.md#fr-003` | `validator/cli.py` — ANTHROPIC_API_KEY warning |
 | @spec FR-004 | `spec.md#fr-004` | `validator/sdk_test_runner.py` — `SdkTestRunner.run()`, `validator/exceptions.py` — `SdkTestRunError` |
 | @spec FR-005 | `spec.md#fr-005` | `validator/cli.py` — exit code mapping (exit 5 → 0, non-zero → 1) |
-| @spec FR-006 | `spec.md#fr-006` | `validator/cli.py` — `_resolve_feature_slug()`, `validator/sdk_test_runner.py` — `-k` filter |
-| @spec FR-007 | `spec.md#fr-007` | `validator/sdk_test_runner.py` — `_build_subprocess_env()` |
-| @spec FR-008 | `spec.md#fr-008` | `validator/cli.py` — `_output_sdk_result_json()`, `validator/sdk_test_runner.py` — `SdkTestResult` |
-| @spec FR-009 | `spec.md#fr-009` | `validator/sdk_test_runner.py` — stderr streaming via Popen |
+| @spec FR-006 | `spec.md#fr-006` | `validator/cli.py:92` — `_resolve_feature_slug()`, `validator/sdk_test_runner.py:97` — `-k` filter append |
+| @spec FR-007 | `spec.md#fr-007` | `validator/sdk_test_runner.py:102` — `_build_subprocess_env()` budget forwarding |
+| @spec FR-008 | `spec.md#fr-008` | `validator/cli.py` — `_output_sdk_result_json()`, `validator/sdk_test_runner.py:19` — `SdkTestResult` schema |
+| @spec FR-009 | `spec.md#fr-009` | `validator/sdk_test_runner.py:166` — stderr streaming loop in `run()` |
 
 ## AC Coverage
 

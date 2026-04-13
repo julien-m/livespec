@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-04-13 -- Fix: Feature 002 anchors fixed
+
+[Feature 002] Fix: Added 3 missing @spec anchors (FR-006, FR-007, FR-009), normalized all to single-line convention — 100% anchor alignment (9/9)
+
+---
+
+## 2026-04-13 -- Check: Feature 002 checked
+
+[Feature 002] Check: 100% functional (9/9 FR, 10/10 AC), 67% anchors (6/9) — 3 missing @spec anchors
+
+---
+
 ## 2026-04-13 -- Plan: Feature 002 planned
 
 [Feature 002] Plan created: Layer 3 CLI Surface -- 7 implementation steps, 3 diagrams, 1 new file + 2 modified + 2 test files

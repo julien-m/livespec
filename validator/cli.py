@@ -88,6 +88,7 @@ def _resolve_feature_filter(
     return rel.parts[0] if rel.parts else None
 
 
+# @spec FR-006: Feature slug resolution — .specs/features/002-layer-3-cli-surface/spec.md#fr-006
 def _resolve_feature_slug(path: Path | None, specs_root: Path) -> str | None:
     """Derive a pytest -k slug from an optional feature directory path.
 
@@ -371,8 +372,7 @@ def validate(
         typer.echo("Error: --staged and PATH are mutually exclusive", err=True)
         raise typer.Exit(1)
 
-    # @spec FR-001: --sdk-isolated flag routing
-    # .specs/features/002-layer-3-cli-surface/spec.md#fr-001
+    # @spec FR-001: --sdk-isolated flag routing — .specs/features/002-layer-3-cli-surface/spec.md#fr-001
     if sdk_isolated:
         import importlib.util
         import os
@@ -380,12 +380,12 @@ def validate(
         from .exceptions import SdkDependencyError, SdkTestRunError
         from .sdk_test_runner import SdkTestRunner
 
-        # @spec FR-002: SDK dependency check
+        # @spec FR-002: SDK dependency check — .specs/features/002-layer-3-cli-surface/spec.md#fr-002
         if importlib.util.find_spec("claude_agent_sdk") is None:
             typer.echo(str(SdkDependencyError()), err=True)
             raise typer.Exit(1)
 
-        # @spec FR-003: API key warning
+        # @spec FR-003: API key warning — .specs/features/002-layer-3-cli-surface/spec.md#fr-003
         if os.environ.get("ANTHROPIC_API_KEY") is None:
             typer.echo(
                 "Warning: ANTHROPIC_API_KEY not set"
@@ -407,7 +407,7 @@ def validate(
             typer.echo(f"Error: {exc}", err=True)
             raise typer.Exit(1)  # noqa: B904
 
-        # @spec FR-005: Exit code mapping — exit 5 = no tests collected
+        # @spec FR-005: Exit code mapping — .specs/features/002-layer-3-cli-surface/spec.md#fr-005
         if sdk_result.exit_code == 5:
             typer.echo(
                 "Warning: no level_3b tests collected"
@@ -416,7 +416,7 @@ def validate(
             )
             raise typer.Exit(0)
 
-        # @spec FR-008: JSON output
+        # @spec FR-008: JSON output — .specs/features/002-layer-3-cli-surface/spec.md#fr-008
         if output_format == "json":
             _output_sdk_result_json(sdk_result)
 

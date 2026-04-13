@@ -16,8 +16,7 @@ from pathlib import Path
 
 from .exceptions import SdkTestRunError
 
-# @spec FR-008: SdkTestResult schema
-# .specs/features/002-layer-3-cli-surface/spec.md#fr-008
+# @spec FR-008: SdkTestResult schema — .specs/features/002-layer-3-cli-surface/spec.md#fr-008
 _PASSED_RE = re.compile(r"(\d+) passed")
 _FAILED_RE = re.compile(r"(\d+) failed")
 _SKIPPED_RE = re.compile(r"(\d+) skipped")
@@ -93,11 +92,13 @@ def _build_pytest_cmd(feature_slug: str | None) -> list[str]:
         "-v",
         "--tb=short",
     ]
+    # @spec FR-006: Append -k filter — .specs/features/002-layer-3-cli-surface/spec.md#fr-006
     if feature_slug is not None:
         cmd.extend(["-k", feature_slug])
     return cmd
 
 
+# @spec FR-007: Forward budget env var — .specs/features/002-layer-3-cli-surface/spec.md#fr-007
 def _build_subprocess_env(budget_usd: float | None) -> dict[str, str]:
     """Build environment dict for the pytest subprocess.
 
@@ -115,8 +116,7 @@ def _build_subprocess_env(budget_usd: float | None) -> dict[str, str]:
     return env
 
 
-# @spec FR-004: Subprocess invocation for level_3b tests
-# .specs/features/002-layer-3-cli-surface/spec.md#fr-004
+# @spec FR-004: Subprocess invocation for level_3b tests — .specs/features/002-layer-3-cli-surface/spec.md#fr-004
 class SdkTestRunner:
     """Service that wraps pytest subprocess for Level 3b SDK-isolated tests.
 
@@ -161,6 +161,7 @@ class SdkTestRunner:
         except (FileNotFoundError, PermissionError) as exc:
             raise SdkTestRunError(cmd, str(exc)) from exc
 
+        # @spec FR-009: Stream pytest output to stderr — .specs/features/002-layer-3-cli-surface/spec.md#fr-009
         lines: list[str] = []
         assert proc.stdout is not None  # guaranteed by PIPE
         for raw_line in iter(proc.stdout.readline, b""):
