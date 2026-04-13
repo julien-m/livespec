@@ -6,6 +6,7 @@ import json
 import shutil
 from pathlib import Path
 
+import click
 from typer.testing import CliRunner
 
 from validator.cli import app
@@ -218,7 +219,7 @@ class TestNoReviewFlag:
         """--no-review flag is documented in validate help."""
         result = runner.invoke(app, ["validate", "--help"])
         assert result.exit_code == 0
-        assert "--no-review" in result.output
+        assert "--no-review" in click.unstyle(result.output)
 
 
 class TestSdkIsolatedFlag:
@@ -228,7 +229,7 @@ class TestSdkIsolatedFlag:
         """--sdk-isolated flag appears in validate --help output."""
         result = runner.invoke(app, ["validate", "--help"])
         assert result.exit_code == 0
-        assert "--sdk-isolated" in result.output
+        assert "--sdk-isolated" in click.unstyle(result.output)
 
     def test_sdk_isolated_missing_sdk_exits_1(self, tmp_path: Path) -> None:
         """Missing claude-agent-sdk produces error with install hint."""

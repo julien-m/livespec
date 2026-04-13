@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import click
 from typer.testing import CliRunner
 
 from validator.cli import app
@@ -17,9 +18,7 @@ def _write_specs_with_errors(base: Path) -> Path:
     specs.mkdir(parents=True)
 
     # Roadmap checked item pointing to missing feature -> R1.1 ERROR
-    (specs / "roadmap.md").write_text(
-        "# Roadmap\n\n- [x] [Ghost](features/099-ghost/)\n"
-    )
+    (specs / "roadmap.md").write_text("# Roadmap\n\n- [x] [Ghost](features/099-ghost/)\n")
 
     # A real feature exists
     feat = specs / "features" / "001-auth"
@@ -27,9 +26,7 @@ def _write_specs_with_errors(base: Path) -> Path:
     (feat / "spec.md").write_text("---\nstatus: Draft\n---\n# Auth\n")
 
     # README referencing the ghost feature -> R4.1 ERROR
-    (specs / "README.md").write_text(
-        "| [099-ghost](features/099-ghost/) | Draft |\n"
-    )
+    (specs / "README.md").write_text("| [099-ghost](features/099-ghost/) | Draft |\n")
 
     return specs
 
@@ -39,9 +36,7 @@ def _write_clean_specs(base: Path) -> Path:
     specs = base / ".specs"
     specs.mkdir(parents=True)
 
-    (specs / "roadmap.md").write_text(
-        "# Roadmap\n\n- [x] [Auth](features/001-auth/)\n"
-    )
+    (specs / "roadmap.md").write_text("# Roadmap\n\n- [x] [Auth](features/001-auth/)\n")
 
     feat = specs / "features" / "001-auth"
     feat.mkdir(parents=True)
@@ -49,9 +44,7 @@ def _write_clean_specs(base: Path) -> Path:
     (feat / "plan.md").write_text("# Plan\n")
     (feat / "implementation.md").write_text("# Implementation\n")
 
-    (specs / "README.md").write_text(
-        "| [001-auth](features/001-auth/) | Implemented |\n"
-    )
+    (specs / "README.md").write_text("| [001-auth](features/001-auth/) | Implemented |\n")
 
     return specs
 
@@ -62,13 +55,14 @@ class TestCoherenceHelp:
     def test_validate_help_shows_coherence_flags(self) -> None:
         result = runner.invoke(app, ["validate", "--help"])
         assert result.exit_code == 0
-        assert "--coherence" in result.output
-        assert "--coherence-only" in result.output
-        assert "--strict" in result.output
-        assert "--wave" in result.output
-        assert "--rules" in result.output
-        assert "--ignore" in result.output
-        assert "--no-suppress" in result.output
+        output = click.unstyle(result.output)
+        assert "--coherence" in output
+        assert "--coherence-only" in output
+        assert "--strict" in output
+        assert "--wave" in output
+        assert "--rules" in output
+        assert "--ignore" in output
+        assert "--no-suppress" in output
 
 
 class TestCoherenceOnly:
@@ -133,9 +127,7 @@ class TestStrict:
         feat.mkdir(parents=True)
         (feat / "spec.md").write_text("---\nstatus: Draft\n---\n# Auth\n")
         # README missing -> R4.2 WARNING, but no ERROR
-        (specs / "roadmap.md").write_text(
-            "# Roadmap\n\n- [ ] [Auth](features/001-auth/)\n"
-        )
+        (specs / "roadmap.md").write_text("# Roadmap\n\n- [ ] [Auth](features/001-auth/)\n")
 
         result = runner.invoke(
             app,
@@ -155,8 +147,12 @@ class TestCoherenceWithFiltering:
         result = runner.invoke(
             app,
             [
-                "validate", "--coherence-only", "--format", "json",
-                "--rules", "R4",
+                "validate",
+                "--coherence-only",
+                "--format",
+                "json",
+                "--rules",
+                "R4",
                 str(tmp_path / ".specs"),
             ],
         )
@@ -169,8 +165,10 @@ class TestCoherenceWithFiltering:
         result = runner.invoke(
             app,
             [
-                "validate", "--coherence-only",
-                "--wave", "1",
+                "validate",
+                "--coherence-only",
+                "--wave",
+                "1",
                 str(tmp_path / ".specs"),
             ],
         )
@@ -183,8 +181,10 @@ class TestCoherenceWithFiltering:
         result = runner.invoke(
             app,
             [
-                "validate", "--coherence-only",
-                "--ignore", "R1.1,R4.1",
+                "validate",
+                "--coherence-only",
+                "--ignore",
+                "R1.1,R4.1",
                 str(tmp_path / ".specs"),
             ],
         )
