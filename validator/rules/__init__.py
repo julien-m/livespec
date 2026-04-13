@@ -13,9 +13,7 @@ __all__ = ["validate_by_type", "validate_sections"]
 _PLACEHOLDER_PATTERN = re.compile(r"\[(?:TBD|PLACEHOLDER|TODO)\]", re.IGNORECASE)
 
 
-def validate_by_type(
-    content: str, file_type: str, code_blocks: list[dict]
-) -> list[str]:
+def validate_by_type(content: str, file_type: str, code_blocks: list[dict]) -> list[str]:
     """Run type-specific validation rules and return errors.
 
     Args:

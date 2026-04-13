@@ -79,9 +79,7 @@ class SpecGraph:
 
 
 # Regex for roadmap checklist items
-_CHECKLIST_RE = re.compile(
-    r"^- \[([ xX])\]\s+(?:\[([^\]]+)\]\(([^)]+)\)|(.+))$", re.MULTILINE
-)
+_CHECKLIST_RE = re.compile(r"^- \[([ xX])\]\s+(?:\[([^\]]+)\]\(([^)]+)\)|(.+))$", re.MULTILINE)
 
 # Regex for feature dir names (NNN-slug)
 _FEATURE_DIR_RE = re.compile(r"^(\d+)-(.+)$")
@@ -90,9 +88,7 @@ _FEATURE_DIR_RE = re.compile(r"^(\d+)-(.+)$")
 _SPEC_ANCHOR_RE = re.compile(r"@spec\(?((?:FR|AC)-\d+)\)?")
 
 # Regex for implementation.md file mapping (| FR-xxx | desc | path |)
-_IMPL_PATH_RE = re.compile(
-    r"\|\s*((?:FR|AC)-\d+)\s*\|[^|]*\|\s*`?([^|`\n]+?)`?\s*\|"
-)
+_IMPL_PATH_RE = re.compile(r"\|\s*((?:FR|AC)-\d+)\s*\|[^|]*\|\s*`?([^|`\n]+?)`?\s*\|")
 
 
 def _parse_roadmap(specs_root: Path) -> list[RoadmapItem]:
@@ -123,9 +119,9 @@ def _parse_roadmap(specs_root: Path) -> list[RoadmapItem]:
             parts = link.split("features/")[-1].split("/")[0]
             slug = parts
 
-        items.append(RoadmapItem(
-            name=name, slug=slug, checked=checked, link=link, line_number=line_number
-        ))
+        items.append(
+            RoadmapItem(name=name, slug=slug, checked=checked, link=link, line_number=line_number)
+        )
 
     return items
 
@@ -179,16 +175,18 @@ def _parse_features(specs_root: Path) -> list[FeatureInfo]:
             except (yaml.YAMLError, OSError) as exc:
                 logging.warning("Failed to read %s: %s", impl_path, exc)
 
-        features.append(FeatureInfo(
-            dir_name=d.name,
-            num=num,
-            slug=slug,
-            files=files,
-            status=status,
-            spec_anchors=spec_anchors,
-            spec_mtime=spec_mtime,
-            implementation_paths=impl_paths,
-        ))
+        features.append(
+            FeatureInfo(
+                dir_name=d.name,
+                num=num,
+                slug=slug,
+                files=files,
+                status=status,
+                spec_anchors=spec_anchors,
+                spec_mtime=spec_mtime,
+                implementation_paths=impl_paths,
+            )
+        )
 
     return features
 
@@ -205,9 +203,7 @@ def _parse_readme(specs_root: Path) -> tuple[list[str], dict[str, str]]:
 
     # Look for table rows or links referencing features/NNN-name
     feature_link_re = re.compile(r"features/(\d+-[^/)\s|]+)")
-    status_re = re.compile(
-        r"\|\s*\[?(?:features/)?(\d+-[^/)\]\s|]+)\]?[^|]*\|\s*(\w[\w\s]*?)\s*\|"
-    )
+    status_re = re.compile(r"\|\s*\[?(?:features/)?(\d+-[^/)\]\s|]+)\]?[^|]*\|\s*(\w[\w\s]*?)\s*\|")
 
     for line in content.splitlines():
         for m in feature_link_re.finditer(line):

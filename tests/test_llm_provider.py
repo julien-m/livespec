@@ -47,7 +47,7 @@ class TestProviderLoaded:
     def test_loads_and_calls(self, tmp_path, monkeypatch):
         provider_file = tmp_path / "provider.py"
         provider_file.write_text(
-            'def call_llm(prompt, json_schema=None, model=None):\n'
+            "def call_llm(prompt, json_schema=None, model=None):\n"
             '    return f"echo:{prompt}:{model}"\n'
         )
         monkeypatch.setattr("validator.llm_provider.PROVIDER_PATH", provider_file)
@@ -60,14 +60,15 @@ class TestProviderLoaded:
     def test_json_schema_passed(self, tmp_path, monkeypatch):
         provider_file = tmp_path / "provider.py"
         provider_file.write_text(
-            'import json\n'
-            'def call_llm(prompt, json_schema=None, model=None):\n'
+            "import json\n"
+            "def call_llm(prompt, json_schema=None, model=None):\n"
             '    return json.dumps({"has_schema": json_schema is not None})\n'
         )
         monkeypatch.setattr("validator.llm_provider.PROVIDER_PATH", provider_file)
         reset()
 
         import json
+
         result = json.loads(call_llm("test", json_schema={"type": "object"}))
         assert result["has_schema"] is True
 

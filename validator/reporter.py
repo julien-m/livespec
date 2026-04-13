@@ -112,19 +112,19 @@ def _report_full(results: list[FileResult], specs_root: Path | None) -> None:
     )
 
 
-def _report_json(
-    results: list[FileResult], excluded: list[str], specs_root: Path | None
-) -> str:
+def _report_json(results: list[FileResult], excluded: list[str], specs_root: Path | None) -> str:
     """Machine-readable JSON output."""
     files = []
     for r in results:
-        files.append({
-            "path": _rel_path(r.path, specs_root),
-            "type": r.file_type,
-            "errors": [{"category": e.category, "message": e.message} for e in r.errors],
-            "warnings": [{"category": w.category, "message": w.message} for w in r.warnings],
-            "score": r.score,
-        })
+        files.append(
+            {
+                "path": _rel_path(r.path, specs_root),
+                "type": r.file_type,
+                "errors": [{"category": e.category, "message": e.message} for e in r.errors],
+                "warnings": [{"category": w.category, "message": w.message} for w in r.warnings],
+                "score": r.score,
+            }
+        )
 
     output = {
         "files": files,

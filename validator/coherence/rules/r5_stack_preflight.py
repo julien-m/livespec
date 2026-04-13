@@ -38,8 +38,7 @@ class R5_1_StackNoPreflight:
                         rule_id=self.rule_id,
                         severity=Severity.INFO,
                         message=(
-                            f"Stack technology '{tech}' is not mentioned "
-                            f"in any preflight check"
+                            f"Stack technology '{tech}' is not mentioned in any preflight check"
                         ),
                         context={"technology": tech},
                         fix_hint=(

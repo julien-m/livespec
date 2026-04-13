@@ -87,9 +87,7 @@ Assertion A (from {source_a}): {text_a}
 Assertion B (from {source_b}): {text_b}"""
 
 
-def extract_assertions(
-    content: str, source_file: str, model: str | None = None
-) -> list[Assertion]:
+def extract_assertions(content: str, source_file: str, model: str | None = None) -> list[Assertion]:
     """Extract semantic assertions from spec content via LLM.
 
     Args:
@@ -132,6 +130,7 @@ def extract_assertions(
     }
 
     import json
+
     raw = call_llm(prompt, json_schema=schema, model=model)
     data = json.loads(raw)
 
@@ -148,9 +147,7 @@ def extract_assertions(
     ]
 
 
-def compare_assertions(
-    a: Assertion, b: Assertion, model: str | None = None
-) -> ContradictionResult:
+def compare_assertions(a: Assertion, b: Assertion, model: str | None = None) -> ContradictionResult:
     """Compare two assertions for semantic contradiction via LLM.
 
     Args:
@@ -186,6 +183,7 @@ def compare_assertions(
     }
 
     import json
+
     raw = call_llm(prompt, json_schema=schema, model=model)
     data = json.loads(raw)
 

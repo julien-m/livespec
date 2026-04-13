@@ -43,16 +43,10 @@ def section_present(headings: list[str], keywords: list[str]) -> bool:
         True if at least one keyword matches a heading.
     """
     lower_headings = [h.lower() for h in headings]
-    return any(
-        kw.lower() in heading
-        for heading in lower_headings
-        for kw in keywords
-    )
+    return any(kw.lower() in heading for heading in lower_headings for kw in keywords)
 
 
-def validate_sections(
-    headings: list[str], file_type: str
-) -> tuple[list[str], list[str]]:
+def validate_sections(headings: list[str], file_type: str) -> tuple[list[str], list[str]]:
     """Validate section presence for a given file type.
 
     Args:

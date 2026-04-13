@@ -10,8 +10,16 @@ from typing import Literal
 import yaml
 
 ALL_TYPES = [
-    "spec", "plan", "implementation", "roadmap", "changelog",
-    "stack", "preflight", "progress", "constitution", "project",
+    "spec",
+    "plan",
+    "implementation",
+    "roadmap",
+    "changelog",
+    "stack",
+    "preflight",
+    "progress",
+    "constitution",
+    "project",
 ]
 
 DEFAULT_EXCLUSIONS = [

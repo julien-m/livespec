@@ -81,8 +81,7 @@ class R1_2_OrphanFeature:
                         rule_id=self.rule_id,
                         severity=Severity.WARNING,
                         message=(
-                            f"Feature '{feature.dir_name}' is not referenced "
-                            f"in any roadmap item"
+                            f"Feature '{feature.dir_name}' is not referenced in any roadmap item"
                         ),
                         context={"dir_name": feature.dir_name},
                         fix_hint=f"Add features/{feature.dir_name} to roadmap.md",
@@ -142,9 +141,13 @@ class R1_3_StatusRoadmapMismatch:
                     )
                 )
             elif (
-                status in (
-                    "Draft", "Planned", "In Progress",
-                    "Approved", "Review",
+                status
+                in (
+                    "Draft",
+                    "Planned",
+                    "In Progress",
+                    "Approved",
+                    "Review",
                 )
                 and item.checked
             ):
@@ -162,8 +165,7 @@ class R1_3_StatusRoadmapMismatch:
                             "checked": item.checked,
                         },
                         fix_hint=(
-                            "Uncheck the roadmap item or update"
-                            " the feature status to Implemented"
+                            "Uncheck the roadmap item or update the feature status to Implemented"
                         ),
                         suppress_if_creating=True,
                     )

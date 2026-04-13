@@ -18,7 +18,7 @@ class ValidationResult:
 
 def validate_frontmatter(content: str) -> ValidationResult:
     """Validate that YAML frontmatter is present and parseable."""
-    match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
+    match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
     if not match:
         return ValidationResult(valid=False, errors=["No YAML frontmatter found"])
     try:
@@ -38,14 +38,14 @@ def validate_spec_sections(content: str, required_sections: list[str]) -> Valida
 
 def validate_gherkin_blocks(content: str, min_per_story: int = 2) -> ValidationResult:
     """Validate Gherkin blocks: presence, syntax, and count relative to stories."""
-    blocks = re.findall(r'```gherkin\n(.*?)```', content, re.DOTALL)
+    blocks = re.findall(r"```gherkin\n(.*?)```", content, re.DOTALL)
     errors = []
     for i, block in enumerate(blocks):
         if "Feature:" not in block:
-            errors.append(f"Block {i+1}: 'Feature:' missing")
+            errors.append(f"Block {i + 1}: 'Feature:' missing")
         if "Scenario:" not in block:
-            errors.append(f"Block {i+1}: 'Scenario:' missing")
-    stories = re.findall(r'### Story \d+', content)
+            errors.append(f"Block {i + 1}: 'Scenario:' missing")
+    stories = re.findall(r"### Story \d+", content)
     story_count = len(stories)
     if blocks and story_count > 0 and len(blocks) < story_count * min_per_story:
         errors.append(
@@ -62,17 +62,14 @@ def validate_gherkin_blocks(content: str, min_per_story: int = 2) -> ValidationR
 
 def validate_mermaid_blocks(content: str, expected_type: str = "flowchart") -> ValidationResult:
     """Validate Mermaid blocks of a given type and count them against stories."""
-    pattern = rf'```mermaid\s*\n{re.escape(expected_type)}'
+    pattern = rf"```mermaid\s*\n{re.escape(expected_type)}"
     matches = re.findall(pattern, content)
-    stories = re.findall(r'### Story \d+', content)
+    stories = re.findall(r"### Story \d+", content)
     story_count = len(stories)
     count = len(matches)
     errors = []
     if story_count > 0 and count < story_count:
-        errors.append(
-            f"Insufficient: {count} {expected_type} diagrams for "
-            f"{story_count} stories"
-        )
+        errors.append(f"Insufficient: {count} {expected_type} diagrams for {story_count} stories")
     return ValidationResult(
         valid=len(errors) == 0,
         errors=errors,
@@ -83,11 +80,11 @@ def validate_mermaid_blocks(content: str, expected_type: str = "flowchart") -> V
 
 def validate_ac_fr_links(content: str) -> ValidationResult:
     """Validate that each FR references at least one AC in its neighborhood."""
-    frs = re.findall(r'(FR-\d{3})', content)
+    frs = re.findall(r"(FR-\d{3})", content)
     orphans = []
     for fr in set(frs):
         idx = content.find(fr)
-        neighborhood = content[idx:idx + 500]
+        neighborhood = content[idx : idx + 500]
         if "AC-" not in neighborhood:
             orphans.append(fr)
     return ValidationResult(valid=len(orphans) == 0, orphan_frs=sorted(orphans))
@@ -95,10 +92,8 @@ def validate_ac_fr_links(content: str) -> ValidationResult:
 
 def validate_spec_anchor_format(content: str) -> ValidationResult:
     """Validate that @spec anchors follow the format: @spec FR-NNN: description -- path#fragment."""
-    anchor_pattern = re.compile(
-        r'@spec\s+FR-\d{3}(?::\s+[^—]{1,50}\s+—\s+[^\s]+#fr-\d{3})?'
-    )
-    raw_anchors = re.findall(r'@spec\s+FR-\d{3}.*', content)
+    anchor_pattern = re.compile(r"@spec\s+FR-\d{3}(?::\s+[^—]{1,50}\s+—\s+[^\s]+#fr-\d{3})?")
+    raw_anchors = re.findall(r"@spec\s+FR-\d{3}.*", content)
     errors = []
     for anchor in raw_anchors:
         if not anchor_pattern.match(anchor):
@@ -126,11 +121,12 @@ def validate_roadmap_structure(content: str) -> ValidationResult:
             errors.append(f"Missing marker: {end}")
     # Check for at least one item in MVP
     mvp_match = re.search(
-        r'<!-- roadmap:mvp:start -->(.*?)<!-- roadmap:mvp:end -->',
-        content, re.DOTALL,
+        r"<!-- roadmap:mvp:start -->(.*?)<!-- roadmap:mvp:end -->",
+        content,
+        re.DOTALL,
     )
     if mvp_match:
-        items = re.findall(r'^- \[', mvp_match.group(1), re.MULTILINE)
+        items = re.findall(r"^- \[", mvp_match.group(1), re.MULTILINE)
         if len(items) == 0:
             errors.append("MVP section has no items")
     return ValidationResult(valid=len(errors) == 0, errors=errors)

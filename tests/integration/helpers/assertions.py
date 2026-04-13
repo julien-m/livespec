@@ -43,11 +43,8 @@ def assert_adr_exists(specs_root: Path) -> None:
     """Check that at least one ADR file exists in the decisions directory."""
     decisions_dir = specs_root / "stacks" / "decisions"
     if not decisions_dir.exists():
-        raise AssertionError(
-            f"Decisions directory not found: {decisions_dir}"
-        )
+        raise AssertionError(f"Decisions directory not found: {decisions_dir}")
     adrs = list(decisions_dir.glob("ADR-*.md"))
     assert len(adrs) >= 1, (
-        f"No ADR files found in {decisions_dir}. "
-        f"At least one ADR is required by the quality gate."
+        f"No ADR files found in {decisions_dir}. At least one ADR is required by the quality gate."
     )

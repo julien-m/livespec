@@ -40,9 +40,11 @@ def pytest_collection_modifyitems(config, items):
 
         # If none of the test's level markers are in the allowed set, skip it
         if not (level_marks & allowed):
-            item.add_marker(pytest.mark.skip(
-                reason=f"Test level {level_marks} not included in LIVESPEC_TEST_LEVEL={level}"
-            ))
+            item.add_marker(
+                pytest.mark.skip(
+                    reason=f"Test level {level_marks} not included in LIVESPEC_TEST_LEVEL={level}"
+                )
+            )
 
 
 @pytest.fixture(scope="session")

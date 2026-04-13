@@ -159,9 +159,7 @@ def review_spec(
     findings = [
         ReviewFinding(
             category=f.get("category", "general"),
-            severity=severity_map.get(
-                f.get("severity", "warning"), Severity.WARNING
-            ),
+            severity=severity_map.get(f.get("severity", "warning"), Severity.WARNING),
             description=f.get("description", ""),
             suggestion=f.get("suggestion", ""),
         )

@@ -11,7 +11,6 @@ from rich.text import Text
 from .violation import Severity, Violation
 
 if TYPE_CHECKING:  # Circular: rule_engine imports from report indirectly
-
     from .rule_engine import CoherenceResult
 
 
@@ -85,9 +84,7 @@ def _report_console(result: CoherenceResult) -> None:
         name = group_names.get(group_id, group_id)
         console.print(f"[bold]{group_id} — {name}[/]")
         for v in groups[group_id]:
-            label, style = _SEVERITY_STYLE.get(
-                v.severity, ("???   ", "dim")
-            )
+            label, style = _SEVERITY_STYLE.get(v.severity, ("???   ", "dim"))
             line = Text()
             line.append(f"  [{v.rule_id}] ", style="bold")
             line.append(label, style=style)
@@ -118,21 +115,25 @@ def _report_json(result: CoherenceResult) -> str:
     """Machine-readable JSON output."""
     violations = []
     for v in result.violations:
-        violations.append({
-            "rule_id": v.rule_id,
-            "severity": v.severity.value,
-            "message": v.message,
-            "context": v.context,
-            "fix_hint": v.fix_hint,
-        })
+        violations.append(
+            {
+                "rule_id": v.rule_id,
+                "severity": v.severity.value,
+                "message": v.message,
+                "context": v.context,
+                "fix_hint": v.fix_hint,
+            }
+        )
 
     suppressed = []
     for v in result.suppressed:
-        suppressed.append({
-            "rule_id": v.rule_id,
-            "severity": v.severity.value,
-            "message": v.message,
-        })
+        suppressed.append(
+            {
+                "rule_id": v.rule_id,
+                "severity": v.severity.value,
+                "message": v.message,
+            }
+        )
 
     output = {
         "graph": {

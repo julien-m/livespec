@@ -44,9 +44,7 @@ def review_spec_auto(
         spec_content = spec_path.read_text()
         return review_spec(spec_content)
     except Exception:
-        logger.warning(
-            "Spec review failed for %s", feature_dir, exc_info=True
-        )
+        logger.warning("Spec review failed for %s", feature_dir, exc_info=True)
         return None
 
 
@@ -91,11 +89,7 @@ def review_plan_auto(
         specs_root = feature_dir.parent.parent
         constitution_path = specs_root / "constitution.md"
         stack_path = specs_root / "stacks" / "_default.md"
-        constitution = (
-            constitution_path.read_text()
-            if constitution_path.exists()
-            else ""
-        )
+        constitution = constitution_path.read_text() if constitution_path.exists() else ""
         stack = stack_path.read_text() if stack_path.exists() else ""
 
         return review_plan(
@@ -105,7 +99,5 @@ def review_plan_auto(
             constitution_content=constitution,
         )
     except Exception:
-        logger.warning(
-            "Plan review failed for %s", feature_dir, exc_info=True
-        )
+        logger.warning("Plan review failed for %s", feature_dir, exc_info=True)
         return None

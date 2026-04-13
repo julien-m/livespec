@@ -54,9 +54,7 @@ AXIS_WEIGHTS: dict[str, float] = {
 
 _NEEDS_CLARIFICATION_RE = re.compile(r"\[NEEDS\s+CLARIFICATION\]", re.IGNORECASE)
 _GHERKIN_BLOCK_RE = re.compile(r"```gherkin", re.IGNORECASE)
-_MERMAID_BLOCK_RE = re.compile(
-    r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORECASE
-)
+_MERMAID_BLOCK_RE = re.compile(r"```mermaid\s*\n(.*?)```", re.DOTALL | re.IGNORECASE)
 _FR_ID_RE = re.compile(r"\bFR-\d+\b")
 _AC_ID_RE = re.compile(r"\bAC-\d+\b")
 _SPEC_ANCHOR_RE = re.compile(r"@spec\(?((?:FR|AC)-\d+)\)?")
@@ -310,10 +308,6 @@ def score_project(features: list[FeatureInfo], specs_root: Path) -> ProjectScore
     """
     feature_scores = [score_feature(f, specs_root) for f in features]
 
-    total = (
-        sum(fs.total for fs in feature_scores) / len(feature_scores)
-        if feature_scores
-        else 0.0
-    )
+    total = sum(fs.total for fs in feature_scores) / len(feature_scores) if feature_scores else 0.0
 
     return ProjectScore(features=feature_scores, total=round(total, 1))

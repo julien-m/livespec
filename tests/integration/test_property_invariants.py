@@ -58,16 +58,13 @@ class TestSpecMdInvariants:
         """Each story MUST have a Mermaid flowchart."""
         result = validate_mermaid_blocks(spec_md, expected_type="flowchart")
         assert result.count >= result.story_count, (
-            f"Insufficient Mermaid: {result.count} flowcharts for "
-            f"{result.story_count} stories"
+            f"Insufficient Mermaid: {result.count} flowcharts for {result.story_count} stories"
         )
 
     def test_no_unresolved_decision_needed(self, spec_md: str):
         """Output MUST NOT contain unresolved [DECISION NEEDED] markers."""
         unresolved = re.findall(r"\[DECISION NEEDED\]", spec_md, re.IGNORECASE)
-        assert len(unresolved) == 0, (
-            f"{len(unresolved)} unresolved [DECISION NEEDED] marker(s)"
-        )
+        assert len(unresolved) == 0, f"{len(unresolved)} unresolved [DECISION NEEDED] marker(s)"
 
     def test_fr_maps_to_ac(self, spec_md: str):
         """Each FR MUST reference at least one AC."""
@@ -87,16 +84,12 @@ class TestSpecMdInvariants:
                     seen.append(num)
             ac_definitions = seen
         expected = [f"{i + 1:03d}" for i in range(len(ac_definitions))]
-        assert ac_definitions == expected, (
-            f"Non-sequential AC numbering: {ac_definitions}"
-        )
+        assert ac_definitions == expected, f"Non-sequential AC numbering: {ac_definitions}"
 
     def test_no_excessive_needs_clarification(self, spec_md: str):
         """Max 3 [NEEDS CLARIFICATION] markers allowed."""
         markers = re.findall(r"\[NEEDS CLARIFICATION\]", spec_md, re.IGNORECASE)
-        assert len(markers) <= 3, (
-            f"{len(markers)} [NEEDS CLARIFICATION] markers (max: 3)"
-        )
+        assert len(markers) <= 3, f"{len(markers)} [NEEDS CLARIFICATION] markers (max: 3)"
 
 
 @pytest.mark.level_3a
@@ -116,9 +109,7 @@ class TestSpecAnchorFormat:
             content = path.read_text()
             raw_anchors = re.findall(r"@spec\s+FR-\d{3}.*", content)
             for anchor in raw_anchors:
-                assert anchor_pattern.match(anchor), (
-                    f"Malformed anchor in {path.name}: {anchor!r}"
-                )
+                assert anchor_pattern.match(anchor), f"Malformed anchor in {path.name}: {anchor!r}"
 
 
 @pytest.mark.level_3a

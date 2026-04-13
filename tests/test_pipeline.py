@@ -62,12 +62,22 @@ def specs_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 class TestPipelineInit:
     def test_creates_pipeline_md(self, specs_root: Path) -> None:
         feature_dir = specs_root / "features" / "001-test"
-        result = runner.invoke(app, ["pipeline", "init", "--feature", "001-test"], catch_exceptions=False)
+        result = runner.invoke(
+            app, ["pipeline", "init", "--feature", "001-test"], catch_exceptions=False
+        )
         assert result.exit_code == 0
         pipeline = feature_dir / "pipeline.md"
         assert pipeline.exists()
         content = pipeline.read_text()
-        for phase in ["Specify", "Spec Review", "Plan", "Plan Review", "Preflight", "Implement", "Test"]:
+        for phase in [
+            "Specify",
+            "Spec Review",
+            "Plan",
+            "Plan Review",
+            "Preflight",
+            "Implement",
+            "Test",
+        ]:
             assert f"| {phase} | Pending |" in content
 
     def test_error_if_feature_not_found(self, specs_root: Path) -> None:
@@ -81,7 +91,16 @@ class TestPipelineUpdate:
         pipeline_path.write_text(PIPELINE_MD)
         result = runner.invoke(
             app,
-            ["pipeline", "update", "--feature", "001-test", "--phase", "specify", "--status", "in_progress"],
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "specify",
+                "--status",
+                "in_progress",
+            ],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -93,7 +112,16 @@ class TestPipelineUpdate:
         pipeline_path.write_text(PIPELINE_MD_PADDED)
         result = runner.invoke(
             app,
-            ["pipeline", "update", "--feature", "001-test", "--phase", "specify", "--status", "done"],
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "specify",
+                "--status",
+                "done",
+            ],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -102,9 +130,33 @@ class TestPipelineUpdate:
     def test_update_is_idempotent(self, specs_root: Path) -> None:
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(PIPELINE_MD)
-        runner.invoke(app, ["pipeline", "update", "--feature", "001-test", "--phase", "specify", "--status", "done"])
+        runner.invoke(
+            app,
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "specify",
+                "--status",
+                "done",
+            ],
+        )
         content_after_first = pipeline_path.read_text()
-        runner.invoke(app, ["pipeline", "update", "--feature", "001-test", "--phase", "specify", "--status", "done"])
+        runner.invoke(
+            app,
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "specify",
+                "--status",
+                "done",
+            ],
+        )
         assert pipeline_path.read_text() == content_after_first
 
     def test_update_unknown_phase_exits_1(self, specs_root: Path) -> None:
@@ -112,7 +164,16 @@ class TestPipelineUpdate:
         pipeline_path.write_text(PIPELINE_MD)
         result = runner.invoke(
             app,
-            ["pipeline", "update", "--feature", "001-test", "--phase", "nonexistent", "--status", "done"],
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "nonexistent",
+                "--status",
+                "done",
+            ],
         )
         assert result.exit_code != 0
         assert pipeline_path.read_text() == PIPELINE_MD  # File must not be mutated
@@ -122,10 +183,20 @@ class TestPipelineRead:
     def test_outputs_json_for_all_phases(self, specs_root: Path) -> None:
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(PIPELINE_MD)
-        result = runner.invoke(app, ["pipeline", "read", "--feature", "001-test"], catch_exceptions=False)
+        result = runner.invoke(
+            app, ["pipeline", "read", "--feature", "001-test"], catch_exceptions=False
+        )
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert set(data.keys()) == {"specify", "spec-review", "plan", "plan-review", "preflight", "implement", "test"}
+        assert set(data.keys()) == {
+            "specify",
+            "spec-review",
+            "plan",
+            "plan-review",
+            "preflight",
+            "implement",
+            "test",
+        }
         assert data["specify"] == "Pending"
 
 
@@ -134,14 +205,24 @@ class TestPipelineNext:
         content = PIPELINE_MD.replace("| Specify | Pending |", "| Specify | Done |")
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(content)
-        result = runner.invoke(app, ["pipeline", "next", "--feature", "001-test"], catch_exceptions=False)
+        result = runner.invoke(
+            app, ["pipeline", "next", "--feature", "001-test"], catch_exceptions=False
+        )
         assert result.exit_code == 0
         assert result.output.strip() == "spec-review"
 
     def test_all_done_exits_2(self, specs_root: Path) -> None:
         """Exit 2 = pipeline complete (success state, not error)."""
         content = PIPELINE_MD
-        for phase in ["Specify", "Spec Review", "Plan", "Plan Review", "Preflight", "Implement", "Test"]:
+        for phase in [
+            "Specify",
+            "Spec Review",
+            "Plan",
+            "Plan Review",
+            "Preflight",
+            "Implement",
+            "Test",
+        ]:
             content = content.replace(f"| {phase} | Pending |", f"| {phase} | Done |")
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(content)

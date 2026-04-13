@@ -185,14 +185,14 @@ def fix_file(
             actions.append(FixAction(path, f"updated corrected to {date.today()}", "updated"))
 
     if file_type == "plan" and "created" not in metadata:
-            metadata["created"] = _file_created_date(path)
-            metadata_changed = True
-            actions.append(FixAction(path, f"created set to {metadata['created']}", "created"))
+        metadata["created"] = _file_created_date(path)
+        metadata_changed = True
+        actions.append(FixAction(path, f"created set to {metadata['created']}", "created"))
 
     if file_type == "stack" and "updated" not in metadata:
-            metadata["updated"] = date.today()
-            metadata_changed = True
-            actions.append(FixAction(path, f"updated set to {metadata['updated']}", "updated"))
+        metadata["updated"] = date.today()
+        metadata_changed = True
+        actions.append(FixAction(path, f"updated set to {metadata['updated']}", "updated"))
 
     # --- Section fixes ---
 
@@ -200,9 +200,7 @@ def fix_file(
 
     rules = SECTION_RULES.get(file_type, {})
     for _key, (keywords, required) in rules.items():
-        if required and not section_present(
-            _extract_headings_from_content(content), keywords
-        ):
+        if required and not section_present(_extract_headings_from_content(content), keywords):
             section_name = keywords[0]
             content = _inject_section(content, section_name, file_type)
             content_changed = True

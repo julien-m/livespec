@@ -40,9 +40,7 @@ class TestValidateFile:
         assert result.file_type == "plan"
         assert not result.has_errors
 
-    def test_unknown_type_skipped(
-        self, specs_root: Path, default_config: ValidatorConfig
-    ) -> None:
+    def test_unknown_type_skipped(self, specs_root: Path, default_config: ValidatorConfig) -> None:
         # Root-level files resolve to their stem; "weird_file" is not in
         # validate_types so validation is effectively skipped.
         unknown = specs_root / "weird_file.md"
@@ -71,9 +69,7 @@ class TestScoreComputation:
         expected = max(0, 100 - len(result.errors) * 20 - len(result.warnings) * 5)
         assert result.score == expected
 
-    def test_score_never_negative(
-        self, specs_root: Path, default_config: ValidatorConfig
-    ) -> None:
+    def test_score_never_negative(self, specs_root: Path, default_config: ValidatorConfig) -> None:
         # Create a spec with many errors
         bad = specs_root / "features" / "001-test" / "spec.md"
         bad.write_text("---\ntitle: ''\nstatus: bad\n---\n\nNo sections.\n")
@@ -102,9 +98,7 @@ class TestValidateAll:
 class TestCollectFiles:
     """File collection with exclusions."""
 
-    def test_exclusion_patterns(
-        self, specs_root: Path, default_config: ValidatorConfig
-    ) -> None:
+    def test_exclusion_patterns(self, specs_root: Path, default_config: ValidatorConfig) -> None:
         # README.md is excluded by default
         readme = specs_root / "README.md"
         readme.write_text("# README\n")
@@ -117,9 +111,7 @@ class TestCollectFiles:
         # spec.md should not be excluded
         assert any(f.name == "spec.md" for f in files)
 
-    def test_archive_excluded(
-        self, specs_root: Path, default_config: ValidatorConfig
-    ) -> None:
+    def test_archive_excluded(self, specs_root: Path, default_config: ValidatorConfig) -> None:
         archive = specs_root / "archive"
         archive.mkdir()
         (archive / "old.md").write_text("# Old\n")

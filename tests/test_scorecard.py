@@ -47,8 +47,11 @@ def _make_feature(
     """Create a FeatureInfo and write files on disk."""
     if files is None:
         files = {
-            "spec": False, "plan": False, "implementation": False,
-            "progress": False, "changelog": False,
+            "spec": False,
+            "plan": False,
+            "implementation": False,
+            "progress": False,
+            "changelog": False,
         }
     return FeatureInfo(
         dir_name=dir_name,
@@ -117,8 +120,11 @@ FR-1: Authentication endpoint.
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": True, "implementation": True,
-                "progress": False, "changelog": True,
+                "spec": True,
+                "plan": True,
+                "implementation": True,
+                "progress": False,
+                "changelog": True,
             },
             status="Draft",
         )
@@ -136,8 +142,11 @@ FR-1: Authentication endpoint.
         feature = _make_feature(
             specs_root,
             files={
-                "spec": False, "plan": False, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": False,
+                "plan": False,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
             status="Draft",
         )
@@ -177,8 +186,11 @@ FR-1: Auth endpoint.
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": False, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": False,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
             status="Draft",
         )
@@ -235,8 +247,11 @@ AC-1: Referenced here.
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": False, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": False,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
         )
 
@@ -275,8 +290,11 @@ FR-1: Authentication endpoint.
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": False, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": False,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
         )
 
@@ -309,8 +327,11 @@ sequenceDiagram
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": True, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": True,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
         )
 
@@ -366,8 +387,11 @@ FR-2: Logout endpoint.
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": False, "implementation": True,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": False,
+                "implementation": True,
+                "progress": False,
+                "changelog": False,
             },
             status="Implemented",
             spec_anchors=["FR-1", "FR-2", "AC-1", "AC-2"],
@@ -402,8 +426,11 @@ FR-1: Login endpoint.
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": False, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": False,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
         )
 
@@ -428,8 +455,11 @@ class TestAxis4:
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": False, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": False,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
         )
 
@@ -487,8 +517,11 @@ sequenceDiagram
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": True, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": True,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
         )
 
@@ -506,8 +539,11 @@ sequenceDiagram
         feature = _make_feature(
             specs_root,
             files={
-                "spec": True, "plan": False, "implementation": False,
-                "progress": False, "changelog": False,
+                "spec": True,
+                "plan": False,
+                "implementation": False,
+                "progress": False,
+                "changelog": False,
             },
         )
 
@@ -531,8 +567,11 @@ class TestProjectScore:
             _write_spec(feature_dir, _BASIC_SPEC)
 
         spec_files = {
-            "spec": True, "plan": False, "implementation": False,
-            "progress": False, "changelog": False,
+            "spec": True,
+            "plan": False,
+            "implementation": False,
+            "progress": False,
+            "changelog": False,
         }
         features = [
             _make_feature(specs_root, dir_name="001-auth", files=spec_files),
@@ -590,12 +629,12 @@ class TestCLI:
 
         result = runner.invoke(
             app,
-            ["validate", "--scorecard", "--warn-only",
-             "--format", "json", str(specs_root)],
+            ["validate", "--scorecard", "--warn-only", "--format", "json", str(specs_root)],
         )
         assert result.exit_code == 0
         # Output contains multiple JSON objects (L1 + scorecard). Parse last one.
         import json
+
         # Find the scorecard JSON (has "total" and "features" keys at root)
         lines = result.output.strip()
         # Split on }{ boundary between two JSON docs

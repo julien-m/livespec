@@ -23,9 +23,7 @@ def _make_spec(specs_root: Path, content: str) -> Path:
 class TestFixInvalidStatus:
     """Fixes invalid status to Draft."""
 
-    def test_fixes_status_to_draft(
-        self, specs_root: Path, default_config: ValidatorConfig
-    ) -> None:
+    def test_fixes_status_to_draft(self, specs_root: Path, default_config: ValidatorConfig) -> None:
         path = _make_spec(
             specs_root,
             "---\ntitle: Test\nstatus: WIP\npriority: P1\n"
@@ -46,9 +44,7 @@ class TestFixInvalidStatus:
 class TestFixMissingPriority:
     """Fixes missing priority to P2."""
 
-    def test_fixes_priority_to_p2(
-        self, specs_root: Path, default_config: ValidatorConfig
-    ) -> None:
+    def test_fixes_priority_to_p2(self, specs_root: Path, default_config: ValidatorConfig) -> None:
         path = _make_spec(
             specs_root,
             "---\ntitle: Test\nstatus: Draft\n"

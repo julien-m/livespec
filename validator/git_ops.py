@@ -34,7 +34,9 @@ def branch(
 
 @git_app.command()
 def stage(
-    feature: str = typer.Option(..., "--feature", help="Feature directory name (e.g. 001-my-feature)"),
+    feature: str = typer.Option(
+        ..., "--feature", help="Feature directory name (e.g. 001-my-feature)"
+    ),
 ) -> None:
     """Stage feature files plus roadmap.md and changelog.md.
 

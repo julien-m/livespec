@@ -28,7 +28,9 @@ import typer
 from .exceptions import SpecsRootNotFoundError
 from .specs_utils import find_specs_root
 
-commit_context_app = typer.Typer(name="commit-context", help="Commit context bridge for LiveSpec pipelines.")
+commit_context_app = typer.Typer(
+    name="commit-context", help="Commit context bridge for LiveSpec pipelines."
+)
 
 _CONTEXT_FILE = ".commit-context.json"
 
@@ -40,7 +42,9 @@ def _get_context_path(specs_root: Path) -> Path:
 
 @commit_context_app.command()
 def write(
-    feature: str = typer.Option(..., "--feature", help="Feature directory name (e.g. 001-my-feature)"),
+    feature: str = typer.Option(
+        ..., "--feature", help="Feature directory name (e.g. 001-my-feature)"
+    ),
 ) -> None:
     """Write commit context JSON for the given feature.
 

@@ -182,9 +182,7 @@ def apply_mutation(mutation: Mutation, spec_path: Path, work_dir: Path) -> Path:
     return mutated_root
 
 
-def run_mutation_suite(
-    specs_root: Path, work_dir: Path
-) -> list[MutationResult]:
+def run_mutation_suite(specs_root: Path, work_dir: Path) -> list[MutationResult]:
     """Run all mutations in the catalogue against the spec tree.
 
     For each mutation: apply it, run validation layers, check if killed.
@@ -202,12 +200,14 @@ def run_mutation_suite(
         try:
             mutated_path = apply_mutation(mutation, specs_root, work_dir)
         except NotImplementedError as exc:
-            results.append(MutationResult(
-                mutation=mutation,
-                killed=False,
-                killed_by=None,
-                details=f"Skipped: {exc}",
-            ))
+            results.append(
+                MutationResult(
+                    mutation=mutation,
+                    killed=False,
+                    killed_by=None,
+                    details=f"Skipped: {exc}",
+                )
+            )
             continue
 
         # Run validation layers against mutated tree
@@ -218,6 +218,7 @@ def run_mutation_suite(
 
         try:
             from validator.parser import validate_structure
+
             structure_errors = validate_structure(mutated_path)
             if structure_errors:
                 killed = True
@@ -235,6 +236,7 @@ def run_mutation_suite(
             try:
                 from validator.coherence.graph_builder import build_graph
                 from validator.coherence.rule_engine import run_coherence_checks
+
                 graph = build_graph(mutated_path)
                 violations = run_coherence_checks(graph, mutated_path)
                 if violations:
@@ -249,12 +251,14 @@ def run_mutation_suite(
                 logging.warning("L2 check failed for mutation %s: %s", mutation.id, exc)
                 details += f"; L2 check failed: {exc}"
 
-        results.append(MutationResult(
-            mutation=mutation,
-            killed=killed,
-            killed_by=killed_by,
-            details=details,
-        ))
+        results.append(
+            MutationResult(
+                mutation=mutation,
+                killed=killed,
+                killed_by=killed_by,
+                details=details,
+            )
+        )
 
         # Cleanup
         shutil.rmtree(mutated_path, ignore_errors=True)

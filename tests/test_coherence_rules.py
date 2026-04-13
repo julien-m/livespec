@@ -45,9 +45,13 @@ def _make_feature(
         num=num,
         slug=slug,
         status=status,
-        files=files or {
-            "spec": True, "plan": True, "implementation": False,
-            "progress": False, "changelog": False,
+        files=files
+        or {
+            "spec": True,
+            "plan": True,
+            "implementation": False,
+            "progress": False,
+            "changelog": False,
         },
         spec_anchors=spec_anchors or [],
         implementation_paths=implementation_paths or {},
@@ -219,13 +223,18 @@ class TestR1_4_CheckedNoLink:
 class TestR2_1_RequiredFileAbsent:
     def test_planned_missing_plan(self) -> None:
         graph = SpecGraph(
-            features=[_make_feature(
-                status="Planned",
-                files={
-                    "spec": True, "plan": False, "implementation": False,
-                    "progress": False, "changelog": False,
-                },
-            )],
+            features=[
+                _make_feature(
+                    status="Planned",
+                    files={
+                        "spec": True,
+                        "plan": False,
+                        "implementation": False,
+                        "progress": False,
+                        "changelog": False,
+                    },
+                )
+            ],
         )
         violations = R2_1_RequiredFileAbsent().check(graph, Path("."))
         assert len(violations) == 1
@@ -234,13 +243,18 @@ class TestR2_1_RequiredFileAbsent:
 
     def test_planned_with_all_files_is_valid(self) -> None:
         graph = SpecGraph(
-            features=[_make_feature(
-                status="Planned",
-                files={
-                    "spec": True, "plan": True, "implementation": False,
-                    "progress": False, "changelog": False,
-                },
-            )],
+            features=[
+                _make_feature(
+                    status="Planned",
+                    files={
+                        "spec": True,
+                        "plan": True,
+                        "implementation": False,
+                        "progress": False,
+                        "changelog": False,
+                    },
+                )
+            ],
         )
         violations = R2_1_RequiredFileAbsent().check(graph, Path("."))
         assert violations == []
@@ -254,13 +268,18 @@ class TestR2_1_RequiredFileAbsent:
 class TestR2_2_AdvancedFileForLowStatus:
     def test_draft_with_implementation(self) -> None:
         graph = SpecGraph(
-            features=[_make_feature(
-                status="Draft",
-                files={
-                    "spec": True, "plan": False, "implementation": True,
-                    "progress": False, "changelog": False,
-                },
-            )],
+            features=[
+                _make_feature(
+                    status="Draft",
+                    files={
+                        "spec": True,
+                        "plan": False,
+                        "implementation": True,
+                        "progress": False,
+                        "changelog": False,
+                    },
+                )
+            ],
         )
         violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
         assert len(violations) == 1
@@ -268,26 +287,36 @@ class TestR2_2_AdvancedFileForLowStatus:
 
     def test_draft_without_implementation_is_valid(self) -> None:
         graph = SpecGraph(
-            features=[_make_feature(
-                status="Draft",
-                files={
-                    "spec": True, "plan": False, "implementation": False,
-                    "progress": False, "changelog": False,
-                },
-            )],
+            features=[
+                _make_feature(
+                    status="Draft",
+                    files={
+                        "spec": True,
+                        "plan": False,
+                        "implementation": False,
+                        "progress": False,
+                        "changelog": False,
+                    },
+                )
+            ],
         )
         violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
         assert violations == []
 
     def test_implemented_with_implementation_is_valid(self) -> None:
         graph = SpecGraph(
-            features=[_make_feature(
-                status="Implemented",
-                files={
-                    "spec": True, "plan": True, "implementation": True,
-                    "progress": False, "changelog": False,
-                },
-            )],
+            features=[
+                _make_feature(
+                    status="Implemented",
+                    files={
+                        "spec": True,
+                        "plan": True,
+                        "implementation": True,
+                        "progress": False,
+                        "changelog": False,
+                    },
+                )
+            ],
         )
         violations = R2_2_AdvancedFileForLowStatus().check(graph, Path("."))
         assert violations == []
@@ -303,8 +332,13 @@ class TestR2_3_InvalidStatus:
 
     def test_valid_statuses_pass(self) -> None:
         valid_statuses = (
-            "Draft", "Planned", "In Progress", "Approved",
-            "Implemented", "Deprecated", "Review",
+            "Draft",
+            "Planned",
+            "In Progress",
+            "Approved",
+            "Implemented",
+            "Deprecated",
+            "Review",
         )
         for status in valid_statuses:
             graph = SpecGraph(features=[_make_feature(status=status)])
@@ -327,9 +361,11 @@ class TestR3_1_SourceFileNotFound:
         specs_root = tmp_path / ".specs"
         specs_root.mkdir()
         graph = SpecGraph(
-            features=[_make_feature(
-                implementation_paths={"FR-001": ["src/auth/login.ts"]},
-            )],
+            features=[
+                _make_feature(
+                    implementation_paths={"FR-001": ["src/auth/login.ts"]},
+                )
+            ],
         )
         violations = R3_1_SourceFileNotFound().check(graph, specs_root)
         assert len(violations) == 1
@@ -343,9 +379,11 @@ class TestR3_1_SourceFileNotFound:
         src_file.parent.mkdir(parents=True)
         src_file.write_text("// login")
         graph = SpecGraph(
-            features=[_make_feature(
-                implementation_paths={"FR-001": ["src/auth/login.ts"]},
-            )],
+            features=[
+                _make_feature(
+                    implementation_paths={"FR-001": ["src/auth/login.ts"]},
+                )
+            ],
         )
         violations = R3_1_SourceFileNotFound().check(graph, specs_root)
         assert violations == []
@@ -366,9 +404,11 @@ class TestR3_2_SpecAnchorMissing:
         src_file.parent.mkdir(parents=True)
         src_file.write_text("// no anchor here\nfunction login() {}\n")
         graph = SpecGraph(
-            features=[_make_feature(
-                implementation_paths={"FR-001": ["src/auth.ts"]},
-            )],
+            features=[
+                _make_feature(
+                    implementation_paths={"FR-001": ["src/auth.ts"]},
+                )
+            ],
         )
         violations = R3_2_SpecAnchorMissing().check(graph, specs_root)
         assert len(violations) == 1
@@ -382,9 +422,11 @@ class TestR3_2_SpecAnchorMissing:
         src_file.parent.mkdir(parents=True)
         src_file.write_text("// @spec(FR-001)\nfunction login() {}\n")
         graph = SpecGraph(
-            features=[_make_feature(
-                implementation_paths={"FR-001": ["src/auth.ts"]},
-            )],
+            features=[
+                _make_feature(
+                    implementation_paths={"FR-001": ["src/auth.ts"]},
+                )
+            ],
         )
         violations = R3_2_SpecAnchorMissing().check(graph, specs_root)
         assert violations == []
@@ -393,9 +435,11 @@ class TestR3_2_SpecAnchorMissing:
         specs_root = tmp_path / ".specs"
         specs_root.mkdir()
         graph = SpecGraph(
-            features=[_make_feature(
-                implementation_paths={"FR-001": ["src/missing.ts"]},
-            )],
+            features=[
+                _make_feature(
+                    implementation_paths={"FR-001": ["src/missing.ts"]},
+                )
+            ],
         )
         violations = R3_2_SpecAnchorMissing().check(graph, specs_root)
         assert violations == []

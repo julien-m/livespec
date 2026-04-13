@@ -68,7 +68,8 @@ def get_rules(
     if rule_ids is not None:
         id_set = set(rule_ids)
         rules = [
-            r for r in rules
+            r
+            for r in rules
             if r.rule_id in id_set or any(r.rule_id.startswith(rid) for rid in id_set)
         ]
 

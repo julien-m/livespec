@@ -27,10 +27,13 @@ def specs_root(tmp_path: Path) -> Path:
 class TestCommitContextWrite:
     def test_creates_file_schema_v1(self, specs_root: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             context_path = specs_root / "hooks" / ".commit-context.json"
             assert context_path.exists()
@@ -44,12 +47,15 @@ class TestCommitContextWrite:
 
     def test_overwrites_stale(self, specs_root: Path) -> None:
         import os
+
         (specs_root / "hooks").mkdir(exist_ok=True)
         (specs_root / "hooks" / ".commit-context.json").write_text('{"old": "data"}')
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             data = json.loads((specs_root / "hooks" / ".commit-context.json").read_text())
             assert "version" in data  # New schema, not old data
@@ -59,11 +65,14 @@ class TestCommitContextWrite:
     def test_creates_hooks_dir_when_missing(self, specs_root: Path) -> None:
         """write must succeed even when .specs/hooks/ doesn't exist yet."""
         import os
+
         assert not (specs_root / "hooks").exists()
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             assert (specs_root / "hooks" / ".commit-context.json").exists()
         finally:
@@ -71,10 +80,13 @@ class TestCommitContextWrite:
 
     def test_adr_paths_empty_when_no_adrs(self, specs_root: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             data = json.loads((specs_root / "hooks" / ".commit-context.json").read_text())
             assert data["adr_paths"] == ""
@@ -83,6 +95,7 @@ class TestCommitContextWrite:
 
     def test_adr_paths_populated_when_adrs_exist(self, specs_root: Path) -> None:
         import os
+
         adr_dir = specs_root / "stacks" / "decisions"
         adr_dir.mkdir(parents=True)
         (adr_dir / "ADR-001-auth.md").write_text("# ADR-001")
@@ -90,7 +103,9 @@ class TestCommitContextWrite:
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             data = json.loads((specs_root / "hooks" / ".commit-context.json").read_text())
             assert "ADR-001-auth.md" in data["adr_paths"]
@@ -102,8 +117,15 @@ class TestCommitContextWrite:
 class TestCommitContextRead:
     def test_prints_json(self, specs_root: Path) -> None:
         import os
+
         (specs_root / "hooks").mkdir()
-        ctx = {"version": 1, "feature_name": "001-test", "spec_path": "/x/spec.md", "plan_path": "/x/plan.md", "adr_paths": ""}
+        ctx = {
+            "version": 1,
+            "feature_name": "001-test",
+            "spec_path": "/x/spec.md",
+            "plan_path": "/x/plan.md",
+            "adr_paths": "",
+        }
         (specs_root / "hooks" / ".commit-context.json").write_text(json.dumps(ctx))
         original = os.getcwd()
         os.chdir(specs_root.parent)
@@ -116,6 +138,7 @@ class TestCommitContextRead:
 
     def test_exits_1_when_missing(self, specs_root: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
@@ -128,6 +151,7 @@ class TestCommitContextRead:
 class TestCommitContextClear:
     def test_removes_file(self, specs_root: Path) -> None:
         import os
+
         (specs_root / "hooks").mkdir()
         ctx_path = specs_root / "hooks" / ".commit-context.json"
         ctx_path.write_text('{"version": 1}')
@@ -142,6 +166,7 @@ class TestCommitContextClear:
 
     def test_idempotent(self, specs_root: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:

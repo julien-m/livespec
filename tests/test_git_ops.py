@@ -18,8 +18,15 @@ runner = CliRunner()
 @pytest.fixture()
 def git_repo(tmp_path: Path) -> Path:
     subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
-    subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=tmp_path, check=True, capture_output=True)
-    subprocess.run(["git", "config", "user.name", "Test"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "config", "user.email", "test@test.com"],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Test"], cwd=tmp_path, check=True, capture_output=True
+    )
     specs = tmp_path / ".specs"
     specs.mkdir()
     feature_dir = specs / "features" / "001-test"
@@ -33,18 +40,24 @@ def git_repo(tmp_path: Path) -> Path:
 class TestGitBranch:
     def test_creates_branch(self, git_repo: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
-            result = runner.invoke(app, ["git", "branch", "feature/test-branch"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["git", "branch", "feature/test-branch"], catch_exceptions=False
+            )
             assert result.exit_code == 0
-            check = subprocess.run(["git", "branch", "--show-current"], cwd=git_repo, capture_output=True, text=True)
+            check = subprocess.run(
+                ["git", "branch", "--show-current"], cwd=git_repo, capture_output=True, text=True
+            )
             assert check.stdout.strip() == "feature/test-branch"
         finally:
             os.chdir(original)
 
     def test_already_exists_exits_1(self, git_repo: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
@@ -58,11 +71,14 @@ class TestGitBranch:
 class TestGitStage:
     def test_stages_feature_files(self, git_repo: Path) -> None:
         import os
+
         (git_repo / ".specs" / "features" / "001-test" / "plan.md").write_text("# plan")
         original = os.getcwd()
         os.chdir(git_repo)
         try:
-            result = runner.invoke(app, ["git", "stage", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["git", "stage", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             assert "files staged" in result.output
         finally:
@@ -73,6 +89,7 @@ class TestGitMerge:
     def test_conflict_always_exits_2(self, git_repo: Path) -> None:
         """Exit 2 even when git merge --abort also fails."""
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
@@ -96,11 +113,14 @@ class TestGitMerge:
 class TestGitDelete:
     def test_not_merged_exits_2(self, git_repo: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
             # Create an unmerged branch
-            subprocess.run(["git", "checkout", "-b", "unmerged-branch"], cwd=git_repo, capture_output=True)
+            subprocess.run(
+                ["git", "checkout", "-b", "unmerged-branch"], cwd=git_repo, capture_output=True
+            )
             (git_repo / ".specs" / "features" / "001-test" / "new.md").write_text("new")
             subprocess.run(["git", "add", "."], cwd=git_repo, capture_output=True)
             subprocess.run(["git", "commit", "-m", "unmerged"], cwd=git_repo, capture_output=True)
@@ -114,6 +134,7 @@ class TestGitDelete:
 class TestGitStatus:
     def test_outputs_valid_json(self, git_repo: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:

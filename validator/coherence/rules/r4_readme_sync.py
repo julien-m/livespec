@@ -34,8 +34,7 @@ class R4_1_ReadmeFeatureMissing:
                         rule_id=self.rule_id,
                         severity=Severity.ERROR,
                         message=(
-                            f"README references features/{entry} "
-                            f"but the directory does not exist"
+                            f"README references features/{entry} but the directory does not exist"
                         ),
                         context={"dir_name": entry},
                         fix_hint=f"Create features/{entry}/ or remove the README entry",

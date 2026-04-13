@@ -68,30 +68,20 @@ class TestSpecSpecify:
             "Success Criteria",
         ]
         for section in required:
-            assert section in spec_md_content, (
-                f"Required section missing: {section}"
-            )
+            assert section in spec_md_content, f"Required section missing: {section}"
 
     def test_gherkin_blocks_present(self, spec_md_content: str):
         """Invariant: at least 2 ```gherkin blocks with Feature: and Scenario:."""
-        gherkin_blocks = re.findall(
-            r"```gherkin\n(.*?)```", spec_md_content, re.DOTALL
-        )
-        assert len(gherkin_blocks) >= 2, (
-            f"Only {len(gherkin_blocks)} Gherkin block(s) (min: 2)"
-        )
+        gherkin_blocks = re.findall(r"```gherkin\n(.*?)```", spec_md_content, re.DOTALL)
+        assert len(gherkin_blocks) >= 2, f"Only {len(gherkin_blocks)} Gherkin block(s) (min: 2)"
         for block in gherkin_blocks:
             assert "Feature:" in block, "Gherkin block without 'Feature:'"
             assert "Scenario:" in block, "Gherkin block without 'Scenario:'"
-            assert "Given" in block or "When" in block, (
-                "Gherkin block without Given/When"
-            )
+            assert "Given" in block or "When" in block, "Gherkin block without Given/When"
 
     def test_mermaid_flowcharts_present(self, spec_md_content: str):
         """Invariant: at least one Mermaid flowchart per story."""
-        flowcharts = re.findall(
-            r"```mermaid\s*\nflowchart", spec_md_content
-        )
+        flowcharts = re.findall(r"```mermaid\s*\nflowchart", spec_md_content)
         # Expect at least as many flowcharts as P1/P2 stories
         stories = re.findall(r"### Story \d+", spec_md_content)
         assert len(flowcharts) >= len(stories), (
@@ -141,6 +131,4 @@ class TestSpecSpecify:
         changelog = feature_dirs[-1] / "changelog.md"
         assert changelog.exists(), "changelog.md missing in feature directory"
         content = changelog.read_text()
-        assert "Spec" in content or "spec" in content, (
-            "No Spec-type entry in changelog"
-        )
+        assert "Spec" in content or "spec" in content, "No Spec-type entry in changelog"

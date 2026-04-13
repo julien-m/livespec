@@ -175,20 +175,14 @@ def run_plan_review(
 
     # Validate feature filter against graph
     if feature_filter and not graph.get_feature(feature_filter):
-        check_result.errors.append(
-            f"{feature_filter}: feature not found in spec graph"
-        )
+        check_result.errors.append(f"{feature_filter}: feature not found in spec graph")
         return check_result
 
     # Read global context files
     constitution_path = specs_root / "constitution.md"
     stack_path = specs_root / "stacks" / "_default.md"
-    constitution_content = (
-        constitution_path.read_text() if constitution_path.exists() else ""
-    )
-    stack_content = (
-        stack_path.read_text() if stack_path.exists() else ""
-    )
+    constitution_content = constitution_path.read_text() if constitution_path.exists() else ""
+    stack_content = stack_path.read_text() if stack_path.exists() else ""
 
     # Determine which models to use
     review_models: list[str | None] = [None]
@@ -208,9 +202,7 @@ def run_plan_review(
                     missing.append("spec.md")
                 if not has_plan:
                     missing.append("plan.md")
-                check_result.errors.append(
-                    f"{feature.dir_name}: missing {', '.join(missing)}"
-                )
+                check_result.errors.append(f"{feature.dir_name}: missing {', '.join(missing)}")
             continue
 
         spec_path = specs_root / "features" / feature.dir_name / "spec.md"
@@ -223,8 +215,12 @@ def run_plan_review(
             for model in review_models:
                 try:
                     _run_single_review(
-                        feature.dir_name, spec_content, plan_content,
-                        stack_content, constitution_content, model,
+                        feature.dir_name,
+                        spec_content,
+                        plan_content,
+                        stack_content,
+                        constitution_content,
+                        model,
                         check_result,
                     )
                 except PlanReviewError as exc:
@@ -233,11 +229,15 @@ def run_plan_review(
         else:
             try:
                 _run_cascade_review(
-                    feature.dir_name, spec_content, plan_content,
-                    stack_content, constitution_content,
+                    feature.dir_name,
+                    spec_content,
+                    plan_content,
+                    stack_content,
+                    constitution_content,
                     review_models if models else [None],
                     models or [],
-                    confidence_threshold, check_result,
+                    confidence_threshold,
+                    check_result,
                 )
             except PlanReviewError as exc:
                 logger.warning("%s", exc)
@@ -280,9 +280,7 @@ def _run_single_review(
             constitution_content=constitution_content,
             model=model,
         )
-        check_result.reviews.append(
-            PlanReviewEntry(feature_name=feature_name, result=result)
-        )
+        check_result.reviews.append(PlanReviewEntry(feature_name=feature_name, result=result))
         return result
     except Exception as exc:
         raise PlanReviewError(feature_name, str(exc)) from exc
@@ -318,9 +316,13 @@ def _run_cascade_review(
         check_result: Result accumulator to append to.
     """
     result = _run_single_review(
-        feature_name, spec_content, plan_content,
-        stack_content, constitution_content,
-        review_models[0], check_result,
+        feature_name,
+        spec_content,
+        plan_content,
+        stack_content,
+        constitution_content,
+        review_models[0],
+        check_result,
     )
 
     # Cascade: if soft review and more models available, try next
@@ -328,12 +330,18 @@ def _run_cascade_review(
         cascade_model = all_models[1]
         logger.info(
             "Soft review for %s from %s, cascading to %s",
-            feature_name, result.reviewer_model, cascade_model,
+            feature_name,
+            result.reviewer_model,
+            cascade_model,
         )
         cascade_result = _run_single_review(
-            feature_name, spec_content, plan_content,
-            stack_content, constitution_content,
-            cascade_model, check_result,
+            feature_name,
+            spec_content,
+            plan_content,
+            stack_content,
+            constitution_content,
+            cascade_model,
+            check_result,
         )
 
         # If second reviewer also finds nothing, mark confidence as validated
@@ -341,7 +349,8 @@ def _run_cascade_review(
         if not cascade_result.findings:
             cascade_result.confidence = 5  # Both agree: high confidence
             check_result.reviews = [
-                e for e in check_result.reviews
+                e
+                for e in check_result.reviews
                 if e.feature_name != feature_name or e.result.confidence == 5
             ]
 
@@ -400,9 +409,7 @@ def run_spec_review(
     check_result = SpecReviewCheckResult()
 
     if feature_filter and not graph.get_feature(feature_filter):
-        check_result.errors.append(
-            f"{feature_filter}: feature not found in spec graph"
-        )
+        check_result.errors.append(f"{feature_filter}: feature not found in spec graph")
         return check_result
 
     review_models: list[str | None] = [None]
@@ -416,9 +423,7 @@ def run_spec_review(
 
         if not has_spec:
             if feature_filter:
-                check_result.errors.append(
-                    f"{feature.dir_name}: missing spec.md"
-                )
+                check_result.errors.append(f"{feature.dir_name}: missing spec.md")
             continue
 
         spec_path = specs_root / "features" / feature.dir_name / "spec.md"
@@ -431,9 +436,7 @@ def run_spec_review(
                     model=model,
                 )
                 check_result.reviews.append(
-                    SpecReviewEntry(
-                        feature_name=feature.dir_name, result=result
-                    )
+                    SpecReviewEntry(feature_name=feature.dir_name, result=result)
                 )
             except Exception as exc:
                 err = SpecReviewError(feature.dir_name, str(exc))

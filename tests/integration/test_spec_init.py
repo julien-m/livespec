@@ -34,8 +34,7 @@ class TestSpecInit:
             FIXTURES,
         )
         assert result.estimated_cost_usd < BUDGET_LIMIT_USD / 5, (
-            f"Cost too high: ${result.estimated_cost_usd:.2f} "
-            f"(limit: ${BUDGET_LIMIT_USD / 5:.2f})"
+            f"Cost too high: ${result.estimated_cost_usd:.2f} (limit: ${BUDGET_LIMIT_USD / 5:.2f})"
         )
         return result
 
@@ -65,9 +64,7 @@ class TestSpecInit:
     def test_at_least_one_adr_created(self, run_result):
         decisions = run_result.cwd / ".specs/stacks/decisions"
         adrs = list(decisions.glob("ADR-*.md")) if decisions.exists() else []
-        assert len(adrs) >= 1, (
-            "Quality gate /spec.init: at least 1 ADR required (BLOCKING)"
-        )
+        assert len(adrs) >= 1, "Quality gate /spec.init: at least 1 ADR required (BLOCKING)"
 
     def test_roadmap_has_tiers_with_items(self, run_result):
         roadmap = run_result.cwd / ".specs/roadmap.md"
@@ -89,9 +86,7 @@ class TestSpecInit:
         project = (run_result.cwd / ".specs/project.md").read_text()
         placeholders = ["[TBD]", "[PLACEHOLDER]", "[YOUR PROJECT]"]
         for p in placeholders:
-            assert p not in project, (
-                f"Unreplaced placeholder in project.md: {p}"
-            )
+            assert p not in project, f"Unreplaced placeholder in project.md: {p}"
 
     def test_stack_default_without_tbd(self, run_result):
         stack = (run_result.cwd / ".specs/stacks/_default.md").read_text()

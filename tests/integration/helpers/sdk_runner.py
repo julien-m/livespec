@@ -9,6 +9,7 @@ from pathlib import Path
 
 try:
     from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, query
+
     HAS_SDK = True
 except ImportError:
     HAS_SDK = False
@@ -26,10 +27,7 @@ class CommandResult:
     @property
     def estimated_cost_usd(self) -> float:
         # claude-opus-4-6: $5/1M input, $25/1M output
-        return (
-            self.total_input_tokens * 5 / 1_000_000
-            + self.total_output_tokens * 25 / 1_000_000
-        )
+        return self.total_input_tokens * 5 / 1_000_000 + self.total_output_tokens * 25 / 1_000_000
 
 
 async def run_livespec_command(

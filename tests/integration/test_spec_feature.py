@@ -87,8 +87,7 @@ class TestSpecFeaturePipeline:
         if spec_frs:
             coverage = len(spec_frs & plan_frs) / len(spec_frs)
             assert coverage >= 0.8, (
-                f"Insufficient FR spec->plan coverage: "
-                f"{coverage:.0%} (uncovered: {uncovered})"
+                f"Insufficient FR spec->plan coverage: {coverage:.0%} (uncovered: {uncovered})"
             )
 
     def test_changelog_global_updated(self, run_result):

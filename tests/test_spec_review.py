@@ -114,20 +114,20 @@ class TestSpecReviewResult:
 class TestReviewSpec:
     """Tests for review_spec() with mocked LLM."""
 
-    def _mock_response(
-        self, findings: list[dict], confidence: int = 4
-    ) -> str:
+    def _mock_response(self, findings: list[dict], confidence: int = 4) -> str:
         return json.dumps({"findings": findings, "confidence": confidence})
 
     def test_returns_findings_from_llm(self):
-        response = self._mock_response([
-            {
-                "category": "testability",
-                "severity": "blocking",
-                "description": "FR-002 uses vague verb 'manages'",
-                "suggestion": "Replace with specific measurable outcome",
-            },
-        ])
+        response = self._mock_response(
+            [
+                {
+                    "category": "testability",
+                    "severity": "blocking",
+                    "description": "FR-002 uses vague verb 'manages'",
+                    "suggestion": "Replace with specific measurable outcome",
+                },
+            ]
+        )
 
         with patch("validator.llm_provider.call_llm", return_value=response):
             result = review_spec(
@@ -142,11 +142,13 @@ class TestReviewSpec:
         assert result.confidence == 4
 
     def test_maps_severity_correctly(self):
-        response = self._mock_response([
-            {"category": "a", "severity": "blocking", "description": "x", "suggestion": "y"},
-            {"category": "b", "severity": "warning", "description": "x", "suggestion": "y"},
-            {"category": "c", "severity": "info", "description": "x", "suggestion": "y"},
-        ])
+        response = self._mock_response(
+            [
+                {"category": "a", "severity": "blocking", "description": "x", "suggestion": "y"},
+                {"category": "b", "severity": "warning", "description": "x", "suggestion": "y"},
+                {"category": "c", "severity": "info", "description": "x", "suggestion": "y"},
+            ]
+        )
 
         with patch("validator.llm_provider.call_llm", return_value=response):
             result = review_spec(SAMPLE_SPEC)

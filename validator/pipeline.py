@@ -95,7 +95,9 @@ def _parse_pipeline(content: str) -> dict[str, str]:
 
 @pipeline_app.command()
 def init(
-    feature: str = typer.Option(..., "--feature", help="Feature directory name (e.g. 001-my-feature)"),
+    feature: str = typer.Option(
+        ..., "--feature", help="Feature directory name (e.g. 001-my-feature)"
+    ),
 ) -> None:
     """Create pipeline.md for a feature with all phases set to Pending.
 
@@ -125,8 +127,12 @@ def init(
 def update(
     feature: str = typer.Option(..., "--feature", help="Feature directory name"),
     phase: str = typer.Option(..., "--phase", help="Phase slug (e.g. specify, plan-review)"),
-    status: str = typer.Option(..., "--status", help="Status slug (e.g. pending, in_progress, done)"),
-    timestamp: bool = typer.Option(False, "--timestamp", help="Write current UTC timestamp in Completed At column"),
+    status: str = typer.Option(
+        ..., "--status", help="Status slug (e.g. pending, in_progress, done)"
+    ),
+    timestamp: bool = typer.Option(
+        False, "--timestamp", help="Write current UTC timestamp in Completed At column"
+    ),
 ) -> None:
     """Update a phase status in pipeline.md.
 
@@ -158,9 +164,7 @@ def update(
     content = pipeline_path.read_text(encoding="utf-8")
 
     # Flexible whitespace pattern — handles AI-generated padded tables
-    pattern = re.compile(
-        r"\|[^|]*\b" + re.escape(display_phase) + r"\b[^|]*\|[^|]*\|[^|]*\|"
-    )
+    pattern = re.compile(r"\|[^|]*\b" + re.escape(display_phase) + r"\b[^|]*\|[^|]*\|[^|]*\|")
     new_content = re.sub(pattern, new_row, content, count=1)
 
     if new_content == content:

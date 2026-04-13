@@ -1,4 +1,5 @@
 """Base frontmatter model shared by all spec types."""
+
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, field_validator

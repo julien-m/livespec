@@ -171,14 +171,16 @@ class TestReviewPlan:
         return json.dumps({"findings": findings, "confidence": confidence})
 
     def test_returns_findings_from_llm(self):
-        response = self._mock_response([
-            {
-                "category": "coverage_gap",
-                "severity": "blocking",
-                "description": "AC-003 has no implementation step",
-                "suggestion": "Add token expiry handling",
-            },
-        ])
+        response = self._mock_response(
+            [
+                {
+                    "category": "coverage_gap",
+                    "severity": "blocking",
+                    "description": "AC-003 has no implementation step",
+                    "suggestion": "Add token expiry handling",
+                },
+            ]
+        )
 
         with patch("validator.llm_provider.call_llm", return_value=response):
             result = review_plan(
@@ -194,11 +196,13 @@ class TestReviewPlan:
         assert result.confidence == 4
 
     def test_maps_severity_correctly(self):
-        response = self._mock_response([
-            {"category": "a", "severity": "blocking", "description": "x", "suggestion": "y"},
-            {"category": "b", "severity": "warning", "description": "x", "suggestion": "y"},
-            {"category": "c", "severity": "info", "description": "x", "suggestion": "y"},
-        ])
+        response = self._mock_response(
+            [
+                {"category": "a", "severity": "blocking", "description": "x", "suggestion": "y"},
+                {"category": "b", "severity": "warning", "description": "x", "suggestion": "y"},
+                {"category": "c", "severity": "info", "description": "x", "suggestion": "y"},
+            ]
+        )
 
         with patch("validator.llm_provider.call_llm", return_value=response):
             result = review_plan(SAMPLE_SPEC, SAMPLE_PLAN)
@@ -351,22 +355,26 @@ class TestPlanReviewOrchestrator:
         from validator.orchestrator import PlanReviewCheckResult, _run_cascade_review
 
         # First review: soft (0 findings, confidence 2, complex)
-        soft_response = json.dumps({
-            "findings": [],
-            "confidence": 2,
-        })
+        soft_response = json.dumps(
+            {
+                "findings": [],
+                "confidence": 2,
+            }
+        )
         # Second review: solid (1 finding, high confidence)
-        solid_response = json.dumps({
-            "findings": [
-                {
-                    "category": "coverage_gap",
-                    "severity": "warning",
-                    "description": "AC-001 missing",
-                    "suggestion": "Add step",
-                }
-            ],
-            "confidence": 5,
-        })
+        solid_response = json.dumps(
+            {
+                "findings": [
+                    {
+                        "category": "coverage_gap",
+                        "severity": "warning",
+                        "description": "AC-001 missing",
+                        "suggestion": "Add step",
+                    }
+                ],
+                "confidence": 5,
+            }
+        )
 
         responses = [soft_response, solid_response]
         call_count = [0]
@@ -485,7 +493,9 @@ class TestPlanReviewFeatureFilter:
 
         specs = tmp_path / ".specs"
         specs.mkdir()
-        (specs / "roadmap.md").write_text("- [x] [001-auth](features/001-auth/)\n- [x] [002-pay](features/002-pay/)\n")
+        (specs / "roadmap.md").write_text(
+            "- [x] [001-auth](features/001-auth/)\n- [x] [002-pay](features/002-pay/)\n"
+        )
         for name in ("001-auth", "002-pay"):
             d = specs / "features" / name
             d.mkdir(parents=True)

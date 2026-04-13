@@ -78,11 +78,8 @@ class TestNonRegression:
         for invariant_name, _ in STRUCTURAL_INVARIANTS:
             pass_count = sum(1 for r in results if r[invariant_name])
             if pass_count < self.N_RUNS:
-                failures.append(
-                    f"{invariant_name}: {pass_count}/{self.N_RUNS} runs OK"
-                )
+                failures.append(f"{invariant_name}: {pass_count}/{self.N_RUNS} runs OK")
 
-        assert not failures, (
-            "Unstable invariants (potential model regression):\n"
-            + "\n".join(f"  - {f}" for f in failures)
+        assert not failures, "Unstable invariants (potential model regression):\n" + "\n".join(
+            f"  - {f}" for f in failures
         )

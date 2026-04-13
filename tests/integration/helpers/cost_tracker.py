@@ -29,6 +29,7 @@ class CostTracker:
             total = sum(c.usd for c in self._costs)
             if total > self.limit_usd * 0.9:
                 import warnings
+
                 warnings.warn(
                     f"Budget at 90%: ${total:.2f} / ${self.limit_usd:.2f}",
                     stacklevel=2,

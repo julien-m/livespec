@@ -27,9 +27,7 @@ def specs_dir(tmp_path: Path) -> Path:
     # features/001-auth with spec.md (frontmatter), plan.md, implementation.md
     auth_dir = root / "features" / "001-auth"
     auth_dir.mkdir(parents=True)
-    (auth_dir / "spec.md").write_text(
-        "---\nstatus: Implemented\n---\n# Auth Feature\n"
-    )
+    (auth_dir / "spec.md").write_text("---\nstatus: Implemented\n---\n# Auth Feature\n")
     (auth_dir / "plan.md").write_text("# Plan\n")
     (auth_dir / "implementation.md").write_text(
         "# Implementation\n\n"
@@ -41,9 +39,7 @@ def specs_dir(tmp_path: Path) -> Path:
     # features/002-search with spec.md only
     search_dir = root / "features" / "002-search"
     search_dir.mkdir(parents=True)
-    (search_dir / "spec.md").write_text(
-        "---\nstatus: Draft\n---\n# Search Feature\n"
-    )
+    (search_dir / "spec.md").write_text("---\nstatus: Draft\n---\n# Search Feature\n")
 
     # README.md referencing features
     (root / "README.md").write_text(

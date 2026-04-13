@@ -164,13 +164,9 @@ def review_plan(
     prompt = _REVIEW_PROMPT.format(
         spec_content=spec_content[:8000],
         plan_content=plan_content[:8000],
-        stack_content=(
-            stack_content[:2000] if stack_content else "(not provided)"
-        ),
+        stack_content=(stack_content[:2000] if stack_content else "(not provided)"),
         constitution_content=(
-            constitution_content[:2000]
-            if constitution_content
-            else "(not provided)"
+            constitution_content[:2000] if constitution_content else "(not provided)"
         ),
     )
 
