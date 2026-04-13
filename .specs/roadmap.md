@@ -25,7 +25,7 @@
 
 <!-- roadmap:mvp:start -->
 - [x] **Auto LLM review after spec.specify and spec.plan** -- automatic LLM review of the generated spec (testable FRs, measurable ACs, sufficient edge cases) and of the generated plan (FR coverage, feasibility). Triggered automatically after generation, advisory by default. Based on existing LLM provider abstraction. · Scope: M · Deps: LLM provider abstraction --> [001-auto-llm-review](features/001-auto-llm-review/spec.md)
-- [ ] **Layer 3 CLI surface** — Expose Level 3b SDK-isolated validation as a distinct CLI flag (tests exist, flag not yet wired) · Scope: M
+- [x] **Layer 3 CLI surface** — Expose Level 3b SDK-isolated validation as a distinct CLI flag (tests exist, flag not yet wired) · Scope: M --> [002-layer-3-cli-surface](features/002-layer-3-cli-surface/spec.md)
 <!-- roadmap:mvp:end -->
 
 ---
