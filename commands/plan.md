@@ -60,7 +60,7 @@ flowchart TD
 | `--auto`, `-a` | Skip confirmation, generate plan silently |
 | `--no-contracts`, `-C` | Skip API contract generation |
 | `--diagram-only`, `-D` | Regenerate only the Mermaid diagrams in an existing plan |
-| `--review`, `-r` | Run LLM plan review after generation (advisory, never blocks) |
+| `--no-review`, `-N` | Skip LLM plan review (review runs by default) |
 | `--all-reviewers`, `-R` | Use all configured reviewers (default: first only) |
 
 ---
@@ -328,9 +328,9 @@ Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 Also add a summary entry to `.specs/changelog.md` (global):
 `[Feature NNN] Plan created: [Feature Name] — N implementation steps, N diagrams`
 
-### Step 9.7 — LLM Plan Review (if `--review`)
+### Step 9.7 — LLM Plan Review (default, unless `--no-review`)
 
-If the `--review` flag is set:
+Unless the `--no-review` flag is set:
 
 1. Read the generated `plan.md` content
 2. Load reviewer models from `.specs/semantic/config.yaml` → `review_reviewers` list
@@ -350,12 +350,15 @@ If the `--review` flag is set:
    ```
    ⚠ Review suspiciously empty for a plan of this complexity. Consider using a different reviewer model.
    ```
-8. If blocking findings exist, display note before approval prompt:
-   ```
-   ⚠ Review found blocking issues. Consider revising the plan before implementation.
-   ```
 
-This step is **advisory only** — it never prevents plan.md from being written or blocks the workflow.
+**On findings — correction behavior:**
+
+- **`[ERROR]` / BLOCKING findings:** Regenerate `plan.md` with the findings injected as hard constraints (max 2 retries). On each retry, re-run the review. If BLOCKING findings remain after 2 retries → display all remaining findings and stop with:
+  ```
+  ⚠ Plan still has blocking issues after 2 correction attempts. Review manually then re-run /spec.plan.
+  ```
+- **`[WARNING]` / `[INFO]` findings only:** Display findings and proceed. These are informational — no regeneration triggered.
+- **PASS (no findings):** Proceed silently.
 
 ### Step 9.8 — Structural Validation
 

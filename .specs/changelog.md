@@ -3,7 +3,19 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/NNN-feature-name/changelog.md`.
 >
-> Last updated: 2026-04-13
+> Last updated: 2026-04-14
+
+---
+
+## 2026-04-14 -- Spec: Feature 004 created
+
+[Feature 004] Spec created: Visual Testing Governance — 4 stories, 12 AC, 8 FR
+
+---
+
+## 2026-04-14 -- Spec: Feature 003 created
+
+[Feature 003] Spec created: Visual Testing Fidelity — 6 stories, 14 AC, 10 FR
 
 ---
 

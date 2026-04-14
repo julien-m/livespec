@@ -395,6 +395,38 @@ Before presenting the spec, check:
 
 If validation fails, fix the issues before presenting.
 
+### Step 6.5 — LLM Spec Review (default, unless `--no-review`)
+
+Unless the `--no-review` flag is set:
+
+1. Read the generated `spec.md` content
+2. Load reviewer models from `.specs/semantic/config.yaml` → `review_reviewers` list
+3. If no reviewers configured, use the provider's default model
+4. Send the spec + project.md + constitution to the first reviewer via `call_llm()`
+5. Display findings inline with severity markers:
+   ```
+   Spec Review (google/gemini-3.1-pro):
+     [ERROR] AC-003 is not testable: "system performs well" has no measurable criterion
+       → Rewrite as: "API responds in < 200ms for 95th percentile of requests"
+     [WARNING] Story 2 has no edge case for empty state
+       → Add edge case: what happens when the list is empty?
+     Confidence: 4/5 | Findings: 2 | Stories: 3, AC: 8, FR: 6
+   ```
+6. If `--all-reviewers` is set and multiple reviewers are configured, run each reviewer sequentially and display all findings
+7. If confidence is low (< threshold) and findings are empty, display warning:
+   ```
+   ⚠ Review suspiciously empty for a spec of this complexity. Consider using a different reviewer model.
+   ```
+
+**On findings — correction behavior:**
+
+- **`[ERROR]` / BLOCKING findings:** Regenerate `spec.md` with the findings injected as hard constraints (max 2 retries). On each retry, re-run the review. If BLOCKING findings remain after 2 retries → display all remaining findings and stop with:
+  ```
+  ⚠ Spec still has blocking issues after 2 correction attempts. Review manually then re-run /spec.specify.
+  ```
+- **`[WARNING]` / `[INFO]` findings only:** Display findings and proceed to Step 7. These are informational — no regeneration triggered.
+- **PASS (no findings):** Proceed silently to Step 7.
+
 ### Step 7 — Present and Confirm
 
 Show the generated spec and ask for confirmation:
@@ -544,6 +576,7 @@ flowchart TD
 | `--branch`, `-b` | Automatically create git branch after spec creation |
 | `--no-branch`, `-B` | Skip branch creation prompt |
 | `--priority`, `-p` `[P1\|P2\|P3]` | Override all stories to specified priority |
+| `--no-review`, `-N` | Skip LLM spec review (review runs by default) |
 
 ---
 
