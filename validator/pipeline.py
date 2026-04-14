@@ -5,13 +5,13 @@ from __future__ import annotations
 import json
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import typer
 
-from .specs_utils import find_specs_root
 from .exceptions import SpecsRootNotFoundError
+from .specs_utils import find_specs_root
 
 pipeline_app = typer.Typer(name="pipeline", help="Manage pipeline.md state for a feature.")
 
@@ -59,7 +59,7 @@ def _resolve_feature_dir(feature: str) -> Path:
     feature_dir = specs_root / "features" / feature
     if not feature_dir.is_dir():
         typer.echo(f"Error: feature directory not found: {feature_dir}", err=True)
-        raise typer.Exit(1)  # noqa: B904
+        raise typer.Exit(1)
 
     return feature_dir
 
@@ -108,7 +108,7 @@ def init(
     feature_dir = _resolve_feature_dir(feature)
     pipeline_path = feature_dir / "pipeline.md"
 
-    now = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M")
+    now = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M")
     rows = "\n".join(f"| {PHASE_MAP[slug]} | Pending | — |" for slug in PHASE_ORDER)
     header = (
         f"# Pipeline — {feature}\n\n"
@@ -158,7 +158,7 @@ def update(
 
     display_phase = PHASE_MAP[phase]
     display_status = STATUS_MAP[status]
-    ts = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M") if timestamp else "—"
+    ts = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M") if timestamp else "—"
     new_row = f"| {display_phase} | {display_status} | {ts} |"
 
     content = pipeline_path.read_text(encoding="utf-8")

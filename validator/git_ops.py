@@ -129,7 +129,10 @@ def delete(
 ) -> None:
     """Delete a git branch.
 
-    Exit codes: 0 = success, 1 = branch not found or generic error, 2 = not fully merged (without --force).
+    Exit codes:
+    - 0 = success
+    - 1 = branch not found or generic error
+    - 2 = not fully merged (without --force)
     """
     flag = "-D" if force else "-d"
     result = subprocess.run(

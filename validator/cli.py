@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import typer
 
@@ -116,7 +116,7 @@ def _resolve_feature_slug(path: Path | None, specs_root: Path) -> str | None:
 
 
 def _display_review_findings(
-    reviews: list,
+    reviews: list[Any],
     errors: list[str],
     review_type: str,
     sem_config: object,
@@ -191,7 +191,7 @@ def _display_review_findings(
     return has_blocking
 
 
-def _output_review_json(reviews: list, errors: list[str]) -> None:
+def _output_review_json(reviews: list[Any], errors: list[str]) -> None:
     """Output review findings as JSON to stdout.
 
     Args:
@@ -372,7 +372,7 @@ def validate(
         typer.echo("Error: --staged and PATH are mutually exclusive", err=True)
         raise typer.Exit(1)
 
-    # @spec FR-001: --sdk-isolated flag routing — .specs/features/002-layer-3-cli-surface/spec.md#fr-001
+    # @spec FR-001: --sdk-isolated flag routing — .specs/features/002-layer-3-cli-surface/spec.md#fr-001  # noqa: E501
     if sdk_isolated:
         import importlib.util
         import os
@@ -380,7 +380,7 @@ def validate(
         from .exceptions import SdkDependencyError, SdkTestRunError
         from .sdk_test_runner import SdkTestRunner
 
-        # @spec FR-002: SDK dependency check — .specs/features/002-layer-3-cli-surface/spec.md#fr-002
+        # @spec FR-002: SDK dependency check — .specs/features/002-layer-3-cli-surface/spec.md#fr-002  # noqa: E501
         if importlib.util.find_spec("claude_agent_sdk") is None:
             typer.echo(str(SdkDependencyError()), err=True)
             raise typer.Exit(1)

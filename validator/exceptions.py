@@ -75,7 +75,7 @@ class ContradictionComparisonError(Exception):
         self.reason = reason
 
 
-# @spec FR-002: SDK dependency check error + install hint — .specs/features/002-layer-3-cli-surface/spec.md#fr-002
+# @spec FR-002: SDK dependency check error + install hint — .specs/features/002-layer-3-cli-surface/spec.md#fr-002  # noqa: E501
 class SdkDependencyError(Exception):
     """Raised when claude-agent-sdk is not importable.
 

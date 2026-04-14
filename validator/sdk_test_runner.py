@@ -116,7 +116,7 @@ def _build_subprocess_env(budget_usd: float | None) -> dict[str, str]:
     return env
 
 
-# @spec FR-004: Subprocess invocation for level_3b tests — .specs/features/002-layer-3-cli-surface/spec.md#fr-004
+# @spec FR-004: Subprocess invocation for level_3b tests — .specs/features/002-layer-3-cli-surface/spec.md#fr-004  # noqa: E501
 class SdkTestRunner:
     """Service that wraps pytest subprocess for Level 3b SDK-isolated tests.
 
@@ -161,7 +161,7 @@ class SdkTestRunner:
         except (FileNotFoundError, PermissionError) as exc:
             raise SdkTestRunError(cmd, str(exc)) from exc
 
-        # @spec FR-009: Stream pytest output to stderr — .specs/features/002-layer-3-cli-surface/spec.md#fr-009
+        # @spec FR-009: Stream pytest output to stderr — .specs/features/002-layer-3-cli-surface/spec.md#fr-009  # noqa: E501
         lines: list[str] = []
         assert proc.stdout is not None  # guaranteed by PIPE
         for raw_line in iter(proc.stdout.readline, b""):

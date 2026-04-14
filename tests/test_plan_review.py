@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -167,7 +168,7 @@ class TestPlanReviewResult:
 class TestReviewPlan:
     """Tests for review_plan() with mocked LLM."""
 
-    def _mock_response(self, findings: list[dict], confidence: int = 4) -> str:
+    def _mock_response(self, findings: list[dict[str, Any]], confidence: int = 4) -> str:
         return json.dumps({"findings": findings, "confidence": confidence})
 
     def test_returns_findings_from_llm(self):
@@ -269,7 +270,7 @@ class TestReviewPlan:
         assert "API-first design" in prompt
 
     def test_prompt_evaluates_all_ac004_aspects(self):
-        """AC-004: Plan review prompt covers FR coverage, feasibility, ordering, stack consistency."""
+        """AC-004: Plan review prompt covers FR coverage, feasibility, ordering, stack consistency."""  # noqa: E501
         response = self._mock_response([])
 
         with patch("validator.llm_provider.call_llm", return_value=response) as mock:
@@ -291,7 +292,7 @@ class TestCascadeReview:
 
     def test_cascade_triggered_on_soft_review(self):
         """Cascade activates when first reviewer returns 0 findings + low confidence."""
-        from validator.orchestrator import _is_review_soft
+        from validator.orchestrator import _is_review_soft  # type: ignore[reportPrivateUsage]
         from validator.semantic.plan_review import PlanReviewResult
 
         # Soft review: 0 findings, confidence 2 (below threshold of 3)
@@ -304,7 +305,7 @@ class TestCascadeReview:
 
     def test_high_confidence_blocks_cascade(self):
         """High confidence review blocks cascade even with 0 findings."""
-        from validator.orchestrator import _is_review_soft
+        from validator.orchestrator import _is_review_soft  # type: ignore[reportPrivateUsage]
         from validator.semantic.plan_review import PlanReviewResult
 
         # High confidence: 0 findings, confidence 5 (at/above threshold)
@@ -317,7 +318,7 @@ class TestCascadeReview:
 
     def test_simple_plan_blocks_cascade(self):
         """Simple plans don't trigger cascade even if low confidence."""
-        from validator.orchestrator import _is_review_soft
+        from validator.orchestrator import _is_review_soft  # type: ignore[reportPrivateUsage]
         from validator.semantic.plan_review import PlanReviewResult
 
         # Low confidence but simple plan (sum < 5)
@@ -331,7 +332,7 @@ class TestCascadeReview:
     def test_findings_blocks_cascade(self):
         """Having findings blocks cascade regardless of confidence."""
         from validator.coherence.violation import Severity
-        from validator.orchestrator import _is_review_soft
+        from validator.orchestrator import _is_review_soft  # type: ignore[reportPrivateUsage]
         from validator.semantic.plan_review import PlanReviewResult
 
         # Has findings, low confidence
@@ -352,7 +353,10 @@ class TestPlanReviewOrchestrator:
         """Verify cascade: first soft, second solid."""
         from unittest.mock import patch
 
-        from validator.orchestrator import PlanReviewCheckResult, _run_cascade_review
+        from validator.orchestrator import (
+            PlanReviewCheckResult,
+            _run_cascade_review,  # type: ignore[reportPrivateUsage]
+        )
 
         # First review: soft (0 findings, confidence 2, complex)
         soft_response = json.dumps(
@@ -379,7 +383,7 @@ class TestPlanReviewOrchestrator:
         responses = [soft_response, solid_response]
         call_count = [0]
 
-        def mock_call_llm(*args, **kwargs):
+        def mock_call_llm(*_args: Any, **_kwargs: Any) -> str:
             result = responses[call_count[0]]
             call_count[0] += 1
             return result
@@ -407,7 +411,10 @@ class TestPlanReviewOrchestrator:
         """Both reviewers return 0 findings → soft entry removed, only cascade kept."""
         from unittest.mock import patch
 
-        from validator.orchestrator import PlanReviewCheckResult, _run_cascade_review
+        from validator.orchestrator import (
+            PlanReviewCheckResult,
+            _run_cascade_review,  # type: ignore[reportPrivateUsage]
+        )
 
         response = json.dumps({"findings": [], "confidence": 2})
 
@@ -435,13 +442,13 @@ class TestResolveFeatureFilter:
 
     def test_none_path_returns_none(self, tmp_path: Path) -> None:
         """None path returns None."""
-        from validator.cli import _resolve_feature_filter
+        from validator.cli import _resolve_feature_filter  # type: ignore[reportPrivateUsage]
 
         assert _resolve_feature_filter(None, tmp_path) is None
 
     def test_spec_file_resolves_to_feature(self, tmp_path: Path) -> None:
         """Spec file path resolves to feature dir_name."""
-        from validator.cli import _resolve_feature_filter
+        from validator.cli import _resolve_feature_filter  # type: ignore[reportPrivateUsage]
 
         features_dir = tmp_path / "features" / "001-auth"
         features_dir.mkdir(parents=True)
@@ -453,7 +460,7 @@ class TestResolveFeatureFilter:
 
     def test_feature_dir_resolves_to_feature(self, tmp_path: Path) -> None:
         """Feature directory path resolves to feature dir_name."""
-        from validator.cli import _resolve_feature_filter
+        from validator.cli import _resolve_feature_filter  # type: ignore[reportPrivateUsage]
 
         features_dir = tmp_path / "features" / "002-payments"
         features_dir.mkdir(parents=True)
@@ -463,7 +470,7 @@ class TestResolveFeatureFilter:
 
     def test_path_outside_features_returns_none(self, tmp_path: Path) -> None:
         """Path outside features/ directory returns None."""
-        from validator.cli import _resolve_feature_filter
+        from validator.cli import _resolve_feature_filter  # type: ignore[reportPrivateUsage]
 
         other = tmp_path / "stacks"
         other.mkdir()
@@ -473,7 +480,7 @@ class TestResolveFeatureFilter:
 
     def test_features_dir_itself_returns_none(self, tmp_path: Path) -> None:
         """Features directory itself returns None."""
-        from validator.cli import _resolve_feature_filter
+        from validator.cli import _resolve_feature_filter  # type: ignore[reportPrivateUsage]
 
         features_dir = tmp_path / "features"
         features_dir.mkdir()
