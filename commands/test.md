@@ -3,6 +3,8 @@ description: "Audit test coverage, generate missing tests, execute suite, verify
 argument-hint: "<feature-name>"
 ---
 
+<!-- @spec FR-001: component-level snapshots, FR-002: reset-baselines workflow, FR-003: docker-compose gen, FR-004: human approval gate, FR-005: auto mode blocking, FR-006: maxDiffPixels threshold — .specs/features/003-visual-testing-fidelity/spec.md#fr-001 -->
+
 # Command: /spec.test
 
 > Post-implementation test validation — audit AC coverage, generate missing tests from Gherkin, execute the full suite, capture visual baselines, and produce a test report.
@@ -326,60 +328,205 @@ For each test, map back to the AC it covers:
 
 **Skipped if `--no-generate` is set.** Only baselines for existing visual tests are captured (Phase 4.5.2).
 
+#### Screens Table Format
+
+The spec.md `## Screens` table may include optional `selector` and `aa_tolerance` columns:
+
+```markdown
+| Screen | Route | Mockup | selector | aa_tolerance |
+|--------|-------|--------|----------|--------------|
+| logo   | /     | logo.png | [data-testid='logo'] | false |
+| hero   | /     | hero.png | | false |
+```
+
+- **`selector`** — CSS selector or data-testid for component-level capture. If empty or absent, fall back to full-page screenshot.
+- **`aa_tolerance`** — if `true`, use `{ maxDiffPixels: 10 }` to allow minor antialiasing variance.
+
+#### Generation Rules
+
 For each screen in `spec.md` without a corresponding visual test file:
 
 1. **Locate mockup reference:** Read mockup PNG from `.specs/design/screens/` (optional, for naming consistency)
-2. **Generate boilerplate test:**
-   ```bash
-   For each missing screen/test:
-     Template: tests/e2e/screens/{screen-name}.spec.ts
-     Content:
-       - import { test, expect } from '@playwright/test'
-       - import { captureBaseline } from '../helpers/visual'
-       - test('Screen: {screen-name}', async ({ page }) => {
-           await page.goto('{screen-route}')
-           await page.waitForLoadState('networkidle')
-           await captureBaseline(page, '{screen-name}')
-         })
+2. **Read `selector` from Screens table**
+3. **Generate test based on selector presence:**
+
+   - **Selector defined** → component-level capture:
+     ```typescript
+     // @spec FR-001: component-level snapshot — .specs/features/NNN-feature-name/spec.md#fr-001
+     test('Screen: {screen-name}', async ({ page }) => {
+       await page.goto('{screen-route}')
+       await page.waitForLoadState('networkidle')
+       await page.locator("{selector}").toHaveScreenshot("{screen-name}.png")
+     })
+     ```
+
+   - **No selector (or empty)** → full-page fallback with warning comment:
+     ```typescript
+     test('Screen: {screen-name}', async ({ page }) => {
+       await page.goto('{screen-route}')
+       await page.waitForLoadState('networkidle')
+       // Full-page screenshot — add selector for component-level precision
+       await page.toHaveScreenshot("{screen-name}.png")
+     })
+     ```
+
+4. **`aa_tolerance: true` override:**
+   Add `{ maxDiffPixels: 10 }` as toHaveScreenshot option:
+   ```typescript
+   await page.locator("{selector}").toHaveScreenshot("{screen-name}.png", { maxDiffPixels: 10 })
    ```
-3. **Follow existing patterns:** Read 1-2 existing visual test files to match import style, fixture usage, and naming conventions
-4. **Compilation gate:** Run the generated file in isolation with `[resolved visual command] tests/e2e/screens/{screen-name}.spec.ts`. If compile error → fix and retry (max 3 iterations). If still broken → delete generated code, mark "Generation Failed"
+
+5. **Follow existing patterns:** Read 1-2 existing visual test files to match import style, fixture usage, and naming conventions
+6. **Compilation gate:** Run the generated file in isolation. If compile error → fix and retry (max 3 iterations). If still broken → delete generated code, mark "Generation Failed"
 
 ### 4.5.2 — Capture Baselines
 
-Run ONLY if Phase 4 (non-visual tests) passed:
+Run ONLY if Phase 4 (non-visual tests) passed.
 
-1. **Capture command:** Use resolved visual test command (from `.specs/testing/strategy.md`)
-   ```bash
-   Example: npx playwright test --update-snapshots tests/e2e/screens/
+**CRITICAL: `--update-snapshots` must NEVER be passed to Playwright.** Use `--reset-baselines` for intentional baseline updates.
+
+#### Default behavior (comparison only)
+
+When `--reset-baselines` is NOT set:
+- Run existing visual tests to compare against current baselines
+- Never delete, replace, or overwrite any existing baseline PNG
+- Any diff triggers test failure — do NOT auto-update
+
+#### `--reset-baselines` behavior
+
+When `--reset-baselines` is set:
+
+1. **CI guard:** If `CI` environment variable is set → exit immediately:
    ```
-2. **Baseline storage:** New screenshots saved to `.specs/features/NNN/baselines/`
-3. **Commit strategy:** Only commit baseline PNG files if Phase 4 suite passed. If Phase 4 had failures, do NOT commit baselines — they are incomplete
-4. **Retry on failure:** If capture fails (server down, element not found, timeout) → retry up to 2 times, then mark "Blocked — [error]"
-
-### 4.5.3 — Design Fidelity Check
-
-Run ONLY on freshly captured baselines (skip pre-existing ones):
-
-1. **Pair baseline with mockup:** For each newly captured baseline, find corresponding mockup in `.specs/design/screens/{screen-name}.png`
-2. **Pixel comparison:** Use `compareDesign()` helper from `visual.ts` to compute pixel diff
-3. **Report format:**
-   ```markdown
-   | Screen | Baseline | Mockup | Diff % | Status |
-   |---|---|---|---|---|
-   | dashboard | ✅ Captured | ✅ Found | 3.2% | ✅ Faithful |
-   | settings | ✅ Captured | ❌ Missing | — | 🎨 Mockup not found (skip check) |
-   | profile | ✅ Captured | ✅ Found | 8.1% | 🎨 Diverged (8.1% > 5% threshold) |
+   Error: Baseline reset must run locally. Commit new baselines after approval.
    ```
-4. **Threshold:** 5% (design fidelity only; regression threshold is 2%, handled by `/spec.check`)
-5. **Action on divergence:** Report as 🎨 (informational only — do NOT fail the phase). Designer reviews and updates mockup or implementation as needed
+
+2. **Delete existing baselines:**
+   - `--reset-baselines` (no value): delete all baseline PNGs for the target feature
+   - `--reset-baselines=<screen-name>`: delete only `baselines/<screen-name>.png`
+
+3. **Capture fresh screenshots:** Run Playwright without `--update-snapshots`
+
+4. **Baseline storage:** New screenshots saved to `.specs/features/NNN/baselines/`
+
+5. **Retry on failure:** If capture fails → retry up to 2 times, then mark "Blocked — [error]"
+
+#### `docker-compose.visual.yml` generation
+
+On first run (or if `docker-compose.visual.yml` is absent in the target project):
+1. Generate `docker-compose.visual.yml` with pinned Playwright Docker image
+2. Record Docker image version as metadata alongside baselines (e.g., in `baselines/.docker-version`)
+3. Surface the run command:
+   ```
+   Visual test environment: docker-compose.visual.yml generated.
+   Run baseline capture with: docker compose run visual-tests
+   ```
+
+**Template:**
+```yaml
+# Run baseline capture with: docker compose run visual-tests
+# This ensures identical pixel output across macOS and CI (Linux + Chrome).
+services:
+  visual-tests:
+    image: mcr.microsoft.com/playwright:v1.44.0-jammy
+    volumes:
+      - ./tests:/app/tests
+      - ./.specs:/app/.specs
+    command: npx playwright test tests/e2e/screens/
+    working_dir: /app
+```
+
+**If `docker-compose.visual.yml` already exists:** skip generation, log: "docker-compose.visual.yml already exists — skipping generation"
+
+**Docker baseline warning:** If baselines exist but no `baselines/.docker-version` metadata file is found, display:
+```
+Warning: Baselines captured outside Docker — pixel differences may be caused by render environment, not UI changes.
+Run spec.test --reset-baselines inside Docker to recapture.
+```
+
+### 4.5.3 — Design Fidelity / Human Approval Gate
+
+Runs after EVERY baseline capture (new or `--reset-baselines`). This phase is mandatory — baselines are NEVER committed without passing through it.
+
+#### Step A: Compute diffs
+
+For each newly captured baseline PNG:
+1. Find corresponding mockup in `.specs/design/screens/{screen-name}.png`
+2. Compute pixel diff using `compareDesign()` from `visual.ts`
+3. Record: screen name, baseline path, mockup path (or "no mockup"), diff %
+
+#### Step B: Interactive approval (non-`--auto` mode)
+
+Display approval table:
+```
+| Screen   | Baseline captured | Diff vs mockup |
+|----------|-------------------|----------------|
+| logo     | ✅ baselines/logo.png | 2.1%         |
+| dashboard | ✅ baselines/dashboard.png | 8.4%    |
+| hero     | ✅ baselines/hero.png | (no mockup)   |
+
+Approve baselines? [y/n/view <screen-name>]
+```
+
+- **`y`** → commit all captured PNGs, continue to Phase 5
+- **`n`** → delete ALL captured PNGs, exit:
+  ```
+  Baselines rejected — fix the UI then run spec.test --reset-baselines
+  ```
+- **`n <screen-name>`** → delete only that screen's PNG, redisplay approval table
+- **`view <screen-name>`** → print:
+  ```
+  Baseline: .specs/features/NNN/baselines/<screen-name>.png
+  Mockup:   .specs/design/screens/<screen-name>.png
+  ```
+  Then redisplay approval prompt.
+
+#### Step C: `--auto` mode (pipeline integration)
+
+When running from `/spec.ship` or `/spec.feature` with `--auto`:
+
+1. If **no mockups available** → auto-approve all baselines with warning:
+   ```
+   Warning: No mockups found — baselines auto-approved without fidelity check.
+   ```
+
+2. If **any baseline diff > 5%**:
+   - Delete all captured PNGs
+   - Exit with:
+     ```
+     SHIP_RESULT: BLOCKED
+     Visual fidelity check failed:
+     - dashboard: 8.4% diff (threshold: 5%)
+     Fix the UI or update the mockup, then re-run spec.test --reset-baselines.
+     ```
+
+3. If **all diffs ≤ 5%** → auto-approve, commit baselines, add to test report:
+   ```
+   Baselines auto-approved (all diffs ≤ 5%)
+   ```
 
 ### Visual Thresholds
 
 | Check type | Threshold | Scope | Owner |
 |---|---|---|---|
 | Design fidelity (baseline vs mockup) | 5% | New baselines only | `/spec.test` Phase 4.5 |
-| Visual regression (baseline vs previous) | 2% | Existing baselines | `/spec.check` Step 8 |
+| Visual regression (baseline vs previous) | `maxDiffPixels: 0` | Existing baselines | `/spec.check` Step 8 |
+
+#### Generated playwright.config.ts snippet
+
+```typescript
+// @spec FR-006: maxDiffPixels threshold — .specs/features/NNN/spec.md#fr-006
+export default defineConfig({
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixels: 0,    // Zero tolerance — any pixel diff is a regression
+      // Per-test override: { maxDiffPixels: 10 } for aa_tolerance: true screens
+    },
+  },
+})
+```
+
+**Never use `maxDiffPixelRatio`.** Use `maxDiffPixels: 0` for zero tolerance. Use `{ maxDiffPixels: 10 }` inline on `toHaveScreenshot()` for screens with `aa_tolerance: true`.
 
 `/spec.test` does NOT evaluate visual regression (pixel-diff against previous baselines). It only performs design fidelity checks on **newly captured** baselines. Visual regression on existing baselines is `/spec.check`'s responsibility.
 
@@ -500,6 +647,7 @@ When multiple features are tested in a single run, display after all individual 
 | `--auto` | | No confirmation prompts (for `/spec.feature` Phase 3.5 and `/spec.ship` integration) |
 | `--update` | `-u` | Auto-update `implementation.md` without asking |
 | `--no-update` | `-U` | Skip `implementation.md` update |
+| `--reset-baselines[=<screen>]` | | Delete existing baselines (all, or named screen only) then recapture. Triggers human approval gate. Use `--reset-baselines` for intentional UI changes — NEVER `--update-snapshots`. Blocked on CI. |
 
 ---
 
@@ -509,6 +657,7 @@ When multiple features are tested in a single run, display after all individual 
 |---|---|---|
 | Generated test compilation fix | 3 per file | Delete generated code, mark "Generation Failed" |
 | Visual capture retry | 2 | Skip, mark "Blocked — [reason]" |
+| Approval gate view cycles | Unlimited | Continue displaying prompt until y/n/n \<screen\> |
 
 ---
 

@@ -275,6 +275,8 @@ For each FR and AC:
 
 **Prerequisite:** Feature's `spec.md` has a `## Screens` section AND baselines exist in `.specs/features/NNN-feature-name/baselines/`. Skip entire step if either is absent.
 
+<!-- @spec FR-007: maxDiffPixels for regression — .specs/features/003-visual-testing-fidelity/spec.md#fr-007 -->
+
 #### Visual Regression Detection
 
 Use `compareRegression()` helper from `tests/e2e/helpers/visual.ts` to detect pixel drift:
@@ -283,22 +285,22 @@ Use `compareRegression()` helper from `tests/e2e/helpers/visual.ts` to detect pi
    - If absent → skip step, report: "Visual drift detection skipped — no visual testing tool resolved"
 2. **For each baseline PNG in `baselines/`:**
    - Locate the most recent Playwright test output for that screen
-   - Run pixel diff: `compareRegression(baseline, currentScreenshot, threshold: 2%)`
+   - Run pixel diff: `compareRegression(baseline, currentScreenshot, maxDiffPixels: 0)`
 3. **Report per baseline:**
-   - ✅ **Match** — diff ≤ 2% (no visual regression detected)
-   - 🖼️ **Drift** — diff > 2% (unintended visual change; show diff % and changed regions)
-   - ❌ **Missing baseline** — baseline file not found (capture required from Phase 4.5)
+   - ✅ **Match** — 0 pixel difference (no visual regression detected)
+   - 🖼️ **Drift** — any pixel difference detected (show pixel count and changed regions)
+   - ❌ **Missing baseline** — baseline file not found (capture required from spec.test Phase 4.5)
 
-**Threshold:** 2% (component-level, configured per test via `compareRegression(threshold: 2%)`)
+**Threshold:** `maxDiffPixels: 0` — zero tolerance. Any pixel difference is a regression. Screens with `aa_tolerance: true` in the spec use `maxDiffPixels: 10` as the per-test override.
 
 **Report format in gap report:**
 ```markdown
 ### Visual Tests (Regression Detection)
 
-| Screenshot | Status | Diff % | Notes |
+| Screenshot | Status | Diff (px) | Notes |
 |---|---|---|---|
-| `login.png` | ✅ Match | 0.3% | |
-| `dashboard.png` | 🖼️ Drift | 4.2% | Badge color changed; diff zones: top-right (5% diff), bottom-left (3% diff) |
+| `login.png` | ✅ Match | 0 px | |
+| `dashboard.png` | 🖼️ Drift | 312 px | Badge color changed; diff zones: top-right, bottom-left |
 | `settings.png` | ❌ Missing | — | Baseline not captured |
 ```
 
@@ -326,7 +328,7 @@ If the feature's `spec.md` contains a `## Screens` section:
 ```
 
 **Threshold distinction:**
-- Visual regression (code vs previous code): 2% — catches unintended changes
+- Visual regression (code vs previous code): `maxDiffPixels: 0` — zero tolerance, any pixel diff is a regression
 - Design fidelity (code vs mockup): 5% — allows minor implementation differences while catching major layout drift
 
 #### Theme Token Compliance (UI features with theme)

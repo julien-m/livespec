@@ -1,7 +1,7 @@
 ---
 feature: Visual Testing Fidelity
 title: Visual Testing Fidelity
-status: Draft
+status: Implemented
 priority: P1
 branch: feature/003-visual-testing-fidelity
 created: 2026-04-14
@@ -14,7 +14,7 @@ number: "003"
 - **Feature:** Visual Testing Fidelity
 - **Branch:** feature/003-visual-testing-fidelity
 - **Date:** 2026-04-14
-- **Status:** Draft
+- **Status:** Implemented
 - **Input:** Improve LiveSpec's visual testing system so that every project using spec.test and spec.check gets reliable, zero-false-positive visual regression detection, safe baseline management, and mandatory human approval gates.
 - **Feature Number:** 003
 
