@@ -1,0 +1,18 @@
+schema_version: "1"
+feature: "001-user-auth"
+generated_at: "2026-04-15T08:00:00Z"
+screens:
+  - screen: "login"
+    capture_date: null
+    approved_by: "pre-v5 (untracked)"
+    browser_version: "unknown"
+    os: "unknown"
+    mockup_version: "none"
+    docker_image: "none"
+  - screen: "register"
+    capture_date: null
+    approved_by: "pre-v5 (untracked)"
+    browser_version: "unknown"
+    os: "unknown"
+    mockup_version: "none"
+    docker_image: "none"

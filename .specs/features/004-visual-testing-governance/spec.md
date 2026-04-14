@@ -1,7 +1,7 @@
 ---
 feature: Visual Testing Governance
 title: Visual Testing Governance
-status: Draft
+status: Implemented
 priority: P2
 branch: feature/004-visual-testing-governance
 created: 2026-04-14
@@ -14,7 +14,7 @@ number: "004"
 - **Feature:** Visual Testing Governance
 - **Branch:** feature/004-visual-testing-governance
 - **Date:** 2026-04-14
-- **Status:** Draft
+- **Status:** Implemented
 - **Input:** Add baseline provenance metadata (who captured, when, in what environment, linked mockup version) and automatic invalidation triggers (when mockup changes, when browser upgrades, when design tokens change) so that baselines never silently become stale and the full audit trail of visual truth is preserved.
 - **Feature Number:** 004
 

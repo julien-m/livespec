@@ -505,6 +505,39 @@ When running from `/spec.ship` or `/spec.feature` with `--auto`:
    Baselines auto-approved (all diffs ≤ 5%)
    ```
 
+#### Step D: Write provenance manifest (after approval — always)
+
+<!-- @spec FR-001: Write baseline.manifest.yml after approval — .specs/features/004-visual-testing-governance/spec.md#fr-001 -->
+
+After approval (Step B `y` or Step C auto-approve), write `baselines/baseline.manifest.yml`:
+
+**Data collection per screen:**
+
+| Field | Source |
+|-------|--------|
+| `capture_date` | Current timestamp (ISO 8601 UTC) |
+| `approved_by` | `git config user.name` in interactive mode; `"auto (spec.ship)"` or `"auto (spec.feature)"` in `--auto` mode |
+| `browser_version` | Parse from `playwright --version` output: `"Version 1.44.0"` → `"chromium/1.44"` |
+| `os` | Platform name + version from system info (e.g., `"Linux 6.1"`, `"Darwin 25.2"`) |
+| `mockup_version` | SHA-256 hex of mockup PNG binary at capture time. `"none"` if no mockup exists for this screen. |
+| `docker_image` | Image field from `docker-compose.visual.yml` if it exists; otherwise `"none"` |
+
+**Write sequence (order-dependent — write manifest AFTER PNGs committed):**
+
+```
+1. Commit PNGs (existing behavior)
+2. Collect provenance data for all approved screens
+3. Write baselines/baseline.manifest.yml (see system/schemas/baseline-manifest.md)
+4. Log: "Provenance manifest written: baselines/baseline.manifest.yml"
+```
+
+**Manifest structure:** See `system/schemas/baseline-manifest.md` for the canonical YAML schema.
+
+**Error handling:**
+- If `playwright --version` fails → use `browser_version: "unknown"`
+- If SHA-256 of mockup fails (file unreadable) → use `mockup_version: "none"`
+- Manifest write failure is a WARNING, not an error — baselines are still valid
+
 ### Visual Thresholds
 
 | Check type | Threshold | Scope | Owner |
@@ -691,6 +724,7 @@ After each feature's implementation phase, the spawned agent runs `/spec.test <f
 - [ ] Missing tests generated (or `--audit-only` / `--no-generate`)
 - [ ] Full test suite executed (or `--audit-only`)
 - [ ] Visual baselines captured for missing screens (or `--no-visual` / non-UI feature)
+- [ ] `baselines/baseline.manifest.yml` written after every baseline approval (or `--no-visual`)
 - [ ] Test report saved to `checks/YYYY-MM-DD-test.md`
 - [ ] `implementation.md` AC status updated (or `--no-update`)
 - [ ] Feature `changelog.md` has test entry

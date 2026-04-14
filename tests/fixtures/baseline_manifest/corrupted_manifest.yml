@@ -1,0 +1,9 @@
+# This file is intentionally malformed YAML — used to test error handling.
+# spec.check must treat corrupted manifests as missing, not crash.
+schema_version: "1"
+feature: broken-feature
+screens:
+  - screen: logo
+    capture_date: NOT_A_DATE
+    approved_by: [this is a list not a string
+    browser_version: "chromium/1.44"

@@ -17,6 +17,8 @@ argument-hint: "<feature-name>"
 /spec.check feature-name          → Step 1 → Steps 3-10
 /spec.check --tree-only           → Step 1 only
 /spec.check --quality feature     → Step 1 → Steps 3-4 only
+/spec.check feature --show-provenance  → Step 1 → Step 3 → Step 3.1 (provenance table) → exit
+/spec.check --visual-status       → Step 8.5 (governance dashboard) → exit
 ```
 
 ```mermaid
@@ -163,6 +165,32 @@ Enter = most recent feature only
 2. If no feature name: detect from current git branch (`feature/NNN-feature-name`)
 3. If still ambiguous: list all features and ask user to choose
 
+#### Step 3.1 — `--show-provenance` early exit
+
+<!-- @spec FR-002: show-provenance flag reads and displays manifest — .specs/features/004-visual-testing-governance/spec.md#fr-002 -->
+
+If `--show-provenance` is set, execute this block after resolving the feature, then exit (skip Steps 4–10):
+
+1. Look for `baselines/baseline.manifest.yml` in the resolved feature directory
+2. **If manifest absent:**
+   ```
+   No baseline manifest found for <feature-name>.
+   Run spec.test --reset-baselines to capture baselines and generate provenance.
+   ```
+3. **If manifest present but unparseable:** treat as absent (same message above)
+4. **If manifest present and parseable:** render provenance table:
+   ```markdown
+   ## Baseline Provenance: <feature-name>
+
+   | Screen | Capture Date | Approved By | Mockup Version | Browser | OS | Docker Image |
+   |--------|-------------|-------------|----------------|---------|-----|--------------|
+   | logo   | 2026-04-14T10:28Z | julienm | sha256:e3b0c4… | chromium/1.44 | Linux 6.1 | playwright:v1.44.0-jammy |
+   | dashboard | 2026-04-14T10:29Z | auto (spec.ship) | sha256:abc987… | chromium/1.44 | Linux 6.1 | playwright:v1.44.0-jammy |
+   ```
+   - Truncate `mockup_version` to first 8 chars of the hex after `sha256:` for display
+   - Truncate `docker_image` to just the tag part (e.g., `playwright:v1.44.0-jammy`)
+   - Print manifest `generated_at` timestamp above the table
+
 ### Step 4 — Validate Spec Quality
 
 Applies quality gates from `spec-system.md` to the resolved feature.
@@ -277,13 +305,67 @@ For each FR and AC:
 
 <!-- @spec FR-007: maxDiffPixels for regression — .specs/features/003-visual-testing-fidelity/spec.md#fr-007 -->
 
+#### Step 8.0 — Staleness Gate (runs BEFORE pixel comparison)
+
+<!-- @spec FR-003: staleness check before comparison, FR-004: mockup hash detection, FR-005: browser version detection — .specs/features/004-visual-testing-governance/spec.md#fr-003 -->
+
+Before running any pixel comparison, classify each baseline's staleness state:
+
+**1. Read manifest:**
+
+```
+Look for baselines/baseline.manifest.yml in the feature directory.
+```
+
+- **If manifest absent:** emit WARNING for all screens:
+  ```
+  Warning: Baselines exist but provenance manifest is missing.
+  Run spec.test --reset-baselines to capture baselines and generate provenance.
+  ```
+  Skip pixel comparison for this feature. Continue to Step 9 with STALE=NO-MANIFEST for all screens.
+
+- **If manifest present but YAML parse fails:** treat as absent (same warning above).
+
+**2. Browser version check (FR-005, AC-008, AC-009):**
+
+- Run `playwright --version` to get the current browser version tag (e.g., `"chromium/1.44"`)
+- If Playwright is not installed: log `"Playwright not installed — browser version check skipped"`, skip browser check only
+- Compare current tag against `browser_version` from the manifest (any screen entry — they all share the same browser)
+- If **mismatch:** mark ALL screens for this feature as `STALE-BROWSER`
+  - Log: `"Browser version changed: <old> → <new> — all baselines require reset"`
+  - Suggest: `spec.test --all --reset-baselines`
+  - Skip ALL pixel comparisons for this feature
+
+**3. Per-screen mockup hash check (FR-004, AC-005):**
+
+- Only runs if browser version matches (not STALE-BROWSER)
+- For each screen in the manifest:
+  - Find the mockup PNG at `.specs/design/screens/<screen>.png`
+  - If mockup is absent: mark screen `STALE-MOCKUP` with reason `mockup_deleted` — skip its comparison
+  - Compute SHA-256 of current mockup binary → compare against `manifest.screens[screen].mockup_version`
+  - If **mismatch:** mark screen `STALE-MOCKUP`
+    - Log: `"Mockup updated after baseline capture — baseline may no longer reflect current design"`
+    - Skip comparison for this screen
+  - If **match:** classify as `VALID` → proceed to pixel comparison
+
+**4. Staleness classification summary:**
+
+| Classification | Meaning | Pixel comparison |
+|---|---|---|
+| `VALID` | Browser + mockup match manifest | Runs normally |
+| `STALE-MOCKUP` | Mockup SHA-256 changed | Skipped |
+| `STALE-BROWSER` | Playwright version changed | Skipped (all screens) |
+| `NO-MANIFEST` | No manifest file | Skipped (all screens) |
+
+**Exit code for stale baselines:** WARNING (not ERROR). Stale baselines do NOT fail the build — they are informational.
+
 #### Visual Regression Detection
 
 Use `compareRegression()` helper from `tests/e2e/helpers/visual.ts` to detect pixel drift:
 
 1. **Check resolved visual test tool** from `.specs/testing/strategy.md` or `plan.md` **Resolved Test Commands**
    - If absent → skip step, report: "Visual drift detection skipped — no visual testing tool resolved"
-2. **For each baseline PNG in `baselines/`:**
+2. **For each baseline PNG in `baselines/` classified as VALID by the Staleness Gate:**
    - Locate the most recent Playwright test output for that screen
    - Run pixel diff: `compareRegression(baseline, currentScreenshot, maxDiffPixels: 0)`
 3. **Report per baseline:**
@@ -293,15 +375,17 @@ Use `compareRegression()` helper from `tests/e2e/helpers/visual.ts` to detect pi
 
 **Threshold:** `maxDiffPixels: 0` — zero tolerance. Any pixel difference is a regression. Screens with `aa_tolerance: true` in the spec use `maxDiffPixels: 10` as the per-test override.
 
-**Report format in gap report:**
+**Report format in gap report (extended with staleness):**
 ```markdown
 ### Visual Tests (Regression Detection)
 
-| Screenshot | Status | Diff (px) | Notes |
-|---|---|---|---|
-| `login.png` | ✅ Match | 0 px | |
-| `dashboard.png` | 🖼️ Drift | 312 px | Badge color changed; diff zones: top-right, bottom-left |
-| `settings.png` | ❌ Missing | — | Baseline not captured |
+| Screenshot | Staleness | Status | Diff (px) | Notes |
+|---|---|---|---|---|
+| `login.png` | VALID | ✅ Match | 0 px | |
+| `dashboard.png` | STALE-MOCKUP | ⚠️ Skipped | — | Mockup updated 2026-04-14 |
+| `nav.png` | STALE-BROWSER | ⚠️ Skipped | — | chromium/1.42→1.44 |
+| `settings.png` | NO-MANIFEST | ⚠️ Skipped | — | Run spec.test --reset-baselines |
+| `header.png` | VALID | 🖼️ Drift | 312 px | Badge color changed |
 ```
 
 #### Design Fidelity Check (UI features with mockups)
@@ -354,6 +438,63 @@ If `.specs/design/theme.css` exists:
 - 🎨 Hardcoded — found hardcoded values that should use theme tokens
 
 If `.specs/design/theme.css` does not exist → skip this check silently.
+
+### Step 8.5 — Visual Governance Dashboard (`--visual-status` flag)
+
+<!-- @spec FR-006: visual-status flag scans all features and classifies baselines — .specs/features/004-visual-testing-governance/spec.md#fr-006 -->
+
+**Only runs when `--visual-status` is set.** Exits after display — does not run Steps 9–10.
+
+This handler can be invoked without a feature argument: `spec.check --visual-status` scans ALL features.
+
+#### Scan all features
+
+1. Find all directories matching `.specs/features/*/baselines/`
+2. For each feature with a `baselines/` directory:
+   a. Read `baselines/baseline.manifest.yml` (if present)
+   b. Get current browser version from `playwright --version` (or `"unknown"` if not installed)
+   c. For each screen:
+      - If no manifest: classify `NO-MANIFEST`
+      - If browser version mismatch: classify `STALE-BROWSER`
+      - If mockup hash mismatch or mockup deleted: classify `STALE-MOCKUP`
+      - Otherwise: classify `VALID`
+3. Render governance table:
+
+```markdown
+## Visual Governance Dashboard
+
+**Checked:** 2026-04-14
+**Features scanned:** 3
+
+| Feature | Screen | Status | Last Approved | Reason |
+|---------|--------|--------|---------------|--------|
+| 003-visual-testing-fidelity | logo | ✅ VALID | 2026-04-14 julienm | — |
+| 003-visual-testing-fidelity | dashboard | ⚠️ STALE-MOCKUP | 2026-04-14 julienm | Mockup updated after capture |
+| 004-visual-testing-governance | hero | ⚠️ NO-MANIFEST | — | Run spec.test --reset-baselines |
+| 002-layer-3-cli-surface | nav | ⚠️ STALE-BROWSER | 2026-04-13 julienm | chromium/1.42 → chromium/1.44 |
+```
+
+4. Print action summary if any STALE/NO-MANIFEST entries exist:
+
+```markdown
+### Action Required
+
+| Feature | Issue | Command |
+|---------|-------|---------|
+| 003-visual-testing-fidelity | STALE-MOCKUP (dashboard) | `spec.test 003-visual-testing-fidelity --reset-baselines=dashboard` |
+| 004-visual-testing-governance | NO-MANIFEST (hero) | `spec.test 004-visual-testing-governance --reset-baselines` |
+| 002-layer-3-cli-surface | STALE-BROWSER (all) | `spec.test 002-layer-3-cli-surface --reset-baselines` |
+```
+
+5. If all baselines are VALID:
+   ```
+   All baselines valid — no action needed.
+   ```
+
+6. If no features have `baselines/` directories:
+   ```
+   No visual baselines found in this project.
+   ```
 
 ### Step 9 — Produce Gap Report
 
@@ -577,6 +718,8 @@ Ordered list of the most urgent actions across all checked features:
 | `--quality`, `-q` | Only validate spec quality gates, skip code alignment |
 | `--all`, `-A` | Check all features without prompting for selection |
 | `--summary`, `-S` | Multi-spec: only display the consolidated report |
+| `--show-provenance` | Display baseline provenance table for the resolved feature (Step 3.1). Exits after display — does not run Steps 4–10. |
+| `--visual-status` | Scan all features and display the visual governance dashboard (Step 8.5). Exits after display. |
 
 ---
 
