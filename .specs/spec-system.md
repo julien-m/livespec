@@ -365,12 +365,41 @@ To prevent changelogs from growing unbounded:
 
 ### When working with DESIGN mockups
 
+<!-- @spec FR-010: Screens table format with selector and aa_tolerance — .specs/features/003-visual-testing-fidelity/spec.md#fr-010 -->
+
 1. Design mockups are centralized in `.specs/design/` — one source file per project
 2. PNGs in `screens/` are the reference for implementation — always the latest version
 3. The design source file (`ui.pen`, `ui.fig`, etc.) is saved manually by the user
 4. When a feature modifies existing screens, save the versioned PNG in `screens/<NNN-feature-name>/` and update the latest copy at `screens/<name>.png`
 5. The `## Screens` section in `spec.md` links features to their visual references
-6. Design fidelity threshold is 5% (more permissive than visual regression at 2%)
+6. Design fidelity threshold is 5% (more permissive than visual regression at `maxDiffPixels: 0`)
+
+#### Screens Table Format
+
+The `## Screens` table in `spec.md` supports optional columns for visual testing precision:
+
+```markdown
+| Screen    | Route      | Mockup      | selector                     | aa_tolerance |
+|-----------|------------|-------------|------------------------------|--------------|
+| logo      | /          | logo.png    | [data-testid='logo']         | false        |
+| dashboard | /dashboard | dashboard.png | [data-testid='main-content'] | false      |
+| nav       | /          | nav.png     |                              | false        |
+```
+
+**Column definitions:**
+
+| Column | Required | Description |
+|--------|----------|-------------|
+| `Screen` | Yes | Screen identifier (matches baseline filename) |
+| `Route` | Yes | URL path for Playwright navigation |
+| `Mockup` | No | PNG filename in `.specs/design/screens/` |
+| `selector` | No | CSS selector or `[data-testid='...']` for component-level snapshot. If empty, falls back to full-page screenshot with a warning comment. |
+| `aa_tolerance` | No | `true` → use `{ maxDiffPixels: 10 }` to allow minor antialiasing variance. Default: `false` (zero tolerance). |
+
+**Guidance:**
+- Add `selector` for critical UI components (logos, badges, buttons) to prevent the component being masked by full-page pixel ratio
+- Use `aa_tolerance: true` only for text-heavy components where antialiasing varies between OS/GPU
+- Full-page screenshots (no selector) are acceptable for layout tests but less precise for component regression detection
 
 ### When REVIEWING a feature
 
@@ -523,6 +552,7 @@ Before a spec is considered complete:
 - [ ] No more than 3 `[NEEDS CLARIFICATION]` markers
 - [ ] If feature has UI screens: `## Screens` section exists with PNG references
 - [ ] If design tool configured: referenced PNGs exist in `.specs/design/screens/`
+- [ ] If feature has critical UI components: Screens table includes `selector` column for component-level precision
 
 Before a plan is considered complete:
 - [ ] Sequence diagrams exist for API interactions
