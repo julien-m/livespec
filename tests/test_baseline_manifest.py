@@ -16,6 +16,7 @@ the documented behavior, following the same pattern as feature 003 implementatio
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 import yaml
@@ -82,7 +83,7 @@ class TestBaselineManifestSchema:
         """Schema must contain a valid YAML example block."""
         content = BASELINE_SCHEMA_MD.read_text()
         # Extract the first ```yaml block
-        yaml_blocks: list[str] = []  # type: ignore[assignment]
+        yaml_blocks: list[str] = []
         in_block = False
         current_block: list[str] = []
         for line in content.splitlines():
@@ -91,7 +92,7 @@ class TestBaselineManifestSchema:
                 current_block = []
             elif line.strip() == "```" and in_block:
                 in_block = False
-                yaml_blocks.append("\n".join(current_block))  # type: ignore[attr-defined]
+                yaml_blocks.append("\n".join(current_block))
             elif in_block:
                 current_block.append(line)
 
@@ -99,12 +100,12 @@ class TestBaselineManifestSchema:
 
         # The first block is the schema definition — parse it
         # It uses placeholder values like "<feature-name>" so we only check it doesn't crash
-        for block in yaml_blocks:  # type: ignore[attr-defined]
+        for block in yaml_blocks:
             # Skip schema definition blocks with angle-bracket placeholders
             if "<" in block:
                 continue
             try:
-                parsed = yaml.safe_load(block)  # type: ignore[arg-type]
+                parsed = yaml.safe_load(block)
                 assert isinstance(parsed, dict), "YAML example block must parse to a dict"
             except yaml.YAMLError as e:
                 pytest.fail(f"Invalid YAML in schema example block: {e}")
@@ -456,10 +457,12 @@ class TestBaselineManifestFixtures:
         if not fixture_path.exists():
             pytest.skip("stub_manifest.yml fixture not yet created")
         content = fixture_path.read_text()
-        parsed = yaml.safe_load(content)  # type: ignore[arg-type]
+        parsed = yaml.safe_load(content)
         assert isinstance(parsed, dict), "stub_manifest.yml must parse to a dict"
-        screens = parsed.get("screens", [])  # type: ignore[attr-defined]
-        assert len(screens) > 0, "stub_manifest.yml must have at least one screen"  # type: ignore[arg-type]
-        assert screens[0].get("approved_by") == "pre-v5 (untracked)", (  # type: ignore[union-attr,arg-type]
+        manifest = cast(dict[str, Any], parsed)
+        screens = cast(list[Any], manifest.get("screens", []))
+        assert len(screens) > 0, "stub_manifest.yml must have at least one screen"
+        first_screen = cast(dict[str, Any], screens[0])
+        assert first_screen.get("approved_by") == "pre-v5 (untracked)", (
             "stub_manifest.yml screen must have 'pre-v5 (untracked)' approved_by"
         )
