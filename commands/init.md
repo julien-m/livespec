@@ -767,6 +767,8 @@ After installing the CLAUDE.md section, create local symlinks for all LiveSpec c
    - `.claude/commands/spec.*.md`
    - `.claude/agents/livespec-*.md`
    - `.specs/.livespec-path`
+   - `test-results/`
+   - `playwright-report/`
 
 **Output:**
 > Installed 17 spec commands and 4 agents as local symlinks in `.claude/`
@@ -982,7 +984,7 @@ Before declaring success, verify:
 - [ ] All symlinks resolve to existing files (no broken links)
 - [ ] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo
 - [ ] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory
-- [ ] `.gitignore` contains `.claude/commands/spec.*.md`, `.claude/agents/livespec-*.md`, `.specs/.livespec-path`
+- [ ] `.gitignore` contains `.claude/commands/spec.*.md`, `.claude/agents/livespec-*.md`, `.specs/.livespec-path`, `test-results/`, `playwright-report/`
 - [ ] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`
 - [ ] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)
 
