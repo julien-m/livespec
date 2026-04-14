@@ -37,7 +37,7 @@
 | 001 | Auto LLM Review | Implemented | 2026-04-13 | 2026-04-13 | [spec](features/001-auto-llm-review/spec.md) |
 | 002 | Layer 3 CLI Surface | Planned | 2026-04-13 | 2026-04-13 | [spec](features/002-layer-3-cli-surface/spec.md) |
 | 003 | Visual Testing Fidelity | Implemented | 2026-04-14 | 2026-04-14 | [spec](features/003-visual-testing-fidelity/spec.md) |
-| 004 | Visual Testing Governance | Draft | 2026-04-14 | 2026-04-14 | [spec](features/004-visual-testing-governance/spec.md) |
+| 004 | Visual Testing Governance | Implemented | 2026-04-14 | 2026-04-14 | [spec](features/004-visual-testing-governance/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -61,6 +61,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-14 | Feature | [Feature 004] Implemented: Visual Testing Governance — 4 new files, 2 modified, 41 new tests, 406 total pass |
+| 2026-04-14 | Plan | [Feature 004] Plan created: Visual Testing Governance — 7 steps, 4 diagrams |
 | 2026-04-14 | Feature | [Feature 003] Implemented: Visual Testing Fidelity — 6 files modified, 2 created, 14/14 AC |
 | 2026-04-14 | Plan | [Feature 003] Plan created: Visual Testing Fidelity — 8 steps, 3 diagrams |
 | 2026-04-14 | Spec | [Feature 004] Spec created: Visual Testing Governance — 4 stories, 12 AC, 8 FR |
