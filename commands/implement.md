@@ -88,6 +88,13 @@ flowchart TD
 7. `.specs/design/theme.css` — if exists, read as the authoritative theme for CSS variables (colors, spacing, typography)
 8. `.specs/design/theme.md` — if exists, read for install command and color palette reference
 
+<!-- @spec FR-005: Behavioral TDD step insertion, FR-006: Taxonomy test patterns — .specs/features/005-ui-behavioral-testing/spec.md#fr-005 -->
+
+9. **Behavioral AC detection:** Check whether spec.md contains a `## Behavioral AC` section.
+   - If present: extract all declared traits and their test patterns by reading `system/testing/ui-behavioral-taxonomy.md`. Record the list of traits + required test patterns for Phase 2.
+   - If absent: no behavioral TDD step is added (AC-008).
+   - If taxonomy is missing but `## Behavioral AC` exists: log WARNING — "Behavioral AC declared but taxonomy not found. Behavioral TDD step will be skipped. Create taxonomy or run /spec.specify --no-behavioral." (EC-005 graceful degradation — see taxonomy section 6.)
+
 **Explore the codebase:**
 - Find existing patterns matching what needs to be built
 - Identify files that will need modification
@@ -150,6 +157,7 @@ This phase ensures tools, OAuth sessions, and API tokens are available before au
 Create an ordered todo list from `plan.md`:
 
 ```
+[ ] Step 0a: Behavioral TDD (if ## Behavioral AC present) — runs BEFORE infrastructure
 [ ] Step 0: Infrastructure setup (provision, bind, verify) — only if plan has Infrastructure Setup
 [ ] Step 1: Create database migration
 [ ] Step 2: Create data access functions
@@ -162,6 +170,26 @@ Create an ordered todo list from `plan.md`:
 [ ] Step 9: Capture visual baselines
 [ ] Step 10: Update implementation.md
 [ ] Step 11: Update changelog.md
+```
+
+#### Step 0a — Behavioral TDD (if `## Behavioral AC` present)
+
+> **Ordering note:** Step 0a runs BEFORE Step 0 (Infrastructure). The "a" suffix indicates it precedes the existing Step 0. This step is entirely skipped when no `## Behavioral AC` section exists in spec.md.
+
+This step runs BEFORE any infrastructure provisioning and BEFORE any component code.
+
+For each trait declared in `## Behavioral AC`:
+1. Read the trait's required test patterns from `system/testing/ui-behavioral-taxonomy.md`
+2. Generate a failing test file covering ALL required patterns for ALL declared traits (combined into one test file per component — not one file per trait)
+3. Run tests to confirm RED phase (tests must fail — if they pass before implementation, flag as: "Tests pass before implementation — investigate whether component already exists or test is incorrectly written")
+4. Record Step 0a in `progress.md` as Done only after: test file written AND tests confirmed failing (RED)
+
+**Deduplication:** See taxonomy deduplication rule (section 5).
+
+**Taxonomy reference:** The implementer must include a comment in the test file:
+```
+# Behavioral patterns from: system/testing/ui-behavioral-taxonomy.md
+# Traits: [list of detected traits]
 ```
 
 ### Step Gate (Blocking) — obligatoire avant passage au step suivant

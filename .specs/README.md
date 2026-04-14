@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-04-14
+> Last updated: 2026-04-14 (plan generated for 005-ui-behavioral-testing)
 
 ---
 
@@ -38,6 +38,7 @@
 | 002 | Layer 3 CLI Surface | Planned | 2026-04-13 | 2026-04-13 | [spec](features/002-layer-3-cli-surface/spec.md) |
 | 003 | Visual Testing Fidelity | Implemented | 2026-04-14 | 2026-04-14 | [spec](features/003-visual-testing-fidelity/spec.md) |
 | 004 | Visual Testing Governance | Implemented | 2026-04-14 | 2026-04-14 | [spec](features/004-visual-testing-governance/spec.md) |
+| 005 | UI Behavioral Testing | Planned | 2026-04-14 | 2026-04-14 | [spec](features/005-ui-behavioral-testing/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -61,6 +62,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-14 | Plan | [Feature 005] Plan created: UI Behavioral Testing — 5 steps, 4 diagrams |
+| 2026-04-14 | Spec | [Feature 005] Spec created: UI Behavioral Testing — 5 stories, 13 AC, 9 FR |
 | 2026-04-14 | Feature | [Feature 004] Implemented: Visual Testing Governance — 4 new files, 2 modified, 41 new tests, 406 total pass |
 | 2026-04-14 | Plan | [Feature 004] Plan created: Visual Testing Governance — 7 steps, 4 diagrams |
 | 2026-04-14 | Feature | [Feature 003] Implemented: Visual Testing Fidelity — 6 files modified, 2 created, 14/14 AC |

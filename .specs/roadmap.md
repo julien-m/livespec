@@ -35,6 +35,7 @@
 
 <!-- roadmap:postmvp:start -->
 - [x] **Visual Testing Governance** — Baseline provenance metadata, mockup-change and browser-upgrade invalidation triggers, `--visual-status` governance dashboard, migration v5. Deps: Feature 003. · Scope: M → [004-visual-testing-governance](features/004-visual-testing-governance/spec.md)
+- [x] **UI Behavioral Testing** — Behavioral trait taxonomy (is_submittable, async_action, has_overlay, dismissible_layer, has_validation) + silent inject in /spec.specify + TDD anchors in /spec.implement + audit sentinel in /spec.test. Scope: M → [005-ui-behavioral-testing](features/005-ui-behavioral-testing/spec.md)
 - [ ] **Embedding reindex** — Connect embeddings to pluggable provider interface (stubbed: `--reindex` flag) · Scope: S · Deps: Layer 4
 - [ ] **Multi-model consensus** — Finalize `semantic/multi_model.py` integration (stubbed: `--experimental-multi-model` flag) · Scope: M · Deps: LLM provider
 - [ ] **JSON output for all subcommands** — `pipeline` and `git` subcommands lack `--format json` · Scope: S

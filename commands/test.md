@@ -145,6 +145,47 @@ For each AC in `spec.md`:
    - ❌ **Missing** — no test found for this AC
    - 🚫 **No Gherkin** — AC has no Gherkin scenario (cannot auto-generate)
 
+### Behavioral Audit (sub-phase 1.5 — if `## Behavioral AC` present)
+
+<!-- @spec FR-007: Parse Behavioral AC section, FR-008: Gap report — .specs/features/005-ui-behavioral-testing/spec.md#fr-007 -->
+
+**Skipped if:** spec.md has no `## Behavioral AC` section (AC-011). No behavioral audit section appears in the report.
+
+1. **Extract declared traits:** Parse the `## Behavioral AC` section of spec.md. Identify all trait names declared (e.g., `async_action`, `is_submittable`).
+
+2. **Load required patterns:** For each declared trait, read the "Test patterns" table from `system/testing/ui-behavioral-taxonomy.md`. Extract the pattern keyword column (the grep-able string used to detect coverage).
+
+3. **Scan test files:** For each pattern keyword, scan the feature's test files (from `implementation.md` AC Mapping or by discovering test files in the project):
+   - grep for the pattern keyword in test file content
+   - If found: trait + pattern is covered
+   - If not found: gap detected
+
+4. **Handle non-standard naming (EC-003):** If a test exists but uses a non-standard naming pattern that doesn't contain the taxonomy's keyword, report as gap with note: "Pattern keyword '[keyword]' not found — manual review required. Test may exist under a different name."
+
+5. **Taxonomy missing (EC-005):** If `system/testing/ui-behavioral-taxonomy.md` does not exist but `## Behavioral AC` is present, skip behavioral audit with WARNING: "Behavioral taxonomy not found — behavioral audit skipped." (See taxonomy section 6 for asymmetry rationale.)
+
+6. **Output — Behavioral Coverage Audit section:**
+
+```markdown
+### Behavioral Coverage Audit
+
+| Trait | Required Pattern | Pattern Keyword | Status | Notes |
+|-------|-----------------|-----------------|--------|-------|
+| async_action | loading state | `loading-state` | Covered | tests/e2e/form.spec.ts:42 |
+| async_action | double-click prevention | `double-click` | Gap | no test found |
+| is_submittable | submit disabled when invalid | `submit-disabled` | Covered | tests/unit/form.test.ts:18 |
+
+**Behavioral coverage:** 2/3 patterns covered (67%)
+**Gaps:** 1 — async_action: double-click prevention not tested
+  -> See taxonomy: system/testing/ui-behavioral-taxonomy.md#async_action
+
+All behavioral traits covered  <-- (only shown if 0 gaps)
+```
+
+7. **Audit-only:** This sub-phase NEVER generates or modifies test files. It only reports gaps. (FR-008)
+
+8. **Integration with Phase 5 Report:** Include the Behavioral Coverage Audit table in the test report saved to `checks/YYYY-MM-DD-test.md`.
+
 ### Visual Audit (UI features only)
 
 If `spec.md` has a `## Screens` section:
@@ -680,6 +721,7 @@ When multiple features are tested in a single run, display after all individual 
 | `--auto` | | No confirmation prompts (for `/spec.feature` Phase 3.5 and `/spec.ship` integration) |
 | `--update` | `-u` | Auto-update `implementation.md` without asking |
 | `--no-update` | `-U` | Skip `implementation.md` update |
+| `--no-behavioral` | | Skip behavioral coverage audit (sub-phase 1.5) |
 | `--reset-baselines[=<screen>]` | | Delete existing baselines (all, or named screen only) then recapture. Triggers human approval gate. Use `--reset-baselines` for intentional UI changes — NEVER `--update-snapshots`. Blocked on CI. |
 
 ---
