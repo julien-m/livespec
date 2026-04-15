@@ -24,3 +24,36 @@
 - **Code modified:** None
 - **AC impacted:** AC-001 through AC-013 (all defined)
 - **Author:** spec.specify
+
+---
+
+## 2026-04-15 — Audit: Post-implementation improvements applied
+
+- **Type:** Audit Review
+- **Spec modified:** Yes (spec.md line 17 status: Draft → Planned)
+- **Code modified:** system/testing/ui-behavioral-taxonomy.md (versioning v1.0.0 + detection examples for 5 traits), system/testing/taxonomy-review-process.md (created), .specs/features/005-ui-behavioral-testing/tests/ (3 .feature files created)
+- **AC impacted:** None (improvements to existing artifacts, no AC changes)
+- **Author:** audit-review
+
+## Backlog — Feature 006 Candidate
+
+### /spec.stats --behavioral (behavioral metrics dashboard)
+
+Identified during post-implementation audit (2026-04-15). Not implemented in feature 005 — requires populated behavioral AC data to be useful.
+
+**What it does:**
+- Scans all `spec.md` files for `## Behavioral AC` sections
+- Counts trait frequency across all features
+- Detects false positives (Behavioral AC in non-UI features)
+- Reports unclassified component candidates for taxonomy review
+
+**Why deferred:**
+- Feature 005 is the first feature with Behavioral AC — dashboard would be empty
+- Requires ≥10 features with behavioral data to produce meaningful signal
+- Implement as part of feature 006 or as a standalone utility once adoption grows
+
+**Acceptance criteria (draft):**
+- [ ] Scans `.specs/features/*/spec.md` for `## Behavioral AC` sections
+- [ ] Displays trait frequency table
+- [ ] Flags features where Behavioral AC traits don't match the taxonomy (stale versions)
+- [ ] Reports coverage: % of features with behavioral traits vs. total
