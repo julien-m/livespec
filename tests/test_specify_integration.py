@@ -9,6 +9,7 @@ detect_traits() returns the correct deterministic trait set.
 
 from __future__ import annotations
 
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -24,10 +25,10 @@ _TAXONOMY_PATH = (
 
 
 @pytest.fixture(autouse=True)
-def clear_cache() -> None:  # type: ignore[misc]
+def clear_cache() -> Generator[None, None, None]:  # type: ignore[no-untyped-def]
     """Ensure each test starts with a clean taxonomy cache."""
     _TAXONOMY_CACHE.clear()  # type: ignore[attr-defined]
-    yield  # type: ignore[misc]
+    yield
     _TAXONOMY_CACHE.clear()  # type: ignore[attr-defined]
 
 
