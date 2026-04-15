@@ -3,7 +3,19 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/NNN-feature-name/changelog.md`.
 >
-> Last updated: 2026-04-14
+> Last updated: 2026-04-15
+
+---
+
+## 2026-04-15 -- Plan: Feature 006 planned
+
+[Feature 006] Plan created: Taxonomy Testing Infrastructure — 3 implementation steps, 2 diagrams
+
+---
+
+## 2026-04-15 -- Spec: Feature 006 created
+
+[Feature 006] Spec created: Taxonomy Testing Infrastructure — 4 stories, 15 AC, 8 FR
 
 ---
 
