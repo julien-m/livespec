@@ -204,6 +204,38 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
   - List each resource with type, provider, environment, and when it's needed
   - If unsure whether a resource is needed, mark it `[ASSUMED]` in the table
 
+### Step 5.7 — Behavioral AC Injection
+
+<!-- @spec FR-002: UI signal detection, FR-003: Behavioral AC injection, FR-004: AC section separation — .specs/features/005-ui-behavioral-testing/spec.md#fr-002 -->
+
+After generating spec.md, detect behavioral traits and inject Gherkin AC:
+
+1. **Taxonomy gate:** Check that `system/testing/ui-behavioral-taxonomy.md` exists.
+   - If missing and no `--no-behavioral` flag: fail fast with: "Behavioral taxonomy not found at system/testing/ui-behavioral-taxonomy.md. Run /spec.specify --no-behavioral or create the taxonomy first." Do NOT skip silently.
+   - If `--no-behavioral` flag is set: skip this step entirely.
+
+2. **Signal detection (LLM-driven):** Using the taxonomy's detection signals table as vocabulary, evaluate the feature description for UI behavioral signals. Read `system/testing/ui-behavioral-taxonomy.md` section 3 for the signal tables.
+
+   Detection threshold (FR-002):
+   - At least 2 independent UI signals (e.g., "form" + "submit"), OR
+   - 1 unambiguous UI signal with no contraindicators (e.g., "modal" alone is sufficient; "submit" alone in a backend context is NOT)
+
+   Disambiguation uses the full feature description context — a mention of "submit" in "submit a report to a server" without any other UI indicators does NOT trigger injection (EC-001).
+
+3. **Trait mapping:** For each detected signal, map to the corresponding trait(s) per the taxonomy. If a component matches multiple transversal patterns, apply deduplication. See taxonomy deduplication rule (section 5).
+
+4. **Template injection:** For each mapped trait, load the Gherkin template from the taxonomy and parameterize it with feature-specific names (entity names, field names from the feature description).
+
+5. **Section injection:** Add a `## Behavioral AC` section to spec.md AFTER the `## Acceptance Criteria` section. Content = parameterized Gherkin templates. DO NOT add behavioral scenarios to `## Acceptance Criteria` (FR-004).
+
+6. **Replace-not-append rule:** If `## Behavioral AC` already exists in the target spec.md, **replace it entirely** (do not append). This ensures re-running `/spec.specify` on an existing spec produces a clean behavioral section without duplicates.
+
+7. **No traits detected:** If no traits are found, skip injection. No `## Behavioral AC` section is created. Spec.md structure is identical to current behavior (AC-005).
+
+8. **Overlap note:** If the feature description already contains behavioral boilerplate in `## Acceptance Criteria` (detectable by trait pattern keywords), add a comment in `## Behavioral AC`:
+   > Note: Behavioral patterns also referenced in ## Acceptance Criteria (AC-NNN).
+   > /spec.implement will deduplicate. See taxonomy deduplication rule (section 5).
+
 ### Step 5.1 — Structural Validation
 
 After generating `spec.md`, validate its structure before presenting to the user:
@@ -577,6 +609,7 @@ flowchart TD
 | `--no-branch`, `-B` | Skip branch creation prompt |
 | `--priority`, `-p` `[P1\|P2\|P3]` | Override all stories to specified priority |
 | `--no-review`, `-N` | Skip LLM spec review (review runs by default) |
+| `--no-behavioral` | Skip behavioral AC injection (Step 5.7). Use when feature is confirmed non-UI or taxonomy not yet created |
 
 ---
 

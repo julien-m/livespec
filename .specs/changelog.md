@@ -7,6 +7,24 @@
 
 ---
 
+## 2026-04-14 -- Check: Feature 005 checked
+
+[Feature 005] Check: 100% verified (9/9 FR, 13/13 AC) — Healthy. All plan-review mandatory findings satisfied.
+
+---
+
+## 2026-04-14 -- Plan: Feature 005 plan created
+
+[Feature 005] Plan created: UI Behavioral Testing — 5 implementation steps, 4 diagrams
+
+---
+
+## 2026-04-14 -- Spec: Feature 005 created
+
+[Feature 005] Spec created: UI Behavioral Testing — 5 stories, 13 AC, 9 FR
+
+---
+
 ## 2026-04-14 -- Feature: Feature 004 implemented
 
 [Feature 004] Implemented: Visual Testing Governance — 4 new files created, 2 modified, 41 tests added, 406 total pass
