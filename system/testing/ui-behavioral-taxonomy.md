@@ -49,6 +49,22 @@ This document defines the behavioral traits that UI components exhibit. Commands
 | "send" | Requires at least 1 other UI signal |
 | "create" (with entity) | Requires UI context (e.g., "create dialog", "create form") |
 
+**Detection examples:**
+
+✅ **INJECT** (positive examples):
+- "form with submit button and validation" → `is_submittable` + `has_validation`
+- "create user dialog with save button" → `is_submittable` (dialog = unambiguous UI context)
+- "modal with form and async submit" → `is_submittable` + `async_action` + `has_overlay`
+
+❌ **DO NOT INJECT** (EC-001 — no UI context):
+- "submit a report to the analytics server" → backend operation, no UI signal
+- "save configuration to database" → no UI signal, pure backend
+- "send notification email" → backend action, not user-initiated UI submit
+
+**Ambiguous cases (requires ≥2 signals):**
+- "save settings" alone → ❌ insufficient (could be backend)
+- "save settings button in preferences dialog" → ✅ sufficient (dialog + button = UI context)
+
 **Gherkin template:**
 
 ```gherkin
@@ -94,6 +110,22 @@ Scenario: Submit button disabled state
 | "fetch" | Requires UI context (not backend fetch) |
 | "long operation" | Sufficient alone |
 | "file upload" | Sufficient alone |
+
+**Detection examples:**
+
+✅ **INJECT** (positive examples):
+- "search button with spinner during API call" → `async_action`
+- "file upload with progress indicator" → `async_action`
+- "submit button that fetches results with loading state" → `async_action` + `is_submittable`
+
+❌ **DO NOT INJECT** (EC-001 — no UI context):
+- "backend service that fetches data from database" → no UI, pure backend fetch
+- "cron job that runs a long operation" → no UI trigger
+- "API endpoint that processes a file upload" → server-side, no UI component
+
+**Ambiguous cases (requires ≥2 signals):**
+- "fetch data" alone → ❌ insufficient (backend fetch likely)
+- "fetch data when button clicked" → ✅ sufficient (button = UI trigger)
 
 **Gherkin template:**
 
@@ -144,6 +176,22 @@ Scenario: Error and retry on failure
 | "popover" | Sufficient alone |
 | "sheet" | Requires UI context |
 
+**Detection examples:**
+
+✅ **INJECT** (positive examples):
+- "confirmation modal" → `has_overlay` + `dismissible_layer`
+- "settings drawer that slides in from the right" → `has_overlay` + `dismissible_layer`
+- "delete confirmation dialog" → `has_overlay` + `dismissible_layer`
+
+❌ **DO NOT INJECT** (EC-001 — no overlay):
+- "inline settings panel on the page" → page-level, not overlaid
+- "expandable accordion section" → no overlay, inline content
+- "tooltip on hover" → typically not a full overlay requiring focus trap / scroll lock
+
+**Ambiguous cases (requires ≥2 signals):**
+- "sheet" alone → ❌ ambiguous (could be spreadsheet)
+- "bottom sheet with dismiss button" → ✅ sufficient (dismiss + overlay context)
+
 **Gherkin template:**
 
 ```gherkin
@@ -190,6 +238,22 @@ Scenario: Body scroll is locked when overlay is open
 | "click outside" | Sufficient alone |
 | "closable" | Sufficient alone |
 
+**Detection examples:**
+
+✅ **INJECT** (positive examples):
+- "modal with close button" → `dismissible_layer` + `has_overlay`
+- "dialog closable via Escape key" → `dismissible_layer`
+- "drawer that closes on click outside" → `dismissible_layer` + `has_overlay`
+
+❌ **DO NOT INJECT** (EC-001 — no dismissible UI layer):
+- "user can close their account" → account action, not a UI layer
+- "administrator dismisses a notification from the admin panel" → UI action but no layer component
+- "session expires and closes the connection" → system event, not user-dismissible layer
+
+**Ambiguous cases (requires ≥2 signals):**
+- "closable" alone → ❌ ambiguous (could describe any closable thing)
+- "closable notification panel with X button" → ✅ sufficient (panel + button = dismissible layer)
+
 **Gherkin template:**
 
 ```gherkin
@@ -234,6 +298,22 @@ Scenario: Dismiss via click outside
 | "format check" | Sufficient alone |
 | "field error" | Sufficient alone |
 | "inline error" | Sufficient alone |
+
+**Detection examples:**
+
+✅ **INJECT** (positive examples):
+- "form with email validation and required fields" → `has_validation` + `is_submittable`
+- "input that shows inline error when format is invalid" → `has_validation`
+- "password field with strength requirements" → `has_validation`
+
+❌ **DO NOT INJECT** (EC-001 — no UI validation):
+- "server validates the JWT token on each request" → server-side validation, no UI
+- "database constraint prevents duplicate emails" → DB-level, no UI component
+- "API returns 422 when required fields are missing" → backend validation response
+
+**Ambiguous cases (requires ≥2 signals):**
+- "error message" alone → ❌ ambiguous (could be a system error, not form validation)
+- "error message shown below the input field" → ✅ sufficient (input + error = UI validation)
 
 **Gherkin template:**
 
