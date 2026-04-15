@@ -93,6 +93,24 @@ class SdkDependencyError(Exception):
         self.install_hint: str = self.INSTALL_HINT
 
 
+# @spec FR-007 — TaxonomyLoadError — .specs/features/006-taxonomy-testing-infra/spec.md#fr-007
+class TaxonomyLoadError(Exception):
+    """Raised when the UI behavioral taxonomy file is missing or unparseable.
+
+    Args:
+        path: The taxonomy file path that was searched.
+        reason: Optional parse failure description.
+    """
+
+    def __init__(self, path: str, reason: str | None = None) -> None:
+        msg = f"Taxonomy not found at {path}"
+        if reason:
+            msg += f": {reason}"
+        super().__init__(msg)
+        self.path = path
+        self.reason = reason
+
+
 # @spec FR-004: Subprocess failure error — .specs/features/002-layer-3-cli-surface/spec.md#fr-004
 class SdkTestRunError(Exception):
     """Raised when the pytest subprocess fails to start.
