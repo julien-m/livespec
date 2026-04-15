@@ -6,6 +6,7 @@
 > Referenced by `/spec.specify`, `/spec.implement`, and `/spec.test`. No command file may duplicate trait definitions — all must defer to this document.
 
 **Version:** 2026-04-14
+**Taxonomy Version:** v1.0.0
 **Feature:** 005-ui-behavioral-testing
 
 ---
@@ -385,6 +386,19 @@ Commands handle a missing taxonomy document differently by design:
 | `/spec.test` | **Degrade gracefully** — skip behavioral audit with WARNING | Audit is additive. Missing taxonomy does not invalidate structural test coverage. |
 
 This asymmetry is intentional: `/spec.specify` is the injection point where incorrect data would propagate downstream. `/spec.implement` and `/spec.test` are consumers that can function without behavioral data.
+
+---
+
+---
+
+## 7. Changelog
+
+### v1.0.0 (2026-04-14)
+- Initial taxonomy: 5 traits (is_submittable, async_action, has_overlay, dismissible_layer, has_validation)
+- 3 transversal patterns (form-in-modal, inline-edit, async-search-select)
+- Crash test: 84.6% coverage on 13 real-world components
+- Deduplication rules (EC-002, EC-004)
+- Asymmetric error handling (EC-005)
 
 ---
 
