@@ -214,15 +214,24 @@ After generating spec.md, detect behavioral traits and inject Gherkin AC:
    - If missing and no `--no-behavioral` flag: fail fast with: "Behavioral taxonomy not found at system/testing/ui-behavioral-taxonomy.md. Run /spec.specify --no-behavioral or create the taxonomy first." Do NOT skip silently.
    - If `--no-behavioral` flag is set: skip this step entirely.
 
-2. **Signal detection (LLM-driven):** Using the taxonomy's detection signals table as vocabulary, evaluate the feature description for UI behavioral signals. Read `system/testing/ui-behavioral-taxonomy.md` section 3 for the signal tables.
+2. **Phase 1 — LLM Structured Signal Extraction:** Prompt the LLM to analyze the feature description and extract UI signals as structured JSON. The prompt includes:
+   - The feature description text
+   - The taxonomy's detection signal vocabulary as reference (read from `system/testing/ui-behavioral-taxonomy.md` section 3, signal tables)
+   - Explicit instruction: "Return ONLY a JSON object with a single key `signals` containing an array of UI signal strings detected in the description. If no UI signals are detected, return `{"signals": []}`. Do not include explanations."
 
-   Detection threshold (FR-002):
-   - At least 2 independent UI signals (e.g., "form" + "submit"), OR
-   - 1 unambiguous UI signal with no contraindicators (e.g., "modal" alone is sufficient; "submit" alone in a backend context is NOT)
+   <!-- @spec FR-001: 3-phase pipeline refactoring, FR-002: Structured JSON prompt — .specs/features/007-structured-signal-extraction/spec.md#fr-001 -->
 
-   Disambiguation uses the full feature description context — a mention of "submit" in "submit a report to a server" without any other UI indicators does NOT trigger injection (EC-001).
+   JSON validation rules:
+   - Valid JSON with `"signals"` key containing an array of strings → proceed to Phase 2
+   - Valid JSON but missing `"signals"` key or `signals: null` → treat as `signals = []`
+   - Not valid JSON → retry once with a stricter prompt: "You MUST return ONLY valid JSON matching: `{"signals": ["signal1", "signal2"]}`. Return `{"signals": []}` if no UI signals found." If the second response is also unparseable, default `signals = []` and log a WARNING
 
-3. **Trait mapping:** For each detected signal, map to the corresponding trait(s) per the taxonomy. If a component matches multiple transversal patterns, apply deduplication. See taxonomy deduplication rule (section 5).
+3. **Phase 2 — Deterministic Trait Detection:** Call `validator.taxonomy.detect_traits(signals, path=<taxonomy_path>)` with the signal list extracted in Phase 1. This is a deterministic Python function call — the command file contains NO hardcoded signal-to-trait mapping table. All detection logic is delegated to `detect_traits()`.
+
+   <!-- @spec FR-003: detect_traits delegation — .specs/features/007-structured-signal-extraction/spec.md#fr-003 -->
+
+   - If `detect_traits()` returns an empty set → skip to sub-step 7 (no traits detected)
+   - If `detect_traits()` returns traits → proceed to sub-step 4 (template injection, unchanged)
 
 4. **Template injection:** For each mapped trait, load the Gherkin template from the taxonomy and parameterize it with feature-specific names (entity names, field names from the feature description).
 

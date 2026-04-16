@@ -7,6 +7,24 @@
 
 ---
 
+## 2026-04-15 -- Plan: Feature 007 planned
+
+[Feature 007] Plan created: Structured Signal Extraction — 3 implementation steps, 1 diagram
+
+---
+
+## 2026-04-15 -- Spec: Feature 007 regenerated (9 review findings addressed)
+
+[Feature 007] Spec regenerated: Structured Signal Extraction — 4 stories, 11 AC, 7 FR. Addressed F-001 through F-009: added AC-009/AC-010/AC-011, fixed drawer scenario, replaced spec_specify() with detect_traits() contract tests, added Step 5.7 refactoring map.
+
+---
+
+## 2026-04-15 -- Spec: Feature 007 created
+
+[Feature 007] Spec created: Structured Signal Extraction — 4 stories, 8 AC, 7 FR
+
+---
+
 ## 2026-04-15 -- Plan: Feature 006 planned
 
 [Feature 006] Plan created: Taxonomy Testing Infrastructure — 3 implementation steps, 2 diagrams

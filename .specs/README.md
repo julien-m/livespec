@@ -4,6 +4,7 @@
 >
 > Last updated: 2026-04-15
 
+
 ---
 
 ## System Files
@@ -40,6 +41,7 @@
 | 004 | Visual Testing Governance | Implemented | 2026-04-14 | 2026-04-14 | [spec](features/004-visual-testing-governance/spec.md) |
 | 005 | UI Behavioral Testing | Planned | 2026-04-14 | 2026-04-14 | [spec](features/005-ui-behavioral-testing/spec.md) |
 | 006 | Taxonomy Testing Infrastructure | Planned | 2026-04-15 | 2026-04-15 | [spec](features/006-taxonomy-testing-infra/spec.md) |
+| 007 | Structured Signal Extraction | Planned | 2026-04-15 | 2026-04-15 | [spec](features/007-structured-signal-extraction/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -63,6 +65,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-15 | Plan | [Feature 007] Plan created: Structured Signal Extraction — 3 implementation steps, 1 diagram |
+| 2026-04-15 | Spec | [Feature 007] Spec created: Structured Signal Extraction — 4 stories, 8 AC, 7 FR |
 | 2026-04-15 | Spec | [Feature 006] Spec created: Taxonomy Testing Infrastructure — 4 stories, 15 AC, 8 FR |
 | 2026-04-14 | Plan | [Feature 005] Plan created: UI Behavioral Testing — 5 steps, 4 diagrams |
 | 2026-04-14 | Spec | [Feature 005] Spec created: UI Behavioral Testing — 5 stories, 13 AC, 9 FR |
