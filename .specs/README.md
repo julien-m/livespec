@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-04-15
+> Last updated: 2026-04-16
 
 
 ---
@@ -42,6 +42,7 @@
 | 005 | UI Behavioral Testing | Planned | 2026-04-14 | 2026-04-14 | [spec](features/005-ui-behavioral-testing/spec.md) |
 | 006 | Taxonomy Testing Infrastructure | Planned | 2026-04-15 | 2026-04-15 | [spec](features/006-taxonomy-testing-infra/spec.md) |
 | 007 | Structured Signal Extraction | Planned | 2026-04-15 | 2026-04-15 | [spec](features/007-structured-signal-extraction/spec.md) |
+| 008 | Feature Seed | Draft | 2026-04-16 | 2026-04-16 | [spec](features/008-feature-seed/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -65,6 +66,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-16 | Spec | [Feature 008] Spec created: Feature Seed — 5 stories, 11 AC, 7 FR |
 | 2026-04-15 | Plan | [Feature 007] Plan created: Structured Signal Extraction — 3 implementation steps, 1 diagram |
 | 2026-04-15 | Spec | [Feature 007] Spec created: Structured Signal Extraction — 4 stories, 8 AC, 7 FR |
 | 2026-04-15 | Spec | [Feature 006] Spec created: Taxonomy Testing Infrastructure — 4 stories, 15 AC, 8 FR |

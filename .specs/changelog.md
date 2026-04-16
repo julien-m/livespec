@@ -3,7 +3,25 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/NNN-feature-name/changelog.md`.
 >
-> Last updated: 2026-04-15
+> Last updated: 2026-04-16
+
+---
+
+## 2026-04-16 -- Feature: Feature 008 implemented
+
+[Feature 008] Implemented: Feature Seed — 2 files modified (commands/specify.md, spec-system.md), 7 FR, 11 AC all satisfied
+
+---
+
+## 2026-04-16 -- Plan: Feature 008 planned
+
+[Feature 008] Plan created: Feature Seed — 5 implementation steps, 3 diagrams
+
+---
+
+## 2026-04-16 -- Spec: Feature 008 created
+
+[Feature 008] Spec created: Feature Seed — 5 stories, 11 AC, 7 FR
 
 ---
 

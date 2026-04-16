@@ -60,6 +60,8 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │       ├── progress.md          ← Step-by-step checkpoint (MANDATORY during implement)
 │       ├── implementation.md
 │       ├── changelog.md
+│       ├── seed.md              ← Context seed from feature split (present until spec.specify runs)
+│       ├── seed.absorbed.md     ← Renamed after spec.md is generated (preserved for traceability)
 │       ├── checks/              ← Gap report history
 │       ├── logs/                ← Execution logs (auto-saved)
 │       ├── contracts/
@@ -185,6 +187,20 @@ Gap reports from `/spec.check` runs. Each file is named `YYYY-MM-DD.md` and cont
 ### logs/ — Execution logs
 
 Detailed execution logs from `/spec.implement` runs. Each file is named `YYYY-MM-DD.md`. Saved by default (use `--no-save` to disable).
+
+### seed.md — Context seed from feature split (optional)
+
+<!-- @spec FR-005: Document seed artifacts in spec-system — .specs/features/008-feature-seed/spec.md#fr-005 -->
+
+Lightweight Markdown artifact created when `/spec.specify` splits a feature into sub-features. Contains 4 structured sections: Origin (parent reference + split reason + date), Decisions (already made), Constraints (inherited), Open Questions (for later). Consumed by `/spec.specify` when the sub-feature is later specified -- the seed content is loaded as LLM input context.
+
+**Lifecycle:** Created at split time (Step 1.5.5.1) -> loaded at specify time (Step 1.7) -> renamed to `seed.absorbed.md` after spec generation (Step 7.3).
+
+**Not validated by the Python validator** -- seeds are advisory context managed by the slash command, not structural artifacts.
+
+### seed.absorbed.md — Consumed seed (archived after spec generation)
+
+Renamed from `seed.md` after `/spec.specify` generates `spec.md` for the feature. Preserved for traceability. Never loaded by any subsequent command invocation.
 
 ### roadmap.md — Feature Backlog
 

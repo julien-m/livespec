@@ -112,6 +112,51 @@ The others go into the roadmap for next specifications.
 - Add remaining domains to `.specs/roadmap.md` Deferred section with: source request, item name, context from the original request, date
 - If a domain matches an existing unchecked roadmap item, update that item's context instead of duplicating
 
+#### 1.5.5.1 — Seed Creation for Deferred Sub-features
+
+<!-- @spec FR-001: Seed creation step after split — .specs/features/008-feature-seed/spec.md#fr-001 -->
+<!-- @spec FR-004: 4-field Markdown schema with placeholders — .specs/features/008-feature-seed/spec.md#fr-004 -->
+<!-- @spec FR-006: Origin field structure — .specs/features/008-feature-seed/spec.md#fr-006 -->
+
+For each domain added to the Deferred section in Step 1.5.5:
+
+1. **Create feature directory:** If `.specs/features/NNN-slug/` does not exist, create it using the next available NNN number (same allocation logic as Step 2).
+
+2. **Check for existing spec.md:** If the directory already has `spec.md`, skip seed creation for this sub-feature -- it is already specified. (EC-001)
+
+3. **Write seed.md:** If no `spec.md` exists (but `seed.md` may or may not exist), write `seed.md` with the following schema. If `seed.md` already exists, overwrite it (latest split context wins -- EC-001).
+
+   ```markdown
+   # Seed — {NNN-feature-slug}
+
+   > Context preserved from parent feature split. Consumed by `/spec.specify`.
+
+   ## Origin
+
+   - **Parent:** {parent-NNN-name}
+   - **Split reason:** {why this domain was deferred -- one line from the split proposal}
+   - **Created:** {YYYY-MM-DD}
+
+   ## Decisions
+
+   {bullet list of decisions already made during this session relevant to this sub-feature, or "None yet -- to be determined at specify time"}
+
+   ## Constraints
+
+   {bullet list of constraints inherited from the parent feature or project context, or "None yet -- to be determined at specify time"}
+
+   ## Open Questions
+
+   {bullet list of open questions that should be addressed when this sub-feature is specified}
+   ```
+
+4. **Field rules:**
+   - `## Origin` is always populated: parent feature number+name, split reason, creation date
+   - `## Decisions` and `## Constraints` use placeholder text if empty: "None yet -- to be determined at specify time"
+   - `## Open Questions` should always have at least one entry (the scope boundary with the parent feature)
+
+5. **No split, no seed:** When no sub-features are identified during scope analysis (Step 1.5.3/1.5.4), no seed.md files are created anywhere.
+
 #### 1.5.6 — User Declines Split
 
 - Proceed with the full request as a single spec (current behavior)
@@ -127,6 +172,30 @@ If user mentions implementation details only ("use Redis", "add endpoint") witho
 #### 1.5.9 — Clarification Limit
 
 Limit clarification to **max 2 questions**, then proceed with explicit assumptions marked `[ASSUMED]` in `spec.md`.
+
+### Step 1.7 — Seed Detection and Loading
+
+<!-- @spec FR-002: Seed detection and context injection — .specs/features/008-feature-seed/spec.md#fr-002 -->
+<!-- @spec FR-007: Seeded attribution in Input section — .specs/features/008-feature-seed/spec.md#fr-007 -->
+
+Before generating spec.md, check the target feature directory for seed context:
+
+1. **Check target feature directory:** If the feature directory already exists (e.g., the user specified a feature by number or slug), check for files:
+   - If `spec.md` exists: proceed with the normal refine flow. If `seed.md` also exists alongside `spec.md`, log a WARNING: "Both spec.md and seed.md found in NNN-slug/. seed.md is ignored -- consider removing it or renaming to seed.absorbed.md." (EC-003). Do NOT load seed.md.
+   - If `spec.md` does NOT exist but `seed.md` exists: load `seed.md` content and inject it into the LLM prompt context under a `## Seed Context` heading. This gives the LLM the decisions, constraints, and open questions from the parent feature session.
+   - If neither `spec.md` nor `seed.md` exists: proceed with the normal specify flow from scratch.
+
+2. **Seed context injection format:** When seed.md is loaded, add to the LLM prompt:
+   ```markdown
+   ## Seed Context
+
+   This feature was seeded from a parent feature split. The following context
+   was preserved from the original session. Use it to inform the spec generation.
+
+   [verbatim seed.md content]
+   ```
+
+3. **Seeded attribution:** When generating spec.md from a seed, the `Input` section must include a note: `Seeded from [parent-feature-number-name] -- see seed.absorbed.md for original context.`
 
 ### Step 2 — Auto-Number the Feature
 
@@ -485,6 +554,23 @@ Show the generated spec and ask for confirmation:
 > 1. Proceed to planning: `/spec.plan notifications`
 > 2. Review and edit the spec first
 > 3. Create a git branch: `feature/004-notifications`
+
+### Step 7.3 — Seed Absorption
+
+<!-- @spec FR-003: Seed absorption after spec generation — .specs/features/008-feature-seed/spec.md#fr-003 -->
+
+After `spec.md` has been successfully written to the feature directory:
+
+1. **Check for seed.md:** If `seed.md` exists in the feature directory, rename it to `seed.absorbed.md`:
+   ```
+   mv .specs/features/NNN-slug/seed.md .specs/features/NNN-slug/seed.absorbed.md
+   ```
+
+2. **Content preservation:** The file content must be identical -- this is a rename, not a rewrite.
+
+3. **Skip if already absorbed:** If `seed.absorbed.md` already exists (from a previous specify run) and `spec.md` also exists, the seed detection step (Step 1.7) already skipped loading -- no action needed here. (EC-005)
+
+4. **Skip if no seed:** If neither `seed.md` nor `seed.absorbed.md` exists, skip this step silently.
 
 ### Step 7.5 — Update README.md
 
