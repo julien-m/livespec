@@ -31,6 +31,8 @@ This is a meta-feature: it enhances LiveSpec's own commands to support behaviora
 
 No new Python validator code is introduced by this feature. This feature modifies Markdown command files and creates one new system document.
 
+> **Extension:** Feature 005.2 (Taxonomy Complete Expansion) expanded the taxonomy from 5 to 22 traits and from 3 to 6 transversal patterns. The taxonomy is now at v2.0.0 with >95% coverage on a 15-component extended sample.
+
 ---
 
 ## User Scenarios & Testing

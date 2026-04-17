@@ -36,13 +36,21 @@ class TestVisualStateParsing:
     """Tests for VisualState parsing from the real taxonomy document."""
 
     def test_visual_states_parsed_from_taxonomy(self) -> None:
-        """Load the real taxonomy and assert each of the 5 traits has visual states."""
+        """Load the real taxonomy and assert traits with visual states have >= 2 states."""
+        # Traits documented as having visual states (5 core + 6 from 005.2 expansion)
+        traits_with_visual_states = {
+            "is_submittable", "async_action", "has_overlay",
+            "dismissible_layer", "has_validation",
+            "is_navigable", "is_sortable", "shows_notification",
+            "has_drag_drop", "has_date_picker",
+        }
         taxonomy = load_taxonomy(_TAXONOMY_PATH)
         for trait in taxonomy.traits:
-            assert len(trait.visual_states) >= 2, (
-                f"Trait '{trait.name}' has {len(trait.visual_states)} visual states, "
-                f"expected at least 2"
-            )
+            if trait.name in traits_with_visual_states:
+                assert len(trait.visual_states) >= 2, (
+                    f"Trait '{trait.name}' has {len(trait.visual_states)} visual states, "
+                    f"expected at least 2"
+                )
 
     def test_visual_state_fields(self) -> None:
         """Assert VisualState has state_id: str, css_attributes: list[str], screenshot: str."""

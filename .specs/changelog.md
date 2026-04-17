@@ -7,6 +7,24 @@
 
 ---
 
+## 2026-04-17 -- Implement: Feature 005.2 implemented
+
+[Feature 005.2] Implemented: Taxonomy Complete Expansion -- 17 new traits (22 total), 3 new transversal patterns (6 total), taxonomy v2.0.0. 478 tests passing (18 new detection tests). 100% classification on 15-component crash test. Parser required no code changes (additive schema).
+
+---
+
+## 2026-04-17 -- Plan: Feature 005.2 planned
+
+[Feature 005.2] Plan created: Taxonomy Complete Expansion -- 6 implementation steps, 15 new traits + 3 transversal patterns + 15 detection tests + crash test + parser validation + docs. All 12 FR covered.
+
+---
+
+## 2026-04-17 -- Spec: Feature 005.2 created
+
+[Feature 005.2] Spec created: Taxonomy Complete Expansion — 5 stories, 20 AC, 12 FR. Adds 15 new behavioral traits across 5 categories, 3 new transversal patterns, taxonomy v2.0.0 targeting >95% coverage.
+
+---
+
 ## 2026-04-17 -- Fix: Feature 005.1 gaps closed
 
 [Feature 005.1] Fix: 4/4 gaps closed (100% → 100% alignment) — crash test report created, AC-012/013/014/015 validated

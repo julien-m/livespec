@@ -44,6 +44,8 @@
 | 007 | Structured Signal Extraction | Planned | 2026-04-15 | 2026-04-15 | [spec](features/007-structured-signal-extraction/spec.md) |
 | 008 | Feature Seed | Draft | 2026-04-16 | 2026-04-16 | [spec](features/008-feature-seed/spec.md) |
 | 009 | Visual State Baselines | Planned | 2026-04-17 | 2026-04-17 | [spec](features/009-visual-state-baselines/spec.md) |
+| 005.1 | Behavioral TDD Audit | Draft | 2026-04-17 | 2026-04-17 | [spec](features/005.1-behavioral-tdd-audit/spec.md) |
+| 005.2 | Taxonomy Complete Expansion | Draft | 2026-04-17 | 2026-04-17 | [spec](features/005.2-taxonomy-complete-expansion/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -67,6 +69,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-17 | Spec | [Feature 005.2] Spec created: Taxonomy Complete Expansion — 5 stories, 20 AC, 12 FR |
 | 2026-04-17 | Spec | [Feature 009] Spec created: Visual State Baselines — 5 stories, 15 AC, 11 FR |
 | 2026-04-16 | Spec | [Feature 008] Spec created: Feature Seed — 5 stories, 11 AC, 7 FR |
 | 2026-04-15 | Plan | [Feature 007] Plan created: Structured Signal Extraction — 3 implementation steps, 1 diagram |
