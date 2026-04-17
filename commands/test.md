@@ -323,6 +323,61 @@ After writing each test file:
 3. If still broken after 3 iterations → **delete the generated code** (revert to pre-generation state), mark as "Generation Failed" in report
 4. If test **compiles but assertion fails** → keep the test (this reveals an implementation gap, not a generation error)
 
+### 3.6 — Visual State Test Generation
+
+<!-- @spec FR-004: toHaveScreenshot generation, FR-005: Baseline storage, FR-006: Metadata, FR-011: Taxonomy hash — .specs/features/009-visual-state-baselines/spec.md#fr-004 -->
+
+When a Gherkin scenario contains `matches visual state "[state-id]"` assertions (injected by `/spec.specify` Step 5.7 sub-step 4.5), generate Playwright test code with screenshot assertions:
+
+```typescript
+// Visual state assertion — generated from behavioral trait
+await expect([element]).toHaveScreenshot('[screenshot]', {
+  animations: 'disabled',
+  maxDiffPixels: 100,
+});
+```
+
+- Look up `screenshot` from the taxonomy's `visual_states` table for the corresponding `state_id`
+- The `element` locator comes from the Gherkin scenario context
+
+**Baseline storage:** `.specs/features/NNN-slug/baselines/states/[screenshot]`
+
+This is a `states/` subdirectory under the existing `baselines/` directory (not `baselines/components/`).
+
+**Metadata generation:** After `--update-snapshots`, for each new baseline PNG, generate `[screenshot].meta.yml`:
+
+```yaml
+visual_state: [state-id]
+behavioral_trait: [trait-name]
+gherkin_scenario: "[scenario title]"
+screenshot: [screenshot-filename]
+created: YYYY-MM-DD
+approved_by: null
+approved_date: null
+invalidate_on:
+  - css_change
+  - state_definition_change
+taxonomy_hash: [git hash of system/testing/ui-behavioral-taxonomy.md]
+```
+
+The `taxonomy_hash` is obtained via `git hash-object system/testing/ui-behavioral-taxonomy.md`.
+
+**EC-002 handling:** Before generating, check for duplicate screenshot filenames across all states. If found, raise validation error: "Duplicate screenshot name '[name]' in states '[state-a]' and '[state-b]'"
+
+**EC-003 handling:** If baseline exists but `.meta.yml` is missing, regenerate from filename (parse state-id from `[element]-[state-id].png` pattern) and log WARNING.
+
+**Staleness detection:** When `/spec.test` runs Phase 1 (Audit) for visual state baselines:
+1. For each existing `.meta.yml`, read the `taxonomy_hash` field
+2. Compare against the current hash of `ui-behavioral-taxonomy.md`
+3. If mismatch, flag baseline as stale in audit output
+4. Recommend: "Re-run with `--update-snapshots` to refresh stale baselines."
+
+**Coexistence with manual tests (AC-015):** Visual state tests are appended to the feature's test file with a comment separator:
+
+```typescript
+// --- Visual State Tests (auto-generated from behavioral taxonomy) ---
+```
+
 ---
 
 ## Phase 4 — Execute
@@ -723,6 +778,7 @@ When multiple features are tested in a single run, display after all individual 
 | `--no-update` | `-U` | Skip `implementation.md` update |
 | `--no-behavioral` | | Skip behavioral coverage audit (sub-phase 1.5) |
 | `--reset-baselines[=<screen>]` | | Delete existing baselines (all, or named screen only) then recapture. Triggers human approval gate. Use `--reset-baselines` for intentional UI changes — NEVER `--update-snapshots`. Blocked on CI. |
+| `--regenerate-missing` | | Scan all features for missing tests. Combine with `--confirm` to generate or `--dry-run` to preview. See dedicated section below. |
 
 ---
 
@@ -755,6 +811,66 @@ After each feature's implementation phase, the spawned agent runs `/spec.test <f
 ### /spec.check
 
 `/spec.check` can reference the latest test report from `checks/YYYY-MM-DD-test.md` to include dynamic test results alongside its static alignment analysis.
+
+---
+
+## --regenerate-missing Flag
+
+<!-- @spec FR-007: Scan for missing tests, FR-008: Batch generation, FR-009: Dry-run, FR-010: Never overwrite — .specs/features/009-visual-state-baselines/spec.md#fr-007 -->
+
+**Trigger:** `/spec.test --regenerate-missing [--confirm] [--dry-run] [feature-name?]`
+
+**Behavior:**
+
+1. **Scan:** Walk `.specs/features/*/` directories
+   - For each directory with a `spec.md` file:
+     - If `tests/` subdirectory does NOT exist within the feature directory → flag as missing
+     - If `tests/` exists → skip (EC-004 guard: never overwrite)
+     - If `spec.md` does not exist → skip (no spec to generate from)
+   - Include `status: Draft` specs in scan (EC-005: Draft specs need tests too)
+
+2. **Report:**
+   ```
+   Scanning .specs/features/ for missing tests...
+
+   Features missing tests (N):
+     - 003-visual-testing-fidelity
+     - 007-structured-signal-extraction
+     - 010-api-auth-service
+
+   Run with --confirm to generate tests.
+   ```
+
+3. **Guard (FR-010):** Features with existing `tests/` directories are NEVER included in the generation list. This is a hard guard — there is no `--force` override.
+
+4. **Generation (--confirm):** For each feature in the list, run the same Phases 1-3 logic as normal `/spec.test`:
+   - Phase 1: Build coverage matrix from spec.md
+   - Phase 2: Plan test generation
+   - Phase 3: Generate missing tests from Gherkin
+   - Skip Phases 4-5 (execution and visual) — generation only
+
+5. **Dry-run (--dry-run):** Display the list only, create no files, exit 0.
+
+6. **No sub-flag:** Display the summary and prompt: "Run with `--confirm` to generate or `--dry-run` to preview."
+
+7. **Empty result (EC-004):** If no features are missing tests:
+   ```
+   All features have tests. Nothing to regenerate.
+   ```
+   Exit 0.
+
+**Example run:**
+```
+$ /spec.test --regenerate-missing --dry-run
+Scanning .specs/features/ for missing tests...
+
+Features missing tests (3):
+  - 003-visual-testing-fidelity
+  - 007-structured-signal-extraction
+  - 010-api-auth-service
+
+Run with --confirm to generate tests.
+```
 
 ---
 

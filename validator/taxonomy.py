@@ -54,6 +54,16 @@ class DetectionSignal:
     unambiguous: bool  # True → fires alone; False → requires ≥2 UI signals
 
 
+# @spec FR-002: VisualState dataclass — .specs/features/009-visual-state-baselines/spec.md#fr-002
+@dataclass(frozen=True)
+class VisualState:
+    """A visual state entry for a behavioral trait."""
+
+    state_id: str
+    css_attributes: list[str]
+    screenshot: str
+
+
 @dataclass
 class Trait:
     """A single behavioral trait parsed from the taxonomy."""
@@ -63,6 +73,9 @@ class Trait:
     detection_signals: list[DetectionSignal] = field(default_factory=lambda: [])
     gherkin_template: str = ""
     test_patterns: list[TestPattern] = field(default_factory=lambda: [])
+    # @spec FR-002: Trait visual_states field
+    # .specs/features/009-visual-state-baselines/spec.md#fr-002
+    visual_states: list[VisualState] = field(default_factory=lambda: [])
 
 
 @dataclass
@@ -225,6 +238,86 @@ def _parse_test_patterns(nodes: list[dict[str, Any]]) -> list[TestPattern]:
     return patterns
 
 
+def _extract_cell_codespans(cell: dict[str, Any]) -> list[str]:
+    """Extract codespan values from a table cell AST node."""
+    spans: list[str] = []
+    for child in cell.get("children", []):
+        if child.get("type") == "codespan":
+            raw = child.get("raw", "").strip()
+            if raw:
+                spans.append(raw)
+    return spans
+
+
+def _cell_plain_text(cell: dict[str, Any]) -> str:
+    """Extract all text (including codespan raw) from a cell node."""
+    parts: list[str] = []
+    for child in cell.get("children", []):
+        if child.get("type") in ("codespan", "text"):
+            parts.append(child.get("raw", ""))
+        else:
+            parts.append(_node_text(child))
+    return "".join(parts).strip()
+
+
+def _parse_visual_states(nodes: list[dict[str, Any]]) -> list[VisualState]:
+    """Extract visual states from the table that follows '**Visual states:**'."""
+    states: list[VisualState] = []
+    for node in nodes:
+        if node.get("type") != "table":
+            continue
+        head_cells, body_rows = _table_parts(node)
+        if not head_cells:
+            continue
+        headers = [_cell_plain_text(c).lower() for c in head_cells]
+        try:
+            sid_idx = headers.index("state id")
+            css_idx = headers.index("css/attributes")
+            ss_idx = headers.index("screenshot")
+        except ValueError:
+            continue
+        for row_node in body_rows:
+            cells = row_node.get("children", [])
+            if len(cells) <= max(sid_idx, css_idx, ss_idx):
+                continue
+            state_id = _cell_plain_text(cells[sid_idx])
+            screenshot = _cell_plain_text(cells[ss_idx])
+            if not state_id or not screenshot:
+                continue
+            # Extract backtick-wrapped values (codespans) from the CSS cell
+            css_attributes = _extract_cell_codespans(cells[css_idx])
+            if not css_attributes:
+                # Check if the cell contains plain text like "(none)"
+                plain = _cell_plain_text(cells[css_idx])
+                if plain.lower() not in ("(none)", "none", "—", "-", ""):
+                    css_attributes = [v.strip() for v in plain.split(",") if v.strip()]
+            states.append(
+                VisualState(
+                    state_id=state_id,
+                    css_attributes=css_attributes,
+                    screenshot=screenshot,
+                )
+            )
+    return states
+
+
+def check_duplicate_screenshots(trait: Trait) -> list[str]:
+    """Return list of warning messages for duplicate screenshot names in a trait."""
+    seen: dict[str, str] = {}
+    warnings_list: list[str] = []
+    for vs in trait.visual_states:
+        if vs.screenshot in seen:
+            msg = (
+                f"Duplicate screenshot name '{vs.screenshot}' "
+                f"in states '{seen[vs.screenshot]}' and '{vs.state_id}' "
+                f"for trait '{trait.name}'"
+            )
+            warnings_list.append(msg)
+        else:
+            seen[vs.screenshot] = vs.state_id
+    return warnings_list
+
+
 def _parse_traits(nodes: list[dict[str, Any]]) -> list[Trait]:
     """Extract trait definitions from Section 3 nodes."""
     traits: list[Trait] = []
@@ -234,8 +327,10 @@ def _parse_traits(nodes: list[dict[str, Any]]) -> list[Trait]:
     gherkin_lines: list[str] = []
     in_detection = False
     in_patterns = False
+    in_visual_states = False
     detection_nodes: list[dict[str, Any]] = []
     pattern_nodes: list[dict[str, Any]] = []
+    visual_states_nodes: list[dict[str, Any]] = []
 
     for node in nodes:
         node_type = node.get("type", "")
@@ -250,11 +345,13 @@ def _parse_traits(nodes: list[dict[str, Any]]) -> list[Trait]:
                     if gherkin_lines:
                         current_trait.gherkin_template = "\n".join(gherkin_lines).strip()
                     if detection_nodes:
-                        current_trait.detection_signals = _parse_detection_signals(
-                            detection_nodes
-                        )
+                        current_trait.detection_signals = _parse_detection_signals(detection_nodes)
                     if pattern_nodes:
                         current_trait.test_patterns = _parse_test_patterns(pattern_nodes)
+                    if visual_states_nodes:
+                        current_trait.visual_states = _parse_visual_states(visual_states_nodes)
+                        for warn in check_duplicate_screenshots(current_trait):
+                            logger.warning(warn)
                     traits.append(current_trait)
 
                 current_trait = Trait(name=text, description="")
@@ -262,14 +359,17 @@ def _parse_traits(nodes: list[dict[str, Any]]) -> list[Trait]:
                 gherkin_lines = []
                 in_detection = False
                 in_patterns = False
+                in_visual_states = False
                 detection_nodes = []
                 pattern_nodes = []
+                visual_states_nodes = []
                 section_mode = True
                 continue
 
             if section_mode and level == 4:
                 in_detection = False
                 in_patterns = False
+                in_visual_states = False
                 if "gherkin" in text.lower() or "template" in text.lower():
                     gherkin_accumulating = True
                 elif "detection signals" in text.lower():
@@ -277,6 +377,9 @@ def _parse_traits(nodes: list[dict[str, Any]]) -> list[Trait]:
                     gherkin_accumulating = False
                 elif "test patterns" in text.lower():
                     in_patterns = True
+                    gherkin_accumulating = False
+                elif "visual states" in text.lower():
+                    in_visual_states = True
                     gherkin_accumulating = False
                 continue
 
@@ -296,23 +399,34 @@ def _parse_traits(nodes: list[dict[str, Any]]) -> list[Trait]:
                 if "detection signals" in para_text:
                     in_detection = True
                     in_patterns = False
+                    in_visual_states = False
                     gherkin_accumulating = False
                     continue
                 elif "test patterns" in para_text:
                     in_patterns = True
                     in_detection = False
+                    in_visual_states = False
+                    gherkin_accumulating = False
+                    continue
+                elif "visual states" in para_text:
+                    in_visual_states = True
+                    in_detection = False
+                    in_patterns = False
                     gherkin_accumulating = False
                     continue
                 elif "gherkin template" in para_text:
                     gherkin_accumulating = True
                     in_detection = False
                     in_patterns = False
+                    in_visual_states = False
                     continue
 
             if in_detection:
                 detection_nodes.append(node)
             elif in_patterns:
                 pattern_nodes.append(node)
+            elif in_visual_states:
+                visual_states_nodes.append(node)
             elif gherkin_accumulating and node_type == "block_code":
                 raw = node.get("raw", "")
                 gherkin_lines.append(raw)
@@ -325,6 +439,10 @@ def _parse_traits(nodes: list[dict[str, Any]]) -> list[Trait]:
             current_trait.detection_signals = _parse_detection_signals(detection_nodes)
         if pattern_nodes:
             current_trait.test_patterns = _parse_test_patterns(pattern_nodes)
+        if visual_states_nodes:
+            current_trait.visual_states = _parse_visual_states(visual_states_nodes)
+            for warn in check_duplicate_screenshots(current_trait):
+                logger.warning(warn)
         traits.append(current_trait)
 
     return traits
@@ -515,9 +633,36 @@ def _check_trait(trait: Trait, normalised_signals: list[str], result: set[str]) 
 _AC_PATTERN: re.Pattern[str] = re.compile(r"^(AC-\d+):\s*(.+)", re.IGNORECASE)
 _STOPWORDS: frozenset[str] = frozenset(
     {
-        "le", "la", "les", "un", "une", "des", "et", "ou", "de", "du", "avec",
-        "the", "a", "an", "of", "and", "or", "is", "are", "in", "on", "to",
-        "for", "that", "this", "it", "be", "has", "have", "by",
+        "le",
+        "la",
+        "les",
+        "un",
+        "une",
+        "des",
+        "et",
+        "ou",
+        "de",
+        "du",
+        "avec",
+        "the",
+        "a",
+        "an",
+        "of",
+        "and",
+        "or",
+        "is",
+        "are",
+        "in",
+        "on",
+        "to",
+        "for",
+        "that",
+        "this",
+        "it",
+        "be",
+        "has",
+        "have",
+        "by",
     }
 )
 

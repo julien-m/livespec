@@ -304,6 +304,34 @@ After generating spec.md, detect behavioral traits and inject Gherkin AC:
 
 4. **Template injection:** For each mapped trait, load the Gherkin template from the taxonomy and parameterize it with feature-specific names (entity names, field names from the feature description).
 
+<!-- @spec FR-003: Visual state Gherkin injection — .specs/features/009-visual-state-baselines/spec.md#fr-003 -->
+
+4.5. **Visual state assertion injection:** For each detected trait that has visual states defined in the taxonomy (`trait.visual_states` is non-empty):
+   - Load `trait.visual_states` from the parsed taxonomy (via `load_taxonomy()`)
+   - For each `VisualState` in the list, append to the injected Gherkin scenario:
+     ```gherkin
+     And the [element] matches visual state "[state_id]"
+     ```
+   - Replace `[element]` with the feature-specific element name extracted from the description (same parameterization as the base Gherkin template)
+
+   **Example:** For `is_submittable` trait with states disabled/enabled/loading:
+   ```gherkin
+   Scenario: Form submission — disabled state
+     Given the form has invalid or incomplete data
+     Then the submit button is disabled
+     And the submit button matches visual state "disabled"
+
+   Scenario: Form submission — enabled state
+     Given the form has all required valid data
+     Then the submit button is enabled
+     And the submit button matches visual state "enabled"
+   ```
+
+   **EC-001 handling:** If a trait has no visual states table (empty `visual_states` list), skip visual state assertions for that trait. Add a comment in the generated spec:
+   ```markdown
+   <!-- WARNING: No visual states defined for trait "[trait_name]" in ui-behavioral-taxonomy.md -->
+   ```
+
 5. **Section injection:** Add a `## Behavioral AC` section to spec.md AFTER the `## Acceptance Criteria` section. Content = parameterized Gherkin templates. DO NOT add behavioral scenarios to `## Acceptance Criteria` (FR-004).
 
 6. **Replace-not-append rule:** If `## Behavioral AC` already exists in the target spec.md, **replace it entirely** (do not append). This ensures re-running `/spec.specify` on an existing spec produces a clean behavioral section without duplicates.
