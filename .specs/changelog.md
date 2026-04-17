@@ -7,6 +7,30 @@
 
 ---
 
+## 2026-04-17 -- Test: Feature 011 validated
+
+[Feature 011] Test: 11 feature integration tests passing; command-layer guards reviewed in `commands/migrate.md`; AC coverage report updated.
+
+---
+
+## 2026-04-17 -- Feature: Feature 011 implemented
+
+[Feature 011] Implemented: Visual Migrate Integration -- sentinel output added to migrate-visual-tests.js, visual scaffolding step added to commands/migrate.md (unconditional, silent, graceful degradation), 11 integration tests (level_3a), fixture project with 4 features, and baseline placeholders for generated visual scaffolds.
+
+---
+
+## 2026-04-17 -- Plan: Feature 011 planned (regenerated)
+
+[Feature 011] Plan regenerated: Visual Migrate Integration — 4 implementation steps (commands/migrate.md + migrate-visual-tests.js sentinel output + integration test fixture + tests/integration/test_migrate_visual.py), 1 sequence diagram, 1 state diagram, no API contracts. Visual scaffolding invoked unconditionally from command layer (including "already up to date" path), not from migrate.sh. Safe subprocess capture via set +e/set -e. Tests at tests/integration/test_migrate_visual.py for level_3a discovery.
+
+---
+
+## 2026-04-17 -- Spec: Feature 011 created
+
+[Feature 011] Spec created: Visual Migrate Integration — 4 stories, 12 AC, 11 FR. Automatic visual test scaffolding during spec.migrate: silent generation of Playwright test files + baseline directories for all UI features, idempotent, with post-migration summary and graceful degradation.
+
+---
+
 ## 2026-04-17 -- Implement: Feature 010 implemented
 
 [Feature 010] Implemented: Visual Testing Complete — downstream Playwright scaffolding added across templates, scripts, documentation, workflow artifacts, and baseline placeholders. Python regression suite remains green at 464 passed. No Python modules modified.

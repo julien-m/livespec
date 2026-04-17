@@ -22,7 +22,7 @@ flowchart TD
     RESOLVE --> READ
     READ --> CURRENT["Read VERSION from LiveSpec repo"]
     CURRENT --> CMP{"project == current?"}
-    CMP -->|yes| UPTODATE["✅ Already up to date (v{N})"]
+    CMP -->|yes| UPTODATE["Already up to date (v{N})"]
     CMP -->|no| LIST["List migrations from\nproject+1 to current"]
     LIST --> LOOP["For each migration (in order):"]
     LOOP --> PARSE["Read migrations/N/migrate.md"]
@@ -30,7 +30,9 @@ flowchart TD
     EXEC --> NEXT{"More migrations?"}
     NEXT -->|yes| LOOP
     NEXT -->|no| VALIDATE["Run exit criteria checks"]
-    VALIDATE --> DONE["✅ Migrated v{old} → v{new}"]
+    VALIDATE --> VMIGRATE["Visual scaffolding\n(migrate-visual-tests.js)"]
+    UPTODATE --> VMIGRATE
+    VMIGRATE --> DONE["✅ Migration complete"]
 
     style START fill:#e8f4f8,stroke:#2196F3
     style DONE fill:#e8f5e9,stroke:#4CAF50
@@ -60,7 +62,7 @@ flowchart TD
 
 1. Read `.specs/livespec-version` — if missing, assume `1`
 2. Read `VERSION` from the LiveSpec repo
-3. If equal → display `✅ Already up to date (v{N})` and exit
+3. If equal → display `Already up to date (v{N})` and **fall through** to Step 4.5 (Visual Scaffolding)
 4. If project > repo → display error: "Project version (v{P}) is newer than repo (v{R}). This should not happen."
 
 ### Step 3 — Apply migrations
@@ -78,6 +80,43 @@ After all migrations complete:
 - [ ] All agent symlinks in `.claude/agents/` exist and resolve
 - [ ] `.specs/livespec-version` matches `VERSION` from repo
 - [ ] No orphaned symlinks (from commands removed in newer versions)
+
+<!-- @spec FR-001: Unconditional invocation after migration, FR-002: Silent no-prompt — .specs/features/011-visual-migrate-integration/spec.md#fr-001 -->
+### Step 4.5 — Visual Test Scaffolding
+
+**This step runs unconditionally** — after core migrations complete AND on the "already up to date" path. No user prompt.
+
+1. Resolve `VISUAL_SCRIPT` = `{livespec_dir}/scripts/migrate-visual-tests.js`
+
+2. **Guard: script exists?**
+   If `VISUAL_SCRIPT` does not exist on disk:
+   - Display: `WARNING: migrate-visual-tests.js not found — visual scaffolding skipped`
+   - Proceed to Step 5 (Report)
+
+3. **Guard: Node.js available?**
+   If `command -v node` fails:
+   - Display: `WARNING: Node.js required for visual scaffolding — skipped`
+   - Proceed to Step 5 (Report)
+
+4. **Run with safe subprocess capture** (safe under `set -euo pipefail`):
+   ```bash
+   set +e
+   VISUAL_OUTPUT=$(node "$VISUAL_SCRIPT" --generate 2>&1)
+   VISUAL_EXIT=$?
+   set -e
+   ```
+
+5. **Guard: non-zero exit?**
+   If `VISUAL_EXIT != 0`:
+   - Display: `WARNING: visual scaffolding failed (exit {VISUAL_EXIT})`
+   - Display captured output for debugging
+   - Proceed to Step 5 (Report)
+
+6. **Parse sentinel from output:**
+   Extract the `VISUAL_SCAFFOLD_RESULT: files=N dirs=M` line from `VISUAL_OUTPUT`.
+   Store `FILES` and `DIRS` counts for display in Step 5.
+
+7. Display human-readable lines from the script output (all lines except the sentinel line).
 
 ### Step 5 — Report
 
@@ -97,6 +136,29 @@ Validation:
   ✓ .specs/livespec-version = {new}
 
 ✅ Migration complete: v{old} → v{new}
+```
+
+<!-- @spec FR-007: Post-migration visual summary — .specs/features/011-visual-migrate-integration/spec.md#fr-007 -->
+**Append visual scaffolding summary** (if Step 4.5 ran successfully):
+
+```
+Visual test scaffolding:
+  {FILES} file(s) created
+  {DIRS} baseline directory(ies) created
+```
+
+If `FILES > 0`, list each created `.spec.ts` path:
+```
+Visual test scaffolding:
+  2 file(s) created:
+    tests/visual/001-auth-ui.spec.ts
+    tests/visual/003-dashboard.spec.ts
+  12 baseline directory(ies) created
+```
+
+If `FILES == 0`:
+```
+Visual test scaffolding: 0 files created
 ```
 
 ---
@@ -127,6 +189,22 @@ If `migrations/N/migrate.md` does not exist for a version in the range:
 If a previous migration failed mid-execution:
 - Re-running `spec.migrate` is safe (all DSL verbs are idempotent)
 - `SET_VERSION` is always the last action — version only bumps on full success
+
+<!-- @spec FR-008: Script-missing guard, FR-009: Node-missing guard, FR-010: Non-fatal on failure — .specs/features/011-visual-migrate-integration/spec.md#fr-008 -->
+### Visual scaffolding — script absent
+If `scripts/migrate-visual-tests.js` does not exist (older LiveSpec install without Feature 010):
+- Warning logged, visual scaffolding skipped
+- Core migration unaffected, exit code remains 0
+
+### Visual scaffolding — Node.js unavailable
+If `node` is not in PATH:
+- Warning logged, visual scaffolding skipped
+- Core migration unaffected, exit code remains 0
+
+### Visual scaffolding — script exits non-zero
+If `migrate-visual-tests.js` exits with a non-zero code:
+- Warning logged with captured script output for debugging
+- Core migration unaffected, exit code remains 0
 
 ---
 

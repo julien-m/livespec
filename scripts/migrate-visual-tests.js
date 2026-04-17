@@ -120,17 +120,23 @@ test.describe('Visual tests: ${title}', () => {
 `;
 }
 
+// @spec FR-006: Emit structured sentinel from --generate — .specs/features/011-visual-migrate-integration/spec.md#fr-006
 function generateTests(features, dryRun) {
   const toGenerate = features.filter(f => f.hasUI && !f.hasTests);
 
   if (toGenerate.length === 0) {
     console.log('All UI features already have visual tests. Nothing to generate.');
+    // @spec FR-006: Always emit sentinel on --generate (even for 0 files) — spec.md#fr-006
+    if (!dryRun) {
+      console.log('VISUAL_SCAFFOLD_RESULT: files=0 dirs=0');
+    }
     process.exit(0);
   }
 
   console.log(`\n${dryRun ? '[DRY RUN] Would generate' : 'Generating'} ${toGenerate.length} test file(s):\n`);
 
   let generated = 0;
+  let dirsCreated = 0;
   let skipped = 0;
 
   for (const feature of toGenerate) {
@@ -155,14 +161,18 @@ function generateTests(features, dryRun) {
       writeFileSync(feature.testPath, testContent);
       console.log(`  [CREATED] ${feature.testPath}`);
 
-      // @spec FR-025: Create baseline directories — spec.md#fr-025
+      // @spec FR-005: Create baseline directories — .specs/features/011-visual-migrate-integration/spec.md#fr-005
       for (const dir of BASELINE_DIRS) {
         const baselineDir = join('baselines', dir, feature.slug);
+        const baselineDirExists = existsSync(baselineDir);
         mkdirSync(baselineDir, { recursive: true });
         // Add .gitkeep so empty dirs are committed
         const gitkeep = join(baselineDir, '.gitkeep');
         if (!existsSync(gitkeep)) {
           writeFileSync(gitkeep, '');
+        }
+        if (!baselineDirExists) {
+          dirsCreated++;
         }
       }
       console.log(`  [CREATED DIRS] baselines/{${BASELINE_DIRS.join(',')}}/${feature.slug}/`);
@@ -176,6 +186,8 @@ function generateTests(features, dryRun) {
     console.log('  1. Export Figma mockups to baselines/mockups/<feature>/ for each generated test');
     console.log('  2. Update TODO placeholders in generated test files (routes, selectors)');
     console.log('  3. Run: npx playwright test --update-snapshots to create initial baselines');
+    // @spec FR-006: Structured sentinel line for command-layer parsing — spec.md#fr-006
+    console.log(`VISUAL_SCAFFOLD_RESULT: files=${generated} dirs=${dirsCreated}`);
   }
 
   process.exit(0);
