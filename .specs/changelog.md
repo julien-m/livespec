@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-04-17 -- Fix: Feature 005.1 gaps closed
+
+[Feature 005.1] Fix: 4/4 gaps closed (100% → 100% alignment) — crash test report created, AC-012/013/014/015 validated
+
+---
+
+## 2026-04-17 -- Test: Feature 009 spec.md corrected + full suite revalidated
+
+[Feature 009] Test (run 2): 3/3 Python-testable ACs (100%), 446 unit tests passing, spec.md status Draft → Implemented, --regenerate-missing scan: EC-004 (0 features missing tests)
+
+---
+
 ## 2026-04-17 -- Test: Feature 009 test validation
 
 [Feature 009] Test: 3/3 Python-testable ACs covered (100%), 441 unit tests passing, 0 tests generated (EC-004: nothing to regenerate)
