@@ -229,7 +229,7 @@ Designer workflow guide covering:
 - Where to place PNG (`baselines/mockups/[feature]/component.png`)
 - How to create `.meta.yml` with required fields (template included)
 - Running `validate-mockup-metadata.js` to verify
-- Approval workflow: reviewing diffs in PR, running `--approve-visual-diff`
+- Approval workflow: reviewing diffs in PR, then refreshing approved snapshots
 
 ---
 

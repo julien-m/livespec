@@ -46,8 +46,8 @@ test.describe(`Mockup comparison: ${COMPONENT}`, () => {
     );
   });
 
-  // @spec AC-006: --approve-visual-diff updates mockup baseline + records approval — spec.md#ac-006
-  // To approve a visual diff:
+  // @spec AC-006: Designer approval updates the mockup baseline and records approval — spec.md#ac-006
+  // Approval workflow after designer review:
   //   npx playwright test --update-snapshots tests/visual/mockup-comparison.spec.ts
   // Then update baselines/mockups/<component>.meta.yml:
   //   approved_by: <designer_name>

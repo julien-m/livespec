@@ -78,7 +78,7 @@ Feature: Designer-driven visual baselines
     Given a visual test fails with 5% pixel difference
     When the designer reviews the diff image
     And the designer approves the new rendering
-    Then the developer runs --approve-visual-diff
+    Then the developer refreshes the approved baseline snapshot
     And the mockup baseline is updated with the new screenshot
     And metadata records approved_by, approved_date, and diff_percentage
 
@@ -444,7 +444,7 @@ Feature: CI visual diff PR workflow
   Scenario: Designer approves visual change in PR
     Given a PR comment with visual diffs
     When designer reviews diffs and approves
-    Then developer runs --approve-visual-diff
+    Then the developer refreshes the approved baseline snapshot
     And baselines are updated with new screenshots
     And PR checks turn green
 
@@ -465,7 +465,7 @@ flowchart TD
     E --> F[Upload to GitHub artifacts]
     F --> G[Post PR comment with diffs]
     G --> H{Designer action}
-    H -- Approve --> I[Developer runs: --approve-visual-diff]
+    H -- Approve --> I[Developer refreshes approved baseline snapshot]
     I --> J[Update baselines]
     J --> K[Tests pass]
     H -- Reject --> L[Developer fixes code]
@@ -487,7 +487,7 @@ flowchart TD
 | AC-003 | Visual tests compare code screenshot to mockup baseline (not code-to-code) when mockup exists | S1 |
 | AC-004 | Mockup comparison tolerance is configurable per component (default 2% maxDiffPixelRatio) | S1 |
 | AC-005 | When mockup baseline is missing, test is skipped with WARNING and TODO comment in test output | S1 |
-| AC-006 | Designer approval workflow: `--approve-visual-diff` flag updates mockup baseline and records approval in metadata | S1 |
+| AC-006 | Designer approval workflow refreshes the approved baseline and records approval in metadata | S1 |
 
 ### Full-Page Layout Validation (Story 2)
 
@@ -550,7 +550,7 @@ flowchart TD
 | FR-002 | Mockup baseline metadata shall include Figma URL, artboard name, designer name, export date, resolution | AC-002 |
 | FR-003 | Mockup comparison tests shall use configurable tolerance (default 2% maxDiffPixelRatio) | AC-004 |
 | FR-004 | When mockup baseline is missing, test shall skip with WARNING and output TODO comment | AC-005 |
-| FR-005 | `--approve-visual-diff` flag shall update mockup baseline and record approval in metadata | AC-006 |
+| FR-005 | Designer approval workflow shall refresh the approved baseline and record approval in metadata | AC-006 |
 
 ### Full-Page Layout Validation
 
