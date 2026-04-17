@@ -7,6 +7,24 @@
 
 ---
 
+## 2026-04-17 -- Implement: Feature 010 implemented
+
+[Feature 010] Implemented: Visual Testing Complete — downstream Playwright scaffolding added across templates, scripts, documentation, workflow artifacts, and baseline placeholders. Python regression suite remains green at 464 passed. No Python modules modified.
+
+---
+
+## 2026-04-17 -- Plan: Feature 010 planned
+
+[Feature 010] Plan created: Visual Testing Complete — 8 steps (Step 0–7), 4 TS test templates, 3 Node.js scripts, 8 Markdown guides, 1 CI workflow, 1 meta-test suite. Artifacts are framework tooling for downstream projects; no Python modules modified; meta-tests validate artifact existence only (constitution "No Visual Testing" preserved).
+
+---
+
+## 2026-04-17 -- Spec: Feature 010 created
+
+[Feature 010] Spec created: Visual Testing Complete — 7 stories, 30 AC, 25 FR. Framework tooling and templates for downstream projects: mockup-driven baselines, full-page layout validation, responsive (3 viewports), cross-browser (3 engines), animation keyframes, migration tool, CI/CD visual diff PR workflow.
+
+---
+
 ## 2026-04-17 -- Implement: Feature 005.2 implemented
 
 [Feature 005.2] Implemented: Taxonomy Complete Expansion -- 17 new traits (22 total), 3 new transversal patterns (6 total), taxonomy v2.0.0. 478 tests passing (18 new detection tests). 100% classification on 15-component crash test. Parser required no code changes (additive schema).

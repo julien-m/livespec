@@ -46,6 +46,7 @@
 | 009 | Visual State Baselines | Planned | 2026-04-17 | 2026-04-17 | [spec](features/009-visual-state-baselines/spec.md) |
 | 005.1 | Behavioral TDD Audit | Draft | 2026-04-17 | 2026-04-17 | [spec](features/005.1-behavioral-tdd-audit/spec.md) |
 | 005.2 | Taxonomy Complete Expansion | Draft | 2026-04-17 | 2026-04-17 | [spec](features/005.2-taxonomy-complete-expansion/spec.md) |
+| 010 | Visual Testing Complete | Planned | 2026-04-17 | 2026-04-17 | [spec](features/010-visual-testing-complete/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -69,6 +70,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-17 | Plan | [Feature 010] Plan created: Visual Testing Complete — 8 steps, 4 TS templates, 3 scripts, 8 docs, 1 CI workflow |
+| 2026-04-17 | Spec | [Feature 010] Spec created: Visual Testing Complete — 7 stories, 30 AC, 25 FR |
 | 2026-04-17 | Spec | [Feature 005.2] Spec created: Taxonomy Complete Expansion — 5 stories, 20 AC, 12 FR |
 | 2026-04-17 | Spec | [Feature 009] Spec created: Visual State Baselines — 5 stories, 15 AC, 11 FR |
 | 2026-04-16 | Spec | [Feature 008] Spec created: Feature Seed — 5 stories, 11 AC, 7 FR |

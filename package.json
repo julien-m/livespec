@@ -1,0 +1,19 @@
+{
+  "name": "livespec-visual-testing",
+  "version": "1.0.0",
+  "description": "Visual testing framework artifacts for LiveSpec",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^20.19.39",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "test:visual": "playwright test tests/feature-010/",
+    "test:visual:update": "playwright test tests/visual/ --update-snapshots",
+    "migrate:scan": "node scripts/migrate-visual-tests.js --scan",
+    "migrate:generate": "node scripts/migrate-visual-tests.js --generate",
+    "migrate:dry-run": "node scripts/migrate-visual-tests.js --dry-run",
+    "validate:mockups": "node scripts/validate-mockup-metadata.js baselines/mockups/"
+  }
+}
