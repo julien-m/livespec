@@ -381,7 +381,19 @@ Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 
 Also add a summary entry to `.specs/changelog.md` (global).
 
-### Phase 8.5 — Update README.md
+### Phase 8.5 — Update spec.md status and README.md
+
+**Update `spec.md` status (MANDATORY — do this first):**
+
+1. Open `.specs/features/NNN-feature-name/spec.md`
+2. In the YAML frontmatter, set:
+   - `status: Implemented` (all steps done) or `status: In Progress` (blocked or partial)
+   - `updated: YYYY-MM-DD` (today's date)
+3. In the body header block, update the `**Status:**` line to match (e.g. `**Status:** Implemented`)
+
+This ensures the spec reflects the implementation state and `/spec.implement` feature resolution can detect the feature as done on subsequent runs.
+
+**Update `.specs/README.md`:**
 
 1. Update the feature row in `.specs/README.md`:
    - If all steps completed successfully: set Status to `Implemented`
@@ -402,8 +414,10 @@ If `.specs/README.md` does not exist, create it by scanning existing artifacts (
 ## Output
 
 ```
+.specs/README.md         ← Updated (feature row, recent activity, last updated)
+
 .specs/features/004-notifications/
-├── spec.md              ← Unchanged
+├── spec.md              ← Updated (status + updated date)
 ├── plan.md              ← Unchanged
 ├── progress.md          ← Step-by-step checkpoint (used by --resume)
 ├── implementation.md    ← Created/updated with FR→@spec mapping
