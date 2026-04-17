@@ -6,7 +6,7 @@
 > Referenced by `/spec.specify`, `/spec.implement`, and `/spec.test`. No command file may duplicate trait definitions — all must defer to this document.
 
 **Version:** 2026-04-14
-**Taxonomy Version:** v1.0.0
+**Taxonomy Version:** v1.1.0
 **Feature:** 005-ui-behavioral-testing
 
 ---
@@ -93,6 +93,14 @@ Scenario: Submit button disabled state
 | Submit validation block | `submit-disabled` | Submit prevented when required fields empty |
 | Submit disabled state | `submit-disabled-state` | Button disabled or visually unavailable when invalid |
 
+**Visual states:**
+
+| State ID | CSS/Attributes | Screenshot |
+|----------|----------------|------------|
+| disabled | `[disabled]`, `.btn-disabled`, `aria-disabled="true"` | submit-disabled.png |
+| enabled | `:not([disabled])`, `.btn-primary` | submit-enabled.png |
+| loading | `[aria-busy="true"]`, `.btn-loading` | submit-loading.png |
+
 ---
 
 ### async_action
@@ -158,6 +166,15 @@ Scenario: Error and retry on failure
 | Double-click prevention | `double-click` | Only one operation dispatched on rapid clicks |
 | Error and retry | `error-retry` | Error displayed with retry option after failure |
 
+**Visual states:**
+
+| State ID | CSS/Attributes | Screenshot |
+|----------|----------------|------------|
+| idle | (none) | async-idle.png |
+| loading | `[aria-busy="true"]`, `.loading-spinner` | async-loading.png |
+| error | `.error-state`, `[data-error]` | async-error.png |
+| success | `.success-state`, `[data-success]` | async-success.png |
+
 ---
 
 ### has_overlay
@@ -219,6 +236,14 @@ Scenario: Body scroll is locked when overlay is open
 | Overlay rendering | `overlay-render` | Overlay visible above page content |
 | Focus trap | `focus-trap` | Tab navigation stays inside overlay |
 | Scroll lock | `scroll-lock` | Body scroll disabled when overlay open |
+
+**Visual states:**
+
+| State ID | CSS/Attributes | Screenshot |
+|----------|----------------|------------|
+| closed | `.modal[aria-hidden="true"]`, `display:none` | overlay-closed.png |
+| open | `.modal[aria-hidden="false"]`, `.backdrop` | overlay-open.png |
+| focused | `.modal:focus-within` | overlay-focused.png |
 
 ---
 
@@ -282,6 +307,14 @@ Scenario: Dismiss via click outside
 | Escape key | `escape-dismiss` | Layer closes on Escape key press |
 | Click outside | `click-outside` | Layer closes on outside click |
 
+**Visual states:**
+
+| State ID | CSS/Attributes | Screenshot |
+|----------|----------------|------------|
+| open | `.layer[aria-hidden="false"]` | dismissible-open.png |
+| closing | `.layer-exit`, `.layer-exit-active` | dismissible-closing.png |
+| closed | `.layer[aria-hidden="true"]` | dismissible-closed.png |
+
 ---
 
 ### has_validation
@@ -344,6 +377,14 @@ Scenario: Error clears on correction
 | Required field | `required-field` | Error shown for empty required fields |
 | Format validation | `format-validation` | Error shown for invalid format |
 | Error clearance | `error-clearance` | Error removed after correction |
+
+**Visual states:**
+
+| State ID | CSS/Attributes | Screenshot |
+|----------|----------------|------------|
+| valid | `.field-valid`, `[aria-invalid="false"]` | validation-valid.png |
+| invalid | `.field-invalid`, `[aria-invalid="true"]` | validation-invalid.png |
+| empty | `.field-empty`, `:placeholder-shown` | validation-empty.png |
 
 ---
 
@@ -472,6 +513,10 @@ This asymmetry is intentional: `/spec.specify` is the injection point where inco
 ---
 
 ## 7. Changelog
+
+### v1.1.0 (2026-04-17)
+- Added visual states tables for all 5 traits (is_submittable, async_action, has_overlay, dismissible_layer, has_validation)
+- Feature: 009-visual-state-baselines
 
 ### v1.0.0 (2026-04-14)
 - Initial taxonomy: 5 traits (is_submittable, async_action, has_overlay, dismissible_layer, has_validation)

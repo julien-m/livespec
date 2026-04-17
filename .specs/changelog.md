@@ -3,7 +3,19 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/NNN-feature-name/changelog.md`.
 >
-> Last updated: 2026-04-16
+> Last updated: 2026-04-17
+
+---
+
+## 2026-04-17 -- Plan: Feature 009 planned
+
+[Feature 009] Plan created: Visual State Baselines — 6 implementation steps, 2 diagrams (ER + state), M-size scope
+
+---
+
+## 2026-04-17 -- Spec: Feature 009 created
+
+[Feature 009] Spec created: Visual State Baselines — 5 stories, 15 AC, 11 FR
 
 ---
 
