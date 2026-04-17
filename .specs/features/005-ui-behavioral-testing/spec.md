@@ -14,7 +14,7 @@ number: "005"
 - **Feature:** UI Behavioral Testing
 - **Branch:** feature/005-ui-behavioral-testing
 - **Date:** 2026-04-14
-- **Status:** Planned
+- **Status:** Partially Implemented  # Reflected via 006, 007, 009
 - **Feature Number:** 005
 - **Input:** UI Behavioral Testing — taxonomie par traits comportementaux (is_submittable, async_action, has_overlay, dismissible_layer, has_validation) + shift left dans /spec.specify (injection silencieuse hors spec humaine) + /spec.implement TDD prioritaire sur ces traits + /spec.test comme sentinelle d'audit de couverture comportementale sur l'existant. Nouveau document system/testing/ui-behavioral-taxonomy.md comme source de vérité.
 
