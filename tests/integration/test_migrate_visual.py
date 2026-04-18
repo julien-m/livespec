@@ -383,11 +383,7 @@ class TestMigrateVisualDeleteSuperseded:
         assert route_test.exists(), "route-settings.spec.ts should not be deleted"
 
 
-@pytest.mark.level_3a
-class TestMigrateVisualLegacyMerge:
-    """Tests for merging custom tests from legacy spec files into route-scan generated files."""
-
-    LEGACY_SETTINGS_CONTENT = """\
+_LEGACY_SETTINGS_CONTENT = """\
 import { expect, test } from '@playwright/test';
 import { mockAuthenticatedAPIs, mockSettingsFormAPIs } from './fixtures.js';
 
@@ -421,7 +417,13 @@ test.describe('Settings page @visual', () => {
 });
 """
 
-    def _setup_legacy(self, fixture: Path, content: str) -> tuple[Path, Path]:
+
+@pytest.mark.level_3a
+class TestMigrateVisualLegacyMerge:
+    """Tests for merging custom tests from legacy spec files into route-scan generated files."""
+
+    @staticmethod
+    def _setup_legacy(fixture: Path, content: str) -> tuple[Path, Path]:
         e2e_dir = fixture / "frontend" / "tests" / "e2e"
         e2e_dir.mkdir(parents=True, exist_ok=True)
         legacy = e2e_dir / "settings.spec.ts"
@@ -433,7 +435,7 @@ test.describe('Settings page @visual', () => {
     ) -> None:
         """Custom test blocks from legacy file are merged into route file."""
         e2e_dir, _ = self._setup_legacy(
-            fixture_migrate_visual_frontend, self.LEGACY_SETTINGS_CONTENT
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
         )
 
         result = _run_generate(fixture_migrate_visual_frontend)
@@ -448,7 +450,7 @@ test.describe('Settings page @visual', () => {
     ) -> None:
         """Standard test 'full page with data' not injected from legacy (dedup)."""
         e2e_dir, _ = self._setup_legacy(
-            fixture_migrate_visual_frontend, self.LEGACY_SETTINGS_CONTENT
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
         )
 
         _run_generate(fixture_migrate_visual_frontend)
@@ -457,13 +459,14 @@ test.describe('Settings page @visual', () => {
         assert content.count("test('full page with data'") == 1, (
             "Standard test duplicated from legacy"
         )
+        assert "settings with form validation errors" in content, "Custom tests should still be merged"
 
     def test_custom_imports_merged_from_legacy(
         self, fixture_migrate_visual_frontend: Path
     ) -> None:
         """Custom imports from legacy file are merged into route file."""
         e2e_dir, _ = self._setup_legacy(
-            fixture_migrate_visual_frontend, self.LEGACY_SETTINGS_CONTENT
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
         )
 
         _run_generate(fixture_migrate_visual_frontend)
@@ -477,7 +480,7 @@ test.describe('Settings page @visual', () => {
     ) -> None:
         """Preserved custom tests are annotated with their source file."""
         e2e_dir, _ = self._setup_legacy(
-            fixture_migrate_visual_frontend, self.LEGACY_SETTINGS_CONTENT
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
         )
 
         _run_generate(fixture_migrate_visual_frontend)
@@ -491,7 +494,7 @@ test.describe('Settings page @visual', () => {
     ) -> None:
         """Legacy spec file is deleted after custom tests are merged."""
         e2e_dir, legacy = self._setup_legacy(
-            fixture_migrate_visual_frontend, self.LEGACY_SETTINGS_CONTENT
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
         )
 
         result = _run_generate(fixture_migrate_visual_frontend)
@@ -500,3 +503,5 @@ test.describe('Settings page @visual', () => {
             not legacy.exists()
         ), "Legacy file should be deleted after successful merge"
         assert (e2e_dir / "route-settings.spec.ts").exists()
+        merged_content = (e2e_dir / "route-settings.spec.ts").read_text()
+        assert "settings with form validation errors" in merged_content, "Custom tests should be merged before deletion"
