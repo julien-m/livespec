@@ -32,18 +32,18 @@ created: 2026-04-17
 | FR-021 | `page.waitForTimeout(ms)` for keyframe timing | `tests/visual/animations.spec.ts` |
 | FR-022 | Animation metadata: duration, easing, keyframes | `scripts/capture-keyframes.ts` (YAML output), `tests/visual/animations.spec.ts` (ANIMATION const) |
 | FR-023 | `--scan` reports features without visual tests | `scripts/migrate-visual-tests.js` |
-| FR-024 | `--generate` creates test files in batch | `scripts/migrate-visual-tests.js` |
-| FR-025 | Migration creates baseline directory structure | `scripts/migrate-visual-tests.js` (BASELINE_DIRS) |
+| FR-024 | `--generate` creates test files in batch | `scripts/migrate-visual-tests.js` (adaptive: `frontend/tests/e2e/` or `tests/visual/`) |
+| FR-025 | Migration creates baseline directory structure | `scripts/migrate-visual-tests.js` (legacy: `baselines/{dir}/`; frontend mode: `frontend/tests/e2e/baselines/`) |
 
 ## AC → File mapping
 
 | AC | Criterion | File(s) |
 |----|-----------|---------|
-| AC-001 | Baselines from `baselines/mockups/` | `tests/visual/mockup-comparison.spec.ts` |
+| AC-001 | Baselines from designer mockups | `tests/visual/mockup-comparison.spec.ts` (legacy); `.specs/design/screens/current-*.png` (Pencil mode via migration tool) |
 | AC-002 | `.meta.yml` required fields | `scripts/validate-mockup-metadata.js` (REQUIRED_FIELDS) |
-| AC-003 | Compare code to mockup baseline | `tests/visual/mockup-comparison.spec.ts` |
-| AC-004 | Configurable tolerance (default 2%) | `tests/visual/mockup-comparison.spec.ts` |
-| AC-005 | Skip with WARNING when mockup missing | `tests/visual/mockup-comparison.spec.ts` |
+| AC-003 | Compare code to mockup baseline | `tests/visual/mockup-comparison.spec.ts` (legacy); generated `frontend/tests/e2e/*.spec.ts` reference `.specs/design/screens/current-*.png` and capture stable Playwright screenshots for review (Pencil mode) |
+| AC-004 | Configurable tolerance (default 2%) | `tests/visual/mockup-comparison.spec.ts`; generated E2E tests (`TOLERANCE = 0.02`) |
+| AC-005 | Warn + fallback when mockup missing | `tests/visual/mockup-comparison.spec.ts` (test.skip); generated E2E tests (`console.warn` + `toHaveScreenshot` fallback) |
 | AC-006 | Designer approval workflow | `docs/visual-testing/mockup-workflow.md` |
 | AC-007 | Full viewport capture | `tests/visual/fullpage-layout.spec.ts` |
 | AC-008 | Baselines in `baselines/fullpage/` | `tests/visual/fullpage-layout.spec.ts` |

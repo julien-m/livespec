@@ -348,7 +348,7 @@ function extractCustomTestBlocks(content) {
 
   for (const line of lines) {
     if (!inBlock) {
-      const m = line.match(/^  test\(['"]([^'"]+)['"]/);
+      const m = line.match(/^\s+test\(['"]([^'"]+)['"]/);
       if (m) {
         blockName = m[1];
         blockLines = [line];

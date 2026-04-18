@@ -1,5 +1,60 @@
 # Changelog — Feature 010: Visual Testing Complete
 
+## 2026-04-18 — Fix: Generated test template upgraded — exhaustive tests + Playwright API corrected
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `scripts/migrate-visual-tests.js` (`generateE2ETemplate`, sentinel `dirs` counter), 14 generated spec files in downstream project (`claude-pilot/frontend/tests/e2e/001-*` through `014-*`)
+- **Gaps closed:**
+  - Playwright API bug: replaced invalid `page.toMatchSnapshot(filePath)` (jest/vitest API) with correct Playwright screenshot assertions via `expect(page).toHaveScreenshot(...)`
+  - Tests are now exhaustive: 4 state-based tests per feature (full page with data, empty state, header/navigation, mobile view) instead of 2 generic tests
+  - Empty state tests use `beforeEach` + targeted API endpoint overrides (LIFO pattern) instead of broad route rewrites
+  - `fixtures.ts` detection: imports `mockAuthenticatedAPIs` / `mockEmptyDashboardAPIs` when `fixtures.ts` exists
+  - Bad route inference fixed: 003 (`/api/workers/kill-all` → `/dashboard`), 006 (`/api/costs/by-project` → `/costs`), 007 (`/api/drift/configs` → `/drift`)
+  - Sentinel `dirs` counter fixed: was always `dirs=0`; now correctly counts legacy baseline directories created
+  - `@visual` tag added to all `test.describe` blocks for selective test runs
+- **Remaining:** None
+- **Author:** spec.fix
+
+---
+
+## 2026-04-18 — Fix: Migration tool architecture corrected (frontend/Pencil mode)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `scripts/migrate-visual-tests.js`
+- **Artifacts removed:** `playwright.visual.config.ts` (generated artifact)
+- **Gaps closed:** Migration tool now targets correct locations when run against real projects
+- **Remaining:** None
+- **Author:** spec.fix
+- **Details:**
+  - **Adaptive detection** — runtime detection of `frontend/tests/e2e/`, `frontend/playwright.config.ts`, `.specs/design/screens/`
+  - **Frontend/Pencil mode** (when `frontend/tests/e2e/` exists): generates E2E tests in `frontend/tests/e2e/`, looks for Pencil mockups in `.specs/design/screens/current-*.png`, updates `frontend/playwright.config.ts`
+  - **Legacy mode** (fallback): unchanged behavior (`tests/visual/` + `playwright.visual.config.ts` + `baselines/mockups/`)
+  - `inferMockupFilename()` — searches `.specs/design/screens/` for `current-NN-*{slug}*-{viewport}.png`
+  - New E2E template — mockup path logged as a design reference, `console.warn` + fallback to auto baseline when mockup missing (AC-005), and stable `toHaveScreenshot(...)` snapshot names for generated coverage
+  - `cleanupOldMigration()` — removes `playwright.visual.config.ts` when switching to frontend mode
+  - 205/205 meta-tests still pass
+
+---
+
+## 2026-04-17 — Fix: 4 migration tool gaps closed (functional)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `scripts/migrate-visual-tests.js`, `playwright.visual.config.ts` (created)
+- **Gaps closed:** FR-024/AC-012 (playwright.visual.config.ts generation), test template TODO placeholders removed, completion report with next steps
+- **Remaining:** None
+- **Author:** spec.fix
+- **Details:**
+  - `ensurePlaywrightVisualConfig()` — creates `playwright.visual.config.ts` with 5 projects (mobile/tablet/desktop/firefox/webkit) + `snapshotPathTemplate: 'baselines/{projectName}/{arg}'` on `--generate`; hard guard preserves if exists (AC-030)
+  - `inferRouteFromFeature()` — heuristic slug→route map + spec.md URL extraction; replaces `/TODO-replace-with-actual-route`
+  - Improved test template — uses `page` screenshot instead of locator; adds fullpage + responsive test cases; removes `[data-testid="TODO-replace-selector"]`
+  - `printCompletionReport()` — comprehensive next-steps report after `--generate`
+  - All 11 integration tests still pass (sentinel format preserved)
+
+---
+
 ## 2026-04-17 — Test: Artifact coverage mapped and Python regression suite validated
 
 - **Type:** Test

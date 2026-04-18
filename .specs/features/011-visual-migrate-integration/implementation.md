@@ -42,5 +42,5 @@
 
 ## Files Modified
 
-- `scripts/migrate-visual-tests.js` — Added structured sentinel line output (`VISUAL_SCAFFOLD_RESULT: files=N dirs=M`) and `dirsCreated` counter
+- `scripts/migrate-visual-tests.js` — Added structured sentinel line output (`VISUAL_SCAFFOLD_RESULT: files=N dirs=M routes=R`) and `dirsCreated` counter; added 5 analysis helpers (`analyzeExistingTests`, `detectFixturesFromDir`, `extractSelectorsFromExistingTests`, `extractWaitPatterns`, `extractCommonTestCases`) for smarter template generation; fixed 3 template quality issues (mockup reference, header selector, empty-state fixture detection)
 - `commands/migrate.md` — Removed early exit on "already up to date", added Step 4.5 (Visual Test Scaffolding) with 3 guards, added visual summary to Report, added 3 edge cases

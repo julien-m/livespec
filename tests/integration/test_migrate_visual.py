@@ -459,7 +459,9 @@ class TestMigrateVisualLegacyMerge:
         assert content.count("test('full page with data'") == 1, (
             "Standard test duplicated from legacy"
         )
-        assert "settings with form validation errors" in content, "Custom tests should still be merged"
+        assert "settings with form validation errors" in content, (
+            "Custom tests should still be merged"
+        )
 
     def test_custom_imports_merged_from_legacy(
         self, fixture_migrate_visual_frontend: Path
@@ -504,4 +506,6 @@ class TestMigrateVisualLegacyMerge:
         ), "Legacy file should be deleted after successful merge"
         assert (e2e_dir / "route-settings.spec.ts").exists()
         merged_content = (e2e_dir / "route-settings.spec.ts").read_text()
-        assert "settings with form validation errors" in merged_content, "Custom tests should be merged before deletion"
+        assert "settings with form validation errors" in merged_content, (
+            "Custom tests should be merged before deletion"
+        )
