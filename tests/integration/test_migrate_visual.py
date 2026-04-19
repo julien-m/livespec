@@ -47,7 +47,7 @@ def _run_generate(cwd: Path, env: dict[str, str] | None = None) -> subprocess.Co
 
 def _parse_sentinel(stdout: str) -> tuple[int, int] | None:
     """Extract files and dirs counts from the sentinel line."""
-    match = re.search(r"^VISUAL_SCAFFOLD_RESULT: files=(\d+) dirs=(\d+)$", stdout, re.MULTILINE)
+    match = re.search(r"^VISUAL_SCAFFOLD_RESULT: files=(\d+) dirs=(\d+)", stdout, re.MULTILINE)
     if not match:
         return None
     return int(match.group(1)), int(match.group(2))
@@ -227,4 +227,376 @@ class TestMigrateVisualGuards:
         assert result.returncode != 0, "Expected non-zero exit for missing .specs/features/"
         assert "Missing .specs/features/" in result.stderr, (
             f"Expected error about missing directory, got: {result.stderr}"
+        )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Frontend mode fixtures and helpers
+
+FIXTURE_MIGRATE_VISUAL_FRONTEND = FIXTURES / "migrate-visual-frontend"
+
+
+@pytest.fixture()
+def fixture_migrate_visual_frontend(tmp_path: Path) -> Path:
+    """Copy the migrate-visual-frontend fixture to tmp_path for isolation."""
+    dst = tmp_path / "project"
+    shutil.copytree(FIXTURE_MIGRATE_VISUAL_FRONTEND, dst)
+    return dst
+
+
+def _parse_sentinel_routes(stdout: str) -> tuple[int, int, int]:
+    """Parse VISUAL_SCAFFOLD_RESULT: files=N dirs=M routes=R — returns (-1,-1,-1) if not found."""
+    m = re.search(r"VISUAL_SCAFFOLD_RESULT: files=(\d+) dirs=(\d+) routes=(\d+)", stdout)
+    if not m:
+        return (-1, -1, -1)
+    return (int(m.group(1)), int(m.group(2)), int(m.group(3)))
+
+
+@pytest.mark.level_3a
+class TestMigrateVisualRouteScan:
+    """Tests for route-scan functionality in migrate-visual-tests.js."""
+
+    def test_generates_route_test_for_uncovered_page(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Route scan creates route-settings.spec.ts for settings.tsx not in any spec."""
+        result = _run_generate(fixture_migrate_visual_frontend)
+        assert result.returncode == 0, (
+            f"Script failed:\nSTDOUT: {result.stdout}\nSTDERR: {result.stderr}"
+        )
+
+        e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+        route_test = e2e_dir / "route-settings.spec.ts"
+        assert route_test.exists(), (
+            f"route-settings.spec.ts not generated. stdout:\n{result.stdout}"
+        )
+
+    def test_route_test_uses_extracted_heading(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Route scan extracts h1 'Settings' from settings.tsx."""
+        _run_generate(fixture_migrate_visual_frontend)
+        route_file = (
+            fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+            / "route-settings.spec.ts"
+        )
+        content = route_file.read_text()
+        assert "HEADING = 'Settings'" in content, (
+            f"Heading not extracted correctly. Content:\n{content[:500]}"
+        )
+
+    def test_skips_redirect_only_routes(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Profile page with redirect() and no h1 is not generated."""
+        _run_generate(fixture_migrate_visual_frontend)
+        e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+        assert not (
+            e2e_dir / "route-profile.spec.ts"
+        ).exists(), "Redirect-only page should not get a route test"
+
+    def test_generates_not_found_test_from_root(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """notFoundComponent in __root.tsx produces route-not-found.spec.ts."""
+        _run_generate(fixture_migrate_visual_frontend)
+        e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+        assert (e2e_dir / "route-not-found.spec.ts").exists(), (
+            "route-not-found.spec.ts not generated from __root.tsx"
+        )
+
+    def test_route_test_overwrites_on_regenerate(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Running --generate twice overwrites route-* tests (no AC-030 protection)."""
+        _run_generate(fixture_migrate_visual_frontend)
+        route_test = (
+            fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+            / "route-settings.spec.ts"
+        )
+        original_mtime = route_test.stat().st_mtime
+
+        import time
+        time.sleep(0.1)
+        _run_generate(fixture_migrate_visual_frontend)
+        new_mtime = route_test.stat().st_mtime
+        assert new_mtime > original_mtime, (
+            "route-settings.spec.ts was not overwritten on second run"
+        )
+
+    def test_sentinel_includes_routes_count(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Sentinel line includes routes= count reflecting route-scan results."""
+        result = _run_generate(fixture_migrate_visual_frontend)
+        _, _, routes = _parse_sentinel_routes(result.stdout)
+        assert routes >= 1, (
+            f"Sentinel routes= should be >= 1. stdout:\n{result.stdout}"
+        )
+
+
+@pytest.mark.level_3a
+class TestMigrateVisualDeleteSuperseded:
+    """Tests for auto-deletion of superseded non-numbered tests."""
+
+    def test_deletes_superseded_test_covered_by_route_scan(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Old settings.spec.ts is deleted after route-settings.spec.ts is generated."""
+        e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+        e2e_dir.mkdir(parents=True, exist_ok=True)
+        old_test = e2e_dir / "settings.spec.ts"
+        old_test.write_text("// old hand-crafted test\n")
+
+        _run_generate(fixture_migrate_visual_frontend)
+
+        assert not old_test.exists(), (
+            "settings.spec.ts should be deleted after route-settings.spec.ts covers"
+            " /settings"
+        )
+        assert (e2e_dir / "route-settings.spec.ts").exists(), \
+            "route-settings.spec.ts should exist as replacement"
+
+    def test_preserves_numbered_tests(self, fixture_migrate_visual_frontend: Path) -> None:
+        """Numbered tests (001-*.spec.ts) are never deleted."""
+        e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+        e2e_dir.mkdir(parents=True, exist_ok=True)
+        numbered = e2e_dir / "001-auth-ui.spec.ts"
+        numbered.write_text("// existing numbered test\n")
+
+        _run_generate(fixture_migrate_visual_frontend)
+
+        assert numbered.exists(), "Numbered test 001-auth-ui.spec.ts must not be deleted"
+
+    def test_preserves_route_prefixed_tests_from_deletion(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """route-* tests are never deleted by deleteSupersededTests."""
+        e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+        e2e_dir.mkdir(parents=True, exist_ok=True)
+        route_test = e2e_dir / "route-settings.spec.ts"
+        route_test.write_text("// existing route test\n")
+
+        _run_generate(fixture_migrate_visual_frontend)
+
+        # File should still exist (overwritten on second run, not deleted)
+        assert route_test.exists(), "route-settings.spec.ts should not be deleted"
+
+
+_LEGACY_SETTINGS_CONTENT = """\
+import { expect, test } from '@playwright/test';
+import { mockAuthenticatedAPIs, mockSettingsFormAPIs } from './fixtures.js';
+
+test.describe('Settings page @visual', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockAuthenticatedAPIs(page);
+  });
+
+  test('full page with data', async ({ page }) => {
+    await page.goto('/settings', { waitUntil: 'networkidle' });
+    await page.waitForSelector('h1');
+    await expect(page).toHaveScreenshot('settings-full.png', { fullPage: true });
+  });
+
+  test('settings with form validation errors', async ({ page }) => {
+    await page.route('**/api/settings/save', (route) =>
+      route.fulfill({ status: 422, json: { detail: 'Validation failed' } })
+    );
+    await page.goto('/settings', { waitUntil: 'networkidle' });
+    await page.waitForSelector('[role="alert"]');
+    await expect(page).toHaveScreenshot('settings-validation-error.png', { fullPage: true });
+  });
+
+  test('settings with success toast', async ({ page }) => {
+    await page.goto('/settings', { waitUntil: 'networkidle' });
+    await page.fill('[name="username"]', 'newuser');
+    await page.click('button[type="submit"]');
+    await page.waitForSelector('.toast-success');
+    await expect(page).toHaveScreenshot('settings-saved.png', { fullPage: true });
+  });
+});
+"""
+
+
+@pytest.mark.level_3a
+class TestMigrateVisualLegacyMerge:
+    """Tests for merging custom tests from legacy spec files into route-scan generated files."""
+
+    @staticmethod
+    def _setup_legacy(fixture: Path, content: str) -> tuple[Path, Path]:
+        e2e_dir = fixture / "frontend" / "tests" / "e2e"
+        e2e_dir.mkdir(parents=True, exist_ok=True)
+        legacy = e2e_dir / "settings.spec.ts"
+        legacy.write_text(content)
+        return e2e_dir, legacy
+
+    def test_merges_custom_tests_from_legacy_file(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Custom test blocks from legacy file are merged into route file."""
+        e2e_dir, _ = self._setup_legacy(
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
+        )
+
+        result = _run_generate(fixture_migrate_visual_frontend)
+        assert result.returncode == 0, f"Script failed:\n{result.stdout}\n{result.stderr}"
+
+        content = (e2e_dir / "route-settings.spec.ts").read_text()
+        assert "settings with form validation errors" in content, "Custom test 1 not merged"
+        assert "settings with success toast" in content, "Custom test 2 not merged"
+
+    def test_standard_tests_not_duplicated_from_legacy(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Standard test 'full page with data' not injected from legacy (dedup)."""
+        e2e_dir, _ = self._setup_legacy(
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
+        )
+
+        _run_generate(fixture_migrate_visual_frontend)
+        content = (e2e_dir / "route-settings.spec.ts").read_text()
+        # Standard name appears exactly once (from template only)
+        assert content.count("test('full page with data'") == 1, (
+            "Standard test duplicated from legacy"
+        )
+        assert "settings with form validation errors" in content, (
+            "Custom tests should still be merged"
+        )
+
+    def test_custom_imports_merged_from_legacy(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Custom imports from legacy file are merged into route file."""
+        e2e_dir, _ = self._setup_legacy(
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
+        )
+
+        _run_generate(fixture_migrate_visual_frontend)
+        content = (e2e_dir / "route-settings.spec.ts").read_text()
+        assert (
+            "mockSettingsFormAPIs" in content
+        ), "Custom import not merged into route file"
+
+    def test_provenance_comment_present(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Preserved custom tests are annotated with their source file."""
+        e2e_dir, _ = self._setup_legacy(
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
+        )
+
+        _run_generate(fixture_migrate_visual_frontend)
+        content = (e2e_dir / "route-settings.spec.ts").read_text()
+        assert (
+            "Preserved from settings.spec.ts" in content
+        ), "Provenance comment missing"
+
+    def test_legacy_file_deleted_after_merge(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
+        """Legacy spec file is deleted after custom tests are merged."""
+        e2e_dir, legacy = self._setup_legacy(
+            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
+        )
+
+        result = _run_generate(fixture_migrate_visual_frontend)
+        assert result.returncode == 0
+        assert (
+            not legacy.exists()
+        ), "Legacy file should be deleted after successful merge"
+        assert (e2e_dir / "route-settings.spec.ts").exists()
+        merged_content = (e2e_dir / "route-settings.spec.ts").read_text()
+        assert "settings with form validation errors" in merged_content, (
+            "Custom tests should be merged before deletion"
+        )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# No-web-frontend guard tests
+
+FIXTURE_MIGRATE_VISUAL_NO_WEB = FIXTURES / "migrate-visual-no-web"
+
+
+@pytest.fixture()
+def fixture_no_web(tmp_path: Path) -> Path:
+    """Copy the migrate-visual-no-web fixture to tmp_path for isolation."""
+    dst = tmp_path / "project"
+    shutil.copytree(FIXTURE_MIGRATE_VISUAL_NO_WEB, dst)
+    return dst
+
+
+@pytest.mark.level_3a
+class TestMigrateVisualNoWebProject:
+    """Guard: no visual scaffolding generated for projects without a web frontend.
+
+    A project without package.json (with web deps), frontend config files, or
+    routes directories should skip all visual scaffold generation.
+    """
+
+    def test_exits_zero(self, fixture_no_web: Path) -> None:
+        """--generate on a non-web project must exit 0 (valid state, not an error)."""
+        result = _run_generate(fixture_no_web)
+        assert result.returncode == 0, (
+            f"Expected exit 0 for no-web project, got {result.returncode}\n"
+            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+
+    def test_no_playwright_config_created(self, fixture_no_web: Path) -> None:
+        """No playwright.visual.config.ts must be created for non-web projects."""
+        _run_generate(fixture_no_web)
+        assert not (fixture_no_web / "playwright.visual.config.ts").exists(), (
+            "playwright.visual.config.ts should NOT be generated for a non-web project"
+        )
+
+    def test_no_test_files_created(self, fixture_no_web: Path) -> None:
+        """No visual test files (tests/visual/*.spec.ts) must be created."""
+        _run_generate(fixture_no_web)
+        visual_dir = fixture_no_web / "tests" / "visual"
+        # The fixture has one pre-existing test for feature 004; count should not grow
+        if visual_dir.exists():
+            existing: set[str] = {f.name for f in visual_dir.iterdir()}
+        else:
+            existing = set[str]()
+        assert "001-auth-ui.spec.ts" not in existing, (
+            "Visual test for 001-auth-ui should NOT be generated for a non-web project"
+        )
+        assert "003-dashboard.spec.ts" not in existing, (
+            "Visual test for 003-dashboard should NOT be generated for a non-web project"
+        )
+
+    def test_sentinel_emitted_with_no_frontend_reason(self, fixture_no_web: Path) -> None:
+        """FR-006: sentinel must be emitted; reason=no-frontend distinguishes from 'all covered'."""
+        result = _run_generate(fixture_no_web)
+        expected = "VISUAL_SCAFFOLD_RESULT: files=0 dirs=0 routes=0 reason=no-frontend"
+        assert expected in result.stdout, (
+            f"Expected sentinel '{expected}' in stdout.\n"
+            f"Got stdout: {result.stdout}"
+        )
+
+    def test_skip_message_in_output(self, fixture_no_web: Path) -> None:
+        """User-facing message must explain why nothing was generated."""
+        result = _run_generate(fixture_no_web)
+        assert "No web frontend detected" in result.stdout, (
+            f"Expected 'No web frontend detected' in stdout.\nGot: {result.stdout}"
+        )
+
+    def test_force_flag_bypasses_guard(self, fixture_no_web: Path) -> None:
+        """--force overrides the guard and generates files as if a web frontend existed."""
+        run_env = os.environ.copy()
+        result = subprocess.run(
+            ["node", str(SCRIPT_PATH), "--generate", "--force"],
+            cwd=str(fixture_no_web),
+            capture_output=True,
+            text=True,
+            timeout=30,
+            env=run_env,
+        )
+        assert result.returncode == 0, (
+            f"Expected exit 0 with --force, got {result.returncode}\n"
+            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+        # With --force and 2 UI features (001-auth-ui, 003-dashboard), visual dir must be created
+        visual_dir = fixture_no_web / "tests" / "visual"
+        assert visual_dir.exists(), (
+            "tests/visual/ should be created when --force bypasses the guard"
         )

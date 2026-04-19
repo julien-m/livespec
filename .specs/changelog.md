@@ -7,6 +7,30 @@
 
 ---
 
+## 2026-04-18 -- Fix: Feature 011 generator template quality (3 issues)
+
+[Feature 011] Fix: 3 template quality issues in `scripts/migrate-visual-tests.js` — (1) mockup comparison no longer creates wrong auto-baseline (now documents as reference); (2) header selector extracted from existing project tests instead of generic fallback; (3) empty-state test uses detected `mockEmpty*` fixture from `fixtures.ts` instead of hardcoded inline routes. 11/11 tests pass.
+
+---
+
+## 2026-04-18 -- Fix: Feature 010 generated test template upgraded
+
+[Feature 010] Fix: Playwright API bug fixed (`toMatchSnapshot` → Playwright `toHaveScreenshot` assertions), generated E2E tests now exhaustive (4 state-based tests: full data, empty state, header, mobile), fixtures detection auto-imports `mockAuthenticatedAPIs`/`mockEmptyDashboardAPIs`, bad route inference corrected for 003/006/007.
+
+---
+
+## 2026-04-18 -- Fix: Feature 010 migration tool architecture corrected
+
+[Feature 010] Fix: Migration tool now uses adaptive detection — `frontend/tests/e2e/` mode targets correct dirs (frontend/tests/e2e/, .specs/design/screens/ Pencil mockups, frontend/playwright.config.ts); legacy fallback unchanged. Legacy config cleanup preserved. 205/205 meta-tests pass.
+
+---
+
+## 2026-04-17 -- Fix: Feature 010 migration tool gaps closed
+
+[Feature 010] Fix: 4/4 gaps closed — `playwright.visual.config.ts` auto-generated on `--generate`, test templates improved (route inference, page screenshots, fullpage+responsive tests), completion report printed. 11 integration tests still pass.
+
+---
+
 ## 2026-04-17 -- Test: Feature 011 validated
 
 [Feature 011] Test: 11 feature integration tests passing; command-layer guards reviewed in `commands/migrate.md`; AC coverage report updated.

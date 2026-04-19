@@ -2,6 +2,22 @@
 
 ---
 
+### 2026-04-18 — Fix: Generator template quality — 3 issues resolved
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** scripts/migrate-visual-tests.js
+- **AC impacted:** None (template quality improvement, existing ACs still satisfied)
+- **Author:** spec.fix
+- **Fixes:**
+  1. Issue 1 (Mockup comparison): `toHaveScreenshot(path.basename(mockupPath))` was using the Pencil filename as the snapshot name, making Playwright create an auto-baseline with that name instead of comparing to the mockup. Fixed: mockup is now documented as a design reference only, and generated tests always use stable screenshot names like `${slug}-full.png`.
+  2. Issue 2 (Generic selectors): Header test used `'header, nav, [data-testid="header"]'` — generic and imprecise. Fixed: 5 new analysis helpers (`analyzeExistingTests`, `detectFixturesFromDir`, `extractSelectorsFromExistingTests`, `extractWaitPatterns`, `extractCommonTestCases`) extract the most-used project selector containing "header"; falls back to generic if none found.
+  3. Issue 3 (Inline routes): Empty-state test used hardcoded `page.route('**/api/workers**', ...)` etc. Fixed: `detectFixturesFromDir` detects exported `mockEmpty*` fixture from `fixtures.ts`; uses it when found, else falls back to single `**/api/**` catch-all with a TODO comment.
+- **Analysis computed once** before the generation loop (`analyzeExistingTests`) — O(#existing_tests) overhead, not per-feature.
+- **All 11 integration tests still pass** — template behavior (file creation, sentinel, idempotency) unchanged.
+
+---
+
 ### 2026-04-17 — Test: AC coverage validated
 
 - **Type:** Spec Update
