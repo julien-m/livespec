@@ -556,7 +556,7 @@ class TestMigrateVisualNoWebProject:
         if visual_dir.exists():
             existing: set[str] = {f.name for f in visual_dir.iterdir()}
         else:
-            existing = set()
+            existing = set[str]()
         assert "001-auth-ui.spec.ts" not in existing, (
             "Visual test for 001-auth-ui should NOT be generated for a non-web project"
         )
