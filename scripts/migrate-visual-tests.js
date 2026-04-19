@@ -29,7 +29,7 @@ const LEGACY_CONFIG_PATH = 'playwright.visual.config.ts';
 // Runtime detection
 const hasFrontendE2E = existsSync(FRONTEND_E2E_DIR);
 const hasFrontendConfig = existsSync(FRONTEND_CONFIG_PATH);
-const hasPencilMockups = existsSync(PENCIL_MOCKUP_DIR);
+const hasPencilMockups = existsSync(PENCIL_MOCKUP_DIR) && readdirSync(PENCIL_MOCKUP_DIR).some(f => f.endsWith('.png'));
 
 const TEST_DIR = hasFrontendE2E ? FRONTEND_E2E_DIR : LEGACY_TESTS_DIR;
 const PENCIL_MODE = hasPencilMockups;
