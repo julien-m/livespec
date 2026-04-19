@@ -60,6 +60,24 @@ If no `maxDiffPixelRatio` found in any file:
 LOG: "No maxDiffPixelRatio found — playwright config already uses correct threshold or no visual tests configured"
 ```
 
+### FRONTEND CHECK (prerequisite for GENERATE_FILE)
+
+Before creating `docker-compose.visual.yml`, check if the project has a web frontend layer:
+
+Check for any of the following indicators:
+- Directory exists: `frontend/tests/e2e/`, `frontend/`, or any of `src/app/routes`, `frontend/app/routes`, `app/routes`, `src/routes`, `src/pages`, `pages`
+- File exists: `frontend/playwright.config.ts`, `playwright.config.ts`, `cypress.config.ts`, `.specs/design/screens/` (Pencil mockups)
+- File `package.json` exists AND contains one of these in `dependencies` or `devDependencies`: `react`, `vue`, `next`, `nuxt`, `svelte`, `@angular`, `astro`, `vite`, `webpack`, `remix`, `solid-js`, `qwik`
+
+If NONE of the above are found:
+
+```
+LOG: "No web frontend detected — docker-compose.visual.yml skipped."
+SKIP the GENERATE_FILE action entirely (proceed to SET_VERSION below).
+```
+
+If ANY indicator is found: proceed with GENERATE_FILE as documented below.
+
 ### GENERATE_FILE
 
 Check if `docker-compose.visual.yml` exists in the project root.
