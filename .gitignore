@@ -172,3 +172,4 @@ Thumbs.db
 .claude/commands/spec.*.md
 .claude/agents/livespec-*.md
 .specs/.livespec-path
+playwright-report/
