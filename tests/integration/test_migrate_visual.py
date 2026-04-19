@@ -509,3 +509,94 @@ class TestMigrateVisualLegacyMerge:
         assert "settings with form validation errors" in merged_content, (
             "Custom tests should be merged before deletion"
         )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# No-web-frontend guard tests
+
+FIXTURE_MIGRATE_VISUAL_NO_WEB = FIXTURES / "migrate-visual-no-web"
+
+
+@pytest.fixture()
+def fixture_no_web(tmp_path: Path) -> Path:
+    """Copy the migrate-visual-no-web fixture to tmp_path for isolation."""
+    dst = tmp_path / "project"
+    shutil.copytree(FIXTURE_MIGRATE_VISUAL_NO_WEB, dst)
+    return dst
+
+
+@pytest.mark.level_3a
+class TestMigrateVisualNoWebProject:
+    """Guard: no visual scaffolding generated for projects without a web frontend.
+
+    A project without package.json (with web deps), frontend config files, or
+    routes directories should skip all visual scaffold generation.
+    """
+
+    def test_exits_zero(self, fixture_no_web: Path) -> None:
+        """--generate on a non-web project must exit 0 (valid state, not an error)."""
+        result = _run_generate(fixture_no_web)
+        assert result.returncode == 0, (
+            f"Expected exit 0 for no-web project, got {result.returncode}\n"
+            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+
+    def test_no_playwright_config_created(self, fixture_no_web: Path) -> None:
+        """No playwright.visual.config.ts must be created for non-web projects."""
+        _run_generate(fixture_no_web)
+        assert not (fixture_no_web / "playwright.visual.config.ts").exists(), (
+            "playwright.visual.config.ts should NOT be generated for a non-web project"
+        )
+
+    def test_no_test_files_created(self, fixture_no_web: Path) -> None:
+        """No visual test files (tests/visual/*.spec.ts) must be created."""
+        _run_generate(fixture_no_web)
+        visual_dir = fixture_no_web / "tests" / "visual"
+        # The fixture has one pre-existing test for feature 004; count should not grow
+        if visual_dir.exists():
+            existing: set[str] = {f.name for f in visual_dir.iterdir()}
+        else:
+            existing = set()
+        assert "001-auth-ui.spec.ts" not in existing, (
+            "Visual test for 001-auth-ui should NOT be generated for a non-web project"
+        )
+        assert "003-dashboard.spec.ts" not in existing, (
+            "Visual test for 003-dashboard should NOT be generated for a non-web project"
+        )
+
+    def test_sentinel_emitted_with_no_frontend_reason(self, fixture_no_web: Path) -> None:
+        """FR-006: sentinel must be emitted; reason=no-frontend distinguishes from 'all covered'."""
+        result = _run_generate(fixture_no_web)
+        expected = "VISUAL_SCAFFOLD_RESULT: files=0 dirs=0 routes=0 reason=no-frontend"
+        assert expected in result.stdout, (
+            f"Expected sentinel '{expected}' in stdout.\n"
+            f"Got stdout: {result.stdout}"
+        )
+
+    def test_skip_message_in_output(self, fixture_no_web: Path) -> None:
+        """User-facing message must explain why nothing was generated."""
+        result = _run_generate(fixture_no_web)
+        assert "No web frontend detected" in result.stdout, (
+            f"Expected 'No web frontend detected' in stdout.\nGot: {result.stdout}"
+        )
+
+    def test_force_flag_bypasses_guard(self, fixture_no_web: Path) -> None:
+        """--force overrides the guard and generates files as if a web frontend existed."""
+        run_env = os.environ.copy()
+        result = subprocess.run(
+            ["node", str(SCRIPT_PATH), "--generate", "--force"],
+            cwd=str(fixture_no_web),
+            capture_output=True,
+            text=True,
+            timeout=30,
+            env=run_env,
+        )
+        assert result.returncode == 0, (
+            f"Expected exit 0 with --force, got {result.returncode}\n"
+            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+        # With --force and 2 UI features (001-auth-ui, 003-dashboard), visual dir must be created
+        visual_dir = fixture_no_web / "tests" / "visual"
+        assert visual_dir.exists(), (
+            "tests/visual/ should be created when --force bypasses the guard"
+        )
