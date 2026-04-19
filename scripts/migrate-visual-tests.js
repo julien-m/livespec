@@ -54,6 +54,27 @@ const ROUTES_DIRS = [
   'pages',
 ];
 
+// Project-level visual layer detection — guards --generate and --dry-run
+// Returns true if the project has ANY indicator of a web frontend.
+function detectWebFrontend() {
+  // Already-computed frontend indicators (re-use startup variables)
+  if (hasFrontendE2E || hasFrontendConfig || hasPencilMockups) return true;
+  // Known routes directories (covers Next.js, Nuxt, Remix, SvelteKit, etc.)
+  if (ROUTES_DIRS.some(d => existsSync(d))) return true;
+  // package.json with web framework dependencies
+  // Non-exhaustive — add markers as needed
+  try {
+    const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+    const WEB_MARKERS = [
+      'react', 'vue', 'next', 'nuxt', 'svelte', '@angular', 'astro',
+      'vite', 'webpack', 'remix', 'solid-js', 'qwik', '@sveltejs',
+    ];
+    return WEB_MARKERS.some(m => Object.keys(deps).some(d => d.startsWith(m)));
+  } catch { return false; }
+}
+const hasWebFrontend = detectWebFrontend();
+
 // EC-007: UI heuristic keywords — features without these are likely backend-only
 const UI_KEYWORDS = [
   'button', 'modal', 'form', 'page', 'layout', 'screen', 'component', 'view',
@@ -1405,6 +1426,7 @@ if (!scan && !generate && !dryRun) {
   console.log('  node scripts/migrate-visual-tests.js --scan       # List features without visual tests');
   console.log('  node scripts/migrate-visual-tests.js --generate   # Create test files for missing features');
   console.log('  node scripts/migrate-visual-tests.js --dry-run    # Preview without creating files');
+  console.log('  node scripts/migrate-visual-tests.js --generate --force  # Bypass frontend detection');
   process.exit(1);
 }
 
@@ -1417,5 +1439,16 @@ if (scan) {
 
 if (dryRun || generate) {
   printScanTable(features);
+
+  if (!hasWebFrontend && !args.includes('--force')) {
+    console.log('\nNo web frontend detected — visual scaffolding skipped.');
+    console.log('Use --force to generate anyway (e.g. projects using Playwright without a JS framework).');
+    if (generate) {
+      // FR-006: always emit sentinel on --generate; reason= distinguishes from "all features covered"
+      console.log('VISUAL_SCAFFOLD_RESULT: files=0 dirs=0 routes=0 reason=no-frontend');
+    }
+    process.exit(0);
+  }
+
   generateTests(features, dryRun);
 }
