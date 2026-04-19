@@ -66,7 +66,8 @@ Before creating `docker-compose.visual.yml`, check if the project has a web fron
 
 Check for any of the following indicators:
 - Directory exists: `frontend/tests/e2e/`, `frontend/`, or any of `src/app/routes`, `frontend/app/routes`, `app/routes`, `src/routes`, `src/pages`, `pages`
-- File exists: `frontend/playwright.config.ts`, `playwright.config.ts`, `cypress.config.ts`, `.specs/design/screens/` (Pencil mockups)
+- File exists: `frontend/playwright.config.ts`, `playwright.config.ts`, `cypress.config.ts`
+- Directory exists: `.specs/design/screens/` (Pencil mockups)
 - File `package.json` exists AND contains one of these in `dependencies` or `devDependencies`: `react`, `vue`, `next`, `nuxt`, `svelte`, `@angular`, `astro`, `vite`, `webpack`, `remix`, `solid-js`, `qwik`
 
 If NONE of the above are found:

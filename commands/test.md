@@ -508,10 +508,10 @@ When `--reset-baselines` is set:
 5. **Retry on failure:** If capture fails → retry up to 2 times, then mark "Blocked — [error]"
 
 **Prerequisites — frontend detection:** Before generating `docker-compose.visual.yml`, verify the project has a web frontend layer by checking for any of:
-- Routes directory: `src/app/routes`, `app/routes`, `src/routes`, `src/pages`, `pages`, `frontend/app/routes`
-- Config file: `frontend/playwright.config.ts`, `playwright.config.ts`, `cypress.config.ts`
-- Pencil mockups: `.specs/design/screens/`
-- `package.json` with a web framework dep: `react`, `vue`, `next`, `nuxt`, `svelte`, `@angular`, `astro`, `vite`, `webpack`, `remix`, `solid-js`
+- Directory exists: `frontend/tests/e2e/`, `frontend/`, or any of `src/app/routes`, `frontend/app/routes`, `app/routes`, `src/routes`, `src/pages`, `pages`
+- File exists: `frontend/playwright.config.ts`, `playwright.config.ts`, `cypress.config.ts`
+- Pencil mockups directory: `.specs/design/screens/`
+- `package.json` with a web framework dep: `react`, `vue`, `next`, `nuxt`, `svelte`, `@angular`, `astro`, `vite`, `webpack`, `remix`, `solid-js`, `qwik`
 
 If no web frontend detected:
 ```
