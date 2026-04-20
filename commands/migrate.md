@@ -32,7 +32,10 @@ flowchart TD
     NEXT -->|no| VALIDATE["Run exit criteria checks"]
     VALIDATE --> VMIGRATE["Visual scaffolding\n(migrate-visual-tests.js)"]
     UPTODATE --> VMIGRATE
-    VMIGRATE --> DONE["✅ Migration complete"]
+    VMIGRATE --> RECONCILE{"Files or routes\ngenerated?"}
+    RECONCILE -->|"yes"| AICHECK["AI reconciliation\n(5 checks)"]
+    RECONCILE -->|"no"| DONE
+    AICHECK --> DONE["✅ Migration complete"]
 
     style START fill:#e8f4f8,stroke:#2196F3
     style DONE fill:#e8f5e9,stroke:#4CAF50
@@ -113,10 +116,67 @@ After all migrations complete:
    - Proceed to Step 5 (Report)
 
 6. **Parse sentinel from output:**
-   Extract the `VISUAL_SCAFFOLD_RESULT: files=N dirs=M` line from `VISUAL_OUTPUT`.
-   Store `FILES` and `DIRS` counts for display in Step 5.
+   Extract the `VISUAL_SCAFFOLD_RESULT: files=N dirs=M routes=R [reason=...]` line from `VISUAL_OUTPUT`.
+   Store `FILES`, `DIRS`, `ROUTES` counts and optional `REASON` for display in Step 5.
 
 7. Display human-readable lines from the script output (all lines except the sentinel line).
+
+### Step 4.6 — Visual Test Reconciliation (AI)
+
+**Runs when:** Step 4.5 sentinel shows `FILES > 0` OR `ROUTES > 0`.
+**Skip when:** `FILES == 0 AND ROUTES == 0`, Step 4.5 was skipped/failed, or `REASON == no-frontend`.
+
+**Rollback boundary:** Before modifying any file, stage all files generated/modified by Step 4.5:
+```
+git add <TEST_DIR>/
+```
+This creates a clean boundary — Step 4.6 corrections remain unstaged and can be reverted with `git checkout -- <TEST_DIR>/`.
+
+**Procedure:** Read all `.spec.ts` files in the test directory (`frontend/tests/e2e/` or `tests/visual/`). Apply the 5 checks below **in order**. Fix issues directly and log each correction.
+
+#### Check 1: Duplicate route coverage (run first — reduces file count)
+
+List all `.spec.ts` files. Extract the `ROUTE` constant from each. If two or more files target the same route:
+- Keep the file with more test cases (count `test(` occurrences)
+- Delete the other file(s)
+- Log: `Duplicate removed: {deleted-file} (same route as {kept-file})`
+
+#### Check 2: Syntax errors from merge (requires accurate file inventory)
+
+For each file created or modified by Step 4.5:
+- Count opening `{` and closing `}` braces — they must be equal
+- Check for consecutive `});` on adjacent lines at the end of the file (sign of double-close from legacy merge)
+- If found: remove the orphan `});` and fix indentation
+- Log: `Syntax fixed: {file} (removed orphan closing brace)`
+
+#### Check 3: Dead code in preserved sections (requires parseable files)
+
+For each file containing `// ── Preserved from`:
+- **NEVER delete content with real logic** (assertions, `page.goto`, `expect`, `locator` calls, `waitForSelector`)
+- Delete ONLY empty stubs: `test("placeholder", async () => {});` or `test.describe.skip(...)` blocks with no assertions
+- Log: `Dead stub removed: {file} (empty placeholder in Preserved section)`
+
+#### Check 4: Orphaned route tests (requires accurate file inventory from Check 1)
+
+Cross-reference `route-*.spec.ts` files with the project's route directory:
+- Read the routes directory (e.g., `frontend/app/routes/`, `src/routes/`, `src/pages/`)
+- If a `route-*.spec.ts` targets a route with no matching file: **warn but do NOT delete** (route may be in development)
+- Log: `⚠ Potentially orphaned: {file} (route {route} not found in project)`
+
+#### Check 5: Slug/route/heading coherence (final validation on clean set)
+
+For each file, verify:
+- `ROUTE` value is plausible for the file slug (e.g., `route-analytics.spec.ts` → `ROUTE` should contain `/analytics`)
+- `HEADING` is not a generic placeholder like `"Page Title"`, `"Feature Name"`, or identical to the raw feature slug in Title Case
+- Log warnings only (do not auto-fix headings): `⚠ Check heading: {file} (HEADING="{value}" may need manual update)`
+
+**Early exit:** If all 5 checks pass with zero findings, log `Visual test reconciliation: clean — no issues found` and skip to Step 5.
+
+**On failure:** If any check fails unexpectedly (e.g., file read error), log the error and continue with remaining checks. Do not abort the entire migration.
+
+**Idempotency:** If Step 4.6 runs on already-reconciled files (e.g., second run of `spec.migrate`), all checks should find zero issues and exit cleanly.
+
+**Summary:** After all checks, store total `FIXES` count and `WARNINGS` count for Step 5 report.
 
 ### Step 5 — Report
 
@@ -159,6 +219,33 @@ Visual test scaffolding:
 If `FILES == 0`:
 ```
 Visual test scaffolding: 0 files created
+```
+
+**Append reconciliation summary** (if Step 4.6 ran):
+
+```
+Visual test reconciliation:
+  {FIXES} fix(es) applied, {WARNINGS} warning(s)
+```
+
+If `FIXES > 0`, list each fix:
+```
+Visual test reconciliation:
+  ✓ 1 duplicate removed (not-found.spec.ts → covered by route-not-found.spec.ts)
+  ✓ 5 syntax fixes (double }); in route-*.spec.ts)
+  ✓ 5 dead stubs removed (placeholder tests)
+  ⚠ 1 potentially orphaned route
+  0 heading issues
+```
+
+If Step 4.6 found no issues:
+```
+Visual test reconciliation: clean — no issues found
+```
+
+If Step 4.6 was skipped (no changes from Step 4.5):
+```
+Visual test reconciliation: skipped (no new files)
 ```
 
 ---
