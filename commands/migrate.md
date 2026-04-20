@@ -134,12 +134,18 @@ This creates a clean boundary — Step 4.6 corrections remain unstaged and can b
 
 **Procedure:** Read all `.spec.ts` files in the test directory (`frontend/tests/e2e/` or `tests/visual/`). Apply the 5 checks below **in order**. Fix issues directly and log each correction.
 
-#### Check 1: Duplicate route coverage (run first — reduces file count)
+#### Check 1: Duplicate coverage (run first — reduces file count)
 
-List all `.spec.ts` files. Extract the `ROUTE` constant from each. If two or more files target the same route:
-- Keep the file with more test cases (count `test(` occurrences)
+List all `.spec.ts` files. Determine if two or more files **test the same page or functionality**. Use your judgment — do NOT rely solely on comparing `ROUTE` string literals. Consider all signals:
+- File names: `not-found.spec.ts` and `route-not-found.spec.ts` are obviously the same page
+- Route values: `/this-route-does-not-exist` and `/nonexistent-page-404` both test a 404 page
+- Headings and describe blocks: `"Not Found"` in both files
+- Feature slug: both reference the same feature
+
+If duplicates found:
+- Keep the file with more test cases (count `test(` occurrences) and better coverage
 - Delete the other file(s)
-- Log: `Duplicate removed: {deleted-file} (same route as {kept-file})`
+- Log: `Duplicate removed: {deleted-file} (same page as {kept-file})`
 
 #### Check 2: Syntax errors from merge (requires accurate file inventory)
 
