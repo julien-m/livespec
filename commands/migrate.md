@@ -123,8 +123,8 @@ After all migrations complete:
 
 ### Step 4.6 — Visual Test Reconciliation (AI)
 
-**Runs when:** Step 4.5 sentinel shows `FILES > 0` OR `ROUTES > 0`.
-**Skip when:** `FILES == 0 AND ROUTES == 0`, Step 4.5 was skipped/failed, or `REASON == no-frontend`.
+**Runs when:** Step 4.5 sentinel shows `FILES > 0` (new test files were generated or modified).
+**Skip when:** `FILES == 0`, Step 4.5 was skipped/failed, or `REASON == no-frontend`.
 
 **Rollback boundary:** Before modifying any file, stage all files generated/modified by Step 4.5:
 ```
