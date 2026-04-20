@@ -34,8 +34,9 @@ flowchart TD
     UPTODATE --> VMIGRATE
     VMIGRATE --> RECONCILE{"Files or routes\ngenerated?"}
     RECONCILE -->|"yes"| AICHECK["AI reconciliation\n(5 checks)"]
-    RECONCILE -->|"no"| DONE
-    AICHECK --> DONE["✅ Migration complete"]
+    RECONCILE -->|"no"| E2EGEN
+    AICHECK --> E2EGEN["E2E test generation\n(generate-e2e-tests.js)"]
+    E2EGEN --> DONE["✅ Migration complete"]
 
     style START fill:#e8f4f8,stroke:#2196F3
     style DONE fill:#e8f5e9,stroke:#4CAF50
@@ -132,7 +133,7 @@ git add <TEST_DIR>/
 ```
 This creates a clean boundary — Step 4.6 corrections remain unstaged and can be reverted with `git checkout -- <TEST_DIR>/`.
 
-**Procedure:** Read all `.spec.ts` files in the test directory (`frontend/tests/e2e/` or `tests/visual/`). Apply the 5 checks below **in order**. Fix issues directly and log each correction.
+**Procedure:** Read all `.spec.ts` files in the test directory (`frontend/tests/e2e/` or `tests/visual/`), including both `route-*.spec.ts` (visual) and `e2e-*.spec.ts` (interactive). Apply the 5 checks below **in order**. Fix issues directly and log each correction.
 
 #### Check 1: Duplicate coverage (run first — reduces file count)
 
@@ -187,6 +188,108 @@ For each file, verify:
 **Idempotency:** If Step 4.6 runs on already-reconciled files (e.g., second run of `spec.migrate`), all checks should find zero issues and exit cleanly.
 
 **Summary:** After all checks, store total `FIXES` count and `WARNINGS` count for Step 5 report.
+
+### Step 4.7 — E2E Test Generation (AI-driven)
+
+**This step runs unconditionally** — same trigger as Step 4.5. Generates **complete, functional** E2E tests by reading feature specs AND actual source code. No placeholders, no `test.todo()`, no `TODO` markers.
+
+**Skip when:** No web frontend detected (same 9-indicator check as Step 4.5), or `.specs/features/` does not exist.
+
+#### Phase A: Scan for missing tests
+
+1. Resolve `E2E_SCRIPT` = `{livespec_dir}/scripts/generate-e2e-tests.js`
+2. If script exists and Node.js available, run `node "$E2E_SCRIPT" --scan` to get the list of features needing E2E tests
+3. If script unavailable: manually scan `.specs/features/*/spec.md` for Gherkin blocks and check if `e2e-{NNN}-{slug}.spec.ts` or `{NNN}-{slug}.spec.ts` exists in the test directory with >10 lines of real content
+4. Build list: `FEATURES_TO_GENERATE` = features with Gherkin that have no existing E2E test
+
+If `FEATURES_TO_GENERATE` is empty → display `E2E test generation: 0 files (all features covered)` and skip to Step 5.
+
+#### Phase B: Load project context for generation
+
+For each feature in `FEATURES_TO_GENERATE`, read:
+
+| Source | Purpose |
+|--------|---------|
+| `.specs/features/NNN/spec.md` | Gherkin scenarios, AC, user stories |
+| Frontend route files (e.g., `frontend/app/routes/`) | Actual routes, page components, data loaders |
+| Frontend component source files | Real selectors (`data-testid`, class names, ARIA roles) |
+| Existing test fixtures (`fixtures.ts`, `mock-server.ts`) | Available mock functions, API setup helpers |
+| Existing E2E tests (e.g., `route-*.spec.ts`) | Coding patterns, conventions, import style |
+| `frontend/playwright.config.ts` | Project configuration, base URL |
+
+**Route mapping:** For each feature, identify the actual route file that implements it:
+- Read the routes directory listing
+- Match feature slug to route file name (e.g., `013-workflow-analytics` → `analytics` route)
+- Read that route file to extract: page component name, data fetched, UI elements rendered
+
+**Selector discovery:** From the actual component source code, extract:
+- `data-testid="..."` attributes
+- ARIA roles and labels (`role="alert"`, `aria-label="..."`)
+- Form elements (input names, button text)
+- Headings (h1, h2 text)
+
+#### Phase C: Generate complete E2E tests
+
+For **each feature** in `FEATURES_TO_GENERATE`:
+
+1. **Read the spec Gherkin scenarios** — these define WHAT to test
+2. **Read the actual route/page code** — this defines HOW the UI works
+3. **Read fixtures** — this defines what mock helpers are available
+4. **Generate a complete `e2e-{NNN}-{slug}.spec.ts`** file that:
+
+**Requirements for generated tests:**
+- Every Gherkin scenario becomes a real `test()` with a working body
+- Use real routes from the code (e.g., `/analytics`, not `'the'`)
+- Use real selectors from the code (e.g., `[data-testid="workflow-list"]`, not `TODO-*`)
+- Use real fixture functions (e.g., `mockAuthenticatedAPIs(page)`)
+- Use real assertions that match what the UI actually renders
+- Follow the same coding style as existing tests in the project
+- Import from the same fixture files
+- Group tests by User Story (`test.describe`)
+- Add `@spec` comment references to AC IDs
+
+**Test structure per scenario:**
+```typescript
+test('{scenario name}', async ({ page }) => {
+  // Setup: mock APIs, seed state
+  await mockAuthenticatedAPIs(page);
+
+  // Navigate to actual route
+  await page.goto('/actual-route');
+  await page.waitForLoadState('networkidle');
+
+  // Action: interact with real elements
+  await page.locator('[data-testid="actual-element"]').click();
+  await page.locator('input[name="actual-field"]').fill('value');
+
+  // Assertion: verify real outcomes
+  await expect(page.locator('[data-testid="result"]')).toBeVisible();
+  await expect(page).toHaveURL('/expected-redirect');
+});
+```
+
+**When information is unavailable:**
+- If a route file doesn't exist yet → use the most likely route path inferred from spec (e.g., `/analytics` for analytics feature)
+- If specific selectors aren't findable in source → use semantic selectors: `getByRole('button', { name: 'Submit' })`, `getByText('...')`, `getByLabel('...')`
+- If a mock function for a specific API doesn't exist in fixtures → create a setup block with `page.route()` inline
+- **Never** emit `// TODO:` or `test.todo()` — always write a complete test body
+
+5. Write the file to `{test-dir}/e2e-{NNN}-{slug}.spec.ts`
+
+#### Phase D: Verify generated tests compile
+
+After generating all files:
+1. Check each file for syntax validity (balanced braces, valid imports)
+2. If the project has TypeScript config, attempt `npx tsc --noEmit` on the generated files
+3. Fix any compilation errors found
+
+#### Reporting
+
+Store results for Step 5:
+- `E2E_FILES` = number of test files created
+- `E2E_SKIPPED` = number of features skipped (already have tests)
+- `E2E_TESTS` = total number of `test()` blocks generated
+- `E2E_SCENARIOS` = total Gherkin scenarios covered
 
 ### Step 5 — Report
 
@@ -256,6 +359,34 @@ Visual test reconciliation: clean — no issues found
 If Step 4.6 was skipped (no changes from Step 4.5):
 ```
 Visual test reconciliation: skipped (no new files)
+```
+
+**Append E2E generation summary** (if Step 4.7 ran successfully):
+
+```
+E2E test generation:
+  {E2E_FILES} file(s) created
+  {E2E_SKIPPED} feature(s) skipped (tests already exist)
+```
+
+If `E2E_FILES > 0`, list each created file path:
+```
+E2E test generation:
+  3 file(s) created:
+    frontend/tests/e2e/e2e-001-authentication.spec.ts
+    frontend/tests/e2e/e2e-002-workflow-engine.spec.ts
+    frontend/tests/e2e/e2e-003-worker-management.spec.ts
+  11 feature(s) skipped (tests already exist)
+```
+
+If `E2E_FILES == 0`:
+```
+E2E test generation: 0 files created ({E2E_SKIPPED} skipped — tests already exist)
+```
+
+If Step 4.7 was skipped (no frontend or script missing):
+```
+E2E test generation: skipped (reason: {REASON})
 ```
 
 ---
