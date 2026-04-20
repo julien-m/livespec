@@ -136,15 +136,19 @@ This creates a clean boundary — Step 4.6 corrections remain unstaged and can b
 
 #### Check 1: Duplicate coverage (run first — reduces file count)
 
-List all `.spec.ts` files. Determine if two or more files **test the same page or functionality**. Use your judgment — do NOT rely solely on comparing `ROUTE` string literals. Consider all signals:
+**CRITICAL: Scan the ENTIRE test directory** — not just files modified by Step 4.5. Pre-existing files that were not touched by the scaffolding step are the most likely source of duplicates (e.g., an old `foo.spec.ts` still exists next to a newly generated `route-foo.spec.ts`).
+
+List **every** `.spec.ts` file in the test directory. For each pair, determine if they **test the same page or functionality**. Use your judgment — do NOT rely solely on comparing `ROUTE` string literals. Consider all signals:
 - File names: `not-found.spec.ts` and `route-not-found.spec.ts` are obviously the same page
 - Route values: `/this-route-does-not-exist` and `/nonexistent-page-404` both test a 404 page
 - Headings and describe blocks: `"Not Found"` in both files
 - Feature slug: both reference the same feature
+- A file without `route-` prefix that has a corresponding `route-` prefixed file is almost certainly a duplicate
 
 If duplicates found:
 - Keep the file with more test cases (count `test(` occurrences) and better coverage
-- Delete the other file(s)
+- If the less-complete file contains unique tests not present in the other, merge them into the kept file's "Preserved from" section before deleting
+- Delete the duplicate file(s)
 - Log: `Duplicate removed: {deleted-file} (same page as {kept-file})`
 
 #### Check 2: Syntax errors from merge (requires accurate file inventory)
