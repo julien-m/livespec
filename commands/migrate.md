@@ -33,7 +33,7 @@ flowchart TD
     VALIDATE --> VMIGRATE["Visual scaffolding\n(migrate-visual-tests.js)"]
     UPTODATE --> VMIGRATE
     VMIGRATE --> RECONCILE{"Files or routes\ngenerated?"}
-    RECONCILE -->|"yes"| AICHECK["AI reconciliation\n(5 checks)"]
+    RECONCILE -->|"yes"| AICHECK["AI reconciliation\n(6 checks: UI filter + 5)"]
     RECONCILE -->|"no"| E2EGEN
     AICHECK --> E2EGEN["E2E test generation\n(generate-e2e-tests.js)"]
     E2EGEN --> DONE["✅ Migration complete"]
@@ -133,7 +133,31 @@ git add <TEST_DIR>/
 ```
 This creates a clean boundary — Step 4.6 corrections remain unstaged and can be reverted with `git checkout -- <TEST_DIR>/`.
 
-**Procedure:** Read all `.spec.ts` files in the test directory (`frontend/tests/e2e/` or `tests/visual/`), including both `route-*.spec.ts` (visual) and `e2e-*.spec.ts` (interactive). Apply the 5 checks below **in order**. Fix issues directly and log each correction.
+**Procedure:** Read all `.spec.ts` files in the test directory (`frontend/tests/e2e/` or `tests/visual/`), including both `route-*.spec.ts` (visual) and `e2e-*.spec.ts` (interactive). Apply the 6 checks below **in order** (Check 0 first, then Checks 1-5). Fix issues directly and log each correction.
+
+#### Check 0: Non-visual feature filter (AI semantic — run first)
+
+For each `.spec.ts` file **created by Step 4.5** (not pre-existing files):
+
+1. Extract the feature directory name from the test filename (e.g., `007-api-push.spec.ts` → `007-api-push`)
+2. Read `.specs/features/{feature-dir}/spec.md`
+   - If spec.md does not exist → classify as `ambiguous`
+3. Classify the feature using semantic judgment:
+
+   > Feature directory: `{feature-dir}`
+   >
+   > Read this feature spec. Does it describe something the end user interacts with visually in a web browser (a page, screen, dialog, component, dashboard, form)?
+   >
+   > A CLI tool, REST/GraphQL API endpoint, background worker, caching layer, SDK library, or infrastructure service is NOT visual — even if its spec mentions words like "response", "input", "output", "table", or "list" in a non-UI context.
+   >
+   > Answer: VISUAL, NON-VISUAL, or AMBIGUOUS (with one-line rationale).
+
+4. Act on classification:
+   - **VISUAL:** No action. Store `CHECK0_RESULTS[feature-dir] = visual`.
+   - **NON-VISUAL:** Delete the scaffolded `.spec.ts` file. Delete baseline directories created for this feature (`baselines/mockups/{slug}/` or equivalent). Store `CHECK0_RESULTS[feature-dir] = non-visual`. Log: `Check 0: deleted {file} (non-visual feature: {rationale})`
+   - **AMBIGUOUS:** Keep the file. Insert `// ⚠️ CHECK: This feature may not have a browser UI — verify before running` as the first line. Store `CHECK0_RESULTS[feature-dir] = ambiguous`. Log: `⚠ Check 0: kept {file} (ambiguous: {rationale})`
+
+**Post-Check 0:** If all scaffolded files were deleted (0 files remaining), skip Checks 1-5 with log: `Checks 1-5: skipped (0 files remaining after Check 0)`. Store `CHECK0_RESULTS` for reuse by Step 4.7.
 
 #### Check 1: Duplicate coverage (run first — reduces file count)
 
@@ -181,7 +205,7 @@ For each file, verify:
 - `HEADING` is not a generic placeholder like `"Page Title"`, `"Feature Name"`, or identical to the raw feature slug in Title Case
 - Log warnings only (do not auto-fix headings): `⚠ Check heading: {file} (HEADING="{value}" may need manual update)`
 
-**Early exit:** If all 5 checks pass with zero findings, log `Visual test reconciliation: clean — no issues found` and skip to Step 5.
+**Early exit:** If all 6 checks (0-5) pass with zero findings, log `Visual test reconciliation: clean — no issues found` and skip to Step 5. If Check 0 removed all files, skip Checks 1-5 and proceed to Step 4.7.
 
 **On failure:** If any check fails unexpectedly (e.g., file read error), log the error and continue with remaining checks. Do not abort the entire migration.
 
@@ -201,6 +225,14 @@ For each file, verify:
 2. If script exists and Node.js available, run `node "$E2E_SCRIPT" --scan` to get the list of features needing E2E tests
 3. If script unavailable: manually scan `.specs/features/*/spec.md` for Gherkin blocks and check if `e2e-{NNN}-{slug}.spec.ts` or `{NNN}-{slug}.spec.ts` exists in the test directory with >10 lines of real content
 4. Build list: `FEATURES_TO_GENERATE` = features with Gherkin that have no existing E2E test
+
+5. **Filter non-visual features:** For each feature in `FEATURES_TO_GENERATE`:
+   - If `CHECK0_RESULTS[feature-dir]` exists and equals `non-visual` → remove from list
+   - If `CHECK0_RESULTS[feature-dir]` does not exist (feature not scaffolded in Step 4.5) → apply the same AI classification as Check 0 (read spec.md, classify as VISUAL/NON-VISUAL/AMBIGUOUS). If `non-visual` → remove from list. Store the result in `CHECK0_RESULTS`.
+   - `ambiguous` and `visual` features remain in the list
+   - Log removed features: `E2E generation: skipped {feature-dir} (non-visual — no browser UI)`
+
+   **Note:** "non-visual" here means the feature has no browser UI at all (pure CLI, API without UI, background worker). A feature with a web form or page is visual even without Figma mockups — it keeps its E2E tests.
 
 If `FEATURES_TO_GENERATE` is empty → display `E2E test generation: 0 files (all features covered)` and skip to Step 5.
 
@@ -341,15 +373,19 @@ Visual test reconciliation:
   {FIXES} fix(es) applied, {WARNINGS} warning(s)
 ```
 
-If `FIXES > 0`, list each fix:
+If `FIXES > 0` or Check 0 had findings, list each action:
 ```
 Visual test reconciliation:
+  ✓ 2 non-visual feature(s) removed (Check 0)
+  ⚠ 1 ambiguous feature(s) kept for review (Check 0)
   ✓ 1 duplicate removed (not-found.spec.ts → covered by route-not-found.spec.ts)
   ✓ 5 syntax fixes (double }); in route-*.spec.ts)
   ✓ 5 dead stubs removed (placeholder tests)
   ⚠ 1 potentially orphaned route
   0 heading issues
 ```
+
+Omit Check 0 lines if both non-visual and ambiguous counts are 0 (no noise when all features are visual).
 
 If Step 4.6 found no issues:
 ```
