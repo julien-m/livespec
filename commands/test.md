@@ -77,6 +77,12 @@ Both orders are valid. Choose based on whether you want to audit tests before or
 
 ---
 
+## Surface-Aware Test Directory Resolution
+
+**Before any step that references test file paths:** If `.specs/surfaces.yaml` exists, read it and use each surface's `testDir` as the test directory. All test paths in this command (e.g., `tests/e2e/notifications.spec.ts`) are **examples** — replace with the actual surface-resolved path (e.g., `apps/web/tests/e2e/notifications.spec.ts`). If no `surfaces.yaml` exists, use legacy detection.
+
+---
+
 ## Phase 0 — Resolve & Preflight
 
 ### Feature Resolution
@@ -507,11 +513,14 @@ When `--reset-baselines` is set:
 
 5. **Retry on failure:** If capture fails → retry up to 2 times, then mark "Blocked — [error]"
 
-**Prerequisites — frontend detection:** Before generating `docker-compose.visual.yml`, verify the project has a web frontend layer by checking for any of:
-- Directory exists: `frontend/tests/e2e/`, `frontend/`, or any of `src/app/routes`, `frontend/app/routes`, `app/routes`, `src/routes`, `src/pages`, `pages`
-- File exists: `frontend/playwright.config.ts`, `playwright.config.ts`, `cypress.config.ts`
-- Pencil mockups directory: `.specs/design/screens/`
-- `package.json` with a web framework dep: `react`, `vue`, `next`, `nuxt`, `svelte`, `@angular`, `astro`, `vite`, `webpack`, `remix`, `solid-js`, `qwik`
+**Prerequisites — frontend detection:** Before generating `docker-compose.visual.yml`, verify the project has a web frontend layer:
+
+1. **If `.specs/surfaces.yaml` exists:** Read it. If any surface has `runner: playwright`, the project has a web frontend. Use each surface's `testDir` as the test directory. Skip surfaces with `runner: manual` or `runner: unsupported`.
+2. **If no `surfaces.yaml`:** Fall back to legacy detection — check for any of:
+   - Directory exists: `frontend/tests/e2e/`, `frontend/`, or any of `src/app/routes`, `frontend/app/routes`, `app/routes`, `src/routes`, `src/pages`, `pages`
+   - File exists: `frontend/playwright.config.ts`, `playwright.config.ts`, `cypress.config.ts`
+   - Pencil mockups directory: `.specs/design/screens/`
+   - `package.json` with a web framework dep: `react`, `vue`, `next`, `nuxt`, `svelte`, `@angular`, `astro`, `vite`, `webpack`, `remix`, `solid-js`, `qwik`
 
 If no web frontend detected:
 ```

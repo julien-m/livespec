@@ -780,13 +780,17 @@ After `.specs/` is installed, check if Playwright is available and scaffold visu
 **Detection:**
 1. Check if `@playwright/test` is listed in `package.json` devDependencies
 2. If found:
-   - Check if `tests/e2e/helpers/visual.ts` already exists (skip if present)
-   - **Create directory** `tests/e2e/helpers/` if absent
-   - **Scaffold `tests/e2e/helpers/visual.ts`** using the template from `system/testing/visual-helper-scaffold.md`
+   - **Resolve test directory:**
+     - If `.specs/surfaces.yaml` exists: use the `testDir` of the first surface with `runner: playwright`
+     - Otherwise: default to `tests/e2e/`
+   - Let `$TEST_DIR` = the resolved test directory (e.g., `apps/web/tests/e2e` or `tests/e2e`)
+   - Check if `$TEST_DIR/helpers/visual.ts` already exists (skip if present)
+   - **Create directory** `$TEST_DIR/helpers/` if absent
+   - **Scaffold `$TEST_DIR/helpers/visual.ts`** using the template from `system/testing/visual-helper-scaffold.md`
    - **Ensure dependencies** `pixelmatch` and `sharp` are installed:
      - Check `package.json` for these packages
      - If absent, output instruction: "Visual helpers scaffolded. Install missing dependencies: `bun add -d pixelmatch sharp` (or `npm install -D pixelmatch sharp`)"
-   - **Output:** "Visual testing helpers scaffolded at `tests/e2e/helpers/visual.ts`"
+   - **Output:** "Visual testing helpers scaffolded at `$TEST_DIR/helpers/visual.ts`"
 
 3. If Playwright is NOT found → skip silently (visual helpers are optional, can be added later when Playwright is installed)
 

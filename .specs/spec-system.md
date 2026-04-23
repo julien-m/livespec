@@ -390,6 +390,44 @@ To prevent changelogs from growing unbounded:
 5. The `## Screens` section in `spec.md` links features to their visual references
 6. Design fidelity threshold is 5% (more permissive than visual regression at `maxDiffPixels: 0`)
 
+#### Multi-Surface Configuration
+
+Projects with multiple UI applications (web, mobile, watch) declare their surfaces in `.specs/surfaces.yaml`:
+
+```yaml
+# .specs/surfaces.yaml
+surfaces:
+  - id: web                                    # stable key, never changes
+    name: Application Web                       # human label
+    path: apps/web                              # app root directory
+    testDir: apps/web/tests/e2e                 # where tests are generated
+    runner: playwright                          # determines which generator applies
+    runnerConfig: apps/web/playwright.config.ts # optional
+  - id: mobile
+    name: App iOS
+    path: apps/mobile
+    testDir: apps/mobile/tests/e2e
+    runner: manual                              # tests managed outside LiveSpec
+  - id: watch
+    name: Apple Watch
+    path: apps/watch
+    runner: unsupported                         # no test framework applicable
+```
+
+**Fields:**
+- `id` — stable identifier (referenced by `Surfaces:` in spec.md)
+- `name` — human-readable label
+- `path` — app root directory (relative to project root)
+- `testDir` — where test files are generated
+- `runner` — `playwright` (LiveSpec generates), `manual` (external), `unsupported` (no tests)
+- `runnerConfig` — optional path to runner config file
+
+**Per-feature annotation:** Optional `- Surfaces: web, mobile` in spec.md header. Default = all surfaces.
+
+**Commands:**
+- `spec.migrate` — generates `surfaces.yaml` if absent (Migration v8)
+- `spec.check --surfaces` — detects drift between config and filesystem
+
 #### Screens Table Format
 
 The `## Screens` table in `spec.md` supports optional columns for visual testing precision:

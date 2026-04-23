@@ -72,6 +72,12 @@ flowchart TD
 >
 > **Hooks — after completing:** Same resolution with `after-plan` at all 3 levels.
 
+## Surface-Aware Test Directory Resolution
+
+**When generating the Testing Strategy table:** If `.specs/surfaces.yaml` exists, use each surface's `testDir` for test file paths instead of generic `tests/e2e/`. Example paths in this command are illustrations — resolve actual paths from surfaces config.
+
+---
+
 ## Steps
 
 ### Step 1 — Resolve Feature

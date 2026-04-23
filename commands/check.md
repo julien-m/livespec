@@ -19,6 +19,7 @@ argument-hint: "<feature-name>"
 /spec.check --quality feature     → Step 1 → Steps 3-4 only
 /spec.check feature --show-provenance  → Step 1 → Step 3 → Step 3.1 (provenance table) → exit
 /spec.check --visual-status       → Step 8.5 (governance dashboard) → exit
+/spec.check --surfaces            → Step 1 → Step 1.5 (surface drift detection) → exit
 ```
 
 ```mermaid
@@ -125,6 +126,43 @@ Compare the Features table in `.specs/README.md` with actual directories on disk
 | Orphan files | ✅ Pass | No orphans detected |
 | README sync | ❌ Fail | 005-search on disk but not in README |
 ```
+
+### Step 1.5 — Surface Drift Detection (`--surfaces` only)
+
+**Runs only when:** `--surfaces` flag is passed. Exits after this step.
+
+**Purpose:** Compare `.specs/surfaces.yaml` against actual project filesystem to detect drift — surfaces that exist on disk but are not configured, or configured surfaces whose paths no longer exist.
+
+#### Procedure
+
+1. **Read `.specs/surfaces.yaml`**
+   - If absent: display `No surfaces configured. Run /spec.migrate to generate .specs/surfaces.yaml.` and exit.
+   - If parse error: display `FATAL: surfaces.yaml is malformed` with error details and exit.
+
+2. **Validate configured surfaces:**
+   - For each surface: check `path` exists on disk
+   - Check for duplicate `id` or `testDir` values
+   - Check `testDir` is under `path` (or at project root for `path: .`)
+   - Check `runnerConfig` file exists if specified
+
+3. **Scan filesystem for unconfigured surfaces:**
+   - Scan `apps/*/`, `packages/*/`, `frontend/`, `web/`, `client/` for directories with web markers (package.json with web framework deps, routes directories, Playwright config)
+   - Report any app directory with web markers that is NOT in `surfaces.yaml`
+
+4. **Report:**
+
+```markdown
+## Surface Drift Report
+
+| Surface | Status | Details |
+|---|---|---|
+| web (apps/web) | ✅ Configured | runner: playwright, testDir: apps/web/tests/e2e |
+| mobile (apps/mobile) | ✅ Configured | runner: manual |
+| apps/dashboard | ⚠️ Not configured | Has web deps (react), not in surfaces.yaml |
+| watch (apps/watch) | ⚠️ Path missing | Configured but apps/watch/ does not exist |
+```
+
+**Exit:** After displaying the report. Does not proceed to Step 2+.
 
 If `--tree-only`, stop here. Otherwise continue.
 
@@ -361,7 +399,7 @@ Look for baselines/baseline.manifest.yml in the feature directory.
 
 #### Visual Regression Detection
 
-Use `compareRegression()` helper from `tests/e2e/helpers/visual.ts` to detect pixel drift:
+Use `compareRegression()` helper from the test directory's `helpers/visual.ts` to detect pixel drift. Resolve the test directory from `.specs/surfaces.yaml` (first surface with `runner: playwright`) or default to `tests/e2e/`:
 
 1. **Check resolved visual test tool** from `.specs/testing/strategy.md` or `plan.md` **Resolved Test Commands**
    - If absent → skip step, report: "Visual drift detection skipped — no visual testing tool resolved"

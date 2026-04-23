@@ -4,78 +4,25 @@
 //   node scripts/generate-e2e-tests.js --generate       # Create E2E test files from Gherkin scenarios
 //   node scripts/generate-e2e-tests.js --dry-run        # Preview without creating files (exit 0)
 //
-// Adaptive detection:
-//   - If frontend/tests/e2e/ exists → generates tests there
-//   - If tests/e2e/ exists → uses that
-//   - Otherwise → legacy fallback: tests/visual/
+// Multi-surface support:
+//   - Reads .specs/surfaces.yaml if present (config-first)
+//   - Falls back to filesystem detection (legacy behavior)
+//   - Iterates over all surfaces with runner=playwright
 //
 // Reads .specs/features/*/spec.md Gherkin scenarios and generates Playwright E2E tests.
 
 import { existsSync, readdirSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, basename } from 'path';
+import { getPlaywrightSurfaces, hasAnySurface } from './lib/surface-resolver.js';
 
 const SPECS_DIR = '.specs/features';
 
-// Candidate paths — detected at startup
-const FRONTEND_E2E_DIR = 'frontend/tests/e2e';
-const FRONTEND_DIR = 'frontend';
-const FRONTEND_CONFIG_PATH = 'frontend/playwright.config.ts';
-const PENCIL_MOCKUP_DIR = '.specs/design/screens';
+// ─── Surface resolution (replaces hardcoded detection) ─────────────────────
+const SURFACES = getPlaywrightSurfaces();
+const hasWebFrontend = SURFACES.length > 0;
 
-// Candidate routes directories — detected at startup (ordered by specificity)
-const ROUTES_DIRS = [
-  'frontend/app/routes',
-  'src/app/routes',
-  'app/routes',
-  'src/routes',
-  'src/pages',
-  'pages',
-];
-
-// ─── Frontend detection (9 indicators) ──────────────────────────────────────
-// Matches migrate-visual-tests.js logic exactly.
-
-const hasFrontendE2E = existsSync(FRONTEND_E2E_DIR);
-const hasFrontendDir = existsSync(FRONTEND_DIR);
-const hasFrontendConfig = existsSync(FRONTEND_CONFIG_PATH);
-const hasRoutesDir = ROUTES_DIRS.some(d => existsSync(d));
-const hasPencilMockups =
-  existsSync(PENCIL_MOCKUP_DIR) &&
-  readdirSync(PENCIL_MOCKUP_DIR).some(file => file.toLowerCase().endsWith('.png'));
-
-function hasWebDepsInPackageJson() {
-  try {
-    const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
-    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-    const WEB_MARKERS = [
-      'react', 'vue', 'next', 'nuxt', 'svelte', '@angular', 'astro',
-      'vite', 'webpack', 'remix', 'solid-js', 'qwik', '@sveltejs',
-    ];
-    return WEB_MARKERS.some(m => Object.keys(deps).some(d => d.startsWith(m)));
-  } catch { return false; }
-}
-
-function detectWebFrontend() {
-  if (hasFrontendE2E) return true;
-  if (hasFrontendDir) return true;
-  if (hasFrontendConfig) return true;
-  if (hasRoutesDir) return true;
-  if (hasPencilMockups) return true;
-  if (hasWebDepsInPackageJson()) return true;
-  return false;
-}
-
-const hasWebFrontend = detectWebFrontend();
-
-// ─── Test directory detection ───────────────────────────────────────────────
-
-function detectTestDir() {
-  if (existsSync(FRONTEND_E2E_DIR)) return FRONTEND_E2E_DIR;
-  if (existsSync('tests/e2e')) return 'tests/e2e';
-  return 'tests/visual'; // legacy fallback
-}
-
-const TEST_DIR = detectTestDir();
+// Default TEST_DIR for scan mode (uses first surface or legacy fallback)
+let TEST_DIR = SURFACES.length > 0 ? SURFACES[0].testDir : 'tests/visual';
 
 // ─── Fixtures detection ─────────────────────────────────────────────────────
 
@@ -517,22 +464,37 @@ if (!scan && !generate && !dryRun) {
   process.exit(1);
 }
 
-const features = scanFeatures();
-
-if (scan) {
-  printScanTable(features);
+if (!hasWebFrontend && !args.includes('--force')) {
+  console.log('\nNo web frontend detected — E2E test generation skipped.');
+  console.log('Use --force to generate anyway.');
+  console.log('E2E_GENERATE_RESULT: files=0 skipped=0 reason=no-frontend');
   process.exit(0);
 }
 
-if (dryRun || generate) {
-  printScanTable(features);
+// Multi-surface loop: iterate over all playwright surfaces
+let totalGenerated = 0;
+let totalSkipped = 0;
 
-  if (!hasWebFrontend && !args.includes('--force')) {
-    console.log('\nNo web frontend detected — E2E test generation skipped.');
-    console.log('Use --force to generate anyway.');
-    console.log('E2E_GENERATE_RESULT: files=0 skipped=0 reason=no-frontend');
-    process.exit(0);
+for (const surface of SURFACES) {
+  TEST_DIR = surface.testDir;
+
+  if (SURFACES.length > 1) {
+    console.log(`\n── Surface: ${surface.name} (${surface.id}) → ${surface.testDir} ──`);
   }
 
-  generateTests(features, dryRun);
+  const features = scanFeatures();
+
+  if (scan) {
+    printScanTable(features);
+    continue;
+  }
+
+  if (dryRun || generate) {
+    printScanTable(features);
+    generateTests(features, dryRun);
+  }
+}
+
+if (scan) {
+  process.exit(0);
 }

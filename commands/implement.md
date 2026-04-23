@@ -57,6 +57,12 @@ flowchart TD
 > **Hooks — before each step:** Same resolution with `before-implement-step` at all 3 levels.
 > **Hooks — after each step:** Same resolution with `after-implement-step` at all 3 levels.
 
+## Surface-Aware Test Directory Resolution
+
+**Before any step that creates or references test files:** If `.specs/surfaces.yaml` exists, read it and use each surface's `testDir` as the test directory. Test paths in this command (e.g., `tests/e2e/screens/`) are **examples** — replace with the actual surface-resolved path. If no `surfaces.yaml` exists, use legacy detection.
+
+---
+
 ## Feature Resolution
 
 1. If feature name provided: find `.specs/features/NNN-feature-name/`

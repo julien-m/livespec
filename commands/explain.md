@@ -69,6 +69,12 @@ flowchart LR
 
 ---
 
+## Surface-Aware Test Directory Resolution
+
+**When listing test file locations:** If `.specs/surfaces.yaml` exists, resolve test paths from each surface's `testDir` instead of generic `tests/e2e/`.
+
+---
+
 ## Steps
 
 ### Step 1 — Resolve Input

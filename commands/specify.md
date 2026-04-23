@@ -515,6 +515,20 @@ After generating spec.md, determine if the feature involves UI:
 
 **Re-modification:** When `/spec.specify` is run on a feature that already has mockups (screens listed in existing spec.md), the AI detects existing screens, determines which need updating based on spec changes, regenerates via MCP (or instructs manual update), re-exports PNGs in the feature's own subfolder (`screens/<NNN-feature-name>/`), updates the latest copies, and updates the existing changelog row for this feature+screen pair (same spec = update row, not append).
 
+### Step 5.8 — Surface Annotation
+
+**Runs when:** `.specs/surfaces.yaml` exists AND declares more than 1 surface with `runner: playwright`.
+
+**Purpose:** Add an optional `Surfaces:` field to the spec.md header so the migration knows which surfaces this feature targets.
+
+1. Read `.specs/surfaces.yaml`
+2. If only 1 playwright surface or no `surfaces.yaml`: skip (no annotation needed — feature implicitly targets all surfaces)
+3. If multiple playwright surfaces:
+   - List the available surfaces by `id` and `name`
+   - Ask: "Which surfaces does this feature target? (default: all)"
+   - Add `- Surfaces: web, mobile` (or `all`) to the spec.md metadata header (after `- Priority:`)
+4. If the feature is clearly platform-specific (e.g., "Apple Watch haptic feedback"), auto-select the matching surface without asking
+
 ### Step 6 — Quality Validation
 
 Before presenting the spec, check:

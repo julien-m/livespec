@@ -85,10 +85,28 @@ After all migrations complete:
 - [ ] `.specs/livespec-version` matches `VERSION` from repo
 - [ ] No orphaned symlinks (from commands removed in newer versions)
 
+### Step 4.4 — Surface Resolution
+
+**This step runs unconditionally** — before visual scaffolding.
+
+1. Check if `.specs/surfaces.yaml` exists
+2. If present: read and validate (FATAL on parse error or validation failure)
+3. Display detected surfaces:
+   ```
+   Surfaces: web (apps/web, playwright), mobile (apps/mobile, manual), watch (apps/watch, unsupported)
+   ```
+4. For surfaces with `runner != playwright`: log `Surface '{name}' ({runner}) — skipped (no Playwright generator)`
+5. If 0 playwright surfaces: skip Steps 4.5-4.7 with log `No playwright surfaces — test scaffolding skipped`
+6. If no `surfaces.yaml` exists: proceed to Step 4.5 with legacy filesystem detection (handled internally by scripts)
+
+**Note:** The surface resolution is handled internally by `scripts/lib/surface-resolver.js`, shared by both test generation scripts. This step documents the behavior visible to the user.
+
 <!-- @spec FR-001: Unconditional invocation after migration, FR-002: Silent no-prompt — .specs/features/011-visual-migrate-integration/spec.md#fr-001 -->
 ### Step 4.5 — Visual Test Scaffolding
 
 **This step runs unconditionally** — after core migrations complete AND on the "already up to date" path. No user prompt.
+
+**Multi-surface:** The script iterates over all surfaces with `runner=playwright` from `.specs/surfaces.yaml` (or a single detected surface in legacy mode). Test files are generated in each surface's `testDir`.
 
 1. Resolve `VISUAL_SCRIPT` = `{livespec_dir}/scripts/migrate-visual-tests.js`
 
