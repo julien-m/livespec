@@ -13,4 +13,4 @@ Test scripts now iterate over declared surfaces instead of hardcoded paths.
 ## Actions
 
 SET_VERSION 8
-RUN_SCRIPT scripts/generate-surfaces.js
+RUN generate-surfaces.js
