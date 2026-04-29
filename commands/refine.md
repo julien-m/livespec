@@ -153,6 +153,19 @@ If an argument is provided, skip this menu and enter the flow directly.
 
 ## Flow: Project (`/spec.refine project`)
 
+### Step 0.5 — Brainstorm Re-import (`--import-brainstorm`)
+
+If the user invoked `/spec.refine project --import-brainstorm`:
+
+1. Assert `.specs/` exists. If not, print `Run /spec.init instead.` and abort (FR-013).
+2. Run `livespec brainstorm validate --cwd . --format json`. On exit ≠ 0, print all violations and abort (`.specs/` is left in its pre-run state — FR-013 / AC-004).
+3. Run `livespec brainstorm plan --cwd . --mode refine --out .livespec-plan.json`. The plan respects existing NNNs and lists `skipped_slugs` (slugs already present in `.specs/features/`).
+4. Print the import summary: `N new features, M skipped (already present), K mockups copied`.
+5. Confirm (skipped under `--auto`).
+6. Run `livespec brainstorm apply .livespec-plan.json`. In refine mode, atomic writes are per-file; if an exception is raised mid-apply, the error message will surface "partial apply possible in refine mode — inspect .specs/" so the operator can review the directory state.
+7. Append a refinement entry to `.specs/changelog.md` and let the helper merge new tier items into `roadmap.md` (existing checked items are unchanged).
+8. Skip the rest of the Project flow.
+
 ### Step 1 — Read Current State
 
 Read all project-level artifacts:
@@ -555,6 +568,7 @@ If the project refinement involves adding/replacing a technology, redirect to `/
 |---|---|
 | `--auto`, `-a` | Apply changes without confirmation prompts |
 | `--dry-run`, `-d` | Show proposed changes without applying them |
+| `--import-brainstorm` | (Project flow only) Re-import `project-brainstorm` artifacts (`specs/flows/`, `mockups/`, `project-profile.md`) into the existing `.specs/`. Allocates next free NNN; never overwrites existing features. See feature 012-brainstorm-ingestion. |
 
 ---
 

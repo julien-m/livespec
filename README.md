@@ -130,6 +130,17 @@ For any AI tool that reads Markdown, paste the content of `system/spec-system.md
 
 ## Workflow Guide
 
+### Brainstorm ingestion (from `project-brainstorm`)
+
+If your CWD contains `project-brainstorm` artifacts (`specs/flows/*.md`, `specs/screens/*.md`, `mockups/manifest.json` schemaVersion 2, `mockups/*.png`, `project-profile.md`), `/spec.init` auto-detects them and ingests everything atomically:
+
+```bash
+/spec.init                                       # auto-detects + ingests
+/spec.refine project --import-brainstorm         # re-import into an existing .specs/
+```
+
+The `livespec brainstorm` CLI (`detect`, `validate`, `plan`, `apply`) backs the slash commands and can be invoked directly for scripting. Validation is strict: any grammar violation aborts before any write — no partial `.specs/` is ever produced.
+
 ### Manual flow (step by step)
 
 Run each command individually with full control at every stage:

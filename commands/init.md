@@ -66,6 +66,33 @@ flowchart TD
 
 The AI asks questions one at a time, waits for answers, and builds a PROJECT PROFILE.
 
+### Pre-Check: Brainstorm Ingestion (project-brainstorm artifacts)
+
+Before any other Pre-Check, scan the CWD for ingestable `project-brainstorm` artifacts.
+
+**Detection:**
+
+1. Run `livespec brainstorm detect --cwd .` — parses JSON snapshot.
+2. If `flows_count > 0` (i.e. `specs/flows/*.md` present), enter ingestion mode:
+   - **If `.specs/` already exists** → abort `/spec.init`. Print:
+     `⚠️ .specs/ already initialized. Run /spec.refine project --import-brainstorm to import these artifacts.`
+     Skip the rest of `/spec.init` (FR-012).
+   - **Else** → run `livespec brainstorm validate --cwd . --format json`.
+     - Exit code 2 (grammar) or 3 (missing mockup) → print all violations and abort. `.specs/` is **not** created (FR-003 / AC-004 / AC-005).
+   - Print the detected artifact list: `flows_count`, `screens_count`, `mockups_count`, `has_project_profile` (FR-014).
+   - Confirm with the user: "Proceed with ingestion?" — **skipped under `--auto`**.
+   - Run `livespec brainstorm plan --cwd . --mode init --out .livespec-plan.json`.
+   - Run `livespec brainstorm apply .livespec-plan.json`.
+   - Skip Phases A and B (replaced by ingestion). Continue with Phase C "Installation" only for the parts NOT already produced by the helper:
+     - `spec-system.md` copy
+     - ADRs (if any)
+     - `CLAUDE.md` install (Step 3.11)
+     - Local commands install (Step 3.12)
+     - Playwright scaffold (Step 3.13)
+   - If `project-profile.md` was absent, the helper has emitted `[NEEDS INTERACTIVE FILL]` markers in `.specs/project.md`. Read them and run a minimal interactive prompt to fill name/vision/audience/constraints (FR-011 / AC-012).
+   - Continue Phase D (preflight) and Phase E (after-init hooks) as normal.
+3. If `flows_count == 0` (no project-brainstorm artifacts) → fall through to the legacy Brainstorm Detection below.
+
 ### Pre-Check: Brainstorm Detection
 
 Before starting the interview, check if a brainstorm from `project-brainstorm` already exists.

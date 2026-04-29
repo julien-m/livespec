@@ -3,7 +3,21 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/NNN-feature-name/changelog.md`.
 >
-> Last updated: 2026-04-17
+> Last updated: 2026-04-29
+
+---
+
+## 2026-04-29 -- Feature: Feature 012 implemented
+
+[Feature 012] Implemented: Brainstorm Ingestion — `validator/brainstorm/` package (10 modules, <300 LOC each), `livespec brainstorm {detect,validate,plan,apply}` CLI, `commands/init.md` Pre-Check + `commands/refine.md --import-brainstorm`. 37 new tests, 501/501 unit suite green. Plan-review findings #1..#5 all addressed.
+
+## 2026-04-29 -- Plan: Feature 012 planned
+
+[Feature 012] Plan created: Brainstorm Ingestion — 11 implementation steps, 4 diagrams (sequence x2, state, ER)
+
+## 2026-04-29 -- Spec: Feature 012 created
+
+[Feature 012] Spec created: Brainstorm Ingestion — 4 stories, 15 AC, 15 FR
 
 ---
 

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 import typer
 
+from .brainstorm.cli import app as brainstorm_app
 from .commit_context import commit_context_app
 from .config import load_config
 from .engine import validate_all
@@ -25,6 +26,7 @@ app = typer.Typer(name="livespec", help="LiveSpec structural validator")
 app.add_typer(pipeline_app, name="pipeline")
 app.add_typer(git_app, name="git")
 app.add_typer(commit_context_app, name="commit-context")
+app.add_typer(brainstorm_app, name="brainstorm")
 
 
 def _find_specs_root(start: Path | None = None) -> Path:

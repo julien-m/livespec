@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-04-17
+> Last updated: 2026-04-29
 
 
 ---
@@ -48,6 +48,7 @@
 | 005.2 | Taxonomy Complete Expansion | Draft | 2026-04-17 | 2026-04-17 | [spec](features/005.2-taxonomy-complete-expansion/spec.md) |
 | 010 | Visual Testing Complete | Implemented | 2026-04-17 | 2026-04-17 | [spec](features/010-visual-testing-complete/spec.md) |
 | 011 | Visual Migrate Integration | Implemented | 2026-04-17 | 2026-04-17 | [spec](features/011-visual-migrate-integration/spec.md) |
+| 012 | Brainstorm Ingestion | Implemented | 2026-04-29 | 2026-04-29 | [spec](features/012-brainstorm-ingestion/spec.md), [plan](features/012-brainstorm-ingestion/plan.md) |
 <!-- readme:features:end -->
 
 ---
@@ -71,6 +72,9 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-04-29 | Feature | [Feature 012] Implemented: Brainstorm Ingestion — `livespec brainstorm` CLI added, import flows documented |
+| 2026-04-29 | Plan | [Feature 012] Plan created: Brainstorm Ingestion — 11 implementation steps, 4 diagrams |
+| 2026-04-29 | Spec | [Feature 012] Spec created: Brainstorm Ingestion — 4 stories, 15 AC, 15 FR |
 | 2026-04-17 | Feature | [Feature 011] Implemented: Visual Migrate Integration — 11 integration tests, command-layer guards documented |
 | 2026-04-17 | Spec | [Feature 011] Spec created: Visual Migrate Integration — 4 stories, 12 AC, 11 FR |
 | 2026-04-17 | Feature | [Feature 010] Implemented: Visual Testing Complete — downstream Playwright scaffolding added; pytest suite remains green |
