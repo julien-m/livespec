@@ -3,7 +3,7 @@
 > Reusable hardened-step template for all `commands/*.md` and `agents/livespec-*.md` files.
 > Injected via `<!-- @import system/anti-drift-block.md -->` directive at the top of each target.
 >
-> Goal: standardise the *form* of every step (prerequisite, evidence, success, failure) so executors
+> Goal: standardise the *form* of every step (the 6 canonical fields defined in §1) so executors
 > cannot silently skip, reorder, or lose state. This block addresses **Chantier 1 from AUDIT.md**
 > and resolves the recurring "Top optimisations to apply" findings shared across all sections.
 >
@@ -14,9 +14,21 @@
 
 ## 1. Per-step canonical shape (6 fields)
 
-Every numbered step in a command or agent file should expose the following sub-fields. Implementers
-may use Markdown headers, bullet lists, or inline prose, but each sub-field MUST be present and
-verifiable.
+Every numbered step in a command or agent file MUST expose the following 6 sub-fields, **using these
+exact names as written**. They are the canonical labels — references in this block (§4, §5) and in
+all reviews target these names verbatim. Implementers may use Markdown headers, bullet lists, or
+inline prose, but each named sub-field MUST be present and observably verifiable.
+
+| # | Canonical field name | Purpose |
+|---|----------------------|---------|
+| 1 | `Prerequisite` | What must be true before this step starts. |
+| 2 | `Required inputs` | Files, env vars, tools, credentials, or prior-step outputs consumed. |
+| 3 | `Action` | One specific, executable instruction (exact command or tool call when known). |
+| 4 | `Execution evidence` | Observable proof captured BEFORE advancing (path, exit code, hash, line count, quoted output). |
+| 5 | `Success criteria` | Observable conditions verified BEFORE moving to step N+1. |
+| 6 | `Failure handling` | Retry policy + which canonical line (ERROR §2 or BLOCKED §2) to emit on failure. |
+
+Reference template (use the names from the table above, do NOT rename them):
 
 ```markdown
 ### Step N — <imperative verb + object>
@@ -62,14 +74,21 @@ ERROR step=<N> type=<command_failed|timeout|missing_dependency|permission_denied
 
 ### BLOCKED (policy denial or unmet prerequisite)
 
+The BLOCKED line is **always 3 segments separated by ` - `**, with no exception. This single shape
+is reused everywhere in this block (including §5's final report line):
+
 ```
-BLOCKED at step <N> - policy_blocked - <one-line reason>
+BLOCKED at step <N> - <subtype> - <one-line reason>
 ```
 
-- Use `policy_blocked` as the sub-type when a tool/skill is denied by sandbox, hooks, or permissions.
-- For other prerequisites (e.g., missing file expected by Step N), substitute `policy_blocked`
-  with `prerequisite_unmet`, `dependency_unmet`, or `state_invalid` as applicable, while keeping
-  the same shape.
+- `<N>` — the failing step's numeric ID.
+- `<subtype>` — chosen from this closed set:
+  - `policy_blocked` — tool/skill denied by sandbox, hooks, or permissions.
+  - `prerequisite_unmet` — a Step N-1 success criterion is not met.
+  - `dependency_unmet` — a required input file/tool is missing.
+  - `state_invalid` — pipeline/progress state is in an unexpected shape.
+  - `verification_failed` — final consistency check (§5) failed.
+- `<one-line reason>` — single-line, no quotes, ≤120 chars.
 
 After emitting BLOCKED, the executor MUST stop. It does NOT silently substitute alternate commands,
 prompt the user (unless explicitly authorised), or skip ahead.
@@ -127,10 +146,11 @@ checklist when programmatic verification is unavailable):
 - [ ] Every command call respects the policy from §3, or declares its override inline.
 - [ ] Every "Success criteria" entry is observable (file path, exit code, hash, count, or quoted output).
 - [ ] No `[NEEDS CLARIFICATION]`, `[ASSUMED]`, or `<placeholder>` tokens remain unresolved.
-- [ ] Final report line is exactly `DONE` or `BLOCKED at step N - <one-line reason>` — no
-      "should", "probably", or "hopefully".
+- [ ] Final report line is exactly `DONE` or the canonical BLOCKED line from §2
+      (`BLOCKED at step <N> - <subtype> - <one-line reason>`) — no "should", "probably", or "hopefully".
 
-If any checkbox fails, emit the corresponding ERROR/BLOCKED line and stop. Do NOT report DONE.
+If any checkbox fails, emit the corresponding ERROR/BLOCKED line (using the §2 shape) and stop.
+Do NOT report DONE. The subtype for a §5 failure is `verification_failed`.
 
 ---
 
