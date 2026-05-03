@@ -235,6 +235,30 @@ class TestMigrateVisualGuards:
             f"Expected error about missing directory, got: {result.stderr}"
         )
 
+    # @spec FR-010: Same guard must apply to --dry-run and --scan, not only --generate.
+    # Regression test for Codex AMEND on fix/migrate-visual-test-failures: without this,
+    # a non-LiveSpec dir invoked with --dry-run silently exited 0 with reason=no-frontend
+    # instead of surfacing the more fundamental "Missing .specs/features/" error.
+    @pytest.mark.parametrize("mode_flag", ["--dry-run", "--scan"])
+    def test_nonzero_exit_on_missing_specs_dir_for_other_modes(
+        self, tmp_path: Path, mode_flag: str
+    ) -> None:
+        """FR-010: --dry-run and --scan must also exit non-zero when .specs/features/ is missing."""
+        result = subprocess.run(
+            ["node", str(SCRIPT_PATH), mode_flag],
+            cwd=str(tmp_path),
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        assert result.returncode != 0, (
+            f"Expected non-zero exit for {mode_flag} with missing .specs/features/, "
+            f"got returncode={result.returncode}, stdout={result.stdout!r}"
+        )
+        assert "Missing .specs/features/" in result.stderr, (
+            f"Expected error about missing directory for {mode_flag}, got stderr={result.stderr!r}"
+        )
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Frontend mode fixtures and helpers

@@ -1401,7 +1401,10 @@ if (!scan && !generate && !dryRun) {
 // @spec FR-010: Non-zero exit guard — a missing LiveSpec project is a more
 // fundamental error than a missing frontend; surface it first so callers can
 // distinguish "wrong directory" from "intentionally no frontend".
-if (generate && !existsSync(SPECS_DIR)) {
+// Applies to every mode that consumes .specs/features/ (--generate, --dry-run, --scan).
+// The inner scanFeatures() check is kept as a defensive guard for any future
+// caller that reaches scanFeatures() without going through this top-level branch.
+if ((generate || dryRun || scan) && !existsSync(SPECS_DIR)) {
   console.error(`Missing .specs/features/ directory. Is this a LiveSpec project?`);
   process.exit(1);
 }
