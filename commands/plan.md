@@ -191,6 +191,8 @@ Mark each gate as ✅ or add a note if deviation is needed.
 
 ### Step 6 — Generate Mermaid Diagrams
 
+> **`--diagram-only` flag behavior:** When invoked with `--diagram-only`/`-D`, the command jumps directly to this step. It reads the existing `plan.md`, regenerates ONLY the Mermaid diagrams (sequence, state, ER) using the decision table below, and writes them back in place — without re-running Steps 1–5 or Steps 7–10. The rest of `plan.md` (file-by-file plan, testing strategy, contracts, README/changelog updates) is left untouched. Fails with `BLOCKED` if `plan.md` does not yet exist.
+
 #### Decision: Which diagrams to generate?
 
 | Condition | Gherkin | Mermaid |
