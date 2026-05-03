@@ -173,3 +173,7 @@ Thumbs.db
 .claude/agents/livespec-*.md
 .specs/.livespec-path
 playwright-report/
+
+# Local audit reports (consultative, not versioned)
+AUDIT.md
+AUDIT-CODEX.md
