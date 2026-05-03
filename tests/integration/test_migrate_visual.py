@@ -93,16 +93,22 @@ class TestMigrateVisualGenerate:
         assert existing_file.read_text() == original_content, "Existing test file was modified"
 
     # @spec FR-005: Create baseline dirs, AC-003 — spec.md#fr-005
+    # Note: as of multi-surface v8, baselines are co-located with tests under
+    # <TEST_DIR>/baselines/ (see scripts/migrate-visual-tests.js:66), not at
+    # the project root.
     def test_creates_baseline_directories(self, fixture_migrate_visual: Path) -> None:
         """FR-005, AC-003: all 6 baseline subdirs created per scaffolded feature."""
         result = _run_generate(fixture_migrate_visual)
         assert result.returncode == 0
 
         baseline_subdirs = ["mockups", "fullpage", "mobile", "tablet", "desktop", "animations"]
+        baselines_root = fixture_migrate_visual / "tests" / "visual" / "baselines"
         for feature_slug in ["auth-ui", "dashboard"]:
             for subdir in baseline_subdirs:
-                d = fixture_migrate_visual / "baselines" / subdir / feature_slug
-                assert d.exists(), f"Missing baseline dir: baselines/{subdir}/{feature_slug}/"
+                d = baselines_root / subdir / feature_slug
+                assert d.exists(), (
+                    f"Missing baseline dir: tests/visual/baselines/{subdir}/{feature_slug}/"
+                )
 
     # @spec AC-008: Idempotent on second run — spec.md#ac-008
     def test_idempotent_on_second_run(self, fixture_migrate_visual: Path) -> None:

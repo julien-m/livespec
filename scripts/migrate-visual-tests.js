@@ -1398,6 +1398,14 @@ if (!scan && !generate && !dryRun) {
   process.exit(1);
 }
 
+// @spec FR-010: Non-zero exit guard — a missing LiveSpec project is a more
+// fundamental error than a missing frontend; surface it first so callers can
+// distinguish "wrong directory" from "intentionally no frontend".
+if (generate && !existsSync(SPECS_DIR)) {
+  console.error(`Missing .specs/features/ directory. Is this a LiveSpec project?`);
+  process.exit(1);
+}
+
 if (!hasWebFrontend && !args.includes('--force')) {
   console.log('\nNo web frontend detected — visual scaffolding skipped.');
   console.log('Use --force to generate anyway (e.g. projects using Playwright without a JS framework).');
