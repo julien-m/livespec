@@ -3,6 +3,10 @@ description: "Verify spec vs code alignment and produce gap report"
 argument-hint: "<feature-name>"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.check
 
 > Compare spec vs actual code — find gaps, verify AC coverage, detect visual drift.

@@ -3,6 +3,10 @@ description: "Audit test coverage, generate missing tests, execute suite, verify
 argument-hint: "<feature-name>"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 <!-- @spec FR-001: component-level snapshots, FR-002: reset-baselines workflow, FR-003: docker-compose gen, FR-004: human approval gate, FR-005: auto mode blocking, FR-006: maxDiffPixels threshold — .specs/features/003-visual-testing-fidelity/spec.md#fr-001 -->
 
 # Command: /spec.test

@@ -3,6 +3,10 @@ description: "Auto-implement from plan: analyze, code, test, map"
 argument-hint: "<feature-name>"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.implement
 
 > APEX-style auto-pipeline: implement → test → visual baselines → map to spec.

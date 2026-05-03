@@ -3,6 +3,10 @@ description: "Full feature pipeline: specify → plan → review → implement �
 argument-hint: "[feature description]"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.feature
 
 > End-to-end feature pipeline — chains specify, plan, plan review, and implement with validation gates between each phase.

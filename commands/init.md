@@ -2,6 +2,10 @@
 description: "Initialize LiveSpec in a project through a 3-phase conversational brainstorm"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.init
 
 > Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
