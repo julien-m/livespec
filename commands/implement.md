@@ -151,6 +151,8 @@ To avoid large accidental edits:
 
 ### Phase 0.5 — Preflight Check (Light)
 
+> **Phase numbering note (Chantier 4 / Feature 013):** There is intentionally no `Phase 1` in this command — Phase 1 was historically a separate "Analyze" step that has been collapsed into Phase 2 (Plan Execution). The preflight check is numbered 0.5 to mark its position between the Preflight Safety Contract (no number) and Phase 2. Implementations must NOT insert a Phase 1; the next phase after 0.5 is always Phase 2.
+
 After verifying spec/plan files exist (Preflight Safety Contract), run a light preflight check to verify tools and access are ready:
 
 1. If `.specs/preflight.md` does not exist → log warning: "No preflight manifest found. Run `/spec.preflight --regenerate` to create one." and continue to Phase 2
@@ -206,7 +208,13 @@ For each trait declared in `## Behavioral AC`:
 
 Règle globale: un step ne peut passer à `Done` que si ses vérifications sont vertes (ou `Blocked` documenté).
 
-> **MANDATORY: `progress.md` must be created at Step 1 and updated after EVERY step.**
+> **MANDATORY: `progress.md` must exist before any step is marked Done, and updated after EVERY step.**
+> Creation site (Chantier 4 / Feature 013):
+> - If the spec contains a `## Behavioral AC` section → Step 0a creates `progress.md` (writes its own checkpoint when test files are RED).
+> - Otherwise → Step 1 creates `progress.md` as its first action (before any code is written).
+>
+> In both cases the file MUST exist before any step transitions to `Done`. Step Gate is the single enforcement point and refuses to advance if `progress.md` is missing. The file is created exactly once per feature; subsequent steps only append/update entries.
+>
 > This file is the only mechanism enabling `--resume`. Skipping it is NOT allowed.
 > If the implementation is interrupted without `progress.md`, all progress is lost.
 
@@ -316,7 +324,7 @@ The subagent will auto-activate the `superpowers:subagent-driven-development` sk
 
 **On Superpowers completion:** receive the list of files created/modified, FR/AC addressed, and test results. Feed these into the Step Gate (Phase 2) to write the `progress.md` checkpoint.
 
-**Execution logs:** By default, a detailed execution log is saved to `.specs/features/NNN-feature-name/logs/YYYY-MM-DD.md` after completion. Use `--no-save` to disable.
+**Execution logs:** By default, a detailed execution log is saved to `.specs/features/{feature_slug}/logs/YYYY-MM-DD.md` after completion (where `{feature_slug}` is the resolved `NNN-feature-name` from `commands/feature.md § Identity Resolution`). This path is mirrored by `agents/livespec-documenter.md` Step 5 — both writers must converge on the same directory. Use `--no-save` to disable.
 
 ### Phase 5 — Visual Baselines (TDD Phase 5: UI features only)
 

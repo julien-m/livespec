@@ -81,7 +81,7 @@ Create/update all final documentation artifacts.
 
 4. **`.specs/README.md`** — Update feature row status (Implemented or In Progress), regenerate Recent Activity from changelog (last 10 entries), update `Last updated` date.
 
-5. **Execution log** — Write to `.specs/features/NNN/logs/YYYY-MM-DD.md` with step summary, files, test results, and timing.
+5. **Execution log** — Write to `.specs/features/{feature_slug}/logs/YYYY-MM-DD.md` with step summary, files, test results, and timing. The `{feature_slug}` is the resolved `NNN-feature-name` value passed via the Universal Agent Context (see `commands/feature.md § Identity Resolution`). This path is the single canonical location for execution logs across documenter and implementer — see `commands/implement.md § Phase 4` for the mirrored convention.
 
 ## Rules
 
