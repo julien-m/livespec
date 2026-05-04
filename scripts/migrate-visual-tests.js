@@ -169,8 +169,64 @@ function matchedUIKeywords(content) {
   return UI_KEYWORDS.filter(kw => lower.includes(kw));
 }
 
-// Infer the most likely URL route from a feature slug + spec content
+// Cache of { surfaceId → [{ slug, route }] } built lazily from surfaces' routesDir
+const ROUTE_EXTS = ['.tsx', '.jsx', '.vue', '.ts', '.js'];
+const ROUTE_SUBDIR_CANDIDATES = ['app/routes', 'src/app/routes', 'src/routes', 'src/pages', 'pages'];
+let _surfaceRoutesCache = null;
+
+function listSurfaceRoutes() {
+  if (_surfaceRoutesCache) return _surfaceRoutesCache;
+  const all = [];
+  for (const surface of SURFACES) {
+    const dirs = new Set();
+    if (surface.routesDir && existsSync(surface.routesDir)) dirs.add(surface.routesDir);
+    for (const sub of ROUTE_SUBDIR_CANDIDATES) {
+      const dir = surface.path && surface.path !== '.' ? join(surface.path, sub) : sub;
+      if (existsSync(dir)) dirs.add(dir);
+    }
+    for (const dir of dirs) {
+      try {
+        for (const file of readdirSync(dir)) {
+          if (file.startsWith('_') || file.startsWith('.')) continue;
+          if (!ROUTE_EXTS.some(ext => file.endsWith(ext))) continue;
+          const fileSlug = file.replace(/\.(tsx|jsx|vue|ts|js)$/, '');
+          const route = fileSlug === 'index' ? '/' : `/${fileSlug}`;
+          all.push({ slug: fileSlug, route, dir, surfaceId: surface.id });
+        }
+      } catch { /* skip unreadable dir */ }
+    }
+  }
+  _surfaceRoutesCache = all;
+  return all;
+}
+
+// Match a feature slug against actual route files discovered in surfaces' routesDir
+function findRouteInSurfaces(slug) {
+  const routes = listSurfaceRoutes();
+  if (routes.length === 0) return null;
+
+  const exact = routes.find(r => r.slug === slug);
+  if (exact) return exact.route;
+
+  const slugMatch = routes.find(r => slug === r.slug || slug.endsWith(`-${r.slug}`) || slug.startsWith(`${r.slug}-`));
+  if (slugMatch) return slugMatch.route;
+
+  const partial = routes.find(r => r.slug !== 'index' && (slug.includes(r.slug) || r.slug.includes(slug)));
+  if (partial) return partial.route;
+
+  return null;
+}
+
+// Infer the most likely URL route from a feature slug + spec content.
+// Resolution order:
+//   1. Actual route file in any configured surface's routesDir (authoritative)
+//   2. ROUTE_MAP slug heuristic (legacy fallback)
+//   3. Backtick-quoted /path in spec content
+//   4. Default '/'
 function inferRouteFromFeature(slug, specPath) {
+  const surfaceRoute = findRouteInSurfaces(slug);
+  if (surfaceRoute) return surfaceRoute;
+
   if (ROUTE_MAP[slug]) return ROUTE_MAP[slug];
   for (const [key, route] of Object.entries(ROUTE_MAP)) {
     if (slug.includes(key)) return route;

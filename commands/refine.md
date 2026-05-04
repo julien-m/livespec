@@ -505,6 +505,10 @@ Report any new gaps.
 
 ### Step 7 — Apply and Record
 
+<!-- @spec FR-006: Acquire .specs/.LOCK around README/changelog updates — .specs/features/015-global-write-locks/spec.md#fr-006 -->
+
+> **Concurrency safety (Chantier 3 / Feature 015):** all writes touching `.specs/changelog.md`, `.specs/README.md`, or `.specs/roadmap.md` MUST be wrapped in `validator.locks.acquire_lock(specs_root)` and use `validator.locks.write_with_hash_check`. Per-feature files (`plan.md`, feature-scoped `changelog.md`) are not under the global lock. See [`system/locks.md`](../system/locks.md).
+
 1. Apply changes to `plan.md`
 2. Add entry to `.specs/features/NNN-*/changelog.md`:
 

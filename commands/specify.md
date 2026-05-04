@@ -620,6 +620,22 @@ After `spec.md` has been successfully written to the feature directory:
 
 ### Step 7.5 — Update README.md
 
+<!-- @spec FR-005: Acquire .specs/.LOCK before Steps 7.5/7.6 — .specs/features/015-global-write-locks/spec.md#fr-005 -->
+
+> **Concurrency safety (Chantier 3 / Feature 015):** Steps 7.5, 7.6, and 7.7 all write to global `.specs/` files (`README.md`, `changelog.md`, `roadmap.md`). They MUST run inside a single critical section guarded by `validator.locks.acquire_lock(specs_root)`, and each individual write MUST go through `validator.locks.write_with_hash_check(target, content)`. See [`system/locks.md`](../system/locks.md) for the full primitives.
+>
+> Reference Python skeleton:
+> ```python
+> from validator.locks import acquire_lock, write_with_hash_check
+> with acquire_lock(specs_root):
+>     write_with_hash_check(specs_root / "README.md", new_readme_content)
+>     write_with_hash_check(specs_root / "features" / slug / "changelog.md", feature_changelog)
+>     write_with_hash_check(specs_root / "changelog.md", new_global_changelog)
+>     write_with_hash_check(specs_root / "roadmap.md", new_roadmap)
+> ```
+>
+> If lock acquisition times out → emit `BLOCKED at step 7.5 - policy_blocked - .specs/.LOCK timeout (10s)`. If a hash mismatch is detected → emit `BLOCKED at step 7.5 - state_invalid - hash mismatch on <path>`.
+
 Add a new row to the Features table in `.specs/README.md` (between `<!-- readme:features:start -->` and `<!-- readme:features:end -->` markers):
 
 | NNN | Feature Name | Draft | YYYY-MM-DD | YYYY-MM-DD | [spec](features/NNN-feature-name/spec.md) |
