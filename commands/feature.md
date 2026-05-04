@@ -101,6 +101,11 @@ This convention is mirrored by `agents/livespec-documenter.md § Step 5` and `co
 
 ## PHASE_RESULT Schemas
 
+<!-- @spec FR-001: PHASE_RESULT JSON schema — .specs/features/014-supervisor-contracts/spec.md#fr-001 -->
+<!-- @spec FR-004: Regex-anchored parser — .specs/features/014-supervisor-contracts/spec.md#fr-004 -->
+
+> **Canonical contract (Chantier 2 / Feature 014):** the JSON-with-delimiter format defined in [`system/contracts/PHASE_RESULT.md`](../system/contracts/PHASE_RESULT.md) is the canonical form going forward. The legacy key-value blocks documented below remain parseable for backward compatibility but emit a `DeprecationWarning`. Use [`validator/contracts.py`](../validator/contracts.py) `parse_phase_result()` to consume agent output.
+
 Each phase agent **must** output a PHASE_RESULT block as its **last output**. The main context parses these fields to drive gates, branch proposals, and pipeline state updates. Field names are exact — no deviation.
 
 ### Universal Agent Contract

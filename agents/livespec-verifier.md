@@ -8,6 +8,10 @@ model: sonnet
 <!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
 <!-- @import system/anti-drift-block.md -->
 
+<!-- @spec FR-006: Activation Contract — .specs/features/014-supervisor-contracts/spec.md#fr-006 -->
+<!-- Activation Contract injected via @import (Chantier 2 / Feature 014). See system/contracts/ACTIVATION_CONTRACT.md for the full reference. -->
+<!-- @import system/activation-contract.md -->
+
 
 ## Activation Contract (Hard Gate)
 
