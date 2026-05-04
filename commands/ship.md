@@ -2,6 +2,10 @@
 description: "Batch autopilot: ship multiple features from roadmap end-to-end"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.ship
 
 > Batch autopilot — selects features from the roadmap and runs `/spec.feature --auto --branch` for each, with preflight, audit, merge, and roadmap updates.

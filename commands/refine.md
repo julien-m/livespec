@@ -3,6 +3,10 @@ description: "Refine existing spec artifacts through guided conversation"
 argument-hint: "<target>"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.refine
 
 > Iteratively refine existing LiveSpec artifacts (project, feature spec, or plan) through guided conversation — without risking downstream inconsistencies.

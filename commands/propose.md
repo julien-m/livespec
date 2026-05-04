@@ -2,6 +2,10 @@
 description: "Analyze project context and propose the next feature(s) to build"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.propose
 
 > Analyze the full project context — vision, users, roles, existing features, and optional roadmap — and intelligently propose the next feature(s) to build, with priority reasoning.

@@ -3,6 +3,10 @@ description: "Create a new feature spec with user stories, Mermaid flowcharts, A
 argument-hint: "<feature description>"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.specify
 
 > Create a new feature spec with user stories, Mermaid flowcharts, acceptance criteria, and functional requirements.

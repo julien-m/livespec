@@ -3,6 +3,10 @@ description: "Show, create, or edit lifecycle hooks for a command"
 argument-hint: "[command-name]"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.hooks
 
 > Display which lifecycle hooks are active, or create/edit hooks for any `/spec.*` command.

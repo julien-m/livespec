@@ -2,6 +2,10 @@
 description: "Upgrade a LiveSpec project to the latest version by running pending migrations"
 ---
 
+<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
+<!-- @import system/anti-drift-block.md -->
+
+
 # Command: /spec.migrate
 
 > Upgrade a LiveSpec project to the latest version by applying pending migrations sequentially.
