@@ -211,9 +211,9 @@ class TestReserveNnn:
         # Alternative: monkey-patch _scan_max_nnn.
         from validator import locks as locks_module
 
-        original = locks_module._scan_max_nnn
+        original = locks_module._scan_max_nnn  # type: ignore[attr-defined]
         try:
-            locks_module._scan_max_nnn = lambda _features_dir: 3  # type: ignore[assignment]
+            locks_module._scan_max_nnn = lambda _features_dir: 3  # type: ignore[assignment, attr-defined]
             with pytest.raises(NnnCollisionError):
                 reserve_nnn(specs, "test")  # candidate = 004-test, exists w/o marker
         finally:
