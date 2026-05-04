@@ -728,7 +728,10 @@ function buildSpecAwareTests(acRows) {
 
 // ────────────────────────────────────────────────────────────────────────────
 
-// Generate E2E test template for Pencil/frontend mode
+// Generate E2E test template for Pencil/frontend mode.
+// The template is self-contained: it resolves the repo root from the generated
+// file location, loads optional fixtures, and emits the standard visual-regression
+// flow (full page, empty state, header, responsive, plus spec-aware extras).
 // @spec AC-003: compare code to mockup — spec.md#ac-003
 // @spec AC-004: 2% tolerance — spec.md#ac-004
 // @spec AC-005: warn + fallback when mockup missing — spec.md#ac-005
@@ -838,6 +841,7 @@ function findRepoRoot(startDir) {
   while (dir !== '/' && dir !== '.') {
     if (existsSync(join(dir, '.specs'))) return dir;
     const parent = dirname(dir);
+    // Stop at the filesystem root so broken scaffolds fail loudly instead of looping forever.
     if (parent === dir) break;
     dir = parent;
   }
@@ -849,7 +853,7 @@ const FEATURE = '${slug}';
 const ROUTE = '${route}'; // Inferred from spec — update if incorrect
 const HEADING = '${heading}'; // Update if actual <h1> text differs
 const MOCKUP_DIR = join(REPO_ROOT, '${mockupAbsPath}');
-const TOLERANCE = 0.02; // 2% tolerance for anti-aliasing
+const TOLERANCE = 0.02; // 2% tolerance absorbs anti-aliasing drift without masking real layout regressions.
 
 test.describe('${heading} @visual', () => {
 ${beforeEachBlock}
@@ -1031,7 +1035,9 @@ function deleteSupersededTests(allCoveredRoutes, dryRun, mergeResults = new Map(
   return removed;
 }
 
-// Generate legacy template for projects without frontend/tests/e2e/
+// Generate the legacy template for projects without frontend/tests/e2e/.
+// This keeps the old baseline layout intact while using the same repo-root
+// resolution strategy as the modern template so monorepo launches still work.
 function generateLegacyTemplate(feature) {
   const { dir, slug, specPath } = feature;
 
@@ -1071,6 +1077,7 @@ function findRepoRoot(startDir) {
   while (dir !== '/' && dir !== '.') {
     if (existsSync(join(dir, '.specs'))) return dir;
     const parent = dirname(dir);
+    // Stop at the filesystem root so broken scaffolds fail loudly instead of looping forever.
     if (parent === dir) break;
     dir = parent;
   }
@@ -1081,7 +1088,7 @@ const REPO_ROOT = findRepoRoot(__dirname);
 const FEATURE = '${slug}';
 const ROUTE = '${route}'; // Inferred — update if incorrect
 const MOCKUP_DIR = join(REPO_ROOT, '${TEST_DIR}', 'baselines/mockups', FEATURE);
-const TOLERANCE = 0.02;
+const TOLERANCE = 0.02; // 2% tolerance absorbs anti-aliasing drift without masking real layout regressions.
 
 test.describe('Visual tests: ${title}', () => {
 
