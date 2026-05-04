@@ -103,7 +103,7 @@ Instead of formatted text, output a JSON structure:
 ### Summary Header
 
 ```
-📊 LiveSpec Status — [Project Name]
+LiveSpec Status — [Project Name]
 
   Roadmap:  12 items (4 ✅ specified, 8 ⬜ pending) · 2 deferred
   Features: 4 specs (1 Implemented, 1 In Progress, 1 Planned, 1 Draft)

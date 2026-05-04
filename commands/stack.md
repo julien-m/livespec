@@ -288,7 +288,7 @@ After creating the ADR and updating `_default.md`:
    b. Preserve Custom section (between `<!-- preflight:custom:start/end -->` markers)
    c. Deduplicate — do not overwrite existing checks
    d. Show diff: "Stack modified. Preflight updated: 2 checks added (vercel CLI, vercel-oauth), 1 check removed (heroku)."
-   e. Commit updated `preflight.md`
+   e. Commit updated `preflight.md` via the `/git.commit` skill (do NOT invoke `git commit` directly — see `~/.claude/projects/claude-skills/projects/git-command/kit/rules/commit-via-skill.md`)
 2. If `.specs/preflight.md` does not exist → skip silently (project may not use preflight yet)
 
 ---

@@ -59,7 +59,6 @@ flowchart TD
 |---|---|
 | `--auto`, `-a` | Skip confirmation, generate plan silently |
 | `--no-contracts`, `-C` | Skip API contract generation |
-| `--diagram-only`, `-D` | Regenerate only the Mermaid diagrams in an existing plan |
 | `--no-review`, `-N` | Skip LLM plan review (review runs by default) |
 | `--all-reviewers`, `-R` | Use all configured reviewers (default: first only) |
 

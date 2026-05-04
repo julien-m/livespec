@@ -39,7 +39,7 @@ flowchart TD
 
 If `command-name` is provided:
 - Strip `spec.` prefix if present (e.g., `spec.plan` → `plan`)
-- Validate it matches a known command: `init`, `propose`, `specify`, `plan`, `implement`, `check`, `explain`, `stack`, `feature`, `refine`, `preflight`, `play-coverage`
+- Validate it matches a known command: `init`, `propose`, `specify`, `plan`, `implement`, `check`, `explain`, `stack`, `feature`, `refine`, `preflight`, `play-coverage`, `ship`, `fix`, `test`, `hooks`, `migrate`, `status`, `refresh-conventions`
 
 If no `command-name` is provided:
 - Show hooks for ALL commands (summary view)
@@ -110,19 +110,28 @@ Hooks for /spec.plan:
 ```
 LiveSpec Hooks Summary:
 
-  Command       Before              After
-  ─────────     ─────────           ─────────
-  init          —                   —
-  specify       project             —
-  plan          global + project    global
-  implement     global + local      —
-    step        project             project + local
-  check         —                   —
-  explain       —                   —
-  stack         —                   —
-  feature       project             —
-  refine        —                   —
-  preflight     —                   —
+  Command              Before              After
+  ─────────            ─────────           ─────────
+  init                 —                   —
+  propose              —                   —
+  specify              project             —
+  plan                 global + project    global
+  implement            global + local      —
+    step               project             project + local
+  check                —                   —
+  explain              —                   —
+  stack                —                   —
+  feature              project             —
+  refine               —                   —
+  preflight            —                   —
+  play-coverage        —                   —
+  ship                 —                   —
+  fix                  —                   —
+  test                 —                   —
+  hooks                —                   —
+  migrate              —                   —
+  status               —                   —
+  refresh-conventions  —                   —
 
   Legend: global = ~/.claude/livespec/hooks/
           project = .specs/hooks/*.md (committed)

@@ -117,7 +117,7 @@ Compare the Features table in `.specs/README.md` with actual directories on disk
 
 | Check | Status | Details |
 |---|---|---|
-| System files | ✅ Pass | All 7 system files present |
+| System files | ✅ Pass | All 8 system files present |
 | Stack config | ✅ Pass | `_default.md` has no [TBD] |
 | ADRs | ✅ Pass | 3 ADRs found |
 | Feature naming | ⚠️ Warning | Gap: 001, 002, 005 (missing 003-004) |
