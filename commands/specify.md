@@ -201,26 +201,47 @@ Before generating spec.md, check the target feature directory for seed context:
 
 3. **Seeded attribution:** When generating spec.md from a seed, the `Input` section must include a note: `Seeded from [parent-feature-number-name] -- see seed.absorbed.md for original context.`
 
-### Step 2 — Auto-Number the Feature
+### Step 2 — Auto-Number the Feature (atomic reservation)
+
+<!-- @spec FR-001: Atomic NNN reservation — .specs/features/015-global-write-locks/spec.md#fr-001 -->
+
+> **Concurrency safety (Chantier 3 / Feature 015):** the previous "scan + increment + mkdir" sequence was racy — two parallel runs could allocate the same NNN. Use [`validator.locks.reserve_nnn(specs_root, name)`](../validator/locks.py) instead, which:
+> 1. Computes `nnn = max(existing) + 1`
+> 2. Calls `mkdir(features/NNN-name)` atomically (fails fast on `EEXIST`)
+> 3. Writes a `.reserved` marker inside the new directory
+> 4. Returns `NnnReservation(slug, directory, resumed=False)` on success
+> 5. Raises `NnnCollisionError` if the target directory exists without a marker (foreign creation)
+>
+> Steps 1–4 below describe the conceptual flow; the implementation is the single `reserve_nnn()` call.
 
 1. Scan `.specs/features/` for existing directories
 2. Find the highest existing number (e.g., `003-*`)
 3. Increment to get the next number (e.g., `004`)
 4. Zero-pad to 3 digits: `004`
 
-```
-.specs/features/
-├── 001-user-auth/
-├── 002-job-listings/
-├── 003-messaging/
-└── 004-notifications/     ← New feature gets NNN=004
+```python
+from pathlib import Path
+from validator.locks import reserve_nnn, NnnCollisionError
+
+try:
+    reservation = reserve_nnn(Path(".specs"), "notifications")
+except NnnCollisionError as exc:
+    raise SystemExit(f"BLOCKED at step 2 - state_invalid - NNN collision: {exc}")
+
+print(reservation.slug)        # → "004-notifications"
+print(reservation.directory)   # → .specs/features/004-notifications/
 ```
 
 ### Step 3 — Create Feature Directory
 
-```bash
-mkdir -p .specs/features/004-notifications
-```
+The directory is already created by `reserve_nnn` in Step 2 (atomicity requires
+the `mkdir` to be the reservation primitive itself). This step is a no-op when
+Step 2's `reserve_nnn` succeeds; it remains documented for callers that bypass
+`reserve_nnn` (e.g., manual setup, migration tooling) — those callers must
+ensure the directory exists before Step 4.
+
+After spec.md is fully written and committed (typically at the end of Step 7.7),
+call `release_reservation(reservation)` to remove the `.reserved` marker.
 
 ### Step 4 — Read Context Files
 
@@ -619,6 +640,22 @@ After `spec.md` has been successfully written to the feature directory:
 4. **Skip if no seed:** If neither `seed.md` nor `seed.absorbed.md` exists, skip this step silently.
 
 ### Step 7.5 — Update README.md
+
+<!-- @spec FR-005: Acquire .specs/.LOCK before Steps 7.5/7.6 — .specs/features/015-global-write-locks/spec.md#fr-005 -->
+
+> **Concurrency safety (Chantier 3 / Feature 015):** Steps 7.5, 7.6, and 7.7 all write to global `.specs/` files (`README.md`, `changelog.md`, `roadmap.md`). They MUST run inside a single critical section guarded by `validator.locks.acquire_lock(specs_root)`, and each individual write MUST go through `validator.locks.write_with_hash_check(target, content)`. See [`system/locks.md`](../system/locks.md) for the full primitives.
+>
+> Reference Python skeleton:
+> ```python
+> from validator.locks import acquire_lock, write_with_hash_check
+> with acquire_lock(specs_root):
+>     write_with_hash_check(specs_root / "README.md", new_readme_content)
+>     write_with_hash_check(specs_root / "features" / slug / "changelog.md", feature_changelog)
+>     write_with_hash_check(specs_root / "changelog.md", new_global_changelog)
+>     write_with_hash_check(specs_root / "roadmap.md", new_roadmap)
+> ```
+>
+> If lock acquisition times out → emit `BLOCKED at step 7.5 - policy_blocked - .specs/.LOCK timeout (10s)`. The `10s` budget comes from the lock primitive's default CLI-facing timeout: long enough to cover the README/changelog/roadmap write burst, short enough to fail fast instead of leaving concurrent `/spec.*` runs waiting indefinitely. If a hash mismatch is detected → emit `BLOCKED at step 7.5 - state_invalid - hash mismatch on <path>`.
 
 Add a new row to the Features table in `.specs/README.md` (between `<!-- readme:features:start -->` and `<!-- readme:features:end -->` markers):
 

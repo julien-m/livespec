@@ -169,8 +169,64 @@ function matchedUIKeywords(content) {
   return UI_KEYWORDS.filter(kw => lower.includes(kw));
 }
 
-// Infer the most likely URL route from a feature slug + spec content
+// Cache of { surfaceId → [{ slug, route }] } built lazily from surfaces' routesDir
+const ROUTE_EXTS = ['.tsx', '.jsx', '.vue', '.ts', '.js'];
+const ROUTE_SUBDIR_CANDIDATES = ['app/routes', 'src/app/routes', 'src/routes', 'src/pages', 'pages'];
+let _surfaceRoutesCache = null;
+
+function listSurfaceRoutes() {
+  if (_surfaceRoutesCache) return _surfaceRoutesCache;
+  const all = [];
+  for (const surface of SURFACES) {
+    const dirs = new Set();
+    if (surface.routesDir && existsSync(surface.routesDir)) dirs.add(surface.routesDir);
+    for (const sub of ROUTE_SUBDIR_CANDIDATES) {
+      const dir = surface.path && surface.path !== '.' ? join(surface.path, sub) : sub;
+      if (existsSync(dir)) dirs.add(dir);
+    }
+    for (const dir of dirs) {
+      try {
+        for (const file of readdirSync(dir)) {
+          if (file.startsWith('_') || file.startsWith('.')) continue;
+          if (!ROUTE_EXTS.some(ext => file.endsWith(ext))) continue;
+          const fileSlug = file.replace(/\.(tsx|jsx|vue|ts|js)$/, '');
+          const route = fileSlug === 'index' ? '/' : `/${fileSlug}`;
+          all.push({ slug: fileSlug, route, dir, surfaceId: surface.id });
+        }
+      } catch { /* skip unreadable dir */ }
+    }
+  }
+  _surfaceRoutesCache = all;
+  return all;
+}
+
+// Match a feature slug against actual route files discovered in surfaces' routesDir
+function findRouteInSurfaces(slug) {
+  const routes = listSurfaceRoutes();
+  if (routes.length === 0) return null;
+
+  const exact = routes.find(r => r.slug === slug);
+  if (exact) return exact.route;
+
+  const slugMatch = routes.find(r => slug === r.slug || slug.endsWith(`-${r.slug}`) || slug.startsWith(`${r.slug}-`));
+  if (slugMatch) return slugMatch.route;
+
+  const partial = routes.find(r => r.slug !== 'index' && (slug.includes(r.slug) || r.slug.includes(slug)));
+  if (partial) return partial.route;
+
+  return null;
+}
+
+// Infer the most likely URL route from a feature slug + spec content.
+// Resolution order:
+//   1. Actual route file in any configured surface's routesDir (authoritative)
+//   2. ROUTE_MAP slug heuristic (legacy fallback)
+//   3. Backtick-quoted /path in spec content
+//   4. Default '/'
 function inferRouteFromFeature(slug, specPath) {
+  const surfaceRoute = findRouteInSurfaces(slug);
+  if (surfaceRoute) return surfaceRoute;
+
   if (ROUTE_MAP[slug]) return ROUTE_MAP[slug];
   for (const [key, route] of Object.entries(ROUTE_MAP)) {
     if (slug.includes(key)) return route;
@@ -490,8 +546,17 @@ function extractHeadingFromRouteFile(content, slug) {
     .join(' ');
 }
 
-// Auto-detect the routes directory from ROUTES_DIRS
+// Auto-detect the routes directory.
+// Surfaces from .specs/surfaces.yaml are authoritative (each surface's
+// routesDir is resolved by surface-resolver.js relative to its own path,
+// so monorepos like apps/web/app/routes work). Falls back to repo-root
+// ROUTES_DIRS for legacy single-surface layouts.
 function detectRoutesDir() {
+  for (const surface of SURFACES) {
+    if (surface.routesDir && existsSync(surface.routesDir)) {
+      return surface.routesDir;
+    }
+  }
   return ROUTES_DIRS.find(d => existsSync(d)) || null;
 }
 
@@ -663,7 +728,10 @@ function buildSpecAwareTests(acRows) {
 
 // ────────────────────────────────────────────────────────────────────────────
 
-// Generate E2E test template for Pencil/frontend mode
+// Generate E2E test template for Pencil/frontend mode.
+// The template is self-contained: it resolves the repo root from the generated
+// file location, loads optional fixtures, and emits the standard visual-regression
+// flow (full page, empty state, header, responsive, plus spec-aware extras).
 // @spec AC-003: compare code to mockup — spec.md#ac-003
 // @spec AC-004: 2% tolerance — spec.md#ac-004
 // @spec AC-005: warn + fallback when mockup missing — spec.md#ac-005
@@ -744,6 +812,8 @@ function generateE2ETemplate(feature, analysis = {}, externalSpecCtx = null) {
 
   return `import { test, expect } from '@playwright/test';
 import { existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import * as path from 'path';${fixturesImport}
 
 // Visual tests for: ${title}
@@ -761,11 +831,29 @@ import * as path from 'path';${fixturesImport}
 //
 // Full guide: docs/visual-testing/README.md
 
+// Resolve from THIS file's location (not process.cwd()) so the test works
+// whether Playwright is launched from the repo root or from a sub-app like
+// apps/web/. Walks parents until a .specs/ directory is found.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+function findRepoRoot(startDir) {
+  let dir = startDir;
+  while (dir !== '/' && dir !== '.') {
+    if (existsSync(join(dir, '.specs'))) return dir;
+    const parent = dirname(dir);
+    // Stop at the filesystem root so broken scaffolds fail loudly instead of looping forever.
+    if (parent === dir) break;
+    dir = parent;
+  }
+  throw new Error('.specs/ not found in any parent directory of ' + startDir);
+}
+const REPO_ROOT = findRepoRoot(__dirname);
+
 const FEATURE = '${slug}';
 const ROUTE = '${route}'; // Inferred from spec — update if incorrect
 const HEADING = '${heading}'; // Update if actual <h1> text differs
-const MOCKUP_DIR = path.join(process.cwd(), '${mockupAbsPath}');
-const TOLERANCE = 0.02; // 2% tolerance for anti-aliasing
+const MOCKUP_DIR = join(REPO_ROOT, '${mockupAbsPath}');
+const TOLERANCE = 0.02; // 2% tolerance absorbs anti-aliasing drift without masking real layout regressions.
 
 test.describe('${heading} @visual', () => {
 ${beforeEachBlock}
@@ -947,7 +1035,9 @@ function deleteSupersededTests(allCoveredRoutes, dryRun, mergeResults = new Map(
   return removed;
 }
 
-// Generate legacy template for projects without frontend/tests/e2e/
+// Generate the legacy template for projects without frontend/tests/e2e/.
+// This keeps the old baseline layout intact while using the same repo-root
+// resolution strategy as the modern template so monorepo launches still work.
 function generateLegacyTemplate(feature) {
   const { dir, slug, specPath } = feature;
 
@@ -961,6 +1051,8 @@ function generateLegacyTemplate(feature) {
 
   return `import { test, expect } from '@playwright/test';
 import { existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import * as path from 'path';
 
 // Visual tests for: ${title}
@@ -975,10 +1067,28 @@ import * as path from 'path';
 //
 // Full guide: docs/visual-testing/README.md
 
+// Resolve from THIS file's location (not process.cwd()) so the test works
+// whether Playwright is launched from the repo root or from a sub-app like
+// apps/web/. Walks parents until a .specs/ directory is found.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+function findRepoRoot(startDir) {
+  let dir = startDir;
+  while (dir !== '/' && dir !== '.') {
+    if (existsSync(join(dir, '.specs'))) return dir;
+    const parent = dirname(dir);
+    // Stop at the filesystem root so broken scaffolds fail loudly instead of looping forever.
+    if (parent === dir) break;
+    dir = parent;
+  }
+  throw new Error('.specs/ not found in any parent directory of ' + startDir);
+}
+const REPO_ROOT = findRepoRoot(__dirname);
+
 const FEATURE = '${slug}';
 const ROUTE = '${route}'; // Inferred — update if incorrect
-const MOCKUP_DIR = path.join(process.cwd(), '${TEST_DIR}', 'baselines/mockups', FEATURE);
-const TOLERANCE = 0.02;
+const MOCKUP_DIR = join(REPO_ROOT, '${TEST_DIR}', 'baselines/mockups', FEATURE);
+const TOLERANCE = 0.02; // 2% tolerance absorbs anti-aliasing drift without masking real layout regressions.
 
 test.describe('Visual tests: ${title}', () => {
 

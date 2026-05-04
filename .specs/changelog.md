@@ -3,7 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-03
+> Last updated: 2026-05-04
+
+---
+
+## 2026-05-04 -- Fix: Feature 010 monorepo path resolution
+
+[Feature 010] Fix: 2/2 gaps closed — generated test templates now resolve `MOCKUP_DIR` from `import.meta.url` (parent walker for `.specs/`) instead of `process.cwd()`, and `detectRoutesDir()` consults surface-aware paths from `surfaces.yaml` before falling back to repo-root scan. Unblocks Playwright runs from sub-apps in monorepos.
 
 ---
 

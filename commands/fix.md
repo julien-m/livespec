@@ -246,6 +246,10 @@ After all fixes are applied:
 
 ### Step 8 — Update Artifacts
 
+<!-- @spec FR-007: Acquire .specs/.LOCK around all global writes in Step 8 — .specs/features/015-global-write-locks/spec.md#fr-007 -->
+
+> **Concurrency safety (Chantier 3 / Feature 015):** Step 8 touches feature-scoped files (`implementation.md`, baselines, screen index, feature `changelog.md`) AND global files (`.specs/changelog.md`, `.specs/README.md`). All writes to global files MUST be wrapped in `validator.locks.acquire_lock(specs_root)` and use `validator.locks.write_with_hash_check`. Feature-scoped writes are outside the lock. See [`system/locks.md`](../system/locks.md) for the API.
+
 1. **Update `implementation.md`:**
    - Add/update FR→code mappings for fixed FRs
    - Add/update AC→test mappings for fixed ACs
