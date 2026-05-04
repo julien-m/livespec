@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-15'
+current_state: Done
+feature_slug: 005-ui-behavioral-testing
+owner_command: spec.feature
+schema_version: 1
+updated_at: '2026-04-15'
+---
+
 # Pipeline — 005-ui-behavioral-testing
 
 **Started:** 2026-04-14 17:10

@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # @spec FR-002: Canonical slug regex — spec.md#fr-002
-SLUG_REGEX = re.compile(r"^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$")
+SLUG_REGEX = re.compile(r"^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$")
 
 # Literal placeholder used in command markdown as a template variable.
 # It MUST never appear as a resolved slug.
@@ -83,10 +83,12 @@ def _next_nnn(specs_root: Path) -> str:
         return "001"
 
     max_nnn = 0
+    # Match the leading 3-digit NNN (ignore optional .M sub-feature suffix when
+    # computing the next top-level NNN — sub-features reuse their parent's NNN).
     for entry in features_dir.iterdir():
         if not entry.is_dir():
             continue
-        match = re.match(r"^(\d{3})-", entry.name)
+        match = re.match(r"^(\d{3})", entry.name)
         if match:
             max_nnn = max(max_nnn, int(match.group(1)))
     return f"{max_nnn + 1:03d}"

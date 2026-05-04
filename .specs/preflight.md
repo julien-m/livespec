@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-13'
+current_state: Done
+feature_slug: '-'
+owner_command: spec.preflight
+schema_version: 1
+updated_at: '2026-04-13'
+---
+
 # Preflight Manifest
 
 > Auto-generated from stack by `spec.init --from-code` on 2026-04-13. Editable — changes are preserved on regeneration.

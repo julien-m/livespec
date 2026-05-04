@@ -134,7 +134,16 @@ class TestSlugRegex:
 
     def test_regex_pattern_matches_documentation(self) -> None:
         # If this test breaks, system/identity.md must be updated to match.
-        assert SLUG_REGEX.pattern == r"^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$"
+        assert SLUG_REGEX.pattern == r"^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$"
+
+    def test_regex_accepts_subfeatures(self) -> None:
+        # Sub-features (NNN.M-name) are a real LiveSpec convention — see
+        # .specs/features/005.1-behavioral-tdd-audit/ for example.
+        assert SLUG_REGEX.match("005.1-behavioral-tdd-audit") is not None
+        assert SLUG_REGEX.match("005.2-taxonomy-complete-expansion") is not None
+        # But malformed sub-numbers are still rejected
+        assert SLUG_REGEX.match("005.-foo") is None
+        assert SLUG_REGEX.match("005.a-foo") is None
 
     def test_regex_rejects_placeholder(self) -> None:
         # The placeholder uses alphabetic 'NNN', not digits, so the regex naturally rejects it.

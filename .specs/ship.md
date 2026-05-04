@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-14'
+current_state: Done
+feature_slug: '-'
+owner_command: spec.ship
+schema_version: 1
+updated_at: '2026-04-14'
+---
+
 # Ship Session
 
 **Started:** 2026-04-14

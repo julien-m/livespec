@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-16'
+current_state: Done
+feature_slug: 008-feature-seed
+owner_command: spec.implement
+schema_version: 1
+updated_at: '2026-04-16'
+---
+
 # Progress — 008 Feature Seed
 
 | Step | Description | Status | Timestamp |

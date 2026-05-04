@@ -336,6 +336,17 @@ def validate(
             "ship.md, preflight.md (Chantier 4 / Feature 013)"
         ),
     ),
+    migrate: bool = typer.Option(
+        False,
+        "--migrate",
+        help=(
+            "Used with --state-files: add the canonical frontmatter to legacy state "
+            "files in place. Existing keys are preserved (no overwrite); body content "
+            "is preserved verbatim. Inferences: feature_slug from path, dates from git "
+            "log (filesystem mtime fallback), current_state from body markers (Done by "
+            "default for historical files)."
+        ),
+    ),
 ) -> None:
     """Validate .specs/ files structurally.
 
@@ -383,9 +394,38 @@ def validate(
 
     # @spec FR-006: state-files validation — .specs/features/013-state-model-identity-resolution/spec.md#fr-006  # noqa: E501
     if state_files:
-        from .state_files import validate_state_files
+        from .state_files import migrate_state_files, validate_state_files
 
         specs_root = _require_specs_root(Path(path) if path else None)
+
+        if migrate:
+            mig_report = migrate_state_files(specs_root)
+            typer.echo(
+                f"Migrated {mig_report.files_checked} state file(s): "
+                f"{mig_report.added_count} added, "
+                f"{mig_report.completed_count} completed, "
+                f"{mig_report.already_compliant_count} already compliant."
+            )
+            for outcome in mig_report.outcomes:
+                if outcome.action != "already_compliant":
+                    typer.echo(f"  {outcome}")
+            # Re-validate after migration to confirm 0 violations
+            sf_report = validate_state_files(specs_root)
+            if sf_report.ok:
+                typer.echo(
+                    f"OK: post-migration re-validation confirms "
+                    f"{sf_report.files_checked} file(s) compliant."
+                )
+                raise typer.Exit(0)
+            typer.echo(
+                f"WARN: {len(sf_report.violations)} violation(s) remain after migration "
+                f"(some files could not be auto-migrated):",
+                err=True,
+            )
+            for violation in sf_report.violations:
+                typer.echo(f"  {violation}", err=True)
+            raise typer.Exit(0 if warn_only else 1)
+
         sf_report = validate_state_files(specs_root)
         if sf_report.ok:
             typer.echo(

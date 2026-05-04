@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-13'
+current_state: Done
+feature_slug: 001-auto-llm-review
+owner_command: spec.feature
+schema_version: 1
+updated_at: '2026-04-13'
+---
+
 # Pipeline — 001-auto-llm-review
 
 **Started:** 2026-04-13 11:04

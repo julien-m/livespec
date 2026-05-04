@@ -1,7 +1,13 @@
 ---
-feature: 004-visual-testing-governance
 created: 2026-04-14
+created_at: '2026-04-14'
+current_state: Done
+feature: 004-visual-testing-governance
+feature_slug: 004-visual-testing-governance
+owner_command: spec.implement
+schema_version: 1
 updated: 2026-04-14
+updated_at: '2026-04-14'
 ---
 
 # Progress: Visual Testing Governance
