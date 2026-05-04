@@ -546,8 +546,17 @@ function extractHeadingFromRouteFile(content, slug) {
     .join(' ');
 }
 
-// Auto-detect the routes directory from ROUTES_DIRS
+// Auto-detect the routes directory.
+// Surfaces from .specs/surfaces.yaml are authoritative (each surface's
+// routesDir is resolved by surface-resolver.js relative to its own path,
+// so monorepos like apps/web/app/routes work). Falls back to repo-root
+// ROUTES_DIRS for legacy single-surface layouts.
 function detectRoutesDir() {
+  for (const surface of SURFACES) {
+    if (surface.routesDir && existsSync(surface.routesDir)) {
+      return surface.routesDir;
+    }
+  }
   return ROUTES_DIRS.find(d => existsSync(d)) || null;
 }
 
@@ -800,6 +809,8 @@ function generateE2ETemplate(feature, analysis = {}, externalSpecCtx = null) {
 
   return `import { test, expect } from '@playwright/test';
 import { existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import * as path from 'path';${fixturesImport}
 
 // Visual tests for: ${title}
@@ -817,10 +828,27 @@ import * as path from 'path';${fixturesImport}
 //
 // Full guide: docs/visual-testing/README.md
 
+// Resolve from THIS file's location (not process.cwd()) so the test works
+// whether Playwright is launched from the repo root or from a sub-app like
+// apps/web/. Walks parents until a .specs/ directory is found.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+function findRepoRoot(startDir) {
+  let dir = startDir;
+  while (dir !== '/' && dir !== '.') {
+    if (existsSync(join(dir, '.specs'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  throw new Error('.specs/ not found in any parent directory of ' + startDir);
+}
+const REPO_ROOT = findRepoRoot(__dirname);
+
 const FEATURE = '${slug}';
 const ROUTE = '${route}'; // Inferred from spec — update if incorrect
 const HEADING = '${heading}'; // Update if actual <h1> text differs
-const MOCKUP_DIR = path.join(process.cwd(), '${mockupAbsPath}');
+const MOCKUP_DIR = join(REPO_ROOT, '${mockupAbsPath}');
 const TOLERANCE = 0.02; // 2% tolerance for anti-aliasing
 
 test.describe('${heading} @visual', () => {
@@ -1017,6 +1045,8 @@ function generateLegacyTemplate(feature) {
 
   return `import { test, expect } from '@playwright/test';
 import { existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import * as path from 'path';
 
 // Visual tests for: ${title}
@@ -1031,9 +1061,26 @@ import * as path from 'path';
 //
 // Full guide: docs/visual-testing/README.md
 
+// Resolve from THIS file's location (not process.cwd()) so the test works
+// whether Playwright is launched from the repo root or from a sub-app like
+// apps/web/. Walks parents until a .specs/ directory is found.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+function findRepoRoot(startDir) {
+  let dir = startDir;
+  while (dir !== '/' && dir !== '.') {
+    if (existsSync(join(dir, '.specs'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  throw new Error('.specs/ not found in any parent directory of ' + startDir);
+}
+const REPO_ROOT = findRepoRoot(__dirname);
+
 const FEATURE = '${slug}';
 const ROUTE = '${route}'; // Inferred — update if incorrect
-const MOCKUP_DIR = path.join(process.cwd(), '${TEST_DIR}', 'baselines/mockups', FEATURE);
+const MOCKUP_DIR = join(REPO_ROOT, '${TEST_DIR}', 'baselines/mockups', FEATURE);
 const TOLERANCE = 0.02;
 
 test.describe('Visual tests: ${title}', () => {

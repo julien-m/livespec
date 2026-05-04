@@ -1,5 +1,19 @@
 # Changelog — Feature 010: Visual Testing Complete
 
+## 2026-05-04 — Fix: Monorepo path resolution — MOCKUP_DIR + detectRoutesDir surface-aware
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `scripts/migrate-visual-tests.js` (both `generateE2ETemplate` and `generateLegacyTemplate` test templates; `detectRoutesDir()` helper)
+- **Gaps closed:**
+  - Generated test templates resolved `MOCKUP_DIR` via `process.cwd()`, which broke when Playwright was launched from a sub-app (e.g. `apps/web/` in a monorepo) — the scaffold then looked for `apps/web/.specs/design/screens/` instead of `<repo-root>/.specs/design/screens/`. Templates now derive `REPO_ROOT` from `import.meta.url` and walk parent directories until a `.specs/` folder is found, so the test works regardless of CWD or nesting depth.
+  - `detectRoutesDir()` only scanned the repo-root `ROUTES_DIRS` array and ignored surface-aware paths from `.specs/surfaces.yaml` — meaning monorepo layouts like `apps/web/app/routes` were invisible. It now consults `SURFACES[*].routesDir` (resolved by `scripts/lib/surface-resolver.js`) before falling back to the legacy scan.
+- **Verification:** `node --check` passes; 33/33 `tests/integration/test_migrate_visual.py` pass; source contains 4 `findRepoRoot` occurrences (2 templates × declaration + invocation), 0 functional `process.cwd()` calls in template literals.
+- **Remaining:** None
+- **Author:** spec.fix
+
+---
+
 ## 2026-04-18 — Fix: Generated test template upgraded — exhaustive tests + Playwright API corrected
 
 - **Type:** Bug Fix
