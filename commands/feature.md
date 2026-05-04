@@ -60,7 +60,11 @@ flowchart TD
 
 ## Identity Resolution (Chantier 4 / Feature 013)
 
-> **Critical:** every reference to `NNN-feature-name` in this command file is a **template variable**, not a literal value. The actual `feature_slug` (e.g. `013-state-model-identity-resolution`) MUST be resolved BEFORE any side-effect — including the first `livespec pipeline init` call.
+<!-- @spec FR-001: Single resolve_feature_slug helper — .specs/features/013-state-model-identity-resolution/spec.md#fr-001 -->
+<!-- @spec FR-002: Pre-side-effect resolution — .specs/features/013-state-model-identity-resolution/spec.md#fr-002 -->
+<!-- @spec FR-009: Reject literal placeholder — .specs/features/013-state-model-identity-resolution/spec.md#fr-009 -->
+
+> **Critical:** every reference to `NNN-feature-name` in this command file is a **template variable**, not a literal value. The actual `feature_slug` (e.g. `013-state-model-identity-resolution`) MUST be resolved BEFORE any side-effect — including the first `livespec pipeline init` call. Implementation: [`validator/identity.py`](../validator/identity.py); reference: [`system/identity.md`](../system/identity.md).
 
 ### Resolution rules
 
@@ -580,6 +584,11 @@ In `--auto` mode: no confirmation prompts, proceeds automatically.
 ## Resume (`--resume`)
 
 ### State machine (Chantier 4 / Feature 013)
+
+<!-- @spec FR-003: State machine reference — .specs/features/013-state-model-identity-resolution/spec.md#fr-003 -->
+<!-- @spec FR-004: Hard halt on Blocked — .specs/features/013-state-model-identity-resolution/spec.md#fr-004 -->
+
+See [`system/state-machine.md`](../system/state-machine.md) for the full state set, allowed transitions, and resume rules.
 
 Each phase in `pipeline.md` is in exactly one of four states:
 

@@ -327,6 +327,15 @@ def validate(
         "--sdk-isolated",
         help="Run Layer 3 SDK-isolated tests (pytest -m level_3b)",
     ),
+    # @spec FR-006: state-files validator subcommand — .specs/features/013-state-model-identity-resolution/spec.md#fr-006  # noqa: E501
+    state_files: bool = typer.Option(
+        False,
+        "--state-files",
+        help=(
+            "Validate the shared frontmatter schema across pipeline.md, progress.md, "
+            "ship.md, preflight.md (Chantier 4 / Feature 013)"
+        ),
+    ),
 ) -> None:
     """Validate .specs/ files structurally.
 
@@ -371,6 +380,26 @@ def validate(
     if staged and path:
         typer.echo("Error: --staged and PATH are mutually exclusive", err=True)
         raise typer.Exit(1)
+
+    # @spec FR-006: state-files validation — .specs/features/013-state-model-identity-resolution/spec.md#fr-006  # noqa: E501
+    if state_files:
+        from .state_files import validate_state_files
+
+        specs_root = _require_specs_root(Path(path) if path else None)
+        sf_report = validate_state_files(specs_root)
+        if sf_report.ok:
+            typer.echo(
+                f"OK: {sf_report.files_checked} state file(s) checked, no schema violation."
+            )
+            raise typer.Exit(0)
+        typer.echo(
+            f"FAIL: {len(sf_report.violations)} schema violation(s) "
+            f"across {sf_report.files_checked} state file(s):",
+            err=True,
+        )
+        for violation in sf_report.violations:
+            typer.echo(f"  {violation}", err=True)
+        raise typer.Exit(0 if warn_only else 1)
 
     # @spec FR-001: --sdk-isolated flag routing — .specs/features/002-layer-3-cli-surface/spec.md#fr-001  # noqa: E501
     if sdk_isolated:
