@@ -22,12 +22,17 @@ This document defines the canonical rules; the Python module enforces them.
 ## The `feature_slug` regex
 
 ```
-^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$
+^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$
 ```
 
 - 3-digit zero-padded NNN (`001`–`999`)
+- Optional `.M` sub-feature suffix (e.g. `005.1`, `005.2`) — used when a feature is split into derivative work tracked under the same parent number
 - A hyphen separator
 - Kebab-case name (lowercase letters and digits, hyphen-separated, no leading/trailing hyphen)
+
+Examples:
+- `013-state-model-identity-resolution` (top-level feature)
+- `005.1-behavioral-tdd-audit` (sub-feature of 005)
 
 The literal string `NNN-feature-name` MUST never match this regex (the `NNN` part is alphabetic, not digits) and is additionally rejected explicitly by `parse_slug` and `resolve_feature_slug`.
 

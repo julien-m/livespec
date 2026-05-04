@@ -224,7 +224,10 @@ def write_with_hash_check(target: Path, content: str, encoding: str = "utf-8") -
 
 # ─── NNN reservation (FR-001) ────────────────────────────────────────────────
 
-_NNN_REGEX = re.compile(r"^(\d{3})-")
+# Match the leading 3-digit NNN; the optional .M sub-feature suffix (e.g. 005.1)
+# is intentionally not captured because sub-features share their parent's NNN
+# slot when computing the next top-level reservation.
+_NNN_REGEX = re.compile(r"^(\d{3})")
 
 
 def _scan_max_nnn(features_dir: Path) -> int:

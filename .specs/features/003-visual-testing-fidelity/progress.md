@@ -1,8 +1,14 @@
 ---
-type: progress
-feature: 003-visual-testing-fidelity
 created: 2026-04-14
+created_at: '2026-04-14'
+current_state: Done
+feature: 003-visual-testing-fidelity
+feature_slug: 003-visual-testing-fidelity
+owner_command: spec.implement
+schema_version: 1
+type: progress
 updated: 2026-04-14
+updated_at: '2026-04-14'
 ---
 
 # Implementation Progress: Visual Testing Fidelity

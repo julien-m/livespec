@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-17'
+current_state: Done
+feature_slug: 005.2-taxonomy-complete-expansion
+owner_command: spec.feature
+schema_version: 1
+updated_at: '2026-04-17'
+---
+
 # Pipeline — Taxonomy Complete Expansion
 
 **Started:** 2026-04-17

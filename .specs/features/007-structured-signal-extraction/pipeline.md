@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-15'
+current_state: Done
+feature_slug: 007-structured-signal-extraction
+owner_command: spec.feature
+schema_version: 1
+updated_at: '2026-04-15'
+---
+
 # Pipeline — 007-structured-signal-extraction
 
 **Started:** 2026-04-15 15:08

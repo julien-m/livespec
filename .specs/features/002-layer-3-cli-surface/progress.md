@@ -1,9 +1,15 @@
 ---
-type: progress
-title: Layer 3 CLI Surface
-feature: 002-layer-3-cli-surface
 created: 2026-04-13
+created_at: '2026-04-13'
+current_state: Done
+feature: 002-layer-3-cli-surface
+feature_slug: 002-layer-3-cli-surface
+owner_command: spec.implement
+schema_version: 1
+title: Layer 3 CLI Surface
+type: progress
 updated: 2026-04-13
+updated_at: '2026-04-13'
 ---
 
 # Progress: Layer 3 CLI Surface

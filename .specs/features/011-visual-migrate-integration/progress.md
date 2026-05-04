@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-17'
+current_state: Done
+feature_slug: 011-visual-migrate-integration
+owner_command: spec.implement
+schema_version: 1
+updated_at: '2026-04-17'
+---
+
 # Progress — 011-visual-migrate-integration
 
 | Step | Status | Files | Tests run | Result | Updated at |

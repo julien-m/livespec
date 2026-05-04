@@ -1,3 +1,12 @@
+---
+created_at: '2026-04-15'
+current_state: Done
+feature_slug: 006-taxonomy-testing-infra
+owner_command: spec.feature
+schema_version: 1
+updated_at: '2026-04-15'
+---
+
 # Pipeline — 006-taxonomy-testing-infra
 
 **Started:** 2026-04-15 13:39

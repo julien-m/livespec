@@ -97,9 +97,39 @@ Exit code: `0` on no violations, `1` otherwise. Add `--warn-only` to always exit
 
 ## Migration of legacy state files
 
-Existing state files (created before Chantier 4) generally carry partial frontmatter — typically the spec metadata (date, status) but not the schema fields above. Two migration paths:
+Existing state files created before Chantier 4 generally lack the canonical frontmatter. The validator ships with `--migrate` to add the missing fields in place:
 
-1. **Manual** — edit each state file to add the required keys. Recommended when the file count is low.
-2. **Automated** — a one-shot migration is left as a follow-up (validator could grow a `--state-files --migrate` flag that infers `feature_slug` from the path, sets `schema_version: 1`, `created_at` from filesystem mtime, and `current_state: Pending` as a safe default).
+```bash
+livespec validate --state-files --migrate
+```
 
-Until migration is complete, run `livespec validate --state-files --warn-only` to surface violations without failing the build.
+**Inference rules:**
+
+| Field | Inferred from |
+|-------|---------------|
+| `schema_version` | Constant `1` |
+| `owner_command` | File basename: `pipeline.md` → `spec.feature`, `progress.md` → `spec.implement`, `ship.md` → `spec.ship`, `preflight.md` → `spec.preflight` |
+| `feature_slug` | Path: `.specs/features/<slug>/` → `<slug>`; `.specs/<file>` (project-global) → `"-"` |
+| `created_at` | First commit date from `git log --diff-filter=A`; filesystem mtime as fallback |
+| `updated_at` | Last commit date from `git log -1`; filesystem mtime as fallback |
+| `current_state` | Body markers (`Blocked`/`In Progress`/`Done`); defaults to `Done` for historical files |
+
+**Merge strategy:**
+
+- Missing keys are added.
+- Existing keys whose value passes the schema are preserved verbatim.
+- Existing keys whose value fails the schema are replaced with the inferred default.
+- Body content (after the frontmatter block) is preserved byte-for-byte.
+
+**Output:**
+
+```
+Migrated 23 state file(s): 0 added, 4 completed, 19 already compliant.
+  /path/to/pipeline.md: completed [feature_slug] (fixed: feature_slug)
+  ...
+OK: post-migration re-validation confirms 23 file(s) compliant.
+```
+
+After migration, the body of each file is intact and the frontmatter is canonical. The migration is idempotent: re-running `--migrate` on an already-compliant tree is a no-op.
+
+Manual editing remains supported and is preferred when you want to set specific values (e.g., a `current_state` other than the inferred default).
