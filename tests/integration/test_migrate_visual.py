@@ -93,16 +93,22 @@ class TestMigrateVisualGenerate:
         assert existing_file.read_text() == original_content, "Existing test file was modified"
 
     # @spec FR-005: Create baseline dirs, AC-003 — spec.md#fr-005
+    # Note: as of multi-surface v8, baselines are co-located with tests under
+    # <TEST_DIR>/baselines/ (see scripts/migrate-visual-tests.js:66), not at
+    # the project root.
     def test_creates_baseline_directories(self, fixture_migrate_visual: Path) -> None:
         """FR-005, AC-003: all 6 baseline subdirs created per scaffolded feature."""
         result = _run_generate(fixture_migrate_visual)
         assert result.returncode == 0
 
         baseline_subdirs = ["mockups", "fullpage", "mobile", "tablet", "desktop", "animations"]
+        baselines_root = fixture_migrate_visual / "tests" / "visual" / "baselines"
         for feature_slug in ["auth-ui", "dashboard"]:
             for subdir in baseline_subdirs:
-                d = fixture_migrate_visual / "baselines" / subdir / feature_slug
-                assert d.exists(), f"Missing baseline dir: baselines/{subdir}/{feature_slug}/"
+                d = baselines_root / subdir / feature_slug
+                assert d.exists(), (
+                    f"Missing baseline dir: tests/visual/baselines/{subdir}/{feature_slug}/"
+                )
 
     # @spec AC-008: Idempotent on second run — spec.md#ac-008
     def test_idempotent_on_second_run(self, fixture_migrate_visual: Path) -> None:
@@ -227,6 +233,30 @@ class TestMigrateVisualGuards:
         assert result.returncode != 0, "Expected non-zero exit for missing .specs/features/"
         assert "Missing .specs/features/" in result.stderr, (
             f"Expected error about missing directory, got: {result.stderr}"
+        )
+
+    # @spec FR-010: Same guard must apply to --dry-run and --scan, not only --generate.
+    # Regression test for Codex AMEND on fix/migrate-visual-test-failures: without this,
+    # a non-LiveSpec dir invoked with --dry-run silently exited 0 with reason=no-frontend
+    # instead of surfacing the more fundamental "Missing .specs/features/" error.
+    @pytest.mark.parametrize("mode_flag", ["--dry-run", "--scan"])
+    def test_nonzero_exit_on_missing_specs_dir_for_other_modes(
+        self, tmp_path: Path, mode_flag: str
+    ) -> None:
+        """FR-010: --dry-run and --scan must also exit non-zero when .specs/features/ is missing."""
+        result = subprocess.run(
+            ["node", str(SCRIPT_PATH), mode_flag],
+            cwd=str(tmp_path),
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        assert result.returncode != 0, (
+            f"Expected non-zero exit for {mode_flag} with missing .specs/features/, "
+            f"got returncode={result.returncode}, stdout={result.stdout!r}"
+        )
+        assert "Missing .specs/features/" in result.stderr, (
+            f"Expected error about missing directory for {mode_flag}, got stderr={result.stderr!r}"
         )
 
 
