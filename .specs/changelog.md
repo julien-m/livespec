@@ -1,9 +1,15 @@
 # Changelog
 
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
-> Per-feature details live in `.specs/features/NNN-feature-name/changelog.md`.
+> Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-04-17
+> Last updated: 2026-05-03
+
+---
+
+## 2026-05-03 -- Spec: Feature 013 State Model & Identity Resolution (Chantier 4)
+
+[Feature 013] Spec created: State Model & Identity Resolution — 5 stories, 10 AC, 10 FR. Addresses the most critical defects from AUDIT.md: literal `NNN-feature-name` propagation in `/spec.feature`, log path incoherence, internal contradictions in `/spec.implement`, undefined `--resume` semantics on `Blocked`, absence of shared state-file frontmatter schema.
 
 ---
 
