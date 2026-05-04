@@ -226,10 +226,34 @@ The agent executes the full pipeline autonomously: specify → spec review → p
 
 ### Step 3 — Parse Result
 
-Read the agent's output and extract the `SHIP_RESULT` block:
+<!-- @spec FR-002: SHIP_RESULT JSON schema — .specs/features/014-supervisor-contracts/spec.md#fr-002 -->
+<!-- @spec FR-005: Regex-anchored parser — .specs/features/014-supervisor-contracts/spec.md#fr-005 -->
+<!-- @spec FR-007: Validation gate before destructive git ops — .specs/features/014-supervisor-contracts/spec.md#fr-007 -->
 
-- **`SHIP_RESULT: OK`** → proceed to Step 3.5
-- **`SHIP_RESULT: BLOCKED`** → STOP (see Error Handling)
+Read the agent's output and extract the `SHIP_RESULT` block using the typed contract from [`system/contracts/SHIP_RESULT.md`](../system/contracts/SHIP_RESULT.md). Use [`validator/contracts.py`](../validator/contracts.py) `parse_ship_result()`:
+
+```python
+from validator.contracts import parse_ship_result, ContractParseError, ContractValidationError
+
+try:
+    result = parse_ship_result(agent_stdout)
+except (ContractParseError, ContractValidationError) as exc:
+    # Cannot trust this result; halt with canonical BLOCKED line
+    print(f"BLOCKED at step ship - state_invalid - SHIP_RESULT invalid: {exc}")
+    sys.exit(1)
+
+if result.status != "OK":
+    print(f"BLOCKED at step ship - state_invalid - {result.error}")
+    sys.exit(1)
+
+# Defense-in-depth: branch must match the resolved slug
+if result.branch != f"feature/{result.feature_slug}":
+    print(f"BLOCKED at step ship - state_invalid - branch/slug mismatch")
+    sys.exit(1)
+```
+
+- **`result.status == "OK"` AND branch/slug consistent** → proceed to Step 3.5
+- **Any failure above** → STOP (see Error Handling). The validation gate explicitly prevents `livespec git delete` from being invoked on a malformed or injected result.
 
 ### Step 3.5 — Test Gate
 
