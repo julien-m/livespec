@@ -58,6 +58,47 @@ flowchart TD
 
 ---
 
+## Identity Resolution (Chantier 4 / Feature 013)
+
+<!-- @spec FR-001: Single resolve_feature_slug helper — .specs/features/013-state-model-identity-resolution/spec.md#fr-001 -->
+<!-- @spec FR-002: Pre-side-effect resolution — .specs/features/013-state-model-identity-resolution/spec.md#fr-002 -->
+<!-- @spec FR-009: Reject literal placeholder — .specs/features/013-state-model-identity-resolution/spec.md#fr-009 -->
+
+> **Critical:** every reference to `NNN-feature-name` in this command file is a **template variable**, not a literal value. The actual `feature_slug` (e.g. `013-state-model-identity-resolution`) MUST be resolved BEFORE any side-effect — including the first `livespec pipeline init` call. Implementation: [`validator/identity.py`](../validator/identity.py); reference: [`system/identity.md`](../system/identity.md).
+
+### Resolution rules
+
+1. **From CLI argument:** if `/spec.feature <slug-or-description>` is invoked with a token matching the regex `^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$`, treat it as the resolved `feature_slug` and skip new-NNN allocation.
+2. **From feature description (Phase 0 path):** when no slug is provided, the supervisor MUST resolve the slug BEFORE the first `livespec pipeline init` call, by running:
+   - Scan `.specs/features/` for the highest existing NNN
+   - Increment by 1 (zero-padded to 3 digits)
+   - Slugify the description (`kebab-case`, max 60 chars)
+   - Compose `feature_slug = "{NNN}-{slug}"`
+3. **From `--resume`:** read the slug from `pipeline.md` header (or `spec.md` frontmatter as fallback) — never re-derive.
+
+### Identity guard (anti-leakage)
+
+Before spawning ANY subagent, validate the resolved `feature_slug` against this regex:
+
+```
+^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$
+```
+
+If the value is the literal string `NNN-feature-name`, contains an unresolved `<placeholder>`, or fails the regex:
+- Emit: `BLOCKED at step <N> - state_invalid - feature_slug not resolved (got: "<value>")`
+- Stop. Do NOT pass the unresolved value to any downstream phase.
+
+### Substitution convention
+
+Throughout the rest of this file, the literal string `NNN-feature-name` is a **template placeholder** for the resolved `feature_slug`. Implementations performing substitution must:
+- Replace `NNN-feature-name` everywhere it appears in CLI calls, prompts, and paths
+- Apply the regex guard above before each substitution
+- Persist the resolved slug to `pipeline.md` so `--resume` can recover it without re-derivation
+
+This convention is mirrored by `agents/livespec-documenter.md § Step 5` and `commands/implement.md § Phase 4` (execution log path), and by `commands/specify.md § Step 2` (NNN allocation site).
+
+---
+
 ## PHASE_RESULT Schemas
 
 Each phase agent **must** output a PHASE_RESULT block as its **last output**. The main context parses these fields to drive gates, branch proposals, and pipeline state updates. Field names are exact — no deviation.
@@ -542,10 +583,39 @@ In `--auto` mode: no confirmation prompts, proceeds automatically.
 
 ## Resume (`--resume`)
 
+### State machine (Chantier 4 / Feature 013)
+
+<!-- @spec FR-003: State machine reference — .specs/features/013-state-model-identity-resolution/spec.md#fr-003 -->
+<!-- @spec FR-004: Hard halt on Blocked — .specs/features/013-state-model-identity-resolution/spec.md#fr-004 -->
+
+See [`system/state-machine.md`](../system/state-machine.md) for the full state set, allowed transitions, and resume rules.
+
+Each phase in `pipeline.md` is in exactly one of four states:
+
+| State | Meaning | `--resume` behavior |
+|-------|---------|---------------------|
+| `Pending` | Not yet started | Spawn the phase agent. |
+| `In Progress` | Started but not finished (likely interrupted) | Spawn the phase agent with `--resume` in instructions; the agent reads `progress.md` (Implement only) or restarts the phase from scratch (Specify/Plan/Test). |
+| `Done` | Completed successfully | Skip; advance to next phase. |
+| `Blocked` | Hard halt — explicit failure recorded | **Do NOT advance.** Display the block reason and stop. The user must clear the block manually (fix issue → set status back to `Pending` or `In Progress`) before re-running `--resume`. |
+
+`Skipped` is reserved for phases that don't apply to the current feature (e.g., Visual Baselines on a backend-only feature) and is treated like `Done` for advancement.
+
+### Hard-halt-on-Blocked rule
+
+If `livespec pipeline next` returns a phase with status `Blocked`:
+- Emit: `BLOCKED at step <phase> - state_invalid - phase marked Blocked at <timestamp>; reason: <reason from pipeline.md>`
+- Stop. Do NOT silently advance to the next phase.
+- The user must inspect the block, resolve it, and update `pipeline.md` (manually or via `livespec pipeline update --feature <slug> --phase <phase> --status pending`) before retrying `--resume`.
+
+This rule applies recursively: if multiple phases are Blocked, the FIRST one (in pipeline order) is reported.
+
+### Resume procedure
+
 When `--resume` is provided:
 
 1. Run: `livespec pipeline read --feature NNN-feature-name`
-2. Run: `livespec pipeline next --feature NNN-feature-name` → find first phase with status != `Done` and != `Skipped`
+2. Run: `livespec pipeline next --feature NNN-feature-name` → returns the first phase with status `Pending` or `In Progress`. If the call would skip past a `Blocked` phase, halt per the rule above instead.
 3. Read `Feature Description` from the `pipeline.md` header field
 4. Assemble the **resume state envelope**:
    - `feature_name`: NNN-feature-name

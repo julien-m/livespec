@@ -147,9 +147,20 @@ Receive back: confirmation that `progress.md` is updated.
 
 Only proceed to next step if current step is `Done` (Superpowers returned passing reviews + tests).
 
+<!-- @spec FR-004: Hard halt on Blocked — .specs/features/013-state-model-identity-resolution/spec.md#fr-004 -->
+
 If Superpowers returns a failure or block:
-- Record `Blocked` in `progress.md` with the reason (from Superpowers output).
-- Continue to next step.
+- Record `Blocked` in `progress.md` with a non-empty `reason` field (from Superpowers output) and `current_state: Blocked`.
+- **Halt the execution loop immediately.** Do NOT continue to the next step.
+- Emit the canonical halt line (see [`system/anti-drift-block.md`](../system/anti-drift-block.md) §2):
+  ```
+  BLOCKED at step <N> - state_invalid - <one-line reason>
+  ```
+- Exit the agent loop. The user (or orchestrator) must resolve the block manually before re-invoking the supervisor with `--resume`.
+
+State semantics — when reading `progress.md` or `pipeline.md` at startup:
+- The supervisor MUST identify the first non-`Done` / non-`Skipped` step in pipeline order.
+- If that step is `Blocked` → emit the halt line above and exit. Never advance past a `Blocked` step silently. See [`system/state-machine.md`](../system/state-machine.md) for the full state set and resume rules.
 
 ## Final Phase
 
