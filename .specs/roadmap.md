@@ -29,6 +29,8 @@
 - [x] **Layer 3 CLI surface** — Expose Level 3b SDK-isolated validation as a distinct CLI flag (tests exist, flag not yet wired) · Scope: M --> [002-layer-3-cli-surface](features/002-layer-3-cli-surface/spec.md)
 - [x] **Visual Testing Fidelity** — Render env pinning, component-level snapshots, maxDiffPixels threshold, --reset-baselines workflow, human approval gate, migration v4 · Scope: L → [003-visual-testing-fidelity](features/003-visual-testing-fidelity/spec.md)
 - [ ] **State Model & Identity Resolution (Chantier 4 / AUDIT.md)** — Resolve feature slug once before any side-effect (eliminates literal `NNN-feature-name` propagation), unify log paths across documenter/implementer, fix internal contradictions in `/spec.implement` Phase 0.5 / `progress.md`, formalize `--resume` state machine with hard halt on `Blocked`, share frontmatter schema across `pipeline.md` / `progress.md` / `ship.md` / `preflight.md` · Scope: L · Priority: P1 → [013-state-model-identity-resolution](features/013-state-model-identity-resolution/spec.md)
+- [ ] **Supervisor↔Subagent Return Contracts (Chantier 2)** — Define typed JSON schemas (PHASE_RESULT, SHIP_RESULT, Superpowers return) + regex-anchored parsers + active filesystem verification in Activation Contracts · Scope: M · Priority: P1 → [014-supervisor-contracts](features/014-supervisor-contracts/spec.md)
+- [ ] **Global Write Locks & Atomic NNN Reservation (Chantier 3)** — File locks on `.specs/changelog.md`, `.specs/README.md`, `.specs/roadmap.md` + post-write re-read assertions + atomic NNN reservation for `spec.specify` · Scope: M · Priority: P1 → [015-global-write-locks](features/015-global-write-locks/spec.md)
 <!-- roadmap:mvp:end -->
 
 ---

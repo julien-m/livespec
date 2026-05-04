@@ -49,6 +49,8 @@
 | 010 | Visual Testing Complete | Implemented | 2026-04-17 | 2026-04-17 | [spec](features/010-visual-testing-complete/spec.md) |
 | 011 | Visual Migrate Integration | Implemented | 2026-04-17 | 2026-04-17 | [spec](features/011-visual-migrate-integration/spec.md) |
 | 013 | State Model & Identity Resolution | Draft | 2026-05-03 | 2026-05-03 | [spec](features/013-state-model-identity-resolution/spec.md) |
+| 014 | Supervisor↔Subagent Return Contracts | Draft | 2026-05-03 | 2026-05-03 | [spec](features/014-supervisor-contracts/spec.md) |
+| 015 | Global Write Locks & Atomic NNN Reservation | Draft | 2026-05-03 | 2026-05-03 | [spec](features/015-global-write-locks/spec.md) |
 <!-- Note: NNN=012 reserved for in-flight feature/012-brainstorm-ingestion (separate branch) -->
 <!-- readme:features:end -->
 
@@ -73,6 +75,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-03 | Spec | [Feature 015] Spec created: Global Write Locks & Atomic NNN Reservation — 5 stories, 10 AC, 10 FR |
+| 2026-05-03 | Spec | [Feature 014] Spec created: Supervisor↔Subagent Return Contracts — 5 stories, 10 AC, 10 FR |
 | 2026-05-03 | Spec | [Feature 013] Spec created: State Model & Identity Resolution — 5 stories, 10 AC, 10 FR |
 | 2026-04-17 | Feature | [Feature 011] Implemented: Visual Migrate Integration — 11 integration tests, command-layer guards documented |
 | 2026-04-17 | Spec | [Feature 011] Spec created: Visual Migrate Integration — 4 stories, 12 AC, 11 FR |

@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-05-03 -- Spec: Feature 015 Global Write Locks & Atomic NNN Reservation
+
+[Feature 015] Spec created: Global Write Locks & Atomic NNN Reservation — 5 stories, 10 AC, 10 FR. Implements file locks on shared .specs files + post-write re-read assertions + atomic NNN reservation for spec.specify to prevent race conditions and silent data corruption.
+
+---
+
+## 2026-05-03 -- Spec: Feature 014 Supervisor↔Subagent Return Contracts
+
+[Feature 014] Spec created: Supervisor↔Subagent Return Contracts — 5 stories, 10 AC, 10 FR. Defines typed JSON schemas (PHASE_RESULT, SHIP_RESULT, Superpowers return) + regex-anchored parsers + active filesystem verification in Activation Contracts to harden supervisor↔subagent communication.
+
+---
+
 ## 2026-05-03 -- Spec: Feature 013 State Model & Identity Resolution (Chantier 4)
 
 [Feature 013] Spec created: State Model & Identity Resolution — 5 stories, 10 AC, 10 FR. Addresses the most critical defects from AUDIT.md: literal `NNN-feature-name` propagation in `/spec.feature`, log path incoherence, internal contradictions in `/spec.implement`, undefined `--resume` semantics on `Blocked`, absence of shared state-file frontmatter schema.
