@@ -1,0 +1,5 @@
+name: go
+detect:
+  files:
+    - go.mod
+# Filled in by feature 020 (driver-go).

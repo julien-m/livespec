@@ -1,0 +1,7 @@
+name: python
+detect:
+  files:
+    - pyproject.toml
+    - setup.py
+# Capabilities are intentionally empty in feature 016 (architecture only).
+# Filled in by feature 017 (driver-python).

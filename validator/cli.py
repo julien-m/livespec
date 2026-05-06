@@ -10,6 +10,7 @@ import typer
 
 from .commit_context import commit_context_app
 from .config import load_config
+from .drivers.cli import driver_app
 from .engine import validate_all
 from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
@@ -25,6 +26,7 @@ app = typer.Typer(name="livespec", help="LiveSpec structural validator")
 app.add_typer(pipeline_app, name="pipeline")
 app.add_typer(git_app, name="git")
 app.add_typer(commit_context_app, name="commit-context")
+app.add_typer(driver_app, name="spec-driver")
 
 
 def _find_specs_root(start: Path | None = None) -> Path:

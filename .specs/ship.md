@@ -1,20 +1,30 @@
 ---
-created_at: '2026-04-14'
-current_state: Done
+created_at: '2026-05-06'
+current_state: In Progress
 feature_slug: '-'
 owner_command: spec.ship
 schema_version: 1
-updated_at: '2026-04-14'
+updated_at: '2026-05-06'
 ---
 
 # Ship Session
 
-**Started:** 2026-04-14
-**Scope:** 003-visual-testing-fidelity, 004-visual-testing-governance
-**Flags:** none
-**Base branch:** main
+**Started:** 2026-05-06
+**Scope:** 016-026 (test drivers + UI runners deps for 026)
+**Flags:** custom selection
+**Base branch:** ship/test-drivers-016-026 (off main)
+**Final merge target:** main (after all features done)
 
-| # | Feature | Status | Branch | Started | Completed |
-|---|---------|--------|--------|---------|-----------|
-| 1 | 003-visual-testing-fidelity | Done | feature/003-visual-testing-fidelity | 2026-04-14 | 2026-04-14 |
-| 2 | 004-visual-testing-governance | Done | feature/004-visual-testing-governance | 2026-04-14 | 2026-04-14 |
+| #  | Feature                                  | Status   | Branch                                     | Started    | Completed |
+|----|------------------------------------------|----------|--------------------------------------------|------------|-----------|
+| 1  | 016-cross-language-test-driver-architecture | In Progress | feature/016-cross-language-test-driver-architecture | 2026-05-06 | —         |
+| 2  | 017-driver-python                         | Pending  | —                                          | —          | —         |
+| 3  | 018-driver-typescript-javascript          | Pending  | —                                          | —          | —         |
+| 4  | 019-driver-swift                          | Pending  | —                                          | —          | —         |
+| 5  | 020-driver-go                             | Pending  | —                                          | —          | —         |
+| 6  | 021-driver-rust                           | Pending  | —                                          | —          | —         |
+| 7  | 022-driver-jvm                            | Pending  | —                                          | —          | —         |
+| 8  | 023-driver-custom-scaffolding             | Pending  | —                                          | —          | —         |
+| 9  | 024-patch-coverage-local                  | Pending  | —                                          | —          | —         |
+| 10 | 025-mutation-testing-on-demand            | Pending  | —                                          | —          | —         |
+| 11 | 026-conventions-propagation-by-stack      | Pending  | —                                          | —          | —         |
