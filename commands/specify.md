@@ -667,6 +667,14 @@ If this is the first feature, remove the `> No features yet.` hint line below th
 
 If `.specs/README.md` does not exist, create it by scanning existing artifacts (see spec-system.md README.md Recovery).
 
+**Regenerate Recent Activity** (after Step 7.6 has appended the changelog entry):
+
+1. Read `.specs/changelog.md`
+2. Extract the last 10 entries (most recent first)
+3. Rewrite the content between `<!-- readme:activity:start -->` and `<!-- readme:activity:end -->`
+
+This step keeps the README's Recent Activity table in sync with the changelog after every spec creation, mirroring the regeneration performed by `/spec.implement` and `/spec.stack`.
+
 ### Step 7.6 — Update Changelog
 
 Add a first entry to `.specs/features/NNN-feature-name/changelog.md`:

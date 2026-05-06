@@ -212,7 +212,7 @@ Persistent backlog of specs to build, organized in tiers (MVP / Post-MVP / Futur
 
 **Update rules:**
 - `/spec.init` creates it with initial content
-- `/spec.specify` adds a feature row (Status: Draft)
+- `/spec.specify` adds a feature row (Status: Draft) + regenerates Recent Activity from changelog.md
 - `/spec.plan` updates feature status to Planned
 - `/spec.implement` updates feature status to Implemented/In Progress + regenerates Recent Activity from changelog.md
 - `/spec.stack` adds ADR rows + regenerates Recent Activity
