@@ -1,0 +1,5 @@
+name: swift
+detect:
+  files:
+    - Package.swift
+# Filled in by feature 019 (driver-swift).

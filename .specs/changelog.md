@@ -7,6 +7,7 @@
 
 ---
 
+## 2026-05-06 -- [Feature 016] Implemented: Cross-Language Test Driver Architecture — 5 stories, 15 AC, 8 FR; 35 tests pass
 ## 2026-05-06 -- [Feature 034] Spec created: Preflight Auto-Install & Init via /spec.preflight --fix — 5 stories, 14 AC, 11 FR
 ## 2026-05-06 -- [Feature 033] Spec created: Smart Test Selection — 4 stories, 12 AC, 10 FR
 ## 2026-05-06 -- [Feature 032] Spec created: Pre-commit / Pre-push Test Hooks — 5 stories, 13 AC, 10 FR

@@ -1,0 +1,7 @@
+name: jvm
+detect:
+  files:
+    - build.gradle
+    - build.gradle.kts
+    - pom.xml
+# Filled in by feature 022 (driver-jvm).

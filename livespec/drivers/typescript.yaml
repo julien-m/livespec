@@ -1,0 +1,6 @@
+name: typescript
+detect:
+  files:
+    - package.json
+    - tsconfig.json
+# Filled in by feature 018 (driver-typescript-javascript).
