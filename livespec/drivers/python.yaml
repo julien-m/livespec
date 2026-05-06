@@ -1,7 +1,18 @@
+# @spec FR-001: Python driver YAML with all 4 capabilities — .specs/features/017-driver-python/spec.md#fr-001
 name: python
 detect:
   files:
     - pyproject.toml
     - setup.py
-# Capabilities are intentionally empty in feature 016 (architecture only).
-# Filled in by feature 017 (driver-python).
+    - requirements.txt
+coverage:
+  command: pytest --cov={module} --cov-report=lcov:{report_path} --cov-fail-under={threshold}
+  report_path: lcov.info
+  threshold: 80
+snapshots:
+  command: pytest --snapshot-warn-unused
+properties:
+  command: pytest -m property --hypothesis-show-statistics
+mutation:
+  command: mutmut run && mutmut results --use-coverage
+  threshold: 70
