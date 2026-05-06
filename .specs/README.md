@@ -62,6 +62,14 @@
 | 024 | Patch Coverage Local Computation | Draft | 2026-05-06 | 2026-05-06 | [spec](features/024-patch-coverage-local/spec.md) |
 | 025 | Mutation Testing On-Demand | Draft | 2026-05-06 | 2026-05-06 | [spec](features/025-mutation-testing-on-demand/spec.md) |
 | 026 | Conventions Propagation by Stack | Draft | 2026-05-06 | 2026-05-06 | [spec](features/026-conventions-propagation-by-stack/spec.md) |
+| 027 | UI Runner Architecture | Draft | 2026-05-06 | 2026-05-06 | [spec](features/027-ui-runner-architecture/spec.md) |
+| 028 | UI Runner Web (Playwright Refactor) | Draft | 2026-05-06 | 2026-05-06 | [spec](features/028-ui-runner-web/spec.md) |
+| 029 | UI Runner Tauri | Draft | 2026-05-06 | 2026-05-06 | [spec](features/029-ui-runner-tauri/spec.md) |
+| 030 | UI Runner iOS / watchOS | Draft | 2026-05-06 | 2026-05-06 | [spec](features/030-ui-runner-ios-watchos/spec.md) |
+| 031 | UI Runner Android | Draft | 2026-05-06 | 2026-05-06 | [spec](features/031-ui-runner-android/spec.md) |
+| 032 | Pre-commit / Pre-push Test Hooks | Draft | 2026-05-06 | 2026-05-06 | [spec](features/032-test-hooks-pre-commit-pre-push/spec.md) |
+| 033 | Smart Test Selection | Draft | 2026-05-06 | 2026-05-06 | [spec](features/033-smart-test-selection/spec.md) |
+| 034 | Preflight Auto-Install & Init | Draft | 2026-05-06 | 2026-05-06 | [spec](features/034-preflight-autofix/spec.md) |
 <!-- Note: NNN=012 reserved for in-flight feature/012-brainstorm-ingestion (separate branch) -->
 <!-- readme:features:end -->
 
