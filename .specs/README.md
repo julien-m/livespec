@@ -51,6 +51,17 @@
 | 013 | State Model & Identity Resolution | Draft | 2026-05-03 | 2026-05-03 | [spec](features/013-state-model-identity-resolution/spec.md) |
 | 014 | Supervisor↔Subagent Return Contracts | Draft | 2026-05-03 | 2026-05-03 | [spec](features/014-supervisor-contracts/spec.md) |
 | 015 | Global Write Locks & Atomic NNN Reservation | Draft | 2026-05-03 | 2026-05-03 | [spec](features/015-global-write-locks/spec.md) |
+| 016 | Cross-Language Test Driver Architecture | Draft | 2026-05-06 | 2026-05-06 | [spec](features/016-cross-language-test-driver-architecture/spec.md) |
+| 017 | Driver Python | Draft | 2026-05-06 | 2026-05-06 | [spec](features/017-driver-python/spec.md) |
+| 018 | Driver TypeScript/JavaScript | Draft | 2026-05-06 | 2026-05-06 | [spec](features/018-driver-typescript-javascript/spec.md) |
+| 019 | Driver Swift | Draft | 2026-05-06 | 2026-05-06 | [spec](features/019-driver-swift/spec.md) |
+| 020 | Driver Go | Draft | 2026-05-06 | 2026-05-06 | [spec](features/020-driver-go/spec.md) |
+| 021 | Driver Rust | Draft | 2026-05-06 | 2026-05-06 | [spec](features/021-driver-rust/spec.md) |
+| 022 | Driver JVM (Java + Kotlin) | Draft | 2026-05-06 | 2026-05-06 | [spec](features/022-driver-jvm/spec.md) |
+| 023 | Driver Custom Scaffolding & Graceful Degradation | Draft | 2026-05-06 | 2026-05-06 | [spec](features/023-driver-custom-scaffolding/spec.md) |
+| 024 | Patch Coverage Local Computation | Draft | 2026-05-06 | 2026-05-06 | [spec](features/024-patch-coverage-local/spec.md) |
+| 025 | Mutation Testing On-Demand | Draft | 2026-05-06 | 2026-05-06 | [spec](features/025-mutation-testing-on-demand/spec.md) |
+| 026 | Conventions Propagation by Stack | Draft | 2026-05-06 | 2026-05-06 | [spec](features/026-conventions-propagation-by-stack/spec.md) |
 <!-- Note: NNN=012 reserved for in-flight feature/012-brainstorm-ingestion (separate branch) -->
 <!-- readme:features:end -->
 

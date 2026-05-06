@@ -3,9 +3,21 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-04
+> Last updated: 2026-05-06
 
 ---
+
+## 2026-05-06 -- [Feature 026] Spec created: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR
+## 2026-05-06 -- [Feature 025] Spec created: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR
+## 2026-05-06 -- [Feature 024] Spec created: Patch Coverage Local Computation — 2 stories, 9 AC, 6 FR
+## 2026-05-06 -- [Feature 023] Spec created: Driver Custom Scaffolding & Graceful Degradation — 3 stories, 10 AC, 6 FR
+## 2026-05-06 -- [Feature 022] Spec created: Driver JVM (Java + Kotlin) — 4 stories, 11 AC, 6 FR
+## 2026-05-06 -- [Feature 021] Spec created: Driver Rust — 4 stories, 10 AC, 5 FR
+## 2026-05-06 -- [Feature 020] Spec created: Driver Go — 4 stories, 9 AC, 5 FR
+## 2026-05-06 -- [Feature 019] Spec created: Driver Swift — 4 stories, 10 AC, 6 FR
+## 2026-05-06 -- [Feature 018] Spec created: Driver TypeScript/JavaScript — 4 stories, 12 AC, 6 FR
+## 2026-05-06 -- [Feature 017] Spec created: Driver Python — 4 stories, 12 AC, 7 FR
+## 2026-05-06 -- [Feature 016] Spec created: Cross-Language Test Driver Architecture — 5 stories, 15 AC, 8 FR
 
 ## 2026-05-04 -- Fix: Feature 010 monorepo path resolution
 

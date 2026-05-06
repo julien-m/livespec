@@ -51,6 +51,17 @@
 - [ ] **Embedding reindex** — Connect embeddings to pluggable provider interface (stubbed: `--reindex` flag) · Scope: S · Deps: Layer 4
 - [ ] **Multi-model consensus** — Finalize `semantic/multi_model.py` integration (stubbed: `--experimental-multi-model` flag) · Scope: M · Deps: LLM provider
 - [ ] **JSON output for all subcommands** — `pipeline` and `git` subcommands lack `--format json` · Scope: S
+- [x] **Cross-Language Test Driver Architecture** — YAML driver system with 5 capabilities (coverage, snapshots, properties, mutation, migration). Foundation for all per-stack drivers (017-022). Self-hosted, no external service. · Scope: L · Priority: P0 → [016-cross-language-test-driver-architecture](features/016-cross-language-test-driver-architecture/spec.md)
+- [x] **Driver Python** — Built-in driver for Python stack (pytest-cov, syrupy, hypothesis, mutmut). Pilote implementation. · Scope: M · Priority: P1 · Deps: 016 → [017-driver-python](features/017-driver-python/spec.md)
+- [x] **Driver TypeScript/JavaScript** — Built-in driver for TS/JS stack (vitest/jest coverage, vitest snapshots, fast-check, Stryker). · Scope: M · Priority: P1 · Deps: 016 → [018-driver-typescript-javascript](features/018-driver-typescript-javascript/spec.md)
+- [x] **Driver Swift** — Built-in driver for Swift stack (llvm-cov via xcrun, swift-snapshot-testing, SwiftCheck, muter). Coverage gate via script. · Scope: M · Priority: P1 · Deps: 016 → [019-driver-swift](features/019-driver-swift/spec.md)
+- [x] **Driver Go** — Built-in driver for Go stack (go test -cover, go-snaps, gopter). No mutation tool. · Scope: M · Priority: P2 · Deps: 016 → [020-driver-go](features/020-driver-go/spec.md)
+- [x] **Driver Rust** — Built-in driver for Rust stack (cargo-llvm-cov, insta, proptest, cargo-mutants). · Scope: M · Priority: P2 · Deps: 016 → [021-driver-rust](features/021-driver-rust/spec.md)
+- [x] **Driver JVM (Java + Kotlin)** — Built-in driver for JVM stack (JaCoCo, approvaltests-java/kotest-snapshot, jqwik/kotest-property, pitest). Single driver for both languages. · Scope: M · Priority: P2 · Deps: 016 → [022-driver-jvm](features/022-driver-jvm/spec.md)
+- [x] **Driver Custom Scaffolding & Graceful Degradation** — livespec spec.driver --new <stack> scaffold + structured degradation message for unsupported stacks. · Scope: S · Priority: P1 · Deps: 016 → [023-driver-custom-scaffolding](features/023-driver-custom-scaffolding/spec.md)
+- [x] **Patch Coverage Local Computation** — lcov.info + git diff intersection for patch coverage without external service. · Scope: S · Priority: P2 · Deps: 016, 017 → [024-patch-coverage-local](features/024-patch-coverage-local/spec.md)
+- [x] **Mutation Testing On-Demand** — on-demand mutation testing via --mutation flag + historical report. Not in per-PR CI. · Scope: S · Priority: P3 · Deps: 016, 017 → [025-mutation-testing-on-demand](features/025-mutation-testing-on-demand/spec.md)
+- [x] **Conventions Propagation by Stack** — /spec.init generates test config (coverage gate, snapshot setup, CI workflow) per stack via conventions. · Scope: M · Priority: P3 · Deps: 016, 017, 018, 019, 020, 021, 022 → [026-conventions-propagation-by-stack](features/026-conventions-propagation-by-stack/spec.md)
 <!-- roadmap:postmvp:end -->
 
 ---
