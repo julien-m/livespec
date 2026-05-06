@@ -1,3 +1,11 @@
+---
+title: "Smart Test Selection"
+status: "Draft"
+priority: "P2"
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: Smart Test Selection
 
 - **Feature:** Smart Test Selection
@@ -20,17 +28,17 @@ When the pre-commit hook runs, it invokes the smart selector with `git diff --ca
 
 **Priority reason:** Pre-commit must be fast. Running the full suite at every commit is the #1 reason developers disable hooks.
 
-**Independent test:** Modify one file with `@spec FR-003` anchors; verify the selector identifies feature N and queues only tests covering FR-003.
+**Independent test:** Modify one file with `@spec` anchors pointing to `.specs/features/005-some-feature/spec.md`; verify the selector identifies `005-some-feature` and queues only its relevant tests.
 
 ```gherkin
 Feature: Smart selection from staged changes
   Scenario: Single file changed — only its tests run
-    Given a Python file src/foo.py has @spec FR-001, FR-002 anchors
+    Given a Python file src/foo.py has @spec anchors pointing to .specs/features/005-some-feature/spec.md#fr-001 and #fr-002
     And the developer stages only foo.py
     When the smart selector runs in pre-commit mode
     Then it parses anchors in foo.py
     And resolves them to feature 005-some-feature
-    And queues tests in tests/ tagged for FR-001 and FR-002
+    And queues tests covering feature 005-some-feature requirements FR-001 and FR-002
     And tests for unrelated features are skipped
 
   Scenario: Multiple files changed — union of test sets
@@ -52,7 +60,7 @@ flowchart TD
     B --> C[Smart selector reads file list]
     C --> D[For each file]
     D --> E{File has @spec anchors?}
-    E -- Yes --> F[Parse anchors → feature IDs]
+    E -- Yes --> F[Parse anchors → feature IDs from spec paths]
     E -- No --> G[Filename heuristic]
     F --> H[Resolve features → tests via implementation.md]
     G --> I[Match test names by keyword]
@@ -185,7 +193,7 @@ flowchart TD
 
 ## Acceptance Criteria
 
-- **AC-001** — `SmartTestSelector.from_changed_files(files: list[Path]) -> set[FeatureID]` returns the set of impacted features by parsing `@spec` anchors.
+- **AC-001** — `SmartTestSelector.from_changed_files(files: list[Path]) -> set[FeatureID]` returns the set of impacted features by parsing the feature slugs embedded in `@spec` anchor paths.
 - **AC-002** — `SmartTestSelector.tests_for_features(feature_ids: set[FeatureID]) -> list[TestRef]` returns the list of test targets across all configured drivers/runners using each feature's `implementation.md`.
 - **AC-003** — File without `@spec` anchors → fall back to filename heuristic; log the fallback.
 - **AC-004** — `livespec spec.test --since=<ref>` uses git diff against `<ref>` and runs the smart subset.
@@ -203,7 +211,7 @@ flowchart TD
 ## Functional Requirements
 
 - **FR-001** — Implement `SmartTestSelector` class with methods `from_changed_files`, `tests_for_features`, `build_cache`, `update_cache_incremental`.
-- **FR-002** — Implement `@spec` anchor parser: scan files for `@spec FR-NNN`, `@spec AC-NNN` patterns, extract feature paths.
+- **FR-002** — Implement `@spec` anchor parser: scan files for requirement IDs plus the linked `.specs/features/NNN-name/spec.md` path, and extract the feature slugs from that path.
 - **FR-003** — Implement test target resolution: parse `implementation.md` per feature to find test files for each FR/AC.
 - **FR-004** — Implement filename heuristic fallback: keyword matching against test file names.
 - **FR-005** — Implement cache read/write/incremental update at `.specs/.test-selector-cache.json`.
@@ -220,7 +228,7 @@ flowchart TD
 | Entity | Description |
 |---|---|
 | `SmartTestSelector` | Class encapsulating selection logic. |
-| `@spec` anchor | Comment in source code linking to a spec FR/AC. |
+| `@spec` anchor | Comment in source code linking to a specific spec path and FR/AC requirement. |
 | `.test-selector-cache.json` | Precomputed reverse map for performance. |
 | `TestRef` | A reference to a specific test target (driver, capability, test name). |
 | `FeatureID` | The NNN-name slug of a feature. |

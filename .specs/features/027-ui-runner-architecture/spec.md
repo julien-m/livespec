@@ -1,3 +1,11 @@
+---
+title: "UI Runner Architecture"
+status: "Draft"
+priority: "P1"
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: UI Runner Architecture
 
 - **Feature:** UI Runner Architecture
@@ -6,7 +14,7 @@
 - **Status:** Draft
 - **Priority:** P1
 - **Scope:** M
-- **Input:** Cross-platform visual UI testing system, parallel to the driver system (Feature 016) but distinct from it. Defines a YAML manifest format for UI runners (one per platform/surface), exposing capabilities: detect, capture_screenshot, run_flow, compare_baseline. Local-first design — runs identically in dev shell and CI. Builds on the existing Feature 010 (Visual Testing Complete) which becomes the first runner of this pattern (web/Playwright). Extensible: Tauri (029), iOS/watchOS (030), Android (031), and future platforms register through the same interface.
+- **Input:** Cross-platform visual UI testing system, parallel to the driver system (Feature 016) but distinct from it. Defines a YAML manifest format for UI runners (one per platform/surface), exposing capabilities: detect, capture_screenshot, run_flow, compare_baseline. Local-first design — runs identically in dev shell and CI. Builds on the existing Feature 010 (Visual Testing Complete) which becomes the first runner of this pattern (web/Playwright). Extensible: Tauri (029), iOS/watchOS (030), Android (031), and future platforms register through the same interface, with deterministic runner selection based on explicit priority plus custom-runner precedence on ties.
 - **Feature Number:** 027
 - **Deps:** 010
 
@@ -45,7 +53,8 @@ Feature: UI runner dispatch
   Scenario: Multiple UI runners detected — primary picked
     Given a polyglot project with both web (Playwright) and Tauri runners detected
     When the developer runs /spec.test --visual
-    Then LiveSpec uses the runner with the highest priority match
+    Then LiveSpec uses the runner with the highest configured priority
+    And if priorities tie, a custom runner is chosen before a built-in runner
     And reports the chosen runner name
     And the developer can override via --runner=<name>
 ```
@@ -109,8 +118,8 @@ flowchart TD
     G --> H
     H -- Yes --> C
     H -- No --> I[Glob .specs/ui-runners/*.yaml]
-    I --> J[Add custom runners — higher priority]
-    J --> K[Registry ready]
+    I --> J[Add custom runners — tie-breaker favors custom]
+    J --> K[Registry ready with deterministic ordering]
 ```
 
 ---
@@ -199,10 +208,10 @@ flowchart TD
 
 ## Acceptance Criteria
 
-- **AC-001** — A `UIRunnerSchema` (Pydantic) defines the YAML manifest with fields: `name`, `detect.files`, optional capabilities `capture_screenshot`, `run_flow`, `compare_baseline`, `init_environment`, `teardown`.
+- **AC-001** — A `UIRunnerSchema` (Pydantic) defines the YAML manifest with fields: `name`, `detect.files`, optional `priority`, optional capabilities `capture_screenshot`, `run_flow`, `compare_baseline`, `init_environment`, `teardown`.
 - **AC-002** — Each capability accepts either `command:` (subprocess) or `script:` (path to a shell script — escape hatch).
-- **AC-003** — Built-in runners live in `livespec/ui-runners/*.yaml`. Custom runners live in `.specs/ui-runners/*.yaml`. Custom runners take priority on detect match.
-- **AC-004** — `UIRunnerRegistry.detect(project_root)` returns an ordered list of matching runners (custom first, then alphabetical). Empty list = graceful degradation message.
+- **AC-003** — Built-in runners live in `livespec/ui-runners/*.yaml`. Custom runners live in `.specs/ui-runners/*.yaml`. Custom runners win ties against built-ins when priorities are equal.
+- **AC-004** — `UIRunnerRegistry.detect(project_root)` returns an ordered list of matching runners sorted by `priority` (highest first), then custom before built-in on equal priority, then alphabetical by `name`. Empty list = graceful degradation message.
 - **AC-005** — `run_ui_capability(runner, capability, **kwargs)` returns a `UICapabilityResult` dataclass with `status` (`success` | `failure` | `not_implemented` | `skipped`), `exit_code`, `output_path`, `stdout`, `stderr`.
 - **AC-006** — Graceful degradation message format mirrors Feature 016 driver degradation: detected file signals, custom runner path (`.specs/ui-runners/<name>.yaml`), scaffold command (`livespec spec.runner --new <name>`), link to docs.
 - **AC-007** — Slash commands (`/spec.test`, `/spec.feature`, `/spec.implement`, `/spec.fix`) invoke runners exclusively through `run_ui_capability` — no YAML parsing in command files.
@@ -216,8 +225,8 @@ flowchart TD
 
 ## Functional Requirements
 
-- **FR-001** — Define `UIRunnerSchema` Pydantic model with all 5 capability blocks and detect rule.
-- **FR-002** — Implement `UIRunnerRegistry`: scan `livespec/ui-runners/` then `.specs/ui-runners/`, validate YAML, return ordered registry.
+- **FR-001** — Define `UIRunnerSchema` Pydantic model with detect rule, optional `priority`, and all 5 capability blocks.
+- **FR-002** — Implement `UIRunnerRegistry`: scan `livespec/ui-runners/` then `.specs/ui-runners/`, validate YAML, and return a deterministically ordered registry using priority/custom/name tie-breakers.
 - **FR-003** — Implement `run_ui_capability(runner: UIRunnerManifest, capability: str, **kwargs) -> UICapabilityResult`: subprocess execution, output capture, structured result.
 - **FR-004** — Implement graceful degradation handler when registry returns empty for a project.
 - **FR-005** — Implement `UICapabilityResult` dataclass with status enum, exit_code, paths, stdout/stderr.
@@ -252,7 +261,7 @@ This feature itself has no external tooling requirement — it is the dispatcher
 ## Edge Cases
 
 - **EC-001** — Project has both a built-in and custom runner with the same `name`: custom wins, no error.
-- **EC-002** — Multiple matching runners (e.g., Tauri detects via Cargo.toml + Web detects via package.json): primary chosen by `priority` field if present, otherwise first match in the custom > built-in order.
+- **EC-002** — Multiple matching runners (e.g., Tauri detects via Cargo.toml + Web detects via package.json): primary chosen by highest `priority`; ties resolve custom before built-in, then alphabetical by `name`.
 - **EC-003** — `script:` path points to a non-existent file: capability fails with status `failure` and a clear message; does not crash the runner.
 - **EC-004** — Capability subprocess takes too long: timeout is configurable per capability (default: 5 minutes); exceeded → status `failure` with timeout reason.
 - **EC-005** — Runner YAML uses both `command:` and `script:` in the same capability block: `script:` takes priority, WARNING logged.

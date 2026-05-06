@@ -1,4 +1,4 @@
-## 2026-05-06 — Spec: Feature specification created
+## 2026-05-06 — [Spec Update]: Feature specification created
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (created — all sections)

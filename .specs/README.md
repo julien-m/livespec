@@ -94,16 +94,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-06 | Spec | [Feature 034] Spec created: Preflight Auto-Install & Init via /spec.preflight --fix — 5 stories, 14 AC, 11 FR |
+| 2026-05-06 | Spec | [Feature 033] Spec created: Smart Test Selection — 4 stories, 12 AC, 10 FR |
+| 2026-05-06 | Spec | [Feature 032] Spec created: Pre-commit / Pre-push Test Hooks — 5 stories, 13 AC, 10 FR |
+| 2026-05-06 | Spec | [Feature 031] Spec created: UI Runner Android (Maestro) — 3 stories, 13 AC, 8 FR |
+| 2026-05-06 | Spec | [Feature 030] Spec created: UI Runner iOS / watchOS (XCUITest) — 4 stories, 14 AC, 9 FR |
+| 2026-05-06 | Spec | [Feature 029] Spec created: UI Runner Tauri — 3 stories, 12 AC, 7 FR |
+| 2026-05-06 | Spec | [Feature 028] Spec created: UI Runner Web (Playwright Refactor) — 2 stories, 8 AC, 5 FR |
+| 2026-05-06 | Spec | [Feature 027] Spec created: UI Runner Architecture — 4 stories, 12 AC, 8 FR |
 | 2026-05-06 | Fix | [Features 013, 014, 015] Fix: implementation.md created (post-merge bookkeeping for Chantiers 4/2/3) |
 | 2026-05-06 | Spec | [Feature 026] Spec created: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR |
-| 2026-05-06 | Spec | [Feature 025] Spec created: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR |
-| 2026-05-06 | Spec | [Feature 024] Spec created: Patch Coverage Local Computation — 2 stories, 9 AC, 6 FR |
-| 2026-05-06 | Spec | [Feature 023] Spec created: Driver Custom Scaffolding & Graceful Degradation — 3 stories, 10 AC, 6 FR |
-| 2026-05-06 | Spec | [Feature 022] Spec created: Driver JVM (Java + Kotlin) — 4 stories, 11 AC, 6 FR |
-| 2026-05-06 | Spec | [Feature 021] Spec created: Driver Rust — 4 stories, 10 AC, 5 FR |
-| 2026-05-06 | Spec | [Feature 020] Spec created: Driver Go — 4 stories, 9 AC, 5 FR |
-| 2026-05-06 | Spec | [Feature 019] Spec created: Driver Swift — 4 stories, 10 AC, 6 FR |
-| 2026-05-06 | Spec | [Feature 018] Spec created: Driver TypeScript/JavaScript — 4 stories, 12 AC, 6 FR |
 <!-- readme:activity:end -->
 
 ---

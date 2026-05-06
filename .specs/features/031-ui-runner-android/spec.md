@@ -1,3 +1,11 @@
+---
+title: "UI Runner Android"
+status: "Draft"
+priority: "P2"
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: UI Runner Android (Maestro)
 
 - **Feature:** UI Runner Android
@@ -6,7 +14,7 @@
 - **Status:** Draft
 - **Priority:** P2
 - **Scope:** M
-- **Input:** Built-in UI runner for Android native apps (Kotlin or Java), using Maestro (YAML-based mobile test framework) — chosen over Espresso for Android because Maestro has the simpler onboarding curve, YAML-readable flows that LiveSpec's IA tooling can produce reliably, and the Maestro CLI handles emulator orchestration cleanly. Hybrid Design 3 with iOS: Apple uses XCUITest natif (Feature 030), Android uses Maestro YAML — each platform in its best-fit tool. Single runner manifest covers all Android variants (phone, tablet, foldable, Wear OS).
+- **Input:** Built-in UI runner for Android native apps (Kotlin or Java), using Maestro (YAML-based mobile test framework) — chosen over Espresso for Android because Maestro has the simpler onboarding curve, YAML-readable flows that LiveSpec's AI tooling can produce reliably, and the Maestro CLI handles emulator orchestration cleanly. Hybrid Design 3 with iOS: Apple uses XCUITest native (Feature 030), Android uses Maestro YAML — each platform in its best-fit tool. Single runner manifest covers all Android variants (phone, tablet, foldable, Wear OS).
 - **Feature Number:** 031
 - **Deps:** 027, 022
 

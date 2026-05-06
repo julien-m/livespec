@@ -1,3 +1,11 @@
+---
+title: "UI Runner Web (Playwright Refactor)"
+status: "Draft"
+priority: "P2"
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: UI Runner Web (Playwright Refactor)
 
 - **Feature:** UI Runner Web

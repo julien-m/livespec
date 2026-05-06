@@ -1,3 +1,11 @@
+---
+title: "Pre-commit / Pre-push Test Hooks"
+status: "Draft"
+priority: "P1"
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: LiveSpec Pre-commit / Pre-push Test Hooks
 
 - **Feature:** Pre-commit / Pre-push Test Hooks
@@ -145,31 +153,29 @@ Feature: Pre-push full suite
     And the push is blocked
     And the developer can either add tests or bypass with git push --no-verify
 
-  Scenario: Bypass logged for accountability
-    Given the developer uses git push --no-verify
-    When the bypass occurs
-    Then LiveSpec writes a line to .specs/hooks-bypass.log with date, branch, commit hash
-    And the next commit/push reminds: "Reminder: tests bypassed at <date>"
+  Scenario: Bypass remains an explicit escape hatch
+    Given the developer decides to bypass the pre-push hook
+    When they re-run git push with --no-verify
+    Then Git skips the pre-push hook entirely
+    And LiveSpec does not claim to log a bypass it cannot observe
+    And the failing hook output has already shown the exact bypass command
 ```
 
 ```mermaid
 flowchart TD
     A[git push] --> B[Pre-push hook fires]
-    B --> C{--no-verify?}
-    C -- Yes --> D[Log bypass to .specs/hooks-bypass.log]
-    D --> E[Push proceeds]
-    C -- No --> F[Run full coverage gate]
+    B --> C[Run full coverage gate]
+    C --> D{Pass?}
+    D -- No --> E[Block push + show recovery and --no-verify escape hatch]
+    D -- Yes --> F[Run snapshot suite]
     F --> G{Pass?}
-    G -- No --> H[Block push]
-    G -- Yes --> I[Run snapshot suite]
-    I --> J{Pass?}
-    J -- No --> H
-    J -- Yes --> K{visual configured?}
-    K -- Yes --> L[Run UI runner]
-    K -- No --> M[Push proceeds]
-    L --> N{Pass?}
-    N -- No --> H
-    N -- Yes --> M
+    G -- No --> E
+    G -- Yes --> H{visual configured?}
+    H -- Yes --> I[Run UI runner]
+    H -- No --> J[Push proceeds]
+    I --> K{Pass?}
+    K -- No --> E
+    K -- Yes --> J
 ```
 
 ---
@@ -195,7 +201,7 @@ Feature: Hook configuration
     When validation fails on commit
     Then the hook prints a WARN message
     And exits 0 (commit proceeds anyway)
-    And the warning is highlighted in the next pre-push run
+    And the summary indicates warn-only mode was applied
 
   Scenario: Per-stage timeout
     Given pre_push.timeout_minutes: 3
@@ -274,7 +280,7 @@ flowchart TD
 - **AC-003** — Existing user-provided hook scripts are preserved; LiveSpec adds itself as a chained step (not overwrite).
 - **AC-004** — Pre-commit hook runs `livespec validate --staged` then smart-selected unit tests on changed files. Target: < 5 seconds.
 - **AC-005** — Pre-push hook runs full coverage gate, full snapshot suite, and visual tests (if configured). Target: < 5 minutes typical.
-- **AC-006** — `git push --no-verify` is logged to `.specs/hooks-bypass.log` with timestamp, branch, commit hash; the next commit/push reminds about the bypass.
+- **AC-006** — Hook failure output explicitly shows the supported escape hatch (`git commit --no-verify` or `git push --no-verify`) and LiveSpec does not claim to log bypasses it cannot observe.
 - **AC-007** — `hooks-config.yaml` supports per-stage toggles (`enabled: true/false`), per-step toggles (`coverage: true/false`, `visual: true/false`, etc.), `mode: strict|warn`, and `timeout_minutes`.
 - **AC-008** — Migration adds pre-push to projects that only had pre-commit; migration is idempotent.
 - **AC-009** — `livespec install-hook --uninstall` removes both hooks (or removes LiveSpec lines if chained); `--purge` also removes `hooks-config.yaml`.
@@ -292,7 +298,7 @@ flowchart TD
 - **FR-003** — Author the pre-push hook script: invokes `livespec spec.test --pre-push-mode`.
 - **FR-004** — Implement `--pre-commit-mode` and `--pre-push-mode` flags on `livespec spec.test`: configure which capabilities run, apply timeouts, read `hooks-config.yaml`.
 - **FR-005** — Define `HooksConfigSchema` Pydantic model and YAML serialization.
-- **FR-006** — Implement bypass logging: when `GIT_PUSH_NO_VERIFY` is detected (or via post-push hook), append to `.specs/hooks-bypass.log`.
+- **FR-006** — Implement hook failure guidance: when a hook blocks, print the exact bypass command and explain that Git bypasses skip hook execution entirely.
 - **FR-007** — Implement the migration script: `migrate-test-hooks.{js|py}` that installs pre-push and config on existing projects. Hooked into `/spec.migrate` pipeline.
 - **FR-008** — Add `--uninstall` and `--purge` flags to `livespec install-hook`.
 - **FR-009** — Write integration tests: install hooks on a fixture, simulate commit/push, verify behavior.
@@ -307,7 +313,7 @@ flowchart TD
 | Pre-commit hook script | Bash script in `.git/hooks/pre-commit` invoking LiveSpec. |
 | Pre-push hook script | Bash script in `.git/hooks/pre-push` invoking LiveSpec. |
 | `hooks-config.yaml` | Project-level configuration for hook behavior, in `.specs/`. |
-| `hooks-bypass.log` | Append-only log of bypass events for accountability. |
+| Bypass guidance | Explicit `--no-verify` recovery instructions shown when a hook blocks. |
 | `HooksConfigSchema` | Pydantic model for parsing/validating the config. |
 | Smart selection (delegated to 033) | Logic to pick which tests are relevant to changed files. |
 
@@ -338,7 +344,7 @@ flowchart TD
 - **SC-001** — Installation completes in < 1 second on a clean project.
 - **SC-002** — Pre-commit on a typical project runs in < 5 seconds (depending on project size, with smart selection).
 - **SC-003** — Pre-push on a typical project runs in < 5 minutes (full suite without UI mobile, which is opt-in).
-- **SC-004** — Bypass log accumulates correctly across multiple bypass events.
+- **SC-004** — Hook failure output consistently shows the relevant bypass command and recovery steps.
 - **SC-005** — Migration is idempotent (run twice without changes).
 - **SC-006** — Existing user hooks are preserved (no destructive overwrite ever).
 

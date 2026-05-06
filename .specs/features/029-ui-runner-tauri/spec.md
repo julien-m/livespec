@@ -1,3 +1,11 @@
+---
+title: "UI Runner Tauri"
+status: "Draft"
+priority: "P1"
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: UI Runner Tauri
 
 - **Feature:** UI Runner Tauri
@@ -28,7 +36,7 @@ Feature: Tauri WebView visual testing
     Given a Tauri project with tauri.conf.json (devtools enabled)
     And tauri-driver is installed
     When the developer runs /spec.test --visual
-    Then LiveSpec starts the app via tauri build --debug --no-bundle
+    Then LiveSpec starts the app via cargo tauri dev --no-bundle
     And tauri-driver is launched on the configured port
     And Playwright connects via WebDriver
     And screenshots of declared screens are captured

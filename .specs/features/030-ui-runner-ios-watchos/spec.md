@@ -1,3 +1,11 @@
+---
+title: "UI Runner iOS / watchOS"
+status: "Draft"
+priority: "P1"
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: UI Runner iOS / watchOS (XCUITest)
 
 - **Feature:** UI Runner iOS / watchOS
@@ -88,7 +96,7 @@ Feature: watchOS visual testing via XCUITest
   Scenario: watchOS simulator runtime missing
     Given the watchOS simulator runtime is not installed
     When the runner attempts to use it
-    Then the runner emits: "watchOS simulator runtime not installed. Install via Xcode > Settings > Components."
+    Then the runner emits: "watchOS simulator runtime not installed. Install via Xcode > Settings > Platforms."
     And exits 1
 ```
 
@@ -111,14 +119,14 @@ XCUITest supports launching the app with a custom argument list. The runner mani
 
 **Priority reason:** This is the primary advantage of XCUITest over Maestro. It allows fast, deterministic state setup that would be slow or impossible to reproduce via UI clicks.
 
-**Independent test:** Run a scenario with `launchArguments: ["--ui-test-mode", "--mock-data=./fixtures/dashboard.json"]` and verify the app starts in the expected state.
+**Independent test:** Run a scenario with `launch_arguments: ["--ui-test-mode", "--mock-data=./fixtures/dashboard.json"]` and verify the app starts in the expected state.
 
 ```gherkin
 Feature: launchArguments for state presets
   Scenario: Test launches app with custom arguments
     Given a manifest scenario with launch_arguments
     When the test runs
-    Then xcodebuild test sets XCUIApplication.launchArguments
+    Then the XCUITest harness sets XCUIApplication.launchArguments before launch
     And the app reads them in didFinishLaunching
     And the test sees the preset state
 
@@ -131,7 +139,7 @@ Feature: launchArguments for state presets
 
 ```mermaid
 flowchart TD
-    A[Scenario with launch_arguments] --> B[xcodebuild test passes args via -testRunner]
+    A[Scenario with launch_arguments] --> B[Runner passes scenario args to XCUITest harness]
     B --> C[XCUIApplication.launchArguments set in test]
     C --> D[App launches with custom args]
     D --> E[App reads args, presets state]
@@ -190,7 +198,7 @@ flowchart TD
 - **AC-007** — `--platform=watchos` flag filters destinations to watchOS only; without it, only iOS destinations run.
 - **AC-008** — Simulator auto-boot: if the target destination simulator is not booted, the runner runs `xcrun simctl boot <udid>` and waits for ready before running tests.
 - **AC-009** — Missing watchOS simulator runtime → clear error message pointing to Xcode > Settings > Platforms (not generic "destination not found").
-- **AC-010** — `launch_arguments` field per scenario passes through to `XCUIApplication.launchArguments` via xcodebuild test environment.
+- **AC-010** — `launch_arguments` field per scenario is made available to the XCUITest harness, which sets `XCUIApplication.launchArguments` before app launch.
 - **AC-011** — Coordinated execution: `/spec.test` (no flags) runs both Swift driver (019) XCTest unit tests AND this UI runner's XCUITest UI tests; `/spec.test --visual` runs only the UI runner.
 - **AC-012** — Screenshots are extracted from `.xcresult` (binary format) and converted to PNG; HEIC intermediate is handled correctly.
 - **AC-013** — Per-destination output: when multiple destinations are declared, screenshots are stored under `.specs/design/screens/<destination_id>/<screen>.png` (or similar).
@@ -204,7 +212,7 @@ flowchart TD
 - **FR-002** — Implement `.xcresult` bundle parsing: extract attached screenshots using `xcrun xcresulttool get` JSON output and convert HEIC → PNG.
 - **FR-003** — Implement simulator boot orchestration: detect boot state via `xcrun simctl list devices`, boot if needed, wait for ready (`xcrun simctl bootstatus`).
 - **FR-004** — Implement watchOS-specific filtering: parse target schemes from project, filter destinations matching watchOS criteria.
-- **FR-005** — Implement launch_arguments injection: pass values to xcodebuild test via test plan or `-only-testing` filter.
+- **FR-005** — Implement launch_arguments injection: pass scenario values into the XCUITest harness (for example via a test plan or environment payload) so the test code sets `XCUIApplication.launchArguments` before launch.
 - **FR-006** — Implement license acceptance detection: parse xcodebuild stderr for license-not-accepted patterns, emit recovery hint.
 - **FR-007** — Write integration tests on a minimal iOS fixture project on macOS (skipped on non-macOS CI).
 - **FR-008** — Write a separate integration test for watchOS using a minimal watchOS fixture.

@@ -1,3 +1,11 @@
+---
+title: "Preflight Auto-Install & Init"
+status: "Draft"
+priority: "P1"
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: Preflight Auto-Install & Init via /spec.preflight --fix
 
 - **Feature:** Preflight Auto-Install & Init
@@ -24,7 +32,7 @@ A developer pulls a branch that adds the iOS UI runner. Running `/spec.preflight
 
 ```gherkin
 Feature: Auto-install missing tools
-  Scenario: Tool installable via Homebrew
+  Scenario: Tool installable via trusted curl bootstrap
     Given Maestro CLI is not on PATH
     And the project has the Android UI runner enabled
     When the developer runs /spec.preflight --fix
@@ -317,7 +325,7 @@ flowchart TD
 |---|---|---|---|---|
 | git | Tooling | OS | dev only | Required for smart scoping |
 | Internet access | Network | varies | dev only | Required for install commands |
-| Package managers (one of: brew, apt, etc.) | Tooling | OS | dev only | At least one must be available for auto-install |
+| Supported installers (Homebrew and language-native package managers) | Tooling | OS + language ecosystems | dev only | At least one supported dispatcher must be available for each installable requirement |
 
 ---
 
@@ -328,7 +336,7 @@ flowchart TD
 - **EC-003** — Install command requires sudo but user is not in sudoers: report and suggest manual install.
 - **EC-004** — Tool installs but is not on PATH (e.g., installed to ~/.cargo/bin not in PATH): emit "installed to <path> but not on PATH; add to your shell profile".
 - **EC-005** — Smart scoping detects no changes (clean working tree): runner reports "No changes since HEAD~1 — running full verification" and proceeds as `--full`.
-- **EC-006** — Multiple package managers available (brew + apt on Linux): runner picks via priority order documented in the manifest.
+- **EC-006** — Multiple supported installers could satisfy the same requirement (for example, Homebrew plus a language-native installer): runner picks via the documented per-tool priority order.
 - **EC-007** — Curl-pipe install URL not in allowlist: runner refuses and emits "Untrusted install URL — manual install required" with the documented URL.
 
 ---
