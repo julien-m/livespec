@@ -16,41 +16,62 @@ import re
 import sys
 from datetime import date
 from pathlib import Path
+from typing import Final
 
-
-FEATURES_START = "<!-- readme:features:start -->"
-FEATURES_END = "<!-- readme:features:end -->"
-ACTIVITY_START = "<!-- readme:activity:start -->"
-ACTIVITY_END = "<!-- readme:activity:end -->"
+FEATURES_START: Final[str] = "<!-- readme:features:start -->"
+FEATURES_END: Final[str] = "<!-- readme:features:end -->"
+ACTIVITY_START: Final[str] = "<!-- readme:activity:start -->"
+ACTIVITY_END: Final[str] = "<!-- readme:activity:end -->"
 
 
 IMPL_MARKERS = re.compile(
+    # Match changelog phrases that indicate code shipped even if implementation.md
+    # is missing because the feature predated the current bookkeeping flow.
     r"(implemented|implementation\b|spec\.implement|spec\.fix\s+gaps closed)",
     re.IGNORECASE,
 )
 
 
 def feature_changelog_says_implemented(feature_dir: Path) -> bool:
-    """A feature's own changelog mentioning implementation/fix activity is
-    a strong signal that code shipped, even if implementation.md is missing
-    (e.g., feature merged through a PR before /spec.implement bookkeeping)."""
-    cl = feature_dir / "changelog.md"
-    if not cl.exists():
+    """Return whether a feature changelog indicates the feature shipped.
+
+    Args:
+        feature_dir: Feature directory under ``.specs/features``.
+
+    Returns:
+        ``True`` when the feature changelog contains implementation markers.
+    """
+    changelog_path = feature_dir / "changelog.md"
+    if not changelog_path.exists():
         return False
     try:
-        text = cl.read_text(encoding="utf-8")
+        changelog_text = changelog_path.read_text(encoding="utf-8")
     except OSError:
         return False
-    return bool(IMPL_MARKERS.search(text))
+    return bool(IMPL_MARKERS.search(changelog_text))
 
 
-PROMOTION_RANK = {"Draft": 0, "Planned": 1, "In Progress": 2, "Implemented": 3}
+PROMOTION_RANK: Final[dict[str, int]] = {
+    "Draft": 0,
+    "Planned": 1,
+    "In Progress": 2,
+    "Implemented": 3,
+}
 
 
 def infer_status(feature_dir: Path, current: str) -> str:
-    if (feature_dir / "implementation.md").exists():
-        candidate = "Implemented"
-    elif feature_changelog_says_implemented(feature_dir):
+    """Infer the canonical README status for a feature directory.
+
+    Args:
+        feature_dir: Feature directory under ``.specs/features``.
+        current: Current status value from the README row.
+
+    Returns:
+        The promoted status inferred from artifacts on disk.
+    """
+    if (feature_dir / "implementation.md").exists() or feature_changelog_says_implemented(
+        feature_dir
+    ):
         candidate = "Implemented"
     elif (feature_dir / "plan.md").exists():
         candidate = "Planned"
@@ -64,22 +85,37 @@ def infer_status(feature_dir: Path, current: str) -> str:
 
 
 def feature_dirs(specs_root: Path) -> dict[str, Path]:
-    """Map feature number (e.g. '004', '005.1') → directory."""
-    out: dict[str, Path] = {}
+    """Return feature directories keyed by feature number.
+
+    Args:
+        specs_root: Root ``.specs`` directory for the project.
+
+    Returns:
+        Mapping from feature number such as ``004`` or ``005.1`` to directory.
+    """
+    directories: dict[str, Path] = {}
     features_root = specs_root / "features"
     if not features_root.is_dir():
-        return out
-    for d in sorted(features_root.iterdir()):
-        if not d.is_dir():
+        return directories
+    for feature_path in sorted(features_root.iterdir()):
+        if not feature_path.is_dir():
             continue
-        m = re.match(r"^(\d+(?:\.\d+)?)-", d.name)
-        if m:
-            out[m.group(1)] = d
-    return out
+        feature_number_match = re.match(r"^(\d+(?:\.\d+)?)-", feature_path.name)
+        if feature_number_match:
+            directories[feature_number_match.group(1)] = feature_path
+    return directories
 
 
 def update_features_table(readme: str, dirs: dict[str, Path]) -> tuple[str, int]:
-    """Rewrite the Status column for each row whose # matches a feature dir."""
+    """Rewrite README feature statuses from on-disk feature artifacts.
+
+    Args:
+        readme: Current README contents.
+        dirs: Feature directory mapping keyed by feature number.
+
+    Returns:
+        Tuple of updated README contents and number of status changes applied.
+    """
     if FEATURES_START not in readme or FEATURES_END not in readme:
         return readme, 0
 
@@ -111,11 +147,22 @@ def update_features_table(readme: str, dirs: dict[str, Path]) -> tuple[str, int]
     return pre + FEATURES_START + new_block + FEATURES_END + post, changed
 
 
-CHANGELOG_HEADING = re.compile(r"^##\s+(\d{4}-\d{2}-\d{2})\s*-{1,3}\s*(.+?)\s*$")
+CHANGELOG_HEADING = re.compile(
+    # Match `## YYYY-MM-DD - ...` or em-dash variants used in changelog headings.
+    r"^##\s+(\d{4}-\d{2}-\d{2})\s*-{1,3}\s*(.+?)\s*$"
+)
 
 
 def parse_changelog_entries(changelog: Path, limit: int = 10) -> list[tuple[str, str, str]]:
-    """Return [(date, type, description), ...] in changelog order (most recent first)."""
+    """Parse recent changelog headings into README activity rows.
+
+    Args:
+        changelog: Path to ``.specs/changelog.md``.
+        limit: Maximum number of entries to return.
+
+    Returns:
+        Recent changelog entries in source order.
+    """
     if not changelog.exists():
         return []
     entries: list[tuple[str, str, str]] = []
@@ -132,21 +179,40 @@ def parse_changelog_entries(changelog: Path, limit: int = 10) -> list[tuple[str,
 
 
 def classify_entry(text: str) -> str:
+    """Classify a changelog description into a README activity type.
+
+    Args:
+        text: Raw changelog heading text without the date prefix.
+
+    Returns:
+        Normalized activity type label for the README table.
+    """
     low = text.lower()
+    # Order matters: "Fix:" lines often mention "implementation.md" in their
+    # description, so check fix patterns before the implementation match.
+    if low.startswith("fix") or " fix:" in low or "fix:" in low:
+        return "Fix"
     if "spec created" in low or low.startswith("spec:") or " spec " in low[:20]:
         return "Spec"
     if "implemented" in low or "implementation" in low:
         return "Feature"
     if "plan created" in low or low.startswith("plan:"):
         return "Plan"
-    if low.startswith("fix") or " fix:" in low or "fix:" in low:
-        return "Fix"
     if "initialized" in low or low.startswith("setup"):
         return "Setup"
     return "Update"
 
 
 def regenerate_activity(readme: str, entries: list[tuple[str, str, str]]) -> tuple[str, bool]:
+    """Replace the README Recent Activity block with changelog-derived rows.
+
+    Args:
+        readme: Current README contents.
+        entries: Parsed changelog entries for the activity table.
+
+    Returns:
+        Tuple of updated README contents and whether the block was regenerated.
+    """
     if ACTIVITY_START not in readme or ACTIVITY_END not in readme:
         return readme, False
     pre, rest = readme.split(ACTIVITY_START, 1)
@@ -160,10 +226,33 @@ def regenerate_activity(readme: str, entries: list[tuple[str, str, str]]) -> tup
 
 
 def update_last_updated(readme: str, today: str) -> str:
-    return re.sub(r"^(>\s*Last updated:\s*).*$", rf"\g<1>{today}", readme, count=1, flags=re.MULTILINE)
+    """Update the README header's ``Last updated`` line.
+
+    Args:
+        readme: Current README contents.
+        today: ISO-formatted date to write into the header.
+
+    Returns:
+        README contents with the header date updated.
+    """
+    return re.sub(
+        r"^(>\s*Last updated:\s*).*$",
+        rf"\g<1>{today}",
+        readme,
+        count=1,
+        flags=re.MULTILINE,
+    )
 
 
 def main(argv: list[str]) -> int:
+    """Run the README status audit for a target project directory.
+
+    Args:
+        argv: CLI arguments where ``argv[1]`` is the project directory.
+
+    Returns:
+        Process exit code.
+    """
     if len(argv) < 2:
         print("Usage: audit-readme-status.py <project-dir> [<livespec-dir>]", file=sys.stderr)
         return 2
@@ -188,8 +277,12 @@ def main(argv: list[str]) -> int:
 
     if updated != original:
         readme_path.write_text(updated, encoding="utf-8")
-        print(f"  ▸ README audit: {status_changes} status correction(s), "
-              f"{'activity regenerated' if activity_changed else 'activity unchanged'}")
+        activity_result = (
+            "activity regenerated" if activity_changed else "activity unchanged"
+        )
+        print(
+            f"  ▸ README audit: {status_changes} status correction(s), {activity_result}"
+        )
     else:
         print("  ▸ README audit: nothing to fix")
     return 0

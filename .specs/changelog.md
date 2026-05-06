@@ -7,6 +7,7 @@
 
 ---
 
+## 2026-05-06 -- [Features 013, 014, 015] Fix: implementation.md created (post-merge bookkeeping for Chantiers 4/2/3)
 ## 2026-05-06 -- [Feature 026] Spec created: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR
 ## 2026-05-06 -- [Feature 025] Spec created: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR
 ## 2026-05-06 -- [Feature 024] Spec created: Patch Coverage Local Computation — 2 stories, 9 AC, 6 FR

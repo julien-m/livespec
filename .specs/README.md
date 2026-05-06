@@ -86,6 +86,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-06 | Fix | [Features 013, 014, 015] Fix: implementation.md created (post-merge bookkeeping for Chantiers 4/2/3) |
 | 2026-05-06 | Spec | [Feature 026] Spec created: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR |
 | 2026-05-06 | Spec | [Feature 025] Spec created: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR |
 | 2026-05-06 | Spec | [Feature 024] Spec created: Patch Coverage Local Computation — 2 stories, 9 AC, 6 FR |
@@ -95,7 +96,6 @@
 | 2026-05-06 | Spec | [Feature 020] Spec created: Driver Go — 4 stories, 9 AC, 5 FR |
 | 2026-05-06 | Spec | [Feature 019] Spec created: Driver Swift — 4 stories, 10 AC, 6 FR |
 | 2026-05-06 | Spec | [Feature 018] Spec created: Driver TypeScript/JavaScript — 4 stories, 12 AC, 6 FR |
-| 2026-05-06 | Spec | [Feature 017] Spec created: Driver Python — 4 stories, 12 AC, 7 FR |
 <!-- readme:activity:end -->
 
 ---

@@ -1,5 +1,14 @@
 # Changelog — Feature 014: Supervisor↔Subagent Return Contracts
 
+### 2026-05-06 — Fix: implementation.md created (post-merge bookkeeping)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** None — only `implementation.md` produced from existing `@spec` anchors
+- **Gaps closed:** Missing FR→file mapping document. Code shipped via PR #22 without running `/spec.implement`.
+- **Remaining:** None
+- **Author:** spec.fix
+
 ### 2026-05-03 — Spec: Feature specification created
 
 - **Type:** Spec Update
