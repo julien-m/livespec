@@ -1,9 +1,19 @@
+---
+feature: 016-cross-language-test-driver-architecture
+title: Cross-Language Test Driver Architecture
+status: Implemented
+priority: P1
+branch: feature/016-cross-language-test-driver-architecture
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: Cross-Language Test Driver Architecture
 
 - **Feature:** Cross-Language Test Driver Architecture
 - **Branch:** feature/016-cross-language-test-driver-architecture
 - **Date:** 2026-05-06
-- **Status:** Draft
+- **Status:** Implemented
 - **Priority:** P0
 - **Scope:** L
 - **Input:** Foundation for cross-language test orchestration in LiveSpec. Defines the driver system that allows any project using LiveSpec (Python, TS/JS, Swift, Go, Rust, JVM) to have automated test orchestration for 5 patterns: coverage gate, snapshot testing, migration tests, property-based testing, and mutation testing. NOT for LiveSpec's own tests — this is the infrastructure layer that all per-stack driver features (017-022) depend on.
