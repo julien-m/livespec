@@ -1,6 +1,6 @@
 ---
 feature: 016-cross-language-test-driver-architecture
-title: "Cross-Language Test Driver Architecture — YAML driver subsystem with 5 capabilities"
+title: "Cross-Language Test Driver Architecture — YAML driver subsystem with detect rules and 4 executable capabilities"
 spec_ref: .specs/features/016-cross-language-test-driver-architecture/spec.md
 status: Approved
 created: 2026-05-06
@@ -11,7 +11,7 @@ updated: 2026-05-06
 
 ## Summary
 
-Add a YAML-driven test driver subsystem under `validator/drivers/` plus 5 built-in driver stubs under `livespec/drivers/`. Expose a stable Python API (`validator.drivers.run_capability`) and a `livespec spec.driver --new <stack>` CLI subcommand. No external services; patch coverage is computed locally from `lcov.info` + `git diff`.
+Add a YAML-driven test driver subsystem under `validator/drivers/` plus 5 built-in driver stubs under `livespec/drivers/`. Expose a stable Python API (`validator.drivers.run_capability`) and a `livespec spec-driver --new <stack>` CLI subcommand. No external services; patch coverage is computed locally from `lcov.info` + `git diff`.
 
 ## Technical Context
 
@@ -153,7 +153,7 @@ erDiagram
 - `@spec FR-004`, `AC-007`.
 
 ### Step 7 — Scaffold CLI (`validator/drivers/scaffold.py` + register in `cli.py`)
-- `livespec spec-driver --new <stack> [--force]` writes `.specs/drivers/<stack>.yaml` from embedded template (5 sections, inline doc, integration note).
+- `livespec spec-driver --new <stack> [--force]` writes `.specs/drivers/<stack>.yaml` from an embedded template (detect rules + 4 executable capability sections, inline docs, integration note).
 - `@spec FR-006`, `AC-008`.
 
 ### Step 8 — Public API (`validator/drivers/__init__.py`)

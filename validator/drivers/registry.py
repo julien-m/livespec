@@ -1,10 +1,10 @@
 """Driver registry — discovers and matches drivers against the project root."""
 
-# @spec FR-002: DriverRegistry with built-in + custom scan — .specs/features/016-cross-language-test-driver-architecture/spec.md#fr-002  # noqa: E501
-# @spec AC-003: Built-in drivers under livespec/drivers/ auto-discovered — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-003  # noqa: E501
-# @spec AC-004: Custom drivers under .specs/drivers/ override built-in — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-004  # noqa: E501
-# @spec AC-005: detect.files glob matching — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-005  # noqa: E501
-# @spec AC-006: Custom > built-in; alphabetical tie-break — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-006  # noqa: E501
+# @spec FR-002: Registry scans shipped manifests first, then project overrides.
+# @spec AC-003: Built-in manifests under livespec/drivers are auto-discovered.
+# @spec AC-004: Custom manifests under .specs/drivers override built-ins by name.
+# @spec AC-005: detect.files patterns are matched against the project root.
+# @spec AC-006: Custom manifests sort before built-ins, then alphabetical by filename.
 
 
 from __future__ import annotations
@@ -16,16 +16,37 @@ from .schemas import DriverManifest
 
 
 def _builtin_drivers_dir() -> Path:
-    """Return the directory holding shipped built-in driver YAMLs."""
+    """Return the directory holding shipped built-in driver YAMLs.
+
+    Returns:
+        Absolute path to the repository's ``livespec/drivers`` directory.
+    """
     # Layout: <repo>/livespec/drivers/*.yaml (sibling of the validator package).
     return Path(__file__).resolve().parent.parent.parent / "livespec" / "drivers"
 
 
 def _custom_drivers_dir(project_root: Path) -> Path:
+    """Return the project-local custom driver directory.
+
+    Args:
+        project_root: Repository root being inspected.
+
+    Returns:
+        ``.specs/drivers`` under the supplied project root.
+    """
     return project_root / ".specs" / "drivers"
 
 
 def _scan(directory: Path, *, is_custom: bool) -> list[DriverManifest]:
+    """Load every manifest file in a driver directory.
+
+    Args:
+        directory: Directory to scan for ``*.yaml`` manifest files.
+        is_custom: Whether discovered manifests should be tagged as custom.
+
+    Returns:
+        Valid manifests from the directory, ordered alphabetically by filename.
+    """
     if not directory.is_dir():
         return []
     out: list[DriverManifest] = []
@@ -37,6 +58,15 @@ def _scan(directory: Path, *, is_custom: bool) -> list[DriverManifest]:
 
 
 def _matches(manifest: DriverManifest, project_root: Path) -> bool:
+    """Return whether a manifest's detect rules match the project root.
+
+    Args:
+        manifest: Driver manifest under evaluation.
+        project_root: Repository root being inspected.
+
+    Returns:
+        ``True`` when any configured top-level file glob matches.
+    """
     patterns = manifest.detect.files
     if not patterns:
         return False
@@ -45,7 +75,12 @@ def _matches(manifest: DriverManifest, project_root: Path) -> bool:
 
 
 class DriverRegistry:
-    """Ordered list of drivers matching the current project."""
+    """Discover and rank drivers for one repository.
+
+    Args:
+        project_root: Repository root whose files are used for driver detection.
+        builtin_dir: Optional override for the shipped built-in manifest directory.
+    """
 
     def __init__(
         self,
@@ -61,8 +96,9 @@ class DriverRegistry:
     def discover(self) -> list[DriverManifest]:
         """Scan built-in + custom dirs, return drivers matching project_root.
 
-        Custom drivers come first; alphabetical order within each tier is preserved
-        from `_scan`'s `sorted(...)`.
+        Returns:
+            Matching manifests ordered by priority: custom overrides first, then
+            shipped built-ins, with alphabetical ordering preserved within each tier.
         """
         builtin = _scan(self.builtin_dir, is_custom=False)
         custom = _scan(_custom_drivers_dir(self.project_root), is_custom=True)
@@ -76,22 +112,40 @@ class DriverRegistry:
         return self._matching
 
     def all(self) -> list[DriverManifest]:
-        """Return every loaded driver (matching or not). Triggers discover() if needed."""
+        """Return every loaded driver, whether or not it matches.
+
+        Returns:
+            All loaded manifests after triggering discovery on first access.
+        """
         if not self._all_drivers:
             self.discover()
         return list(self._all_drivers)
 
     def matching(self) -> list[DriverManifest]:
+        """Return the subset of loaded drivers that match the project root.
+
+        Returns:
+            Matching manifests after triggering discovery on first access.
+        """
         if not self._all_drivers:
             self.discover()
         return list(self._matching)
 
     def primary(self) -> DriverManifest | None:
-        m = self.matching()
-        return m[0] if m else None
+        """Return the highest-priority matching driver, if any."""
+        matching_drivers = self.matching()
+        return matching_drivers[0] if matching_drivers else None
 
     def find(self, name: str) -> DriverManifest | None:
-        for d in self.all():
-            if d.name == name:
-                return d
+        """Look up a driver by its manifest name.
+
+        Args:
+            name: Driver name to locate.
+
+        Returns:
+            The matching manifest, if it was loaded during discovery.
+        """
+        for driver in self.all():
+            if driver.name == name:
+                return driver
         return None

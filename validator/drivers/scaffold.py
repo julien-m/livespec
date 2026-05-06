@@ -1,7 +1,7 @@
 """Scaffold a custom driver YAML for an unsupported stack."""
 
-# @spec FR-006: livespec spec-driver --new <stack> — .specs/features/016-cross-language-test-driver-architecture/spec.md#fr-006  # noqa: E501
-# @spec AC-008: Scaffold all 5 capability sections + --force — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-008  # noqa: E501
+# @spec FR-006: The CLI can scaffold a project-local driver manifest from a template.
+# @spec AC-008: The scaffold includes detect rules and every executable capability section.
 
 
 from __future__ import annotations
@@ -41,7 +41,7 @@ detect:
 
 
 class DriverFileExistsError(FileExistsError):
-    """Raised when the scaffold target already exists and --force is absent."""
+    """Raised when the scaffold target already exists and ``--force`` is absent."""
 
 
 def scaffold_custom_driver(
@@ -50,7 +50,20 @@ def scaffold_custom_driver(
     project_root: Path | None = None,
     force: bool = False,
 ) -> Path:
-    """Write `.specs/drivers/<stack>.yaml` from the template. Return the file path."""
+    """Write ``.specs/drivers/<stack>.yaml`` from the template.
+
+    Args:
+        stack: Stack slug to embed in the scaffolded filename and manifest.
+        project_root: Repository root where the custom driver directory lives.
+        force: Whether to overwrite an existing manifest file.
+
+    Returns:
+        Path to the scaffolded manifest file.
+
+    Raises:
+        ValueError: ``stack`` is empty or would escape the target directory.
+        DriverFileExistsError: The target file exists and ``force`` is ``False``.
+    """
     if not stack or "/" in stack or stack.startswith("."):
         raise ValueError(f"Invalid stack name: {stack!r}")
     root = project_root or Path.cwd()

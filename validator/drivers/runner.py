@@ -1,9 +1,9 @@
 """Run driver capabilities as subprocesses."""
 
-# @spec FR-003: run_driver_capability function — .specs/features/016-cross-language-test-driver-architecture/spec.md#fr-003  # noqa: E501
-# @spec AC-009: command field exec via subprocess — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-009  # noqa: E501
-# @spec AC-010: script field exec — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-010  # noqa: E501
-# @spec AC-011: coverage validates report path exists — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-011  # noqa: E501
+# @spec FR-003: Driver capabilities execute through one subprocess-based API.
+# @spec AC-009: Command-backed capabilities capture stdout, stderr, and exit status.
+# @spec AC-010: Script-backed capabilities run the referenced file instead of a command.
+# @spec AC-011: Coverage capabilities fail when the declared report artifact is missing.
 
 
 from __future__ import annotations
@@ -22,10 +22,19 @@ from .schemas import (
 
 
 def _resolve_script(script: str, project_root: Path) -> Path:
-    p = Path(script)
-    if not p.is_absolute():
-        p = project_root / p
-    return p
+    """Resolve a script path against the project root.
+
+    Args:
+        script: Script path declared in the manifest.
+        project_root: Repository root that anchors relative script paths.
+
+    Returns:
+        Absolute or project-relative path to the script file.
+    """
+    script_path = Path(script)
+    if not script_path.is_absolute():
+        script_path = project_root / script_path
+    return script_path
 
 
 def run_capability(
@@ -38,8 +47,20 @@ def run_capability(
 ) -> CapabilityResult:
     """Execute a single capability and return a structured result.
 
+    Args:
+        driver: Driver manifest that owns the capability.
+        capability: Capability name from ``CAPABILITY_NAMES``.
+        project_root: Working directory used for command execution.
+        env: Optional environment overrides merged onto ``os.environ``.
+        timeout: Optional subprocess timeout in seconds.
+
+    Returns:
+        Structured subprocess result, including synthetic failures such as
+        ``command not found`` and missing coverage artifacts.
+
     Raises:
-        CapabilityNotImplementedError: capability missing on the driver.
+        ValueError: ``capability`` is not a supported capability identifier.
+        CapabilityNotImplementedError: The driver does not define the capability.
         FileNotFoundError: ``script:`` references a non-existent file.
     """
     if capability not in CAPABILITY_NAMES:
@@ -58,12 +79,17 @@ def run_capability(
             raise FileNotFoundError(
                 f"Driver {driver.name!r} {capability} script not found: {script_path}"
             )
+        # Run scripts through bash so driver manifests can rely on standard shell semantics.
         argv: list[str] = ["bash", str(script_path)]
     else:
-        assert cap.command is not None  # enforced by schema validator
+        # The manifest validator guarantees one executable field is present, but mypy
+        # cannot infer that contract across the Pydantic model boundary.
+        assert cap.command is not None
         argv = shlex.split(cap.command)
 
     try:
+        # Use list-form subprocess invocation with shell=False so driver commands do not
+        # inherit shell interpolation beyond the manifest's explicit command tokenization.
         completed = subprocess.run(
             argv,
             cwd=str(cwd),
@@ -77,7 +103,7 @@ def run_capability(
         stdout = completed.stdout
         stderr = completed.stderr
     except FileNotFoundError:
-        # Binary not on PATH — surface as 127.
+        # Map a missing executable to 127 so callers get the conventional shell failure code.
         return CapabilityResult(
             capability_name=capability,
             exit_code=127,

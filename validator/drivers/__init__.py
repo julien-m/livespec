@@ -1,7 +1,7 @@
 """LiveSpec test driver subsystem — public API."""
 
-# @spec FR-007: Stable Python API for slash commands — .specs/features/016-cross-language-test-driver-architecture/spec.md#fr-007  # noqa: E501
-# @spec AC-013: Single run_capability entry point — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-013  # noqa: E501
+# @spec FR-007: Slash commands consume one stable Python API for driver execution.
+# @spec AC-013: The public surface exposes a single run_capability entry point.
 
 
 from .degradation import format_degradation_message, infer_stack_slug
@@ -20,6 +20,7 @@ from .schemas import (
     PatchCoverageReport,
 )
 
+# Export the supported driver API so slash commands and tests rely on one stable surface.
 __all__ = [
     "CAPABILITY_NAMES",
     "CapabilityNotImplementedError",

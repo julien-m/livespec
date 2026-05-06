@@ -1,7 +1,7 @@
 """Typer subcommand: livespec spec-driver --new <stack>."""
 
-# @spec FR-006: livespec spec-driver --new — .specs/features/016-cross-language-test-driver-architecture/spec.md#fr-006  # noqa: E501
-# @spec AC-008: Scaffold + --force + clear error — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-008  # noqa: E501
+# @spec FR-006: Driver manifests can be scaffolded from the main LiveSpec CLI.
+# @spec AC-008: The CLI exposes forceful overwrite and clear failure modes.
 
 
 from __future__ import annotations
@@ -24,7 +24,15 @@ def root(
         False, "--force", help="Overwrite existing driver file"
     ),
 ) -> None:
-    """Driver management entry point."""
+    """Handle ``livespec spec-driver`` root options.
+
+    Args:
+        new: Stack slug to scaffold under ``.specs/drivers``.
+        force: Whether to overwrite an existing manifest file.
+
+    Side Effects:
+        Writes a manifest file and emits status or error text to the terminal.
+    """
     if new is None:
         typer.echo("Usage: livespec spec-driver --new <stack> [--force]")
         raise typer.Exit(0)

@@ -1,7 +1,7 @@
 """Graceful-degradation message when no driver matches the project."""
 
-# @spec FR-004: Degradation message when registry empty — .specs/features/016-cross-language-test-driver-architecture/spec.md#fr-004  # noqa: E501
-# @spec AC-007: Structured degradation message format — .specs/features/016-cross-language-test-driver-architecture/spec.md#ac-007  # noqa: E501
+# @spec FR-004: Unsupported projects receive a structured degradation message.
+# @spec AC-007: The message includes signals, missing capabilities, and scaffold guidance.
 
 
 from __future__ import annotations
@@ -26,7 +26,14 @@ _SIGNAL_GLOBS: dict[str, list[str]] = {
 
 
 def detect_signals(project_root: Path) -> list[str]:
-    """Return file signal hints found at the top of the project."""
+    """Return file-signal hints found at the top of the project.
+
+    Args:
+        project_root: Repository root to scan for well-known marker files.
+
+    Returns:
+        Sorted unique marker patterns that matched the repository root.
+    """
     found: list[str] = []
     for _stack, patterns in _SIGNAL_GLOBS.items():
         for pat in patterns:
@@ -36,7 +43,15 @@ def detect_signals(project_root: Path) -> list[str]:
 
 
 def infer_stack_slug(project_root: Path) -> str:
-    """Best-effort slug for the unsupported stack (used in scaffold path)."""
+    """Infer a best-effort stack slug for scaffold suggestions.
+
+    Args:
+        project_root: Repository root to scan for well-known marker files.
+
+    Returns:
+        Stack slug for the first matching marker family, or ``custom`` when no
+        known signals are present.
+    """
     for stack, patterns in _SIGNAL_GLOBS.items():
         for pat in patterns:
             if any(project_root.glob(pat)):
@@ -45,7 +60,14 @@ def infer_stack_slug(project_root: Path) -> str:
 
 
 def format_degradation_message(project_root: Path) -> str:
-    """Build the structured degradation message — see AC-007."""
+    """Build the structured unsupported-stack message.
+
+    Args:
+        project_root: Repository root whose markers inform the guidance text.
+
+    Returns:
+        Human-readable instructions for creating a custom driver manifest.
+    """
     signals = detect_signals(project_root)
     stack = infer_stack_slug(project_root)
     custom_path = f".specs/drivers/{stack}.yaml"

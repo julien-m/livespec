@@ -28,10 +28,10 @@ from validator.drivers.schemas import CAPABILITY_NAMES
 
 
 def test_driver_manifest_all_capabilities_optional() -> None:
-    m = DriverManifest(name="empty")
-    assert m.implemented_capabilities() == []
+    manifest = DriverManifest(name="empty")
+    assert manifest.implemented_capabilities() == []
     for cap in CAPABILITY_NAMES:
-        assert m.get_capability(cap) is None
+        assert manifest.get_capability(cap) is None
 
 
 def test_driver_capability_requires_command_or_script() -> None:
@@ -54,11 +54,11 @@ def test_driver_capability_unknown_field_rejected() -> None:
 def test_load_manifest_valid(tmp_path: Path) -> None:
     p = tmp_path / "ruby.yaml"
     p.write_text("name: ruby\ndetect:\n  files: [Gemfile]\n")
-    m = load_manifest(p)
-    assert m is not None
-    assert m.name == "ruby"
-    assert m.detect.files == ["Gemfile"]
-    assert m.source_path == p
+    manifest = load_manifest(p)
+    assert manifest is not None
+    assert manifest.name == "ruby"
+    assert manifest.detect.files == ["Gemfile"]
+    assert manifest.source_path == p
 
 
 def test_load_manifest_malformed_yaml_returns_none(
@@ -163,78 +163,78 @@ def test_registry_skips_malformed_and_loads_rest(
 
 
 def test_run_capability_command_success(tmp_path: Path) -> None:
-    m = DriverManifest.model_validate(
+    manifest = DriverManifest.model_validate(
         {"name": "x", "snapshots": {"command": "echo hello"}}
     )
-    res = run_capability(m, "snapshots", project_root=tmp_path)
-    assert res.exit_code == 0
-    assert "hello" in res.stdout
+    result = run_capability(manifest, "snapshots", project_root=tmp_path)
+    assert result.exit_code == 0
+    assert "hello" in result.stdout
 
 
 def test_run_capability_command_failure(tmp_path: Path) -> None:
-    m = DriverManifest.model_validate(
+    manifest = DriverManifest.model_validate(
         {"name": "x", "snapshots": {"command": "false"}}
     )
-    res = run_capability(m, "snapshots", project_root=tmp_path)
-    assert res.exit_code != 0
+    result = run_capability(manifest, "snapshots", project_root=tmp_path)
+    assert result.exit_code != 0
 
 
 def test_run_capability_script_runs(tmp_path: Path) -> None:
     script = tmp_path / "run.sh"
     script.write_text("#!/usr/bin/env bash\necho from-script\n")
-    m = DriverManifest.model_validate(
+    manifest = DriverManifest.model_validate(
         {"name": "x", "snapshots": {"script": "run.sh"}}
     )
-    res = run_capability(m, "snapshots", project_root=tmp_path)
-    assert res.exit_code == 0
-    assert "from-script" in res.stdout
+    result = run_capability(manifest, "snapshots", project_root=tmp_path)
+    assert result.exit_code == 0
+    assert "from-script" in result.stdout
 
 
 def test_run_capability_script_missing_raises(tmp_path: Path) -> None:
-    m = DriverManifest.model_validate(
+    manifest = DriverManifest.model_validate(
         {"name": "x", "snapshots": {"script": "no-such.sh"}}
     )
     with pytest.raises(FileNotFoundError):
-        run_capability(m, "snapshots", project_root=tmp_path)
+        run_capability(manifest, "snapshots", project_root=tmp_path)
 
 
 def test_run_capability_missing_capability_raises(tmp_path: Path) -> None:
-    m = DriverManifest(name="x")
+    manifest = DriverManifest(name="x")
     with pytest.raises(CapabilityNotImplementedError):
-        run_capability(m, "coverage", project_root=tmp_path)
+        run_capability(manifest, "coverage", project_root=tmp_path)
 
 
 def test_run_capability_missing_binary_returns_127(tmp_path: Path) -> None:
-    m = DriverManifest.model_validate(
+    manifest = DriverManifest.model_validate(
         {"name": "x", "snapshots": {"command": "this-binary-does-not-exist-xyz"}}
     )
-    res = run_capability(m, "snapshots", project_root=tmp_path)
-    assert res.exit_code == 127
+    result = run_capability(manifest, "snapshots", project_root=tmp_path)
+    assert result.exit_code == 127
 
 
 def test_run_capability_coverage_validates_report_exists(tmp_path: Path) -> None:
     # Command succeeds but produces no report → must fail.
-    m = DriverManifest.model_validate(
+    manifest = DriverManifest.model_validate(
         {
             "name": "x",
             "coverage": {"command": "true", "report_path": "lcov.info"},
         }
     )
-    res = run_capability(m, "coverage", project_root=tmp_path)
-    assert res.exit_code != 0
-    assert "Missing coverage report" in res.stderr
+    result = run_capability(manifest, "coverage", project_root=tmp_path)
+    assert result.exit_code != 0
+    assert "Missing coverage report" in result.stderr
 
 
 def test_run_capability_coverage_with_report_present(tmp_path: Path) -> None:
     (tmp_path / "lcov.info").write_text("TN:\nend_of_record\n")
-    m = DriverManifest.model_validate(
+    manifest = DriverManifest.model_validate(
         {
             "name": "x",
             "coverage": {"command": "true", "report_path": "lcov.info"},
         }
     )
-    res = run_capability(m, "coverage", project_root=tmp_path)
-    assert res.exit_code == 0
+    result = run_capability(manifest, "coverage", project_root=tmp_path)
+    assert result.exit_code == 0
 
 
 # --- Patch coverage (FR-005 / AC-012) -----------------------------------------
@@ -259,8 +259,8 @@ def test_parse_diff_added_lines() -> None:
         "+added\n"
         " line2\n"
     )
-    d = parse_diff(diff)
-    assert d["src/foo.py"] == {2}
+    diff_map = parse_diff(diff)
+    assert diff_map["src/foo.py"] == {2}
 
 
 def test_compute_patch_coverage_full_partial_missing(tmp_path: Path) -> None:

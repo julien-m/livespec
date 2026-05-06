@@ -15,13 +15,13 @@ status: Implemented
 
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
-| FR-001 | `validator/drivers/schemas.py` | `@spec FR-001: YAML driver schema with 5 optional capabilities` | Implemented | 2026-05-06 |
-| FR-002 | `validator/drivers/registry.py` | `@spec FR-002: DriverRegistry with built-in + custom scan` | Implemented | 2026-05-06 |
-| FR-003 | `validator/drivers/runner.py` | `@spec FR-003: run_driver_capability function` | Implemented | 2026-05-06 |
-| FR-004 | `validator/drivers/degradation.py` | `@spec FR-004: Degradation message when registry empty` | Implemented | 2026-05-06 |
+| FR-001 | `validator/drivers/schemas.py` | `@spec FR-001: YAML driver schema with detect rules plus optional capability blocks` | Implemented | 2026-05-06 |
+| FR-002 | `validator/drivers/registry.py` | `@spec FR-002: Registry scans shipped manifests first, then project overrides.` | Implemented | 2026-05-06 |
+| FR-003 | `validator/drivers/runner.py` | `@spec FR-003: Driver capabilities execute through one subprocess-based API.` | Implemented | 2026-05-06 |
+| FR-004 | `validator/drivers/degradation.py` | `@spec FR-004: Unsupported projects receive a structured degradation message.` | Implemented | 2026-05-06 |
 | FR-005 | `validator/drivers/patch_coverage.py` | `@spec FR-005: compute_patch_coverage` | Implemented | 2026-05-06 |
-| FR-006 | `validator/drivers/scaffold.py`, `validator/drivers/cli.py` | `@spec FR-006: livespec spec-driver --new` | Implemented | 2026-05-06 |
-| FR-007 | `validator/drivers/__init__.py` | `@spec FR-007: Stable Python API for slash commands` | Implemented | 2026-05-06 |
+| FR-006 | `validator/drivers/scaffold.py`, `validator/drivers/cli.py` | `@spec FR-006: The CLI can scaffold a project-local driver manifest from a template.` | Implemented | 2026-05-06 |
+| FR-007 | `validator/drivers/__init__.py` | `@spec FR-007: Slash commands consume one stable Python API for driver execution.` | Implemented | 2026-05-06 |
 | FR-008 | `validator/drivers/loader.py` | `@spec FR-008: Schema validation on load` | Implemented | 2026-05-06 |
 
 ## Files Created
