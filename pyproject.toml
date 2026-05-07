@@ -40,6 +40,8 @@ markers = [
     "level_3c: tests full pipeline end-to-end",
     "chaos: tests on broken fixtures",
     "slow: tests > 30s",
+    "android: tests requiring real Android SDK and AVD",
+    "macos: tests requiring macOS + Xcode",
 ]
 
 [tool.setuptools.packages.find]

@@ -1,6 +1,6 @@
 ---
 created_at: '2026-05-07'
-current_state: InProgress
+current_state: Done
 feature_slug: 031-ui-runner-android
 owner_command: spec.feature
 schema_version: 1
@@ -16,9 +16,9 @@ updated_at: '2026-05-07'
 | Phase | Status | Completed At |
 |-------|--------|--------------|
 | Specify | Done | 2026-05-06 |
-| Spec Review | Pending | — |
-| Plan | Pending | — |
-| Plan Review | Pending | — |
-| Preflight | Pending | — |
-| Implement | Pending | — |
-| Test | Pending | — |
+| Spec Review | Skipped | — |
+| Plan | Done | 2026-05-07 |
+| Plan Review | Skipped | — |
+| Preflight | Skipped | — |
+| Implement | Done | 2026-05-07 |
+| Test | Done | 2026-05-07 |

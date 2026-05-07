@@ -1,0 +1,69 @@
+# @spec FR-008: Maestro flow template — .specs/features/031-ui-runner-android/spec.md#fr-008
+#
+# LiveSpec Maestro Flow Template: Checkout Flow
+#
+# Copy this file to your project's .specs/maestro/ directory and customize it.
+# This template demonstrates a multi-step flow with screenshots at key moments.
+#
+# Replace 'com.example.myapp' with your app's package name.
+
+appId: com.example.myapp
+
+---
+
+# Launch the app
+- launchApp
+
+# Wait for the app to fully load
+- waitForAnimationToEnd
+
+# Navigate to the product catalog
+- tapOn:
+    id: "catalog_tab"
+
+- waitForAnimationToEnd
+
+# Capture the catalog screen
+- takeScreenshot: catalog
+
+# Tap on the first product
+- tapOn:
+    id: "product_item_0"
+
+- waitForAnimationToEnd
+
+# Capture product detail screen
+- takeScreenshot: product_detail
+
+# Tap "Add to Cart"
+- tapOn:
+    id: "add_to_cart_button"
+
+- waitForAnimationToEnd
+
+# Navigate to cart
+- tapOn:
+    id: "cart_icon"
+
+- waitForAnimationToEnd
+
+# Capture cart screen
+- takeScreenshot: cart
+
+# Proceed to checkout
+- tapOn:
+    id: "checkout_button"
+
+- waitForAnimationToEnd
+
+# Capture checkout screen
+- takeScreenshot: checkout
+
+# -----------------------------------------------------------------------
+# Notes:
+# - IDs above are illustrative. Replace with your app's actual
+#   android:contentDescription or accessibilityViewIdResourceName values.
+# - Use takeScreenshot: <name> to mark key moments for visual regression.
+# - LiveSpec renames PNGs using the tag name (e.g. 'cart.png').
+# - Flows without takeScreenshot get one auto-captured screenshot at the end.
+# -----------------------------------------------------------------------

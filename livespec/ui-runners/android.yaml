@@ -1,0 +1,162 @@
+# Built-in UI Runner: Android (Maestro)
+# Feature 031 — UI Runner Android
+#
+# @spec FR-001: Android/Maestro runner manifest — .specs/features/031-ui-runner-android/spec.md#fr-001
+
+runner:
+  id: maestro
+  name: Android (Maestro)
+  description: >
+    Detects and runs Maestro YAML UI flows on Android emulators.
+    Orchestrates AVD boot, executes .specs/maestro/*.yaml flows,
+    captures screenshots, and compares to baselines.
+  version: "1.0.0"
+  platforms:
+    - android
+    - wearos  # experimental — emits warning when used
+  # @spec FR-003: priority 50, lower than iOS (60) — .specs/features/031-ui-runner-android/spec.md#fr-003
+  priority: 50
+
+# @spec FR-001: detect rules — .specs/features/031-ui-runner-android/spec.md#fr-001
+detect:
+  # OR logic: project must match AT LEAST ONE of the listed markers
+  logic: OR
+  files:
+    - build.gradle
+    - build.gradle.kts
+    - AndroidManifest.xml
+  dirs:
+    - maestro        # top-level maestro/ directory with YAML flows
+    - .specs/maestro # LiveSpec-style .specs/maestro/ directory
+
+capabilities:
+  detect:
+    description: >
+      Detect whether this project is an Android Gradle project
+      with Maestro flow YAML files.
+    # No command — handled by MaestroRunnerHandler.detect()
+
+  # @spec FR-003: capture_screenshot capability — .specs/features/031-ui-runner-android/spec.md#fr-003
+  capture_screenshot:
+    description: >
+      Run Maestro flows, extract tagged screenshots (takeScreenshot commands),
+      or fall back to adb shell screencap at end of each flow.
+    command: "maestro test <flow_path>"
+    parameters:
+      avd_name:
+        type: string
+        required: false
+        default: "Pixel_8_API_35"
+        description: >
+          AVD name to use for screenshot capture.
+          Overrides the default destination when set.
+      adb_port:
+        type: integer
+        required: false
+        default: 5554
+        description: ADB port for the emulator (used in multi-emulator environments)
+      platform:
+        type: string
+        required: false
+        default: "android"
+        description: >
+          Platform filter. 'wearos' emits an experimental warning.
+    output_path: ".specs/design/screens/{avd_name}/{screen}.png"
+
+  # @spec FR-004: run_flow capability — .specs/features/031-ui-runner-android/spec.md#fr-004
+  run_flow:
+    description: >
+      Run all Maestro YAML flows from .specs/maestro/ sequentially.
+      Reports per-flow pass/fail. Failed flows do not stop others
+      unless --fail-fast is set.
+    command: "maestro test .specs/maestro/<flow>.yaml"
+    parameters:
+      avd_name:
+        type: string
+        required: false
+        default: "Pixel_8_API_35"
+        description: AVD name to target. Lists available AVDs if not found.
+      adb_port:
+        type: integer
+        required: false
+        default: 5554
+        description: ADB port for multi-emulator environments
+      fail_fast:
+        type: boolean
+        required: false
+        default: false
+        description: Stop execution after first failed flow (AC-011)
+      platform:
+        type: string
+        required: false
+        default: "android"
+        description: Platform filter — 'wearos' emits experimental warning
+    output: "per-flow pass/fail results + failed flow names"
+
+  # @spec FR-005: compare_baseline delegates to pixelmatch — .specs/features/031-ui-runner-android/spec.md#fr-005
+  compare_baseline:
+    description: >
+      Compare a screenshot against baseline using pixelmatch (Feature 010).
+      Same comparison engine used by web and iOS runners.
+    command: "node scripts/pixelmatch-cli.js <baseline> <screenshot> <threshold>"
+    parameters:
+      baseline:
+        type: string
+        required: true
+        description: Path to baseline PNG file
+      screenshot:
+        type: string
+        required: true
+        description: Path to current screenshot PNG file
+      threshold:
+        type: number
+        required: false
+        default: 0.05
+        description: Pixel diff tolerance (Feature 010 default 0.05)
+    output: "diff PNG + boolean result"
+
+# @spec FR-002: default AVD destination — .specs/features/031-ui-runner-android/spec.md#fr-002
+destinations:
+  - avd_name: Pixel_8_API_35
+    platform: android
+    adb_port: 5554
+    default: true
+    description: >
+      Default Android emulator (Pixel 8, API 35). Create with:
+      avdmanager create avd -n Pixel_8_API_35
+      -k 'system-images;android-35;google_apis;arm64-v8a'
+  - avd_name: Pixel_Tablet_API_34
+    platform: android
+    adb_port: 5556
+    default: false
+    description: >
+      Tablet emulator for tablet/foldable coverage (optional).
+      Per-device baselines stored under .specs/design/screens/Pixel_Tablet_API_34/
+  - avd_name: WearOS_Small_Round_API_33
+    platform: wearos
+    adb_port: 5558
+    default: false
+    description: >
+      Wear OS emulator (experimental — Maestro Wear OS support is experimental).
+      Use with: /spec.test --visual --platform=wearos
+
+# @spec FR-004: default scenario — .specs/features/031-ui-runner-android/spec.md#fr-004
+scenarios:
+  - name: default
+    avd_name: null        # null = use manifest default (Pixel_8_API_35)
+    fail_fast: false      # AC-011: continue after per-flow failure
+    timeout_seconds: 300  # per-flow timeout
+
+# Feature 010 compatibility: compare_baseline delegates to Feature 010 pixelmatch engine
+feature_010_compatibility: |
+  compare_baseline delegates to Feature 010's pixelmatch-cli.js script.
+  Web, iOS, and Android runners all share the same pixel-level comparison engine.
+
+# Infrastructure requirements (managed by /spec.preflight --fix):
+# - ANDROID_HOME or ANDROID_SDK_ROOT must be set
+# - adb must be on PATH (bundled with Android SDK)
+# - emulator binary must be on PATH (bundled with Android SDK)
+# - Maestro CLI: curl -Ls https://get.maestro.mobile.dev | bash
+# - AVD must exist: avdmanager create avd -n Pixel_8_API_35
+#     -k 'system-images;android-35;google_apis;arm64-v8a'
+# - JDK 17+ required by Android Gradle plugin

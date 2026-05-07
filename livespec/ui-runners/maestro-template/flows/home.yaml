@@ -1,0 +1,46 @@
+# @spec FR-008: Maestro flow template — .specs/features/031-ui-runner-android/spec.md#fr-008
+#
+# LiveSpec Maestro Flow Template: Home Screen
+#
+# Copy this file to your project's .specs/maestro/ directory and customize it.
+# LiveSpec will run all .yaml files in .specs/maestro/ when /spec.test --visual is invoked.
+#
+# Replace 'com.example.myapp' with your app's package name (applicationId in build.gradle).
+
+appId: com.example.myapp
+
+---
+
+# Launch the app (kills any existing instance)
+- launchApp
+
+# Wait for the home screen to render
+- waitForAnimationToEnd
+
+# Capture the home screen for visual regression testing.
+# The PNG will be saved as 'home.png' (or 'home_<timestamp>.png')
+# under .specs/design/screens/ and compared to the baseline.
+- takeScreenshot: home
+
+# Example interactions (uncomment and customize as needed):
+#
+# Tap a button by its accessibility ID:
+# - tapOn:
+#     id: "login_button"
+#
+# Tap by text:
+# - tapOn: "Sign In"
+#
+# Assert an element is visible:
+# - assertVisible:
+#     id: "dashboard_header"
+#
+# Scroll down in a scrollable container:
+# - scroll
+#
+# Wait for a specific element:
+# - waitForAnimationToEnd:
+#     timeout: 5000
+
+# Capture a second screenshot after interactions
+# - takeScreenshot: home_after_scroll
