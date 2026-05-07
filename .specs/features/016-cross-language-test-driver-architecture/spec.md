@@ -1,12 +1,22 @@
+---
+feature: 016-cross-language-test-driver-architecture
+title: Cross-Language Test Driver Architecture
+status: Implemented
+priority: P1
+branch: feature/016-cross-language-test-driver-architecture
+created: 2026-05-06
+updated: 2026-05-06
+---
+
 # Feature Spec: Cross-Language Test Driver Architecture
 
 - **Feature:** Cross-Language Test Driver Architecture
 - **Branch:** feature/016-cross-language-test-driver-architecture
 - **Date:** 2026-05-06
-- **Status:** Draft
-- **Priority:** P0
+- **Status:** Implemented
+- **Priority:** P1
 - **Scope:** L
-- **Input:** Foundation for cross-language test orchestration in LiveSpec. Defines the driver system that allows any project using LiveSpec (Python, TS/JS, Swift, Go, Rust, JVM) to have automated test orchestration for 5 patterns: coverage gate, snapshot testing, migration tests, property-based testing, and mutation testing. NOT for LiveSpec's own tests — this is the infrastructure layer that all per-stack driver features (017-022) depend on.
+- **Input:** Foundation for cross-language test orchestration in LiveSpec. Defines the driver system that allows any project using LiveSpec (Python, TS/JS, Swift, Go, Rust, JVM) to have automated test orchestration for 4 executable patterns: coverage gate, snapshot testing, property-based testing, and mutation testing. Detection rules are modeled separately from executable capabilities. NOT for LiveSpec's own tests — this is the infrastructure layer that all per-stack driver features (017-022) depend on.
 - **Feature Number:** 016
 
 ---
@@ -91,7 +101,7 @@ Feature: Graceful degradation for unsupported stack
     Then LiveSpec emits a warning: "Stack 'elixir' not supported"
     And the message includes the detected file signals
     And the message includes the custom driver path: .specs/drivers/elixir.yaml
-    And the message includes the scaffold command: livespec spec.driver --new elixir
+    And the message includes the scaffold command: livespec spec-driver --new elixir
     And the message includes which LiveSpec file to connect the driver to
     And /spec.test exits with code 0 (not blocked)
 
@@ -169,38 +179,38 @@ flowchart TD
 
 ### Story 4 — Developer scaffolds a custom driver for an unsupported stack `P2`
 
-A developer whose stack is unsupported runs `livespec spec.driver --new elixir`. LiveSpec writes `.specs/drivers/elixir.yaml` with all 5 capability fields documented, commented out, and ready to fill in.
+A developer whose stack is unsupported runs `livespec spec-driver --new elixir`. LiveSpec writes `.specs/drivers/elixir.yaml` with detect rules plus all 4 executable capability sections documented, commented out, and ready to fill in.
 
 **Priority reason:** Reduces friction for custom driver adoption. Developers shouldn't need to know the YAML schema from memory.
 
-**Independent test:** Run `livespec spec.driver --new elixir` and verify the generated YAML file contains all 5 capability sections with inline documentation.
+**Independent test:** Run `livespec spec-driver --new elixir` and verify the generated YAML file contains detect rules plus all 4 executable capability sections with inline documentation.
 
 ```gherkin
 Feature: Custom driver scaffolding
   Scenario: Scaffold new driver for unsupported stack
     Given no .specs/drivers/elixir.yaml exists
-    When the developer runs: livespec spec.driver --new elixir
+    When the developer runs: livespec spec-driver --new elixir
     Then LiveSpec creates .specs/drivers/elixir.yaml
-    And the file contains all 5 capability sections: detect, coverage, snapshots, properties, mutation
+    And the file contains detect plus all executable capability sections: coverage, snapshots, properties, mutation
     And each capability section is commented with inline documentation
     And the file includes a note pointing to spec-system.md for integration instructions
 
   Scenario: Scaffold blocked when driver already exists
     Given .specs/drivers/python.yaml already exists
-    When the developer runs: livespec spec.driver --new python
+    When the developer runs: livespec spec-driver --new python
     Then LiveSpec emits: "Driver .specs/drivers/python.yaml already exists. Use --force to overwrite."
     And the existing file is not modified
 ```
 
 ```mermaid
 flowchart TD
-    A[livespec spec.driver --new elixir] --> B{File already exists?}
+    A[livespec spec-driver --new elixir] --> B{File already exists?}
     B -- Yes --> C{--force flag?}
     C -- No --> D[Error: file exists, use --force]
     C -- Yes --> E[Overwrite with template]
     B -- No --> E
     E --> F[Write YAML template]
-    F --> G[5 capability sections, documented]
+    F --> G[Detect + 4 capability sections, documented]
     G --> H[Add integration note]
     H --> I[Print success + next steps]
 ```
@@ -254,19 +264,19 @@ flowchart TD
 
 ## Acceptance Criteria
 
-- **AC-001** — Driver YAML schema defines exactly 5 capability fields: `detect`, `coverage`, `snapshots`, `properties`, `mutation`. Each field is optional.
+- **AC-001** — Driver YAML schema defines `detect` rules plus exactly 4 executable capability fields: `coverage`, `snapshots`, `properties`, `mutation`. Each executable capability field is optional.
 - **AC-002** — A driver may omit any capability field. Omitted capabilities are reported as "not implemented" and skipped — they do not cause an error or non-zero exit.
 - **AC-003** — Built-in drivers are embedded in the LiveSpec package under `livespec/drivers/*.yaml` and auto-discovered on registry initialization.
 - **AC-004** — Custom drivers are loaded from `.specs/drivers/<stack>.yaml` in the project repo and take priority over built-in drivers.
 - **AC-005** — The `detect` capability uses file-pattern matching (`files: [pattern]`) to auto-identify the stack from the project root.
 - **AC-006** — When multiple drivers match via detect(), custom drivers win over built-in; among same tier, first alphabetical match wins.
-- **AC-007** — When no driver matches, LiveSpec emits a structured degradation message: detected file signals, missing capabilities list, `.specs/drivers/<stack>.yaml` path, `livespec spec.driver --new <stack>` command, link to integration doc.
-- **AC-008** — `livespec spec.driver --new <stack>` creates `.specs/drivers/<stack>.yaml` with all 5 capability sections documented inline. Fails with clear error if file exists (unless `--force`).
+- **AC-007** — When no driver matches, LiveSpec emits a structured degradation message: detected file signals, missing capabilities list, `.specs/drivers/<stack>.yaml` path, `livespec spec-driver --new <stack>` command, link to integration doc.
+- **AC-008** — `livespec spec-driver --new <stack>` creates `.specs/drivers/<stack>.yaml` with detect rules plus all 4 executable capability sections documented inline. Fails with clear error if file exists (unless `--force`).
 - **AC-009** — Each capability with a `command:` field executes it as a subprocess; stdout, stderr, and exit code are captured into `CapabilityResult`.
 - **AC-010** — Each capability with a `script:` field executes the referenced shell script instead of a `command:` (escape hatch for complex parsing); same `CapabilityResult` shape.
 - **AC-011** — Coverage capability reports the path of the produced `lcov.info`. LiveSpec validates the file exists after execution; missing file = capability failure.
 - **AC-012** — Patch coverage is computed by LiveSpec via `lcov.info` + `git diff HEAD~1` intersection. No external service call.
-- **AC-013** — `/spec.test`, `/spec.feature` (test phase), and `/spec.implement` (test phase) all invoke drivers through a single `run_driver_capability(driver, capability, **kwargs)` Python function.
+- **AC-013** — `/spec.test`, `/spec.feature` (test phase), and `/spec.implement` (test phase) all invoke drivers through a single `run_capability(driver, capability, **kwargs)` Python function.
 - **AC-014** — A malformed driver YAML file is skipped with a WARNING log; the rest of the registry loads normally.
 - **AC-015** — The driver system has no dependency on Codecov, Coveralls, SonarCloud, or any hosted service.
 
@@ -274,13 +284,13 @@ flowchart TD
 
 ## Functional Requirements
 
-- **FR-001** — Define YAML driver schema (`DriverSchema`) with 5 optional capability blocks: `detect` (file patterns), `coverage` (command/script + report_path + threshold), `snapshots` (command/script), `properties` (command/script), `mutation` (command/script + report_path). Validate with Pydantic.
+- **FR-001** — Define YAML driver schema (`DriverSchema`) with `detect` rules plus 4 optional executable capability blocks: `coverage` (command/script + report_path + threshold), `snapshots` (command/script), `properties` (command/script), `mutation` (command/script + report_path). Validate with Pydantic.
 - **FR-002** — Implement `DriverRegistry`: scan `livespec/drivers/*.yaml` (built-in), then `.specs/drivers/*.yaml` (custom, higher priority). For each candidate, evaluate `detect.files` against project root. Return ordered list of matching drivers.
-- **FR-003** — Implement `run_driver_capability(driver: DriverManifest, capability: str, **kwargs) -> CapabilityResult`. Execute `command` or `script` as subprocess, capture output, return structured result. Raise `CapabilityNotImplementedError` if capability missing.
+- **FR-003** — Implement `run_capability(driver: DriverManifest, capability: str, **kwargs) -> CapabilityResult`. Execute `command` or `script` as subprocess, capture output, return structured result. Raise `CapabilityNotImplementedError` if capability missing.
 - **FR-004** — Implement graceful degradation handler: when `DriverRegistry` returns empty, emit structured warning (AC-007 format) to stdout and return without error.
 - **FR-005** — Implement `compute_patch_coverage(lcov_path: Path, diff_output: str) -> dict[str, float]`. Parse lcov.info DA lines, parse git diff hunk headers, intersect, return per-file coverage ratio.
-- **FR-006** — Implement `livespec spec.driver --new <stack>` subcommand: write `.specs/drivers/<stack>.yaml` from embedded template. Add `--force` flag to overwrite.
-- **FR-007** — Expose driver invocation to slash commands via a stable Python API (`livespec.drivers.run_capability()`) that `/spec.test`, `/spec.feature`, and `/spec.implement` call — no direct YAML parsing in slash command files.
+- **FR-006** — Implement `livespec spec-driver --new <stack>` subcommand: write `.specs/drivers/<stack>.yaml` from embedded template. Add `--force` flag to overwrite.
+- **FR-007** — Expose driver invocation to slash commands via a stable Python API (`validator.drivers.run_capability()`) that `/spec.test`, `/spec.feature`, and `/spec.implement` call — no direct YAML parsing in slash command files.
 - **FR-008** — Implement driver schema validation on load: malformed YAML or schema violations → log WARNING + skip driver (AC-014).
 
 ---
@@ -289,7 +299,7 @@ flowchart TD
 
 | Entity | Description |
 |---|---|
-| `DriverManifest` | Parsed and validated YAML driver file. Holds `name`, `detect` rules, and up to 5 capability blocks. |
+| `DriverManifest` | Parsed and validated YAML driver file. Holds `name`, `detect` rules, and up to 4 executable capability blocks. |
 | `DriverCapability` | One capability block (coverage / snapshots / properties / mutation). Has `command` or `script`, optional `report_path`, optional `threshold`. |
 | `CapabilityResult` | Result of executing one capability: `exit_code`, `report_path`, `stdout`, `stderr`, `capability_name`. |
 | `DriverRegistry` | Ordered list of `DriverManifest` objects matching the current project. Built-in drivers + custom drivers, custom first. |
@@ -313,7 +323,7 @@ flowchart TD
 
 - **SC-001** — `/spec.test` on a Python fixture project completes in < 5 seconds excluding test execution time (driver overhead only).
 - **SC-002** — Running on a project with no matching driver emits a degradation message and exits 0 in < 1 second.
-- **SC-003** — `livespec spec.driver --new <stack>` generates a valid YAML file that passes schema validation.
+- **SC-003** — `livespec spec-driver --new <stack>` generates a valid YAML file that passes schema validation.
 - **SC-004** — Adding a new YAML file to `livespec/drivers/` requires zero changes to any Python file.
 - **SC-005** — Patch coverage computation produces correct results on a reference lcov.info + diff fixture (verified by unit test).
 - **SC-006** — All 5 built-in driver slots (Python, TS/JS, Swift, Go, JVM) are registered in the registry even if their YAML is a stub (capabilities may be empty in Phase 0).

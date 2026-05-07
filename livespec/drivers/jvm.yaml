@@ -1,0 +1,40 @@
+# @spec FR-001: JVM driver YAML — .specs/features/022-driver-jvm/spec.md#fr-001
+# Single driver covers Java + Kotlin (Gradle Groovy DSL, Gradle Kotlin DSL, Maven).
+# Capabilities all use shell escape hatches because the Gradle vs Maven dispatch
+# happens before any concrete tool is invoked:
+#   - coverage  : JaCoCo via Gradle (jacocoTestCoverageVerification) or Maven (verify)
+#   - snapshots : ./gradlew test or mvn test (kotest-snapshot for Kotlin, approvaltests for Java)
+#   - properties: ./gradlew test or mvn test (kotest-property for Kotlin, jqwik for Java)
+#   - mutation  : pitest via ./gradlew pitest or mvn org.pitest:pitest-maven:mutationCoverage
+#
+# Required tools (not installed by LiveSpec; runner surfaces install hints):
+#   gradle / ./gradlew  (or)  mvn
+#   JaCoCo plugin in build file
+#   pitest plugin in build file (optional — capability skips with hint if absent)
+name: jvm
+detect:
+  files:
+    - build.gradle
+    - build.gradle.kts
+    - pom.xml
+coverage:
+  # Gradle path: build/reports/jacoco/test/lcov.info
+  # Maven path:  target/site/jacoco/lcov.info
+  # Threshold default mirrors the spec example (80%); override via .specs/drivers/jvm.yaml.
+  script: scripts/jvm-coverage-gate.sh
+  report_path: build/reports/jacoco/test/lcov.info
+  threshold: 80
+snapshots:
+  # Auto-detect kotest-snapshot (Kotlin-first) or approvaltests (Java-first) via
+  # validator/drivers/jvm_detector.py; the runner emits the skip-message when
+  # neither is present (AC-005). Tests run via the build tool's standard task.
+  script: scripts/jvm-snapshots.sh
+properties:
+  # Auto-detect kotest-property (Kotlin-first) or jqwik (Java-first); runner
+  # emits the skip-message when neither is present (AC-006).
+  script: scripts/jvm-properties.sh
+mutation:
+  # Parses build/reports/pitest/mutations.xml (Gradle) or
+  # target/pit-reports/<timestamp>/mutations.xml (Maven) via
+  # validator/drivers/jvm_detector.parse_pitest_xml.
+  script: scripts/jvm-mutation.sh

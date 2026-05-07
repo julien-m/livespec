@@ -1,0 +1,17 @@
+# @spec FR-001: TS/JS driver YAML with all 4 capabilities — .specs/features/018-driver-typescript-javascript/spec.md#fr-001
+name: typescript
+detect:
+  files:
+    - package.json
+coverage:
+  command: npx vitest run --coverage --coverage.reporter=lcov
+  report_path: coverage/lcov.info
+  threshold: 80
+snapshots:
+  command: npx vitest run
+properties:
+  command: npx vitest run
+mutation:
+  command: npx stryker run
+  report_path: reports/mutation/mutation.json
+  threshold: 60

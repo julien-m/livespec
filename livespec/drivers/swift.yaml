@@ -1,0 +1,16 @@
+# @spec FR-001: Swift driver YAML with all 4 capabilities — .specs/features/019-driver-swift/spec.md#fr-001
+name: swift
+detect:
+  files:
+    - Package.swift
+coverage:
+  script: scripts/swift-coverage-gate.sh
+  report_path: .build/coverage/lcov.info
+  threshold: 75
+snapshots:
+  command: swift test
+properties:
+  command: swift test --filter Property
+mutation:
+  command: muter run
+  threshold: 60

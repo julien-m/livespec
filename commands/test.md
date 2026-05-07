@@ -804,6 +804,55 @@ When multiple features are tested in a single run, display after all individual 
 | `--no-behavioral` | | Skip behavioral coverage audit (sub-phase 1.5) |
 | `--reset-baselines[=<screen>]` | | Delete existing baselines (all, or named screen only) then recapture. Triggers human approval gate. Use `--reset-baselines` for intentional UI changes — NEVER `--update-snapshots`. Blocked on CI. |
 | `--regenerate-missing` | | Scan all features for missing tests. Combine with `--confirm` to generate or `--dry-run` to preview. See dedicated section below. |
+| `--mutation` | | **On-demand mutation testing audit** (feature 025). Invokes the active driver's `mutation` capability, parses the output, and prepends a dated entry to `.specs/testing/mutation-report.md`. Never run as part of standard `/spec.test` or per-PR CI — must be opted into explicitly. See dedicated section below. |
+
+---
+
+## --mutation — On-Demand Mutation Testing Audit
+
+> Feature 025 — `feature/025-mutation-testing-on-demand`. Implementation:
+> [`validator/drivers/mutation_report.py`](../validator/drivers/mutation_report.py).
+
+When `--mutation` is provided, `/spec.test` runs the active driver's `mutation`
+capability through `validator.drivers.run_mutation` and produces a Markdown
+report at `.specs/testing/mutation-report.md` (newest entry first).
+
+**Behaviour:**
+
+- Without the flag, mutation is never invoked (SC-001).
+- When the active driver has no `mutation` block (e.g. Go), the command prints
+  `mutation: not implemented for <driver> driver` plus the alternative
+  suggestion returned by `validator.drivers.alternative_for(driver)` and exits
+  `0` (AC-002).
+- When the mutation tool is not installed (subprocess exit code 127), the
+  command prints an install hint and exits `0` (AC-007).
+- When a `threshold` is set on the driver's `mutation` capability (e.g.
+  `threshold: 70` in `python.yaml`) and the kill rate is below it, the command
+  exits non-zero (AC-005).
+- The historical report file is created on the first run and prepended to on
+  subsequent runs (AC-003, AC-004). Survivor lists exceeding 20 entries are
+  truncated and a "N more survivors — run tool directly for full list" line is
+  appended (EC-002). The `.specs/testing/` directory is created on demand
+  (EC-003).
+
+**Driver dispatch:**
+
+| Driver       | Tool          | Parser used                                   |
+|--------------|---------------|-----------------------------------------------|
+| `python`     | mutmut        | `mutmut_parser.parse_mutmut_results`          |
+| `typescript` | Stryker       | `stryker_parser.load_stryker_report`          |
+| `jvm`        | pitest        | `jvm_detector.parse_pitest_xml`               |
+| `rust`       | cargo-mutants | `rust_detector.parse_cargo_mutants_json`      |
+| `swift`      | muter         | regex extraction from muter stdout            |
+| `go`         | n/a           | capability absent → "not implemented" + exit 0 |
+
+**Output summary printed by the command:**
+
+```
+Mutation audit (python) — kill rate 92.3 %  (killed 120 / survived 8 / timeout 2)
+Survivors: 8 — see .specs/testing/mutation-report.md
+Full report: .specs/testing/mutation-report.md
+```
 
 ---
 
