@@ -264,7 +264,7 @@ Loop terminates when all checks pass or user skips.
 
 After execution (regardless of verdict — READY, WARNINGS, or BLOCKED), write `.specs/preflight-report.md` using the template from `system/templates/preflight-report-template.md`.
 
-**Gitignore enforcement:** `.specs/preflight-report.md` is an execution artifact and **must never be committed**. Before writing the report, ensure `.gitignore` contains a line matching `.specs/preflight-report.md` (or `preflight-report.md`). If absent, append:
+**Gitignore enforcement:** `.specs/preflight-report.md` is an execution artifact and **must never be committed**. Before writing the report, ensure `.gitignore` contains an exact ignore entry for `.specs/preflight-report.md`. If absent, append:
 
 ```
 # Preflight report — execution artifact, never versioned

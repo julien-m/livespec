@@ -21,7 +21,7 @@ source: pyproject.toml requires-python ≥3.11
 auto_resolve: false
 ```
 
-**Status:** Verify manually — `python3 --version` or `python --version`
+**Status:** Verify manually — `python3 --version`
 
 ### pip (package manager)
 
@@ -31,7 +31,7 @@ source: CI workflow uses pip install -e
 auto_resolve: false
 ```
 
-**Status:** Standard with Python installation
+**Status:** Verify manually — `python3 -m pip --version`
 
 ### Virtual environment
 

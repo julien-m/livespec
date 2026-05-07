@@ -811,7 +811,7 @@ After `.specs/` structure is installed, generate and execute the preflight manif
 5. **Gitignore:** Ensure `.gitignore` contains `.specs/preflight-report.md`. The report is an execution artifact and must never be committed.
 6. **Commit:** Add `preflight.md` to the init commit. **Do NOT commit `preflight-report.md`** — it is gitignored.
 
-If the user declines to resolve blockers during init, the manifest is still committed with the checks marked as failing in the report. They can re-run `/spec.preflight` later.
+If the user declines to resolve blockers during init, the manifest is still committed and the local preflight report records the failing checks. They can re-run `/spec.preflight` later.
 
 ---
 
