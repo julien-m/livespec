@@ -7,6 +7,7 @@
 
 ---
 
+## 2026-05-07 -- [Feature 033] In progress: Smart Test Selection — core selector module + 22 unit tests; selector logic landed, hook/CLI/migration work still pending
 ## 2026-05-07 -- [Feature 028] In progress: UI Runner Web (Playwright Refactor) — added web.yaml manifest and Playwright handler scaffold
 ## 2026-05-07 -- [Feature 026] Implemented: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR; 43 new tests pass (917 total)
 ## 2026-05-07 -- [Feature 025] Implemented: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR; 15 new tests pass (874 total)
