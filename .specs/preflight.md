@@ -16,7 +16,7 @@ updated_at: '2026-04-13'
 ### Python 3.11+
 
 ```yaml
-check: python --version | grep "3\.(1[1-9]|[2-9][0-9])"
+check: python3 --version | grep -E "3\.(1[1-9]|[2-9][0-9])"
 source: pyproject.toml requires-python ≥3.11
 auto_resolve: false
 ```
@@ -26,7 +26,7 @@ auto_resolve: false
 ### pip (package manager)
 
 ```yaml
-check: pip --version
+check: python3 -m pip --version
 source: CI workflow uses pip install -e
 auto_resolve: false
 ```

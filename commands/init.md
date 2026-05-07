@@ -808,7 +808,8 @@ After `.specs/` structure is installed, generate and execute the preflight manif
 2. **Detect `.env` tokens:** If a `.env` file exists at project root, scan for `creds:*` entries and add them as Token checks
 3. **Execute full preflight:** Run the 3-pass execution engine (Pass 1: verify all → Pass 2: auto-resolve → Pass 3: human blockers)
 4. **Present blockers:** The user is present during init — present all human-required actions (OAuth login, `creds set`) grouped together
-5. **Commit:** Add `preflight.md` and `preflight-report.md` to the init commit
+5. **Gitignore:** Ensure `.gitignore` contains `.specs/preflight-report.md`. The report is an execution artifact and must never be committed.
+6. **Commit:** Add `preflight.md` to the init commit. **Do NOT commit `preflight-report.md`** — it is gitignored.
 
 If the user declines to resolve blockers during init, the manifest is still committed with the checks marked as failing in the report. They can re-run `/spec.preflight` later.
 
@@ -871,7 +872,7 @@ flowchart TD
 > - `.specs/changelog.md` — global changelog
 > - `.specs/roadmap.md` — feature roadmap (N items across MVP/Post-MVP/Future)
 > - `.specs/preflight.md` — preflight manifest (tooling, auth, tokens)
-> - `.specs/preflight-report.md` — preflight execution report
+> - `.specs/preflight-report.md` — preflight execution report (gitignored, local only)
 > - `.conventions/conventions.md` — coding conventions (generated from stack)
 > - `.claude/commands/` — 17 spec commands (local symlinks)
 > - `.claude/agents/` — 4 LiveSpec agents (local symlinks)
@@ -982,6 +983,7 @@ Before declaring success, verify:
 - [ ] `.specs/hooks/` directory exists
 - [ ] `.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`
 - [ ] `.gitignore` contains `.specs/hooks/*.local.md`
+- [ ] `.gitignore` contains `.specs/preflight-report.md` (execution artifact, never versioned)
 - [ ] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)
 - [ ] `.specs/preflight.md` exists with checks generated from stack
 - [ ] `.specs/preflight-report.md` exists with execution results

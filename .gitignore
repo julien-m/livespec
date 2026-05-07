@@ -177,3 +177,6 @@ playwright-report/
 # Local audit reports (consultative, not versioned)
 AUDIT.md
 AUDIT-CODEX.md
+
+# Preflight report — execution artifact, never versioned
+.specs/preflight-report.md
