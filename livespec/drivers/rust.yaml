@@ -1,0 +1,35 @@
+# @spec FR-001: Rust driver YAML — .specs/features/021-driver-rust/spec.md#fr-001
+# Rust is the only stack in the test-driver batch where every capability ships
+# a native command — no escape-hatch script required:
+#   - coverage   : cargo llvm-cov has --fail-under-lines + native lcov output
+#   - snapshots  : cargo insta provides a TUI review affordance
+#   - properties : cargo test (proptest / quickcheck detected via Cargo.toml)
+#   - mutation   : cargo mutants is fast + incremental + JSON-friendly
+#
+# Required tools (not installed by LiveSpec; runner surfaces install hints):
+#   cargo install cargo-llvm-cov
+#   cargo install cargo-insta
+#   cargo install cargo-mutants
+name: rust
+detect:
+  files:
+    - Cargo.toml
+coverage:
+  # Native --fail-under-lines: the gate is enforced by cargo-llvm-cov directly.
+  # Threshold mirrors the spec example (80%); override via .specs/drivers/rust.yaml.
+  command: cargo llvm-cov --lcov --output-path lcov.info --fail-under-lines 80
+  report_path: lcov.info
+  threshold: 80
+snapshots:
+  # --unreferenced=reject fails the run when stale .snap files are present,
+  # matching the spec contract (insta is the reference Rust snapshot library).
+  command: cargo insta test --unreferenced=reject
+properties:
+  # cargo test runs every test, including proptest / quickcheck cases.
+  # Library detection (proptest preferred over quickcheck) lives in
+  # validator/drivers/rust_detector.py and is consulted by the runner.
+  command: cargo test
+mutation:
+  # JSON output is parsed by validator/drivers/rust_detector.parse_cargo_mutants_json
+  # to extract caught/missed/timeout/unviable counts.
+  command: cargo mutants --json
