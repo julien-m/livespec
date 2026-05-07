@@ -77,16 +77,16 @@ def _sum_from_files_block(files_block: dict[str, Any]) -> tuple[int, int, int, i
     for file_entry_obj in files_block.values():  # type: ignore[union-attr]
         if not isinstance(file_entry_obj, dict):
             continue
-        file_entry: dict[str, Any] = file_entry_obj
-        mutants_obj = file_entry.get("mutants", [])  # type: ignore[union-attr]
+        file_entry = cast(dict[str, Any], file_entry_obj)
+        mutants_obj = file_entry.get("mutants", [])
         if not isinstance(mutants_obj, list):
             continue
-        mutants: list[Any] = mutants_obj
+        mutants = cast(list[Any], mutants_obj)
         for mutant_obj in mutants:
             if not isinstance(mutant_obj, dict):
                 continue
-            mutant: dict[str, Any] = mutant_obj
-            status = mutant.get("status")  # type: ignore[union-attr]
+            mutant = cast(dict[str, Any], mutant_obj)
+            status = mutant.get("status")
             if status == _KILLED_STATUS:
                 killed += 1
             elif status == _SURVIVED_STATUS:
