@@ -11,6 +11,7 @@ from typer.testing import CliRunner
 from validator.cli import app
 from validator.drivers import (
     CapabilityNotImplementedError,
+    DriverCapability,
     DriverManifest,
     DriverRegistry,
     compute_patch_coverage,
@@ -21,6 +22,7 @@ from validator.drivers import (
     run_capability,
     scaffold_custom_driver,
 )
+from validator.drivers import run_all_capabilities
 from validator.drivers.scaffold import DriverFileExistsError
 from validator.drivers.schemas import CAPABILITY_NAMES
 
@@ -298,17 +300,38 @@ def test_compute_patch_coverage_empty_diff(tmp_path: Path) -> None:
 def test_format_degradation_message_elixir(tmp_path: Path) -> None:
     (tmp_path / "mix.exs").write_text("")
     msg = format_degradation_message(tmp_path)
+    # AC-006: structured prefix and required sections.
+    assert msg.startswith("⚠ Stack not supported")
     assert "elixir" in msg
+    assert "No driver registered for this stack" in msg
     assert ".specs/drivers/elixir.yaml" in msg
-    assert "livespec spec-driver --new elixir" in msg
+    assert "livespec spec.driver --new elixir" in msg
     assert "mix.exs" in msg
     assert "spec-system.md" in msg
 
 
 def test_format_degradation_message_no_signals(tmp_path: Path) -> None:
+    # AC-008: fallback slug is "unknown" when no signals are detected.
     msg = format_degradation_message(tmp_path)
-    assert "custom" in msg
+    assert "unknown" in msg
     assert "(none)" in msg
+    assert msg.startswith("⚠ Stack not supported")
+
+
+def test_format_degradation_message_ruby_inference(tmp_path: Path) -> None:
+    # SC-004: stack inference for ruby via Gemfile.
+    (tmp_path / "Gemfile").write_text("")
+    msg = format_degradation_message(tmp_path)
+    assert "ruby" in msg
+    assert "livespec spec.driver --new ruby" in msg
+
+
+def test_format_degradation_message_php_inference(tmp_path: Path) -> None:
+    # SC-004: stack inference for php via composer.json.
+    (tmp_path / "composer.json").write_text("{}")
+    msg = format_degradation_message(tmp_path)
+    assert "php" in msg
+    assert "livespec spec.driver --new php" in msg
 
 
 # --- Scaffold (FR-006 / AC-008) -----------------------------------------------
@@ -318,10 +341,41 @@ def test_scaffold_creates_yaml(tmp_path: Path) -> None:
     target = scaffold_custom_driver("elixir", project_root=tmp_path)
     assert target.exists()
     text = target.read_text()
+    # AC-001: all 5 sections present (detect + 4 capabilities).
     for cap in CAPABILITY_NAMES:
         assert cap in text
     assert "detect" in text
     assert "spec-system.md" in text
+    # AC-005: detect.files pre-filled for known stack.
+    assert "mix.exs" in text
+
+
+def test_scaffold_template_passes_schema_validation(tmp_path: Path) -> None:
+    # AC-002: generated YAML passes schema validation.
+    target = scaffold_custom_driver("elixir", project_root=tmp_path)
+    manifest = load_manifest(target, is_custom=True)
+    assert manifest is not None
+    assert manifest.name == "elixir"
+    assert "mix.exs" in manifest.detect.files
+
+
+def test_scaffold_unknown_stack_still_validates(tmp_path: Path) -> None:
+    # AC-002 + EC-003: unknown stacks emit valid YAML with empty detect.files.
+    target = scaffold_custom_driver("haskell", project_root=tmp_path)
+    manifest = load_manifest(target, is_custom=True)
+    assert manifest is not None
+    assert manifest.name == "haskell"
+    assert manifest.detect.files == []
+
+
+def test_scaffold_inline_documentation_present(tmp_path: Path) -> None:
+    # Story 3 / SC-001: inline documentation for command vs script and report_path.
+    target = scaffold_custom_driver("ruby", project_root=tmp_path)
+    text = target.read_text()
+    assert "command:" in text
+    assert "script:" in text
+    assert "report_path" in text
+    assert "lcov.info" in text
 
 
 def test_scaffold_refuses_overwrite(tmp_path: Path) -> None:
@@ -342,15 +396,33 @@ def test_scaffold_rejects_invalid_name(tmp_path: Path) -> None:
         scaffold_custom_driver("../etc", project_root=tmp_path)
 
 
+def test_scaffold_sanitizes_hyphenated_name(tmp_path: Path) -> None:
+    # EC-001: hyphenated stack names become valid filenames.
+    target = scaffold_custom_driver("ruby-on-rails", project_root=tmp_path)
+    assert target.name == "ruby-on-rails.yaml"
+    assert target.exists()
+
+
+def test_scaffold_creates_specs_drivers_dir(tmp_path: Path) -> None:
+    # EC-002: .specs/drivers/ created automatically.
+    assert not (tmp_path / ".specs" / "drivers").exists()
+    target = scaffold_custom_driver("elixir", project_root=tmp_path)
+    assert target.parent.is_dir()
+    assert target.parent.name == "drivers"
+
+
 # --- CLI integration (FR-006 / AC-008) ----------------------------------------
 
 
 def test_cli_spec_driver_new_creates_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     runner = CliRunner()
-    result = runner.invoke(app, ["spec-driver", "--new", "rust"])
+    result = runner.invoke(app, ["spec.driver", "--new", "rust"])
     assert result.exit_code == 0, result.output
     assert (tmp_path / ".specs/drivers/rust.yaml").exists()
+    # AC-010: next-steps message printed.
+    assert "Next steps" in result.output
+    assert "spec-system.md" in result.output
 
 
 def test_cli_spec_driver_new_refuses_overwrite(
@@ -358,17 +430,43 @@ def test_cli_spec_driver_new_refuses_overwrite(
 ) -> None:
     monkeypatch.chdir(tmp_path)
     runner = CliRunner()
-    runner.invoke(app, ["spec-driver", "--new", "rust"])
-    result = runner.invoke(app, ["spec-driver", "--new", "rust"])
+    runner.invoke(app, ["spec.driver", "--new", "rust"])
+    result = runner.invoke(app, ["spec.driver", "--new", "rust"])
     assert result.exit_code == 1
 
 
 def test_cli_spec_driver_force(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     runner = CliRunner()
-    runner.invoke(app, ["spec-driver", "--new", "rust"])
-    result = runner.invoke(app, ["spec-driver", "--new", "rust", "--force"])
+    runner.invoke(app, ["spec.driver", "--new", "rust"])
+    result = runner.invoke(app, ["spec.driver", "--new", "rust", "--force"])
     assert result.exit_code == 0
+
+
+def test_run_all_capabilities_partial_driver(tmp_path: Path) -> None:
+    # AC-009: partial driver runs implemented capabilities and reports None for the rest.
+    manifest = DriverManifest(
+        name="elixir",
+        snapshots=DriverCapability(command="true"),
+    )
+    results = run_all_capabilities(manifest, project_root=tmp_path)
+    assert set(results.keys()) == set(CAPABILITY_NAMES)
+    assert results["snapshots"] is not None
+    assert results["snapshots"].exit_code == 0
+    assert results["coverage"] is None
+    assert results["properties"] is None
+    assert results["mutation"] is None
+
+
+def test_cli_spec_driver_legacy_alias_still_works(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Backward compat: pre-023 callers used `spec-driver`.
+    monkeypatch.chdir(tmp_path)
+    runner = CliRunner()
+    result = runner.invoke(app, ["spec-driver", "--new", "rust"])
+    assert result.exit_code == 0, result.output
+    assert (tmp_path / ".specs/drivers/rust.yaml").exists()
 
 
 # --- Built-in driver smoke (SC-006 / AC-003) ----------------------------------

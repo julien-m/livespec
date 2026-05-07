@@ -8,7 +8,7 @@ from .degradation import format_degradation_message, infer_stack_slug
 from .loader import load_manifest
 from .patch_coverage import compute_patch_coverage, git_diff, parse_diff, parse_lcov
 from .registry import DriverRegistry
-from .runner import run_capability
+from .runner import run_all_capabilities, run_capability
 from .scaffold import DriverFileExistsError, scaffold_custom_driver
 from .schemas import (
     CAPABILITY_NAMES,
@@ -38,6 +38,7 @@ __all__ = [
     "load_manifest",
     "parse_diff",
     "parse_lcov",
+    "run_all_capabilities",
     "run_capability",
     "scaffold_custom_driver",
 ]
