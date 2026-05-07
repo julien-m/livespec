@@ -357,7 +357,7 @@ Preflight dry run — N checks would be executed:
 
 | Flag | Behavior |
 |------|----------|
-| `--light`, `-l` | Light check — only expires, feature-source, and new items |
+| `--light`, `-l` | Light check - only expires, feature-source, and new items |
 | `--regenerate`, `-r` | Regenerate manifest from stack + specs (preserves Custom) |
 | `--regenerate --force`, `-r -f` | Regenerate manifest and reset Custom section |
 | `--dry-run`, `-d` | Show what would be checked without executing |
@@ -365,11 +365,11 @@ Preflight dry run — N checks would be executed:
 | `--full` | With `--fix`: disable smart scoping; verify every entry |
 | `--auto` | With `--fix`: non-interactive, auto-yes to safe installs |
 
-### Auto-Install & Init Mode (`--fix`) — Feature 034
+### Auto-Install & Init Mode (`--fix`) - Feature 034
 
 `/spec.preflight --fix` extends the read-only verifier with auto-install
 and resource-init capability. Implemented by `validator.preflight_autofix`
-(invoke directly via `python -m validator.preflight_autofix --manifest .specs/preflight.md`).
+(invoke directly via `python3 -m validator.preflight_autofix --manifest .specs/preflight.md`).
 
 **Install dispatchers:** `brew install`, `cargo install`, `npm install -g`
 (uses `pnpm` when available), `pip install --user`, `pipx install`,
@@ -382,7 +382,7 @@ allowlisted curl-pipe installers (Maestro, rustup, Bun, Starship).
 
 **Smart scoping (default):** examines `git diff HEAD~1..HEAD` and only
 verifies/installs dependencies for drivers and UI runners impacted by
-files in the recent commit. File-pattern → driver/runner mapping is
+files in the recent commit. File-pattern to driver/runner mapping is
 declared in `validator/preflight_autofix.py::FILE_PATTERN_MAP`.
 
 **Manual-action guides:** when an installer is `human` (Xcode app, Apple
@@ -394,7 +394,7 @@ exit with code `1`. `0` means everything is satisfied or auto-resolved.
 *Verified / Installed / Would install / Manual required / Failed / Skipped*.
 
 The migration that enriches `.specs/preflight.md` with entries from
-features 016-033 is shipped as migration v10 — run `/spec.migrate`.
+features 016-033 is shipped as migration v10 - run `/spec.migrate`.
 
 ---
 

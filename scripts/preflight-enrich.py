@@ -3,7 +3,7 @@
 
 The migration scans the project for active drivers/UI runners and
 appends matching preflight entries between LiveSpec section markers
-(``<!-- preflight:livespec:start -->`` … ``<!-- preflight:livespec:end -->``).
+(``<!-- preflight:livespec:start -->`` ... ``<!-- preflight:livespec:end -->``).
 User-authored content outside the markers is preserved verbatim.
 
 Idempotent: re-running produces no diff once the markers contain the
@@ -215,7 +215,7 @@ def enrich(text: str, block: str) -> str:
             flags=re.DOTALL,
         )
 
-    # No markers yet — append the section.
+    # No markers yet - append the section.
     if not text.endswith("\n"):
         text += "\n"
     return text + section
@@ -233,7 +233,7 @@ def run(project: Path) -> int:
 
     manifest = project / ".specs" / "preflight.md"
     if not manifest.exists():
-        print(f"  ⚠ preflight.md not found at {manifest}; skipping", file=sys.stderr)
+        print(f"  WARN preflight.md not found at {manifest}; skipping", file=sys.stderr)
         return 0
 
     drivers = detect_drivers(project)
@@ -244,13 +244,13 @@ def run(project: Path) -> int:
     updated = enrich(original, block)
 
     if updated == original:
-        print("  ✓ preflight.md already up to date")
+        print("  OK preflight.md already up to date")
         return 0
 
     manifest.write_text(updated, encoding="utf-8")
     added = sum(1 for driver_name in drivers if driver_name in DRIVER_BLOCKS)
     added += sum(1 for runner_name in runners if runner_name in RUNNER_BLOCKS)
-    print(f"  ✓ enriched preflight.md ({added} entries)")
+    print(f"  OK enriched preflight.md ({added} entries)")
     return 0
 
 
