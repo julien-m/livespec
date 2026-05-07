@@ -47,11 +47,10 @@ Closed the gaps left by feature 016 around the custom-driver UX:
 | EC-002 | `test_scaffold_creates_specs_drivers_dir` |
 | SC-004 | `test_format_degradation_message_ruby_inference`, `test_format_degradation_message_php_inference` |
 
-## Test results
+## Verification Notes
 
-- `pytest tests/`: 852 passed, 28 skipped (44 driver tests).
-- `pyright validator/drivers/ validator/cli.py`: 0 errors, 0 warnings.
-- `ruff check validator/`: passes.
+- The original implementation added targeted driver coverage in `tests/test_drivers.py`.
+- This document no longer records point-in-time pass counts because audit verification is rerun separately from the feature write-up.
 
 ## Notes
 

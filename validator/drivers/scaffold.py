@@ -40,8 +40,8 @@ _TEMPLATE_PATH = (
     / "custom-driver-template.yaml"
 )
 
-# Backward-compat shim: previously a constant string. Now loaded lazily so
-# tests/callers that imported `TEMPLATE` keep working.
+# Backward-compat shim: older callers imported `TEMPLATE` directly, so keep the
+# module-level constant even though fresh scaffolds are rendered from disk.
 TEMPLATE = _TEMPLATE_PATH.read_text(encoding="utf-8")
 
 

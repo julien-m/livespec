@@ -12,7 +12,7 @@
   - `validator/cli.py` (mount `spec.driver` + hidden alias)
   - `tests/test_drivers.py` (updated + 8 new tests)
 - **AC impacted:** AC-001 through AC-010, EC-001/002, SC-004
-- **Tests:** 852 passed, 28 skipped; pyright/ruff clean
+- **Tests:** Targeted driver coverage added in `tests/test_drivers.py`; audit verification is tracked separately from this implementation note.
 - **Author:** spec.implement
 
 ## 2026-05-06 — Spec: Feature specification created

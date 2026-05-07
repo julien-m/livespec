@@ -19,10 +19,10 @@ from validator.drivers import (
     load_manifest,
     parse_diff,
     parse_lcov,
+    run_all_capabilities,
     run_capability,
     scaffold_custom_driver,
 )
-from validator.drivers import run_all_capabilities
 from validator.drivers.scaffold import DriverFileExistsError
 from validator.drivers.schemas import CAPABILITY_NAMES
 

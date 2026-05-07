@@ -23,12 +23,10 @@ Feature 016 already shipped baseline scaffolding (`validator/drivers/scaffold.py
 
 ```
 validator/drivers/
-├── templates/
-│   └── custom-driver-template.yaml   # NEW — embedded resource
-├── scaffold.py                        # MODIFIED — load template via importlib.resources, pre-fill detect.files, sanitize stack
+├── scaffold.py                        # MODIFIED — load template from livespec/drivers/templates, pre-fill detect.files, sanitize stack
 ├── degradation.py                     # MODIFIED — new format with ⚠ prefix and explicit "No driver registered"
 ├── cli.py                             # MODIFIED — typer name "spec.driver", richer next-steps output
-└── runner.py                          # untouched (partial driver behavior already correct)
+└── runner.py                          # MODIFIED — add partial-driver helper
 
 validator/cli.py                       # MODIFIED — mount under "spec.driver" name
 ```
@@ -44,8 +42,8 @@ Tests added in `tests/test_drivers.py`:
 
 ## Implementation Steps
 
-1. Create `validator/drivers/templates/custom-driver-template.yaml` with documented sections.
-2. Update `scaffold.py` to load template via `importlib.resources`, support stack→detect-files map, sanitize names, ensure parent dir.
+1. Create `livespec/drivers/templates/custom-driver-template.yaml` with documented sections.
+2. Update `scaffold.py` to load the embedded template from `livespec/drivers/templates`, support stack→detect-files map, sanitize names, ensure parent dir.
 3. Update `degradation.py` for new structured format.
 4. Update CLI: `driver_app = typer.Typer(name="spec.driver")`; print next-steps including `livespec spec.driver --help` and integration doc path. Update `validator/cli.py` mounting accordingly.
 5. Update tests; add new ones for AC-002, AC-005, AC-006, EC-001, EC-002, AC-009 path.
