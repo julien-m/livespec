@@ -15,6 +15,7 @@ from validator.drivers import (
     DriverManifest,
     DriverRegistry,
     compute_patch_coverage,
+    evaluate_patch_gate,
     format_degradation_message,
     load_manifest,
     parse_diff,
@@ -22,9 +23,10 @@ from validator.drivers import (
     run_all_capabilities,
     run_capability,
     scaffold_custom_driver,
+    summarise_patch_coverage,
 )
 from validator.drivers.scaffold import DriverFileExistsError
-from validator.drivers.schemas import CAPABILITY_NAMES
+from validator.drivers.schemas import CAPABILITY_NAMES, PatchCoverageReport
 
 # --- Schemas (FR-001 / AC-001 / AC-002) ---------------------------------------
 
@@ -292,6 +294,73 @@ def test_compute_patch_coverage_empty_diff(tmp_path: Path) -> None:
     report = compute_patch_coverage(lcov, "", project_root=tmp_path)
     assert report.overall_ratio == 1.0
     assert report.files == {}
+
+
+# --- Patch coverage gate (Feature 024 — AC-007 / FR-004) ----------------------
+
+
+def test_evaluate_patch_gate_all_pass() -> None:
+    # @spec AC-007: Threshold gate emits no failures when every file meets it.
+    coverage = {"src/a.py": 0.95, "src/b.py": 1.0, "src/c.py": 0.9}
+    assert evaluate_patch_gate(coverage, 0.85) == []
+
+
+def test_evaluate_patch_gate_some_fail_preserves_order() -> None:
+    # @spec FR-004: evaluate_patch_gate returns failing files in input order.
+    coverage = {"src/a.py": 0.92, "src/b.py": 0.5, "src/c.py": 0.7, "src/d.py": 0.9}
+    assert evaluate_patch_gate(coverage, 0.85) == ["src/b.py", "src/c.py"]
+
+
+def test_evaluate_patch_gate_threshold_zero_never_fails() -> None:
+    # @spec AC-007: A 0.0 threshold lets every file through, including 0% files.
+    coverage = {"src/a.py": 0.0, "src/b.py": 0.5}
+    assert evaluate_patch_gate(coverage, 0.0) == []
+
+
+def test_summarise_patch_coverage_not_applicable() -> None:
+    # @spec AC-006: Empty diff → "not applicable" message in the summary.
+    report = PatchCoverageReport()
+    summary = summarise_patch_coverage(report)
+    assert "not applicable" in summary
+
+
+def test_summarise_patch_coverage_pass_no_threshold() -> None:
+    # @spec AC-009: /spec.test summary surfaces overall ratio without a threshold.
+    report = PatchCoverageReport(
+        files={"src/a.py": 0.9},
+        overall_ratio=0.9,
+        measured_lines=10,
+        covered_lines=9,
+    )
+    summary = summarise_patch_coverage(report)
+    assert "90.0%" in summary
+    assert "Gate" not in summary
+
+
+def test_summarise_patch_coverage_threshold_failure_lists_failing_file() -> None:
+    # @spec AC-007 + AC-009: Failing file appears with its ratio under the gate header.
+    report = PatchCoverageReport(
+        files={"src/ok.py": 0.95, "src/bad.py": 0.5},
+        overall_ratio=0.7,
+        measured_lines=20,
+        covered_lines=14,
+    )
+    summary = summarise_patch_coverage(report, threshold=0.85)
+    assert "Gate FAILED" in summary
+    assert "src/bad.py" in summary
+    assert "src/ok.py" not in summary.split("Gate FAILED", 1)[1]
+
+
+def test_summarise_patch_coverage_threshold_pass() -> None:
+    # @spec AC-007: All files at or above threshold → "Gate PASSED" line.
+    report = PatchCoverageReport(
+        files={"src/a.py": 0.9, "src/b.py": 1.0},
+        overall_ratio=0.95,
+        measured_lines=20,
+        covered_lines=19,
+    )
+    summary = summarise_patch_coverage(report, threshold=0.85)
+    assert "Gate PASSED" in summary
 
 
 # --- Degradation (FR-004 / AC-007) --------------------------------------------

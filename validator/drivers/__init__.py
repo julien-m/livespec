@@ -6,7 +6,14 @@
 
 from .degradation import format_degradation_message, infer_stack_slug
 from .loader import load_manifest
-from .patch_coverage import compute_patch_coverage, git_diff, parse_diff, parse_lcov
+from .patch_coverage import (
+    compute_patch_coverage,
+    evaluate_patch_gate,
+    git_diff,
+    parse_diff,
+    parse_lcov,
+    summarise_patch_coverage,
+)
 from .registry import DriverRegistry
 from .runner import run_all_capabilities, run_capability
 from .scaffold import DriverFileExistsError, scaffold_custom_driver
@@ -32,6 +39,7 @@ __all__ = [
     "DriverRegistry",
     "PatchCoverageReport",
     "compute_patch_coverage",
+    "evaluate_patch_gate",
     "format_degradation_message",
     "git_diff",
     "infer_stack_slug",
@@ -41,4 +49,5 @@ __all__ = [
     "run_all_capabilities",
     "run_capability",
     "scaffold_custom_driver",
+    "summarise_patch_coverage",
 ]
