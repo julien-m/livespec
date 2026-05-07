@@ -1,9 +1,9 @@
 ---
 title: "UI Runner Tauri"
-status: "Draft"
+status: "Implemented"
 priority: "P1"
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-07
 ---
 
 # Feature Spec: UI Runner Tauri
@@ -11,7 +11,7 @@ updated: 2026-05-06
 - **Feature:** UI Runner Tauri
 - **Branch:** feature/029-ui-runner-tauri
 - **Date:** 2026-05-06
-- **Status:** Draft
+- **Status:** Implemented
 - **Priority:** P1
 - **Scope:** M
 - **Input:** Built-in UI runner for Tauri projects (Rust backend + WebView frontend). Three test surfaces orchestrated together: (1) WebView frontend tested via Playwright connected through tauri-driver / WebDriver; (2) Tauri commands (#[tauri::command]) tested via tauri::test::mock_app() — escape hatch from the Rust driver (021); (3) IPC bridge integration tested by launching the full app and verifying invoke() roundtrips. The runner manifest orchestrates all three under one detect rule (Cargo.toml + tauri.conf.json).

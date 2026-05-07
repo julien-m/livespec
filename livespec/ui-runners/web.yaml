@@ -1,0 +1,64 @@
+# Built-in UI Runner: Web (Playwright)
+# Reference implementation for Feature 027 UI Runner Architecture
+# Validates the 027 pattern on a known, proven Playwright + pixelmatch implementation
+
+runner:
+  id: web
+  name: Web (Playwright)
+  description: Detects and runs Playwright visual tests on Node.js projects
+  version: "1.0.0"
+
+detect:
+  files:
+    - package.json
+    - "playwright*.config.{ts,js,mjs}"
+  logic: AND
+  # AND logic: project must have BOTH package.json AND a Playwright config file
+  # Glob patterns expand to all matching file names (e.g., playwright.config.ts, playwright.visual.config.ts)
+
+capabilities:
+  detect:
+    description: Detect whether this project is a Playwright web project
+    # No command — handled by runner's detect() method
+
+  capture_screenshot:
+    description: Capture a single screen using Playwright's screenshot mechanism
+    command: "npx playwright test --grep @capture"
+    parameters:
+      screen:
+        type: string
+        required: true
+        description: Screen name (matches @capture-<screen> tag in test)
+    output_path: ".specs/design/screens/{screen}.png"
+
+  run_flow:
+    description: Run a full Playwright test flow (navigation + assertions)
+    command: "npx playwright test"
+    output: "playwright-report/"
+    parameters: {}
+
+  compare_baseline:
+    description: Compare a screenshot against baseline using pixelmatch (Feature 010)
+    command: "node scripts/pixelmatch-cli.js"
+    parameters:
+      baseline:
+        type: string
+        required: true
+        description: Path to baseline PNG file
+      screenshot:
+        type: string
+        required: true
+        description: Path to current screenshot PNG file
+      threshold:
+        type: number
+        required: false
+        default: 0.05
+        description: Pixel diff tolerance (0-1, Feature 010 uses 0.05)
+    output: "diff PNG + boolean result"
+
+# Feature 010 compatibility: all invocations delegate to existing scripts
+# No modifications to Feature 010 code are required
+feature_010_compatibility: |
+  This runner wraps Feature 010's Playwright implementation without modifying it.
+  Existing Feature 010 projects are fully backwards-compatible.
+  Scripts preserved: scripts/migrate-visual-tests.js, scripts/pixelmatch-cli.js, test templates
