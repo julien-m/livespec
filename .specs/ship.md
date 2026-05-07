@@ -17,7 +17,7 @@ updated_at: '2026-05-07'
 
 | #  | Feature                                  | Status   | Branch                                     | Started    | Completed |
 |----|------------------------------------------|----------|--------------------------------------------|------------|-----------|
-| 1  | 027-ui-runner-architecture               | Pending  | —                                          | —          | —         |
+| 1  | 027-ui-runner-architecture               | In Progress | feature/027-ui-runner-architecture       | 2026-05-07 | —         |
 | 2  | 028-ui-runner-web                        | Pending  | —                                          | —          | —         |
 | 3  | 029-ui-runner-tauri                      | Pending  | —                                          | —          | —         |
 | 4  | 030-ui-runner-ios-watchos                | Pending  | —                                          | —          | —         |
@@ -29,5 +29,5 @@ updated_at: '2026-05-07'
 ## Notes
 
 - Specs already written for all 8 features → spawned agents skip Phase 1 (specify) and start at plan.
-- Each feature merged into `ship/ui-runners-027-034` via `--no-ff`. Final merge to `main` after batch.
+- Each feature is intended to merge into `ship/ui-runners-027-034` via `--no-ff` as it completes. Final merge to `main` happens after the batch is finished.
 - Dependency order respected: 027 first (foundation), then 028-031 (runners), then 032 → 033, then 034.
