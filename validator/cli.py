@@ -11,6 +11,7 @@ import typer
 from .commit_context import commit_context_app
 from .config import load_config
 from .drivers.cli import driver_app
+from .drivers.test_config_cli import init_app
 from .engine import validate_all
 from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
@@ -29,6 +30,8 @@ app.add_typer(commit_context_app, name="commit-context")
 app.add_typer(driver_app, name="spec.driver")
 # @spec FR-001 (feature 023): backward-compat alias for the old `spec-driver` name.
 app.add_typer(driver_app, name="spec-driver", hidden=True)
+# @spec FR-005 (feature 026): livespec init test-config — used by /spec.init Phase C.
+app.add_typer(init_app, name="init")
 
 
 def _find_specs_root(start: Path | None = None) -> Path:
