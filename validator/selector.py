@@ -10,9 +10,10 @@ import logging
 import re
 import subprocess
 import time
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import ClassVar, TypedDict
+from typing import Any, ClassVar, TypedDict, cast
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,11 @@ class SmartTestSelector:
         re.MULTILINE,
     )
     FEATURE_PATTERN = re.compile(r"\.specs/features/(\d{3}-[a-z0-9-]+)/spec\.md")
-    TEST_FILE_PATTERN = re.compile(r"(tests/[^\s`|]+(?:test|spec)\.(?:py|ts|js|go|rs|java|kt))")
+    # This matches test paths mentioned in markdown, allowing extra filename
+    # segments before or after `test`/`spec` before the language extension.
+    TEST_FILE_PATTERN = re.compile(
+        r"(tests/[^\s`|]*(?:test|spec)[^\s`|]*\.(?:py|ts|js|go|rs|java|kt))"
+    )
     CACHE_FILENAME: ClassVar[str] = ".test-selector-cache.json"
     CACHE_SCHEMA_VERSION: ClassVar[str] = "1.0"
     SOURCE_SUFFIXES: ClassVar[set[str]] = {
@@ -105,7 +110,7 @@ class SmartTestSelector:
         self.cache_path = self.specs_root / self.CACHE_FILENAME
         self.cache: CacheData = self._empty_cache()
 
-    def from_changed_files(self, files: list[Path | str]) -> set[str]:
+    def from_changed_files(self, files: Sequence[Path | str]) -> set[str]:
         """Resolve impacted feature slugs from changed files.
 
         Args:
@@ -551,22 +556,26 @@ class SmartTestSelector:
             return {}
 
         entries: dict[str, CacheEntry] = {}
-        for path_key, raw_entry in raw_entries.items():
-            if not isinstance(path_key, str) or not isinstance(raw_entry, dict):
+        typed_entries = cast(dict[str, Any], raw_entries)
+        for path_key, raw_entry in typed_entries.items():
+            if not isinstance(raw_entry, dict):
                 continue
 
-            raw_mtime = raw_entry.get("mtime")
-            raw_anchors = raw_entry.get("anchors")
+            typed_entry = cast(dict[str, Any], raw_entry)
+            raw_mtime = typed_entry.get("mtime")
+            raw_anchors = typed_entry.get("anchors")
             if not isinstance(raw_mtime, (int, float)) or not isinstance(raw_anchors, list):
                 continue
 
             anchors: list[AnchorRecord] = []
-            for raw_anchor in raw_anchors:
+            typed_anchors = cast(list[Any], raw_anchors)
+            for raw_anchor in typed_anchors:
                 if not isinstance(raw_anchor, dict):
                     continue
 
-                requirement_id = raw_anchor.get("requirement_id")
-                spec_path = raw_anchor.get("spec_path")
+                typed_anchor = cast(dict[str, Any], raw_anchor)
+                requirement_id = typed_anchor.get("requirement_id")
+                spec_path = typed_anchor.get("spec_path")
                 if isinstance(requirement_id, str) and isinstance(spec_path, str):
                     anchors.append(
                         {
