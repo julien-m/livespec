@@ -1,5 +1,20 @@
+# @spec FR-001: Go driver YAML — .specs/features/020-driver-go/spec.md#fr-001
+# Mutation capability is intentionally omitted: go-mutesting is unmaintained
+# and there is no maintained Go mutation testing tool. The runner surfaces
+# `CapabilityNotImplementedError` ("mutation: not implemented for go driver")
+# via the standard schema (spec AC-006, Story 4). Consider gopter (properties)
+# as a complementary safety net.
 name: go
 detect:
   files:
     - go.mod
-# Filled in by feature 020 (driver-go).
+coverage:
+  script: scripts/go-coverage-gate.sh
+  report_path: coverage/lcov.info
+  # Baseline threshold comes from the accepted feature spec so the new driver
+  # starts with the same minimum contract exercised by the Go fixtures.
+  threshold: 70
+snapshots:
+  command: go test ./...
+properties:
+  command: go test ./... -run Property
