@@ -3,10 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-06
+> Last updated: 2026-05-07
 
 ---
 
+## 2026-05-07 -- [Feature 025] Implemented: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR; 15 new tests pass (874 total)
 ## 2026-05-07 -- [Feature 019] Implemented: Driver Swift — 4 stories, 10 AC, 6 FR; 31 new tests pass (723 total)
 ## 2026-05-06 -- [Feature 016] Implemented: Cross-Language Test Driver Architecture — 5 stories, 15 AC, 8 FR; 35 tests pass
 ## 2026-05-06 -- [Feature 034] Spec created: Preflight Auto-Install & Init via /spec.preflight --fix — 5 stories, 14 AC, 11 FR
