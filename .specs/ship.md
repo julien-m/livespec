@@ -1,30 +1,33 @@
 ---
-created_at: '2026-05-06'
+created_at: '2026-05-07'
 current_state: In Progress
 feature_slug: '-'
 owner_command: spec.ship
 schema_version: 1
-updated_at: '2026-05-06'
+updated_at: '2026-05-07'
 ---
 
 # Ship Session
 
-**Started:** 2026-05-06
-**Scope:** 016-026 (test drivers + UI runners deps for 026)
-**Flags:** custom selection
-**Base branch:** ship/test-drivers-016-026 (off main)
+**Started:** 2026-05-07
+**Scope:** 027-034 (UI runner architecture + per-platform runners + test hooks chain)
+**Flags:** custom selection (chaîne complète 027 → 034), reuse existing specs (skip specify)
+**Base branch:** ship/ui-runners-027-034 (off main)
 **Final merge target:** main (after all features done)
 
 | #  | Feature                                  | Status   | Branch                                     | Started    | Completed |
 |----|------------------------------------------|----------|--------------------------------------------|------------|-----------|
-| 1  | 016-cross-language-test-driver-architecture | Done | feature/016-cross-language-test-driver-architecture | 2026-05-06 | 2026-05-06 |
-| 2  | 017-driver-python                         | Done | feature/017-driver-python | 2026-05-06 | 2026-05-06 |
-| 3  | 018-driver-typescript-javascript          | Done | feature/018-driver-typescript-javascript | 2026-05-06 | 2026-05-07 |
-| 4  | 019-driver-swift                          | Done | feature/019-driver-swift | 2026-05-07 | 2026-05-07 |
-| 5  | 020-driver-go                             | Pending  | —                                          | —          | —         |
-| 6  | 021-driver-rust                           | Pending  | —                                          | —          | —         |
-| 7  | 022-driver-jvm                            | Pending  | —                                          | —          | —         |
-| 8  | 023-driver-custom-scaffolding             | Pending  | —                                          | —          | —         |
-| 9  | 024-patch-coverage-local                  | Pending  | —                                          | —          | —         |
-| 10 | 025-mutation-testing-on-demand            | Pending  | —                                          | —          | —         |
-| 11 | 026-conventions-propagation-by-stack      | Pending  | —                                          | —          | —         |
+| 1  | 027-ui-runner-architecture               | Pending  | —                                          | —          | —         |
+| 2  | 028-ui-runner-web                        | Pending  | —                                          | —          | —         |
+| 3  | 029-ui-runner-tauri                      | Pending  | —                                          | —          | —         |
+| 4  | 030-ui-runner-ios-watchos                | Pending  | —                                          | —          | —         |
+| 5  | 031-ui-runner-android                    | Pending  | —                                          | —          | —         |
+| 6  | 032-test-hooks-pre-commit-pre-push       | Pending  | —                                          | —          | —         |
+| 7  | 033-smart-test-selection                 | Pending  | —                                          | —          | —         |
+| 8  | 034-preflight-autofix                    | Pending  | —                                          | —          | —         |
+
+## Notes
+
+- Specs already written for all 8 features → spawned agents skip Phase 1 (specify) and start at plan.
+- Each feature merged into `ship/ui-runners-027-034` via `--no-ff`. Final merge to `main` after batch.
+- Dependency order respected: 027 first (foundation), then 028-031 (runners), then 032 → 033, then 034.
