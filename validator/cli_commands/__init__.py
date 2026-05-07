@@ -1,0 +1,36 @@
+"""Unified CLI subcommand implementations (Feature 035).
+
+Each module in this package implements one top-level ``livespec`` subcommand
+introduced by Feature 035. The Typer entry points are registered from
+``validator/cli.py``; the ``register(app)`` function in each module wires the
+callback to a typer app instance so the surface stays declarative and
+auto-discoverable.
+"""
+
+from __future__ import annotations
+
+import typer
+
+from . import (
+    coverage_cmd,
+    drivers_cmd,
+    mutation_cmd,
+    preflight_cmd,
+    test_cmd,
+)
+
+
+def register_unified_commands(app: typer.Typer) -> None:
+    """Register the five unified subcommands on ``app``.
+
+    Args:
+        app: Top-level ``livespec`` Typer application.
+    """
+    test_cmd.register(app)
+    coverage_cmd.register(app)
+    drivers_cmd.register(app)
+    mutation_cmd.register(app)
+    preflight_cmd.register(app)
+
+
+__all__ = ["register_unified_commands"]
