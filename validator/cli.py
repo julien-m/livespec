@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 import typer
 
+from .cli_commands import register_unified_commands
 from .commit_context import commit_context_app
 from .config import load_config
 from .drivers.cli import driver_app
@@ -32,6 +33,8 @@ app.add_typer(driver_app, name="spec.driver")
 app.add_typer(driver_app, name="spec-driver", hidden=True)
 # @spec FR-005 (feature 026): livespec init test-config — used by /spec.init Phase C.
 app.add_typer(init_app, name="init")
+# @spec FR-001..005 (feature 035): unified short-form CLI surface.
+register_unified_commands(app)
 
 
 def _find_specs_root(start: Path | None = None) -> Path:

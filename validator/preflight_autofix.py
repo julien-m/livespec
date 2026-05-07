@@ -343,6 +343,11 @@ def _verify(item: PreflightItem) -> bool:
     return False
 
 
+def verify_item(item: PreflightItem) -> bool:
+    """Public wrapper around :func:`_verify` for external callers (Feature 035)."""
+    return _verify(item)
+
+
 # --- Guide rendering -------------------------------------------------------
 
 
