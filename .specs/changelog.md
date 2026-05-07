@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-05-07 -- [Feature 036] Test: 92% AC covered (11/12), 906 tests passing (22 JS + 884 Python), 0 generated
+## 2026-05-07 -- [Feature 036] Plan created: Multi-Surface Detection and Migration — 5 implementation steps, 2 diagrams (sequence + state), 4 files
+## 2026-05-07 -- [Feature 036] Spec created: Multi-Surface Detection and Migration — 4 stories, 12 AC, 8 FR
 ## 2026-05-07 -- [Feature 033] In progress: Smart Test Selection — core selector module + 22 unit tests; selector logic landed, hook/CLI/migration work still pending
 ## 2026-05-07 -- [Feature 028] In progress: UI Runner Web (Playwright Refactor) — added web.yaml manifest and Playwright handler scaffold
 ## 2026-05-07 -- [Feature 026] Implemented: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR; 43 new tests pass (917 total)
