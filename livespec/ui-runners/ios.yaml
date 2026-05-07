@@ -1,0 +1,112 @@
+# Built-in UI Runner: iOS / watchOS (XCUITest)
+# Feature 030 — UI Runner iOS/watchOS
+#
+# @spec FR-001: iOS/watchOS runner manifest — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
+
+runner:
+  id: ios
+  name: iOS / watchOS (XCUITest)
+  description: Detects and runs XCUITest visual tests on iOS and watchOS simulator projects
+  version: "1.0.0"
+  platforms:
+    - ios
+    - watchos
+
+detect:
+  files:
+    - "*.xcodeproj"
+    - "*.xcworkspace"
+    - Package.swift
+  logic: OR
+  # OR logic: project must have AT LEAST ONE of the listed markers
+  # Glob patterns expand: *.xcodeproj matches any directory ending in .xcodeproj
+
+capabilities:
+  detect:
+    description: Detect whether this project is an Xcode/Swift project with XCUITest target
+    # No command — handled by XCUITestRunnerHandler.detect()
+
+  capture_screenshot:
+    description: Run xcodebuild test, extract screenshots from .xcresult bundle, export PNGs
+    command: "xcodebuild test -destination <destination> -resultBundlePath <xcresult>"
+    parameters:
+      screen:
+        type: string
+        required: false
+        description: Screen identifier for baseline naming
+      destination:
+        type: string
+        required: false
+        default: "platform=iOS Simulator,name=iPhone 16"
+        description: Xcode destination string
+      test_scheme:
+        type: string
+        required: false
+        description: Xcode test scheme name (auto-detected if omitted)
+      launch_arguments:
+        type: array
+        required: false
+        description: Arguments passed to XCUIApplication.launchArguments via XCUI_LAUNCH_ARGS
+    output_path: ".specs/design/screens/{destination_id}/{screen}.png"
+
+  run_flow:
+    description: Run full XCUITest suite (all UI tests in scheme), report test pass/fail
+    command: "xcodebuild test -destination <destination> -scheme <scheme>"
+    parameters:
+      destination:
+        type: string
+        required: false
+        default: "platform=iOS Simulator,name=iPhone 16"
+        description: Xcode destination string
+      test_scheme:
+        type: string
+        required: false
+        description: Xcode test scheme name
+      launch_arguments:
+        type: array
+        required: false
+        description: Arguments passed to XCUIApplication.launchArguments
+    output: "xcodebuild test result + failed test names"
+
+  compare_baseline:
+    description: Compare a screenshot against baseline using pixelmatch (Feature 010)
+    command: "node scripts/pixelmatch-cli.js <baseline> <screenshot> <threshold>"
+    parameters:
+      baseline:
+        type: string
+        required: true
+        description: Path to baseline PNG file
+      screenshot:
+        type: string
+        required: true
+        description: Path to current screenshot PNG file
+      threshold:
+        type: number
+        required: false
+        default: 0.05
+        description: Pixel diff tolerance (Feature 010 default 0.05)
+    output: "diff PNG + boolean result"
+
+# Simulator destinations — configure per project
+# @spec FR-003: simulator boot orchestration — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-003
+destinations:
+  - platform: "iOS Simulator"
+    name: "iPhone 16"
+    udid: "auto-detect"
+    default: true
+  - platform: "watchOS Simulator"
+    name: "Apple Watch Series 10 - 46mm"
+    udid: "auto-detect"
+    default: false
+
+# @spec FR-005: launch_arguments per scenario — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-005
+scenarios:
+  - name: default
+    test_scheme: null
+    launch_arguments: []
+    timeout_seconds: 300
+
+# Feature 010 compatibility: compare_baseline delegates to Feature 010 pixelmatch engine
+feature_010_compatibility: |
+  compare_baseline delegates to Feature 010's pixelmatch-cli.js script.
+  Both runners (web + iOS) share the same pixel-level comparison engine.
