@@ -27,7 +27,7 @@ Smart test selector integrates with Feature 032 hooks and `/spec.test` CLI to de
 | Language | Python 3.11+ | LiveSpec runtime consistency |
 | Module | `validator/selector.py` | New core module for selection logic |
 | Testing | pytest + fixtures | Per project testing standards |
-| Dependencies | GitPython (git diff parsing) | Already available; handles edge cases |
+| Dependencies | Python stdlib (`subprocess`) | Keeps git integration dependency-free |
 | State | `.specs/.test-selector-cache.json` | Project-local cache, git-ignored |
 | Integration points | Feature 032 (hooks), `/spec.test` CLI | Hooks invoke selector; CLI exposes `--since` |
 
@@ -195,7 +195,7 @@ erDiagram
 **Files:** `validator/selector.py` (new)
 
 - Create module with skeleton class and imports
-- Add `GitPython` to `setup.py` (if not already present)
+- Reuse the existing `git` CLI via `subprocess`
 - Verify git availability on system
 - Create `.specs/.test-selector-cache.json` template
 
@@ -523,7 +523,7 @@ pytest tests/test_selector.py tests/integration/test_*.py -v --tb=short
 | **Fallback-to-full-suite on error** | Conservative: over-runs tests safely rather than silently skipping them. Aligns with AC-010. |
 | **Filename heuristic as fallback** | Better than failing entirely; useful for legacy code without anchors. Still logged so developer knows. |
 | **Incremental cache update** | ~100ms target (SC-001) requires avoiding full re-scan on every invocation. Incremental + mtime check achieves this. |
-| **GitPython for git diff** | Cross-platform; handles edge cases (partial history, detached HEAD). Preferred over shelling out to `git`. |
+| **`subprocess` for git diff** | Avoids adding a new dependency while keeping the selector compatible with normal git workflows. |
 
 ---
 

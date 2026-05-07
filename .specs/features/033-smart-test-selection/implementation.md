@@ -118,7 +118,7 @@ N/A (backend Python module, no UI)
 ## Dependencies
 
 - **Explicit:** Feature 032 (test hooks) — calls SmartTestSelector
-- **External:** GitPython (already in requirements.py)
+- **External:** `git` CLI available in the project environment
 
 ---
 
