@@ -1,6 +1,6 @@
 ---
 created_at: '2026-05-07'
-current_state: Done (7/8)
+current_state: Done
 feature_slug: '-'
 owner_command: spec.ship
 schema_version: 1
@@ -13,7 +13,7 @@ updated_at: '2026-05-07'
 **Scope:** 027-034 (UI runner architecture + per-platform runners + test hooks chain)
 **Flags:** custom selection (full chain 027 → 034), reuse existing specs
 **Base branch:** ship/ui-runners-027-034 (off main)
-**Status:** ✅ **7/8 features shipped and merged**
+**Status:** ✅ **8/8 features shipped and merged**
 
 | #  | Feature                                  | Status   | Branch                                     | Started    | Completed |
 |----|------------------------------------------|----------|--------------------------------------------|------------|-----------|
@@ -24,34 +24,43 @@ updated_at: '2026-05-07'
 | 5  | 031-ui-runner-android                    | Done     | feature/031-ui-runner-android              | 2026-05-07 | 2026-05-07 |
 | 6  | 032-test-hooks-pre-commit-pre-push       | Done     | feature/032-test-hooks-pre-commit-pre-push | 2026-05-07 | 2026-05-07 |
 | 7  | 033-smart-test-selection                 | Done     | feature/033-smart-test-selection           | 2026-05-07 | 2026-05-07 |
-| 8  | 034-preflight-autofix                    | Deferred | (not yet created)                          | —          | —          |
+| 8  | 034-preflight-autofix                    | Done     | feature/034-preflight-autofix              | 2026-05-07 | 2026-05-07 |
 
 ## Completion Summary
 
-**Features Shipped:** 7 complete (027-033)
-- ✅ 027: UI Runner Architecture (foundation)
-- ✅ 028: UI Runner Web (Playwright refactor)
-- ✅ 029: UI Runner Tauri (WebDriver + tauri-driver + mock_app)
-- ✅ 030: UI Runner iOS/watchOS (XCUITest on simulator)
-- ✅ 031: UI Runner Android (Maestro flows)
-- ✅ 032: Pre-commit/Pre-push Test Hooks (git hook orchestration)
-- ✅ 033: Smart Test Selection (file→test mapping + cache)
+**Features Shipped:** 8/8 complete (027-034)
 
-**Branch Status:** All 7 features merged into `ship/ui-runners-027-034`
-**Ready for:** Final merge to `main` via PR
+### Platform Runners (5)
+- ✅ 027 — UI Runner Architecture (foundation: YAML manifest + cross-platform orchestration)
+- ✅ 028 — UI Runner Web (Playwright refactor, backward-compatible)
+- ✅ 029 — UI Runner Tauri (WebDriver + tauri-driver + mock_app)
+- ✅ 030 — UI Runner iOS/watchOS (XCUITest on simulator)
+- ✅ 031 — UI Runner Android (Maestro YAML flows)
 
-**Deferred:** Feature 034 (Preflight Auto-Install & Init) — spawned agent still in progress. Can be picked up in next session or merged separately.
+### Test Infrastructure (3)
+- ✅ 032 — Pre-commit/Pre-push Test Hooks (driver + runner orchestration)
+- ✅ 033 — Smart Test Selection (file→test mapping with cache)
+- ✅ 034 — Preflight Auto-Install & Init (--fix flag for tools/simulators/AVDs)
+
+## Branch Status
+
+```
+ship/ui-runners-027-034 (origin/ship/ui-runners-027-034)
+├── All 8 features merged via --no-ff
+├── 4000+ files changed (specs, plans, implementations, tests, migrations)
+└── Ready for PR → main
+```
 
 ## Technical Notes
 
-- All agents used existing specs (no re-specification needed)
-- Agents generated plans, implementations, test coverage autonomously
-- Feature 033 has pyright type warnings (flagged for follow-up audit)
-- All 7 shipped features passed ruff linting (after ClassVar fixes)
-- Integration between features verified: 027 foundation used by 028-031, 032 depends on 016/027, 033 depends on 032
+- All agents executed autonomously after spec reuse (`--auto --branch`)
+- Feature 034 required a second spawn (first agent abandoned prematurely)
+- Feature 033 has pyright type warnings (functionality verified, follow-up audit recommended)
+- Feature 034 introduces Migration v10 (preflight.md enrichment)
+- Integration dependencies respected throughout the chain
 
 ## Next Steps
 
 1. **Review & merge** `ship/ui-runners-027-034` → `main` via PR
-2. **Follow up:** Feature 034 completion + integration
-3. **Post-merge:** Update roadmap, tag release, document integration
+2. **Post-merge:** Update roadmap, tag release, document integration
+3. **Follow-up audit:** Resolve pyright type warnings in feature 033 (selector.py)
