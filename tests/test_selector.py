@@ -1,6 +1,6 @@
 """Unit tests for the smart test selector.
 
-@spec FR-009: Write unit tests for selector logic — .specs/features/033-smart-test-selection/spec.md#fr-009
+See .specs/features/033-smart-test-selection/spec.md#fr-009 for details.
 """
 
 import subprocess
@@ -54,7 +54,8 @@ class TestAnchorParser:
         source_file = selector.project_root / "src" / "notifications.py"
         source_file.parent.mkdir(parents=True, exist_ok=True)
         source_file.write_text(
-            "# @spec FR-001: Fetch notifications — .specs/features/005-notifications/spec.md#fr-001\n",
+            "# @spec FR-001: Fetch notifications — "
+            ".specs/features/005-notifications/spec.md#fr-001\n",
             encoding="utf-8",
         )
 

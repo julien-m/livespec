@@ -1,10 +1,8 @@
 """Smart test selector for mapping changed files to impacted tests.
 
-@spec FR-001: Implement SmartTestSelector class — .specs/features/033-smart-test-selection/spec.md#fr-001
-@spec FR-002: Implement @spec anchor parser — .specs/features/033-smart-test-selection/spec.md#fr-002
-@spec FR-003: Implement test target resolution — .specs/features/033-smart-test-selection/spec.md#fr-003
-@spec FR-004: Implement filename heuristic fallback — .specs/features/033-smart-test-selection/spec.md#fr-004
-@spec FR-005: Implement cache read/write/incremental update — .specs/features/033-smart-test-selection/spec.md#fr-005
+FR-001: SmartTestSelector class; FR-002: anchor parser; FR-003: test resolution
+FR-004: filename heuristic; FR-005: cache read/write/incremental update
+See .specs/features/033-smart-test-selection/spec.md for details.
 """
 
 import json
@@ -14,7 +12,7 @@ import subprocess
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypedDict
+from typing import ClassVar, TypedDict
 
 logger = logging.getLogger(__name__)
 
@@ -62,9 +60,9 @@ class SmartTestSelector:
     )
     FEATURE_PATTERN = re.compile(r"\.specs/features/(\d{3}-[a-z0-9-]+)/spec\.md")
     TEST_FILE_PATTERN = re.compile(r"(tests/[^\s`|]+(?:test|spec)\.(?:py|ts|js|go|rs|java|kt))")
-    CACHE_FILENAME = ".test-selector-cache.json"
-    CACHE_SCHEMA_VERSION = "1.0"
-    SOURCE_SUFFIXES = {
+    CACHE_FILENAME: ClassVar[str] = ".test-selector-cache.json"
+    CACHE_SCHEMA_VERSION: ClassVar[str] = "1.0"
+    SOURCE_SUFFIXES: ClassVar[set[str]] = {
         ".c",
         ".cpp",
         ".go",
@@ -82,7 +80,7 @@ class SmartTestSelector:
         ".ts",
         ".tsx",
     }
-    EXCLUDED_PARTS = {
+    EXCLUDED_PARTS: ClassVar[set[str]] = {
         ".git",
         ".pytest_cache",
         ".venv",
@@ -92,7 +90,9 @@ class SmartTestSelector:
         "node_modules",
         "venv",
     }
-    TEST_FILE_SUFFIXES = {".go", ".js", ".py", ".rs", ".ts"}
+    TEST_FILE_SUFFIXES: ClassVar[set[str]] = {
+        ".go", ".js", ".py", ".rs", ".ts"
+    }
 
     def __init__(self, specs_root: Path | str) -> None:
         """Initialize the selector.
