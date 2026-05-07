@@ -18,9 +18,9 @@ updated_at: '2026-05-06'
 | #  | Feature                                  | Status   | Branch                                     | Started    | Completed |
 |----|------------------------------------------|----------|--------------------------------------------|------------|-----------|
 | 1  | 016-cross-language-test-driver-architecture | Done | feature/016-cross-language-test-driver-architecture | 2026-05-06 | 2026-05-06 |
-| 2  | 017-driver-python                         | In Progress | feature/017-driver-python | 2026-05-06 | —         |
-| 3  | 018-driver-typescript-javascript          | Pending  | —                                          | —          | —         |
-| 4  | 019-driver-swift                          | Pending  | —                                          | —          | —         |
+| 2  | 017-driver-python                         | Done | feature/017-driver-python | 2026-05-06 | 2026-05-06 |
+| 3  | 018-driver-typescript-javascript          | Done | feature/018-driver-typescript-javascript | 2026-05-06 | 2026-05-07 |
+| 4  | 019-driver-swift                          | Done | feature/019-driver-swift | 2026-05-07 | 2026-05-07 |
 | 5  | 020-driver-go                             | Pending  | —                                          | —          | —         |
 | 6  | 021-driver-rust                           | Pending  | —                                          | —          | —         |
 | 7  | 022-driver-jvm                            | Pending  | —                                          | —          | —         |
