@@ -135,3 +135,45 @@ def run_capability(
         stderr=stderr,
         report_path=report_path,
     )
+
+
+# Feature 023: partial-driver capability loop.
+# @spec FR-005: Run implemented capabilities, report None for the rest
+# @spec AC-009: Skip non-implemented capabilities without raising
+def run_all_capabilities(
+    driver: DriverManifest,
+    *,
+    project_root: Path | None = None,
+    env: dict[str, str] | None = None,
+    timeout: float | None = None,
+) -> dict[str, CapabilityResult | None]:
+    """Run every capability the driver implements and skip the rest.
+
+    Each capability slot in :data:`CAPABILITY_NAMES` is mapped to either the
+    real :class:`CapabilityResult` produced by execution, or ``None`` when the
+    driver does not declare that capability. Callers can render
+    ``"not implemented for {driver}"`` for the ``None`` entries without having
+    to handle :class:`CapabilityNotImplementedError` themselves.
+
+    Args:
+        driver: Driver manifest whose capabilities are exercised.
+        project_root: Working directory used for command execution.
+        env: Optional environment overrides merged onto ``os.environ``.
+        timeout: Optional subprocess timeout in seconds.
+
+    Returns:
+        Mapping from capability name to result (``None`` if not implemented).
+    """
+    out: dict[str, CapabilityResult | None] = {}
+    for cap in CAPABILITY_NAMES:
+        try:
+            out[cap] = run_capability(
+                driver,
+                cap,
+                project_root=project_root,
+                env=env,
+                timeout=timeout,
+            )
+        except CapabilityNotImplementedError:
+            out[cap] = None
+    return out

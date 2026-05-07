@@ -26,7 +26,9 @@ app = typer.Typer(name="livespec", help="LiveSpec structural validator")
 app.add_typer(pipeline_app, name="pipeline")
 app.add_typer(git_app, name="git")
 app.add_typer(commit_context_app, name="commit-context")
-app.add_typer(driver_app, name="spec-driver")
+app.add_typer(driver_app, name="spec.driver")
+# @spec FR-001 (feature 023): backward-compat alias for the old `spec-driver` name.
+app.add_typer(driver_app, name="spec-driver", hidden=True)
 
 
 def _find_specs_root(start: Path | None = None) -> Path:
