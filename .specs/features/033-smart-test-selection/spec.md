@@ -1,9 +1,9 @@
 ---
 title: "Smart Test Selection"
-status: "Draft"
+status: "In Progress"
 priority: "P2"
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-07
 ---
 
 # Feature Spec: Smart Test Selection
@@ -11,7 +11,7 @@ updated: 2026-05-06
 - **Feature:** Smart Test Selection
 - **Branch:** feature/033-smart-test-selection
 - **Date:** 2026-05-06
-- **Status:** Draft
+- **Status:** In Progress
 - **Priority:** P2
 - **Scope:** M
 - **Input:** Determine which tests to run based on the files changed since the last commit / push, instead of running the full suite. Uses the @spec anchor reverse map and implementation.md per feature to map changed code files to impacted features and capabilities. Drastically reduces hook execution time (Feature 032) by running only the relevant subset. Also exposed via livespec spec.test --since=<ref> for manual usage. **Includes a migration** if it adds state files to downstream .specs/ (e.g., a precomputed reverse map cache).
