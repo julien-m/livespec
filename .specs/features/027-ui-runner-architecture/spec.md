@@ -1,17 +1,17 @@
 ---
 title: "UI Runner Architecture"
-status: "Draft"
+status: "Implemented"
 priority: "P1"
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-07
 ---
 
 # Feature Spec: UI Runner Architecture
 
 - **Feature:** UI Runner Architecture
 - **Branch:** feature/027-ui-runner-architecture
-- **Date:** 2026-05-06
-- **Status:** Draft
+- **Date:** 2026-05-07
+- **Status:** Implemented
 - **Priority:** P1
 - **Scope:** M
 - **Input:** Cross-platform visual UI testing system, parallel to the driver system (Feature 016) but distinct from it. Defines a YAML manifest format for UI runners (one per platform/surface), exposing capabilities: detect, capture_screenshot, run_flow, compare_baseline. Local-first design — runs identically in dev shell and CI. Builds on the existing Feature 010 (Visual Testing Complete) which becomes the first runner of this pattern (web/Playwright). Extensible: Tauri (029), iOS/watchOS (030), Android (031), and future platforms register through the same interface, with deterministic runner selection based on explicit priority plus custom-runner precedence on ties.
