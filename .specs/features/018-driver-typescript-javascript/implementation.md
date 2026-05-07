@@ -59,8 +59,8 @@ status: Implemented
 
 - **New unit tests:** 27 (16 detector + 11 stryker parser) — all pass.
 - **New integration tests:** 11 — all pass.
-- **Full suite:** 692 passed, 28 skipped, 0 failed.
-- **Lint:** `ruff check validator/drivers/` — clean.
+- **Repository lint audit:** `ruff check .` passes.
+- **Repository type audit:** `mypy .` currently fails on pre-existing issues outside the Feature 018 file set.
 
 ## Notes
 

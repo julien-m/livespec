@@ -18,5 +18,5 @@
   - `tests/unit/test_stryker_parser.py` (new — 11 tests)
   - `tests/integration/test_driver_typescript.py` (new — 11 tests)
 - **AC impacted:** AC-001 through AC-012 (all covered)
-- **Tests:** 692 passed, 28 skipped, 0 failed (full suite)
+- **Verification:** `ruff check .` passes. `mypy .` currently reports pre-existing repository issues outside the Feature 018 file set.
 - **Author:** spec.feature (auto)

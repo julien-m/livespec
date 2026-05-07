@@ -11,6 +11,6 @@
 
 ## Verification
 
-- `pytest tests/` → 692 passed, 28 skipped
-- `ruff check validator/drivers/` → clean
+- `ruff check .` -> passes
+- `mypy .` -> fails on pre-existing repository issues outside the Feature 018 file set
 - Driver loads via `DriverRegistry` for projects with `package.json`
