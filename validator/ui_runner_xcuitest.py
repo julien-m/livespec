@@ -176,7 +176,9 @@ class XCUITestRunnerHandler:
         if (self.project_dir / "Package.swift").exists():
             return True
         # Check for .xcodeproj or .xcworkspace directories
-        for entry in self.project_dir.iterdir() if self.project_dir.exists() else []:
+        if not self.project_dir.exists():
+            return False
+        for entry in self.project_dir.iterdir():
             if entry.suffix in {".xcodeproj", ".xcworkspace"}:
                 return True
         return False
@@ -357,12 +359,17 @@ class XCUITestRunnerHandler:
         if attachments is None:
             attachments = []
         if isinstance(data, dict):
-            if data.get("_type", {}).get("_name") == "ActionTestAttachment":
-                attachments.append(data)
-            for value in data.values():
+            data_dict = cast(dict[str, Any], data)
+            type_field = data_dict.get("_type")
+            if (
+                isinstance(type_field, dict)
+                and cast(dict[str, Any], type_field).get("_name") == "ActionTestAttachment"
+            ):
+                attachments.append(data_dict)
+            for value in data_dict.values():
                 self._extract_attachments_from_xcresult_json(value, attachments)
         elif isinstance(data, list):
-            for item in data:
+            for item in cast(list[Any], data):
                 self._extract_attachments_from_xcresult_json(item, attachments)
         return attachments
 
