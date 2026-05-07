@@ -105,3 +105,21 @@ note: Only needed for --plan-review, --semantic, --contradiction-only flags
 <!-- preflight:custom:start -->
 <!-- Add manual checks here. Use the same ### format as above. Set source: manual -->
 <!-- preflight:custom:end -->
+
+## LiveSpec-Managed (auto-generated)
+
+<!-- preflight:livespec:start -->
+### node (driver)
+- **binary:** `node`
+- **verify:** `node --version`
+- **install:** `brew install node`
+- **severity:** critical
+- **source:** stack (driver: node)
+
+### python (driver)
+- **binary:** `python3`
+- **verify:** `python3 --version`
+- **install:** `brew install python`
+- **severity:** critical
+- **source:** stack (driver: python)
+<!-- preflight:livespec:end -->

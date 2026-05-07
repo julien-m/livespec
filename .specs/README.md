@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-05-06
+> Last updated: 2026-05-07
 
 
 ---
@@ -51,20 +51,20 @@
 | 013 | State Model & Identity Resolution | Implemented | 2026-05-03 | 2026-05-04 | [spec](features/013-state-model-identity-resolution/spec.md) |
 | 014 | Supervisor↔Subagent Return Contracts | Implemented | 2026-05-03 | 2026-05-04 | [spec](features/014-supervisor-contracts/spec.md) |
 | 015 | Global Write Locks & Atomic NNN Reservation | Implemented | 2026-05-03 | 2026-05-04 | [spec](features/015-global-write-locks/spec.md) |
-| 016 | Cross-Language Test Driver Architecture | Draft | 2026-05-06 | 2026-05-06 | [spec](features/016-cross-language-test-driver-architecture/spec.md) |
-| 017 | Driver Python | Draft | 2026-05-06 | 2026-05-06 | [spec](features/017-driver-python/spec.md) |
-| 018 | Driver TypeScript/JavaScript | Draft | 2026-05-06 | 2026-05-06 | [spec](features/018-driver-typescript-javascript/spec.md) |
+| 016 | Cross-Language Test Driver Architecture | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/016-cross-language-test-driver-architecture/spec.md) |
+| 017 | Driver Python | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/017-driver-python/spec.md) |
+| 018 | Driver TypeScript/JavaScript | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/018-driver-typescript-javascript/spec.md) |
 | 019 | Driver Swift | Implemented | 2026-05-06 | 2026-05-07 | [spec](features/019-driver-swift/spec.md) |
-| 020 | Driver Go | Draft | 2026-05-06 | 2026-05-06 | [spec](features/020-driver-go/spec.md) |
-| 021 | Driver Rust | Draft | 2026-05-06 | 2026-05-06 | [spec](features/021-driver-rust/spec.md) |
-| 022 | Driver JVM (Java + Kotlin) | Draft | 2026-05-06 | 2026-05-06 | [spec](features/022-driver-jvm/spec.md) |
-| 023 | Driver Custom Scaffolding & Graceful Degradation | Draft | 2026-05-06 | 2026-05-06 | [spec](features/023-driver-custom-scaffolding/spec.md) |
-| 024 | Patch Coverage Local Computation | Draft | 2026-05-06 | 2026-05-06 | [spec](features/024-patch-coverage-local/spec.md) |
-| 025 | Mutation Testing On-Demand | Draft | 2026-05-06 | 2026-05-06 | [spec](features/025-mutation-testing-on-demand/spec.md) |
-| 026 | Conventions Propagation by Stack | Draft | 2026-05-06 | 2026-05-06 | [spec](features/026-conventions-propagation-by-stack/spec.md) |
+| 020 | Driver Go | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/020-driver-go/spec.md) |
+| 021 | Driver Rust | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/021-driver-rust/spec.md) |
+| 022 | Driver JVM (Java + Kotlin) | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/022-driver-jvm/spec.md) |
+| 023 | Driver Custom Scaffolding & Graceful Degradation | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/023-driver-custom-scaffolding/spec.md) |
+| 024 | Patch Coverage Local Computation | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/024-patch-coverage-local/spec.md) |
+| 025 | Mutation Testing On-Demand | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/025-mutation-testing-on-demand/spec.md) |
+| 026 | Conventions Propagation by Stack | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/026-conventions-propagation-by-stack/spec.md) |
 | 027 | UI Runner Architecture | Draft | 2026-05-06 | 2026-05-06 | [spec](features/027-ui-runner-architecture/spec.md) |
 | 028 | UI Runner Web (Playwright Refactor) | Draft | 2026-05-06 | 2026-05-06 | [spec](features/028-ui-runner-web/spec.md) |
-| 029 | UI Runner Tauri | Draft | 2026-05-06 | 2026-05-06 | [spec](features/029-ui-runner-tauri/spec.md) |
+| 029 | UI Runner Tauri | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/029-ui-runner-tauri/spec.md) |
 | 030 | UI Runner iOS / watchOS | Draft | 2026-05-06 | 2026-05-06 | [spec](features/030-ui-runner-ios-watchos/spec.md) |
 | 031 | UI Runner Android | Draft | 2026-05-06 | 2026-05-06 | [spec](features/031-ui-runner-android/spec.md) |
 | 032 | Pre-commit / Pre-push Test Hooks | Draft | 2026-05-06 | 2026-05-06 | [spec](features/032-test-hooks-pre-commit-pre-push/spec.md) |
@@ -94,16 +94,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-07 | Update | [Feature 033] In progress: Smart Test Selection — core selector module + 22 unit tests; selector logic landed, hook/CLI/migration work still pending |
+| 2026-05-07 | Update | [Feature 028] In progress: UI Runner Web (Playwright Refactor) — added web.yaml manifest and Playwright handler scaffold; CLI wiring, docs, and tests remain open |
+| 2026-05-07 | Feature | [Feature 026] Implemented: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR; 43 new tests pass (917 total) |
+| 2026-05-07 | Feature | [Feature 025] Implemented: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR; 15 new tests pass (874 total) |
+| 2026-05-07 | Feature | [Feature 019] Implemented: Driver Swift — 4 stories, 10 AC, 6 FR; 31 new tests pass (723 total) |
+| 2026-05-06 | Feature | [Feature 016] Implemented: Cross-Language Test Driver Architecture — 5 stories, 15 AC, 8 FR; 35 tests pass |
 | 2026-05-06 | Spec | [Feature 034] Spec created: Preflight Auto-Install & Init via /spec.preflight --fix — 5 stories, 14 AC, 11 FR |
 | 2026-05-06 | Spec | [Feature 033] Spec created: Smart Test Selection — 4 stories, 12 AC, 10 FR |
 | 2026-05-06 | Spec | [Feature 032] Spec created: Pre-commit / Pre-push Test Hooks — 5 stories, 13 AC, 10 FR |
 | 2026-05-06 | Spec | [Feature 031] Spec created: UI Runner Android (Maestro) — 3 stories, 13 AC, 8 FR |
-| 2026-05-06 | Spec | [Feature 030] Spec created: UI Runner iOS / watchOS (XCUITest) — 4 stories, 14 AC, 9 FR |
-| 2026-05-06 | Spec | [Feature 029] Spec created: UI Runner Tauri — 3 stories, 12 AC, 7 FR |
-| 2026-05-06 | Spec | [Feature 028] Spec created: UI Runner Web (Playwright Refactor) — 2 stories, 8 AC, 5 FR |
-| 2026-05-06 | Spec | [Feature 027] Spec created: UI Runner Architecture — 4 stories, 12 AC, 8 FR |
-| 2026-05-06 | Fix | [Features 013, 014, 015] Fix: implementation.md created (post-merge bookkeeping for Chantiers 4/2/3) |
-| 2026-05-06 | Spec | [Feature 026] Spec created: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR |
 <!-- readme:activity:end -->
 
 ---
