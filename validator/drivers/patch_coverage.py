@@ -172,6 +172,64 @@ def compute_patch_coverage(
     )
 
 
+def evaluate_patch_gate(coverage: dict[str, float], threshold: float) -> list[str]:
+    """Return files whose patch coverage falls below ``threshold``.
+
+    Args:
+        coverage: Mapping of file path to patch coverage ratio (0.0 to 1.0).
+        threshold: Minimum acceptable ratio expressed as a fraction.
+
+    Returns:
+        Files below ``threshold`` in input (insertion) order. Empty list when
+        every file meets or exceeds the threshold.
+    """
+    # @spec FR-004: evaluate_patch_gate isolates the threshold logic from the parser.
+    # @spec AC-007: Threshold is optional; callers only invoke when it is configured.
+    return [path for path, ratio in coverage.items() if ratio < threshold]
+
+
+def summarise_patch_coverage(
+    report: PatchCoverageReport,
+    *,
+    threshold: float | None = None,
+) -> str:
+    """Render a ``/spec.test``-friendly summary for a patch coverage report.
+
+    Args:
+        report: Computed patch coverage data.
+        threshold: Optional gating threshold; when provided, failing files are listed.
+
+    Returns:
+        Multi-line summary string describing the patch coverage outcome.
+    """
+    # @spec AC-009: /spec.test summary surfaces patch coverage alongside total coverage.
+    # @spec FR-005: Auto-integration is built on this pure formatter so the runner stays untouched.
+    if not report.files and report.measured_lines == 0:
+        return "Patch coverage: not applicable (no changed lines)."
+
+    lines: list[str] = []
+    overall_pct = report.overall_ratio * 100
+    lines.append(
+        f"Patch coverage: {overall_pct:.1f}% "
+        f"({report.covered_lines}/{report.measured_lines} changed lines covered)"
+    )
+
+    if threshold is not None:
+        threshold_pct = threshold * 100
+        failing = evaluate_patch_gate(report.files, threshold)
+        if failing:
+            lines.append(f"Gate FAILED — threshold {threshold_pct:.0f}%:")
+            for path in failing:
+                lines.append(f"  - {path}: {report.files[path] * 100:.1f}% < {threshold_pct:.0f}%")
+        else:
+            lines.append(f"Gate PASSED — all files ≥ {threshold_pct:.0f}%.")
+
+    for warning in report.warnings:
+        lines.append(f"warning: {warning}")
+
+    return "\n".join(lines)
+
+
 def git_diff(base_ref: str = "HEAD~1", *, project_root: Path | None = None) -> str:
     """Run ``git diff`` and return unified diff text.
 
