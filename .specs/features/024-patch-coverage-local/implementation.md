@@ -35,16 +35,16 @@ Spec FR-001 calls for `livespec/coverage/patch.py`. The foundation actually ship
 | AC-008 | Done (016) | `compute_patch_coverage` is pure file I/O + parsing — confirmed by absence of network imports. |
 | AC-009 | **Done (024)** | `summarise_patch_coverage` returns the `/spec.test` summary block (overall + gate + warnings). |
 
-## Test results
+## Verification
 
 ```
 pytest tests/                  → 859 passed, 28 skipped (suite-wide)
 pytest tests/test_drivers.py   → 51 passed (44 baseline + 7 new)
-ruff check validator/          → all checks passed
-pyright validator/drivers/patch_coverage.py → 0 errors
+ruff check .                   → all checks passed
+mypy validator/drivers/patch_coverage.py → 0 errors
 ```
 
-Pre-existing pyright errors in `validator/semantic/` (117) are unrelated to this feature and were already present on the base branch.
+`mypy .` currently fails in unrelated files outside this feature's allowed edit set (for example `validator/config.py`, `validator/parser.py`, and `tests/integration/helpers/sdk_runner.py`). `validator/drivers/patch_coverage.py` type-checks cleanly in isolation, but `tests/test_drivers.py` and `validator/drivers/__init__.py` pull in those broader repository issues during import analysis.
 
 ## Notes
 

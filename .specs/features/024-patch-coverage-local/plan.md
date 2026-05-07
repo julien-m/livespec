@@ -59,16 +59,16 @@ Public API (after this feature):
    - `test_summarise_patch_coverage_not_applicable` — empty report → "not applicable" line.
    - `test_summarise_patch_coverage_pass` — populated report, no threshold → reports overall.
    - `test_summarise_patch_coverage_threshold_failure` — threshold provided, file below → summary names failing file with its ratio.
-5. Run `pytest tests/`, `pyright validator/`, `ruff check validator/` until clean.
+5. Run `pytest tests/`, `mypy` on the changed Python files, and `ruff check .` until clean.
 6. Write `implementation.md` documenting the deviation around module path (FR-001 actual location).
 7. Update `changelog.md`.
 
 ## Verification
 
-- `pytest tests/test_drivers.py` — all pass (existing 4 patch coverage tests + 6 new ones).
+- `pytest tests/test_drivers.py` — all pass (existing 4 patch coverage tests + 7 new ones).
 - `pytest tests/` — full suite green.
-- `pyright validator/` — 0 errors.
-- `ruff check validator/` — clean.
+- `mypy tests/test_drivers.py validator/drivers/__init__.py validator/drivers/patch_coverage.py` — 0 errors.
+- `ruff check .` — clean.
 
 ## Risks
 
