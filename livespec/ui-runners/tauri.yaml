@@ -1,0 +1,118 @@
+# @spec FR-001: Built-in Tauri UI runner manifest — .specs/features/029-ui-runner-tauri/spec.md#fr-001
+
+name: tauri
+display_name: Tauri UI Runner
+description: |
+  Built-in runner for Tauri projects (Rust backend + WebView frontend).
+  Orchestrates three test surfaces:
+  1. WebView visual testing via tauri-driver/Playwright
+  2. Tauri commands testing via tauri::test::mock_app()
+  3. IPC integration testing via full app launch + invoke() roundtrips
+
+version: 1.0.0
+
+detect:
+  # AC-002: Detect Tauri projects by Cargo.toml + tauri.conf.json (AND logic)
+  files:
+    - Cargo.toml
+    - ["src-tauri/tauri.conf.json", "tauri.conf.json"]  # OR — either location
+  # AC-003: Priority 110 (higher than Rust driver 100 — more specific)
+  priority: 110
+
+capabilities:
+  # AC-004: Capture WebView screenshots via tauri-driver + Playwright
+  capture_screenshot:
+    description: "Launch Tauri app in dev mode, attach tauri-driver, capture WebView screenshots"
+    config:
+      dev_command: "cargo tauri dev --no-bundle"
+      driver_port: 4444  # tauri-driver WebDriver port
+      webview_ready_timeout_s: 10
+      driver_launch_timeout_s: 5
+    implements: [FR-002]
+
+  # AC-005: Execute Playwright flow inside tauri-driver session
+  run_flow:
+    description: "Run a Playwright test script inside the active tauri-driver WebDriver session"
+    config:
+      test_framework: playwright
+    implements: [FR-002]
+
+  # AC-006: Compare baseline screenshots using pixelmatch (delegated to web runner)
+  compare_baseline:
+    description: "Compare captured screenshots to baseline PNGs using pixelmatch"
+    config:
+      delegated_to: web_runner
+    implements: [FR-002]
+
+  # AC-007: Test Tauri commands via tauri::test::mock_app() and cargo test
+  tauri_commands:
+    description: "Invoke cargo test on integration tests using tauri::test::mock_app()"
+    config:
+      test_glob: "src-tauri/tests/**/*.rs"
+      mock_app_pattern: "tauri::test::mock_app"
+      command: "cargo test --test '*tauri*' -- --nocapture"
+    implements: [FR-004]
+    skip_condition: "no integration tests found using mock_app()"
+
+  # AC-008: Test IPC roundtrips via full app launch + invoke() assertions
+  ipc_integration:
+    description: "Launch full Tauri app and run Playwright tests exercising invoke() calls"
+    config:
+      build_command: "cargo build --release"
+      app_launch_timeout_s: 10
+      test_glob: "tests/e2e/**/*.spec.ts"
+      invoke_pattern: "window.__TAURI__.invoke"
+    implements: [FR-005]
+    skip_condition: "no full app build or E2E tests found"
+
+error_handling:
+  # AC-009: Clear install hint if tauri-driver not found (required, not optional)
+  missing_tauri_driver:
+    message: "tauri-driver not found. Install: cargo install tauri-driver"
+    exit_code: 1
+    severity: critical
+
+  # AC-012: Parse IPC errors and surface actionable hints
+  ipc_errors:
+    patterns:
+      - pattern: "command not registered"
+        hint: "Command not registered in tauri::generate_handler. Check main.rs."
+      - pattern: "Tauri command failed"
+        hint: "IPC handler threw exception. Check Rust error logs."
+      - pattern: "timeout"
+        hint: "IPC roundtrip timeout. Check backend performance."
+
+  # AC-010: Extract port from tauri.conf.json
+  config_parsing:
+    extract_fields:
+      - "build.devPath"
+      - "tauri.windows[0].url"
+      - "dev_port (inferred or explicit)"
+
+  # AC-011: Graceful teardown with process cleanup verification
+  teardown:
+    signals: [SIGTERM, SIGKILL]
+    orphan_check_delay_s: 2
+    verify_clean: true
+
+metadata:
+  language: rust
+  frontend: webview
+  test_frameworks:
+    - playwright
+    - custom (invoke roundtrips)
+  dependencies:
+    - cargo (Rust toolchain)
+    - tauri-cli (cargo install tauri-cli)
+    - tauri-driver (cargo install tauri-driver, REQUIRED)
+    - node/npm (Playwright)
+  supports_versions:
+    - tauri: 1.x
+    - tauri: 2.x
+  tags:
+    - tauri
+    - rust
+    - webview
+    - webdriver
+    - mock_app
+    - ipc-testing
