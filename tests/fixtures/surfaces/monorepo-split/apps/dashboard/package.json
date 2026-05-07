@@ -1,0 +1,7 @@
+{
+  "name": "dashboard",
+  "type": "module",
+  "dependencies": {
+    "react": "^18.0.0"
+  }
+}

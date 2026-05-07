@@ -520,6 +520,15 @@ When `--reset-baselines` is set:
 **Prerequisites — frontend detection:** Before generating `docker-compose.visual.yml`, verify the project has a web frontend layer:
 
 1. **If `.specs/surfaces.yaml` exists:** Read it. If any surface has `runner: playwright`, the project has a web frontend. Use each surface's `testDir` as the test directory. Skip surfaces with `runner: manual` or `runner: unsupported`.
+
+   **Multi-surface projects (Feature 036):** A project may declare multiple surfaces per app. The convention is:
+   - `<appdir>` — the e2e surface (testDir = `tests/e2e/`, runnerConfig = `playwright.config.ts`)
+   - `<appdir>-visual` — the optional visual surface (testDir = `tests/visual/`, runnerConfig = `playwright.visual.config.ts`)
+
+   When both `tests/e2e/` and `tests/visual/` exist for an app, `scripts/generate-surfaces.js` emits two surfaces per app. Run all surfaces with `runner: playwright`; do not assume a single entry per app. For monorepos, surfaces are app-interleaved: `<app1>`, `<app1>-visual`, `<app2>`, `<app2>-visual`, ...
+
+   **Adding visual surfaces to a legacy single-surface manifest:** Run `node scripts/generate-surfaces.js --migrate-surfaces`. This is an additive operation — it appends missing `<appdir>-visual` entries while preserving existing entries (and their manual edits) byte-for-byte. Combine with `--dry-run` to preview. `--force` takes precedence and regenerates the entire file from scratch.
+
 2. **If no `surfaces.yaml`:** Fall back to legacy detection — check for any of:
    - Directory exists: `frontend/tests/e2e/`, `frontend/`, or any of `src/app/routes`, `frontend/app/routes`, `app/routes`, `src/routes`, `src/pages`, `pages`
    - File exists: `frontend/playwright.config.ts`, `playwright.config.ts`, `cypress.config.ts`
