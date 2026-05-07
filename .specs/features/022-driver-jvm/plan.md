@@ -12,7 +12,7 @@ status: Approved
 
 ## Summary
 
-Implement the built-in JVM driver (`livespec/drivers/jvm.yaml`) covering both Java and Kotlin via a single manifest. Detection: `build.gradle`, `build.gradle.kts`, or `pom.xml`. Coverage uses a `script:` escape hatch that auto-detects Gradle vs Maven and dispatches the appropriate JaCoCo invocation; the script is the gate. Snapshots and properties run plain `gradle`/`mvn` test commands (the test runner library detection is consultative — the driver doesn't gate on it). Mutation runs pitest via Gradle/Maven (`script:` escape hatch — pitest invocation differs between build tools; the script picks the right one and parses `mutations.xml`). A Python `jvm_detector.py` parses Gradle (.gradle / .gradle.kts via regex — Gradle DSL is not a stable parseable format) and Maven (`pom.xml` via stdlib `xml.etree.ElementTree`) build files for plugin/dependency presence and exposes a `parse_pitest_xml` helper.
+Implement the built-in JVM driver (`livespec/drivers/jvm.yaml`) covering both Java and Kotlin via a single manifest. Detection: `build.gradle`, `build.gradle.kts`, or `pom.xml`. Coverage uses a `script:` escape hatch that auto-detects Gradle vs Maven and dispatches the appropriate JaCoCo invocation; the script is the gate. Snapshots and properties run plain `gradle`/`mvn` test commands, but only after library detection confirms the capability is configured; otherwise the scripts emit the documented skip message and exit 0. Mutation runs pitest via Gradle/Maven (`script:` escape hatch — pitest invocation differs between build tools; the script picks the right one and parses `mutations.xml`). A Python `jvm_detector.py` parses Gradle (.gradle / .gradle.kts via regex — Gradle DSL is not a stable parseable format) and Maven (`pom.xml` via shallow `<artifactId>` regex) build files for plugin/dependency presence and exposes a `parse_pitest_xml` helper implemented with regex for the same portability reason.
 
 ---
 
@@ -27,8 +27,8 @@ Implement the built-in JVM driver (`livespec/drivers/jvm.yaml`) covering both Ja
 | Snapshots | `script:` → `./gradlew test` or `mvn test` | Spec AC-005 — auto-detect kotest-snapshot or approvaltests; skip with exit 0 if absent |
 | Properties | `script:` → same | Spec AC-006 — auto-detect kotest-property or jqwik; skip with exit 0 if absent |
 | Mutation | `script:` → `./gradlew pitest` or `mvn pitest:mutationCoverage` | Spec AC-007, AC-008 — XML parsed by `parse_pitest_xml` |
-| Detector | Pure-Python (regex for Gradle DSL, `ElementTree` for Maven) | Spec FR-002, FR-003 — stdlib only |
-| pitest XML parser | `xml.etree.ElementTree` | Spec FR-004, AC-008 — stdlib only |
+| Detector | Pure-Python (regex for Gradle DSL and Maven) | Spec FR-002, FR-003 — stdlib only |
+| pitest XML parser | Regex over `<mutation status="...">` | Spec FR-004, AC-008 — avoids broken stdlib XML backends |
 | Driver Schema | `DriverManifest` (Feature 016, pydantic) | Existing — reused unchanged |
 
 ---
@@ -39,7 +39,7 @@ Implement the built-in JVM driver (`livespec/drivers/jvm.yaml`) covering both Ja
 - **Separation:** YAML manifest holds capability metadata; `jvm_detector.py` isolates Gradle DSL and Maven XML parsing AND the pitest XML parser in one cohesive module; shell scripts isolate Gradle/Maven dispatch. ✅
 - **Testing:** unit tests for the Gradle/Maven parser (plugin + dependency detection across `build.gradle`, `build.gradle.kts`, `pom.xml`); unit tests for the pitest XML parser (KILLED/SURVIVED/TIMED_OUT counts, missing fields, malformed XML); integration tests for manifest schema, registry detection on each of the three build files, capability metadata, and dependency detection on Gradle Groovy / Gradle Kotlin / Maven fixtures. ✅
 - **Naming:** `livespec/drivers/jvm.yaml`, `validator/drivers/jvm_detector.py`, `livespec/drivers/scripts/jvm-coverage-gate.sh`, `livespec/drivers/scripts/jvm-mutation.sh`, `tests/unit/test_jvm_detector.py`, `tests/integration/test_driver_jvm.py`. Mirrors 020 (Go) and 019 (Swift) for the script-escape-hatch pattern. ✅
-- **Infrastructure:** no new runtime deps (pyright-strict friendly via `cast()` on `ElementTree` results); shell scripts are POSIX `bash` matching the Go/Swift pattern. ✅
+- **Infrastructure:** no new runtime deps; shell scripts are POSIX `bash` matching the Go/Swift pattern. ✅
 
 ---
 
@@ -124,7 +124,7 @@ erDiagram
 ### Step 2 — Create coverage gate script `livespec/drivers/scripts/jvm-coverage-gate.sh`
 
 - Detects build tool: `build.gradle.kts` → Gradle Kotlin; `build.gradle` → Gradle Groovy; `pom.xml` → Maven. Both Gradle and Maven present → Gradle takes priority (AC-010).
-- Probes for JaCoCo: regex on `build.gradle*` for `jacoco`, or XPath on `pom.xml` for `jacoco-maven-plugin`. If absent → emit setup-guide line ("JaCoCo not configured in build.gradle/pom.xml — see docs for setup"), exit 0.
+- Probes for JaCoCo: regex on `build.gradle*` for `jacoco`, or regex on `pom.xml` for `jacoco-maven-plugin`. If absent → emit setup-guide line ("JaCoCo not configured in build.gradle/pom.xml — see docs for setup"), exit 0.
 - Gradle path: `./gradlew test jacocoTestReport jacocoTestCoverageVerification`. Locate lcov.info at `build/reports/jacoco/test/lcov.info`.
 - Maven path: `mvn verify`. Locate lcov.info at `target/site/jacoco/lcov.info`.
 - **AC covered:** AC-002, AC-003, AC-004, AC-010.
@@ -142,10 +142,10 @@ erDiagram
 - **Functions:**
   - `detect_build_tool(project_root: str) -> str | None` — returns `"gradle"` (when `build.gradle` or `build.gradle.kts` present), `"maven"` (only `pom.xml`), or `None`. Gradle priority when both (AC-010).
   - `parse_gradle_build(project_root: str) -> list[str]` — regex over `build.gradle` and `build.gradle.kts` to extract plugin/dependency tokens. Strips comments. Lowercases.
-  - `parse_maven_pom(project_root: str) -> list[str]` — `xml.etree.ElementTree` walks `<plugin><artifactId>` and `<dependency><artifactId>` nodes (any namespace). Lowercases.
-  - `parse_jvm_dependencies(project_root: str) -> list[str]` — dispatches based on `detect_build_tool`. Returns deduplicated list.
+  - `parse_maven_pom(project_root: str) -> list[str]` — shallow regex over `<artifactId>...</artifactId>` nodes (plugins + dependencies), lowercased.
+  - `parse_jvm_dependencies(project_root: str) -> list[str]` — returns the deduplicated union of Gradle tokens and Maven artifact ids so mixed migration trees are still detectable.
   - `has_jvm_dependency(project_root: str, name: str) -> bool` — substring case-insensitive (Maven uses dotted artifact ids, Gradle uses dotted strings; substring is the right granularity).
-  - `parse_pitest_xml(xml_text: str) -> dict[str, int]` — parses pitest `<mutation status="...">` elements via ElementTree, returns `{"killed": N, "survived": N, "timed_out": N, "no_coverage": N, "memory_error": N, "run_error": N}` (zero-defaults for absent statuses; tolerant of malformed XML — returns all zeros without raising).
+  - `parse_pitest_xml(xml_text: str) -> dict[str, int]` — parses pitest `<mutation status="...">` elements via regex, returns `{"killed": N, "survived": N, "timed_out": N, "no_coverage": N, "memory_error": N, "run_error": N}` (zero-defaults for absent statuses; tolerant of malformed XML — returns all zeros without raising).
 - **AC covered:** AC-008, AC-010, AC-011, FR-002, FR-003, FR-004.
 
 ### Step 5 — Unit tests `tests/unit/test_jvm_detector.py`
@@ -166,7 +166,7 @@ erDiagram
 - `parse_pitest_xml` recognises lowercase `killed`/`survived` AND uppercase `KILLED`/`SURVIVED` (pitest is uppercase in practice; we normalise).
 - **AC covered:** AC-008, AC-010, AC-011, FR-002, FR-003, FR-004, FR-006.
 
-### Step 6 — Unit tests for shell scripts `tests/unit/test_jvm_coverage_gate.py` and `tests/unit/test_jvm_mutation.py`
+### Step 6 — Unit tests for shell scripts `tests/unit/test_jvm_coverage_gate.py` and `tests/unit/test_jvm_mutation_script.py`
 
 - Coverage gate: JaCoCo absent on Gradle → setup-guide printed, exit 0.
 - Coverage gate: JaCoCo absent on Maven → setup-guide printed, exit 0.
@@ -211,7 +211,7 @@ erDiagram
 | Unit | Gradle DSL + Maven POM parser | tests/unit/test_jvm_detector.py | AC-010, AC-011, FR-002, FR-003 |
 | Unit | pitest XML parser | tests/unit/test_jvm_detector.py | AC-008, FR-004 |
 | Unit | Coverage gate shell script | tests/unit/test_jvm_coverage_gate.py | AC-002, AC-004 |
-| Unit | Mutation shell script | tests/unit/test_jvm_mutation.py | AC-007 |
+| Unit | Mutation + snapshots + properties shell scripts | tests/unit/test_jvm_mutation_script.py | AC-005, AC-006, AC-007 |
 | Integration | Registry + manifest + 4-capability metadata + dependency detection on three build files | tests/integration/test_driver_jvm.py | AC-001, AC-005, AC-006, AC-009, AC-010, AC-011 |
 | Schema | DriverManifest validates jvm.yaml | (asserted in integration tests) | AC-009 |
 
@@ -224,7 +224,7 @@ erDiagram
 3. **pitest XML report path varies** — Gradle: `build/reports/pitest/mutations.xml`. Maven: `target/pit-reports/<timestamp>/mutations.xml`. The mutation script handles both via globbing (EC-004).
 4. **Multi-module Gradle projects (EC-001)** — addressed at the build-tool level (JaCoCo aggregation task in build.gradle). The driver runs at the project root and inherits the build tool's aggregation behaviour.
 5. **Kotlin Multiplatform (EC-002)** — driver does not special-case KMP; the README references the spec note that KMP requires manual driver configuration. No code path in this feature.
-6. **Test infrastructure quirk** — pyright-strict on `xml.etree.ElementTree`: `Element.findall` returns `list[Element]` without text typing, and `Element.text` is `str | None`. We narrow with `if elem.text is None: continue` rather than `cast()` because there is no type narrowing path through `cast()` for ElementTree text.
+6. **Python XML backend portability** — the local Python 3.14 environment exposed a broken `pyexpat` backend, so shallow regex parsing was chosen for Maven `artifactId` extraction and pitest status counting. The data shape is constrained enough that this remains robust without adding dependencies.
 7. **No auto-installation of build tools** — `gradle`/`mvn` absence is surfaced by the runner as the standard install hint; the gate script does not attempt to install build tools.
 
 ---

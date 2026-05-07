@@ -42,7 +42,7 @@ def _run(
 
 
 def test_all_jvm_scripts_are_shipped_and_executable() -> None:
-    """All four JVM scripts are on disk and executable."""
+    """The mutation, snapshots, and properties scripts are on disk and executable."""
     for script in (_MUTATION_SCRIPT, _SNAPSHOTS_SCRIPT, _PROPERTIES_SCRIPT):
         assert script.is_file(), f"missing: {script}"
         assert os.access(script, os.X_OK), f"not executable: {script}"
