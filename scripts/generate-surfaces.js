@@ -11,6 +11,8 @@
 //                                                       # Combine with --dry-run to preview. --force takes precedence.
 
 // @spec FR-001: detectTestDirs returns array, FR-008: extend findPlaywrightConfig — .specs/features/036-multi-surface-detection-and-migration/spec.md#fr-001
+// @spec FR-001: iOS/watchOS surface detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
+// @spec FR-001: Android/Maestro surface detection — .specs/features/031-ui-runner-android/spec.md#fr-001
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
@@ -55,6 +57,49 @@ const UI_FRAMEWORKS = [
 	"qwik",
 	"@sveltejs",
 ];
+
+// @spec FR-001: iOS/watchOS surface detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
+/**
+ * Detect whether a directory contains an Xcode project (iOS/watchOS).
+ * Matches: Package.swift at root OR a *.xcodeproj directory.
+ */
+export function hasXcodeProject(dir) {
+	if (existsSync(join(dir, "Package.swift"))) return true;
+	try {
+		const entries = readdirSync(dir, { withFileTypes: true });
+		return entries.some(
+			(entry) => entry.isDirectory() && entry.name.endsWith(".xcodeproj"),
+		);
+	} catch {
+		return false;
+	}
+}
+
+// @spec FR-001: Android/Maestro surface detection — .specs/features/031-ui-runner-android/spec.md#fr-001
+/**
+ * Detect whether a directory contains an Android Gradle project.
+ * Matches: build.gradle or build.gradle.kts at root or in app/ subdirectory.
+ */
+export function hasAndroidProject(dir) {
+	return (
+		existsSync(join(dir, "build.gradle")) ||
+		existsSync(join(dir, "build.gradle.kts")) ||
+		existsSync(join(dir, "app", "build.gradle")) ||
+		existsSync(join(dir, "app", "build.gradle.kts"))
+	);
+}
+
+// @spec FR-003: Maestro flows directory detection — .specs/features/031-ui-runner-android/spec.md#fr-003
+/**
+ * Detect whether a directory has Maestro flow YAML files.
+ * Matches: .specs/maestro/ OR maestro/ directory presence.
+ */
+export function hasMaestroFlows(dir) {
+	return (
+		existsSync(join(dir, ".specs", "maestro")) ||
+		existsSync(join(dir, "maestro"))
+	);
+}
 
 export function hasWebDeps(dir) {
 	const pkgPath = join(dir, "package.json");
@@ -276,7 +321,9 @@ export function detectSurfaces() {
 					(existsSync(join(appPath, "ios")) ||
 						existsSync(join(appPath, "android")) ||
 						existsSync(join(appPath, "Info.plist")) ||
-						existsSync(join(appPath, "Package.swift")));
+						existsSync(join(appPath, "Package.swift")) ||
+						hasXcodeProject(appPath) ||
+						hasAndroidProject(appPath));
 
 				if (isWeb) {
 					surfaces.push(
@@ -293,15 +340,40 @@ export function detectSurfaces() {
 				}
 
 				if (isNative) {
-					surfaces.push(
-						...buildSurfacesForDir({
-							baseId: appDir,
-							displayName: appDir.charAt(0).toUpperCase() + appDir.slice(1),
-							dirPath: appPath,
-							runner: "manual",
-							siblingNames,
-						}),
-					);
+					// @spec FR-001: iOS/watchOS surface detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
+					if (hasXcodeProject(appPath)) {
+						surfaces.push({
+							id: appDir,
+							name: appDir.charAt(0).toUpperCase() + appDir.slice(1),
+							path: appPath,
+							testDir: join(appPath, "UITests"),
+							runner: "xcuitest",
+							platform: "ios",
+						});
+					// @spec FR-001: Android/Maestro surface detection — .specs/features/031-ui-runner-android/spec.md#fr-001
+					} else if (hasAndroidProject(appPath) && hasMaestroFlows(appPath)) {
+						const maestroDir = existsSync(join(appPath, ".specs", "maestro"))
+							? join(appPath, ".specs", "maestro")
+							: join(appPath, "maestro");
+						surfaces.push({
+							id: appDir,
+							name: appDir.charAt(0).toUpperCase() + appDir.slice(1),
+							path: appPath,
+							testDir: maestroDir,
+							runner: "maestro",
+							platform: "android",
+						});
+					} else {
+						surfaces.push(
+							...buildSurfacesForDir({
+								baseId: appDir,
+								displayName: appDir.charAt(0).toUpperCase() + appDir.slice(1),
+								dirPath: appPath,
+								runner: "manual",
+								siblingNames,
+							}),
+						);
+					}
 				}
 			}
 		} catch {
@@ -369,6 +441,33 @@ export function detectSurfaces() {
 		);
 	}
 
+	// @spec FR-001: iOS/watchOS root-level detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
+	if (surfaces.length === 0 && hasXcodeProject(".")) {
+		surfaces.push({
+			id: "default",
+			name: "Default",
+			path: ".",
+			testDir: "UITests",
+			runner: "xcuitest",
+			platform: "ios",
+		});
+	}
+
+	// @spec FR-001: Android/Maestro root-level detection — .specs/features/031-ui-runner-android/spec.md#fr-001
+	if (surfaces.length === 0 && hasAndroidProject(".") && hasMaestroFlows(".")) {
+		const maestroDir = existsSync(join(".", ".specs", "maestro"))
+			? join(".", ".specs", "maestro")
+			: "maestro";
+		surfaces.push({
+			id: "default",
+			name: "Default",
+			path: ".",
+			testDir: maestroDir,
+			runner: "maestro",
+			platform: "android",
+		});
+	}
+
 	return surfaces;
 }
 
@@ -395,6 +494,9 @@ function surfaceToYamlLines(surface) {
 	lines.push(`    path: ${surface.path}`);
 	lines.push(`    testDir: ${surface.testDir}`);
 	lines.push(`    runner: ${surface.runner}`);
+	if (surface.platform) {
+		lines.push(`    platform: ${surface.platform}`);
+	}
 	if (surface.runnerConfig) {
 		lines.push(`    runnerConfig: ${surface.runnerConfig}`);
 	}
@@ -458,11 +560,76 @@ export function runMigrateSurfaces({ dryRun }) {
 	return 0;
 }
 
+/**
+ * Migration v12: additive migration that appends native (xcuitest + maestro) surfaces
+ * to an existing surfaces.yaml. Mirrors runMigrateSurfaces but targets iOS/Android runners.
+ *
+ * INVARIANT: never parse + reserialize the YAML — only append new lines.
+ *
+ * @spec FR-001: iOS/watchOS migration v12 — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
+ * @spec FR-001: Android/Maestro migration v12 — .specs/features/031-ui-runner-android/spec.md#fr-001
+ */
+export function runMigrateNativeSurfaces({ dryRun }) {
+	if (!existsSync(SURFACES_CONFIG)) {
+		console.error(
+			`${SURFACES_CONFIG} does not exist — nothing to migrate. Run without --migrate-native to generate.`,
+		);
+		return 1;
+	}
+
+	const existingText = readFileSync(SURFACES_CONFIG, "utf-8");
+	const existingIds = new Set();
+	for (const rawLine of existingText.split("\n")) {
+		const match = rawLine.match(/^\s*-\s+id:\s*(.+?)\s*$/);
+		if (match) {
+			existingIds.add(match[1]);
+		}
+	}
+
+	const detected = detectSurfaces();
+	// Only native runners (xcuitest, maestro) — web surfaces are handled by runMigrateSurfaces
+	const nativeSurfaces = detected.filter(
+		(surface) => surface.runner === "xcuitest" || surface.runner === "maestro",
+	);
+	const missing = nativeSurfaces.filter((surface) => !existingIds.has(surface.id));
+
+	if (missing.length === 0) {
+		console.log("No new native surfaces detected — surfaces.yaml is up to date.");
+		return 0;
+	}
+
+	const newBlocks = missing.flatMap((surface) => surfaceToYamlLines(surface));
+	const prefix = existingText.endsWith("\n") ? existingText : `${existingText}\n`;
+	const appendedText = `${newBlocks.join("\n")}\n`;
+	const updated = `${prefix}${appendedText}`;
+
+	console.log(`Detected ${missing.length} new native surface(s) to append:`);
+	for (const surface of missing) {
+		console.log(`  [${surface.id}] ${surface.name} (${surface.runner}/${surface.platform}) → ${surface.testDir}`);
+	}
+
+	if (dryRun) {
+		console.log(`\n[DRY RUN] Would append to ${SURFACES_CONFIG}:`);
+		console.log(appendedText);
+		return 0;
+	}
+
+	writeFileSync(SURFACES_CONFIG, updated);
+	console.log(`\nAppended ${missing.length} native surface(s) to ${SURFACES_CONFIG}`);
+	return 0;
+}
+
 export function main() {
 	const args = process.argv.slice(2);
 	const dryRun = args.includes("--dry-run");
 	const force = args.includes("--force");
 	const migrateSurfaces = args.includes("--migrate-surfaces");
+	const migrateNative = args.includes("--migrate-native");
+
+	if (migrateNative && !force) {
+		// Migration v12: append iOS/Android surfaces to existing manifest.
+		return runMigrateNativeSurfaces({ dryRun });
+	}
 
 	if (migrateSurfaces && !force) {
 		// --force takes precedence over --migrate-surfaces (full regenerate).
