@@ -33,6 +33,8 @@ def _read_cargo_toml(project_root: Path) -> str:
     try:
         return cargo_path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
+        # Treat unreadable manifests as "feature not detected" so discovery
+        # degrades safely instead of crashing on filesystem or encoding issues.
         return ""
 
 
@@ -64,6 +66,8 @@ def parse_cargo_dependencies(project_root: str) -> list[str]:
     try:
         parsed: dict[str, Any] = tomllib.loads(contents)
     except tomllib.TOMLDecodeError:
+        # Invalid TOML is external project input; returning no dependencies keeps
+        # capability detection non-fatal for malformed fixtures or repos.
         return []
 
     seen: set[str] = set()
@@ -130,6 +134,8 @@ def parse_cargo_mutants_json(stdout: str) -> dict[str, int]:
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
+        # Older cargo-mutants versions may emit line-delimited objects instead of
+        # one summary object, so a whole-stdout parse failure is not terminal.
         data = None
 
     if isinstance(data, dict):
@@ -158,13 +164,17 @@ def parse_cargo_mutants_json(stdout: str) -> dict[str, int]:
         try:
             event = json.loads(line)
         except json.JSONDecodeError:
+            # Ignore malformed lines so partial JSON streams still yield counts
+            # from the valid cargo-mutants events that were emitted.
             continue
         if not isinstance(event, dict):
             continue
         event_dict = cast(dict[str, Any], event)
-        outcome = event_dict.get("outcome") or event_dict.get("status")
-        if isinstance(outcome, str):
-            normalised = outcome.strip().lower()
+        outcome_value = event_dict.get("outcome")
+        if not isinstance(outcome_value, str):
+            outcome_value = event_dict.get("status")
+        if isinstance(outcome_value, str):
+            normalised = outcome_value.strip().lower()
             if normalised in counts:
                 counts[normalised] += 1
 
