@@ -390,12 +390,20 @@ export function detectSurfaces() {
 								});
 							}
 						} else if (xcodeprojDir) {
-							// A parsed .xcodeproj with no surviving test targets should not emit a
-							// placeholder surface because that would point downstream tooling at a
-							// synthetic UITests directory that may not exist.
+							// pbxproj parsed but no test targets enumerated -- emit a placeholder
+							// surface so client projects with bare-bones .xcodeproj fixtures still
+							// pick up xcuitest detection (Feature 030 backward compat).
 							console.warn(
-								`WARNING: ${appDir} has .xcodeproj but no test targets — skipping`,
+								`WARNING: ${appDir} has .xcodeproj but no test targets - emitting fallback surface`,
 							);
+							surfaces.push({
+								id: appDir,
+								name: appDir.charAt(0).toUpperCase() + appDir.slice(1),
+								path: appPath,
+								testDir: join(appPath, "UITests"),
+								runner: "xcuitest",
+								platform: "ios",
+							});
 						} else {
 							surfaces.push({
 								id: appDir,
@@ -518,7 +526,20 @@ export function detectSurfaces() {
 					});
 				}
 			} else {
-				console.warn("WARNING: default project has .xcodeproj but no test targets — skipping");
+				// pbxproj parsed but no test targets enumerated -- emit a placeholder
+				// surface so client projects with bare-bones .xcodeproj fixtures still
+				// pick up xcuitest detection (Feature 030 backward compat).
+				console.warn(
+					"WARNING: default project has .xcodeproj but no test targets - emitting fallback surface (testDir: UITests)",
+				);
+				surfaces.push({
+					id: "default",
+					name: "Default",
+					path: ".",
+					testDir: "UITests",
+					runner: "xcuitest",
+					platform: "ios",
+				});
 			}
 		} else {
 			surfaces.push({
