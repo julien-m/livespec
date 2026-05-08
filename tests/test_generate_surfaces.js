@@ -424,3 +424,60 @@ describe("--dry-run (multi-surface output)", () => {
 		expect(stdout).toContain("[web-visual]");
 	});
 });
+
+// @spec FR-004, FR-005, FR-007: pbxproj parser tests — .specs/features/037-test-multi-runner-integration/spec.md#fr-004
+describe("pbxproj parser (Feature 037)", () => {
+	test("parses ASCII pbxproj and classifies watchOS targets", async () => {
+		const pbxMod = await import(join(REPO_ROOT, "scripts", "lib", "pbxproj.js"));
+		const ascii = `// !$*UTF8*$!\n{\n\trootObject = ABC;\n\tobjects = {\n/* Begin PBXNativeTarget section */\n\t\tT1 /* AppTests */ = {isa = PBXNativeTarget; name = AppTests; productType = "com.apple.product-type.bundle.unit-test"; };\n\t\tT2 /* AppUITests */ = {isa = PBXNativeTarget; name = AppUITests; productType = "com.apple.product-type.bundle.ui-testing"; };\n\t\tT3 /* AppWatchTests */ = {isa = PBXNativeTarget; name = AppWatchTests; productType = "com.apple.product-type.bundle.unit-test"; };\n/* End PBXNativeTarget section */\n\t};\n}\n`;
+		const targets = pbxMod.parsePbxprojContents(ascii);
+		expect(targets.length).toBe(3);
+		const names = targets.map((t) => t.name).sort();
+		expect(names).toEqual(["AppTests", "AppUITests", "AppWatchTests"]);
+	});
+
+	test("classifies watchOS, widget, ui, and unit targets", async () => {
+		const { classifyTestTarget } = await import(join(REPO_ROOT, "scripts", "lib", "pbxproj.js"));
+		expect(classifyTestTarget("AppWatchTests", "com.apple.product-type.bundle.unit-test").platform).toBe("watchos");
+		expect(classifyTestTarget("AppWidgetTests", "com.apple.product-type.bundle.unit-test").kind).toBe("widget");
+		expect(classifyTestTarget("AppUITests", "com.apple.product-type.bundle.ui-testing").kind).toBe("ui");
+		expect(classifyTestTarget("AppTests", "com.apple.product-type.bundle.unit-test").kind).toBe("unit");
+	});
+
+	test("kebabize converts CamelCase target names", async () => {
+		const { kebabize } = await import(join(REPO_ROOT, "scripts", "lib", "pbxproj.js"));
+		expect(kebabize("AppWatchTests")).toBe("app-watch-tests");
+		expect(kebabize("StraptUITests")).toBe("strapt-uitests");
+		expect(kebabize("App_Tests")).toBe("app-tests");
+	});
+
+	test("enumerateAndFallback returns directory-globbed targets when pbxproj missing", async () => {
+		const { enumerateAndFallback } = await import(join(REPO_ROOT, "scripts", "lib", "pbxproj.js"));
+		const tmp = mkdtempSync(join(tmpdir(), "pbx-fallback-"));
+		mkdirSync(join(tmp, "App.xcodeproj"));
+		mkdirSync(join(tmp, "AppTests"));
+		mkdirSync(join(tmp, "AppUITests"));
+		mkdirSync(join(tmp, "AppWatchTests"));
+		const result = enumerateAndFallback(join(tmp, "App.xcodeproj"), tmp);
+		const names = result.targets.map((t) => t.name).sort();
+		expect(names).toEqual(["AppTests", "AppUITests", "AppWatchTests"]);
+		expect(result.warnings.length).toBeGreaterThan(0);
+		rmSync(tmp, { recursive: true, force: true });
+	});
+
+	test("orphan target (declared but directory missing) is omitted with warning", async () => {
+		const { enumerateAndFallback } = await import(join(REPO_ROOT, "scripts", "lib", "pbxproj.js"));
+		const tmp = mkdtempSync(join(tmpdir(), "pbx-orphan-"));
+		const xcodeproj = join(tmp, "App.xcodeproj");
+		mkdirSync(xcodeproj);
+		writeFileSync(
+			join(xcodeproj, "project.pbxproj"),
+			`// !$*UTF8*$!\n{\n\tobjects = {\n/* Begin PBXNativeTarget section */\n\t\tT1 = {isa = PBXNativeTarget; name = AppTests; productType = "com.apple.product-type.bundle.unit-test"; };\n/* End PBXNativeTarget section */\n\t};\n}\n`,
+		);
+		// Note: AppTests directory is intentionally NOT created
+		const result = enumerateAndFallback(xcodeproj, tmp);
+		expect(result.targets.length).toBe(0);
+		expect(result.warnings.some((w) => w.includes("AppTests") && w.includes("not found"))).toBe(true);
+		rmSync(tmp, { recursive: true, force: true });
+	});
+});

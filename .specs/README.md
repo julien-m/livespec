@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-05-07
+> Last updated: 2026-05-08
 
 
 ---
@@ -73,6 +73,7 @@
 <!-- Note: NNN=012 reserved for in-flight feature/012-brainstorm-ingestion (separate branch) -->
 | 035 | Unified CLI Surface | Implemented | 2026-05-07 | 2026-05-07 | [spec](features/035-unified-cli-surface/spec.md) |
 | 036 | Multi-Surface Detection and Migration | Planned | 2026-05-07 | 2026-05-07 | [spec](features/036-multi-surface-detection-and-migration/spec.md) |
+| 037 | Test Multi-Runner Integration | Implemented | 2026-05-08 | 2026-05-08 | [spec](features/037-test-multi-runner-integration/spec.md), [plan](features/037-test-multi-runner-integration/plan.md), [implementation](features/037-test-multi-runner-integration/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -96,6 +97,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-08 | Spec | [Feature 037] Spec created: Test Multi-Runner Integration — 5 stories, 15 AC, 15 FR |
 | 2026-05-07 | Spec | [Feature 036] Spec created: Multi-Surface Detection and Migration — 4 stories, 12 AC, 8 FR |
 | 2026-05-07 | Update | [Feature 033] In progress: Smart Test Selection — core selector module + 22 unit tests; selector logic landed, hook/CLI/migration work still pending |
 | 2026-05-07 | Update | [Feature 028] In progress: UI Runner Web (Playwright Refactor) — added web.yaml manifest and Playwright handler scaffold; CLI wiring, docs, and tests remain open |
@@ -105,7 +107,6 @@
 | 2026-05-06 | Feature | [Feature 016] Implemented: Cross-Language Test Driver Architecture — 5 stories, 15 AC, 8 FR; 35 tests pass |
 | 2026-05-06 | Spec | [Feature 034] Spec created: Preflight Auto-Install & Init via /spec.preflight --fix — 5 stories, 14 AC, 11 FR |
 | 2026-05-06 | Spec | [Feature 033] Spec created: Smart Test Selection — 4 stories, 12 AC, 10 FR |
-| 2026-05-06 | Spec | [Feature 032] Spec created: Pre-commit / Pre-push Test Hooks — 5 stories, 13 AC, 10 FR |
 <!-- readme:activity:end -->
 
 ---

@@ -430,6 +430,28 @@ For each test, map back to the AC it covers:
 - Playwright (or resolved visual tool) is available
 - `--no-visual` is NOT set
 
+### Runner-aware dispatcher (Feature 037)
+
+<!-- @spec FR-001, FR-002, FR-014: Phase 4.5 dispatcher — .specs/features/037-test-multi-runner-integration/spec.md#fr-001 -->
+
+Phase 4.5 reads `.specs/surfaces.yaml` and dispatches each surface to a runner handler via `validator/ui_runner_dispatcher.py`:
+
+| `runner` value      | Handler module                              | Backend                    |
+|---------------------|---------------------------------------------|----------------------------|
+| `playwright`        | `validator.ui_runner_web.WebRunnerHandler`  | Playwright (web)           |
+| `xcuitest`          | `validator.ui_runner_xcuitest`              | iOS / watchOS via xcrun    |
+| `maestro`           | `validator.ui_runner_maestro`               | Android via adb + maestro  |
+| any other / missing | (skipped)                                   | logs `Skipping surface <id>: runner <name> is not handled` |
+
+The dispatcher:
+
+1. Calls `Handler.detect()` first as a preflight gate. On `False` it logs `BLOCKED at step preflight - tooling_missing - <message>` (where `<message>` is `Handler.preflight_message()`) and skips the surface (FR-011, FR-012, FR-013).
+2. Calls `Handler.capture_screenshot(screen)` for each row in the feature's `## Screens` table. Native runners (`xcuitest`, `maestro`) MUST NOT trigger Playwright source generation, `docker-compose.visual.yml`, or `playwright.config.ts` — those steps are gated on `runner == "playwright"` (FR-003).
+3. When `surfaces.yaml` is missing, the dispatcher synthesises a single `runner: playwright` surface (legacy fallback — preserves Feature 010 behaviour).
+4. Surface iteration order is stable: lexicographic on `surface.id`, with secondary priority `(playwright, xcuitest, maestro)`.
+
+Phase 5 then renders an aggregated `### Visual Baselines (per surface)` table with columns `Surface, Runner, Screen, Baseline, Mockup diff, Status` (FR-014).
+
 ### 4.5.1 — Generate Missing Visual Test Files
 
 **Skipped if `--no-generate` is set.** Only baselines for existing visual tests are captured (Phase 4.5.2).
@@ -806,6 +828,7 @@ When multiple features are tested in a single run, display after all individual 
 | `--audit-only` | `-a` | Only audit coverage (Phases 0-1), don't generate or execute |
 | `--no-generate` | `-G` | Execute existing tests but don't generate missing ones. Skips Phase 3 (AC test generation) and Phase 4.5.1 (visual test file generation) |
 | `--no-visual` | `-V` | Skip visual baseline capture and design fidelity check |
+| `--visual` | | **Opt-in**: run only Phase 4.5 (visual) skipping suite execution. Mutually exclusive with `--no-visual` (combining them exits with code 2 and message "--visual and --no-visual are mutually exclusive"). Routes each surface in `.specs/surfaces.yaml` to its handler via `validator/ui_runner_dispatcher.py` (Phase 4.5 dispatcher). |
 | `--all` | `-A` | Test all features with status `Implemented` or `In Progress` |
 | `--auto` | | No confirmation prompts (for `/spec.feature` Phase 3.5 and `/spec.ship` integration) |
 | `--update` | `-u` | Auto-update `implementation.md` without asking |

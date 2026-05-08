@@ -155,6 +155,30 @@ class MaestroRunnerHandler:
         except (OSError, FileNotFoundError, subprocess.TimeoutExpired):
             return False
 
+    # @spec FR-013: Maestro preflight diagnostics — .specs/features/037-test-multi-runner-integration/spec.md#fr-013  # noqa: E501
+    def preflight_message(self) -> str:
+        """Return an actionable diagnostic for the dispatcher BLOCKED line.
+
+        Returns:
+            Empty string when the toolchain is ready; otherwise a hint
+            covering the missing piece (CLI, SDK, emulator).
+        """
+        if not self._check_maestro():
+            return (
+                "maestro CLI not on PATH — install: "
+                "curl -Ls 'https://get.maestro.mobile.dev' | bash"
+            )
+        if not self._check_android_sdk():
+            return (
+                "Android SDK not found — set ANDROID_HOME or install Android Studio"
+            )
+        if self._get_running_emulator() is None:
+            return (
+                "no Android emulator available — start one with "
+                "'emulator -avd <name>'"
+            )
+        return ""
+
     # ------------------------------------------------------------------
     # Project detection
     # ------------------------------------------------------------------
@@ -636,8 +660,11 @@ class MaestroRunnerHandler:
         )
 
     # @spec FR-003: capture_screenshot capability — .specs/features/031-ui-runner-android/spec.md#fr-003  # noqa: E501
+    # @spec FR-002: uniform capture_screenshot(screen) signature — .specs/features/037-test-multi-runner-integration/spec.md#fr-002  # noqa: E501
     def capture_screenshot(
         self,
+        screen: str = "main",
+        *,
         avd_name: str | None = None,
         platform: str = "android",
         fail_fast: bool = False,

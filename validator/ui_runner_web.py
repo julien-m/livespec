@@ -110,6 +110,25 @@ class WebRunnerHandler:
         has_playwright_config = any(self.project_dir.glob("playwright*.config.*"))
         return has_package_json and has_playwright_config
 
+    # @spec FR-011: Playwright preflight diagnostic — .specs/features/037-test-multi-runner-integration/spec.md#fr-011  # noqa: E501
+    def preflight_message(self) -> str:
+        """Return an actionable diagnostic for the dispatcher BLOCKED line.
+
+        Returns:
+            Empty string when Playwright is wired up; otherwise the install
+            hint surfaced through the Phase 4.5 dispatcher.
+        """
+        if not (self.project_dir / "package.json").exists():
+            return (
+                "@playwright/test not installed — npm install -D @playwright/test "
+                "(no package.json found)"
+            )
+        if not any(self.project_dir.glob("playwright*.config.*")):
+            return (
+                "@playwright/test not installed — npm install -D @playwright/test"
+            )
+        return ""
+
     def capture_screenshot(self, screen: str) -> UICapabilityResult:
         """Capture one tagged Playwright screenshot.
 
