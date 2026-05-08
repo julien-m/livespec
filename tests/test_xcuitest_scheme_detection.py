@@ -130,3 +130,112 @@ def test_build_xcodebuild_command_workspace_takes_precedence(tmp_path: Path) -> 
     assert "-workspace" in cmd
     assert "STRAPT.xcworkspace" in cmd
     assert "-project" not in cmd
+
+
+# --------------------------------------------------------------------------
+# Destination auto-detection (Strapt regression: hardcoded iPhone 16 fails on
+# machines that only ship iPhone 17+ runtimes).
+# --------------------------------------------------------------------------
+
+
+def _fake_simctl_list(devices_by_runtime: dict[str, list[dict[str, object]]]) -> dict[str, object]:
+    return {"devices": devices_by_runtime}
+
+
+def test_autodetect_destination_picks_first_available_iphone(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    handler = XCUITestRunnerHandler(tmp_path)
+    fake = _fake_simctl_list(
+        {
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
+                {"name": "iPhone 17", "isAvailable": True},
+                {"name": "iPhone 17 Pro", "isAvailable": True},
+            ],
+        }
+    )
+    handler._list_simulators = lambda: fake  # type: ignore[method-assign]
+    assert (
+        handler._autodetect_destination(platform="ios")
+        == "platform=iOS Simulator,name=iPhone 17"
+    )
+
+
+def test_autodetect_destination_skips_unavailable_devices(tmp_path: Path) -> None:
+    handler = XCUITestRunnerHandler(tmp_path)
+    fake = _fake_simctl_list(
+        {
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
+                {"name": "iPhone 16", "isAvailable": False},
+                {"name": "iPhone 17", "isAvailable": True},
+            ],
+        }
+    )
+    handler._list_simulators = lambda: fake  # type: ignore[method-assign]
+    assert (
+        handler._autodetect_destination(platform="ios")
+        == "platform=iOS Simulator,name=iPhone 17"
+    )
+
+
+def test_autodetect_destination_picks_apple_watch_for_watchos(tmp_path: Path) -> None:
+    handler = XCUITestRunnerHandler(tmp_path)
+    fake = _fake_simctl_list(
+        {
+            "com.apple.CoreSimulator.SimRuntime.watchOS-11-0": [
+                {"name": "Apple Watch Series 10 (46mm)", "isAvailable": True},
+            ],
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
+                {"name": "iPhone 17", "isAvailable": True},
+            ],
+        }
+    )
+    handler._list_simulators = lambda: fake  # type: ignore[method-assign]
+    assert (
+        handler._autodetect_destination(platform="watchos")
+        == "platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)"
+    )
+
+
+def test_autodetect_destination_excludes_watch_for_ios(tmp_path: Path) -> None:
+    handler = XCUITestRunnerHandler(tmp_path)
+    fake = _fake_simctl_list(
+        {
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
+                # An old runtime listing that mistakenly included a watch entry
+                {"name": "Apple Watch Series 10", "isAvailable": True},
+                {"name": "iPhone 17", "isAvailable": True},
+            ],
+        }
+    )
+    handler._list_simulators = lambda: fake  # type: ignore[method-assign]
+    assert (
+        handler._autodetect_destination(platform="ios")
+        == "platform=iOS Simulator,name=iPhone 17"
+    )
+
+
+def test_autodetect_destination_returns_none_when_no_simulators(tmp_path: Path) -> None:
+    handler = XCUITestRunnerHandler(tmp_path)
+    handler._list_simulators = lambda: {}  # type: ignore[method-assign]
+    assert handler._autodetect_destination(platform="ios") is None
+
+
+def test_autodetect_destination_prefers_newest_runtime(tmp_path: Path) -> None:
+    handler = XCUITestRunnerHandler(tmp_path)
+    fake = _fake_simctl_list(
+        {
+            "com.apple.CoreSimulator.SimRuntime.iOS-17-0": [
+                {"name": "iPhone 15", "isAvailable": True},
+            ],
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
+                {"name": "iPhone 17", "isAvailable": True},
+            ],
+        }
+    )
+    handler._list_simulators = lambda: fake  # type: ignore[method-assign]
+    # Reverse-sorted runtime keys → iOS-26-4 wins → iPhone 17 returned.
+    assert (
+        handler._autodetect_destination(platform="ios")
+        == "platform=iOS Simulator,name=iPhone 17"
+    )

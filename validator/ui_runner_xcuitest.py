@@ -335,6 +335,57 @@ class XCUITestRunnerHandler:
         match_str = platform_map.get(platform_lower, platform_lower)
         return [d for d in destinations if match_str in d.get("platform", "").lower()]
 
+    # @spec FR-003: Simulator boot orchestration — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-003  # noqa: E501
+    def _autodetect_destination(self, platform: str = "ios") -> str | None:
+        """Pick the first available simulator destination for the given platform.
+
+        Strapt-class robustness: when surfaces.yaml does not declare a destination,
+        scan `xcrun simctl list devices available` and pick the first booted-or-shutdown
+        device matching the platform (iPhone for ios, Apple Watch for watchos). This
+        avoids the hardcoded "iPhone 16" trap on machines that only ship newer
+        simulator runtimes.
+
+        Args:
+            platform: "ios" (default) or "watchos".
+
+        Returns:
+            Xcode destination string (e.g. "platform=iOS Simulator,name=iPhone 17"),
+            or None if no matching simulator is available.
+        """
+        devices_data = self._list_simulators()
+        runtimes = cast(dict[str, list[dict[str, Any]]], devices_data.get("devices", {}))
+
+        platform_lower = platform.lower()
+
+        def _watch_name(n: str) -> bool:
+            return "watch" in n.lower()
+
+        def _non_watch_name(n: str) -> bool:
+            return "watch" not in n.lower()
+
+        if platform_lower == "watchos":
+            runtime_match = "watchOS"
+            sim_label = "watchOS Simulator"
+            name_filter = _watch_name
+        else:
+            runtime_match = "iOS"
+            sim_label = "iOS Simulator"
+            name_filter = _non_watch_name
+
+        # Sort runtime keys descending so newest OS wins (e.g. iOS-26 before iOS-17)
+        runtime_keys = sorted(
+            (k for k in runtimes if runtime_match in k),
+            reverse=True,
+        )
+        for runtime_key in runtime_keys:
+            for device in runtimes[runtime_key]:
+                if not device.get("isAvailable", False):
+                    continue
+                name = device.get("name", "")
+                if name and name_filter(name):
+                    return f"platform={sim_label},name={name}"
+        return None
+
     # ------------------------------------------------------------------
     # .xcresult bundle parsing
     # ------------------------------------------------------------------
@@ -495,7 +546,7 @@ class XCUITestRunnerHandler:
     def capture_screenshot(
         self,
         screen: str = "main",
-        destination: str = "platform=iOS Simulator,name=iPhone 16",
+        destination: str | None = None,
         test_scheme: str | None = None,
         launch_arguments: list[str] | None = None,
         project: str | None = None,
@@ -562,6 +613,21 @@ class XCUITestRunnerHandler:
                         "(check 'Shared')."
                     ),
                     metadata={"project_dir": str(self.project_dir)},
+                )
+
+        # Auto-detect destination when surfaces.yaml didn't supply one. This avoids
+        # the hardcoded "iPhone 16" trap on machines that only ship newer simulator
+        # runtimes (iPhone 17+). Falls back to the legacy default if simctl is
+        # unavailable so existing v12 manifests keep working.
+        if destination is None:
+            detected = self._autodetect_destination(platform=platform or "ios")
+            if detected is not None:
+                destination = detected
+            else:
+                destination = (
+                    "platform=watchOS Simulator,name=Apple Watch"
+                    if (platform or "").lower() == "watchos"
+                    else "platform=iOS Simulator,name=iPhone 16"
                 )
 
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -640,9 +706,10 @@ class XCUITestRunnerHandler:
     # @spec FR-005: launch_arguments injection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-005  # noqa: E501
     def run_flow(
         self,
-        destination: str = "platform=iOS Simulator,name=iPhone 16",
+        destination: str | None = None,
         test_scheme: str | None = None,
         launch_arguments: list[str] | None = None,
+        platform: str | None = None,
     ) -> UICapabilityResult:
         """Run the full XCUITest suite and report pass/fail.
 
@@ -672,6 +739,19 @@ class XCUITestRunnerHandler:
                 success=False,
                 error=_LICENSE_ERROR,
             )
+
+        # Auto-detect destination when surfaces.yaml didn't supply one (same logic
+        # as capture_screenshot — see comment there).
+        if destination is None:
+            detected = self._autodetect_destination(platform=platform or "ios")
+            if detected is not None:
+                destination = detected
+            else:
+                destination = (
+                    "platform=watchOS Simulator,name=Apple Watch"
+                    if (platform or "").lower() == "watchos"
+                    else "platform=iOS Simulator,name=iPhone 16"
+                )
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             xcresult_path = Path(tmp_dir) / "flow_result.xcresult"

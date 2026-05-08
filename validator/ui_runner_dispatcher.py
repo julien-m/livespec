@@ -131,12 +131,21 @@ def _runner_config_to_kwargs(surface: Surface) -> dict[str, Any]:
 
     Unknown keys are dropped silently so a surfaces.yaml carrying extra fields
     (project, comments, future runner extensions) does not crash the dispatcher.
+
+    Falls back to surface-level `platform` when `runnerConfig.platform` is absent —
+    legacy v8/v12 manifests declare platform at the surface root, not under runnerConfig.
     """
     mapping = _RUNNER_CONFIG_KEYS.get(surface.runner, {})
     kwargs: dict[str, Any] = {}
     for source_key, target_key in mapping.items():
         if source_key in surface.runner_config:
             kwargs[target_key] = surface.runner_config[source_key]
+    if (
+        "platform" not in kwargs
+        and surface.platform is not None
+        and "platform" in mapping.values()
+    ):
+        kwargs["platform"] = surface.platform
     return kwargs
 
 
