@@ -118,11 +118,13 @@ export function buildXcuitestRunnerConfig(xcodeprojDir, platform) {
 	const projectPath = basename(xcodeprojDir);
 	const schemes = listSharedSchemes(xcodeprojDir);
 	const scheme = pickSchemeForPlatform(schemes, platform);
-	const destination =
-		platform === "watchos"
-			? "platform=watchOS Simulator,name=Apple Watch Series 10 (46mm)"
-			: "platform=iOS Simulator,name=iPhone 16";
-	const config = { project: projectPath, destination };
+	// Do NOT hardcode a specific simulator name (e.g. "iPhone 16") — runtimes
+	// vary across machines (iPhone 16 not installed on iOS 26+ hosts). The
+	// XCUITestRunnerHandler auto-detects the first available simulator at
+	// runtime via `xcrun simctl list devices --json`. We only emit `platform`
+	// so the handler picks the correct family (iOS vs watchOS).
+	const config = { project: projectPath };
+	if (platform) config.platform = platform;
 	if (scheme) config.scheme = scheme;
 	return config;
 }
@@ -562,7 +564,23 @@ export function detectSurfaces() {
 				console.warn(`WARNING: ${warning}`);
 			}
 			if (result.targets.length > 0) {
-				for (const target of result.targets) {
+				// Only UI-testing bundles capture screenshots; unit-test bundles
+				// can't run XCUIScreen.main.screenshot(). Filter so visual surfaces
+				// stay actionable for the dispatcher.
+				const uiTargets = result.targets.filter((t) => t.kind === "ui");
+				const skipped = result.targets.filter((t) => t.kind !== "ui");
+				for (const t of skipped) {
+					console.warn(
+						`Skipping ${t.name} (kind=${t.kind}) — only UI Testing Bundles emit visual baselines`,
+					);
+				}
+				if (uiTargets.length === 0) {
+					console.warn(
+						"WARNING: project has test targets but none are UI Testing Bundles. " +
+							"Run `livespec ui-runner scaffold --target ios` and create a UI Testing Bundle in Xcode.",
+					);
+				}
+				for (const target of uiTargets) {
 					surfaces.push({
 						id: kebabize(target.name),
 						name: target.name,

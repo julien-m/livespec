@@ -60,19 +60,29 @@ const TEST_PRODUCT_TYPES = new Set([
  */
 export function classifyTestTarget(name, productType) {
 	const lower = name.toLowerCase();
+	// Platform: derived from name (watch suffix → watchOS, otherwise iOS).
+	const platform = /watch/i.test(name) ? "watchos" : "ios";
+	// Widgets are a special kind regardless of productType.
 	if (/widget.*tests?$/i.test(name)) {
-		return { platform: "ios", kind: "widget" };
+		return { platform, kind: "widget" };
 	}
-	if (/watch.*tests?$/i.test(name)) {
-		return { platform: "watchos", kind: "ui" };
+	// Kind: trust productType first — it is the only authoritative signal that
+	// distinguishes UI Testing Bundles (which capture screenshots) from plain
+	// unit-test bundles (which do not). Name-based heuristics are a fallback
+	// for malformed pbxproj where productType is missing.
+	if (productType === "com.apple.product-type.bundle.ui-testing") {
+		return { platform, kind: "ui" };
 	}
-	if (productType === "com.apple.product-type.bundle.ui-testing" || /uitests?$/i.test(name)) {
-		return { platform: "ios", kind: "ui" };
+	if (productType === "com.apple.product-type.bundle.unit-test") {
+		return { platform, kind: "unit" };
 	}
-	if (productType === "com.apple.product-type.bundle.unit-test" || /tests?$/i.test(lower)) {
-		return { platform: "ios", kind: "unit" };
+	if (/uitests?$/i.test(name)) {
+		return { platform, kind: "ui" };
 	}
-	return { platform: "ios", kind: "unit" };
+	if (/tests?$/i.test(lower)) {
+		return { platform, kind: "unit" };
+	}
+	return { platform, kind: "unit" };
 }
 
 /**
@@ -191,11 +201,36 @@ export function enumerateXcodeTestTargets(xcodeprojDir, appPath) {
 			productType: t.productType,
 			kind: cls.kind,
 			platform: cls.platform,
-			directory: join(appPath, t.name),
+			directory: resolveTargetDirectory(appPath, t.name),
 		};
 	});
 
 	return { targets: enriched, fallback: false, warning: null };
+}
+
+/**
+ * Resolve the on-disk directory for an Xcode target. Xcode does not encode
+ * the source path inside `PBXNativeTarget`, so we probe the common locations
+ * used in the wild: `<root>/<Target>/`, `<root>/Tests/<Target>/`,
+ * `<root>/Sources/<Target>/`, `<root>/UITests/<Target>/`.
+ *
+ * @param {string} appPath
+ * @param {string} targetName
+ * @returns {string}
+ */
+function resolveTargetDirectory(appPath, targetName) {
+	const candidates = [
+		join(appPath, targetName),
+		join(appPath, "Tests", targetName),
+		join(appPath, "Sources", targetName),
+		join(appPath, "UITests", targetName),
+	];
+	for (const candidate of candidates) {
+		if (existsSync(candidate)) return candidate;
+	}
+	// Fall back to the Xcode-standard layout so callers can still report a
+	// canonical "expected here" path in their warning.
+	return join(appPath, targetName);
 }
 
 /**

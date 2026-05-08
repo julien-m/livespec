@@ -527,7 +527,7 @@ describe("scheme extractor (Feature 038)", () => {
 
 // @spec FR-001: runnerConfig wiring — .specs/features/038-runner-config-wiring/spec.md#fr-001
 describe("buildXcuitestRunnerConfig (Feature 038)", () => {
-	test("populates project + destination + scheme from xcshareddata", () => {
+	test("populates project + platform + scheme from xcshareddata", () => {
 		const tmp = mkdtempSync(join(tmpdir(), "rc-xcuitest-"));
 		const xcodeproj = join(tmp, "STRAPT.xcodeproj");
 		const schemesDir = join(xcodeproj, "xcshareddata", "xcschemes");
@@ -536,11 +536,15 @@ describe("buildXcuitestRunnerConfig (Feature 038)", () => {
 		writeFileSync(join(schemesDir, "STRAPT Watch App.xcscheme"), "<Scheme/>");
 		const config = buildXcuitestRunnerConfig(xcodeproj, "ios");
 		expect(config.scheme).toBe("STRAPT");
-		expect(config.destination).toBe("platform=iOS Simulator,name=iPhone 16");
+		// destination is intentionally omitted — runtime auto-detects the
+		// available simulator (iPhone 16 may not exist on iOS 26+ hosts).
+		expect(config.destination).toBeUndefined();
+		expect(config.platform).toBe("ios");
 		expect(config.project).toContain("STRAPT.xcodeproj");
 		const watchConfig = buildXcuitestRunnerConfig(xcodeproj, "watchos");
 		expect(watchConfig.scheme).toBe("STRAPT Watch App");
-		expect(watchConfig.destination).toContain("watchOS Simulator");
+		expect(watchConfig.platform).toBe("watchos");
+		expect(watchConfig.destination).toBeUndefined();
 		rmSync(tmp, { recursive: true, force: true });
 	});
 
@@ -550,7 +554,8 @@ describe("buildXcuitestRunnerConfig (Feature 038)", () => {
 		mkdirSync(xcodeproj);
 		const config = buildXcuitestRunnerConfig(xcodeproj, "ios");
 		expect(config.scheme).toBeUndefined();
-		expect(config.destination).toBeDefined();
+		expect(config.destination).toBeUndefined();
+		expect(config.platform).toBe("ios");
 		expect(config.project).toContain("App.xcodeproj");
 		rmSync(tmp, { recursive: true, force: true });
 	});
