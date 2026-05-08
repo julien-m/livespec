@@ -51,6 +51,18 @@ class Surface:
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any]) -> Surface:
+        # runnerConfig accepts either a structured map (preferred for native
+        # runners: scheme/project/destination/appId/flowsDir/...) or a legacy
+        # string (Playwright config path). Strings are coerced to {"_path": value}
+        # so the dispatcher always sees a dict — handlers that need the legacy
+        # path read it via runner_config["_path"].
+        raw_config: Any = raw.get("runnerConfig", {}) or {}
+        if isinstance(raw_config, str):
+            normalized_config: dict[str, Any] = {"_path": raw_config}
+        elif isinstance(raw_config, dict):
+            normalized_config = cast(dict[str, Any], raw_config)
+        else:
+            normalized_config = {}
         return cls(
             id=str(raw.get("id", "")),
             runner=str(raw.get("runner", "")).lower(),
@@ -58,7 +70,7 @@ class Surface:
             test_dir=str(raw.get("testDir", raw.get("test_dir", "tests/e2e"))),
             platform=raw.get("platform"),
             kind=raw.get("kind"),
-            runner_config=cast(dict[str, Any], raw.get("runnerConfig", {})) or {},
+            runner_config=normalized_config,
         )
 
 
@@ -86,6 +98,46 @@ def _resolve_registry() -> dict[str, type[RunnerHandler]]:
         "xcuitest": cast(type[RunnerHandler], XCUITestRunnerHandler),
         "maestro": cast(type[RunnerHandler], MaestroRunnerHandler),
     }
+
+
+# Map surfaces.yaml runnerConfig keys to handler.capture_screenshot kwargs.
+# Centralised so adding a new runner key is a one-line change instead of
+# touching every dispatcher call site.
+_RUNNER_CONFIG_KEYS: dict[str, dict[str, str]] = {
+    "xcuitest": {
+        "scheme": "test_scheme",
+        "destination": "destination",
+        "project": "project",
+        "workspace": "workspace",
+        "platform": "platform",
+        "launchArguments": "launch_arguments",
+        "launch_arguments": "launch_arguments",
+    },
+    "maestro": {
+        "avdName": "avd_name",
+        "avd_name": "avd_name",
+        "platform": "platform",
+        "failFast": "fail_fast",
+        "fail_fast": "fail_fast",
+        "timeout": "timeout",
+    },
+    # Playwright handler ignores runnerConfig (uses playwright.config.ts directly).
+    "playwright": {},
+}
+
+
+def _runner_config_to_kwargs(surface: Surface) -> dict[str, Any]:
+    """Translate surface.runner_config into kwargs for handler.capture_screenshot.
+
+    Unknown keys are dropped silently so a surfaces.yaml carrying extra fields
+    (project, comments, future runner extensions) does not crash the dispatcher.
+    """
+    mapping = _RUNNER_CONFIG_KEYS.get(surface.runner, {})
+    kwargs: dict[str, Any] = {}
+    for source_key, target_key in mapping.items():
+        if source_key in surface.runner_config:
+            kwargs[target_key] = surface.runner_config[source_key]
+    return kwargs
 
 
 def _stable_sort_key(surface: Surface) -> tuple[str, int]:
@@ -210,11 +262,17 @@ class Phase4_5Dispatcher:
                 )
             ]
 
+        # Translate surfaces.yaml runnerConfig keys into capture_screenshot kwargs.
+        # This is what wires `runnerConfig.scheme` → xcodebuild `-scheme`, etc.
+        capture_kwargs = _runner_config_to_kwargs(surface)
+
         results: list[VisualPhaseResult] = []
         target_screens = screens or [""]
         for screen in target_screens:
             try:
-                outcome: UICapabilityResult = handler.capture_screenshot(screen)
+                outcome: UICapabilityResult = handler.capture_screenshot(
+                    screen, **capture_kwargs
+                )
             except Exception as exc:  # pragma: no cover - defensive boundary
                 logger.error(
                     "BLOCKED at step phase_4.5 - runtime_error - %s: %s",

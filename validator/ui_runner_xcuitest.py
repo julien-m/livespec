@@ -498,6 +498,9 @@ class XCUITestRunnerHandler:
         destination: str = "platform=iOS Simulator,name=iPhone 16",
         test_scheme: str | None = None,
         launch_arguments: list[str] | None = None,
+        project: str | None = None,
+        workspace: str | None = None,
+        platform: str | None = None,
     ) -> UICapabilityResult:
         """Run xcodebuild test, extract screenshots from .xcresult bundle.
 
@@ -506,6 +509,9 @@ class XCUITestRunnerHandler:
             destination: Xcode destination string.
             test_scheme: Xcode scheme name (auto-detected if None).
             launch_arguments: Arguments passed as XCUI_LAUNCH_ARGS env var.
+            project: Optional .xcodeproj path (relative to project_dir or absolute).
+            workspace: Optional .xcworkspace path (takes precedence over project).
+            platform: 'ios' or 'watchos' — used for scheme auto-detection.
 
         Returns:
             Result containing the list of exported PNG paths on success.
@@ -530,12 +536,42 @@ class XCUITestRunnerHandler:
                 error=_LICENSE_ERROR,
             )
 
+        # Auto-detect scheme/project when surfaces.yaml didn't supply them — this
+        # is what unblocks `livespec ui-runner dispatch` on projects whose
+        # surfaces.yaml predates the runnerConfig wiring (e.g. v8 migrations).
+        if test_scheme is None or (project is None and workspace is None):
+            xcodeproj = self._find_xcodeproj()
+            if xcodeproj is not None:
+                if project is None and workspace is None:
+                    rel = xcodeproj.relative_to(self.project_dir) if (
+                        xcodeproj.is_relative_to(self.project_dir)
+                    ) else xcodeproj
+                    if xcodeproj.suffix == ".xcworkspace":
+                        workspace = str(rel)
+                    else:
+                        project = str(rel)
+                if test_scheme is None:
+                    test_scheme = self._autodetect_scheme(xcodeproj, platform=platform)
+            if test_scheme is None:
+                return UICapabilityResult(
+                    success=False,
+                    error=(
+                        "xcodebuild requires a -scheme. Either declare "
+                        "`runnerConfig.scheme: <name>` in .specs/surfaces.yaml or share "
+                        "a scheme via Xcode > Product > Scheme > Manage Schemes "
+                        "(check 'Shared')."
+                    ),
+                    metadata={"project_dir": str(self.project_dir)},
+                )
+
         with tempfile.TemporaryDirectory() as tmp_dir:
             xcresult_path = Path(tmp_dir) / "result.xcresult"
             command = self._build_xcodebuild_command(
                 destination=destination,
                 test_scheme=test_scheme,
                 xcresult_path=xcresult_path,
+                project=project,
+                workspace=workspace,
             )
             env = self._build_env(launch_arguments)
 
@@ -791,11 +827,60 @@ class XCUITestRunnerHandler:
     # Internal helpers
     # ------------------------------------------------------------------
 
+    def _find_xcodeproj(self) -> Path | None:
+        """Return the first .xcodeproj or .xcworkspace under project_dir, or None."""
+        if not self.project_dir.exists():
+            return None
+        # .xcworkspace wins over .xcodeproj when both are present (workspace is
+        # what xcodebuild expects in CocoaPods/SPM-mixed projects).
+        workspaces = sorted(self.project_dir.glob("*.xcworkspace"))
+        if workspaces:
+            return workspaces[0]
+        projects = sorted(self.project_dir.glob("*.xcodeproj"))
+        return projects[0] if projects else None
+
+    def _list_shared_schemes(self, xcodeproj: Path) -> list[str]:
+        """Read scheme names from `<xcodeproj>/xcshareddata/xcschemes/*.xcscheme`."""
+        schemes_dir = xcodeproj / "xcshareddata" / "xcschemes"
+        if not schemes_dir.is_dir():
+            return []
+        return sorted(p.stem for p in schemes_dir.glob("*.xcscheme"))
+
+    def _autodetect_scheme(
+        self, xcodeproj: Path, platform: str | None = None
+    ) -> str | None:
+        """Pick the most likely scheme for the given platform from shared schemes.
+
+        Args:
+            xcodeproj: Path to .xcodeproj or .xcworkspace.
+            platform: 'ios' or 'watchos' to filter; None returns the first scheme.
+
+        Returns:
+            Scheme name, or None when no suitable scheme is found.
+        """
+        schemes = self._list_shared_schemes(xcodeproj)
+        if not schemes:
+            return None
+        if platform == "watchos":
+            for scheme in schemes:
+                lower = scheme.lower()
+                if "watch" in lower:
+                    return scheme
+            return None
+        if platform == "ios":
+            # Prefer non-watch schemes for iOS; fallback to first available.
+            for scheme in schemes:
+                if "watch" not in scheme.lower():
+                    return scheme
+        return schemes[0]
+
     def _build_xcodebuild_command(
         self,
         destination: str,
         test_scheme: str | None,
         xcresult_path: Path,
+        project: str | None = None,
+        workspace: str | None = None,
     ) -> list[str]:
         """Assemble the xcodebuild test command.
 
@@ -803,6 +888,8 @@ class XCUITestRunnerHandler:
             destination: Xcode destination string.
             test_scheme: Scheme to test (uses -scheme flag if provided).
             xcresult_path: Path for the output .xcresult bundle.
+            project: Optional .xcodeproj path (relative or absolute).
+            workspace: Optional .xcworkspace path (takes precedence over project).
 
         Returns:
             Command list suitable for subprocess.run.
@@ -817,6 +904,10 @@ class XCUITestRunnerHandler:
             "CODE_SIGN_IDENTITY=",
             "CODE_SIGNING_REQUIRED=NO",
         ]
+        if workspace:
+            command.extend(["-workspace", workspace])
+        elif project:
+            command.extend(["-project", project])
         if test_scheme:
             command.extend(["-scheme", test_scheme])
         return command

@@ -1,9 +1,51 @@
 // @spec FR-004: enumerate Xcode test targets — .specs/features/037-test-multi-runner-integration/spec.md#fr-004
 // @spec FR-005: fallback when pbxproj parse fails — .specs/features/037-test-multi-runner-integration/spec.md#fr-005
 // @spec FR-007: watch/widget classification — .specs/features/037-test-multi-runner-integration/spec.md#fr-007
+// @spec FR-002: extract Xcode schemes for runnerConfig — .specs/features/038-runner-config-wiring/spec.md#fr-002
 
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, basename } from "node:path";
+
+/**
+ * List shared scheme names declared under <xcodeproj>/xcshareddata/xcschemes/*.xcscheme.
+ * The scheme name is the file stem; this is exactly what `xcodebuild -scheme` accepts.
+ *
+ * @param {string} xcodeprojDir Absolute path to the `.xcodeproj` directory
+ * @returns {string[]} Sorted scheme names; empty array when none are shared
+ */
+export function listSharedSchemes(xcodeprojDir) {
+	const schemesDir = join(xcodeprojDir, "xcshareddata", "xcschemes");
+	if (!existsSync(schemesDir)) return [];
+	try {
+		return readdirSync(schemesDir)
+			.filter((name) => name.endsWith(".xcscheme"))
+			.map((name) => name.replace(/\.xcscheme$/, ""))
+			.sort();
+	} catch {
+		return [];
+	}
+}
+
+/**
+ * Pick the most likely scheme for a given platform from a list of shared schemes.
+ * iOS prefers names without "watch"; watchOS requires "watch" in the name.
+ *
+ * @param {string[]} schemes
+ * @param {"ios"|"watchos"|undefined} platform
+ * @returns {string | null}
+ */
+export function pickSchemeForPlatform(schemes, platform) {
+	if (schemes.length === 0) return null;
+	if (platform === "watchos") {
+		const match = schemes.find((s) => /watch/i.test(s));
+		return match ?? null;
+	}
+	if (platform === "ios") {
+		const match = schemes.find((s) => !/watch/i.test(s));
+		return match ?? schemes[0];
+	}
+	return schemes[0];
+}
 
 const TEST_PRODUCT_TYPES = new Set([
 	"com.apple.product-type.bundle.unit-test",
