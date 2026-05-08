@@ -394,6 +394,122 @@ def inspect_command(
                 typer.echo(f"  {kind}: {', '.join(items[:8])}")
 
 
+@ui_runner_app.command("converge")
+def converge_command(
+    screens: Annotated[
+        list[str] | None,
+        typer.Argument(help="Screen identifiers to capture across iterations."),
+    ] = None,
+    project_dir: str = typer.Option(".", "--project-dir", "-p", help="Project root."),
+    feature_dir: str = typer.Option(
+        ...,
+        "--feature-dir",
+        "-f",
+        help="Feature directory (e.g. .specs/features/001-name/).",
+    ),
+    max_iterations: int = typer.Option(
+        5,
+        "--max-iterations",
+        "-n",
+        help="Stop after this many dispatch+patch cycles even if not converged.",
+    ),
+) -> None:
+    """Loop dispatch + inspect --patch until the Swift candidate lists stabilise.
+
+    The first run usually captures the wrong screen because the auto-generated
+    `tapFirstAvailable` candidate lists are placeholders. `inspect --patch`
+    injects the real labels XCUITest saw, so the next run navigates one level
+    deeper. Repeat until `--patch` reports zero changes — that's convergence.
+
+    Args:
+        screens: Screen identifiers (same as dispatch).
+        project_dir: Project root.
+        feature_dir: Feature directory.
+        max_iterations: Hard stop to avoid infinite loops on unreachable screens.
+
+    Raises:
+        typer.Exit: With code 0 on convergence, 1 if max iterations reached
+            without stabilising, 2 on dispatch failure.
+    """
+    from validator.ui_runner_dispatcher import Phase4_5Dispatcher
+    from validator.ui_runner_inspect import (
+        extract_screen_trees,
+        parse_tree_elements,
+        rewrite_swift_candidates,
+    )
+
+    if not screens:
+        typer.echo("No screens provided.", err=True)
+        raise typer.Exit(code=2)
+
+    project_path = Path(project_dir).resolve()
+    feature_path = Path(feature_dir).resolve()
+    bundles_dir = project_path / ".specs" / ".test-bundles"
+
+    for iteration in range(1, max_iterations + 1):
+        typer.echo(f"\n--- Iteration {iteration}/{max_iterations} ---")
+
+        # 1. Dispatch
+        results = Phase4_5Dispatcher(
+            project_dir=project_path,
+            feature_dir=feature_path,
+        ).run(screens)
+        for r in results:
+            typer.echo(
+                f"  [{r.surface_id}] {r.screen}: "
+                f"{_normalize_dispatch_status(r.status)}"
+                + (f" — {r.error[:80]}" if r.error else "")
+            )
+
+        # 2. Patch each surface's Swift file from its persisted .xcresult
+        total_patched = 0
+        if not bundles_dir.exists():
+            typer.echo("  No .xcresult bundles produced — nothing to inspect.")
+            raise typer.Exit(code=2)
+
+        for bundle in bundles_dir.glob("*.xcresult"):
+            test_target = bundle.stem  # e.g. "STRAPTUITests"
+            swift_dir = project_path / test_target
+            if not swift_dir.exists():
+                typer.echo(
+                    f"  ~ {test_target}: no matching Swift directory at {swift_dir}"
+                )
+                continue
+            swift_files = list(swift_dir.glob("*.swift"))
+            if not swift_files:
+                typer.echo(f"  ~ {test_target}: no .swift files in {swift_dir}")
+                continue
+
+            trees = extract_screen_trees(bundle)
+            if not trees:
+                typer.echo(f"  ~ {test_target}: no <screen>.tree.txt attachments")
+                continue
+            inventories = {
+                screen: parse_tree_elements(text) for screen, text in trees.items()
+            }
+            for swift_file in swift_files:
+                changed = rewrite_swift_candidates(swift_file, inventories)
+                total_patched += changed
+                typer.echo(
+                    f"  → {test_target}/{swift_file.name}: patched {changed} method(s)"
+                )
+
+        if total_patched == 0:
+            typer.echo(
+                f"\n✓ Converged after {iteration} iteration(s) — "
+                f"no more candidates to inject."
+            )
+            raise typer.Exit(code=0)
+
+    typer.echo(
+        f"\n✗ Did not converge after {max_iterations} iterations. "
+        "Some screens may be unreachable via current navigation; "
+        "inspect the .specs/.test-bundles/*.xcresult bundles manually.",
+        err=True,
+    )
+    raise typer.Exit(code=1)
+
+
 @ui_runner_app.command("scaffold")
 def scaffold_command(
     target: str = typer.Option(

@@ -171,3 +171,26 @@ def test_ui_runner_scaffold_ios_falls_back_to_uitests_dir(tmp_path: Path) -> Non
     )
     assert result.exit_code == 0
     assert (tmp_path / "UITests" / "LSSampleUITests.swift").exists()
+
+
+def test_ui_runner_converge_requires_screens(tmp_path: Path) -> None:
+    """converge without screen args exits with code 2 (mirrors dispatch)."""
+    result = runner.invoke(
+        app,
+        [
+            "ui-runner",
+            "converge",
+            "--project-dir",
+            str(tmp_path),
+            "--feature-dir",
+            str(tmp_path),
+        ],
+    )
+    assert result.exit_code == 2
+
+
+def test_ui_runner_converge_help_lists_max_iterations() -> None:
+    """converge --help mentions --max-iterations to make the loop discoverable."""
+    result = runner.invoke(app, ["ui-runner", "converge", "--help"])
+    assert result.exit_code == 0
+    assert "--max-iterations" in result.stdout or "max-iterations" in result.stdout
