@@ -108,3 +108,66 @@ def test_ui_runner_check_registry_contains(runner_name: str, tmp_path: Path) -> 
     )
     payload = json.loads(result.stdout)
     assert runner_name in payload["registry"]
+
+
+def test_ui_runner_scaffold_ios_copies_template(tmp_path: Path) -> None:
+    """scaffold --target ios copies LSSampleUITests.swift into the project."""
+    # Create a UITests directory so scaffold uses it.
+    uitests = tmp_path / "MyAppUITests"
+    uitests.mkdir()
+
+    result = runner.invoke(
+        app,
+        ["ui-runner", "scaffold", "--target", "ios", "--project-dir", str(tmp_path)],
+    )
+    assert result.exit_code == 0
+    assert (uitests / "LSSampleUITests.swift").exists()
+    assert "Scaffolded ios runner template" in result.stdout
+
+
+def test_ui_runner_scaffold_ios_skips_existing_without_force(tmp_path: Path) -> None:
+    """Existing files are skipped unless --force is passed."""
+    uitests = tmp_path / "MyAppUITests"
+    uitests.mkdir()
+    existing = uitests / "LSSampleUITests.swift"
+    existing.write_text("// my custom test", encoding="utf-8")
+
+    result = runner.invoke(
+        app,
+        ["ui-runner", "scaffold", "--target", "ios", "--project-dir", str(tmp_path)],
+    )
+    assert result.exit_code == 0
+    assert existing.read_text(encoding="utf-8") == "// my custom test"
+
+
+def test_ui_runner_scaffold_ios_force_overwrites(tmp_path: Path) -> None:
+    """--force overwrites existing template files."""
+    uitests = tmp_path / "MyAppUITests"
+    uitests.mkdir()
+    existing = uitests / "LSSampleUITests.swift"
+    existing.write_text("// stale", encoding="utf-8")
+
+    result = runner.invoke(
+        app,
+        [
+            "ui-runner",
+            "scaffold",
+            "--target",
+            "ios",
+            "--project-dir",
+            str(tmp_path),
+            "--force",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "XCUITest" in existing.read_text(encoding="utf-8")
+
+
+def test_ui_runner_scaffold_ios_falls_back_to_uitests_dir(tmp_path: Path) -> None:
+    """When no *UITests/ glob match exists, scaffold creates UITests/."""
+    result = runner.invoke(
+        app,
+        ["ui-runner", "scaffold", "--target", "ios", "--project-dir", str(tmp_path)],
+    )
+    assert result.exit_code == 0
+    assert (tmp_path / "UITests" / "LSSampleUITests.swift").exists()

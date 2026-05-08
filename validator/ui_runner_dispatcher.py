@@ -298,14 +298,44 @@ class Phase4_5Dispatcher:
                     )
                 )
                 continue
+            # Detect "test target ran but produced zero attachments" — xcodebuild
+            # exits 0 but the UITest target didn't add any XCTAttachment.image()
+            # calls, so the dispatcher has nothing to compare. Flag this as
+            # BLOCKED with actionable guidance instead of silently passing.
+            exported_paths_raw: Any = (
+                outcome.metadata.get("exported_paths", []) if outcome.metadata else []
+            )
+            exported_paths: list[Any] = (
+                cast(list[Any], exported_paths_raw)
+                if isinstance(exported_paths_raw, list)
+                else []
+            )
+            empty_attachments = (
+                outcome.success
+                and outcome.output_path is None
+                and surface.runner == "xcuitest"
+                and len(exported_paths) == 0
+            )
+            if empty_attachments:
+                status = "blocked"
+                error = (
+                    "xcodebuild test ran but produced zero screenshot attachments. "
+                    "Wire your UITests target to capture XCUIScreen.main.screenshot() "
+                    "and add(XCTAttachment) per screen identifier (lifetime = .keepAlways). "
+                    "Reference: livespec/ui-runners/xcuitest-template/LSSampleUITests.swift "
+                    "in the LiveSpec install, or run `livespec ui-runner scaffold --target ios`."
+                )
+            else:
+                status = "ok" if outcome.success else "fail"
+                error = outcome.error
             results.append(
                 VisualPhaseResult(
                     surface_id=surface.id,
                     runner=surface.runner,
                     screen=screen,
-                    status="ok" if outcome.success else "fail",
+                    status=status,
                     baseline_path=outcome.output_path,
-                    error=outcome.error,
+                    error=error,
                     metadata=outcome.metadata,
                 )
             )

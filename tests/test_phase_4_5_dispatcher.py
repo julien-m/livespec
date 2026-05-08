@@ -390,3 +390,39 @@ def test_surface_from_dict_preserves_dict_runner_config() -> None:
         "scheme": "App",
         "destination": "platform=iOS Simulator,name=iPhone 16",
     }
+
+
+# ---------------------------------------------------------------------------
+# Empty-attachment detection (Strapt regression: xcodebuild exits 0 but
+# UITest target produces zero XCTAttachment.image entries).
+# ---------------------------------------------------------------------------
+
+
+class _EmptyAttachmentXcuitestHandler(FakeHandler):
+    """Simulates xcodebuild test exit 0 with no PNG attachments produced."""
+
+    def __init__(self, project_dir: Path | str) -> None:
+        super().__init__(project_dir, name="xcuitest")
+
+    def capture_screenshot(self, screen: str, **kwargs: Any) -> UICapabilityResult:
+        return UICapabilityResult(
+            success=True,
+            output_path=None,
+            metadata={"exit_code": 0, "exported_paths": []},
+        )
+
+
+def test_dispatcher_blocks_when_xcuitest_returns_zero_attachments(tmp_path: Path) -> None:
+    """When xcodebuild succeeds but no XCTAttachment is added, dispatcher
+    must surface a BLOCKED status pointing to the LSSampleUITests template.
+    Otherwise visual diffs would silently no-op (Strapt regression).
+    """
+    surfaces = [Surface(id="ios", runner="xcuitest")]
+    registry = {"xcuitest": _EmptyAttachmentXcuitestHandler}
+    dispatcher = _build_dispatcher(tmp_path, surfaces, registry)
+    results = dispatcher.run(["home"])
+    assert len(results) == 1
+    assert results[0].status == "blocked"
+    assert results[0].error is not None
+    assert "XCTAttachment" in results[0].error
+    assert "LSSampleUITests" in results[0].error or "scaffold" in results[0].error

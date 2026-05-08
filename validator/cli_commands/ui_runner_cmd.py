@@ -312,6 +312,110 @@ def dispatch_command(
     raise typer.Exit(code=exit_code)
 
 
+@ui_runner_app.command("scaffold")
+def scaffold_command(
+    target: str = typer.Option(
+        "ios",
+        "--target",
+        "-t",
+        help="Scaffold target: 'ios' (XCUITest) or 'android' (Maestro).",
+    ),
+    project_dir: str = typer.Option(
+        ".",
+        "--project-dir",
+        "-p",
+        help="Project root (default: cwd).",
+    ),
+    out_dir: str | None = typer.Option(
+        None,
+        "--out",
+        "-o",
+        help=(
+            "Override destination directory (defaults: <App>UITests/ for ios, "
+            ".specs/maestro/ for android)."
+        ),
+    ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        "-f",
+        help="Overwrite existing files.",
+    ),
+) -> None:
+    """Copy LiveSpec UI runner test templates into the current project.
+
+    Bridges the gap between `xcodebuild test` exit 0 and zero baseline emission:
+    the UITest target must call XCTAttachment(screenshot:) per screen identifier.
+    This command drops a working LSSampleUITests.swift into your UITests target
+    that demonstrates the pattern, including launchArguments wiring.
+
+    Args:
+        target: 'ios' (XCUITest) or 'android' (Maestro flow).
+        project_dir: Project root (default: cwd).
+        out_dir: Override destination directory.
+        force: Overwrite existing files.
+
+    Raises:
+        typer.Exit: With code 0 on success, 2 on missing template/destination conflicts.
+    """
+    project_path = Path(project_dir).resolve()
+    target_lower = target.lower()
+
+    # Locate the template directory inside the LiveSpec install. The CLI runs
+    # from the global install, so we resolve relative to this module.
+    livespec_root = Path(__file__).resolve().parents[2]
+    template_name = "xcuitest" if target_lower == "ios" else "maestro"
+    template_dir = (
+        livespec_root / "livespec" / "ui-runners" / f"{template_name}-template"
+    )
+
+    if not template_dir.exists():
+        typer.echo(
+            f"BLOCKED: template not found at {template_dir}. "
+            f"Re-run /spec.migrate or reinstall LiveSpec.",
+            err=True,
+        )
+        raise typer.Exit(code=2)
+
+    # Resolve destination
+    if out_dir is not None:
+        dest = (project_path / out_dir).resolve()
+    elif target_lower == "ios":
+        # Try common UITests directory naming
+        candidates = list(project_path.glob("*UITests"))
+        dest = candidates[0] if candidates else project_path / "UITests"
+    else:
+        dest = project_path / ".specs" / "maestro"
+
+    dest.mkdir(parents=True, exist_ok=True)
+
+    copied: list[str] = []
+    skipped: list[str] = []
+    for src in template_dir.iterdir():
+        if src.is_dir():
+            continue
+        target_file = dest / src.name
+        if target_file.exists() and not force:
+            skipped.append(str(target_file.relative_to(project_path)))
+            continue
+        target_file.write_bytes(src.read_bytes())
+        copied.append(str(target_file.relative_to(project_path)))
+
+    typer.echo(f"Scaffolded {target_lower} runner template into {dest.relative_to(project_path)}/")
+    for path in copied:
+        typer.echo(f"  + {path}")
+    for path in skipped:
+        typer.echo(f"  ~ {path} (already exists, use --force to overwrite)", err=True)
+
+    if target_lower == "ios" and copied:
+        typer.echo(
+            "\nNext: add LSSampleUITests.swift to your UITests target in Xcode "
+            "(File > Add Files to \"<project>\"...), share the test scheme "
+            "(Product > Scheme > Manage Schemes > tick 'Shared'), then re-run "
+            "`livespec ui-runner dispatch`."
+        )
+
+
 def _serialize_results(results: list[VisualPhaseResult]) -> list[DispatchPayload]:
     """Convert dispatcher dataclasses into JSON-safe dictionaries.
 
