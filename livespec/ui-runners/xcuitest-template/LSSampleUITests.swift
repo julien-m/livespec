@@ -42,20 +42,26 @@ class LSSampleUITests: XCTestCase {
 
     // @spec FR-002: XCUIScreen screenshot capture — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-002
 
+    /// Capture screenshot + accessibility tree. The `.tree.txt` attachment lets
+    /// `livespec ui-runner inspect` auto-correct identifiers when navigation
+    /// TODOs miss their target — no manual editing required.
+    private func snapshot(_ name: String) {
+        let png = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        png.name = name
+        png.lifetime = .keepAlways
+        add(png)
+
+        let tree = XCTAttachment(string: app.debugDescription)
+        tree.name = "\(name).tree.txt"
+        tree.lifetime = .keepAlways
+        add(tree)
+    }
+
     /// Capture the main screen for baseline comparison.
-    ///
-    /// LiveSpec extracts XCTAttachment screenshots from the .xcresult bundle.
-    /// Use `lifetime = .keepAlways` so the attachment survives even when the
-    /// test passes (Xcode's default is to delete passing-test attachments).
     func testCaptureMainScreen() throws {
         // TODO: navigate to the screen you want to capture
         // Example: app.tabBars.buttons["Home"].tap()
-
-        let screenshot = XCUIScreen.main.screenshot()
-        let attachment = XCTAttachment(screenshot: screenshot)
-        attachment.name = "main_screen"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        snapshot("main_screen")
     }
 
     /// Example: capture the dashboard screen.

@@ -312,6 +312,88 @@ def dispatch_command(
     raise typer.Exit(code=exit_code)
 
 
+@ui_runner_app.command("inspect")
+def inspect_command(
+    xcresult: str = typer.Argument(
+        ...,
+        help="Path to the .xcresult bundle produced by xcodebuild test.",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit machine-readable JSON.",
+    ),
+    patch: str | None = typer.Option(
+        None,
+        "--patch",
+        help=(
+            "Path to a Swift UI test file. When set, inspect rewrites the "
+            "tapFirstAvailable/tapAnyTab candidate lists with the labels "
+            "actually found on each screen (auto-fix navigation TODOs)."
+        ),
+    ),
+) -> None:
+    """Extract accessibility trees from a test run and report per-screen elements.
+
+    The Swift template attaches `<screen>.tree.txt` to every snapshot. This
+    command pulls them out of the .xcresult bundle, parses interactive
+    elements (buttons, tabs, cells, statictexts), and prints a per-screen
+    inventory. Use `--patch <file>` to auto-rewrite the Swift candidates so
+    you don't have to chase accessibilityIdentifier mismatches manually.
+
+    Args:
+        xcresult: Path to .xcresult bundle.
+        json_output: Emit JSON instead of human text.
+        patch: When provided, rewrite the Swift test file's tap candidates.
+
+    Raises:
+        typer.Exit: With code 0 on success, 2 on parse errors.
+    """
+    from validator.ui_runner_inspect import (
+        extract_screen_trees,
+        parse_tree_elements,
+        rewrite_swift_candidates,
+    )
+
+    bundle = Path(xcresult).resolve()
+    if not bundle.exists():
+        typer.echo(f"BLOCKED: .xcresult not found at {bundle}", err=True)
+        raise typer.Exit(code=2)
+
+    trees = extract_screen_trees(bundle)
+    if not trees:
+        typer.echo(
+            "No <screen>.tree.txt attachments found. Make sure the Swift test "
+            "uses the snapshot() helper from livespec/ui-runners/xcuitest-template "
+            "(or run `livespec ui-runner scaffold --target ios --force`).",
+            err=True,
+        )
+        raise typer.Exit(code=2)
+
+    inventories: dict[str, dict[str, list[str]]] = {}
+    for screen, tree_text in trees.items():
+        inventories[screen] = parse_tree_elements(tree_text)
+
+    if patch:
+        target = Path(patch).resolve()
+        if not target.exists():
+            typer.echo(f"BLOCKED: Swift file not found at {target}", err=True)
+            raise typer.Exit(code=2)
+        changed = rewrite_swift_candidates(target, inventories)
+        typer.echo(f"Patched {changed} test method(s) in {target.name}")
+
+    if json_output:
+        typer.echo(json.dumps(inventories, indent=2))
+        return
+
+    for screen, inv in inventories.items():
+        typer.echo(f"\n=== {screen} ===")
+        for kind in ("tabs", "buttons", "cells", "statictexts"):
+            items = inv.get(kind, [])
+            if items:
+                typer.echo(f"  {kind}: {', '.join(items[:8])}")
+
+
 @ui_runner_app.command("scaffold")
 def scaffold_command(
     target: str = typer.Option(
