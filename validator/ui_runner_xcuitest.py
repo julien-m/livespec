@@ -25,8 +25,8 @@ from typing import Any, cast
 import yaml  # type: ignore[import-untyped]
 
 DEFAULT_COMPARE_THRESHOLD = 0.05
-SCREENSHOT_TIMEOUT_SECONDS = 300
-FLOW_TIMEOUT_SECONDS = 600
+SCREENSHOT_TIMEOUT_SECONDS = 1200  # 20 min — first build of a large iOS app
+FLOW_TIMEOUT_SECONDS = 1800        # 30 min — flow runs are longer than single captures
 COMPARE_TIMEOUT_SECONDS = 60
 SIMULATOR_BOOT_TIMEOUT_SECONDS = 120
 XCRESULTTOOL_TIMEOUT_SECONDS = 60
@@ -552,6 +552,7 @@ class XCUITestRunnerHandler:
         project: str | None = None,
         workspace: str | None = None,
         platform: str | None = None,
+        only_testing: str | None = None,
     ) -> UICapabilityResult:
         """Run xcodebuild test, extract screenshots from .xcresult bundle.
 
@@ -630,78 +631,93 @@ class XCUITestRunnerHandler:
                     else "platform=iOS Simulator,name=iPhone 16"
                 )
 
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            xcresult_path = Path(tmp_dir) / "result.xcresult"
-            command = self._build_xcodebuild_command(
-                destination=destination,
-                test_scheme=test_scheme,
-                xcresult_path=xcresult_path,
-                project=project,
-                workspace=workspace,
+        # Persist the .xcresult under the project so `livespec ui-runner inspect`
+        # can read it after the dispatch returns. TemporaryDirectory would delete
+        # it before the user has a chance to inspect the trees.
+        bundles_dir = self.project_dir / ".specs" / ".test-bundles"
+        bundles_dir.mkdir(parents=True, exist_ok=True)
+        # Reuse a stable filename per (surface, screen) so subsequent runs
+        # overwrite cleanly. We can't use the surface id here (handler doesn't
+        # know it), but only_testing is the next-best disambiguator.
+        bundle_name = (only_testing or "default").replace("/", "_") + ".xcresult"
+        xcresult_path = bundles_dir / bundle_name
+        if xcresult_path.exists():
+            import shutil as _shutil
+
+            _shutil.rmtree(xcresult_path)
+
+        command = self._build_xcodebuild_command(
+            destination=destination,
+            test_scheme=test_scheme,
+            xcresult_path=xcresult_path,
+            project=project,
+            workspace=workspace,
+            only_testing=only_testing,
+        )
+        env = self._build_env(launch_arguments)
+
+        try:
+            result = subprocess.run(
+                command,
+                cwd=self.project_dir,
+                capture_output=True,
+                text=True,
+                timeout=SCREENSHOT_TIMEOUT_SECONDS,
+                env=env,
+                check=False,
             )
-            env = self._build_env(launch_arguments)
-
-            try:
-                result = subprocess.run(
-                    command,
-                    cwd=self.project_dir,
-                    capture_output=True,
-                    text=True,
-                    timeout=SCREENSHOT_TIMEOUT_SECONDS,
-                    env=env,
-                    check=False,
-                )
-            except subprocess.TimeoutExpired as error:
-                return UICapabilityResult(
-                    success=False,
-                    error=f"xcodebuild test timed out after {error.timeout}s",
-                    metadata={"timeout": error.timeout, "command": " ".join(command)},
-                )
-            except OSError as error:
-                return UICapabilityResult(
-                    success=False,
-                    error=f"Failed to execute xcodebuild: {error}",
-                    metadata={"command": " ".join(command)},
-                )
-
-            # Check for license error in output
-            combined_output = result.stdout + result.stderr
-            combined_lower = combined_output.lower()
-            if "license" in combined_lower and "not been accepted" in combined_lower:
-                return UICapabilityResult(
-                    success=False,
-                    error=_LICENSE_ERROR,
-                    metadata={"command": " ".join(command)},
-                )
-
-            if not xcresult_path.exists():
-                return UICapabilityResult(
-                    success=False,
-                    error="No .xcresult bundle produced by xcodebuild test",
-                    metadata={
-                        "command": " ".join(command),
-                        "exit_code": result.returncode,
-                        "stdout_snippet": _truncate_stdout(result.stdout),
-                    },
-                )
-
-            destination_id = destination.replace("=", "_").replace(",", "_").replace(" ", "_")
-            output_dir = self.project_dir / ".specs" / "design" / "screens"
-            exported_paths = self._parse_xcresult(xcresult_path, output_dir, destination_id)
-
-            first_path = exported_paths[0] if exported_paths else None
-            has_error = not exported_paths and result.returncode != 0
+        except subprocess.TimeoutExpired as error:
             return UICapabilityResult(
-                success=result.returncode == 0 or bool(exported_paths),
-                output_path=first_path,
-                error=result.stderr or None if has_error else None,
+                success=False,
+                error=f"xcodebuild test timed out after {error.timeout}s",
+                metadata={"timeout": error.timeout, "command": " ".join(command)},
+            )
+        except OSError as error:
+            return UICapabilityResult(
+                success=False,
+                error=f"Failed to execute xcodebuild: {error}",
+                metadata={"command": " ".join(command)},
+            )
+
+        # Check for license error in output
+        combined_output = result.stdout + result.stderr
+        combined_lower = combined_output.lower()
+        if "license" in combined_lower and "not been accepted" in combined_lower:
+            return UICapabilityResult(
+                success=False,
+                error=_LICENSE_ERROR,
+                metadata={"command": " ".join(command)},
+            )
+
+        if not xcresult_path.exists():
+            return UICapabilityResult(
+                success=False,
+                error="No .xcresult bundle produced by xcodebuild test",
                 metadata={
                     "command": " ".join(command),
                     "exit_code": result.returncode,
-                    "exported_paths": [str(p) for p in exported_paths],
                     "stdout_snippet": _truncate_stdout(result.stdout),
                 },
             )
+
+        destination_id = destination.replace("=", "_").replace(",", "_").replace(" ", "_")
+        output_dir = self.project_dir / ".specs" / "design" / "screens"
+        exported_paths = self._parse_xcresult(xcresult_path, output_dir, destination_id)
+
+        first_path = exported_paths[0] if exported_paths else None
+        has_error = not exported_paths and result.returncode != 0
+        return UICapabilityResult(
+            success=result.returncode == 0 or bool(exported_paths),
+            output_path=first_path,
+            error=result.stderr or None if has_error else None,
+            metadata={
+                "command": " ".join(command),
+                "exit_code": result.returncode,
+                "exported_paths": [str(p) for p in exported_paths],
+                "stdout_snippet": _truncate_stdout(result.stdout),
+                "xcresult_path": str(xcresult_path),
+            },
+        )
 
     # @spec FR-005: launch_arguments injection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-005  # noqa: E501
     def run_flow(
@@ -961,6 +977,7 @@ class XCUITestRunnerHandler:
         xcresult_path: Path,
         project: str | None = None,
         workspace: str | None = None,
+        only_testing: str | None = None,
     ) -> list[str]:
         """Assemble the xcodebuild test command.
 
@@ -970,6 +987,11 @@ class XCUITestRunnerHandler:
             xcresult_path: Path for the output .xcresult bundle.
             project: Optional .xcodeproj path (relative or absolute).
             workspace: Optional .xcworkspace path (takes precedence over project).
+            only_testing: Restrict the run to a specific test bundle/method via
+                xcodebuild's `-only-testing:` flag. Required when a scheme has
+                multiple targets across platforms (e.g. iOS UITests + watchOS
+                UITests in the same scheme): otherwise xcodebuild tries to run
+                the wrong-platform bundles and the whole invocation fails.
 
         Returns:
             Command list suitable for subprocess.run.
@@ -984,6 +1006,8 @@ class XCUITestRunnerHandler:
             "CODE_SIGN_IDENTITY=",
             "CODE_SIGNING_REQUIRED=NO",
         ]
+        if only_testing:
+            command.extend(["-only-testing:" + only_testing])
         if workspace:
             command.extend(["-workspace", workspace])
         elif project:

@@ -112,6 +112,8 @@ _RUNNER_CONFIG_KEYS: dict[str, dict[str, str]] = {
         "platform": "platform",
         "launchArguments": "launch_arguments",
         "launch_arguments": "launch_arguments",
+        "onlyTesting": "only_testing",
+        "only_testing": "only_testing",
     },
     "maestro": {
         "avdName": "avd_name",

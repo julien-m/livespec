@@ -111,7 +111,7 @@ export function findXcodeProjectDir(dir) {
  * @param {"ios"|"watchos"|undefined} platform
  * @returns {Record<string, string> | null}
  */
-export function buildXcuitestRunnerConfig(xcodeprojDir, platform) {
+export function buildXcuitestRunnerConfig(xcodeprojDir, platform, testTargetName) {
 	if (!xcodeprojDir) return null;
 	// xcodebuild runs with cwd = surface.path, so -project must be the project
 	// name relative to that directory (just the basename, not the full repo path).
@@ -126,6 +126,11 @@ export function buildXcuitestRunnerConfig(xcodeprojDir, platform) {
 	const config = { project: projectPath };
 	if (platform) config.platform = platform;
 	if (scheme) config.scheme = scheme;
+	// onlyTesting restricts xcodebuild to a single test bundle. Required when
+	// the scheme has multiple test targets across platforms (iOS UITests +
+	// watchOS UITests in the same scheme): otherwise xcodebuild builds and
+	// tries to run the wrong-platform bundles, which fails.
+	if (testTargetName) config.onlyTesting = testTargetName;
 	return config;
 }
 
@@ -589,7 +594,11 @@ export function detectSurfaces() {
 						runner: "xcuitest",
 						platform: target.platform,
 						kind: target.kind,
-						runnerConfig: buildXcuitestRunnerConfig(xcodeprojDir, target.platform),
+						runnerConfig: buildXcuitestRunnerConfig(
+							xcodeprojDir,
+							target.platform,
+							target.name,
+						),
 					});
 				}
 			} else {

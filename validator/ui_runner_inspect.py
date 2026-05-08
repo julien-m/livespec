@@ -41,13 +41,17 @@ def extract_screen_trees(xcresult_path: Path) -> dict[str, str]:
     if shutil.which("xcrun") is None:
         return {}
 
-    # First: list all attachment refs via xcresulttool.
+    # First: list all attachment refs via xcresulttool. Xcode 26 deprecated
+    # `xcresulttool get` (no subcommand) and requires `--legacy` for the JSON
+    # graph dump. We try the legacy form first since it returns the rich
+    # ActionTestAttachment shape we already parse below.
     try:
         graph_raw = subprocess.run(
             [
                 "xcrun",
                 "xcresulttool",
                 "get",
+                "--legacy",
                 "--path",
                 str(xcresult_path),
                 "--format",
@@ -68,7 +72,26 @@ def extract_screen_trees(xcresult_path: Path) -> dict[str, str]:
     except json.JSONDecodeError:
         return {}
 
-    refs = _collect_attachment_refs(graph)
+    # The top-level graph only contains the ActionsInvocationRecord, which
+    # points to test metadata via `testsRef`. We have to fetch the testsRef
+    # payload first to discover per-test `summaryRef` ids, and THEN fetch each
+    # summary record — that's where ActionTestAttachment entries actually live.
+    refs: list[tuple[str, str]] = []
+    refs.extend(_collect_attachment_refs(graph))
+
+    tests_refs = _collect_named_refs(graph, "testsRef")
+    summary_refs: list[str] = []
+    for tref in tests_refs:
+        tests_payload = _fetch_subrecord(xcresult_path, tref)
+        if tests_payload is None:
+            continue
+        summary_refs.extend(_collect_summary_refs(tests_payload))
+
+    for sref in summary_refs:
+        sub = _fetch_subrecord(xcresult_path, sref)
+        if sub is not None:
+            refs.extend(_collect_attachment_refs(sub))
+
     trees: dict[str, str] = {}
     for name, ref_id in refs:
         if not name.endswith(_TREE_SUFFIX):
@@ -78,6 +101,74 @@ def extract_screen_trees(xcresult_path: Path) -> dict[str, str]:
         if text is not None:
             trees[screen] = text
     return trees
+
+
+def _collect_summary_refs(node: object) -> list[str]:
+    """Walk the graph and return every `summaryRef.id._value` it carries."""
+    return _collect_named_refs(node, "summaryRef")
+
+
+def _collect_named_refs(node: object, ref_name: str) -> list[str]:
+    """Walk the graph collecting `<ref_name>.id._value` strings.
+
+    Args:
+        node: Root of the JSON subtree to search.
+        ref_name: Field name to follow (e.g. "summaryRef", "testsRef").
+
+    Returns:
+        List of reference id strings, in document order.
+    """
+    out: list[str] = []
+
+    def visit(obj: object) -> None:
+        if isinstance(obj, dict):
+            d = cast(dict[str, Any], obj)
+            ref = d.get(ref_name)
+            if isinstance(ref, dict):
+                rid_field = cast(dict[str, Any], ref).get("id")
+                if isinstance(rid_field, dict):
+                    rv = cast(dict[str, Any], rid_field).get("_value")
+                    if isinstance(rv, str):
+                        out.append(rv)
+            for v in d.values():
+                visit(v)
+        elif isinstance(obj, list):
+            for v in cast(list[Any], obj):
+                visit(v)
+
+    visit(node)
+    return out
+
+
+def _fetch_subrecord(xcresult_path: Path, ref_id: str) -> object | None:
+    """Fetch a sub-record from the xcresult bundle by its reference id."""
+    try:
+        result = subprocess.run(
+            [
+                "xcrun",
+                "xcresulttool",
+                "get",
+                "--legacy",
+                "--path",
+                str(xcresult_path),
+                "--id",
+                ref_id,
+                "--format",
+                "json",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode != 0:
+        return None
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
 
 
 def _collect_attachment_refs(node: object) -> list[tuple[str, str]]:
@@ -101,12 +192,16 @@ def _collect_attachment_refs(node: object) -> list[tuple[str, str]]:
                 if isinstance(tn, str):
                     type_name = tn
             if type_name == "ActionTestAttachment":
-                fname_field = d.get("filename")
+                # `filename` carries Xcode's auto-generated suffix
+                # (e.g. "watch-home.tree_0_<uuid>.txt"). The user-facing
+                # identifier we set via `attachment.name` is in the `name`
+                # field — that's what matches our `<screen>.tree.txt` convention.
+                name_field = d.get("name")
                 fname: str | None = None
-                if isinstance(fname_field, dict):
-                    fv = cast(dict[str, Any], fname_field).get("_value")
-                    if isinstance(fv, str):
-                        fname = fv
+                if isinstance(name_field, dict):
+                    nv = cast(dict[str, Any], name_field).get("_value")
+                    if isinstance(nv, str):
+                        fname = nv
                 payload = d.get("payloadRef")
                 if isinstance(payload, dict):
                     rid_field = cast(dict[str, Any], payload).get("id")
@@ -143,6 +238,7 @@ def _export_attachment_text(xcresult_path: Path, ref_id: str) -> str | None:
                 "xcrun",
                 "xcresulttool",
                 "get",
+                "--legacy",
                 "--path",
                 str(xcresult_path),
                 "--id",
