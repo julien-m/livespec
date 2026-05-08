@@ -1,9 +1,9 @@
 ---
 title: "UI Runner iOS / watchOS"
-status: "Draft"
+status: "Implemented"
 priority: "P1"
 created: 2026-05-06
-updated: 2026-05-06
+updated: 2026-05-08
 ---
 
 # Feature Spec: UI Runner iOS / watchOS (XCUITest)
