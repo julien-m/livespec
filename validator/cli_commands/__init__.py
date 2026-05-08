@@ -17,11 +17,12 @@ from . import (
     mutation_cmd,
     preflight_cmd,
     test_cmd,
+    ui_runner_cmd,
 )
 
 
 def register_unified_commands(app: typer.Typer) -> None:
-    """Register the five unified subcommands on ``app``.
+    """Register the unified subcommands on ``app``.
 
     Args:
         app: Top-level ``livespec`` Typer application.
@@ -31,6 +32,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     drivers_cmd.register(app)
     mutation_cmd.register(app)
     preflight_cmd.register(app)
+    ui_runner_cmd.register(app)
 
 
 __all__ = ["register_unified_commands"]

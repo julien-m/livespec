@@ -16,6 +16,8 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
+// @spec FR-004: Xcode test target enumeration — .specs/features/037-test-multi-runner-integration/spec.md#fr-004
+import { enumerateAndFallback, kebabize } from "./lib/pbxproj.js";
 
 const SURFACES_CONFIG = ".specs/surfaces.yaml";
 
@@ -73,6 +75,25 @@ export function hasXcodeProject(dir) {
 	} catch {
 		return false;
 	}
+}
+
+/**
+ * Locate the .xcodeproj directory inside a project directory.
+ * @param {string} dir
+ * @returns {string | null}
+ */
+export function findXcodeProjectDir(dir) {
+	try {
+		const entries = readdirSync(dir, { withFileTypes: true });
+		for (const entry of entries) {
+			if (entry.isDirectory() && entry.name.endsWith(".xcodeproj")) {
+				return join(dir, entry.name);
+			}
+		}
+	} catch {
+		// fall through
+	}
+	return null;
 }
 
 // @spec FR-001: Android/Maestro surface detection — .specs/features/031-ui-runner-android/spec.md#fr-001
@@ -340,16 +361,59 @@ export function detectSurfaces() {
 				}
 
 				if (isNative) {
-					// @spec FR-001: iOS/watchOS surface detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
+					// @spec FR-004: enumerate Xcode test targets — .specs/features/037-test-multi-runner-integration/spec.md#fr-004
 					if (hasXcodeProject(appPath)) {
-						surfaces.push({
-							id: appDir,
-							name: appDir.charAt(0).toUpperCase() + appDir.slice(1),
-							path: appPath,
-							testDir: join(appPath, "UITests"),
-							runner: "xcuitest",
-							platform: "ios",
-						});
+						const xcodeprojDir = findXcodeProjectDir(appPath);
+						/** @type {Array<{name:string, productType:string, kind:string, platform:string, directory:string}>} */
+						let targets = [];
+						/** @type {string[]} */
+						let warnings = [];
+						if (xcodeprojDir) {
+							const result = enumerateAndFallback(xcodeprojDir, appPath);
+							targets = result.targets;
+							warnings = result.warnings;
+						}
+						for (const w of warnings) {
+							console.warn(`WARNING: ${w}`);
+						}
+						if (targets.length > 0) {
+							for (const t of targets) {
+								const id = `${appDir}-${kebabize(t.name)}`;
+								surfaces.push({
+									id,
+									name: `${appDir.charAt(0).toUpperCase() + appDir.slice(1)} ${t.name}`,
+									path: appPath,
+									testDir: t.directory,
+									runner: "xcuitest",
+									platform: t.platform,
+									kind: t.kind,
+								});
+							}
+						} else if (xcodeprojDir) {
+							// pbxproj parsed but no test targets enumerated -- emit a placeholder
+							// surface so client projects with bare-bones .xcodeproj fixtures still
+							// pick up xcuitest detection (Feature 030 backward compat).
+							console.warn(
+								`WARNING: ${appDir} has .xcodeproj but no test targets - emitting fallback surface`,
+							);
+							surfaces.push({
+								id: appDir,
+								name: appDir.charAt(0).toUpperCase() + appDir.slice(1),
+								path: appPath,
+								testDir: join(appPath, "UITests"),
+								runner: "xcuitest",
+								platform: "ios",
+							});
+						} else {
+							surfaces.push({
+								id: appDir,
+								name: appDir.charAt(0).toUpperCase() + appDir.slice(1),
+								path: appPath,
+								testDir: join(appPath, "UITests"),
+								runner: "xcuitest",
+								platform: "ios",
+							});
+						}
 					// @spec FR-001: Android/Maestro surface detection — .specs/features/031-ui-runner-android/spec.md#fr-001
 					} else if (hasAndroidProject(appPath) && hasMaestroFlows(appPath)) {
 						const maestroDir = existsSync(join(appPath, ".specs", "maestro"))
@@ -443,14 +507,50 @@ export function detectSurfaces() {
 
 	// @spec FR-001: iOS/watchOS root-level detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
 	if (surfaces.length === 0 && hasXcodeProject(".")) {
-		surfaces.push({
-			id: "default",
-			name: "Default",
-			path: ".",
-			testDir: "UITests",
-			runner: "xcuitest",
-			platform: "ios",
-		});
+		const xcodeprojDir = findXcodeProjectDir(".");
+		if (xcodeprojDir) {
+			const result = enumerateAndFallback(xcodeprojDir, ".");
+			for (const warning of result.warnings) {
+				console.warn(`WARNING: ${warning}`);
+			}
+			if (result.targets.length > 0) {
+				for (const target of result.targets) {
+					surfaces.push({
+						id: kebabize(target.name),
+						name: target.name,
+						path: ".",
+						testDir: target.directory,
+						runner: "xcuitest",
+						platform: target.platform,
+						kind: target.kind,
+					});
+				}
+			} else {
+				// pbxproj parsed but no test targets enumerated -- emit a placeholder
+				// surface so client projects with bare-bones .xcodeproj fixtures still
+				// pick up xcuitest detection (Feature 030 backward compat).
+				console.warn(
+					"WARNING: default project has .xcodeproj but no test targets - emitting fallback surface (testDir: UITests)",
+				);
+				surfaces.push({
+					id: "default",
+					name: "Default",
+					path: ".",
+					testDir: "UITests",
+					runner: "xcuitest",
+					platform: "ios",
+				});
+			}
+		} else {
+			surfaces.push({
+				id: "default",
+				name: "Default",
+				path: ".",
+				testDir: "UITests",
+				runner: "xcuitest",
+				platform: "ios",
+			});
+		}
 	}
 
 	// @spec FR-001: Android/Maestro root-level detection — .specs/features/031-ui-runner-android/spec.md#fr-001

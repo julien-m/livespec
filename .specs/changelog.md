@@ -3,10 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-07
+> Last updated: 2026-05-08
 
 ---
 
+## 2026-05-08 -- [Feature 037] Implemented: Test Multi-Runner Integration — runner-aware Phase 4.5 dispatcher, multi-target Xcode pbxproj parsing, --visual flag documented; +32 Python tests +5 JS tests, 0 regressions
+## 2026-05-08 -- [Feature 037] Plan created: Test Multi-Runner Integration — 17 implementation steps, 4 diagrams (sequence + flow + state + ER), 15+ files
+## 2026-05-08 -- [Feature 037] Spec created: Test Multi-Runner Integration — 5 stories, 15 AC, 15 FR
 ## 2026-05-07 -- [Feature 036] Test: 92% AC covered (11/12), 906 tests passing (22 JS + 884 Python), 0 generated
 ## 2026-05-07 -- [Feature 036] Plan created: Multi-Surface Detection and Migration — 5 implementation steps, 2 diagrams (sequence + state), 4 files
 ## 2026-05-07 -- [Feature 036] Spec created: Multi-Surface Detection and Migration — 4 stories, 12 AC, 8 FR

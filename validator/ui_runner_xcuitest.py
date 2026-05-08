@@ -161,6 +161,24 @@ class XCUITestRunnerHandler:
         except (OSError, FileNotFoundError):
             return False
 
+    # @spec FR-012: platform-aware preflight message — .specs/features/037-test-multi-runner-integration/spec.md#fr-012  # noqa: E501
+    def preflight_message(self) -> str:
+        """Return an actionable diagnostic for the dispatcher BLOCKED line.
+
+        Returns:
+            Empty string when the toolchain is ready; otherwise a human
+            readable hint covering the missing piece (host OS, xcrun, etc.).
+        """
+        if not self._check_macos():
+            return (
+                f"XCUITest runner requires macOS host (current: {platform.system().lower()})"
+            )
+        if self._get_toolchain_path() is None:
+            return "xcrun simctl not found — install Xcode CLI tools"
+        if not self._check_xcode_license():
+            return _LICENSE_ERROR
+        return ""
+
     # ------------------------------------------------------------------
     # Project detection
     # ------------------------------------------------------------------
