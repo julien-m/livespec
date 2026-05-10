@@ -431,13 +431,6 @@ def converge_command(
         typer.Exit: With code 0 on convergence, 1 if max iterations reached
             without stabilising, 2 on dispatch failure.
     """
-    from validator.ui_runner_dispatcher import Phase4_5Dispatcher
-    from validator.ui_runner_inspect import (
-        extract_screen_trees,
-        parse_tree_elements,
-        rewrite_swift_candidates,
-    )
-
     if not screens:
         typer.echo("No screens provided.", err=True)
         raise typer.Exit(code=2)
@@ -445,9 +438,77 @@ def converge_command(
     project_path = Path(project_dir).resolve()
     feature_path = Path(feature_dir).resolve()
     bundles_dir = project_path / ".specs" / ".test-bundles"
+    bundles_dir.mkdir(parents=True, exist_ok=True)
+
+    # Lockfile prevents two `converge` instances from clobbering each other's
+    # .xcresult bundles. The lock holds a stale-detection pid + start time so a
+    # crashed prior run can be reaped without a manual `rm`.
+    import os
+    import time
+    lock_file = bundles_dir / "converge.lock"
+    if lock_file.exists():
+        try:
+            stale_pid = int(lock_file.read_text(encoding="utf-8").split(":", 1)[0])
+        except (ValueError, OSError):
+            stale_pid = -1
+        if stale_pid > 0:
+            try:
+                os.kill(stale_pid, 0)
+            except ProcessLookupError:
+                stale_pid = -1
+            else:
+                typer.echo(
+                    f"BLOCKED: another `livespec ui-runner converge` is already "
+                    f"running (pid {stale_pid}). Wait for it to finish or kill it.",
+                    err=True,
+                )
+                raise typer.Exit(code=2)
+        if stale_pid <= 0:
+            typer.echo(
+                "Removing stale converge.lock from a previous crashed run.",
+                err=True,
+            )
+            lock_file.unlink(missing_ok=True)
+    lock_file.write_text(f"{os.getpid()}:{int(time.time())}", encoding="utf-8")
+
+    try:
+        _converge_loop(
+            project_path=project_path,
+            feature_path=feature_path,
+            bundles_dir=bundles_dir,
+            screens=screens,
+            max_iterations=max_iterations,
+        )
+    finally:
+        lock_file.unlink(missing_ok=True)
+
+
+def _converge_loop(
+    *,
+    project_path: Path,
+    feature_path: Path,
+    bundles_dir: Path,
+    screens: list[str],
+    max_iterations: int,
+) -> None:
+    """Inner converge loop, extracted so the outer command can hold a lockfile."""
+    import sys
+
+    from validator.ui_runner_dispatcher import Phase4_5Dispatcher
+    from validator.ui_runner_inspect import (
+        extract_screen_trees,
+        parse_tree_elements,
+        rewrite_swift_candidates,
+    )
 
     for iteration in range(1, max_iterations + 1):
         typer.echo(f"\n--- Iteration {iteration}/{max_iterations} ---")
+        sys.stdout.flush()
+        typer.echo(
+            f"  Dispatching {len(screens)} screen(s) "
+            f"(first iter can take 5-15 min on cold build)..."
+        )
+        sys.stdout.flush()
 
         # 1. Dispatch
         results = Phase4_5Dispatcher(
@@ -460,6 +521,7 @@ def converge_command(
                 f"{_normalize_dispatch_status(r.status)}"
                 + (f" — {r.error[:80]}" if r.error else "")
             )
+        sys.stdout.flush()
 
         # 2. Patch each surface's Swift file from its persisted .xcresult
         total_patched = 0
