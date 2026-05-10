@@ -279,27 +279,60 @@ class Phase4_5Dispatcher:
 
         results: list[VisualPhaseResult] = []
         target_screens = screens or [""]
-        for screen in target_screens:
+        # Performance: native runners (xcuitest, maestro) build the test target
+        # and run ALL test methods every time `capture_screenshot` is called —
+        # i.e. ONE call already produces attachments for every screen. Calling
+        # it once per requested screen would mean N x rebuild + N x run with
+        # the same outcome. We invoke the handler once and replay the same
+        # outcome across the screen list, then let `_parse_xcresult` (already
+        # called inside the handler) populate per-screen artefacts.
+        if surface.runner in ("xcuitest", "maestro") and len(target_screens) > 1:
             try:
-                outcome: UICapabilityResult = handler.capture_screenshot(
-                    screen, **capture_kwargs
+                shared_outcome: UICapabilityResult = handler.capture_screenshot(
+                    target_screens[0], **capture_kwargs
                 )
-            except Exception as exc:  # pragma: no cover - defensive boundary
+            except Exception as exc:  # pragma: no cover
                 logger.error(
                     "BLOCKED at step phase_4.5 - runtime_error - %s: %s",
                     surface.runner,
                     exc,
                 )
-                results.append(
+                return [
                     VisualPhaseResult(
                         surface_id=surface.id,
                         runner=surface.runner,
-                        screen=screen,
+                        screen=s,
                         status="error",
                         error=str(exc),
                     )
-                )
-                continue
+                    for s in target_screens
+                ]
+            outcomes_by_screen = {s: shared_outcome for s in target_screens}
+        else:
+            outcomes_by_screen = {}
+
+        for screen in target_screens:
+            if screen in outcomes_by_screen:
+                outcome = outcomes_by_screen[screen]
+            else:
+                try:
+                    outcome = handler.capture_screenshot(screen, **capture_kwargs)
+                except Exception as exc:  # pragma: no cover - defensive boundary
+                    logger.error(
+                        "BLOCKED at step phase_4.5 - runtime_error - %s: %s",
+                        surface.runner,
+                        exc,
+                    )
+                    results.append(
+                        VisualPhaseResult(
+                            surface_id=surface.id,
+                            runner=surface.runner,
+                            screen=screen,
+                            status="error",
+                            error=str(exc),
+                        )
+                    )
+                    continue
             # Detect "test target ran but produced zero attachments" — xcodebuild
             # exits 0 but the UITest target didn't add any XCTAttachment.image()
             # calls, so the dispatcher has nothing to compare. Flag this as
