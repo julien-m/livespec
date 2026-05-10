@@ -45,13 +45,38 @@ class LSSampleUITests: XCTestCase {
     /// Capture screenshot + accessibility tree. The `.tree.txt` attachment lets
     /// `livespec ui-runner inspect` auto-correct identifiers when navigation
     /// TODOs miss their target — no manual editing required.
+    ///
+    /// Waits for `.runningForeground` and forces an initial hierarchy query
+    /// because on iOS, app.debugDescription returns only "Query chain:" until
+    /// the snapshot cache has been populated by at least one .exists call.
     private func snapshot(_ name: String) {
+        if app.state != .runningForeground {
+            let pred = NSPredicate(format: "state == %d",
+                                   XCUIApplication.State.runningForeground.rawValue)
+            let exp = expectation(for: pred, evaluatedWith: app)
+            wait(for: [exp], timeout: 10.0)
+        }
+        _ = app.descendants(matching: .any).firstMatch.exists
+
         let png = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         png.name = name
         png.lifetime = .keepAlways
         add(png)
 
-        let tree = XCTAttachment(string: app.debugDescription)
+        // Dump per-kind so inspect can reliably parse buttons/cells/tabs.
+        let dump = "\(app.debugDescription)\n\n=== Buttons ===\n" +
+            app.buttons.allElementsBoundByIndex.map { $0.debugDescription }
+                .joined(separator: "\n") +
+            "\n\n=== StaticTexts ===\n" +
+            app.staticTexts.allElementsBoundByIndex.map { $0.debugDescription }
+                .joined(separator: "\n") +
+            "\n\n=== Cells ===\n" +
+            app.cells.allElementsBoundByIndex.map { $0.debugDescription }
+                .joined(separator: "\n") +
+            "\n\n=== TabBar ===\n" +
+            app.tabBars.allElementsBoundByIndex.map { $0.debugDescription }
+                .joined(separator: "\n")
+        let tree = XCTAttachment(string: dump)
         tree.name = "\(name).tree.txt"
         tree.lifetime = .keepAlways
         add(tree)
