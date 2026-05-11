@@ -182,6 +182,154 @@ def check_command(
     )
 
 
+def _discover_screens_in_feature(feature_dir: Path) -> list[str]:
+    """Parse the `## Screens` table in `<feature_dir>/spec.md` and return ids.
+
+    Supported formats inside the table:
+      • Markdown table: `| Screen | Status | Reference |` — column 1 is the id
+      • Bullet form:    `- **<id>.png** — description`
+      • Bullet w/ link: ``- [`<id>.png`](...) — description``
+
+    Args:
+        feature_dir: Path to `.specs/features/NNN-name/`.
+
+    Returns:
+        Deduplicated, source-order list of screen identifiers (lowercase,
+        kebab-case). Empty list when no Screens section exists or no row
+        matched. Mockup file extensions (`.png`) are stripped.
+    """
+    spec_path = feature_dir / "spec.md"
+    if not spec_path.is_file():
+        return []
+
+    try:
+        text = spec_path.read_text(encoding="utf-8")
+    except OSError:
+        return []
+
+    # Find the Screens section (between `## Screens` and the next `## ` heading).
+    import re
+
+    section_match = re.search(
+        r"^##\s+Screens\s*$\n(.*?)(?=^##\s|\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if not section_match:
+        return []
+    section = section_match.group(1)
+
+    screens: list[str] = []
+    seen: set[str] = set()
+
+    # Table rows: prefer the mockup filename from the Reference column when
+    # available — it's the canonical screen identifier (matches both the PNG
+    # in .specs/design/screens/ and `attachment.name` in Swift tests). Fall
+    # back to slugifying the first column when no mockup link is present.
+    import re as _re
+
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|") or stripped.startswith("|--"):
+            continue
+        cells = [c.strip() for c in stripped.strip("|").split("|")]
+        if not cells or not cells[0]:
+            continue
+        first = cells[0].lower()
+        if first in {"screen", "name"}:
+            continue
+        # Look for a `*.png` reference in any cell — that's the canonical id.
+        screen_id: str | None = None
+        for cell in cells:
+            png_match = _re.search(r"([A-Za-z0-9_-]+)\.png", cell)
+            if png_match:
+                screen_id = png_match.group(1).lower()
+                break
+        if screen_id is None:
+            screen_id = _normalize_screen_id(cells[0])
+        if screen_id and screen_id not in seen:
+            seen.add(screen_id)
+            screens.append(screen_id)
+
+    # Bullet form: `- **<id>.png** — ...` or `- [\`<id>.png\`](...) — ...`
+    bullet_re = re.compile(
+        r"^\s*[-*]\s+(?:\*\*|\[`)?([^*`\]\s]+?)\.png(?:\*\*|`\])?\s*[—\-]",
+        re.MULTILINE,
+    )
+    for match in bullet_re.finditer(section):
+        screen_id = _normalize_screen_id(match.group(1))
+        if screen_id and screen_id not in seen:
+            seen.add(screen_id)
+            screens.append(screen_id)
+
+    return screens
+
+
+def _normalize_screen_id(raw: str) -> str:
+    """Strip mockup link/markup and reduce a label to its screen identifier.
+
+    Examples:
+        `[iphone-home.png](path/...)` → `iphone-home`
+        `Home`                        → `home`
+        `**watch-rest-timer**`        → `watch-rest-timer`
+    """
+    import re
+
+    # Extract from markdown link
+    link_match = re.search(r"\[([^\]]+)\]", raw)
+    if link_match:
+        raw = link_match.group(1)
+    # Strip emphasis, code fences, file extensions
+    cleaned = raw.strip().strip("*").strip("`").rstrip(".png").rstrip(".jpg")
+    return cleaned.lower().replace(" ", "-")
+
+
+def _discover_screens_all(project_dir: Path) -> list[tuple[str, str]]:
+    """Auto-discover every screen across features eligible for visual testing.
+
+    Walks `.specs/features/*/spec.md`, filters to features whose frontmatter
+    `status:` is `Implemented` or `In Progress`, and yields `(slug, screen_id)`
+    pairs.
+
+    Args:
+        project_dir: Project root.
+
+    Returns:
+        List of `(feature_slug, screen_id)` tuples in feature-then-source
+        order. Slugs match the directory name.
+    """
+    features_root = project_dir / ".specs" / "features"
+    if not features_root.is_dir():
+        return []
+    out: list[tuple[str, str]] = []
+    for feature_dir in sorted(features_root.iterdir()):
+        if not feature_dir.is_dir():
+            continue
+        spec_path = feature_dir / "spec.md"
+        if not spec_path.is_file():
+            continue
+        try:
+            header = spec_path.read_text(encoding="utf-8")[:400]
+        except OSError:
+            continue
+        # Frontmatter status check: `status: "Implemented"` or
+        # `status: Implemented` — case insensitive.
+        import re
+
+        status_match = re.search(
+            r"^status:\s*\"?([^\"\n]+)\"?",
+            header,
+            re.MULTILINE | re.IGNORECASE,
+        )
+        if status_match:
+            status = status_match.group(1).strip().lower()
+            if status not in {"implemented", "in progress"}:
+                continue
+        for screen in _discover_screens_in_feature(feature_dir):
+            out.append((feature_dir.name, screen))
+    return out
+
+
 def _validate_surfaces_yaml(project_dir: Path) -> None:
     """Validate `.specs/surfaces.yaml` early so `check` can hard-block on parse errors.
 
@@ -402,10 +550,30 @@ def converge_command(
     ] = None,
     project_dir: str = typer.Option(".", "--project-dir", "-p", help="Project root."),
     feature_dir: str = typer.Option(
-        ...,
+        None,
         "--feature-dir",
         "-f",
-        help="Feature directory (e.g. .specs/features/001-name/).",
+        help=(
+            "Feature directory (e.g. .specs/features/001-name/). "
+            "Ignored when --all or --feature is used."
+        ),
+    ),
+    feature: str | None = typer.Option(
+        None,
+        "--feature",
+        help=(
+            "Feature slug (e.g. 001-workout-library). Auto-discovers screens "
+            "from .specs/features/<slug>/spec.md `## Screens` section."
+        ),
+    ),
+    all_features: bool = typer.Option(
+        False,
+        "--all",
+        "-a",
+        help=(
+            "Auto-discover every feature with status Implemented or In Progress "
+            "and converge across all their screens. Zero-argument workflow."
+        ),
     ),
     max_iterations: int = typer.Option(
         5,
@@ -421,22 +589,87 @@ def converge_command(
     injects the real labels XCUITest saw, so the next run navigates one level
     deeper. Repeat until `--patch` reports zero changes — that's convergence.
 
+    Discovery modes:
+      • `screens` positional arg + `--feature-dir`: explicit list (legacy)
+      • `--feature <slug>`: parse one feature's spec.md `## Screens` table
+      • `--all`: parse every feature.spec.md and converge all screens
+
     Args:
-        screens: Screen identifiers (same as dispatch).
+        screens: Explicit screen identifiers (omitted with --all/--feature).
         project_dir: Project root.
-        feature_dir: Feature directory.
+        feature_dir: Explicit feature directory (legacy).
+        feature: Feature slug to auto-discover screens for.
+        all_features: Auto-discover all features.
         max_iterations: Hard stop to avoid infinite loops on unreachable screens.
 
     Raises:
         typer.Exit: With code 0 on convergence, 1 if max iterations reached
             without stabilising, 2 on dispatch failure.
     """
-    if not screens:
-        typer.echo("No screens provided.", err=True)
-        raise typer.Exit(code=2)
-
     project_path = Path(project_dir).resolve()
-    feature_path = Path(feature_dir).resolve()
+
+    # Resolve screens + feature_path from the three discovery modes.
+    if all_features:
+        if screens or feature or feature_dir:
+            typer.echo(
+                "--all is exclusive — drop --feature, --feature-dir, and screen args.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        discovered = _discover_screens_all(project_path)
+        if not discovered:
+            typer.echo(
+                "No screens discovered. Check .specs/features/*/spec.md for "
+                "`## Screens` tables and that features have status Implemented "
+                "or In Progress.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        screens = sorted({s for _, s in discovered})
+        # feature_path for state writes: use the first discovered feature.
+        feature_path = (project_path / ".specs" / "features" / discovered[0][0]).resolve()
+        typer.echo(
+            f"Auto-discovered {len(screens)} screen(s) across "
+            f"{len({f for f, _ in discovered})} feature(s)."
+        )
+    elif feature:
+        if screens or feature_dir:
+            typer.echo(
+                "--feature is exclusive — drop --feature-dir and screen args.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        feature_path = (project_path / ".specs" / "features" / feature).resolve()
+        if not feature_path.is_dir():
+            typer.echo(
+                f"Feature directory not found at {feature_path}", err=True
+            )
+            raise typer.Exit(code=2)
+        feature_screens = _discover_screens_in_feature(feature_path)
+        if not feature_screens:
+            typer.echo(
+                f"No screens found in {feature_path}/spec.md `## Screens` section.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        screens = feature_screens
+        typer.echo(f"Auto-discovered {len(screens)} screen(s) for {feature}.")
+    else:
+        if not screens:
+            typer.echo(
+                "No screens provided. Pass screen IDs explicitly, or use "
+                "--feature <slug> / --all to auto-discover.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        if not feature_dir:
+            typer.echo(
+                "--feature-dir is required when passing screens explicitly.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        feature_path = Path(feature_dir).resolve()
+
     bundles_dir = project_path / ".specs" / ".test-bundles"
     bundles_dir.mkdir(parents=True, exist_ok=True)
 

@@ -443,13 +443,32 @@ livespec ui-runner check                              # human output
 livespec ui-runner check --json                       # machine output for state checks
 # Exit codes: 0 READY, 2 BLOCKED (handler missing, tooling missing, surfaces unparseable)
 
-# Dispatch (Phase 4.5 execution):
+# Dispatch (Phase 4.5 execution) — one-shot capture:
 livespec ui-runner dispatch <screen> [<screen> ...] \
   --feature-dir .specs/features/NNN-name/             # required
   [--project-dir .]                                   # default cwd
   [--json]                                            # machine output
 # Exit codes: 0 all OK, 1 visual diff failure, 2 tooling blocked
+
+# Converge (Phase 4.5 with iterative test-method patching) — recommended
+# for native runners where Swift candidate lists need to be auto-populated
+# from the actual UI hierarchy:
+livespec ui-runner converge --all                     # auto-discover every
+                                                      #   feature + screen
+livespec ui-runner converge --feature NNN-name        # one feature, all
+                                                      #   screens from spec.md
+livespec ui-runner converge <screen>... \             # explicit list (legacy)
+  --feature-dir .specs/features/NNN-name/
+# Exit codes: 0 converged, 1 max-iterations reached, 2 tooling/discovery blocked
 ```
+
+`converge` runs `dispatch` + `inspect --patch` in a loop until the auto-generated
+`tapFirstAvailable` / `tapAnyTab` candidate lists stabilise (no new labels
+discovered). It is the preferred entry point for `xcuitest` and `maestro`
+surfaces where the first run typically captures the wrong screen — successive
+iterations navigate one step deeper as the test file picks up real
+accessibility identifiers. With Swift-content hash caching, repeat runs over
+unchanged sources are nearly free.
 
 | `runner` value      | Handler                                     | Backend                    |
 |---------------------|---------------------------------------------|----------------------------|
