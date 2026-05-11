@@ -464,79 +464,157 @@ class XCUITestRunnerHandler:
         dest_dir.mkdir(parents=True, exist_ok=True)
         exported: list[Path] = []
 
-        # Step 1: get JSON manifest
-        try:
-            result = subprocess.run(
-                [
-                    "xcrun",
-                    "xcresulttool",
-                    "get",
-                    "--path",
-                    str(bundle_path),
-                    "--format",
-                    "json",
-                ],
-                capture_output=True,
-                text=True,
-                timeout=XCRESULTTOOL_TIMEOUT_SECONDS,
-                check=False,
-            )
-            data = json.loads(result.stdout or "{}")
-        except (json.JSONDecodeError, subprocess.TimeoutExpired, OSError):
-            # EC-002: corrupted bundle — return empty partial result without crash
-            return exported
+        # Xcode 26 introduced `xcresulttool export attachments` which dumps
+        # every ActionTestAttachment for every test method in one shot, with
+        # a manifest.json mapping `exportedFileName → suggestedHumanName`.
+        # This is the only reliable way to extract attachments in Xcode 26+
+        # since `--legacy export --type file --id <ref>` errors out with
+        # "item missing for id" for ids obtained from the legacy graph dump.
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            try:
+                subprocess.run(
+                    [
+                        "xcrun",
+                        "xcresulttool",
+                        "export",
+                        "attachments",
+                        "--path",
+                        str(bundle_path),
+                        "--output-path",
+                        tmp_dir,
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=XCRESULTTOOL_TIMEOUT_SECONDS,
+                    check=False,
+                )
+            except (subprocess.TimeoutExpired, OSError):
+                # EC-002: corrupted bundle — return empty partial result.
+                return exported
 
-        # Step 2: find all attachments
-        attachments = self._extract_attachments_from_xcresult_json(data)
-
-        # Step 3: export each attachment
-        for i, att in enumerate(attachments):
-            name = att.get("name", {}).get("_value", f"screenshot_{i}")
-            payload_ref = att.get("payloadRef", {}).get("id", {}).get("_value")
-            if not payload_ref:
-                continue
+            manifest_path = Path(tmp_dir) / "manifest.json"
+            if not manifest_path.exists():
+                return exported
 
             try:
-                with tempfile.TemporaryDirectory() as tmp_dir:
-                    subprocess.run(
-                        [
-                            "xcrun",
-                            "xcresulttool",
-                            "export",
-                            "--path",
-                            str(bundle_path),
-                            "--id",
-                            payload_ref,
-                            "--output-path",
-                            tmp_dir,
-                            "--type",
-                            "file",
-                        ],
-                        capture_output=True,
-                        text=True,
-                        timeout=30,
-                        check=False,
-                    )
-                    # Find exported file
-                    for exported_file in Path(tmp_dir).iterdir():
-                        suffix = exported_file.suffix.lower()
-                        if suffix not in {".heic", ".png", ".jpg", ".jpeg"}:
-                            continue
-                        png_name = f"{name}.png"
-                        png_path = dest_dir / png_name
-                        if suffix == ".heic":
-                            if self._convert_heic_to_png(exported_file, png_path):
-                                exported.append(png_path)
-                        else:
-                            import shutil
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                return exported
 
-                            shutil.copy2(exported_file, png_path)
-                            exported.append(png_path)
-            except (OSError, subprocess.TimeoutExpired):
-                # EC-002: skip one bad attachment, continue with rest
-                continue
+            # The manifest is a list of {testIdentifier: [{exportedFileName,
+            # suggestedHumanReadableName, ...}, ...]}. We walk every test's
+            # attachments and rename each file from <exportedFileName> to
+            # `<screen>.png` using the user-supplied attachment name (which
+            # is the screen identifier — see snapshot() in the template).
+            attachments_iter = self._iter_manifest_attachments(manifest)
+            for entry in attachments_iter:
+                exported_file = Path(tmp_dir) / entry["exportedFileName"]
+                if not exported_file.exists():
+                    continue
+                suffix = exported_file.suffix.lower()
+                if suffix not in {".png", ".heic", ".jpg", ".jpeg"}:
+                    continue
+                screen_name = entry.get("attachmentName", exported_file.stem)
+                # `attachmentName` is the user-supplied tag (e.g. "watch-home").
+                # The suggestedHumanReadableName carries Xcode's full filename
+                # (e.g. "watch-home_0_<uuid>.png") — we don't need that.
+                png_path = dest_dir / f"{screen_name}.png"
+                if suffix == ".heic":
+                    if self._convert_heic_to_png(exported_file, png_path):
+                        exported.append(png_path)
+                else:
+                    import shutil as _shutil
+
+                    _shutil.copy2(exported_file, png_path)
+                    exported.append(png_path)
 
         return exported
+
+    def _iter_manifest_attachments(
+        self, manifest: object
+    ) -> list[dict[str, str]]:
+        """Flatten `xcresulttool export attachments` manifest into one list.
+
+        The manifest groups attachments per test method:
+            [{"attachments": [{"exportedFileName": "<uuid>.png",
+                               "suggestedHumanReadableName":
+                                   "<screen>_<idx>_<uuid>.png",
+                               ...}, ...]},
+             ...]
+
+        We derive the screen name from `suggestedHumanReadableName` by
+        stripping the trailing `_<idx>_<uuid>.<ext>` suffix that Xcode
+        appends. This recovers the user-set `attachment.name` from the
+        Swift test (e.g. `"watch-home"`).
+
+        Args:
+            manifest: Parsed manifest.json content.
+
+        Returns:
+            Flat list of attachment dicts (`exportedFileName`, `screenName`).
+            Entries lacking either field are dropped.
+        """
+        flat: list[dict[str, str]] = []
+        if not isinstance(manifest, list):
+            return flat
+        for test_entry in cast(list[Any], manifest):
+            if not isinstance(test_entry, dict):
+                continue
+            atts = cast(dict[str, Any], test_entry).get("attachments")
+            if not isinstance(atts, list):
+                continue
+            for att in cast(list[Any], atts):
+                if not isinstance(att, dict):
+                    continue
+                d = cast(dict[str, Any], att)
+                exported_file = d.get("exportedFileName")
+                if not isinstance(exported_file, str):
+                    continue
+                suggested = d.get("suggestedHumanReadableName")
+                if isinstance(suggested, str):
+                    screen_name = self._strip_attachment_suffix(suggested)
+                else:
+                    screen_name = exported_file.rsplit(".", 1)[0]
+                flat.append(
+                    {
+                        "exportedFileName": exported_file,
+                        "attachmentName": screen_name,
+                    }
+                )
+        return flat
+
+    @staticmethod
+    def _strip_attachment_suffix(suggested_name: str) -> str:
+        """Recover the user-set attachment name from Xcode's filename.
+
+        Xcode generates `"<name>_<idx>_<uuid>.<ext>"` for each XCTAttachment.
+        We strip the extension, then drop the trailing `_<idx>_<uuid>` and
+        any `.tree` suffix added for paired tree dumps.
+
+        Args:
+            suggested_name: Xcode's `suggestedHumanReadableName`.
+
+        Returns:
+            The bare screen identifier (e.g. `"watch-home"` for
+            `"watch-home_0_<uuid>.png"` or `"watch-home"` for
+            `"watch-home.tree_0_<uuid>.txt"`).
+        """
+        # Drop extension
+        stem = suggested_name.rsplit(".", 1)[0]
+        # `<name>_<idx>_<uuid>` — split off the last two underscore segments
+        # if they look like an index + UUID. The UUID always contains hyphens
+        # in canonical 8-4-4-4-12 form, so check for that.
+        parts = stem.split("_")
+        if (
+            len(parts) >= 3
+            and parts[-1].count("-") >= 4
+            and parts[-2].isdigit()
+        ):
+            stem = "_".join(parts[:-2])
+        # Tree dumps share the screen name but with a `.tree` infix: strip it.
+        if stem.endswith(".tree"):
+            stem = stem[: -len(".tree")]
+        return stem
 
     # ------------------------------------------------------------------
     # Public capabilities
