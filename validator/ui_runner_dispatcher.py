@@ -51,6 +51,18 @@ class Surface:
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any]) -> Surface:
+        # runnerConfig accepts either a structured map (preferred for native
+        # runners: scheme/project/destination/appId/flowsDir/...) or a legacy
+        # string (Playwright config path). Strings are coerced to {"_path": value}
+        # so the dispatcher always sees a dict — handlers that need the legacy
+        # path read it via runner_config["_path"].
+        raw_config: Any = raw.get("runnerConfig", {}) or {}
+        if isinstance(raw_config, str):
+            normalized_config: dict[str, Any] = {"_path": raw_config}
+        elif isinstance(raw_config, dict):
+            normalized_config = cast(dict[str, Any], raw_config)
+        else:
+            normalized_config = {}
         return cls(
             id=str(raw.get("id", "")),
             runner=str(raw.get("runner", "")).lower(),
@@ -58,7 +70,7 @@ class Surface:
             test_dir=str(raw.get("testDir", raw.get("test_dir", "tests/e2e"))),
             platform=raw.get("platform"),
             kind=raw.get("kind"),
-            runner_config=cast(dict[str, Any], raw.get("runnerConfig", {})) or {},
+            runner_config=normalized_config,
         )
 
 
@@ -86,6 +98,57 @@ def _resolve_registry() -> dict[str, type[RunnerHandler]]:
         "xcuitest": cast(type[RunnerHandler], XCUITestRunnerHandler),
         "maestro": cast(type[RunnerHandler], MaestroRunnerHandler),
     }
+
+
+# Map surfaces.yaml runnerConfig keys to handler.capture_screenshot kwargs.
+# Centralised so adding a new runner key is a one-line change instead of
+# touching every dispatcher call site.
+_RUNNER_CONFIG_KEYS: dict[str, dict[str, str]] = {
+    "xcuitest": {
+        "scheme": "test_scheme",
+        "destination": "destination",
+        "project": "project",
+        "workspace": "workspace",
+        "platform": "platform",
+        "launchArguments": "launch_arguments",
+        "launch_arguments": "launch_arguments",
+        "onlyTesting": "only_testing",
+        "only_testing": "only_testing",
+    },
+    "maestro": {
+        "avdName": "avd_name",
+        "avd_name": "avd_name",
+        "platform": "platform",
+        "failFast": "fail_fast",
+        "fail_fast": "fail_fast",
+        "timeout": "timeout",
+    },
+    # Playwright handler ignores runnerConfig (uses playwright.config.ts directly).
+    "playwright": {},
+}
+
+
+def _runner_config_to_kwargs(surface: Surface) -> dict[str, Any]:
+    """Translate surface.runner_config into kwargs for handler.capture_screenshot.
+
+    Unknown keys are dropped silently so a surfaces.yaml carrying extra fields
+    (project, comments, future runner extensions) does not crash the dispatcher.
+
+    Falls back to surface-level `platform` when `runnerConfig.platform` is absent —
+    legacy v8/v12 manifests declare platform at the surface root, not under runnerConfig.
+    """
+    mapping = _RUNNER_CONFIG_KEYS.get(surface.runner, {})
+    kwargs: dict[str, Any] = {}
+    for source_key, target_key in mapping.items():
+        if source_key in surface.runner_config:
+            kwargs[target_key] = surface.runner_config[source_key]
+    if (
+        "platform" not in kwargs
+        and surface.platform is not None
+        and "platform" in mapping.values()
+    ):
+        kwargs["platform"] = surface.platform
+    return kwargs
 
 
 def _stable_sort_key(surface: Surface) -> tuple[str, int]:
@@ -210,35 +273,106 @@ class Phase4_5Dispatcher:
                 )
             ]
 
+        # Translate surfaces.yaml runnerConfig keys into capture_screenshot kwargs.
+        # This is what wires `runnerConfig.scheme` → xcodebuild `-scheme`, etc.
+        capture_kwargs = _runner_config_to_kwargs(surface)
+
         results: list[VisualPhaseResult] = []
         target_screens = screens or [""]
-        for screen in target_screens:
+        # Performance: native runners (xcuitest, maestro) build the test target
+        # and run ALL test methods every time `capture_screenshot` is called —
+        # i.e. ONE call already produces attachments for every screen. Calling
+        # it once per requested screen would mean N x rebuild + N x run with
+        # the same outcome. We invoke the handler once and replay the same
+        # outcome across the screen list, then let `_parse_xcresult` (already
+        # called inside the handler) populate per-screen artefacts.
+        if surface.runner in ("xcuitest", "maestro") and len(target_screens) > 1:
             try:
-                outcome: UICapabilityResult = handler.capture_screenshot(screen)
-            except Exception as exc:  # pragma: no cover - defensive boundary
+                shared_outcome: UICapabilityResult = handler.capture_screenshot(
+                    target_screens[0], **capture_kwargs
+                )
+            except Exception as exc:  # pragma: no cover
                 logger.error(
                     "BLOCKED at step phase_4.5 - runtime_error - %s: %s",
                     surface.runner,
                     exc,
                 )
-                results.append(
+                return [
                     VisualPhaseResult(
                         surface_id=surface.id,
                         runner=surface.runner,
-                        screen=screen,
+                        screen=s,
                         status="error",
                         error=str(exc),
                     )
+                    for s in target_screens
+                ]
+            outcomes_by_screen = {s: shared_outcome for s in target_screens}
+        else:
+            outcomes_by_screen = {}
+
+        for screen in target_screens:
+            if screen in outcomes_by_screen:
+                outcome = outcomes_by_screen[screen]
+            else:
+                try:
+                    outcome = handler.capture_screenshot(screen, **capture_kwargs)
+                except Exception as exc:  # pragma: no cover - defensive boundary
+                    logger.error(
+                        "BLOCKED at step phase_4.5 - runtime_error - %s: %s",
+                        surface.runner,
+                        exc,
+                    )
+                    results.append(
+                        VisualPhaseResult(
+                            surface_id=surface.id,
+                            runner=surface.runner,
+                            screen=screen,
+                            status="error",
+                            error=str(exc),
+                        )
+                    )
+                    continue
+            # Detect "test target ran but produced zero attachments" — xcodebuild
+            # exits 0 but the UITest target didn't add any XCTAttachment.image()
+            # calls, so the dispatcher has nothing to compare. Flag this as
+            # BLOCKED with actionable guidance instead of silently passing.
+            exported_paths_raw: Any = (
+                outcome.metadata.get("exported_paths", []) if outcome.metadata else []
+            )
+            exported_paths: list[Any] = (
+                cast(list[Any], exported_paths_raw)
+                if isinstance(exported_paths_raw, list)
+                else []
+            )
+            cached = bool(outcome.metadata.get("cached")) if outcome.metadata else False
+            empty_attachments = (
+                outcome.success
+                and outcome.output_path is None
+                and surface.runner == "xcuitest"
+                and len(exported_paths) == 0
+                and not cached
+            )
+            if empty_attachments:
+                status = "blocked"
+                error = (
+                    "xcodebuild test ran but produced zero screenshot attachments. "
+                    "Wire your UITests target to capture XCUIScreen.main.screenshot() "
+                    "and add(XCTAttachment) per screen identifier (lifetime = .keepAlways). "
+                    "Reference: livespec/ui-runners/xcuitest-template/LSSampleUITests.swift "
+                    "in the LiveSpec install, or run `livespec ui-runner scaffold --target ios`."
                 )
-                continue
+            else:
+                status = "ok" if outcome.success else "fail"
+                error = outcome.error
             results.append(
                 VisualPhaseResult(
                     surface_id=surface.id,
                     runner=surface.runner,
                     screen=screen,
-                    status="ok" if outcome.success else "fail",
+                    status=status,
                     baseline_path=outcome.output_path,
-                    error=outcome.error,
+                    error=error,
                     metadata=outcome.metadata,
                 )
             )

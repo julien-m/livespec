@@ -25,8 +25,8 @@ from typing import Any, cast
 import yaml  # type: ignore[import-untyped]
 
 DEFAULT_COMPARE_THRESHOLD = 0.05
-SCREENSHOT_TIMEOUT_SECONDS = 300
-FLOW_TIMEOUT_SECONDS = 600
+SCREENSHOT_TIMEOUT_SECONDS = 1200  # 20 min — first build of a large iOS app
+FLOW_TIMEOUT_SECONDS = 1800        # 30 min — flow runs are longer than single captures
 COMPARE_TIMEOUT_SECONDS = 60
 SIMULATOR_BOOT_TIMEOUT_SECONDS = 120
 XCRESULTTOOL_TIMEOUT_SECONDS = 60
@@ -335,6 +335,57 @@ class XCUITestRunnerHandler:
         match_str = platform_map.get(platform_lower, platform_lower)
         return [d for d in destinations if match_str in d.get("platform", "").lower()]
 
+    # @spec FR-003: Simulator boot orchestration — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-003  # noqa: E501
+    def _autodetect_destination(self, platform: str = "ios") -> str | None:
+        """Pick the first available simulator destination for the given platform.
+
+        Strapt-class robustness: when surfaces.yaml does not declare a destination,
+        scan `xcrun simctl list devices available` and pick the first booted-or-shutdown
+        device matching the platform (iPhone for ios, Apple Watch for watchos). This
+        avoids the hardcoded "iPhone 16" trap on machines that only ship newer
+        simulator runtimes.
+
+        Args:
+            platform: "ios" (default) or "watchos".
+
+        Returns:
+            Xcode destination string (e.g. "platform=iOS Simulator,name=iPhone 17"),
+            or None if no matching simulator is available.
+        """
+        devices_data = self._list_simulators()
+        runtimes = cast(dict[str, list[dict[str, Any]]], devices_data.get("devices", {}))
+
+        platform_lower = platform.lower()
+
+        def _watch_name(n: str) -> bool:
+            return "watch" in n.lower()
+
+        def _non_watch_name(n: str) -> bool:
+            return "watch" not in n.lower()
+
+        if platform_lower == "watchos":
+            runtime_match = "watchOS"
+            sim_label = "watchOS Simulator"
+            name_filter = _watch_name
+        else:
+            runtime_match = "iOS"
+            sim_label = "iOS Simulator"
+            name_filter = _non_watch_name
+
+        # Sort runtime keys descending so newest OS wins (e.g. iOS-26 before iOS-17)
+        runtime_keys = sorted(
+            (k for k in runtimes if runtime_match in k),
+            reverse=True,
+        )
+        for runtime_key in runtime_keys:
+            for device in runtimes[runtime_key]:
+                if not device.get("isAvailable", False):
+                    continue
+                name = device.get("name", "")
+                if name and name_filter(name):
+                    return f"platform={sim_label},name={name}"
+        return None
+
     # ------------------------------------------------------------------
     # .xcresult bundle parsing
     # ------------------------------------------------------------------
@@ -413,79 +464,157 @@ class XCUITestRunnerHandler:
         dest_dir.mkdir(parents=True, exist_ok=True)
         exported: list[Path] = []
 
-        # Step 1: get JSON manifest
-        try:
-            result = subprocess.run(
-                [
-                    "xcrun",
-                    "xcresulttool",
-                    "get",
-                    "--path",
-                    str(bundle_path),
-                    "--format",
-                    "json",
-                ],
-                capture_output=True,
-                text=True,
-                timeout=XCRESULTTOOL_TIMEOUT_SECONDS,
-                check=False,
-            )
-            data = json.loads(result.stdout or "{}")
-        except (json.JSONDecodeError, subprocess.TimeoutExpired, OSError):
-            # EC-002: corrupted bundle — return empty partial result without crash
-            return exported
+        # Xcode 26 introduced `xcresulttool export attachments` which dumps
+        # every ActionTestAttachment for every test method in one shot, with
+        # a manifest.json mapping `exportedFileName → suggestedHumanName`.
+        # This is the only reliable way to extract attachments in Xcode 26+
+        # since `--legacy export --type file --id <ref>` errors out with
+        # "item missing for id" for ids obtained from the legacy graph dump.
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            try:
+                subprocess.run(
+                    [
+                        "xcrun",
+                        "xcresulttool",
+                        "export",
+                        "attachments",
+                        "--path",
+                        str(bundle_path),
+                        "--output-path",
+                        tmp_dir,
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=XCRESULTTOOL_TIMEOUT_SECONDS,
+                    check=False,
+                )
+            except (subprocess.TimeoutExpired, OSError):
+                # EC-002: corrupted bundle — return empty partial result.
+                return exported
 
-        # Step 2: find all attachments
-        attachments = self._extract_attachments_from_xcresult_json(data)
-
-        # Step 3: export each attachment
-        for i, att in enumerate(attachments):
-            name = att.get("name", {}).get("_value", f"screenshot_{i}")
-            payload_ref = att.get("payloadRef", {}).get("id", {}).get("_value")
-            if not payload_ref:
-                continue
+            manifest_path = Path(tmp_dir) / "manifest.json"
+            if not manifest_path.exists():
+                return exported
 
             try:
-                with tempfile.TemporaryDirectory() as tmp_dir:
-                    subprocess.run(
-                        [
-                            "xcrun",
-                            "xcresulttool",
-                            "export",
-                            "--path",
-                            str(bundle_path),
-                            "--id",
-                            payload_ref,
-                            "--output-path",
-                            tmp_dir,
-                            "--type",
-                            "file",
-                        ],
-                        capture_output=True,
-                        text=True,
-                        timeout=30,
-                        check=False,
-                    )
-                    # Find exported file
-                    for exported_file in Path(tmp_dir).iterdir():
-                        suffix = exported_file.suffix.lower()
-                        if suffix not in {".heic", ".png", ".jpg", ".jpeg"}:
-                            continue
-                        png_name = f"{name}.png"
-                        png_path = dest_dir / png_name
-                        if suffix == ".heic":
-                            if self._convert_heic_to_png(exported_file, png_path):
-                                exported.append(png_path)
-                        else:
-                            import shutil
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                return exported
 
-                            shutil.copy2(exported_file, png_path)
-                            exported.append(png_path)
-            except (OSError, subprocess.TimeoutExpired):
-                # EC-002: skip one bad attachment, continue with rest
-                continue
+            # The manifest is a list of {testIdentifier: [{exportedFileName,
+            # suggestedHumanReadableName, ...}, ...]}. We walk every test's
+            # attachments and rename each file from <exportedFileName> to
+            # `<screen>.png` using the user-supplied attachment name (which
+            # is the screen identifier — see snapshot() in the template).
+            attachments_iter = self._iter_manifest_attachments(manifest)
+            for entry in attachments_iter:
+                exported_file = Path(tmp_dir) / entry["exportedFileName"]
+                if not exported_file.exists():
+                    continue
+                suffix = exported_file.suffix.lower()
+                if suffix not in {".png", ".heic", ".jpg", ".jpeg"}:
+                    continue
+                screen_name = entry.get("attachmentName", exported_file.stem)
+                # `attachmentName` is the user-supplied tag (e.g. "watch-home").
+                # The suggestedHumanReadableName carries Xcode's full filename
+                # (e.g. "watch-home_0_<uuid>.png") — we don't need that.
+                png_path = dest_dir / f"{screen_name}.png"
+                if suffix == ".heic":
+                    if self._convert_heic_to_png(exported_file, png_path):
+                        exported.append(png_path)
+                else:
+                    import shutil as _shutil
+
+                    _shutil.copy2(exported_file, png_path)
+                    exported.append(png_path)
 
         return exported
+
+    def _iter_manifest_attachments(
+        self, manifest: object
+    ) -> list[dict[str, str]]:
+        """Flatten `xcresulttool export attachments` manifest into one list.
+
+        The manifest groups attachments per test method:
+            [{"attachments": [{"exportedFileName": "<uuid>.png",
+                               "suggestedHumanReadableName":
+                                   "<screen>_<idx>_<uuid>.png",
+                               ...}, ...]},
+             ...]
+
+        We derive the screen name from `suggestedHumanReadableName` by
+        stripping the trailing `_<idx>_<uuid>.<ext>` suffix that Xcode
+        appends. This recovers the user-set `attachment.name` from the
+        Swift test (e.g. `"watch-home"`).
+
+        Args:
+            manifest: Parsed manifest.json content.
+
+        Returns:
+            Flat list of attachment dicts (`exportedFileName`, `screenName`).
+            Entries lacking either field are dropped.
+        """
+        flat: list[dict[str, str]] = []
+        if not isinstance(manifest, list):
+            return flat
+        for test_entry in cast(list[Any], manifest):
+            if not isinstance(test_entry, dict):
+                continue
+            atts = cast(dict[str, Any], test_entry).get("attachments")
+            if not isinstance(atts, list):
+                continue
+            for att in cast(list[Any], atts):
+                if not isinstance(att, dict):
+                    continue
+                d = cast(dict[str, Any], att)
+                exported_file = d.get("exportedFileName")
+                if not isinstance(exported_file, str):
+                    continue
+                suggested = d.get("suggestedHumanReadableName")
+                if isinstance(suggested, str):
+                    screen_name = self._strip_attachment_suffix(suggested)
+                else:
+                    screen_name = exported_file.rsplit(".", 1)[0]
+                flat.append(
+                    {
+                        "exportedFileName": exported_file,
+                        "attachmentName": screen_name,
+                    }
+                )
+        return flat
+
+    @staticmethod
+    def _strip_attachment_suffix(suggested_name: str) -> str:
+        """Recover the user-set attachment name from Xcode's filename.
+
+        Xcode generates `"<name>_<idx>_<uuid>.<ext>"` for each XCTAttachment.
+        We strip the extension, then drop the trailing `_<idx>_<uuid>` and
+        any `.tree` suffix added for paired tree dumps.
+
+        Args:
+            suggested_name: Xcode's `suggestedHumanReadableName`.
+
+        Returns:
+            The bare screen identifier (e.g. `"watch-home"` for
+            `"watch-home_0_<uuid>.png"` or `"watch-home"` for
+            `"watch-home.tree_0_<uuid>.txt"`).
+        """
+        # Drop extension
+        stem = suggested_name.rsplit(".", 1)[0]
+        # `<name>_<idx>_<uuid>` — split off the last two underscore segments
+        # if they look like an index + UUID. The UUID always contains hyphens
+        # in canonical 8-4-4-4-12 form, so check for that.
+        parts = stem.split("_")
+        if (
+            len(parts) >= 3
+            and parts[-1].count("-") >= 4
+            and parts[-2].isdigit()
+        ):
+            stem = "_".join(parts[:-2])
+        # Tree dumps share the screen name but with a `.tree` infix: strip it.
+        if stem.endswith(".tree"):
+            stem = stem[: -len(".tree")]
+        return stem
 
     # ------------------------------------------------------------------
     # Public capabilities
@@ -495,9 +624,13 @@ class XCUITestRunnerHandler:
     def capture_screenshot(
         self,
         screen: str = "main",
-        destination: str = "platform=iOS Simulator,name=iPhone 16",
+        destination: str | None = None,
         test_scheme: str | None = None,
         launch_arguments: list[str] | None = None,
+        project: str | None = None,
+        workspace: str | None = None,
+        platform: str | None = None,
+        only_testing: str | None = None,
     ) -> UICapabilityResult:
         """Run xcodebuild test, extract screenshots from .xcresult bundle.
 
@@ -506,6 +639,9 @@ class XCUITestRunnerHandler:
             destination: Xcode destination string.
             test_scheme: Xcode scheme name (auto-detected if None).
             launch_arguments: Arguments passed as XCUI_LAUNCH_ARGS env var.
+            project: Optional .xcodeproj path (relative to project_dir or absolute).
+            workspace: Optional .xcworkspace path (takes precedence over project).
+            platform: 'ios' or 'watchos' — used for scheme auto-detection.
 
         Returns:
             Result containing the list of exported PNG paths on success.
@@ -530,15 +666,126 @@ class XCUITestRunnerHandler:
                 error=_LICENSE_ERROR,
             )
 
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            xcresult_path = Path(tmp_dir) / "result.xcresult"
-            command = self._build_xcodebuild_command(
-                destination=destination,
-                test_scheme=test_scheme,
-                xcresult_path=xcresult_path,
-            )
-            env = self._build_env(launch_arguments)
+        # Auto-detect scheme/project when surfaces.yaml didn't supply them — this
+        # is what unblocks `livespec ui-runner dispatch` on projects whose
+        # surfaces.yaml predates the runnerConfig wiring (e.g. v8 migrations).
+        if test_scheme is None or (project is None and workspace is None):
+            xcodeproj = self._find_xcodeproj()
+            if xcodeproj is not None:
+                if project is None and workspace is None:
+                    rel = xcodeproj.relative_to(self.project_dir) if (
+                        xcodeproj.is_relative_to(self.project_dir)
+                    ) else xcodeproj
+                    if xcodeproj.suffix == ".xcworkspace":
+                        workspace = str(rel)
+                    else:
+                        project = str(rel)
+                if test_scheme is None:
+                    test_scheme = self._autodetect_scheme(xcodeproj, platform=platform)
+            if test_scheme is None:
+                return UICapabilityResult(
+                    success=False,
+                    error=(
+                        "xcodebuild requires a -scheme. Either declare "
+                        "`runnerConfig.scheme: <name>` in .specs/surfaces.yaml or share "
+                        "a scheme via Xcode > Product > Scheme > Manage Schemes "
+                        "(check 'Shared')."
+                    ),
+                    metadata={"project_dir": str(self.project_dir)},
+                )
 
+        # Auto-detect destination when surfaces.yaml didn't supply one. This avoids
+        # the hardcoded "iPhone 16" trap on machines that only ship newer simulator
+        # runtimes (iPhone 17+). Falls back to the legacy default if simctl is
+        # unavailable so existing v12 manifests keep working.
+        if destination is None:
+            detected = self._autodetect_destination(platform=platform or "ios")
+            if detected is not None:
+                destination = detected
+            else:
+                destination = (
+                    "platform=watchOS Simulator,name=Apple Watch"
+                    if (platform or "").lower() == "watchos"
+                    else "platform=iOS Simulator,name=iPhone 16"
+                )
+
+        # Persist the .xcresult under the project so `livespec ui-runner inspect`
+        # can read it after the dispatch returns. TemporaryDirectory would delete
+        # it before the user has a chance to inspect the trees.
+        bundles_dir = self.project_dir / ".specs" / ".test-bundles"
+        bundles_dir.mkdir(parents=True, exist_ok=True)
+        # Reuse a stable filename per (surface, screen) so subsequent runs
+        # overwrite cleanly. We can't use the surface id here (handler doesn't
+        # know it), but only_testing is the next-best disambiguator.
+        bundle_name = (only_testing or "default").replace("/", "_") + ".xcresult"
+        xcresult_path = bundles_dir / bundle_name
+        hash_path = bundles_dir / f"{bundle_name}.hash"
+
+        # Optimisation #1: Swift-content hash cache.
+        # Hash every .swift file under the test target's directory. If the
+        # hash matches the one we stored after the previous successful run,
+        # skip xcodebuild entirely — the bundle on disk already reflects the
+        # current source. Saves a full build + test cycle on iterations where
+        # `inspect --patch` reported 0 changes.
+        swift_hash = self._compute_swift_hash(only_testing)
+        if (
+            swift_hash is not None
+            and xcresult_path.exists()
+            and hash_path.exists()
+            and hash_path.read_text(encoding="utf-8").strip() == swift_hash
+        ):
+            # Cache hit: skip xcodebuild but STILL extract attachments from
+            # the existing bundle. Otherwise we'd return success with
+            # exported_paths=[], leaving the .specs/design/screens/<dest>/
+            # directory empty on repeat runs.
+            destination_id = destination.replace("=", "_").replace(
+                ",", "_"
+            ).replace(" ", "_")
+            cached_output_dir = self.project_dir / ".specs" / "design" / "screens"
+            cached_paths = self._parse_xcresult(
+                xcresult_path, cached_output_dir, destination_id
+            )
+            return UICapabilityResult(
+                success=True,
+                output_path=cached_paths[0] if cached_paths else None,
+                metadata={
+                    "command": "<cached — swift hash unchanged>",
+                    "exit_code": 0,
+                    "exported_paths": [str(p) for p in cached_paths],
+                    "stdout_snippet": "",
+                    "xcresult_path": str(xcresult_path),
+                    "cached": True,
+                },
+            )
+
+        if xcresult_path.exists():
+            import shutil as _shutil
+
+            _shutil.rmtree(xcresult_path)
+
+        command = self._build_xcodebuild_command(
+            destination=destination,
+            test_scheme=test_scheme,
+            xcresult_path=xcresult_path,
+            project=project,
+            workspace=workspace,
+            only_testing=only_testing,
+        )
+        env = self._build_env(launch_arguments)
+
+        # Optimisation #2: auto-retry on "Timed out while evaluating UI query".
+        # SwiftUI accessibility hierarchies are flaky on first query; xcodebuild
+        # sometimes reports this opaque error and exits non-zero. A second run
+        # almost always succeeds because DerivedData is now warm and the
+        # simulator has paged in the runtime. Retry up to RETRY_LIMIT times.
+        RETRY_LIMIT = 3
+        TIMEOUT_MARKER = "Failed to get matching snapshots: Timed out while evaluating UI query"
+        result: subprocess.CompletedProcess[str] | None = None
+        for attempt in range(1, RETRY_LIMIT + 1):
+            if xcresult_path.exists() and attempt > 1:
+                import shutil as _shutil
+
+                _shutil.rmtree(xcresult_path)
             try:
                 result = subprocess.run(
                     command,
@@ -561,52 +808,104 @@ class XCUITestRunnerHandler:
                     error=f"Failed to execute xcodebuild: {error}",
                     metadata={"command": " ".join(command)},
                 )
+            stream = (result.stdout or "") + (result.stderr or "")
+            if TIMEOUT_MARKER not in stream:
+                break
+            # Else loop and retry — flaky UI query timeout.
 
-            # Check for license error in output
-            combined_output = result.stdout + result.stderr
-            combined_lower = combined_output.lower()
-            if "license" in combined_lower and "not been accepted" in combined_lower:
-                return UICapabilityResult(
-                    success=False,
-                    error=_LICENSE_ERROR,
-                    metadata={"command": " ".join(command)},
-                )
+        if result is None:  # pragma: no cover - unreachable, satisfies pyright
+            return UICapabilityResult(success=False, error="no result")
 
-            if not xcresult_path.exists():
-                return UICapabilityResult(
-                    success=False,
-                    error="No .xcresult bundle produced by xcodebuild test",
-                    metadata={
-                        "command": " ".join(command),
-                        "exit_code": result.returncode,
-                        "stdout_snippet": _truncate_stdout(result.stdout),
-                    },
-                )
-
-            destination_id = destination.replace("=", "_").replace(",", "_").replace(" ", "_")
-            output_dir = self.project_dir / ".specs" / "design" / "screens"
-            exported_paths = self._parse_xcresult(xcresult_path, output_dir, destination_id)
-
-            first_path = exported_paths[0] if exported_paths else None
-            has_error = not exported_paths and result.returncode != 0
+        # Check for license error in output
+        combined_output = result.stdout + result.stderr
+        combined_lower = combined_output.lower()
+        if "license" in combined_lower and "not been accepted" in combined_lower:
             return UICapabilityResult(
-                success=result.returncode == 0 or bool(exported_paths),
-                output_path=first_path,
-                error=result.stderr or None if has_error else None,
+                success=False,
+                error=_LICENSE_ERROR,
+                metadata={"command": " ".join(command)},
+            )
+
+        if not xcresult_path.exists():
+            return UICapabilityResult(
+                success=False,
+                error="No .xcresult bundle produced by xcodebuild test",
                 metadata={
                     "command": " ".join(command),
                     "exit_code": result.returncode,
-                    "exported_paths": [str(p) for p in exported_paths],
                     "stdout_snippet": _truncate_stdout(result.stdout),
                 },
             )
 
+        destination_id = destination.replace("=", "_").replace(",", "_").replace(" ", "_")
+        output_dir = self.project_dir / ".specs" / "design" / "screens"
+        exported_paths = self._parse_xcresult(xcresult_path, output_dir, destination_id)
+
+        first_path = exported_paths[0] if exported_paths else None
+        has_error = not exported_paths and result.returncode != 0
+
+        # Persist the Swift hash next to the bundle so the next call can skip
+        # xcodebuild when the source is unchanged (optimisation #1).
+        if swift_hash is not None and (result.returncode == 0 or bool(exported_paths)):
+            import contextlib
+
+            with contextlib.suppress(OSError):
+                hash_path.write_text(swift_hash, encoding="utf-8")
+
+        return UICapabilityResult(
+            success=result.returncode == 0 or bool(exported_paths),
+            output_path=first_path,
+            error=result.stderr or None if has_error else None,
+            metadata={
+                "command": " ".join(command),
+                "exit_code": result.returncode,
+                "exported_paths": [str(p) for p in exported_paths],
+                "stdout_snippet": _truncate_stdout(result.stdout),
+                "xcresult_path": str(xcresult_path),
+            },
+        )
+
+    def _compute_swift_hash(self, only_testing: str | None) -> str | None:
+        """Return a SHA-256 hex digest of all .swift files in the test target dir.
+
+        Used as the cache key for skipping xcodebuild when the test target's
+        source hasn't changed since the last bundle. Returns None when the
+        target directory can't be located (e.g. only_testing is None for a
+        backward-compat single-bundle project).
+
+        Args:
+            only_testing: Test target name (e.g. "STRAPTUITests").
+
+        Returns:
+            64-char hex SHA-256, or None if hashing is not applicable.
+        """
+        if not only_testing:
+            return None
+        target_dir = self.project_dir / only_testing
+        if not target_dir.is_dir():
+            return None
+        import hashlib
+
+        h = hashlib.sha256()
+        # Sort for determinism. Hash the relative path + content of each .swift
+        # so renames invalidate the cache too.
+        for swift in sorted(target_dir.rglob("*.swift")):
+            try:
+                h.update(str(swift.relative_to(target_dir)).encode("utf-8"))
+                h.update(b"\0")
+                h.update(swift.read_bytes())
+                h.update(b"\0")
+            except OSError:
+                return None
+        return h.hexdigest()
+
     # @spec FR-005: launch_arguments injection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-005  # noqa: E501
     def run_flow(
         self,
-        destination: str = "platform=iOS Simulator,name=iPhone 16",
+        destination: str | None = None,
         test_scheme: str | None = None,
         launch_arguments: list[str] | None = None,
+        platform: str | None = None,
     ) -> UICapabilityResult:
         """Run the full XCUITest suite and report pass/fail.
 
@@ -636,6 +935,19 @@ class XCUITestRunnerHandler:
                 success=False,
                 error=_LICENSE_ERROR,
             )
+
+        # Auto-detect destination when surfaces.yaml didn't supply one (same logic
+        # as capture_screenshot — see comment there).
+        if destination is None:
+            detected = self._autodetect_destination(platform=platform or "ios")
+            if detected is not None:
+                destination = detected
+            else:
+                destination = (
+                    "platform=watchOS Simulator,name=Apple Watch"
+                    if (platform or "").lower() == "watchos"
+                    else "platform=iOS Simulator,name=iPhone 16"
+                )
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             xcresult_path = Path(tmp_dir) / "flow_result.xcresult"
@@ -791,11 +1103,61 @@ class XCUITestRunnerHandler:
     # Internal helpers
     # ------------------------------------------------------------------
 
+    def _find_xcodeproj(self) -> Path | None:
+        """Return the first .xcodeproj or .xcworkspace under project_dir, or None."""
+        if not self.project_dir.exists():
+            return None
+        # .xcworkspace wins over .xcodeproj when both are present (workspace is
+        # what xcodebuild expects in CocoaPods/SPM-mixed projects).
+        workspaces = sorted(self.project_dir.glob("*.xcworkspace"))
+        if workspaces:
+            return workspaces[0]
+        projects = sorted(self.project_dir.glob("*.xcodeproj"))
+        return projects[0] if projects else None
+
+    def _list_shared_schemes(self, xcodeproj: Path) -> list[str]:
+        """Read scheme names from `<xcodeproj>/xcshareddata/xcschemes/*.xcscheme`."""
+        schemes_dir = xcodeproj / "xcshareddata" / "xcschemes"
+        if not schemes_dir.is_dir():
+            return []
+        return sorted(p.stem for p in schemes_dir.glob("*.xcscheme"))
+
+    def _autodetect_scheme(
+        self, xcodeproj: Path, platform: str | None = None
+    ) -> str | None:
+        """Pick the most likely scheme for the given platform from shared schemes.
+
+        Args:
+            xcodeproj: Path to .xcodeproj or .xcworkspace.
+            platform: 'ios' or 'watchos' to filter; None returns the first scheme.
+
+        Returns:
+            Scheme name, or None when no suitable scheme is found.
+        """
+        schemes = self._list_shared_schemes(xcodeproj)
+        if not schemes:
+            return None
+        if platform == "watchos":
+            for scheme in schemes:
+                lower = scheme.lower()
+                if "watch" in lower:
+                    return scheme
+            return None
+        if platform == "ios":
+            # Prefer non-watch schemes for iOS; fallback to first available.
+            for scheme in schemes:
+                if "watch" not in scheme.lower():
+                    return scheme
+        return schemes[0]
+
     def _build_xcodebuild_command(
         self,
         destination: str,
         test_scheme: str | None,
         xcresult_path: Path,
+        project: str | None = None,
+        workspace: str | None = None,
+        only_testing: str | None = None,
     ) -> list[str]:
         """Assemble the xcodebuild test command.
 
@@ -803,6 +1165,13 @@ class XCUITestRunnerHandler:
             destination: Xcode destination string.
             test_scheme: Scheme to test (uses -scheme flag if provided).
             xcresult_path: Path for the output .xcresult bundle.
+            project: Optional .xcodeproj path (relative or absolute).
+            workspace: Optional .xcworkspace path (takes precedence over project).
+            only_testing: Restrict the run to a specific test bundle/method via
+                xcodebuild's `-only-testing:` flag. Required when a scheme has
+                multiple targets across platforms (e.g. iOS UITests + watchOS
+                UITests in the same scheme): otherwise xcodebuild tries to run
+                the wrong-platform bundles and the whole invocation fails.
 
         Returns:
             Command list suitable for subprocess.run.
@@ -817,6 +1186,12 @@ class XCUITestRunnerHandler:
             "CODE_SIGN_IDENTITY=",
             "CODE_SIGNING_REQUIRED=NO",
         ]
+        if only_testing:
+            command.extend(["-only-testing:" + only_testing])
+        if workspace:
+            command.extend(["-workspace", workspace])
+        elif project:
+            command.extend(["-project", project])
         if test_scheme:
             command.extend(["-scheme", test_scheme])
         return command

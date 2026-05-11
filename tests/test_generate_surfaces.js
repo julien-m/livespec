@@ -27,7 +27,12 @@ const {
 	findPlaywrightConfig,
 	findVisualPlaywrightConfig,
 	detectSurfaces,
+	buildXcuitestRunnerConfig,
+	buildMaestroRunnerConfig,
 } = mod;
+
+const PBXPROJ_MOD = await import(join(REPO_ROOT, "scripts", "lib", "pbxproj.js"));
+const { listSharedSchemes, pickSchemeForPlatform } = PBXPROJ_MOD;
 
 let savedCwd;
 let workDir;
@@ -479,5 +484,131 @@ describe("pbxproj parser (Feature 037)", () => {
 		expect(result.targets.length).toBe(0);
 		expect(result.warnings.some((w) => w.includes("AppTests") && w.includes("not found"))).toBe(true);
 		rmSync(tmp, { recursive: true, force: true });
+	});
+});
+
+// @spec FR-002: scheme extraction — .specs/features/038-runner-config-wiring/spec.md#fr-002
+describe("scheme extractor (Feature 038)", () => {
+	test("listSharedSchemes returns sorted scheme names", () => {
+		const tmp = mkdtempSync(join(tmpdir(), "schemes-"));
+		const xcodeproj = join(tmp, "App.xcodeproj");
+		const schemesDir = join(xcodeproj, "xcshareddata", "xcschemes");
+		mkdirSync(schemesDir, { recursive: true });
+		writeFileSync(join(schemesDir, "App.xcscheme"), "<Scheme/>");
+		writeFileSync(join(schemesDir, "App Watch App.xcscheme"), "<Scheme/>");
+		const schemes = listSharedSchemes(xcodeproj);
+		expect(schemes).toEqual(["App", "App Watch App"]);
+		rmSync(tmp, { recursive: true, force: true });
+	});
+
+	test("listSharedSchemes returns empty array when no schemes shared", () => {
+		const tmp = mkdtempSync(join(tmpdir(), "no-schemes-"));
+		const xcodeproj = join(tmp, "App.xcodeproj");
+		mkdirSync(xcodeproj);
+		expect(listSharedSchemes(xcodeproj)).toEqual([]);
+		rmSync(tmp, { recursive: true, force: true });
+	});
+
+	test("pickSchemeForPlatform picks watch scheme for watchos", () => {
+		const result = pickSchemeForPlatform(["App", "App Watch App"], "watchos");
+		expect(result).toBe("App Watch App");
+	});
+
+	test("pickSchemeForPlatform picks non-watch scheme for ios", () => {
+		const result = pickSchemeForPlatform(["App", "App Watch App"], "ios");
+		expect(result).toBe("App");
+	});
+
+	test("pickSchemeForPlatform returns null when watchos has no watch scheme", () => {
+		const result = pickSchemeForPlatform(["App"], "watchos");
+		expect(result).toBeNull();
+	});
+});
+
+// @spec FR-001: runnerConfig wiring — .specs/features/038-runner-config-wiring/spec.md#fr-001
+describe("buildXcuitestRunnerConfig (Feature 038)", () => {
+	test("populates project + platform + scheme from xcshareddata", () => {
+		const tmp = mkdtempSync(join(tmpdir(), "rc-xcuitest-"));
+		const xcodeproj = join(tmp, "STRAPT.xcodeproj");
+		const schemesDir = join(xcodeproj, "xcshareddata", "xcschemes");
+		mkdirSync(schemesDir, { recursive: true });
+		writeFileSync(join(schemesDir, "STRAPT.xcscheme"), "<Scheme/>");
+		writeFileSync(join(schemesDir, "STRAPT Watch App.xcscheme"), "<Scheme/>");
+		const config = buildXcuitestRunnerConfig(xcodeproj, "ios");
+		expect(config.scheme).toBe("STRAPT");
+		// destination is intentionally omitted — runtime auto-detects the
+		// available simulator (iPhone 16 may not exist on iOS 26+ hosts).
+		expect(config.destination).toBeUndefined();
+		expect(config.platform).toBe("ios");
+		expect(config.project).toContain("STRAPT.xcodeproj");
+		const watchConfig = buildXcuitestRunnerConfig(xcodeproj, "watchos");
+		expect(watchConfig.scheme).toBe("STRAPT Watch App");
+		expect(watchConfig.platform).toBe("watchos");
+		expect(watchConfig.destination).toBeUndefined();
+		rmSync(tmp, { recursive: true, force: true });
+	});
+
+	test("returns config without scheme when no schemes are shared", () => {
+		const tmp = mkdtempSync(join(tmpdir(), "rc-no-schemes-"));
+		const xcodeproj = join(tmp, "App.xcodeproj");
+		mkdirSync(xcodeproj);
+		const config = buildXcuitestRunnerConfig(xcodeproj, "ios");
+		expect(config.scheme).toBeUndefined();
+		expect(config.destination).toBeUndefined();
+		expect(config.platform).toBe("ios");
+		expect(config.project).toContain("App.xcodeproj");
+		rmSync(tmp, { recursive: true, force: true });
+	});
+});
+
+describe("buildMaestroRunnerConfig (Feature 038)", () => {
+	test("returns flowsDir + platform=android", () => {
+		const config = buildMaestroRunnerConfig("maestro");
+		expect(config.flowsDir).toBe("maestro");
+		expect(config.platform).toBe("android");
+	});
+});
+
+// @spec FR-005: nested YAML output — .specs/features/038-runner-config-wiring/spec.md#fr-005
+describe("toYaml emits nested runnerConfig (Feature 038)", () => {
+	test("object runnerConfig becomes nested YAML map", async () => {
+		const { toYaml } = mod;
+		const yaml = toYaml([
+			{
+				id: "ios",
+				name: "STRAPT",
+				path: ".",
+				testDir: "STRAPTTests",
+				runner: "xcuitest",
+				platform: "ios",
+				runnerConfig: {
+					project: "STRAPT.xcodeproj",
+					scheme: "STRAPT",
+					destination: "platform=iOS Simulator,name=iPhone 16",
+				},
+			},
+		]);
+		expect(yaml).toContain("    runnerConfig:");
+		expect(yaml).toContain("      project: STRAPT.xcodeproj");
+		expect(yaml).toContain("      scheme: STRAPT");
+		// Destination contains commas/equals → must be quoted
+		expect(yaml).toContain('      destination: "platform=iOS Simulator,name=iPhone 16"');
+	});
+
+	test("string runnerConfig stays single-line (legacy form)", async () => {
+		const { toYaml } = mod;
+		const yaml = toYaml([
+			{
+				id: "web",
+				name: "Web",
+				path: "apps/web",
+				testDir: "apps/web/tests/e2e",
+				runner: "playwright",
+				runnerConfig: "apps/web/playwright.config.ts",
+			},
+		]);
+		expect(yaml).toContain("    runnerConfig: apps/web/playwright.config.ts");
+		// Must NOT have nested form
+		expect(yaml).not.toContain("\n      ");
 	});
 });

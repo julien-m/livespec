@@ -30,6 +30,7 @@ class FakeHandler:
     """Programmable in-memory handler for dispatcher tests."""
 
     last_screen_calls: ClassVar[list[tuple[str, str]]] = []
+    last_capture_kwargs: ClassVar[list[dict[str, Any]]] = []
 
     def __init__(
         self,
@@ -50,15 +51,16 @@ class FakeHandler:
     def preflight_message(self) -> str:
         return self.preflight
 
-    def capture_screenshot(self, screen: str) -> UICapabilityResult:
+    def capture_screenshot(self, screen: str, **kwargs: Any) -> UICapabilityResult:
         FakeHandler.last_screen_calls.append((self.name, screen))
+        FakeHandler.last_capture_kwargs.append(kwargs)
         return UICapabilityResult(
             success=True,
             output_path=self.project_dir / f"{screen}.png",
-            metadata={"runner": self.name},
+            metadata={"runner": self.name, "kwargs": kwargs},
         )
 
-    def run_flow(self) -> UICapabilityResult:  # pragma: no cover - unused
+    def run_flow(self, **kwargs: Any) -> UICapabilityResult:  # pragma: no cover - unused
         return UICapabilityResult(success=True)
 
 
@@ -291,3 +293,136 @@ def test_visual_phase_result_records_baseline_path(tmp_path: Path) -> None:
     results = dispatcher.run(["home"])
     assert isinstance(results[0], VisualPhaseResult)
     assert results[0].baseline_path == tmp_path / "home.png"
+
+
+# ---------------------------------------------------------------------------
+# Runner config wiring (Feature 038)
+# ---------------------------------------------------------------------------
+# @spec FR-001: dispatcher passes runnerConfig kwargs — .specs/features/038-runner-config-wiring/spec.md#fr-001  # noqa: E501
+
+
+def test_dispatcher_passes_xcuitest_runner_config(tmp_path: Path) -> None:
+    """xcuitest surfaces propagate scheme/destination as test_scheme/destination kwargs."""
+    FakeHandler.last_capture_kwargs = []
+    surfaces = [
+        Surface(
+            id="ios",
+            runner="xcuitest",
+            platform="ios",
+            runner_config={
+                "scheme": "STRAPT",
+                "destination": "platform=iOS Simulator,name=iPhone 16",
+                "project": "STRAPT.xcodeproj",
+            },
+        )
+    ]
+    registry = {"xcuitest": _make_handler("xcuitest")}
+    dispatcher = _build_dispatcher(tmp_path, surfaces, registry)
+    dispatcher.run(["home"])
+    assert len(FakeHandler.last_capture_kwargs) == 1
+    kwargs = FakeHandler.last_capture_kwargs[0]
+    assert kwargs.get("test_scheme") == "STRAPT"
+    assert kwargs.get("destination") == "platform=iOS Simulator,name=iPhone 16"
+    assert kwargs.get("project") == "STRAPT.xcodeproj"
+
+
+def test_dispatcher_passes_maestro_runner_config(tmp_path: Path) -> None:
+    """maestro surfaces propagate avdName/platform as kwargs."""
+    FakeHandler.last_capture_kwargs = []
+    surfaces = [
+        Surface(
+            id="android",
+            runner="maestro",
+            platform="android",
+            runner_config={
+                "avdName": "Pixel_8_API_35",
+                "platform": "android",
+                "failFast": True,
+            },
+        )
+    ]
+    registry = {"maestro": _make_handler("maestro")}
+    dispatcher = _build_dispatcher(tmp_path, surfaces, registry)
+    dispatcher.run(["home"])
+    kwargs = FakeHandler.last_capture_kwargs[0]
+    assert kwargs.get("avd_name") == "Pixel_8_API_35"
+    assert kwargs.get("platform") == "android"
+    assert kwargs.get("fail_fast") is True
+
+
+def test_dispatcher_drops_unknown_runner_config_keys(tmp_path: Path) -> None:
+    """Unknown runnerConfig keys are silently dropped so future fields don't break dispatch."""
+    FakeHandler.last_capture_kwargs = []
+    surfaces = [
+        Surface(
+            id="ios",
+            runner="xcuitest",
+            runner_config={"scheme": "S", "futureKey": "x", "another": 42},
+        )
+    ]
+    registry = {"xcuitest": _make_handler("xcuitest")}
+    dispatcher = _build_dispatcher(tmp_path, surfaces, registry)
+    dispatcher.run(["home"])
+    kwargs = FakeHandler.last_capture_kwargs[0]
+    assert kwargs == {"test_scheme": "S"}
+
+
+def test_surface_from_dict_normalizes_string_runner_config() -> None:
+    """Legacy `runnerConfig: <string>` is coerced to {"_path": value}."""
+    raw = {
+        "id": "web",
+        "runner": "playwright",
+        "runnerConfig": "apps/web/playwright.config.ts",
+    }
+    surface = Surface.from_dict(raw)
+    assert surface.runner_config == {"_path": "apps/web/playwright.config.ts"}
+
+
+def test_surface_from_dict_preserves_dict_runner_config() -> None:
+    """Structured `runnerConfig: { ... }` reaches the dispatcher untouched."""
+    raw = {
+        "id": "ios",
+        "runner": "xcuitest",
+        "runnerConfig": {"scheme": "App", "destination": "platform=iOS Simulator,name=iPhone 16"},
+    }
+    surface = Surface.from_dict(raw)
+    assert surface.runner_config == {
+        "scheme": "App",
+        "destination": "platform=iOS Simulator,name=iPhone 16",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Empty-attachment detection (Strapt regression: xcodebuild exits 0 but
+# UITest target produces zero XCTAttachment.image entries).
+# ---------------------------------------------------------------------------
+
+
+class _EmptyAttachmentXcuitestHandler(FakeHandler):
+    """Simulates xcodebuild test exit 0 with no PNG attachments produced."""
+
+    def __init__(self, project_dir: Path | str) -> None:
+        super().__init__(project_dir, name="xcuitest")
+
+    def capture_screenshot(self, screen: str, **kwargs: Any) -> UICapabilityResult:
+        return UICapabilityResult(
+            success=True,
+            output_path=None,
+            metadata={"exit_code": 0, "exported_paths": []},
+        )
+
+
+def test_dispatcher_blocks_when_xcuitest_returns_zero_attachments(tmp_path: Path) -> None:
+    """When xcodebuild succeeds but no XCTAttachment is added, dispatcher
+    must surface a BLOCKED status pointing to the LSSampleUITests template.
+    Otherwise visual diffs would silently no-op (Strapt regression).
+    """
+    surfaces = [Surface(id="ios", runner="xcuitest")]
+    registry = {"xcuitest": _EmptyAttachmentXcuitestHandler}
+    dispatcher = _build_dispatcher(tmp_path, surfaces, registry)
+    results = dispatcher.run(["home"])
+    assert len(results) == 1
+    assert results[0].status == "blocked"
+    assert results[0].error is not None
+    assert "XCTAttachment" in results[0].error
+    assert "LSSampleUITests" in results[0].error or "scaffold" in results[0].error

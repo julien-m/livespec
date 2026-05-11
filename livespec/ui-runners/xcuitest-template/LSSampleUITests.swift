@@ -42,20 +42,53 @@ class LSSampleUITests: XCTestCase {
 
     // @spec FR-002: XCUIScreen screenshot capture — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-002
 
-    /// Capture the main screen for baseline comparison.
+    /// Capture screenshot + accessibility tree. The `.tree.txt` attachment lets
+    /// `livespec ui-runner inspect` auto-correct identifiers when navigation
+    /// TODOs miss their target — no manual editing required.
     ///
-    /// LiveSpec extracts XCTAttachment screenshots from the .xcresult bundle.
-    /// Use `lifetime = .keepAlways` so the attachment survives even when the
-    /// test passes (Xcode's default is to delete passing-test attachments).
+    /// Waits for `.runningForeground` and forces an initial hierarchy query
+    /// because on iOS, app.debugDescription returns only "Query chain:" until
+    /// the snapshot cache has been populated by at least one .exists call.
+    private func snapshot(_ name: String) {
+        // Best-effort foreground wait via XCTWaiter so a timeout doesn't
+        // fail the test — we still capture whatever the screen shows.
+        if app.state != .runningForeground {
+            let pred = NSPredicate(format: "state == %d",
+                                   XCUIApplication.State.runningForeground.rawValue)
+            let exp = XCTNSPredicateExpectation(predicate: pred, object: app)
+            _ = XCTWaiter().wait(for: [exp], timeout: 5.0)
+        }
+        _ = app.descendants(matching: .any).firstMatch.exists
+
+        let png = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        png.name = name
+        png.lifetime = .keepAlways
+        add(png)
+
+        // Dump per-kind so inspect can reliably parse buttons/cells/tabs.
+        let dump = "\(app.debugDescription)\n\n=== Buttons ===\n" +
+            app.buttons.allElementsBoundByIndex.map { $0.debugDescription }
+                .joined(separator: "\n") +
+            "\n\n=== StaticTexts ===\n" +
+            app.staticTexts.allElementsBoundByIndex.map { $0.debugDescription }
+                .joined(separator: "\n") +
+            "\n\n=== Cells ===\n" +
+            app.cells.allElementsBoundByIndex.map { $0.debugDescription }
+                .joined(separator: "\n") +
+            "\n\n=== TabBar ===\n" +
+            app.tabBars.allElementsBoundByIndex.map { $0.debugDescription }
+                .joined(separator: "\n")
+        let tree = XCTAttachment(string: dump)
+        tree.name = "\(name).tree.txt"
+        tree.lifetime = .keepAlways
+        add(tree)
+    }
+
+    /// Capture the main screen for baseline comparison.
     func testCaptureMainScreen() throws {
         // TODO: navigate to the screen you want to capture
         // Example: app.tabBars.buttons["Home"].tap()
-
-        let screenshot = XCUIScreen.main.screenshot()
-        let attachment = XCTAttachment(screenshot: screenshot)
-        attachment.name = "main_screen"
-        attachment.lifetime = .keepAlways
-        add(attachment)
+        snapshot("main_screen")
     }
 
     /// Example: capture the dashboard screen.

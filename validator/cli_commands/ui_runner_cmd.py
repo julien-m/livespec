@@ -182,6 +182,154 @@ def check_command(
     )
 
 
+def _discover_screens_in_feature(feature_dir: Path) -> list[str]:
+    """Parse the `## Screens` table in `<feature_dir>/spec.md` and return ids.
+
+    Supported formats inside the table:
+      • Markdown table: `| Screen | Status | Reference |` — column 1 is the id
+      • Bullet form:    `- **<id>.png** — description`
+      • Bullet w/ link: ``- [`<id>.png`](...) — description``
+
+    Args:
+        feature_dir: Path to `.specs/features/NNN-name/`.
+
+    Returns:
+        Deduplicated, source-order list of screen identifiers (lowercase,
+        kebab-case). Empty list when no Screens section exists or no row
+        matched. Mockup file extensions (`.png`) are stripped.
+    """
+    spec_path = feature_dir / "spec.md"
+    if not spec_path.is_file():
+        return []
+
+    try:
+        text = spec_path.read_text(encoding="utf-8")
+    except OSError:
+        return []
+
+    # Find the Screens section (between `## Screens` and the next `## ` heading).
+    import re
+
+    section_match = re.search(
+        r"^##\s+Screens\s*$\n(.*?)(?=^##\s|\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if not section_match:
+        return []
+    section = section_match.group(1)
+
+    screens: list[str] = []
+    seen: set[str] = set()
+
+    # Table rows: prefer the mockup filename from the Reference column when
+    # available — it's the canonical screen identifier (matches both the PNG
+    # in .specs/design/screens/ and `attachment.name` in Swift tests). Fall
+    # back to slugifying the first column when no mockup link is present.
+    import re as _re
+
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|") or stripped.startswith("|--"):
+            continue
+        cells = [c.strip() for c in stripped.strip("|").split("|")]
+        if not cells or not cells[0]:
+            continue
+        first = cells[0].lower()
+        if first in {"screen", "name"}:
+            continue
+        # Look for a `*.png` reference in any cell — that's the canonical id.
+        screen_id: str | None = None
+        for cell in cells:
+            png_match = _re.search(r"([A-Za-z0-9_-]+)\.png", cell)
+            if png_match:
+                screen_id = png_match.group(1).lower()
+                break
+        if screen_id is None:
+            screen_id = _normalize_screen_id(cells[0])
+        if screen_id and screen_id not in seen:
+            seen.add(screen_id)
+            screens.append(screen_id)
+
+    # Bullet form: `- **<id>.png** — ...` or `- [\`<id>.png\`](...) — ...`
+    bullet_re = re.compile(
+        r"^\s*[-*]\s+(?:\*\*|\[`)?([^*`\]\s]+?)\.png(?:\*\*|`\])?\s*[—\-]",
+        re.MULTILINE,
+    )
+    for match in bullet_re.finditer(section):
+        screen_id = _normalize_screen_id(match.group(1))
+        if screen_id and screen_id not in seen:
+            seen.add(screen_id)
+            screens.append(screen_id)
+
+    return screens
+
+
+def _normalize_screen_id(raw: str) -> str:
+    """Strip mockup link/markup and reduce a label to its screen identifier.
+
+    Examples:
+        `[iphone-home.png](path/...)` → `iphone-home`
+        `Home`                        → `home`
+        `**watch-rest-timer**`        → `watch-rest-timer`
+    """
+    import re
+
+    # Extract from markdown link
+    link_match = re.search(r"\[([^\]]+)\]", raw)
+    if link_match:
+        raw = link_match.group(1)
+    # Strip emphasis, code fences, file extensions
+    cleaned = raw.strip().strip("*").strip("`").rstrip(".png").rstrip(".jpg")
+    return cleaned.lower().replace(" ", "-")
+
+
+def _discover_screens_all(project_dir: Path) -> list[tuple[str, str]]:
+    """Auto-discover every screen across features eligible for visual testing.
+
+    Walks `.specs/features/*/spec.md`, filters to features whose frontmatter
+    `status:` is `Implemented` or `In Progress`, and yields `(slug, screen_id)`
+    pairs.
+
+    Args:
+        project_dir: Project root.
+
+    Returns:
+        List of `(feature_slug, screen_id)` tuples in feature-then-source
+        order. Slugs match the directory name.
+    """
+    features_root = project_dir / ".specs" / "features"
+    if not features_root.is_dir():
+        return []
+    out: list[tuple[str, str]] = []
+    for feature_dir in sorted(features_root.iterdir()):
+        if not feature_dir.is_dir():
+            continue
+        spec_path = feature_dir / "spec.md"
+        if not spec_path.is_file():
+            continue
+        try:
+            header = spec_path.read_text(encoding="utf-8")[:400]
+        except OSError:
+            continue
+        # Frontmatter status check: `status: "Implemented"` or
+        # `status: Implemented` — case insensitive.
+        import re
+
+        status_match = re.search(
+            r"^status:\s*\"?([^\"\n]+)\"?",
+            header,
+            re.MULTILINE | re.IGNORECASE,
+        )
+        if status_match:
+            status = status_match.group(1).strip().lower()
+            if status not in {"implemented", "in progress"}:
+                continue
+        for screen in _discover_screens_in_feature(feature_dir):
+            out.append((feature_dir.name, screen))
+    return out
+
+
 def _validate_surfaces_yaml(project_dir: Path) -> None:
     """Validate `.specs/surfaces.yaml` early so `check` can hard-block on parse errors.
 
@@ -310,6 +458,455 @@ def dispatch_command(
 
     exit_code = _dispatch_exit_code(results)
     raise typer.Exit(code=exit_code)
+
+
+@ui_runner_app.command("inspect")
+def inspect_command(
+    xcresult: str = typer.Argument(
+        ...,
+        help="Path to the .xcresult bundle produced by xcodebuild test.",
+    ),
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit machine-readable JSON.",
+    ),
+    patch: str | None = typer.Option(
+        None,
+        "--patch",
+        help=(
+            "Path to a Swift UI test file. When set, inspect rewrites the "
+            "tapFirstAvailable/tapAnyTab candidate lists with the labels "
+            "actually found on each screen (auto-fix navigation TODOs)."
+        ),
+    ),
+) -> None:
+    """Extract accessibility trees from a test run and report per-screen elements.
+
+    The Swift template attaches `<screen>.tree.txt` to every snapshot. This
+    command pulls them out of the .xcresult bundle, parses interactive
+    elements (buttons, tabs, cells, statictexts), and prints a per-screen
+    inventory. Use `--patch <file>` to auto-rewrite the Swift candidates so
+    you don't have to chase accessibilityIdentifier mismatches manually.
+
+    Args:
+        xcresult: Path to .xcresult bundle.
+        json_output: Emit JSON instead of human text.
+        patch: When provided, rewrite the Swift test file's tap candidates.
+
+    Raises:
+        typer.Exit: With code 0 on success, 2 on parse errors.
+    """
+    from validator.ui_runner_inspect import (
+        extract_screen_trees,
+        parse_tree_elements,
+        rewrite_swift_candidates,
+    )
+
+    bundle = Path(xcresult).resolve()
+    if not bundle.exists():
+        typer.echo(f"BLOCKED: .xcresult not found at {bundle}", err=True)
+        raise typer.Exit(code=2)
+
+    trees = extract_screen_trees(bundle)
+    if not trees:
+        typer.echo(
+            "No <screen>.tree.txt attachments found. Make sure the Swift test "
+            "uses the snapshot() helper from livespec/ui-runners/xcuitest-template "
+            "(or run `livespec ui-runner scaffold --target ios --force`).",
+            err=True,
+        )
+        raise typer.Exit(code=2)
+
+    inventories: dict[str, dict[str, list[str]]] = {}
+    for screen, tree_text in trees.items():
+        inventories[screen] = parse_tree_elements(tree_text)
+
+    if patch:
+        target = Path(patch).resolve()
+        if not target.exists():
+            typer.echo(f"BLOCKED: Swift file not found at {target}", err=True)
+            raise typer.Exit(code=2)
+        changed = rewrite_swift_candidates(target, inventories)
+        typer.echo(f"Patched {changed} test method(s) in {target.name}")
+
+    if json_output:
+        typer.echo(json.dumps(inventories, indent=2))
+        return
+
+    for screen, inv in inventories.items():
+        typer.echo(f"\n=== {screen} ===")
+        for kind in ("tabs", "buttons", "cells", "statictexts"):
+            items = inv.get(kind, [])
+            if items:
+                typer.echo(f"  {kind}: {', '.join(items[:8])}")
+
+
+@ui_runner_app.command("converge")
+def converge_command(
+    screens: Annotated[
+        list[str] | None,
+        typer.Argument(help="Screen identifiers to capture across iterations."),
+    ] = None,
+    project_dir: str = typer.Option(".", "--project-dir", "-p", help="Project root."),
+    feature_dir: str = typer.Option(
+        None,
+        "--feature-dir",
+        "-f",
+        help=(
+            "Feature directory (e.g. .specs/features/001-name/). "
+            "Ignored when --all or --feature is used."
+        ),
+    ),
+    feature: str | None = typer.Option(
+        None,
+        "--feature",
+        help=(
+            "Feature slug (e.g. 001-workout-library). Auto-discovers screens "
+            "from .specs/features/<slug>/spec.md `## Screens` section."
+        ),
+    ),
+    all_features: bool = typer.Option(
+        False,
+        "--all",
+        "-a",
+        help=(
+            "Auto-discover every feature with status Implemented or In Progress "
+            "and converge across all their screens. Zero-argument workflow."
+        ),
+    ),
+    max_iterations: int = typer.Option(
+        5,
+        "--max-iterations",
+        "-n",
+        help="Stop after this many dispatch+patch cycles even if not converged.",
+    ),
+) -> None:
+    """Loop dispatch + inspect --patch until the Swift candidate lists stabilise.
+
+    The first run usually captures the wrong screen because the auto-generated
+    `tapFirstAvailable` candidate lists are placeholders. `inspect --patch`
+    injects the real labels XCUITest saw, so the next run navigates one level
+    deeper. Repeat until `--patch` reports zero changes — that's convergence.
+
+    Discovery modes:
+      • `screens` positional arg + `--feature-dir`: explicit list (legacy)
+      • `--feature <slug>`: parse one feature's spec.md `## Screens` table
+      • `--all`: parse every feature.spec.md and converge all screens
+
+    Args:
+        screens: Explicit screen identifiers (omitted with --all/--feature).
+        project_dir: Project root.
+        feature_dir: Explicit feature directory (legacy).
+        feature: Feature slug to auto-discover screens for.
+        all_features: Auto-discover all features.
+        max_iterations: Hard stop to avoid infinite loops on unreachable screens.
+
+    Raises:
+        typer.Exit: With code 0 on convergence, 1 if max iterations reached
+            without stabilising, 2 on dispatch failure.
+    """
+    project_path = Path(project_dir).resolve()
+
+    # Resolve screens + feature_path from the three discovery modes.
+    if all_features:
+        if screens or feature or feature_dir:
+            typer.echo(
+                "--all is exclusive — drop --feature, --feature-dir, and screen args.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        discovered = _discover_screens_all(project_path)
+        if not discovered:
+            typer.echo(
+                "No screens discovered. Check .specs/features/*/spec.md for "
+                "`## Screens` tables and that features have status Implemented "
+                "or In Progress.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        screens = sorted({s for _, s in discovered})
+        # feature_path for state writes: use the first discovered feature.
+        feature_path = (project_path / ".specs" / "features" / discovered[0][0]).resolve()
+        typer.echo(
+            f"Auto-discovered {len(screens)} screen(s) across "
+            f"{len({f for f, _ in discovered})} feature(s)."
+        )
+    elif feature:
+        if screens or feature_dir:
+            typer.echo(
+                "--feature is exclusive — drop --feature-dir and screen args.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        feature_path = (project_path / ".specs" / "features" / feature).resolve()
+        if not feature_path.is_dir():
+            typer.echo(
+                f"Feature directory not found at {feature_path}", err=True
+            )
+            raise typer.Exit(code=2)
+        feature_screens = _discover_screens_in_feature(feature_path)
+        if not feature_screens:
+            typer.echo(
+                f"No screens found in {feature_path}/spec.md `## Screens` section.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        screens = feature_screens
+        typer.echo(f"Auto-discovered {len(screens)} screen(s) for {feature}.")
+    else:
+        if not screens:
+            typer.echo(
+                "No screens provided. Pass screen IDs explicitly, or use "
+                "--feature <slug> / --all to auto-discover.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        if not feature_dir:
+            typer.echo(
+                "--feature-dir is required when passing screens explicitly.",
+                err=True,
+            )
+            raise typer.Exit(code=2)
+        feature_path = Path(feature_dir).resolve()
+
+    bundles_dir = project_path / ".specs" / ".test-bundles"
+    bundles_dir.mkdir(parents=True, exist_ok=True)
+
+    # Lockfile prevents two `converge` instances from clobbering each other's
+    # .xcresult bundles. The lock holds a stale-detection pid + start time so a
+    # crashed prior run can be reaped without a manual `rm`.
+    import os
+    import time
+    lock_file = bundles_dir / "converge.lock"
+    if lock_file.exists():
+        try:
+            stale_pid = int(lock_file.read_text(encoding="utf-8").split(":", 1)[0])
+        except (ValueError, OSError):
+            stale_pid = -1
+        if stale_pid > 0:
+            try:
+                os.kill(stale_pid, 0)
+            except ProcessLookupError:
+                stale_pid = -1
+            else:
+                typer.echo(
+                    f"BLOCKED: another `livespec ui-runner converge` is already "
+                    f"running (pid {stale_pid}). Wait for it to finish or kill it.",
+                    err=True,
+                )
+                raise typer.Exit(code=2)
+        if stale_pid <= 0:
+            typer.echo(
+                "Removing stale converge.lock from a previous crashed run.",
+                err=True,
+            )
+            lock_file.unlink(missing_ok=True)
+    lock_file.write_text(f"{os.getpid()}:{int(time.time())}", encoding="utf-8")
+
+    try:
+        _converge_loop(
+            project_path=project_path,
+            feature_path=feature_path,
+            bundles_dir=bundles_dir,
+            screens=screens,
+            max_iterations=max_iterations,
+        )
+    finally:
+        lock_file.unlink(missing_ok=True)
+
+
+def _converge_loop(
+    *,
+    project_path: Path,
+    feature_path: Path,
+    bundles_dir: Path,
+    screens: list[str],
+    max_iterations: int,
+) -> None:
+    """Inner converge loop, extracted so the outer command can hold a lockfile."""
+    import sys
+
+    from validator.ui_runner_dispatcher import Phase4_5Dispatcher
+    from validator.ui_runner_inspect import (
+        extract_screen_trees,
+        parse_tree_elements,
+        rewrite_swift_candidates,
+    )
+
+    for iteration in range(1, max_iterations + 1):
+        typer.echo(f"\n--- Iteration {iteration}/{max_iterations} ---")
+        sys.stdout.flush()
+        typer.echo(
+            f"  Dispatching {len(screens)} screen(s) "
+            f"(first iter can take 5-15 min on cold build)..."
+        )
+        sys.stdout.flush()
+
+        # 1. Dispatch
+        results = Phase4_5Dispatcher(
+            project_dir=project_path,
+            feature_dir=feature_path,
+        ).run(screens)
+        for r in results:
+            typer.echo(
+                f"  [{r.surface_id}] {r.screen}: "
+                f"{_normalize_dispatch_status(r.status)}"
+                + (f" — {r.error[:80]}" if r.error else "")
+            )
+        sys.stdout.flush()
+
+        # 2. Patch each surface's Swift file from its persisted .xcresult
+        total_patched = 0
+        if not bundles_dir.exists():
+            typer.echo("  No .xcresult bundles produced — nothing to inspect.")
+            raise typer.Exit(code=2)
+
+        for bundle in bundles_dir.glob("*.xcresult"):
+            test_target = bundle.stem  # e.g. "STRAPTUITests"
+            swift_dir = project_path / test_target
+            if not swift_dir.exists():
+                typer.echo(
+                    f"  ~ {test_target}: no matching Swift directory at {swift_dir}"
+                )
+                continue
+            swift_files = list(swift_dir.glob("*.swift"))
+            if not swift_files:
+                typer.echo(f"  ~ {test_target}: no .swift files in {swift_dir}")
+                continue
+
+            trees = extract_screen_trees(bundle)
+            if not trees:
+                typer.echo(f"  ~ {test_target}: no <screen>.tree.txt attachments")
+                continue
+            inventories = {
+                screen: parse_tree_elements(text) for screen, text in trees.items()
+            }
+            for swift_file in swift_files:
+                changed = rewrite_swift_candidates(swift_file, inventories)
+                total_patched += changed
+                typer.echo(
+                    f"  → {test_target}/{swift_file.name}: patched {changed} method(s)"
+                )
+
+        if total_patched == 0:
+            typer.echo(
+                f"\n✓ Converged after {iteration} iteration(s) — "
+                f"no more candidates to inject."
+            )
+            raise typer.Exit(code=0)
+
+    typer.echo(
+        f"\n✗ Did not converge after {max_iterations} iterations. "
+        "Some screens may be unreachable via current navigation; "
+        "inspect the .specs/.test-bundles/*.xcresult bundles manually.",
+        err=True,
+    )
+    raise typer.Exit(code=1)
+
+
+@ui_runner_app.command("scaffold")
+def scaffold_command(
+    target: str = typer.Option(
+        "ios",
+        "--target",
+        "-t",
+        help="Scaffold target: 'ios' (XCUITest) or 'android' (Maestro).",
+    ),
+    project_dir: str = typer.Option(
+        ".",
+        "--project-dir",
+        "-p",
+        help="Project root (default: cwd).",
+    ),
+    out_dir: str | None = typer.Option(
+        None,
+        "--out",
+        "-o",
+        help=(
+            "Override destination directory (defaults: <App>UITests/ for ios, "
+            ".specs/maestro/ for android)."
+        ),
+    ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        "-f",
+        help="Overwrite existing files.",
+    ),
+) -> None:
+    """Copy LiveSpec UI runner test templates into the current project.
+
+    Bridges the gap between `xcodebuild test` exit 0 and zero baseline emission:
+    the UITest target must call XCTAttachment(screenshot:) per screen identifier.
+    This command drops a working LSSampleUITests.swift into your UITests target
+    that demonstrates the pattern, including launchArguments wiring.
+
+    Args:
+        target: 'ios' (XCUITest) or 'android' (Maestro flow).
+        project_dir: Project root (default: cwd).
+        out_dir: Override destination directory.
+        force: Overwrite existing files.
+
+    Raises:
+        typer.Exit: With code 0 on success, 2 on missing template/destination conflicts.
+    """
+    project_path = Path(project_dir).resolve()
+    target_lower = target.lower()
+
+    # Locate the template directory inside the LiveSpec install. The CLI runs
+    # from the global install, so we resolve relative to this module.
+    livespec_root = Path(__file__).resolve().parents[2]
+    template_name = "xcuitest" if target_lower == "ios" else "maestro"
+    template_dir = (
+        livespec_root / "livespec" / "ui-runners" / f"{template_name}-template"
+    )
+
+    if not template_dir.exists():
+        typer.echo(
+            f"BLOCKED: template not found at {template_dir}. "
+            f"Re-run /spec.migrate or reinstall LiveSpec.",
+            err=True,
+        )
+        raise typer.Exit(code=2)
+
+    # Resolve destination
+    if out_dir is not None:
+        dest = (project_path / out_dir).resolve()
+    elif target_lower == "ios":
+        # Try common UITests directory naming
+        candidates = list(project_path.glob("*UITests"))
+        dest = candidates[0] if candidates else project_path / "UITests"
+    else:
+        dest = project_path / ".specs" / "maestro"
+
+    dest.mkdir(parents=True, exist_ok=True)
+
+    copied: list[str] = []
+    skipped: list[str] = []
+    for src in template_dir.iterdir():
+        if src.is_dir():
+            continue
+        target_file = dest / src.name
+        if target_file.exists() and not force:
+            skipped.append(str(target_file.relative_to(project_path)))
+            continue
+        target_file.write_bytes(src.read_bytes())
+        copied.append(str(target_file.relative_to(project_path)))
+
+    typer.echo(f"Scaffolded {target_lower} runner template into {dest.relative_to(project_path)}/")
+    for path in copied:
+        typer.echo(f"  + {path}")
+    for path in skipped:
+        typer.echo(f"  ~ {path} (already exists, use --force to overwrite)", err=True)
+
+    if target_lower == "ios" and copied:
+        typer.echo(
+            "\nNext: add LSSampleUITests.swift to your UITests target in Xcode "
+            "(File > Add Files to \"<project>\"...), share the test scheme "
+            "(Product > Scheme > Manage Schemes > tick 'Shared'), then re-run "
+            "`livespec ui-runner dispatch`."
+        )
 
 
 def _serialize_results(results: list[VisualPhaseResult]) -> list[DispatchPayload]:

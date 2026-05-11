@@ -14,10 +14,15 @@
 // @spec FR-001: iOS/watchOS surface detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
 // @spec FR-001: Android/Maestro surface detection — .specs/features/031-ui-runner-android/spec.md#fr-001
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { basename, join } from "path";
 import { fileURLToPath } from "url";
 // @spec FR-004: Xcode test target enumeration — .specs/features/037-test-multi-runner-integration/spec.md#fr-004
-import { enumerateAndFallback, kebabize } from "./lib/pbxproj.js";
+import {
+	enumerateAndFallback,
+	kebabize,
+	listSharedSchemes,
+	pickSchemeForPlatform,
+} from "./lib/pbxproj.js";
 
 const SURFACES_CONFIG = ".specs/surfaces.yaml";
 
@@ -94,6 +99,53 @@ export function findXcodeProjectDir(dir) {
 		// fall through
 	}
 	return null;
+}
+
+// @spec FR-001: runnerConfig wiring — .specs/features/038-runner-config-wiring/spec.md#fr-001
+/**
+ * Build the runnerConfig payload for an xcuitest surface so the dispatcher can
+ * pass `-scheme`/`-project`/`-destination` to xcodebuild without filesystem
+ * introspection at runtime.
+ *
+ * @param {string} xcodeprojDir      Absolute path to the .xcodeproj directory
+ * @param {"ios"|"watchos"|undefined} platform
+ * @returns {Record<string, string> | null}
+ */
+export function buildXcuitestRunnerConfig(xcodeprojDir, platform, testTargetName) {
+	if (!xcodeprojDir) return null;
+	// xcodebuild runs with cwd = surface.path, so -project must be the project
+	// name relative to that directory (just the basename, not the full repo path).
+	const projectPath = basename(xcodeprojDir);
+	const schemes = listSharedSchemes(xcodeprojDir);
+	const scheme = pickSchemeForPlatform(schemes, platform);
+	// Do NOT hardcode a specific simulator name (e.g. "iPhone 16") — runtimes
+	// vary across machines (iPhone 16 not installed on iOS 26+ hosts). The
+	// XCUITestRunnerHandler auto-detects the first available simulator at
+	// runtime via `xcrun simctl list devices --json`. We only emit `platform`
+	// so the handler picks the correct family (iOS vs watchOS).
+	const config = { project: projectPath };
+	if (platform) config.platform = platform;
+	if (scheme) config.scheme = scheme;
+	// onlyTesting restricts xcodebuild to a single test bundle. Required when
+	// the scheme has multiple test targets across platforms (iOS UITests +
+	// watchOS UITests in the same scheme): otherwise xcodebuild builds and
+	// tries to run the wrong-platform bundles, which fails.
+	if (testTargetName) config.onlyTesting = testTargetName;
+	return config;
+}
+
+/**
+ * Build the runnerConfig payload for a maestro surface so the dispatcher can
+ * propagate AVD selection without re-detecting the layout at runtime.
+ *
+ * @param {string} flowsDir
+ * @returns {Record<string, string>}
+ */
+export function buildMaestroRunnerConfig(flowsDir) {
+	return {
+		flowsDir,
+		platform: "android",
+	};
 }
 
 // @spec FR-001: Android/Maestro surface detection — .specs/features/031-ui-runner-android/spec.md#fr-001
@@ -387,6 +439,7 @@ export function detectSurfaces() {
 									runner: "xcuitest",
 									platform: t.platform,
 									kind: t.kind,
+									runnerConfig: buildXcuitestRunnerConfig(xcodeprojDir, t.platform),
 								});
 							}
 						} else if (xcodeprojDir) {
@@ -403,6 +456,7 @@ export function detectSurfaces() {
 								testDir: join(appPath, "UITests"),
 								runner: "xcuitest",
 								platform: "ios",
+								runnerConfig: buildXcuitestRunnerConfig(xcodeprojDir, "ios"),
 							});
 						} else {
 							surfaces.push({
@@ -426,6 +480,7 @@ export function detectSurfaces() {
 							testDir: maestroDir,
 							runner: "maestro",
 							platform: "android",
+							runnerConfig: buildMaestroRunnerConfig(maestroDir),
 						});
 					} else {
 						surfaces.push(
@@ -514,7 +569,23 @@ export function detectSurfaces() {
 				console.warn(`WARNING: ${warning}`);
 			}
 			if (result.targets.length > 0) {
-				for (const target of result.targets) {
+				// Only UI-testing bundles capture screenshots; unit-test bundles
+				// can't run XCUIScreen.main.screenshot(). Filter so visual surfaces
+				// stay actionable for the dispatcher.
+				const uiTargets = result.targets.filter((t) => t.kind === "ui");
+				const skipped = result.targets.filter((t) => t.kind !== "ui");
+				for (const t of skipped) {
+					console.warn(
+						`Skipping ${t.name} (kind=${t.kind}) — only UI Testing Bundles emit visual baselines`,
+					);
+				}
+				if (uiTargets.length === 0) {
+					console.warn(
+						"WARNING: project has test targets but none are UI Testing Bundles. " +
+							"Run `livespec ui-runner scaffold --target ios` and create a UI Testing Bundle in Xcode.",
+					);
+				}
+				for (const target of uiTargets) {
 					surfaces.push({
 						id: kebabize(target.name),
 						name: target.name,
@@ -523,6 +594,11 @@ export function detectSurfaces() {
 						runner: "xcuitest",
 						platform: target.platform,
 						kind: target.kind,
+						runnerConfig: buildXcuitestRunnerConfig(
+							xcodeprojDir,
+							target.platform,
+							target.name,
+						),
 					});
 				}
 			} else {
@@ -539,6 +615,7 @@ export function detectSurfaces() {
 					testDir: "UITests",
 					runner: "xcuitest",
 					platform: "ios",
+					runnerConfig: buildXcuitestRunnerConfig(xcodeprojDir, "ios"),
 				});
 			}
 		} else {
@@ -565,6 +642,7 @@ export function detectSurfaces() {
 			testDir: maestroDir,
 			runner: "maestro",
 			platform: "android",
+			runnerConfig: buildMaestroRunnerConfig(maestroDir),
 		});
 	}
 
@@ -587,6 +665,19 @@ export function toYaml(surfaces) {
 	return `${lines.join("\n")}\n`;
 }
 
+/**
+ * Quote a YAML scalar when it contains characters that confuse the parser
+ * (commas, colons, equals, brackets). Identifiers and bare paths are emitted
+ * verbatim so existing diffs stay stable.
+ */
+function yamlScalar(value) {
+	const str = String(value);
+	if (/[:,={}\[\]#&*!|>'"%@`]/.test(str) || /\s/.test(str)) {
+		return `"${str.replace(/"/g, '\\"')}"`;
+	}
+	return str;
+}
+
 function surfaceToYamlLines(surface) {
 	const lines = [];
 	lines.push(`  - id: ${surface.id}`);
@@ -597,8 +688,21 @@ function surfaceToYamlLines(surface) {
 	if (surface.platform) {
 		lines.push(`    platform: ${surface.platform}`);
 	}
-	if (surface.runnerConfig) {
-		lines.push(`    runnerConfig: ${surface.runnerConfig}`);
+	if (surface.runnerConfig != null) {
+		if (typeof surface.runnerConfig === "string") {
+			// Legacy form: runnerConfig is a single value (e.g. playwright config path).
+			lines.push(`    runnerConfig: ${surface.runnerConfig}`);
+		} else if (typeof surface.runnerConfig === "object") {
+			// Structured form: emit a nested map so xcodebuild/maestro flags survive
+			// the YAML round-trip into the dispatcher.
+			const keys = Object.keys(surface.runnerConfig);
+			if (keys.length > 0) {
+				lines.push("    runnerConfig:");
+				for (const key of keys) {
+					lines.push(`      ${key}: ${yamlScalar(surface.runnerConfig[key])}`);
+				}
+			}
+		}
 	}
 	return lines;
 }

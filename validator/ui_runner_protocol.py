@@ -11,7 +11,7 @@ backend (Playwright web, XCUITest iOS/watchOS, Maestro Android).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from validator.ui_runner_web import UICapabilityResult
 
@@ -38,11 +38,16 @@ class RunnerHandler(Protocol):
         """Return an actionable diagnostic when `detect()` is False."""
         ...
 
-    def capture_screenshot(self, screen: str) -> UICapabilityResult:
-        """Capture a single screenshot for the named screen."""
+    def capture_screenshot(self, screen: str, **kwargs: Any) -> UICapabilityResult:
+        """Capture a single screenshot for the named screen.
+
+        Concrete handlers accept additional runner-specific kwargs propagated
+        from `surfaces.yaml` runnerConfig (e.g. `test_scheme`, `destination`
+        for xcuitest; `avd_name`, `platform` for maestro).
+        """
         ...
 
-    def run_flow(self) -> UICapabilityResult:
+    def run_flow(self, **kwargs: Any) -> UICapabilityResult:
         """Run the handler's default end-to-end flow."""
         ...
 

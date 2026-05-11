@@ -421,7 +421,7 @@ def test_xcresult_attachment_extraction(handler: XCUITestRunnerHandler) -> None:
 
 
 def test_xcresult_parsing_png(tmp_path: Path) -> None:
-    """_parse_xcresult exports PNG attachments to the output directory."""
+    """_parse_xcresult exports PNG attachments via `xcresulttool export attachments`."""
     bundle_path = tmp_path / "result.xcresult"
     bundle_path.mkdir()
     output_dir = tmp_path / "output"
@@ -429,11 +429,8 @@ def test_xcresult_parsing_png(tmp_path: Path) -> None:
     def mock_run(cmd, *args, **kwargs):
         joined = " ".join(str(c) for c in cmd)
         mock = MagicMock()
-        if "xcresulttool" in joined and "get" in joined:
-            mock.returncode = 0
-            mock.stdout = json.dumps(_XCRESULT_JSON_PNG)
-        elif "xcresulttool" in joined and "export" in joined:
-            # Create a fake PNG in the output-path directory
+        if "xcresulttool" in joined and "export" in joined and "attachments" in joined:
+            # New Xcode 26 API: writes attachments + manifest.json into output-path
             import os
             out_path = None
             for i, arg in enumerate(cmd):
@@ -442,7 +439,20 @@ def test_xcresult_parsing_png(tmp_path: Path) -> None:
                     break
             if out_path:
                 os.makedirs(out_path, exist_ok=True)
-                (Path(out_path) / "main_screen.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+                (Path(out_path) / "abc-uuid.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+                manifest = [{
+                    "testIdentifier": "Tests/test_main()",
+                    "attachments": [{
+                        "exportedFileName": "abc-uuid.png",
+                        "suggestedHumanReadableName": (
+                            "main_screen_0_"
+                            "12345678-90AB-CDEF-1234-567890ABCDEF.png"
+                        ),
+                    }],
+                }]
+                (Path(out_path) / "manifest.json").write_text(
+                    json.dumps(manifest)
+                )
             mock.returncode = 0
             mock.stdout = ""
         else:
@@ -457,6 +467,8 @@ def test_xcresult_parsing_png(tmp_path: Path) -> None:
 
     assert len(paths) >= 1
     assert all(p.suffix == ".png" for p in paths)
+    # Screen name was recovered from suggestedHumanReadableName.
+    assert paths[0].name == "main_screen.png"
 
 
 def test_xcresult_corrupted_bundle_no_crash(tmp_path: Path) -> None:
@@ -490,22 +502,13 @@ def test_xcresult_heic_conversion(tmp_path: Path) -> None:
     bundle_path.mkdir()
     output_dir = tmp_path / "output"
 
-    heic_data = {
-        "_type": {"_name": "ActionTestAttachment"},
-        "name": {"_value": "watch_screen"},
-        "uniformTypeIdentifier": {"_value": "public.heic"},
-        "payloadRef": {"id": {"_value": "heic-payload-001"}},
-    }
-
     sips_called = []
 
     def mock_run(cmd, *args, **kwargs):
         joined = " ".join(str(c) for c in cmd)
         mock = MagicMock()
-        if "xcresulttool" in joined and "get" in joined:
-            mock.returncode = 0
-            mock.stdout = json.dumps(heic_data)
-        elif "xcresulttool" in joined and "export" in joined:
+        if "xcresulttool" in joined and "export" in joined and "attachments" in joined:
+            # New Xcode 26 API: writes a HEIC + manifest.json into output-path
             import os
             out_path = None
             for i, arg in enumerate(cmd):
@@ -514,12 +517,24 @@ def test_xcresult_heic_conversion(tmp_path: Path) -> None:
                     break
             if out_path:
                 os.makedirs(out_path, exist_ok=True)
-                (Path(out_path) / "watch_screen.heic").write_bytes(b"ftyp")  # fake HEIC
+                (Path(out_path) / "heic-uuid.heic").write_bytes(b"ftyp")
+                manifest = [{
+                    "testIdentifier": "Tests/test_watch()",
+                    "attachments": [{
+                        "exportedFileName": "heic-uuid.heic",
+                        "suggestedHumanReadableName": (
+                            "watch_screen_0_"
+                            "12345678-90AB-CDEF-1234-567890ABCDEF.heic"
+                        ),
+                    }],
+                }]
+                (Path(out_path) / "manifest.json").write_text(
+                    json.dumps(manifest)
+                )
             mock.returncode = 0
             mock.stdout = ""
         elif "sips" in joined:
             sips_called.append(cmd)
-            # Simulate sips creating the PNG
             for i, arg in enumerate(cmd):
                 if arg == "--out" and i + 1 < len(cmd):
                     Path(cmd[i + 1]).write_bytes(b"\x89PNG\r\n\x1a\n")
