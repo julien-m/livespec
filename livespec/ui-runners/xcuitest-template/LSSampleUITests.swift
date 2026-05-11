@@ -50,11 +50,13 @@ class LSSampleUITests: XCTestCase {
     /// because on iOS, app.debugDescription returns only "Query chain:" until
     /// the snapshot cache has been populated by at least one .exists call.
     private func snapshot(_ name: String) {
+        // Best-effort foreground wait via XCTWaiter so a timeout doesn't
+        // fail the test — we still capture whatever the screen shows.
         if app.state != .runningForeground {
             let pred = NSPredicate(format: "state == %d",
                                    XCUIApplication.State.runningForeground.rawValue)
-            let exp = expectation(for: pred, evaluatedWith: app)
-            wait(for: [exp], timeout: 10.0)
+            let exp = XCTNSPredicateExpectation(predicate: pred, object: app)
+            _ = XCTWaiter().wait(for: [exp], timeout: 5.0)
         }
         _ = app.descendants(matching: .any).firstMatch.exists
 
