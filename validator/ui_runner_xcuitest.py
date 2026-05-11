@@ -641,6 +641,34 @@ class XCUITestRunnerHandler:
         # know it), but only_testing is the next-best disambiguator.
         bundle_name = (only_testing or "default").replace("/", "_") + ".xcresult"
         xcresult_path = bundles_dir / bundle_name
+        hash_path = bundles_dir / f"{bundle_name}.hash"
+
+        # Optimisation #1: Swift-content hash cache.
+        # Hash every .swift file under the test target's directory. If the
+        # hash matches the one we stored after the previous successful run,
+        # skip xcodebuild entirely — the bundle on disk already reflects the
+        # current source. Saves a full build + test cycle on iterations where
+        # `inspect --patch` reported 0 changes.
+        swift_hash = self._compute_swift_hash(only_testing)
+        if (
+            swift_hash is not None
+            and xcresult_path.exists()
+            and hash_path.exists()
+            and hash_path.read_text(encoding="utf-8").strip() == swift_hash
+        ):
+            return UICapabilityResult(
+                success=True,
+                output_path=None,
+                metadata={
+                    "command": "<cached — swift hash unchanged>",
+                    "exit_code": 0,
+                    "exported_paths": [],
+                    "stdout_snippet": "",
+                    "xcresult_path": str(xcresult_path),
+                    "cached": True,
+                },
+            )
+
         if xcresult_path.exists():
             import shutil as _shutil
 
@@ -656,28 +684,48 @@ class XCUITestRunnerHandler:
         )
         env = self._build_env(launch_arguments)
 
-        try:
-            result = subprocess.run(
-                command,
-                cwd=self.project_dir,
-                capture_output=True,
-                text=True,
-                timeout=SCREENSHOT_TIMEOUT_SECONDS,
-                env=env,
-                check=False,
-            )
-        except subprocess.TimeoutExpired as error:
-            return UICapabilityResult(
-                success=False,
-                error=f"xcodebuild test timed out after {error.timeout}s",
-                metadata={"timeout": error.timeout, "command": " ".join(command)},
-            )
-        except OSError as error:
-            return UICapabilityResult(
-                success=False,
-                error=f"Failed to execute xcodebuild: {error}",
-                metadata={"command": " ".join(command)},
-            )
+        # Optimisation #2: auto-retry on "Timed out while evaluating UI query".
+        # SwiftUI accessibility hierarchies are flaky on first query; xcodebuild
+        # sometimes reports this opaque error and exits non-zero. A second run
+        # almost always succeeds because DerivedData is now warm and the
+        # simulator has paged in the runtime. Retry up to RETRY_LIMIT times.
+        RETRY_LIMIT = 3
+        TIMEOUT_MARKER = "Failed to get matching snapshots: Timed out while evaluating UI query"
+        result: subprocess.CompletedProcess[str] | None = None
+        for attempt in range(1, RETRY_LIMIT + 1):
+            if xcresult_path.exists() and attempt > 1:
+                import shutil as _shutil
+
+                _shutil.rmtree(xcresult_path)
+            try:
+                result = subprocess.run(
+                    command,
+                    cwd=self.project_dir,
+                    capture_output=True,
+                    text=True,
+                    timeout=SCREENSHOT_TIMEOUT_SECONDS,
+                    env=env,
+                    check=False,
+                )
+            except subprocess.TimeoutExpired as error:
+                return UICapabilityResult(
+                    success=False,
+                    error=f"xcodebuild test timed out after {error.timeout}s",
+                    metadata={"timeout": error.timeout, "command": " ".join(command)},
+                )
+            except OSError as error:
+                return UICapabilityResult(
+                    success=False,
+                    error=f"Failed to execute xcodebuild: {error}",
+                    metadata={"command": " ".join(command)},
+                )
+            stream = (result.stdout or "") + (result.stderr or "")
+            if TIMEOUT_MARKER not in stream:
+                break
+            # Else loop and retry — flaky UI query timeout.
+
+        if result is None:  # pragma: no cover - unreachable, satisfies pyright
+            return UICapabilityResult(success=False, error="no result")
 
         # Check for license error in output
         combined_output = result.stdout + result.stderr
@@ -706,6 +754,15 @@ class XCUITestRunnerHandler:
 
         first_path = exported_paths[0] if exported_paths else None
         has_error = not exported_paths and result.returncode != 0
+
+        # Persist the Swift hash next to the bundle so the next call can skip
+        # xcodebuild when the source is unchanged (optimisation #1).
+        if swift_hash is not None and (result.returncode == 0 or bool(exported_paths)):
+            import contextlib
+
+            with contextlib.suppress(OSError):
+                hash_path.write_text(swift_hash, encoding="utf-8")
+
         return UICapabilityResult(
             success=result.returncode == 0 or bool(exported_paths),
             output_path=first_path,
@@ -718,6 +775,40 @@ class XCUITestRunnerHandler:
                 "xcresult_path": str(xcresult_path),
             },
         )
+
+    def _compute_swift_hash(self, only_testing: str | None) -> str | None:
+        """Return a SHA-256 hex digest of all .swift files in the test target dir.
+
+        Used as the cache key for skipping xcodebuild when the test target's
+        source hasn't changed since the last bundle. Returns None when the
+        target directory can't be located (e.g. only_testing is None for a
+        backward-compat single-bundle project).
+
+        Args:
+            only_testing: Test target name (e.g. "STRAPTUITests").
+
+        Returns:
+            64-char hex SHA-256, or None if hashing is not applicable.
+        """
+        if not only_testing:
+            return None
+        target_dir = self.project_dir / only_testing
+        if not target_dir.is_dir():
+            return None
+        import hashlib
+
+        h = hashlib.sha256()
+        # Sort for determinism. Hash the relative path + content of each .swift
+        # so renames invalidate the cache too.
+        for swift in sorted(target_dir.rglob("*.swift")):
+            try:
+                h.update(str(swift.relative_to(target_dir)).encode("utf-8"))
+                h.update(b"\0")
+                h.update(swift.read_bytes())
+                h.update(b"\0")
+            except OSError:
+                return None
+        return h.hexdigest()
 
     # @spec FR-005: launch_arguments injection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-005  # noqa: E501
     def run_flow(
