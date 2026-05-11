@@ -734,13 +734,24 @@ class XCUITestRunnerHandler:
             and hash_path.exists()
             and hash_path.read_text(encoding="utf-8").strip() == swift_hash
         ):
+            # Cache hit: skip xcodebuild but STILL extract attachments from
+            # the existing bundle. Otherwise we'd return success with
+            # exported_paths=[], leaving the .specs/design/screens/<dest>/
+            # directory empty on repeat runs.
+            destination_id = destination.replace("=", "_").replace(
+                ",", "_"
+            ).replace(" ", "_")
+            cached_output_dir = self.project_dir / ".specs" / "design" / "screens"
+            cached_paths = self._parse_xcresult(
+                xcresult_path, cached_output_dir, destination_id
+            )
             return UICapabilityResult(
                 success=True,
-                output_path=None,
+                output_path=cached_paths[0] if cached_paths else None,
                 metadata={
                     "command": "<cached — swift hash unchanged>",
                     "exit_code": 0,
-                    "exported_paths": [],
+                    "exported_paths": [str(p) for p in cached_paths],
                     "stdout_snippet": "",
                     "xcresult_path": str(xcresult_path),
                     "cached": True,
