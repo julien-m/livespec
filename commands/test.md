@@ -431,6 +431,28 @@ For each test, map back to the AC it covers:
 - Playwright (or resolved visual tool) is available
 - `--no-visual` is NOT set
 
+### Selecting `dispatch` vs `converge`
+
+Before dispatching, inspect the rows in `.specs/surfaces.yaml`:
+
+  - **All surfaces are `playwright`** → use `livespec ui-runner dispatch`. Web
+    snapshots are deterministic on the first run; the iterative patch loop
+    adds no value.
+  - **Any surface is `xcuitest` or `maestro`** → use
+    `livespec ui-runner converge --all` (or `--feature <slug>` when this
+    `/spec.test` invocation is feature-scoped). Native runners need the
+    candidate-list patching loop because `tapFirstAvailable` / `tapAnyTab`
+    placeholders rarely match on the first iteration.
+
+`converge --all` auto-discovers every screen across features with status
+`Implemented` or `In Progress` by parsing `## Screens` tables (and bullet
+lists). The user never has to enumerate screen identifiers or
+`--feature-dir` paths — that's the zero-argument workflow.
+
+When `/spec.test` is invoked at the feature level (the common path), call
+`converge --feature <slug>` instead of `--all` so the loop is scoped to
+that feature's screens.
+
 ### Runner-aware dispatcher (Feature 037)
 
 <!-- @spec FR-001, FR-002, FR-014: Phase 4.5 dispatcher — .specs/features/037-test-multi-runner-integration/spec.md#fr-001 -->
@@ -864,7 +886,7 @@ When multiple features are tested in a single run, display after all individual 
 | `--audit-only` | `-a` | Only audit coverage (Phases 0-1), don't generate or execute |
 | `--no-generate` | `-G` | Execute existing tests but don't generate missing ones. Skips Phase 3 (AC test generation) and Phase 4.5.1 (visual test file generation) |
 | `--no-visual` | `-V` | Skip visual baseline capture and design fidelity check |
-| `--visual` | | **Opt-in**: run only Phase 4.5 (visual) skipping suite execution. Mutually exclusive with `--no-visual` (combining them exits with code 2 and message "--visual and --no-visual are mutually exclusive"). Routes each surface in `.specs/surfaces.yaml` to its handler via the `livespec ui-runner check` / `livespec ui-runner dispatch` CLI (Phase 4.5 dispatcher). |
+| `--visual` | | **Opt-in**: run only Phase 4.5 (visual) skipping suite execution. Mutually exclusive with `--no-visual` (combining them exits with code 2 and message "--visual and --no-visual are mutually exclusive"). Routes each surface in `.specs/surfaces.yaml` to its handler via the `livespec ui-runner check` CLI. Surface dispatch path is chosen by runner type: `playwright` → `livespec ui-runner dispatch` (one-shot); `xcuitest` / `maestro` → `livespec ui-runner converge --all` (or `--feature <slug>` when scoped) to auto-discover screens from `spec.md ## Screens` tables and iteratively patch Swift candidate lists until stable. No screen identifiers or `--feature-dir` arguments need to be supplied by the caller. |
 | `--all` | `-A` | Test all features with status `Implemented` or `In Progress` |
 | `--auto` | | No confirmation prompts (for `/spec.feature` Phase 3.5 and `/spec.ship` integration) |
 | `--update` | `-u` | Auto-update `implementation.md` without asking |
