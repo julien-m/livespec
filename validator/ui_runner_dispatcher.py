@@ -345,11 +345,13 @@ class Phase4_5Dispatcher:
                 if isinstance(exported_paths_raw, list)
                 else []
             )
+            cached = bool(outcome.metadata.get("cached")) if outcome.metadata else False
             empty_attachments = (
                 outcome.success
                 and outcome.output_path is None
                 and surface.runner == "xcuitest"
                 and len(exported_paths) == 0
+                and not cached
             )
             if empty_attachments:
                 status = "blocked"
