@@ -190,10 +190,18 @@ def test_ui_runner_converge_requires_screens(tmp_path: Path) -> None:
 
 
 def test_ui_runner_converge_help_lists_max_iterations() -> None:
-    """converge --help mentions --max-iterations to make the loop discoverable."""
+    """converge --help mentions --max-iterations to make the loop discoverable.
+
+    Strip ANSI escape codes before asserting — rich/typer renders coloured
+    output on CI runners (TTY heuristic differs from local), which fragments
+    the flag name across the rendered string.
+    """
+    import re
+
     result = runner.invoke(app, ["ui-runner", "converge", "--help"])
     assert result.exit_code == 0
-    assert "--max-iterations" in result.stdout or "max-iterations" in result.stdout
+    cleaned = re.sub(r"\x1b\[[0-9;]*m", "", result.stdout)
+    assert "max-iterations" in cleaned
 
 
 # --------------------------------------------------------------------------
