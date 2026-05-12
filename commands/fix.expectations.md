@@ -96,3 +96,51 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.fix <feature>
+> Reading checks/<date>.md → 3 issues
+> Issue 1/3: visual drift on <screen> → re-rendering component
+> Issue 2/3: missing @spec anchor on src/api/foo.ts:45
+> Issue 3/3: unmapped FR-008 → added stub test
+> All issues addressed — re-run /spec.check to verify
+exit 0
+```
+
+### Files Produced
+
+```
+src/<modified files>
+tests/<new or modified tests>
+.specs/features/<feature>/implementation.md   # anchors refreshed
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** every issue from the gap report has a corresponding patch; re-running /spec.check returns 0. Exit 0.
+- **Drift:** some issues could not be auto-fixed; the report lists them as `manual`. Exit 1.
+- **Missing:** no gap report under `.specs/features/<feature>/checks/`. Exit 2 with recovery `/spec.check first`.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Few small issues | 30–90s | LLM call count |
+| Visual drift (multi-screen) | 60–300s | re-render cost |
+| Many structural issues | 120–600s | per-issue patch loop |
+
+### Edge Cases
+
+- `--dry-run`: shows the patch plan without writing files.
+- Visual fix needs a design mockup change: fix flags it as `manual — update design source`.
+- Auto-fix produces a regression in another test: fix rolls back and surfaces the conflict.
+
+### Post-run Actions
+
+- **On success:** re-run `/spec.check <feature>` to confirm zero gaps.
+- **On drift:** address the `manual` issues by hand, re-run `/spec.fix`.
+- **On blocked:** run `/spec.check <feature>` to generate the gap report.

@@ -108,3 +108,52 @@ verify:
     - contains: "Traceback"
     - contains: "TBD"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.specify "Add filter chips to search results"
+> Detected scope: M · Stories: 3 (P1 × 2, P2 × 1)
+> Drafting spec.md (9 AC, 11 FR)
+> Wrote .specs/features/<feature>/spec.md
+> Updated .specs/roadmap.md (checked the matching item)
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/features/<feature>/
+├── spec.md                # user stories + AC + FR + Mermaid flowcharts
+└── changelog.md           # first entry "spec: add <feature>"
+.specs/roadmap.md          # roadmap item checked
+.specs/changelog.md        # summary line appended
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** spec.md exists with Gherkin + Mermaid for every story, ACs numbered, FRs mapped. Exit 0.
+- **Drift:** spec contains `[NEEDS CLARIFICATION]` markers > 3, or a story lacks Gherkin. Exit 1 with the gap report.
+- **Missing:** `.specs/project.md` not found. Exit 2 with recovery `Run /spec.init first`.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Small spec (1 story) | 30–60s | LLM latency |
+| Medium spec (3 stories) | 60–180s | story expansion |
+| Large spec (5+ stories + ER) | 180–300s | diagram generation |
+
+### Edge Cases
+
+- Description references a feature that overlaps an existing one: spec.specify proposes a split and writes a `seed.md` for each sub-feature.
+- LLM emits Mermaid syntax errors: spec.specify retries once, then fails with the malformed block highlighted.
+- Roadmap already has a matching item: it gets checked and linked to the new feature folder.
+
+### Post-run Actions
+
+- **On success:** run `/spec.plan <feature>` next.
+- **On drift:** open spec.md, resolve `[NEEDS CLARIFICATION]`, re-run with `--refine`.
+- **On blocked:** run `/spec.init`, then retry.

@@ -96,3 +96,51 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.migrate
+> Current project version: v2 · LiveSpec repo version: v9
+> Migrations to apply: 7 (v3 → v9)
+> Applying v3: rename .specs/specs/ → .specs/features/
+> ... (steps 2-6 elided)
+> Applying v9: write .specs/surfaces.yaml
+> All migrations applied successfully
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/livespec-version       # bumped to the latest version
+.specs/<various artifacts>    # per migration
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** every migration applied, livespec-version matches repo VERSION, no manual fixups required. Exit 0.
+- **Drift:** a migration encountered conflicting custom edits and skipped the file; report names it. Exit 1.
+- **Missing:** `.specs/` not initialized. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| One migration | 1–5s | file count |
+| Multiple structural | 5–30s | rename volume |
+| Full v1 → v9 catch-up | 30–120s | feature count |
+
+### Edge Cases
+
+- `--dry-run`: print the migration plan without writing.
+- A migration fails mid-way: spec.migrate rolls back the partial step, leaves a clean state.
+- Custom hooks reference paths that the migration renamed: migrate updates the references.
+
+### Post-run Actions
+
+- **On success:** review the changelog entry, commit.
+- **On drift:** open the skipped file, apply the migration manually.
+- **On blocked:** run `/spec.init`.

@@ -41,7 +41,23 @@ REQUIRED_SECTIONS: tuple[str, ...] = (
     "10. Post-run Checks",
     "11. Troubleshooting",
     "12. Verify Contract",
+    "13. Demo Session",
 )
+
+# Required Section 13 sub-sections, in canonical order.
+# Each sub-section is identified by an h3 heading whose text contains the
+# canonical slug (case-insensitive substring match, leading "13.N " allowed).
+SECTION13_SUBSECTIONS: tuple[str, ...] = (
+    "Live Console Output",
+    "Files Produced",
+    "Aligned / Drift / Missing",
+    "Runtime Profile",
+    "Edge Cases",
+    "Post-run Actions",
+)
+
+# Minimum number of non-empty content lines per Section 13 sub-section.
+SECTION13_MIN_CONTENT_LINES: int = 3
 
 RULE_KINDS: frozenset[str] = frozenset(
     {"contains", "exists", "exit_code", "produces_artifact"}
@@ -88,6 +104,33 @@ class VerifyBlock:
 
 
 @dataclass(frozen=True)
+class DemoSession:
+    """Parsed Section 13 (Demo Session) — six required sub-sections.
+
+    @spec FR-003: Section 13 parser
+        .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-003
+    """
+
+    live_console_output: str
+    files_produced: str
+    aligned_drift_missing: str
+    runtime_profile: str
+    edge_cases: str
+    post_run_actions: str
+
+    def as_mapping(self) -> dict[str, str]:
+        """Return the sub-sections keyed by canonical sub-heading name."""
+        return {
+            "Live Console Output": self.live_console_output,
+            "Files Produced": self.files_produced,
+            "Aligned / Drift / Missing": self.aligned_drift_missing,
+            "Runtime Profile": self.runtime_profile,
+            "Edge Cases": self.edge_cases,
+            "Post-run Actions": self.post_run_actions,
+        }
+
+
+@dataclass(frozen=True)
 class ExpectationsFile:
     """Parsed expectations.md file."""
 
@@ -97,6 +140,7 @@ class ExpectationsFile:
     prose_sections: dict[str, str]
     verify: VerifyBlock
     source_path: Path
+    demo_session: DemoSession | None = None
 
 
 def parse_expectations(path: Path) -> ExpectationsFile:
@@ -117,6 +161,7 @@ def parse_expectations(path: Path) -> ExpectationsFile:
     _validate_frontmatter(path, frontmatter)
     sections = _extract_sections(path, body)
     verify = _extract_verify_block(path, sections["12. Verify Contract"])
+    demo_session = _extract_demo_session(path, sections["13. Demo Session"])
     return ExpectationsFile(
         command=str(frontmatter["command"]),
         contract_version=str(frontmatter["contract_version"]),
@@ -124,6 +169,7 @@ def parse_expectations(path: Path) -> ExpectationsFile:
         prose_sections=sections,
         verify=verify,
         source_path=path,
+        demo_session=demo_session,
     )
 
 
@@ -226,6 +272,16 @@ def _extract_sections(path: Path, body: str) -> dict[str, str]:
     found_titles = [m.group(1).strip() for m in matches]
     missing = [s for s in REQUIRED_SECTIONS if s not in found_titles]
     if missing:
+        # AC-008 mandates a precise message when Section 13 is the missing one.
+        # @spec AC-008: section 13 missing message —
+        #   .specs/features/040-expectations-rich-and-verify-preview/spec.md#ac-008
+        if missing == ["13. Demo Session"] or (
+            "13. Demo Session" in missing and len(missing) == 1
+        ):
+            raise ExpectationsInvalid(
+                str(path),
+                f"section 13 missing in {path.as_posix()}",
+            )
         raise ExpectationsInvalid(
             str(path),
             f"missing required section(s): {', '.join(missing)}",
@@ -352,9 +408,115 @@ def _resolve_rule_kind(
     )
 
 
+# ---------- Section 13 (Demo Session) parser ----------
+
+# Tolerant h3 heading regex: matches "### Foo", "### 13.1 Foo", "### 13.1. Foo".
+_H3_RE = re.compile(r"^###\s+(?:13\.\d+\.?\s+)?(.+?)\s*$", re.MULTILINE)
+
+
+def _normalize_subheading(text: str) -> str:
+    """Normalize a sub-heading for fuzzy matching against canonical names."""
+    return re.sub(r"[^a-z0-9 ]", "", text.strip().lower())
+
+
+def _match_subsection_slot(heading: str) -> str | None:
+    """Map a raw h3 heading to one of the 6 canonical Section 13 sub-section slots."""
+    normalized = _normalize_subheading(heading)
+    for canonical in SECTION13_SUBSECTIONS:
+        canonical_norm = _normalize_subheading(canonical)
+        if canonical_norm in normalized or normalized in canonical_norm:
+            return canonical
+    # Looser fallback: match on first significant word.
+    first_word = normalized.split(" ", 1)[0]
+    aliases = {
+        "live": "Live Console Output",
+        "console": "Live Console Output",
+        "files": "Files Produced",
+        "produced": "Files Produced",
+        "aligned": "Aligned / Drift / Missing",
+        "drift": "Aligned / Drift / Missing",
+        "missing": "Aligned / Drift / Missing",
+        "runtime": "Runtime Profile",
+        "scenarios": "Runtime Profile",
+        "edge": "Edge Cases",
+        "post": "Post-run Actions",
+        "postrun": "Post-run Actions",
+    }
+    return aliases.get(first_word)
+
+
+def _content_line_count(body: str) -> int:
+    """Count non-empty, non-comment, non-fence content lines."""
+    count = 0
+    for line in body.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("<!--") and stripped.endswith("-->"):
+            continue
+        if stripped == "```" or stripped.startswith("```"):
+            # Fence lines count as content (they prove an example block exists).
+            count += 1
+            continue
+        count += 1
+    return count
+
+
+def _extract_demo_session(path: Path, section_body: str) -> DemoSession:
+    """Parse Section 13 into the six required sub-sections.
+
+    @spec FR-003: Section 13 enforcement
+        .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-003
+    @spec AC-008: missing-section message
+        .specs/features/040-expectations-rich-and-verify-preview/spec.md#ac-008
+    @spec AC-009: empty-sub-section message
+        .specs/features/040-expectations-rich-and-verify-preview/spec.md#ac-009
+    """
+    matches = list(_H3_RE.finditer(section_body))
+    if not matches:
+        raise ExpectationsInvalid(
+            str(path),
+            "section 13 sub-section 'Live Console Output' is empty",
+        )
+
+    slots: dict[str, str] = {}
+    for i, m in enumerate(matches):
+        start = m.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(section_body)
+        slot = _match_subsection_slot(m.group(1))
+        if slot is None:
+            continue
+        body = section_body[start:end].strip()
+        slots[slot] = body
+
+    for canonical in SECTION13_SUBSECTIONS:
+        if canonical not in slots:
+            raise ExpectationsInvalid(
+                str(path),
+                f"section 13 sub-section '{canonical}' is empty",
+            )
+        if _content_line_count(slots[canonical]) < SECTION13_MIN_CONTENT_LINES:
+            raise ExpectationsInvalid(
+                str(path),
+                f"section 13 sub-section '{canonical}' is empty",
+            )
+
+    return DemoSession(
+        live_console_output=slots["Live Console Output"],
+        files_produced=slots["Files Produced"],
+        aligned_drift_missing=slots["Aligned / Drift / Missing"],
+        runtime_profile=slots["Runtime Profile"],
+        edge_cases=slots["Edge Cases"],
+        post_run_actions=slots["Post-run Actions"],
+    )
+
+
 __all__ = [
     "REQUIRED_SECTIONS",
     "RULE_KINDS",
+    "SECTION13_MIN_CONTENT_LINES",
+    "SECTION13_SUBSECTIONS",
+    "DemoSession",
     "ExpectationsFile",
     "Rule",
     "VerifyBlock",

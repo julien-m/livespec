@@ -105,3 +105,56 @@ verify:
       must:
         - contains: "Visual baselines"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.test <feature> --visual
+> Auditing AC coverage: <feature> has 12 ACs, 9 covered, 3 missing
+> Generating 3 missing scaffolds in apps/web/tests/e2e/<feature>/
+> Running 38 specs across 1 surface (web)
+> Visual: 13 baselines · 0 diff · 1 missing (<screen>)
+> AC coverage: 12/12 ✓  Visual: 12/13 ✗ (1 missing)
+exit 1
+```
+
+### Files Produced
+
+```
+apps/web/tests/e2e/<feature>/
+├── happy-path.spec.ts          # generated from AC-001..AC-003
+├── edge-cases.spec.ts          # generated from EC-001..EC-005
+└── visual.spec.ts              # screenshot grid
+.specs/features/<feature>/
+├── baselines/
+│   └── <screen>.png             # captured (if --update)
+└── checks/<date>-test.md        # AC coverage report
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** All AC scaffolded, all tests pass, visual diff 0 across all screens. Exit 0 with `Visual: N baselines · 0 diff`.
+- **Drift:** Some AC have no test (gap), or pixel diff exceeds threshold on a screen. Exit 1 with a per-AC and per-screen report.
+- **Missing:** No `<surface>` testDir configured, or no Playwright config detected. Exit 2 naming the surface and the recovery command.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Single surface, cached browsers | 20–60s | spec count |
+| Visual + screenshot capture | 60–180s | screen count |
+| Multi-surface (web + native) | 120–600s | converge cost |
+
+### Edge Cases
+
+- New screen mentioned in `spec.md` but missing PNG mockup: report flags `[no mockup]` and falls back to a layout-only baseline.
+- Driver in `--migrate` mode: tests are regenerated under the new naming convention; old `.skip` versions are kept until `--commit`.
+- `--regenerate-missing` invoked: only baselines absent on disk are captured; pre-existing baselines are NEVER overwritten without `--update`.
+
+### Post-run Actions
+
+- **On success:** commit baselines + checks file, push.
+- **On drift:** open the gap report, fix code or update spec; re-run with `--update` when ready to re-baseline.
+- **On blocked:** create the surface entry in `.specs/surfaces.yaml`, then re-run.

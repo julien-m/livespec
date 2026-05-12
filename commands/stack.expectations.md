@@ -99,3 +99,50 @@ verify:
       must:
         - contains: "ADR-"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.stack
+> Current stack: <stack>
+> Impact analysis: 3 files affected by your draft change
+> Drafting ADR-012-replace-pg-with-sqlite.md
+> Wrote .specs/stacks/decisions/ADR-012-*.md
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/stacks/decisions/ADR-NNN-*.md      # new ADR
+.specs/stacks/_default.md                  # updated if stack identity changed
+.specs/changelog.md                        # stack: ADR-NNN entry
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** ADR exists with Context, Decision, Consequences sections, stack rationale updated. Exit 0.
+- **Drift:** ADR missing one of the canonical sections. Exit 1.
+- **Missing:** `.specs/stacks/` directory not initialized. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Single ADR | 20–60s | LLM call |
+| ADR + impact analysis | 60–180s | repo scan |
+| ADR + propagation to features | 180–600s | feature touch count |
+
+### Edge Cases
+
+- Stack change affects existing features: spec.stack lists them and proposes `/spec.refine` to update each.
+- `--view`: read-only mode lists the current stack and ADRs without prompting changes.
+- ADR conflicts with a previous one: spec.stack surfaces the conflict for manual resolution.
+
+### Post-run Actions
+
+- **On success:** run `/spec.refresh-conventions` if the stack identity changed.
+- **On drift:** edit the ADR to add missing sections.
+- **On blocked:** run `/spec.init` first.

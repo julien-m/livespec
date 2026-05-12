@@ -95,3 +95,48 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.hooks plan
+> Resolved hooks for "plan":
+> [global] ~/.claude/livespec/hooks/before-plan.md
+> [project] .specs/hooks/before-plan.md
+> Mode: extend (chain executes both)
+exit 0
+```
+
+### Files Produced
+
+```
+(read-only — prints hook chain to stdout)
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** hook chain is printed with file paths and mode. Exit 0.
+- **Drift:** local hook declares `mode: override` but the same level lacks content. Exit 1 (validation).
+- **Missing:** the command name doesn't exist. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Single command resolution | 1–3s | filesystem only |
+| `--create` | 3–10s | template scaffold |
+| `--edit` | depends on editor | user time |
+
+### Edge Cases
+
+- `--create` on a level that already exists: hooks prompts before overwriting.
+- `mode: override` at local level: chain shortens to one entry; spec.hooks marks the chain explicitly.
+- Hook file is invalid YAML frontmatter: spec.hooks reports the parse error.
+
+### Post-run Actions
+
+- **On success:** review the chain; if customization is needed, run `--create local`.
+- **On drift:** fix the offending hook's frontmatter.
+- **On blocked:** verify the command spelling.

@@ -110,3 +110,50 @@ verify:
       must:
         - contains: "Plan Review"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.plan <feature>
+> Loaded spec.md (9 AC, 11 FR)
+> Drafting plan.md — 8 steps, 1 sequence diagram, 1 state diagram
+> Constitution check: PASS
+> Wrote .specs/features/<feature>/plan.md
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/features/<feature>/
+├── plan.md                # file-by-file plan, diagrams, testing strategy
+└── changelog.md           # entry "plan: draft <feature>"
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** plan.md has Technical Context, Constitution Check, sequence/state/ER diagrams as appropriate, and one step per FR. Exit 0.
+- **Drift:** Constitution Check missing or an FR is uncovered in the plan. Exit 1.
+- **Missing:** spec.md not found for the feature. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Small plan (3 steps) | 30–60s | LLM call count |
+| Medium plan (8 steps) | 60–180s | diagram drafting |
+| Plan with ER + state diagrams | 120–300s | entity count |
+
+### Edge Cases
+
+- Plan references libraries not in the stack: spec.plan warns and suggests adding an ADR.
+- `--no-contracts`: skips OpenAPI/GraphQL emission; useful when the feature exposes no API.
+- Plan exceeds 800 lines: spec.plan suggests splitting the feature.
+
+### Post-run Actions
+
+- **On success:** review plan.md, then run `/spec.implement <feature>`.
+- **On drift:** open the gap report, refine plan.md, re-run `--refine`.
+- **On blocked:** run `/spec.specify` first.

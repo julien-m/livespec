@@ -89,6 +89,47 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ demo --flag
+> step 1
+> step 2
+> step 3
+```
+
+### Files Produced
+
+- output.txt — sample output file
+- log.txt — execution log
+- summary.md — human summary
+
+### Aligned / Drift / Missing
+
+- Aligned: every must rule passes, exit 0.
+- Drift: a must rule fails, exit 1.
+- Missing: precondition absent, exit 2.
+
+### Runtime Profile (scenarios)
+
+- Cold run: 1-2 seconds.
+- Warm run: < 1 second.
+- Worst case: 5 seconds.
+
+### Edge Cases
+
+- Empty input: produces an empty output.
+- Malformed input: surfaces a clear error message.
+- Concurrent runs: serialized via lock file.
+
+### Post-run Actions
+
+- On success: review output.txt.
+- On drift: inspect log.txt then re-run.
+- On blocked: run setup script first.
 """
 
 

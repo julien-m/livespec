@@ -98,3 +98,49 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.propose
+> Reading project.md, roadmap.md, recent changelog
+> Top 3 suggestions:
+>   1. Add CSV export · Scope: M · Roles: backend
+>   2. Search by date range · Scope: S · Roles: frontend
+>   3. Audit log viewer · Scope: M · Roles: full-stack
+exit 0
+```
+
+### Files Produced
+
+```
+(read-only — prints suggestions; nothing written unless --append-roadmap)
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** ≥ 1 suggestion printed with name, scope, roles, deps. Exit 0.
+- **Drift:** roadmap already exhausts the obvious features; suggestions become speculative. Exit 0 (informational).
+- **Missing:** project.md absent. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Small project | 10–30s | LLM call |
+| Medium project | 30–90s | history scan |
+| Large project | 60–180s | doc depth |
+
+### Edge Cases
+
+- `--append-roadmap`: writes the top-N suggestions to roadmap.md MVP tier.
+- Roadmap already has a similar item: propose dedups and links to the existing line.
+- LLM rate-limited: propose retries once, then exits 1 with the rate-limit hint.
+
+### Post-run Actions
+
+- **On success:** run `/spec.specify "<chosen suggestion>"`.
+- **On drift:** ignore; propose is advisory.
+- **On blocked:** run `/spec.init`.

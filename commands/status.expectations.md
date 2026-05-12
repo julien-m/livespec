@@ -102,3 +102,47 @@ verify:
       must:
         - contains: '"features"'
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.status
+> Roadmap: 3 MVP · 5 Post-MVP · 2 Future · 1 Deferred
+> Features in progress: 2 (<feature>, <feature>)
+> Last activity: 2026-05-12 14:22 — impl: 040
+exit 0
+```
+
+### Files Produced
+
+```
+(read-only — prints summary to stdout)
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** summary lists tier counts, in-progress features, recent changelog. Exit 0.
+- **Drift:** spec.status detects a feature without a pipeline.md and flags it as orphan. Exit 0 (informational).
+- **Missing:** `.specs/` not initialized. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Small project | < 2s | file count |
+| Large project | 2–10s | feature folder count |
+| Project with logs | 5–20s | log aggregation |
+
+### Edge Cases
+
+- `--json`: emits a structured envelope for machine consumption.
+- Multiple features with overlapping branches: status lists them all with branch markers.
+- Roadmap has Deferred items: they appear in their own line, distinct from Future.
+
+### Post-run Actions
+
+- **On success:** decide which feature to advance next.
+- **On drift:** investigate the flagged orphan feature.
+- **On blocked:** run `/spec.init`.

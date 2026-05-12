@@ -110,3 +110,55 @@ verify:
       must:
         - contains: "Resuming"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.implement <feature>
+> Loaded plan.md — 8 steps queued
+> Step 1/8: src/api/csv-export.ts (create) — 42 lines
+> Step 2/8: tests/api/csv-export.test.ts — 6 tests PASS
+> ... (steps 3-7 elided)
+> Step 8/8: docs/exports.md (update) — 12 lines
+> All steps Done · 27 tests pass · implementation.md generated
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/features/<feature>/
+├── progress.md            # step-by-step checkpoint (MANDATORY)
+├── implementation.md      # FR/AC → file map with @spec anchors
+├── logs/<date>.md         # execution log (unless --no-save)
+└── changelog.md           # entry "impl: <feature>"
+src/<...> + tests/<...>    # code under each step
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** every step in progress.md is Done, implementation.md maps all FR/AC to anchors, all tests pass. Exit 0.
+- **Drift:** one step failed and was rolled back; progress.md shows it `Blocked` with reason. Exit 1.
+- **Missing:** plan.md not found, or preflight check failed. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Small (3 steps) | 2–5 min | step latency |
+| Medium (8 steps) | 5–20 min | test compile time |
+| Large (15+ steps) | 20–60 min | step orchestration |
+
+### Edge Cases
+
+- `--resume`: reads progress.md and continues at the first non-Done step.
+- `--step`: pauses between steps for manual validation.
+- A step's tests fail twice: implement stops, marks the step Blocked, surfaces the failing output.
+
+### Post-run Actions
+
+- **On success:** run `/spec.test <feature>` to lock visual baselines.
+- **On drift:** inspect progress.md, fix the failing step, re-run with `--resume`.
+- **On blocked:** run `/spec.plan` first, or unblock the preflight check.

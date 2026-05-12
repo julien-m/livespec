@@ -1,6 +1,6 @@
 ---
 description: "Verify a command's latest run artifact against its expectations contract"
-argument-hint: "<command> [--scenario flags] [--run <path>] [--json]"
+argument-hint: "<command> [--scenario flags] [--run <path>] [--json] [--preview] [--save]"
 ---
 
 <!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
@@ -17,7 +17,7 @@ argument-hint: "<command> [--scenario flags] [--run <path>] [--json]"
 
 ## Overview
 
-`/spec.verify-output <command> [--scenario "<flags>"] [--run <path>] [--json] [--feature <name>]`
+`/spec.verify-output <command> [--scenario "<flags>"] [--run <path>] [--json] [--feature <name>] [--preview [--save]]`
 
 Use cases:
 
@@ -25,6 +25,28 @@ Use cases:
 - Audit drift between expected stdout / FS effects / exit code and the
   actual run.
 - CI gate after running a slash-command.
+- **Preview** (`--preview`) — render Section 13 (Demo Session) of the
+  expectations file with the **current project's** real values substituted
+  for `<feature>`, `<screen>`, `<stack>` placeholders. No run artifact
+  required. Useful to know what a command will do **before** running it.
+
+### Triad workflow
+
+The canonical "test your LiveSpec commands like code" loop:
+
+1. `livespec verify-output --preview <cmd>` — see what the command will do on YOUR project.
+2. `livespec run wrap <cmd> -- <argv>` — run for real, capture an artifact.
+3. `livespec verify-output <cmd>` — verify reality matches the contract.
+
+### `--preview` and `--save`
+
+- `--preview` skips artifact resolution entirely; the renderer reads
+  `.specs/stacks/_default.md`, `.specs/features/`, `.specs/design/screens/`,
+  and `.conventions/manifest.yaml` to instantiate Section 13.
+- `--preview --save` additionally writes the rendered Markdown to
+  `.specs/.previews/<command>-<ISO-timestamp>.md`.
+- Section 13 is **mandatory**; a missing or empty sub-section blocks
+  preview with exit 2 and a canonical error message.
 
 ```mermaid
 flowchart LR
