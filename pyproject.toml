@@ -33,7 +33,7 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-asyncio_mode = "auto"
+testpaths = ["tests"]
 markers = [
     "level_3a: tests without LLM on static fixtures",
     "level_3b: tests with SDK isolated commands",

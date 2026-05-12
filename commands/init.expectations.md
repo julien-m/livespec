@@ -110,3 +110,58 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.init
+> Phase 1 — Project discovery: detecting language, framework, tests
+> Phase 2 — Stack proposal: <stack> (confidence: high)
+> Phase 3 — Brainstorm: 4 user-story candidates, 1 ADR draft
+> Wrote .specs/project.md, stacks/_default.md, roadmap.md, preflight.md
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/
+├── README.md                    # spec registry index
+├── spec-system.md               # universal rules (this project)
+├── constitution.md              # architecture principles
+├── project.md                   # vision, users, constraints
+├── roadmap.md                   # MVP / Post-MVP / Future
+├── stacks/_default.md           # chosen stack + rationale
+├── stacks/decisions/ADR-001-*.md
+├── testing/strategy.md
+├── preflight.md                 # preflight manifest
+└── preflight-report.md          # first run report
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** `.specs/` exists, project.md has real values, ADR-001 + stack rationale present, preflight-report.md verdict READY. Exit 0.
+- **Drift:** project.md still contains `[TBD]` placeholders, stack rationale empty, or no ADR generated despite stack choice. Exit 1 with a gap report.
+- **Missing:** Tooling preconditions failed (no git, no Python). Exit 2 with the missing tool name.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Fresh repo (small) | 60–180s | brainstorm rounds |
+| Existing codebase reverse-engineer | 180–600s | code scan size |
+| Large monorepo | 300–900s | feature inference |
+
+### Edge Cases
+
+- Repo already contains a stale `.specs/` from a previous version: `/spec.migrate` is suggested before re-running init.
+- No git remote configured: init proceeds, leaves a warning in `preflight-report.md`.
+- LLM rate-limited mid-brainstorm: init resumes from the last saved checkpoint on next invocation.
+
+### Post-run Actions
+
+- **On success:** review `project.md`, then run `/spec.propose` to pick the first feature.
+- **On drift:** open `.specs/checks/<today>.md`, fix the flagged blanks, re-run init.
+- **On blocked:** install the missing tool from `preflight-report.md`, re-run init.

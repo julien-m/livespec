@@ -98,3 +98,47 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.explain <feature>
+> Loading spec.md, plan.md, implementation.md, changelog.md
+> Synthesizing living documentation for <feature>
+> Section: Overview · User flows · Architecture · Files · History
+exit 0
+```
+
+### Files Produced
+
+```
+(stdout only — Markdown narrative)
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** Markdown explanation covers Overview, User flows, Architecture, Files, History sections. Exit 0.
+- **Drift:** the feature has partial implementation; explanation marks missing FR/AC explicitly. Exit 0 still (read-only command).
+- **Missing:** feature directory not found. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Small feature | 15–45s | doc length |
+| Medium feature | 45–120s | story count |
+| Large feature | 120–300s | implementation breadth |
+
+### Edge Cases
+
+- Implementation lacks @spec anchors: explanation falls back to file inference.
+- Multiple changelog entries: explanation summarizes them as a timeline.
+- `--json`: emits structured envelope instead of prose.
+
+### Post-run Actions
+
+- **On success:** share the output with reviewers; pipe to a doc site if desired.
+- **On drift:** no action.
+- **On blocked:** confirm the feature slug; run `/spec.status` to list features.

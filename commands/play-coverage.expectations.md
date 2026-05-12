@@ -96,3 +96,46 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.play-coverage
+> Building grep index for .specs/ ↔ src/
+> 47 spec anchors found · 4 unmapped FRs
+> Listening on http://localhost:4810 (Ctrl-C to stop)
+```
+
+### Files Produced
+
+```
+.specs/.coverage-cache.json     # transient grep cache (gitignored)
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** server starts, browser shows coverage matrix with green/red cells. Exit 0 on graceful stop.
+- **Drift:** unmapped FR count > 0; the UI highlights them red. Exit 0 still (informational).
+- **Missing:** port already in use. Exit 2 with `--port <N>` recovery suggestion.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Small repo | 1–5s startup | ripgrep size |
+| Medium repo | 5–15s startup | anchor count |
+| Large monorepo | 15–60s startup | file traversal |
+
+### Edge Cases
+
+- No spec anchors found in code: the UI displays a single placeholder row.
+- `--once`: emit a JSON snapshot to stdout and exit 0 without starting the server.
+- Browser cannot reach the server (corporate proxy): use `--host 0.0.0.0` and the local IP.
+
+### Post-run Actions
+
+- **On success:** Ctrl-C when done.
+- **On drift:** add @spec anchors to source files for the highlighted FRs.
+- **On blocked:** retry on a different `--port`.

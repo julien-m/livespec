@@ -96,3 +96,50 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.refine <feature>
+> Loaded spec.md and plan.md for <feature>
+> Conversational refinement: 3 questions
+> Wrote refinements to spec.md (+12 lines, -3 lines)
+> Updated changelog.md
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/features/<feature>/spec.md       # refined
+.specs/features/<feature>/plan.md       # refined if --plan
+.specs/features/<feature>/changelog.md  # new entry
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** spec/plan updated with traceable changelog entry, no schema regression. Exit 0.
+- **Drift:** refinement introduces `[NEEDS CLARIFICATION]` markers > previous count. Exit 1.
+- **Missing:** target spec/plan absent. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Small refine | 30–90s | conversation turns |
+| Project-level refine | 60–240s | profile re-evaluation |
+| Plan refine with diagrams | 90–300s | re-rendering |
+
+### Edge Cases
+
+- `project` subject: re-evaluates roadmap after profile changes.
+- `plan` subject: targets only plan.md.
+- Refinement removes an AC: refine confirms the removal interactively and adjusts FR mapping.
+
+### Post-run Actions
+
+- **On success:** run `/spec.check <feature>` to confirm code alignment.
+- **On drift:** open spec.md and resolve `[NEEDS CLARIFICATION]`.
+- **On blocked:** confirm the feature slug.

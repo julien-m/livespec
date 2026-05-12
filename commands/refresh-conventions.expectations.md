@@ -95,3 +95,48 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.refresh-conventions
+> Reading .specs/stacks/_default.md (<stack>)
+> Generating .conventions/manifest.yaml + index.md
+> 4 sub-domains detected: code, design-tokens, design-components, design-views
+exit 0
+```
+
+### Files Produced
+
+```
+.conventions/manifest.yaml    # machine-readable
+.conventions/index.md         # routing table
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** manifest.yaml and index.md exist with matching sub-domains. Exit 0.
+- **Drift:** manifest declares sub-domains the source files no longer define. Exit 1.
+- **Missing:** ai-ressources path unresolved or stack file absent. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Minimal stack | 1–5s | sub-domain count |
+| Full stack | 5–20s | source file count |
+| With `--full` re-detect | 20–60s | exclusion analysis |
+
+### Edge Cases
+
+- `--full`: re-detects sub-domains from scratch (used after stack identity change).
+- ai-ressources repo not cloned locally: refresh emits a clear error with the expected `$AIRESOURCES` path.
+- Old compiled-format `.conventions/` detected: refresh prompts migration.
+
+### Post-run Actions
+
+- **On success:** subsequent commands auto-load the new conventions.
+- **On drift:** run `--full` to rebuild from scratch.
+- **On blocked:** set `AIRESOURCES` env var, or run `/spec.init` first.

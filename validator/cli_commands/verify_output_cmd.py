@@ -4,9 +4,16 @@
 #   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-007
 # @spec AC-005, AC-006, AC-007: exit code semantics
 #   — .specs/features/039-command-expectations-and-verify-output/spec.md
+# @spec FR-005: --preview and --save flags
+#   — .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-005
+# @spec FR-008: --save writes .specs/.previews/
+#   — .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-008
+# @spec FR-009: canonical error strings
+#   — .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-009
 """
 
 import json
+import secrets
 from pathlib import Path
 
 import typer
@@ -18,6 +25,7 @@ from ..exceptions import (
     OverrideMalformed,
 )
 from ..expectations import load_expectations
+from ..preview import ERR_NO_SPECS_DIR, render_preview
 from ..run_artifact import find_latest_artifact, read_artifact
 from ..specs_utils import find_specs_root
 from ..verify_output import (
@@ -52,6 +60,16 @@ JSON_OPTION = typer.Option(
     "--json",
     help="Emit JSON to stdout instead of a human table.",
 )
+PREVIEW_OPTION = typer.Option(
+    False,
+    "--preview",
+    help="Project-aware preview (no artifact required); render Section 13 with placeholders.",
+)
+SAVE_OPTION = typer.Option(
+    False,
+    "--save",
+    help="With --preview, also write the rendered Markdown to .specs/.previews/.",
+)
 
 
 def register(app: typer.Typer) -> None:
@@ -68,8 +86,13 @@ def verify_output_command(
     run: Path | None = RUN_OPTION,
     feature: str | None = FEATURE_OPTION,
     json_out: bool = JSON_OPTION,
+    preview: bool = PREVIEW_OPTION,
+    save: bool = SAVE_OPTION,
 ) -> None:
     """Verify the latest run artifact against the command's expectations."""
+    if preview:
+        _run_preview(command, json_out=json_out, save=save)
+        return
     try:
         project_root = find_specs_root().parent
     except Exception as exc:
@@ -137,6 +160,75 @@ def verify_output_command(
     )
     _emit_report(report, json_out)
     raise typer.Exit(report.exit_code)
+
+
+def _run_preview(command: str, *, json_out: bool, save: bool) -> None:
+    """Handle the ``--preview`` branch of ``verify-output``.
+
+    # @spec FR-005: --preview wiring
+    #   — .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-005
+    # @spec FR-008: --save writes file
+    #   — .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-008
+    # @spec FR-009: canonical error strings
+    #   — .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-009
+    """
+    cwd = Path.cwd()
+    specs_dir = cwd / ".specs"
+    if not specs_dir.is_dir():
+        typer.echo(ERR_NO_SPECS_DIR, err=True)
+        raise typer.Exit(2)
+
+    project_root = cwd
+    livespec_root = _detect_livespec_root()
+
+    # Load expectations and surface the canonical AC-008/009 error strings.
+    try:
+        expectations = load_expectations(command, project_root, livespec_root)
+    except ExpectationsMissing as exc:
+        typer.echo(
+            f"no expectations file for {command!r} (searched: {exc.searched_paths})",
+            err=True,
+        )
+        raise typer.Exit(2) from exc
+    except OverrideMalformed as exc:
+        typer.echo(f"override malformed: {exc.reason}", err=True)
+        raise typer.Exit(2) from exc
+    except ExpectationsInvalid as exc:
+        # AC-008 / AC-009 messages are already shaped inside the parser.
+        typer.echo(exc.reason, err=True)
+        raise typer.Exit(2) from exc
+
+    if expectations.demo_session is None:
+        typer.echo(
+            f"section 13 missing in {expectations.source_path.as_posix()}",
+            err=True,
+        )
+        raise typer.Exit(2)
+
+    report = render_preview(expectations, project_root)
+
+    if save:
+        previews_dir = project_root / ".specs" / ".previews"
+        previews_dir.mkdir(parents=True, exist_ok=True)
+        base_name = f"{command}-{report.timestamp}"
+        target = previews_dir / f"{base_name}.md"
+        if target.exists():
+            # Avoid collision on sub-second double-invocation (EC-006).
+            suffix = secrets.token_hex(2)[:3]
+            target = previews_dir / f"{base_name}-{suffix}.md"
+        target.write_text(report.markdown, encoding="utf-8")
+
+    if json_out:
+        envelope = {
+            "command": report.command,
+            "project_root": str(report.project_root),
+            "timestamp": report.timestamp,
+            "markdown": report.markdown,
+        }
+        typer.echo(json.dumps(envelope, indent=2))
+    else:
+        typer.echo(report.markdown)
+    raise typer.Exit(0)
 
 
 def _detect_livespec_root() -> Path:

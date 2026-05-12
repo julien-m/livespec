@@ -98,3 +98,48 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.check <feature>
+> Scanning code for @spec anchors → 27 matches
+> Cross-referencing with spec.md FR/AC → 2 unmapped FRs
+> Visual fidelity: 12/13 screens match (1 drift: <screen>)
+> Wrote .specs/features/<feature>/checks/<date>.md
+exit 1
+```
+
+### Files Produced
+
+```
+.specs/features/<feature>/checks/<date>.md   # gap report
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** every FR/AC has at least one `@spec` anchor in code; visual diff < threshold for every screen. Exit 0.
+- **Drift:** unmapped FR/AC, missing test, or visual drift > threshold. Exit 1, gap report names each issue.
+- **Missing:** spec.md absent or `@spec` anchor convention not configured. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Code-only check | 10–30s | ripgrep span |
+| Code + visual | 30–120s | screenshot count |
+| Code + visual + surfaces | 60–300s | surface count |
+
+### Edge Cases
+
+- Code has a `@spec` anchor pointing to a deleted FR: check reports `orphan anchor`.
+- Visual driver disabled: only structural check runs.
+- `--surfaces` flag: detects drift between `.specs/surfaces.yaml` and the actual filesystem.
+
+### Post-run Actions
+
+- **On success:** done.
+- **On drift:** run `/spec.fix <feature>` for visual drift, or edit code/spec for structural drift.
+- **On blocked:** run `/spec.specify` first.

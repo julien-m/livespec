@@ -53,6 +53,42 @@ verify:
   must_not:
     - contains: "Traceback"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+```
+$ demo
+> marker
+```
+- step a
+- step b
+- step c
+
+### Files Produced
+- a.txt
+- b.txt
+- c.txt
+
+### Aligned / Drift / Missing
+- aligned: marker present.
+- drift: marker absent.
+- missing: command never ran.
+
+### Runtime Profile (scenarios)
+- cold: 1s
+- warm: <1s
+- worst: 2s
+
+### Edge Cases
+- empty: noop.
+- crash: handled.
+- unicode: ok.
+
+### Post-run Actions
+- success: done.
+- drift: re-run.
+- blocked: fix preconditions.
 """
 
 

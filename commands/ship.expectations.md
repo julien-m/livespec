@@ -104,3 +104,50 @@ verify:
       must:
         - contains: "batch"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.ship
+> Scanning roadmap.md — 3 unchecked items in MVP tier
+> Picking next: <feature>
+> Spawning /spec.feature -a "<feature>" --branch
+> Pipeline complete → SHIP_RESULT: OK on feature/<feature>
+> Continuing batch: 2 remaining
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/features/<feature>/             # one folder per shipped feature
+git branches:                          # feature/<feature> × N
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** every targeted roadmap item is shipped (commit + PR), SHIP_RESULT: OK for each. Exit 0.
+- **Drift:** one feature returned SHIP_RESULT: BLOCKED; batch halts. Exit 1 with the failing feature name.
+- **Missing:** roadmap.md absent or empty. Exit 2.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Single feature | 5–25 min | feature size |
+| Batch of 3 small features | 15–60 min | sum of per-feature time |
+| Full MVP tier | 60–240 min | feature count × scope |
+
+### Edge Cases
+
+- `--limit N`: ships at most N features then stops.
+- `--dry-run`: prints the batch plan without spawning any pipeline.
+- A feature fails mid-batch: ship logs the failure and offers `--resume` to skip past.
+
+### Post-run Actions
+
+- **On success:** review the resulting PRs.
+- **On drift:** open the failing feature's pipeline.md, fix the blocker, re-run with `--resume`.
+- **On blocked:** populate roadmap.md via `/spec.propose`.

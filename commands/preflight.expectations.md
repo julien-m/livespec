@@ -102,3 +102,50 @@ verify:
       must:
         - contains: "installed"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+
+```
+$ /spec.preflight
+> Running 7 checks from .specs/preflight.md
+> ✓ git ≥ 2.30
+> ✓ python3 ≥ 3.11
+> ✓ playwright installed (1.45)
+> ⚠ ANTHROPIC_API_KEY missing (warning, not critical)
+> Wrote .specs/preflight-report.md — verdict: WARNINGS
+exit 0
+```
+
+### Files Produced
+
+```
+.specs/preflight-report.md     # verdict (READY | WARNINGS | BLOCKED), per-check status
+```
+
+### Aligned / Drift / Missing
+
+- **Aligned:** every critical check passes, report verdict READY. Exit 0.
+- **Drift:** only warnings; verdict WARNINGS. Exit 0 (non-blocking by design).
+- **Missing:** a critical check fails. Exit 2 with the failing check and recovery command.
+
+### Runtime Profile (scenarios)
+
+| Scenario | Duration | Driver |
+|----------|----------|--------|
+| Pure tooling check | 2–10s | binary lookup |
+| Tooling + LLM creds | 5–20s | network |
+| Full stack + autofix | 10–60s | autofix loop |
+
+### Edge Cases
+
+- `--light`: runs only critical checks (used by /spec.feature 2.7).
+- `--autofix`: attempts to install missing deps when safe.
+- Check command crashes: preflight reports `error` for that line, continues.
+
+### Post-run Actions
+
+- **On success:** proceed with `/spec.feature` or the targeted command.
+- **On drift:** address the warnings if relevant; no blocker.
+- **On blocked:** run the recovery command from the report, re-run preflight.

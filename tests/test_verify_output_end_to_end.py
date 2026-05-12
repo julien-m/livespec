@@ -47,6 +47,42 @@ verify:
     - exit_code: 0
     - contains: "MARKER-OK"
 ```
+
+## 13. Demo Session
+
+### Live Console Output
+```
+$ e2e
+> MARKER-OK
+```
+- line1
+- line2
+- line3
+
+### Files Produced
+- a
+- b
+- c
+
+### Aligned / Drift / Missing
+- aligned: marker present.
+- drift: marker absent.
+- missing: never ran.
+
+### Runtime Profile (scenarios)
+- cold: 1s
+- warm: <1s
+- worst: 2s
+
+### Edge Cases
+- empty: noop.
+- crash: caught.
+- unicode: ok.
+
+### Post-run Actions
+- success: done.
+- drift: re-run.
+- blocked: fix.
 """
 
 
