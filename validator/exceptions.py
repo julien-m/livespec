@@ -112,6 +112,78 @@ class TaxonomyLoadError(Exception):
 
 
 # @spec FR-004: Subprocess failure error — .specs/features/002-layer-3-cli-surface/spec.md#fr-004
+# @spec FR-003: ExpectationsMissing
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-003
+class ExpectationsMissing(Exception):
+    """Raised when no expectations file can be found for a command.
+
+    Args:
+        command: The command name that was looked up.
+        searched_paths: The paths that were checked in lookup order.
+    """
+
+    def __init__(self, command: str, searched_paths: list[str]) -> None:
+        paths_str = ", ".join(searched_paths)
+        super().__init__(
+            f"No expectations file for {command!r} (searched: {paths_str})"
+        )
+        self.command = command
+        self.searched_paths = searched_paths
+
+
+# @spec FR-003: ExpectationsInvalid
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-003
+class ExpectationsInvalid(Exception):
+    """Raised when an expectations file fails schema validation.
+
+    Args:
+        path: Path to the offending file.
+        reason: Description of the validation failure.
+    """
+
+    def __init__(self, path: str, reason: str) -> None:
+        super().__init__(f"Invalid expectations file {path}: {reason}")
+        self.path = path
+        self.reason = reason
+
+
+# @spec FR-008: OverrideMalformed
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-008
+class OverrideMalformed(Exception):
+    """Raised when a project override is malformed.
+
+    The verifier MUST NOT silently fall back to the builtin — it blocks
+    (exit 2) so the operator sees the override problem.
+
+    Args:
+        path: Path to the malformed override.
+        reason: Description of the failure.
+    """
+
+    def __init__(self, path: str, reason: str) -> None:
+        super().__init__(f"Override malformed at {path}: {reason}")
+        self.path = path
+        self.reason = reason
+
+
+# @spec FR-005: ArtifactMalformed
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-005
+class ArtifactMalformed(Exception):
+    """Raised when a RunArtifact JSON file cannot be parsed.
+
+    Mapped to outcome=blocked by the verifier (EC-007).
+
+    Args:
+        path: Path to the malformed artifact.
+        reason: Description of the failure (typically a JSONDecodeError).
+    """
+
+    def __init__(self, path: str, reason: str) -> None:
+        super().__init__(f"Malformed run artifact at {path}: {reason}")
+        self.path = path
+        self.reason = reason
+
+
 class SdkTestRunError(Exception):
     """Raised when the pytest subprocess fails to start.
 

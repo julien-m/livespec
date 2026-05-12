@@ -3,10 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-08
+> Last updated: 2026-05-12
 
 ---
 
+## 2026-05-12 -- [Feature 039] Implemented: Command Expectations & /spec.verify-output — 20 builtin expectations files, RunArtifact JSON schema, verify-output CLI + slash-command, pre-commit last_reviewed hook, override resolver, 4-state outcome classifier (no-short-circuit invariant)
 ## 2026-05-08 -- [Feature 037] Implemented: Test Multi-Runner Integration — runner-aware Phase 4.5 dispatcher, multi-target Xcode pbxproj parsing, --visual flag documented; +32 Python tests +5 JS tests, 0 regressions
 ## 2026-05-08 -- [Feature 037] Plan created: Test Multi-Runner Integration — 17 implementation steps, 4 diagrams (sequence + flow + state + ER), 15+ files
 ## 2026-05-08 -- [Feature 037] Spec created: Test Multi-Runner Integration — 5 stories, 15 AC, 15 FR
