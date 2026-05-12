@@ -753,4 +753,24 @@ If any phase fails:
 
 ---
 
+## Run Artifact Emission
+
+> **Run artifact:** at the end of execution, the command MUST emit a run
+> artifact via:
+>
+> ```
+> livespec run record \
+>   --command feature \
+>   --exit-code <N> \
+>   --flags "<flags>" \
+>   --stdout-file <captured.out> \
+>   --stderr-file <captured.err>
+> ```
+>
+> The artifact lands in `.specs/.runs/feature-<ISO>.json` and is consumed by
+> `/spec.verify-output feature`. See `system/expectations.md` for the
+> RunArtifact schema and `commands/feature.expectations.md` for the contract.
+
+---
+
 *LiveSpec Command v1.0*
