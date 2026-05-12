@@ -183,3 +183,4 @@ AUDIT-CODEX.md
 
 # LiveSpec local run artifacts (feature 039)
 .specs/.runs/
+/.tmp-orchestrate/
