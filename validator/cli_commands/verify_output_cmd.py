@@ -1,10 +1,10 @@
 """``livespec verify-output`` — compare a run artifact against expectations.
 
-# @spec FR-007: verify-output CLI — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-007
-# @spec AC-005, AC-006, AC-007: exit code semantics — .specs/features/039-command-expectations-and-verify-output/spec.md
+# @spec FR-007: verify-output CLI
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-007
+# @spec AC-005, AC-006, AC-007: exit code semantics
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md
 """
-
-from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -28,6 +28,31 @@ from ..verify_output import (
     render_json,
 )
 
+COMMAND_ARGUMENT = typer.Argument(
+    ...,
+    help="Command name (e.g. 'specify').",
+)
+SCENARIO_OPTION = typer.Option(
+    "",
+    "--scenario",
+    help="Extra flags to activate when: branches (space-separated).",
+)
+RUN_OPTION = typer.Option(
+    None,
+    "--run",
+    help="Explicit artifact path (overrides latest lookup).",
+)
+FEATURE_OPTION = typer.Option(
+    None,
+    "--feature",
+    help="Active feature dir name (resolves <feature> placeholder).",
+)
+JSON_OPTION = typer.Option(
+    False,
+    "--json",
+    help="Emit JSON to stdout instead of a human table.",
+)
+
 
 def register(app: typer.Typer) -> None:
     """Register the ``verify-output`` command on ``app``."""
@@ -38,27 +63,11 @@ def register(app: typer.Typer) -> None:
 
 
 def verify_output_command(
-    command: str = typer.Argument(..., help="Command name (e.g. 'specify')."),
-    scenario: str = typer.Option(
-        "",
-        "--scenario",
-        help="Extra flags to activate when: branches (space-separated).",
-    ),
-    run: Path | None = typer.Option(
-        None,
-        "--run",
-        help="Explicit artifact path (overrides latest lookup).",
-    ),
-    feature: str | None = typer.Option(
-        None,
-        "--feature",
-        help="Active feature dir name (resolves <feature> placeholder).",
-    ),
-    json_out: bool = typer.Option(
-        False,
-        "--json",
-        help="Emit JSON to stdout instead of a human table.",
-    ),
+    command: str = COMMAND_ARGUMENT,
+    scenario: str = SCENARIO_OPTION,
+    run: Path | None = RUN_OPTION,
+    feature: str | None = FEATURE_OPTION,
+    json_out: bool = JSON_OPTION,
 ) -> None:
     """Verify the latest run artifact against the command's expectations."""
     try:
@@ -162,4 +171,5 @@ def _emit_report(report: VerifyReport, json_out: bool) -> None:
         typer.echo(render_human(report))
 
 
+# Export the command registration hooks used by the top-level CLI.
 __all__ = ["register", "verify_output_command"]
