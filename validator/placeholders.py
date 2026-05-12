@@ -1,15 +1,12 @@
 """Placeholder resolver for verify-output rules.
 
-# @spec FR-011: placeholder resolver
-#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-011
+# @spec FR-011: placeholder resolver — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-011
 """
 
 from __future__ import annotations
 
 import re
 
-# Match the three documented placeholder tokens and nothing else so unexpected
-# angle-bracket text is preserved verbatim in expectations files.
 _PLACEHOLDER_RE = re.compile(r"<(feature|date|path)>")
 
 
@@ -51,5 +48,4 @@ def run_date_from_timestamp(timestamp: str) -> str:
     return timestamp[:10]
 
 
-# Export the placeholder helpers used by verify-output evaluation.
 __all__ = ["resolve", "run_date_from_timestamp"]

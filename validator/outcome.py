@@ -1,7 +1,6 @@
 """4-state outcome classifier for verify-output reports.
 
-# @spec FR-012: outcome classifier
-#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-012
+# @spec FR-012: outcome classifier — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-012
 """
 
 from __future__ import annotations
@@ -51,5 +50,4 @@ def exit_code_for(outcome: Outcome) -> int:
     return OUTCOME_EXIT_CODES[outcome]
 
 
-# Export the outcome vocabulary shared by verification and CLI rendering.
 __all__ = ["OUTCOME_EXIT_CODES", "Outcome", "classify", "exit_code_for"]

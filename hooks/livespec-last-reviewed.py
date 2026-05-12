@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Pre-commit hook — enforce `last_reviewed` bump on expectations files.
 
-# @spec FR-009: pre-commit hook
-#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-009
-# @spec AC-008: hook contract
-#   — .specs/features/039-command-expectations-and-verify-output/spec.md#ac-008
+# @spec FR-009: pre-commit hook — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-009
+# @spec AC-008: hook contract — .specs/features/039-command-expectations-and-verify-output/spec.md#ac-008
 
 For each staged ``commands/<X>.md`` (excluding ``*.expectations.md``):
 

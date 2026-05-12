@@ -1,16 +1,14 @@
 """Tests for validator/run_artifact.py.
 
-# @spec FR-005: RunArtifact schema
-#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-005
-# @spec EC-007: malformed artifact
-#   — .specs/features/039-command-expectations-and-verify-output/spec.md#ec-007
-# @spec EC-009: lexicographic latest
-#   — .specs/features/039-command-expectations-and-verify-output/spec.md#ec-009
+# @spec FR-005: RunArtifact schema — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-005
+# @spec EC-007: malformed artifact — .specs/features/039-command-expectations-and-verify-output/spec.md#ec-007
+# @spec EC-009: lexicographic latest — .specs/features/039-command-expectations-and-verify-output/spec.md#ec-009
 """
 
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 

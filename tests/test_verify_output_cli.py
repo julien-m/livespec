@@ -57,9 +57,7 @@ verify:
 
 
 def _run(args: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
-    # The CLI is exercised through the real Python entry point so these tests
-    # validate stdout/stderr and exit-code behavior end to end.
-    return subprocess.run(
+    return subprocess.run(  # noqa: S603 — test-only invocation
         [sys.executable, "-m", "validator.cli", *args],
         cwd=str(cwd),
         capture_output=True,

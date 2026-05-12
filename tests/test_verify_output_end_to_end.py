@@ -51,9 +51,7 @@ verify:
 
 
 def _cli(args: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
-    # The CLI is launched as a subprocess so the smoke test covers the full user
-    # contract: argument parsing, output rendering, and process exit status.
-    return subprocess.run(
+    return subprocess.run(  # noqa: S603 — test-only
         [sys.executable, "-m", "validator.cli", *args],
         cwd=str(cwd),
         capture_output=True,
