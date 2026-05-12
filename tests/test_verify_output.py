@@ -1,6 +1,7 @@
 """Tests for validator/verify_output.py.
 
-# @spec FR-007, FR-010, AC-009, AC-011 — .specs/features/039-command-expectations-and-verify-output/spec.md
+# @spec FR-007, FR-010, AC-009, AC-011
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md
 """
 
 from __future__ import annotations

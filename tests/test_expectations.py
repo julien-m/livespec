@@ -1,7 +1,9 @@
 """Tests for validator/expectations.py (parser + override resolver).
 
-# @spec FR-003: parser tests — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-003
-# @spec FR-008: override total no merge — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-008
+# @spec FR-003: parser tests
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-003
+# @spec FR-008: override total no merge
+#   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-008
 """
 
 from __future__ import annotations
@@ -67,7 +69,7 @@ clean.
 
 ## 9. Runtime Profile
 
-- 1–2 seconds.
+- 1-2 seconds.
 
 ## 10. Post-run Checks
 
@@ -148,7 +150,10 @@ def test_load_expectations_prefers_override(tmp_path):
     override = project_root / ".specs" / "expectations" / "demo.md"
     builtin = livespec_root / "commands" / "demo.expectations.md"
     override.write_text(
-        MINIMAL_VALID.replace("contract_version: \"1.0\"", "contract_version: \"override\""),
+        MINIMAL_VALID.replace(
+            'contract_version: "1.0"',
+            'contract_version: "override"',
+        ),
         encoding="utf-8",
     )
     builtin.write_text(MINIMAL_VALID, encoding="utf-8")
@@ -201,7 +206,13 @@ def test_load_expectations_missing_raises(tmp_path):
 def test_when_branches_parse(tmp_path):
     body = MINIMAL_VALID.replace(
         '    - contains: "Traceback"\n',
-        '    - contains: "Traceback"\n  when:\n    - flag: "--visual"\n      must:\n        - contains: "baselines"\n',
+        (
+            '    - contains: "Traceback"\n'
+            '  when:\n'
+            '    - flag: "--visual"\n'
+            '      must:\n'
+            '        - contains: "baselines"\n'
+        ),
     )
     path = _write(tmp_path, "when.md", body)
     e = parse_expectations(path)
@@ -214,7 +225,12 @@ def test_when_branches_parse(tmp_path):
 def test_produces_artifact_rule_parses(tmp_path):
     body = MINIMAL_VALID.replace(
         '    - exit_code: 0\n',
-        '    - exit_code: 0\n    - produces_artifact: "spec.md"\n      contains_sections:\n        - "User Scenarios"\n',
+        (
+            '    - exit_code: 0\n'
+            '    - produces_artifact: "spec.md"\n'
+            '      contains_sections:\n'
+            '        - "User Scenarios"\n'
+        ),
     )
     path = _write(tmp_path, "art.md", body)
     e = parse_expectations(path)

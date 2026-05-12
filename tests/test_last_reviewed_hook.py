@@ -19,7 +19,9 @@ HOOK = (
 
 
 def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(  # noqa: S603 — test-only
+    # Git is the contract under test here; capture_output/check let the test
+    # assert hook and repository behavior without mutating global process state.
+    return subprocess.run(
         ["git", "-C", str(repo), *args],
         capture_output=True,
         text=True,
@@ -36,7 +38,9 @@ def _init_repo(repo: Path) -> None:
 
 
 def _run_hook(repo: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(  # noqa: S603 — test-only
+    # The hook is executed as a subprocess so tests can assert its real exit code
+    # and stderr contract exactly as pre-commit would observe them.
+    return subprocess.run(
         [sys.executable, str(HOOK)],
         cwd=str(repo),
         capture_output=True,
@@ -48,7 +52,10 @@ def _run_hook(repo: Path) -> subprocess.CompletedProcess[str]:
 def _make_expectations(repo: Path, name: str, last_reviewed: str) -> None:
     (repo / "commands").mkdir(exist_ok=True)
     (repo / f"commands/{name}.expectations.md").write_text(
-        f"---\ncommand: {name}\ncontract_version: \"1.0\"\nlast_reviewed: {last_reviewed}\n---\n\n# x\n",
+        (
+            f"---\ncommand: {name}\ncontract_version: \"1.0\"\n"
+            f"last_reviewed: {last_reviewed}\n---\n\n# x\n"
+        ),
         encoding="utf-8",
     )
 

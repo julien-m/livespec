@@ -9,7 +9,10 @@ from validator.placeholders import resolve, run_date_from_timestamp
 
 
 def test_resolve_feature():
-    assert resolve("<feature>/spec.md", feature="001-foo", run_date="2026-05-12") == "001-foo/spec.md"
+    assert (
+        resolve("<feature>/spec.md", feature="001-foo", run_date="2026-05-12")
+        == "001-foo/spec.md"
+    )
 
 
 def test_resolve_date_from_artifact_timestamp_never_today():
