@@ -766,11 +766,14 @@ After installing the CLAUDE.md section, create local symlinks for all LiveSpec c
 2. **Write path discovery file:** Write the resolved path to `.specs/.livespec-path`
 3. **Create directories:** `mkdir -p .claude/commands .claude/agents`
 4. **Run link script:** Execute `bash <livespec-dir>/scripts/link-local.sh <project-dir> <livespec-dir>`
-5. **Write version:** Read `VERSION` from the LiveSpec repo, write to `.specs/livespec-version`
-6. **Update .gitignore:** Add the following patterns (if not already present):
+5. **Install pre-commit hook:** Execute `bash <livespec-dir>/scripts/install-hooks.sh <project-dir> <livespec-dir>` to install the `last_reviewed` hook (feature 039 FR-009). Idempotent — keyed off the `# livespec-expectations` marker. Skipped silently if the project has no `.git/` directory.
+6. **Write version:** Read `VERSION` from the LiveSpec repo, write to `.specs/livespec-version`
+7. **Update .gitignore:** Add the following patterns (if not already present):
    - `.claude/commands/spec.*.md`
    - `.claude/agents/livespec-*.md`
    - `.specs/.livespec-path`
+   - `.specs/.runs/`
+   - `.specs/.previews/`
    - `test-results/`
    - `playwright-report/`
 

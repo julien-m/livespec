@@ -38,11 +38,27 @@ cmd_count=0
 agent_count=0
 errors=0
 
-# Link commands (exclude init.md and migrate.md)
+# Clean up orphan symlinks from older link-local versions that did not
+# filter sidecar metadata files (e.g. `*.expectations.md`). These end up
+# as `.claude/commands/spec.<cmd>.expectations.md` and pollute the slash
+# command menu. Remove them before re-linking so the operation is
+# self-healing on re-runs / migrations.
+for orphan in "$PROJECT_DIR"/.claude/commands/spec.*.expectations.md; do
+  [[ -L "$orphan" ]] || continue
+  rm -f "$orphan"
+done
+
+# Link commands (exclude init.md and migrate.md + sidecar metadata files)
 for src in "$LIVESPEC_DIR"/commands/*.md; do
   name="$(basename "$src" .md)"
   # Skip init and migrate — they stay global
   if [[ "$name" == "init" || "$name" == "migrate" ]]; then
+    continue
+  fi
+  # Skip sidecar files (e.g. *.expectations.md) — they are metadata,
+  # consumed by `livespec verify-output` directly from the LiveSpec
+  # checkout, never invoked as slash commands.
+  if [[ "$name" == *.expectations ]]; then
     continue
   fi
   dest="$PROJECT_DIR/.claude/commands/spec.${name}.md"

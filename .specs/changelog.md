@@ -3,10 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-12
+> Last updated: 2026-05-13
 
 ---
 
+## 2026-05-13 -- [Migration v13] Backfill command-expectations wiring — re-link `.claude/commands/` (drops orphan `spec.*.expectations.md` symlinks left by pre-fix `link-local.sh`, adds `/spec.verify-output`), install `last_reviewed` pre-commit hook, append `.specs/.runs/` and `.specs/.previews/` to `.gitignore`; `install-hooks.sh` accepts `<project> <livespec>` args; `/spec.init` now wires the hook automatically (features 039, 040)
 ## 2026-05-12 -- [Feature 040] Implemented: Rich Expectations Format & Verify Preview — Section 13 (Demo Session) mandatory across the 20 builtin expectations files, new `livespec verify-output --preview [--save]` mode that resolves placeholders from `.specs/stacks/_default.md`, `.specs/features/`, `.specs/design/screens/`, `.conventions/manifest.yaml`; +15 tests, 0 regressions (depends on feature 039)
 ## 2026-05-12 -- [Feature 039] Implemented: Command Expectations & /spec.verify-output — 20 builtin expectations files, RunArtifact JSON schema, verify-output CLI + slash-command, pre-commit last_reviewed hook, override resolver, 4-state outcome classifier (no-short-circuit invariant)
 ## 2026-05-08 -- [Feature 037] Implemented: Test Multi-Runner Integration — runner-aware Phase 4.5 dispatcher, multi-target Xcode pbxproj parsing, --visual flag documented; +32 Python tests +5 JS tests, 0 regressions
