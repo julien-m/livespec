@@ -3,10 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-13
+> Last updated: 2026-05-14
 
 ---
 
+## 2026-05-13 -- [Feature 043] Spec created: `/spec.sync-brainstorm` — Living Bridge to Brainstorm — 5 stories, 17 AC, 18 FR (new slash-command detecting stale/orphaned/manual flows; Mode A re-pull for flows with `--apply` + per-file confirmation; Mode B inviolable for derived feature AC/FR; `--prune-orphaned` with explicit confirmation; integrates 4 new gap categories into `/spec.check`)
+## 2026-05-13 -- [Feature 042] Spec created: `/spec.specify` Derives from Imported Brainstorm Flows — 3 stories, 13 AC, 13 FR (transcribes Mermaid + AC + FR from `.specs/flows/<slug>.md` produced by Feature 041; Mode B locking; classic-fallback when no flow matches)
+## 2026-05-13 -- [Feature 041] Spec created: Brainstorm Flow & Screen Specs Ingestion — 3 stories, 14 AC, 12 FR (extends `spec.init` Step 3.6 to ingest `.brainstorm/specs/{flows,screens}/*.md` produced by brainstorm `specify-flows`)
 ## 2026-05-13 -- [Migration v13] Backfill command-expectations wiring — re-link `.claude/commands/` (drops orphan `spec.*.expectations.md` symlinks left by pre-fix `link-local.sh`, adds `/spec.verify-output`), install `last_reviewed` pre-commit hook, append `.specs/.runs/` and `.specs/.previews/` to `.gitignore`; `install-hooks.sh` accepts `<project> <livespec>` args; `/spec.init` now wires the hook automatically (features 039, 040)
 ## 2026-05-12 -- [Feature 040] Implemented: Rich Expectations Format & Verify Preview — Section 13 (Demo Session) mandatory across the 20 builtin expectations files, new `livespec verify-output --preview [--save]` mode that resolves placeholders from `.specs/stacks/_default.md`, `.specs/features/`, `.specs/design/screens/`, `.conventions/manifest.yaml`; +15 tests, 0 regressions (depends on feature 039)
 ## 2026-05-12 -- [Feature 039] Implemented: Command Expectations & /spec.verify-output — 20 builtin expectations files, RunArtifact JSON schema, verify-output CLI + slash-command, pre-commit last_reviewed hook, override resolver, 4-state outcome classifier (no-short-circuit invariant)

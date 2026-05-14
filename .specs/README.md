@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-05-08
+> Last updated: 2026-05-14
 
 
 ---
@@ -74,6 +74,9 @@
 | 035 | Unified CLI Surface | Implemented | 2026-05-07 | 2026-05-07 | [spec](features/035-unified-cli-surface/spec.md) |
 | 036 | Multi-Surface Detection and Migration | Planned | 2026-05-07 | 2026-05-07 | [spec](features/036-multi-surface-detection-and-migration/spec.md) |
 | 037 | Test Multi-Runner Integration | Implemented | 2026-05-08 | 2026-05-08 | [spec](features/037-test-multi-runner-integration/spec.md), [plan](features/037-test-multi-runner-integration/plan.md), [implementation](features/037-test-multi-runner-integration/implementation.md) |
+| 041 | Brainstorm Flow & Screen Specs Ingestion | Draft | 2026-05-13 | 2026-05-14 | [spec](features/041-spec-init-flow-specs-ingestion/spec.md) |
+| 042 | `/spec.specify` Derives from Imported Brainstorm Flows | Draft | 2026-05-13 | 2026-05-14 | [spec](features/042-spec-specify-from-brainstorm/spec.md) |
+| 043 | `/spec.sync-brainstorm` — Living Bridge to Brainstorm | Draft | 2026-05-13 | 2026-05-14 | [spec](features/043-spec-sync-brainstorm/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -97,16 +100,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-13 | Spec | [Feature 043] Spec created: `/spec.sync-brainstorm` — Living Bridge to Brainstorm — 5 stories, 17 AC, 18 FR |
+| 2026-05-13 | Spec | [Feature 042] Spec created: `/spec.specify` Derives from Imported Brainstorm Flows — 3 stories, 13 AC, 13 FR |
+| 2026-05-13 | Spec | [Feature 041] Spec created: Brainstorm Flow & Screen Specs Ingestion — 3 stories, 14 AC, 12 FR |
+| 2026-05-13 | Update | [Migration v13] Backfill command-expectations wiring — re-link `.claude/commands/`, install `last_reviewed` hook, wire `/spec.verify-output` and ignore `.specs/.runs/` + `.specs/.previews/` |
+| 2026-05-12 | Feature | [Feature 040] Implemented: Rich Expectations Format & Verify Preview — Section 13 mandatory, preview mode added, +15 tests, 0 regressions |
+| 2026-05-12 | Feature | [Feature 039] Implemented: Command Expectations & /spec.verify-output — 20 builtin expectations files, verify-output CLI + slash-command |
+| 2026-05-08 | Feature | [Feature 037] Implemented: Test Multi-Runner Integration — runner-aware dispatcher, `--visual` flag documented, 0 regressions |
 | 2026-05-08 | Spec | [Feature 037] Spec created: Test Multi-Runner Integration — 5 stories, 15 AC, 15 FR |
 | 2026-05-07 | Spec | [Feature 036] Spec created: Multi-Surface Detection and Migration — 4 stories, 12 AC, 8 FR |
 | 2026-05-07 | Update | [Feature 033] In progress: Smart Test Selection — core selector module + 22 unit tests; selector logic landed, hook/CLI/migration work still pending |
-| 2026-05-07 | Update | [Feature 028] In progress: UI Runner Web (Playwright Refactor) — added web.yaml manifest and Playwright handler scaffold; CLI wiring, docs, and tests remain open |
-| 2026-05-07 | Feature | [Feature 026] Implemented: Conventions Propagation by Stack — 3 stories, 8 AC, 7 FR; 43 new tests pass (917 total) |
-| 2026-05-07 | Feature | [Feature 025] Implemented: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR; 15 new tests pass (874 total) |
-| 2026-05-07 | Feature | [Feature 019] Implemented: Driver Swift — 4 stories, 10 AC, 6 FR; 31 new tests pass (723 total) |
-| 2026-05-06 | Feature | [Feature 016] Implemented: Cross-Language Test Driver Architecture — 5 stories, 15 AC, 8 FR; 35 tests pass |
-| 2026-05-06 | Spec | [Feature 034] Spec created: Preflight Auto-Install & Init via /spec.preflight --fix — 5 stories, 14 AC, 11 FR |
-| 2026-05-06 | Spec | [Feature 033] Spec created: Smart Test Selection — 4 stories, 12 AC, 10 FR |
 <!-- readme:activity:end -->
 
 ---
