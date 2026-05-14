@@ -250,6 +250,60 @@ Before generating the spec, read:
 - `.specs/constitution.md` — architecture principles
 - `.specs/stacks/_default.md` — technical stack context
 
+### Step 4.5 — Native Behavioral Mode Detection
+
+<!-- @spec FR-001, FR-002, FR-014, FR-015: Mode detection dispatch — .specs/features/045-native-behavioral-specs/spec.md#fr-001 -->
+
+Before generating spec.md, branch on the behavioral mode (F045). This step
+is purely additive — Mode A (reuse) falls through to the existing Step 5
+unchanged so the F042 transcription path is never modified.
+
+1. **Resolve override flag** for the slug:
+   - `--native` → `validator.behavioral_grammar.GenerationMode.NATIVE_INTERVIEW`
+   - `--from-mockups` → `GenerationMode.MOCKUP_DERIVED`
+   - else → `None` (auto-detect)
+
+2. **Detect mode** by calling
+   `validator.behavioral_grammar.detect_mode(slug, specs_root, override)`.
+   Auto-detect precedence (FR-001): A (reuse) > C (mockup-derived) > B
+   (native interview).
+
+3. **Emit structured log line** exactly once per invocation:
+   `mode: <reuse|mockup-derived|native-interview>`.
+
+4. **Pre-existing target guard** (FR-014):
+   - Resolve target path:
+     - flow → `.specs/flows/<slug>.md`
+     - screen → `.specs/design/screens/<slug>.md`
+   - If target exists and its frontmatter `specStatus` equals `manual`
+     and `--force` is NOT passed → log `<slug>: skipped (specStatus: manual)`
+     and exit `0` (mirrors F041's overwrite-protection contract on the
+     producer side).
+   - If target exists without `manual` and no `--force` → log
+     `already present` and exit `0` (mirrors F041 idempotence).
+
+5. **Dispatch**:
+   - **`reuse`** → continue to Step 5 (existing F042 transcription path
+     keys on `.specs/flows/<slug>.md` per its FR-001/AC-001 — no change).
+   - **`mockup-derived`** → call
+     `validator.native_behavioral.run_mockup_derived(slug, specs_root, asker=…, mockup_paths=…)`.
+     If `--from-mockups` is set and no readable mockup matches the slug,
+     emit `BLOCKED` with the reason `--from-mockups requested but no
+     readable mockup file matches slug <slug>` and exit non-zero (FR-015).
+     Pass the artefact through Step 6 validator gate
+     (`validator.native_behavioral.apply_validation_gate`); SKIP Step 5
+     (the artefact IS the screen.md, not a feature spec.md).
+   - **`native-interview`** → call
+     `validator.native_behavioral.run_native_interview(slug, kind, specs_root, asker=…)`.
+     Pass the result through the validator gate; SKIP Step 5.
+
+6. **Validator gate outcome** (FR-008/9/10):
+   - `PASS` → silent write at the canonical path.
+   - `WARNING` → write + log every diagnostic to the user.
+   - `FAIL` → discard, write `error.md` under
+     `.specs/features/045-native-behavioral-specs/`, emit literal
+     `BLOCKED` to stdout, exit non-zero.
+
 ### Step 5 — Generate spec.md
 
 Using `system/templates/spec-template.md` as the base, generate a complete spec with:

@@ -42,6 +42,7 @@ See ``system/grammar/behavioral-specs-v1.md`` and the State Diagram in
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass, field
 from enum import Enum
@@ -419,15 +420,110 @@ def validate_behavioral(path: Path) -> ValidationOutcome:
     )
 
 
+# ─── F045 mode detection (additive — does not affect existing F044 behavior) ─
+
+
+# @spec FR-001: Mode detection — .specs/features/045-native-behavioral-specs/spec.md#fr-001
+# @spec FR-016: Mode-detection unit-tested across 4 branches — spec.md#fr-016
+class GenerationMode(str, Enum):  # noqa: UP042 — public API name, str-mixin kept for compat
+    """Behavioral artefact generation mode for ``/spec.specify``.
+
+    Three mutually-exclusive values matching F045 spec.md (Story 1/2/4):
+
+    - ``REUSE`` — Mode A — `.specs/flows/<slug>.md` exists, delegate to F042.
+    - ``MOCKUP_DERIVED`` — Mode C — readable mockup exists, no flow file.
+    - ``NATIVE_INTERVIEW`` — Mode B — nothing exists, run full interview.
+    """
+
+    REUSE = "reuse"
+    MOCKUP_DERIVED = "mockup-derived"
+    NATIVE_INTERVIEW = "native-interview"
+
+
+# File extensions considered as mockup sources for Mode C detection. Order
+# matters — `.pen` is highest-priority per spec.md Edge Cases (multiple
+# mockups → `.pen` first, else PNG).
+MOCKUP_EXTENSIONS: tuple[str, ...] = ("pen", "png")
+"""@spec FR-001: Mockup extensions for Mode C detection — spec.md#fr-001"""
+
+
+def _flow_path_for(specs_root: Path, slug: str) -> Path:
+    """Return the canonical flow path for a slug under ``specs_root``."""
+    return specs_root / "flows" / f"{slug}.md"
+
+
+def _candidate_mockup_paths(specs_root: Path, slug: str) -> list[Path]:
+    """List candidate mockup paths for a slug, in priority order.
+
+    Order matches :data:`MOCKUP_EXTENSIONS` — `.pen` first, then `.png`.
+    """
+    return [
+        specs_root / "design" / "screens" / f"{slug}.{ext}"
+        for ext in MOCKUP_EXTENSIONS
+    ]
+
+
+def _has_readable_mockup(specs_root: Path, slug: str) -> bool:
+    """Return ``True`` iff at least one candidate mockup file is non-empty.
+
+    Files of size zero (or unreadable via ``os.stat``) are NOT considered
+    readable — Mode C is expected to fall back to Mode B in that case
+    (FR-013).
+    """
+    for path in _candidate_mockup_paths(specs_root, slug):
+        try:
+            if path.exists() and os.stat(path).st_size > 0:
+                return True
+        except OSError:
+            continue
+    return False
+
+
+def detect_mode(
+    slug: str,
+    specs_root: Path,
+    override: GenerationMode | None = None,
+) -> GenerationMode:
+    """Detect the F045 generation mode for ``slug`` under ``specs_root``.
+
+    Precedence (FR-001, AC-018): ``override`` (if any) > A (reuse) > C
+    (mockup-derived) > B (native-interview).
+
+    Args:
+        slug: Feature / artefact slug, e.g. ``"booking"``.
+        specs_root: ``.specs`` directory root (typically project root /
+            ``.specs``).
+        override: Optional caller-provided override. When set, returned
+            verbatim — feasibility (e.g. ``MOCKUP_DERIVED`` requires an
+            actual mockup file) is the caller's responsibility.
+
+    Returns:
+        The selected :class:`GenerationMode`.
+    """
+    if override is not None:
+        return override
+
+    if _flow_path_for(specs_root, slug).exists():
+        return GenerationMode.REUSE
+
+    if _has_readable_mockup(specs_root, slug):
+        return GenerationMode.MOCKUP_DERIVED
+
+    return GenerationMode.NATIVE_INTERVIEW
+
+
 # Export the documented public API so downstream imports stay stable even if
 # private helpers evolve.
 __all__ = [
     "LIVESPEC_FRONTMATTER_FIELDS",
     "MANDATORY_FLOW_SECTIONS",
     "MANDATORY_SCREEN_SECTIONS",
+    "MOCKUP_EXTENSIONS",
     "OPTIONAL_FLOW_SECTIONS",
     "OPTIONAL_SCREEN_SECTIONS",
     "VALIDATION_RESULT",
+    "GenerationMode",
     "ValidationOutcome",
+    "detect_mode",
     "validate_behavioral",
 ]
