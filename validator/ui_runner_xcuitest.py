@@ -386,6 +386,70 @@ class XCUITestRunnerHandler:
                     return f"platform={sim_label},name={name}"
         return None
 
+    def _normalize_destination_by_id(self, destination: str) -> str:
+        """Rewrite ``id=<UUID>`` destinations to ``name=<name>,OS=<version>``.
+
+        Downstream code derives the screenshot folder name from the destination
+        string. Using a UDID makes folders unreadable and unstable — the UDID
+        changes whenever the simulator is recreated, even though the device
+        name is identical. When two simulators share the same name across
+        runtime versions (the historical reason projects pinned by UDID), we
+        disambiguate by appending ``OS=<version>`` so xcodebuild can still
+        target the right device.
+
+        Falls back to the original destination string when:
+          * the destination does not contain ``id=<UUID>``,
+          * the UDID cannot be resolved via ``xcrun simctl list``,
+          * the matched device has no usable name.
+
+        Args:
+            destination: Xcode ``-destination`` value.
+
+        Returns:
+            A normalized destination string suitable for both xcodebuild and
+            for folder-name derivation.
+        """
+        destination_parts = destination.split(",")
+        udid: str | None = None
+        retained_parts: list[str] = []
+        for part in destination_parts:
+            if part.startswith("id="):
+                udid = part.removeprefix("id=")
+                continue
+            retained_parts.append(part)
+
+        if udid is None:
+            return destination
+
+        devices_data = self._list_simulators()
+        runtimes = cast(dict[str, list[dict[str, Any]]], devices_data.get("devices", {}))
+        for runtime_key, devs in runtimes.items():
+            for dev in devs:
+                if dev.get("udid") != udid:
+                    continue
+                name = dev.get("name")
+                if not name:
+                    return destination
+
+                runtime_suffix = runtime_key.rsplit(".", 1)[-1]
+                runtime_parts = runtime_suffix.split("-")
+                os_version = (
+                    f"{runtime_parts[-2]}.{runtime_parts[-1]}"
+                    if len(runtime_parts) >= 3
+                    else None
+                )
+                parts = [
+                    f"name={name}" if part.startswith("name=") else part
+                    for part in retained_parts
+                ]
+                if all(not part.startswith("name=") for part in parts):
+                    insert_at = 1 if parts and parts[0].startswith("platform=") else 0
+                    parts.insert(insert_at, f"name={name}")
+                if os_version:
+                    parts.append(f"OS={os_version}")
+                return ",".join(parts)
+        return destination
+
     # ------------------------------------------------------------------
     # .xcresult bundle parsing
     # ------------------------------------------------------------------
@@ -709,6 +773,12 @@ class XCUITestRunnerHandler:
                     else "platform=iOS Simulator,name=iPhone 16"
                 )
 
+        # Rewrite "id=<UUID>" destinations to "name=<name>,OS=<version>" so the
+        # screenshot folder name stays human-readable and stable across simulator
+        # recreations. No-op when destination already uses name=, or when the
+        # UDID cannot be resolved.
+        destination = self._normalize_destination_by_id(destination)
+
         # Persist the .xcresult under the project so `livespec ui-runner inspect`
         # can read it after the dispatch returns. TemporaryDirectory would delete
         # it before the user has a chance to inspect the trees.
@@ -948,6 +1018,9 @@ class XCUITestRunnerHandler:
                     if (platform or "").lower() == "watchos"
                     else "platform=iOS Simulator,name=iPhone 16"
                 )
+
+        # Same id→name normalization as capture_screenshot.
+        destination = self._normalize_destination_by_id(destination)
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             xcresult_path = Path(tmp_dir) / "flow_result.xcresult"

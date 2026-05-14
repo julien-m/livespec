@@ -378,6 +378,90 @@ def test_find_simulator_udid_not_found(handler: XCUITestRunnerHandler) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Destination normalization (id=UUID → name=...,OS=...)
+# ---------------------------------------------------------------------------
+
+_SIMCTL_JSON_WATCH = json.dumps({
+    "devices": {
+        "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
+            {
+                "udid": "C566988B-648F-4B35-AE30-A369C841335E",
+                "name": "Apple Watch Series 11 (46mm)",
+                "state": "Shutdown",
+                "isAvailable": True,
+            },
+        ],
+        "com.apple.CoreSimulator.SimRuntime.watchOS-26-5": [
+            {
+                "udid": "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE",
+                "name": "Apple Watch Series 11 (46mm)",
+                "state": "Shutdown",
+                "isAvailable": True,
+            },
+        ],
+    }
+})
+
+
+def test_normalize_destination_by_id_rewrites_uuid_to_name_and_os(
+    handler: XCUITestRunnerHandler,
+) -> None:
+    """id=UUID destinations are rewritten to name=...,OS=... using simctl data."""
+    mock_result = MagicMock(returncode=0, stdout=_SIMCTL_JSON_WATCH)
+    with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_result):
+        out = handler._normalize_destination_by_id(
+            "platform=watchOS Simulator,id=C566988B-648F-4B35-AE30-A369C841335E"
+        )
+    assert out == (
+        "platform=watchOS Simulator,name=Apple Watch Series 11 (46mm),OS=26.4"
+    )
+
+
+def test_normalize_destination_by_id_passthrough_when_no_id(
+    handler: XCUITestRunnerHandler,
+) -> None:
+    """Destinations without id=<UUID> are returned unchanged (no simctl call)."""
+    with patch(
+        "validator.ui_runner_xcuitest.subprocess.run",
+        side_effect=AssertionError("simctl must not be invoked"),
+    ):
+        out = handler._normalize_destination_by_id(
+            "platform=iOS Simulator,name=iPhone 16"
+        )
+    assert out == "platform=iOS Simulator,name=iPhone 16"
+
+
+def test_normalize_destination_by_id_falls_back_when_udid_unknown(
+    handler: XCUITestRunnerHandler,
+) -> None:
+    """Unknown UDIDs fall back to the original destination string."""
+    mock_result = MagicMock(returncode=0, stdout=_SIMCTL_JSON_EMPTY)
+    with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_result):
+        out = handler._normalize_destination_by_id(
+            "platform=watchOS Simulator,id=00000000-0000-0000-0000-000000000000"
+        )
+    assert out == (
+        "platform=watchOS Simulator,id=00000000-0000-0000-0000-000000000000"
+    )
+
+
+def test_normalize_destination_by_id_preserves_non_id_qualifiers(
+    handler: XCUITestRunnerHandler,
+) -> None:
+    """Normalization preserves destination qualifiers other than the resolved id."""
+    mock_result = MagicMock(returncode=0, stdout=_SIMCTL_JSON_WATCH)
+    with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_result):
+        out = handler._normalize_destination_by_id(
+            "platform=watchOS Simulator,id=C566988B-648F-4B35-AE30-A369C841335E,"
+            "variant=paired"
+        )
+    assert out == (
+        "platform=watchOS Simulator,name=Apple Watch Series 11 (46mm),"
+        "variant=paired,OS=26.4"
+    )
+
+
+# ---------------------------------------------------------------------------
 # .xcresult bundle parsing
 # ---------------------------------------------------------------------------
 
