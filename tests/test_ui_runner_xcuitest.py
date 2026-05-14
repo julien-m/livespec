@@ -378,7 +378,7 @@ def test_find_simulator_udid_not_found(handler: XCUITestRunnerHandler) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Destination normalization (id=UUID → name=...,OS=...)
+# Friendly destination id (folder naming, stable across UDID changes)
 # ---------------------------------------------------------------------------
 
 _SIMCTL_JSON_WATCH = json.dumps({
@@ -391,74 +391,178 @@ _SIMCTL_JSON_WATCH = json.dumps({
                 "isAvailable": True,
             },
         ],
-        "com.apple.CoreSimulator.SimRuntime.watchOS-26-5": [
-            {
-                "udid": "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE",
-                "name": "Apple Watch Series 11 (46mm)",
-                "state": "Shutdown",
-                "isAvailable": True,
-            },
-        ],
     }
 })
 
 
-def test_normalize_destination_by_id_rewrites_uuid_to_name_and_os(
+def test_friendly_destination_id_resolves_udid_to_platform_name(
     handler: XCUITestRunnerHandler,
 ) -> None:
-    """id=UUID destinations are rewritten to name=...,OS=... using simctl data."""
+    """id=UUID is resolved via simctl to a stable <platform>_<name>_<OS> folder."""
     mock_result = MagicMock(returncode=0, stdout=_SIMCTL_JSON_WATCH)
     with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_result):
-        out = handler._normalize_destination_by_id(
+        out = handler._friendly_destination_id(
             "platform=watchOS Simulator,id=C566988B-648F-4B35-AE30-A369C841335E"
         )
-    assert out == (
-        "platform=watchOS Simulator,name=Apple Watch Series 11 (46mm),OS=26.4"
-    )
+    # OS version is appended for multi-runtime disambiguation.
+    assert out == "watchos_apple_watch_series_11_46mm_26_4"
 
 
-def test_normalize_destination_by_id_passthrough_when_no_id(
+def test_friendly_destination_id_uses_name_when_no_udid(
     handler: XCUITestRunnerHandler,
 ) -> None:
-    """Destinations without id=<UUID> are returned unchanged (no simctl call)."""
+    """Destinations with explicit name= produce the same folder, no simctl call."""
     with patch(
         "validator.ui_runner_xcuitest.subprocess.run",
-        side_effect=AssertionError("simctl must not be invoked"),
+        side_effect=AssertionError("simctl must not be invoked when name is present"),
     ):
-        out = handler._normalize_destination_by_id(
+        out = handler._friendly_destination_id(
             "platform=iOS Simulator,name=iPhone 16"
         )
-    assert out == "platform=iOS Simulator,name=iPhone 16"
+    assert out == "ios_iphone_16"
 
 
-def test_normalize_destination_by_id_falls_back_when_udid_unknown(
+def test_friendly_destination_id_stable_across_udid_changes(
     handler: XCUITestRunnerHandler,
 ) -> None:
-    """Unknown UDIDs fall back to the original destination string."""
+    """Recreating the simulator (new UDID, same name, same runtime) yields same folder."""
+    simctl_v2 = json.dumps({
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
+                {
+                    "udid": "FFFFFFFF-9999-9999-9999-FFFFFFFFFFFF",
+                    "name": "Apple Watch Series 11 (46mm)",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+            ],
+        }
+    })
+    mock_v1 = MagicMock(returncode=0, stdout=_SIMCTL_JSON_WATCH)
+    mock_v2 = MagicMock(returncode=0, stdout=simctl_v2)
+
+    with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_v1):
+        first = handler._friendly_destination_id(
+            "platform=watchOS Simulator,id=C566988B-648F-4B35-AE30-A369C841335E"
+        )
+    with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_v2):
+        second = handler._friendly_destination_id(
+            "platform=watchOS Simulator,id=FFFFFFFF-9999-9999-9999-FFFFFFFFFFFF"
+        )
+    assert first == second == "watchos_apple_watch_series_11_46mm_26_4"
+
+
+def test_friendly_destination_id_falls_back_when_udid_unknown(
+    handler: XCUITestRunnerHandler,
+) -> None:
+    """Unknown UDID with no name= falls back to a sanitized destination string."""
     mock_result = MagicMock(returncode=0, stdout=_SIMCTL_JSON_EMPTY)
     with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_result):
-        out = handler._normalize_destination_by_id(
+        out = handler._friendly_destination_id(
             "platform=watchOS Simulator,id=00000000-0000-0000-0000-000000000000"
         )
-    assert out == (
-        "platform=watchOS Simulator,id=00000000-0000-0000-0000-000000000000"
-    )
+    # No raw "=" or "," and no UUID-style hyphen runs in the folder name.
+    assert "=" not in out
+    assert "," not in out
+    assert out  # non-empty fallback
 
 
-def test_normalize_destination_by_id_preserves_non_id_qualifiers(
+def test_friendly_destination_id_includes_variant_disambiguator(
     handler: XCUITestRunnerHandler,
 ) -> None:
-    """Normalization preserves destination qualifiers other than the resolved id."""
+    """Distinct destinations with variant=paired vs unpaired produce different folders."""
     mock_result = MagicMock(returncode=0, stdout=_SIMCTL_JSON_WATCH)
     with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_result):
-        out = handler._normalize_destination_by_id(
-            "platform=watchOS Simulator,id=C566988B-648F-4B35-AE30-A369C841335E,"
-            "variant=paired"
+        paired = handler._friendly_destination_id(
+            "platform=watchOS Simulator,id=C566988B-648F-4B35-AE30-A369C841335E,variant=paired"
         )
-    assert out == (
-        "platform=watchOS Simulator,name=Apple Watch Series 11 (46mm),"
-        "variant=paired,OS=26.4"
-    )
+        unpaired = handler._friendly_destination_id(
+            "platform=watchOS Simulator,id=C566988B-648F-4B35-AE30-A369C841335E"
+        )
+    assert paired != unpaired
+    assert "paired" in paired
+    assert "paired" not in unpaired
+
+
+def test_friendly_destination_id_includes_os_version_for_multi_runtime_disambiguation(
+    handler: XCUITestRunnerHandler,
+) -> None:
+    """Same-name simulators on different runtimes get different folder names."""
+    # Two Apple Watch Series 11 (46mm) devices on different watchOS runtimes.
+    multi_runtime = json.dumps({
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
+                {
+                    "udid": "C566988B-648F-4B35-AE30-A369C841335E",
+                    "name": "Apple Watch Series 11 (46mm)",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+            ],
+            "com.apple.CoreSimulator.SimRuntime.watchOS-26-5": [
+                {
+                    "udid": "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE",
+                    "name": "Apple Watch Series 11 (46mm)",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+            ],
+        }
+    })
+    mock_v264 = MagicMock(returncode=0, stdout=_SIMCTL_JSON_WATCH)
+    mock_multi = MagicMock(returncode=0, stdout=multi_runtime)
+
+    with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_v264):
+        v264 = handler._friendly_destination_id(
+            "platform=watchOS Simulator,id=C566988B-648F-4B35-AE30-A369C841335E"
+        )
+    with patch("validator.ui_runner_xcuitest.subprocess.run", return_value=mock_multi):
+        v265 = handler._friendly_destination_id(
+            "platform=watchOS Simulator,id=AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE"
+        )
+    assert v264 != v265
+    assert "26_4" in v264
+    assert "26_5" in v265
+
+
+def test_capture_screenshot_passes_unmodified_destination_to_xcodebuild(
+    tmp_path: Path,
+) -> None:
+    """Verify that xcodebuild receives the original destination string (id=UUID)."""
+    handler = XCUITestRunnerHandler(tmp_path)
+    (tmp_path / "MyApp.xcodeproj").mkdir()
+    (tmp_path / "MyApp.xcodeproj" / "project.pbxproj").write_text("")
+    (tmp_path / ".specs").mkdir()
+
+    captured_dest = []
+
+    def mock_run(cmd, *args, **kwargs):
+        joined = " ".join(str(c) for c in cmd)
+        if "xcodebuild" in joined:
+            # Capture the -destination value.
+            try:
+                idx = cmd.index("-destination")
+                captured_dest.append(cmd[idx + 1])
+            except (ValueError, IndexError):
+                pass
+        mock = MagicMock()
+        mock.returncode = 0
+        mock.stdout = ""
+        mock.stderr = ""
+        return mock
+
+    with patch(
+        "validator.ui_runner_xcuitest.subprocess.run", side_effect=mock_run
+    ), patch("validator.ui_runner_xcuitest.platform.system", return_value="Darwin"):
+        handler.capture_screenshot(
+            destination="platform=watchOS Simulator,id=TEST-UUID-001",
+            test_scheme="TestScheme",
+            platform="watchos"
+        )
+
+    # Verify -destination argument is the unmodified id=UUID form, not rewritten to name=.
+    assert len(captured_dest) > 0
+    assert captured_dest[0] == "platform=watchOS Simulator,id=TEST-UUID-001"
 
 
 # ---------------------------------------------------------------------------

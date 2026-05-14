@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import platform
+import re
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
@@ -386,69 +387,106 @@ class XCUITestRunnerHandler:
                     return f"platform={sim_label},name={name}"
         return None
 
-    def _normalize_destination_by_id(self, destination: str) -> str:
-        """Rewrite ``id=<UUID>`` destinations to ``name=<name>,OS=<version>``.
+    def _friendly_destination_id(self, destination: str) -> str:
+        """Derive a stable, human-readable screenshot folder name.
 
-        Downstream code derives the screenshot folder name from the destination
-        string. Using a UDID makes folders unreadable and unstable — the UDID
-        changes whenever the simulator is recreated, even though the device
-        name is identical. When two simulators share the same name across
-        runtime versions (the historical reason projects pinned by UDID), we
-        disambiguate by appending ``OS=<version>`` so xcodebuild can still
-        target the right device.
+        The xcodebuild destination string is left untouched (we keep
+        ``id=<UUID>`` when the user pinned a specific simulator — that form is
+        unambiguous even when an iPhone/Watch pair has lookalike names). What
+        changes here is the *folder name* we write captures into: it must be
+        readable and, more importantly, **stable** for the same logical
+        simulator across reruns.
 
-        Falls back to the original destination string when:
-          * the destination does not contain ``id=<UUID>``,
-          * the UDID cannot be resolved via ``xcrun simctl list``,
-          * the matched device has no usable name.
+        Strategy:
+          1. If the destination carries ``id=<UUID>``, resolve the UDID via
+             ``xcrun simctl list`` to recover the device name + platform.
+          2. Otherwise fall back to the ``name=`` and ``platform=`` qualifiers
+             already present in the destination string.
+          3. Produce ``<platform>_<sanitized_name>`` (e.g.
+             ``watchos_apple_watch_series_11_46mm``) — no UUID, no OS version,
+             no shell-hostile characters.
+
+        Same simulator (same name, same kind) → same folder, even if the
+        simulator was deleted and recreated (new UDID, same name).
 
         Args:
-            destination: Xcode ``-destination`` value.
+            destination: Xcode ``-destination`` value as passed to xcodebuild.
 
         Returns:
-            A normalized destination string suitable for both xcodebuild and
-            for folder-name derivation.
+            Sanitized folder name. Never empty: falls back to a sanitized form
+            of the destination string when no usable name can be derived.
         """
-        destination_parts = destination.split(",")
+        parts = [p.strip() for p in destination.split(",") if p.strip()]
         udid: str | None = None
-        retained_parts: list[str] = []
-        for part in destination_parts:
+        name: str | None = None
+        platform_label: str | None = None
+        variant: str | None = None
+        os_version: str | None = None
+        for part in parts:
             if part.startswith("id="):
                 udid = part.removeprefix("id=")
-                continue
-            retained_parts.append(part)
+            elif part.startswith("name="):
+                name = part.removeprefix("name=")
+            elif part.startswith("platform="):
+                platform_label = part.removeprefix("platform=")
+            elif part.startswith("variant="):
+                variant = part.removeprefix("variant=")
+            elif part.startswith("OS="):
+                os_version = part.removeprefix("OS=")
 
-        if udid is None:
-            return destination
-
-        devices_data = self._list_simulators()
-        runtimes = cast(dict[str, list[dict[str, Any]]], devices_data.get("devices", {}))
-        for runtime_key, devs in runtimes.items():
-            for dev in devs:
-                if dev.get("udid") != udid:
+        # When pinned by UDID, resolve to a stable device name + runtime via simctl.
+        # Prefer resolved name over any passed-in name=, since the UDID is the
+        # canonical reference and might be stale if a name= contradicts it.
+        if udid is not None:
+            devices_data = self._list_simulators()
+            runtimes = cast(
+                dict[str, list[dict[str, Any]]], devices_data.get("devices", {})
+            )
+            for runtime_key, devs in runtimes.items():
+                matched = next((d for d in devs if d.get("udid") == udid), None)
+                if matched is None:
                     continue
-                name = dev.get("name")
-                if not name:
-                    return destination
+                name = matched.get("name")
+                if platform_label is None:
+                    key_lower = runtime_key.lower()
+                    if "watchos" in key_lower:
+                        platform_label = "watchOS Simulator"
+                    elif "tvos" in key_lower:
+                        platform_label = "tvOS Simulator"
+                    elif "visionos" in key_lower or "xros" in key_lower:
+                        platform_label = "visionOS Simulator"
+                    elif "ios" in key_lower:
+                        platform_label = "iOS Simulator"
+                # Extract runtime version for multi-runtime disambiguation
+                if os_version is None:
+                    m = re.search(r"(?:iOS|watchOS|tvOS|visionOS)-(\d+)-(\d+)", runtime_key)
+                    os_version = f"{m.group(1)}.{m.group(2)}" if m else None
+                break
 
-                runtime_suffix = runtime_key.rsplit(".", 1)[-1]
-                runtime_parts = runtime_suffix.split("-")
-                os_version = (
-                    f"{runtime_parts[-2]}.{runtime_parts[-1]}"
-                    if len(runtime_parts) >= 3
-                    else None
-                )
-                parts = [
-                    f"name={name}" if part.startswith("name=") else part
-                    for part in retained_parts
-                ]
-                if all(not part.startswith("name=") for part in parts):
-                    insert_at = 1 if parts and parts[0].startswith("platform=") else 0
-                    parts.insert(insert_at, f"name={name}")
-                if os_version:
-                    parts.append(f"OS={os_version}")
-                return ",".join(parts)
-        return destination
+        def _sanitize(value: str) -> str:
+            value = value.lower()
+            # Collapse every run of non-lowercase-alphanumeric characters to "_"
+            # so folder names stay filesystem-safe and deterministic.
+            value = re.sub(r"[^a-z0-9]+", "_", value)
+            return value.strip("_")
+
+        if name:
+            platform_prefix = _sanitize(platform_label or "simulator")
+            # Drop the trailing "_simulator" noise for compact folder names.
+            platform_prefix = re.sub(r"_simulator$", "", platform_prefix) or "simulator"
+            parts_list = [platform_prefix, _sanitize(name)]
+            # Append stable disambiguators so distinct logical destinations don't
+            # collide to the same folder.
+            if variant:
+                parts_list.append(_sanitize(variant))
+            if os_version:
+                parts_list.append(_sanitize(os_version))
+            return "_".join(parts_list)
+
+        # No name resolvable — fall back to a sanitized destination string so
+        # we still avoid raw "=" and "," in the path.
+        fallback = _sanitize(destination)
+        return fallback or "destination"
 
     # ------------------------------------------------------------------
     # .xcresult bundle parsing
@@ -773,11 +811,9 @@ class XCUITestRunnerHandler:
                     else "platform=iOS Simulator,name=iPhone 16"
                 )
 
-        # Rewrite "id=<UUID>" destinations to "name=<name>,OS=<version>" so the
-        # screenshot folder name stays human-readable and stable across simulator
-        # recreations. No-op when destination already uses name=, or when the
-        # UDID cannot be resolved.
-        destination = self._normalize_destination_by_id(destination)
+        # NOTE: destination is passed to xcodebuild untouched (id=<UUID> stays
+        # unambiguous when an iPhone/Watch pair shares lookalike names). Folder
+        # naming is handled separately via _friendly_destination_id below.
 
         # Persist the .xcresult under the project so `livespec ui-runner inspect`
         # can read it after the dispatch returns. TemporaryDirectory would delete
@@ -808,9 +844,7 @@ class XCUITestRunnerHandler:
             # the existing bundle. Otherwise we'd return success with
             # exported_paths=[], leaving the .specs/design/screens/<dest>/
             # directory empty on repeat runs.
-            destination_id = destination.replace("=", "_").replace(
-                ",", "_"
-            ).replace(" ", "_")
+            destination_id = self._friendly_destination_id(destination)
             cached_output_dir = self.project_dir / ".specs" / "design" / "screens"
             cached_paths = self._parse_xcresult(
                 xcresult_path, cached_output_dir, destination_id
@@ -907,7 +941,7 @@ class XCUITestRunnerHandler:
                 },
             )
 
-        destination_id = destination.replace("=", "_").replace(",", "_").replace(" ", "_")
+        destination_id = self._friendly_destination_id(destination)
         output_dir = self.project_dir / ".specs" / "design" / "screens"
         exported_paths = self._parse_xcresult(xcresult_path, output_dir, destination_id)
 
@@ -1019,8 +1053,8 @@ class XCUITestRunnerHandler:
                     else "platform=iOS Simulator,name=iPhone 16"
                 )
 
-        # Same id→name normalization as capture_screenshot.
-        destination = self._normalize_destination_by_id(destination)
+        # destination is passed to xcodebuild untouched — same rationale as
+        # capture_screenshot. Folder naming uses _friendly_destination_id.
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             xcresult_path = Path(tmp_dir) / "flow_result.xcresult"
