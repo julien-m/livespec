@@ -85,6 +85,41 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 
 ---
 
+## User Integrations (`~/.config/livespec/*.md`)
+
+LiveSpec supports **user-level Markdown integrations**: drop a `<name>.md`
+file under `~/.config/livespec/` and it is automatically injected into the
+LLM context of the LiveSpec commands you target via its YAML frontmatter.
+This is a hook-resolution **Level 0**, prepended to the existing Global /
+Project / Local levels.
+
+```yaml
+---
+integration: <name>
+commands: [specify, plan]   # any subset of commands/*.md
+phase: before               # before | after (default: before)
+mode: extend                # extend | override (default: extend)
+order: 100                  # lower = injected earlier
+---
+
+<markdown body — injected as-is, with {{feature_name}} etc. substituted>
+```
+
+**Opt-in by design.** Without a file in `~/.config/livespec/`, the
+framework is tool-agnostic — no warning, no error, identical behavior.
+A starter template is shipped under
+[`examples/config/mockups.md.example`](examples/config/mockups.md.example).
+
+See [`system/integrations.md`](system/integrations.md) for the full
+specification (eligibility rule, override scope, template variables,
+chained-pipeline semantics, `--economy` mode limitation). Diagnostic:
+`livespec integrations list` or `/spec.hooks <command>`.
+
+This pattern is independent of `~/.config/livespec/provider.py` (the
+existing Python callable that overrides LLM routing).
+
+---
+
 ## Quick Start
 
 ### Claude Code (recommended)

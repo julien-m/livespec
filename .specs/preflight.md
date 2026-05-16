@@ -123,3 +123,17 @@ note: Only needed for --plan-review, --semantic, --contradiction-only flags
 - **severity:** critical
 - **source:** stack (driver: python)
 <!-- preflight:livespec:end -->
+
+## User Integrations (optional)
+
+### user-level integrations report
+
+```yaml
+check: ls ~/.config/livespec/*.md 2>/dev/null | grep -v provider.py || true
+source: validator/integrations.py
+status: optional
+```
+
+**Status:** Informational only — surfaces which Level 0 markdown integrations
+are currently active for the local user. Absence is normal — LiveSpec runs
+unchanged without any integration. See `system/integrations.md`.

@@ -19,6 +19,7 @@ from .engine import validate_all
 from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
 from .git_ops import git_app
+from .hooks_cli import hooks_app, integrations_app
 from .pipeline import pipeline_app
 from .reporter import report, report_excluded, report_score_only
 from .specs_utils import find_specs_root
@@ -40,6 +41,9 @@ register_unified_commands(app)
 # @spec FR-006, FR-007 (feature 039): verify-output + run wrap/record.
 register_verify_output(app)
 app.add_typer(run_app, name="run")
+# Feature: integration-markdown-pattern — hook resolution runtime CLI + L0 diagnostic.
+app.add_typer(hooks_app, name="hooks")
+app.add_typer(integrations_app, name="integrations")
 
 
 def _find_specs_root(start: Path | None = None) -> Path:

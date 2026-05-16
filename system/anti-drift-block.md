@@ -176,3 +176,81 @@ in the command's `## Drift tests` section).
 *This block is a form-standardisation tool. It does NOT replace command-specific business logic,
 identity resolution (Chantier 4), supervisor↔subagent contracts (Chantier 2), or write-lock
 semantics (Chantier 3).*
+
+---
+
+## 7. Hook & Integration Resolution (runtime)
+
+You are currently executing a LiveSpec slash command. The user invoked you
+via a literal `/spec.<NAME>` instruction (e.g. `/spec.plan`, `/spec.feature`).
+This `<NAME>` is the canonical command name and is directly observable in
+the user's invocation string.
+
+At the VERY start of execution:
+
+1. Read the slash-command invocation string from the current user turn.
+2. Strip the leading `/spec.` prefix to obtain `<NAME>`.
+   - Valid example: `/spec.plan` → `<NAME>` = `plan`
+   - Valid example: `/spec.feature` → `<NAME>` = `feature`
+3. If you have a resolved feature slug (e.g., `042-notifications`), run:
+
+       livespec hooks resolve --event before --command <NAME> --feature <slug>
+
+   Otherwise (no feature context available), run:
+
+       livespec hooks resolve --event before --command <NAME>
+
+4. Treat stdout (if non-empty) as additional context to honor before
+   proceeding with the command body.
+
+At the VERY end of execution, run the same invocation with `--event after`,
+optionally including `--feature <slug>` if available.
+
+**Absence handling** (all conditions → silent no-op, never an error):
+
+- the invocation does not match `/spec.<NAME>` → skip resolution
+- the CLI binary is not on PATH → skip resolution
+- `--feature` is omitted when feature context is unavailable (absence-tolerant)
+- stdout is empty → no injection
+- exit code is non-zero → skip resolution and continue
+
+### Chained / pipeline invocations
+
+When `/spec.feature` (or `/spec.ship`) spawns subagents in sequence
+(Specify, Plan, Implement, Test, …):
+
+**Decision LOCKED — option β: per-sub-command resolution.** The hook
+resolver always receives the name of the sub-command that is currently
+executing — NOT the outer pipeline name. Implementation contract:
+
+1. When the user invokes `/spec.feature`, the OUTER command resolves
+   `before-feature` / `after-feature` at its outer boundary with
+   `<NAME> = feature`.
+2. Before spawning each subagent (Specify, Plan, Implement, Test, …),
+   the supervisor in `commands/feature.md` MUST prepend a synthetic
+   invocation header to the subagent prompt, of the EXACT form:
+
+       /spec.<subcmd>
+
+   where `<subcmd>` ∈ {`specify`, `plan`, `implement`, `test`, …}. This
+   single line is the FIRST line of the subagent's user turn, so the
+   subagent applies steps (1)–(4) of this directive against `<subcmd>`,
+   not `feature`. The same rule applies to `commands/ship.md` (batch
+   wrapper).
+3. Each subagent therefore runs (with `--feature <slug>` included when feature
+   context is available):
+
+       livespec hooks resolve --event before --command <subcmd> [--feature <slug>]
+       livespec hooks resolve --event after  --command <subcmd> [--feature <slug>]
+
+   at its own boundaries — completely independent of the outer call.
+4. Integrations target sub-phases by listing them explicitly in
+   `commands:`. Example: `commands: [specify, plan]` injects at
+   `before-specify` AND `before-plan` inside a `/spec.feature` pipeline,
+   but NOT at `before-feature`. To inject at the outer pipeline boundary
+   ONLY, list `[feature]`. To inject at BOTH outer and inner, list all
+   relevant names explicitly. **No automatic propagation from outer to
+   inner.** The `commands:` list is authoritative.
+
+See [`integrations.md`](integrations.md) for the full Level 0 semantics
+and [`hooks.md`](hooks.md) for the Level 1/2/3 algorithm.

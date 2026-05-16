@@ -355,6 +355,7 @@ When a feature description is provided → skip this phase entirely, proceed to 
 3. Spawn a **Specify agent** with the assembled Universal Agent Context and these instructions:
 
    ```
+   /spec.specify
    Execute the full specify pipeline from `commands/specify.md`.
 
    [Universal Agent Context fields: feature_name, feature_dir, feature_description, active_flags, conventions]
@@ -366,6 +367,12 @@ When a feature description is provided → skip this phase entirely, proceed to 
    Output a PHASE_RESULT block (Specify agent schema from § PHASE_RESULT Schemas)
    as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
    ```
+
+   > **D-α (Hook resolution for chained invocations).** The first line `/spec.specify`
+   > is a synthetic invocation header consumed by the subagent's anti-drift directive
+   > (`system/anti-drift-block.md § 7`) so that `livespec hooks resolve --event before
+   > --command specify` is invoked instead of `--command feature`. Do NOT remove this
+   > line. See [`system/integrations.md`](../system/integrations.md) for the contract.
 
 4. Receive PHASE_RESULT from the Specify agent.
    - If `PHASE_RESULT: BLOCKED` → display error, run `livespec pipeline update --feature NNN-feature-name --phase specify --status blocked`, stop.
@@ -449,6 +456,7 @@ Once branch decision is resolved, spawn the Plan agent (Phase 2).
 3. Spawn a **Plan agent** with the assembled Universal Agent Context and these instructions:
 
    ```
+   /spec.plan
    Execute the full plan pipeline from `commands/plan.md`.
 
    [Universal Agent Context fields: feature_name, feature_dir, feature_description, active_flags, conventions]
@@ -536,6 +544,7 @@ This ensures all tools and credentials are available before the autonomous imple
 3. Spawn an **Implement agent** with the assembled Universal Agent Context and these instructions:
 
    ```
+   /spec.implement
    Execute the full implement pipeline from `commands/implement.md`.
 
    [Universal Agent Context fields: feature_name, feature_dir, feature_description, active_flags, conventions]
@@ -561,6 +570,7 @@ This ensures all tools and credentials are available before the autonomous imple
 2. Spawn a **Test agent** with `feature_name` and these instructions:
 
    ```
+   /spec.test
    Execute: /spec.test <NNN-feature-name> --auto --update
 
    feature_name: NNN-feature-name

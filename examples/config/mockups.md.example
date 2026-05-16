@@ -1,0 +1,45 @@
+---
+# OPT-IN INTEGRATION TEMPLATE — NOT ACTIVE BY DEFAULT.
+# Copy this file to ~/.config/livespec/mockups.md to enable.
+# Remove/rename that copy to fully disable. LiveSpec core is tool-agnostic
+# and does NOT reference /mockup-factory unless this file is present.
+integration: mockups
+commands: [specify, plan]
+phase: before
+mode: extend
+order: 50
+---
+
+<!--
+OPT-IN INTEGRATION TEMPLATE — NOT ACTIVE BY DEFAULT.
+
+LiveSpec is tool-agnostic. This file is shipped as a copy-paste template
+under examples/config/ and is NOT loaded, referenced, nor invoked by any
+LiveSpec command unless you explicitly do:
+
+    cp examples/config/mockups.md.example ~/.config/livespec/mockups.md
+
+Removing or renaming ~/.config/livespec/mockups.md fully disables the
+integration — LiveSpec returns to default behavior with zero residual
+mention of /mockup-factory anywhere in the framework.
+
+The /mockup-factory skill itself lives in ai-ressources and is neither
+bundled with nor required by LiveSpec.
+-->
+
+# Mockup Factory Integration (opt-in)
+
+When the current feature has a UI dimension (it includes one or more
+user-facing screens), generate or refresh visual mockups via the global
+Claude Code skill `/mockup-factory` BEFORE producing screens references
+or design plans.
+
+Invocation contract:
+
+- `/mockup-factory --target . --groups <derived-from-feature> --product <derived-from-stack>`
+- `--groups` is derived from the feature description (e.g. `auth,onboarding`).
+- `--product` is derived from `.specs/stacks/_default.md` product type
+  (e.g. `web`, `mobile`).
+
+Skip if `.specs/design/screens/` already contains screens matching the
+feature scope.
