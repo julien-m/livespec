@@ -27,8 +27,8 @@ def _isolate_user_config(
     _reset_warnings_for_tests()
     # Re-import for changed defaults (module-level constants captured Path.home()
     # at import time). Reload via monkeypatching the module constants directly.
-    import validator.integrations as integ
     import validator.hook_resolver as hr
+    import validator.integrations as integ
 
     monkeypatch.setattr(integ, "INTEGRATIONS_DIR", fake_home / ".config" / "livespec")
     monkeypatch.setattr(

@@ -13,13 +13,13 @@ from .cli_commands.run_cmd import run_app
 from .cli_commands.verify_output_cmd import register as register_verify_output
 from .commit_context import commit_context_app
 from .config import load_config
-from .hooks_cli import hooks_app, integrations_app
 from .drivers.cli import driver_app
 from .drivers.test_config_cli import init_app
 from .engine import validate_all
 from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
 from .git_ops import git_app
+from .hooks_cli import hooks_app, integrations_app
 from .pipeline import pipeline_app
 from .reporter import report, report_excluded, report_score_only
 from .specs_utils import find_specs_root
