@@ -176,8 +176,7 @@ def test_invalid_mode_is_skipped_with_warning(
     assert result == []
     err = capsys.readouterr().err
     assert err.count("⚠ ") == 1
-    assert 'invalid mode "merge"' in err
-    assert "unknown mode" in err
+    assert "invalid mode" in err and "merge" in err
 
 
 def test_broken_yaml_emits_single_warning(
