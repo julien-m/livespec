@@ -68,12 +68,15 @@ flowchart TD
 
 ---
 
-> **Hooks — before starting:** **Read** `before-plan` hooks from all 3 levels (skip missing files):
-> 1. `~/.claude/livespec/hooks/before-plan.md`
-> 2. `.specs/hooks/before-plan.md`
-> 3. `.specs/hooks/before-plan.local.md` (if `mode: override` → use only this one)
+> **Hooks & integrations — before starting:** Run `livespec hooks resolve --event before --command plan [--feature <slug>]` (the anti-drift directive in [`system/anti-drift-block.md`](../system/anti-drift-block.md) § 7 fires this automatically when this command is invoked directly as `/spec.plan`). The CLI resolves the full 4-level chain:
+> 0. `~/.config/livespec/*.md` — user-level integrations (see [`system/integrations.md`](../system/integrations.md))
+> 1. `~/.claude/livespec/hooks/before-plan.md` — global
+> 2. `.specs/hooks/before-plan.md` — project
+> 3. `.specs/hooks/before-plan.local.md` — personal (if `mode: override` → skips 1 and 2)
 >
-> **Hooks — after completing:** Same resolution with `after-plan` at all 3 levels.
+> Non-empty stdout is injected as additional context. When hook files, CLI, or integrations are absent: no injection occurs (this is NOT an error — per [`system/integrations.md`](../system/integrations.md) design contract, absence is intentional). When exit code is non-zero (which should not occur per system guarantees in [`system/integrations.md`](../system/integrations.md) L154-156): skip resolution and emit a diagnostic to stderr.
+>
+> **Hooks & integrations — after completing:** Same resolution with `--event after`.
 
 ## Surface-Aware Test Directory Resolution
 
