@@ -43,23 +43,55 @@ before-feature.md        # Injected before /spec.feature (the full pipeline)
 
 ---
 
-## Resolution Levels (3 levels)
+## Resolution Levels (4 levels)
 
-Hooks are resolved from 3 locations, in order:
+Hooks are resolved from 4 locations, in order:
 
 ```
-Level 1: Global     ~/.claude/livespec/hooks/{before|after}-{command}.md
-Level 2: Project    .specs/hooks/{before|after}-{command}.md              (committed — team conventions)
-Level 3: Local      .specs/hooks/{before|after}-{command}.local.md        (gitignored — personal prefs)
+Level 0: User Integrations  ~/.config/livespec/*.md                      (user-level, frontmatter-targeted)
+Level 1: Global             ~/.claude/livespec/hooks/{before|after}-{command}.md
+Level 2: Project             .specs/hooks/{before|after}-{command}.md     (committed — team conventions)
+Level 3: Local               .specs/hooks/{before|after}-{command}.local.md (gitignored — personal prefs)
 ```
 
 | Level | Location | Committed? | Scope |
 |-------|----------|------------|-------|
+| User Integrations | `~/.config/livespec/*.md` | N/A (user config) | Selected commands per file frontmatter |
 | Global | `~/.claude/livespec/hooks/` | N/A (user home) | All LiveSpec projects |
 | Project | `.specs/hooks/` | Yes | This project (team-shared) |
 | Local | `.specs/hooks/*.local.md` | No (gitignored) | This project (personal) |
 
 The distinction between committed and local is the `.local.md` suffix — exactly like `.env` vs `.env.local`.
+
+### Level 0 — User Integrations
+
+Files in `~/.config/livespec/*.md` are **user-level integrations**: markdown
+instructions injected into the LLM context of selected LiveSpec commands,
+targeted by their YAML frontmatter (not by filename).
+
+Frontmatter schema (BOTH `integration:` and `commands:` are required to
+identify the file as an integration):
+
+```yaml
+---
+integration: <name>           # REQUIRED — logical name (any non-empty string)
+commands: [<cmd>, ...]        # REQUIRED — matched against commands/*.md registry
+phase: before | after         # default: before
+mode: extend | override       # default: extend
+order: <int>                  # default: 100 (lower = injected earlier)
+---
+```
+
+**Single eligibility rule:** a file is treated as an integration if and
+only if its frontmatter contains BOTH the `integration:` key AND the
+`commands:` key. Otherwise (no frontmatter, missing either key) the file
+is **silently ignored** — free `.md` notes can coexist without noise. A
+file that DOES declare itself an integration but is malformed (unknown
+command, invalid mode, invalid types, broken YAML) emits a single
+stderr warning and is skipped.
+
+**Read** [`integrations.md`](integrations.md) for the full semantics, runtime
+algorithm, ordering rules, and override scope.
 
 ---
 
@@ -112,19 +144,34 @@ Local before-plan.local.md (alone) → COMMAND → after hooks...
 For each hook event (e.g., `before-plan`):
 
 ```
-1. Collect candidates:
-   global  = ~/.claude/livespec/hooks/before-plan.md      (if exists)
-   project = .specs/hooks/before-plan.md                   (if exists)
-   local   = .specs/hooks/before-plan.local.md             (if exists)
+1. Collect Level 0 candidates:
+   For each ~/.config/livespec/*.md:
+     parse YAML frontmatter
+     keep iff "integration" AND "commands" both present
+                                AND <cmd> ∈ commands
+                                AND (phase == event OR phase absent and event == "before")
+   Sort kept files by (order ASC, basename ASC).
+   If ≥2 files have mode == "override" → error "Multiple override integrations".
+   If exactly 1 file has mode == "override" → L0 = [that file] (others discarded).
+   Else L0 = sorted list.
 
-2. Check local hook mode:
+2. Collect Level 1/2/3 candidates:
+   global  = ~/.claude/livespec/hooks/{event}-{cmd}.md     (if exists)
+   project = .specs/hooks/{event}-{cmd}.md                  (if exists)
+   local   = .specs/hooks/{event}-{cmd}.local.md            (if exists)
+
+3. Check local hook mode (unchanged):
    - If local exists AND mode == "override":
-     → Use ONLY the local hook. Skip global and project.
-   - Otherwise (extend or no local):
-     → Load all existing hooks in order: global → project → local
+     → higher_chain = [local]    (Level 0 is NOT affected)
+   - Otherwise:
+     → higher_chain = [global, project, local] (existing ones)
 
-3. Inject the combined content into the command context.
+4. Inject (L0 ∥ higher_chain) into the command context, after template variable substitution.
 ```
+
+Note: a `mode: override` at Level 3 (`.local.md`) does NOT strip Level 0 — and
+symmetrically, a `mode: override` at Level 0 does NOT strip Levels 1/2/3.
+The override scope is strictly bounded to the level that declares it.
 
 If no hooks exist for an event, nothing is injected — the command runs as normal.
 
@@ -297,6 +344,11 @@ For `/spec.implement`, two additional hook points exist:
 3. **Before each step** — resolve and inject `before-implement-step` hooks
 4. **After each step** — resolve and inject `after-implement-step` hooks
 
+**Level 0 (user integrations)** participate in the same injection points as
+Levels 1–3. They are resolved first and prepended to the chain. The set of
+commands a Level 0 file applies to is determined by its `commands:` frontmatter
+field, not by filename — multiple commands can share one integration file.
+
 For `/spec.feature`, hooks are resolved for each sub-command in the pipeline:
 - `before-feature` / `after-feature` — wraps the entire pipeline
 - `before-specify` / `after-specify` — wraps the specify phase
@@ -347,8 +399,8 @@ The following pattern must be present in the project's `.gitignore` (added by `/
 
 ## Discovery
 
-Use `/spec.hooks [command]` to see which hooks would be loaded for a given command, or `--create`/`--edit` to manage them. See `commands/hooks.md` for details.
+Use `/spec.hooks [command]` to see which hooks would be loaded for a given command, including Level 0 user integrations (path, name, order, mode), or `--create`/`--edit` to manage levels 1–3. See [`commands/hooks.md`](../commands/hooks.md) for details. Level 0 integrations are managed by simply creating, editing, or deleting files in `~/.config/livespec/`.
 
 ---
 
-*LiveSpec Hooks Protocol v1.0*
+*LiveSpec Hooks Protocol v1.1 — adds Level 0 user integrations*

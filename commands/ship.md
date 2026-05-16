@@ -208,6 +208,7 @@ Spawn a new agent with a fresh context to execute the feature pipeline:
 
 ```
 Agent prompt:
+  /spec.feature
   You are working on project: <project name from .specs/project.md>
   Current branch: feature/NNN-name (already created and checked out)
   Target: Execute `/spec.feature "<description from roadmap item>" --auto --branch`
@@ -219,6 +220,14 @@ Agent prompt:
 
   IMPORTANT: End your response with the SHIP_RESULT block (see feature.md § Ship Result).
 ```
+
+> **D-α (Hook resolution for chained invocations).** The first prompt line `/spec.feature`
+> is a synthetic invocation header consumed by the spawned agent's anti-drift directive
+> (`system/anti-drift-block.md § 7`) so that `livespec hooks resolve --event before
+> --command feature` is invoked at the outer pipeline boundary. The agent will then,
+> in turn, prepend `/spec.<subcmd>` headers when spawning its own Specify/Plan/…
+> subagents (see `commands/feature.md`). Do NOT remove this line. See
+> [`system/integrations.md`](../system/integrations.md) for the contract.
 
 The agent executes the full pipeline autonomously: specify → spec review → plan → plan review → preflight light → implement → audit → commit. Each agent gets a **fresh context window**, preventing exhaustion on large batches.
 

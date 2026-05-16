@@ -50,7 +50,24 @@ If no `command-name` is provided:
 
 ### Step 2 — Scan Hook Locations
 
-For the target command, check existence of hook files at all 3 levels:
+For the target command, scan the 4 resolution levels:
+
+```
+~/.config/livespec/*.md                            → Level 0 (user integrations)
+                                                       — filtered by frontmatter `commands:` list.
+                                                       — only files declaring `integration:` + `commands:`
+                                                         are considered (others silently ignored).
+                                                       — run `livespec integrations list` for diagnostic.
+```
+
+Programmatic equivalent for Level 0 resolution:
+
+```bash
+livespec hooks resolve --event before --command <command>   # full rendered chain
+livespec integrations list                                  # table of all L0 files
+```
+
+Then check existence of hook files at the 3 existing levels:
 
 ```
 ~/.claude/livespec/hooks/before-{command}.md       → Global
@@ -84,6 +101,7 @@ For each existing hook file, parse the YAML frontmatter to extract:
 Hooks for /spec.plan:
 
   BEFORE:
+    [L0 integration] mockups (order=50, mode=extend) → ~/.config/livespec/mockups.md
     ✓ ~/.claude/livespec/hooks/before-plan.md          (global, extend)
     ✓ .specs/hooks/before-plan.md                      (project, extend)
     ✓ .specs/hooks/before-plan.local.md                (local, extend)

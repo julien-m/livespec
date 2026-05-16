@@ -13,6 +13,7 @@ from .cli_commands.run_cmd import run_app
 from .cli_commands.verify_output_cmd import register as register_verify_output
 from .commit_context import commit_context_app
 from .config import load_config
+from .hooks_cli import hooks_app, integrations_app
 from .drivers.cli import driver_app
 from .drivers.test_config_cli import init_app
 from .engine import validate_all
@@ -40,6 +41,9 @@ register_unified_commands(app)
 # @spec FR-006, FR-007 (feature 039): verify-output + run wrap/record.
 register_verify_output(app)
 app.add_typer(run_app, name="run")
+# Feature: integration-markdown-pattern — hook resolution runtime CLI + L0 diagnostic.
+app.add_typer(hooks_app, name="hooks")
+app.add_typer(integrations_app, name="integrations")
 
 
 def _find_specs_root(start: Path | None = None) -> Path:

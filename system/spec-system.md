@@ -240,11 +240,16 @@ LiveSpec supports **lifecycle hooks** — Markdown files with instructions injec
 **Full protocol:** Read [`system/hooks.md`](../system/hooks.md) for the complete resolution protocol, naming conventions, and inheritance model.
 
 **Quick reference:**
-- 3 resolution levels: global (`~/.claude/livespec/hooks/`) → project (`.specs/hooks/`) → local (`.specs/hooks/*.local.md`)
-- Naming: `{before|after}-{command}.md` and `{before|after}-{command}.local.md`
-- Inheritance: `mode: extend` (default, accumulate) or `mode: override` (replace chain)
+- 4 resolution levels: user integrations (`~/.config/livespec/*.md`) → global (`~/.claude/livespec/hooks/`) → project (`.specs/hooks/`) → local (`.specs/hooks/*.local.md`)
+- Naming: `{before|after}-{command}.md` and `{before|after}-{command}.local.md` (Levels 1–3); user integrations target commands via frontmatter, not filename
+- Inheritance: `mode: extend` (default, accumulate) or `mode: override` (replace chain at the level that declares it)
 - Step-level hooks: `before-implement-step.md` / `after-implement-step.md`
 - Discovery: `/spec.hooks [command]` to see active hooks; use `--create`/`--edit` to manage hooks
+
+**User-level integrations.** Markdown files in `~/.config/livespec/` may
+inject instructions into selected commands (Level 0 of hook resolution).
+See [`integrations.md`](../system/integrations.md) for the full schema,
+runtime CLI (`livespec hooks resolve`), and chained-pipeline semantics.
 
 ---
 
