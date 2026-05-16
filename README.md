@@ -407,7 +407,9 @@ Install the two bootstrap commands that must exist before a project can link the
 bash ~/livespec/scripts/install.sh
 ```
 
-This creates global symlinks for `/spec.init` and `/spec.migrate` in `~/.claude/commands/`.
+This creates global symlinks for:
+- `/spec.init` and `/spec.migrate` in `~/.claude/commands/`
+- The routing rule `livespec-routing.md` (+ its `livespec-commands.md` reference) in `~/.claude/rules/` — Claude automatically routes user requests (add feature, run tests, fix UI, etc.) to the matching `/spec.*` command whenever a `.specs/` directory is detected in the project root.
 
 ### Per-project (automatic after bootstrap)
 
@@ -445,6 +447,7 @@ LiveSpec separates **format** from **automation**:
 |---|---|---|
 | **Spec format** (`.specs/`, Markdown, Mermaid, Gherkin) | ✅ Universal | Any AI tool that reads Markdown can follow the rules in `spec-system.md` |
 | **Commands** (`/spec.*`) | ⚠️ Claude Code | `/spec.init` and `/spec.migrate` are bootstrapped globally; the rest are symlinked per project via `link-local.sh` |
+| **Routing rule** (auto-route to `/spec.*`) | ⚠️ Claude Code | Bootstrapped globally; triggers on `.specs/` presence in cwd |
 | **Agents** (multi-agent orchestration) | ⚠️ Claude Code | Requires Claude Code agent teams + Superpowers skills |
 | **Shell scripts** (`link-local.sh`, `migrate.sh`, `init.sh`) | ⚠️ macOS | Uses `sed -i ''` (BSD), `open` (macOS), `mktemp` — not tested on Linux |
 
