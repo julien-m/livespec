@@ -510,6 +510,27 @@ The dispatcher:
 
 Phase 5 then renders an aggregated `### Visual Baselines (per surface)` table with columns `Surface, Runner, Screen, Baseline, Mockup diff, Status` (FR-014).
 
+<!-- @spec FR-004: Visual gate verdict — .specs/features/046-visual-implementation-gate/spec.md#fr-004 -->
+### Visual Gate Verdict
+
+Consumed by `/spec.implement` Phase 6.5 when a visual feature is being finalized.
+
+Every visual run MUST emit exactly one final machine-readable line:
+
+```text
+Visual Gate Verdict: PASS | FAIL | BLOCKED
+```
+
+Verdict rules:
+
+| Verdict | Meaning | Exit behavior |
+|---|---|---|
+| `PASS` | All declared screens have tests, baselines, captures, and mockup/design comparisons within threshold. | exit code 0 only for PASS |
+| `FAIL` | Visual tests ran but at least one screen has a missing test, missing baseline, stale baseline, or visual/design diff. | exit code 1 |
+| `BLOCKED` | Visual runner, browser, simulator, app launch, or surface configuration is unavailable. | exit code 2 |
+
+When invoked by `/spec.implement`, this verdict is blocking: `FAIL` and `BLOCKED` prevent final implementation documentation and prevent `Implemented` status.
+
 ### 4.5.1 — Generate Missing Visual Test Files
 
 **Skipped if `--no-generate` is set.** Only baselines for existing visual tests are captured (Phase 4.5.2).

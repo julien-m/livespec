@@ -1,7 +1,7 @@
 ---
 command: test
 contract_version: "1.0"
-last_reviewed: 2026-05-12
+last_reviewed: 2026-05-17
 ---
 
 # Expectations — /spec.test
@@ -38,6 +38,7 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 
 **optional:**
 - `test-results/`
+- `.specs/features/<feature>/baselines/`
 
 **forbidden:**
 - `src/`
@@ -55,7 +56,7 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 
 ## 6. Produced Artifacts
 
-- _(none)_
+- stdout marker: `Visual Gate Verdict: PASS | FAIL | BLOCKED` for `--visual` runs
 
 ## 7. Exit Codes
 
@@ -104,6 +105,8 @@ verify:
     - flag: "--visual"
       must:
         - contains: "Visual baselines"
+        - contains: "Visual Gate Verdict"
+        - contains: "PASS | FAIL | BLOCKED"
 ```
 
 ## 13. Demo Session
@@ -116,6 +119,7 @@ $ /spec.test <feature> --visual
 > Generating 3 missing scaffolds in apps/web/tests/e2e/<feature>/
 > Running 38 specs across 1 surface (web)
 > Visual: 13 baselines · 0 diff · 1 missing (<screen>)
+> Visual Gate Verdict: FAIL
 > AC coverage: 12/12 ✓  Visual: 12/13 ✗ (1 missing)
 exit 1
 ```
@@ -152,6 +156,7 @@ apps/web/tests/e2e/<feature>/
 - New screen mentioned in `spec.md` but missing PNG mockup: report flags `[no mockup]` and falls back to a layout-only baseline.
 - Driver in `--migrate` mode: tests are regenerated under the new naming convention; old `.skip` versions are kept until `--commit`.
 - `--regenerate-missing` invoked: only baselines absent on disk are captured; pre-existing baselines are NEVER overwritten without `--update`.
+- Visual gate result is always one of `PASS | FAIL | BLOCKED`; `/spec.implement` consumes this line during Phase 6.5.
 
 ### Post-run Actions
 

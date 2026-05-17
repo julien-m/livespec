@@ -40,7 +40,9 @@ flowchart TD
     P5 -->|"yes"| VIS["Phase 5\nVisual baselines\n(Playwright)"]
     P5 -->|"no"| P6
     VIS --> P6["Phase 6\nFull test suite"]
-    P6 --> P7["Phase 7\nUpdate\nimplementation.md"]
+    P6 --> P65{"Phase 6.5\nMandatory\nVisual Gate"}
+    P65 -->|"PASS / not UI"| P7["Phase 7\nUpdate\nimplementation.md"]
+    P65 -->|"FAIL / BLOCKED"| BLOCKED
     P7 --> P8["Phase 8\nUpdate changelogs\n+ README"]
     P8 --> DONE(["Done"])
 
@@ -342,7 +344,7 @@ During TDD implementation (inside Phase 3 dispatch loop), when a visual step com
 2. **Baseline storage:** New screenshots automatically saved to `.specs/features/NNN-feature-name/baselines/`
 3. **Commit strategy:** Only commit baseline PNG files **if Phase 4 non-visual tests pass**. If Phase 4 fails or doesn't exist yet, keep baselines uncommitted until the full test suite passes.
 4. **Reference:** Read [`visual-baselines.md`](../../system/testing/visual-baselines.md) for screenshot lifecycle rules and 3-image format (baseline, diff, previous).
-5. **If Playwright unavailable:** Log "Visual baselines skipped — Playwright not installed" and continue without blocking the phase.
+5. **If visual tooling is unavailable for a UI feature:** Visual tooling unavailable on a UI feature is BLOCKED; do not continue without blocking. Record the missing tool, recovery command, and resume point in `progress.md`; status remains `In Progress`.
 
 ### Phase 6 — Validate
 
@@ -364,6 +366,34 @@ Before declaring implementation complete:
 - Only commit baselines once Phase 4 fully passes
 
 > **Note:** Phase 6 runs EXISTING tests (created during Phase 3 TDD) as a validation gate. For post-implementation test coverage audit, generation of missing tests, design fidelity checks, and visual baseline review, use `/spec.test` after implementation is complete (see `/spec.feature` Phase 3.5).
+
+<!-- @spec FR-001: Mandatory visual gate, FR-002: Tooling blocks UI, FR-003: no-visual caps status — .specs/features/046-visual-implementation-gate/spec.md#fr-001 -->
+### Phase 6.5 — Mandatory Visual Gate
+
+This phase runs after Phase 6 validation and before Phase 7 documentation. It is the final implementation gate for visual features.
+
+**Trigger:** A feature is visual when `spec.md` has a `## Screens` section, visual AC/FR, mockup references under `.specs/design/screens/`, visual-state Gherkin, or declared UI surfaces.
+
+**Required command for visual features:**
+
+```bash
+/spec.test <feature> --auto --visual
+```
+
+The command may also execute the same `/spec.test` visual phases inline: audit, missing-test generation, execution, screenshot capture, baseline comparison, and design-fidelity comparison. Do not duplicate a weaker visual path in `/spec.implement`; `/spec.test` owns visual certification.
+
+**Gate behavior:**
+
+| Visual Gate Verdict | `/spec.implement` behavior |
+|---|---|
+| `PASS` | Continue to Phase 7 and Phase 8.5. |
+| `FAIL` | Stop before Phase 7; record visual diffs/missing baselines in `progress.md`; feature status remains `In Progress`. |
+| `BLOCKED` | Stop before Phase 7; record missing tooling/simulator/browser/runner and recovery command; feature status remains `In Progress`. |
+| Not a visual feature | Skip Phase 6.5 and continue normally. |
+
+`Visual Gate Verdict: PASS` is required before Phase 7 can create final visual mappings and before Phase 8.5 can mark a visual feature as `Implemented`. A visual feature must never be marked `Implemented` with missing visual tests, missing baselines, unapproved visual diffs, or blocked runner tooling.
+
+**`--no-visual` rule:** `--no-visual` on a visual feature is allowed only for partial implementation runs. It must set Status to `In Progress`, never `Implemented`, and the output must state: "Visual validation skipped by flag." Backend-only features are unaffected by this flag.
 
 ### Phase 7 — Update implementation.md
 
@@ -417,7 +447,7 @@ This ensures the spec reflects the implementation state and `/spec.implement` fe
 **Update `.specs/README.md`:**
 
 1. Update the feature row in `.specs/README.md`:
-   - If all steps completed successfully: set Status to `Implemented`
+   - If all steps completed successfully and any required visual gate returned `PASS`: set Status to `Implemented`
    - If blocked or partial: set Status to `In Progress`
    - Update the `Updated` date to today
 
@@ -466,7 +496,7 @@ db/migrations/           ← New migration files
 | `--mono`, `-m` | Single-agent mode — no orchestration, all phases executed directly (original APEX pipeline) |
 | `--economy`, `-e` | No subagents, direct tools only (slower but uses less tokens) |
 | `--resume`, `-r` | Resume an interrupted implementation (reads `progress.md`, restarts at first non-`Done` step) |
-| `--no-visual`, `-V` | Skip visual baseline capture even if UI components are created |
+| `--no-visual`, `-V` | Skip visual baseline capture. For a visual feature this is partial-only: status must remain `In Progress`, never `Implemented`. |
 | `--step`, `-s` `[N]` | Start from step N (skip earlier steps, useful for partial re-runs) |
 
 ---
@@ -519,6 +549,9 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 - [ ] `progress.md` exists with a checkpoint row for every step executed
 - [ ] Planned FR scope for this run is implemented or explicitly deferred
 - [ ] Relevant tests pass for touched scope (or blocker documented)
+- [ ] For visual features, `/spec.test <feature> --auto --visual` completed with `Visual Gate Verdict: PASS`
+- [ ] For visual features, every `## Screens` row has a visual test, current baseline artifact, and passing design-fidelity comparison
+- [ ] If `--no-visual` was used on a visual feature, status is `In Progress` and the skipped gate is documented
 - [ ] `implementation.md` updated with FR/AC -> `@spec` mappings
 - [ ] Feature `changelog.md` updated
 - [ ] Global `.specs/changelog.md` updated

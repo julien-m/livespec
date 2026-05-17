@@ -1,14 +1,14 @@
 ---
 command: implement
 contract_version: "1.0"
-last_reviewed: 2026-05-12
+last_reviewed: 2026-05-17
 ---
 
 # Expectations — /spec.implement
 
 ## 1. Purpose
 
-Auto-implement a feature from its plan, write tests, and map FR/AC to @spec anchors.
+Auto-implement a feature from its plan, write tests, run the visual gate for UI features, and map FR/AC to @spec anchors.
 
 ## 2. Preconditions
 
@@ -38,7 +38,8 @@ Auto-implement a feature from its plan, write tests, and map FR/AC to @spec anch
 - `.specs/changelog.md`
 
 **optional:**
-- _(none)_
+- `.specs/features/<feature>/baselines/`
+- `.specs/features/<feature>/checks/<date>-test.md`
 
 **forbidden:**
 - `.specs/features/<feature>/spec.md`
@@ -61,6 +62,9 @@ Auto-implement a feature from its plan, write tests, and map FR/AC to @spec anch
   must_contain_sections:
   - "FR mapping"
   - "AC mapping"
+- path: `.specs/features/<feature>/checks/<date>-test.md`
+  must_contain_sections:
+  - "Visual Gate Verdict"
 
 ## 7. Exit Codes
 
@@ -106,6 +110,10 @@ verify:
   must_not:
     - contains: "Traceback"
   when:
+    - flag: "--visual"
+      must:
+        - contains: "Visual Gate Verdict"
+        - contains: "/spec.test <feature> --auto --visual"
     - flag: "--resume"
       must:
         - contains: "Resuming"
@@ -122,6 +130,7 @@ $ /spec.implement <feature>
 > Step 2/8: tests/api/csv-export.test.ts — 6 tests PASS
 > ... (steps 3-7 elided)
 > Step 8/8: docs/exports.md (update) — 12 lines
+> Visual Gate Verdict: PASS — visual gate passed before final status
 > All steps Done · 27 tests pass · implementation.md generated
 exit 0
 ```
@@ -155,10 +164,12 @@ src/<...> + tests/<...>    # code under each step
 
 - `--resume`: reads progress.md and continues at the first non-Done step.
 - `--step`: pauses between steps for manual validation.
+- Visual feature: runs `/spec.test <feature> --auto --visual`; `Implemented` requires Visual Gate Verdict PASS.
+- `--no-visual` on a visual feature: leaves status `In Progress`.
 - A step's tests fail twice: implement stops, marks the step Blocked, surfaces the failing output.
 
 ### Post-run Actions
 
-- **On success:** run `/spec.test <feature>` to lock visual baselines.
+- **On success:** visual gate passed before final status; review generated checks and baseline artifacts.
 - **On drift:** inspect progress.md, fix the failing step, re-run with `--resume`.
 - **On blocked:** run `/spec.plan` first, or unblock the preflight check.

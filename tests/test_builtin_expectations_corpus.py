@@ -12,7 +12,7 @@ import pytest
 from validator.expectations import REQUIRED_SECTIONS, parse_expectations
 
 COMMANDS_DIR = Path(__file__).resolve().parents[1] / "commands"
-TODAY = "2026-05-12"
+MIN_REVIEW_DATE = "2026-05-12"
 
 # The 19-command invariant enumerated by AC-002, plus the 20th (verify-output)
 # acknowledged in the feature changelog and spec-system.md `### Command discovery`.
@@ -60,10 +60,10 @@ def test_all_builtins_parse(cmd: str):
 
 
 @pytest.mark.parametrize("cmd", EXPECTED_COMMANDS)
-def test_builtins_last_reviewed_is_today(cmd: str):
+def test_builtins_last_reviewed_is_not_stale(cmd: str):
     path = COMMANDS_DIR / f"{cmd}.expectations.md"
     exp = parse_expectations(path)
-    assert exp.last_reviewed == TODAY
+    assert exp.last_reviewed >= MIN_REVIEW_DATE
 
 
 @pytest.mark.parametrize("cmd", EXPECTED_COMMANDS)

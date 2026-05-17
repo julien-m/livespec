@@ -1,0 +1,9 @@
+# Changelog - Feature 046 - Visual Implementation Gate
+
+## 2026-05-17 — Feature: Mandatory visual implementation gate
+
+- **Type:** Feature
+- **Spec modified:** Yes (feature created and marked Implemented)
+- **Code modified:** `commands/implement.md`, `commands/test.md`, `commands/implement.expectations.md`, `commands/test.expectations.md`, `tests/test_visual_implementation_gate.py`
+- **AC impacted:** AC-001, AC-002, AC-003, AC-004, AC-005, AC-006
+- **Author:** codex
