@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-05-17 -- [Feature 047] Implemented: Design Alignment Gate — global `ui.pen` → runtime alignment protocol, support-quality contract, manifest schema, reusable Python comparator, `livespec design-alignment compare`, `/spec.test --visual` Phase 4.5.0 integration, +8 regression tests.
+
 ## 2026-05-17 -- [Feature 046] Implemented: Visual Implementation Gate — `/spec.implement` now requires `/spec.test <feature> --auto --visual` before finalizing UI features; visual tooling failures and `--no-visual` keep status `In Progress`; `/spec.test` emits `Visual Gate Verdict: PASS | FAIL | BLOCKED`; +5 regression tests.
 
 ## 2026-05-13 -- [Feature 043] Spec created: `/spec.sync-brainstorm` — Living Bridge to Brainstorm — 5 stories, 17 AC, 18 FR (new slash-command detecting stale/orphaned/manual flows; Mode A re-pull for flows with `--apply` + per-file confirmation; Mode B inviolable for derived feature AC/FR; `--prune-orphaned` with explicit confirmation; integrates 4 new gap categories into `/spec.check`)

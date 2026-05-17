@@ -78,6 +78,7 @@
 | 042 | `/spec.specify` Derives from Imported Brainstorm Flows | Draft | 2026-05-13 | 2026-05-14 | [spec](features/042-spec-specify-from-brainstorm/spec.md) |
 | 043 | `/spec.sync-brainstorm` — Living Bridge to Brainstorm | Draft | 2026-05-13 | 2026-05-14 | [spec](features/043-spec-sync-brainstorm/spec.md) |
 | 046 | Visual Implementation Gate | Implemented | 2026-05-17 | 2026-05-17 | [spec](features/046-visual-implementation-gate/spec.md), [plan](features/046-visual-implementation-gate/plan.md), [implementation](features/046-visual-implementation-gate/implementation.md) |
+| 047 | Design Alignment Gate | Implemented | 2026-05-17 | 2026-05-17 | [spec](features/047-design-alignment-gate/spec.md), [plan](features/047-design-alignment-gate/plan.md), [implementation](features/047-design-alignment-gate/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -101,6 +102,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-17 | Feature | [Feature 047] Implemented: Design Alignment Gate — reusable `ui.pen` → runtime alignment gate for `/spec.test --visual` |
 | 2026-05-17 | Feature | [Feature 046] Implemented: Visual Implementation Gate — mandatory `/spec.test --auto --visual` before UI feature finalization |
 | 2026-05-13 | Spec | [Feature 043] Spec created: `/spec.sync-brainstorm` — Living Bridge to Brainstorm — 5 stories, 17 AC, 18 FR |
 | 2026-05-13 | Spec | [Feature 042] Spec created: `/spec.specify` Derives from Imported Brainstorm Flows — 3 stories, 13 AC, 13 FR |
@@ -110,7 +112,6 @@
 | 2026-05-12 | Feature | [Feature 039] Implemented: Command Expectations & /spec.verify-output — 20 builtin expectations files, verify-output CLI + slash-command |
 | 2026-05-08 | Feature | [Feature 037] Implemented: Test Multi-Runner Integration — runner-aware dispatcher, `--visual` flag documented, 0 regressions |
 | 2026-05-08 | Spec | [Feature 037] Spec created: Test Multi-Runner Integration — 5 stories, 15 AC, 15 FR |
-| 2026-05-07 | Spec | [Feature 036] Spec created: Multi-Surface Detection and Migration — 4 stories, 12 AC, 8 FR |
 <!-- readme:activity:end -->
 
 ---

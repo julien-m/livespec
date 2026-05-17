@@ -39,6 +39,7 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 **optional:**
 - `test-results/`
 - `.specs/features/<feature>/baselines/`
+- `.specs/features/<feature>/design-alignment/`
 
 **forbidden:**
 - `src/`
@@ -57,6 +58,7 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 ## 6. Produced Artifacts
 
 - stdout marker: `Visual Gate Verdict: PASS | FAIL | BLOCKED` for `--visual` runs
+- stdout marker: `Design Alignment Verdict: PASS | FAIL | BLOCKED` for `--visual` runs when `ui.pen` is present or changed
 
 ## 7. Exit Codes
 
@@ -105,6 +107,7 @@ verify:
     - flag: "--visual"
       must:
         - contains: "Visual baselines"
+        - contains: "Design Alignment Verdict"
         - contains: "Visual Gate Verdict"
         - contains: "PASS | FAIL | BLOCKED"
 ```
@@ -117,6 +120,7 @@ verify:
 $ /spec.test <feature> --visual
 > Auditing AC coverage: <feature> has 12 ACs, 9 covered, 3 missing
 > Generating 3 missing scaffolds in apps/web/tests/e2e/<feature>/
+> Design Alignment Verdict: PASS
 > Running 38 specs across 1 surface (web)
 > Visual: 13 baselines · 0 diff · 1 missing (<screen>)
 > Visual Gate Verdict: FAIL

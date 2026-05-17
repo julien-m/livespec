@@ -13,6 +13,7 @@ import typer
 
 from . import (
     coverage_cmd,
+    design_alignment_cmd,
     drivers_cmd,
     mutation_cmd,
     preflight_cmd,
@@ -29,6 +30,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     """
     test_cmd.register(app)
     coverage_cmd.register(app)
+    design_alignment_cmd.register(app)
     drivers_cmd.register(app)
     mutation_cmd.register(app)
     preflight_cmd.register(app)

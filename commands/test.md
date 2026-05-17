@@ -431,6 +431,39 @@ For each test, map back to the AC it covers:
 - Playwright (or resolved visual tool) is available
 - `--no-visual` is NOT set
 
+<!-- @spec FR-005: test command integration — .specs/features/047-design-alignment-gate/spec.md#fr-005 -->
+### 4.5.0 — Design Alignment Gate
+
+Runs before visual test generation and before baseline capture for screens backed by a new or changed `ui.pen` design source.
+
+**Reference workflow:** read [`system/testing/design-alignment.md`](../system/testing/design-alignment.md) and [`system/testing/design-alignment-quality.md`](../system/testing/design-alignment-quality.md). Do not inline or weaken that procedure inside this command.
+
+**Trigger:**
+
+- Feature has a `## Screens` section
+- `.specs/design/ui.pen` exists
+- The screen has no approved baseline, or `design_hash` in `design-alignment.manifest.json` / `baseline.manifest.yml` differs from the current `ui.pen`
+
+**Execution:**
+
+```bash
+livespec design-alignment compare \
+  --design .specs/design/ui.pen \
+  --runtime .specs/features/<feature>/design-alignment/<screen>.runtime.json \
+  --screen <screen> \
+  --output-dir .specs/features/<feature>/design-alignment/
+```
+
+The active UI runner is responsible for producing the runtime contract JSON from the browser/simulator before this command runs.
+
+Every run MUST emit:
+
+```text
+Design Alignment Verdict: PASS | FAIL | BLOCKED
+```
+
+`FAIL` or `BLOCKED` prevents baseline capture and prevents baseline approval. Only `PASS` may continue to Phase 4.5.1 and Phase 4.5.2.
+
 ### Selecting `dispatch` vs `converge`
 
 Before dispatching, inspect the rows in `.specs/surfaces.yaml`:
