@@ -15,7 +15,7 @@ Upgrades visual testing infrastructure to v4 standards:
 
 After migration completes:
 1. Review the updated `playwright.config.ts`
-2. Run `spec.test --reset-baselines` to regenerate baselines with the new settings
+2. Run `spec-test --reset-baselines` to regenerate baselines with the new settings
 3. Approve the new baselines with the human approval gate
 
 ## Idempotency Check
@@ -133,7 +133,7 @@ Files modified:
 
 Next steps:
   1. Review the updated playwright.config.ts
-  2. Run spec.test --reset-baselines to regenerate baselines with the new settings
+  2. Run spec-test --reset-baselines to regenerate baselines with the new settings
   3. Approve the new baselines with the human approval gate
 ```
 
@@ -152,4 +152,4 @@ All visual testing settings already match v4 standards.
   Check the image version and update manually if needed.
   ```
 - **`playwright.config.ts` has multiple `maxDiffPixelRatio` occurrences:** Replace all occurrences, log count.
-- **No `playwright.config.ts` found:** Skip REPLACE_CONFIG, log: "No playwright config found — visual testing may not be set up yet. Run spec.test to initialize."
+- **No `playwright.config.ts` found:** Skip REPLACE_CONFIG, log: "No playwright config found — visual testing may not be set up yet. Run spec-test to initialize."

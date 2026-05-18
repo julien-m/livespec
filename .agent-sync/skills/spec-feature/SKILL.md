@@ -189,7 +189,7 @@ SUMMARY: 2-3 sentences of test results
 ### PHASE_RESULT vs SHIP_RESULT
 
 These are two distinct protocols at different scopes:
-- **PHASE_RESULT** — internal inter-phase communication within a single `/spec-feature` run. Only the `spec.feature` main context reads it. Consumed and discarded by the main context.
+- **PHASE_RESULT** — internal inter-phase communication within a single `/spec-feature` run. Only the `spec-feature` main context reads it. Consumed and discarded by the main context.
 - **SHIP_RESULT** — output of the entire `/spec-feature` pipeline when called by `/spec-ship`. The ship orchestrator reads it. The SHIP_RESULT block is emitted at the very end by the main context after all phases complete.
 
 **Phase 3.5 (Test) dual output:** Phase 3.5 emits PHASE_RESULT for the main context AND preserves the existing `SHIP_RESULT: BLOCKED` when AC failures are detected and the pipeline is called from `/spec-ship`. Both are preserved — they serve different consumers.
@@ -214,7 +214,7 @@ The agent receives this as part of its initial prompt — no file write, no para
 `/spec-feature` is a **pure supervisor** — it does not execute phase logic itself. It spawns an isolated agent per phase, receives a compact `PHASE_RESULT` block, and handles gates and pipeline state.
 
 ```
-spec.feature — Main Context (supervisor)
+spec-feature — Main Context (supervisor)
   │
   ├── [Phase 0]   Roadmap resolution (inline — user interaction)
   ├── [Phase 1]   Spawn → Specify Agent  (fresh context)

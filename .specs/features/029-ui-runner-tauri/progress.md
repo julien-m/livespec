@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-07'
+current_state: Done
+feature_slug: 029-ui-runner-tauri
+owner_command: spec-implement
+schema_version: 1
+updated_at: '2026-05-07'
+---
+
 # Implementation Progress — Feature 029
 
 **Started:** 2026-05-07

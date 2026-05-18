@@ -37,7 +37,7 @@ On first implementation of a UI feature:
 
 Once a baseline exists, it is updated only when:
 - Design is intentionally approved (update via `/spec-implement --update-baseline`)
-- Or manually via `spec.test --update-baseline`
+- Or manually via `spec-test --update-baseline`
 
 ### Storage
 
@@ -158,7 +158,7 @@ If visual tests exceed timeout, hook skips with warning (non-blocking during dev
 
 ### New Feature (No Baseline)
 
-1. `spec.test` Phase 4.5.2 captures screenshot
+1. `spec-test` Phase 4.5.2 captures screenshot
 2. If Phase 4 (non-visual tests) passed → baseline committed
 3. If Phase 4 failed → baseline NOT committed (prevents bad reference)
 
@@ -174,7 +174,7 @@ If visual tests exceed timeout, hook skips with warning (non-blocking during dev
 1. Designer approves new mockup
 2. `.specs/design/screens/[name].png` is exported from Pencil and committed
 3. Developer implements new design
-4. `spec.test` Phase 4.5.3 runs `compareDesign()` and reports fidelity
+4. `spec-test` Phase 4.5.3 runs `compareDesign()` and reports fidelity
 5. If fidelity < 5% → passes, baseline is the new reference
 6. If fidelity > 8% → fails, developer adjusts implementation
 

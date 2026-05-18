@@ -2,7 +2,7 @@
 created_at: '2026-04-13'
 current_state: Done
 feature_slug: 001-auto-llm-review
-owner_command: spec.implement
+owner_command: spec-implement
 schema_version: 1
 updated_at: '2026-04-13'
 ---

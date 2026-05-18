@@ -6,7 +6,7 @@
 # initialised before v13:
 #
 #   1. Re-link commands/agents through the patched `link-local.sh` so that
-#      new commands (notably `spec.verify-output`) appear and orphan
+#      new commands (notably `spec-verify-output`) appear and orphan
 #      `spec.*.expectations.md` symlinks created by the buggy pre-fix
 #      `link-local.sh` are removed.
 #   2. Install the `last_reviewed` pre-commit hook

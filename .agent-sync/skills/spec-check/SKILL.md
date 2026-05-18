@@ -224,7 +224,7 @@ If `--show-provenance` is set, execute this block after resolving the feature, t
 2. **If manifest absent:**
    ```
    No baseline manifest found for <feature-name>.
-   Run spec.test --reset-baselines to capture baselines and generate provenance.
+   Run spec-test --reset-baselines to capture baselines and generate provenance.
    ```
 3. **If manifest present but unparseable:** treat as absent (same message above)
 4. **If manifest present and parseable:** render provenance table:
@@ -234,7 +234,7 @@ If `--show-provenance` is set, execute this block after resolving the feature, t
    | Screen | Capture Date | Approved By | Mockup Version | Browser | OS | Docker Image |
    |--------|-------------|-------------|----------------|---------|-----|--------------|
    | logo   | 2026-04-14T10:28Z | julienm | sha256:e3b0c4… | chromium/1.44 | Linux 6.1 | playwright:v1.44.0-jammy |
-   | dashboard | 2026-04-14T10:29Z | auto (spec.ship) | sha256:abc987… | chromium/1.44 | Linux 6.1 | playwright:v1.44.0-jammy |
+   | dashboard | 2026-04-14T10:29Z | auto (spec-ship) | sha256:abc987… | chromium/1.44 | Linux 6.1 | playwright:v1.44.0-jammy |
    ```
    - Truncate `mockup_version` to first 8 chars of the hex after `sha256:` for display
    - Truncate `docker_image` to just the tag part (e.g., `playwright:v1.44.0-jammy`)
@@ -369,7 +369,7 @@ Look for baselines/baseline.manifest.yml in the feature directory.
 - **If manifest absent:** emit WARNING for all screens:
   ```
   Warning: Baselines exist but provenance manifest is missing.
-  Run spec.test --reset-baselines to capture baselines and generate provenance.
+  Run spec-test --reset-baselines to capture baselines and generate provenance.
   ```
   Skip pixel comparison for this feature. Continue to Step 9 with STALE=NO-MANIFEST for all screens.
 
@@ -382,7 +382,7 @@ Look for baselines/baseline.manifest.yml in the feature directory.
 - Compare current tag against `browser_version` from the manifest (any screen entry — they all share the same browser)
 - If **mismatch:** mark ALL screens for this feature as `STALE-BROWSER`
   - Log: `"Browser version changed: <old> → <new> — all baselines require reset"`
-  - Suggest: `spec.test --all --reset-baselines`
+  - Suggest: `spec-test --all --reset-baselines`
   - Skip ALL pixel comparisons for this feature
 
 **3. Per-screen mockup hash check (FR-004, AC-005):**
@@ -420,7 +420,7 @@ Use `compareRegression()` helper from the test directory's `helpers/visual.ts` t
 3. **Report per baseline:**
    - ✅ **Match** — 0 pixel difference (no visual regression detected)
    - 🖼️ **Drift** — any pixel difference detected (show pixel count and changed regions)
-   - ❌ **Missing baseline** — baseline file not found (capture required from spec.test Phase 4.5)
+   - ❌ **Missing baseline** — baseline file not found (capture required from spec-test Phase 4.5)
 
 **Threshold:** `maxDiffPixels: 0` — zero tolerance. Any pixel difference is a regression. Screens with `aa_tolerance: true` in the spec use `maxDiffPixels: 10` as the per-test override.
 
@@ -433,7 +433,7 @@ Use `compareRegression()` helper from the test directory's `helpers/visual.ts` t
 | `login.png` | VALID | ✅ Match | 0 px | |
 | `dashboard.png` | STALE-MOCKUP | ⚠️ Skipped | — | Mockup updated 2026-04-14 |
 | `nav.png` | STALE-BROWSER | ⚠️ Skipped | — | chromium/1.42→1.44 |
-| `settings.png` | NO-MANIFEST | ⚠️ Skipped | — | Run spec.test --reset-baselines |
+| `settings.png` | NO-MANIFEST | ⚠️ Skipped | — | Run spec-test --reset-baselines |
 | `header.png` | VALID | 🖼️ Drift | 312 px | Badge color changed |
 ```
 
@@ -494,7 +494,7 @@ If `.specs/design/theme.css` does not exist → skip this check silently.
 
 **Only runs when `--visual-status` is set.** Exits after display — does not run Steps 9–10.
 
-This handler can be invoked without a feature argument: `spec.check --visual-status` scans ALL features.
+This handler can be invoked without a feature argument: `spec-check --visual-status` scans ALL features.
 
 #### Scan all features
 
@@ -519,7 +519,7 @@ This handler can be invoked without a feature argument: `spec.check --visual-sta
 |---------|--------|--------|---------------|--------|
 | 003-visual-testing-fidelity | logo | ✅ VALID | 2026-04-14 julienm | — |
 | 003-visual-testing-fidelity | dashboard | ⚠️ STALE-MOCKUP | 2026-04-14 julienm | Mockup updated after capture |
-| 004-visual-testing-governance | hero | ⚠️ NO-MANIFEST | — | Run spec.test --reset-baselines |
+| 004-visual-testing-governance | hero | ⚠️ NO-MANIFEST | — | Run spec-test --reset-baselines |
 | 002-layer-3-cli-surface | nav | ⚠️ STALE-BROWSER | 2026-04-13 julienm | chromium/1.42 → chromium/1.44 |
 ```
 
@@ -530,9 +530,9 @@ This handler can be invoked without a feature argument: `spec.check --visual-sta
 
 | Feature | Issue | Command |
 |---------|-------|---------|
-| 003-visual-testing-fidelity | STALE-MOCKUP (dashboard) | `spec.test 003-visual-testing-fidelity --reset-baselines=dashboard` |
-| 004-visual-testing-governance | NO-MANIFEST (hero) | `spec.test 004-visual-testing-governance --reset-baselines` |
-| 002-layer-3-cli-surface | STALE-BROWSER (all) | `spec.test 002-layer-3-cli-surface --reset-baselines` |
+| 003-visual-testing-fidelity | STALE-MOCKUP (dashboard) | `spec-test 003-visual-testing-fidelity --reset-baselines=dashboard` |
+| 004-visual-testing-governance | NO-MANIFEST (hero) | `spec-test 004-visual-testing-governance --reset-baselines` |
+| 002-layer-3-cli-surface | STALE-BROWSER (all) | `spec-test 002-layer-3-cli-surface --reset-baselines` |
 ```
 
 5. If all baselines are VALID:

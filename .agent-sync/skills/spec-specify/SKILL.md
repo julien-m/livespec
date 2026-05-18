@@ -546,7 +546,7 @@ After generating spec.md, determine if the feature involves UI:
    - The source file (`ui.pen`, etc.) must be saved manually by the user
 
 5.5. **Update screen index:** After exporting PNGs, update `.specs/design/screens/index.md`:
-   - For each **new** screen: add a row with Source = `spec.specify (NNN-feature-name)`, First Added = today, Last Modified = today
+   - For each **new** screen: add a row with Source = `spec-specify (NNN-feature-name)`, First Added = today, Last Modified = today
    - For each **modified** screen: update Last Modified = today
    - If `index.md` does not exist: create from `system/templates/screen-index-template.md` first
 
@@ -719,7 +719,7 @@ After `spec.md` has been successfully written to the feature directory:
 >     write_with_hash_check(specs_root / "roadmap.md", new_roadmap)
 > ```
 >
-> If lock acquisition times out → emit `BLOCKED at step 7.5 - policy_blocked - .specs/.LOCK timeout (10s)`. The `10s` budget comes from the lock primitive's default CLI-facing timeout: long enough to cover the README/changelog/roadmap write burst, short enough to fail fast instead of leaving concurrent `/spec.*` runs waiting indefinitely. If a hash mismatch is detected → emit `BLOCKED at step 7.5 - state_invalid - hash mismatch on <path>`.
+> If lock acquisition times out → emit `BLOCKED at step 7.5 - policy_blocked - .specs/.LOCK timeout (10s)`. The `10s` budget comes from the lock primitive's default CLI-facing timeout: long enough to cover the README/changelog/roadmap write burst, short enough to fail fast instead of leaving concurrent `/spec-*` runs waiting indefinitely. If a hash mismatch is detected → emit `BLOCKED at step 7.5 - state_invalid - hash mismatch on <path>`.
 
 Add a new row to the Features table in `.specs/README.md` (between `<!-- readme:features:start -->` and `<!-- readme:features:end -->` markers):
 

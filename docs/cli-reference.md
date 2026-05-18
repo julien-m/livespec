@@ -407,8 +407,8 @@ safe to grep in CI logs.
 
 ## Related documentation
 
-- `commands/spec-test.md` — `/spec.test` slash command (interactive test workflow).
-- `commands/spec-preflight.md` — `/spec.preflight` slash command (manifest editor).
+- `.agent-sync/skills/spec-test/SKILL.md` — `/spec-test` skill (interactive test workflow).
+- `.agent-sync/skills/spec-preflight/SKILL.md` — `/spec-preflight` skill (manifest editor).
 - `system/identity.md` — feature slug resolution (used by `--feature`).
 - `validator/cli_resolvers.py` — auto-detection helpers (importable).
 - `validator/cli_exit_codes.py` — exit code constants (importable).

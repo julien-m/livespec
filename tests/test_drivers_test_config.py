@@ -112,7 +112,7 @@ def test_generate_ci_workflow_uses_livespec_spec_test() -> None:
     file = generate_ci_workflow(driver)
     assert file.path == Path(".github/workflows/test.yml")
     assert file.mode == "skip_if_exists"
-    assert "livespec spec.test" in file.content
+    assert "livespec spec-test" in file.content
     # AC-003: must NOT bypass the orchestration with the raw runner.
     assert "pytest --cov" not in file.content
 
@@ -120,7 +120,7 @@ def test_generate_ci_workflow_uses_livespec_spec_test() -> None:
 def test_generate_ci_workflow_includes_install_step_before_test_step() -> None:
     file = generate_ci_workflow(_make_driver("python"))
     install_idx = file.content.index("pip install livespec-validator")
-    test_idx = file.content.index("run: livespec spec.test")
+    test_idx = file.content.index("run: livespec spec-test")
     assert install_idx < test_idx
 
 
@@ -448,7 +448,7 @@ def test_init_test_config_updates_conventions_index(
 def test_init_test_config_refresh_only_skips_writes(
     runner: CliRunner, tmp_path: Path
 ) -> None:
-    # AC-006: spec.refresh-conventions reuses this surface to refresh testing
+    # AC-006: spec-refresh-conventions reuses this surface to refresh testing
     # domain without rewriting project files.
     _seed_project(tmp_path, marker_files=["pyproject.toml"])
     conv_dir = tmp_path / ".conventions"

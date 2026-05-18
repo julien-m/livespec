@@ -9,6 +9,7 @@ from validator.state_files import (
     KNOWN_STATE_FILENAMES,
     REQUIRED_KEYS,
     discover_state_files,
+    migrate_state_file,
     validate_state_file,
     validate_state_files,
 )
@@ -26,7 +27,7 @@ def _valid_feature_pipeline(tmp_path: Path, slug: str) -> Path:
         p,
         [
             "schema_version: 1",
-            "owner_command: spec.feature",
+            "owner_command: spec-feature",
             f"feature_slug: {slug}",
             "created_at: 2026-05-04",
             "updated_at: 2026-05-04",
@@ -46,7 +47,7 @@ class TestDiscovery:
             tmp_path / ".specs" / "ship.md",
             [
                 "schema_version: 1",
-                "owner_command: spec.ship",
+                "owner_command: spec-ship",
                 'feature_slug: "-"',
                 "created_at: 2026-05-04",
                 "updated_at: 2026-05-04",
@@ -81,7 +82,7 @@ class TestValidateStateFile:
             p,
             [
                 "schema_version: 1",
-                "owner_command: spec.feature",
+                "owner_command: spec-feature",
                 "feature_slug: NNN-feature-name",
                 "created_at: 2026-05-04",
                 "updated_at: 2026-05-04",
@@ -99,7 +100,7 @@ class TestValidateStateFile:
             p,
             [
                 "schema_version: 1",
-                "owner_command: spec.feature",
+                "owner_command: spec-feature",
                 "feature_slug: 001-foo",
                 "created_at: 2026-05-04",
                 "updated_at: 2026-05-04",
@@ -111,13 +112,34 @@ class TestValidateStateFile:
         assert wrong_value
         assert "Halfway" in wrong_value[0].message
 
+    def test_rejects_legacy_dotted_owner_command(self, tmp_path: Path) -> None:
+        p = tmp_path / ".specs" / "features" / "001-foo" / "pipeline.md"
+        _write(
+            p,
+            [
+                "schema_version: 1",
+                "owner_command: spec" + ".feature",
+                "feature_slug: 001-foo",
+                "created_at: 2026-05-04",
+                "updated_at: 2026-05-04",
+                "current_state: Pending",
+            ],
+        )
+
+        violations = validate_state_file(p)
+
+        assert any(
+            v.rule == "wrong_value" and "spec-feature" in v.message
+            for v in violations
+        )
+
     def test_rejects_non_iso_date(self, tmp_path: Path) -> None:
         p = tmp_path / ".specs" / "features" / "001-foo" / "pipeline.md"
         _write(
             p,
             [
                 "schema_version: 1",
-                "owner_command: spec.feature",
+                "owner_command: spec-feature",
                 "feature_slug: 001-foo",
                 "created_at: 2026/05/04",
                 "updated_at: 2026-05-04",
@@ -135,7 +157,7 @@ class TestValidateStateFile:
             p,
             [
                 "schema_version: 1",
-                "owner_command: spec.feature",
+                "owner_command: spec-feature",
                 "feature_slug: 001-foo",
                 "created_at: 2026-05-04",
                 "updated_at: 2026-05-04",
@@ -151,7 +173,7 @@ class TestValidateStateFile:
             p,
             [
                 "schema_version: 1",
-                "owner_command: spec.feature",
+                "owner_command: spec-feature",
                 "feature_slug: 001-foo",
                 "created_at: 2026-05-04",
                 "updated_at: 2026-05-04",
@@ -167,7 +189,7 @@ class TestValidateStateFile:
             p,
             [
                 "schema_version: 1",
-                "owner_command: spec.ship",
+                "owner_command: spec-ship",
                 'feature_slug: "-"',
                 "created_at: 2026-05-04",
                 "updated_at: 2026-05-04",
@@ -182,7 +204,7 @@ class TestValidateStateFile:
             p,
             [
                 "schema_version: 1",
-                "owner_command: spec.ship",
+                "owner_command: spec-ship",
                 "feature_slug: 001-foo",
                 "created_at: 2026-05-04",
                 "updated_at: 2026-05-04",
@@ -191,6 +213,28 @@ class TestValidateStateFile:
         )
         violations = validate_state_file(p)
         assert any(v.rule == "wrong_value" for v in violations)
+
+    def test_migrate_fixes_legacy_dotted_owner_command(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        p = specs_root / "features" / "001-foo" / "pipeline.md"
+        _write(
+            p,
+            [
+                "schema_version: 1",
+                "owner_command: spec" + ".feature",
+                "feature_slug: 001-foo",
+                "created_at: 2026-05-04",
+                "updated_at: 2026-05-04",
+                "current_state: Pending",
+            ],
+        )
+
+        outcome = migrate_state_file(p, specs_root)
+
+        assert outcome.action == "completed"
+        assert "owner_command" in outcome.added_keys
+        assert "owner_command: spec-feature" in p.read_text(encoding="utf-8")
+        assert validate_state_file(p) == []
 
 
 class TestValidateStateFiles:

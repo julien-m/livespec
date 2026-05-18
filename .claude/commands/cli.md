@@ -72,4 +72,4 @@ The CLI auto-resolves these without flags — only override when something is wr
 - Network reporting (Codecov, Slack notifications) — local-only.
 - TUI prompts beyond the single follow-up described above.
 
-For deeper workflows (AC coverage audit, baseline regeneration, design fidelity), use `/spec.test`. For manifest authoring, use `/spec.preflight --regenerate`.
+For deeper workflows (AC coverage audit, baseline regeneration, design fidelity), use `/spec-test`. For manifest authoring, use `/spec-preflight --regenerate`.

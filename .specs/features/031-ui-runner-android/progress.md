@@ -1,7 +1,13 @@
 ---
-title: "Feature 031 — Implementation Progress"
-status: "Done"
+created_at: '2026-05-07'
+current_state: Done
+feature_slug: 031-ui-runner-android
+owner_command: spec-implement
+schema_version: 1
+status: Done
+title: Feature 031 — Implementation Progress
 updated: 2026-05-07
+updated_at: '2026-05-07'
 ---
 
 # Implementation Progress: UI Runner Android (Maestro) — Feature 031

@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-08'
+current_state: Done
+feature_slug: 037-test-multi-runner-integration
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-08'
+---
+
 # Pipeline — 037-test-multi-runner-integration
 
 **Started:** 2026-05-08 10:30

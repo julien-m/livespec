@@ -124,7 +124,7 @@ exit 0
 ### Aligned / Drift / Missing
 
 - **Aligned:** summary lists tier counts, in-progress features, recent changelog. Exit 0.
-- **Drift:** spec.status detects a feature without a pipeline.md and flags it as orphan. Exit 0 (informational).
+- **Drift:** spec-status detects a feature without a pipeline.md and flags it as orphan. Exit 0 (informational).
 - **Missing:** `.specs/` not initialized. Exit 2.
 
 ### Runtime Profile (scenarios)

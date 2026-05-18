@@ -37,7 +37,7 @@ def test_command_registry_excludes_expectations() -> None:
 def test_integration_commands_accept_slash_aliases(tmp_path: Path) -> None:
     _write(
         tmp_path / "alias.md",
-        "---\nintegration: alias\ncommands: [/spec-plan, /spec.check]\n---\nbody\n",
+        "---\nintegration: alias\ncommands: [/spec-plan, /spec-check]\n---\nbody\n",
     )
 
     integrations = discover_integrations(integrations_dir=tmp_path)

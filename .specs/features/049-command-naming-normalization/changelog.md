@@ -23,3 +23,11 @@
 - **Code modified:** `commands/spec-*.md`, `commands/spec-*.expectations.md`, `validator/command_registry.py`, `validator/command_audit.py`, `validator/run_artifact.py`, `scripts/link-local.sh`, `scripts/install.sh`, tests
 - **AC impacted:** AC-001 through AC-011
 - **Author:** codex
+
+## 2026-05-18 — [Bugfix]: Completed dotted-name cleanup in active surfaces
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `.agent-sync/`, `.specs/` state files, `validator/state_files.py`, active docs, CLI help, tests
+- **AC impacted:** AC-001, AC-002, AC-011
+- **Author:** codex

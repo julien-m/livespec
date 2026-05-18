@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-07'
+current_state: Done
+feature_slug: 023-driver-custom-scaffolding
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-07'
+---
+
 # Pipeline — 023-driver-custom-scaffolding
 
 **Started:** 2026-05-07 04:13

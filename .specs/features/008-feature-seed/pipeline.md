@@ -2,7 +2,7 @@
 created_at: '2026-04-16'
 current_state: Done
 feature_slug: 008-feature-seed
-owner_command: spec.feature
+owner_command: spec-feature
 schema_version: 1
 updated_at: '2026-04-16'
 ---

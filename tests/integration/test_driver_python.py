@@ -58,7 +58,7 @@ def test_python_driver_schema_validation() -> None:
 
 def test_python_driver_capabilities_exist() -> None:
     """The manifest should advertise all four Python capabilities."""
-    # @spec AC-012: All 4 capabilities appear in spec.test output
+    # @spec AC-012: All 4 capabilities appear in spec-test output
     # — .specs/features/017-driver-python/spec.md#ac-012
     manifest = _load_python_manifest()
 

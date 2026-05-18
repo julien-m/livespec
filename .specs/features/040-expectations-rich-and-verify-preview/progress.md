@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-12'
+current_state: Done
+feature_slug: 040-expectations-rich-and-verify-preview
+owner_command: spec-implement
+schema_version: 1
+updated_at: '2026-05-12'
+---
+
 # Progress — Feature 040
 
 | Step | Status | Notes |

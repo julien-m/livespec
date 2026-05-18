@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-07'
+current_state: Done
+feature_slug: 021-driver-rust
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-07'
+---
+
 # Pipeline — 021-driver-rust
 
 **Started:** 2026-05-07 03:47

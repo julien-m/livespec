@@ -14,7 +14,7 @@
 | `system/templates/command-expectations.template.md` | LiveSpec | Canonical 12-section template + `verify:` YAML stub. |
 | `.agent-sync/skills/<X>/expectations.md` | LiveSpec (builtin) | One per slash-command skill. Source of truth absent a project override. |
 | `.specs/expectations/<X>.md` | Per-project (override) | Totally replaces the builtin (no merge). |
-| `.specs/.runs/<X>-<ISO>.json` | Per-project (runtime) | Run artifact written by every `/spec.*` command. Gitignored. |
+| `.specs/.runs/<X>-<ISO>.json` | Per-project (runtime) | Run artifact written by every `/spec-*` command. Gitignored. |
 
 ## 2. Frontmatter Schema
 

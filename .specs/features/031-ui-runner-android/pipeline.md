@@ -2,7 +2,7 @@
 created_at: '2026-05-07'
 current_state: Done
 feature_slug: 031-ui-runner-android
-owner_command: spec.feature
+owner_command: spec-feature
 schema_version: 1
 updated_at: '2026-05-07'
 ---

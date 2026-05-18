@@ -1,7 +1,13 @@
 ---
-type: progress
-feature: 017-driver-python
 created: 2026-05-06
+created_at: '2026-05-06'
+current_state: Done
+feature: 017-driver-python
+feature_slug: 017-driver-python
+owner_command: spec-implement
+schema_version: 1
+type: progress
+updated_at: '2026-05-06'
 ---
 
 # Progress — Driver Python Implementation

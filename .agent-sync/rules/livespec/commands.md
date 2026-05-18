@@ -1,6 +1,6 @@
 # LiveSpec Commands — Référence
 
-> **Chargé à la demande par [`livespec-routing.md`](livespec-routing.md).** Ne pas charger ce fichier par défaut.
+> **Chargé à la demande par `livespec-routing.md`.** Ne pas charger ce fichier par défaut.
 
 ## Table — Intention → Commande
 

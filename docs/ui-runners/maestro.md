@@ -3,7 +3,7 @@
 <!-- @spec FR-008: developer documentation — .specs/features/031-ui-runner-android/spec.md#fr-008 -->
 
 LiveSpec's built-in Android UI runner drives Maestro YAML flows on Android emulators.
-It integrates with `/spec.test --visual` to run flows, capture screenshots, and compare
+It integrates with `/spec-test --visual` to run flows, capture screenshots, and compare
 them to baselines using the same pixelmatch engine as the web and iOS runners.
 
 ## Prerequisites
@@ -42,19 +42,19 @@ Edit the copied YAML files:
 ### Step 3 — Run visual tests
 
 ```bash
-/spec.test --visual
+/spec-test --visual
 ```
 
 For a specific device:
 
 ```bash
-/spec.test --visual --device=Pixel_Tablet_API_34
+/spec-test --visual --device=Pixel_Tablet_API_34
 ```
 
 For Wear OS (experimental):
 
 ```bash
-/spec.test --visual --platform=wearos
+/spec-test --visual --platform=wearos
 ```
 
 ## Screenshot Capture Pattern
@@ -98,11 +98,11 @@ When running with a device override, screenshots are stored in a subdirectory:
 When your project also has JVM unit tests (Feature 022 JVM driver):
 
 ```bash
-/spec.test            # runs JVM driver unit tests + Maestro UI flows
-/spec.test --visual   # runs only Maestro UI flows
+/spec-test            # runs JVM driver unit tests + Maestro UI flows
+/spec-test --visual   # runs only Maestro UI flows
 ```
 
-Both results are merged into the unified `/spec.test` summary.
+Both results are merged into the unified `/spec-test` summary.
 
 ## Surfaces Integration
 
@@ -149,7 +149,7 @@ scripts/maestro-capture.sh .specs/design/screens/home.png emulator-5554
 By default, a failed flow does not stop the others (AC-011). To stop on first failure:
 
 ```bash
-/spec.test --visual --fail-fast
+/spec-test --visual --fail-fast
 ```
 
 ## Wear OS (Experimental)
@@ -157,7 +157,7 @@ By default, a failed flow does not stop the others (AC-011). To stop on first fa
 Maestro has experimental Wear OS support. To target a Wear OS AVD:
 
 ```bash
-/spec.test --visual --platform=wearos
+/spec-test --visual --platform=wearos
 ```
 
 This emits a one-line warning: `Wear OS support is experimental in Maestro — proceed with caution`.

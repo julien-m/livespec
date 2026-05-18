@@ -14,7 +14,7 @@ Without this migration, baselines captured before v5 have no provenance record. 
 
 After migration completes:
 1. Review the generated stubs in each feature's `baselines/` directory
-2. Run `spec.test --reset-baselines` on each feature to replace stubs with real provenance
+2. Run `spec-test --reset-baselines` on each feature to replace stubs with real provenance
 3. Human approval will be required — stubs are not considered verified
 
 ## Idempotency Check
@@ -64,8 +64,8 @@ screens:
 **Notes on stub values:**
 - `capture_date: null` — unknown; the PNG predates provenance tracking
 - `approved_by: "pre-v5 (untracked)"` — explicitly marks the ambiguity (see schema approved-by values)
-- `browser_version: "unknown"` — tells spec.check to skip browser version staleness check for this screen
-- `mockup_version: "none"` — tells spec.check to skip mockup hash check for this screen
+- `browser_version: "unknown"` — tells spec-check to skip browser version staleness check for this screen
+- `mockup_version: "none"` — tells spec-check to skip mockup hash check for this screen
 
 **Edge case: no baselines found anywhere:**
 
@@ -99,10 +99,10 @@ Files not modified:
 
 Next steps:
   1. Review the generated stub manifests
-  2. Run spec.test --reset-baselines on each feature to capture real provenance
+  2. Run spec-test --reset-baselines on each feature to capture real provenance
   3. Approve the new baselines with the human approval gate
 
-Note: Stub baselines are treated as NO-MANIFEST by spec.check staleness detection
+Note: Stub baselines are treated as NO-MANIFEST by spec-check staleness detection
 until replaced by real captures.
 ```
 
@@ -117,7 +117,7 @@ All baselines already have provenance manifests (or no baselines exist).
 
 Stub manifests use `"unknown"` for `browser_version` and `"none"` for `mockup_version`.
 
-`spec.check` staleness gate behavior with stubs:
+`spec-check` staleness gate behavior with stubs:
 - `browser_version: "unknown"` → browser check skipped for this screen (not marked STALE-BROWSER)
 - `mockup_version: "none"` → mockup hash check skipped (not marked STALE-MOCKUP)
 - `approved_by: "pre-v5 (untracked)"` → WARNING displayed in `--show-provenance` output

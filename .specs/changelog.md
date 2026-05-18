@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-05-18 — [Bugfix]: Completed command-name normalization leftovers — active docs, agent-sync skills/agents, CLI help, state-file schema, and project state files now use canonical `spec-*`; state-file migration now rewrites legacy dotted `owner_command` values and validates them; agent-sync migration now ignores provider outputs and removes relative legacy command symlinks.
+
 ## 2026-05-18 — [Bugfix]: Global bootstrap now installs only `spec-init` and `spec-migrate` — `scripts/install.sh` no longer links LiveSpec rules globally; project rules remain synced by `/spec-init` through `.agent-sync` and `cc-hub`.
 
 ## 2026-05-18 — [Feature 050]: Implemented: Agent Sync Migration — moved commands, expectations, agents, and routing rules to `.agent-sync`; init/install/migration now sync through `cc-hub`; legacy `commands/`, `agents/`, and tracked `.claude/rules/livespec-*` sources removed; Migration 16 added; command-audit reports 20/20 commands at score 5.

@@ -7,7 +7,7 @@ date: 2026-05-07
 # Migration v10: Preflight Auto-Install Enrichment
 
 Feature 034 (Preflight Auto-Install & Init) introduces a `--fix` flag
-to `/spec.preflight` that auto-installs missing tools and initialises
+to `/spec-preflight` that auto-installs missing tools and initialises
 simulators/AVDs. To benefit from it, downstream projects need their
 `.specs/preflight.md` to declare entries for the drivers and UI
 runners shipped in features 016-033 (test drivers, UI runners,

@@ -138,7 +138,7 @@ destinations:
     default: false
     description: >
       Wear OS emulator (experimental — Maestro Wear OS support is experimental).
-      Use with: /spec.test --visual --platform=wearos
+      Use with: /spec-test --visual --platform=wearos
 
 # @spec FR-004: default scenario — .specs/features/031-ui-runner-android/spec.md#fr-004
 scenarios:
@@ -152,7 +152,7 @@ feature_010_compatibility: |
   compare_baseline delegates to Feature 010's pixelmatch-cli.js script.
   Web, iOS, and Android runners all share the same pixel-level comparison engine.
 
-# Infrastructure requirements (managed by /spec.preflight --fix):
+# Infrastructure requirements (managed by /spec-preflight --fix):
 # - ANDROID_HOME or ANDROID_SDK_ROOT must be set
 # - adb must be on PATH (bundled with Android SDK)
 # - emulator binary must be on PATH (bundled with Android SDK)

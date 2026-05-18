@@ -158,7 +158,7 @@ Tier 4 (--deep): additional 30K on top
 
 ## Auto-Answering the 6 Questions
 
-Using scan results, generate answers to the same 6 questions from `spec.init` Phase A.
+Using scan results, generate answers to the same 6 questions from `spec-init` Phase A.
 
 | Question | Primary signal source | Typical confidence |
 |---|---|---|
@@ -261,7 +261,7 @@ Count sections that have at least INFERRED-level content:
 
 | Populated sections | Action |
 |---|---|
-| < 3, **OR** missing Project Vision, **OR** missing Detected Stack | **Abort:** "Insufficient signal to generate specs. Use `spec.init` without --from-code, or add a README to improve detection." |
+| < 3, **OR** missing Project Vision, **OR** missing Detected Stack | **Abort:** "Insufficient signal to generate specs. Use `spec-init` without --from-code, or add a README to improve detection." |
 | 3-5 sections (with Vision + Stack present) | **Warn:** "Low coverage — N sections need manual input." Proceed with `[FILL]` gaps. |
 | 6+ sections | **Proceed** normally |
 
@@ -387,12 +387,12 @@ After Phase E completes:
 
 | Case | Handling |
 |---|---|
-| Empty repo (no code files) | Abort: "No source code detected. Use `spec.init` without --from-code." |
+| Empty repo (no code files) | Abort: "No source code detected. Use `spec-init` without --from-code." |
 | Monorepo (15+ manifests of same type) | Scan root + 5 most recent. Warn in Analysis Coverage. |
 | No README | Q1 Vision tagged `[SPECULATIVE]` — may trigger abort if no other Vision signal |
 | No tests found | Testing strategy generated with recommendations based on stack |
 | Binary-only project | Abort: "No parseable source code found." |
-| `.brainstorm/` exists | `--from-code` ignores brainstorm data. Use regular `spec.init` for that path. |
+| `.brainstorm/` exists | `--from-code` ignores brainstorm data. Use regular `spec-init` for that path. |
 | Corrupted/partial `bootstrap-recap.md` | Treat as "no recap", re-scan. Warn: "Existing recap is malformed — regenerating." |
 | `.specs/` exists + `bootstrap-recap.md` at root | `--force` required. Backs up `.specs/`, then checks recap status. |
 | User typos in YAML status | Error: "Invalid status '[value]'. Set status to 'validated' to proceed." |

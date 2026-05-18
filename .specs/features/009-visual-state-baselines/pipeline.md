@@ -2,7 +2,7 @@
 created_at: '2026-04-17'
 current_state: Done
 feature_slug: 009-visual-state-baselines
-owner_command: spec.feature
+owner_command: spec-feature
 schema_version: 1
 updated_at: '2026-04-17'
 ---

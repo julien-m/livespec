@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-12'
+current_state: Done
+feature_slug: 040-expectations-rich-and-verify-preview
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-12'
+---
+
 # Pipeline — Feature 040 — Rich Expectations Format & Verify Preview
 
 **Started:** 2026-05-12

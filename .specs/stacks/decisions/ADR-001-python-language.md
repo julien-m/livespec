@@ -13,4 +13,4 @@
   - Requires virtualenv management per-project (`.venv/`)
   - No lock file currently (pip install -e .) — could add `uv` or `pip-tools` for reproducibility
   - CI uses pip directly; no lock file means dependency resolution on every CI run
-- **Note:** This ADR documents an observed choice, not a deliberate decision made during `spec.init`. Rationale reconstructed from codebase signals.
+- **Note:** This ADR documents an observed choice, not a deliberate decision made during `spec-init`. Rationale reconstructed from codebase signals.

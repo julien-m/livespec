@@ -148,8 +148,8 @@ exit 0
 
 ### Edge Cases
 
-- Description references a feature that overlaps an existing one: spec.specify proposes a split and writes a `seed.md` for each sub-feature.
-- LLM emits Mermaid syntax errors: spec.specify retries once, then fails with the malformed block highlighted.
+- Description references a feature that overlaps an existing one: spec-specify proposes a split and writes a `seed.md` for each sub-feature.
+- LLM emits Mermaid syntax errors: spec-specify retries once, then fails with the malformed block highlighted.
 - Roadmap already has a matching item: it gets checked and linked to the new feature folder.
 
 ### Post-run Actions

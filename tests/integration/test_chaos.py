@@ -34,8 +34,8 @@ class TestChaosEngineering:
             FIXTURES,
         )
         combined_output = " ".join(result.stdout_messages).lower()
-        # Command may fail (expected) but must mention spec.init
-        assert "spec.init" in combined_output, (
+        # Command may fail (expected) but must mention spec-init
+        assert "spec-init" in combined_output, (
             "Command did not suggest /spec-init when .specs/ is missing"
         )
 

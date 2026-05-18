@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-14'
+current_state: Done
+feature_slug: 044-behavioral-grammar-v1-shared
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-14'
+---
+
 # Pipeline — 044-behavioral-grammar-v1-shared
 
 **Started:** 2026-05-14 08:03

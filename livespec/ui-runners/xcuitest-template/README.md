@@ -46,7 +46,7 @@ scenarios:
 ### 4. Run visual tests
 
 ```bash
-/spec.test --visual
+/spec-test --visual
 ```
 
 The runner will:
@@ -127,7 +127,7 @@ destinations:
 Run with `--platform=watchos`:
 
 ```bash
-/spec.test --visual --platform=watchos
+/spec-test --visual --platform=watchos
 ```
 
 ## Troubleshooting

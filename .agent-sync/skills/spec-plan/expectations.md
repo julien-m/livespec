@@ -148,9 +148,9 @@ exit 0
 
 ### Edge Cases
 
-- Plan references libraries not in the stack: spec.plan warns and suggests adding an ADR.
+- Plan references libraries not in the stack: spec-plan warns and suggests adding an ADR.
 - `--no-contracts`: skips OpenAPI/GraphQL emission; useful when the feature exposes no API.
-- Plan exceeds 800 lines: spec.plan suggests splitting the feature.
+- Plan exceeds 800 lines: spec-plan suggests splitting the feature.
 
 ### Post-run Actions
 

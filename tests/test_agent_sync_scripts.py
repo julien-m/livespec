@@ -69,3 +69,26 @@ def test_install_dry_run_reports_cc_hub_bootstrap_calls(tmp_path: Path) -> None:
     assert ".agent-sync/skills/spec-init" in result.stdout
     assert ".agent-sync/skills/spec-migrate" in result.stdout
     assert "cc-hub rule" not in result.stdout
+
+
+def test_migrate_agent_sync_removes_relative_legacy_command_symlinks(
+    tmp_path: Path,
+) -> None:
+    project = tmp_path / "project"
+    commands_dir = project / ".claude" / "commands"
+    commands_dir.mkdir(parents=True)
+    legacy = commands_dir / ("spec" + ".check.md")
+    legacy.symlink_to("../../commands/check.md")
+    env, log_path = _env_with_fake_cc_hub(tmp_path)
+
+    result = subprocess.run(
+        ["bash", "scripts/migrate-agent-sync.sh", str(project), str(Path.cwd())],
+        text=True,
+        capture_output=True,
+        check=False,
+        env=env,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert not legacy.is_symlink()
+    assert "skill link" in log_path.read_text(encoding="utf-8")

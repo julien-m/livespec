@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-07'
+current_state: Done
+feature_slug: 036-multi-surface-detection-and-migration
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-07'
+---
+
 # Pipeline — 036-multi-surface-detection-and-migration
 
 **Started:** 2026-05-07 15:18

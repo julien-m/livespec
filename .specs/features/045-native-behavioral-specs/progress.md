@@ -1,8 +1,14 @@
 ---
-title: Implementation Progress — F045 Native Behavioral Specs
-feature: 045-native-behavioral-specs
 created: 2026-05-14
+created_at: '2026-05-14'
+current_state: Done
+feature: 045-native-behavioral-specs
+feature_slug: 045-native-behavioral-specs
+owner_command: spec-implement
+schema_version: 1
+title: Implementation Progress — F045 Native Behavioral Specs
 updated: 2026-05-14
+updated_at: '2026-05-14'
 ---
 
 # Progress

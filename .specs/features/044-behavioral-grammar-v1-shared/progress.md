@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-14'
+current_state: Done
+feature_slug: 044-behavioral-grammar-v1-shared
+owner_command: spec-implement
+schema_version: 1
+updated_at: '2026-05-14'
+---
+
 # Progress — 044-behavioral-grammar-v1-shared
 
 | Step | Description | Status |

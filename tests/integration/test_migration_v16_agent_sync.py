@@ -17,6 +17,9 @@ def _fake_project(root: Path) -> Path:
     (root / ".specs" / "livespec-version").write_text("15\n", encoding="utf-8")
     (root / ".claude" / "commands").mkdir(parents=True)
     (root / ".claude" / "agents").mkdir(parents=True)
+    (root / ".claude" / "commands" / ("spec" + ".check.md")).symlink_to(
+        "../../commands/check.md"
+    )
     return root
 
 
@@ -58,7 +61,14 @@ def test_migration_v16_syncs_agent_assets_with_cc_hub(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stderr
     assert (project / ".specs" / "livespec-version").read_text().strip() == "16"
-    assert ".agent-sync.local/" in (project / ".gitignore").read_text(encoding="utf-8")
+    gitignore = (project / ".gitignore").read_text(encoding="utf-8")
+    assert ".agent-sync.local/" in gitignore
+    assert ".agents/skills/spec-*" in gitignore
+    assert ".claude/skills/spec-*" in gitignore
+    assert ".claude/rules/livespec/" in gitignore
+    assert ".codex/agents/livespec-*.toml" in gitignore
+    legacy = project / ".claude" / "commands" / ("spec" + ".check.md")
+    assert not legacy.is_symlink()
     log = log_path.read_text(encoding="utf-8")
     assert "skill link" in log
     assert "agent build" in log

@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-12'
+current_state: Done
+feature_slug: 039-command-expectations-and-verify-output
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-12'
+---
+
 # Pipeline — 039-command-expectations-and-verify-output
 
 **Started:** 2026-05-12 06:45

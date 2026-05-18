@@ -2,7 +2,7 @@
 created_at: '2026-04-17'
 current_state: Done
 feature_slug: 005.1-behavioral-tdd-audit
-owner_command: spec.implement
+owner_command: spec-implement
 schema_version: 1
 updated_at: '2026-04-17'
 ---

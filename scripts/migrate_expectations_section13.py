@@ -270,8 +270,8 @@ exit 0
 
 ### Edge Cases
 
-- Description references a feature that overlaps an existing one: spec.specify proposes a split and writes a `seed.md` for each sub-feature.
-- LLM emits Mermaid syntax errors: spec.specify retries once, then fails with the malformed block highlighted.
+- Description references a feature that overlaps an existing one: spec-specify proposes a split and writes a `seed.md` for each sub-feature.
+- LLM emits Mermaid syntax errors: spec-specify retries once, then fails with the malformed block highlighted.
 - Roadmap already has a matching item: it gets checked and linked to the new feature folder.
 
 ### Post-run Actions
@@ -320,9 +320,9 @@ exit 0
 
 ### Edge Cases
 
-- Plan references libraries not in the stack: spec.plan warns and suggests adding an ADR.
+- Plan references libraries not in the stack: spec-plan warns and suggests adding an ADR.
 - `--no-contracts`: skips OpenAPI/GraphQL emission; useful when the feature exposes no API.
-- Plan exceeds 800 lines: spec.plan suggests splitting the feature.
+- Plan exceeds 800 lines: spec-plan suggests splitting the feature.
 
 ### Post-run Actions
 
@@ -571,9 +571,9 @@ exit 0
 
 ### Edge Cases
 
-- Stack change affects existing features: spec.stack lists them and proposes `/spec-refine` to update each.
+- Stack change affects existing features: spec-stack lists them and proposes `/spec-refine` to update each.
 - `--view`: read-only mode lists the current stack and ADRs without prompting changes.
-- ADR conflicts with a previous one: spec.stack surfaces the conflict for manual resolution.
+- ADR conflicts with a previous one: spec-stack surfaces the conflict for manual resolution.
 
 ### Post-run Actions
 
@@ -720,8 +720,8 @@ exit 0
 ### Edge Cases
 
 - `--create` on a level that already exists: hooks prompts before overwriting.
-- `mode: override` at local level: chain shortens to one entry; spec.hooks marks the chain explicitly.
-- Hook file is invalid YAML frontmatter: spec.hooks reports the parse error.
+- `mode: override` at local level: chain shortens to one entry; spec-hooks marks the chain explicitly.
+- Hook file is invalid YAML frontmatter: spec-hooks reports the parse error.
 
 ### Post-run Actions
 
@@ -849,7 +849,7 @@ exit 0
 ### Aligned / Drift / Missing
 
 - **Aligned:** summary lists tier counts, in-progress features, recent changelog. Exit 0.
-- **Drift:** spec.status detects a feature without a pipeline.md and flags it as orphan. Exit 0 (informational).
+- **Drift:** spec-status detects a feature without a pipeline.md and flags it as orphan. Exit 0 (informational).
 - **Missing:** `.specs/` not initialized. Exit 2.
 
 ### Runtime Profile (scenarios)
@@ -962,7 +962,7 @@ exit 0
 ### Edge Cases
 
 - `--dry-run`: print the migration plan without writing.
-- A migration fails mid-way: spec.migrate rolls back the partial step, leaves a clean state.
+- A migration fails mid-way: spec-migrate rolls back the partial step, leaves a clean state.
 - Custom hooks reference paths that the migration renamed: migrate updates the references.
 
 ### Post-run Actions

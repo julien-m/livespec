@@ -17,7 +17,7 @@ from ..verify_output import evaluate, render_human
 run_app = typer.Typer(name="run", help="Record LiveSpec command run artifacts.")
 WRAP_COMMAND_ARGUMENT = typer.Argument(
     ...,
-    help="Command name or alias (e.g. 'spec-status', 'status', or '/spec.status').",
+    help="Command name or alias (e.g. 'spec-status', 'status', or '/spec-status').",
 )
 WRAP_ARGV_ARGUMENT = typer.Argument(
     None,

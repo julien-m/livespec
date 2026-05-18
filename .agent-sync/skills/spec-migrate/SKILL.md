@@ -28,7 +28,7 @@ flowchart TD
     START(["/spec-migrate"]) --> CHECK{".specs/ exists?"}
     CHECK -->|no| FAIL["Error: Not a LiveSpec project.\nRun /spec-init first."]
     CHECK -->|yes| PATH{".specs/.livespec-path\nexists?"}
-    PATH -->|no| RESOLVE["Resolve path from\nspec.migrate symlink chain\n→ write .specs/.livespec-path"]
+    PATH -->|no| RESOLVE["Resolve path from\nspec-migrate skill symlink chain\n→ write .specs/.livespec-path"]
     PATH -->|yes| READ["Read .specs/livespec-version\n(default: 1 if missing)"]
     RESOLVE --> READ
     READ --> CURRENT["Read VERSION from LiveSpec repo"]
@@ -67,9 +67,11 @@ flowchart TD
 ### Step 1 — Resolve LiveSpec repo path
 
 1. Read `.specs/.livespec-path`
-2. If missing: resolve from this command's own symlink chain:
-   - `readlink ~/.claude/.agent-sync/skills/spec-migrate/SKILL.md` → `/path/to/livespec/.agent-sync/skills/spec-migrate/SKILL.md`
-   - Strip `.agent-sync/skills/spec-migrate/SKILL.md` → `/path/to/livespec`
+2. If missing: resolve from this skill's provider symlink chain:
+   - Claude global skill: `readlink ~/.claude/skills/spec-migrate` -> `~/.agent-sync/skills/spec-migrate`
+   - Codex global skill: `readlink ~/.agents/skills/spec-migrate` -> `~/.agent-sync/skills/spec-migrate`
+   - Canonical global skill: `readlink ~/.agent-sync/skills/spec-migrate` -> `/path/to/livespec/.agent-sync/skills/spec-migrate`
+   - Strip `.agent-sync/skills/spec-migrate` -> `/path/to/livespec`
    - Write to `.specs/.livespec-path`
 3. Verify the resolved path contains a `VERSION` file
 
@@ -239,7 +241,7 @@ For each file, verify:
 
 **On failure:** If any check fails unexpectedly (e.g., file read error), log the error and continue with remaining checks. Do not abort the entire migration.
 
-**Idempotency:** If Step 4.6 runs on already-reconciled files (e.g., second run of `spec.migrate`), all checks should find zero issues and exit cleanly.
+**Idempotency:** If Step 4.6 runs on already-reconciled files (e.g., second run of `spec-migrate`), all checks should find zero issues and exit cleanly.
 
 **Summary:** After all checks, store total `FIXES` count and `WARNINGS` count for Step 5 report.
 
@@ -481,7 +483,7 @@ If `migrations/N/migrate.md` does not exist for a version in the range:
 
 ### Partial migration
 If a previous migration failed mid-execution:
-- Re-running `spec.migrate` is safe (all DSL verbs are idempotent)
+- Re-running `spec-migrate` is safe (all DSL verbs are idempotent)
 - `SET_VERSION` is always the last action — version only bumps on full success
 
 <!-- @spec FR-008: Script-missing guard, FR-009: Node-missing guard, FR-010: Non-fatal on failure — .specs/features/011-visual-migrate-integration/spec.md#fr-008 -->

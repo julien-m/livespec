@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-07'
+current_state: Done
+feature_slug: 033-smart-test-selection
+owner_command: spec-implement
+schema_version: 1
+updated_at: '2026-05-07'
+---
+
 # Progress — Smart Test Selection
 
 **Started:** 2026-05-07 14:30

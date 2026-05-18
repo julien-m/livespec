@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-14'
+current_state: Done
+feature_slug: 045-native-behavioral-specs
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-14'
+---
+
 # Pipeline — 045-native-behavioral-specs
 
 **Started:** 2026-05-14 10:07

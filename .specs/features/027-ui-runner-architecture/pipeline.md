@@ -2,7 +2,7 @@
 created_at: '2026-05-07'
 current_state: InProgress
 feature_slug: 027-ui-runner-architecture
-owner_command: spec.feature
+owner_command: spec-feature
 schema_version: 1
 updated_at: '2026-05-07'
 ---

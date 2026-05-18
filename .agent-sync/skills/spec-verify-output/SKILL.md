@@ -16,7 +16,7 @@ argument-hint: "<command> [--scenario flags] [--run <path>] [--json] [--preview]
 
 # Command: /spec-verify-output
 
-> Compare the latest run artifact for a `/spec.*` command against the contract
+> Compare the latest run artifact for a `/spec-*` command against the contract
 > declared in `.agent-sync/skills/<X>/expectations.md` (or a project override at
 > `.specs/expectations/<X>.md`). Read-only.
 

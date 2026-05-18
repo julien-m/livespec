@@ -1,7 +1,13 @@
 ---
+created_at: '2026-05-18'
+current_state: Done
 feature: 048-command-validation-hardening
+feature_slug: 048-command-validation-hardening
+owner_command: spec-implement
+schema_version: 1
 status: Implemented
 updated: 2026-05-18
+updated_at: '2026-05-18'
 ---
 
 # Progress - Command Validation Hardening

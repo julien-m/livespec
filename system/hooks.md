@@ -1,7 +1,7 @@
 # LiveSpec Hooks — Resolution Protocol
 
 > **This file defines how lifecycle hooks work in LiveSpec.**
-> Referenced by `spec-system.md`. All `/spec.*` commands follow this protocol.
+> Referenced by `spec-system.md`. All `/spec-*` commands follow this protocol.
 
 ---
 
@@ -335,7 +335,7 @@ Before starting each implementation step:
 
 ## Integration with Commands
 
-**All `/spec.*` commands automatically resolve hooks.** The resolution happens at two points:
+**All `/spec-*` commands automatically resolve hooks.** The resolution happens at two points:
 
 1. **Before the command starts** — resolve and inject `before-{command}` hooks
 2. **After the command completes** — resolve and inject `after-{command}` hooks

@@ -17,7 +17,7 @@ This directory contains Maestro YAML flow templates for Android UI testing with 
 
 3. **Run visual tests:**
    ```bash
-   /spec.test --visual
+   /spec-test --visual
    ```
 
 LiveSpec automatically discovers all `.yaml` files in `.specs/maestro/` and

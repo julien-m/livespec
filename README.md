@@ -71,7 +71,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 | `/spec-implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
 | `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, capture visual baselines, verify design fidelity |
 | `/spec-check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
-| `/spec-fix` | Fix implementation gaps from spec.check — functional and visual corrections with retry loop |
+| `/spec-fix` | Fix implementation gaps from spec-check — functional and visual corrections with retry loop |
 | `/spec-explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec-stack` | Evolve your stack and analyze impact on existing features |
 | `/spec-feature` | Full pipeline: specify → plan → implement → test, with validation gates between phases |

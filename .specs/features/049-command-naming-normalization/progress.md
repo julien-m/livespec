@@ -1,7 +1,13 @@
 ---
+created_at: '2026-05-18'
+current_state: Done
 feature: 049-command-naming-normalization
+feature_slug: 049-command-naming-normalization
+owner_command: spec-implement
+schema_version: 1
 status: Implemented
 updated: 2026-05-18
+updated_at: '2026-05-18'
 ---
 
 # Progress - Command Naming Normalization

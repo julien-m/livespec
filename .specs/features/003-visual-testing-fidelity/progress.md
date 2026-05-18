@@ -4,7 +4,7 @@ created_at: '2026-04-14'
 current_state: Done
 feature: 003-visual-testing-fidelity
 feature_slug: 003-visual-testing-fidelity
-owner_command: spec.implement
+owner_command: spec-implement
 schema_version: 1
 type: progress
 updated: 2026-04-14

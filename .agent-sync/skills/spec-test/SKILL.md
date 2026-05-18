@@ -712,7 +712,7 @@ services:
 **Docker baseline warning:** If baselines exist but no `baselines/.docker-version` metadata file is found, display:
 ```
 Warning: Baselines captured outside Docker — pixel differences may be caused by render environment, not UI changes.
-Run spec.test --reset-baselines inside Docker to recapture.
+Run spec-test --reset-baselines inside Docker to recapture.
 ```
 
 ### 4.5.3 — Design Fidelity / Human Approval Gate
@@ -742,7 +742,7 @@ Approve baselines? [y/n/view <screen-name>]
 - **`y`** → commit all captured PNGs, continue to Phase 5
 - **`n`** → delete ALL captured PNGs, exit:
   ```
-  Baselines rejected — fix the UI then run spec.test --reset-baselines
+  Baselines rejected — fix the UI then run spec-test --reset-baselines
   ```
 - **`n <screen-name>`** → delete only that screen's PNG, redisplay approval table
 - **`view <screen-name>`** → print:
@@ -768,7 +768,7 @@ When running from `/spec-ship` or `/spec-feature` with `--auto`:
      SHIP_RESULT: BLOCKED
      Visual fidelity check failed:
      - dashboard: 8.4% diff (threshold: 5%)
-     Fix the UI or update the mockup, then re-run spec.test --reset-baselines.
+     Fix the UI or update the mockup, then re-run spec-test --reset-baselines.
      ```
 
 3. If **all diffs ≤ 5%** → auto-approve, commit baselines, add to test report:
@@ -787,7 +787,7 @@ After approval (Step B `y` or Step C auto-approve), write `baselines/baseline.ma
 | Field | Source |
 |-------|--------|
 | `capture_date` | Current timestamp (ISO 8601 UTC) |
-| `approved_by` | `git config user.name` in interactive mode; `"auto (spec.ship)"` or `"auto (spec.feature)"` in `--auto` mode |
+| `approved_by` | `git config user.name` in interactive mode; `"auto (spec-ship)"` or `"auto (spec-feature)"` in `--auto` mode |
 | `browser_version` | Parse from `playwright --version` output: `"Version 1.44.0"` → `"chromium/1.44"` |
 | `os` | Platform name + version from system info (e.g., `"Linux 6.1"`, `"Darwin 25.2"`) |
 | `mockup_version` | SHA-256 hex of mockup PNG binary at capture time. `"none"` if no mockup exists for this screen. |

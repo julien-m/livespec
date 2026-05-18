@@ -16,7 +16,7 @@ This agent is callable **only if** all conditions are true:
 
 If any condition is missing or false, respond exactly:
 
-> This agent requires a LiveSpec-initialized project. Run /spec.init to set up LiveSpec first.
+> This agent requires a LiveSpec-initialized project. Run /spec-init to set up LiveSpec first.
 
 ## Project Guard
 

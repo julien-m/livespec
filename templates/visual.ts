@@ -5,15 +5,15 @@
  * Usage:
  *   import { compareRegression, compareDesign } from './visual'
  *
- *   // Regression check (2% threshold) — use in spec.check flows
+ *   // Regression check (2% threshold) — use in spec-check flows
  *   await compareRegression(page, 'login-default', { threshold: 0.02 })
  *
- *   // Design fidelity (5% threshold) — use in spec.test Phase 4.5.3
+ *   // Design fidelity (5% threshold) — use in spec-test Phase 4.5.3
  *   await compareDesign(page, '.specs/design/screens/login.png', { threshold: 0.05 })
  *
  * Environment:
  *   LIVESPEC_FEATURE — feature ID for baseline routing (e.g., "001-auth")
- *                      Set by /spec.test and /spec.implement automatically.
+ *                      Set by /spec-test and /spec-implement automatically.
  *                      If unset, derives from test file path (best-effort).
  */
 
@@ -247,7 +247,7 @@ function _applyIgnoreRegions(actual: PNG, expected: PNG, regions: IgnoreRegion[]
 }
 
 function _testSuiteName(): string {
-  // Primary: use LIVESPEC_FEATURE env var (set by /spec.test or /spec.implement)
+  // Primary: use LIVESPEC_FEATURE env var (set by /spec-test or /spec-implement)
   if (process.env.LIVESPEC_FEATURE) {
     return process.env.LIVESPEC_FEATURE.replace(/[^a-z0-9-]/gi, '-').toLowerCase()
   }

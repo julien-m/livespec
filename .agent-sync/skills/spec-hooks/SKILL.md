@@ -16,7 +16,7 @@ argument-hint: "[command-name]"
 
 # Command: /spec-hooks
 
-> Display which lifecycle hooks are active, or create/edit hooks for any `/spec.*` command.
+> Display which lifecycle hooks are active, or create/edit hooks for any `/spec-*` command.
 
 ---
 
@@ -49,7 +49,7 @@ flowchart TD
 ### Step 1 — Resolve Command Name
 
 If `command-name` is provided:
-- Strip `spec.` prefix if present (e.g., `spec.plan` → `plan`)
+- Strip `spec-` prefix if present (e.g., `spec-plan` → `plan`)
 - Validate it matches a known command: `check`, `explain`, `feature`, `fix`, `hooks`, `implement`, `init`, `migrate`, `plan`, `play-coverage`, `preflight`, `propose`, `refine`, `refresh-conventions`, `ship`, `specify`, `stack`, `status`, `test`, `verify-output`
 
 If no `command-name` is provided:

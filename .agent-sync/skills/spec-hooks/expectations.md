@@ -132,8 +132,8 @@ exit 0
 ### Edge Cases
 
 - `--create` on a level that already exists: hooks prompts before overwriting.
-- `mode: override` at local level: chain shortens to one entry; spec.hooks marks the chain explicitly.
-- Hook file is invalid YAML frontmatter: spec.hooks reports the parse error.
+- `mode: override` at local level: chain shortens to one entry; spec-hooks marks the chain explicitly.
+- Hook file is invalid YAML frontmatter: spec-hooks reports the parse error.
 
 ### Post-run Actions
 

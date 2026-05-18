@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-06'
+current_state: Done
+feature_slug: 016-cross-language-test-driver-architecture
+owner_command: spec-implement
+schema_version: 1
+updated_at: '2026-05-06'
+---
+
 # Progress — 016-cross-language-test-driver-architecture
 
 | Step | Status | Completed |

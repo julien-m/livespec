@@ -1,8 +1,14 @@
 ---
-title: "UI Runner iOS / watchOS — Progress"
+created_at: '2026-05-07'
+current_state: Done
 feature: 030-ui-runner-ios-watchos
+feature_slug: 030-ui-runner-ios-watchos
+owner_command: spec-implement
+schema_version: 1
 status: Done
+title: UI Runner iOS / watchOS — Progress
 updated: 2026-05-07
+updated_at: '2026-05-07'
 ---
 
 # Progress: Feature 030 — UI Runner iOS/watchOS

@@ -60,7 +60,7 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │       ├── progress.md          ← Step-by-step checkpoint (MANDATORY during implement)
 │       ├── implementation.md
 │       ├── changelog.md
-│       ├── seed.md              ← Context seed from feature split (present until spec.specify runs)
+│       ├── seed.md              ← Context seed from feature split (present until spec-specify runs)
 │       ├── seed.absorbed.md     ← Renamed after spec.md is generated (preserved for traceability)
 │       ├── checks/              ← Gap report history
 │       ├── logs/                ← Execution logs (auto-saved)
@@ -437,8 +437,8 @@ surfaces:
 **Per-feature annotation:** Optional `- Surfaces: web, mobile` in spec.md header. Default = all surfaces.
 
 **Commands:**
-- `spec.migrate` — generates `surfaces.yaml` if absent (Migration v8)
-- `spec.check --surfaces` — detects drift between config and filesystem
+- `spec-migrate` — generates `surfaces.yaml` if absent (Migration v8)
+- `spec-check --surfaces` — detects drift between config and filesystem
 
 #### Screens Table Format
 

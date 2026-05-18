@@ -6,7 +6,7 @@ description: Migrated Claude command /spec-fix
 # /spec-fix
 
 ---
-description: "Fix implementation gaps from spec.check — functional and visual corrections"
+description: "Fix implementation gaps from spec-check — functional and visual corrections"
 argument-hint: "<feature-name>"
 ---
 
@@ -85,7 +85,7 @@ If no features → error: "No features found. Run `/spec-specify` first."
 
 ### Step 1 — Resolve Feature
 
-Same logic as `spec.check` Step 3:
+Same logic as `spec-check` Step 3:
 
 1. If feature name provided → find `.specs/features/NNN-feature-name/`
 2. If no feature name → detect from current git branch (`feature/NNN-feature-name`)
@@ -100,7 +100,7 @@ Same logic as `spec.check` Step 3:
    - No commits touch `.specs/features/NNN/` since the report date (spec changes invalidate too)
    - If fresh → use existing gap report, display: `Using gap report from YYYY-MM-DD (N gaps found)`
 3. If not found or stale (report missing, from a previous day, or code/spec changed since):
-   - Run `spec.check` inline (same logic as Steps 3-9 of **Read** [`check.md`](check.md))
+   - Run `spec-check` inline (same logic as Steps 3-9 of **Read** [`check.md`](check.md))
    - Save the gap report to `checks/YYYY-MM-DD.md`
    - Display: `Fresh gap report generated (N gaps found)`
 4. If gap report shows 0 gaps:
@@ -129,7 +129,7 @@ Read **all** of these before any fix attempt:
 | `.specs/features/NNN/baselines/*.png` | Current Playwright screenshots |
 | `.conventions/index.md` + every `→ $AIRESOURCES/...` source it references for the relevant sub-domains | Code & design conventions (if `.conventions/index.md` exists). See `~/.claude/livespec/references/conventions-sync.md` § Load Path. |
 
-**Context loading is what differentiates spec.fix from manual correction.** The command has complete knowledge of what the code should do (spec), how it should be structured (plan, constitution), what it should look like (mockups), and what it currently looks like (baselines, implementation.md).
+**Context loading is what differentiates spec-fix from manual correction.** The command has complete knowledge of what the code should do (spec), how it should be structured (plan, constitution), what it should look like (mockups), and what it currently looks like (baselines, implementation.md).
 
 ### Step 4 — Filter Gaps
 
@@ -153,7 +153,7 @@ Before fixing, check if the gap might be an intentional divergence:
 - On "skip" → skip this gap
 - With `--auto` → default to "fix" (spec is source of truth)
 
-This prevents spec.fix from reverting intentional changes that were made without updating the spec.
+This prevents spec-fix from reverting intentional changes that were made without updating the spec.
 
 Display filtered gap summary:
 
@@ -182,7 +182,7 @@ For each gap, generate a targeted fix plan:
 2. Read the plan.md section covering this FR/AC
 3. Read implementation.md to find related code locations
 4. Identify specific files to create or modify
-5. Generate implementation steps (same granularity as spec.implement)
+5. Generate implementation steps (same granularity as spec-implement)
 
 **Visual gaps (🖼️ Drift, 🎨 Diverged) — analysis pipeline:**
 
@@ -206,7 +206,7 @@ Execute the fix plan. For each gap:
 
 **Functional fixes:**
 
-- Follow the same implementation rules as `spec.implement`:
+- Follow the same implementation rules as `spec-implement`:
   - Add `@spec` anchors for new code
   - Follow patterns from `stacks/_default.md`
   - Follow every rule from the conventions payload built in Step 3 (sub-domains resolved from `.conventions/index.md` into `ai-ressources/` files). Skip this bullet if `.conventions/index.md` is absent.
@@ -279,7 +279,7 @@ After all fixes are applied:
      - **Code modified:** [list of modified files]
      - **Gaps closed:** [list of FR/AC IDs]
      - **Remaining:** [list of still-open gaps, or "None"]
-     - **Author:** spec.fix
+     - **Author:** spec-fix
      ```
    - Global changelog entry:
      `[Feature NNN] Fix: N/M gaps closed (X% → Y% alignment)`
@@ -297,7 +297,7 @@ After all fixes are applied:
 
 When `--all` is set:
 
-1. Run `spec.check --all` to generate gap reports for all features
+1. Run `spec-check --all` to generate gap reports for all features
 2. Filter features that have at least one gap
 3. Execute Steps 3-8 for each feature sequentially
 4. Produce a consolidated report at the end:
@@ -370,7 +370,7 @@ Total: 6/8 gaps closed (75%)
 ## Error Reporting
 
 ```markdown
-## spec.fix — Error Report
+## spec-fix — Error Report
 
 **Feature:** NNN-feature-name
 **Date:** YYYY-MM-DD

@@ -61,3 +61,15 @@ def test_command_registry_reads_agent_sync_skills() -> None:
         feature.expectations_path
         == AGENT_SYNC / "skills" / "spec-feature" / "expectations.md"
     )
+
+
+def test_spec_migrate_documents_provider_skill_resolution() -> None:
+    text = (AGENT_SYNC / "skills" / "spec-migrate" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "~/.claude/skills/spec-migrate" in text
+    assert "~/.agents/skills/spec-migrate" in text
+    assert "~/.agent-sync/skills/spec-migrate" in text
+    assert "~/.claude/.agent-sync" not in text
+    assert "spec" + ".migrate" not in text

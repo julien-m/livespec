@@ -1,4 +1,4 @@
-"""Level 3A — Integration tests for visual scaffolding in spec.migrate.
+"""Level 3A — Integration tests for visual scaffolding in spec-migrate.
 
 Tests invoke scripts/migrate-visual-tests.js directly on a controlled fixture
 to validate sentinel output, file creation, idempotency, and guard behavior.

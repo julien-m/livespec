@@ -234,23 +234,39 @@ See the available presets for guidance:
   # Add LiveSpec local-only files to .gitignore
   header "Updating .gitignore..."
   local gitignore="$PROJECT_DIR/.gitignore"
-  local hooks_pattern=".specs/hooks/*.local.md"
-  local agent_sync_local_pattern=".agent-sync.local/"
+  local live_patterns=(
+    ".specs/hooks/*.local.md"
+    ".agent-sync.local/"
+    ".agents/skills/spec-*"
+    ".claude/skills/spec-*"
+    ".claude/rules/livespec/"
+    ".codex/agents/livespec-*.toml"
+  )
   if [[ "$DRY_RUN" == true ]]; then
-    echo -e "  ${YELLOW}[dry-run]${RESET} Would add '$hooks_pattern' to .gitignore"
-    echo -e "  ${YELLOW}[dry-run]${RESET} Would add '$agent_sync_local_pattern' to .gitignore"
+    local pattern
+    for pattern in "${live_patterns[@]}"; do
+      echo -e "  ${YELLOW}[dry-run]${RESET} Would add '$pattern' to .gitignore"
+    done
   elif [[ ! -f "$gitignore" ]]; then
-    printf '# LiveSpec local files (personal, not committed)\n%s\n%s\n' \
-      "$hooks_pattern" "$agent_sync_local_pattern" > "$gitignore"
+    {
+      printf '# LiveSpec local files (personal, not committed)\n'
+      printf '%s\n' "${live_patterns[@]}"
+    } > "$gitignore"
     success "Created .gitignore with LiveSpec local patterns"
   else
     local added_gitignore=false
-    if ! grep -qF "$hooks_pattern" "$gitignore"; then
-      printf '\n# LiveSpec local hooks (personal, not committed)\n%s\n' "$hooks_pattern" >> "$gitignore"
-      added_gitignore=true
-    fi
-    if ! grep -qF "$agent_sync_local_pattern" "$gitignore"; then
-      printf '\n# LiveSpec local agent-sync overlay (personal, not committed)\n%s\n' "$agent_sync_local_pattern" >> "$gitignore"
+    local missing_patterns=()
+    local pattern
+    for pattern in "${live_patterns[@]}"; do
+      if ! grep -qF "$pattern" "$gitignore"; then
+        missing_patterns+=("$pattern")
+      fi
+    done
+    if [[ "${#missing_patterns[@]}" -gt 0 ]]; then
+      {
+        printf '\n# LiveSpec local files (personal, not committed)\n'
+        printf '%s\n' "${missing_patterns[@]}"
+      } >> "$gitignore"
       added_gitignore=true
     fi
     if [[ "$added_gitignore" == true ]]; then

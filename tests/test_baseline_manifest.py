@@ -2,11 +2,11 @@
 
 Validates that:
 - baseline.manifest.yml schema document exists and is well-formed (FR-007)
-- spec.test.md contains the manifest write block (FR-001)
-- spec.check.md contains --show-provenance handler (FR-002)
-- spec.check.md Step 8 contains staleness gate with mockup hash detection (FR-003, FR-004)
-- spec.check.md Step 8 contains browser version detection (FR-005)
-- spec.check.md contains --visual-status governance dashboard (FR-006)
+- spec-test.md contains the manifest write block (FR-001)
+- spec-check.md contains --show-provenance handler (FR-002)
+- spec-check.md Step 8 contains staleness gate with mockup hash detection (FR-003, FR-004)
+- spec-check.md Step 8 contains browser version detection (FR-005)
+- spec-check.md contains --visual-status governance dashboard (FR-006)
 - migrations/5/migrate.md exists with correct structure (FR-008)
 
 These are "spec-trace" tests: they verify that the command Markdown files contain
@@ -61,10 +61,10 @@ class TestBaselineManifestSchema:
             )
 
     def test_schema_documents_approved_by_auto_values(self) -> None:
-        """AC-002: Schema must document auto-approved values for spec.ship pipeline."""
+        """AC-002: Schema must document auto-approved values for spec-ship pipeline."""
         content = BASELINE_SCHEMA_MD.read_text()
-        assert "auto (spec.ship)" in content, (
-            "Schema must document 'auto (spec.ship)' as an approved_by value"
+        assert "auto (spec-ship)" in content, (
+            "Schema must document 'auto (spec-ship)' as an approved_by value"
         )
 
     def test_schema_documents_pre_v5_stub_value(self) -> None:
@@ -117,30 +117,30 @@ class TestBaselineManifestSchema:
 
 
 # ---------------------------------------------------------------------------
-# FR-001: spec.test.md writes manifest after approval
+# FR-001: spec-test.md writes manifest after approval
 # ---------------------------------------------------------------------------
 
 
 class TestSpecTestManifestWrite:
-    """AC-001, AC-002: spec.test Phase 4.5.3 writes baseline.manifest.yml."""
+    """AC-001, AC-002: spec-test Phase 4.5.3 writes baseline.manifest.yml."""
 
     def test_spec_test_contains_manifest_write_block(self) -> None:
-        """AC-001: spec.test.md must document manifest write after approval."""
-        assert SPEC_TEST_MD.exists(), f"spec.test.md not found at {SPEC_TEST_MD}"
+        """AC-001: spec-test.md must document manifest write after approval."""
+        assert SPEC_TEST_MD.exists(), f"spec-test.md not found at {SPEC_TEST_MD}"
         content = SPEC_TEST_MD.read_text()
         assert "baseline.manifest.yml" in content, (
-            "spec.test.md must document baseline.manifest.yml write (AC-001)"
+            "spec-test.md must document baseline.manifest.yml write (AC-001)"
         )
 
     def test_spec_test_references_fr001_anchor(self) -> None:
-        """FR-001: spec.test.md must have @spec anchor for FR-001."""
+        """FR-001: spec-test.md must have @spec anchor for FR-001."""
         content = SPEC_TEST_MD.read_text()
         assert "@spec FR-001" in content, (
-            "spec.test.md must contain @spec FR-001 anchor for baseline manifest write"
+            "spec-test.md must contain @spec FR-001 anchor for baseline manifest write"
         )
 
     def test_spec_test_documents_all_required_fields(self) -> None:
-        """AC-002: spec.test.md must document collection of all required manifest fields."""
+        """AC-002: spec-test.md must document collection of all required manifest fields."""
         content = SPEC_TEST_MD.read_text()
         required_fields = [
             "capture_date",
@@ -152,30 +152,30 @@ class TestSpecTestManifestWrite:
         ]
         for field in required_fields:
             assert field in content, (
-                f"spec.test.md must document field '{field}' for manifest write (AC-002)"
+                f"spec-test.md must document field '{field}' for manifest write (AC-002)"
             )
 
     def test_spec_test_documents_auto_approved_by(self) -> None:
-        """AC-002: spec.test.md must document auto (spec.ship) approved_by value."""
+        """AC-002: spec-test.md must document auto (spec-ship) approved_by value."""
         content = SPEC_TEST_MD.read_text()
-        assert "auto (spec.ship)" in content, (
-            "spec.test.md must document 'auto (spec.ship)' as approved_by in --auto mode (AC-002)"
+        assert "auto (spec-ship)" in content, (
+            "spec-test.md must document 'auto (spec-ship)' as approved_by in --auto mode (AC-002)"
         )
 
     def test_spec_test_documents_definition_of_done_manifest(self) -> None:
-        """AC-001: baseline.manifest.yml must appear in spec.test Definition of Done."""
+        """AC-001: baseline.manifest.yml must appear in spec-test Definition of Done."""
         content = SPEC_TEST_MD.read_text()
         # Check it appears in the DoD checklist (after "Definition of Done")
         dod_idx = content.find("Definition of Done")
-        assert dod_idx != -1, "spec.test.md must have a Definition of Done section"
+        assert dod_idx != -1, "spec-test.md must have a Definition of Done section"
         dod_section = content[dod_idx:]
         assert "baseline.manifest.yml" in dod_section, (
-            "baseline.manifest.yml must be in spec.test Definition of Done (AC-001)"
+            "baseline.manifest.yml must be in spec-test Definition of Done (AC-001)"
         )
 
 
 # ---------------------------------------------------------------------------
-# FR-002: spec.check.md --show-provenance flag
+# FR-002: spec-check.md --show-provenance flag
 # ---------------------------------------------------------------------------
 
 
@@ -183,18 +183,18 @@ class TestSpecCheckShowProvenance:
     """AC-003, AC-004: --show-provenance flag reads and displays manifest."""
 
     def test_spec_check_contains_show_provenance_flag(self) -> None:
-        """AC-003: spec.check.md must document --show-provenance flag."""
-        assert SPEC_CHECK_MD.exists(), f"spec.check.md not found at {SPEC_CHECK_MD}"
+        """AC-003: spec-check.md must document --show-provenance flag."""
+        assert SPEC_CHECK_MD.exists(), f"spec-check.md not found at {SPEC_CHECK_MD}"
         content = SPEC_CHECK_MD.read_text()
         assert "--show-provenance" in content, (
-            "spec.check.md must document --show-provenance flag (AC-003)"
+            "spec-check.md must document --show-provenance flag (AC-003)"
         )
 
     def test_spec_check_show_provenance_references_fr002(self) -> None:
-        """FR-002: spec.check.md must have @spec anchor for FR-002."""
+        """FR-002: spec-check.md must have @spec anchor for FR-002."""
         content = SPEC_CHECK_MD.read_text()
         assert "@spec FR-002" in content, (
-            "spec.check.md must contain @spec FR-002 anchor for show-provenance handler"
+            "spec-check.md must contain @spec FR-002 anchor for show-provenance handler"
         )
 
     def test_spec_check_show_provenance_documents_table_columns(self) -> None:
@@ -204,77 +204,77 @@ class TestSpecCheckShowProvenance:
         required_display_cols = ["Capture Date", "Approved By", "Mockup Version"]
         for col in required_display_cols:
             assert col in content, (
-                f"spec.check.md --show-provenance must display column '{col}' (AC-003)"
+                f"spec-check.md --show-provenance must display column '{col}' (AC-003)"
             )
 
     def test_spec_check_show_provenance_handles_missing_manifest(self) -> None:
-        """AC-004: Missing manifest must trigger WARNING not ERROR in spec.check."""
+        """AC-004: Missing manifest must trigger WARNING not ERROR in spec-check."""
         content = SPEC_CHECK_MD.read_text()
         # The show-provenance handler should have a graceful missing manifest path
         assert "No baseline manifest found" in content or "manifest" in content.lower(), (
-            "spec.check.md must handle missing manifest gracefully (AC-004)"
+            "spec-check.md must handle missing manifest gracefully (AC-004)"
         )
 
     def test_spec_check_flags_table_includes_show_provenance(self) -> None:
-        """AC-003: --show-provenance must appear in the spec.check flags table."""
+        """AC-003: --show-provenance must appear in the spec-check flags table."""
         content = SPEC_CHECK_MD.read_text()
         flags_idx = content.find("## Flags")
-        assert flags_idx != -1, "spec.check.md must have a Flags section"
+        assert flags_idx != -1, "spec-check.md must have a Flags section"
         flags_section = content[flags_idx:]
         assert "--show-provenance" in flags_section, (
-            "--show-provenance must appear in spec.check Flags table (AC-003)"
+            "--show-provenance must appear in spec-check Flags table (AC-003)"
         )
 
 
 # ---------------------------------------------------------------------------
-# FR-003, FR-004, FR-005: Staleness detection in spec.check Step 8
+# FR-003, FR-004, FR-005: Staleness detection in spec-check Step 8
 # ---------------------------------------------------------------------------
 
 
 class TestStalenessDetection:
-    """AC-005, AC-006, AC-007, AC-008, AC-009: Staleness gate in spec.check Step 8."""
+    """AC-005, AC-006, AC-007, AC-008, AC-009: Staleness gate in spec-check Step 8."""
 
     def test_spec_check_has_staleness_gate(self) -> None:
-        """FR-003: spec.check Step 8 must have a Staleness Gate section."""
+        """FR-003: spec-check Step 8 must have a Staleness Gate section."""
         content = SPEC_CHECK_MD.read_text()
         assert "Staleness Gate" in content or "staleness" in content.lower(), (
-            "spec.check.md Step 8 must document staleness detection (FR-003)"
+            "spec-check.md Step 8 must document staleness detection (FR-003)"
         )
 
     def test_spec_check_references_fr003_fr004_fr005(self) -> None:
-        """FR-003/FR-004/FR-005: spec.check.md must have @spec anchor for staleness FRs."""
+        """FR-003/FR-004/FR-005: spec-check.md must have @spec anchor for staleness FRs."""
         content = SPEC_CHECK_MD.read_text()
-        assert "FR-003" in content, "spec.check.md must reference FR-003 (staleness check)"
-        assert "FR-004" in content, "spec.check.md must reference FR-004 (mockup hash)"
-        assert "FR-005" in content, "spec.check.md must reference FR-005 (browser version)"
+        assert "FR-003" in content, "spec-check.md must reference FR-003 (staleness check)"
+        assert "FR-004" in content, "spec-check.md must reference FR-004 (mockup hash)"
+        assert "FR-005" in content, "spec-check.md must reference FR-005 (browser version)"
 
     def test_spec_check_documents_mockup_hash_comparison(self) -> None:
-        """AC-005/FR-004: spec.check must detect mockup changes via SHA-256 hash."""
+        """AC-005/FR-004: spec-check must detect mockup changes via SHA-256 hash."""
         content = SPEC_CHECK_MD.read_text()
         assert "SHA-256" in content or "sha256" in content.lower(), (
-            "spec.check.md must document SHA-256 hash comparison"
+            "spec-check.md must document SHA-256 hash comparison"
             " for mockup change detection (AC-005)"
         )
 
     def test_spec_check_documents_browser_version_detection(self) -> None:
-        """AC-008/FR-005: spec.check must detect browser version from playwright --version."""
+        """AC-008/FR-005: spec-check must detect browser version from playwright --version."""
         content = SPEC_CHECK_MD.read_text()
         assert "playwright --version" in content or "browser_version" in content, (
-            "spec.check.md must document browser version detection (AC-008)"
+            "spec-check.md must document browser version detection (AC-008)"
         )
 
     def test_spec_check_documents_stale_browser_marks_all_screens(self) -> None:
         """AC-009: Browser version change must mark ALL baselines stale."""
         content = SPEC_CHECK_MD.read_text()
         assert "STALE-BROWSER" in content, (
-            "spec.check.md must document STALE-BROWSER classification (AC-009)"
+            "spec-check.md must document STALE-BROWSER classification (AC-009)"
         )
         # Verify "all" is mentioned in context of browser staleness
         stale_browser_idx = content.find("STALE-BROWSER")
         assert stale_browser_idx != -1
         context = content[max(0, stale_browser_idx - 500) : stale_browser_idx + 500]
         assert "all" in context.lower(), (
-            "spec.check.md must state browser version change marks ALL baselines stale (AC-009)"
+            "spec-check.md must state browser version change marks ALL baselines stale (AC-009)"
         )
 
     def test_spec_check_stale_is_warning_not_error(self) -> None:
@@ -282,14 +282,14 @@ class TestStalenessDetection:
         content = SPEC_CHECK_MD.read_text()
         # Should mention WARNING in context of stale
         assert "WARNING" in content, (
-            "spec.check.md must document WARNING exit for stale baselines (AC-007)"
+            "spec-check.md must document WARNING exit for stale baselines (AC-007)"
         )
 
     def test_spec_check_skips_comparison_for_stale_baselines(self) -> None:
         """AC-006: Stale baselines must NOT be used for pixel comparison."""
         content = SPEC_CHECK_MD.read_text()
         assert "skip" in content.lower() or "Skipped" in content, (
-            "spec.check.md must document that stale baseline comparison is skipped (AC-006)"
+            "spec-check.md must document that stale baseline comparison is skipped (AC-006)"
         )
 
     def test_spec_check_documents_staleness_classifications(self) -> None:
@@ -298,12 +298,12 @@ class TestStalenessDetection:
         states = ["VALID", "STALE-MOCKUP", "STALE-BROWSER", "NO-MANIFEST"]
         for state in states:
             assert state in content, (
-                f"spec.check.md must document staleness state '{state}' (AC-010)"
+                f"spec-check.md must document staleness state '{state}' (AC-010)"
             )
 
 
 # ---------------------------------------------------------------------------
-# FR-006: spec.check.md --visual-status governance dashboard
+# FR-006: spec-check.md --visual-status governance dashboard
 # ---------------------------------------------------------------------------
 
 
@@ -311,17 +311,17 @@ class TestVisualStatusDashboard:
     """AC-010, AC-011: --visual-status governance dashboard."""
 
     def test_spec_check_contains_visual_status_flag(self) -> None:
-        """AC-010: spec.check.md must document --visual-status flag."""
+        """AC-010: spec-check.md must document --visual-status flag."""
         content = SPEC_CHECK_MD.read_text()
         assert "--visual-status" in content, (
-            "spec.check.md must document --visual-status flag (AC-010)"
+            "spec-check.md must document --visual-status flag (AC-010)"
         )
 
     def test_spec_check_visual_status_references_fr006(self) -> None:
-        """FR-006: spec.check.md must have @spec anchor for FR-006."""
+        """FR-006: spec-check.md must have @spec anchor for FR-006."""
         content = SPEC_CHECK_MD.read_text()
         assert "@spec FR-006" in content, (
-            "spec.check.md must contain @spec FR-006 anchor for visual-status handler"
+            "spec-check.md must contain @spec FR-006 anchor for visual-status handler"
         )
 
     def test_spec_check_visual_status_shows_all_classifications(self) -> None:
@@ -334,14 +334,14 @@ class TestVisualStatusDashboard:
         classifications = ["VALID", "STALE-MOCKUP", "STALE-BROWSER", "NO-MANIFEST"]
         for cls in classifications:
             assert cls in content, (
-                f"spec.check.md --visual-status must classify '{cls}' state (AC-010)"
+                f"spec-check.md --visual-status must classify '{cls}' state (AC-010)"
             )
 
     def test_spec_check_visual_status_documents_action_summary(self) -> None:
         """AC-011: --visual-status must print action summary with --reset-baselines commands."""
         content = SPEC_CHECK_MD.read_text()
         assert "Action" in content and "--reset-baselines" in content, (
-            "spec.check.md --visual-status must document action summary"
+            "spec-check.md --visual-status must document action summary"
             " with --reset-baselines (AC-011)"
         )
 
@@ -349,17 +349,17 @@ class TestVisualStatusDashboard:
         """AC-010: --visual-status must report 'all valid' when no issues."""
         content = SPEC_CHECK_MD.read_text()
         assert "All baselines valid" in content, (
-            "spec.check.md --visual-status must document 'All baselines valid' message (AC-010)"
+            "spec-check.md --visual-status must document 'All baselines valid' message (AC-010)"
         )
 
     def test_spec_check_flags_table_includes_visual_status(self) -> None:
-        """AC-010: --visual-status must appear in spec.check flags table."""
+        """AC-010: --visual-status must appear in spec-check flags table."""
         content = SPEC_CHECK_MD.read_text()
         flags_idx = content.find("## Flags")
         assert flags_idx != -1
         flags_section = content[flags_idx:]
         assert "--visual-status" in flags_section, (
-            "--visual-status must appear in spec.check Flags table (AC-010)"
+            "--visual-status must appear in spec-check Flags table (AC-010)"
         )
 
 

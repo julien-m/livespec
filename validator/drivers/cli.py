@@ -43,7 +43,7 @@ def root(
         # EC-004: warn but don't block.
         typer.echo(
             "Note: .specs/ directory not found — "
-            "run `livespec spec.init` first if this project is not initialized.",
+            "run `livespec spec-init` first if this project is not initialized.",
             err=True,
         )
     try:
@@ -58,5 +58,5 @@ def root(
     typer.echo(f"Created {rel}")
     typer.echo("Next steps:")
     typer.echo("  1. Edit the file and fill in each capability's `command:` (or `script:`).")
-    typer.echo("  2. Verify the manifest with: livespec spec.check")
+    typer.echo("  2. Verify the manifest with: livespec spec-check")
     typer.echo("  3. See .specs/spec-system.md for the driver integration guide.")

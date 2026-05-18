@@ -2,7 +2,7 @@
 created_at: '2026-04-13'
 current_state: Done
 feature_slug: 002-layer-3-cli-surface
-owner_command: spec.feature
+owner_command: spec-feature
 schema_version: 1
 updated_at: '2026-04-13'
 ---

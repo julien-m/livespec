@@ -3,7 +3,7 @@
 <!-- @spec FR-009: developer documentation — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-009 -->
 
 LiveSpec's built-in iOS/watchOS UI runner drives XCUITest on the iOS and watchOS simulators.
-It integrates with `/spec.test --visual` to capture screenshots from `.xcresult` bundles
+It integrates with `/spec-test --visual` to capture screenshots from `.xcresult` bundles
 and compare them to baselines using the same pixelmatch engine as the web runner.
 
 ## Prerequisites
@@ -52,13 +52,13 @@ scenarios:
 ### Step 4 — Run visual tests
 
 ```bash
-/spec.test --visual
+/spec-test --visual
 ```
 
 For watchOS only:
 
 ```bash
-/spec.test --visual --platform=watchos
+/spec-test --visual --platform=watchos
 ```
 
 ## Screenshot Capture Pattern
@@ -133,11 +133,11 @@ app.buttons["submit_button"].tap()    // ✅ stable
 When your project also has XCTest unit tests (Feature 019 Swift driver):
 
 ```bash
-/spec.test            # runs XCTest unit tests + XCUITest UI tests
-/spec.test --visual   # runs only XCUITest UI tests
+/spec-test            # runs XCTest unit tests + XCUITest UI tests
+/spec-test --visual   # runs only XCUITest UI tests
 ```
 
-Both results are merged into the unified `/spec.test` summary.
+Both results are merged into the unified `/spec-test` summary.
 
 ## Surfaces Integration
 

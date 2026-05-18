@@ -452,7 +452,7 @@ Detection and confirmation happen here (Phase B context — decisions). File cop
 
 - **"skip"** (or equivalent): skip silently, proceed to Step 4
 
-**Artifact hierarchy:** PNG exports are the canonical design artifacts (required, referenced by all downstream commands). The source file (`.pen`, `.fig`, etc.) is optional — stored for re-editing via design tools. `spec.fix`, `spec.check`, `spec.implement`, and `spec.plan` reference PNGs only, never source files directly.
+**Artifact hierarchy:** PNG exports are the canonical design artifacts (required, referenced by all downstream commands). The source file (`.pen`, `.fig`, etc.) is optional — stored for re-editing via design tools. `spec-fix`, `spec-check`, `spec-implement`, and `spec-plan` reference PNGs only, never source files directly.
 
 **Post-import rule:** After import, `.brainstorm/` is never referenced again by any LiveSpec command. All downstream commands read exclusively from `.specs/design/`.
 
@@ -779,6 +779,10 @@ through `cc-hub`:
 6. **Write version:** Read `VERSION` from the LiveSpec repo, write to `.specs/livespec-version`
 7. **Update .gitignore:** Add the following patterns (if not already present):
    - `.agent-sync.local/`
+   - `.agents/skills/spec-*`
+   - `.claude/skills/spec-*`
+   - `.claude/rules/livespec/`
+   - `.codex/agents/livespec-*.toml`
    - `.specs/.livespec-path`
    - `.specs/.runs/`
    - `.specs/.previews/`
@@ -1006,7 +1010,7 @@ Before declaring success, verify:
 - [ ] `.agent-sync/agents/livespec-*` resolves for all 4 LiveSpec agents
 - [ ] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo
 - [ ] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory
-- [ ] `.gitignore` contains `.agent-sync.local/`, `.specs/.livespec-path`, `test-results/`, `playwright-report/`
+- [ ] `.gitignore` contains `.agent-sync.local/`, provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`
 - [ ] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`
 - [ ] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)
 

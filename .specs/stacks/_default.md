@@ -4,7 +4,7 @@ updated: 2026-04-13
 
 # Stack — LiveSpec
 
-> Detected from codebase by `spec.init --from-code` on 2026-04-13.
+> Detected from codebase by `spec-init --from-code` on 2026-04-13.
 > All choices are Observed from existing code. See `decisions/` for rationale ADRs.
 
 ---
@@ -63,4 +63,4 @@ The LLM provider is NOT part of the stack — it is user-configured via `~/.conf
 
 ---
 
-*Updated by `spec.init --from-code` on 2026-04-13. Bump `updated` date on every stack change via `/spec.stack`.*
+*Updated by `spec-init --from-code` on 2026-04-13. Bump `updated` date on every stack change via `/spec-stack`.*

@@ -16,7 +16,7 @@ This agent is callable **only if** all conditions are true:
 
 If any condition is missing or false, respond exactly:
 
-> This agent requires a LiveSpec-initialized project. Run /spec.init to set up LiveSpec first.
+> This agent requires a LiveSpec-initialized project. Run /spec-init to set up LiveSpec first.
 
 ## Project Guard
 
@@ -51,7 +51,7 @@ Create `progress.md` if it doesn't exist (with header row).
 
 <!-- @spec FR-008: Acquire .specs/.LOCK around Steps 2-5 (writes to global files) — .specs/features/015-global-write-locks/spec.md#fr-008 -->
 
-> **Concurrency safety (Chantier 3 / Feature 015):** Actions 2 (feature changelog), 3 (`.specs/changelog.md`), 4 (`.specs/README.md`), and 5 (execution log path) below all write to shared files. Wrap the full action sequence in `validator.locks.acquire_lock(specs_root)` and use `validator.locks.write_with_hash_check(target, content)` for each write. Multiple documenter instances run concurrently in `/spec.ship` batches; the lock serialises their writes and prevents lost updates. See [`system/locks.md`](../system/locks.md).
+> **Concurrency safety (Chantier 3 / Feature 015):** Actions 2 (feature changelog), 3 (`.specs/changelog.md`), 4 (`.specs/README.md`), and 5 (execution log path) below all write to shared files. Wrap the full action sequence in `validator.locks.acquire_lock(specs_root)` and use `validator.locks.write_with_hash_check(target, content)` for each write. Multiple documenter instances run concurrently in `/spec-ship` batches; the lock serialises their writes and prevents lost updates. See [`system/locks.md`](../system/locks.md).
 
 Create/update all final documentation artifacts.
 

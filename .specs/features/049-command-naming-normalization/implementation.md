@@ -21,7 +21,7 @@ updated: 2026-05-18
 | FR-008 | `migrations/15/migrate.md`, `scripts/migrate-command-naming.sh` | `FR-008` | ✅ Implemented | 2026-05-18 |
 | FR-009 | `validator/command_registry.py`, `validator/expectations.py`, `validator/run_artifact.py` | `FR-009` | ✅ Implemented | 2026-05-18 |
 | FR-010 | `tests/test_command_registry.py`, `tests/test_command_aliases.py`, `tests/test_integrations.py`, `tests/test_hooks_cli.py` | `FR-010` | ✅ Implemented | 2026-05-18 |
-| FR-011 | `commands/spec-*.md`, `commands/spec-*.expectations.md`, `validator/command_audit.py` | `FR-011` | ✅ Implemented | 2026-05-18 |
+| FR-011 | `.agent-sync/skills/spec-*`, `validator/command_audit.py`, `validator/state_files.py` | `FR-011` | ✅ Implemented | 2026-05-18 |
 
 ## Acceptance Criteria Mapping
 
@@ -47,6 +47,8 @@ updated: 2026-05-18
 - Updated command docs and generated references to prefer `/spec-*`.
 - Added Migration 15.
 - Renamed command source files and expectation sidecars to `commands/spec-*.md` and `commands/spec-*.expectations.md`.
+- Completed the agent-sync-era cleanup so active skills, agents, docs, CLI help, and state-file `owner_command` values use `spec-*`.
+- Added state-file validation and migration coverage for legacy dotted `owner_command` values.
 
 ## Verification
 

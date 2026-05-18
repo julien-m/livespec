@@ -137,9 +137,9 @@ exit 0
 
 ### Edge Cases
 
-- Stack change affects existing features: spec.stack lists them and proposes `/spec-refine` to update each.
+- Stack change affects existing features: spec-stack lists them and proposes `/spec-refine` to update each.
 - `--view`: read-only mode lists the current stack and ADRs without prompting changes.
-- ADR conflicts with a previous one: spec.stack surfaces the conflict for manual resolution.
+- ADR conflicts with a previous one: spec-stack surfaces the conflict for manual resolution.
 
 ### Post-run Actions
 

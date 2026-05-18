@@ -73,7 +73,7 @@ def test_run_finalize_accepts_legacy_slash_alias(tmp_path: Path) -> None:
             "run",
             "finalize",
             "--command",
-            "/spec.status",
+            "/spec" + ".status",
             "--exit-code",
             "0",
             "--stdout-file",

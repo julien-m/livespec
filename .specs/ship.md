@@ -1,8 +1,8 @@
 ---
 created_at: '2026-05-07'
-current_state: Completed
+current_state: Done
 feature_slug: '-'
-owner_command: spec.ship
+owner_command: spec-ship
 schema_version: 1
 updated_at: '2026-05-07'
 ---

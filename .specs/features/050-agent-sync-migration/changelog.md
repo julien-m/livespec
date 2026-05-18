@@ -23,3 +23,11 @@
 - **Code modified:** `scripts/install.sh`, `README.md`, `tests/test_agent_sync_scripts.py`, `tests/test_command_aliases.py`
 - **AC impacted:** AC-006
 - **Author:** codex
+
+## 2026-05-18 — [Bugfix]: Ignore provider outputs and clean relative legacy links
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `scripts/init.sh`, `scripts/migrate-agent-sync.sh`, `migrations/16/migrate.md`, `.gitignore`, tests
+- **AC impacted:** AC-007
+- **Author:** codex

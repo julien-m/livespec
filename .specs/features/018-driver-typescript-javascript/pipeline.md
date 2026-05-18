@@ -1,3 +1,12 @@
+---
+created_at: '2026-05-07'
+current_state: Done
+feature_slug: 018-driver-typescript-javascript
+owner_command: spec-feature
+schema_version: 1
+updated_at: '2026-05-07'
+---
+
 # Pipeline — 018-driver-typescript-javascript
 
 **Started:** 2026-05-07 03:13

@@ -13,7 +13,7 @@
 | Key             | Type    | Description                                                                          |
 |-----------------|---------|--------------------------------------------------------------------------------------|
 | `schema_version`| `int`   | Currently `1`. Bumped on incompatible schema changes; older values trigger a halt.   |
-| `owner_command` | `str`   | Slash command that owns this file (`spec.feature`, `spec.implement`, `spec.ship`, `spec.preflight`). |
+| `owner_command` | `str`   | Slash command that owns this file (`spec-feature`, `spec-implement`, `spec-ship`, `spec-preflight`). |
 | `feature_slug`  | `str`   | The resolved `NNN-name` slug, or the literal `"-"` for project-global files (see below). |
 | `created_at`    | `str`   | ISO date `YYYY-MM-DD` when the file was first written.                               |
 | `updated_at`    | `str`   | ISO date `YYYY-MM-DD` when the file was last modified.                               |
@@ -37,7 +37,7 @@ Project-global files (`ship.md`, `preflight.md` directly under `.specs/`) carry 
 ```yaml
 ---
 schema_version: 1
-owner_command: spec.feature
+owner_command: spec-feature
 feature_slug: 013-state-model-identity-resolution
 created_at: 2026-05-04
 updated_at: 2026-05-04
@@ -50,7 +50,7 @@ current_state: InProgress
 ```yaml
 ---
 schema_version: 1
-owner_command: spec.feature
+owner_command: spec-feature
 feature_slug: 013-state-model-identity-resolution
 created_at: 2026-05-04
 updated_at: 2026-05-04
@@ -64,7 +64,7 @@ reason: livespec validate --state-files reports schema violation in progress.md
 ```yaml
 ---
 schema_version: 1
-owner_command: spec.ship
+owner_command: spec-ship
 feature_slug: "-"
 created_at: 2026-05-04
 updated_at: 2026-05-04
@@ -108,7 +108,7 @@ livespec validate --state-files --migrate
 | Field | Inferred from |
 |-------|---------------|
 | `schema_version` | Constant `1` |
-| `owner_command` | File basename: `pipeline.md` → `spec.feature`, `progress.md` → `spec.implement`, `ship.md` → `spec.ship`, `preflight.md` → `spec.preflight` |
+| `owner_command` | File basename: `pipeline.md` → `spec-feature`, `progress.md` → `spec-implement`, `ship.md` → `spec-ship`, `preflight.md` → `spec-preflight` |
 | `feature_slug` | Path: `.specs/features/<slug>/` → `<slug>`; `.specs/<file>` (project-global) → `"-"` |
 | `created_at` | First commit date from `git log --diff-filter=A`; filesystem mtime as fallback |
 | `updated_at` | Last commit date from `git log -1`; filesystem mtime as fallback |

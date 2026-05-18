@@ -6,11 +6,11 @@ date: 2026-05-13
 
 # Migration v13: Command Expectations Wiring
 
-Features 039 (command expectations + `/spec.verify-output` + last-reviewed
+Features 039 (command expectations + `/spec-verify-output` + last-reviewed
 pre-commit hook) and 040 (rich expectations + `--preview` / `--save`) added
 runtime artefacts that were not auto-wired into pre-v13 projects:
 
-- **New slash command** `/spec.verify-output` — needs a symlink in
+- **New slash command** `/spec-verify-output` — needs a symlink in
   `.claude/commands/`.
 - **Sidecar metadata** `commands/*.expectations.md` — read directly from
   the LiveSpec checkout by `livespec verify-output`. The pre-fix

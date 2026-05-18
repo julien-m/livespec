@@ -9,7 +9,7 @@ date: 2026-04-10
 Scaffolds the visual testing helper, creates required directories, installs
 pixelmatch and sharp, and adds root-level test-results output to .gitignore.
 
-After migration completes, run /spec.test to capture visual baselines for existing features.
+After migration completes, run /spec-test to capture visual baselines for existing features.
 
 ## Actions
 

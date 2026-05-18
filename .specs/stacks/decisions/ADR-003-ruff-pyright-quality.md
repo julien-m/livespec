@@ -13,4 +13,4 @@
   - Ruff is configured with a strict rule set (B = bugbear, SIM = simplify, RUF = ruff-specific) — some rules require explicit ignores for intentional patterns (e.g., `noqa: B904` for intentional `raise typer.Exit` without `from`)
   - Pyright strict mode requires all function signatures to be typed — no `Any` escape hatches
   - CI runs ruff + pyright on every push; failures block merge
-- **Note:** This ADR documents an observed choice, not a deliberate decision made during `spec.init`. Rationale reconstructed from codebase signals.
+- **Note:** This ADR documents an observed choice, not a deliberate decision made during `spec-init`. Rationale reconstructed from codebase signals.

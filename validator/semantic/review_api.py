@@ -20,7 +20,7 @@ def review_spec_auto(
 ) -> SpecReviewResult | None:
     """Review a spec.md automatically with graceful degradation.
 
-    Intended for calling from spec.specify hooks. Never raises --
+    Intended for calling from spec-specify hooks. Never raises --
     returns None on any error.
 
     Args:
@@ -55,7 +55,7 @@ def review_plan_auto(
 ) -> PlanReviewResult | None:
     """Review a plan.md automatically with graceful degradation.
 
-    Intended for calling from spec.plan hooks. Never raises --
+    Intended for calling from spec-plan hooks. Never raises --
     returns None on any error.
 
     Args:

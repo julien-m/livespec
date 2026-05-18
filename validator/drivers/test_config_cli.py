@@ -7,7 +7,7 @@ Feature 026 surface used by ``/spec-init`` Phase C and by
 # @spec FR-005: Integrate generate_test_config into /spec-init pipeline.
 # @spec AC-002: Unsupported stack -> note + exit 0 without writing files.
 # @spec AC-007: Print summary listing generated files.
-# @spec AC-006: Reused by spec.refresh-conventions for the testing domain.
+# @spec AC-006: Reused by spec-refresh-conventions for the testing domain.
 
 from __future__ import annotations
 
@@ -110,5 +110,5 @@ def test_config_command(
         f"\nDone. Stack: {primary.name} | Runner: {plan.runner} "
         f"| Threshold: {plan.threshold:g}% | Snapshots: {plan.snapshot_lib}",
     )
-    typer.echo("Next: run `livespec spec.test` to validate the generated config.")
+    typer.echo("Next: run `livespec spec-test` to validate the generated config.")
     raise typer.Exit(0)

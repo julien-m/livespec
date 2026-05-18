@@ -7,7 +7,7 @@ created: 2026-04-14
 
 # Schema: baseline.manifest.yml
 
-Provenance manifest written by `spec.test` after every baseline approval (human or auto).
+Provenance manifest written by `spec-test` after every baseline approval (human or auto).
 Stored at `baselines/baseline.manifest.yml` alongside the PNG baselines.
 
 ---
@@ -15,7 +15,7 @@ Stored at `baselines/baseline.manifest.yml` alongside the PNG baselines.
 ## Purpose
 
 Without provenance metadata, a baseline is just a PNG with no context. This manifest records:
-- **Who** approved it (human username or "auto (spec.ship)")
+- **Who** approved it (human username or "auto (spec-ship)")
 - **When** it was captured
 - **Which browser** rendered it (Playwright + browser tag)
 - **Which OS** it ran on
@@ -65,8 +65,8 @@ screens:                               # List, required. One entry per captured 
 | Value | Meaning |
 |-------|---------|
 | `"<git-username>"` | Human approval — `git config user.name` at approval time |
-| `"auto (spec.ship)"` | Auto-approved by `spec.ship` pipeline (all diffs ≤ 5%) |
-| `"auto (spec.feature)"` | Auto-approved by `spec.feature` pipeline |
+| `"auto (spec-ship)"` | Auto-approved by `spec-ship` pipeline (all diffs ≤ 5%) |
+| `"auto (spec-feature)"` | Auto-approved by `spec-feature` pipeline |
 | `"pre-v5 (untracked)"` | Migration v5 stub — baseline existed before provenance was introduced |
 
 ---
@@ -78,7 +78,7 @@ sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 ```
 
 - SHA-256 of the mockup PNG binary content at the moment of capture
-- Used by `spec.check` to detect when a mockup has been updated since the baseline was captured
+- Used by `spec-check` to detect when a mockup has been updated since the baseline was captured
 - `"none"` when no mockup PNG exists for this screen in `.specs/design/screens/`
 
 ---
@@ -94,7 +94,7 @@ webkit/1.44
 - First component: browser name (lowercase)
 - Second component: Playwright version tag
 - Derived from `playwright --version` output: `Version 1.44.0` → tag `1.44`
-- Used by `spec.check` to detect when Playwright has been upgraded since capture
+- Used by `spec-check` to detect when Playwright has been upgraded since capture
 
 ---
 
@@ -156,8 +156,8 @@ screens:
 ## Error Handling
 
 If `baseline.manifest.yml` exists but is **unparseable YAML**: treat as missing manifest.
-- Emit WARNING: "baseline.manifest.yml is corrupted — treating as missing. Re-run spec.test --reset-baselines."
-- Do NOT crash `spec.check`.
+- Emit WARNING: "baseline.manifest.yml is corrupted — treating as missing. Re-run spec-test --reset-baselines."
+- Do NOT crash `spec-check`.
 
 If `baseline.manifest.yml` has **missing required fields**: treat as a stub (pre-v5 format).
 - Fields default to `"unknown"` for version checks, `"none"` for hash checks.

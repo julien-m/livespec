@@ -3,7 +3,7 @@
 # LiveSpec Maestro Flow Template: Home Screen
 #
 # Copy this file to your project's .specs/maestro/ directory and customize it.
-# LiveSpec will run all .yaml files in .specs/maestro/ when /spec.test --visual is invoked.
+# LiveSpec will run all .yaml files in .specs/maestro/ when /spec-test --visual is invoked.
 #
 # Replace 'com.example.myapp' with your app's package name (applicationId in build.gradle).
 

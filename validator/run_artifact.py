@@ -49,7 +49,7 @@ class FsChange:
 
 @dataclass
 class RunArtifact:
-    """Canonical artifact captured for a single `/spec.*` invocation."""
+    """Canonical artifact captured for a single `/spec-*` invocation."""
 
     command: str
     timestamp: str  # ISO 8601 UTC

@@ -136,7 +136,7 @@ exit 0
 ### Edge Cases
 
 - `--dry-run`: print the migration plan without writing.
-- A migration fails mid-way: spec.migrate rolls back the partial step, leaves a clean state.
+- A migration fails mid-way: spec-migrate rolls back the partial step, leaves a clean state.
 - Custom hooks reference paths that the migration renamed: migrate updates the references.
 
 ### Post-run Actions

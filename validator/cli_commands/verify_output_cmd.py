@@ -39,7 +39,7 @@ from ..verify_output import (
 
 COMMAND_ARGUMENT = typer.Argument(
     ...,
-    help="Command name or alias (e.g. 'spec-specify', 'specify', or '/spec.specify').",
+    help="Command name or alias (e.g. 'spec-specify', 'specify', or '/spec-specify').",
 )
 SCENARIO_OPTION = typer.Option(
     "",

@@ -13,7 +13,7 @@ Validates that every known state file under ``.specs/`` carries the canonical
 YAML frontmatter defined in ``system/state-files-schema.md``:
 
 - ``schema_version: int`` (currently ``1``)
-- ``owner_command: str`` (e.g. ``spec.feature``, ``spec.implement``)
+- ``owner_command: str`` (e.g. ``spec-feature``, ``spec-implement``)
 - ``feature_slug: str`` (matches :data:`validator.identity.SLUG_REGEX` —
   except for project-global state files where the field is the literal ``"-"``)
 - ``created_at: str`` (ISO date ``YYYY-MM-DD``)
@@ -122,6 +122,16 @@ def _validate_value_shapes(meta: dict[str, Any], path: Path) -> list[StateFileVi
         violations.append(
             StateFileViolation(path, "wrong_type", "owner_command must be non-empty string")
         )
+    elif "owner_command" in meta:
+        expected_owner = _infer_owner_command(path)
+        if expected_owner != "unknown" and meta["owner_command"] != expected_owner:
+            violations.append(
+                StateFileViolation(
+                    path,
+                    "wrong_value",
+                    f"owner_command must be {expected_owner!r} (got {meta['owner_command']!r})",
+                )
+            )
 
     # feature_slug — project-global files use "-" sentinel
     slug = meta.get("feature_slug")
@@ -256,10 +266,10 @@ def validate_state_files(specs_root: Path) -> StateFilesReport:
 
 # Filename → owner_command mapping.
 _OWNER_COMMAND_BY_FILENAME = {
-    "pipeline.md": "spec.feature",
-    "progress.md": "spec.implement",
-    "ship.md": "spec.ship",
-    "preflight.md": "spec.preflight",
+    "pipeline.md": "spec-feature",
+    "progress.md": "spec-implement",
+    "ship.md": "spec-ship",
+    "preflight.md": "spec-preflight",
 }
 
 # Body markers used to infer the legacy state when no `current_state` field is set.

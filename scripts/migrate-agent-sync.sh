@@ -17,6 +17,9 @@ cleanup_legacy_symlinks() {
       "$LIVESPEC_DIR"/commands/*|"$LIVESPEC_DIR"/agents/*)
         rm -f "$link"
         ;;
+      ../../commands/*|../../agents/*)
+        rm -f "$link"
+        ;;
     esac
   done
 }
