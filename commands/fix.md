@@ -120,7 +120,7 @@ Read **all** of these before any fix attempt:
 | `.specs/design/theme.css` | Theme CSS variables (if exists) |
 | `.specs/design/theme.md` | Theme metadata and color palette (if exists) |
 | `.specs/features/NNN/baselines/*.png` | Current Playwright screenshots |
-| `.conventions/conventions.md` | Code conventions (if exists) |
+| `.conventions/index.md` + every `→ $AIRESOURCES/...` source it references for the relevant sub-domains | Code & design conventions (if `.conventions/index.md` exists). See `~/.claude/livespec/references/conventions-sync.md` § Load Path. |
 
 **Context loading is what differentiates spec.fix from manual correction.** The command has complete knowledge of what the code should do (spec), how it should be structured (plan, constitution), what it should look like (mockups), and what it currently looks like (baselines, implementation.md).
 
@@ -202,7 +202,7 @@ Execute the fix plan. For each gap:
 - Follow the same implementation rules as `spec.implement`:
   - Add `@spec` anchors for new code
   - Follow patterns from `stacks/_default.md`
-  - Follow conventions from `.conventions/conventions.md`
+  - Follow every rule from the conventions payload built in Step 3 (sub-domains resolved from `.conventions/index.md` into `ai-ressources/` files). Skip this bullet if `.conventions/index.md` is absent.
   - Generate tests for new AC implementations
 - Update `progress.md` with fix checkpoint
 

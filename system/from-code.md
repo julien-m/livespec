@@ -400,7 +400,7 @@ After Phase E completes:
 | `--force` + recap exists | Re-scan codebase, overwrite existing recap. |
 | All Q5/Q6 answers SPECULATIVE | Valid — recap has more [FILL] markers for human. |
 | `## Analysis Coverage` | Informational only — not parsed by Phase C, not required for validation. |
-| `.conventions/` already exists | Phase E skips conventions.init (convention guard). |
+| `.conventions/` already exists (with `index.md` or legacy `conventions.md`) | Phase E skips the conventions bootstrap (convention guard). Projects on the legacy format should run `/spec.refresh-conventions --full` once to migrate. |
 | Polyglot project | Multiple stacks presented neutrally. Domain roles as [INFERRED]. One ADR per domain. |
 
 ---

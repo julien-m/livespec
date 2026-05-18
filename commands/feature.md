@@ -117,11 +117,11 @@ feature_name: NNN-feature-name          ← exact slug, e.g. 004-notifications
 feature_dir:  .specs/features/NNN-feature-name/
 feature_description: <original feature description text>
 active_flags: --auto --mono (etc.)
-conventions: <full content of .conventions/conventions.md, or NONE if file absent>
+conventions: <mandatory read list — sub-domains + ai-ressources file paths derived from .conventions/index.md, or NONE if .conventions/index.md is absent>
 ```
 
 The agent uses `feature_name` for all `livespec pipeline update` CLI calls.
-The agent uses `conventions` content directly — it does NOT read the file itself.
+The `conventions` field is the structured payload described in `~/.claude/livespec/references/conventions-sync.md` § Step 4 — the supervisor builds it by reading `.conventions/index.md`, selecting the relevant sub-domains for the phase, and resolving the `→ $AIRESOURCES/...` paths. The subagent MUST read every file in the list and follow its rules. The subagent does NOT need to read `.conventions/index.md` itself — the supervisor has already done the routing.
 
 ### Specify agent schema
 
@@ -233,7 +233,7 @@ spec.feature — Main Context (supervisor)
 - Auto-commit sequence after Phase 3.5
 
 **What runs in phase agents (isolated context):**
-- All file reads (spec.md, plan.md, constitution.md, stack.md, conventions.md)
+- All file reads (spec.md, plan.md, constitution.md, stack.md, and every `ai-ressources/` file listed in the conventions payload)
 - All generation (spec, plan, implementation code)
 - All tests and lint runs
 - Verifier dispatches (spec review, plan review)
@@ -350,7 +350,7 @@ When a feature description is provided → skip this phase entirely, proceed to 
    - `feature_dir`: `.specs/features/NNN-feature-name/`
    - `feature_description`: from CLI argument or from `pipeline.md` Feature Description field
    - `active_flags`: `--priority P1` (if provided), `--auto` (if active)
-   - `conventions`: read `.conventions/conventions.md` if it exists, else `NONE`
+   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` if `.conventions/index.md` is absent.
 
 3. Spawn a **Specify agent** with the assembled Universal Agent Context and these instructions:
 
@@ -451,7 +451,7 @@ Once branch decision is resolved, spawn the Plan agent (Phase 2).
    - `feature_dir`: `.specs/features/NNN-feature-name/`
    - `feature_description`: from `pipeline.md` Feature Description field
    - `active_flags`: `--auto` (if active)
-   - `conventions`: read `.conventions/conventions.md` if it exists, else `NONE`
+   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` if `.conventions/index.md` is absent.
 
 3. Spawn a **Plan agent** with the assembled Universal Agent Context and these instructions:
 
@@ -539,7 +539,7 @@ This ensures all tools and credentials are available before the autonomous imple
    - `feature_dir`: `.specs/features/NNN-feature-name/`
    - `feature_description`: from `pipeline.md` Feature Description field
    - `active_flags`: `--mono` (if provided), `--step` (if provided), `--resume` (if provided), `--auto` (if active)
-   - `conventions`: read `.conventions/conventions.md` if it exists, else `NONE`
+   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` if `.conventions/index.md` is absent.
 
 3. Spawn an **Implement agent** with the assembled Universal Agent Context and these instructions:
 
@@ -638,7 +638,7 @@ When `--resume` is provided:
      - If absent (older pipeline.md): fall back to `title` field in `spec.md` frontmatter
      - If spec.md also absent: prompt user for the feature description
    - `active_flags`: original flags from `pipeline.md` Flags field + `--resume`
-   - `conventions`: read `.conventions/conventions.md` if it exists, else `NONE`
+   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` if `.conventions/index.md` is absent.
 5. Spawn the appropriate phase agent (Specify / Plan / Implement / Test) with the resume state envelope and `--resume` in the instructions.
    - For the **Implement agent**: the agent reads `progress.md` internally to resume at the first non-Done step.
 6. If `pipeline.md` doesn't exist (exit 1) → start fresh from Phase 1 (spawn Specify agent with original description)

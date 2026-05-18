@@ -274,7 +274,7 @@ updated: {today's date YYYY-MM-DD}
 ---
 ```
 
-This date is compared against `.conventions/conventions.md`'s `generated` date by the `before-plan` and `before-implement` hooks to determine if conventions need refreshing.
+This date is used by the `after-stack` hook, which always runs `/spec.refresh-conventions --full` on a stack change to rebuild `.conventions/index.md` + `.conventions/manifest.yaml` from scratch (the new format has no compiled file and no staleness check — the bundle is regenerated whenever the stack changes).
 
 #### Step 6 — Generate Migration Specs (optional)
 

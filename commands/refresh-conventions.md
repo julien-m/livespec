@@ -8,33 +8,35 @@ description: "Manually initialize or refresh project conventions from the LiveSp
 
 # Command: /spec.refresh-conventions
 
-> Manually trigger conventions initialization or refresh based on the current LiveSpec stack.
+> Manually trigger generation or regeneration of the project's conventions bundle (`.conventions/index.md` + `.conventions/manifest.yaml`) from the current LiveSpec stack.
 
 ---
 
 ## Overview
 
-`/spec.refresh-conventions` runs the conventions-sync algorithm manually, with verbose output. Use it when:
-- `/spec.init` was run but conventions were not generated (e.g., hook was not triggered)
-- You changed ai-ressources and want to propagate updates
-- You want to force a conventions refresh without changing the stack
+`/spec.refresh-conventions` runs the **Bootstrap Path** defined in `~/.claude/livespec/references/conventions-sync.md`, with verbose output. Use it when:
+
+- `/spec.init` ran but conventions were not generated (e.g., the `after-init` hook was not triggered).
+- The stack changed and you want to rebuild conventions explicitly.
+- The project is still on the legacy compiled format (`.conventions/conventions.md`) and you want to migrate to the new `index.md` + `manifest.yaml` layout.
+- You simply want to regenerate the bundle from scratch.
+
+The new format references `ai-ressources/` source files directly, so there is **no staleness check** — running this command always rebuilds the bundle when invoked with `--full` (the default semantics).
 
 ```mermaid
 flowchart TD
-    START(["/spec.refresh-conventions"]) --> SYNC["Read conventions-sync.md\n(shared algorithm)"]
-    SYNC --> CHECK{".conventions/\nconventions.md?"}
-    CHECK -->|missing| STACK{".specs/stacks/\n_default.md?"}
-    STACK -->|exists| INIT["/conventions.init"]
+    START(["/spec.refresh-conventions"]) --> GUARD{".specs/\nexists?"}
+    GUARD -->|no| ABORT["Abort — run /spec.init first"]
+    GUARD -->|yes| STACK{".specs/stacks/\n_default.md?"}
     STACK -->|missing| NOSTACK["Skip — no stack defined"]
-    CHECK -->|exists| FRESH{"Compare dates:\ngenerated vs updated\nvs .last-updated"}
-    FRESH -->|stack changed| FULL["/conventions.refresh --full"]
-    FRESH -->|ai-res updated| REFRESH["/conventions.refresh"]
-    FRESH -->|up to date| UPTODATE["Already up to date"]
-    INIT --> REPORT["Verbose report"]
-    FULL --> REPORT
-    REFRESH --> REPORT
-    UPTODATE --> REPORT
+    STACK -->|exists| LEGACY{"Legacy\nconventions.md\nfound?"}
+    LEGACY -->|yes| MIGRATE["Migrate: delete legacy\nfile, continue"]
+    LEGACY -->|no| SIGNALS["Extract stack signals\n(typescript, bun, react, ...)"]
+    MIGRATE --> SIGNALS
+    SIGNALS --> REFRESH["/conventions.refresh --full\n(writes index.md + manifest.yaml)"]
+    REFRESH --> REPORT["Verbose report"]
     NOSTACK --> REPORT
+    ABORT --> REPORT
     REPORT --> DONE(["Done"])
 
     style START fill:#e8f4f8,stroke:#2196F3
@@ -53,7 +55,15 @@ Verify `.specs/` directory exists. If not:
 
 Stop.
 
-### Step 2 — Extract Signals from Stack
+### Step 2 — Legacy detection
+
+If `.conventions/conventions.md` (compiled legacy format) exists:
+
+- Report: `Legacy compiled-format detected — migrating to index.md + manifest.yaml.`
+- Delete `.conventions/conventions.md` (the new format supersedes it).
+- Continue to Step 3.
+
+### Step 3 — Extract Signals from Stack
 
 **Read** `.specs/stacks/_default.md` fully. **Read** `.specs/project.md` if it exists.
 
@@ -61,77 +71,78 @@ Extract a flat list of keyword signals: technology names, dependency names, arch
 
 Example: for a Bun + TypeScript + cron-parser project → `typescript, bun, cron-parser, parseArgs, cli`
 
-### Step 3 — Run Conventions Sync
+### Step 4 — Run Bootstrap Path
 
-**Read** [`~/.claude/livespec/references/conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) and follow its algorithm. When invoking `/conventions.init` or `/conventions.refresh`, pass the extracted signals from Step 2 so the skill can resolve them via `domain-catalog.md`.
+**Read** [`~/.claude/livespec/references/conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) and follow its **Bootstrap Path** algorithm. Invoke `/conventions.refresh --full` and pass the extracted signals from Step 3 so the skill can resolve them via `domain-catalog.md` in ai-ressources.
 
-### Step 4 — Verbose Report
+The skill writes:
 
-Regardless of the outcome (even on skip), display a verbose report:
+- `.conventions/index.md` — routing table (sub-domains + `→ $AIRESOURCES/...` lines)
+- `.conventions/manifest.yaml` — machine-readable mirror
+
+No compiled `conventions.md` is produced.
+
+### Step 5 — Verbose Report
+
+Display a verbose report on stdout, regardless of the outcome:
 
 ```
-Conventions Sync Report
-═══════════════════════
+Conventions Bootstrap Report
+════════════════════════════
 
-  Stack file:        .specs/stacks/_default.md
-  Stack updated:     2026-03-30
-  Conventions file:  .conventions/conventions.md
-  Conventions gen:   2026-03-28
-  ai-ressources:     2026-03-29
+  Stack file:           .specs/stacks/_default.md
+  Stack updated:        2026-05-17
+  Signals extracted:    typescript, bun, react, cloudflare, ...
+  Legacy file removed:  yes | no
+  Sub-domains written:  code, design-tokens, design-components, design-views
+  Files referenced:     12
 
-  Status: STALE (ai-ressources updated since last generation)
-  Action: /conventions.refresh
-  Result: Conventions refreshed successfully
+  Result: Conventions bundle generated at .conventions/index.md + .conventions/manifest.yaml
 ```
 
-If conventions did not exist:
-```
-  Status: MISSING
-  Action: /conventions.init
-  Result: Conventions initialized from stack (12 domains detected)
-```
+If the bundle already existed and `--full` rebuilt it:
 
-If already up to date:
 ```
-  Status: UP TO DATE
-  Action: None
+  Result: Conventions bundle regenerated (full rebuild)
 ```
 
 If no stack file:
+
 ```
   Status: NO STACK
   Action: None — run /spec.init to define a stack
 ```
 
-### Step 5 — Flags
+### Step 6 — Flags
 
 | Flag | Behavior |
 |------|----------|
-| `--force`, `-f` | Skip freshness check, always run `/conventions.refresh --full` |
-| `--dry-run`, `-d` | Show what would happen without executing |
+| `--full`, `-F` | Default. Always rebuild `.conventions/index.md` + `.conventions/manifest.yaml` from scratch by re-detecting sub-domains. |
+| `--force`, `-f` | Alias of `--full`. Kept for backward compatibility. |
+| `--dry-run`, `-d` | Show what would happen without writing any file. |
 
-If `--force` is passed, skip Step 3's date comparisons (performed inside `conventions-sync.md`) and directly run `/conventions.refresh --full`.
-If `--dry-run` is passed, display the report but do not execute `/conventions.init` or `/conventions.refresh`.
+If `--dry-run` is passed, run Steps 1-3 and display the report at Step 5, but do not invoke `/conventions.refresh --full` and do not delete any legacy file.
 
 ---
 
 ## Output
 
-- Verbose report on stdout (always)
-- `.conventions/conventions.md` created or updated (unless `--dry-run` or already up to date)
+- Verbose report on stdout (always).
+- `.conventions/index.md` + `.conventions/manifest.yaml` created or rewritten (unless `--dry-run` or no stack file).
+- Legacy `.conventions/conventions.md` deleted if it was present.
 
 ---
 
 ## Definition of Done
 
-- [ ] Guard checks `.specs/` existence
-- [ ] Reads and follows `conventions-sync.md` algorithm
-- [ ] Displays verbose report with all 3 dates
-- [ ] `--force` bypasses freshness check
-- [ ] `--dry-run` shows report without executing
-- [ ] Works when conventions don't exist yet (init case)
-- [ ] Works when conventions are stale (refresh case)
-- [ ] Works when conventions are up to date (skip case)
+- [ ] Guard checks `.specs/` existence.
+- [ ] Legacy `.conventions/conventions.md` migrated (deleted) when present.
+- [ ] Stack signals extracted from `.specs/stacks/_default.md` (+ `.specs/project.md` if it exists).
+- [ ] Bootstrap Path from `conventions-sync.md` followed and `/conventions.refresh --full` invoked.
+- [ ] `.conventions/index.md` AND `.conventions/manifest.yaml` exist after execution (unless `--dry-run` or missing stack).
+- [ ] Verbose report displayed with signals, legacy status, sub-domains, file count.
+- [ ] `--dry-run` produces the report without writing files.
+- [ ] Works when no stack file exists (clean abort, no error).
 
 ---
 

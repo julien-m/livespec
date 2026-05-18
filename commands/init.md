@@ -600,7 +600,7 @@ updated: {today's date YYYY-MM-DD}
 ---
 ```
 
-This `updated` field is used by LiveSpec hooks to determine if `.conventions/conventions.md` needs refreshing. It is bumped by `/spec.stack` on every stack change.
+This `updated` field is bumped by `/spec.stack` on every stack change. The `after-stack` hook reads it and triggers `/spec.refresh-conventions --full`, which regenerates `.conventions/index.md` + `.conventions/manifest.yaml` from scratch.
 
 ### Step 3.9 — Generate Roadmap
 
@@ -851,9 +851,9 @@ flowchart TD
 
 3. **Execute** each hook: Read the file and follow its instructions sequentially.
 
-4. **Convention guard (--from-code):** If `.conventions/` directory already exists AND contains `conventions.md`, skip `conventions.init`. The project already has conventions configured — do not overwrite them.
+4. **Convention guard (--from-code):** If `.conventions/` directory already exists AND contains `index.md` (or the legacy `conventions.md`), skip the conventions bootstrap. The project already has conventions configured — do not overwrite them. Projects still on the legacy compiled format should run `/spec.refresh-conventions --full` once to migrate to the `index.md` + `manifest.yaml` layout.
 
-5. **Expected outcome (standard mode):** The global `after-init` hook runs `conventions-sync.md`, which detects that `.conventions/conventions.md` does not exist and triggers `/conventions.init` to generate it from the stack.
+5. **Expected outcome (standard mode):** The global `after-init` hook follows the Bootstrap Path in `~/.claude/livespec/references/conventions-sync.md`, detects that `.conventions/index.md` does not exist, and triggers `/spec.refresh-conventions --full` to generate `.conventions/index.md` + `.conventions/manifest.yaml` from the stack.
 
 ---
 
@@ -876,7 +876,8 @@ flowchart TD
 > - `.specs/roadmap.md` — feature roadmap (N items across MVP/Post-MVP/Future)
 > - `.specs/preflight.md` — preflight manifest (tooling, auth, tokens)
 > - `.specs/preflight-report.md` — preflight execution report (gitignored, local only)
-> - `.conventions/conventions.md` — coding conventions (generated from stack)
+> - `.conventions/index.md` — convention routing table (generated from stack, points into ai-ressources)
+> - `.conventions/manifest.yaml` — machine-readable mirror of the routing table
 > - `.claude/commands/` — 17 spec commands (local symlinks)
 > - `.claude/agents/` — 4 LiveSpec agents (local symlinks)
 > - `.specs/livespec-version` — version tracking (v2)
@@ -991,7 +992,7 @@ Before declaring success, verify:
 - [ ] `.specs/preflight.md` exists with checks generated from stack
 - [ ] `.specs/preflight-report.md` exists with execution results
 - [ ] After-init hooks resolved and executed (Phase E)
-- [ ] `.conventions/conventions.md` exists (generated from stack by after-init hook, OR pre-existing in --from-code mode)
+- [ ] `.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)
 - [ ] `.claude/commands/` exists with symlinks for all spec.* commands (except init/migrate)
 - [ ] `.claude/agents/` exists with symlinks for all livespec-* agents
 - [ ] All symlinks resolve to existing files (no broken links)

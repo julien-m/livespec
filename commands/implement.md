@@ -265,7 +265,12 @@ For each step, assemble the following payload:
 - Exact step description from `plan.md` (files to create/modify, patterns to follow, exact code structure if specified).
 - Relevant rules from `.specs/constitution.md` that apply to the files being touched.
 - Stack and patterns from `.specs/stacks/_default.md`.
-- **Full content of `.conventions/conventions.md`** — include the entire file in the payload so the subagent has all code conventions (general, architecture, logging, testing, language delta, framework deltas) without needing to read them itself. This is critical: subagents have fresh context and no access to prior convention reads.
+- **Conventions payload** — built per `~/.claude/livespec/references/conventions-sync.md` § Load Path:
+  1. Read `.conventions/index.md`. If absent, set the conventions payload to `NONE` and skip the rest of this bullet.
+  2. Select sub-domains relevant to this step: always include `code`; add `design-tokens`, `design-components`, `design-views` (and other visual sub-domains) if the step touches UI; add `design-dataviz`, `design-realtime`, `design-quality` based on the work signal.
+  3. Resolve every `→ $AIRESOURCES/...` path for the selected sub-domains.
+  4. **Read** the content of each resolved file and inline it in the subagent payload under a `## Conventions (MANDATORY)` section, grouped by sub-domain. The subagent has fresh context — it cannot reload these files on its own.
+  5. State explicitly that the subagent MUST follow every rule in the listed files for any code it produces.
 - **Full content of `.specs/design/theme.css`** (if exists and step involves UI) — include so the subagent uses theme CSS variables for all color/spacing values. Add instruction: "Use CSS variables from theme.css (e.g., `var(--primary)`, `var(--secondary)`) for all colors and design tokens. Never hardcode colors when a matching CSS variable exists."
 
 **3. LiveSpec Mandatory Rules**
