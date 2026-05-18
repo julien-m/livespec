@@ -11,20 +11,20 @@ updated: 2026-04-16
 
 ## Summary
 
-Add seed creation, loading, and absorption logic to `commands/specify.md` and document `seed.md` / `seed.absorbed.md` as recognized artifacts in `spec-system.md`. No Python code changes -- seeds are Markdown artifacts managed entirely by slash command instructions.
+Add seed creation, loading, and absorption logic to `commands/spec-specify.md` and document `seed.md` / `seed.absorbed.md` as recognized artifacts in `spec-system.md`. No Python code changes -- seeds are Markdown artifacts managed entirely by slash command instructions.
 
 ## Technical Context
 
 | Aspect | Choice | Reason |
 |---|---|---|
 | Language | Markdown (command instructions) | Seeds are managed by slash command logic, not Python validator |
-| Target file (command) | `commands/specify.md` | Add 3 new behaviors: seed creation, detection/loading, absorption |
+| Target file (command) | `commands/spec-specify.md` | Add 3 new behaviors: seed creation, detection/loading, absorption |
 | Target file (docs) | `.specs/spec-system.md` | Document seed.md and seed.absorbed.md in Feature Directory Structure |
 | Python changes | None | SC-004: `git diff HEAD -- validator/` must show zero changes |
 | Testing | Manual / code inspection | No executable tests -- changes are Markdown instruction text |
 | Artifact format | Markdown with 4 structured sections | Enforced by convention in command instructions, not by validator |
 
-> **Rollback safety:** No Python files are created or modified. The only files touched are `commands/specify.md` (modified) and `.specs/spec-system.md` (modified). Both are reversible via `git checkout`.
+> **Rollback safety:** No Python files are created or modified. The only files touched are `commands/spec-specify.md` (modified) and `.specs/spec-system.md` (modified). Both are reversible via `git checkout`.
 
 ---
 
@@ -32,7 +32,7 @@ Add seed creation, loading, and absorption logic to `commands/specify.md` and do
 
 **Size: S (small)**
 - 7 FR, no new entities, no API routes, no database changes
-- 1 Markdown command file modified (`commands/specify.md`)
+- 1 Markdown command file modified (`commands/spec-specify.md`)
 - 1 documentation file modified (`.specs/spec-system.md`)
 - No Python code, no tests to write (command instructions are the implementation)
 
@@ -226,9 +226,9 @@ Expected: All existing tests pass.
 
 ---
 
-### Step 1 -- Modify `commands/specify.md`: Add Seed Detection and Loading (FR-002, FR-007)
+### Step 1 -- Modify `commands/spec-specify.md`: Add Seed Detection and Loading (FR-002, FR-007)
 
-**File:** `commands/specify.md` -- **modify**
+**File:** `commands/spec-specify.md` -- **modify**
 
 Add a new **Step 1.7 -- Seed Detection** between Step 1.5 (Scope Analysis) and Step 2 (Auto-Number):
 
@@ -258,9 +258,9 @@ At the beginning of the specify flow, after parsing the feature description but 
 
 ---
 
-### Step 2 -- Modify `commands/specify.md`: Add Seed Creation during Split (FR-001, FR-004, FR-006)
+### Step 2 -- Modify `commands/spec-specify.md`: Add Seed Creation during Split (FR-001, FR-004, FR-006)
 
-**File:** `commands/specify.md` -- **modify**
+**File:** `commands/spec-specify.md` -- **modify**
 
 Extend **Step 1.5.5 -- User Accepts Split** to include seed creation after each deferred roadmap entry:
 
@@ -312,9 +312,9 @@ For each domain added to the Deferred section:
 
 ---
 
-### Step 3 -- Modify `commands/specify.md`: Add Seed Absorption (FR-003)
+### Step 3 -- Modify `commands/spec-specify.md`: Add Seed Absorption (FR-003)
 
-**File:** `commands/specify.md` -- **modify**
+**File:** `commands/spec-specify.md` -- **modify**
 
 Add a new **Step 7.3 -- Seed Absorption** between Step 7 (Present and Confirm) and Step 7.5 (Update README):
 
@@ -370,7 +370,7 @@ Renamed from `seed.md` after `/spec.specify` generates `spec.md` for the feature
 git diff HEAD -- validator/
 
 # Confirm specify.md was modified
-git diff --stat commands/specify.md
+git diff --stat commands/spec-specify.md
 
 # Confirm spec-system.md was modified
 git diff --stat .specs/spec-system.md
@@ -380,9 +380,9 @@ pytest tests/ --ignore=tests/integration -v --tb=short
 ```
 
 **Verification checklist:**
-- [ ] `commands/specify.md` contains Step 1.7 (Seed Detection)
-- [ ] `commands/specify.md` contains Step 1.5.5.1 (Seed Creation)
-- [ ] `commands/specify.md` contains Step 7.3 (Seed Absorption)
+- [ ] `commands/spec-specify.md` contains Step 1.7 (Seed Detection)
+- [ ] `commands/spec-specify.md` contains Step 1.5.5.1 (Seed Creation)
+- [ ] `commands/spec-specify.md` contains Step 7.3 (Seed Absorption)
 - [ ] `.specs/spec-system.md` documents `seed.md` and `seed.absorbed.md`
 - [ ] `git diff HEAD -- validator/` shows zero changes
 - [ ] All existing tests pass
@@ -395,7 +395,7 @@ pytest tests/ --ignore=tests/integration -v --tb=short
 |---|---|---|---|
 | Non-regression (all tests) | `pytest tests/ --ignore=tests/integration -v --tb=short` | pytest 8.x | Verified |
 | Zero Python changes | `git diff HEAD -- validator/` | git | Verified |
-| Command file modified | `git diff --stat commands/specify.md` | git | Verified |
+| Command file modified | `git diff --stat commands/spec-specify.md` | git | Verified |
 | Docs file modified | `git diff --stat .specs/spec-system.md` | git | Verified |
 
 ---
@@ -404,9 +404,9 @@ pytest tests/ --ignore=tests/integration -v --tb=short
 
 | Test Type | What | Verification Method | FR/AC |
 |---|---|---|---|
-| Code inspection | Step 1.7 exists with seed detection logic | Read `commands/specify.md`, verify Step 1.7 section | FR-002, AC-004, AC-005 |
-| Code inspection | Step 1.5.5.1 exists with seed creation logic | Read `commands/specify.md`, verify Step 1.5.5.1 section | FR-001, FR-004, FR-006, AC-001, AC-002, AC-003, AC-008, AC-009, AC-010 |
-| Code inspection | Step 7.3 exists with seed absorption logic | Read `commands/specify.md`, verify Step 7.3 section | FR-003, AC-006, AC-007 |
+| Code inspection | Step 1.7 exists with seed detection logic | Read `commands/spec-specify.md`, verify Step 1.7 section | FR-002, AC-004, AC-005 |
+| Code inspection | Step 1.5.5.1 exists with seed creation logic | Read `commands/spec-specify.md`, verify Step 1.5.5.1 section | FR-001, FR-004, FR-006, AC-001, AC-002, AC-003, AC-008, AC-009, AC-010 |
+| Code inspection | Step 7.3 exists with seed absorption logic | Read `commands/spec-specify.md`, verify Step 7.3 section | FR-003, AC-006, AC-007 |
 | Code inspection | spec-system.md lists seed.md and seed.absorbed.md | Read `.specs/spec-system.md`, verify Feature Directory Structure | FR-005, AC-011 |
 | Code inspection | Zero Python changes | `git diff HEAD -- validator/` returns empty | SC-004 |
 | Non-regression | All existing tests pass after changes | `pytest tests/ --ignore=tests/integration -v --tb=short` | implicit |
@@ -436,9 +436,9 @@ pytest tests/ --ignore=tests/integration -v --tb=short
 ## Implementation Checklist
 
 - [ ] Step 0: Run baseline test suite (all tests pass)
-- [ ] Step 1: Add Step 1.7 (Seed Detection and Loading) to `commands/specify.md`
-- [ ] Step 2: Add Step 1.5.5.1 (Seed Creation) to `commands/specify.md`
-- [ ] Step 3: Add Step 7.3 (Seed Absorption) to `commands/specify.md`
+- [ ] Step 1: Add Step 1.7 (Seed Detection and Loading) to `commands/spec-specify.md`
+- [ ] Step 2: Add Step 1.5.5.1 (Seed Creation) to `commands/spec-specify.md`
+- [ ] Step 3: Add Step 7.3 (Seed Absorption) to `commands/spec-specify.md`
 - [ ] Step 4: Update `.specs/spec-system.md` Feature Directory Structure
 - [ ] Step 5: Run verification and quality gates
 - [ ] Verify: `git diff HEAD -- validator/` shows zero changes (SC-004)

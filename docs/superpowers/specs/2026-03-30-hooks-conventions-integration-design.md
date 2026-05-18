@@ -229,7 +229,7 @@ Diagnostic commands (`hooks`, `play-coverage`, `status`, `refresh-conventions`) 
 
 ## Part 6 — /spec.refresh-conventions Command
 
-**File:** `commands/refresh-conventions.md` in the livespec project.
+**File:** `commands/spec-refresh-conventions.md` in the livespec project.
 
 ### Behavior
 
@@ -272,7 +272,7 @@ After creation, linked via `/link` as `/spec.refresh-conventions`.
 
 ## Part 7 — spec.init Phase E (Post-Init Hooks)
 
-### Update to commands/init.md
+### Update to commands/spec-init.md
 
 Add Phase E after Phase D, before the "Done" message.
 

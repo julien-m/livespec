@@ -12,6 +12,7 @@ from __future__ import annotations
 import typer
 
 from . import (
+    command_audit_cmd,
     coverage_cmd,
     design_alignment_cmd,
     drivers_cmd,
@@ -19,6 +20,7 @@ from . import (
     preflight_cmd,
     test_cmd,
     ui_runner_cmd,
+    utility_cmd,
 )
 
 
@@ -35,6 +37,8 @@ def register_unified_commands(app: typer.Typer) -> None:
     mutation_cmd.register(app)
     preflight_cmd.register(app)
     ui_runner_cmd.register(app)
+    command_audit_cmd.register(app)
+    utility_cmd.register(app)
 
 
 __all__ = ["register_unified_commands"]

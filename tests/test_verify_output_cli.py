@@ -14,12 +14,12 @@ import pytest
 
 MINIMAL = """\
 ---
-command: demo
+command: spec-demo
 contract_version: "1.0"
 last_reviewed: 2026-05-12
 ---
 
-# Expectations — /spec.demo
+# Expectations — /spec-demo
 
 ## 1. Purpose
 demo.
@@ -127,10 +127,10 @@ def test_run_wrap_creates_artifact(project: Path):
         cwd=project,
     )
     assert result.returncode == 0
-    runs = list((project / ".specs" / ".runs").glob("demo-*.json"))
+    runs = list((project / ".specs" / ".runs").glob("spec-demo-*.json"))
     assert len(runs) == 1
     data = json.loads(runs[0].read_text(encoding="utf-8"))
-    assert data["command"] == "demo"
+    assert data["command"] == "spec-demo"
     assert data["exit_code"] == 0
     assert "marker" in data["stdout"]
 
@@ -196,7 +196,7 @@ def test_run_record_writes_artifact_from_streams(project: Path, tmp_path: Path):
         cwd=project,
     )
     assert result.returncode == 0
-    runs = list((project / ".specs" / ".runs").glob("demo-*.json"))
+    runs = list((project / ".specs" / ".runs").glob("spec-demo-*.json"))
     assert len(runs) == 1
     data = json.loads(runs[0].read_text(encoding="utf-8"))
     assert "recorded marker" in data["stdout"]

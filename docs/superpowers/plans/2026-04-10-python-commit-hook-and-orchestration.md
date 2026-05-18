@@ -17,9 +17,9 @@
 | File | Change |
 |---|---|
 | `system/hooks.md` | Add `## Commit Hook` section |
-| `commands/feature.md` | Replace auto-commit raw git call with hook-resolution flow |
-| `commands/specify.md` | Add structural validation gate after spec.md generation |
-| `commands/plan.md` | Add structural validation gate after plan.md generation |
+| `commands/spec-feature.md` | Replace auto-commit raw git call with hook-resolution flow |
+| `commands/spec-specify.md` | Add structural validation gate after spec.md generation |
+| `commands/spec-plan.md` | Add structural validation gate after plan.md generation |
 
 ### Branch 2 — New files + modifications
 
@@ -33,8 +33,8 @@
 | `tests/test_pipeline.py` | **NEW** |
 | `tests/test_git_ops.py` | **NEW** |
 | `tests/test_commit_context.py` | **NEW** |
-| `commands/feature.md` | Replace all pipeline.md writes + git staging with Python CLI calls |
-| `commands/ship.md` | Replace raw git branch/merge/delete with `livespec git` calls |
+| `commands/spec-feature.md` | Replace all pipeline.md writes + git staging with Python CLI calls |
+| `commands/spec-ship.md` | Replace raw git branch/merge/delete with `livespec git` calls |
 | `system/hooks.md` | Add gitignore note for `.commit-context.json` |
 | `.gitignore` | Add `.specs/hooks/.commit-context.json` |
 
@@ -124,12 +124,12 @@ If {{adr_paths}} is empty, use: `/git.commit "feat({{feature_name}}): <message>"
 
 ---
 
-### Task 3: Update commands/feature.md — Auto-Commit Phase
+### Task 3: Update commands/spec-feature.md — Auto-Commit Phase
 
 **Files:**
-- Modify: `commands/feature.md`
+- Modify: `commands/spec-feature.md`
 
-- [ ] **Step 1:** Read `commands/feature.md` lines 285–302 to confirm exact current auto-commit text
+- [ ] **Step 1:** Read `commands/spec-feature.md` lines 285–302 to confirm exact current auto-commit text
 
 - [ ] **Step 2:** Find and replace the entire `## Auto-Commit` section. Replace:
 
@@ -181,16 +181,16 @@ When `--auto` is active and Phase 3.5 (Test) completes successfully:
 **Without `--auto`:** no commit is made. The user commits manually.
 ```
 
-- [ ] **Step 3:** Re-read `commands/feature.md` lines 285–320 to confirm the new auto-commit section is in place
+- [ ] **Step 3:** Re-read `commands/spec-feature.md` lines 285–320 to confirm the new auto-commit section is in place
 
 ---
 
-### Task 4: Add Structural Validation Gate to commands/specify.md
+### Task 4: Add Structural Validation Gate to commands/spec-specify.md
 
 **Files:**
-- Modify: `commands/specify.md`
+- Modify: `commands/spec-specify.md`
 
-- [ ] **Step 1:** Read `commands/specify.md` lines 155–170 to locate the "after spec.md generation" position
+- [ ] **Step 1:** Read `commands/spec-specify.md` lines 155–170 to locate the "after spec.md generation" position
 
 - [ ] **Step 2:** After the spec.md generation step, insert:
 
@@ -226,12 +226,12 @@ ABORT: "spec.md failed structural validation after 2 retries.
 
 ---
 
-### Task 5: Add Structural Validation Gate to commands/plan.md
+### Task 5: Add Structural Validation Gate to commands/spec-plan.md
 
 **Files:**
-- Modify: `commands/plan.md`
+- Modify: `commands/spec-plan.md`
 
-- [ ] **Step 1:** Read `commands/plan.md` lines 310–370 to locate where `plan.md` is generated
+- [ ] **Step 1:** Read `commands/spec-plan.md` lines 310–370 to locate where `plan.md` is generated
 
 - [ ] **Step 2:** After the plan.md generation step, insert same gate pattern:
 
@@ -280,7 +280,7 @@ ABORT: "plan.md failed structural validation after 2 retries.
 
 ```bash
 cd /Users/julienm/projects/livespec
-git add system/hooks.md commands/feature.md commands/specify.md commands/plan.md
+git add system/hooks.md commands/spec-feature.md commands/spec-specify.md commands/spec-plan.md
 ```
 
 - [ ] **Step 2:** Verify clean: `git status` shows only those 4 files staged, no other dirty state
@@ -973,12 +973,12 @@ Expected: all pass.
 
 ---
 
-### Task 14: Update commands/feature.md — Branch 2 Changes
+### Task 14: Update commands/spec-feature.md — Branch 2 Changes
 
 **Files:**
-- Modify: `commands/feature.md`
+- Modify: `commands/spec-feature.md`
 
-- [ ] **Step 1:** Re-read `commands/feature.md` (full file — context may be stale from Branch 1 edits)
+- [ ] **Step 1:** Re-read `commands/spec-feature.md` (full file — context may be stale from Branch 1 edits)
 
 - [ ] **Step 2:** Grep for `pipeline.md` → enumerate all occurrences with line numbers → build replacement checklist. Expected: 15+ occurrences.
 
@@ -1012,12 +1012,12 @@ Run: livespec commit-context clear
 
 ---
 
-### Task 15: Update commands/ship.md
+### Task 15: Update commands/spec-ship.md
 
 **Files:**
-- Modify: `commands/ship.md`
+- Modify: `commands/spec-ship.md`
 
-- [ ] **Step 1:** Read `commands/ship.md` lines 190–260
+- [ ] **Step 1:** Read `commands/spec-ship.md` lines 190–260
 
 - [ ] **Step 2:** Replace:
 
@@ -1175,8 +1175,8 @@ git add \
   tests/test_pipeline.py \
   tests/test_git_ops.py \
   tests/test_commit_context.py \
-  commands/feature.md \
-  commands/ship.md \
+  commands/spec-feature.md \
+  commands/spec-ship.md \
   system/hooks.md \
   .gitignore
 ```

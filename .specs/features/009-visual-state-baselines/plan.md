@@ -11,7 +11,7 @@ updated: 2026-04-17
 
 ## Summary
 
-Extend the behavioral taxonomy with per-trait visual state tables and the Python parser with a `VisualState` dataclass, then augment `commands/specify.md` (Gherkin injection) and `commands/test.md` (Playwright generation + `--regenerate-missing` flag) to produce screenshot-based visual state tests with provenance metadata.
+Extend the behavioral taxonomy with per-trait visual state tables and the Python parser with a `VisualState` dataclass, then augment `commands/spec-specify.md` (Gherkin injection) and `commands/spec-test.md` (Playwright generation + `--regenerate-missing` flag) to produce screenshot-based visual state tests with provenance metadata.
 
 ## Technical Context
 
@@ -20,7 +20,7 @@ Extend the behavioral taxonomy with per-trait visual state tables and the Python
 | Language | Python 3.11+ | Extends existing `validator/taxonomy.py` module |
 | Markdown parsing | mistune >= 3.0 | Already used for taxonomy parsing; reuse `_table_parts()` helpers |
 | Data model | dataclass (`VisualState`) | Consistent with existing `Trait`, `DetectionSignal`, `TestPattern` dataclasses |
-| Command changes | Markdown instructions | `commands/specify.md` and `commands/test.md` are slash command instruction files |
+| Command changes | Markdown instructions | `commands/spec-specify.md` and `commands/spec-test.md` are slash command instruction files |
 | Testing | pytest (unit + integration) | Extends existing `tests/test_taxonomy_detection.py` + new `tests/test_visual_states.py` |
 | Metadata format | YAML (`.meta.yml`) | Consistent with spec frontmatter convention; pyyaml already in stack |
 | Platform | CLI tool (no web frontend) | No actual Playwright execution -- generated tests are templates for target projects |
@@ -35,7 +35,7 @@ Extend the behavioral taxonomy with per-trait visual state tables and the Python
 - 11 FR, 2 new dataclass fields, no API routes, no database changes
 - 1 Python module modified (`validator/taxonomy.py`)
 - 1 Markdown system document modified (`system/testing/ui-behavioral-taxonomy.md`)
-- 2 Markdown command files modified (`commands/specify.md`, `commands/test.md`)
+- 2 Markdown command files modified (`commands/spec-specify.md`, `commands/spec-test.md`)
 - 1 new test file (`tests/test_visual_states.py`)
 - Extends existing test file (`tests/test_taxonomy_detection.py`)
 
@@ -262,10 +262,10 @@ Update taxonomy changelog (section 7) to v1.1.0 with: "Added visual states table
 
 ---
 
-### Step 3 -- Extend commands/specify.md with visual state Gherkin injection
+### Step 3 -- Extend commands/spec-specify.md with visual state Gherkin injection
 
 **Time estimate:** ~30 min
-**Files:** `commands/specify.md`
+**Files:** `commands/spec-specify.md`
 **FR covered:** FR-003 (Gherkin with "matches visual state" assertions)
 **AC covered:** AC-002 (spec.specify generates visual state Gherkin)
 
@@ -292,10 +292,10 @@ For each detected trait that has visual states in the taxonomy:
 
 ---
 
-### Step 4 -- Extend commands/test.md with Playwright visual state generation
+### Step 4 -- Extend commands/spec-test.md with Playwright visual state generation
 
 **Time estimate:** ~45 min
-**Files:** `commands/test.md`
+**Files:** `commands/spec-test.md`
 **FR covered:** FR-004 (toHaveScreenshot generation), FR-005 (baseline storage path), FR-006 (metadata file), FR-011 (taxonomy hash invalidation)
 **AC covered:** AC-003, AC-004, AC-005, AC-006, AC-011, AC-012, AC-015
 
@@ -372,16 +372,16 @@ This ensures `--regenerate-missing` does not interfere with features that alread
 
 ---
 
-### Step 5 -- Add --regenerate-missing flag to commands/test.md
+### Step 5 -- Add --regenerate-missing flag to commands/spec-test.md
 
 **Time estimate:** ~30 min
-**Files:** `commands/test.md`
+**Files:** `commands/spec-test.md`
 **FR covered:** FR-007 (scan for missing tests), FR-008 (batch generation), FR-009 (dry-run), FR-010 (never overwrite)
 **AC covered:** AC-007, AC-008, AC-009, AC-010
 
 #### Changes
 
-Add a new section to `commands/test.md` after the Flags table:
+Add a new section to `commands/spec-test.md` after the Flags table:
 
 ##### Flag definition
 
@@ -474,8 +474,8 @@ Add 1 test to existing suite:
 | Unit | `VisualState` parsing from taxonomy Markdown | pytest | `tests/test_visual_states.py` |
 | Unit | Backward compat (existing traits still parse) | pytest | `tests/test_taxonomy_detection.py` |
 | Integration | Full taxonomy load with visual states | pytest | `tests/test_visual_states.py` |
-| Manual | Verify `commands/specify.md` Gherkin injection instructions | Code review | N/A |
-| Manual | Verify `commands/test.md` Playwright generation instructions | Code review | N/A |
+| Manual | Verify `commands/spec-specify.md` Gherkin injection instructions | Code review | N/A |
+| Manual | Verify `commands/spec-test.md` Playwright generation instructions | Code review | N/A |
 
 **No E2E tests:** This is a CLI/spec tool. The Playwright test code is generated as templates for target projects, not executed within LiveSpec itself. The constitution confirms: "No Visual Testing -- This project has no UI."
 

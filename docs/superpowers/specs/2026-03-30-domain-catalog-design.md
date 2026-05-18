@@ -161,7 +161,7 @@ This is a documentation rule (not a git hook) — the agent checks coherence whe
 | **Create/Update** | `CLAUDE.md` or `.claude/rules/domain-catalog-sync.md` | ai-ressources |
 | **Modify** | `claude/skills/conventions.init/SKILL.md` | ai-ressources |
 | **Simplify** | `~/.claude/livespec/references/conventions-sync.md` | livespec (global) |
-| **Update** | `commands/refresh-conventions.md` | livespec |
+| **Update** | `commands/spec-refresh-conventions.md` | livespec |
 
 ---
 

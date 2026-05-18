@@ -11,21 +11,21 @@ updated: 2026-04-15
 
 ## Summary
 
-Refactor Step 5.7 sub-steps 2-3 in `commands/specify.md` into a 3-phase pipeline (LLM structured JSON signal extraction, deterministic `detect_traits()` call, unchanged Gherkin injection) and add 6 integration tests in `tests/test_specify_integration.py` that validate the Phase 2 contract by calling `detect_traits()` directly with fixed signal lists.
+Refactor Step 5.7 sub-steps 2-3 in `commands/spec-specify.md` into a 3-phase pipeline (LLM structured JSON signal extraction, deterministic `detect_traits()` call, unchanged Gherkin injection) and add 6 integration tests in `tests/test_specify_integration.py` that validate the Phase 2 contract by calling `detect_traits()` directly with fixed signal lists.
 
 ## Technical Context
 
 | Aspect | Choice | Reason |
 |---|---|---|
 | Language | Python >=3.11 | Project stack |
-| Target file (command) | `commands/specify.md` | Markdown slash command -- Step 5.7 sub-steps 2-3 |
+| Target file (command) | `commands/spec-specify.md` | Markdown slash command -- Step 5.7 sub-steps 2-3 |
 | Target file (tests) | `tests/test_specify_integration.py` | New -- 6 integration tests for Phase 2 contract |
 | Dependency | `validator/taxonomy.py` | Feature 006 -- `detect_traits()` already exists |
 | Testing | pytest >=8.0 | Resolved in strategy.md |
 | Type checker | pyright strict | Required by constitution |
 | Linter | ruff (E, F, I, UP, RUF, B, SIM) | Required by constitution |
 
-> **Rollback safety:** `validator/taxonomy.py` is NOT modified by this feature (SC-004). The only Python file created is `tests/test_specify_integration.py`. The only non-Python file modified is `commands/specify.md`.
+> **Rollback safety:** `validator/taxonomy.py` is NOT modified by this feature (SC-004). The only Python file created is `tests/test_specify_integration.py`. The only non-Python file modified is `commands/spec-specify.md`.
 
 > **Note on FR sub-IDs:** The spec uses flat FR-001..FR-007 identifiers. This plan decomposes them into plan-internal sub-steps (e.g., "FR-001 pipeline refactoring" in Step 1) but does not introduce decimal suffixes. All references point back to the spec's flat IDs.
 
@@ -35,7 +35,7 @@ Refactor Step 5.7 sub-steps 2-3 in `commands/specify.md` into a 3-phase pipeline
 
 **Size: S (small)**
 - 7 FR, no new entities, no API routes, no database changes
-- 1 Markdown file modified (`commands/specify.md` -- sub-steps 2-3 of Step 5.7)
+- 1 Markdown file modified (`commands/spec-specify.md` -- sub-steps 2-3 of Step 5.7)
 - 1 Python test file created (`tests/test_specify_integration.py` -- 6 tests)
 - No LLM calls in tests (fixed signal lists substitute for Phase 1 output)
 
@@ -53,7 +53,7 @@ Refactor Step 5.7 sub-steps 2-3 in `commands/specify.md` into a 3-phase pipeline
 | Fail Fast, Exit Clearly | OK | Malformed JSON retry + fallback to `[]` with WARNING (AC-009) |
 | Minimal Surface | OK | No new CLI commands or flags; existing `--no-behavioral` still works |
 | No Hosted Infrastructure | OK | No cloud resources |
-| Source of truth (SC-003) | OK | `commands/specify.md` contains no hardcoded signal-to-trait mapping table |
+| Source of truth (SC-003) | OK | `commands/spec-specify.md` contains no hardcoded signal-to-trait mapping table |
 | Rollback safety (SC-004) | OK | Zero changes to `validator/taxonomy.py` |
 
 ---
@@ -144,9 +144,9 @@ Expected: 421 tests pass (current count from features 005+006).
 
 ---
 
-### Step 1 -- Modify `commands/specify.md` Step 5.7 sub-steps 2-3
+### Step 1 -- Modify `commands/spec-specify.md` Step 5.7 sub-steps 2-3
 
-**File:** `commands/specify.md` -- **modify** (replace sub-steps 2 and 3 only)
+**File:** `commands/spec-specify.md` -- **modify** (replace sub-steps 2 and 3 only)
 
 Replace the current sub-step 2 ("Signal detection (LLM-driven)") and sub-step 3 ("Trait mapping") with the 3-phase pipeline. Sub-steps 1 and 4-8 remain unchanged.
 
@@ -234,7 +234,7 @@ def test_malformed_json_falls_back_to_empty_signals():
 
     This test validates the observable end-state of EC-001: when signals
     fall back to [], detect_traits([]) returns an empty set, meaning no
-    traits are injected. The retry logic itself lives in commands/specify.md
+    traits are injected. The retry logic itself lives in commands/spec-specify.md
     (Markdown); this test validates the downstream contract.
     """
     result = detect_traits([], path=_TAXONOMY_PATH)
@@ -276,7 +276,7 @@ Expected:
 **Verification: `--no-behavioral` early-return precedes `detect_traits()` (AC-011):**
 
 ```bash
-grep -n "no-behavioral\|detect_traits" commands/specify.md
+grep -n "no-behavioral\|detect_traits" commands/spec-specify.md
 ```
 
 Expected output: the `--no-behavioral` check line number is strictly less than any `detect_traits` reference line number. This confirms the early-return guard precedes all Phase 2 logic, satisfying AC-011.
@@ -284,7 +284,7 @@ Expected output: the `--no-behavioral` check line number is strictly less than a
 **Verification: sub-steps 4-8 unchanged (SC-004 for command file):**
 
 ```bash
-git diff commands/specify.md
+git diff commands/spec-specify.md
 ```
 
 Review the diff output to confirm that ONLY sub-steps 2 and 3 are modified. Sub-steps 4, 5, 6, 7, and 8 must be byte-identical to their pre-change state. Any change to sub-steps 4-8 is a BLOCKING issue that must be reverted before proceeding.
@@ -300,7 +300,7 @@ Expected: empty output (zero changes).
 **Verification: no hardcoded mapping table (SC-003):**
 
 ```bash
-grep -c "signal.*trait\|mapping.*table" commands/specify.md
+grep -c "signal.*trait\|mapping.*table" commands/spec-specify.md
 ```
 
 Expected: 0 matches.
@@ -334,10 +334,10 @@ Expected: 0 matches.
 | Integration | Duplicate signals (2x, 3x) == deduplicated signals (frequency-independent) | `tests/test_specify_integration.py` | `pytest tests/test_specify_integration.py::test_duplicate_signals_same_as_deduplicated` | AC-010 |
 | Integration | `detect_traits([], path=_TAXONOMY_PATH)` returns empty set (EC-001 fallback contract) | `tests/test_specify_integration.py` | `pytest tests/test_specify_integration.py::test_malformed_json_falls_back_to_empty_signals` | AC-009 |
 | Non-regression | 15 taxonomy detection tests still pass | `tests/test_taxonomy_detection.py` | `pytest tests/test_taxonomy_detection.py -v` | AC-003 |
-| Code inspection | `commands/specify.md` has no hardcoded mapping table | `commands/specify.md` | `grep -c "signal.*trait\|mapping.*table" commands/specify.md` | AC-002, SC-003 |
+| Code inspection | `commands/spec-specify.md` has no hardcoded mapping table | `commands/spec-specify.md` | `grep -c "signal.*trait\|mapping.*table" commands/spec-specify.md` | AC-002, SC-003 |
 | Code inspection | `validator/taxonomy.py` has zero changes | `validator/taxonomy.py` | `git diff HEAD -- validator/taxonomy.py` | SC-004 |
-| Code inspection | `--no-behavioral` early-return precedes `detect_traits()` | `commands/specify.md` | `grep -n "no-behavioral\|detect_traits" commands/specify.md` | AC-011 |
-| Code inspection | Sub-steps 4-8 unchanged in specify.md | `commands/specify.md` | `git diff commands/specify.md` (review sub-steps 4-8 byte-identical) | FR-004 |
+| Code inspection | `--no-behavioral` early-return precedes `detect_traits()` | `commands/spec-specify.md` | `grep -n "no-behavioral\|detect_traits" commands/spec-specify.md` | AC-011 |
+| Code inspection | Sub-steps 4-8 unchanged in specify.md | `commands/spec-specify.md` | `git diff commands/spec-specify.md` (review sub-steps 4-8 byte-identical) | FR-004 |
 | Type check | Zero pyright violations on validator | `validator/` | `pyright validator/` | implicit |
 | Type check | Zero pyright violations on test file | `tests/test_specify_integration.py` | `pyright tests/test_specify_integration.py` | implicit |
 | Lint | Zero ruff violations | All files | `ruff check tests/test_specify_integration.py` | implicit |
@@ -358,20 +358,20 @@ Expected: 0 matches.
 | AC-008 | Step 2 -- test 4 | `test_ambiguous_save_alone_returns_empty_set` |
 | AC-009 | Step 1 -- Phase 1 retry/fallback logic + Step 2 test 6 | `test_malformed_json_falls_back_to_empty_signals` validates fallback contract: `detect_traits([]) == set()` (observable end-state of EC-001) |
 | AC-010 | Step 2 -- test 5 | `test_duplicate_signals_same_as_deduplicated` (asserts 2x and 3x duplicates match single, ruling out frequency-dependent behavior) |
-| AC-011 | Step 1 -- unchanged taxonomy gate (sub-step 1) | Step 3 grep verification: `grep -n "no-behavioral\|detect_traits" commands/specify.md` confirms early-return precedes any detect_traits reference |
+| AC-011 | Step 1 -- unchanged taxonomy gate (sub-step 1) | Step 3 grep verification: `grep -n "no-behavioral\|detect_traits" commands/spec-specify.md` confirms early-return precedes any detect_traits reference |
 
 ---
 
 ## Implementation Checklist
 
 - [ ] Step 0: Run baseline test suite (421 tests pass)
-- [ ] Step 1: Modify `commands/specify.md` Step 5.7 sub-steps 2-3
+- [ ] Step 1: Modify `commands/spec-specify.md` Step 5.7 sub-steps 2-3
 - [ ] Step 2: Create `tests/test_specify_integration.py` with 6 tests
 - [ ] Step 3: Run full test suite (427 tests pass) + quality gates
 - [ ] Verify: `pyright tests/test_specify_integration.py` -- 0 violations
 - [ ] Verify: `git diff HEAD -- validator/taxonomy.py` shows zero changes (SC-004)
-- [ ] Verify: `git diff commands/specify.md` confirms sub-steps 4-8 unchanged
-- [ ] Verify: `grep -n "no-behavioral\|detect_traits" commands/specify.md` confirms early-return ordering (AC-011)
+- [ ] Verify: `git diff commands/spec-specify.md` confirms sub-steps 4-8 unchanged
+- [ ] Verify: `grep -n "no-behavioral\|detect_traits" commands/spec-specify.md` confirms early-return ordering (AC-011)
 - [ ] Verify: `grep` for hardcoded mapping tables in specify.md returns 0 matches (SC-003)
 
 ---
@@ -382,7 +382,7 @@ Expected: 0 matches.
 |---|---|---|
 | LLM returns inconsistent signal vocabulary across runs | Expected | Phase 2 handles this: `detect_traits()` ignores unknown signals (existing behavior from 006) |
 | Taxonomy structure changes break test assertions | Low | Tests use `in result` (subset check), not `== exact_set`; resilient to new traits |
-| `commands/specify.md` is read by humans/AI, not executed as code | N/A | The Markdown instructions are the implementation -- "code" changes are textual sub-step rewrites |
+| `commands/spec-specify.md` is read by humans/AI, not executed as code | N/A | The Markdown instructions are the implementation -- "code" changes are textual sub-step rewrites |
 
 ---
 

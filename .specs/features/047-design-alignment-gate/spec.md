@@ -86,7 +86,7 @@ flowchart TD
 
 **Priority reason:** CloudSkill and other orchestrators need a single canonical verdict source.
 
-**Independent test:** Inspect `commands/test.md` and `commands/test.expectations.md` for `Phase 4.5.0`, `Design Alignment Verdict`, and artifact paths.
+**Independent test:** Inspect `commands/spec-test.md` and `commands/spec-test.expectations.md` for `Phase 4.5.0`, `Design Alignment Verdict`, and artifact paths.
 
 ```gherkin
 Feature: test command integration
@@ -116,7 +116,7 @@ flowchart TD
 - **AC-007** - Matching design/runtime contracts return `PASS` and write a manifest/report.
 - **AC-008** - A CLI command exposes the comparator with exit codes 0/1/2 for PASS/FAIL/BLOCKED.
 - **AC-009** - `/spec.test --visual` documents Phase 4.5.0 Design Alignment Gate before baseline capture.
-- **AC-010** - `commands/test.expectations.md` requires `Design Alignment Verdict` for visual runs.
+- **AC-010** - `commands/spec-test.expectations.md` requires `Design Alignment Verdict` for visual runs.
 
 ## Functional Requirements
 

@@ -5,9 +5,9 @@
 
 ---
 
-## Task 1 — Update commands/init.md (step 3.12)
+## Task 1 — Update commands/spec-init.md (step 3.12)
 
-**File:** `commands/init.md`
+**File:** `commands/spec-init.md`
 
 Locate the step 3.12 block (~line 766):
 ```
@@ -27,7 +27,7 @@ Replace it with:
    - `playwright-report/`
 ```
 
-- [ ] Read `commands/init.md` before editing
+- [ ] Read `commands/spec-init.md` before editing
 - [ ] Apply the edit
 - [ ] Re-read to confirm
 

@@ -17,9 +17,9 @@
 | Action | File | Responsibility |
 |--------|------|---------------|
 | Create | `system/templates/roadmap-template.md` | Template for `.specs/roadmap.md` with section markers |
-| Modify | `commands/init.md` | Add Step 3.9 (roadmap generation), update directory tree, output, DoD, Generated Files |
-| Modify | `commands/specify.md` | Rewrite Step 1.5 (split detection), add Step 7.7 (roadmap sync), update DoD |
-| Modify | `commands/propose.md` | Enhance Step 3 (Deferred awareness), update Step 5 (ranking boost) |
+| Modify | `commands/spec-init.md` | Add Step 3.9 (roadmap generation), update directory tree, output, DoD, Generated Files |
+| Modify | `commands/spec-specify.md` | Rewrite Step 1.5 (split detection), add Step 7.7 (roadmap sync), update DoD |
+| Modify | `commands/spec-propose.md` | Enhance Step 3 (Deferred awareness), update Step 5 (ranking boost) |
 | Modify | `system/spec-system.md` | Add roadmap.md to Project Layout tree and README update rules |
 
 All 5 files are independent — no file depends on another being modified first. Tasks can be parallelized.
@@ -46,10 +46,10 @@ Check that section marker naming follows the same pattern as README.md markers (
 
 ---
 
-## Task 2: Modify `commands/init.md`
+## Task 2: Modify `commands/spec-init.md`
 
 **Files:**
-- Modify: `commands/init.md`
+- Modify: `commands/spec-init.md`
 
 Reference: Read the design spec Section 2 (Init Phase C), Section 7 (README integration), Section 8 (installation output), Section 9 (DoD).
 
@@ -148,7 +148,7 @@ In the Generated Files Reference table (around line 509-519), add:
 
 - [ ] **Step 6: Update Definition of Done**
 
-Add to the Exit Criteria section in `commands/init.md` (around line 548-562):
+Add to the Exit Criteria section in `commands/spec-init.md` (around line 548-562):
 
 ```markdown
 - [ ] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)
@@ -170,10 +170,10 @@ Read the final file. Confirm Step 3.9 appears before Step 3.10 and the numbering
 
 ---
 
-## Task 3: Modify `commands/specify.md`
+## Task 3: Modify `commands/spec-specify.md`
 
 **Files:**
-- Modify: `commands/specify.md`
+- Modify: `commands/spec-specify.md`
 
 Reference: Read the design spec Section 3 (Split Detection), Section 4 (Roadmap Sync), Section 9 (DoD).
 
@@ -224,10 +224,10 @@ Read the final file. Confirm step numbering: ... → 7.5 (README) → 7.6 (Chang
 
 ---
 
-## Task 4: Modify `commands/propose.md`
+## Task 4: Modify `commands/spec-propose.md`
 
 **Files:**
-- Modify: `commands/propose.md`
+- Modify: `commands/spec-propose.md`
 
 Reference: Read the design spec Section 5 (Propose — Deferred Awareness).
 

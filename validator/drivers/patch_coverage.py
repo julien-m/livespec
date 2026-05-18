@@ -193,7 +193,7 @@ def summarise_patch_coverage(
     *,
     threshold: float | None = None,
 ) -> str:
-    """Render a ``/spec.test``-friendly summary for a patch coverage report.
+    """Render a ``/spec-test``-friendly summary for a patch coverage report.
 
     Args:
         report: Computed patch coverage data.
@@ -202,7 +202,7 @@ def summarise_patch_coverage(
     Returns:
         Multi-line summary string describing the patch coverage outcome.
     """
-    # @spec AC-009: /spec.test summary surfaces patch coverage alongside total coverage.
+    # @spec AC-009: /spec-test summary surfaces patch coverage alongside total coverage.
     # @spec FR-005: Auto-integration is built on this pure formatter so the runner stays untouched.
     if not report.files and report.measured_lines == 0:
         return "Patch coverage: not applicable (no changed lines)."

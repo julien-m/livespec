@@ -3,9 +3,9 @@
 This module is the SINGLE source of truth for the runtime resolution of
 LiveSpec hooks + Level 0 user integrations. It is consumed by:
 
-* the runtime CLI ``livespec hooks resolve`` (invoked by ``commands/*.md``
-  via the Bash tool through the directive in ``system/anti-drift-block.md``);
-* the diagnostic CLI ``/spec.hooks`` (tabular display of the chain).
+* the runtime CLI ``livespec hooks resolve`` (invoked by command skills via
+  the directive in ``system/anti-drift-block.md``);
+* the diagnostic CLI ``/spec-hooks`` (tabular display of the chain).
 
 The pseudo-code in ``plan-C.md`` Phase 2 is the implementation of reference.
 """
@@ -18,6 +18,7 @@ from typing import Any, cast
 
 import yaml
 
+from validator.command_registry import normalize_command_name, short_command_name
 from validator.integrations import (
     VALID_PHASES,
     discover_integrations,
@@ -166,6 +167,7 @@ def resolve_injection_chain(
         raise ValueError(
             f"event must be one of {sorted(VALID_PHASES)}, got: {event!r}"
         )
+    command = normalize_command_name(command)
 
     cwd = project_root if project_root is not None else Path.cwd()
     ctx = (
@@ -194,10 +196,11 @@ def resolve_injection_chain(
 
     # --- Level 1/2/3 -------------------------------------------------------
     global_dir = global_hooks_dir if global_hooks_dir is not None else GLOBAL_HOOKS_DIR
-    l1 = _read_if_exists(global_dir / f"{event}-{command}.md")
+    hook_name = short_command_name(command)
+    l1 = _read_if_exists(global_dir / f"{event}-{hook_name}.md")
     project_hooks = cwd / PROJECT_HOOKS_DIR_NAME
-    l2 = _read_if_exists(project_hooks / f"{event}-{command}.md")
-    l3 = _read_if_exists(project_hooks / f"{event}-{command}.local.md")
+    l2 = _read_if_exists(project_hooks / f"{event}-{hook_name}.md")
+    l3 = _read_if_exists(project_hooks / f"{event}-{hook_name}.local.md")
 
     higher_chain: list[str] = []
     if l3 is not None and l3[0].get("mode") == "override":
@@ -227,6 +230,7 @@ def render_chain_for_stdout(
     (absence-tolerance contract).
     """
     cwd = project_root if project_root is not None else Path.cwd()
+    command = normalize_command_name(command)
     ctx = _build_feature_ctx(command, feature_slug, cwd)
     chain = resolve_injection_chain(
         event,

@@ -12,7 +12,7 @@ Feature 039 introduced per-command `*.expectations.md` files and a `livespec ver
 
 1. **Two contracts silently mixed.** Section 12 (verify YAML) is a MACHINE contract consumed by the verifier. Sections 1-11 are supposed to be the OPERATOR contract — what a human or a future LLM session should read to know what the command does, what files it produces, what console output looks like, what to do when it goes wrong. In practice these prose sections are drained: section 1 is one sentence, section 6 ("Produced Artifacts") is often empty, section 11 ("Troubleshooting") lists a single symptom, section 9 ("Runtime Profile") is an abstract range without scenario context.
 
-2. **The files do not answer the questions a fresh operator asks.** Reading `commands/test.expectations.md` today, a new Claude Code session cannot answer: *What does the console look like when I run `/spec.test --visual`? Which files appear, where, in what tree? What does success look like vs drift vs blocked? How long does it take, and what drives that? Which exit code triggers which next action?*
+2. **The files do not answer the questions a fresh operator asks.** Reading `commands/spec-test.expectations.md` today, a new Claude Code session cannot answer: *What does the console look like when I run `/spec.test --visual`? Which files appear, where, in what tree? What does success look like vs drift vs blocked? How long does it take, and what drives that? Which exit code triggers which next action?*
 
 This feature transforms `*.expectations.md` from a passive machine descriptor into a **living operator contract** with two complementary modes:
 
@@ -214,7 +214,7 @@ flowchart TD
 
 - **AC-001** — The enriched template at `system/templates/command-expectations.template.md` defines **13 sections** (sections 1-12 from feature 039 stay structurally compatible; section 13 "Demo Session" is added) and documents the 6 sub-sections of Section 13: *Live Console Output*, *Files Produced*, *Aligned / Drift / Missing*, *Runtime Profile (scenarios)*, *Edge Cases*, *Post-run Actions*.
 - **AC-002** — Sections 1-11 in the template are rewritten with richer structured sub-fields and example prose, so that filling them naïvely yields a file that answers the fresh-operator readability test (a developer who has never run the command can describe expected behavior after reading).
-- **AC-003** — All 20 builtin expectations files (`commands/<X>.expectations.md` for the 19 slash-commands plus `commands/verify-output.expectations.md`) are migrated to the enriched format: every Section 13 sub-section is filled with ≥ 3 non-empty content lines.
+- **AC-003** — All 20 builtin expectations files (`commands/<X>.expectations.md` for the 19 slash-commands plus `commands/spec-verify-output.expectations.md`) are migrated to the enriched format: every Section 13 sub-section is filled with ≥ 3 non-empty content lines.
 - **AC-004** — The schema validator in `validator/expectations.py` accepts the enriched format: Section 13 is a required section (alongside sections 1-12) and its 6 sub-sections must each have non-empty content. The parser emits `ExpectationsInvalid` with a precise reason when any sub-section is missing or empty.
 - **AC-005** — `livespec verify-output --preview <command>` reads the expectations file, instantiates Section 13 placeholders against the current project's `.specs/` data, and prints a Markdown report to stdout. Exit 0 on success.
 - **AC-006** — The preview command resolves placeholders from at least 4 project sources: (a) `.specs/stacks/_default.md` (stack name), (b) `.specs/features/` (feature slugs and count), (c) `.specs/design/screens/` (screen filenames, if the directory exists), (d) `.conventions/manifest.yaml` (convention sub-domains, if present).
@@ -241,8 +241,8 @@ flowchart TD
 - **FR-009** — `verify-output --preview` exits 2 with the canonical error strings when (a) Section 13 missing, (b) sub-section empty, (c) no `.specs/` directory in cwd. Error strings MUST match the exact substrings declared in AC-008, AC-009, AC-010. → AC-008, AC-009, AC-010
 - **FR-010** — Section 12 (verify YAML) parsing, evaluation, when-branches, placeholders, outcome classification semantics from feature 039 remain identical. No regression — existing test suite passes unchanged for those concerns. → AC-013
 - **FR-011** — Add tests: (a) unit tests for `render_preview` covering placeholder substitution from each of the 4 sources; (b) CLI tests for `verify-output --preview` covering success, --save, missing section 13, empty sub-section, no .specs/; (c) snapshot tests asserting Section 13 completeness on `init`, `test`, `feature` expectations files (AC-011). → AC-011, AC-005, AC-007, AC-008, AC-009, AC-010
-- **FR-012** — Update `commands/verify-output.md` (the slash-command instructions) to document the `--preview` and `--save` flags, the triad workflow, and the Section 13 contract. → quality of life
-- **FR-013** — Update `commands/verify-output.expectations.md` to reflect the new `--preview` behavior in its own contract (adding `when: - flag: "--preview"` branches and a complete Section 13). → AC-003
+- **FR-012** — Update `commands/spec-verify-output.md` (the slash-command instructions) to document the `--preview` and `--save` flags, the triad workflow, and the Section 13 contract. → quality of life
+- **FR-013** — Update `commands/spec-verify-output.expectations.md` to reflect the new `--preview` behavior in its own contract (adding `when: - flag: "--preview"` branches and a complete Section 13). → AC-003
 - **FR-014** — Pre-commit hook semantics from feature 039 (last_reviewed bump) are unchanged. Files touched by this feature MUST have `last_reviewed: 2026-05-12`. → no regression
 
 ---
@@ -274,6 +274,6 @@ flowchart TD
 
 - **SC-001** — 20/20 builtin expectations files migrated to the enriched format with complete Section 13 (verified by snapshot tests).
 - **SC-002** — `livespec verify-output --preview` on each of the 19 commands, run from the livespec repo, exits 0 and produces a report referencing real feature slugs.
-- **SC-003** — A fresh Claude Code session given ONLY `commands/test.expectations.md` (enriched) can describe, in its own words, the expected console output, the files produced, and the operator action for each of Aligned/Drift/Missing — without running the command. (Human evaluation — informal, but the prose must contain enough detail to enable this.)
+- **SC-003** — A fresh Claude Code session given ONLY `commands/spec-test.expectations.md` (enriched) can describe, in its own words, the expected console output, the files produced, and the operator action for each of Aligned/Drift/Missing — without running the command. (Human evaluation — informal, but the prose must contain enough detail to enable this.)
 - **SC-004** — Feature 039's full test suite continues to pass without modification (no Section 12 semantic regression).
 - **SC-005** — The `last_reviewed` frontmatter on all 20 migrated files equals `2026-05-12` and the pre-commit hook does not block the commit of this feature.

@@ -2,7 +2,7 @@
 # @spec FR-009: Pre-commit / CI regression check — .specs/features/013-state-model-identity-resolution/spec.md#fr-009
 #
 # Fails the build if the literal placeholder "NNN-feature-name" reappears in
-# command markdown, agent markdown, or generated .specs/features/<slug>/ artefacts.
+# agent-sync skill/agent markdown, or generated .specs/features/<slug>/ artefacts.
 #
 # Allowed occurrences (scoped exclusions):
 #   - .specs/features/013-state-model-identity-resolution/  (the spec defining the placeholder)
@@ -29,8 +29,8 @@ EXCLUDES=(
   --exclude=check-no-placeholder.sh
 )
 
-# Search scope: commands/, agents/, .specs/features/, system/ (excluding templates and the
-# defining spec). The placeholder remains valid in commands/feature.md and other command
+# Search scope: .agent-sync/, .specs/features/, system/ (excluding templates and the
+# defining spec). The placeholder remains valid in .agent-sync/skills/spec-feature/SKILL.md and other skill
 # markdown ONLY as a documented template variable — see system/identity.md for the convention.
 # This check enforces that NO file in .specs/features/<other-slug>/ ever contains the literal,
 # which would indicate that resolve_feature_slug was bypassed at runtime.
@@ -55,4 +55,4 @@ if [ -n "$HITS" ]; then
 fi
 
 echo "OK: no '$PATTERN' literal in runtime state files or execution logs."
-echo "(Occurrences in commands/, agents/, system/identity.md, spec.md/plan.md remain valid as documented template variables — see system/identity.md.)"
+echo "(Occurrences in .agent-sync/, system/identity.md, spec.md/plan.md remain valid as documented template variables — see system/identity.md.)"

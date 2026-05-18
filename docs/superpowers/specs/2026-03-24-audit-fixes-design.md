@@ -16,8 +16,8 @@
 ### P1 — Important
 
 3. **Standardize Playwright** — replace `playwright-cli` references in `discovery.md` with `npx playwright`
-4. **Add `play-coverage` to hooks** — update valid command list in `system/hooks.md` and `commands/hooks.md`
-5. **Preflight: add superpowers + agent teams checks** — add to Stack-to-Checks catalog in `commands/preflight.md`
+4. **Add `play-coverage` to hooks** — update valid command list in `system/hooks.md` and `commands/spec-hooks.md`
+5. **Preflight: add superpowers + agent teams checks** — add to Stack-to-Checks catalog in `commands/spec-preflight.md`
 6. **Preflight: add `creds` binary check** — add creds detection to catalog
 
 ### P2 — Nice-to-have

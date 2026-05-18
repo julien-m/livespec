@@ -2,7 +2,7 @@
 
 <!-- @spec FR-002: Design alignment manifest schema — .specs/features/047-design-alignment-gate/spec.md#fr-002 -->
 
-Written by `livespec design-alignment compare` and consumed by `/spec.test --visual`.
+Written by `livespec design-alignment compare` and consumed by `/spec-test --visual`.
 
 ## Location
 

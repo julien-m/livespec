@@ -28,7 +28,7 @@ This feature introduces `seed.md` as a new artifact type in the feature director
 
 **Scope boundary:** This feature covers seed creation, loading, and absorption only. It does not change the LLM provider interface, the validator layers, or the testing infrastructure.
 
-**Dependencies:** None -- this feature modifies only the `commands/specify.md` command file and the spec-system documentation. No Python code changes required (the seed is a Markdown artifact managed by the slash command, not the validator).
+**Dependencies:** None -- this feature modifies only the `commands/spec-specify.md` command file and the spec-system documentation. No Python code changes required (the seed is a Markdown artifact managed by the slash command, not the validator).
 
 ### Seed lifecycle
 
@@ -292,9 +292,9 @@ flowchart TD
 
 | ID | Requirement | AC |
 |----|------------|-----|
-| FR-001 | `commands/specify.md` shall include a "Seed Creation" step after the deferred-split logic: for each sub-feature added to the roadmap Deferred section, create the feature directory (if needed) and write `seed.md` with the 4-field schema | AC-001, AC-002, AC-003, AC-008, AC-009 |
-| FR-002 | `commands/specify.md` shall include a "Seed Detection" step at the beginning of the specify flow: check if the target feature directory contains `seed.md` but no `spec.md`. If true, read `seed.md` and inject its content into the LLM prompt under a `## Seed Context` heading | AC-004, AC-005 |
-| FR-003 | `commands/specify.md` shall include a "Seed Absorption" step after `spec.md` is written: if `seed.md` exists in the feature directory, rename it to `seed.absorbed.md` | AC-006, AC-007 |
+| FR-001 | `commands/spec-specify.md` shall include a "Seed Creation" step after the deferred-split logic: for each sub-feature added to the roadmap Deferred section, create the feature directory (if needed) and write `seed.md` with the 4-field schema | AC-001, AC-002, AC-003, AC-008, AC-009 |
+| FR-002 | `commands/spec-specify.md` shall include a "Seed Detection" step at the beginning of the specify flow: check if the target feature directory contains `seed.md` but no `spec.md`. If true, read `seed.md` and inject its content into the LLM prompt under a `## Seed Context` heading | AC-004, AC-005 |
+| FR-003 | `commands/spec-specify.md` shall include a "Seed Absorption" step after `spec.md` is written: if `seed.md` exists in the feature directory, rename it to `seed.absorbed.md` | AC-006, AC-007 |
 | FR-004 | The `seed.md` schema shall use Markdown sections (`## Origin`, `## Decisions`, `## Constraints`, `## Open Questions`) with free-form Markdown content under each heading. Empty fields shall contain placeholder text: "None yet -- to be determined at specify time" | AC-002, AC-003, AC-010 |
 | FR-005 | `spec-system.md` Feature Directory Structure shall list `seed.md` as "Context seed from feature split (optional)" and `seed.absorbed.md` as "Consumed seed (archived after spec generation)" | AC-011 |
 | FR-006 | The `## Origin` field shall contain: parent feature number and name (e.g., `010-parent-feature`), a one-line reason for the split, and the date the seed was created | AC-003 |

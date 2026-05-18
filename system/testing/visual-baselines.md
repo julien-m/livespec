@@ -11,8 +11,8 @@ This protocol defines two orthogonal testing responsibilities:
 
 | Testing Goal | Command | Tool | Threshold | Stores |
 |---|---|---|---|---|
-| **Regression Detection** | `/spec.check` | Playwright native | 2% (configurable) | `.specs/features/NNN/baselines/` |
-| **Design Fidelity** | `/spec.test` | pixelmatch | 5-8% (configurable) | `.specs/design/screens/` |
+| **Regression Detection** | `/spec-check` | Playwright native | 2% (configurable) | `.specs/features/NNN/baselines/` |
+| **Design Fidelity** | `/spec-test` | pixelmatch | 5-8% (configurable) | `.specs/design/screens/` |
 
 **Regression** answers: "Has this feature changed since we last approved it?"
 **Fidelity** answers: "Does this implementation match the design mockup?"
@@ -25,7 +25,7 @@ These are independent checks. A feature can regress (change from baseline) while
 
 Visual baselines are captured in two contexts:
 
-### Initial Capture (`/spec.test` Phase 4.5.2)
+### Initial Capture (`/spec-test` Phase 4.5.2)
 
 On first implementation of a UI feature:
 1. Run visual tests via resolved test command (e.g., `npx playwright test --grep visual`)
@@ -36,7 +36,7 @@ On first implementation of a UI feature:
 ### Subsequent Captures
 
 Once a baseline exists, it is updated only when:
-- Design is intentionally approved (update via `/spec.implement --update-baseline`)
+- Design is intentionally approved (update via `/spec-implement --update-baseline`)
 - Or manually via `spec.test --update-baseline`
 
 ### Storage
@@ -63,7 +63,7 @@ Archived baselines (in `baselines/archived/`) are ignored by hooks and regressio
 
 ### Regression Detection (Playwright Native)
 
-When `/spec.check` executes Step 8:
+When `/spec-check` executes Step 8:
 1. Run `page.screenshot()` or `locator.screenshot()` to capture current state
 2. Compare against baseline pixel-by-pixel via Playwright's snapshot comparison
 3. Diff threshold: **2%** (default, configurable per component)
@@ -73,7 +73,7 @@ Playwright native comparison is built-in and does NOT require additional tools.
 
 ### Design Fidelity (pixelmatch)
 
-When `/spec.test` executes Phase 4.5.3:
+When `/spec-test` executes Phase 4.5.3:
 1. For each newly captured baseline
 2. If `.specs/design/screens/[name].png` exists (Pencil export), compare via pixelmatch
 3. Diff threshold: **5-8%** (default, configurable per component)
@@ -189,7 +189,7 @@ Old baselines are moved to `baselines/archived/YYYY-MM-DD/` before replacement. 
 
 ## Prerequisite Check
 
-The visual tool availability is resolved **once** during `/spec.plan` discovery and recorded in Resolved Test Commands.
+The visual tool availability is resolved **once** during `/spec-plan` discovery and recorded in Resolved Test Commands.
 
 - If Playwright is installed and available → visual tests are enabled
 - If Playwright is NOT available → visual tests are skipped with message: "Visual baselines skipped — Playwright not installed"

@@ -293,9 +293,9 @@ Add to Phase C output message:
 
 | File | Change |
 |------|--------|
-| `commands/init.md` | Add Step 3.9, update Phase C directory tree, update output message, update DoD, add row to Generated Files Reference table: `.specs/roadmap.md` → `system/templates/roadmap-template.md` (filled from Phase A project profile inference) |
-| `commands/specify.md` | Rewrite Step 1.5, add Step 7.7, update DoD |
-| `commands/propose.md` | Enhance Step 3 with Deferred awareness, update Step 5 ranking |
+| `commands/spec-init.md` | Add Step 3.9, update Phase C directory tree, update output message, update DoD, add row to Generated Files Reference table: `.specs/roadmap.md` → `system/templates/roadmap-template.md` (filled from Phase A project profile inference) |
+| `commands/spec-specify.md` | Rewrite Step 1.5, add Step 7.7, update DoD |
+| `commands/spec-propose.md` | Enhance Step 3 with Deferred awareness, update Step 5 ranking |
 | `system/spec-system.md` | Add roadmap.md to artifact listing and README update rules |
 | `system/templates/roadmap-template.md` | **New file** — roadmap template |
 

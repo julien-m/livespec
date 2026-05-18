@@ -37,13 +37,13 @@ Six months later, nobody knows **why** something was built the way it was.
 
 ```mermaid
 flowchart LR
-    P["/spec.propose\nDiscover what\nto build"] --> S["/spec.specify\nWrite the spec\n(stories, AC, FR)"]
-    S --> PL["/spec.plan\nTechnical plan\n(diagrams, steps)"]
-    PL --> I["/spec.implement\nCode, test,\nmap to spec"]
-    I --> T["/spec.test\nAudit + generate\n+ run tests"]
-    T --> C["/spec.check\nVerify spec\nvs code"]
-    C --> F["/spec.fix\nFix gaps\n(functional + visual)"]
-    F --> E["/spec.explain\nLiving\ndocumentation"]
+    P["/spec-propose\nDiscover what\nto build"] --> S["/spec-specify\nWrite the spec\n(stories, AC, FR)"]
+    S --> PL["/spec-plan\nTechnical plan\n(diagrams, steps)"]
+    PL --> I["/spec-implement\nCode, test,\nmap to spec"]
+    I --> T["/spec-test\nAudit + generate\n+ run tests"]
+    T --> C["/spec-check\nVerify spec\nvs code"]
+    C --> F["/spec-fix\nFix gaps\n(functional + visual)"]
+    F --> E["/spec-explain\nLiving\ndocumentation"]
 
     style P fill:#e8f4f8,stroke:#2196F3
     style S fill:#e8f4f8,stroke:#2196F3
@@ -55,7 +55,7 @@ flowchart LR
     style E fill:#e8f4f8,stroke:#2196F3
 ```
 
-Each command works standalone, or chain them all with `/spec.feature` for an end-to-end pipeline with validation gates.
+Each command works standalone, or chain them all with `/spec-feature` for an end-to-end pipeline with validation gates.
 
 ---
 
@@ -63,25 +63,25 @@ Each command works standalone, or chain them all with `/spec.feature` for an end
 
 | Command | What it does |
 |---|---|
-| `/spec.init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md. `--from-code`: reverse-engineer existing codebase. |
-| `/spec.migrate` | Upgrade project to latest LiveSpec version — applies pending migrations, updates local symlinks |
-| `/spec.propose` | Analyze project context and intelligently propose the next feature(s) to build |
-| `/spec.specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
-| `/spec.plan` | Generate technical plan with sequence, state, and ER diagrams |
-| `/spec.implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
-| `/spec.test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, capture visual baselines, verify design fidelity |
-| `/spec.check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
-| `/spec.fix` | Fix implementation gaps from spec.check — functional and visual corrections with retry loop |
-| `/spec.explain` | "How does X work?" — living documentation from spec + diagrams + history |
-| `/spec.stack` | Evolve your stack and analyze impact on existing features |
-| `/spec.feature` | Full pipeline: specify → plan → implement → test, with validation gates between phases |
-| `/spec.preflight` | Verify tooling, auth, and API tokens before starting implementation — runs auto-install, detects blockers, gates feature work |
-| `/spec.hooks` | Show, create, or edit lifecycle hooks for a command |
-| `/spec.play-coverage` | Open spec coverage playground with live grep data |
-| `/spec.ship` | Batch autopilot: ship multiple features from roadmap end-to-end |
-| `/spec.refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
-| `/spec.status` | Display factual status overview of roadmap and features |
-| `/spec.refresh-conventions` | Manually initialize or refresh project conventions from the LiveSpec stack |
+| `/spec-init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md. `--from-code`: reverse-engineer existing codebase. |
+| `/spec-migrate` | Upgrade project to latest LiveSpec version — applies pending migrations, updates local symlinks |
+| `/spec-propose` | Analyze project context and intelligently propose the next feature(s) to build |
+| `/spec-specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
+| `/spec-plan` | Generate technical plan with sequence, state, and ER diagrams |
+| `/spec-implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
+| `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, capture visual baselines, verify design fidelity |
+| `/spec-check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
+| `/spec-fix` | Fix implementation gaps from spec.check — functional and visual corrections with retry loop |
+| `/spec-explain` | "How does X work?" — living documentation from spec + diagrams + history |
+| `/spec-stack` | Evolve your stack and analyze impact on existing features |
+| `/spec-feature` | Full pipeline: specify → plan → implement → test, with validation gates between phases |
+| `/spec-preflight` | Verify tooling, auth, and API tokens before starting implementation — runs auto-install, detects blockers, gates feature work |
+| `/spec-hooks` | Show, create, or edit lifecycle hooks for a command |
+| `/spec-play-coverage` | Open spec coverage playground with live grep data |
+| `/spec-ship` | Batch autopilot: ship multiple features from roadmap end-to-end |
+| `/spec-refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
+| `/spec-status` | Display factual status overview of roadmap and features |
+| `/spec-refresh-conventions` | Manually initialize or refresh project conventions from the LiveSpec stack |
 
 ---
 
@@ -96,7 +96,7 @@ Project / Local levels.
 ```yaml
 ---
 integration: <name>
-commands: [specify, plan]   # any subset of commands/*.md
+commands: [specify, plan]   # any subset of .agent-sync/skills/spec-*
 phase: before               # before | after (default: before)
 mode: extend                # extend | override (default: extend)
 order: 100                  # lower = injected earlier
@@ -113,7 +113,7 @@ A starter template is shipped under
 See [`system/integrations.md`](system/integrations.md) for the full
 specification (eligibility rule, override scope, template variables,
 chained-pipeline semantics, `--economy` mode limitation). Diagnostic:
-`livespec integrations list` or `/spec.hooks <command>`.
+`livespec integrations list` or `/spec-hooks <command>`.
 
 This pattern is independent of `~/.config/livespec/provider.py` (the
 existing Python callable that overrides LLM routing).
@@ -133,28 +133,28 @@ bash ~/livespec/scripts/install.sh
 
 # 3. Initialize LiveSpec in your project (creates .specs/ + CLAUDE.md)
 cd your-project
-/spec.init
+/spec-init
 
 # 4. Discover what to build first
-/spec.propose
+/spec-propose
 
 # 5. Create your first feature spec
-/spec.specify "User can receive real-time notifications"
+/spec-specify "User can receive real-time notifications"
 
 # 6. Generate technical plan
-/spec.plan notifications
+/spec-plan notifications
 
 # 7. Implement with auto-pipeline
-/spec.implement notifications
+/spec-implement notifications
 
 # 8. Verify spec vs code
-/spec.check notifications
+/spec-check notifications
 
 # 9. Explain the feature (living docs)
-/spec.explain "how do notifications work?"
+/spec-explain "how do notifications work?"
 
 # Alternative: full pipeline in one command
-/spec.feature "User can receive real-time notifications"
+/spec-feature "User can receive real-time notifications"
 ```
 
 ### Other AI tools
@@ -170,202 +170,202 @@ For any AI tool that reads Markdown, paste the content of `system/spec-system.md
 Run each command individually with full control at every stage:
 
 ```bash
-/spec.specify "User can filter by date"   # 1. Generate spec.md
-/spec.plan date-filter                     # 2. Generate plan.md
-/spec.implement date-filter                # 3. Implement from plan
-/spec.check date-filter                    # 4. Verify spec vs code
+/spec-specify "User can filter by date"   # 1. Generate spec.md
+/spec-plan date-filter                     # 2. Generate plan.md
+/spec-implement date-filter                # 3. Implement from plan
+/spec-check date-filter                    # 4. Verify spec vs code
 ```
 
-### Pipeline flow (`/spec.feature`)
+### Pipeline flow (`/spec-feature`)
 
 Run the full pipeline in one command with validation gates between each phase:
 
 ```bash
 # Interactive (default) — pauses for your approval between phases
-/spec.feature "User can filter by date"
+/spec-feature "User can filter by date"
 
 # Automatic — no pauses, auto-retries if plan review fails
-/spec.feature "User can filter by date" --auto
+/spec-feature "User can filter by date" --auto
 
 # Resume an interrupted pipeline
-/spec.feature --resume date-filter
+/spec-feature --resume date-filter
 ```
 
 ### After implementation
 
 ```bash
-/spec.test date-filter                     # Audit + generate missing tests
-/spec.check date-filter                    # Verify spec-code alignment
-/spec.explain "how does date filtering work?"  # Living documentation
-/spec.stack                                # View or evolve the stack
+/spec-test date-filter                     # Audit + generate missing tests
+/spec-check date-filter                    # Verify spec-code alignment
+/spec-explain "how does date filtering work?"  # Living documentation
+/spec-stack                                # View or evolve the stack
 ```
 
 ---
 
 ## Command Reference
 
-### `/spec.init`
+### `/spec-init`
 
 Initialize LiveSpec in a project. Runs a 3-phase conversational brainstorm (interview → stack decisions → file generation).
 
 ```bash
-/spec.init                       # Full interactive setup
-/spec.init --auto                # Use defaults, skip questions
-/spec.init --stack web-realtime  # Skip interview, use preset
-/spec.init --from-code           # Reverse-engineer existing codebase into specs
-/spec.init --from-code --deep    # Extended scan (git history, CI, env)
+/spec-init                       # Full interactive setup
+/spec-init --auto                # Use defaults, skip questions
+/spec-init --stack web-realtime  # Skip interview, use preset
+/spec-init --from-code           # Reverse-engineer existing codebase into specs
+/spec-init --from-code --deep    # Extended scan (git history, CI, env)
 ```
 
 Key flags: `--auto`, `--stack [preset]`, `--from-code`, `--deep`, `--force`, `--dir [path]`, `--dry-run`
 
-### `/spec.propose`
+### `/spec-propose`
 
 Analyze project context (vision, users, existing features, roadmap) and propose the next feature(s) to build. Read-only — no files created.
 
 ```bash
-/spec.propose                     # Propose the next feature
-/spec.propose --count 3           # Propose 3 ranked features
-/spec.propose --role admin        # Focus on admin features
-/spec.propose --mvp               # Only MVP-critical suggestions
+/spec-propose                     # Propose the next feature
+/spec-propose --count 3           # Propose 3 ranked features
+/spec-propose --role admin        # Focus on admin features
+/spec-propose --mvp               # Only MVP-critical suggestions
 ```
 
 Key flags: `--count N`, `--role [name]`, `--mvp`, `--auto`
 
-### `/spec.specify`
+### `/spec-specify`
 
 Create a feature spec with user stories, Mermaid flowcharts, AC, and FR.
 
 ```bash
-/spec.specify "User can upload profile photos"
-/spec.specify "Payment processing" --branch --priority P1
+/spec-specify "User can upload profile photos"
+/spec-specify "Payment processing" --branch --priority P1
 ```
 
 Key flags: `--branch`, `--no-branch`, `--priority`
 
-### `/spec.plan`
+### `/spec-plan`
 
 Generate a technical plan with sequence, state, and ER diagrams from a spec.
 
 ```bash
-/spec.plan profile-photos
-/spec.plan profile-photos --review          # LLM plan review (advisory)
-/spec.plan profile-photos -r -R             # Review with all configured reviewers
-/spec.plan profile-photos --no-contracts
+/spec-plan profile-photos
+/spec-plan profile-photos --review          # LLM plan review (advisory)
+/spec-plan profile-photos -r -R             # Review with all configured reviewers
+/spec-plan profile-photos --no-contracts
 ```
 
 Key flags: `--review` (`-r`), `--all-reviewers` (`-R`), `--no-contracts` (`-C`), `--diagram-only` (`-D`), `--auto` (`-a`)
 
-### `/spec.implement`
+### `/spec-implement`
 
 Auto-implement from plan: code, test, verify, document. Multi-agent by default.
 
 ```bash
-/spec.implement profile-photos            # Multi-agent (default)
-/spec.implement profile-photos --mono     # Single-agent
-/spec.implement profile-photos --resume   # Resume interrupted run
+/spec-implement profile-photos            # Multi-agent (default)
+/spec-implement profile-photos --mono     # Single-agent
+/spec-implement profile-photos --resume   # Resume interrupted run
 ```
 
 Key flags: `--mono`, `--economy`, `--resume`, `--no-visual`, `--no-save`, `--step`
 
-### `/spec.test`
+### `/spec-test`
 
 Audit test coverage against AC, generate missing tests from Gherkin scenarios, execute the full suite, and capture visual baselines.
 
 ```bash
-/spec.test profile-photos                 # Test one feature
-/spec.test --all                          # Test all implemented features
-/spec.test profile-photos --audit-only   # Coverage audit only (no generation/execution)
-/spec.test profile-photos --no-generate  # Run existing tests, don't generate missing ones
+/spec-test profile-photos                 # Test one feature
+/spec-test --all                          # Test all implemented features
+/spec-test profile-photos --audit-only   # Coverage audit only (no generation/execution)
+/spec-test profile-photos --no-generate  # Run existing tests, don't generate missing ones
 ```
 
 Key flags: `--audit-only`, `--no-generate`, `--no-visual`, `--all`, `--auto`, `--update`
 
-### `/spec.check`
+### `/spec-check`
 
 Compare spec vs actual code — find gaps, verify AC, detect visual drift.
 
 ```bash
-/spec.check profile-photos
-/spec.check                               # Check all features
+/spec-check profile-photos
+/spec-check                               # Check all features
 ```
 
-### `/spec.explain`
+### `/spec-explain`
 
 Living documentation — understand how a feature works from spec + code + history.
 
 ```bash
-/spec.explain "how do notifications work?"
-/spec.explain profile-photos
+/spec-explain "how do notifications work?"
+/spec-explain profile-photos
 ```
 
-### `/spec.stack`
+### `/spec-stack`
 
 View current stack, analyze change impact, create Architecture Decision Records.
 
 ```bash
-/spec.stack                               # View current stack
-/spec.stack "migrate from Supabase to Prisma"
+/spec-stack                               # View current stack
+/spec-stack "migrate from Supabase to Prisma"
 ```
 
-### `/spec.feature`
+### `/spec-feature`
 
 Full pipeline: specify → plan → plan review → implement, with validation gates.
 
 ```bash
-/spec.feature "Real-time notifications"              # Interactive
-/spec.feature "CSV export" --auto                     # Automatic
-/spec.feature --resume csv-export                     # Resume
-/spec.feature "Dark mode" --mono                      # Single-agent implementation
-/spec.feature "Payment processing" --branch --priority P1  # With branch + priority
+/spec-feature "Real-time notifications"              # Interactive
+/spec-feature "CSV export" --auto                     # Automatic
+/spec-feature --resume csv-export                     # Resume
+/spec-feature "Dark mode" --mono                      # Single-agent implementation
+/spec-feature "Payment processing" --branch --priority P1  # With branch + priority
 ```
 
 Key flags: `--auto`, `--resume`, `--branch`, `--priority`, `--mono`, `--economy`, `--step`
 
-### `/spec.preflight`
+### `/spec-preflight`
 
 Verify tooling, authentication, and API tokens are ready before implementation. Auto-installs what it can, groups human blockers, gates feature work until all critical checks pass.
 
 ```bash
-/spec.preflight                     # Full preflight check
-/spec.preflight --light             # Light check (only new items since last run)
-/spec.preflight --regenerate        # Regenerate manifest from stack
+/spec-preflight                     # Full preflight check
+/spec-preflight --light             # Light check (only new items since last run)
+/spec-preflight --regenerate        # Regenerate manifest from stack
 ```
 
 Key flags: `--light`, `--regenerate`, `--save`, `--no-save`
 
-Runs automatically as part of `/spec.init` (Phase D), `/spec.implement` (Phase 0.5), and `/spec.feature` (Phase 2.7).
+Runs automatically as part of `/spec-init` (Phase D), `/spec-implement` (Phase 0.5), and `/spec-feature` (Phase 2.7).
 
-### `/spec.refine`
+### `/spec-refine`
 
 Iteratively refine existing artifacts through guided conversation. Enforces eligibility rules — blocks refinement on specs/plans that already have downstream code.
 
 ```bash
-/spec.refine                        # Interactive menu
-/spec.refine project                # Refine project profile, constitution, or testing strategy
-/spec.refine notifications          # Refine a feature spec
-/spec.refine 002 plan              # Refine a feature plan
+/spec-refine                        # Interactive menu
+/spec-refine project                # Refine project profile, constitution, or testing strategy
+/spec-refine notifications          # Refine a feature spec
+/spec-refine 002 plan              # Refine a feature plan
 ```
 
 Key flags: `--auto`, `--dry-run`
 
-### `/spec.status`
+### `/spec-status`
 
 Factual status overview — roadmap items, feature statuses, next actions. Read-only.
 
 ```bash
-/spec.status                  # Full status
-/spec.status --roadmap        # Roadmap only
-/spec.status --features       # Features only
-/spec.status --json           # Machine-readable output
+/spec-status                  # Full status
+/spec-status --roadmap        # Roadmap only
+/spec-status --features       # Features only
+/spec-status --json           # Machine-readable output
 ```
 
 Key flags: `--roadmap`, `--features`, `--json`
 
-> Full command documentation is in `commands/*.md`.
+> Full command documentation is in `.agent-sync/skills/spec-*/SKILL.md`.
 
 ---
 
-## Project Structure Created by `/spec.init`
+## Project Structure Created by `/spec-init`
 
 ```
 .specs/
@@ -401,21 +401,24 @@ Key flags: `--roadmap`, `--features`, `--json`
 
 ### Global bootstrap (required once)
 
-Install the two bootstrap commands that must exist before a project can link the rest of LiveSpec locally:
+Install the two bootstrap skills that must exist before a project can sync the rest of LiveSpec locally:
 
 ```bash
 bash ~/livespec/scripts/install.sh
 ```
 
-This creates global symlinks for:
-- `/spec.init` and `/spec.migrate` in `~/.claude/commands/`
-- The routing rule `livespec-routing.md` (+ its `livespec-commands.md` reference) in `~/.claude/rules/` — Claude automatically routes user requests (add feature, run tests, fix UI, etc.) to the matching `/spec.*` command whenever a `.specs/` directory is detected in the project root.
+This asks `cc-hub` to install:
+- `spec-init` and `spec-migrate` as portable skills for Claude Code and Codex
+- The LiveSpec routing and command rules for both providers
 
 ### Per-project (automatic after bootstrap)
 
-When you run `/spec.init` in a project, LiveSpec automatically creates local symlinks in `.claude/commands/` and `.claude/agents/` for the rest of the command set. No additional manual installation is needed.
+When you run `/spec-init` in a project, LiveSpec syncs `.agent-sync` assets
+through `cc-hub`, which materializes the correct Claude Code and Codex provider
+outputs. No manual provider-specific installation is needed.
 
-For existing projects initialized before v2, run `/spec.migrate` to add local symlinks.
+For existing projects initialized before v16, run `/spec-migrate` to migrate to
+the `.agent-sync` sync flow.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -429,12 +432,12 @@ For other AI tools, paste `system/spec-system.md` into your tool's context.
 | Spec-to-code traceability | ✅ FR/AC → `@spec` anchors with deep-links | ❌ None | ⚠️ Partial |
 | Per-feature changelogs | ✅ Yes | ❌ No | ❌ No |
 | Visual testing baselines | ✅ Playwright + design fidelity | ❌ None | ❌ None |
-| Post-impl test validation | ✅ `/spec.test` (audit + generate + run) | ❌ None | ❌ None |
+| Post-impl test validation | ✅ `/spec-test` (audit + generate + run) | ❌ None | ❌ None |
 | Stack presets + decision trees | ✅ Yes | ❌ No | ⚠️ Minimal |
 | Brainstorm-driven init | ✅ 3-phase conversation | ❌ No | ⚠️ Partial |
-| Gap detection (spec vs code) | ✅ `/spec.check` | ❌ None | ❌ None |
-| Living documentation | ✅ `/spec.explain` | ❌ None | ❌ None |
-| Stack evolution + impact | ✅ `/spec.stack` | ❌ None | ❌ None |
+| Gap detection (spec vs code) | ✅ `/spec-check` | ❌ None | ❌ None |
+| Living documentation | ✅ `/spec-explain` | ❌ None | ❌ None |
+| Stack evolution + impact | ✅ `/spec-stack` | ❌ None | ❌ None |
 | Tool-agnostic | ✅ Yes (Markdown-based) | ⚠️ GitHub only | ⚠️ Claude only |
 
 ---
@@ -446,8 +449,8 @@ LiveSpec separates **format** from **automation**:
 | Layer | Portable? | Details |
 |---|---|---|
 | **Spec format** (`.specs/`, Markdown, Mermaid, Gherkin) | ✅ Universal | Any AI tool that reads Markdown can follow the rules in `spec-system.md` |
-| **Commands** (`/spec.*`) | ⚠️ Claude Code | `/spec.init` and `/spec.migrate` are bootstrapped globally; the rest are symlinked per project via `link-local.sh` |
-| **Routing rule** (auto-route to `/spec.*`) | ⚠️ Claude Code | Bootstrapped globally; triggers on `.specs/` presence in cwd |
+| **Commands** (`/spec-*`) | ⚠️ Claude Code | `/spec-init` and `/spec-migrate` are bootstrapped globally; the rest are symlinked per project via `link-local.sh` |
+| **Routing rule** (auto-route to `/spec-*`) | ⚠️ Claude Code | Bootstrapped globally; triggers on `.specs/` presence in cwd |
 | **Agents** (multi-agent orchestration) | ⚠️ Claude Code | Requires Claude Code agent teams + Superpowers skills |
 | **Shell scripts** (`link-local.sh`, `migrate.sh`, `init.sh`) | ⚠️ macOS | Uses `sed -i ''` (BSD), `open` (macOS), `mktemp` — not tested on Linux |
 
@@ -457,7 +460,7 @@ LiveSpec separates **format** from **automation**:
 
 ## Multi-Agent Mode (default)
 
-`/spec.implement` uses multi-agent orchestration by default — a supervisor acts as **Orchestrator/Translator**, building a Task Payload per step and delegating execution to the `superpowers:subagent-driven-development` skill:
+`/spec-implement` uses multi-agent orchestration by default — a supervisor acts as **Orchestrator/Translator**, building a Task Payload per step and delegating execution to the `superpowers:subagent-driven-development` skill:
 
 ```mermaid
 flowchart TD
@@ -490,13 +493,13 @@ flowchart TD
 
 ```bash
 # Multi-agent implementation (default)
-/spec.implement notifications
+/spec-implement notifications
 
 # Single-agent mode (original APEX pipeline)
-/spec.implement notifications --mono
+/spec-implement notifications --mono
 
 # Resume an interrupted run
-/spec.implement notifications --resume
+/spec-implement notifications --resume
 ```
 
 **Per-step cycle:** Supervisor builds Task Payload (FR/AC context, TDD commands, `@spec` rules, Definition of Done) → dispatches to `superpowers:subagent-driven-development` → Documenter writes `progress.md` checkpoint. Superpowers handles the full TDD loop, spec compliance review, and code quality review with isolated subagents (no context pollution).
@@ -560,30 +563,14 @@ livespec/
 │       ├── web-realtime.md
 │       ├── web-static.md
 │       └── api-rest.md
-├── agents/                         ← Agent definitions (symlinked per-project by /spec.init)
-│   ├── livespec-supervisor.md      ← Orchestrator — builds Task Payloads, dispatches to Superpowers
-│   ├── livespec-implementer.md     ← Infrastructure provisioning (Phase 0 only)
-│   ├── livespec-verifier.md        ← Spec review + plan review (code review via Superpowers)
-│   └── livespec-documenter.md      ← Updates spec artifacts
-├── commands/                       ← init/migrate bootstrapped globally; other command docs symlinked per-project
-│   ├── init.md
-│   ├── migrate.md
-│   ├── propose.md
-│   ├── specify.md
-│   ├── plan.md
-│   ├── implement.md
-│   ├── test.md
-│   ├── check.md
-│   ├── explain.md
-│   ├── stack.md
-│   ├── feature.md
-│   ├── preflight.md
-│   ├── hooks.md
-│   ├── play-coverage.md
-│   └── refine.md
+├── .agent-sync/                    ← Portable source for skills, agents, and rules
+│   ├── skills/spec-*/              ← LiveSpec command skills + expectations.md
+│   ├── agents/livespec-*/          ← Portable agent.yaml + prompt.md
+│   └── rules/livespec/             ← Rules built by cc-hub for Claude/Codex
 └── scripts/
-    ├── install.sh                  ← Bootstrap global spec.init + spec.migrate symlinks
-    ├── link-local.sh               ← Create per-project symlinks in .claude/ (called by /spec.init)
+    ├── install.sh                  ← Bootstrap global skills/rules through cc-hub
+    ├── sync-agent-assets.sh        ← Sync .agent-sync assets into projects through cc-hub
+    ├── link-local.sh               ← Backward-compatible wrapper around sync-agent-assets.sh
     └── init.sh                     ← Bootstrap .specs/ structure (shell)
 ```
 

@@ -27,11 +27,23 @@ def _clear_warning_dedup() -> None:
 
 def test_command_registry_excludes_expectations() -> None:
     names = valid_command_names()
-    assert "plan" in names
-    assert "feature" in names
-    assert "plan.expectations" not in names
-    assert "feature.expectations" not in names
+    assert "spec-plan" in names
+    assert "spec-feature" in names
+    assert "spec-plan.expectations" not in names
+    assert "spec-feature.expectations" not in names
     assert not any(n.endswith(".expectations") for n in names)
+
+
+def test_integration_commands_accept_slash_aliases(tmp_path: Path) -> None:
+    _write(
+        tmp_path / "alias.md",
+        "---\nintegration: alias\ncommands: [/spec-plan, /spec.check]\n---\nbody\n",
+    )
+
+    integrations = discover_integrations(integrations_dir=tmp_path)
+
+    assert len(integrations) == 1
+    assert integrations[0].commands == ("spec-plan", "spec-check")
 
 
 # ---------------------------------------------------------------------------
@@ -160,7 +172,7 @@ def test_unknown_command_emits_single_warning(
     assert result == []
     err = capsys.readouterr().err
     assert err.count("⚠ ") == 1
-    assert 'unknown command "bogus"' in err
+    assert 'unknown command "spec-bogus"' in err
 
 
 def test_invalid_mode_is_skipped_with_warning(
@@ -283,5 +295,5 @@ def test_example_template_parses(tmp_path: Path) -> None:
     assert len(result) == 1
     integ: Integration = result[0]
     assert integ.name == "mockups"
-    assert "specify" in integ.commands
-    assert "plan" in integ.commands
+    assert "spec-specify" in integ.commands
+    assert "spec-plan" in integ.commands

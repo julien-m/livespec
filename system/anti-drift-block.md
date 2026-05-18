@@ -1,6 +1,6 @@
 # Anti-Drift Block
 
-> Reusable hardened-step template for all `commands/*.md` and `agents/livespec-*.md` files.
+> Reusable hardened-step template for all LiveSpec `.agent-sync` skills and agents.
 > Injected via `<!-- @import system/anti-drift-block.md -->` directive at the top of each target.
 >
 > Goal: standardise the *form* of every step (the 6 canonical fields defined in §1) so executors
@@ -152,6 +152,21 @@ checklist when programmatic verification is unavailable):
 If any checkbox fails, emit the corresponding ERROR/BLOCKED line (using the §2 shape) and stop.
 Do NOT report DONE. The subtype for a §5 failure is `verification_failed`.
 
+### Runtime finalization gate
+
+Before a slash command reports success, its observable stdout, stderr, exit code,
+flags, cwd, git state, and filesystem effects MUST be recorded and verified via:
+
+```bash
+livespec run finalize --command <command-name> --exit-code <code> \
+  --stdout-file <captured-stdout> --stderr-file <captured-stderr> --cwd <project-root>
+```
+
+If finalization returns `drift`, `blocked`, or `error`, the slash command MUST
+emit the corresponding canonical ERROR/BLOCKED line and MUST NOT report success.
+`/spec-verify-output` may verify itself only through an already-recorded wrapper
+artifact to avoid recursive verification.
+
 ---
 
 ## 6. Drift tests (mini-suite for command/agent maintainers)
@@ -182,16 +197,17 @@ semantics (Chantier 3).*
 ## 7. Hook & Integration Resolution (runtime)
 
 You are currently executing a LiveSpec slash command. The user invoked you
-via a literal `/spec.<NAME>` instruction (e.g. `/spec.plan`, `/spec.feature`).
+via a literal `/spec-<NAME>` instruction (e.g. `/spec-plan`, `/spec-feature`).
+Legacy `/spec.<NAME>` aliases are accepted during the naming migration.
 This `<NAME>` is the canonical command name and is directly observable in
 the user's invocation string.
 
 At the VERY start of execution:
 
 1. Read the slash-command invocation string from the current user turn.
-2. Strip the leading `/spec.` prefix to obtain `<NAME>`.
-   - Valid example: `/spec.plan` → `<NAME>` = `plan`
-   - Valid example: `/spec.feature` → `<NAME>` = `feature`
+2. Strip the leading `/spec-` prefix (or legacy `/spec.` prefix) to obtain `<NAME>`.
+   - Valid example: `/spec-plan` → `<NAME>` = `plan`
+   - Valid example: `/spec-feature` → `<NAME>` = `feature`
 3. If you have a resolved feature slug (e.g., `042-notifications`), run:
 
        livespec hooks resolve --event before --command <NAME> --feature <slug>
@@ -208,7 +224,7 @@ optionally including `--feature <slug>` if available.
 
 **Absence handling** (all conditions → silent no-op, never an error):
 
-- the invocation does not match `/spec.<NAME>` → skip resolution
+- the invocation does not match `/spec-<NAME>` or legacy `/spec.<NAME>` → skip resolution
 - the CLI binary is not on PATH → skip resolution
 - `--feature` is omitted when feature context is unavailable (absence-tolerant)
 - stdout is empty → no injection
@@ -216,26 +232,26 @@ optionally including `--feature <slug>` if available.
 
 ### Chained / pipeline invocations
 
-When `/spec.feature` (or `/spec.ship`) spawns subagents in sequence
+When `/spec-feature` (or `/spec-ship`) spawns subagents in sequence
 (Specify, Plan, Implement, Test, …):
 
 **Decision LOCKED — option β: per-sub-command resolution.** The hook
 resolver always receives the name of the sub-command that is currently
 executing — NOT the outer pipeline name. Implementation contract:
 
-1. When the user invokes `/spec.feature`, the OUTER command resolves
+1. When the user invokes `/spec-feature`, the OUTER command resolves
    `before-feature` / `after-feature` at its outer boundary with
    `<NAME> = feature`.
 2. Before spawning each subagent (Specify, Plan, Implement, Test, …),
-   the supervisor in `commands/feature.md` MUST prepend a synthetic
+   the supervisor in `.agent-sync/skills/spec-feature/SKILL.md` MUST prepend a synthetic
    invocation header to the subagent prompt, of the EXACT form:
 
-       /spec.<subcmd>
+       /spec-<subcmd>
 
    where `<subcmd>` ∈ {`specify`, `plan`, `implement`, `test`, …}. This
    single line is the FIRST line of the subagent's user turn, so the
    subagent applies steps (1)–(4) of this directive against `<subcmd>`,
-   not `feature`. The same rule applies to `commands/ship.md` (batch
+   not `feature`. The same rule applies to `.agent-sync/skills/spec-ship/SKILL.md` (batch
    wrapper).
 3. Each subagent therefore runs (with `--feature <slug>` included when feature
    context is available):
@@ -246,7 +262,7 @@ executing — NOT the outer pipeline name. Implementation contract:
    at its own boundaries — completely independent of the outer call.
 4. Integrations target sub-phases by listing them explicitly in
    `commands:`. Example: `commands: [specify, plan]` injects at
-   `before-specify` AND `before-plan` inside a `/spec.feature` pipeline,
+   `before-specify` AND `before-plan` inside a `/spec-feature` pipeline,
    but NOT at `before-feature`. To inject at the outer pipeline boundary
    ONLY, list `[feature]`. To inject at BOTH outer and inner, list all
    relevant names explicitly. **No automatic propagation from outer to

@@ -25,8 +25,8 @@ updated: 2026-05-06
 | `agents/livespec-implementer.md` | Modified | Activation Contract @import |
 | `agents/livespec-verifier.md` | Modified | Activation Contract @import |
 | `agents/livespec-documenter.md` | Modified | Activation Contract @import |
-| `commands/feature.md` | Modified | Wires PHASE_RESULT validation between phases |
-| `commands/ship.md` | Modified | SHIP_RESULT validation gate before destructive git ops |
+| `commands/spec-feature.md` | Modified | Wires PHASE_RESULT validation between phases |
+| `commands/spec-ship.md` | Modified | SHIP_RESULT validation gate before destructive git ops |
 | `tests/test_contracts.py` | Created | 276 LOC — 6 test classes (PhaseResultParser, PhaseResultLegacy, ShipResultParser, SuperpowersReturnParser, RoundTrip, SchemaModels) |
 
 ## Spec Anchor Mappings
@@ -39,9 +39,9 @@ updated: 2026-05-06
 | @spec FR-004 | `spec.md#fr-004` | `validator/contracts.py:55` — unique delimiter pair + last-30-line scan parser |
 | @spec FR-005 | `spec.md#fr-005` | `validator/contracts.py` — `parse_ship_result()`; `system/contracts/SHIP_RESULT.md` |
 | @spec FR-006 | `spec.md#fr-006` | `agents/livespec-supervisor.md:11`, `livespec-documenter.md:11`, `livespec-implementer.md`, `livespec-verifier.md` (Activation Contract @import) |
-| @spec FR-007 | `spec.md#fr-007` | `validator/contracts.py` — Pydantic `model_validate`; `commands/ship.md:231` — validation gate |
+| @spec FR-007 | `spec.md#fr-007` | `validator/contracts.py` — Pydantic `model_validate`; `commands/spec-ship.md:231` — validation gate |
 | @spec FR-008 | `spec.md#fr-008` | `tests/test_contracts.py` — covers valid returns, malformed returns, multi-block output, injection attempts |
-| @spec FR-009 | `spec.md#fr-009` | `commands/feature.md`, `commands/ship.md`, all 4 `agents/livespec-*.md` updated to use new contracts |
+| @spec FR-009 | `spec.md#fr-009` | `commands/spec-feature.md`, `commands/spec-ship.md`, all 4 `agents/livespec-*.md` updated to use new contracts |
 | @spec FR-010 | `spec.md#fr-010` | `system/contracts/{PHASE_RESULT,SHIP_RESULT,SUPERPOWERS_RETURN,ACTIVATION_CONTRACT}.md` |
 
 ## AC Coverage
@@ -50,7 +50,7 @@ updated: 2026-05-06
 |---|---|---|
 | AC-001 | Covered | `tests/test_contracts.py::TestPhaseResultParser` (regex anchoring + last-30-line scan) |
 | AC-002 | Covered | `tests/test_contracts.py::TestPhaseResultParser` (BLOCKED line format on parse error) |
-| AC-003 | Covered | `tests/test_contracts.py::TestShipResultParser` (missing-status rejection); `commands/ship.md:231` |
+| AC-003 | Covered | `tests/test_contracts.py::TestShipResultParser` (missing-status rejection); `commands/spec-ship.md:231` |
 | AC-004 | Covered | All 4 `agents/livespec-*.md` import `ACTIVATION_CONTRACT.md` (`test -d .specs` Step 1) |
 | AC-005 | Covered | `tests/test_contracts.py::TestSuperpowersReturnParser`, `TestSchemaModels` |
 | AC-006 | Covered | `validator/contracts.py` — Pydantic-based validation; `tests/test_contracts.py::TestRoundTrip` |

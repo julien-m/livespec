@@ -325,7 +325,7 @@ def test_summarise_patch_coverage_not_applicable() -> None:
 
 
 def test_summarise_patch_coverage_pass_no_threshold() -> None:
-    # @spec AC-009: /spec.test summary surfaces overall ratio without a threshold.
+    # @spec AC-009: /spec-test summary surfaces overall ratio without a threshold.
     report = PatchCoverageReport(
         files={"src/a.py": 0.9},
         overall_ratio=0.9,

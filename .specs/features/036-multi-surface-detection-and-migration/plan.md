@@ -252,15 +252,15 @@ Create the test infrastructure before any production code changes, enabling stri
 
 ---
 
-### Step 5 — Update `commands/test.md` surface resolution documentation
+### Step 5 — Update `commands/spec-test.md` surface resolution documentation
 
-**Files:** `commands/test.md` (modified)
+**Files:** `commands/spec-test.md` (modified)
 
 **FR covered:** FR-001.2: Document multi-surface detection, FR-002.2: Document id convention
 
 **What to implement:**
 
-1. Locate the §522 surface resolution section in `commands/test.md`.
+1. Locate the §522 surface resolution section in `commands/spec-test.md`.
 2. Add a paragraph (after the single-surface description) explaining the multi-surface case:
    - When a project has both `tests/e2e/` and `tests/visual/`, the generator emits two surfaces per app: `<appdir>` (e2e) and `<appdir>-visual` (visual).
    - `--migrate-surfaces` flag can add missing visual surface entries to an existing manifest without disturbing existing entries.
@@ -326,7 +326,7 @@ Create the test infrastructure before any production code changes, enabling stri
 | `tests/fixtures/surfaces/` | New (fixture dir) | 0 | SC-001–SC-003 |
 | `tests/test_generate_surfaces.js` | New (skeleton) | 0, 4 | SC-001, SC-002, SC-003 |
 | `scripts/generate-surfaces.js` | Modified | 1, 2, 3, 4 | FR-001 through FR-008 |
-| `commands/test.md` | Modified | 5 | FR-001, FR-002 (doc) |
+| `commands/spec-test.md` | Modified | 5 | FR-001, FR-002 (doc) |
 
 Total files: 4 (well within the 12-file Change Scope Guard).
 

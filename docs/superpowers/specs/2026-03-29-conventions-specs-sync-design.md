@@ -238,8 +238,8 @@ Three timestamps involved:
 
 | File | Change |
 |---|---|
-| `commands/init.md` | Phase B: add Dev Tooling questions. Phase C: add `updated` frontmatter to `_default.md` template |
-| `commands/stack.md` | Bump `updated` field in `_default.md` after every stack change |
+| `commands/spec-init.md` | Phase B: add Dev Tooling questions. Phase C: add `updated` frontmatter to `_default.md` template |
+| `commands/spec-stack.md` | Bump `updated` field in `_default.md` after every stack change |
 | `stacks/presets/*.md` | Add Dev Tooling rows to preset stack tables (optional section) |
 
 ### Project: ai-ressources

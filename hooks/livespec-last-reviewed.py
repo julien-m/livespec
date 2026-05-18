@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Pre-commit hook — enforce `last_reviewed` bump on expectations files.
+"""Pre-commit hook — enforce `last_reviewed` bump on skill expectations files.
 
 # @spec FR-009: pre-commit hook
 #   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-009
 # @spec AC-008: hook contract
 #   — .specs/features/039-command-expectations-and-verify-output/spec.md#ac-008
 
-For each staged ``commands/<X>.md`` (excluding ``*.expectations.md``):
+For each staged ``.agent-sync/skills/<X>/SKILL.md``:
 
-* Locate ``commands/<X>.expectations.md``. If missing -> block with a message
-  naming the missing file.
+* Locate ``.agent-sync/skills/<X>/expectations.md``. If missing -> block with
+  a message naming the missing file.
 * Read its frontmatter ``last_reviewed`` value (stdlib only — no pyyaml dep).
 * If absent or != today's date -> block with the EXACT recovery string from
   AC-008.
@@ -26,7 +26,8 @@ from datetime import date
 from pathlib import Path
 
 RECOVERY_FMT = (
-    "Relis `commands/{name}.expectations.md`, bump `last_reviewed`, recommit."
+    "Relis `.agent-sync/skills/{name}/expectations.md`, "
+    "bump `last_reviewed`, recommit."
 )
 
 
@@ -43,14 +44,12 @@ def _staged_paths() -> list[str]:
 
 
 def _command_targets(paths: list[str]) -> list[str]:
-    """Filter staged paths down to `commands/<X>.md` (not `<X>.expectations.md`)."""
+    """Filter staged paths down to agent-sync command skill sources."""
     out: list[str] = []
     for p in paths:
-        if not p.startswith("commands/"):
+        if not p.startswith(".agent-sync/skills/"):
             continue
-        if not p.endswith(".md"):
-            continue
-        if p.endswith(".expectations.md"):
+        if not p.endswith("/SKILL.md"):
             continue
         out.append(p)
     return out
@@ -88,19 +87,20 @@ def main(argv: list[str] | None = None) -> int:
     blockers: list[str] = []
 
     for rel in _command_targets(_staged_paths()):
-        name = Path(rel).stem  # commands/X.md -> X
-        exp_rel = f"commands/{name}.expectations.md"
+        name = Path(rel).parent.name
+        exp_rel = f".agent-sync/skills/{name}/expectations.md"
         exp_path = repo_root / exp_rel
         if not exp_path.exists():
             blockers.append(
-                f"✘ commands/{name}.md modified but {exp_rel} is missing.\n"
-                f"  Create it from system/templates/command-expectations.template.md."
+                f"✘ .agent-sync/skills/{name}/SKILL.md modified but "
+                f"{exp_rel} is missing.\n"
+                f"  Create it from a neighboring skill expectations.md file."
             )
             continue
         last = _read_last_reviewed(exp_path)
         if last != today:
             blockers.append(
-                f"✘ commands/{name}.md modified but {exp_rel} "
+                f"✘ .agent-sync/skills/{name}/SKILL.md modified but {exp_rel} "
                 f"last_reviewed is {last} (expected {today}).\n"
                 f"  " + RECOVERY_FMT.format(name=name)
             )

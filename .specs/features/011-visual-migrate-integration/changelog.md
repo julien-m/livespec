@@ -33,7 +33,7 @@
 
 - **Type:** Feature
 - **Spec modified:** No
-- **Code modified:** scripts/migrate-visual-tests.js, commands/migrate.md, tests/integration/test_migrate_visual.py, tests/integration/fixtures/migrate-visual/
+- **Code modified:** scripts/migrate-visual-tests.js, commands/spec-migrate.md, tests/integration/test_migrate_visual.py, tests/integration/fixtures/migrate-visual/
 - **AC impacted:** AC-001 through AC-012 (all satisfied)
 - **Author:** claude-code
 
@@ -46,7 +46,7 @@
 - **Code modified:** None (plan.md updated)
 - **AC impacted:** None (pre-implementation)
 - **Author:** spec.plan
-- **Changes from regeneration:** (1) Visual scaffolding moved to commands/migrate.md command layer (not migrate.sh); (2) "already up to date" early-exit removed so scaffolding runs unconditionally; (3) Shell injection avoided — sentinel uses files=N dirs=M, no inline node -e; (4) set +e/set -e guards around subprocess call; (5) Integration tests moved to tests/integration/test_migrate_visual.py; (6) FR-005 added to Step 1 FR coverage.
+- **Changes from regeneration:** (1) Visual scaffolding moved to commands/spec-migrate.md command layer (not migrate.sh); (2) "already up to date" early-exit removed so scaffolding runs unconditionally; (3) Shell injection avoided — sentinel uses files=N dirs=M, no inline node -e; (4) set +e/set -e guards around subprocess call; (5) Integration tests moved to tests/integration/test_migrate_visual.py; (6) FR-005 added to Step 1 FR coverage.
 
 ---
 

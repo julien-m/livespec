@@ -17,7 +17,7 @@ When `/spec.implement` builds a visual feature from a mockup or screen spec, the
 
 **Priority reason:** This is the core failure mode: code can currently be implemented without proving the rendered UI matches the requested visual change.
 
-**Independent test:** Inspect `commands/implement.md` and verify it declares Phase 6.5, calls `/spec.test <feature> --auto --visual`, and blocks `Implemented` status on visual failure.
+**Independent test:** Inspect `commands/spec-implement.md` and verify it declares Phase 6.5, calls `/spec.test <feature> --auto --visual`, and blocks `Implemented` status on visual failure.
 
 ```gherkin
 Feature: Visual implementation gate
@@ -53,7 +53,7 @@ flowchart TD
 
 **Priority reason:** A missing runner is not equivalent to a passing UI implementation.
 
-**Independent test:** Verify `commands/implement.md` does not document "continue without blocking" for unavailable visual tooling and instead documents a blocking rule.
+**Independent test:** Verify `commands/spec-implement.md` does not document "continue without blocking" for unavailable visual tooling and instead documents a blocking rule.
 
 ```gherkin
 Feature: Visual tooling failure is blocking
@@ -87,7 +87,7 @@ flowchart TD
 
 **Priority reason:** The flag is useful during iteration but must not bypass acceptance.
 
-**Independent test:** Verify the `--no-visual` flag documentation in `commands/implement.md` says visual features remain `In Progress`.
+**Independent test:** Verify the `--no-visual` flag documentation in `commands/spec-implement.md` says visual features remain `In Progress`.
 
 ```gherkin
 Feature: no-visual flag is partial-only
@@ -122,10 +122,10 @@ flowchart TD
 
 ## Functional Requirements
 
-- **FR-001** - Update `commands/implement.md` to insert a Phase 6.5 visual gate between final validation and documentation/status updates.
-- **FR-002** - Update `commands/implement.md` so unavailable visual tooling blocks UI features instead of continuing.
-- **FR-003** - Update `commands/implement.md` so `--no-visual` on visual features results in `In Progress`, not `Implemented`.
-- **FR-004** - Update `commands/test.md` to define a structured visual gate verdict with `PASS`, `FAIL`, and `BLOCKED`.
+- **FR-001** - Update `commands/spec-implement.md` to insert a Phase 6.5 visual gate between final validation and documentation/status updates.
+- **FR-002** - Update `commands/spec-implement.md` so unavailable visual tooling blocks UI features instead of continuing.
+- **FR-003** - Update `commands/spec-implement.md` so `--no-visual` on visual features results in `In Progress`, not `Implemented`.
+- **FR-004** - Update `commands/spec-test.md` to define a structured visual gate verdict with `PASS`, `FAIL`, and `BLOCKED`.
 - **FR-005** - Update command expectations for `/spec.implement` and `/spec.test` to reflect visual-gate observability.
 - **FR-006** - Add regression tests that lock the command contract text.
 

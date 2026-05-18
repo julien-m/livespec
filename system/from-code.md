@@ -1,6 +1,6 @@
 # From-Code Flow
 
-> Referenced by `commands/init.md` when `--from-code` flag is set.
+> Referenced by `.agent-sync/skills/spec-init/SKILL.md` when `--from-code` flag is set.
 > This file specifies the complete reverse-engineering flow: code analysis → bootstrap recap → human validation → Phase C entry.
 
 ---
@@ -32,7 +32,7 @@ flowchart TD
     START(["--from-code received"]) --> SPECS{".specs/ exists?"}
     SPECS -->|"no"| RECAP_CHK
     SPECS -->|"yes + --force"| BAK["Backup .specs/ →\n.specs.bak-YYYYMMDD-HHMMSS/"]
-    SPECS -->|"yes + no --force"| ERR["Error:\n.specs/ already exists.\nUse --force to backup,\nor /spec.refine to update."]
+    SPECS -->|"yes + no --force"| ERR["Error:\n.specs/ already exists.\nUse --force to backup,\nor /spec-refine to update."]
     BAK --> RECAP_CHK{"bootstrap-recap.md?"}
 
     style ERR fill:#ffebee,stroke:#f44336
@@ -65,7 +65,7 @@ stateDiagram-v2
 | State | Action |
 |---|---|
 | No `bootstrap-recap.md` | Start Phase A' scan |
-| `bootstrap-recap.md` with `status: draft` | Print: "Edit bootstrap-recap.md, set status to 'validated', then re-run `/spec.init --from-code`" |
+| `bootstrap-recap.md` with `status: draft` | Print: "Edit bootstrap-recap.md, set status to 'validated', then re-run `/spec-init --from-code`" |
 | `bootstrap-recap.md` with `status: validated` | Run validation gate → Phase C if pass |
 | `bootstrap-recap.md` malformed (unparseable YAML, missing H2 sections) | Warn: "Existing recap is malformed — regenerating." Start Phase A' scan. |
 | Invalid status value (not draft/validated) | Error: "Invalid status '[value]'. Set status to 'validated' to proceed." |
@@ -306,7 +306,7 @@ bootstrap-recap.md generated.
   Action required: [N] sections need manual input
 
 → Edit bootstrap-recap.md, set status to "validated", then re-run:
-  /spec.init --from-code
+  /spec-init --from-code
 ```
 
 If `--auto`: skip the "Edit..." prompt, proceed directly to validation gate.
@@ -400,10 +400,10 @@ After Phase E completes:
 | `--force` + recap exists | Re-scan codebase, overwrite existing recap. |
 | All Q5/Q6 answers SPECULATIVE | Valid — recap has more [FILL] markers for human. |
 | `## Analysis Coverage` | Informational only — not parsed by Phase C, not required for validation. |
-| `.conventions/` already exists (with `index.md` or legacy `conventions.md`) | Phase E skips the conventions bootstrap (convention guard). Projects on the legacy format should run `/spec.refresh-conventions --full` once to migrate. |
+| `.conventions/` already exists (with `index.md` or legacy `conventions.md`) | Phase E skips the conventions bootstrap (convention guard). Projects on the legacy format should run `/spec-refresh-conventions --full` once to migrate. |
 | Polyglot project | Multiple stacks presented neutrally. Domain roles as [INFERRED]. One ADR per domain. |
 
 ---
 
 *From-code flow spec — LiveSpec v1.1*
-*Referenced by commands/init.md when --from-code flag is set.*
+*Referenced by .agent-sync/skills/spec-init/SKILL.md when --from-code flag is set.*

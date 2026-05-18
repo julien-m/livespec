@@ -71,7 +71,7 @@ stateDiagram-v2
 | `validator/cli.py` | Modify | Register the new `init` Typer app. |
 | `tests/drivers/test_test_config.py` | Create | Unit tests for each generator + CI workflow + conventions update. |
 | `tests/drivers/test_test_config_cli.py` | Create | CLI integration test on TS, Python, unsupported fixtures. |
-| `commands/init.md` | Modify | Reference the new `livespec init test-config` step in Phase C. |
+| `commands/spec-init.md` | Modify | Reference the new `livespec init test-config` step in Phase C. |
 
 ---
 

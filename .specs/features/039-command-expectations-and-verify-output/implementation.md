@@ -63,7 +63,7 @@
 - `validator/verify_output.py`
 - `validator/cli_commands/verify_output_cmd.py`
 - `validator/cli_commands/run_cmd.py`
-- `commands/verify-output.md`
+- `commands/spec-verify-output.md`
 - `commands/<X>.expectations.md` (20 files)
 - `hooks/livespec-last-reviewed.py`
 - `scripts/install-hooks.sh`
@@ -84,7 +84,7 @@
 
 - `validator/exceptions.py` (added 4 exception classes)
 - `validator/cli.py` (wired `verify-output` + `run` subcommands)
-- `commands/feature.md` (added Run Artifact Emission section)
+- `commands/spec-feature.md` (added Run Artifact Emission section)
 - `.specs/spec-system.md` (20-command discovery + new section)
 - `.specs/changelog.md` (feature 039 entry)
 - `.gitignore` (`.specs/.runs/`)

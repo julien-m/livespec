@@ -22,7 +22,7 @@ Le script `migrate-visual-tests.js` génère, supprime et merge des fichiers de 
 
 ## Solution
 
-### Nouveau Step 4.6 dans `commands/migrate.md`
+### Nouveau Step 4.6 dans `commands/spec-migrate.md`
 
 Ajouter une phase de réconciliation IA entre Step 4.5 (Visual Scaffolding) et Step 5 (Report). L'agent qui exécute `/spec.migrate` analyse les fichiers de test générés et corrige les incohérences.
 
@@ -103,7 +103,7 @@ Visual test reconciliation: 0 issues found
 
 | Fichier | Changement |
 |---|---|
-| `commands/migrate.md` | Mise à jour Step 4.5 point 6 (parser `routes=R`) + nouveau Step 4.6 (réconciliation IA) |
+| `commands/spec-migrate.md` | Mise à jour Step 4.5 point 6 (parser `routes=R`) + nouveau Step 4.6 (réconciliation IA) |
 
 ---
 

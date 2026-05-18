@@ -19,7 +19,7 @@ Use this protocol whenever a visual feature starts from a new mockup, a changed 
 
 ## Invocation Point
 
-`/spec.test --visual` runs this protocol before baseline capture when:
+`/spec-test --visual` runs this protocol before baseline capture when:
 
 - the feature has a `## Screens` section, and
 - `.specs/design/ui.pen` exists, and
@@ -108,4 +108,4 @@ Store artifacts under the feature:
 └── design-alignment.manifest.json
 ```
 
-`/spec.test --visual` includes the verdict and report path in `checks/YYYY-MM-DD-test.md`.
+`/spec-test --visual` includes the verdict and report path in `checks/YYYY-MM-DD-test.md`.

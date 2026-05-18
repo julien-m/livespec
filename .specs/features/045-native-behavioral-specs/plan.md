@@ -13,7 +13,7 @@ updated: 2026-05-14
 
 ## Summary
 
-F045 makes `/spec.specify` autonomous on behavioral specs by adding three auto-detected modes (precedence A > C > B): **Mode A — reuse** delegates to F042's existing transcription path when `.specs/flows/<slug>.md` exists; **Mode C — mockup-derived** runs a 5-question interview over the remaining canonical screen sections (`Acteur`, `Source d'entrée`, `Sortie principale`, `Validations`, `Erreurs`) and stamps `derivedFrom: native-mockups` when readable mockups exist for the slug; **Mode B — native interview** runs a fixed 8-question template (per F044 mandatory section) when nothing exists. All native artefacts carry `specStatus: manual` (honoring F041's overwrite-protection contract from the producer side) and pass through a hard `validate_behavioral` gate (PASS → silent write, WARNING → write + log diagnostics, FAIL → discard + write `error.md` + emit `BLOCKED` + non-zero exit). Implementation is purely additive: one new module (`validator/native_behavioral.py`), one templates module (`validator/native_behavioral_templates.py`), one `detect_mode()` function appended to `validator/behavioral_grammar.py`, and one new Step 4.5 inserted into `commands/specify.md` (mirrored in `.claude/commands/spec.specify.md`). Zero modification of F041/042/043/044 spec.md, zero new dependencies, zero new top-level CLI command, zero new agent type.
+F045 makes `/spec.specify` autonomous on behavioral specs by adding three auto-detected modes (precedence A > C > B): **Mode A — reuse** delegates to F042's existing transcription path when `.specs/flows/<slug>.md` exists; **Mode C — mockup-derived** runs a 5-question interview over the remaining canonical screen sections (`Acteur`, `Source d'entrée`, `Sortie principale`, `Validations`, `Erreurs`) and stamps `derivedFrom: native-mockups` when readable mockups exist for the slug; **Mode B — native interview** runs a fixed 8-question template (per F044 mandatory section) when nothing exists. All native artefacts carry `specStatus: manual` (honoring F041's overwrite-protection contract from the producer side) and pass through a hard `validate_behavioral` gate (PASS → silent write, WARNING → write + log diagnostics, FAIL → discard + write `error.md` + emit `BLOCKED` + non-zero exit). Implementation is purely additive: one new module (`validator/native_behavioral.py`), one templates module (`validator/native_behavioral_templates.py`), one `detect_mode()` function appended to `validator/behavioral_grammar.py`, and one new Step 4.5 inserted into `commands/spec-specify.md` (mirrored in `.claude/commands/spec.specify.md`). Zero modification of F041/042/043/044 spec.md, zero new dependencies, zero new top-level CLI command, zero new agent type.
 
 ---
 
@@ -28,7 +28,7 @@ F045 makes `/spec.specify` autonomous on behavioral specs by adding three auto-d
 | Mockup detection | Stdlib only — `pathlib` + `os.stat` (size check) | No image decoding needed; spec only requires "readable + nonzero size" (AC-016). Pillow NOT in pyproject — out of scope to add. |
 | `.pen` analysis | Filename-presence heuristic only | `.pen` files are encrypted (Pencil MCP). No native parser available. Mode C with `.pen` falls back to "non-visual interview only, visual sections = `(to fill later)`" — explicit `WARNING` from validator, never silent. |
 | Tests | pytest 8 (already pinned) | Matches existing test layout |
-| Slash command surface | Modify `commands/specify.md` AND `.claude/commands/spec.specify.md` (mirror) | Per spec FR-015 — auto-detect by default + optional `--native` / `--from-mockups` overrides |
+| Slash command surface | Modify `commands/spec-specify.md` AND `.claude/commands/spec.specify.md` (mirror) | Per spec FR-015 — auto-detect by default + optional `--native` / `--from-mockups` overrides |
 | Stack profile | `.specs/stacks/_default.md` | LiveSpec internal validator project |
 
 ### Versioning
@@ -245,10 +245,10 @@ No infrastructure resources. No UI / theme work.
 ### Step 5 — Slash-command extension (`/spec.specify`)
 
 **Files (modify):**
-- `commands/specify.md` — add **Step 4.5 — Native Behavioral Mode Detection** between existing Step 4 (Read Context Files) and Step 5 (Generate spec.md). ~60 added lines.
+- `commands/spec-specify.md` — add **Step 4.5 — Native Behavioral Mode Detection** between existing Step 4 (Read Context Files) and Step 5 (Generate spec.md). ~60 added lines.
 - `.claude/commands/spec.specify.md` — mirror the same Step 4.5 block (the two files are kept in sync per existing convention).
 
-**Step 4.5 content (skeleton to write into commands/specify.md):**
+**Step 4.5 content (skeleton to write into commands/spec-specify.md):**
 
 ```markdown
 ### Step 4.5 — Native Behavioral Mode Detection
@@ -298,7 +298,7 @@ The existing Step 5 ("Generate spec.md") is NOT modified — Mode A continues to
 
 ### Step 7 — Optional override flags (already specified by Step 5; no extra files)
 
-The flag plumbing happens in `commands/specify.md` Step 4.5 and the corresponding mirror file. No Python module changes needed beyond what Step 2 already does (the `override` parameter on `detect_mode`).
+The flag plumbing happens in `commands/spec-specify.md` Step 4.5 and the corresponding mirror file. No Python module changes needed beyond what Step 2 already does (the `override` parameter on `detect_mode`).
 
 **FR covered:** FR-015.2: Impossible-mode requests fail loudly (e.g. `--from-mockups` with no mockup → BLOCKED with reason).
 
@@ -420,7 +420,7 @@ Not applicable — no new HTTP endpoints. Module Python signatures are documente
 ## Compatibility Notes (re-stated for the implementer)
 
 - F041 (`spec.init`): producer-side honors the `specStatus: manual` overwrite contract. F045 sets `specStatus: manual` at production time; F041 will NOT overwrite without `--force-overwrite-manual`. F041 spec.md is NOT touched.
-- F042 (`spec.specify` derivation): Mode A path delegates strictly. F042 spec.md is NOT touched. The new Step 4.5 in `commands/specify.md` is purely additive — Mode A falls through to the existing Step 5 unchanged.
+- F042 (`spec.specify` derivation): Mode A path delegates strictly. F042 spec.md is NOT touched. The new Step 4.5 in `commands/spec-specify.md` is purely additive — Mode A falls through to the existing Step 5 unchanged.
 - F043 (`spec.sync-brainstorm`): no F045 change required. Note (non-binding): future F043 implementation should `exit 0 — no brainstorm — skipping sync` on projects without `.brainstorm/`. F043 spec.md is NOT touched.
 - F044 (grammar v1.0 + validator): F045 imports the canonical surface verbatim. The new optional frontmatter field `derivedFrom: native-mockups` is additive — F044 validator already tolerates unknown frontmatter fields at WARNING-level at most. F044 spec.md is NOT touched.
 
@@ -432,11 +432,11 @@ Not applicable — no new HTTP endpoints. Module Python signatures are documente
 |------|-----------|--------|------------|
 | Mode C without image decoding produces visual sections that are placeholders, possibly surprising power users who expect pixel-extracted content | Medium | Low | The placeholder string `(to fill later — populated from mockup analysis)` is the explicit upgrade hook; documented in Step 4 implementer note. The validator returns WARNING (not FAIL) on placeholder bodies — non-fatal. Future iteration can replace the placeholder with real extraction without spec change. |
 | `.pen` files are encrypted and only accessible via Pencil MCP write surface, which is explicitly out of scope per spec.md "Out-of-Scope Guard" | High | Low | Treat `.pen` presence as a Mode C trigger but DO NOT attempt to decode. Visual sections stay as placeholders (same as PNG path). Filename + `os.stat` heuristic is the contract. |
-| The slash-command extension touches both `commands/specify.md` and `.claude/commands/spec.specify.md` — risk of drift between the two files | Medium | Medium | Step 5 explicitly mandates mirroring; the project already keeps these two files in sync (see existing convention; both files are 827 lines and structurally identical). Add a CI / verifier check (out of scope here) in a follow-up. |
+| The slash-command extension touches both `commands/spec-specify.md` and `.claude/commands/spec.specify.md` — risk of drift between the two files | Medium | Medium | Step 5 explicitly mandates mirroring; the project already keeps these two files in sync (see existing convention; both files are 827 lines and structurally identical). Add a CI / verifier check (out of scope here) in a follow-up. |
 | User confusion when `/spec.specify <slug>` produces a `flow.md` (Modes B/C) vs a feature `spec.md` (Mode A / classic). Two different output kinds from one command | Low | Medium | Step 4.5 logs `mode: <name>` per invocation. The Step 10 user-facing summary (existing in specify.md) lists which artefact was produced. No code change needed beyond the structured log. |
 | Future grammar v2.0 ships a sibling validator module — F045 must pin to v1 | Low | Low | Step 1 templates module imports section names from F044 v1 module explicitly. Migration to v2 is explicit and reviewable. Documented in Technical Context "Versioning". |
 | `--from-mockups` flag with no readable mockup must fail loudly (FR-015), not silently fall back to Mode B | Low | High | Step 5 + Step 7 explicitly enforce `BLOCKED` + non-zero exit on this path. Test `test_from_mockups_with_no_mockup_blocks_loudly` covers it. |
-| F042 path is invoked unchanged but lives inside the existing Step 5 — accidental edits to Step 5 during the F045 patch could regress F042 | Medium | High | Step 9 BLOCKING `git diff` gate against F041–F044 covers spec.md only — but Step 5's body is in `commands/specify.md`, NOT in F042 spec.md. Mitigation: PR-level review must explicitly list `commands/specify.md` Step 5 lines as untouched (only Step 4.5 inserted). Add a focused diff check: `git diff main -- commands/specify.md | grep -E "^[+-]" | grep -v "Step 4\.5"` should yield only frontmatter + Step 4.5 hunks. |
+| F042 path is invoked unchanged but lives inside the existing Step 5 — accidental edits to Step 5 during the F045 patch could regress F042 | Medium | High | Step 9 BLOCKING `git diff` gate against F041–F044 covers spec.md only — but Step 5's body is in `commands/spec-specify.md`, NOT in F042 spec.md. Mitigation: PR-level review must explicitly list `commands/spec-specify.md` Step 5 lines as untouched (only Step 4.5 inserted). Add a focused diff check: `git diff main -- commands/spec-specify.md | grep -E "^[+-]" | grep -v "Step 4\.5"` should yield only frontmatter + Step 4.5 hunks. |
 
 ---
 
@@ -449,10 +449,10 @@ Reviewer: inline self-review against the gates listed in the supervisor brief.
 | FR coverage table — every FR mapped to ≥1 step | PASS — 17 FR, 17 entries in FR Coverage Table, no gap |
 | Feasibility — no missing deps | PASS — no new deps; Pillow explicitly excluded; Mode C uses filename + `os.stat` only |
 | Consistency with spec.md AC | PASS — every AC traceable to a test row in Testing Strategy |
-| F042 delegation point identified | PASS — `commands/specify.md` Step 4 → new Step 4.5 → Mode A falls through to existing Step 5 (which already contains F042 transcription per F042 spec.md AC-001) |
+| F042 delegation point identified | PASS — `commands/spec-specify.md` Step 4 → new Step 4.5 → Mode A falls through to existing Step 5 (which already contains F042 transcription per F042 spec.md AC-001) |
 | Validator F044 invocation explicit | PASS — Step 6 dedicated to gate; structured log line per artefact required |
 | F041 overwrite-protection semantics honored | PASS — Step 5 documents producer-side `specStatus: manual` write + Step 5's manual-target guard mirrors F041 contract |
-| No new top-level CLI command, no new agent type | PASS — only extension is Step 4.5 inside existing `/spec.specify`; mirrored in both `commands/specify.md` and `.claude/commands/spec.specify.md` |
+| No new top-level CLI command, no new agent type | PASS — only extension is Step 4.5 inside existing `/spec.specify`; mirrored in both `commands/spec-specify.md` and `.claude/commands/spec.specify.md` |
 | `git diff main -- .specs/features/04{1,2,3,4}-*/spec.md` empty after F045 lands | PASS — Step 9 enforces it as BLOCKING |
 
 **Verdict:** PASS — 0 BLOCKING, 0 WARNING, 0 INFO findings. Plan is approved-eligible.

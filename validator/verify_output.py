@@ -1,4 +1,4 @@
-"""Rule evaluator + report builder for `/spec.verify-output`.
+"""Rule evaluator + report builder for `/spec-verify-output`.
 
 # @spec FR-007: verify-output evaluator
 #   — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-007

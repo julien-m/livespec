@@ -58,9 +58,9 @@ Also update the "When working with DESIGN mockups" rules section — change rule
 
 ---
 
-### T3 — Update `commands/specify.md` Step 5.6
+### T3 — Update `commands/spec-specify.md` Step 5.6
 
-**File:** `commands/specify.md`
+**File:** `commands/spec-specify.md`
 
 Replace sub-steps 5 through 8 within Step 5.6 (lines ~269-308):
 

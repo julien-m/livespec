@@ -211,7 +211,7 @@ flowchart TD
 ```
 
 **Naming convention:**
-- Commands: `commands/check.md` → `.claude/commands/spec.check.md`
+- Commands: `commands/spec-check.md` → `.claude/commands/spec.check.md`
 - Agents: `agents/livespec-supervisor.md` → `.claude/agents/livespec-supervisor.md`
 
 **Exclusions:** The script does NOT symlink `init.md` and `migrate.md` locally — they stay global only.
@@ -340,7 +340,7 @@ Update the "Command discovery" paragraph in `spec-system.md` to:
 
 ### 6.2 Update CLAUDE.md command list template
 
-In `commands/init.md` Step 3.11, add `/spec.migrate` to the command list written between `<!-- livespec:start -->` and `<!-- livespec:end -->` markers.
+In `commands/spec-init.md` Step 3.11, add `/spec.migrate` to the command list written between `<!-- livespec:start -->` and `<!-- livespec:end -->` markers.
 
 ### 6.3 Version check preamble
 
@@ -399,7 +399,7 @@ rm ~/.claude/agents/livespec-verifier.md
 
 ```bash
 # spec.migrate — new global command
-ln -sf ~/projects/livespec/commands/migrate.md ~/.claude/commands/spec.migrate.md
+ln -sf ~/projects/livespec/commands/spec-migrate.md ~/.claude/commands/spec.migrate.md
 ```
 
 `spec.init` is already globally symlinked — no change needed.
@@ -488,7 +488,7 @@ When a new command is added (e.g., `spec.dashboard`):
 
 `spec.migrate` handles this **before executing any migration**:
 1. Check if `.specs/.livespec-path` exists
-2. If missing → resolve the LiveSpec repo path from `spec.migrate`'s own symlink chain (`readlink ~/.claude/commands/spec.migrate.md` → `~/projects/livespec/commands/migrate.md` → strip `commands/migrate.md`)
+2. If missing → resolve the LiveSpec repo path from `spec.migrate`'s own symlink chain (`readlink ~/.claude/commands/spec.migrate.md` → `~/projects/livespec/commands/spec-migrate.md` → strip `commands/spec-migrate.md`)
 3. Write the resolved path to `.specs/.livespec-path`
 4. Then proceed with migrations (which call `link-local.sh`, which reads `.livespec-path`)
 
@@ -506,10 +506,10 @@ Each developer runs `spec.init` or `spec.migrate` on their machine. The symlinks
 | 2 | `migrations/2/migrate.md` | New file | First migration (global → local) |
 | 3 | `scripts/link-local.sh` | New file | Symlink creator for local distribution |
 | 4 | `scripts/migrate.sh` | New file | DSL interpreter for migrations |
-| 5 | `commands/migrate.md` | New file | `spec.migrate` command spec |
-| 6 | `commands/init.md` | Modify | Add Step 3.12 (local symlinks) + exit criteria |
+| 5 | `commands/spec-migrate.md` | New file | `spec.migrate` command spec |
+| 6 | `commands/spec-init.md` | Modify | Add Step 3.12 (local symlinks) + exit criteria |
 | 7 | `system/spec-system.md` | Modify | Add version check preamble + update command roster + distribution description |
-| 8 | `commands/init.md` (Step 3.11) | Modify | Add `/spec.migrate` to CLAUDE.md command list template |
+| 8 | `commands/spec-init.md` (Step 3.11) | Modify | Add `/spec.migrate` to CLAUDE.md command list template |
 | 9 | `.claude/skills/link/SKILL.md` | Delete | Replaced by link-local.sh |
 | 10 | `.claude/rules/commands-agents-must-be-linked.md` | Delete | No longer applicable |
 | 11 | `~/.claude/commands/spec.*.md` (17) | Delete | Global symlinks removed |

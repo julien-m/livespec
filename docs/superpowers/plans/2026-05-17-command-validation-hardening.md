@@ -35,7 +35,7 @@ Facts found:
 - Every command imports `system/anti-drift-block.md`.
 - `livespec verify-output` and `livespec run` are implemented and tested.
 - `scripts/check-coherence.sh` is stale: it expects `COMMANDS=(...)` and `AGENTS=(...)`, but `scripts/install.sh` now has `BOOTSTRAP_COMMANDS=(init migrate)`.
-- Several docs are stale: `system/spec-system.md` says 19 commands, `scripts/init.sh` lists only 13 commands, `commands/hooks.md` omits `verify-output`.
+- Several docs are stale: `system/spec-system.md` says 19 commands, `scripts/init.sh` lists only 13 commands, `commands/spec-hooks.md` omits `verify-output`.
 - `/spec.play-coverage` expectations describe server/data artifacts that the actual `scripts/play-coverage.sh` does not create.
 - Only `/spec.feature` and `/spec.verify-output` currently mention run-artifact finalization. Most commands can finish without producing `.specs/.runs/<command>-*.json`.
 
@@ -78,8 +78,8 @@ Modify:
 - `system/spec-system.md` - fix command count and stale "No hooks" language.
 - `commands/*.md` - update only where command-specific finalization details are required beyond the shared anti-drift block.
 - `commands/*.expectations.md` - strengthen weak rules and align with actual outputs/artifacts.
-- `commands/hooks.md` - remove hardcoded stale command list or include all 20 from the registry.
-- `commands/init.md` and `scripts/init.sh` - include `verify-output` in command lists.
+- `commands/spec-hooks.md` - remove hardcoded stale command list or include all 20 from the registry.
+- `commands/spec-init.md` and `scripts/init.sh` - include `verify-output` in command lists.
 - `.claude/checks/livespec-routing-sync.md` - point to `livespec command-audit`.
 - `VERSION` - bump to `14` when migration 14 is added.
 
@@ -227,7 +227,7 @@ def test_command_audit_clean_repo_exits_zero():
 
 def test_command_audit_missing_expectations_exits_one(tmp_path):
     project = copy_minimal_livespec_repo(tmp_path)
-    (project / "commands/status.expectations.md").unlink()
+    (project / "commands/spec-status.expectations.md").unlink()
     result = runner.invoke(app, ["command-audit", "--repo", str(project)])
     assert result.exit_code == 1
     assert "status.expectations.md" in result.output
@@ -246,7 +246,7 @@ The command must verify:
 - routing headings equal registry names
 - `scripts/install.sh` declares only bootstrap commands `init`, `migrate`
 - `scripts/link-local.sh` links every non-bootstrap command and excludes expectations sidecars
-- `commands/hooks.md`, `system/spec-system.md`, `commands/init.md`, `scripts/init.sh` mention `verify-output`
+- `commands/spec-hooks.md`, `system/spec-system.md`, `commands/spec-init.md`, `scripts/init.sh` mention `verify-output`
 - no stale phrase `19 available commands` remains
 
 - [ ] **Step 3: Register in Typer**
@@ -412,8 +412,8 @@ Expected: pass.
 **Files:**
 - Create: `validator/cli_commands/status_cmd.py`
 - Modify: `validator/cli.py`
-- Modify: `commands/status.md`
-- Modify: `commands/status.expectations.md`
+- Modify: `commands/spec-status.md`
+- Modify: `commands/spec-status.expectations.md`
 - Create: `tests/test_status_cli.py`
 
 - [ ] **Step 1: Add tests**
@@ -441,7 +441,7 @@ Use `validator.coherence.graph_builder.build_graph()` to compute:
 
 - [ ] **Step 3: Update slash command**
 
-`commands/status.md` must say the slash command invokes:
+`commands/spec-status.md` must say the slash command invokes:
 
 ```bash
 livespec status "$@"
@@ -455,8 +455,8 @@ and then finalizes with `livespec run finalize`.
 - Create: `validator/cli_commands/play_coverage_cmd.py`
 - Modify: `validator/cli.py`
 - Modify: `scripts/play-coverage.sh`
-- Modify: `commands/play-coverage.md`
-- Modify: `commands/play-coverage.expectations.md`
+- Modify: `commands/spec-play-coverage.md`
+- Modify: `commands/spec-play-coverage.expectations.md`
 - Create: `tests/test_play_coverage_cli.py`
 
 - [ ] **Step 1: Add tests for non-GUI mode**
@@ -495,8 +495,8 @@ Remove false claims about `playground/coverage/data.json` unless the new CLI act
 **Files:**
 - Create: `validator/cli_commands/conventions_cmd.py`
 - Modify: `validator/cli.py`
-- Modify: `commands/refresh-conventions.md`
-- Modify: `commands/refresh-conventions.expectations.md`
+- Modify: `commands/spec-refresh-conventions.md`
+- Modify: `commands/spec-refresh-conventions.expectations.md`
 - Create: `tests/test_conventions_cli.py`
 
 - [ ] **Step 1: Add tests**
@@ -527,8 +527,8 @@ Call existing `validator.drivers.test_config.update_conventions_testing_domain()
 
 **Files:**
 - Modify: `system/spec-system.md`
-- Modify: `commands/hooks.md`
-- Modify: `commands/init.md`
+- Modify: `commands/spec-hooks.md`
+- Modify: `commands/spec-init.md`
 - Modify: `scripts/init.sh`
 - Modify: `.claude/rules/livespec-commands.md` only if command names change
 - Create or extend: `tests/test_command_registry.py`
@@ -543,7 +543,7 @@ Change stale text:
 
 - [ ] **Step 2: Fix hooks docs**
 
-`commands/hooks.md` must include `verify-output`, or must state the valid command list is resolved dynamically by `validator.integrations.valid_command_names()`.
+`commands/spec-hooks.md` must include `verify-output`, or must state the valid command list is resolved dynamically by `validator.integrations.valid_command_names()`.
 
 - [ ] **Step 3: Fix system hooks language**
 

@@ -1,4 +1,4 @@
-"""Level 3B — Non-regression tests: run /spec.specify N times, verify structural stability."""
+"""Level 3B — Non-regression tests: run /spec-specify N times, verify structural stability."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ class TestNonRegression:
     """
 
     N_RUNS = 3  # Minimal viable count — each run costs ~$3-5
-    COMMAND = '/spec.specify "User can reset their password via email" --auto'
+    COMMAND = '/spec-specify "User can reset their password via email" --auto'
 
     def test_invariants_stable_across_n_runs(self):
         """

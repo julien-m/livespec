@@ -1,7 +1,7 @@
 # Test Execution Rules
 
 > When to run tests and final validation checklist.
-> Referenced by `/spec.implement` phases 3, 4, and 6.
+> Referenced by `/spec-implement` phases 3, 4, and 6.
 
 ---
 

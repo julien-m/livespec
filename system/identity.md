@@ -9,7 +9,7 @@
 
 ## Why this exists
 
-Before Chantier 4, `commands/feature.md` propagated the literal placeholder string `NNN-feature-name` into runtime CLI calls (`livespec pipeline init --feature NNN-feature-name`) and into the Universal Agent Context dispatched to subagents. The placeholder was never resolved before side-effects, leading to:
+Before Chantier 4, `.agent-sync/skills/spec-feature/SKILL.md` propagated the literal placeholder string `NNN-feature-name` into runtime CLI calls (`livespec pipeline init --feature NNN-feature-name`) and into the Universal Agent Context dispatched to subagents. The placeholder was never resolved before side-effects, leading to:
 
 - Pipeline state files initialised with literal `NNN-feature-name`
 - Subagent payloads carrying an unresolved identifier
@@ -75,11 +75,11 @@ assert_resolved(maybe_slug)
 
 ## Where this is used
 
-- `commands/feature.md` — Identity Resolution section (calls `resolve_feature_slug` before any side-effect)
-- `commands/specify.md` Step 2 (NNN allocation) — uses the same regex
-- `agents/livespec-supervisor.md` Activation Contract — calls `assert_resolved` on every payload field
-- `agents/livespec-documenter.md` Step 5 (log path) — uses the resolved slug in the log directory name
-- `commands/implement.md` Phase 4 (execution log path) — mirrors the documenter convention
+- `.agent-sync/skills/spec-feature/SKILL.md` — Identity Resolution section (calls `resolve_feature_slug` before any side-effect)
+- `.agent-sync/skills/spec-specify/SKILL.md` Step 2 (NNN allocation) — uses the same regex
+- `.agent-sync/agents/livespec-supervisor/prompt.md` Activation Contract — calls `assert_resolved` on every payload field
+- `.agent-sync/agents/livespec-documenter/prompt.md` Step 5 (log path) — uses the resolved slug in the log directory name
+- `.agent-sync/skills/spec-implement/SKILL.md` Phase 4 (execution log path) — mirrors the documenter convention
 - `validator/state_files.py` — `feature_slug` frontmatter field is validated against the same regex
 
 ## Migration of legacy artefacts
@@ -87,7 +87,7 @@ assert_resolved(maybe_slug)
 When migrating an existing project that has files written with the literal placeholder, run:
 
 ```bash
-grep -r "NNN-feature-name" .specs/features/ commands/ agents/
+grep -r "NNN-feature-name" .specs/features/ .agent-sync/
 ```
 
 Move/rename any matched files to the resolved slug. The CI regression check defined by [FR-009](#fr-009) prevents the literal from being reintroduced.

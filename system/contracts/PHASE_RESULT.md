@@ -1,6 +1,6 @@
 # PHASE_RESULT Contract
 
-> Canonical return contract emitted by every phase agent (specify, plan, implement, test) and consumed by the `/spec.feature` supervisor.
+> Canonical return contract emitted by every phase agent (specify, plan, implement, test) and consumed by the `/spec-feature` supervisor.
 >
 > Implementation: [`validator/contracts.py`](../../validator/contracts.py) (`PhaseResult`, `parse_phase_result`).
 >
@@ -78,7 +78,7 @@ This emits a `DeprecationWarning`. Migration is mandatory before the next major 
 
 ## Caller behaviour
 
-The `/spec.feature` supervisor invokes the parser as part of Phase N → Gate N transition:
+The `/spec-feature` supervisor invokes the parser as part of Phase N → Gate N transition:
 
 ```python
 from validator.contracts import parse_phase_result, ContractParseError, ContractValidationError

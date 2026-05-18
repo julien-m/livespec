@@ -20,9 +20,9 @@ updated: 2026-05-08
 | [FR-005: pbxproj fallback glob](spec.md#fr-005) | `scripts/lib/pbxproj.js` (`fallbackGlobTestDirs`) | `// @spec FR-005 ...` | Implemented | 2026-05-08 |
 | [FR-006: omit non-existent testDir + WARNING](spec.md#fr-006) | `scripts/lib/pbxproj.js` (`enumerateAndFallback`) + caller in `generate-surfaces.js` | `// @spec FR-006 ...` | Implemented | 2026-05-08 |
 | [FR-007: watchOS/widget classification](spec.md#fr-007) | `scripts/lib/pbxproj.js` (`classifyTestTarget`) | `// @spec FR-007 ...` | Implemented | 2026-05-08 |
-| [FR-008: --visual flag accepted](spec.md#fr-008) | `commands/test.md` (Flags table) | `(documentation)` | Implemented | 2026-05-08 |
-| [FR-009: --visual --no-visual mutually exclusive](spec.md#fr-009) | `commands/test.md` (Flags table) | `(documentation)` | Implemented | 2026-05-08 |
-| [FR-010: --visual documented](spec.md#fr-010) | `commands/test.md` | `(documentation)` | Implemented | 2026-05-08 |
+| [FR-008: --visual flag accepted](spec.md#fr-008) | `commands/spec-test.md` (Flags table) | `(documentation)` | Implemented | 2026-05-08 |
+| [FR-009: --visual --no-visual mutually exclusive](spec.md#fr-009) | `commands/spec-test.md` (Flags table) | `(documentation)` | Implemented | 2026-05-08 |
+| [FR-010: --visual documented](spec.md#fr-010) | `commands/spec-test.md` | `(documentation)` | Implemented | 2026-05-08 |
 | [FR-011: dispatcher detect() preflight gate](spec.md#fr-011) | `validator/ui_runner_dispatcher.py`, all three handlers' `preflight_message()` | `# @spec FR-011 ...` | Implemented | 2026-05-08 |
 | [FR-012: XCUITest preflight diagnostics](spec.md#fr-012) | `validator/ui_runner_xcuitest.py` | `# @spec FR-012 ...` | Implemented | 2026-05-08 |
 | [FR-013: Maestro preflight diagnostics](spec.md#fr-013) | `validator/ui_runner_maestro.py` | `# @spec FR-013 ...` | Implemented | 2026-05-08 |
@@ -49,7 +49,7 @@ updated: 2026-05-08
 - `validator/ui_runner_maestro.py` — added `preflight_message()` and made `screen` the first positional argument of `capture_screenshot`
 - `scripts/generate-surfaces.js` — replaced single-target xcuitest branch with `enumerateAndFallback`-driven multi-target emission
 - `tests/test_generate_surfaces.js` — added 5 new tests for pbxproj parsing
-- `commands/test.md` — added `--visual` flag row and runner-aware Phase 4.5 narrative
+- `commands/spec-test.md` — added `--visual` flag row and runner-aware Phase 4.5 narrative
 
 ## Test results
 

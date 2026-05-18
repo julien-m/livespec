@@ -17,7 +17,7 @@ from validator.expectations import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PRIORITY_COMMANDS = ("init", "test", "feature")
+PRIORITY_COMMANDS = ("spec-init", "spec-test", "spec-feature")
 
 
 def _count_content_lines(body: str) -> int:
@@ -34,7 +34,7 @@ def _count_content_lines(body: str) -> int:
 
 @pytest.mark.parametrize("command", PRIORITY_COMMANDS)
 def test_priority_command_has_full_section_13(command: str) -> None:
-    path = REPO_ROOT / "commands" / f"{command}.expectations.md"
+    path = REPO_ROOT / ".agent-sync" / "skills" / command / "expectations.md"
     expectations = parse_expectations(path)
     assert expectations.demo_session is not None, f"{command}: no demo session"
     sub_map = expectations.demo_session.as_mapping()

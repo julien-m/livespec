@@ -4,7 +4,7 @@
 # Invokes `generate-surfaces.js --migrate-native` from PROJECT_DIR so that
 # downstream projects with native (Xcode / Android Gradle) layouts get
 # their iOS, watchOS, and Android surfaces appended to
-# `.specs/surfaces.yaml` automatically during `/spec.migrate`.
+# `.specs/surfaces.yaml` automatically during `/spec-migrate`.
 #
 # The text-level append in `runMigrateNative()` is idempotent and
 # byte-for-byte preserves existing manifest entries — re-running on an

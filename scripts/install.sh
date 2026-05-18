@@ -1,22 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# LiveSpec bootstrap installer for Claude Code.
+# LiveSpec bootstrap installer for portable Claude/Codex agent assets.
 #
-# Installs the two global bootstrap commands that must exist before a project
-# can link the rest of the LiveSpec commands locally via /spec.init.
+# Installs global bootstrap skills and rules through cc-hub. Project-local
+# assets are synced later by spec-init via scripts/sync-agent-assets.sh.
 
 LIVESPEC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-COMMANDS_DIR="$HOME/.claude/commands"
-RULES_DIR="$HOME/.claude/rules"
 
-BOOTSTRAP_COMMANDS=(init migrate)
-# Global rules — loaded by Claude on any project. The routing rule only
-# triggers when `.specs/` is detected in the cwd, so it is safe globally.
-# The commands reference is required alongside it (relative link target).
-BOOTSTRAP_RULES=(livespec-routing livespec-commands)
-
-FORCE=false
+BOOTSTRAP_COMMANDS=(spec-init spec-migrate)
 DRY_RUN=false
 UNINSTALL=false
 
@@ -24,110 +16,26 @@ print_help() {
   cat <<'EOF'
 Usage: bash scripts/install.sh [OPTIONS]
 
-Install the global bootstrap commands and routing rule required by LiveSpec:
-  /spec.init
-  /spec.migrate
-  .claude/rules/livespec-routing.md  (global rule, triggers on `.specs/`)
-  .claude/rules/livespec-commands.md (referenced by routing rule)
-
-All other /spec.* commands and agents are linked per project by /spec.init.
+Install the global LiveSpec bootstrap assets through cc-hub:
+  spec-init and spec-migrate skills
+  livespec routing and commands rules
 
 Options:
-  --force         Overwrite existing symlinks
-  --dry-run       Preview changes without writing anything
-  --uninstall     Remove bootstrap symlinks
+  --force         Accepted for compatibility; cc-hub decides replacement safety
+  --dry-run       Preview cc-hub calls without writing anything
+  --uninstall     Remove bootstrap assets through cc-hub
   --help          Show this help message
 EOF
-}
-
-log_ok() {
-  printf '  %s\n' "$1"
 }
 
 log_warn() {
   printf '  %s\n' "$1" >&2
 }
 
-log_dry_run() {
-  printf '  [dry-run] %s\n' "$1"
-}
-
-ensure_source_files() {
-  local command_name=""
-  for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
-    if [[ ! -f "$LIVESPEC_ROOT/commands/$command_name.md" ]]; then
-      log_warn "ERROR: missing source file: $LIVESPEC_ROOT/commands/$command_name.md"
-      exit 1
-    fi
-  done
-  local rule_name=""
-  for rule_name in "${BOOTSTRAP_RULES[@]}"; do
-    if [[ ! -f "$LIVESPEC_ROOT/.claude/rules/$rule_name.md" ]]; then
-      log_warn "ERROR: missing source file: $LIVESPEC_ROOT/.claude/rules/$rule_name.md"
-      exit 1
-    fi
-  done
-}
-
-create_symlink() {
-  local source_path="$1"
-  local target_path="$2"
-  local label="$3"
-
-  if [[ "$DRY_RUN" == true ]]; then
-    log_dry_run "$label -> $source_path"
-    return
-  fi
-
-  if [[ -L "$target_path" ]]; then
-    local current_target=""
-    current_target="$(readlink "$target_path")"
-    if [[ "$current_target" == "$source_path" ]]; then
-      log_ok "$label already up to date"
-      return
-    fi
-    if [[ "$FORCE" != true ]]; then
-      log_warn "$label exists and points to $current_target (use --force to overwrite)"
-      return
-    fi
-    rm -f "$target_path"
-  elif [[ -e "$target_path" ]]; then
-    if [[ "$FORCE" != true ]]; then
-      log_warn "$label exists as a regular file (use --force to overwrite)"
-      return
-    fi
-    rm -f "$target_path"
-  fi
-
-  ln -s "$source_path" "$target_path"
-  log_ok "linked $label"
-}
-
-remove_symlink() {
-  local target_path="$1"
-  local label="$2"
-
-  if [[ ! -L "$target_path" ]]; then
-    if [[ -e "$target_path" ]]; then
-      log_warn "$label is not a symlink; leaving it in place"
-    fi
-    return
-  fi
-
-  if [[ "$DRY_RUN" == true ]]; then
-    log_dry_run "remove $label"
-    return
-  fi
-
-  rm -f "$target_path"
-  log_ok "removed $label"
-}
-
 parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --force)
-        FORCE=true
         shift
         ;;
       --dry-run)
@@ -151,48 +59,67 @@ parse_args() {
   done
 }
 
-install_bootstrap_commands() {
-  local command_name=""
-
-  if [[ "$DRY_RUN" != true ]]; then
-    mkdir -p "$COMMANDS_DIR"
-  fi
-
+ensure_source_files() {
+  local command_name
   for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
-    create_symlink \
-      "$LIVESPEC_ROOT/commands/$command_name.md" \
-      "$COMMANDS_DIR/spec.$command_name.md" \
-      "commands/spec.$command_name.md"
+    if [[ ! -f "$LIVESPEC_ROOT/.agent-sync/skills/$command_name/SKILL.md" ]]; then
+      log_warn "ERROR: missing source skill: $LIVESPEC_ROOT/.agent-sync/skills/$command_name/SKILL.md"
+      exit 1
+    fi
+  done
+  if [[ ! -f "$LIVESPEC_ROOT/.agent-sync/rules/livespec/routing.md" ]]; then
+    log_warn "ERROR: missing source rule: $LIVESPEC_ROOT/.agent-sync/rules/livespec/routing.md"
+    exit 1
+  fi
+  if [[ ! -f "$LIVESPEC_ROOT/.agent-sync/rules/livespec/commands.md" ]]; then
+    log_warn "ERROR: missing source rule: $LIVESPEC_ROOT/.agent-sync/rules/livespec/commands.md"
+    exit 1
+  fi
+  if [[ "$DRY_RUN" != true ]] && ! command -v cc-hub >/dev/null 2>&1; then
+    log_warn "ERROR: cc-hub is required to install LiveSpec agent assets"
+    exit 1
+  fi
+}
+
+run_cc_hub() {
+  if [[ "$DRY_RUN" == true ]]; then
+    printf '  [dry-run] cc-hub'
+    local arg
+    for arg in "$@"; do
+      printf ' %q' "$arg"
+    done
+    printf '\n'
+    return
+  fi
+  cc-hub "$@"
+}
+
+install_bootstrap_commands() {
+  local command_name
+  for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
+    run_cc_hub skill link "$LIVESPEC_ROOT/.agent-sync/skills/$command_name" \
+      --scope global --targets all
   done
 }
 
 uninstall_bootstrap_commands() {
-  local command_name=""
+  local command_name
   for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
-    remove_symlink "$COMMANDS_DIR/spec.$command_name.md" "commands/spec.$command_name.md"
+    run_cc_hub skill unlink "$command_name" --scope global --targets all
   done
 }
 
 install_bootstrap_rules() {
-  local rule_name=""
-
-  if [[ "$DRY_RUN" != true ]]; then
-    mkdir -p "$RULES_DIR"
-  fi
-
-  for rule_name in "${BOOTSTRAP_RULES[@]}"; do
-    create_symlink \
-      "$LIVESPEC_ROOT/.claude/rules/$rule_name.md" \
-      "$RULES_DIR/$rule_name.md" \
-      "rules/$rule_name.md"
-  done
+  run_cc_hub rule link "$LIVESPEC_ROOT/.agent-sync/rules/livespec/routing.md" \
+    --scope global --targets all --namespace livespec -n livespec-routing
+  run_cc_hub rule link "$LIVESPEC_ROOT/.agent-sync/rules/livespec/commands.md" \
+    --scope global --targets all --namespace livespec -n livespec-commands
+  run_cc_hub rule build --scope global --targets all --namespace livespec
 }
 
 uninstall_bootstrap_rules() {
-  local rule_name=""
-  for rule_name in "${BOOTSTRAP_RULES[@]}"; do
-    remove_symlink "$RULES_DIR/$rule_name.md" "rules/$rule_name.md"
-  done
+  run_cc_hub rule unlink livespec-routing --scope global --targets all
+  run_cc_hub rule unlink livespec-commands --scope global --targets all
 }
 
 main() {
@@ -200,21 +127,19 @@ main() {
   ensure_source_files
 
   if [[ "$UNINSTALL" == true ]]; then
-    printf 'Removing LiveSpec bootstrap commands and rules...\n'
+    printf 'Removing LiveSpec bootstrap skills and rules...\n'
     uninstall_bootstrap_commands
     uninstall_bootstrap_rules
     printf 'Done.\n'
     return
   fi
 
-  printf 'Installing LiveSpec bootstrap commands...\n'
+  printf 'Installing LiveSpec bootstrap skills...\n'
   install_bootstrap_commands
-  printf '\n'
-  printf 'Installing LiveSpec global routing rule...\n'
+  printf '\nInstalling LiveSpec global routing rules...\n'
   install_bootstrap_rules
-  printf '\n'
-  printf 'Installed: /spec.init, /spec.migrate, livespec-routing rule (global)\n'
-  printf 'Next: run /spec.init inside a project to link the rest of LiveSpec locally.\n'
+  printf '\nInstalled: spec-init, spec-migrate, livespec rules (global)\n'
+  printf 'Next: run spec-init inside a project to sync LiveSpec locally.\n'
 }
 
 main "$@"

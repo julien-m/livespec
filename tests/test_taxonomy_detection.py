@@ -332,7 +332,7 @@ class TestEc005Asymmetry:
     def test_graceful_degradation_pattern(self, tmp_path: Path) -> None:
         """Callers can catch TaxonomyLoadError and degrade gracefully.
 
-        Validates the /spec.implement and /spec.test degradation contract:
+        Validates the /spec-implement and /spec-test degradation contract:
         catch TaxonomyLoadError → log WARNING → return empty result.
         """
         missing = tmp_path / "nonexistent-taxonomy.md"

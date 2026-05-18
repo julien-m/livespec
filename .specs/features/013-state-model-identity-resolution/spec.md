@@ -20,7 +20,7 @@
 
 **As a** LiveSpec command author, **I want** the feature slug (`NNN-kebab-name`) resolved at a single observable point before any pipeline or state-file write, **so that** no file path, no `pipeline.md` payload, and no subagent input ever contains the literal string `NNN-feature-name`.
 
-**Priority reason:** This is a P1 factual bug demonstrated in `commands/feature.md:285,299`. Today, `livespec pipeline init --feature NNN-feature-name` runs before slug resolution, and the literal placeholder propagates downstream — directories named `NNN-feature-name/` can be created on disk, and subagents receive an unresolvable feature reference.
+**Priority reason:** This is a P1 factual bug demonstrated in `commands/spec-feature.md:285,299`. Today, `livespec pipeline init --feature NNN-feature-name` runs before slug resolution, and the literal placeholder propagates downstream — directories named `NNN-feature-name/` can be created on disk, and subagents receive an unresolvable feature reference.
 
 **Independent test:** Run `/spec.feature "add example feature"` and grep every artifact created during the run for the literal string `NNN-feature-name`. Expected count: zero. Today's count: ≥ 1.
 
@@ -151,7 +151,7 @@ flowchart TD
 
 **As a** developer reading execution logs, **I want** a single canonical log path used by both the documenter and the implementer, **so that** writes and reads converge on the same files and lookups never silently fail.
 
-**Priority reason:** P2 factual bug. `agents/livespec-documenter.md:80` writes to `.specs/features/NNN/logs/`; `commands/implement.md:315` reads/writes `.specs/features/NNN-feature-name/logs/`. Either path can be used today depending on the agent path, leading to dispersed artifacts.
+**Priority reason:** P2 factual bug. `agents/livespec-documenter.md:80` writes to `.specs/features/NNN/logs/`; `commands/spec-implement.md:315` reads/writes `.specs/features/NNN-feature-name/logs/`. Either path can be used today depending on the agent path, leading to dispersed artifacts.
 
 **Independent test:** Run a full `/spec.feature` cycle. Grep all newly-created log files. Expected: all under one consistent directory pattern.
 
@@ -170,7 +170,7 @@ Feature: Canonical log path
     Given a developer reads `agents/livespec-documenter.md`
     When the log path is documented
     Then it references `.specs/features/<resolved-slug>/logs/`
-    And `commands/implement.md` references the same convention
+    And `commands/spec-implement.md` references the same convention
 ```
 
 #### User Flow
@@ -190,23 +190,23 @@ flowchart TD
 
 **As a** developer running `/spec.implement`, **I want** Phase 0.5 → Phase 1 → Phase 2 ordering to be unambiguous and `progress.md` to be created at one and only one site, **so that** the command is internally consistent and `--resume` finds a predictable file.
 
-**Priority reason:** P2 factual contradiction documented in `commands/implement.md:152` (Phase 0.5 says "continue to Phase 2", skipping Phase 1) and `commands/implement.md:191,205` (`progress.md` declared "must be created at Step 0a" and "must be created at Step 1"). Either branch executed today produces an inconsistent state.
+**Priority reason:** P2 factual contradiction documented in `commands/spec-implement.md:152` (Phase 0.5 says "continue to Phase 2", skipping Phase 1) and `commands/spec-implement.md:191,205` (`progress.md` declared "must be created at Step 0a" and "must be created at Step 1"). Either branch executed today produces an inconsistent state.
 
-**Independent test:** Read `commands/implement.md` linearly. Expected: a unique numbered ordering, one creation site for `progress.md`, no contradictory directives.
+**Independent test:** Read `commands/spec-implement.md` linearly. Expected: a unique numbered ordering, one creation site for `progress.md`, no contradictory directives.
 
 #### Acceptance Scenarios (Gherkin — source of truth for tests)
 
 ```gherkin
 Feature: Implement command consistency
   Scenario: Phase ordering is unambiguous
-    Given a developer reads `commands/implement.md`
+    Given a developer reads `commands/spec-implement.md`
     When phases 0.5, 1, and 2 are inspected
     Then Phase 0.5 explicitly hands off to Phase 1
     And Phase 1 explicitly hands off to Phase 2
     And no phase document says "skip Phase N" without an explicit conditional gate
 
   Scenario: progress.md has a single creation site
-    Given the developer searches `commands/implement.md` for the directive "create progress.md"
+    Given the developer searches `commands/spec-implement.md` for the directive "create progress.md"
     When all matches are listed
     Then exactly one phase / step is responsible for creation
     And other phases reference the existing file (read or update only)
@@ -241,7 +241,7 @@ flowchart TD
 | AC-006 | Every state file (`pipeline.md`, `progress.md`, `ship.md`, `preflight.md`) declares YAML frontmatter with the required keys: `schema_version`, `owner_command`, `feature_slug`, `created_at`, `updated_at`, `current_state` | P1 | Story 3 |
 | AC-007 | A validator command rejects state files missing required frontmatter keys with a non-zero exit and a per-file error | P1 | Story 3 |
 | AC-008 | Documenter and implementer reference an identical log-path convention `.specs/features/<resolved-slug>/logs/<YYYY-MM-DD>.md` | P2 | Story 4 |
-| AC-009 | `commands/implement.md` contains a single `progress.md` creation site, and Phase 0.5 → Phase 1 → Phase 2 ordering is explicit | P2 | Story 5 |
+| AC-009 | `commands/spec-implement.md` contains a single `progress.md` creation site, and Phase 0.5 → Phase 1 → Phase 2 ordering is explicit | P2 | Story 5 |
 | AC-010 | A regression test fails if any future change reintroduces the literal placeholder `NNN-feature-name` in any tracked file under `commands/`, `agents/`, or generated `.specs/features/<slug>/` artifacts | P1 | Story 1 |
 
 ### AC-001
@@ -277,7 +277,7 @@ flowchart TD
 **Priority:** P2 | **Story:** Story 4
 
 ### AC-009
-**Criterion:** `commands/implement.md` has a single `progress.md` creation site, Phase 0.5 → Phase 1 → Phase 2 ordering is explicit
+**Criterion:** `commands/spec-implement.md` has a single `progress.md` creation site, Phase 0.5 → Phase 1 → Phase 2 ordering is explicit
 **Priority:** P2 | **Story:** Story 5
 
 ### AC-010
@@ -291,13 +291,13 @@ flowchart TD
 | ID | Requirement | AC References |
 |---|---|---|
 | FR-001 | The framework must expose a single `resolve_feature_slug(description)` helper (Markdown-described in `system/identity.md` + Python implementation in `validator/identity.py`) that all `/spec.*` commands call before any side-effect | AC-001, AC-002, AC-003 |
-| FR-002 | `/spec.feature` must call `resolve_feature_slug` before `livespec pipeline init` and before any subagent dispatch; the resolved slug replaces every prior occurrence of `NNN-feature-name` in `commands/feature.md` | AC-001, AC-002, AC-003 |
+| FR-002 | `/spec.feature` must call `resolve_feature_slug` before `livespec pipeline init` and before any subagent dispatch; the resolved slug replaces every prior occurrence of `NNN-feature-name` in `commands/spec-feature.md` | AC-001, AC-002, AC-003 |
 | FR-003 | A reusable `system/state-machine.md` reference document defines the four states and allowed transitions; `livespec-supervisor` and all `/spec.*` commands link to this single source of truth | AC-004, AC-005 |
 | FR-004 | `livespec-supervisor.md` must specify a hard halt with canonical `BLOCKED at step N - <reason>` output when the next step is in state `Blocked`; never advance silently | AC-004, AC-005 |
 | FR-005 | A `system/state-files-schema.md` reference defines the YAML frontmatter required for `pipeline.md`, `progress.md`, `ship.md`, `preflight.md`: `schema_version` (int), `owner_command` (str), `feature_slug` (str), `created_at` (ISO date), `updated_at` (ISO date), `current_state` (enum) | AC-006 |
 | FR-006 | A new validator subcommand `livespec validate --state-files` (Python, in `validator/state_files.py`) reads every known state file under `.specs/` and exits non-zero on any schema violation, listing file path + missing key | AC-007 |
-| FR-007 | `agents/livespec-documenter.md` and `commands/implement.md` must reference the canonical log path `.specs/features/<resolved-slug>/logs/<YYYY-MM-DD>.md`; both files updated to remove the conflicting variants | AC-008 |
-| FR-008 | `commands/implement.md` must be edited so Phase 0.5 explicitly hands off to Phase 1 (no skip), and `progress.md` is declared as created at exactly one phase/step (the others reference the existing file) | AC-009 |
+| FR-007 | `agents/livespec-documenter.md` and `commands/spec-implement.md` must reference the canonical log path `.specs/features/<resolved-slug>/logs/<YYYY-MM-DD>.md`; both files updated to remove the conflicting variants | AC-008 |
+| FR-008 | `commands/spec-implement.md` must be edited so Phase 0.5 explicitly hands off to Phase 1 (no skip), and `progress.md` is declared as created at exactly one phase/step (the others reference the existing file) | AC-009 |
 | FR-009 | A pre-commit / CI regression check (e.g., `grep -r "NNN-feature-name"` excluding the spec template + this spec.md + AUDIT artifacts) fails the build if the literal placeholder reappears in `commands/`, `agents/`, or any generated `.specs/features/<slug>/` artifact | AC-010 |
 | FR-010 | All edits to `commands/`, `agents/`, and `system/` are accompanied by `@spec FR-NNN` anchors pointing back to this spec, so traceability is maintained | AC-001 through AC-010 |
 
@@ -330,7 +330,7 @@ flowchart TD
 **AC References:** [AC-008](#ac-008)
 
 ### FR-008
-**Requirement:** Phase ordering and single `progress.md` creation site in `commands/implement.md`
+**Requirement:** Phase ordering and single `progress.md` creation site in `commands/spec-implement.md`
 **AC References:** [AC-009](#ac-009)
 
 ### FR-009

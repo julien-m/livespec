@@ -34,7 +34,7 @@ app.add_typer(commit_context_app, name="commit-context")
 app.add_typer(driver_app, name="spec.driver")
 # @spec FR-001 (feature 023): backward-compat alias for the old `spec-driver` name.
 app.add_typer(driver_app, name="spec-driver", hidden=True)
-# @spec FR-005 (feature 026): livespec init test-config — used by /spec.init Phase C.
+# @spec FR-005 (feature 026): livespec init test-config — used by /spec-init Phase C.
 app.add_typer(init_app, name="init")
 # @spec FR-001..005 (feature 035): unified short-form CLI surface.
 register_unified_commands(app)

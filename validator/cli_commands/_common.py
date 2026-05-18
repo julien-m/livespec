@@ -40,7 +40,7 @@ def require_specs_root(start: Path | None = None) -> Path:
     root = detect_specs_root(start)
     if root is None:
         typer.echo(
-            "Error: .specs/ directory not found — run /spec.init in your project root.",
+            "Error: .specs/ directory not found — run /spec-init in your project root.",
             err=True,
         )
         raise typer.Exit(EXIT_MISSING_SPECS)

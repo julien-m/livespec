@@ -2,17 +2,17 @@
 
 # Command Expectations & Verify Output — Reference
 
-> The canonical reference for the `commands/<X>.expectations.md` contract files,
+> The canonical reference for `.agent-sync/skills/<X>/expectations.md` contract files,
 > the `RunArtifact` JSON schema, the `verify:` YAML grammar, the override
 > resolver, the pre-commit `last_reviewed` hook, and the 4-state outcome
-> classifier consumed by `/spec.verify-output`.
+> classifier consumed by `/spec-verify-output`.
 
 ## 1. File Layout
 
 | File | Owner | Purpose |
 |------|-------|---------|
 | `system/templates/command-expectations.template.md` | LiveSpec | Canonical 12-section template + `verify:` YAML stub. |
-| `commands/<X>.expectations.md` | LiveSpec (builtin) | One per slash-command. Source of truth absent a project override. |
+| `.agent-sync/skills/<X>/expectations.md` | LiveSpec (builtin) | One per slash-command skill. Source of truth absent a project override. |
 | `.specs/expectations/<X>.md` | Per-project (override) | Totally replaces the builtin (no merge). |
 | `.specs/.runs/<X>-<ISO>.json` | Per-project (runtime) | Run artifact written by every `/spec.*` command. Gitignored. |
 
@@ -27,8 +27,9 @@ last_reviewed: YYYY-MM-DD # required ISO date — enforced by pre-commit hook
 ```
 
 The pre-commit hook (`hooks/livespec-last-reviewed.py`) blocks any commit that
-modifies `commands/<X>.md` unless the corresponding
-`commands/<X>.expectations.md` frontmatter `last_reviewed` equals today's date.
+modifies `.agent-sync/skills/<X>/SKILL.md` unless the corresponding
+`.agent-sync/skills/<X>/expectations.md` frontmatter `last_reviewed` equals
+today's date.
 
 ## 3. The 12 Prose Sections
 
@@ -136,27 +137,26 @@ Rotation: 21st artifact triggers move-to-`_archive/` of the oldest.
 
 ```
 1. <project_root>/.specs/expectations/<command>.md   ← project override (total)
-2. <livespec_root>/commands/<command>.expectations.md ← builtin
+2. <livespec_root>/.agent-sync/skills/<command>/expectations.md ← builtin
 ```
 
 First file found wins. The override **totally replaces** the builtin —
 no prose merge, no YAML merge. If the override is malformed,
-`/spec.verify-output` exits 2 with `Blocked By: override missing verify: block`
+`/spec-verify-output` exits 2 with `Blocked By: override missing verify: block`
 (or similar) — it does **NOT** silently fall back to the builtin (AC-007).
 
 ## 7. Pre-commit Hook Contract
 
 `hooks/livespec-last-reviewed.py` is invoked by `.git/hooks/pre-commit` (via
-`scripts/install-hooks.sh`). For each staged `commands/<X>.md` (excluding
-`*.expectations.md` itself):
+`scripts/install-hooks.sh`). For each staged `.agent-sync/skills/<X>/SKILL.md`:
 
-1. Locate `commands/<X>.expectations.md`. If missing → block with message
+1. Locate `.agent-sync/skills/<X>/expectations.md`. If missing → block with message
    naming the missing file.
 2. Read frontmatter `last_reviewed`. If missing or `!= today` → block with the
    exact recovery message:
 
    ```
-   Relis `commands/<X>.expectations.md`, bump `last_reviewed`, recommit.
+   Relis `.agent-sync/skills/<X>/expectations.md`, bump `last_reviewed`, recommit.
    ```
 
 3. Exit 0 if all checks pass.
@@ -166,12 +166,12 @@ environment with Python 3.11+.
 
 ### Renaming a command
 
-Renaming `commands/<old>.md` → `commands/<new>.md` is a multi-file ceremony.
+Renaming `.agent-sync/skills/<old>/` → `.agent-sync/skills/<new>/` is a multi-file ceremony.
 All of these MUST be done **in the same commit**:
 
-1. Rename `commands/<old>.md` → `commands/<new>.md`.
-2. Rename `commands/<old>.expectations.md` → `commands/<new>.expectations.md`.
-3. Update the `command:` frontmatter field inside the renamed expectations file.
+1. Rename `.agent-sync/skills/<old>/` → `.agent-sync/skills/<new>/`.
+2. Update `SKILL.md` frontmatter name/description if needed.
+3. Update the `command:` frontmatter field inside `expectations.md`.
 4. Bump `last_reviewed` to today.
 5. Update `.specs/spec-system.md` `### Command discovery` paragraph to list the
    new name and drop the old one.
@@ -199,7 +199,7 @@ crashed.
 
 ## 9. Placeholders & Edge Cases (summary)
 
-- EC-001: whitespace-only diff to `commands/X.md` still triggers the hook.
+- EC-001: whitespace-only diff to `.agent-sync/skills/X/SKILL.md` still triggers the hook.
 - EC-002: malformed override → blocked, no fallback to builtin.
 - EC-003: no run artifact → blocked.
 - EC-004: multiple active `when:` branches accumulate (ANDed).

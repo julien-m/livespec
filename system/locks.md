@@ -16,7 +16,7 @@ Three classes of bug pre-Chantier 3:
    first because there was no coordination.
 2. **Partial writes.** A crash mid-write left `.specs/README.md` truncated
    or with mixed-version content; downstream commands then read garbage.
-3. **NNN collisions.** Two concurrent `/spec.specify` invocations both
+3. **NNN collisions.** Two concurrent `/spec-specify` invocations both
    computed the same next NNN, then both ran `mkdir`. Whichever ran second
    silently overwrote the first reservation.
 
@@ -101,17 +101,17 @@ See [`system/anti-drift-block.md`](anti-drift-block.md) §2 for the canonical BL
 
 ## Where this is used
 
-- `commands/specify.md` Steps 7.5/7.6 — README + changelog updates
-- `commands/refine.md` — README + feature changelog updates
-- `commands/fix.md` Step 8 — artifacts updates
-- `agents/livespec-documenter.md` Finalize mode — writes to README + changelog + roadmap
+- `.agent-sync/skills/spec-specify/SKILL.md` Steps 7.5/7.6 — README + changelog updates
+- `.agent-sync/skills/spec-refine/SKILL.md` — README + feature changelog updates
+- `.agent-sync/skills/spec-fix/SKILL.md` Step 8 — artifacts updates
+- `.agent-sync/agents/livespec-documenter/prompt.md` Finalize mode — writes to README + changelog + roadmap
 
 All of these wrap their write sequence in `with acquire_lock(specs_root):`
 and use `write_with_hash_check` for the actual write.
 
 ## Performance note
 
-Lock contention is rare in practice (a typical `/spec.specify` run holds
+Lock contention is rare in practice (a typical `/spec-specify` run holds
 the lock for milliseconds). The 10-second timeout is a safety net for
 runaway holders, not an expected wait time. If contention becomes a
 problem, the per-operation lock granularity can be replaced with

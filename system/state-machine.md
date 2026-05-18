@@ -1,6 +1,6 @@
 # Pipeline State Machine
 
-> Single source of truth for the state values used in `pipeline.md`, `progress.md`, `ship.md`, `preflight.md`, and consumed by `livespec-supervisor`, `/spec.feature --resume`, and `/spec.ship --resume`.
+> Single source of truth for the state values used in `pipeline.md`, `progress.md`, `ship.md`, `preflight.md`, and consumed by `livespec-supervisor`, `/spec-feature --resume`, and `/spec-ship --resume`.
 >
 > **@spec FR-003:** State machine reference document — [`.specs/features/013-state-model-identity-resolution/spec.md#fr-003`](../.specs/features/013-state-model-identity-resolution/spec.md#fr-003)
 
@@ -33,7 +33,7 @@ Forbidden transitions:
 
 ## Resume rules
 
-`/spec.feature --resume` and `/spec.ship --resume` MUST:
+`/spec-feature --resume` and `/spec-ship --resume` MUST:
 
 1. Read the state file (`pipeline.md` for features, `ship.md` for ship batches).
 2. Find the **first** phase/step in pipeline order whose state is NOT `Done` and NOT `Skipped`.
@@ -51,7 +51,7 @@ Any state file that records `current_state: Blocked` MUST also carry a non-empty
 
 ## Hard halt format
 
-The canonical halt line (used by `livespec-supervisor`, `/spec.feature`, `/spec.ship`) is the BLOCKED format from [`system/anti-drift-block.md`](anti-drift-block.md) §2:
+The canonical halt line (used by `livespec-supervisor`, `/spec-feature`, `/spec-ship`) is the BLOCKED format from [`system/anti-drift-block.md`](anti-drift-block.md) §2:
 
 ```
 BLOCKED at step <N> - <subtype> - <one-line reason>
@@ -61,6 +61,6 @@ For state-machine halts, `<subtype>` is `state_invalid`. Other anti-drift subtyp
 
 ## Where this is referenced
 
-- `commands/feature.md` § Resume — defines the per-phase state table and references this doc
-- `agents/livespec-supervisor.md` § Hard-halt-on-Blocked — links here for the canonical state set
+- `.agent-sync/skills/spec-feature/SKILL.md` § Resume — defines the per-phase state table and references this doc
+- `.agent-sync/agents/livespec-supervisor/prompt.md` § Hard-halt-on-Blocked — links here for the canonical state set
 - `validator/state_files.py` — `ALLOWED_STATES` set is kept in sync with the table above

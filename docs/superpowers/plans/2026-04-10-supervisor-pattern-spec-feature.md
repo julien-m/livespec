@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Rewrite `commands/feature.md` so each pipeline phase (specify, plan, implement, test) runs as an isolated subagent, reducing main context from ~167k to ~5-15k tokens per feature.
+**Goal:** Rewrite `commands/spec-feature.md` so each pipeline phase (specify, plan, implement, test) runs as an isolated subagent, reducing main context from ~167k to ~5-15k tokens per feature.
 
 **Architecture:** The main context becomes a pure supervisor: it spawns phase agents, receives compact PHASE_RESULT blocks, handles user gates, and orchestrates the pipeline state. Phase agents get a fresh context window per phase. This mirrors the pattern already used by `spec.ship` for feature-level isolation.
 
@@ -30,7 +30,7 @@
 
 | File | Action | What changes |
 |---|---|---|
-| `commands/feature.md` | **Modify** | Flags table; Agent Architecture + Agent Contract; PHASE_RESULT schemas; Phase 1–3.5 rewritten; Branch Proposal moved to main context; State Tracking extended; Resume updated |
+| `commands/spec-feature.md` | **Modify** | Flags table; Agent Architecture + Agent Contract; PHASE_RESULT schemas; Phase 1–3.5 rewritten; Branch Proposal moved to main context; State Tracking extended; Resume updated |
 | `docs/superpowers/specs/2026-04-10-supervisor-pattern-spec-feature-design.md` | **Commit** (already written) | Design doc |
 
 ---
@@ -54,7 +54,7 @@ Expected: commit succeeds on branch `feature/supervisor-pattern`
 ## Task 2: Add PHASE_RESULT Schemas section (FIRST — schemas before any phase section)
 
 **Files:**
-- Modify: `commands/feature.md` — insert new section immediately after the frontmatter + overview block, before the Flags section
+- Modify: `commands/spec-feature.md` — insert new section immediately after the frontmatter + overview block, before the Flags section
 
 **Why first:** Phases 1–3.5 reference schema field names (SCOPE, FINDINGS_DETAIL, etc.). Schemas must be defined before those sections are written.
 
@@ -165,7 +165,7 @@ The agent receives this as part of its initial prompt — no file write, no para
 ## Task 3: Add Agent Architecture + Agent Contract section
 
 **Files:**
-- Modify: `commands/feature.md` — insert after the PHASE_RESULT Schemas section, before Flags
+- Modify: `commands/spec-feature.md` — insert after the PHASE_RESULT Schemas section, before Flags
 
 - [ ] **Step 1: Insert Agent Architecture section**
 
@@ -221,7 +221,7 @@ spec.feature — Main Context (supervisor)
 ## Task 4: Update the Flags table
 
 **Files:**
-- Modify: `commands/feature.md` — Flags section
+- Modify: `commands/spec-feature.md` — Flags section
 
 - [ ] **Step 1: Replace the Flags table**
 
@@ -243,7 +243,7 @@ spec.feature — Main Context (supervisor)
 ## Task 5: Extend the State Tracking section (add feature_description field)
 
 **Files:**
-- Modify: `commands/feature.md` — State Tracking section, pipeline.md template
+- Modify: `commands/spec-feature.md` — State Tracking section, pipeline.md template
 
 **Why:** Resume (blocker C) requires recovering `feature_description` without re-asking the user. It must be persisted in `pipeline.md`.
 
@@ -280,7 +280,7 @@ Replace the existing template with:
 ## Task 6: Rewrite the Overview flowchart
 
 **Files:**
-- Modify: `commands/feature.md` — overview mermaid diagram (lines 18–47)
+- Modify: `commands/spec-feature.md` — overview mermaid diagram (lines 18–47)
 
 - [ ] **Step 1: Replace the mermaid flowchart**
 
@@ -326,7 +326,7 @@ flowchart TD
 ## Task 7: Rewrite Phase 0 — add pipeline.md init with feature_description
 
 **Files:**
-- Modify: `commands/feature.md` — Phase 0 section
+- Modify: `commands/spec-feature.md` — Phase 0 section
 
 - [ ] **Step 1: Add pipeline.md init step to Phase 0**
 
@@ -345,14 +345,14 @@ After confirming the feature:
 ## Task 8: Rewrite Phase 1 — Specify (supervisor dispatch)
 
 **Files:**
-- Modify: `commands/feature.md` — Phase 1 section (currently lines 133–152)
+- Modify: `commands/spec-feature.md` — Phase 1 section (currently lines 133–152)
 
 - [ ] **Step 1: Replace Phase 1 section**
 
 ```markdown
 ## Phase 1 — Specify (Supervisor Dispatch)
 
-> **Economy mode (`--economy`):** execute `commands/specify.md` steps inline in the main context instead.
+> **Economy mode (`--economy`):** execute `commands/spec-specify.md` steps inline in the main context instead.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase specify --status in_progress`
 
@@ -366,12 +366,12 @@ After confirming the feature:
 3. Spawn a **Specify agent** with the assembled context and these instructions:
 
    ```
-   Execute the full specify pipeline from `commands/specify.md`.
+   Execute the full specify pipeline from `commands/spec-specify.md`.
 
    [Universal Agent Context fields above]
 
    After generating the spec, execute Phase 1.5 (Spec Review) as defined in
-   `commands/feature.md § Phase 1.5`: dispatch the livespec-verifier agent in
+   `commands/spec-feature.md § Phase 1.5`: dispatch the livespec-verifier agent in
    spec-review mode and collect its report.
 
    Output a PHASE_RESULT block as the LAST thing you output (Specify agent schema).
@@ -389,7 +389,7 @@ After confirming the feature:
 ## Task 9: Rewrite Phase 1.5 — Spec Review Gate (main context only)
 
 **Files:**
-- Modify: `commands/feature.md` — Phase 1.5 section
+- Modify: `commands/spec-feature.md` — Phase 1.5 section
 
 - [ ] **Step 1: Replace Phase 1.5 section**
 
@@ -430,7 +430,7 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --
 ## Task 10: Add Branch Proposal section (after Gate 1, main context)
 
 **Files:**
-- Modify: `commands/feature.md` — insert after Phase 1.5 gate section
+- Modify: `commands/spec-feature.md` — insert after Phase 1.5 gate section
 
 - [ ] **Step 1: Add Branch Proposal section**
 
@@ -459,14 +459,14 @@ Once branch is created or skipped, spawn the Plan agent.
 ## Task 11: Rewrite Phase 2 — Plan (supervisor dispatch)
 
 **Files:**
-- Modify: `commands/feature.md` — Phase 2 section
+- Modify: `commands/spec-feature.md` — Phase 2 section
 
 - [ ] **Step 1: Replace Phase 2 section**
 
 ```markdown
 ## Phase 2 — Plan (Supervisor Dispatch)
 
-> **Economy mode (`--economy`):** execute `commands/plan.md` steps inline instead.
+> **Economy mode (`--economy`):** execute `commands/spec-plan.md` steps inline instead.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status in_progress`
 
@@ -480,12 +480,12 @@ Once branch is created or skipped, spawn the Plan agent.
 3. Spawn a **Plan agent** with the assembled context and these instructions:
 
    ```
-   Execute the full plan pipeline from `commands/plan.md`.
+   Execute the full plan pipeline from `commands/spec-plan.md`.
 
    [Universal Agent Context fields above]
 
    After generating the plan, execute Phase 2.5 (Plan Review) as defined in
-   `commands/feature.md § Phase 2.5`: dispatch the livespec-verifier agent in
+   `commands/spec-feature.md § Phase 2.5`: dispatch the livespec-verifier agent in
    plan-review mode and collect its report.
 
    Output a PHASE_RESULT block as the LAST thing you output (Plan agent schema).
@@ -503,7 +503,7 @@ Once branch is created or skipped, spawn the Plan agent.
 ## Task 12: Rewrite Phase 2.5 — Plan Review Gate (main context)
 
 **Files:**
-- Modify: `commands/feature.md` — Phase 2.5 section
+- Modify: `commands/spec-feature.md` — Phase 2.5 section
 
 - [ ] **Step 1: Replace Phase 2.5 section**
 
@@ -535,14 +535,14 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --
 ## Task 13: Rewrite Phase 3 — Implement (supervisor dispatch)
 
 **Files:**
-- Modify: `commands/feature.md` — Phase 3 section
+- Modify: `commands/spec-feature.md` — Phase 3 section
 
 - [ ] **Step 1: Replace Phase 3 section**
 
 ```markdown
 ## Phase 3 — Implement (Supervisor Dispatch)
 
-> **Economy mode (`--economy`):** execute `commands/implement.md` steps inline instead.
+> **Economy mode (`--economy`):** execute `commands/spec-implement.md` steps inline instead.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase implement --status in_progress`
 
@@ -556,7 +556,7 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --
 3. Spawn an **Implement agent** with the assembled context and these instructions:
 
    ```
-   Execute the full implement pipeline from `commands/implement.md`.
+   Execute the full implement pipeline from `commands/spec-implement.md`.
 
    [Universal Agent Context fields above]
 
@@ -575,7 +575,7 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --
 ## Task 14: Rewrite Phase 3.5 — Test (supervisor dispatch)
 
 **Files:**
-- Modify: `commands/feature.md` — Phase 3.5 section
+- Modify: `commands/spec-feature.md` — Phase 3.5 section
 
 - [ ] **Step 1: Replace Phase 3.5 section**
 
@@ -611,7 +611,7 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --
 ## Task 15: Update the Resume section
 
 **Files:**
-- Modify: `commands/feature.md` — Resume section
+- Modify: `commands/spec-feature.md` — Resume section
 
 - [ ] **Step 1: Replace Resume section**
 
@@ -642,7 +642,7 @@ When `--resume` is provided:
 ## Task 16: Final verification pass
 
 **Files:**
-- Read: `commands/feature.md` (entire file)
+- Read: `commands/spec-feature.md` (entire file)
 
 - [ ] **Step 1: Read the complete rewritten file and verify**
 
@@ -660,7 +660,7 @@ When `--resume` is provided:
 - [ ] **Step 2: Commit**
 
 ```bash
-git -C /Users/julienm/projects/livespec add commands/feature.md
+git -C /Users/julienm/projects/livespec add commands/spec-feature.md
 git -C /Users/julienm/projects/livespec commit -m "feat(feature): implement supervisor pattern — dispatch each pipeline phase as isolated agent"
 ```
 

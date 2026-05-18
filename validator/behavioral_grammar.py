@@ -426,7 +426,7 @@ def validate_behavioral(path: Path) -> ValidationOutcome:
 # @spec FR-001: Mode detection — .specs/features/045-native-behavioral-specs/spec.md#fr-001
 # @spec FR-016: Mode-detection unit-tested across 4 branches — spec.md#fr-016
 class GenerationMode(str, Enum):  # noqa: UP042 — public API name, str-mixin kept for compat
-    """Behavioral artefact generation mode for ``/spec.specify``.
+    """Behavioral artefact generation mode for ``/spec-specify``.
 
     Three mutually-exclusive values matching F045 spec.md (Story 1/2/4):
 

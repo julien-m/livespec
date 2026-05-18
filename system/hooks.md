@@ -24,21 +24,21 @@ Hooks allow customizing LiveSpec behavior **without modifying core commands**:
 ```
 
 Where `{command}` matches the LiveSpec command name (without `spec.` prefix):
-- `init`, `propose`, `specify`, `plan`, `implement`, `check`, `explain`, `stack`, `feature`, `refine`, `preflight`
+- `check`, `explain`, `feature`, `fix`, `hooks`, `implement`, `init`, `migrate`, `plan`, `play-coverage`, `preflight`, `propose`, `refine`, `refresh-conventions`, `ship`, `specify`, `stack`, `status`, `test`, `verify-output`
 
-**Step-level hooks** for `/spec.implement`:
+**Step-level hooks** for `/spec-implement`:
 - `before-implement-step.md` — injected before EACH implementation step
 - `after-implement-step.md` — injected after EACH implementation step
 
 Examples:
 ```
-before-plan.md           # Injected before /spec.plan
-after-plan.md            # Injected after /spec.plan
-before-implement.md      # Injected before /spec.implement (once, at start)
-after-implement.md       # Injected after /spec.implement (once, at end)
+before-plan.md           # Injected before /spec-plan
+after-plan.md            # Injected after /spec-plan
+before-implement.md      # Injected before /spec-implement (once, at start)
+after-implement.md       # Injected after /spec-implement (once, at end)
 before-implement-step.md # Injected before EACH step during implement
 after-implement-step.md  # Injected after EACH step during implement
-before-feature.md        # Injected before /spec.feature (the full pipeline)
+before-feature.md        # Injected before /spec-feature (the full pipeline)
 ```
 
 ---
@@ -75,7 +75,7 @@ identify the file as an integration):
 ```yaml
 ---
 integration: <name>           # REQUIRED — logical name (any non-empty string)
-commands: [<cmd>, ...]        # REQUIRED — matched against commands/*.md registry
+commands: [<cmd>, ...]        # REQUIRED — matched against .agent-sync/skills/spec-* registry
 phase: before | after         # default: before
 mode: extend | override       # default: extend
 order: <int>                  # default: 100 (lower = injected earlier)
@@ -340,7 +340,7 @@ Before starting each implementation step:
 1. **Before the command starts** — resolve and inject `before-{command}` hooks
 2. **After the command completes** — resolve and inject `after-{command}` hooks
 
-For `/spec.implement`, two additional hook points exist:
+For `/spec-implement`, two additional hook points exist:
 3. **Before each step** — resolve and inject `before-implement-step` hooks
 4. **After each step** — resolve and inject `after-implement-step` hooks
 
@@ -349,7 +349,7 @@ Levels 1–3. They are resolved first and prepended to the chain. The set of
 commands a Level 0 file applies to is determined by its `commands:` frontmatter
 field, not by filename — multiple commands can share one integration file.
 
-For `/spec.feature`, hooks are resolved for each sub-command in the pipeline:
+For `/spec-feature`, hooks are resolved for each sub-command in the pipeline:
 - `before-feature` / `after-feature` — wraps the entire pipeline
 - `before-specify` / `after-specify` — wraps the specify phase
 - `before-plan` / `after-plan` — wraps the plan phase
@@ -389,7 +389,7 @@ For `/spec.feature`, hooks are resolved for each sub-command in the pipeline:
 
 ### Gitignore
 
-The following pattern must be present in the project's `.gitignore` (added by `/spec.init`):
+The following pattern must be present in the project's `.gitignore` (added by `/spec-init`):
 
 ```
 .specs/hooks/*.local.md
@@ -399,7 +399,9 @@ The following pattern must be present in the project's `.gitignore` (added by `/
 
 ## Discovery
 
-Use `/spec.hooks [command]` to see which hooks would be loaded for a given command, including Level 0 user integrations (path, name, order, mode), or `--create`/`--edit` to manage levels 1–3. See [`commands/hooks.md`](../commands/hooks.md) for details. Level 0 integrations are managed by simply creating, editing, or deleting files in `~/.config/livespec/`.
+Use `/spec-hooks [command]` to see which hooks would be loaded for a given command, including Level 0 user integrations (path, name, order, mode), or `--create`/`--edit` to manage levels 1–3. See [`.agent-sync/skills/spec-hooks/SKILL.md`](../.agent-sync/skills/spec-hooks/SKILL.md) for details. Level 0 integrations are managed by simply creating, editing, or deleting files in `~/.config/livespec/`.
+
+Canonical command names are `spec-check`, `spec-explain`, `spec-feature`, `spec-fix`, `spec-hooks`, `spec-implement`, `spec-init`, `spec-migrate`, `spec-plan`, `spec-play-coverage`, `spec-preflight`, `spec-propose`, `spec-refine`, `spec-refresh-conventions`, `spec-ship`, `spec-specify`, `spec-stack`, `spec-status`, `spec-test`, and `spec-verify-output`. Dotted aliases such as `/spec.check` are accepted only as compatibility inputs and are normalized before hook resolution.
 
 ---
 

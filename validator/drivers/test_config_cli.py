@@ -1,10 +1,10 @@
 """Typer subcommand: ``livespec init test-config``.
 
-Feature 026 surface used by ``/spec.init`` Phase C and by
-``/spec.refresh-conventions`` to (re)generate per-stack test configuration.
+Feature 026 surface used by ``/spec-init`` Phase C and by
+``/spec-refresh-conventions`` to (re)generate per-stack test configuration.
 """
 
-# @spec FR-005: Integrate generate_test_config into /spec.init pipeline.
+# @spec FR-005: Integrate generate_test_config into /spec-init pipeline.
 # @spec AC-002: Unsupported stack -> note + exit 0 without writing files.
 # @spec AC-007: Print summary listing generated files.
 # @spec AC-006: Reused by spec.refresh-conventions for the testing domain.
@@ -60,7 +60,7 @@ def test_config_command(
         force: Overwrite existing files that normally use ``skip_if_exists``.
         project_root: Repository root, defaults to ``Path.cwd()``.
         refresh_conventions_only: Skip writing config + CI files. Used by
-            ``/spec.refresh-conventions`` to bring conventions back in sync
+            ``/spec-refresh-conventions`` to bring conventions back in sync
             after a stack change without touching project config.
 
     Side Effects:
@@ -77,7 +77,7 @@ def test_config_command(
     primary = pick_primary_driver(matching, root)
 
     if primary is None:
-        # AC-002: graceful skip — do not block /spec.init.
+        # AC-002: graceful skip — do not block /spec-init.
         typer.echo(
             "Test config not generated — stack not supported. "
             "Use `livespec spec.driver --new <stack>` to add a custom driver.",

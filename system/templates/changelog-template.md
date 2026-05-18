@@ -87,4 +87,4 @@
 
 ---
 
-*Updated by `/spec.implement`, `/spec.check`, or manually — LiveSpec v1.0*
+*Updated by `/spec-implement`, `/spec-check`, or manually — LiveSpec v1.0*

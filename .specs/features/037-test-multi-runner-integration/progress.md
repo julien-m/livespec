@@ -8,8 +8,8 @@
 | 4 | Done | `validator/ui_runner_dispatcher.py`, `tests/test_phase_4_5_dispatcher.py` | `pytest -q tests/test_phase_4_5_dispatcher.py` | Pass (11/11) | 2026-05-08 |
 | 5 | Done | `validator/ui_runner_dispatcher.py` (`_load_surfaces` + legacy fallback) | covered by `test_phase_4_5_dispatcher.py::test_legacy_fallback_when_yaml_missing` | Pass | 2026-05-08 |
 | 6 | Skipped | Phase 5 reporter integration deferred — VisualPhaseResult dataclass shipped, reporter wiring left as Future Work for `validator/reporter.py` | — | Deferred (FR-014 surface only) | 2026-05-08 |
-| 7 | Done | `commands/test.md` (Flags table + Phase 4.5 narrative) | manual diff inspection | Pass | 2026-05-08 |
-| 8 | Done | `commands/test.md` Phase 4.5 narrative refactor (dispatcher + runner table) | manual diff | Pass | 2026-05-08 |
+| 7 | Done | `commands/spec-test.md` (Flags table + Phase 4.5 narrative) | manual diff inspection | Pass | 2026-05-08 |
+| 8 | Done | `commands/spec-test.md` Phase 4.5 narrative refactor (dispatcher + runner table) | manual diff | Pass | 2026-05-08 |
 | 9 | Done | `scripts/lib/pbxproj.js`, `tests/test_generate_surfaces.js` (5 new tests) | `bun test ./tests/test_generate_surfaces.js` | Pass (27/27) | 2026-05-08 |
 | 10 | Done | `scripts/generate-surfaces.js` (replaced single-target xcuitest branch) | `bun test ./tests/test_generate_surfaces.js` | Pass (27/27) | 2026-05-08 |
 | 11 | Done | `tests/integration/test_generate_surfaces_xcode.py` | `pytest -q tests/integration/test_generate_surfaces_xcode.py` | Pass (3/3) | 2026-05-08 |

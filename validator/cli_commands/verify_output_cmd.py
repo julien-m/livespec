@@ -18,6 +18,7 @@ from pathlib import Path
 
 import typer
 
+from ..command_registry import normalize_command_name
 from ..exceptions import (
     ArtifactMalformed,
     ExpectationsInvalid,
@@ -38,7 +39,7 @@ from ..verify_output import (
 
 COMMAND_ARGUMENT = typer.Argument(
     ...,
-    help="Command name (e.g. 'specify').",
+    help="Command name or alias (e.g. 'spec-specify', 'specify', or '/spec.specify').",
 )
 SCENARIO_OPTION = typer.Option(
     "",
@@ -90,6 +91,7 @@ def verify_output_command(
     save: bool = SAVE_OPTION,
 ) -> None:
     """Verify the latest run artifact against the command's expectations."""
+    command = normalize_command_name(command)
     if preview:
         _run_preview(command, json_out=json_out, save=save)
         return
@@ -235,7 +237,9 @@ def _detect_livespec_root() -> Path:
     """Resolve the LiveSpec checkout root by walking parents of this module."""
     here = Path(__file__).resolve()
     for parent in here.parents:
-        if (parent / "commands").is_dir() and (parent / "validator").is_dir():
+        if (parent / ".agent-sync" / "skills").is_dir() and (
+            parent / "validator"
+        ).is_dir():
             return parent
     return here.parents[2]
 

@@ -10,7 +10,7 @@
 - Added `validator/outcome.py` (4-state classifier success/drift/blocked/error).
 - Added `validator/verify_output.py` (rule evaluator with no-short-circuit invariant for must/may/must_not).
 - Added `validator/cli_commands/verify_output_cmd.py` and `run_cmd.py` (`livespec verify-output`, `livespec run wrap|record`).
-- Added `commands/verify-output.md` slash-command.
+- Added `commands/spec-verify-output.md` slash-command.
 - Added 20 builtin `commands/<X>.expectations.md` (init…verify-output) with frontmatter `last_reviewed: 2026-05-12`.
 - Added `hooks/livespec-last-reviewed.py` pre-commit hook (stdlib only).
 - Added `scripts/install-hooks.sh` installer (idempotent, gitignore-aware).

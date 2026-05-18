@@ -55,9 +55,9 @@ Next up: **003-notifications** (MVP, Scope: M)
 
 ### Changes
 
-- `commands/feature.md` — add resolution section after overview
-- `commands/plan.md` — extend Step 1
-- `commands/implement.md` — add explicit feature resolution step
+- `commands/spec-feature.md` — add resolution section after overview
+- `commands/spec-plan.md` — extend Step 1
+- `commands/spec-implement.md` — add explicit feature resolution step
 
 ---
 
@@ -190,9 +190,9 @@ For each feature in order:
 
 | File | Action |
 |------|--------|
-| `commands/feature.md` | Modify — add roadmap fallback |
-| `commands/plan.md` | Modify — extend Step 1 |
-| `commands/implement.md` | Modify — add feature resolution step |
-| `commands/ship.md` | Create — new command |
+| `commands/spec-feature.md` | Modify — add roadmap fallback |
+| `commands/spec-plan.md` | Modify — extend Step 1 |
+| `commands/spec-implement.md` | Modify — add feature resolution step |
+| `commands/spec-ship.md` | Create — new command |
 | `system/templates/ship-template.md` | Create — tracking template |
 | `system/hooks.md` | No change — `ship` has no command-level hooks |

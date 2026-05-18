@@ -34,7 +34,7 @@ This feature refactors Step 5.7 into a 3-phase pipeline that isolates the LLM's 
 
 ### Step 5.7 refactoring map
 
-The current Step 5.7 in `commands/specify.md` has 8 sub-steps. This feature replaces sub-steps 2-3 with the Phase 1 + Phase 2 pipeline. Sub-steps 1 and 4-8 are unchanged:
+The current Step 5.7 in `commands/spec-specify.md` has 8 sub-steps. This feature replaces sub-steps 2-3 with the Phase 1 + Phase 2 pipeline. Sub-steps 1 and 4-8 are unchanged:
 
 | Current sub-step | After refactoring | Phase |
 |------------------|-------------------|-------|
@@ -236,7 +236,7 @@ flowchart TD
 | ID | Criterion | Story |
 |----|-----------|-------|
 | AC-001 | Step 5.7 Phase 1 produces a JSON structured output conforming to `{"signals": string[]}` | S1 |
-| AC-002 | Step 5.7 Phase 2 calls `validator.taxonomy.detect_traits(signals)` — verifiable via code inspection of `commands/specify.md`, which contains no hardcoded signal-to-trait mapping table | S1 |
+| AC-002 | Step 5.7 Phase 2 calls `validator.taxonomy.detect_traits(signals)` — verifiable via code inspection of `commands/spec-specify.md`, which contains no hardcoded signal-to-trait mapping table | S1 |
 | AC-003 | Feature 006 tests (`tests/test_taxonomy_detection.py`, 15 tests) still pass after changes (non-regression) | S4 |
 | AC-004 | 5 integration tests in `tests/test_specify_integration.py` pass: form/submit, modal/dialog, empty-signals, ambiguous-save, duplicate-normalization | S4 |
 | AC-005 | Given signals `["form", "submit button"]`, `detect_traits()` returns a set containing `"is_submittable"` | S1, S4 |
@@ -253,9 +253,9 @@ flowchart TD
 
 | ID | Requirement | AC |
 |----|------------|-----|
-| FR-001 | Step 5.7 shall be refactored into 3 sequential phases: Phase 1 (LLM signal extraction), Phase 2 (deterministic trait detection), Phase 3 (Gherkin injection). Sub-steps 2-3 of the current Step 5.7 in `commands/specify.md` are replaced; sub-steps 1 and 4-8 are unchanged. | AC-001, AC-002 |
+| FR-001 | Step 5.7 shall be refactored into 3 sequential phases: Phase 1 (LLM signal extraction), Phase 2 (deterministic trait detection), Phase 3 (Gherkin injection). Sub-steps 2-3 of the current Step 5.7 in `commands/spec-specify.md` are replaced; sub-steps 1 and 4-8 are unchanged. | AC-001, AC-002 |
 | FR-002 | Phase 1 shall prompt the LLM to return a structured JSON output conforming to `{"signals": string[]}`, using the taxonomy's detection signal vocabulary as guidance. If the response is valid JSON but lacks a `"signals"` key or has `signals: null`, treat as `signals: []` | AC-001, AC-009 |
-| FR-003 | Phase 2 shall call `validator.taxonomy.detect_traits(signals)` with the signal list from Phase 1. No detection logic shall be duplicated in the command file. Verifiable by code inspection: `commands/specify.md` contains no hardcoded signal-to-trait mapping table | AC-002, AC-005, AC-006, AC-007, AC-008, AC-010 |
+| FR-003 | Phase 2 shall call `validator.taxonomy.detect_traits(signals)` with the signal list from Phase 1. No detection logic shall be duplicated in the command file. Verifiable by code inspection: `commands/spec-specify.md` contains no hardcoded signal-to-trait mapping table | AC-002, AC-005, AC-006, AC-007, AC-008, AC-010 |
 | FR-004 | Phase 3 (Gherkin template loading, parameterization, and `## Behavioral AC` section injection) shall remain unchanged from the current implementation defined in feature 005. Specifically: current sub-steps 4-8 of Step 5.7 (template injection, section injection, replace-not-append rule, no-traits-detected skip, overlap note) are kept as-is | AC-005, AC-006 |
 | FR-005 | `tests/test_specify_integration.py` shall contain 5 pytest test functions that call `detect_traits()` directly with fixed signal lists representing Phase 1 output. No `spec_specify()` Python function is invoked — the tests validate the Phase 2 contract only | AC-004 |
 | FR-006 | The integration tests shall call `detect_traits()` with real taxonomy data (not mocked). The LLM is not involved — fixed signal lists substitute for Phase 1 output | AC-004, AC-005, AC-006, AC-007, AC-008, AC-010 |
@@ -292,5 +292,5 @@ flowchart TD
 |----|-----------|-------------------|
 | SC-001 | Pipeline determinism | Same signal list always produces the same trait set (verified by repeated test runs) |
 | SC-002 | Test coverage | 5/5 integration tests pass; 15/15 taxonomy tests pass |
-| SC-003 | No logic duplication | `commands/specify.md` contains no hardcoded signal-to-trait mapping table — verifiable by code inspection |
+| SC-003 | No logic duplication | `commands/spec-specify.md` contains no hardcoded signal-to-trait mapping table — verifiable by code inspection |
 | SC-004 | Rollback safety | `git diff HEAD -- validator/taxonomy.py` shows zero changes after implementation |

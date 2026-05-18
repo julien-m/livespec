@@ -3,7 +3,7 @@
 Client projects invoke the globally installed LiveSpec CLI rather than
 importing `validator/ui_runner_dispatcher.py` from the client tree. This
 module provides the `check` preflight and `dispatch` execution entry points
-used by `/spec.test --visual`.
+used by `/spec-test --visual`.
 """
 
 # @spec FR-014: Runner-aware preflight via livespec CLI — .specs/features/037-test-multi-runner-integration/spec.md#fr-014  # noqa: E501
@@ -865,7 +865,7 @@ def scaffold_command(
     if not template_dir.exists():
         typer.echo(
             f"BLOCKED: template not found at {template_dir}. "
-            f"Re-run /spec.migrate or reinstall LiveSpec.",
+            f"Re-run /spec-migrate or reinstall LiveSpec.",
             err=True,
         )
         raise typer.Exit(code=2)

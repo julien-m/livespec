@@ -29,7 +29,7 @@ Create the template from Design Spec Section 4 (Screen Index):
 
 ### T2 — Add brainstorm design import to `spec.init`
 
-**File:** `commands/init.md` (MODIFY)
+**File:** `commands/spec-init.md` (MODIFY)
 
 **2a. Add Step 3.6 after Step 3.5** (around line 371, after the design tool check):
 
@@ -60,7 +60,7 @@ Add `screens/index.md` to the design directory:
 
 ### T3 — Add brainstorm fallback to `spec.specify`
 
-**File:** `commands/specify.md` (MODIFY)
+**File:** `commands/spec-specify.md` (MODIFY)
 
 **3a. Add brainstorm fallback detection** before Step 5.5 sub-step 3 (Identify screens, around line 270):
 
@@ -82,7 +82,7 @@ After exporting PNGs, update `screens/index.md`:
 
 ### T4 — Create `spec.fix` command
 
-**File:** `commands/fix.md` (CREATE)
+**File:** `commands/spec-fix.md` (CREATE)
 
 This is the main deliverable. Create the full command following the Design Spec Section 7:
 
@@ -144,7 +144,7 @@ argument-hint: "<feature-name>"
 
 ### T5 — Add spec.fix suggestion to `spec.check`
 
-**File:** `commands/check.md` (MODIFY)
+**File:** `commands/spec-check.md` (MODIFY)
 
 In Step 10 (Suggest Fixes), after the existing suggestion blocks (around line 429), add:
 

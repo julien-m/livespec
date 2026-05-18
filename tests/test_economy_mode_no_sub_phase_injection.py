@@ -1,17 +1,17 @@
 """AC-15 — economy mode must NOT inject sub-phase integrations.
 
-The `--economy` mode in `commands/feature.md` runs specify/plan/implement
+The `--economy` mode in `.agent-sync/skills/spec-feature/SKILL.md` runs specify/plan/implement
 inline in the main context (no subagent spawn). Because the
 anti-drift runtime directive resolves under the outer command name
 (`feature`), sub-phase integrations (e.g. `commands: [specify, plan]`)
 CANNOT be injected in this mode by construction.
 
 This contract is enforced by ensuring the `--economy` paragraphs in
-`commands/feature.md`:
+`.agent-sync/skills/spec-feature/SKILL.md`:
 
 1. do NOT contain `livespec hooks resolve --event before --command specify`
 2. do NOT contain `livespec hooks resolve --event before --command plan`
-3. do NOT prepend a synthetic `/spec.specify` or `/spec.plan` header.
+3. do NOT prepend a synthetic `/spec-specify` or `/spec-plan` header.
 
 Any future modification that adds such CLI calls in the economy paths
 would silently re-introduce sub-phase injection — this test prevents that.
@@ -22,7 +22,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-FEATURE_MD = Path(__file__).parent.parent / "commands" / "feature.md"
+FEATURE_MD = (
+    Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-feature" / "SKILL.md"
+)
 
 
 def _economy_blockquote_sections() -> list[str]:
@@ -55,7 +57,9 @@ def _economy_blockquote_sections() -> list[str]:
 def test_economy_paragraphs_present() -> None:
     """Sanity — the economy mode blockquotes still exist."""
     paragraphs = _economy_blockquote_sections()
-    assert paragraphs, "no economy mode blockquote found in commands/feature.md"
+    assert paragraphs, (
+        "no economy mode blockquote found in .agent-sync/skills/spec-feature/SKILL.md"
+    )
 
 
 def test_economy_paragraphs_do_not_call_hooks_resolve_for_subphases() -> None:
@@ -68,9 +72,10 @@ def test_economy_paragraphs_do_not_call_hooks_resolve_for_subphases() -> None:
 
 def test_economy_paragraphs_do_not_prepend_subcmd_headers() -> None:
     for paragraph in _economy_blockquote_sections():
-        # A `/spec.specify` mention inside the economy paragraph would be a
-        # synthetic header — economy mode does not spawn subagents so it
-        # should not synthesise these.
-        assert "/spec.specify" not in paragraph, paragraph
-        assert "/spec.plan" not in paragraph, paragraph
-        assert "/spec.implement" not in paragraph, paragraph
+        # Economy mode may reference canonical command source files such as
+        # `.agent-sync/skills/spec-specify/SKILL.md`; it must not inject a standalone slash
+        # command header because no subagent prompt is spawned.
+        lines = [line.strip() for line in paragraph.splitlines()]
+        assert "/spec-specify" not in lines, paragraph
+        assert "/spec-plan" not in lines, paragraph
+        assert "/spec-implement" not in lines, paragraph

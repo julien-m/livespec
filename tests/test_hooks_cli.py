@@ -81,6 +81,27 @@ def test_hooks_resolve_active_integration_returns_body(
     assert marker in result.stdout
 
 
+def test_hooks_resolve_accepts_hyphenated_command_alias(
+    tmp_path: Path, _isolate_user_config: Path
+) -> None:
+    cfg = _isolate_user_config / ".config" / "livespec"
+    cfg.mkdir(parents=True)
+    marker = "ALIAS_INTEGRATION_MARKER"
+    (cfg / "alias.md").write_text(
+        "---\nintegration: alias\ncommands: [/spec-plan]\n---\n"
+        f"{marker}\n",
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(
+        app,
+        ["hooks", "resolve", "--event", "before", "--command", "/spec-plan"],
+    )
+
+    assert result.exit_code == 0
+    assert marker in result.stdout
+
+
 def test_integrations_list_empty(tmp_path: Path) -> None:
     result = runner.invoke(app, ["integrations", "list"])
     assert result.exit_code == 0
@@ -97,4 +118,4 @@ def test_integrations_list_one(_isolate_user_config: Path) -> None:
     result = runner.invoke(app, ["integrations", "list"])
     assert result.exit_code == 0
     assert "mockups" in result.stdout
-    assert "specify,plan" in result.stdout
+    assert "spec-specify,spec-plan" in result.stdout

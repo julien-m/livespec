@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-shot migration: append Section 13 to every commands/*.expectations.md.
+"""One-shot migration: append Section 13 to every agent-sync expectations file.
 
 Run from repo root:
 
@@ -19,7 +19,7 @@ from pathlib import Path
 # ruff: noqa: E501, RUF001
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-COMMANDS_DIR = REPO_ROOT / "commands"
+COMMANDS_DIR = REPO_ROOT / ".agent-sync" / "skills"
 
 
 def section13_for(command: str) -> str:
@@ -64,7 +64,7 @@ def _init_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.init
+$ /spec-init
 > Phase 1 — Project discovery: detecting language, framework, tests
 > Phase 2 — Stack proposal: <stack> (confidence: high)
 > Phase 3 — Brainstorm: 4 user-story candidates, 1 ADR draft
@@ -104,13 +104,13 @@ exit 0
 
 ### Edge Cases
 
-- Repo already contains a stale `.specs/` from a previous version: `/spec.migrate` is suggested before re-running init.
+- Repo already contains a stale `.specs/` from a previous version: `/spec-migrate` is suggested before re-running init.
 - No git remote configured: init proceeds, leaves a warning in `preflight-report.md`.
 - LLM rate-limited mid-brainstorm: init resumes from the last saved checkpoint on next invocation.
 
 ### Post-run Actions
 
-- **On success:** review `project.md`, then run `/spec.propose` to pick the first feature.
+- **On success:** review `project.md`, then run `/spec-propose` to pick the first feature.
 - **On drift:** open `.specs/checks/<today>.md`, fix the flagged blanks, re-run init.
 - **On blocked:** install the missing tool from `preflight-report.md`, re-run init.
 """
@@ -122,7 +122,7 @@ def _test_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.test <feature> --visual
+$ /spec-test <feature> --visual
 > Auditing AC coverage: <feature> has 12 ACs, 9 covered, 3 missing
 > Generating 3 missing scaffolds in apps/web/tests/e2e/<feature>/
 > Running 38 specs across 1 surface (web)
@@ -178,7 +178,7 @@ def _feature_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.feature -a "Add CSV export"
+$ /spec-feature -a "Add CSV export"
 > Phase 1 (Specify): spawning agent — 1 spec.md drafted (12 FR, 9 AC)
 > Gate 1: review PASS — proceeding
 > Phase 2 (Plan): spawning agent — 1 plan.md drafted (8 steps)
@@ -226,7 +226,7 @@ exit 0
 
 - **On success:** open the commit, push, request review.
 - **On drift:** read `FINDINGS_DETAIL` in `pipeline.md`, fix the spec/plan, re-run with `--resume`.
-- **On blocked:** run `/spec.preflight` standalone to identify the missing prerequisite.
+- **On blocked:** run `/spec-preflight` standalone to identify the missing prerequisite.
 """
 
 
@@ -236,7 +236,7 @@ def _specify_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.specify "Add filter chips to search results"
+$ /spec-specify "Add filter chips to search results"
 > Detected scope: M · Stories: 3 (P1 × 2, P2 × 1)
 > Drafting spec.md (9 AC, 11 FR)
 > Wrote .specs/features/<feature>/spec.md
@@ -258,7 +258,7 @@ exit 0
 
 - **Aligned:** spec.md exists with Gherkin + Mermaid for every story, ACs numbered, FRs mapped. Exit 0.
 - **Drift:** spec contains `[NEEDS CLARIFICATION]` markers > 3, or a story lacks Gherkin. Exit 1 with the gap report.
-- **Missing:** `.specs/project.md` not found. Exit 2 with recovery `Run /spec.init first`.
+- **Missing:** `.specs/project.md` not found. Exit 2 with recovery `Run /spec-init first`.
 
 ### Runtime Profile (scenarios)
 
@@ -276,9 +276,9 @@ exit 0
 
 ### Post-run Actions
 
-- **On success:** run `/spec.plan <feature>` next.
+- **On success:** run `/spec-plan <feature>` next.
 - **On drift:** open spec.md, resolve `[NEEDS CLARIFICATION]`, re-run with `--refine`.
-- **On blocked:** run `/spec.init`, then retry.
+- **On blocked:** run `/spec-init`, then retry.
 """
 
 
@@ -288,7 +288,7 @@ def _plan_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.plan <feature>
+$ /spec-plan <feature>
 > Loaded spec.md (9 AC, 11 FR)
 > Drafting plan.md — 8 steps, 1 sequence diagram, 1 state diagram
 > Constitution check: PASS
@@ -326,9 +326,9 @@ exit 0
 
 ### Post-run Actions
 
-- **On success:** review plan.md, then run `/spec.implement <feature>`.
+- **On success:** review plan.md, then run `/spec-implement <feature>`.
 - **On drift:** open the gap report, refine plan.md, re-run `--refine`.
-- **On blocked:** run `/spec.specify` first.
+- **On blocked:** run `/spec-specify` first.
 """
 
 
@@ -338,7 +338,7 @@ def _implement_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.implement <feature>
+$ /spec-implement <feature>
 > Loaded plan.md — 8 steps queued
 > Step 1/8: src/api/csv-export.ts (create) — 42 lines
 > Step 2/8: tests/api/csv-export.test.ts — 6 tests PASS
@@ -381,9 +381,9 @@ src/<...> + tests/<...>    # code under each step
 
 ### Post-run Actions
 
-- **On success:** run `/spec.test <feature>` to lock visual baselines.
+- **On success:** run `/spec-test <feature>` to lock visual baselines.
 - **On drift:** inspect progress.md, fix the failing step, re-run with `--resume`.
-- **On blocked:** run `/spec.plan` first, or unblock the preflight check.
+- **On blocked:** run `/spec-plan` first, or unblock the preflight check.
 """
 
 
@@ -393,7 +393,7 @@ def _check_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.check <feature>
+$ /spec-check <feature>
 > Scanning code for @spec anchors → 27 matches
 > Cross-referencing with spec.md FR/AC → 2 unmapped FRs
 > Visual fidelity: 12/13 screens match (1 drift: <screen>)
@@ -430,8 +430,8 @@ exit 1
 ### Post-run Actions
 
 - **On success:** done.
-- **On drift:** run `/spec.fix <feature>` for visual drift, or edit code/spec for structural drift.
-- **On blocked:** run `/spec.specify` first.
+- **On drift:** run `/spec-fix <feature>` for visual drift, or edit code/spec for structural drift.
+- **On blocked:** run `/spec-specify` first.
 """
 
 
@@ -441,12 +441,12 @@ def _fix_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.fix <feature>
+$ /spec-fix <feature>
 > Reading checks/<date>.md → 3 issues
 > Issue 1/3: visual drift on <screen> → re-rendering component
 > Issue 2/3: missing @spec anchor on src/api/foo.ts:45
 > Issue 3/3: unmapped FR-008 → added stub test
-> All issues addressed — re-run /spec.check to verify
+> All issues addressed — re-run /spec-check to verify
 exit 0
 ```
 
@@ -460,9 +460,9 @@ tests/<new or modified tests>
 
 ### Aligned / Drift / Missing
 
-- **Aligned:** every issue from the gap report has a corresponding patch; re-running /spec.check returns 0. Exit 0.
+- **Aligned:** every issue from the gap report has a corresponding patch; re-running /spec-check returns 0. Exit 0.
 - **Drift:** some issues could not be auto-fixed; the report lists them as `manual`. Exit 1.
-- **Missing:** no gap report under `.specs/features/<feature>/checks/`. Exit 2 with recovery `/spec.check first`.
+- **Missing:** no gap report under `.specs/features/<feature>/checks/`. Exit 2 with recovery `/spec-check first`.
 
 ### Runtime Profile (scenarios)
 
@@ -480,9 +480,9 @@ tests/<new or modified tests>
 
 ### Post-run Actions
 
-- **On success:** re-run `/spec.check <feature>` to confirm zero gaps.
-- **On drift:** address the `manual` issues by hand, re-run `/spec.fix`.
-- **On blocked:** run `/spec.check <feature>` to generate the gap report.
+- **On success:** re-run `/spec-check <feature>` to confirm zero gaps.
+- **On drift:** address the `manual` issues by hand, re-run `/spec-fix`.
+- **On blocked:** run `/spec-check <feature>` to generate the gap report.
 """
 
 
@@ -492,7 +492,7 @@ def _explain_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.explain <feature>
+$ /spec-explain <feature>
 > Loading spec.md, plan.md, implementation.md, changelog.md
 > Synthesizing living documentation for <feature>
 > Section: Overview · User flows · Architecture · Files · History
@@ -529,7 +529,7 @@ exit 0
 
 - **On success:** share the output with reviewers; pipe to a doc site if desired.
 - **On drift:** no action.
-- **On blocked:** confirm the feature slug; run `/spec.status` to list features.
+- **On blocked:** confirm the feature slug; run `/spec-status` to list features.
 """
 
 
@@ -539,7 +539,7 @@ def _stack_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.stack
+$ /spec-stack
 > Current stack: <stack>
 > Impact analysis: 3 files affected by your draft change
 > Drafting ADR-012-replace-pg-with-sqlite.md
@@ -571,15 +571,15 @@ exit 0
 
 ### Edge Cases
 
-- Stack change affects existing features: spec.stack lists them and proposes `/spec.refine` to update each.
+- Stack change affects existing features: spec.stack lists them and proposes `/spec-refine` to update each.
 - `--view`: read-only mode lists the current stack and ADRs without prompting changes.
 - ADR conflicts with a previous one: spec.stack surfaces the conflict for manual resolution.
 
 ### Post-run Actions
 
-- **On success:** run `/spec.refresh-conventions` if the stack identity changed.
+- **On success:** run `/spec-refresh-conventions` if the stack identity changed.
 - **On drift:** edit the ADR to add missing sections.
-- **On blocked:** run `/spec.init` first.
+- **On blocked:** run `/spec-init` first.
 """
 
 
@@ -589,10 +589,10 @@ def _ship_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.ship
+$ /spec-ship
 > Scanning roadmap.md — 3 unchecked items in MVP tier
 > Picking next: <feature>
-> Spawning /spec.feature -a "<feature>" --branch
+> Spawning /spec-feature -a "<feature>" --branch
 > Pipeline complete → SHIP_RESULT: OK on feature/<feature>
 > Continuing batch: 2 remaining
 exit 0
@@ -629,7 +629,7 @@ git branches:                          # feature/<feature> × N
 
 - **On success:** review the resulting PRs.
 - **On drift:** open the failing feature's pipeline.md, fix the blocker, re-run with `--resume`.
-- **On blocked:** populate roadmap.md via `/spec.propose`.
+- **On blocked:** populate roadmap.md via `/spec-propose`.
 """
 
 
@@ -639,7 +639,7 @@ def _preflight_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.preflight
+$ /spec-preflight
 > Running 7 checks from .specs/preflight.md
 > ✓ git ≥ 2.30
 > ✓ python3 ≥ 3.11
@@ -671,13 +671,13 @@ exit 0
 
 ### Edge Cases
 
-- `--light`: runs only critical checks (used by /spec.feature 2.7).
+- `--light`: runs only critical checks (used by /spec-feature 2.7).
 - `--autofix`: attempts to install missing deps when safe.
 - Check command crashes: preflight reports `error` for that line, continues.
 
 ### Post-run Actions
 
-- **On success:** proceed with `/spec.feature` or the targeted command.
+- **On success:** proceed with `/spec-feature` or the targeted command.
 - **On drift:** address the warnings if relevant; no blocker.
 - **On blocked:** run the recovery command from the report, re-run preflight.
 """
@@ -689,7 +689,7 @@ def _hooks_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.hooks plan
+$ /spec-hooks plan
 > Resolved hooks for "plan":
 > [global] ~/.claude/livespec/hooks/before-plan.md
 > [project] .specs/hooks/before-plan.md
@@ -737,7 +737,7 @@ def _play_coverage_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.play-coverage
+$ /spec-play-coverage
 > Building grep index for .specs/ ↔ src/
 > 47 spec anchors found · 4 unmapped FRs
 > Listening on http://localhost:4810 (Ctrl-C to stop)
@@ -783,7 +783,7 @@ def _refine_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.refine <feature>
+$ /spec-refine <feature>
 > Loaded spec.md and plan.md for <feature>
 > Conversational refinement: 3 questions
 > Wrote refinements to spec.md (+12 lines, -3 lines)
@@ -821,7 +821,7 @@ exit 0
 
 ### Post-run Actions
 
-- **On success:** run `/spec.check <feature>` to confirm code alignment.
+- **On success:** run `/spec-check <feature>` to confirm code alignment.
 - **On drift:** open spec.md and resolve `[NEEDS CLARIFICATION]`.
 - **On blocked:** confirm the feature slug.
 """
@@ -833,7 +833,7 @@ def _status_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.status
+$ /spec-status
 > Roadmap: 3 MVP · 5 Post-MVP · 2 Future · 1 Deferred
 > Features in progress: 2 (<feature>, <feature>)
 > Last activity: 2026-05-12 14:22 — impl: 040
@@ -870,7 +870,7 @@ exit 0
 
 - **On success:** decide which feature to advance next.
 - **On drift:** investigate the flagged orphan feature.
-- **On blocked:** run `/spec.init`.
+- **On blocked:** run `/spec-init`.
 """
 
 
@@ -880,7 +880,7 @@ def _refresh_conventions_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.refresh-conventions
+$ /spec-refresh-conventions
 > Reading .specs/stacks/_default.md (<stack>)
 > Generating .conventions/manifest.yaml + index.md
 > 4 sub-domains detected: code, design-tokens, design-components, design-views
@@ -918,7 +918,7 @@ exit 0
 
 - **On success:** subsequent commands auto-load the new conventions.
 - **On drift:** run `--full` to rebuild from scratch.
-- **On blocked:** set `AIRESOURCES` env var, or run `/spec.init` first.
+- **On blocked:** set `AIRESOURCES` env var, or run `/spec-init` first.
 """
 
 
@@ -928,7 +928,7 @@ def _migrate_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.migrate
+$ /spec-migrate
 > Current project version: v2 · LiveSpec repo version: v9
 > Migrations to apply: 7 (v3 → v9)
 > Applying v3: rename .specs/specs/ → .specs/features/
@@ -969,7 +969,7 @@ exit 0
 
 - **On success:** review the changelog entry, commit.
 - **On drift:** open the skipped file, apply the migration manually.
-- **On blocked:** run `/spec.init`.
+- **On blocked:** run `/spec-init`.
 """
 
 
@@ -979,7 +979,7 @@ def _propose_block() -> str:
 ### Live Console Output
 
 ```
-$ /spec.propose
+$ /spec-propose
 > Reading project.md, roadmap.md, recent changelog
 > Top 3 suggestions:
 >   1. Add CSV export · Scope: M · Roles: backend
@@ -1016,9 +1016,9 @@ exit 0
 
 ### Post-run Actions
 
-- **On success:** run `/spec.specify "<chosen suggestion>"`.
+- **On success:** run `/spec-specify "<chosen suggestion>"`.
 - **On drift:** ignore; propose is advisory.
-- **On blocked:** run `/spec.init`.
+- **On blocked:** run `/spec-init`.
 """
 
 
@@ -1030,7 +1030,7 @@ def _verify_output_block() -> str:
 ```
 $ livespec verify-output specify
 verify-output  command=specify
-source         commands/specify.expectations.md
+source         .agent-sync/skills/spec-specify/expectations.md
 artifact       .specs/.runs/specify-2026-05-12T10-00-00.json
 
 verb      kind                  status    detail
@@ -1089,7 +1089,7 @@ def patch_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     if re.search(r"^## 13\.", text, re.MULTILINE):
         return False
-    command_name = path.name.removesuffix(".expectations.md")
+    command_name = path.parent.name.removeprefix("spec-")
     block = section13_for(command_name)
     if not text.endswith("\n"):
         text += "\n"
@@ -1101,7 +1101,7 @@ def patch_file(path: Path) -> bool:
 def main() -> int:
     updated = 0
     total = 0
-    for path in sorted(COMMANDS_DIR.glob("*.expectations.md")):
+    for path in sorted(COMMANDS_DIR.glob("spec-*/expectations.md")):
         total += 1
         if patch_file(path):
             updated += 1

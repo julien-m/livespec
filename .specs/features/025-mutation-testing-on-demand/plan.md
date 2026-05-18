@@ -162,7 +162,7 @@ The parent directory is created when missing (EC-003).
    - `run_mutation` returns `None` when the driver has no mutation block
      (AC-002, Story 1 Scenario 2).
    - `run_mutation` surfaces install hint when exit code is 127 (AC-007).
-4. **Update `commands/test.md`** to document the `--mutation` flag (Story 1):
+4. **Update `commands/spec-test.md`** to document the `--mutation` flag (Story 1):
    add a section explaining the on-demand semantics, the report path, and the
    "not implemented for X driver" exit-0 behaviour.
 5. **Verify** with `pytest tests/`, `pyright validator/`, `ruff check validator/`.

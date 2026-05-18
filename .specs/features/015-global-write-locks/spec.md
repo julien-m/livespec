@@ -237,7 +237,7 @@ flowchart TD
 - **FR-002:** Create .specs/.LOCK filelock mechanism (fcntl.flock on Unix / equivalent on Windows); integrate into Python wrapper for all write operations
 - **FR-003:** Implement post-write re-read + SHA256 hash assertion in all write operations; log hash values for debugging
 - **FR-004:** Atomic write pattern for global files: write to `.specs/.TEMPFILE_XXXXXX`, verify content, then `os.rename()` to target (atomic on POSIX)
-- **FR-005:** Update spec.specify commands/specify.md Steps 7.5/7.6 to acquire .specs/.LOCK before writing, release after completion
+- **FR-005:** Update spec.specify commands/spec-specify.md Steps 7.5/7.6 to acquire .specs/.LOCK before writing, release after completion
 - **FR-006:** Update spec.refine to acquire lock when updating README/changelog; release after all updates complete
 - **FR-007:** Update spec.fix to acquire lock in Step 8 when updating artifacts; release after completion
 - **FR-008:** Update livespec-documenter agent to acquire lock in Finalize mode (Step 2-5); release after all writes complete

@@ -325,11 +325,11 @@ flowchart TD
 |----|------------|-----|
 | FR-001 | `system/testing/ui-behavioral-taxonomy.md` shall define a `**Visual states:**` Markdown table for each trait with columns: State ID, CSS/Attributes, Screenshot | AC-001 |
 | FR-002 | `validator/taxonomy.py` shall extend `Trait` dataclass with `visual_states: list[VisualState]` field, parsed from the taxonomy table | AC-013, AC-014 |
-| FR-003 | `commands/specify.md` Step 5.7 Phase 3 shall generate Gherkin with "And [element] matches visual state '[state-id]'" for each state in `trait.visual_states` | AC-002 |
-| FR-004 | `commands/test.md` shall generate Playwright tests with `await expect(element).toHaveScreenshot('[screenshot]')` for each visual state Gherkin assertion | AC-003 |
+| FR-003 | `commands/spec-specify.md` Step 5.7 Phase 3 shall generate Gherkin with "And [element] matches visual state '[state-id]'" for each state in `trait.visual_states` | AC-002 |
+| FR-004 | `commands/spec-test.md` shall generate Playwright tests with `await expect(element).toHaveScreenshot('[screenshot]')` for each visual state Gherkin assertion | AC-003 |
 | FR-005 | Baseline screenshots shall be stored in `.specs/features/NNN-slug/baselines/states/[screenshot]` with naming convention `[element]-[state-id].png` | AC-004 |
 | FR-006 | Each baseline shall have a `.meta.yml` file with fields: `visual_state`, `behavioral_trait`, `gherkin_scenario`, `created`, `approved_by`, `invalidate_on` | AC-011 |
-| FR-007 | `commands/test.md` shall add `--regenerate-missing` flag that scans `.specs/features/` for directories with `spec.md` but no `tests/` | AC-007 |
+| FR-007 | `commands/spec-test.md` shall add `--regenerate-missing` flag that scans `.specs/features/` for directories with `spec.md` but no `tests/` | AC-007 |
 | FR-008 | `--regenerate-missing --confirm` shall generate test files for all flagged features using the same generation logic as normal `/spec.test` | AC-008 |
 | FR-009 | `--regenerate-missing --dry-run` shall display the list of features without creating files and exit 0 | AC-009 |
 | FR-010 | `--regenerate-missing` shall skip features that already have a `tests/` directory, never overwriting existing tests | AC-010 |
@@ -345,7 +345,7 @@ flowchart TD
 | Trait (extended) | Existing dataclass in `validator/taxonomy.py` extended with `visual_states: list[VisualState]` field |
 | BaselineMetadata | YAML artifact (`.meta.yml`) stored alongside each baseline PNG with provenance and invalidation data |
 | Visual State Table | Markdown table in the taxonomy document defining per-trait visual states |
-| Regeneration Scanner | Logic in `commands/test.md` that scans feature directories for missing test coverage |
+| Regeneration Scanner | Logic in `commands/spec-test.md` that scans feature directories for missing test coverage |
 
 ### VisualState dataclass
 

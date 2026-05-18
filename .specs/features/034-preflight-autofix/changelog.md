@@ -15,6 +15,6 @@
   - `scripts/preflight-enrich.py` (new) - migration helper (driver/runner detection + manifest patch)
   - `migrations/10/migrate.md` (new) - migration v10
   - `tests/test_preflight_autofix.py` (new) - unit tests
-  - `commands/preflight.md` (updated) - `--fix`, `--full`, `--auto`, `--dry-run` documentation
+  - `commands/spec-preflight.md` (updated) - `--fix`, `--full`, `--auto`, `--dry-run` documentation
 - **AC covered:** AC-001..AC-014 (engine + migration + flags + summary)
 - **Author:** spec.feature

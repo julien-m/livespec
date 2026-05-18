@@ -19,7 +19,7 @@ updated: 2026-04-14
 | Aspect | Choice | Reason |
 |---|---|---|
 | Language | Markdown | Feature modifies command files and creates system docs only |
-| Affected files | `commands/specify.md`, `commands/implement.md`, `commands/test.md` | Core command files |
+| Affected files | `commands/spec-specify.md`, `commands/spec-implement.md`, `commands/spec-test.md` | Core command files |
 | New document | `system/testing/ui-behavioral-taxonomy.md` | Single source of truth for behavioral traits |
 | Crash test output | `.specs/features/005-ui-behavioral-testing/checks/` | Empirical validation report |
 | Testing strategy | Manual + livespec validate | No Python code introduced — validation is structural |
@@ -220,12 +220,12 @@ Create the single source of truth for all behavioral trait definitions, Gherkin 
 
 ---
 
-### Step 2 — Update `commands/specify.md` — Behavioral Detection + Injection
+### Step 2 — Update `commands/spec-specify.md` — Behavioral Detection + Injection
 
 **FR covered:** FR-002.1: UI signal detection, FR-003.1: Behavioral AC injection, FR-004.1: AC section separation
 
 **Files:**
-- `commands/specify.md` (modified)
+- `commands/spec-specify.md` (modified)
 
 **Description:**
 
@@ -287,12 +287,12 @@ Also add `--no-behavioral` to the Flags table with description: "Skip behavioral
 
 ---
 
-### Step 3 — Update `commands/implement.md` — Behavioral TDD Step
+### Step 3 — Update `commands/spec-implement.md` — Behavioral TDD Step
 
 **FR covered:** FR-005.1: Behavioral TDD step insertion, FR-006.1: Taxonomy-referenced test patterns
 
 **Files:**
-- `commands/implement.md` (modified)
+- `commands/spec-implement.md` (modified)
 
 **Description:**
 
@@ -351,12 +351,12 @@ Taxonomy reference: The implementer must include a comment in the test file:
 
 ---
 
-### Step 4 — Update `commands/test.md` — Behavioral Coverage Audit
+### Step 4 — Update `commands/spec-test.md` — Behavioral Coverage Audit
 
 **FR covered:** FR-007.1: Parse Behavioral AC section, FR-008.1: Gap report without test generation
 
 **Files:**
-- `commands/test.md` (modified)
+- `commands/spec-test.md` (modified)
 
 **Description:**
 
@@ -536,9 +536,9 @@ taxonomy adequate | consider adding: [pattern name and description]
 | Step | Files | New / Modified |
 |---|---|---|
 | 1 | `system/testing/ui-behavioral-taxonomy.md` | New |
-| 2 | `commands/specify.md` | Modified |
-| 3 | `commands/implement.md` | Modified |
-| 4 | `commands/test.md` | Modified |
+| 2 | `commands/spec-specify.md` | Modified |
+| 3 | `commands/spec-implement.md` | Modified |
+| 4 | `commands/spec-test.md` | Modified |
 | 5 | `.specs/features/005-ui-behavioral-testing/checks/crash-test-YYYY-MM-DD.md` | New |
 
 Total: 5 files — within Change Scope Guard (≤12).
@@ -548,9 +548,9 @@ Total: 5 files — within Change Scope Guard (≤12).
 ## Definition of Done
 
 - [ ] `system/testing/ui-behavioral-taxonomy.md` created with all 5 traits (AC-001) and transversal patterns (AC-002) including constituent traits per pattern
-- [ ] `commands/specify.md` updated with Step 5.7 (behavioral AC injection) referencing taxonomy (AC-003, AC-004, AC-005)
-- [ ] `commands/implement.md` updated with behavioral TDD step (AC-006, AC-007, AC-008) with deduplication rule for EC-002
-- [ ] `commands/test.md` updated with behavioral audit sub-phase 1.5 (AC-009, AC-010, AC-011)
+- [ ] `commands/spec-specify.md` updated with Step 5.7 (behavioral AC injection) referencing taxonomy (AC-003, AC-004, AC-005)
+- [ ] `commands/spec-implement.md` updated with behavioral TDD step (AC-006, AC-007, AC-008) with deduplication rule for EC-002
+- [ ] `commands/spec-test.md` updated with behavioral audit sub-phase 1.5 (AC-009, AC-010, AC-011)
 - [ ] All command file updates reference `system/testing/ui-behavioral-taxonomy.md` by path — no inline trait definitions (SC-005)
 - [ ] Crash test executed (or documented as PENDING with justification) and report saved to `checks/` (AC-012, AC-013)
 - [ ] Detection mechanism clarified as LLM-driven (addressed in Step 2)

@@ -220,7 +220,7 @@ flowchart TD
 - **FR-006:** Implement Activation Contract template with: (a) `test -d .specs` check as Step 1, (b) flag re-validation, (c) BLOCKED format on failure, (d) reusable via @import across all agents
 - **FR-007:** Integrate jsonschema validation library into supervisor (Python) and ship command; validate returns before checkpoint/delete operations
 - **FR-008:** Create system/tests/test-contracts/ with unit tests covering: valid returns, malformed returns, multi-block output, injection attempts
-- **FR-009:** Update commands/feature.md, commands/ship.md, agents/livespec-supervisor.md, agents/livespec-implementer.md, agents/livespec-verifier.md, agents/livespec-documenter.md to implement new contracts
+- **FR-009:** Update commands/spec-feature.md, commands/spec-ship.md, agents/livespec-supervisor.md, agents/livespec-implementer.md, agents/livespec-verifier.md, agents/livespec-documenter.md to implement new contracts
 - **FR-010:** Documentation: create system/contracts/ directory with 4 markdown files (PHASE_RESULT.md, SHIP_RESULT.md, SUPERPOWERS_RETURN.md, ACTIVATION_CONTRACT.md) explaining schemas, examples, and parser behavior
 
 ---

@@ -244,9 +244,9 @@ Key flags: `--roadmap`, `--features`, `--json`
 
 | File | Change |
 |------|--------|
-| `commands/status.md` | **New file** — full command definition (with YAML frontmatter: `description: "Display factual status overview of roadmap and features"`) |
+| `commands/spec-status.md` | **New file** — full command definition (with YAML frontmatter: `description: "Display factual status overview of roadmap and features"`) |
 | `system/spec-system.md` | Add to command list (14 commands), update read-only exemption line to include `/spec.status`, add read-only rule to README update rules |
-| `commands/init.md` | Update CLAUDE.md template command list to include all 14 commands (fix existing drift — currently lists 11/13) |
+| `commands/spec-init.md` | Update CLAUDE.md template command list to include all 14 commands (fix existing drift — currently lists 11/13) |
 | `scripts/install.sh` | Add `status` to the COMMANDS array |
 | `README.md` | Add to commands table, command reference, update count 13→14 |
 

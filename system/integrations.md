@@ -75,10 +75,10 @@ is signalled exactly once on stderr.
 
 ### Valid commands
 
-The canonical command set is the contents of `commands/*.md` in the
-LiveSpec repo, excluding `*.expectations.md` sidecars. There is no other
-allowlist — adding a new `commands/<x>.md` automatically makes `x` a
-valid target. See `validator.integrations.valid_command_names()`.
+The canonical command set is the contents of `.agent-sync/skills/spec-*` in
+the LiveSpec repo. There is no other allowlist: adding a new skill directory
+with `SKILL.md` and `expectations.md` automatically makes it a valid target.
+See `validator.integrations.valid_command_names()`.
 
 ---
 
@@ -137,7 +137,7 @@ hook can be re-used outside a feature context without crashing.
 When `--feature` is provided but the slug does not match `^\d{3}-`
 (e.g. test fixtures, legacy slugs), `{{feature_number}}` is left literal.
 No warning is emitted — the responsibility of slug validation lies with
-the Identity Guard of `commands/feature.md`, not the resolver.
+the Identity Guard of `.agent-sync/skills/spec-feature/SKILL.md`, not the resolver.
 
 ---
 
@@ -159,7 +159,7 @@ Diagnostic (read-only) :
 
 ```bash
 livespec integrations list           # tabular view of all L0 files
-/spec.hooks <command>                # shows the full L0→L3 chain for <command>
+/spec-hooks <command>                # shows the full L0→L3 chain for <command>
 ```
 
 ---
@@ -170,13 +170,13 @@ The hook resolver always receives the name of the **currently executing
 sub-command**, not the outer pipeline. Implementation contract (locked
 by Decision D-α option β):
 
-1. `/spec.feature` resolves `before-feature` / `after-feature` at its
+1. `/spec-feature` resolves `before-feature` / `after-feature` at its
    outer boundary.
 2. Before spawning each subagent (Specify, Plan, Implement, Test, …) the
-   `commands/feature.md` supervisor prepends a synthetic
+   `.agent-sync/skills/spec-feature/SKILL.md` supervisor prepends a synthetic
    `/spec.<subcmd>` invocation header to the subagent prompt. The
    subagent then resolves `before-<subcmd>` / `after-<subcmd>`.
-3. The same rule applies to `commands/ship.md` (batch wrapper).
+3. The same rule applies to `.agent-sync/skills/spec-ship/SKILL.md` (batch wrapper).
 4. **No automatic propagation from outer to inner.** Integrations target
    sub-phases by listing them explicitly in `commands:`. To inject at
    both outer and inner, list every relevant name.
@@ -184,7 +184,7 @@ by Decision D-α option β):
 > ⚠️ `--economy` mode and Level 0 integrations
 >
 > Integrations targeting sub-phases (`commands: [specify, plan, implement, …]`)
-> are NOT injected when running `/spec.feature --economy`. The economy mode
+> are NOT injected when running `/spec-feature --economy`. The economy mode
 > executes those phases inline in the main context without spawning subagents,
 > so the runtime directive only resolves at the outer `feature` boundary.
 >
@@ -259,12 +259,11 @@ other.
 
 ## Adding a new subagent spawn site
 
-If a new `commands/*.md` adds a subagent spawn (e.g. a future
-`commands/audit.md` that internally spawns a verifier), its prompt
+If a new `.agent-sync/skills/spec-*/SKILL.md` adds a subagent spawn, its prompt
 template MUST prepend a synthetic `/spec.<subcmd>` header so that the
 subagent's anti-drift directive resolves the correct command name. This
 rule is enforced by `tests/test_pipeline_chained_resolution.py`.
 
 ---
 
-*LiveSpec Integrations v1.0 — see `commands/hooks.md` for the diagnostic UX.*
+*LiveSpec Integrations v1.0 — see `.agent-sync/skills/spec-hooks/SKILL.md` for the diagnostic UX.*

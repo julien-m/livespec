@@ -15,7 +15,7 @@ current_state: Done
 | 4 | `validator/placeholders.py` + `validator/outcome.py` + `validator/verify_output.py` (rule evaluator + classifier) | ✅ |
 | 5 | CLI wiring: `livespec verify-output` and `livespec run wrap`/`record` | ✅ |
 | 6 | Pre-commit hook (`hooks/livespec-last-reviewed.py`) + `scripts/install-hooks.sh` + integration test | ✅ |
-| 7 | Slash-command `/spec.verify-output` (`commands/verify-output.md`) + self-expectation | ✅ |
+| 7 | Slash-command `/spec.verify-output` (`commands/spec-verify-output.md`) + self-expectation | ✅ |
 | 8a | 5 builtin expectations (`init`, `migrate`, `propose`, `specify`, `plan`) | ✅ |
 | 8b | 5 builtin expectations (`implement`, `test`, `check`, `fix`, `explain`) | ✅ |
 | 8c | 5 builtin expectations (`stack`, `feature`, `ship`, `preflight`, `hooks`) | ✅ |

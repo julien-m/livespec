@@ -523,11 +523,11 @@ New subsection after "When REVIEWING a feature":
 | `system/templates/spec-template.md` | Add `## Screens` section template |
 | `system/templates/plan-template.md` | Add `## Design Reference` section template |
 | `system/templates/implementation-template.md` | Add "Visual Ref" column note |
-| `commands/init.md` | Add design gate in Phase B, add `.specs/design/` creation in Phase C, update exit criteria |
-| `commands/specify.md` | Add Step 5.5 (mockup generation), update quality gates, add re-modification workflow |
-| `commands/plan.md` | Add Design Reference section generation after Technical Context |
-| `commands/implement.md` | Add mockup reference during UI steps, visual fidelity check, Visual Ref column in implementation.md |
-| `commands/check.md` | Add design fidelity sub-step in Step 8, add to gap report format |
+| `commands/spec-init.md` | Add design gate in Phase B, add `.specs/design/` creation in Phase C, update exit criteria |
+| `commands/spec-specify.md` | Add Step 5.5 (mockup generation), update quality gates, add re-modification workflow |
+| `commands/spec-plan.md` | Add Design Reference section generation after Technical Context |
+| `commands/spec-implement.md` | Add mockup reference during UI steps, visual fidelity check, Visual Ref column in implementation.md |
+| `commands/spec-check.md` | Add design fidelity sub-step in Step 8, add to gap report format |
 | `~/.claude/livespec/hooks/before-specify.md` | Add design tool config loading |
 | `~/.claude/livespec/hooks/before-plan.md` | Add mockup existence validation |
 | `~/.claude/livespec/hooks/before-implement.md` | Add design reference loading |
