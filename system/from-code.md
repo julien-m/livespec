@@ -1,6 +1,6 @@
 # From-Code Flow
 
-> Referenced by `commands/spec-init.md` when `--from-code` flag is set.
+> Referenced by `.agent-sync/skills/spec-init/SKILL.md` when `--from-code` flag is set.
 > This file specifies the complete reverse-engineering flow: code analysis → bootstrap recap → human validation → Phase C entry.
 
 ---
@@ -406,4 +406,4 @@ After Phase E completes:
 ---
 
 *From-code flow spec — LiveSpec v1.1*
-*Referenced by commands/spec-init.md when --from-code flag is set.*
+*Referenced by .agent-sync/skills/spec-init/SKILL.md when --from-code flag is set.*

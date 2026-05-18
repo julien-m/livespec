@@ -18,8 +18,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).parent.parent
 ATOMIC_COMMANDS: list[tuple[str, Path]] = [
-    ("specify", REPO_ROOT / "commands" / "spec-specify.md"),
-    ("plan", REPO_ROOT / "commands" / "spec-plan.md"),
+    ("specify", REPO_ROOT / ".agent-sync" / "skills" / "spec-specify" / "SKILL.md"),
+    ("plan", REPO_ROOT / ".agent-sync" / "skills" / "spec-plan" / "SKILL.md"),
 ]
 
 

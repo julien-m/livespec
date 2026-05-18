@@ -13,8 +13,16 @@ import textwrap
 from pathlib import Path
 
 # Real command files — used for content-based validation
-_IMPLEMENT_CMD = Path(__file__).parent.parent / "commands" / "spec-implement.md"
-_TEST_CMD = Path(__file__).parent.parent / "commands" / "spec-test.md"
+_IMPLEMENT_CMD = (
+    Path(__file__).parent.parent
+    / ".agent-sync"
+    / "skills"
+    / "spec-implement"
+    / "SKILL.md"
+)
+_TEST_CMD = (
+    Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-test" / "SKILL.md"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -43,7 +51,8 @@ def _build_audit_output(
         taxonomy_path: path to taxonomy document for gap references.
 
     Returns:
-        Formatted audit output string matching commands/spec-test.md Phase 1.5 format.
+        Formatted audit output string matching the spec-test skill Phase 1.5
+        format.
     """
     lines = ["### Behavioral Coverage Audit", ""]
     lines.append("| Trait | Required Pattern | Pattern Keyword | Status | Notes |")

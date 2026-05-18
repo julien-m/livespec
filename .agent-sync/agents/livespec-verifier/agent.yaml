@@ -1,0 +1,6 @@
+name: "livespec-verifier"
+description: "LiveSpec-only verifier. Do not select unless `.specs/` exists."
+model: "sonnet"
+targets:
+  - claude
+  - codex

@@ -75,7 +75,7 @@ identify the file as an integration):
 ```yaml
 ---
 integration: <name>           # REQUIRED — logical name (any non-empty string)
-commands: [<cmd>, ...]        # REQUIRED — matched against commands/*.md registry
+commands: [<cmd>, ...]        # REQUIRED — matched against .agent-sync/skills/spec-* registry
 phase: before | after         # default: before
 mode: extend | override       # default: extend
 order: <int>                  # default: 100 (lower = injected earlier)
@@ -399,7 +399,7 @@ The following pattern must be present in the project's `.gitignore` (added by `/
 
 ## Discovery
 
-Use `/spec-hooks [command]` to see which hooks would be loaded for a given command, including Level 0 user integrations (path, name, order, mode), or `--create`/`--edit` to manage levels 1–3. See [`commands/spec-hooks.md`](../commands/spec-hooks.md) for details. Level 0 integrations are managed by simply creating, editing, or deleting files in `~/.config/livespec/`.
+Use `/spec-hooks [command]` to see which hooks would be loaded for a given command, including Level 0 user integrations (path, name, order, mode), or `--create`/`--edit` to manage levels 1–3. See [`.agent-sync/skills/spec-hooks/SKILL.md`](../.agent-sync/skills/spec-hooks/SKILL.md) for details. Level 0 integrations are managed by simply creating, editing, or deleting files in `~/.config/livespec/`.
 
 Canonical command names are `spec-check`, `spec-explain`, `spec-feature`, `spec-fix`, `spec-hooks`, `spec-implement`, `spec-init`, `spec-migrate`, `spec-plan`, `spec-play-coverage`, `spec-preflight`, `spec-propose`, `spec-refine`, `spec-refresh-conventions`, `spec-ship`, `spec-specify`, `spec-stack`, `spec-status`, `spec-test`, and `spec-verify-output`. Dotted aliases such as `/spec.check` are accepted only as compatibility inputs and are normalized before hook resolution.
 

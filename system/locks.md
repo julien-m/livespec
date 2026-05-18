@@ -101,10 +101,10 @@ See [`system/anti-drift-block.md`](anti-drift-block.md) §2 for the canonical BL
 
 ## Where this is used
 
-- `commands/spec-specify.md` Steps 7.5/7.6 — README + changelog updates
-- `commands/spec-refine.md` — README + feature changelog updates
-- `commands/spec-fix.md` Step 8 — artifacts updates
-- `agents/livespec-documenter.md` Finalize mode — writes to README + changelog + roadmap
+- `.agent-sync/skills/spec-specify/SKILL.md` Steps 7.5/7.6 — README + changelog updates
+- `.agent-sync/skills/spec-refine/SKILL.md` — README + feature changelog updates
+- `.agent-sync/skills/spec-fix/SKILL.md` Step 8 — artifacts updates
+- `.agent-sync/agents/livespec-documenter/prompt.md` Finalize mode — writes to README + changelog + roadmap
 
 All of these wrap their write sequence in `with acquire_lock(specs_root):`
 and use `write_with_hash_check` for the actual write.

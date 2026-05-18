@@ -44,8 +44,25 @@ def _fake_project(root: Path, *, with_claude: bool, with_git: bool) -> Path:
     return root
 
 
-def _run_migration(project_dir: Path) -> subprocess.CompletedProcess[str]:
+def _fake_cc_hub(bin_dir: Path, log_path: Path) -> dict[str, str]:
+    bin_dir.mkdir(parents=True)
+    script = bin_dir / "cc-hub"
+    script.write_text(
+        "#!/usr/bin/env bash\n"
+        "printf '%s\\n' \"$*\" >> \"${CC_HUB_LOG}\"\n",
+        encoding="utf-8",
+    )
+    script.chmod(0o755)
     env = os.environ.copy()
+    env["PATH"] = f"{bin_dir}:{env['PATH']}"
+    env["CC_HUB_LOG"] = str(log_path)
+    return env
+
+
+def _run_migration(
+    project_dir: Path,
+    env: dict[str, str],
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["bash", str(MIGRATE_SH), str(MIGRATION_FILE), str(project_dir), str(REPO_ROOT)],
         capture_output=True,
@@ -62,20 +79,13 @@ class TestMigrationV13:
     def test_full_project_with_claude_and_git(self, tmp_path: Path) -> None:
         """Project with `.claude/` and `.git/` — every action lands."""
         project = _fake_project(tmp_path / "proj", with_claude=True, with_git=True)
-        # Simulate the orphan symlinks created by the buggy pre-fix link-local.sh.
-        orphan = project / ".claude" / "commands" / "spec.check.expectations.md"
-        orphan.symlink_to(REPO_ROOT / "commands" / "spec-check.expectations.md")
-        assert orphan.is_symlink()
+        log_path = tmp_path / "cc-hub.log"
+        env = _fake_cc_hub(tmp_path / "bin", log_path)
 
-        result = _run_migration(project)
+        result = _run_migration(project, env)
         assert result.returncode == 0, result.stderr
 
-        # Orphan removed.
-        assert not orphan.exists() and not orphan.is_symlink()
-        # New command linked.
-        verify_link = project / ".claude" / "commands" / "spec.verify-output.md"
-        assert verify_link.is_symlink()
-        assert verify_link.resolve() == (REPO_ROOT / "commands" / "spec-verify-output.md").resolve()
+        assert "skill link" in log_path.read_text(encoding="utf-8")
         # Pre-commit hook installed.
         hook = project / ".git" / "hooks" / "pre-commit"
         assert hook.exists()
@@ -91,11 +101,12 @@ class TestMigrationV13:
     def test_idempotent_rerun(self, tmp_path: Path) -> None:
         """Running v13 twice is a no-op on the second pass."""
         project = _fake_project(tmp_path / "proj", with_claude=True, with_git=True)
-        first = _run_migration(project)
+        env = _fake_cc_hub(tmp_path / "bin", tmp_path / "cc-hub.log")
+        first = _run_migration(project, env)
         assert first.returncode == 0, first.stderr
         gitignore_after_first = (project / ".gitignore").read_text()
 
-        second = _run_migration(project)
+        second = _run_migration(project, env)
         assert second.returncode == 0, second.stderr
         gitignore_after_second = (project / ".gitignore").read_text()
 
@@ -107,7 +118,8 @@ class TestMigrationV13:
     def test_no_claude_dir_skipped_silently(self, tmp_path: Path) -> None:
         """Projects without `.claude/commands/` skip the link refresh."""
         project = _fake_project(tmp_path / "proj", with_claude=False, with_git=True)
-        result = _run_migration(project)
+        env = _fake_cc_hub(tmp_path / "bin", tmp_path / "cc-hub.log")
+        result = _run_migration(project, env)
         assert result.returncode == 0, result.stderr
         # Hook still installed.
         assert (project / ".git" / "hooks" / "pre-commit").exists()
@@ -118,7 +130,8 @@ class TestMigrationV13:
     def test_no_git_dir_skipped_silently(self, tmp_path: Path) -> None:
         """Projects without `.git/` skip the pre-commit hook install."""
         project = _fake_project(tmp_path / "proj", with_claude=True, with_git=False)
-        result = _run_migration(project)
+        env = _fake_cc_hub(tmp_path / "bin", tmp_path / "cc-hub.log")
+        result = _run_migration(project, env)
         assert result.returncode == 0, result.stderr
         # No hook attempted.
         assert not (project / ".git").exists()
@@ -134,33 +147,32 @@ class TestLinkLocalFilter:
 
     def test_expectations_files_are_not_linked(self, tmp_path: Path) -> None:
         project = _fake_project(tmp_path / "proj", with_claude=True, with_git=False)
+        env = _fake_cc_hub(tmp_path / "bin", tmp_path / "cc-hub.log")
         result = subprocess.run(
             ["bash", str(LINK_LOCAL_SH), str(project), str(REPO_ROOT)],
             capture_output=True,
             text=True,
             timeout=30,
+            env=env,
         )
         assert result.returncode == 0, result.stderr
-        # No `.expectations.md` symlink should exist.
-        commands_dir = project / ".claude" / "commands"
-        expectations_links = list(commands_dir.glob("spec.*.expectations.md"))
-        assert expectations_links == [], (
-            f"link-local.sh leaked expectations sidecars: {expectations_links}"
-        )
-        # Sanity: at least one real command was linked.
-        assert (commands_dir / "spec.verify-output.md").is_symlink()
+        assert not (project / ".claude" / "commands" / "spec.verify-output.md").exists()
 
-    def test_orphan_expectations_symlinks_are_cleaned(self, tmp_path: Path) -> None:
+    def test_legacy_orphan_symlinks_are_not_recreated_by_agent_sync(self, tmp_path: Path) -> None:
         project = _fake_project(tmp_path / "proj", with_claude=True, with_git=False)
         orphan = project / ".claude" / "commands" / "spec.feature.expectations.md"
-        orphan.symlink_to(REPO_ROOT / "commands" / "spec-feature.expectations.md")
+        orphan.symlink_to(
+            REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "expectations.md"
+        )
         assert orphan.is_symlink()
+        env = _fake_cc_hub(tmp_path / "bin", tmp_path / "cc-hub.log")
 
         result = subprocess.run(
             ["bash", str(LINK_LOCAL_SH), str(project), str(REPO_ROOT)],
             capture_output=True,
             text=True,
             timeout=30,
+            env=env,
         )
         assert result.returncode == 0, result.stderr
-        assert not orphan.is_symlink() and not orphan.exists()
+        assert orphan.is_symlink()

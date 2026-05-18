@@ -328,18 +328,18 @@ This check is **non-blocking** — the command continues normally after the warn
 
 ### Command discovery
 
-Detailed step-by-step instructions for each `/spec-*` command are symlinked into `.claude/commands/` of each project via `scripts/link-local.sh`. Only `/spec-init` and `/spec-migrate` remain global (`~/.claude/commands/`). The 20 available commands are: `/spec-init`, `/spec-migrate`, `/spec-propose`, `/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-check`, `/spec-fix`, `/spec-explain`, `/spec-stack`, `/spec-feature`, `/spec-ship`, `/spec-preflight`, `/spec-hooks`, `/spec-play-coverage`, `/spec-refine`, `/spec-status`, `/spec-refresh-conventions`, `/spec-verify-output`.
+Detailed step-by-step instructions for each `/spec-*` command live as portable skills in `.agent-sync/skills/spec-*/SKILL.md`. `scripts/sync-agent-assets.sh` uses `cc-hub` to link those skills, rules, and agents into Claude Code and Codex provider outputs for each project. The 20 available commands are: `/spec-init`, `/spec-migrate`, `/spec-propose`, `/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-check`, `/spec-fix`, `/spec-explain`, `/spec-stack`, `/spec-feature`, `/spec-ship`, `/spec-preflight`, `/spec-hooks`, `/spec-play-coverage`, `/spec-refine`, `/spec-status`, `/spec-refresh-conventions`, `/spec-verify-output`.
 
 ### Command Expectations & Verify Output
 
-Every slash-command has a paired contract file `commands/<X>.expectations.md`
+Every slash-command has a paired contract file `.agent-sync/skills/<X>/expectations.md`
 declaring its preconditions, observable signals, FS effects, exit codes, and
 4-state outcome matrix (success/drift/blocked/error). Each file embeds a
 machine-readable `verify:` YAML block consumed by `/spec-verify-output`.
 Run artifacts are written under `.specs/.runs/` (gitignored). A pre-commit
 hook (`hooks/livespec-last-reviewed.py`, installed via
-`scripts/install-hooks.sh`) hard-blocks commits that touch `commands/<X>.md`
-without bumping `commands/<X>.expectations.md`'s `last_reviewed` frontmatter
+`scripts/install-hooks.sh`) hard-blocks commits that touch `.agent-sync/skills/<X>/SKILL.md`
+without bumping `.agent-sync/skills/<X>/expectations.md`'s `last_reviewed` frontmatter
 to today. See `system/expectations.md` for the full reference.
 
 ### When CREATING a new feature

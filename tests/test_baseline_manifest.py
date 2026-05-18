@@ -22,8 +22,8 @@ import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).parent.parent
-SPEC_TEST_MD = REPO_ROOT / "commands" / "spec-test.md"
-SPEC_CHECK_MD = REPO_ROOT / "commands" / "spec-check.md"
+SPEC_TEST_MD = REPO_ROOT / ".agent-sync" / "skills" / "spec-test" / "SKILL.md"
+SPEC_CHECK_MD = REPO_ROOT / ".agent-sync" / "skills" / "spec-check" / "SKILL.md"
 BASELINE_SCHEMA_MD = REPO_ROOT / "system" / "schemas" / "baseline-manifest.md"
 MIGRATION_V5_MD = REPO_ROOT / "migrations" / "5" / "migrate.md"
 FIXTURES_DIR = Path(__file__).parent / "fixtures" / "baseline_manifest"

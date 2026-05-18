@@ -1,0 +1,6 @@
+name: "livespec-implementer"
+description: "LiveSpec-only implementation agent. Do not select unless `.specs/` exists."
+model: "opus"
+targets:
+  - claude
+  - codex

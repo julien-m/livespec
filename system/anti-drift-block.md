@@ -1,6 +1,6 @@
 # Anti-Drift Block
 
-> Reusable hardened-step template for all `commands/*.md` and `agents/livespec-*.md` files.
+> Reusable hardened-step template for all LiveSpec `.agent-sync` skills and agents.
 > Injected via `<!-- @import system/anti-drift-block.md -->` directive at the top of each target.
 >
 > Goal: standardise the *form* of every step (the 6 canonical fields defined in §1) so executors
@@ -243,7 +243,7 @@ executing — NOT the outer pipeline name. Implementation contract:
    `before-feature` / `after-feature` at its outer boundary with
    `<NAME> = feature`.
 2. Before spawning each subagent (Specify, Plan, Implement, Test, …),
-   the supervisor in `commands/spec-feature.md` MUST prepend a synthetic
+   the supervisor in `.agent-sync/skills/spec-feature/SKILL.md` MUST prepend a synthetic
    invocation header to the subagent prompt, of the EXACT form:
 
        /spec-<subcmd>
@@ -251,7 +251,7 @@ executing — NOT the outer pipeline name. Implementation contract:
    where `<subcmd>` ∈ {`specify`, `plan`, `implement`, `test`, …}. This
    single line is the FIRST line of the subagent's user turn, so the
    subagent applies steps (1)–(4) of this directive against `<subcmd>`,
-   not `feature`. The same rule applies to `commands/spec-ship.md` (batch
+   not `feature`. The same rule applies to `.agent-sync/skills/spec-ship/SKILL.md` (batch
    wrapper).
 3. Each subagent therefore runs (with `--feature <slug>` included when feature
    context is available):

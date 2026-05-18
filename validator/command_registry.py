@@ -1,4 +1,4 @@
-"""Canonical registry for LiveSpec slash commands.
+"""Canonical registry for LiveSpec slash command skills.
 
 # @spec FR-001: canonical command registry
 #   — .specs/features/048-command-validation-hardening/spec.md#fr-001
@@ -19,7 +19,7 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class CommandInfo:
-    """Resolved command metadata from the ``commands/`` directory."""
+    """Resolved command metadata from the agent-sync skill source tree."""
 
     name: str
     command_path: Path
@@ -63,10 +63,10 @@ def discover_commands(
     *,
     naming_policy: CommandNamingPolicy = CommandNamingPolicy.HYPHENATED,
 ) -> list[CommandInfo]:
-    """Discover command files and sidecar expectations.
+    """Discover command skills or legacy command files.
 
     Args:
-        commands_dir: Directory containing ``*.md`` command sources.
+        commands_dir: ``.agent-sync/skills`` or legacy ``commands`` source dir.
         naming_policy: Naming policy used for the canonical slash spelling.
 
     Returns:
@@ -75,6 +75,40 @@ def discover_commands(
     """
     if not commands_dir.is_dir():
         return []
+    if (commands_dir / "spec-check" / "SKILL.md").exists():
+        return _discover_agent_sync_skills(commands_dir, naming_policy=naming_policy)
+    return _discover_legacy_command_files(commands_dir, naming_policy=naming_policy)
+
+
+def _discover_agent_sync_skills(
+    skills_dir: Path,
+    *,
+    naming_policy: CommandNamingPolicy,
+) -> list[CommandInfo]:
+    """Discover canonical command skills from ``.agent-sync/skills``."""
+    commands: list[CommandInfo] = []
+    for skill_dir in sorted(skills_dir.glob("spec-*")):
+        if not skill_dir.is_dir():
+            continue
+        name = canonical_command_name(skill_dir.name)
+        commands.append(
+            CommandInfo(
+                name=name,
+                command_path=skill_dir / "SKILL.md",
+                expectations_path=skill_dir / "expectations.md",
+                canonical_slash=naming_policy.canonical_for(name),
+                legacy_slashes=(f"/spec.{short_command_name(name)}",),
+            )
+        )
+    return commands
+
+
+def _discover_legacy_command_files(
+    commands_dir: Path,
+    *,
+    naming_policy: CommandNamingPolicy,
+) -> list[CommandInfo]:
+    """Discover command files from the pre-agent-sync ``commands`` layout."""
     commands: list[CommandInfo] = []
     for command_path in sorted(commands_dir.glob("*.md")):
         stem = command_path.stem
@@ -85,7 +119,10 @@ def discover_commands(
             CommandInfo(
                 name=name,
                 command_path=command_path,
-                expectations_path=_expectations_path_for(commands_dir, command_path.stem),
+                expectations_path=_legacy_expectations_path_for(
+                    commands_dir,
+                    command_path.stem,
+                ),
                 canonical_slash=naming_policy.canonical_for(name),
                 legacy_slashes=(f"/spec.{short_command_name(name)}",),
             )
@@ -117,7 +154,7 @@ def short_command_name(raw_name: str) -> str:
     return name
 
 
-def _expectations_path_for(commands_dir: Path, command_stem: str) -> Path:
+def _legacy_expectations_path_for(commands_dir: Path, command_stem: str) -> Path:
     """Return sidecar path matching canonical and legacy command sources."""
     canonical_stem = canonical_command_name(command_stem)
     canonical_path = commands_dir / f"{canonical_stem}.expectations.md"

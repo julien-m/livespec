@@ -1,4 +1,4 @@
-"""Deterministic audit for LiveSpec command contracts.
+"""Deterministic audit for LiveSpec command skill contracts.
 
 # @spec FR-003: deterministic command audit
 #   — .specs/features/048-command-validation-hardening/spec.md#fr-003
@@ -111,7 +111,7 @@ def audit_commands(
     naming_policy: CommandNamingPolicy = CommandNamingPolicy.HYPHENATED,
 ) -> CommandAuditReport:
     """Audit all command contracts in ``repo_root``."""
-    commands_dir = repo_root / "commands"
+    commands_dir = _command_source_dir(repo_root)
     entries = tuple(
         _audit_command(repo_root, command, naming_policy=naming_policy)
         for command in discover_commands(commands_dir, naming_policy=naming_policy)
@@ -121,6 +121,14 @@ def audit_commands(
         naming_policy=naming_policy,
         entries=entries,
     )
+
+
+def _command_source_dir(repo_root: Path) -> Path:
+    """Return the production command source directory for this repo."""
+    skills_dir = repo_root / ".agent-sync" / "skills"
+    if skills_dir.is_dir():
+        return skills_dir
+    return repo_root / "commands"
 
 
 def _audit_command(
@@ -142,19 +150,34 @@ def _audit_command(
 
 
 def _check_source_filename(command: CommandInfo) -> AuditCheck:
+    if command.command_path.name == "SKILL.md":
+        if command.command_path.parent.name != command.name:
+            return AuditCheck(
+                "source_filename",
+                "FAIL",
+                f"expected .agent-sync/skills/{command.name}/SKILL.md",
+            )
+        if command.expectations_path.name != "expectations.md":
+            return AuditCheck(
+                "source_filename",
+                "FAIL",
+                f"expected .agent-sync/skills/{command.name}/expectations.md",
+            )
+        return AuditCheck("source_filename", "PASS", "source files match command name")
+
     expected_command = f"{command.name}.md"
     expected_expectations = f"{command.name}.expectations.md"
     if command.command_path.name != expected_command:
         return AuditCheck(
             "source_filename",
             "FAIL",
-            f"expected commands/{expected_command}",
+            f"expected legacy commands/{expected_command}",
         )
     if command.expectations_path.name != expected_expectations:
         return AuditCheck(
             "source_filename",
             "FAIL",
-            f"expected commands/{expected_expectations}",
+            f"expected legacy commands/{expected_expectations}",
         )
     return AuditCheck("source_filename", "PASS", "source files match command name")
 
@@ -216,9 +239,9 @@ def _check_expectations_identity(command: CommandInfo) -> AuditCheck:
 
 def _check_docs_reference(repo_root: Path, command: CommandInfo) -> AuditCheck:
     doc_paths = [
-        repo_root / "commands" / "spec-hooks.md",
-        repo_root / "commands" / "spec-init.md",
-        repo_root / ".claude" / "rules" / "livespec-commands.md",
+        repo_root / ".agent-sync" / "skills" / "spec-hooks" / "SKILL.md",
+        repo_root / ".agent-sync" / "skills" / "spec-init" / "SKILL.md",
+        repo_root / ".agent-sync" / "rules" / "livespec" / "commands.md",
         repo_root / "system" / "hooks.md",
         repo_root / "system" / "spec-system.md",
         repo_root / "scripts" / "init.sh",

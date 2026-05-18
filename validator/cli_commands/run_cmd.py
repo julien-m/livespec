@@ -186,7 +186,9 @@ def _detect_livespec_root() -> Path:
     """Resolve the LiveSpec checkout root by walking parents of this module."""
     here = Path(__file__).resolve()
     for parent in here.parents:
-        if (parent / "commands").is_dir() and (parent / "validator").is_dir():
+        if (parent / ".agent-sync" / "skills").is_dir() and (
+            parent / "validator"
+        ).is_dir():
             return parent
     return here.parents[2]
 

@@ -1,0 +1,6 @@
+name: "livespec-documenter"
+description: "LiveSpec-only documentation agent. Do not select unless `.specs/` exists."
+model: "haiku"
+targets:
+  - claude
+  - codex

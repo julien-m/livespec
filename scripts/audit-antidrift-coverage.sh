@@ -19,8 +19,8 @@ cd "$(dirname "$0")/.."
 missing=0
 while IFS= read -r n; do
     [ -n "$n" ] || continue
-    grep -qF "@import system/anti-drift-block.md" "commands/$n.md" \
-      || { echo "MISSING: commands/$n.md"; missing=1; }
+    grep -qF "@import system/anti-drift-block.md" ".agent-sync/skills/$n/SKILL.md" \
+      || { echo "MISSING: .agent-sync/skills/$n/SKILL.md"; missing=1; }
 done < <(python3 -c "from validator.integrations import valid_command_names; print('\n'.join(sorted(valid_command_names())))")
 
 exit "$missing"

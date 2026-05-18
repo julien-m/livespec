@@ -45,7 +45,7 @@ def test_command_audit_fails_when_antidrift_import_is_missing(tmp_path: Path) ->
     commands_dir = tmp_path / "commands"
     commands_dir.mkdir()
     (commands_dir / "spec-demo.md").write_text("# Command: /spec-demo\n", encoding="utf-8")
-    expectation_text = Path("commands/spec-status.expectations.md").read_text(
+    expectation_text = Path(".agent-sync/skills/spec-status/expectations.md").read_text(
         encoding="utf-8"
     )
     (commands_dir / "spec-demo.expectations.md").write_text(
@@ -66,8 +66,8 @@ def test_command_audit_fails_when_antidrift_import_is_missing(tmp_path: Path) ->
 def test_command_audit_fails_when_source_filename_is_not_canonical(tmp_path: Path) -> None:
     commands_dir = tmp_path / "commands"
     commands_dir.mkdir()
-    source_text = Path("commands/spec-status.md").read_text(encoding="utf-8")
-    expectation_text = Path("commands/spec-status.expectations.md").read_text(
+    source_text = Path(".agent-sync/skills/spec-status/SKILL.md").read_text(encoding="utf-8")
+    expectation_text = Path(".agent-sync/skills/spec-status/expectations.md").read_text(
         encoding="utf-8"
     )
     (commands_dir / "demo.md").write_text(
@@ -103,6 +103,6 @@ def test_command_audit_enforces_hyphenated_policy() -> None:
         entry["canonical_slash"].startswith("/spec-") for entry in payload["commands"]
     )
     assert all(
-        entry["command_path"].endswith(f"{entry['name']}.md")
+        entry["command_path"].endswith(f".agent-sync/skills/{entry['name']}/SKILL.md")
         for entry in payload["commands"]
     )

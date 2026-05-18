@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-05-18 — [Feature 050]: Implemented: Agent Sync Migration — moved commands, expectations, agents, and routing rules to `.agent-sync`; init/install/migration now sync through `cc-hub`; legacy `commands/`, `agents/`, and tracked `.claude/rules/livespec-*` sources removed; Migration 16 added; command-audit reports 20/20 commands at score 5.
+
 ## 2026-05-18 — [Feature 049]: Implemented: Command Naming Normalization — `/spec-*` is now canonical across registry, docs, local/bootstrap links, hooks, integrations, command-audit, verify-output, and run finalization; dotted `/spec.*` links remain as legacy aliases; Migration 15 added; full suite 1506 passed, 32 skipped.
 
 ## 2026-05-18 — [Feature 048]: Implemented: Command Validation Hardening — added canonical command registry, `livespec command-audit`, strengthened expectations guard checks, `livespec run finalize`, deterministic `status`/`play-coverage`/`conventions refresh` backends, audit-backed coherence script, Migration 14, and tests; command-audit reports 20/20 commands at score 5.

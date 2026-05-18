@@ -13,7 +13,7 @@ from ..command_registry import CommandNamingPolicy
 REPO_OPTION = typer.Option(
     Path("."),
     "--repo",
-    help="Repository root containing commands/.",
+    help="Repository root containing .agent-sync/skills.",
 )
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
 NAMING_POLICY_OPTION = typer.Option(

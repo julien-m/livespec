@@ -96,7 +96,7 @@ Project / Local levels.
 ```yaml
 ---
 integration: <name>
-commands: [specify, plan]   # any subset of commands/*.md
+commands: [specify, plan]   # any subset of .agent-sync/skills/spec-*
 phase: before               # before | after (default: before)
 mode: extend                # extend | override (default: extend)
 order: 100                  # lower = injected earlier
@@ -361,7 +361,7 @@ Factual status overview — roadmap items, feature statuses, next actions. Read-
 
 Key flags: `--roadmap`, `--features`, `--json`
 
-> Full command documentation is in `commands/*.md`.
+> Full command documentation is in `.agent-sync/skills/spec-*/SKILL.md`.
 
 ---
 
@@ -401,21 +401,24 @@ Key flags: `--roadmap`, `--features`, `--json`
 
 ### Global bootstrap (required once)
 
-Install the two bootstrap commands that must exist before a project can link the rest of LiveSpec locally:
+Install the two bootstrap skills that must exist before a project can sync the rest of LiveSpec locally:
 
 ```bash
 bash ~/livespec/scripts/install.sh
 ```
 
-This creates global symlinks for:
-- `/spec-init` and `/spec-migrate` in `~/.claude/commands/`
-- The routing rule `livespec-routing.md` (+ its `livespec-commands.md` reference) in `~/.claude/rules/` — Claude automatically routes user requests (add feature, run tests, fix UI, etc.) to the matching `/spec-*` command whenever a `.specs/` directory is detected in the project root.
+This asks `cc-hub` to install:
+- `spec-init` and `spec-migrate` as portable skills for Claude Code and Codex
+- The LiveSpec routing and command rules for both providers
 
 ### Per-project (automatic after bootstrap)
 
-When you run `/spec-init` in a project, LiveSpec automatically creates local symlinks in `.claude/commands/` and `.claude/agents/` for the rest of the command set. No additional manual installation is needed.
+When you run `/spec-init` in a project, LiveSpec syncs `.agent-sync` assets
+through `cc-hub`, which materializes the correct Claude Code and Codex provider
+outputs. No manual provider-specific installation is needed.
 
-For existing projects initialized before v2, run `/spec-migrate` to add local symlinks.
+For existing projects initialized before v16, run `/spec-migrate` to migrate to
+the `.agent-sync` sync flow.
 
 For other AI tools, paste `system/spec-system.md` into your tool's context.
 
@@ -560,30 +563,14 @@ livespec/
 │       ├── web-realtime.md
 │       ├── web-static.md
 │       └── api-rest.md
-├── agents/                         ← Agent definitions (symlinked per-project by /spec-init)
-│   ├── livespec-supervisor.md      ← Orchestrator — builds Task Payloads, dispatches to Superpowers
-│   ├── livespec-implementer.md     ← Infrastructure provisioning (Phase 0 only)
-│   ├── livespec-verifier.md        ← Spec review + plan review (code review via Superpowers)
-│   └── livespec-documenter.md      ← Updates spec artifacts
-├── commands/                       ← init/migrate bootstrapped globally; other command docs symlinked per-project
-│   ├── init.md
-│   ├── migrate.md
-│   ├── propose.md
-│   ├── specify.md
-│   ├── plan.md
-│   ├── implement.md
-│   ├── test.md
-│   ├── check.md
-│   ├── explain.md
-│   ├── stack.md
-│   ├── feature.md
-│   ├── preflight.md
-│   ├── hooks.md
-│   ├── play-coverage.md
-│   └── refine.md
+├── .agent-sync/                    ← Portable source for skills, agents, and rules
+│   ├── skills/spec-*/              ← LiveSpec command skills + expectations.md
+│   ├── agents/livespec-*/          ← Portable agent.yaml + prompt.md
+│   └── rules/livespec/             ← Rules built by cc-hub for Claude/Codex
 └── scripts/
-    ├── install.sh                  ← Bootstrap global spec.init + spec.migrate symlinks
-    ├── link-local.sh               ← Create per-project symlinks in .claude/ (called by /spec-init)
+    ├── install.sh                  ← Bootstrap global skills/rules through cc-hub
+    ├── sync-agent-assets.sh        ← Sync .agent-sync assets into projects through cc-hub
+    ├── link-local.sh               ← Backward-compatible wrapper around sync-agent-assets.sh
     └── init.sh                     ← Bootstrap .specs/ structure (shell)
 ```
 

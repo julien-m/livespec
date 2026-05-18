@@ -33,9 +33,9 @@ from .command_registry import (
     valid_command_names as registry_valid_command_names,
 )
 
-# Source of truth for the canonical commands directory. Resolved relative
-# to this file (validator/integrations.py → repo root via ../).
-LIVESPEC_COMMANDS_DIR = Path(__file__).parent.parent / "commands"
+# Source of truth for the canonical command skills directory. Resolved relative
+# to this file (validator/integrations.py -> repo root via ../).
+LIVESPEC_COMMANDS_DIR = Path(__file__).parent.parent / ".agent-sync" / "skills"
 
 INTEGRATIONS_DIR = Path.home() / ".config" / "livespec"
 
@@ -73,10 +73,8 @@ class Integration:
 def valid_command_names(commands_dir: Path | None = None) -> frozenset[str]:
     """Return the canonical LiveSpec command registry.
 
-    The registry is derived from ``commands/*.md`` files in the repo (the
-    same rule used by ``scripts/link-local.sh``). Sidecar files matching
-    ``*.expectations.md`` are excluded — ``Path.stem`` for those returns
-    ``"<name>.expectations"`` (Python only strips the final extension).
+    The registry is derived from ``.agent-sync/skills/spec-*`` directories in
+    the repo.
     """
     base = commands_dir or LIVESPEC_COMMANDS_DIR
     return registry_valid_command_names(base)

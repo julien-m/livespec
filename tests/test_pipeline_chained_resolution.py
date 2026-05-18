@@ -1,9 +1,9 @@
 """Static markdown verification for D-a subagent-header propagation.
 
-The supervisors `commands/spec-feature.md` and `commands/spec-ship.md` must prepend
-a synthetic `/spec.<subcmd>` line as the FIRST line of each subagent
-prompt — this is what makes the subagent's anti-drift directive resolve
-hooks under the correct sub-command name (not under `feature`).
+The supervisor skills for feature and ship must prepend a synthetic
+`/spec.<subcmd>` line as the FIRST line of each subagent prompt. This makes the
+subagent's anti-drift directive resolve hooks under the correct sub-command
+name, not under `feature`.
 
 These tests parse the markdown statically and assert the contract.
 """
@@ -16,8 +16,8 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).parent.parent
-FEATURE_MD = REPO_ROOT / "commands" / "spec-feature.md"
-SHIP_MD = REPO_ROOT / "commands" / "spec-ship.md"
+FEATURE_MD = REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "SKILL.md"
+SHIP_MD = REPO_ROOT / ".agent-sync" / "skills" / "spec-ship" / "SKILL.md"
 
 
 def _read(p: Path) -> str:

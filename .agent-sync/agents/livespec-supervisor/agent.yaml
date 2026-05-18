@@ -1,0 +1,6 @@
+name: "livespec-supervisor"
+description: "LiveSpec-only orchestrator. Do not select unless `.specs/` exists."
+model: "sonnet"
+targets:
+  - claude
+  - codex

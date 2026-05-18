@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-shot migration: append Section 13 to every commands/*.expectations.md.
+"""One-shot migration: append Section 13 to every agent-sync expectations file.
 
 Run from repo root:
 
@@ -19,7 +19,7 @@ from pathlib import Path
 # ruff: noqa: E501, RUF001
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-COMMANDS_DIR = REPO_ROOT / "commands"
+COMMANDS_DIR = REPO_ROOT / ".agent-sync" / "skills"
 
 
 def section13_for(command: str) -> str:
@@ -1030,7 +1030,7 @@ def _verify_output_block() -> str:
 ```
 $ livespec verify-output specify
 verify-output  command=specify
-source         commands/spec-specify.expectations.md
+source         .agent-sync/skills/spec-specify/expectations.md
 artifact       .specs/.runs/specify-2026-05-12T10-00-00.json
 
 verb      kind                  status    detail
@@ -1089,7 +1089,7 @@ def patch_file(path: Path) -> bool:
     text = path.read_text(encoding="utf-8")
     if re.search(r"^## 13\.", text, re.MULTILINE):
         return False
-    command_name = path.name.removesuffix(".expectations.md")
+    command_name = path.parent.name.removeprefix("spec-")
     block = section13_for(command_name)
     if not text.endswith("\n"):
         text += "\n"
@@ -1101,7 +1101,7 @@ def patch_file(path: Path) -> bool:
 def main() -> int:
     updated = 0
     total = 0
-    for path in sorted(COMMANDS_DIR.glob("*.expectations.md")):
+    for path in sorted(COMMANDS_DIR.glob("spec-*/expectations.md")):
         total += 1
         if patch_file(path):
             updated += 1

@@ -95,5 +95,5 @@ Failed activations log the canonical BLOCKED line above. Both formats are machin
 
 ## Where this is referenced
 
-- All four `agents/livespec-*.md` files via `@import system/activation-contract.md`
+- All four `.agent-sync/agents/livespec-*/prompt.md` files via `@import system/activation-contract.md`
 - Test fixtures in `tests/test_contracts.py` simulating successful and failed activations

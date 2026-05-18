@@ -231,20 +231,33 @@ See the available presets for guidance:
   # Features directory (empty)
   create_dir "$PROJECT_DIR/.specs/features"
 
-  # Add .specs/hooks/*.local.md to .gitignore
+  # Add LiveSpec local-only files to .gitignore
   header "Updating .gitignore..."
   local gitignore="$PROJECT_DIR/.gitignore"
   local hooks_pattern=".specs/hooks/*.local.md"
+  local agent_sync_local_pattern=".agent-sync.local/"
   if [[ "$DRY_RUN" == true ]]; then
     echo -e "  ${YELLOW}[dry-run]${RESET} Would add '$hooks_pattern' to .gitignore"
+    echo -e "  ${YELLOW}[dry-run]${RESET} Would add '$agent_sync_local_pattern' to .gitignore"
   elif [[ ! -f "$gitignore" ]]; then
-    printf '# LiveSpec local hooks (personal, not committed)\n%s\n' "$hooks_pattern" > "$gitignore"
-    success "Created .gitignore with hooks pattern"
-  elif ! grep -qF "$hooks_pattern" "$gitignore"; then
-    printf '\n# LiveSpec local hooks (personal, not committed)\n%s\n' "$hooks_pattern" >> "$gitignore"
-    success "Added hooks pattern to .gitignore"
+    printf '# LiveSpec local files (personal, not committed)\n%s\n%s\n' \
+      "$hooks_pattern" "$agent_sync_local_pattern" > "$gitignore"
+    success "Created .gitignore with LiveSpec local patterns"
   else
-    info "hooks pattern already in .gitignore"
+    local added_gitignore=false
+    if ! grep -qF "$hooks_pattern" "$gitignore"; then
+      printf '\n# LiveSpec local hooks (personal, not committed)\n%s\n' "$hooks_pattern" >> "$gitignore"
+      added_gitignore=true
+    fi
+    if ! grep -qF "$agent_sync_local_pattern" "$gitignore"; then
+      printf '\n# LiveSpec local agent-sync overlay (personal, not committed)\n%s\n' "$agent_sync_local_pattern" >> "$gitignore"
+      added_gitignore=true
+    fi
+    if [[ "$added_gitignore" == true ]]; then
+      success "Added LiveSpec local patterns to .gitignore"
+    else
+      info "LiveSpec local patterns already in .gitignore"
+    fi
   fi
 
   # Install LiveSpec section in CLAUDE.md
@@ -282,16 +295,16 @@ Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · 
     success "Updated LiveSpec section in existing CLAUDE.md"
   fi
 
-  # Install Claude Code commands
-  header "Installing Claude Code commands..."
-  local install_script="$SCRIPT_DIR/install.sh"
-  if [[ -f "$install_script" ]]; then
-    local flags=""
-    [[ "$DRY_RUN" == true ]] && flags="--dry-run"
-    bash "$install_script" $flags
+  # Sync project-local agent assets through cc-hub.
+  header "Syncing LiveSpec agent assets..."
+  local sync_script="$SCRIPT_DIR/sync-agent-assets.sh"
+  if [[ -f "$sync_script" ]]; then
+    local flags=()
+    [[ "$DRY_RUN" == true ]] && flags+=(--dry-run)
+    bash "$sync_script" "$PROJECT_DIR" "$LIVESPEC_ROOT" --scope project --targets all "${flags[@]}"
   else
-    warn "install.sh not found at $install_script — skipping command installation."
-    info "Run 'bash scripts/install.sh' manually to install /spec.* commands."
+    warn "sync-agent-assets.sh not found at $sync_script — skipping agent asset sync."
+    info "Run 'bash scripts/sync-agent-assets.sh <project> <livespec>' manually."
   fi
 
   # Summary

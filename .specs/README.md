@@ -81,6 +81,7 @@
 | 047 | Design Alignment Gate | Implemented | 2026-05-17 | 2026-05-17 | [spec](features/047-design-alignment-gate/spec.md), [plan](features/047-design-alignment-gate/plan.md), [implementation](features/047-design-alignment-gate/implementation.md) |
 | 048 | Command Validation Hardening | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/048-command-validation-hardening/spec.md), [plan](features/048-command-validation-hardening/plan.md), [implementation](features/048-command-validation-hardening/implementation.md) |
 | 049 | Command Naming Normalization | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/049-command-naming-normalization/spec.md), [plan](features/049-command-naming-normalization/plan.md), [implementation](features/049-command-naming-normalization/implementation.md) |
+| 050 | Agent Sync Migration | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/050-agent-sync-migration/spec.md), [plan](features/050-agent-sync-migration/plan.md), [implementation](features/050-agent-sync-migration/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -104,6 +105,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-18 | Feature | [Feature 050] Implemented: Agent Sync Migration — `.agent-sync` is now the canonical source for commands, agents, and rules; cc-hub syncs Claude/Codex outputs |
 | 2026-05-18 | Feature | [Feature 049] Implemented: Command Naming Normalization — canonical `/spec-*` slash commands with dotted aliases |
 | 2026-05-18 | Feature | [Feature 048] Implemented: Command Validation Hardening — command-audit score 5/5, run finalization, deterministic utility backends |
 | 2026-05-18 | Spec | [Feature 049] Spec created: Command Naming Normalization — canonical `/spec-*` names, dotted aliases, migration after Feature 048 |

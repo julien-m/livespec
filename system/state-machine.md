@@ -61,6 +61,6 @@ For state-machine halts, `<subtype>` is `state_invalid`. Other anti-drift subtyp
 
 ## Where this is referenced
 
-- `commands/spec-feature.md` § Resume — defines the per-phase state table and references this doc
-- `agents/livespec-supervisor.md` § Hard-halt-on-Blocked — links here for the canonical state set
+- `.agent-sync/skills/spec-feature/SKILL.md` § Resume — defines the per-phase state table and references this doc
+- `.agent-sync/agents/livespec-supervisor/prompt.md` § Hard-halt-on-Blocked — links here for the canonical state set
 - `validator/state_files.py` — `ALLOWED_STATES` set is kept in sync with the table above

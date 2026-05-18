@@ -4,7 +4,7 @@ Exposes two sub-applications wired into ``validator.cli``:
 
 * ``livespec hooks resolve --event <before|after> --command <cmd> [--feature <slug>]``
   — runtime adapter on top of :func:`validator.hook_resolver.render_chain_for_stdout`.
-  Invoked by ``commands/*.md`` via the Bash tool through the directive in
+  Invoked by ``.agent-sync/skills/spec-*/SKILL.md`` through the directive in
   ``system/anti-drift-block.md``.
 
 * ``livespec integrations list``

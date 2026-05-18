@@ -17,7 +17,7 @@ def _read(relative: str) -> str:
 
 def test_implement_requires_visual_gate_before_final_status() -> None:
     """AC-001/AC-002: UI features run /spec-test --visual before finalization."""
-    body = _read("commands/spec-implement.md")
+    body = _read(".agent-sync/skills/spec-implement/SKILL.md")
 
     assert "Phase 6.5 — Mandatory Visual Gate" in body
     assert "/spec-test <feature> --auto --visual" in body
@@ -28,7 +28,7 @@ def test_implement_requires_visual_gate_before_final_status() -> None:
 
 def test_visual_tooling_failure_blocks_implementation() -> None:
     """AC-003: unavailable visual tooling cannot silently pass UI features."""
-    body = _read("commands/spec-implement.md")
+    body = _read(".agent-sync/skills/spec-implement/SKILL.md")
 
     assert "Visual tooling unavailable on a UI feature is BLOCKED" in body
     assert "do not continue without blocking" in body
@@ -41,7 +41,7 @@ def test_visual_tooling_failure_blocks_implementation() -> None:
 
 def test_no_visual_flag_caps_ui_feature_at_in_progress() -> None:
     """AC-004: --no-visual is allowed for partial work only."""
-    body = _read("commands/spec-implement.md")
+    body = _read(".agent-sync/skills/spec-implement/SKILL.md")
 
     assert "`--no-visual` on a visual feature" in body
     assert "must set Status to `In Progress`" in body
@@ -50,7 +50,7 @@ def test_no_visual_flag_caps_ui_feature_at_in_progress() -> None:
 
 def test_spec_test_exposes_structured_visual_gate_verdict() -> None:
     """AC-005: /spec-test provides a verdict consumable by /spec-implement."""
-    body = _read("commands/spec-test.md")
+    body = _read(".agent-sync/skills/spec-test/SKILL.md")
 
     assert "### Visual Gate Verdict" in body
     assert "PASS | FAIL | BLOCKED" in body
@@ -60,8 +60,8 @@ def test_spec_test_exposes_structured_visual_gate_verdict() -> None:
 
 def test_expectations_contracts_describe_visual_gate() -> None:
     """AC-006: command expectation contracts stay aligned with visual gating."""
-    implement = _read("commands/spec-implement.expectations.md")
-    test = _read("commands/spec-test.expectations.md")
+    implement = _read(".agent-sync/skills/spec-implement/expectations.md")
+    test = _read(".agent-sync/skills/spec-test/expectations.md")
 
     assert "Visual Gate Verdict" in implement
     assert "/spec-test <feature> --auto --visual" in implement

@@ -1,6 +1,6 @@
 # Activation Contract (injected fragment)
 
-> Injected via `<!-- @import system/activation-contract.md -->` at the top of every `agents/livespec-*.md`.
+> Injected via `<!-- @import system/activation-contract.md -->` at the top of every `.agent-sync/agents/livespec-*/prompt.md`.
 > Full reference: [`system/contracts/ACTIVATION_CONTRACT.md`](contracts/ACTIVATION_CONTRACT.md).
 >
 > **@spec FR-006:** Activation Contract template — `.specs/features/014-supervisor-contracts/spec.md#fr-006`

@@ -169,6 +169,7 @@ Thumbs.db
 
 # LiveSpec
 .specs/hooks/*.local.md
+.agent-sync.local/
 .claude/commands/spec.*.md
 .claude/agents/livespec-*.md
 .specs/.livespec-path

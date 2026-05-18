@@ -3,8 +3,8 @@
 This module is the SINGLE source of truth for the runtime resolution of
 LiveSpec hooks + Level 0 user integrations. It is consumed by:
 
-* the runtime CLI ``livespec hooks resolve`` (invoked by ``commands/*.md``
-  via the Bash tool through the directive in ``system/anti-drift-block.md``);
+* the runtime CLI ``livespec hooks resolve`` (invoked by command skills via
+  the directive in ``system/anti-drift-block.md``);
 * the diagnostic CLI ``/spec-hooks`` (tabular display of the chain).
 
 The pseudo-code in ``plan-C.md`` Phase 2 is the implementation of reference.

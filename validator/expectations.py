@@ -183,7 +183,8 @@ def load_expectations(
 
     Lookup order (first match wins, total — no merge):
       1. ``<project_root>/.specs/expectations/<command>.md``
-      2. ``<livespec_root>/commands/<command>.expectations.md``
+      2. ``<livespec_root>/.agent-sync/skills/<command>/expectations.md``
+      3. ``<livespec_root>/commands/<command>.expectations.md`` (legacy)
 
     A malformed project override raises :class:`OverrideMalformed`. The
     verifier MUST NOT silently fall back to the builtin (AC-007).
@@ -204,11 +205,13 @@ def load_expectations(
     legacy_command = short_command_name(command)
     override = project_root / ".specs" / "expectations" / f"{command}.md"
     legacy_override = project_root / ".specs" / "expectations" / f"{legacy_command}.md"
-    builtin = livespec_root / "commands" / f"{command}.expectations.md"
+    builtin = livespec_root / ".agent-sync" / "skills" / command / "expectations.md"
+    legacy_builtin = livespec_root / "commands" / f"{command}.expectations.md"
     searched = [str(override)]
     if legacy_override != override:
         searched.append(str(legacy_override))
     searched.append(str(builtin))
+    searched.append(str(legacy_builtin))
 
     if override.exists():
         try:
@@ -224,6 +227,9 @@ def load_expectations(
 
     if builtin.exists():
         return parse_expectations(builtin)
+
+    if legacy_builtin.exists():
+        return parse_expectations(legacy_builtin)
 
     raise ExpectationsMissing(command, searched)
 
