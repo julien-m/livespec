@@ -407,9 +407,9 @@ Install the two bootstrap skills that must exist before a project can sync the r
 bash ~/livespec/scripts/install.sh
 ```
 
-This asks `cc-hub` to install:
+This asks `cc-hub` to install only the two bootstrap skills required before a
+project has `.specs/`:
 - `spec-init` and `spec-migrate` as portable skills for Claude Code and Codex
-- The LiveSpec routing and command rules for both providers
 
 ### Per-project (automatic after bootstrap)
 
@@ -449,9 +449,9 @@ LiveSpec separates **format** from **automation**:
 | Layer | Portable? | Details |
 |---|---|---|
 | **Spec format** (`.specs/`, Markdown, Mermaid, Gherkin) | ✅ Universal | Any AI tool that reads Markdown can follow the rules in `spec-system.md` |
-| **Commands** (`/spec-*`) | ⚠️ Claude Code | `/spec-init` and `/spec-migrate` are bootstrapped globally; the rest are symlinked per project via `link-local.sh` |
-| **Routing rule** (auto-route to `/spec-*`) | ⚠️ Claude Code | Bootstrapped globally; triggers on `.specs/` presence in cwd |
-| **Agents** (multi-agent orchestration) | ⚠️ Claude Code | Requires Claude Code agent teams + Superpowers skills |
+| **Commands** (`/spec-*`) | ⚠️ Claude Code + Codex | `spec-init` and `spec-migrate` are bootstrapped globally; project commands sync through `.agent-sync` via `cc-hub` |
+| **Routing rule** (auto-route to `/spec-*`) | ⚠️ Claude Code + Codex | Project-scoped via `/spec-init`; triggers on `.specs/` presence in cwd |
+| **Agents** (multi-agent orchestration) | ⚠️ Claude Code + Codex | Portable `.agent-sync/agents` sources are built into provider-native outputs by `cc-hub` |
 | **Shell scripts** (`link-local.sh`, `migrate.sh`, `init.sh`) | ⚠️ macOS | Uses `sed -i ''` (BSD), `open` (macOS), `mktemp` — not tested on Linux |
 
 **For non-Claude AI tools:** paste the content of `system/spec-system.md` into your tool's context. The spec format and rules are tool-agnostic — the automation layer is Claude Code specific.
@@ -568,7 +568,7 @@ livespec/
 │   ├── agents/livespec-*/          ← Portable agent.yaml + prompt.md
 │   └── rules/livespec/             ← Rules built by cc-hub for Claude/Codex
 └── scripts/
-    ├── install.sh                  ← Bootstrap global skills/rules through cc-hub
+    ├── install.sh                  ← Bootstrap global spec-init/spec-migrate skills through cc-hub
     ├── sync-agent-assets.sh        ← Sync .agent-sync assets into projects through cc-hub
     ├── link-local.sh               ← Backward-compatible wrapper around sync-agent-assets.sh
     └── init.sh                     ← Bootstrap .specs/ structure (shell)

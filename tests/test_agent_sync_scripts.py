@@ -68,4 +68,4 @@ def test_install_dry_run_reports_cc_hub_bootstrap_calls(tmp_path: Path) -> None:
     assert "cc-hub skill link" in result.stdout
     assert ".agent-sync/skills/spec-init" in result.stdout
     assert ".agent-sync/skills/spec-migrate" in result.stdout
-    assert "cc-hub rule build" in result.stdout
+    assert "cc-hub rule" not in result.stdout

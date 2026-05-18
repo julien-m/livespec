@@ -31,7 +31,7 @@ updated: 2026-05-18
 | AC-003 | `tests/test_agent_sync_layout.py` | Passed |
 | AC-004 | `tests/test_agent_sync_scripts.py`, real cc-hub smoke test | Passed |
 | AC-005 | `tests/test_command_aliases.py`, `tests/test_agent_sync_scripts.py` | Passed |
-| AC-006 | `tests/test_command_aliases.py` | Passed |
+| AC-006 | `tests/test_command_aliases.py`, `tests/test_agent_sync_scripts.py` | Passed |
 | AC-007 | `tests/integration/test_migration_v16_agent_sync.py` | Passed |
 | AC-008 | `tests/test_command_registry.py`, `tests/test_command_audit_cli.py`, `tests/test_integrations.py` | Passed |
 | AC-009 | `tests/test_agent_sync_scripts.py`, `.gitignore` | Passed |

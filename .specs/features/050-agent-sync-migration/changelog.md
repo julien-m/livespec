@@ -15,3 +15,11 @@
 - **Code modified:** `.agent-sync/`, `scripts/`, `validator/`, `hooks/`, `tests/`, `system/`, `README.md`, `AGENTS.md`, `migrations/16/`, `VERSION`
 - **AC impacted:** AC-001 through AC-012
 - **Author:** codex
+
+## 2026-05-18 — [Bugfix]: Restrict global bootstrap to init and migrate
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (AC-006 clarification)
+- **Code modified:** `scripts/install.sh`, `README.md`, `tests/test_agent_sync_scripts.py`, `tests/test_command_aliases.py`
+- **AC impacted:** AC-006
+- **Author:** codex

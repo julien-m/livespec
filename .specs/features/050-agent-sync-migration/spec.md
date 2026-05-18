@@ -110,7 +110,7 @@ flowchart TD
 - **AC-003** - The four LiveSpec agents exist under `.agent-sync/agents/<name>/{agent.yaml,prompt.md}`.
 - **AC-004** - LiveSpec rules exist under `.agent-sync/rules/livespec/` and can be built for Claude and Codex through `cc-hub`.
 - **AC-005** - `scripts/link-local.sh` no longer creates manual `.claude/commands` or `.claude/agents` symlinks; it delegates to the cc-hub sync script.
-- **AC-006** - `scripts/install.sh` bootstraps `spec-init`, `spec-migrate`, and rules through `cc-hub`.
+- **AC-006** - `scripts/install.sh` bootstraps only `spec-init` and `spec-migrate` globally through `cc-hub`; all other skills, agents, and rules remain project-scoped via `/spec-init`.
 - **AC-007** - Migration 16 syncs agent-sync assets through `cc-hub`, removes only LiveSpec-managed legacy symlinks, adds `.agent-sync.local/` to `.gitignore`, and sets version 16.
 - **AC-008** - Command registry, expectations lookup, integrations, previews, and command-audit use `.agent-sync/skills` as the production source.
 - **AC-009** - `.agent-sync.local/` is gitignored and applied only as a target-project overlay.

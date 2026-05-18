@@ -59,3 +59,4 @@ def test_installer_dry_run_mentions_hyphenated_bootstrap_aliases() -> None:
     assert "cc-hub skill link" in result.stdout
     assert ".agent-sync/skills/spec-init" in result.stdout
     assert ".agent-sync/skills/spec-migrate" in result.stdout
+    assert "cc-hub rule" not in result.stdout
