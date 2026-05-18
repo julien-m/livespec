@@ -1,7 +1,7 @@
 # Design Changelog
 
 > Screen-by-screen visual history. Each entry links to the spec and the PNG for direct comparison.
-> This file is auto-maintained by `/spec.specify`. Manual edits are allowed but may be overwritten.
+> This file is auto-maintained by `/spec-specify`. Manual edits are allowed but may be overwritten.
 
 ---
 

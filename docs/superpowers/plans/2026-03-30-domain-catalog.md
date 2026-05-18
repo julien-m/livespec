@@ -491,7 +491,7 @@ The `/conventions.init` skill reads `domain-catalog.md` and resolves:
 ### Task 5: Update /spec.refresh-conventions command
 
 **Files:**
-- Modify: `/Users/julienm/projects/livespec/commands/refresh-conventions.md`
+- Modify: `/Users/julienm/projects/livespec/commands/spec-refresh-conventions.md`
 
 - [ ] **Step 1: Update Step 2 to be signal extraction only**
 

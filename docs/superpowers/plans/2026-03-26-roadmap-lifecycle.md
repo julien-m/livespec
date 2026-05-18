@@ -16,18 +16,18 @@
 
 | Action | File | Responsibility |
 |--------|------|---------------|
-| Modify | `commands/refine.md` | Add Step 5.5 (re-evaluation), add roadmap as 4th menu target, update DoD |
-| Modify | `commands/specify.md` | Add Step 5.5 (emerging deps + absorption), renumber 5.5→5.6, update DoD |
+| Modify | `commands/spec-refine.md` | Add Step 5.5 (re-evaluation), add roadmap as 4th menu target, update DoD |
+| Modify | `commands/spec-specify.md` | Add Step 5.5 (emerging deps + absorption), renumber 5.5→5.6, update DoD |
 | Modify | `system/spec-system.md` | Add roadmap lifecycle rules to README update rules |
 
 All 3 files are independent — tasks can be parallelized.
 
 ---
 
-## Task 1: Modify `commands/refine.md`
+## Task 1: Modify `commands/spec-refine.md`
 
 **Files:**
-- Modify: `commands/refine.md`
+- Modify: `commands/spec-refine.md`
 
 - [ ] **Step 1: Update the Project flow menu (Step 2)**
 
@@ -118,10 +118,10 @@ Read the final file. Confirm the Project flow order: Step 1 (Read) → Step 2 (M
 
 ---
 
-## Task 2: Modify `commands/specify.md`
+## Task 2: Modify `commands/spec-specify.md`
 
 **Files:**
-- Modify: `commands/specify.md`
+- Modify: `commands/spec-specify.md`
 
 - [ ] **Step 1: Renumber existing Step 5.5 to Step 5.6**
 

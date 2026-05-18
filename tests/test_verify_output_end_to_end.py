@@ -11,7 +11,7 @@ from pathlib import Path
 
 EXPECTATIONS = """\
 ---
-command: e2e
+command: spec-e2e
 contract_version: "1.0"
 last_reviewed: 2026-05-12
 ---
@@ -130,7 +130,7 @@ def test_e2e_success_then_drift_then_blocked(tmp_path: Path):
     assert "drift" in r2.stdout
 
     # 3. Delete all artifacts -> blocked, exit 2.
-    for p in (project / ".specs" / ".runs").glob("e2e-*.json"):
+    for p in (project / ".specs" / ".runs").glob("spec-e2e-*.json"):
         p.unlink()
     r3 = _cli(["verify-output", "e2e"], cwd=project)
     assert r3.returncode == 2

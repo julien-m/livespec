@@ -43,7 +43,7 @@ No conflicts. No `[DECISION NEEDED]` markers.
 Feature: verify-output orchestration
   Scenario: Operator verifies a successful run
     Given .specs/expectations/specify.md does not exist
-    And   commands/specify.expectations.md exists and is valid
+    And   commands/spec-specify.expectations.md exists and is valid
     And   .specs/.runs/specify-2026-05-12T10-00-00.json exists with exit_code 0
     When  the operator runs `livespec verify-output specify`
     Then  the CLI loads the builtin expectations
@@ -97,17 +97,17 @@ sequenceDiagram
 ```gherkin
 Feature: Pre-commit hook enforces last_reviewed
   Scenario: Hook blocks stale expectation
-    Given the staged diff modifies commands/plan.md
-    And   commands/plan.expectations.md frontmatter has last_reviewed: 2026-04-01
+    Given the staged diff modifies commands/spec-plan.md
+    And   commands/spec-plan.expectations.md frontmatter has last_reviewed: 2026-04-01
     And   today is 2026-05-12
     When  the pre-commit hook runs
-    Then  it prints "Relis `commands/plan.expectations.md`, bump `last_reviewed`, recommit."
+    Then  it prints "Relis `commands/spec-plan.expectations.md`, bump `last_reviewed`, recommit."
     And   exits with non-zero status
     And   the commit is aborted
 
   Scenario: Hook allows fresh expectation
-    Given the staged diff modifies commands/plan.md
-    And   commands/plan.expectations.md frontmatter has last_reviewed: 2026-05-12
+    Given the staged diff modifies commands/spec-plan.md
+    And   commands/spec-plan.expectations.md frontmatter has last_reviewed: 2026-05-12
     And   today is 2026-05-12
     When  the pre-commit hook runs
     Then  it exits 0
@@ -360,8 +360,8 @@ erDiagram
 
 **Files created:**
 
-- `commands/verify-output.md` — slash command markdown describing usage `/spec.verify-output <command> [--scenario "..."] [--run <path>] [--json]`, prerequisites, output format, exit codes. Invokes `livespec verify-output` via Bash. Includes the standard activation contract block, Universal Command Reliability footer, and outcome interpretation table.
-- `commands/verify-output.expectations.md` — yes, the new command also has its own expectations file (eats its own dog food). Counted in Step 8's batch (so total becomes 20 in the long run but AC-002 explicitly enumerates 19; this 20th is acknowledged in the changelog as a follow-on, not a violation of AC-002).
+- `commands/spec-verify-output.md` — slash command markdown describing usage `/spec.verify-output <command> [--scenario "..."] [--run <path>] [--json]`, prerequisites, output format, exit codes. Invokes `livespec verify-output` via Bash. Includes the standard activation contract block, Universal Command Reliability footer, and outcome interpretation table.
+- `commands/spec-verify-output.expectations.md` — yes, the new command also has its own expectations file (eats its own dog food). Counted in Step 8's batch (so total becomes 20 in the long run but AC-002 explicitly enumerates 19; this 20th is acknowledged in the changelog as a follow-on, not a violation of AC-002).
 
 **Files modified:**
 

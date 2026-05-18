@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-05-17
+> Last updated: 2026-05-18
 
 
 ---
@@ -75,10 +75,12 @@
 | 036 | Multi-Surface Detection and Migration | Planned | 2026-05-07 | 2026-05-07 | [spec](features/036-multi-surface-detection-and-migration/spec.md) |
 | 037 | Test Multi-Runner Integration | Implemented | 2026-05-08 | 2026-05-08 | [spec](features/037-test-multi-runner-integration/spec.md), [plan](features/037-test-multi-runner-integration/plan.md), [implementation](features/037-test-multi-runner-integration/implementation.md) |
 | 041 | Brainstorm Flow & Screen Specs Ingestion | Draft | 2026-05-13 | 2026-05-14 | [spec](features/041-spec-init-flow-specs-ingestion/spec.md) |
-| 042 | `/spec.specify` Derives from Imported Brainstorm Flows | Draft | 2026-05-13 | 2026-05-14 | [spec](features/042-spec-specify-from-brainstorm/spec.md) |
+| 042 | `/spec-specify` Derives from Imported Brainstorm Flows | Draft | 2026-05-13 | 2026-05-14 | [spec](features/042-spec-specify-from-brainstorm/spec.md) |
 | 043 | `/spec.sync-brainstorm` — Living Bridge to Brainstorm | Draft | 2026-05-13 | 2026-05-14 | [spec](features/043-spec-sync-brainstorm/spec.md) |
 | 046 | Visual Implementation Gate | Implemented | 2026-05-17 | 2026-05-17 | [spec](features/046-visual-implementation-gate/spec.md), [plan](features/046-visual-implementation-gate/plan.md), [implementation](features/046-visual-implementation-gate/implementation.md) |
 | 047 | Design Alignment Gate | Implemented | 2026-05-17 | 2026-05-17 | [spec](features/047-design-alignment-gate/spec.md), [plan](features/047-design-alignment-gate/plan.md), [implementation](features/047-design-alignment-gate/implementation.md) |
+| 048 | Command Validation Hardening | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/048-command-validation-hardening/spec.md), [plan](features/048-command-validation-hardening/plan.md), [implementation](features/048-command-validation-hardening/implementation.md) |
+| 049 | Command Naming Normalization | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/049-command-naming-normalization/spec.md), [plan](features/049-command-naming-normalization/plan.md), [implementation](features/049-command-naming-normalization/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -102,14 +104,18 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-05-17 | Feature | [Feature 047] Implemented: Design Alignment Gate — reusable `ui.pen` → runtime alignment gate for `/spec.test --visual` |
-| 2026-05-17 | Feature | [Feature 046] Implemented: Visual Implementation Gate — mandatory `/spec.test --auto --visual` before UI feature finalization |
+| 2026-05-18 | Feature | [Feature 049] Implemented: Command Naming Normalization — canonical `/spec-*` slash commands with dotted aliases |
+| 2026-05-18 | Feature | [Feature 048] Implemented: Command Validation Hardening — command-audit score 5/5, run finalization, deterministic utility backends |
+| 2026-05-18 | Spec | [Feature 049] Spec created: Command Naming Normalization — canonical `/spec-*` names, dotted aliases, migration after Feature 048 |
+| 2026-05-18 | Spec | [Feature 048] Spec created: Command Validation Hardening — 5/5 command audit, deterministic backends, mandatory run finalization |
+| 2026-05-17 | Feature | [Feature 047] Implemented: Design Alignment Gate — reusable `ui.pen` → runtime alignment gate for `/spec-test --visual` |
+| 2026-05-17 | Feature | [Feature 046] Implemented: Visual Implementation Gate — mandatory `/spec-test --auto --visual` before UI feature finalization |
 | 2026-05-13 | Spec | [Feature 043] Spec created: `/spec.sync-brainstorm` — Living Bridge to Brainstorm — 5 stories, 17 AC, 18 FR |
-| 2026-05-13 | Spec | [Feature 042] Spec created: `/spec.specify` Derives from Imported Brainstorm Flows — 3 stories, 13 AC, 13 FR |
+| 2026-05-13 | Spec | [Feature 042] Spec created: `/spec-specify` Derives from Imported Brainstorm Flows — 3 stories, 13 AC, 13 FR |
 | 2026-05-13 | Spec | [Feature 041] Spec created: Brainstorm Flow & Screen Specs Ingestion — 3 stories, 14 AC, 12 FR |
-| 2026-05-13 | Update | [Migration v13] Backfill command-expectations wiring — re-link `.claude/commands/`, install `last_reviewed` hook, wire `/spec.verify-output` and ignore `.specs/.runs/` + `.specs/.previews/` |
+| 2026-05-13 | Update | [Migration v13] Backfill command-expectations wiring — re-link `.claude/commands/`, install `last_reviewed` hook, wire `/spec-verify-output` and ignore `.specs/.runs/` + `.specs/.previews/` |
 | 2026-05-12 | Feature | [Feature 040] Implemented: Rich Expectations Format & Verify Preview — Section 13 mandatory, preview mode added, +15 tests, 0 regressions |
-| 2026-05-12 | Feature | [Feature 039] Implemented: Command Expectations & /spec.verify-output — 20 builtin expectations files, verify-output CLI + slash-command |
+| 2026-05-12 | Feature | [Feature 039] Implemented: Command Expectations & /spec-verify-output — 20 builtin expectations files, verify-output CLI + slash-command |
 | 2026-05-08 | Feature | [Feature 037] Implemented: Test Multi-Runner Integration — runner-aware dispatcher, `--visual` flag documented, 0 regressions |
 | 2026-05-08 | Spec | [Feature 037] Spec created: Test Multi-Runner Integration — 5 stories, 15 AC, 15 FR |
 <!-- readme:activity:end -->

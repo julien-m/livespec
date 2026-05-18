@@ -27,8 +27,8 @@
 
 | File | Change |
 |---|---|
-| `commands/init.md` | Add Dev Tooling questions in Phase B + `updated` frontmatter in Phase C |
-| `commands/stack.md` | Bump `updated` field after every stack change (Step 5) |
+| `commands/spec-init.md` | Add Dev Tooling questions in Phase B + `updated` frontmatter in Phase C |
+| `commands/spec-stack.md` | Bump `updated` field after every stack change (Step 5) |
 | `stacks/presets/web-realtime.md` | Add optional Dev Tooling rows |
 | `stacks/presets/api-rest.md` | Add optional Dev Tooling rows |
 | `stacks/presets/web-static.md` | Add optional Dev Tooling rows |
@@ -38,14 +38,14 @@
 
 ---
 
-## Task 1: Add `updated` frontmatter to `_default.md` in `commands/init.md`
+## Task 1: Add `updated` frontmatter to `_default.md` in `commands/spec-init.md`
 
 **Files:**
-- Modify: `commands/init.md:353-385` (Phase C installation)
+- Modify: `commands/spec-init.md:353-385` (Phase C installation)
 
 - [ ] **Step 1: Add `updated` frontmatter instruction to Phase C**
 
-In `commands/init.md`, after the Phase C directory structure listing (line 385), find the section that describes generating `_default.md` from Phase B decisions. Add an instruction that the generated `_default.md` MUST include a YAML frontmatter block:
+In `commands/spec-init.md`, after the Phase C directory structure listing (line 385), find the section that describes generating `_default.md` from Phase B decisions. Add an instruction that the generated `_default.md` MUST include a YAML frontmatter block:
 
 ```markdown
 ### Step 3.x — Generate `_default.md` with frontmatter
@@ -79,14 +79,14 @@ To:
 
 - [ ] **Step 3: Verify no conflicts with existing content**
 
-Read `commands/init.md` lines 350-400 to confirm the insertion point doesn't break existing step numbering. Adjust step numbers if needed.
+Read `commands/spec-init.md` lines 350-400 to confirm the insertion point doesn't break existing step numbering. Adjust step numbers if needed.
 
 ---
 
-## Task 2: Add Dev Tooling questions to `commands/init.md` Phase B
+## Task 2: Add Dev Tooling questions to `commands/spec-init.md` Phase B
 
 **Files:**
-- Modify: `commands/init.md:279-340` (Phase B, after Step 3 Testing Strategy)
+- Modify: `commands/spec-init.md:279-340` (Phase B, after Step 3 Testing Strategy)
 
 - [ ] **Step 1: Add Dev Tooling substep after Testing Strategy**
 
@@ -133,10 +133,10 @@ Ensure the new step 3.1 doesn't conflict with existing 3.5 (Design Tool Check). 
 
 ---
 
-## Task 3: Bump `updated` in `commands/stack.md`
+## Task 3: Bump `updated` in `commands/spec-stack.md`
 
 **Files:**
-- Modify: `commands/stack.md:254-257` (Step 5 — Update _default.md)
+- Modify: `commands/spec-stack.md:254-257` (Step 5 — Update _default.md)
 
 - [ ] **Step 1: Add `updated` bump instruction**
 

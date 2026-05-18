@@ -432,7 +432,7 @@ Update pre-push hook script to:
 
 ### Step 10 — CLI: /spec.test --since Flag
 
-**Files:** `validator/cli.py` or `commands/test.md` integration
+**Files:** `validator/cli.py` or `commands/spec-test.md` integration
 
 Extend `/spec.test` command:
 - Add `--since=<ref>` flag

@@ -240,11 +240,11 @@ This ensures pipeline.md reflects the correct state even if an agent fails mid-e
 
 ## Scope of File Changes
 
-Only `commands/feature.md` is modified. No changes to:
-- `commands/specify.md`
-- `commands/plan.md`
-- `commands/implement.md`
-- `commands/test.md`
+Only `commands/spec-feature.md` is modified. No changes to:
+- `commands/spec-specify.md`
+- `commands/spec-plan.md`
+- `commands/spec-implement.md`
+- `commands/spec-test.md`
 - Any agent or system files
 
 The sub-commands are already written correctly for isolated execution.

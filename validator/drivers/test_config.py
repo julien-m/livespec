@@ -40,7 +40,7 @@ DEFAULT_THRESHOLD = 70.0
 
 @dataclass(frozen=True)
 class GeneratedFile:
-    """A file to materialize during ``/spec.init`` or ``livespec init test-config``.
+    """A file to materialize during ``/spec-init`` or ``livespec init test-config``.
 
     Attributes:
         path: Project-root-relative path of the file to write.

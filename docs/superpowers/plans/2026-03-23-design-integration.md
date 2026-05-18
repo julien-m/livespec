@@ -28,11 +28,11 @@
 | `system/templates/spec-template.md` | Add `## Screens` section between Key Entities and Infrastructure Requirements |
 | `system/templates/plan-template.md` | Add `## Design Reference` section after Technical Context |
 | `system/templates/implementation-template.md` | Add Visual Ref column note to Requirement Mapping |
-| `commands/init.md` | Add design gate in Phase B, add `.specs/design/` in Phase C, update exit criteria |
-| `commands/specify.md` | Add Step 5.5 (mockup generation), update quality gates, add re-modification workflow |
-| `commands/plan.md` | Add design reference step after reading context |
-| `commands/implement.md` | Add mockup reference in Phase 1, visual fidelity note |
-| `commands/check.md` | Add design fidelity sub-step in Step 8 |
+| `commands/spec-init.md` | Add design gate in Phase B, add `.specs/design/` in Phase C, update exit criteria |
+| `commands/spec-specify.md` | Add Step 5.5 (mockup generation), update quality gates, add re-modification workflow |
+| `commands/spec-plan.md` | Add design reference step after reading context |
+| `commands/spec-implement.md` | Add mockup reference in Phase 1, visual fidelity note |
+| `commands/spec-check.md` | Add design fidelity sub-step in Step 8 |
 | `~/.claude/livespec/hooks/before-specify.md` | Append design tool config section |
 | `~/.claude/livespec/hooks/before-plan.md` | Append mockup validation section |
 | `~/.claude/livespec/hooks/before-implement.md` | Append design reference section |
@@ -210,10 +210,10 @@ Expected: All three files listed
 
 ---
 
-### Task 4: Update `commands/init.md` — Design Gate + Phase C
+### Task 4: Update `commands/spec-init.md` — Design Gate + Phase C
 
 **Files:**
-- Modify: `commands/init.md`
+- Modify: `commands/spec-init.md`
 
 - [ ] **Step 1: Add Design Tool Check step in Phase B**
 
@@ -293,10 +293,10 @@ In the installation output block, add after the hooks line:
 
 ---
 
-### Task 5: Update `commands/specify.md` — Mockup Generation
+### Task 5: Update `commands/spec-specify.md` — Mockup Generation
 
 **Files:**
-- Modify: `commands/specify.md`
+- Modify: `commands/spec-specify.md`
 
 - [ ] **Step 1: Add Step 5.5 — Generate Mockups**
 
@@ -340,11 +340,11 @@ Add to the Definition of Done checklist:
 
 ---
 
-### Task 6: Update `commands/plan.md` and `commands/implement.md`
+### Task 6: Update `commands/spec-plan.md` and `commands/spec-implement.md`
 
 **Files:**
-- Modify: `commands/plan.md`
-- Modify: `commands/implement.md`
+- Modify: `commands/spec-plan.md`
+- Modify: `commands/spec-implement.md`
 
 - [ ] **Step 1: Add Design Reference step to plan.md**
 
@@ -383,10 +383,10 @@ And add a note in the implementation behavior:
 
 ---
 
-### Task 7: Update `commands/check.md` — Design Fidelity
+### Task 7: Update `commands/spec-check.md` — Design Fidelity
 
 **Files:**
-- Modify: `commands/check.md`
+- Modify: `commands/spec-check.md`
 
 - [ ] **Step 1: Add Design Fidelity sub-step**
 

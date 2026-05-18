@@ -18,12 +18,12 @@ import sys
 from pathlib import Path
 
 VALID = """---
-command: previewdemo
+command: spec-previewdemo
 contract_version: "1.0"
 last_reviewed: 2026-05-12
 ---
 
-# Expectations — /spec.previewdemo
+# Expectations — /spec-previewdemo
 
 ## 1. Purpose
 demo.
@@ -138,7 +138,7 @@ def test_preview_save_writes_file(tmp_path: Path) -> None:
         ["verify-output", "previewdemo", "--preview", "--save"], cwd=project
     )
     assert res.returncode == 0
-    previews = list((project / ".specs" / ".previews").glob("previewdemo-*.md"))
+    previews = list((project / ".specs" / ".previews").glob("spec-previewdemo-*.md"))
     assert len(previews) == 1
     assert previews[0].read_text(encoding="utf-8").strip() == res.stdout.strip()
 
@@ -171,6 +171,6 @@ def test_preview_json_emits_envelope(tmp_path: Path) -> None:
     )
     assert res.returncode == 0
     payload = json.loads(res.stdout)
-    assert payload["command"] == "previewdemo"
+    assert payload["command"] == "spec-previewdemo"
     assert "001-cli-feat" in payload["markdown"]
     assert payload["timestamp"]

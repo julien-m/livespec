@@ -15,8 +15,8 @@
 | FR-009 (canonical error strings) | `validator/cli_commands/verify_output_cmd.py`, `validator/expectations.py`, `validator/preview.py` | `# @spec FR-009`, `# @spec AC-008`, `# @spec AC-009` | ✅ | 2026-05-12 |
 | FR-010 (section 12 unchanged) | `validator/verify_output.py` (untouched) | feature 039 anchors | ✅ | 2026-05-12 |
 | FR-011 (tests) | `tests/test_preview.py`, `tests/test_verify_output_preview_cli.py`, `tests/test_demo_session_snapshot.py` | — | ✅ | 2026-05-12 |
-| FR-012 (docs) | `commands/verify-output.md` | — | ✅ | 2026-05-12 |
-| FR-013 (verify-output.expectations.md self) | `commands/verify-output.expectations.md` | — | ✅ | 2026-05-12 |
+| FR-012 (docs) | `commands/spec-verify-output.md` | — | ✅ | 2026-05-12 |
+| FR-013 (verify-output.expectations.md self) | `commands/spec-verify-output.expectations.md` | — | ✅ | 2026-05-12 |
 | FR-014 (last_reviewed bumped) | all 20 `commands/*.expectations.md` | — | ✅ | 2026-05-12 |
 
 ## Acceptance Criteria Mapping
@@ -51,7 +51,7 @@
 - `system/templates/command-expectations.template.md`
 - `validator/expectations.py`
 - `validator/cli_commands/verify_output_cmd.py`
-- `commands/verify-output.md`
+- `commands/spec-verify-output.md`
 - `commands/*.expectations.md` (×20 — Section 13 appended)
 - `tests/test_expectations.py` (MINIMAL_VALID now includes Section 13)
 - `tests/test_verify_output_cli.py` (MINIMAL fixture now includes Section 13)

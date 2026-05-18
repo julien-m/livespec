@@ -30,7 +30,7 @@ EXCLUDES=(
 )
 
 # Search scope: commands/, agents/, .specs/features/, system/ (excluding templates and the
-# defining spec). The placeholder remains valid in commands/feature.md and other command
+# defining spec). The placeholder remains valid in commands/spec-feature.md and other command
 # markdown ONLY as a documented template variable — see system/identity.md for the convention.
 # This check enforces that NO file in .specs/features/<other-slug>/ ever contains the literal,
 # which would indicate that resolve_feature_slug was bypassed at runtime.

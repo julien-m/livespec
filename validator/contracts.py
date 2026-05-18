@@ -102,7 +102,7 @@ class PhaseResult(BaseModel):
 
 # @spec FR-002: SHIP_RESULT schema — spec.md#fr-002
 class ShipResult(BaseModel):
-    """Canonical result returned at the end of /spec.feature when called by /spec.ship."""
+    """Canonical result returned at the end of /spec-feature when called by /spec-ship."""
 
     status: Literal["OK", "BLOCKED"]
     feature_slug: str = Field(pattern=SLUG_REGEX.pattern)

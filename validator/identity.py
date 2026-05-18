@@ -1,7 +1,7 @@
 """Feature slug identity resolution.
 
 Spec anchors (Chantier 4 / Feature 013 — see
-``.specs/features/013-state-model-identity-resolution/spec.md``):
+``.specs/features/013-state-model-identity-resolution/spec-md``):
 
 - @spec FR-001: Single ``resolve_feature_slug`` helper.
 - @spec FR-002: Pre-side-effect resolution.
@@ -9,7 +9,7 @@ Spec anchors (Chantier 4 / Feature 013 — see
 
 This module is the **single source of truth** for converting a user-supplied
 feature description (or an existing slug) into a validated, deterministic
-``feature_slug`` of the form ``NNN-kebab-case-name``. All ``/spec.*`` commands
+``feature_slug`` of the form ``NNN-kebab-case-name``. All ``/spec-*`` commands
 that need a slug — and especially every code path that creates side-effects
 keyed on the slug (directory creation, ``livespec pipeline init``, subagent
 dispatch) — MUST call :func:`resolve_feature_slug` first.
@@ -72,7 +72,7 @@ def _slugify(text: str) -> str:
 def _next_nnn(specs_root: Path) -> str:
     """Return the next available 3-digit NNN by scanning ``.specs/features/``.
 
-    NOTE: this is a non-atomic scan; concurrent ``/spec.specify`` runs can
+    NOTE: this is a non-atomic scan; concurrent ``/spec-specify`` runs can
     collide. Atomic reservation is the responsibility of Chantier 3
     (Feature 015 — Global Write Locks & Atomic NNN Reservation), which wraps
     this helper with a ``mkdir``-based reservation. Callers requiring atomicity

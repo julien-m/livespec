@@ -51,6 +51,8 @@ def _run_hook(repo: Path) -> subprocess.CompletedProcess[str]:
 
 def _make_expectations(repo: Path, name: str, last_reviewed: str) -> None:
     (repo / "commands").mkdir(exist_ok=True)
+    if not name.startswith("spec-"):
+        name = f"spec-{name}"
     (repo / f"commands/{name}.expectations.md").write_text(
         (
             f"---\ncommand: {name}\ncontract_version: \"1.0\"\n"
@@ -64,9 +66,9 @@ def test_pre_commit_hook_allows_fresh_last_reviewed(tmp_path: Path):
     repo = tmp_path / "repo"
     _init_repo(repo)
     (repo / "commands").mkdir()
-    (repo / "commands/plan.md").write_text("hello", encoding="utf-8")
+    (repo / "commands/spec-plan.md").write_text("hello", encoding="utf-8")
     _make_expectations(repo, "plan", date.today().isoformat())
-    _git(repo, "add", "commands/plan.md", "commands/plan.expectations.md")
+    _git(repo, "add", "commands/spec-plan.md", "commands/spec-plan.expectations.md")
 
     result = _run_hook(repo)
     assert result.returncode == 0, result.stderr
@@ -76,13 +78,13 @@ def test_pre_commit_hook_blocks_stale_last_reviewed(tmp_path: Path):
     repo = tmp_path / "repo"
     _init_repo(repo)
     (repo / "commands").mkdir()
-    (repo / "commands/plan.md").write_text("hello", encoding="utf-8")
+    (repo / "commands/spec-plan.md").write_text("hello", encoding="utf-8")
     _make_expectations(repo, "plan", "2020-01-01")
-    _git(repo, "add", "commands/plan.md", "commands/plan.expectations.md")
+    _git(repo, "add", "commands/spec-plan.md", "commands/spec-plan.expectations.md")
 
     result = _run_hook(repo)
     assert result.returncode != 0
-    assert "Relis `commands/plan.expectations.md`" in result.stderr
+    assert "Relis `commands/spec-plan.expectations.md`" in result.stderr
     assert "bump `last_reviewed`" in result.stderr
     assert "recommit." in result.stderr
 
@@ -91,12 +93,12 @@ def test_pre_commit_hook_blocks_when_expectations_missing(tmp_path: Path):
     repo = tmp_path / "repo"
     _init_repo(repo)
     (repo / "commands").mkdir()
-    (repo / "commands/newcmd.md").write_text("hello", encoding="utf-8")
-    _git(repo, "add", "commands/newcmd.md")
+    (repo / "commands/spec-newcmd.md").write_text("hello", encoding="utf-8")
+    _git(repo, "add", "commands/spec-newcmd.md")
 
     result = _run_hook(repo)
     assert result.returncode != 0
-    assert "commands/newcmd.expectations.md is missing" in result.stderr
+    assert "commands/spec-newcmd.expectations.md is missing" in result.stderr
 
 
 def test_pre_commit_hook_ignores_unrelated_changes(tmp_path: Path):
@@ -115,7 +117,7 @@ def test_pre_commit_hook_ignores_expectations_md_changes_only(tmp_path: Path):
     repo = tmp_path / "repo"
     _init_repo(repo)
     _make_expectations(repo, "plan", "2020-01-01")
-    _git(repo, "add", "commands/plan.expectations.md")
+    _git(repo, "add", "commands/spec-plan.expectations.md")
     result = _run_hook(repo)
     assert result.returncode == 0
 
@@ -125,15 +127,15 @@ def test_pre_commit_hook_whitespace_change_still_blocks(tmp_path: Path):
     repo = tmp_path / "repo"
     _init_repo(repo)
     (repo / "commands").mkdir()
-    (repo / "commands/plan.md").write_text("hi", encoding="utf-8")
+    (repo / "commands/spec-plan.md").write_text("hi", encoding="utf-8")
     _make_expectations(repo, "plan", date.today().isoformat())
-    _git(repo, "add", "commands/plan.md", "commands/plan.expectations.md")
+    _git(repo, "add", "commands/spec-plan.md", "commands/spec-plan.expectations.md")
     _git(repo, "commit", "-q", "-m", "first", check=False)
 
     # Now modify only whitespace and roll the expectations date backwards.
-    (repo / "commands/plan.md").write_text("hi   \n", encoding="utf-8")
+    (repo / "commands/spec-plan.md").write_text("hi   \n", encoding="utf-8")
     _make_expectations(repo, "plan", "2020-01-01")
-    _git(repo, "add", "commands/plan.md", "commands/plan.expectations.md")
+    _git(repo, "add", "commands/spec-plan.md", "commands/spec-plan.expectations.md")
 
     result = _run_hook(repo)
     assert result.returncode != 0

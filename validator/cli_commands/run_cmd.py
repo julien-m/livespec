@@ -8,12 +8,16 @@ from pathlib import Path
 
 import typer
 
-from ..run_artifact import record_from_streams, record_subprocess
+from ..command_registry import normalize_command_name
+from ..exceptions import ExpectationsInvalid, ExpectationsMissing, OverrideMalformed
+from ..expectations import load_expectations
+from ..run_artifact import find_latest_artifact, record_from_streams, record_subprocess
+from ..verify_output import evaluate, render_human
 
 run_app = typer.Typer(name="run", help="Record LiveSpec command run artifacts.")
 WRAP_COMMAND_ARGUMENT = typer.Argument(
     ...,
-    help="Logical command name (e.g. 'status').",
+    help="Command name or alias (e.g. 'spec-status', 'status', or '/spec.status').",
 )
 WRAP_ARGV_ARGUMENT = typer.Argument(
     None,
@@ -37,7 +41,7 @@ RUN_SHELL_OPTION = typer.Option(
 RECORD_COMMAND_OPTION = typer.Option(
     ...,
     "--command",
-    help="Logical command name.",
+    help="Command name or alias.",
 )
 RECORD_EXIT_CODE_OPTION = typer.Option(
     0,
@@ -82,6 +86,7 @@ def wrap_cmd(
     if not argv_list:
         typer.echo("Error: argv is empty (use -- to separate)", err=True)
         raise typer.Exit(2)
+    command = normalize_command_name(command)
     effective_cwd = cwd if cwd is not None else Path.cwd()
     if shell:
         # Shell mode delegates quoting, pipes, and globbing to bash; the wrapped
@@ -110,6 +115,7 @@ def record_cmd(
 ) -> None:
     """Write an artifact from already-captured streams (manual API)."""
     effective_cwd = cwd if cwd is not None else Path.cwd()
+    command = normalize_command_name(command)
     stdout = stdout_file.read_text(encoding="utf-8") if stdout_file else ""
     stderr = stderr_file.read_text(encoding="utf-8") if stderr_file else ""
     flag_list = flags.split() if flags else []
@@ -124,6 +130,65 @@ def record_cmd(
         runs_dir=runs_dir,
     )
     typer.echo(f"recorded {command} -> exit={artifact.exit_code} ({artifact.timestamp})")
+
+
+@run_app.command("finalize")
+def finalize_cmd(
+    command: str = RECORD_COMMAND_OPTION,
+    exit_code: int = RECORD_EXIT_CODE_OPTION,
+    flags: str = RECORD_FLAGS_OPTION,
+    stdout_file: Path | None = STDOUT_FILE_OPTION,
+    stderr_file: Path | None = STDERR_FILE_OPTION,
+    duration_ms: int = DURATION_MS_OPTION,
+    cwd: Path | None = RUN_CWD_OPTION,
+    runs_dir: Path | None = RUNS_DIR_OPTION,
+) -> None:
+    """Record captured streams, then verify them against expectations.
+
+    # @spec FR-005: mandatory run finalization
+    #   — .specs/features/048-command-validation-hardening/spec.md#fr-005
+    # @spec FR-004: alias-compatible finalization
+    #   — .specs/features/049-command-naming-normalization/spec.md#fr-004
+    """
+    effective_cwd = cwd if cwd is not None else Path.cwd()
+    normalized_command = normalize_command_name(command)
+    stdout = stdout_file.read_text(encoding="utf-8") if stdout_file else ""
+    stderr = stderr_file.read_text(encoding="utf-8") if stderr_file else ""
+    flag_list = flags.split() if flags else []
+    artifact = record_from_streams(
+        normalized_command,
+        cwd=effective_cwd,
+        flags=flag_list,
+        stdout=stdout,
+        stderr=stderr,
+        exit_code=exit_code,
+        duration_ms=duration_ms,
+        runs_dir=runs_dir,
+    )
+    target_runs_dir = runs_dir or (effective_cwd / ".specs" / ".runs")
+    artifact_path = find_latest_artifact(normalized_command, target_runs_dir)
+    livespec_root = _detect_livespec_root()
+    try:
+        expectations = load_expectations(
+            normalized_command,
+            effective_cwd,
+            livespec_root,
+        )
+    except (ExpectationsInvalid, ExpectationsMissing, OverrideMalformed) as exc:
+        typer.echo(f"finalize blocked: {exc}", err=True)
+        raise typer.Exit(2) from exc
+    report = evaluate(expectations, artifact, artifact_path=artifact_path)
+    typer.echo(render_human(report))
+    raise typer.Exit(report.exit_code)
+
+
+def _detect_livespec_root() -> Path:
+    """Resolve the LiveSpec checkout root by walking parents of this module."""
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        if (parent / "commands").is_dir() and (parent / "validator").is_dir():
+            return parent
+    return here.parents[2]
 
 
 # Export the Typer sub-app for registration from the top-level CLI module.

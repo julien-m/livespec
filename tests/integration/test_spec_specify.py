@@ -1,4 +1,4 @@
-"""Level 3B — Integration tests for /spec.specify via SDK."""
+"""Level 3B — Integration tests for /spec-specify via SDK."""
 
 from __future__ import annotations
 
@@ -22,9 +22,9 @@ FIXTURES = Path(__file__).parent / "fixtures"
     reason="ANTHROPIC_API_KEY not set",
 )
 class TestSpecSpecify:
-    """Integration tests for /spec.specify on post-init fixture."""
+    """Integration tests for /spec-specify on post-init fixture."""
 
-    FEATURE_REQUEST = '/spec.specify "User can log in with email and password" --auto'
+    FEATURE_REQUEST = '/spec-specify "User can log in with email and password" --auto'
 
     @pytest.fixture(scope="class")
     def run_result(self):
@@ -106,7 +106,7 @@ class TestSpecSpecify:
         assert "[DECISION NEEDED]" not in spec_md_content.upper()
 
     def test_roadmap_updated(self, run_result):
-        """Roadmap must have a checked item after /spec.specify."""
+        """Roadmap must have a checked item after /spec-specify."""
         roadmap = (run_result.cwd / ".specs/roadmap.md").read_text()
         checked_items = re.findall(r"- \[x\]", roadmap)
         assert len(checked_items) >= 1, "No checked item in roadmap.md"

@@ -6,7 +6,7 @@
 
 - **Type:** Feature
 - **Spec modified:** No
-- **Code modified:** commands/specify.md, .specs/spec-system.md
+- **Code modified:** commands/spec-specify.md, .specs/spec-system.md
 - **AC impacted:** AC-001 through AC-011 (all implemented)
 - **Author:** spec.implement
 

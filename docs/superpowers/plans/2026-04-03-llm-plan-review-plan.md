@@ -29,7 +29,7 @@
 6. Exit 1 if any blocking findings
 
 ### Step 4: Update spec.plan command
-**File:** `commands/plan.md` (modify)
+**File:** `commands/spec-plan.md` (modify)
 **What:** Add `--review` flag to flags table and add review step between plan generation and "Present for Approval" (Step 10). Advisory only.
 
 ### Step 5: Write tests

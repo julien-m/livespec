@@ -1,4 +1,4 @@
-"""Level 3C — End-to-end pipeline tests for /spec.feature via SDK."""
+"""Level 3C — End-to-end pipeline tests for /spec-feature via SDK."""
 
 from __future__ import annotations
 
@@ -22,11 +22,11 @@ FIXTURES = Path(__file__).parent / "fixtures"
 )
 class TestSpecFeaturePipeline:
     """
-    End-to-end test: /spec.feature generates spec.md + plan.md
+    End-to-end test: /spec-feature generates spec.md + plan.md
     and both are structurally coherent.
     """
 
-    COMMAND = '/spec.feature "User can view their account dashboard" --auto'
+    COMMAND = '/spec-feature "User can view their account dashboard" --auto'
 
     @pytest.fixture(scope="class")
     def run_result(self):

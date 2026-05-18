@@ -26,7 +26,7 @@ def test_global_workflow_docs_exist_and_capture_cloudskill_rules() -> None:
 
 
 def test_spec_test_documents_design_alignment_before_baseline_capture() -> None:
-    body = _read("commands/test.md")
+    body = _read("commands/spec-test.md")
 
     assert "### 4.5.0 — Design Alignment Gate" in body
     assert "system/testing/design-alignment.md" in body
@@ -35,7 +35,7 @@ def test_spec_test_documents_design_alignment_before_baseline_capture() -> None:
 
 
 def test_test_expectations_require_design_alignment_for_visual_runs() -> None:
-    body = _read("commands/test.expectations.md")
+    body = _read("commands/spec-test.expectations.md")
 
     assert "Design Alignment Verdict" in body
     assert ".specs/features/<feature>/design-alignment/" in body

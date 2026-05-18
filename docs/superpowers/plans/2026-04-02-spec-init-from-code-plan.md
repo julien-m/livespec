@@ -12,7 +12,7 @@ Add `--from-code` flag to the existing `spec.init` command. This replaces Phase 
 **Files to create/modify:**
 - `system/from-code.md` — main --from-code flow spec, referenced from init.md (create)
 - `system/templates/bootstrap-recap-template.md` — template for the recap file (create)
-- `commands/init.md` — add routing + flags, ~50 lines (modify)
+- `commands/spec-init.md` — add routing + flags, ~50 lines (modify)
 - `README.md` — add one-liner (modify)
 
 **Total: 4 files (2 create, 2 modify)**
@@ -151,9 +151,9 @@ Full table from design spec (empty repo, monorepo, no README, corrupted recap, .
 
 ---
 
-## Step 3: Modify commands/init.md
+## Step 3: Modify commands/spec-init.md
 
-**File:** `commands/init.md`
+**File:** `commands/spec-init.md`
 **Action:** Modify (~50 lines added)
 
 ### 3a. Add flags to Flags table

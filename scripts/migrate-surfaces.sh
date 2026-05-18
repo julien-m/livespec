@@ -4,7 +4,7 @@
 # Invokes `generate-surfaces.js --migrate-surfaces` from PROJECT_DIR so that
 # downstream projects with split `tests/e2e/` + `tests/visual/` layouts get
 # their visual surface(s) appended to `.specs/surfaces.yaml` automatically
-# during `/spec.migrate`.
+# during `/spec-migrate`.
 #
 # The text-level append in `runMigrateSurfaces()` is idempotent and
 # byte-for-byte preserves existing manifest entries — re-running on a

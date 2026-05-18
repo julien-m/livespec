@@ -24,15 +24,15 @@ Tighten the command-layer contract so `/spec.implement` delegates visual certifi
 
 1. Add regression tests in `tests/test_visual_implementation_gate.py`.
 2. Run the focused test and confirm RED.
-3. Update `commands/implement.md`:
+3. Update `commands/spec-implement.md`:
    - Insert Phase 6.5 visual gate.
    - Make visual tooling unavailable blocking for UI features.
    - Cap `--no-visual` UI features at `In Progress`.
    - Add command-level DoD items.
-4. Update `commands/test.md`:
+4. Update `commands/spec-test.md`:
    - Add structured `Visual Gate Verdict`.
    - Define `PASS`, `FAIL`, `BLOCKED` and exit-code behavior for visual gate use.
-5. Update `commands/implement.expectations.md` and `commands/test.expectations.md`.
+5. Update `commands/spec-implement.expectations.md` and `commands/spec-test.expectations.md`.
 6. Add `implementation.md`, `changelog.md`, and global changelog/README entries.
 7. Run focused tests.
 

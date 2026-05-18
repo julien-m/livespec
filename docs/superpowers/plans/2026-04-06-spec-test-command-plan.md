@@ -2,7 +2,7 @@
 
 ## Summary
 
-Create a single command file `commands/test.md` that defines the `/spec.test` command, following the same structure as existing commands (check.md, implement.md). Then update integration points in `implement.md`, `feature.md`, `ship.md`, `system/spec-system.md`, `README.md`, and `system/testing/test-protocol.md`. Finally link globally via `/link`.
+Create a single command file `commands/spec-test.md` that defines the `/spec.test` command, following the same structure as existing commands (check.md, implement.md). Then update integration points in `implement.md`, `feature.md`, `ship.md`, `system/spec-system.md`, `README.md`, and `system/testing/test-protocol.md`. Finally link globally via `/link`.
 
 **Key distinction with /spec.implement Phase 6:** implement runs EXISTING tests as a validation gate during coding. /spec.test AUDITS coverage against AC, GENERATES missing tests from Gherkin, EXECUTES the full suite, and produces a standalone REPORT. It catches AC with no test at all and generates them.
 
@@ -15,9 +15,9 @@ Create a single command file `commands/test.md` that defines the `/spec.test` co
 
 ## Implementation Plan
 
-### Step 1: Create `commands/test.md`
+### Step 1: Create `commands/spec-test.md`
 
-**File:** `commands/test.md` (CREATE)
+**File:** `commands/spec-test.md` (CREATE)
 
 Write the full command definition following the pattern established by `check.md` and `implement.md`:
 
@@ -40,9 +40,9 @@ Write the full command definition following the pattern established by `check.md
 
 **Source:** Design spec at `docs/superpowers/specs/2026-04-06-spec-test-command-design.md`
 
-### Step 2: Update `commands/implement.md` — Add /spec.test reference
+### Step 2: Update `commands/spec-implement.md` — Add /spec.test reference
 
-**File:** `commands/implement.md` (MODIFY)
+**File:** `commands/spec-implement.md` (MODIFY)
 
 In the Phase 6 (Validate) section, add a note that `/spec.test` can be run standalone for more thorough test validation:
 
@@ -50,17 +50,17 @@ In the Phase 6 (Validate) section, add a note that `/spec.test` can be run stand
 > **Note:** For standalone test validation with generation of missing tests, use `/spec.test`.
 ```
 
-### Step 3: Update `commands/feature.md` — Add Phase 4.5
+### Step 3: Update `commands/spec-feature.md` — Add Phase 4.5
 
-**File:** `commands/feature.md` (MODIFY)
+**File:** `commands/spec-feature.md` (MODIFY)
 
 Add `/spec.test` as Phase 4.5 in the pipeline (after implement, before final audit). The feature pipeline becomes: specify → plan review → plan → implement → **test** → audit → commit.
 
 Clarify in the Phase 4.5 description: "/spec.test generates missing tests that implement's Phase 6 could not run because they didn't exist yet. It also captures visual baselines that may have been skipped during implement (--no-visual or tool unavailable)."
 
-### Step 4: Update `commands/ship.md` — Add test gate
+### Step 4: Update `commands/spec-ship.md` — Add test gate
 
-**File:** `commands/ship.md` (MODIFY)
+**File:** `commands/spec-ship.md` (MODIFY)
 
 In the Per Feature Loop, after the agent completes implementation, add a test validation step before merge. The spawned agent should run `/spec.test <feature> --auto` and include results in SHIP_RESULT.
 
@@ -107,10 +107,10 @@ Run `/link` to symlink the new command globally. Verify with `cc-hub command lis
 
 | Step | File | Action |
 |---|---|---|
-| 1 | `commands/test.md` | CREATE |
-| 2 | `commands/implement.md` | MODIFY (add reference) |
-| 3 | `commands/feature.md` | MODIFY (add Phase 4.5 + clarification) |
-| 4 | `commands/ship.md` | MODIFY (add test gate) |
+| 1 | `commands/spec-test.md` | CREATE |
+| 2 | `commands/spec-implement.md` | MODIFY (add reference) |
+| 3 | `commands/spec-feature.md` | MODIFY (add Phase 4.5 + clarification) |
+| 4 | `commands/spec-ship.md` | MODIFY (add test gate) |
 | 5 | `system/spec-system.md` | MODIFY (intent, hooks, count, quality gates) |
 | 5.5 | `README.md` | MODIFY (table, flowchart, examples, count) |
 | 6 | `system/testing/test-protocol.md` | MODIFY (add reference) |

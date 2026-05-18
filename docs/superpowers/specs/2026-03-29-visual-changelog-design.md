@@ -314,7 +314,7 @@ Update the following in `2026-03-23-design-integration-design.md`:
 
 | File | Change |
 |------|--------|
-| `commands/specify.md` | Update Step 5.6: versioned export paths, new validation UX with previous version, screen-centric changelog update, feature-specific screen references in spec.md |
+| `commands/spec-specify.md` | Update Step 5.6: versioned export paths, new validation UX with previous version, screen-centric changelog update, feature-specific screen references in spec.md |
 | `system/spec-system.md` | Update design directory layout tree to show versioned structure |
 | `docs/superpowers/specs/2026-03-23-design-integration-design.md` | Update versioning strategy, export paths, changelog format, re-modification workflow |
 

@@ -245,8 +245,8 @@ Add to the README.md update rules section:
 
 | File | Change |
 |------|--------|
-| `commands/refine.md` | Add Step 5.5 (roadmap re-evaluation) to Project flow, add roadmap as 4th menu target with full refinement flow, update DoD |
-| `commands/specify.md` | Add Step 5.5 (emerging deps + absorption), renumber existing Step 5.5 → 5.6, update DoD |
+| `commands/spec-refine.md` | Add Step 5.5 (roadmap re-evaluation) to Project flow, add roadmap as 4th menu target with full refinement flow, update DoD |
+| `commands/spec-specify.md` | Add Step 5.5 (emerging deps + absorption), renumber existing Step 5.5 → 5.6, update DoD |
 | `system/spec-system.md` | Add roadmap lifecycle rules to README update rules |
 
 ---

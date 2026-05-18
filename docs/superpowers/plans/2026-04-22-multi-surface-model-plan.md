@@ -75,7 +75,7 @@ New `migrations/8/migrate.md`:
 - `migrations/8/migrate.md` (new)
 - `scripts/generate-surfaces.js` (new — migration script)
 
-## Step 5: Update `commands/migrate.md`
+## Step 5: Update `commands/spec-migrate.md`
 
 Add new Step 4.4 before visual scaffolding:
 
@@ -86,9 +86,9 @@ Add new Step 4.4 before visual scaffolding:
 
 Update Steps 4.5 and 4.7 references to mention multi-surface iteration.
 
-**Files:** `commands/migrate.md` (modify)
+**Files:** `commands/spec-migrate.md` (modify)
 
-## Step 6: Update `commands/specify.md`
+## Step 6: Update `commands/spec-specify.md`
 
 After Step 5 (Generate spec.md), add:
 
@@ -98,9 +98,9 @@ After Step 5 (Generate spec.md), add:
    - Add `- Surfaces: all` (or specific IDs) to spec.md header
 2. If only 1 surface or no surfaces.yaml: skip (no annotation needed)
 
-**Files:** `commands/specify.md` (modify)
+**Files:** `commands/spec-specify.md` (modify)
 
-## Step 7: Update `commands/check.md`
+## Step 7: Update `commands/spec-check.md`
 
 Add new mode `--surfaces`:
 
@@ -113,7 +113,7 @@ Add new mode `--surfaces`:
    - App directories on disk not in config → WARNING (potential drift)
    - Validation errors (duplicate ids, testDir issues) → ERROR
 
-**Files:** `commands/check.md` (modify)
+**Files:** `commands/spec-check.md` (modify)
 
 ## Step 8: Update `spec-system.md`
 

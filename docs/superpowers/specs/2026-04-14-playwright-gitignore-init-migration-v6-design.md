@@ -2,13 +2,13 @@
 
 **Date:** 2026-04-14  
 **Status:** Approved  
-**Scope:** Small — `commands/init.md` and `migrations/6/migrate.md`
+**Scope:** Small — `commands/spec-init.md` and `migrations/6/migrate.md`
 
 ---
 
 ## Problem
 
-`spec.init` (commands/init.md step 3.12) only adds 3 gitignore patterns (LiveSpec symlink artifacts). It does not add Playwright output directories:
+`spec.init` (commands/spec-init.md step 3.12) only adds 3 gitignore patterns (LiveSpec symlink artifacts). It does not add Playwright output directories:
 - `test-results/` — Playwright test artifacts (screenshots, videos, traces)
 - `playwright-report/` — Playwright HTML reporter output
 
@@ -18,7 +18,7 @@ Migration v3 added `test-results/` for existing projects. Migration v6 will add 
 
 ## Solution
 
-### 1. commands/init.md — Step 3.12
+### 1. commands/spec-init.md — Step 3.12
 
 Add `test-results/` and `playwright-report/` to the gitignore update list in step 3.12. These are added unconditionally (not gated on Playwright detection) for two reasons:
 - Consistent with how other LiveSpec patterns are added (no detection gate)
@@ -74,7 +74,7 @@ SET_VERSION 6
 
 | File | Change |
 |------|--------|
-| `commands/init.md` | Add `test-results/` and `playwright-report/` to step 3.12 gitignore list, remove the duplicate step 3.13 instruction, and collapse the DoD into one unconditional checklist item |
+| `commands/spec-init.md` | Add `test-results/` and `playwright-report/` to step 3.12 gitignore list, remove the duplicate step 3.13 instruction, and collapse the DoD into one unconditional checklist item |
 | `migrations/6/migrate.md` | New file — GITIGNORE playwright-report/ + SET_VERSION 6 |
 
 ---

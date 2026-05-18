@@ -1,7 +1,7 @@
 # Plan: Check 0 — Filtre AI sémantique des features non-UI
 
 **Spec:** `docs/superpowers/specs/2026-04-21-check0-ai-ui-filter-design.md`
-**Fichier cible unique:** `commands/migrate.md`
+**Fichier cible unique:** `commands/spec-migrate.md`
 
 ## Modifications
 
@@ -106,11 +106,11 @@ AICHECK["AI reconciliation\n(6 checks: UI filter + 5)"]
 
 ## Ordre d'exécution
 
-Toutes les modifications sont dans le même fichier (`commands/migrate.md`), appliquées séquentiellement de haut en bas pour éviter les conflits d'offset.
+Toutes les modifications sont dans le même fichier (`commands/spec-migrate.md`), appliquées séquentiellement de haut en bas pour éviter les conflits d'offset.
 
 ## Vérification
 
 Après implémentation :
-1. Relire `commands/migrate.md` de bout en bout pour vérifier la cohérence
+1. Relire `commands/spec-migrate.md` de bout en bout pour vérifier la cohérence
 2. Vérifier que les numéros de checks sont cohérents (0, 1, 2, 3, 4, 5)
 3. Vérifier que le diagramme mermaid reflète le nouveau flow

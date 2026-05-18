@@ -22,7 +22,7 @@ date: 2026-04-20
 # Migration v7: E2E Test Generation
 
 Bumps version to enable Step 4.7 (E2E test generation from Gherkin specs).
-The actual generation runs unconditionally in commands/migrate.md Step 4.7.
+The actual generation runs unconditionally in commands/spec-migrate.md Step 4.7.
 
 ## Actions
 
@@ -84,9 +84,9 @@ const PATTERNS = [
 
 ---
 
-### Task 3: Modifier `commands/migrate.md` — ajouter Step 4.7
+### Task 3: Modifier `commands/spec-migrate.md` — ajouter Step 4.7
 
-**Fichier:** `commands/migrate.md`
+**Fichier:** `commands/spec-migrate.md`
 **Action:** Modifier
 
 **Insertions:**
@@ -139,7 +139,7 @@ Task 2 (script)          ──┼── Parallélisables
 Task 4 (VERSION)         ──┘
          │
          ▼
-Task 3 (commands/migrate.md) ── Dépend de Task 2 (pour référencer le bon sentinel)
+Task 3 (commands/spec-migrate.md) ── Dépend de Task 2 (pour référencer le bon sentinel)
          │
          ▼
 Task 5 (test intégration) ── Dépend de tout

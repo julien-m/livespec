@@ -17,7 +17,7 @@ from validator.expectations import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PRIORITY_COMMANDS = ("init", "test", "feature")
+PRIORITY_COMMANDS = ("spec-init", "spec-test", "spec-feature")
 
 
 def _count_content_lines(body: str) -> int:

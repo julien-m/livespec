@@ -5,7 +5,7 @@
 > The canonical reference for the `commands/<X>.expectations.md` contract files,
 > the `RunArtifact` JSON schema, the `verify:` YAML grammar, the override
 > resolver, the pre-commit `last_reviewed` hook, and the 4-state outcome
-> classifier consumed by `/spec.verify-output`.
+> classifier consumed by `/spec-verify-output`.
 
 ## 1. File Layout
 
@@ -141,7 +141,7 @@ Rotation: 21st artifact triggers move-to-`_archive/` of the oldest.
 
 First file found wins. The override **totally replaces** the builtin —
 no prose merge, no YAML merge. If the override is malformed,
-`/spec.verify-output` exits 2 with `Blocked By: override missing verify: block`
+`/spec-verify-output` exits 2 with `Blocked By: override missing verify: block`
 (or similar) — it does **NOT** silently fall back to the builtin (AC-007).
 
 ## 7. Pre-commit Hook Contract

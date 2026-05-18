@@ -21,12 +21,12 @@
 | `scripts/link-local.sh` | Create all command/agent symlinks in a target project's `.claude/` |
 | `scripts/migrate.sh` | Parse and execute migration DSL files |
 | `migrations/2/migrate.md` | First migration: global → local distribution |
-| `commands/migrate.md` | `spec.migrate` command specification |
+| `commands/spec-migrate.md` | `spec.migrate` command specification |
 
 ### Modified Files
 | File | Change |
 |------|--------|
-| `commands/init.md` | Add Step 3.12 (local symlinks) + exit criteria + CLAUDE.md template update |
+| `commands/spec-init.md` | Add Step 3.12 (local symlinks) + exit criteria + CLAUDE.md template update |
 | `system/spec-system.md` | Version check preamble + command roster update |
 | `README.md` | Reflect new distribution model, add spec.migrate |
 
@@ -375,10 +375,10 @@ git commit -m "feat: add migrate.sh DSL interpreter"
 
 ---
 
-## Task 4: `commands/migrate.md`
+## Task 4: `commands/spec-migrate.md`
 
 **Files:**
-- Create: `commands/migrate.md`
+- Create: `commands/spec-migrate.md`
 
 - [ ] **Step 1: Write the spec.migrate command**
 
@@ -436,8 +436,8 @@ flowchart TD
 
 1. Read `.specs/.livespec-path`
 2. If missing: resolve from this command's own symlink chain:
-   - `readlink ~/.claude/commands/spec.migrate.md` → `/path/to/livespec/commands/migrate.md`
-   - Strip `commands/migrate.md` → `/path/to/livespec`
+   - `readlink ~/.claude/commands/spec.migrate.md` → `/path/to/livespec/commands/spec-migrate.md`
+   - Strip `commands/spec-migrate.md` → `/path/to/livespec`
    - Write to `.specs/.livespec-path`
 3. Verify the resolved path contains a `VERSION` file
 
@@ -520,27 +520,27 @@ If a previous migration failed mid-execution:
 
 - [ ] **Step 2: Verify file exists and is valid markdown**
 
-Run: `head -5 commands/migrate.md && echo "..." && wc -l commands/migrate.md`
+Run: `head -5 commands/spec-migrate.md && echo "..." && wc -l commands/spec-migrate.md`
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add commands/migrate.md
+git add commands/spec-migrate.md
 git commit -m "feat: add spec.migrate command"
 ```
 
 ---
 
-## Task 5: Modify `commands/init.md`
+## Task 5: Modify `commands/spec-init.md`
 
 **Files:**
-- Modify: `commands/init.md:735-752` (Step 3.11 CLAUDE.md template)
-- Modify: `commands/init.md:924-946` (Exit Criteria)
+- Modify: `commands/spec-init.md:735-752` (Step 3.11 CLAUDE.md template)
+- Modify: `commands/spec-init.md:924-946` (Exit Criteria)
 - Add: New Step 3.12 after Step 3.11
 
 - [ ] **Step 1: Add `/spec.migrate` to CLAUDE.md command list template**
 
-In `commands/init.md`, find the command list at line 751 and add `/spec.migrate`:
+In `commands/spec-init.md`, find the command list at line 751 and add `/spec.migrate`:
 
 ```
 Commands: `/spec.init` · `/spec.migrate` · `/spec.propose` · `/spec.specify` · `/spec.plan` · `/spec.implement` · `/spec.test` · `/spec.check` · `/spec.fix` · `/spec.explain` · `/spec.stack` · `/spec.feature` · `/spec.ship` · `/spec.refine` · `/spec.preflight` · `/spec.hooks` · `/spec.play-coverage` · `/spec.status` · `/spec.refresh-conventions`
@@ -555,7 +555,7 @@ Insert after the end of Step 3.11 section (after "This keeps the CLAUDE.md lean.
 
 After installing the CLAUDE.md section, create local symlinks for all LiveSpec commands and agents in the project's `.claude/` directory:
 
-1. **Resolve LiveSpec repo path:** Follow the symlink chain of the currently executing `spec.init` command (`readlink` on `~/.claude/commands/spec.init.md`) → extract the repo root by stripping `commands/init.md`
+1. **Resolve LiveSpec repo path:** Follow the symlink chain of the currently executing `spec.init` command (`readlink` on `~/.claude/commands/spec.init.md`) → extract the repo root by stripping `commands/spec-init.md`
 2. **Write path discovery file:** Write the resolved path to `.specs/.livespec-path`
 3. **Create directories:** `mkdir -p .claude/commands .claude/agents`
 4. **Run link script:** Execute `bash <livespec-dir>/scripts/link-local.sh <project-dir> <livespec-dir>`
@@ -594,13 +594,13 @@ In the success message block (around line 829), add after the `.conventions/conv
 
 - [ ] **Step 5: Verify init.md is valid**
 
-Run: `grep -n "Step 3.12\|livespec-version\|link-local\|spec.migrate" commands/init.md`
+Run: `grep -n "Step 3.12\|livespec-version\|link-local\|spec.migrate" commands/spec-init.md`
 Expected: Step 3.12 section present, livespec-version in exit criteria, link-local.sh referenced, spec.migrate in CLAUDE.md template.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add commands/init.md
+git add commands/spec-init.md
 git commit -m "feat(init): add Step 3.12 local symlinks + exit criteria + migrate in CLAUDE.md"
 ```
 
@@ -744,7 +744,7 @@ rm -f ~/.claude/agents/livespec-verifier.md
 - [ ] **Step 3: Create spec.migrate global symlink**
 
 ```bash
-ln -sf ~/projects/livespec/commands/migrate.md ~/.claude/commands/spec.migrate.md
+ln -sf ~/projects/livespec/commands/spec-migrate.md ~/.claude/commands/spec.migrate.md
 ```
 
 - [ ] **Step 4: Verify global state**
@@ -789,8 +789,8 @@ Replace lines 364-374:
 
 ```bash
 # Create global symlinks for spec.init and spec.migrate
-ln -sf ~/projects/livespec/commands/init.md ~/.claude/commands/spec.init.md
-ln -sf ~/projects/livespec/commands/migrate.md ~/.claude/commands/spec.migrate.md
+ln -sf ~/projects/livespec/commands/spec-init.md ~/.claude/commands/spec.init.md
+ln -sf ~/projects/livespec/commands/spec-migrate.md ~/.claude/commands/spec.migrate.md
 ```
 
 ### Per-project (automatic)
@@ -835,7 +835,7 @@ ls migrations/*/migrate.md
 echo "=== Scripts ==="
 ls -la scripts/link-local.sh scripts/migrate.sh
 echo "=== New command ==="
-ls commands/migrate.md
+ls commands/spec-migrate.md
 echo "=== Deleted files ==="
 test -f .claude/skills/link/SKILL.md && echo "FAIL: link skill still exists" || echo "OK: link skill removed"
 test -f .claude/rules/commands-agents-must-be-linked.md && echo "FAIL: rule still exists" || echo "OK: rule removed"

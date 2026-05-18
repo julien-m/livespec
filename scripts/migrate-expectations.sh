@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # migrate-expectations.sh — Migration v13 wrapper.
 #
-# Backfills feature 039 (command expectations + /spec.verify-output) and
+# Backfills feature 039 (command expectations + /spec-verify-output) and
 # feature 040 (rich expectations + --preview/--save) wiring on projects
 # initialised before v13:
 #

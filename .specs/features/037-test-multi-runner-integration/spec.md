@@ -30,7 +30,7 @@ Features 030 (`validator/ui_runner_xcuitest.py`) and 031 (`validator/ui_runner_m
 | `run_flow()`          | ✓                       | ✓                      | ✓                    |
 | `compare_baseline()`  | ✓                       | ✓                      | ✓                    |
 
-These handlers are **not imported anywhere** outside their own test files. `commands/test.md` Phase 4.5 ("Visual") is hardcoded for Playwright: it generates `toHaveScreenshot()` snippets, parses `playwright --version`, writes `docker-compose.visual.yml`, and assumes a web frontend. When a user runs `/spec.test --visual` on an iOS/watchOS or Android project, **none of the work shipped in 030/031 executes** — the dispatcher does not exist.
+These handlers are **not imported anywhere** outside their own test files. `commands/spec-test.md` Phase 4.5 ("Visual") is hardcoded for Playwright: it generates `toHaveScreenshot()` snippets, parses `playwright --version`, writes `docker-compose.visual.yml`, and assumes a web frontend. When a user runs `/spec.test --visual` on an iOS/watchOS or Android project, **none of the work shipped in 030/031 executes** — the dispatcher does not exist.
 
 In addition, the surface generator (`scripts/generate-surfaces.js`, line 349) hardcodes `testDir: join(appPath, "UITests")` for any directory containing an `.xcodeproj`. Real Xcode projects often have **multiple test targets** (`AppTests`, `AppUITests`, `AppWatchTests`, `AppWidgetTests`). The current single-`UITests` heuristic produces a `surfaces.yaml` pointing at a non-existent directory, breaking discovery downstream.
 
@@ -298,7 +298,7 @@ flowchart TD
 | AC-005 | `generate-surfaces.js` emits one surface per Xcode test target detected in `*.xcodeproj/project.pbxproj`                                 | P1       | Story 3  |
 | AC-006 | Every emitted surface in `surfaces.yaml` has a `testDir` that exists on disk; if the directory does not exist the surface is omitted with a WARNING | P1 | Story 3 |
 | AC-007 | watchOS-suffixed test targets (`*WatchTests`, `*WatchUITests`) emit surfaces with `platform: watchos`                                    | P1       | Story 3  |
-| AC-008 | `/spec.test --visual` is documented in the Flags table of `commands/test.md` and accepted by the CLI                                     | P2       | Story 4  |
+| AC-008 | `/spec.test --visual` is documented in the Flags table of `commands/spec-test.md` and accepted by the CLI                                     | P2       | Story 4  |
 | AC-009 | `/spec.test --visual --no-visual` exits with code 2 and message "--visual and --no-visual are mutually exclusive"                         | P2       | Story 4  |
 | AC-010 | `/spec.test --visual` skips Phases 2, 3, 4 and runs only Phases 0, 4.5, 5                                                                | P2       | Story 4  |
 | AC-011 | Phase 4.5 calls `<Handler>.detect()` first; on `false` it emits `BLOCKED at step preflight - tooling_missing - <handler-specific message>` and exits non-zero | P2 | Story 5 |
@@ -322,7 +322,7 @@ flowchart TD
 | FR-007 | Test targets whose name matches the regex `(?i)watch.*tests?$` must emit `platform: watchos`; targets matching `(?i)widget.*tests?$` must emit `platform: ios` and `kind: widget`; otherwise default to `platform: ios` and infer `kind` from the `ui-testing` vs `unit-test` product type | AC-007 |
 | FR-008 | `/spec.test` must accept the `--visual` flag (no short form) with semantics: run only Phases 0, 4.5, 5 | AC-008, AC-010 |
 | FR-009 | `/spec.test` must reject the combination `--visual --no-visual` with exit code 2 and message "--visual and --no-visual are mutually exclusive" | AC-009 |
-| FR-010 | `commands/test.md` must list `--visual` in the Flags table with description "Opt-in: run only Phase 4.5 (visual) skipping suite execution. Mutually exclusive with --no-visual." | AC-008 |
+| FR-010 | `commands/spec-test.md` must list `--visual` in the Flags table with description "Opt-in: run only Phase 4.5 (visual) skipping suite execution. Mutually exclusive with --no-visual." | AC-008 |
 | FR-011 | Before invoking any handler method other than `detect()`, the dispatcher must call `<Handler>(project_dir).detect()` and on `false` emit `BLOCKED at step preflight - tooling_missing - <message>` with the handler-specific message exposed via a new `Handler.preflight_message()` method | AC-011, AC-012, AC-013 |
 | FR-012 | `XCUITestRunnerHandler.preflight_message()` must return platform-aware text: `"XCUITest runner requires macOS host (current: linux)"` on non-macOS, `"xcrun simctl not found — install Xcode CLI tools"` if `_check_macos()` passed but `xcrun` is missing | AC-012 |
 | FR-013 | `MaestroRunnerHandler.preflight_message()` must return: `"maestro CLI not on PATH — install: curl -Ls 'https://get.maestro.mobile.dev' \| bash"` when `_check_maestro()` fails, or `"no Android emulator available — start one with 'emulator -avd <name>'"` when `adb devices` lists none | AC-013 |
@@ -366,7 +366,7 @@ flowchart TD
 **AC References:** [AC-009](#ac-009)
 
 ### FR-010
-**Requirement:** `commands/test.md` lists `--visual` in its Flags table
+**Requirement:** `commands/spec-test.md` lists `--visual` in its Flags table
 **AC References:** [AC-008](#ac-008)
 
 ### FR-011

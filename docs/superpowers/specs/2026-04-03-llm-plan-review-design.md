@@ -51,7 +51,7 @@ New flag `--plan-review` on `livespec validate`:
 - Runs review, displays findings
 - Exit 1 if any blocking findings
 
-### 4. Command integration (`commands/plan.md`)
+### 4. Command integration (`commands/spec-plan.md`)
 
 New flag `--review` on `/spec.plan`:
 - Advisory only (never blocks plan generation)

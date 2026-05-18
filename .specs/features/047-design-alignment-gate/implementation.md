@@ -8,8 +8,8 @@
 | [FR-002: Manifest schema](spec.md#fr-002) | `system/schemas/design-alignment-manifest.md` | `@spec FR-002: Design alignment manifest schema — .specs/features/047-design-alignment-gate/spec.md#fr-002` | ✅ Implemented | 2026-05-17 |
 | [FR-003: Python comparator](spec.md#fr-003) | `validator/design_alignment/models.py`, `validator/design_alignment/core.py`, `validator/design_alignment/__init__.py` | `@spec FR-003: Design alignment module — .specs/features/047-design-alignment-gate/spec.md#fr-003` | ✅ Implemented | 2026-05-17 |
 | [FR-004: CLI command](spec.md#fr-004) | `validator/cli_commands/design_alignment_cmd.py`, `validator/cli_commands/__init__.py` | `@spec FR-004: Design alignment CLI — .specs/features/047-design-alignment-gate/spec.md#fr-004` | ✅ Implemented | 2026-05-17 |
-| [FR-005: /spec.test integration](spec.md#fr-005) | `commands/test.md` | `@spec FR-005: test command integration — .specs/features/047-design-alignment-gate/spec.md#fr-005` | ✅ Implemented | 2026-05-17 |
-| [FR-006: expectations update](spec.md#fr-006) | `commands/test.expectations.md` | Covered by command expectation contract text | ✅ Implemented | 2026-05-17 |
+| [FR-005: /spec.test integration](spec.md#fr-005) | `commands/spec-test.md` | `@spec FR-005: test command integration — .specs/features/047-design-alignment-gate/spec.md#fr-005` | ✅ Implemented | 2026-05-17 |
+| [FR-006: expectations update](spec.md#fr-006) | `commands/spec-test.expectations.md` | Covered by command expectation contract text | ✅ Implemented | 2026-05-17 |
 | [FR-007: tests](spec.md#fr-007) | `tests/test_design_alignment.py`, `tests/test_design_alignment_command_contract.py` | `@spec FR-007: Alignment regression tests — .specs/features/047-design-alignment-gate/spec.md#fr-007` | ✅ Implemented | 2026-05-17 |
 
 ## Acceptance Criteria Mapping
@@ -42,7 +42,7 @@
 | `validator/design_alignment/*` | Reusable comparator API. |
 | `validator/cli_commands/design_alignment_cmd.py` | `livespec design-alignment compare` CLI. |
 | `validator/cli_commands/__init__.py` | CLI registration. |
-| `commands/test.md` | Phase 4.5.0 Design Alignment Gate integration. |
-| `commands/test.expectations.md` | Visual-run verdict and artifact contract. |
+| `commands/spec-test.md` | Phase 4.5.0 Design Alignment Gate integration. |
+| `commands/spec-test.expectations.md` | Visual-run verdict and artifact contract. |
 | `tests/test_design_alignment.py` | Comparator and CLI tests. |
 | `tests/test_design_alignment_command_contract.py` | Command/doc contract tests. |

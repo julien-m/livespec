@@ -13,7 +13,7 @@
 > 1. Read each section — correct affirmations, answer questions
 > 2. Resolve all `[FILL]` markers and `[OBSERVED-CONFLICT]` tags
 > 3. Change `status: draft` to `status: validated` in the YAML header above
-> 4. Re-run `/spec.init --from-code` to generate `.specs/`
+> 4. Re-run `/spec-init --from-code` to generate `.specs/`
 
 ```yaml
 ---

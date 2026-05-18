@@ -24,7 +24,7 @@ Ce matériel n'est jamais transformé en code de test E2E par la migration.
 
 ```mermaid
 flowchart TD
-    MIGRATE["commands/migrate.md"] --> STEP47["Step 4.7 (unconditional)"]
+    MIGRATE["commands/spec-migrate.md"] --> STEP47["Step 4.7 (unconditional)"]
     STEP47 -->|"node generate-e2e-tests.js --generate"| SCRIPT["scripts/generate-e2e-tests.js"]
     SCRIPT --> DETECT{"Frontend détecté?"}
     DETECT -->|non| SKIP["Exit: reason=no-frontend"]
@@ -40,7 +40,7 @@ flowchart TD
 ### Mécanisme d'exécution
 
 - **`migrations/7/migrate.md`** : fait uniquement `SET_VERSION 7` (pas de `RUN`)
-- **Step 4.7 dans `commands/migrate.md`** : invoque le script **unconditionnellement** (comme Step 4.5)
+- **Step 4.7 dans `commands/spec-migrate.md`** : invoque le script **unconditionnellement** (comme Step 4.5)
 - Le script tourne à chaque `spec.migrate`, même sur "already up to date" → nouvelles features = nouveaux tests
 
 ### Pourquoi deux mécanismes séparés
@@ -120,7 +120,7 @@ date: 2026-04-20
 # Migration v7: E2E Test Generation
 
 Bumps version to enable Step 4.7 (E2E test generation from Gherkin specs).
-The actual generation runs unconditionally in commands/migrate.md Step 4.7,
+The actual generation runs unconditionally in commands/spec-migrate.md Step 4.7,
 not via RUN verb.
 
 ## Actions
@@ -130,7 +130,7 @@ SET_VERSION 7
 
 ---
 
-## Intégration dans `commands/migrate.md`
+## Intégration dans `commands/spec-migrate.md`
 
 ### Step 4.7 — E2E Test Generation (nouveau)
 
@@ -198,7 +198,7 @@ E2E test generation:
 |---------|--------|
 | `migrations/7/migrate.md` | Créer — `SET_VERSION 7` uniquement |
 | `scripts/generate-e2e-tests.js` | Créer — scaffold generator Gherkin → Playwright |
-| `commands/migrate.md` | Modifier — ajouter Step 4.7 + étendre Step 4.6 + rapport |
+| `commands/spec-migrate.md` | Modifier — ajouter Step 4.7 + étendre Step 4.6 + rapport |
 | `VERSION` | Modifier — 6 → 7 |
 
 ---

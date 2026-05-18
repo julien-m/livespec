@@ -78,7 +78,7 @@ def infer_status(feature_dir: Path, current: str) -> str:
     else:
         candidate = "Draft"
     # Never downgrade a hand-curated status (e.g. user marked Implemented
-    # when code was merged outside /spec.implement and impl.md is absent).
+    # when code was merged outside /spec-implement and impl.md is absent).
     cur_rank = PROMOTION_RANK.get(current.strip(), -1)
     new_rank = PROMOTION_RANK.get(candidate, -1)
     return candidate if new_rank > cur_rank else current.strip()

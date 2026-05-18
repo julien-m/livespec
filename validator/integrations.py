@@ -13,7 +13,7 @@ Eligibility rule (single, non-negotiable):
     * Both keys present but malformed (invalid YAML, unknown command,
       invalid mode, invalid types) → single stderr warning, file skipped.
 
-This module is the diagnostic-only surface (used by ``/spec.hooks``); the
+This module is the diagnostic-only surface (used by ``/spec-hooks``); the
 runtime injection chain lives in :mod:`validator.hook_resolver`.
 """
 
@@ -25,6 +25,13 @@ from pathlib import Path
 from typing import Any, cast
 
 import yaml
+
+from .command_registry import (
+    normalize_command_name,
+)
+from .command_registry import (
+    valid_command_names as registry_valid_command_names,
+)
 
 # Source of truth for the canonical commands directory. Resolved relative
 # to this file (validator/integrations.py → repo root via ../).
@@ -72,13 +79,7 @@ def valid_command_names(commands_dir: Path | None = None) -> frozenset[str]:
     ``"<name>.expectations"`` (Python only strips the final extension).
     """
     base = commands_dir or LIVESPEC_COMMANDS_DIR
-    if not base.is_dir():
-        return frozenset()
-    return frozenset(
-        p.stem
-        for p in base.glob("*.md")
-        if not p.stem.endswith(".expectations")
-    )
+    return registry_valid_command_names(base)
 
 
 # ---------------------------------------------------------------------------
@@ -178,7 +179,7 @@ def _validate_frontmatter(
                 f"frontmatter field 'commands:' must contain strings (got {type(entry).__name__})",
             )
             return None
-        commands_list.append(entry)
+        commands_list.append(normalize_command_name(entry))
 
     unknown = [c for c in commands_list if c not in valid_commands]
     if unknown:
@@ -324,6 +325,7 @@ def resolve_for(
         integrations_dir=integrations_dir,
         commands_dir=commands_dir,
     )
+    command = normalize_command_name(command)
     candidates = [i for i in all_integrations if i.applies_to(event, command)]
 
     overrides = [i for i in candidates if i.mode == "override"]

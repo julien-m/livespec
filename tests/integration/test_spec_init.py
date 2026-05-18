@@ -1,4 +1,4 @@
-"""Level 3B — Integration tests for /spec.init via SDK."""
+"""Level 3B — Integration tests for /spec-init via SDK."""
 
 from __future__ import annotations
 
@@ -22,14 +22,14 @@ BUDGET_LIMIT_USD = float(os.environ.get("LIVESPEC_TEST_BUDGET_USD", "25"))
     reason="ANTHROPIC_API_KEY not set",
 )
 class TestSpecInit:
-    """Integration tests for /spec.init on minimal-app fixture."""
+    """Integration tests for /spec-init on minimal-app fixture."""
 
     @pytest.fixture(scope="class")
     def run_result(self):
-        """Run /spec.init once for all tests in this class."""
+        """Run /spec-init once for all tests in this class."""
         result = anyio.run(
             run_livespec_command,
-            "/spec.init",
+            "/spec-init",
             "minimal-app",
             FIXTURES,
         )
@@ -64,7 +64,7 @@ class TestSpecInit:
     def test_at_least_one_adr_created(self, run_result):
         decisions = run_result.cwd / ".specs/stacks/decisions"
         adrs = list(decisions.glob("ADR-*.md")) if decisions.exists() else []
-        assert len(adrs) >= 1, "Quality gate /spec.init: at least 1 ADR required (BLOCKING)"
+        assert len(adrs) >= 1, "Quality gate /spec-init: at least 1 ADR required (BLOCKING)"
 
     def test_roadmap_has_tiers_with_items(self, run_result):
         roadmap = run_result.cwd / ".specs/roadmap.md"

@@ -66,7 +66,7 @@ def _run_preflight(*, fix: bool, full: bool) -> None:
     if not manifest_path.exists():
         typer.echo(
             f"Error: {manifest_path} not found. "
-            "Run /spec.preflight --regenerate to generate it.",
+            "Run /spec-preflight --regenerate to generate it.",
             err=True,
         )
         emit_summary("preflight", "FAIL", reason="manifest_missing")

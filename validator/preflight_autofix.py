@@ -1,6 +1,6 @@
 """Auto-fix missing preflight tools and runner resources.
 
-This module implements the ``--fix`` mode of ``/spec.preflight``. It:
+This module implements the ``--fix`` mode of ``/spec-preflight``. It:
 
 * dispatches install commands for missing tools through trusted package
   managers (``brew``, ``cargo``, ``npm``, ``pip``, allowlisted curl-pipe
@@ -16,7 +16,7 @@ This module implements the ``--fix`` mode of ``/spec.preflight``. It:
 
 The module is intentionally pure-Python with subprocess shelling - there
 is no implicit dependency on the rest of the validator package so that
-``/spec.preflight`` (a Claude Code command) can shell out to it from any
+``/spec-preflight`` (a Claude Code command) can shell out to it from any
 context.
 """
 

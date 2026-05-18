@@ -1,8 +1,8 @@
 """Tests for behavioral TDD and audit mechanisms.
 
 Validates that:
-  - /spec.implement detects Behavioral AC and activates Step 0a (AC-001, AC-004)
-  - /spec.test Phase 1.5 produces coverage matrix and messages (AC-007, AC-008, AC-009)
+  - /spec-implement detects Behavioral AC and activates Step 0a (AC-001, AC-004)
+  - /spec-test Phase 1.5 produces coverage matrix and messages (AC-007, AC-008, AC-009)
 
 @spec AC-001, AC-004, AC-007, AC-008, AC-009 — .specs/features/005.1-behavioral-tdd-audit/spec.md
 """
@@ -13,8 +13,8 @@ import textwrap
 from pathlib import Path
 
 # Real command files — used for content-based validation
-_IMPLEMENT_CMD = Path(__file__).parent.parent / "commands" / "implement.md"
-_TEST_CMD = Path(__file__).parent.parent / "commands" / "test.md"
+_IMPLEMENT_CMD = Path(__file__).parent.parent / "commands" / "spec-implement.md"
+_TEST_CMD = Path(__file__).parent.parent / "commands" / "spec-test.md"
 
 
 # ---------------------------------------------------------------------------
@@ -43,7 +43,7 @@ def _build_audit_output(
         taxonomy_path: path to taxonomy document for gap references.
 
     Returns:
-        Formatted audit output string matching commands/test.md Phase 1.5 format.
+        Formatted audit output string matching commands/spec-test.md Phase 1.5 format.
     """
     lines = ["### Behavioral Coverage Audit", ""]
     lines.append("| Trait | Required Pattern | Pattern Keyword | Status | Notes |")
@@ -83,12 +83,12 @@ def _build_audit_output(
 
 
 # ---------------------------------------------------------------------------
-# Test 1 — AC-001: /spec.implement detects Behavioral AC
+# Test 1 — AC-001: /spec-implement detects Behavioral AC
 # ---------------------------------------------------------------------------
 
 
 class TestImplementDetectsBehavioralAc:
-    """AC-001: /spec.implement detects Behavioral AC and includes TDD step."""
+    """AC-001: /spec-implement detects Behavioral AC and includes TDD step."""
 
     # @spec FR-001: Behavioral TDD detection
     # .specs/features/005.1-behavioral-tdd-audit/spec.md#fr-001
@@ -129,7 +129,7 @@ class TestImplementDetectsBehavioralAc:
 
 
 # ---------------------------------------------------------------------------
-# Test 2 — AC-004: /spec.implement skips without Behavioral AC
+# Test 2 — AC-004: /spec-implement skips without Behavioral AC
 # ---------------------------------------------------------------------------
 
 
@@ -176,7 +176,7 @@ class TestImplementSkipsWithoutBehavioralAc:
 
 
 class TestAuditCoverageMatrixStructure:
-    """AC-007: /spec.test produces a behavioral coverage matrix."""
+    """AC-007: /spec-test produces a behavioral coverage matrix."""
 
     # @spec FR-007: Coverage matrix output
     # .specs/features/005.1-behavioral-tdd-audit/spec.md#fr-007

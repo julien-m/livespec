@@ -3,20 +3,28 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-14
+> Last updated: 2026-05-18
 
 ---
 
-## 2026-05-17 -- [Feature 047] Implemented: Design Alignment Gate — global `ui.pen` → runtime alignment protocol, support-quality contract, manifest schema, reusable Python comparator, `livespec design-alignment compare`, `/spec.test --visual` Phase 4.5.0 integration, +8 regression tests.
+## 2026-05-18 — [Feature 049]: Implemented: Command Naming Normalization — `/spec-*` is now canonical across registry, docs, local/bootstrap links, hooks, integrations, command-audit, verify-output, and run finalization; dotted `/spec.*` links remain as legacy aliases; Migration 15 added; full suite 1506 passed, 32 skipped.
 
-## 2026-05-17 -- [Feature 046] Implemented: Visual Implementation Gate — `/spec.implement` now requires `/spec.test <feature> --auto --visual` before finalizing UI features; visual tooling failures and `--no-visual` keep status `In Progress`; `/spec.test` emits `Visual Gate Verdict: PASS | FAIL | BLOCKED`; +5 regression tests.
+## 2026-05-18 — [Feature 048]: Implemented: Command Validation Hardening — added canonical command registry, `livespec command-audit`, strengthened expectations guard checks, `livespec run finalize`, deterministic `status`/`play-coverage`/`conventions refresh` backends, audit-backed coherence script, Migration 14, and tests; command-audit reports 20/20 commands at score 5.
 
-## 2026-05-13 -- [Feature 043] Spec created: `/spec.sync-brainstorm` — Living Bridge to Brainstorm — 5 stories, 17 AC, 18 FR (new slash-command detecting stale/orphaned/manual flows; Mode A re-pull for flows with `--apply` + per-file confirmation; Mode B inviolable for derived feature AC/FR; `--prune-orphaned` with explicit confirmation; integrates 4 new gap categories into `/spec.check`)
-## 2026-05-13 -- [Feature 042] Spec created: `/spec.specify` Derives from Imported Brainstorm Flows — 3 stories, 13 AC, 13 FR (transcribes Mermaid + AC + FR from `.specs/flows/<slug>.md` produced by Feature 041; Mode B locking; classic-fallback when no flow matches)
+## 2026-05-18 — [Feature 049]: Spec created: Command Naming Normalization — canonical slash commands move from dotted `/spec.*` names to hyphenated `/spec-*` names after Feature 048; dotted names remain backward-compatible aliases during migration; registry, docs, hooks, verify-output, and migration tooling must agree on canonical names.
+
+## 2026-05-18 — [Feature 048]: Spec created: Command Validation Hardening — plan created for 5/5 command validation: canonical command registry, deterministic command audit, mandatory run finalization for state-changing commands, fresh coherence checks, script-backed validation for status/play-coverage/refresh-conventions, and migration v14.
+
+## 2026-05-17 -- [Feature 047] Implemented: Design Alignment Gate — global `ui.pen` → runtime alignment protocol, support-quality contract, manifest schema, reusable Python comparator, `livespec design-alignment compare`, `/spec-test --visual` Phase 4.5.0 integration, +8 regression tests.
+
+## 2026-05-17 -- [Feature 046] Implemented: Visual Implementation Gate — `/spec-implement` now requires `/spec-test <feature> --auto --visual` before finalizing UI features; visual tooling failures and `--no-visual` keep status `In Progress`; `/spec-test` emits `Visual Gate Verdict: PASS | FAIL | BLOCKED`; +5 regression tests.
+
+## 2026-05-13 -- [Feature 043] Spec created: `/spec.sync-brainstorm` — Living Bridge to Brainstorm — 5 stories, 17 AC, 18 FR (new slash-command detecting stale/orphaned/manual flows; Mode A re-pull for flows with `--apply` + per-file confirmation; Mode B inviolable for derived feature AC/FR; `--prune-orphaned` with explicit confirmation; integrates 4 new gap categories into `/spec-check`)
+## 2026-05-13 -- [Feature 042] Spec created: `/spec-specify` Derives from Imported Brainstorm Flows — 3 stories, 13 AC, 13 FR (transcribes Mermaid + AC + FR from `.specs/flows/<slug>.md` produced by Feature 041; Mode B locking; classic-fallback when no flow matches)
 ## 2026-05-13 -- [Feature 041] Spec created: Brainstorm Flow & Screen Specs Ingestion — 3 stories, 14 AC, 12 FR (extends `spec.init` Step 3.6 to ingest `.brainstorm/specs/{flows,screens}/*.md` produced by brainstorm `specify-flows`)
-## 2026-05-13 -- [Migration v13] Backfill command-expectations wiring — re-link `.claude/commands/` (drops orphan `spec.*.expectations.md` symlinks left by pre-fix `link-local.sh`, adds `/spec.verify-output`), install `last_reviewed` pre-commit hook, append `.specs/.runs/` and `.specs/.previews/` to `.gitignore`; `install-hooks.sh` accepts `<project> <livespec>` args; `/spec.init` now wires the hook automatically (features 039, 040)
+## 2026-05-13 -- [Migration v13] Backfill command-expectations wiring — re-link `.claude/commands/` (drops orphan `spec.*.expectations.md` symlinks left by pre-fix `link-local.sh`, adds `/spec-verify-output`), install `last_reviewed` pre-commit hook, append `.specs/.runs/` and `.specs/.previews/` to `.gitignore`; `install-hooks.sh` accepts `<project> <livespec>` args; `/spec-init` now wires the hook automatically (features 039, 040)
 ## 2026-05-12 -- [Feature 040] Implemented: Rich Expectations Format & Verify Preview — Section 13 (Demo Session) mandatory across the 20 builtin expectations files, new `livespec verify-output --preview [--save]` mode that resolves placeholders from `.specs/stacks/_default.md`, `.specs/features/`, `.specs/design/screens/`, `.conventions/manifest.yaml`; +15 tests, 0 regressions (depends on feature 039)
-## 2026-05-12 -- [Feature 039] Implemented: Command Expectations & /spec.verify-output — 20 builtin expectations files, RunArtifact JSON schema, verify-output CLI + slash-command, pre-commit last_reviewed hook, override resolver, 4-state outcome classifier (no-short-circuit invariant)
+## 2026-05-12 -- [Feature 039] Implemented: Command Expectations & /spec-verify-output — 20 builtin expectations files, RunArtifact JSON schema, verify-output CLI + slash-command, pre-commit last_reviewed hook, override resolver, 4-state outcome classifier (no-short-circuit invariant)
 ## 2026-05-08 -- [Feature 037] Implemented: Test Multi-Runner Integration — runner-aware Phase 4.5 dispatcher, multi-target Xcode pbxproj parsing, --visual flag documented; +32 Python tests +5 JS tests, 0 regressions
 ## 2026-05-08 -- [Feature 037] Plan created: Test Multi-Runner Integration — 17 implementation steps, 4 diagrams (sequence + flow + state + ER), 15+ files
 ## 2026-05-08 -- [Feature 037] Spec created: Test Multi-Runner Integration — 5 stories, 15 AC, 15 FR
@@ -29,7 +37,7 @@
 ## 2026-05-07 -- [Feature 025] Implemented: Mutation Testing On-Demand — 2 stories, 7 AC, 6 FR; 15 new tests pass (874 total)
 ## 2026-05-07 -- [Feature 019] Implemented: Driver Swift — 4 stories, 10 AC, 6 FR; 31 new tests pass (723 total)
 ## 2026-05-06 -- [Feature 016] Implemented: Cross-Language Test Driver Architecture — 5 stories, 15 AC, 8 FR; 35 tests pass
-## 2026-05-06 -- [Feature 034] Spec created: Preflight Auto-Install & Init via /spec.preflight --fix — 5 stories, 14 AC, 11 FR
+## 2026-05-06 -- [Feature 034] Spec created: Preflight Auto-Install & Init via /spec-preflight --fix — 5 stories, 14 AC, 11 FR
 ## 2026-05-06 -- [Feature 033] Spec created: Smart Test Selection — 4 stories, 12 AC, 10 FR
 ## 2026-05-06 -- [Feature 032] Spec created: Pre-commit / Pre-push Test Hooks — 5 stories, 13 AC, 10 FR
 ## 2026-05-06 -- [Feature 031] Spec created: UI Runner Android (Maestro) — 3 stories, 13 AC, 8 FR
@@ -70,7 +78,7 @@
 
 ## 2026-05-03 -- Spec: Feature 013 State Model & Identity Resolution (Chantier 4)
 
-[Feature 013] Spec created: State Model & Identity Resolution — 5 stories, 10 AC, 10 FR. Addresses the most critical defects from AUDIT.md: literal `NNN-feature-name` propagation in `/spec.feature`, log path incoherence, internal contradictions in `/spec.implement`, undefined `--resume` semantics on `Blocked`, absence of shared state-file frontmatter schema.
+[Feature 013] Spec created: State Model & Identity Resolution — 5 stories, 10 AC, 10 FR. Addresses the most critical defects from AUDIT.md: literal `NNN-feature-name` propagation in `/spec-feature`, log path incoherence, internal contradictions in `/spec-implement`, undefined `--resume` semantics on `Blocked`, absence of shared state-file frontmatter schema.
 
 ---
 
@@ -100,19 +108,19 @@
 
 ## 2026-04-17 -- Test: Feature 011 validated
 
-[Feature 011] Test: 11 feature integration tests passing; command-layer guards reviewed in `commands/migrate.md`; AC coverage report updated.
+[Feature 011] Test: 11 feature integration tests passing; command-layer guards reviewed in `commands/spec-migrate.md`; AC coverage report updated.
 
 ---
 
 ## 2026-04-17 -- Feature: Feature 011 implemented
 
-[Feature 011] Implemented: Visual Migrate Integration -- sentinel output added to migrate-visual-tests.js, visual scaffolding step added to commands/migrate.md (unconditional, silent, graceful degradation), 11 integration tests (level_3a), fixture project with 4 features, and baseline placeholders for generated visual scaffolds.
+[Feature 011] Implemented: Visual Migrate Integration -- sentinel output added to migrate-visual-tests.js, visual scaffolding step added to commands/spec-migrate.md (unconditional, silent, graceful degradation), 11 integration tests (level_3a), fixture project with 4 features, and baseline placeholders for generated visual scaffolds.
 
 ---
 
 ## 2026-04-17 -- Plan: Feature 011 planned (regenerated)
 
-[Feature 011] Plan regenerated: Visual Migrate Integration — 4 implementation steps (commands/migrate.md + migrate-visual-tests.js sentinel output + integration test fixture + tests/integration/test_migrate_visual.py), 1 sequence diagram, 1 state diagram, no API contracts. Visual scaffolding invoked unconditionally from command layer (including "already up to date" path), not from migrate.sh. Safe subprocess capture via set +e/set -e. Tests at tests/integration/test_migrate_visual.py for level_3a discovery.
+[Feature 011] Plan regenerated: Visual Migrate Integration — 4 implementation steps (commands/spec-migrate.md + migrate-visual-tests.js sentinel output + integration test fixture + tests/integration/test_migrate_visual.py), 1 sequence diagram, 1 state diagram, no API contracts. Visual scaffolding invoked unconditionally from command layer (including "already up to date" path), not from migrate.sh. Safe subprocess capture via set +e/set -e. Tests at tests/integration/test_migrate_visual.py for level_3a discovery.
 
 ---
 
@@ -190,7 +198,7 @@
 
 ## 2026-04-16 -- Feature: Feature 008 implemented
 
-[Feature 008] Implemented: Feature Seed — 2 files modified (commands/specify.md, spec-system.md), 7 FR, 11 AC all satisfied
+[Feature 008] Implemented: Feature Seed — 2 files modified (commands/spec-specify.md, spec-system.md), 7 FR, 11 AC all satisfied
 
 ---
 

@@ -159,9 +159,9 @@ Same flow as §1.3 but applied to plan.md after generation, before the plan gate
 | File | Change |
 |---|---|
 | `system/hooks.md` | Add `commit` hook type section: naming, resolution, template vars table, `{{adr_paths}}` glob root, example hook content |
-| `commands/feature.md` | Replace auto-commit `git commit -m` with hook-resolution flow (§1.2) |
-| `commands/specify.md` | Add structural validation step after spec.md generation (§1.3) |
-| `commands/plan.md` | Add structural validation step after plan.md generation (§1.4) |
+| `commands/spec-feature.md` | Replace auto-commit `git commit -m` with hook-resolution flow (§1.2) |
+| `commands/spec-specify.md` | Add structural validation step after spec.md generation (§1.3) |
+| `commands/spec-plan.md` | Add structural validation step after plan.md generation (§1.4) |
 
 ### 1.6 Acceptance Criteria (Branch 1)
 
@@ -391,7 +391,7 @@ Each AI-issued `pipeline.md` write in `feature.md` is replaced:
 
 ### 2.7 Ship.md Git Operation Updates (Branch 2)
 
-In `commands/ship.md`, replace:
+In `commands/spec-ship.md`, replace:
 
 | Old | New |
 |---|---|
@@ -407,8 +407,8 @@ In `commands/ship.md`, replace:
 | `validator/git_ops.py` | NEW — Typer app with `branch`, `stage`, `merge`, `delete`, `status` |
 | `validator/commit_context.py` | NEW — Typer app with `write`, `read`, `clear` |
 | `validator/cli.py` | Add `app.add_typer()` for 3 new command groups |
-| `commands/feature.md` | Replace AI pipeline.md writes with `livespec pipeline` calls; replace git staging with `livespec git stage`; update auto-commit flow with commit-context steps |
-| `commands/ship.md` | Replace git branch/merge/delete with `livespec git` calls |
+| `commands/spec-feature.md` | Replace AI pipeline.md writes with `livespec pipeline` calls; replace git staging with `livespec git stage`; update auto-commit flow with commit-context steps |
+| `commands/spec-ship.md` | Replace git branch/merge/delete with `livespec git` calls |
 | `system/hooks.md` | Add note: `.commit-context.json` is gitignored |
 | Project `.gitignore` / `.specs/.gitignore` | Add `.specs/hooks/.commit-context.json` |
 

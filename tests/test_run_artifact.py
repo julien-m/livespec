@@ -118,6 +118,15 @@ def test_record_subprocess_writes_artifact(tmp_path):
     assert path.exists()
 
 
+def test_find_latest_artifact_accepts_legacy_short_command_prefix(tmp_path):
+    runs_dir = tmp_path / ".specs" / ".runs"
+    runs_dir.mkdir(parents=True)
+    legacy = runs_dir / "status-2026-05-18T10-00-00Z.json"
+    legacy.write_text("{}", encoding="utf-8")
+
+    assert find_latest_artifact("spec-status", runs_dir) == legacy
+
+
 def test_record_subprocess_captures_nonzero_exit(tmp_path):
     art = record_subprocess(
         "failing",

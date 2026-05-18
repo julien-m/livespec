@@ -1,7 +1,7 @@
 """Static markdown verification for atomic-command hook resolver coverage.
 
-The atomic commands `/spec.specify` and `/spec.plan` are invoked directly
-by users (not only as subagents of `/spec.feature`). Their markdown
+The atomic commands `/spec-specify` and `/spec-plan` are invoked directly
+by users (not only as subagents of `/spec-feature`). Their markdown
 must document the full 4-level resolution chain — including Level 0
 user-level integrations from `~/.config/livespec/*.md` — and reference
 the `livespec hooks resolve` CLI rather than the legacy "read 3 levels"
@@ -18,8 +18,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).parent.parent
 ATOMIC_COMMANDS: list[tuple[str, Path]] = [
-    ("specify", REPO_ROOT / "commands" / "specify.md"),
-    ("plan", REPO_ROOT / "commands" / "plan.md"),
+    ("specify", REPO_ROOT / "commands" / "spec-specify.md"),
+    ("plan", REPO_ROOT / "commands" / "spec-plan.md"),
 ]
 
 

@@ -26,24 +26,24 @@ class TestChaosEngineering:
     """
 
     def test_specify_without_specs_dir_suggests_init(self):
-        """Without .specs/, /spec.specify must suggest /spec.init."""
+        """Without .specs/, /spec-specify must suggest /spec-init."""
         result = anyio.run(
             run_livespec_command,
-            '/spec.specify "test feature"',
+            '/spec-specify "test feature"',
             "broken/no-specs-dir",
             FIXTURES,
         )
         combined_output = " ".join(result.stdout_messages).lower()
         # Command may fail (expected) but must mention spec.init
         assert "spec.init" in combined_output, (
-            "Command did not suggest /spec.init when .specs/ is missing"
+            "Command did not suggest /spec-init when .specs/ is missing"
         )
 
     def test_specify_without_roadmap_does_not_crash(self):
-        """Without roadmap.md, /spec.specify must not raise an unhandled exception."""
+        """Without roadmap.md, /spec-specify must not raise an unhandled exception."""
         result = anyio.run(
             run_livespec_command,
-            '/spec.specify "feature without roadmap" --auto',
+            '/spec-specify "feature without roadmap" --auto',
             "broken/missing-roadmap",
             FIXTURES,
         )
@@ -55,12 +55,12 @@ class TestChaosEngineering:
 
     def test_init_on_existing_project_does_not_erase(self):
         """
-        /spec.init on an already-initialized project must not erase
+        /spec-init on an already-initialized project must not erase
         existing specs.
         """
         result = anyio.run(
             run_livespec_command,
-            "/spec.init",
+            "/spec-init",
             "post-init",  # already initialized
             FIXTURES,
         )

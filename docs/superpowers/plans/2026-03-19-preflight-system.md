@@ -18,7 +18,7 @@
 
 | File | Responsibility |
 |------|----------------|
-| `commands/preflight.md` | Standalone `/spec.preflight` command — manifest parsing, 3-pass execution engine, report generation, `--light`/`--regenerate`/`--dry-run` flags |
+| `commands/spec-preflight.md` | Standalone `/spec.preflight` command — manifest parsing, 3-pass execution engine, report generation, `--light`/`--regenerate`/`--dry-run` flags |
 | `system/templates/preflight-manifest-template.md` | Template for `.specs/preflight.md` with section structure and Custom markers |
 | `system/templates/preflight-report-template.md` | Template for `.specs/preflight-report.md` with Summary/Verdict/Details structure |
 
@@ -26,11 +26,11 @@
 
 | File | Change |
 |------|--------|
-| `commands/init.md` | Add Phase D after Phase C — generate manifest, execute full preflight, update exit criteria |
-| `commands/specify.md` | Add post-generation hook — detect Infrastructure Requirements, propose manifest additions |
-| `commands/implement.md` | Add Phase 0.5 before Phase 1 — light preflight check before implementation |
-| `commands/feature.md` | Add Phase 2.7 before Phase 3 — light preflight check before implementation phase |
-| `commands/stack.md` | Add Step 7 after Step 6 — regenerate manifest on stack change |
+| `commands/spec-init.md` | Add Phase D after Phase C — generate manifest, execute full preflight, update exit criteria |
+| `commands/spec-specify.md` | Add post-generation hook — detect Infrastructure Requirements, propose manifest additions |
+| `commands/spec-implement.md` | Add Phase 0.5 before Phase 1 — light preflight check before implementation |
+| `commands/spec-feature.md` | Add Phase 2.7 before Phase 3 — light preflight check before implementation phase |
+| `commands/spec-stack.md` | Add Step 7 after Step 6 — regenerate manifest on stack change |
 | `scripts/install.sh` | Add `preflight` to COMMANDS array |
 | `system/spec-system.md` | Add `preflight.md` and `preflight-report.md` to `.specs/` layout |
 
@@ -159,11 +159,11 @@ git commit -m "feat(preflight): add report template with Summary/Verdict/Details
 This is the core command file. It defines the Generator (stack-to-checks catalog), the Execution Engine (3-pass algorithm), and the report generation logic.
 
 **Files:**
-- Create: `commands/preflight.md`
+- Create: `commands/spec-preflight.md`
 
 - [ ] **Step 1: Create the command file**
 
-The command must follow the existing LiveSpec command pattern (frontmatter → title → overview → steps → flags → definition of done). Write `commands/preflight.md` with the following structure:
+The command must follow the existing LiveSpec command pattern (frontmatter → title → overview → steps → flags → definition of done). Write `commands/spec-preflight.md` with the following structure:
 
 ```markdown
 ---
@@ -490,21 +490,21 @@ Preflight manifest updates are infrastructure-level artifacts — they do not ge
 *LiveSpec Command v1.0*
 ```
 
-Write this content verbatim to `commands/preflight.md`. All sections are fully expanded — no placeholders remain.
+Write this content verbatim to `commands/spec-preflight.md`. All sections are fully expanded — no placeholders remain.
 
 - [ ] **Step 2: Verify file structure**
 
-Run: `head -10 commands/preflight.md`
+Run: `head -10 commands/spec-preflight.md`
 Expected: Shows frontmatter with description and `# Command: /spec.preflight` title
 
 - [ ] **Step 3: Verify command follows pattern**
 
-Check: file has frontmatter (`---`), title (`# Command:`), Overview, Steps/Sections, Flags table, Definition of Done — matching the pattern of `commands/init.md`, `commands/implement.md`, etc.
+Check: file has frontmatter (`---`), title (`# Command:`), Overview, Steps/Sections, Flags table, Definition of Done — matching the pattern of `commands/spec-init.md`, `commands/spec-implement.md`, etc.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add commands/preflight.md
+git add commands/spec-preflight.md
 git commit -m "feat(preflight): add /spec.preflight command with 3-pass engine and generator"
 ```
 
@@ -528,10 +528,10 @@ COMMANDS=(init propose specify plan implement check explain stack feature refine
 
 - [ ] **Step 2: Verify integrity check passes**
 
-> **Dependency:** Task 3 must be complete — `commands/preflight.md` must exist before `install.sh` integrity check (line 129-136) will pass.
+> **Dependency:** Task 3 must be complete — `commands/spec-preflight.md` must exist before `install.sh` integrity check (line 129-136) will pass.
 
 Run: `bash scripts/install.sh --dry-run 2>&1 | grep preflight`
-Expected: Output includes a line matching `→ [dry-run] commands/spec.preflight.md → <repo-root>/commands/preflight.md` (where `<repo-root>` is the absolute path to the livespec repo on this machine). No errors from the integrity check.
+Expected: Output includes a line matching `→ [dry-run] commands/spec.preflight.md → <repo-root>/commands/spec-preflight.md` (where `<repo-root>` is the absolute path to the livespec repo on this machine). No errors from the integrity check.
 
 - [ ] **Step 3: Commit**
 
@@ -586,10 +586,10 @@ git commit -m "feat(preflight): add preflight.md and preflight-report.md to cano
 
 ---
 
-## Task 6: Update `commands/init.md` — Phase D
+## Task 6: Update `commands/spec-init.md` — Phase D
 
 **Files:**
-- Modify: `commands/init.md` (add Phase D after Phase C, update exit criteria)
+- Modify: `commands/spec-init.md` (add Phase D after Phase C, update exit criteria)
 
 - [ ] **Step 1: Add Phase D section**
 
@@ -629,7 +629,7 @@ In the installation output block (around line 341-360), add to the "Created:" li
 
 - [ ] **Step 4: Update CLAUDE.md commands list**
 
-In `commands/init.md` line 335, replace the commands list with the complete set:
+In `commands/spec-init.md` line 335, replace the commands list with the complete set:
 
 From:
 ```
@@ -650,16 +650,16 @@ Read the updated file to confirm Phase D appears between Phase C and the Install
 - [ ] **Step 6: Commit**
 
 ```bash
-git add commands/init.md
+git add commands/spec-init.md
 git commit -m "feat(preflight): add Phase D (preflight setup) to /spec.init"
 ```
 
 ---
 
-## Task 7: Update `commands/specify.md` — post-generation hook
+## Task 7: Update `commands/spec-specify.md` — post-generation hook
 
 **Files:**
-- Modify: `commands/specify.md` (add hook after spec generation, before Definition of Done)
+- Modify: `commands/spec-specify.md` (add hook after spec generation, before Definition of Done)
 
 - [ ] **Step 1: Add preflight manifest update hook**
 
@@ -695,16 +695,16 @@ Read the updated file to confirm the new step fits between existing steps and th
 - [ ] **Step 3: Commit**
 
 ```bash
-git add commands/specify.md
+git add commands/spec-specify.md
 git commit -m "feat(preflight): add post-generation hook to /spec.specify for Infrastructure Requirements"
 ```
 
 ---
 
-## Task 8: Update `commands/implement.md` — Phase 0.5
+## Task 8: Update `commands/spec-implement.md` — Phase 0.5
 
 **Files:**
-- Modify: `commands/implement.md` (add Phase 0.5 before Phase 1)
+- Modify: `commands/spec-implement.md` (add Phase 0.5 before Phase 1)
 
 - [ ] **Step 1: Add Phase 0.5 section**
 
@@ -732,16 +732,16 @@ Read the updated file to confirm ordering: Preflight Safety Contract (file check
 - [ ] **Step 3: Commit**
 
 ```bash
-git add commands/implement.md
+git add commands/spec-implement.md
 git commit -m "feat(preflight): add Phase 0.5 (light preflight check) to /spec.implement"
 ```
 
 ---
 
-## Task 9: Update `commands/feature.md` — Phase 0.5
+## Task 9: Update `commands/spec-feature.md` — Phase 0.5
 
 **Files:**
-- Modify: `commands/feature.md` (add Phase 0.5 before Phase 3 — Implement)
+- Modify: `commands/spec-feature.md` (add Phase 0.5 before Phase 3 — Implement)
 
 - [ ] **Step 1: Add preflight check before implementation phase**
 
@@ -762,9 +762,9 @@ Before starting implementation, run a light preflight check:
 This ensures all tools and credentials are available before the autonomous implementation phase begins.
 ```
 
-- [ ] **Step 2: Update pipeline.md template embedded in `commands/feature.md`**
+- [ ] **Step 2: Update pipeline.md template embedded in `commands/spec-feature.md`**
 
-In the `pipeline.md` template embedded inside `commands/feature.md` (around line 53-66), add the Preflight row between Plan Review and Implement:
+In the `pipeline.md` template embedded inside `commands/spec-feature.md` (around line 53-66), add the Preflight row between Plan Review and Implement:
 
 ```markdown
 | Phase | Status | Completed At |
@@ -784,16 +784,16 @@ Read the updated file to confirm the preflight phase appears between Plan Review
 - [ ] **Step 4: Commit**
 
 ```bash
-git add commands/feature.md
+git add commands/spec-feature.md
 git commit -m "feat(preflight): add Phase 2.7 (preflight check) to /spec.feature before implementation"
 ```
 
 ---
 
-## Task 10: Update `commands/stack.md` — post-ADR hook
+## Task 10: Update `commands/spec-stack.md` — post-ADR hook
 
 **Files:**
-- Modify: `commands/stack.md` (add Step 7 after Step 6)
+- Modify: `commands/spec-stack.md` (add Step 7 after Step 6)
 
 - [ ] **Step 1: Add preflight manifest regeneration step**
 
@@ -828,7 +828,7 @@ Read the updated file to confirm Step 7 appears after Step 6 and before the `dec
 - [ ] **Step 4: Commit**
 
 ```bash
-git add commands/stack.md
+git add commands/spec-stack.md
 git commit -m "feat(preflight): add post-ADR preflight manifest regeneration to /spec.stack"
 ```
 
@@ -845,12 +845,12 @@ Expected: All 12 commands (including `spec.preflight`) listed, no errors
 
 - [ ] **Step 2: Verify all new/modified files exist**
 
-Run: `ls -la commands/preflight.md system/templates/preflight-manifest-template.md system/templates/preflight-report-template.md`
+Run: `ls -la commands/spec-preflight.md system/templates/preflight-manifest-template.md system/templates/preflight-report-template.md`
 Expected: All 3 new files exist
 
 - [ ] **Step 3: Verify modified files mention preflight**
 
-Run: `grep -l "preflight" commands/init.md commands/specify.md commands/implement.md commands/feature.md commands/stack.md system/spec-system.md scripts/install.sh`
+Run: `grep -l "preflight" commands/spec-init.md commands/spec-specify.md commands/spec-implement.md commands/spec-feature.md commands/spec-stack.md system/spec-system.md scripts/install.sh`
 Expected: All 7 files listed
 
 - [ ] **Step 4: Run install.sh for real**
@@ -861,7 +861,7 @@ Expected: All commands and agents installed, including `spec.preflight`
 - [ ] **Step 5: Verify symlink**
 
 Run: `ls -la ~/.claude/commands/spec.preflight.md`
-Expected: Symlink pointing to `livespec/commands/preflight.md`
+Expected: Symlink pointing to `livespec/commands/spec-preflight.md`
 
 - [ ] **Step 6: Commit if any uncommitted changes remain**
 

@@ -1,7 +1,7 @@
 # Test Failure Handling
 
 > Iteration limits, troubleshooting procedure, and error reporting format.
-> Referenced by `/spec.implement` when tests fail.
+> Referenced by `/spec-implement` when tests fail.
 
 ---
 
@@ -48,7 +48,7 @@ When max iterations are exceeded, report using this structure:
 >
 > **Suggested fix:** [actionable suggestion]
 >
-> **Action needed:** Please review and fix, then run `/spec.implement [feature] --resume`
+> **Action needed:** Please review and fix, then run `/spec-implement [feature] --resume`
 
 ---
 

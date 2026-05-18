@@ -15,9 +15,9 @@ updated: 2026-04-17
 
 ## Summary
 
-Feature 011 wires `migrate-visual-tests.js --generate` into the `commands/migrate.md` command layer so that every `spec.migrate` call — including when no migrations are pending — automatically scaffolds Playwright visual test files and baseline directories for all UI features that lack them. The implementation touches two files: `scripts/migrate-visual-tests.js` (add structured sentinel output line) and `commands/migrate.md` (add unconditional visual scaffolding step at the command layer). Integration tests live in `tests/integration/test_migrate_visual.py` to be discovered by `pytest tests/integration/ -m level_3a`. All changes are additive and non-breaking — migration always exits 0.
+Feature 011 wires `migrate-visual-tests.js --generate` into the `commands/spec-migrate.md` command layer so that every `spec.migrate` call — including when no migrations are pending — automatically scaffolds Playwright visual test files and baseline directories for all UI features that lack them. The implementation touches two files: `scripts/migrate-visual-tests.js` (add structured sentinel output line) and `commands/spec-migrate.md` (add unconditional visual scaffolding step at the command layer). Integration tests live in `tests/integration/test_migrate_visual.py` to be discovered by `pytest tests/integration/ -m level_3a`. All changes are additive and non-breaking — migration always exits 0.
 
-**Key architectural decision (addresses review finding #1 and #6):** Visual scaffolding is orchestrated from `commands/migrate.md`, NOT from `scripts/migrate.sh`. The shell script `migrate.sh` is NOT modified. This ensures the scaffolding runs unconditionally — including on the "already up to date" exit path — because `commands/migrate.md` controls the full flow, whereas `migrate.sh` is only executed during the migration loop.
+**Key architectural decision (addresses review finding #1 and #6):** Visual scaffolding is orchestrated from `commands/spec-migrate.md`, NOT from `scripts/migrate.sh`. The shell script `migrate.sh` is NOT modified. This ensures the scaffolding runs unconditionally — including on the "already up to date" exit path — because `commands/spec-migrate.md` controls the full flow, whereas `migrate.sh` is only executed during the migration loop.
 
 ---
 
@@ -44,7 +44,7 @@ Feature 011 wires `migrate-visual-tests.js --generate` into the `commands/migrat
 | Aspect | Choice | Reason |
 |---|---|---|
 | Language | Markdown + Bash (command layer) + Node.js (scaffolder) + Python (tests) | From project stack |
-| Command format | Markdown DSL (`commands/migrate.md`) | LiveSpec convention — command behaviour is documented in `commands/` |
+| Command format | Markdown DSL (`commands/spec-migrate.md`) | LiveSpec convention — command behaviour is documented in `commands/` |
 | Test runner | pytest 8.x | From project stack |
 | Integration test style | subprocess + real fixture `.specs/` directories | From testing strategy |
 | Integration test location | `tests/integration/test_migrate_visual.py` | Matches existing convention — discovered by `pytest tests/integration/ -m level_3a` |
@@ -70,7 +70,7 @@ Feature 011 wires `migrate-visual-tests.js --generate` into the `commands/migrat
 | Minimal Surface | ✅ | No new CLI commands; no changes to migrate.sh; command-layer orchestration only |
 | No Hosted Infrastructure | ✅ | Node.js script runs locally; no network calls |
 | Simplicity | ✅ | Reuse existing `migrate-visual-tests.js --generate`; command layer adds one block |
-| Separation | ✅ | `commands/migrate.md` describes intent; Node.js does file I/O |
+| Separation | ✅ | `commands/spec-migrate.md` describes intent; Node.js does file I/O |
 | Testing | ✅ | Integration tests at `tests/integration/test_migrate_visual.py` with real fixture |
 | Naming | ✅ | Python: `snake_case`; files follow existing naming in `tests/integration/` |
 | Max file length | ✅ | No file expected to exceed 300 lines |
@@ -85,7 +85,7 @@ Feature 011 wires `migrate-visual-tests.js --generate` into the `commands/migrat
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
-    participant Migrate as commands/migrate.md
+    participant Migrate as commands/spec-migrate.md
     participant MigrateLoop as Migration Loop (migrate.sh)
     participant VSScript as scripts/migrate-visual-tests.js
     participant FS as File System
@@ -186,14 +186,14 @@ stateDiagram-v2
 
 ---
 
-### Step 2 — Add unconditional visual scaffolding step to `commands/migrate.md`
+### Step 2 — Add unconditional visual scaffolding step to `commands/spec-migrate.md`
 
-**Files:** `commands/migrate.md` (modify)
+**Files:** `commands/spec-migrate.md` (modify)
 
 **What to do:**
 
 **A. Restructure the "already up to date" exit path:**
-The current Step 2 in `commands/migrate.md` reads: "If equal → display `Already up to date (v{N})` and exit." Remove this early-exit. Instead, display the "up to date" message and fall through to the visual scaffolding step. This ensures FR-001 is satisfied: visual scaffolding runs on every invocation, including when no migrations are pending.
+The current Step 2 in `commands/spec-migrate.md` reads: "If equal → display `Already up to date (v{N})` and exit." Remove this early-exit. Instead, display the "up to date" message and fall through to the visual scaffolding step. This ensures FR-001 is satisfied: visual scaffolding runs on every invocation, including when no migrations are pending.
 
 **B. Add a new Step 4 — Visual Test Scaffolding** (after Validate, before Report):
 ```

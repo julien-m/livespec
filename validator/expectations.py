@@ -21,6 +21,7 @@ from typing import Any, cast
 # typed stubs, so mypy needs an explicit boundary here.
 import yaml  # type: ignore[import-untyped]
 
+from .command_registry import short_command_name
 from .exceptions import (
     ExpectationsInvalid,
     ExpectationsMissing,
@@ -200,15 +201,26 @@ def load_expectations(
         ExpectationsMissing: when neither path exists.
         ExpectationsInvalid: when the builtin is malformed.
     """
+    legacy_command = short_command_name(command)
     override = project_root / ".specs" / "expectations" / f"{command}.md"
+    legacy_override = project_root / ".specs" / "expectations" / f"{legacy_command}.md"
     builtin = livespec_root / "commands" / f"{command}.expectations.md"
-    searched = [str(override), str(builtin)]
+    searched = [str(override)]
+    if legacy_override != override:
+        searched.append(str(legacy_override))
+    searched.append(str(builtin))
 
     if override.exists():
         try:
             return parse_expectations(override)
         except ExpectationsInvalid as exc:
             raise OverrideMalformed(str(override), exc.reason) from exc
+
+    if legacy_override != override and legacy_override.exists():
+        try:
+            return parse_expectations(legacy_override)
+        except ExpectationsInvalid as exc:
+            raise OverrideMalformed(str(legacy_override), exc.reason) from exc
 
     if builtin.exists():
         return parse_expectations(builtin)

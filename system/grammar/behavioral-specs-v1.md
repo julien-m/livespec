@@ -6,7 +6,7 @@
 > **Grammar version: 1.0**
 >
 > Canonical, versioned reference for the behavioral specs grammar consumed by
-> `/spec.init` (F041 — ingestion), `/spec.specify` (F042 — derivation),
+> `/spec-init` (F041 — ingestion), `/spec-specify` (F042 — derivation),
 > `/spec.sync-brainstorm` (F043 — sync), and the future native generator (F045).
 >
 > This file is the single source of truth. Any other file referencing the
@@ -84,7 +84,7 @@ A valid screen file MUST contain the following 8 H2 sections, in this order.
 ## LiveSpec Frontmatter Contract
 
 Every imported flow or screen file under `.specs/` carries a YAML frontmatter
-block prepended by `/spec.init` (F041). The contract defines exactly **3
+block prepended by `/spec-init` (F041). The contract defines exactly **3
 fields**, all required.
 
 | Field | Type | Allowed values | One-line semantics |

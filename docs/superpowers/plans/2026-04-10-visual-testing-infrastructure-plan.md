@@ -27,11 +27,11 @@ version: 1.0
 | `system/testing/visual-baselines.md` | Modify | Protocol: capture, compare, 3-image format, ignoreRegions, 2%/5-8% thresholds |
 | `system/testing/visual-helper-scaffold.md` | Create | Template for `tests/e2e/helpers/visual.ts` with full API |
 | `system/testing/test-protocol.md` | Modify | Add section: Visual Infrastructure Requirements |
-| `commands/test.md` | Modify | Phase 4.5 detailed: generate tests, capture baselines, design fidelity |
-| `commands/check.md` | Modify | Step 8: clarify 2% regression threshold, configurable |
-| `commands/implement.md` | Modify | Phase 5/6: mention visual baseline capture workflow |
+| `commands/spec-test.md` | Modify | Phase 4.5 detailed: generate tests, capture baselines, design fidelity |
+| `commands/spec-check.md` | Modify | Step 8: clarify 2% regression threshold, configurable |
+| `commands/spec-implement.md` | Modify | Phase 5/6: mention visual baseline capture workflow |
 | `validator/hooks/pre-commit-hook` | Modify | Extend hook: visual test execution with file-pattern matching |
-| `commands/init.md` | Modify | Phase C: scaffold `visual.ts` when Playwright detected |
+| `commands/spec-init.md` | Modify | Phase C: scaffold `visual.ts` when Playwright detected |
 
 ---
 
@@ -633,11 +633,11 @@ Expected: Commit succeeds, 1 file changed
 
 **[Tasks 3-8 continue in worktree with similar detailed step-by-step format for:
 - test-protocol.md update
-- commands/test.md Phase 4.5 detailed implementation
-- commands/check.md Step 8 threshold clarification
-- commands/implement.md visual baselines mention
+- commands/spec-test.md Phase 4.5 detailed implementation
+- commands/spec-check.md Step 8 threshold clarification
+- commands/spec-implement.md visual baselines mention
 - pre-commit-hook extension for visual tests
-- commands/init.md scaffolding]**
+- commands/spec-init.md scaffolding]**
 
 **NOTE:** The remaining 6 tasks follow identical patterns — each task has:
 - File paths

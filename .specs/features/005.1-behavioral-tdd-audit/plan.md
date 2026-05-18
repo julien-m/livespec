@@ -11,7 +11,7 @@ updated: 2026-04-17
 
 ## Summary
 
-Close the remaining delta for Feature 005 by creating the crash test procedure document (`procedure.md`) and 5 unit tests (`test_behavioral_tdd.py`) validating the behavioral TDD and audit mechanisms already implemented in `commands/implement.md` and `commands/test.md`.
+Close the remaining delta for Feature 005 by creating the crash test procedure document (`procedure.md`) and 5 unit tests (`test_behavioral_tdd.py`) validating the behavioral TDD and audit mechanisms already implemented in `commands/spec-implement.md` and `commands/spec-test.md`.
 
 ## Technical Context
 
@@ -153,5 +153,5 @@ All 5 tests must pass with 0 failures (SC-003).
 
 | Risk | Severity | Mitigation |
 |------|----------|------------|
-| Tests depend on `commands/implement.md` and `commands/test.md` instruction format | Low | Tests validate detection logic (section presence), not instruction text; format-agnostic parsing |
+| Tests depend on `commands/spec-implement.md` and `commands/spec-test.md` instruction format | Low | Tests validate detection logic (section presence), not instruction text; format-agnostic parsing |
 | Procedure document may become stale if taxonomy evolves | Low | Procedure includes explicit instruction to re-read taxonomy before each execution (EC-001) |

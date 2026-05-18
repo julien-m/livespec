@@ -1,7 +1,7 @@
 # Test Discovery
 
 > Sequential procedure to resolve the project's test infrastructure.
-> Run during `/spec.init` Phase B, `/spec.plan` Step 7.5, or on first `/spec.implement` if not yet resolved.
+> Run during `/spec-init` Phase B, `/spec-plan` Step 7.5, or on first `/spec-implement` if not yet resolved.
 
 ---
 

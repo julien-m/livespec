@@ -10,9 +10,9 @@ import json
 from pathlib import Path
 
 from typer.testing import CliRunner
-from validator.design_alignment import compare_contract_files
 
 from validator.cli import app
+from validator.design_alignment import compare_contract_files
 
 runner = CliRunner()
 

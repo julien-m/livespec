@@ -4,13 +4,13 @@ set -euo pipefail
 # LiveSpec bootstrap installer for Claude Code.
 #
 # Installs the two global bootstrap commands that must exist before a project
-# can link the rest of the LiveSpec commands locally via /spec.init.
+# can link the rest of the LiveSpec commands locally via /spec-init.
 
 LIVESPEC_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 COMMANDS_DIR="$HOME/.claude/commands"
 RULES_DIR="$HOME/.claude/rules"
 
-BOOTSTRAP_COMMANDS=(init migrate)
+BOOTSTRAP_COMMANDS=(spec-init spec-migrate)
 # Global rules — loaded by Claude on any project. The routing rule only
 # triggers when `.specs/` is detected in the cwd, so it is safe globally.
 # The commands reference is required alongside it (relative link target).
@@ -25,12 +25,12 @@ print_help() {
 Usage: bash scripts/install.sh [OPTIONS]
 
 Install the global bootstrap commands and routing rule required by LiveSpec:
-  /spec.init
-  /spec.migrate
+  /spec-init
+  /spec-migrate
   .claude/rules/livespec-routing.md  (global rule, triggers on `.specs/`)
   .claude/rules/livespec-commands.md (referenced by routing rule)
 
-All other /spec.* commands and agents are linked per project by /spec.init.
+All other /spec-* commands and agents are linked per project by /spec-init.
 
 Options:
   --force         Overwrite existing symlinks
@@ -153,23 +153,32 @@ parse_args() {
 
 install_bootstrap_commands() {
   local command_name=""
+  local short_name=""
 
   if [[ "$DRY_RUN" != true ]]; then
     mkdir -p "$COMMANDS_DIR"
   fi
 
   for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
+    short_name="${command_name#spec-}"
     create_symlink \
       "$LIVESPEC_ROOT/commands/$command_name.md" \
-      "$COMMANDS_DIR/spec.$command_name.md" \
-      "commands/spec.$command_name.md"
+      "$COMMANDS_DIR/$command_name.md" \
+      "commands/$command_name.md"
+    create_symlink \
+      "$LIVESPEC_ROOT/commands/$command_name.md" \
+      "$COMMANDS_DIR/spec.$short_name.md" \
+      "commands/spec.$short_name.md"
   done
 }
 
 uninstall_bootstrap_commands() {
   local command_name=""
+  local short_name=""
   for command_name in "${BOOTSTRAP_COMMANDS[@]}"; do
-    remove_symlink "$COMMANDS_DIR/spec.$command_name.md" "commands/spec.$command_name.md"
+    short_name="${command_name#spec-}"
+    remove_symlink "$COMMANDS_DIR/$command_name.md" "commands/$command_name.md"
+    remove_symlink "$COMMANDS_DIR/spec.$short_name.md" "commands/spec.$short_name.md"
   done
 }
 
@@ -213,8 +222,8 @@ main() {
   printf 'Installing LiveSpec global routing rule...\n'
   install_bootstrap_rules
   printf '\n'
-  printf 'Installed: /spec.init, /spec.migrate, livespec-routing rule (global)\n'
-  printf 'Next: run /spec.init inside a project to link the rest of LiveSpec locally.\n'
+  printf 'Installed: /spec-init, /spec-migrate, /spec-init, /spec-migrate, livespec-routing rule (global)\n'
+  printf 'Next: run /spec-init inside a project to link the rest of LiveSpec locally.\n'
 }
 
 main "$@"

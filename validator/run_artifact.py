@@ -18,6 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
 
+from .command_registry import short_command_name
 from .exceptions import ArtifactMalformed
 
 MAX_STREAM_BYTES = 1_048_576  # 1 MB per stream (mitigation b)
@@ -154,6 +155,10 @@ def find_latest_artifact(command: str, runs_dir: Path) -> Path | None:
     if not runs_dir.exists():
         return None
     candidates = sorted(runs_dir.glob(f"{command}-*.json"))
+    if not candidates:
+        legacy_command = short_command_name(command)
+        if legacy_command != command:
+            candidates = sorted(runs_dir.glob(f"{legacy_command}-*.json"))
     return candidates[-1] if candidates else None
 
 

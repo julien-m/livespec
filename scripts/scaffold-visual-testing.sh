@@ -128,7 +128,7 @@ case "$PKG_MANAGER" in
       echo "  ! Package manager: $PKG_MANAGER — automatic install not supported"
       echo "  ! Install manually:"
       echo "    $PKG_MANAGER add -D $DEPS"
-      echo "  ! Then re-run /spec.migrate to complete v3."
+      echo "  ! Then re-run /spec-migrate to complete v3."
       exit 1
     fi
     ;;
@@ -140,7 +140,7 @@ case "$PKG_MANAGER" in
       echo "  ! No package manager lock file found"
       echo "  ! Install manually:"
       echo "    npm install -D $DEPS"
-      echo "  ! Then re-run /spec.migrate to complete v3."
+      echo "  ! Then re-run /spec-migrate to complete v3."
       exit 1
     fi
     ;;
@@ -167,7 +167,7 @@ echo "  ✓ sharp in devDependencies"
 
 echo ""
 echo "  Visual testing infrastructure ready."
-echo "  Next: run /spec.test to capture visual baselines for your existing features."
+echo "  Next: run /spec-test to capture visual baselines for your existing features."
 echo ""
 
 exit 0

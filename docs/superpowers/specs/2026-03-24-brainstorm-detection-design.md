@@ -89,7 +89,7 @@ These are listed as available context but NOT read automatically.
 ## Scope
 
 ### What changes
-- `commands/init.md` — new section "Phase A — Brainstorm Detection" inserted before the current Phase A conversation flow
+- `commands/spec-init.md` — new section "Phase A — Brainstorm Detection" inserted before the current Phase A conversation flow
 
 ### What does NOT change
 - Phase B (Stack Decisions) — unchanged, but receives Stack Reference as context hint

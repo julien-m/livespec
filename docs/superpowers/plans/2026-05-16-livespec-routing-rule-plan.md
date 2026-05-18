@@ -7,7 +7,7 @@
 
 ### T1. Lire toutes les commandes pour extraire params usuels
 
-> **Note importante** : les fichiers dans `commands/` sont nommés **sans préfixe `spec.`** (ex : `commands/test.md`, `commands/feature.md`). Le préfixe `/spec.` n'est que la forme d'invocation utilisateur. La bijection du check (T4) doit donc mapper `commands/<name>.md` ↔ `### /spec.<name>` dans la référence.
+> **Note importante** : les fichiers dans `commands/` sont nommés **sans préfixe `spec.`** (ex : `commands/spec-test.md`, `commands/spec-feature.md`). Le préfixe `/spec.` n'est que la forme d'invocation utilisateur. La bijection du check (T4) doit donc mapper `commands/<name>.md` ↔ `### /spec.<name>` dans la référence.
 
 Les 20 commandes uniques (vérifiées via `find commands -maxdepth 1 -name '*.md' -not -name '*.expectations.md'`) :
 
@@ -82,7 +82,7 @@ Format identique à `migration-version.md` (prose + one-liner, lu par `/audit` q
 Staged files match `commands/*.md` (excluding `*.expectations.md`) or `.claude/rules/livespec-commands.md`.
 
 ## Verify
-The set of command names in `commands/` must match exactly the set of `### /spec.X` headings in `.claude/rules/livespec-commands.md`. Command filenames in `commands/` do NOT carry the `spec.` prefix (e.g. `commands/test.md` ↔ `### /spec.test`).
+The set of command names in `commands/` must match exactly the set of `### /spec.X` headings in `.claude/rules/livespec-commands.md`. Command filenames in `commands/` do NOT carry the `spec.` prefix (e.g. `commands/spec-test.md` ↔ `### /spec.test`).
 
 Compare:
 - Files: `find commands -maxdepth 1 -name '*.md' -not -name '*.expectations.md' | sed 's|.*/||;s|\.md$||' | sort`

@@ -3,7 +3,7 @@
 <!-- @spec FR-001: Behavioral taxonomy source of truth — .specs/features/005-ui-behavioral-testing/spec.md#fr-001 -->
 
 > Single source of truth for UI behavioral trait definitions, Gherkin templates, and test patterns.
-> Referenced by `/spec.specify`, `/spec.implement`, and `/spec.test`. No command file may duplicate trait definitions — all must defer to this document.
+> Referenced by `/spec-specify`, `/spec-implement`, and `/spec-test`. No command file may duplicate trait definitions — all must defer to this document.
 
 **Version:** 2026-04-17
 **Taxonomy Version:** v2.0.0
@@ -15,9 +15,9 @@
 
 This document defines the behavioral traits that UI components exhibit. Commands use this taxonomy to:
 
-- **`/spec.specify`** — detect traits in feature descriptions and inject Gherkin AC
-- **`/spec.implement`** — drive TDD with trait-specific test patterns (RED phase)
-- **`/spec.test`** — audit existing test files for behavioral coverage gaps
+- **`/spec-specify`** — detect traits in feature descriptions and inject Gherkin AC
+- **`/spec-implement`** — drive TDD with trait-specific test patterns (RED phase)
+- **`/spec-test`** — audit existing test files for behavioral coverage gaps
 
 ---
 
@@ -1523,7 +1523,7 @@ When a component matches multiple transversal patterns, all matching patterns ar
 When `## Behavioral AC` contains trait-based Gherkin and `## Acceptance Criteria` contains manually written scenarios covering the same behavior:
 
 1. The `## Behavioral AC` section is **authoritative** for behavioral patterns
-2. `/spec.implement` merges overlapping scenarios into a single test, referencing both AC IDs (e.g., "AC-003 / Behavioral-async_action: loading state")
+2. `/spec-implement` merges overlapping scenarios into a single test, referencing both AC IDs (e.g., "AC-003 / Behavioral-async_action: loading state")
 3. No duplicate tests are generated for the same behavior
 
 ---
@@ -1536,11 +1536,11 @@ Commands handle a missing taxonomy document differently by design:
 
 | Command | Behavior when taxonomy is missing | Rationale |
 |---------|----------------------------------|-----------|
-| `/spec.specify` | **Fail fast** with: "Behavioral taxonomy not found at system/testing/ui-behavioral-taxonomy.md. Run /spec.specify --no-behavioral or create the taxonomy first." | Injection requires the taxonomy to produce correct Gherkin. Injecting without it would produce incorrect or incomplete behavioral AC. |
-| `/spec.implement` | **Degrade gracefully** — skip behavioral TDD step with WARNING: "Behavioral AC declared but taxonomy not found. Behavioral TDD step will be skipped." | Implementation can proceed without behavioral TDD. The behavioral tests are additive quality, not blocking. |
-| `/spec.test` | **Degrade gracefully** — skip behavioral audit with WARNING | Audit is additive. Missing taxonomy does not invalidate structural test coverage. |
+| `/spec-specify` | **Fail fast** with: "Behavioral taxonomy not found at system/testing/ui-behavioral-taxonomy.md. Run /spec-specify --no-behavioral or create the taxonomy first." | Injection requires the taxonomy to produce correct Gherkin. Injecting without it would produce incorrect or incomplete behavioral AC. |
+| `/spec-implement` | **Degrade gracefully** — skip behavioral TDD step with WARNING: "Behavioral AC declared but taxonomy not found. Behavioral TDD step will be skipped." | Implementation can proceed without behavioral TDD. The behavioral tests are additive quality, not blocking. |
+| `/spec-test` | **Degrade gracefully** — skip behavioral audit with WARNING | Audit is additive. Missing taxonomy does not invalidate structural test coverage. |
 
-This asymmetry is intentional: `/spec.specify` is the injection point where incorrect data would propagate downstream. `/spec.implement` and `/spec.test` are consumers that can function without behavioral data.
+This asymmetry is intentional: `/spec-specify` is the injection point where incorrect data would propagate downstream. `/spec-implement` and `/spec-test` are consumers that can function without behavioral data.
 
 ---
 

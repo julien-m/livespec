@@ -9,11 +9,11 @@ created: 2026-04-15
 
 ## Summary
 
-Refactored Step 5.7 sub-steps 2-3 in `commands/specify.md` into a 3-phase pipeline and added 6 integration tests in `tests/test_specify_integration.py`.
+Refactored Step 5.7 sub-steps 2-3 in `commands/spec-specify.md` into a 3-phase pipeline and added 6 integration tests in `tests/test_specify_integration.py`.
 
 ## Files Modified
 
-### commands/specify.md
+### commands/spec-specify.md
 
 Replaced sub-steps 2-3 of Step 5.7 with:
 
@@ -55,9 +55,9 @@ All tests call `detect_traits()` directly with fixed signal lists and real taxon
 
 ## FR/AC Coverage
 
-- FR-001: Pipeline refactoring — sub-steps 2-3 replaced in `commands/specify.md`
+- FR-001: Pipeline refactoring — sub-steps 2-3 replaced in `commands/spec-specify.md`
 - FR-002: Structured JSON prompt — Phase 1 instructions with retry/fallback
-- FR-003: detect_traits delegation — Phase 2 in `commands/specify.md`
+- FR-003: detect_traits delegation — Phase 2 in `commands/spec-specify.md`
 - FR-004: Phase 3 unchanged — sub-steps 4-8 byte-identical
 - FR-005: 6 integration tests in `tests/test_specify_integration.py`
 - FR-006: Real taxonomy data, no mocking

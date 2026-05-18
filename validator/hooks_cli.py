@@ -22,6 +22,7 @@ import traceback
 
 import typer
 
+from validator.command_registry import normalize_command_name
 from validator.hook_resolver import render_chain_for_stdout
 from validator.integrations import (
     discover_integrations,
@@ -40,7 +41,7 @@ def hooks_resolve(
         ..., "--event", help="Hook event: 'before' or 'after'."
     ),
     command: str = typer.Option(
-        ..., "--command", help="LiveSpec command name (without '/spec.' prefix)."
+        ..., "--command", help="LiveSpec command name or alias."
     ),
     feature: str | None = typer.Option(
         None,
@@ -61,6 +62,7 @@ def hooks_resolve(
         typer.echo(f'⚠ unknown event "{event}" — must be "before" or "after"', err=True)
         raise typer.Exit(0)
 
+    command = normalize_command_name(command)
     valid_cmds = valid_command_names()
     if command not in valid_cmds:
         typer.echo(

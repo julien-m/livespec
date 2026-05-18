@@ -102,7 +102,7 @@ flowchart TD
 ```gherkin
 Feature: Verify command output against expectations
   Scenario: Happy path — conforming run passes
-    Given `commands/specify.expectations.md` exists with valid verify YAML
+    Given `commands/spec-specify.expectations.md` exists with valid verify YAML
     And   a run artifact `.specs/.runs/specify-2026-05-12T10-00-00.json` exists
     And   the run stdout contains every declared `must_contain` marker
     And   no `must_not_contain` marker appears
@@ -118,7 +118,7 @@ Feature: Verify command output against expectations
     And   exit code is 2
 
   Scenario: Edge case — flag-scoped when: branch active
-    Given `commands/test.expectations.md` declares a `when: [{ flag: "--visual" }]` branch with extra `must_contain: "Visual baselines updated"`
+    Given `commands/spec-test.expectations.md` declares a `when: [{ flag: "--visual" }]` branch with extra `must_contain: "Visual baselines updated"`
     And   the latest `.specs/.runs/test-*.json` records flags `["--visual"]`
     When  the operator runs `/spec.verify-output test`
     Then  the verifier evaluates the base rules plus the `--visual` branch
@@ -156,24 +156,24 @@ flowchart TD
 
 **Priority reason:** Without enforcement, expectations files rot silently — every commit on a command without re-reading the contract erodes trust in the whole system.
 
-**Independent test:** Modify `commands/plan.md` (whitespace only), stage it, attempt to commit; hook must fail with exit ≠ 0 and the exact message. Bump `last_reviewed` in `commands/plan.expectations.md` to today, recommit; commit must succeed.
+**Independent test:** Modify `commands/spec-plan.md` (whitespace only), stage it, attempt to commit; hook must fail with exit ≠ 0 and the exact message. Bump `last_reviewed` in `commands/spec-plan.expectations.md` to today, recommit; commit must succeed.
 
 ```gherkin
 Feature: Pre-commit hook enforces last_reviewed bump
   Scenario: Happy path — bump matches commit date
-    Given the committer modified `commands/plan.md`
-    And   `commands/plan.expectations.md` frontmatter `last_reviewed: 2026-05-12`
+    Given the committer modified `commands/spec-plan.md`
+    And   `commands/spec-plan.expectations.md` frontmatter `last_reviewed: 2026-05-12`
     And   the commit is created on 2026-05-12
     When  the pre-commit hook runs
     Then  it allows the commit (exit 0)
 
   Scenario: Edge case — stale last_reviewed blocks commit
-    Given the committer modified `commands/plan.md`
-    And   `commands/plan.expectations.md` frontmatter `last_reviewed: 2026-04-01`
+    Given the committer modified `commands/spec-plan.md`
+    And   `commands/spec-plan.expectations.md` frontmatter `last_reviewed: 2026-04-01`
     And   the commit is created on 2026-05-12
     When  the pre-commit hook runs
     Then  the commit is blocked (exit ≠ 0)
-    And   stderr contains "Relis `commands/plan.expectations.md`, bump `last_reviewed`, recommit."
+    And   stderr contains "Relis `commands/spec-plan.expectations.md`, bump `last_reviewed`, recommit."
 
   Scenario: Edge case — expectations file missing entirely
     Given the committer modified `commands/newcmd.md`
@@ -211,7 +211,7 @@ flowchart TD
 Feature: Project override supersedes builtin total
   Scenario: Happy path — project override loaded
     Given `.specs/expectations/implement.md` exists in the project
-    And   `commands/implement.expectations.md` exists in LiveSpec
+    And   `commands/spec-implement.expectations.md` exists in LiveSpec
     When  `/spec.verify-output implement` runs
     Then  it loads ONLY the project file
     And   the report mentions `source: .specs/expectations/implement.md`
@@ -336,7 +336,7 @@ flowchart TD
 - **SC-001** — 19 builtin expectations files exist and pass schema validation in CI (0 errors).
 - **SC-002** — A round-trip test (`/spec.specify <feature>` → `/spec.verify-output specify`) on a clean repo passes with exit 0 and a PASS report covering every base rule.
 - **SC-003** — A deliberate breaking change to a command (e.g. removing a `must_contain` marker from stdout) is caught by `/spec.verify-output` with exit 1 and an explicit `FAIL` line naming the missing marker.
-- **SC-004** — Modifying `commands/plan.md` without bumping `commands/plan.expectations.md`'s `last_reviewed` blocks the commit in 100% of attempts. Bumping the date unblocks in 100% of attempts.
+- **SC-004** — Modifying `commands/spec-plan.md` without bumping `commands/spec-plan.expectations.md`'s `last_reviewed` blocks the commit in 100% of attempts. Bumping the date unblocks in 100% of attempts.
 - **SC-005** — A project override at `.specs/expectations/implement.md` is loaded in 100% of `/spec.verify-output implement` runs; no merge with the builtin is ever observed.
 - **SC-006** — The `RunArtifact` schema is honored by 19/19 commands (verified by running each command and validating the emitted JSON against the schema).
 - **SC-007** — Drift (assertions fail, command exit 0) is distinguished from error (command exit ≠ 0) in 100% of `/spec.verify-output` reports — observed in the printed outcome state and the JSON output when `--json` is set.

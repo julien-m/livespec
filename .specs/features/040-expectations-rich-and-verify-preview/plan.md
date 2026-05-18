@@ -83,7 +83,7 @@ Two-track implementation: (1) document/format work — enrich the template + mig
   - No `.specs/` → exit 2 + canonical message.
   - `--json --preview` emits JSON envelope.
 - **New file:** `tests/test_demo_session_snapshot.py`
-  - Parses `commands/init.expectations.md`, `test.expectations.md`, `feature.expectations.md`.
+  - Parses `commands/spec-init.expectations.md`, `test.expectations.md`, `feature.expectations.md`.
   - Asserts each has all 6 sub-sections and each sub-section has ≥ 3 non-empty content lines.
 - **Update:** `tests/test_expectations.py` and `tests/test_builtin_expectations_corpus.py`
   - Ensure existing 20 files still parse after migration.
@@ -91,7 +91,7 @@ Two-track implementation: (1) document/format work — enrich the template + mig
 - **FR:** FR-011
 
 ### Step 7 — Documentation
-- **File:** `commands/verify-output.md` (the slash-command instructions)
+- **File:** `commands/spec-verify-output.md` (the slash-command instructions)
   - Add `--preview` and `--save` flag docs.
   - Add the triad workflow example.
 - **File:** `.specs/features/040-.../implementation.md`
@@ -131,7 +131,7 @@ Two-track implementation: (1) document/format work — enrich the template + mig
 - `system/templates/command-expectations.template.md`
 - `validator/expectations.py`
 - `validator/cli_commands/verify_output_cmd.py`
-- `commands/verify-output.md`
+- `commands/spec-verify-output.md`
 - `commands/*.expectations.md` (×20)
 - `tests/test_expectations.py` (minor)
 - `tests/test_builtin_expectations_corpus.py` (minor)

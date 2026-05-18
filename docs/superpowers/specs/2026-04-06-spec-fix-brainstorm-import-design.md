@@ -681,11 +681,11 @@ Add `screens/index.md` to the design directory documentation.
 
 | File | Action | Description |
 |------|--------|-------------|
-| `commands/fix.md` | **Create** | New spec.fix command (main deliverable) |
+| `commands/spec-fix.md` | **Create** | New spec.fix command (main deliverable) |
 | `system/templates/screen-index-template.md` | **Create** | Screen index template |
-| `commands/init.md` | **Modify** | Add Step 3.6 (brainstorm design import) |
-| `commands/specify.md` | **Modify** | Add brainstorm fallback + index maintenance |
-| `commands/check.md` | **Modify** | Add spec.fix suggestion in Step 10 |
+| `commands/spec-init.md` | **Modify** | Add Step 3.6 (brainstorm design import) |
+| `commands/spec-specify.md` | **Modify** | Add brainstorm fallback + index maintenance |
+| `commands/spec-check.md` | **Modify** | Add spec.fix suggestion in Step 10 |
 | `system/spec-system.md` | **Modify** | Add spec.fix to registry + screens/index.md to design dir |
 | `README.md` | **Modify** | Add spec.fix to command list |
 

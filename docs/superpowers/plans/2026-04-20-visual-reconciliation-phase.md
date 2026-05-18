@@ -2,23 +2,23 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add an AI reconciliation phase (Step 4.6) to `commands/migrate.md` that detects and fixes visual test file issues after scaffolding.
+**Goal:** Add an AI reconciliation phase (Step 4.6) to `commands/spec-migrate.md` that detects and fixes visual test file issues after scaffolding.
 
-**Architecture:** Single file modification — add prose instructions to `commands/migrate.md` for the agent to execute post-scaffolding verification and cleanup.
+**Architecture:** Single file modification — add prose instructions to `commands/spec-migrate.md` for the agent to execute post-scaffolding verification and cleanup.
 
 **Tech Stack:** Markdown (agent instructions)
 
 ---
 
 ## File Map
-- Modify: `commands/migrate.md` — Update Step 4.5 point 6 to parse `routes=R` + add Step 4.6 reconciliation phase + update flowchart + update Step 5 report section
+- Modify: `commands/spec-migrate.md` — Update Step 4.5 point 6 to parse `routes=R` + add Step 4.6 reconciliation phase + update flowchart + update Step 5 report section
 
 ---
 
 ### Task 1: Update Step 4.5 sentinel parsing
 
 **Files:**
-- Modify: `commands/migrate.md:115-117`
+- Modify: `commands/spec-migrate.md:115-117`
 
 - [ ] **Step 1: Read current Step 4.5 point 6**
 
@@ -42,7 +42,7 @@ Replace with:
 - [ ] **Step 3: Commit**
 
 ```bash
-git add commands/migrate.md
+git add commands/spec-migrate.md
 git commit -m "docs(migrate): parse routes field from visual scaffold sentinel"
 ```
 
@@ -51,7 +51,7 @@ git commit -m "docs(migrate): parse routes field from visual scaffold sentinel"
 ### Task 2: Add Step 4.6 — Visual Test Reconciliation
 
 **Files:**
-- Modify: `commands/migrate.md` — insert new section between Step 4.5 and Step 5
+- Modify: `commands/spec-migrate.md` — insert new section between Step 4.5 and Step 5
 
 - [ ] **Step 1: Read current file to identify insertion point**
 
@@ -117,7 +117,7 @@ For each file, verify:
 - [ ] **Step 3: Commit**
 
 ```bash
-git add commands/migrate.md
+git add commands/spec-migrate.md
 git commit -m "docs(migrate): add Step 4.6 — AI visual test reconciliation phase"
 ```
 
@@ -126,7 +126,7 @@ git commit -m "docs(migrate): add Step 4.6 — AI visual test reconciliation pha
 ### Task 3: Update flowchart and Step 5 report
 
 **Files:**
-- Modify: `commands/migrate.md` — update mermaid flowchart + Step 5 report section
+- Modify: `commands/spec-migrate.md` — update mermaid flowchart + Step 5 report section
 
 - [ ] **Step 1: Update the mermaid flowchart**
 
@@ -173,7 +173,7 @@ Visual test reconciliation: skipped (no new files)
 - [ ] **Step 3: Commit**
 
 ```bash
-git add commands/migrate.md
+git add commands/spec-migrate.md
 git commit -m "docs(migrate): update flowchart and report for Step 4.6 reconciliation"
 ```
 
@@ -181,7 +181,7 @@ git commit -m "docs(migrate): update flowchart and report for Step 4.6 reconcili
 
 ### Task 4: Final verification
 
-- [ ] **Step 1: Re-read the full commands/migrate.md**
+- [ ] **Step 1: Re-read the full commands/spec-migrate.md**
 
 Verify:
 - Step 4.5 point 6 parses `routes=R` and `reason=...`

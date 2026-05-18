@@ -1,7 +1,7 @@
 # Design: Check 0 — Filtre AI sémantique des features non-UI
 
 **Date:** 2026-04-21
-**Scope:** `commands/migrate.md` (Steps 4.6, 4.7, 5)
+**Scope:** `commands/spec-migrate.md` (Steps 4.6, 4.7, 5)
 
 ## Problème
 
@@ -101,4 +101,4 @@ Si Check 0 n'a trouvé aucun non-visual/ambiguous, omettre les lignes Check 0 (p
 
 | Fichier | Modification |
 |---------|-------------|
-| `commands/migrate.md` | Check 0 dans Step 4.6, filtre dans Step 4.7 Phase A, résumé dans Step 5 |
+| `commands/spec-migrate.md` | Check 0 dans Step 4.6, filtre dans Step 4.7 Phase A, résumé dans Step 5 |

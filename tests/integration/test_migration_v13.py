@@ -1,12 +1,12 @@
 """Level 3A — Integration tests for migration v13 (command expectations wiring).
 
-Migration v13 backfills feature 039 (`/spec.verify-output` + last_reviewed
+Migration v13 backfills feature 039 (`/spec-verify-output` + last_reviewed
 pre-commit hook) and feature 040 (expectations gitignore entries) on
 pre-v13 projects:
 
   - Refreshes `.claude/commands/` symlinks via the patched
     `scripts/link-local.sh` (drops orphan `spec.*.expectations.md`
-    entries, adds `/spec.verify-output`).
+    entries, adds `/spec-verify-output`).
   - Installs the pre-commit hook via `scripts/install-hooks.sh`.
   - Appends `.specs/.runs/` and `.specs/.previews/` to `.gitignore`.
 
@@ -64,7 +64,7 @@ class TestMigrationV13:
         project = _fake_project(tmp_path / "proj", with_claude=True, with_git=True)
         # Simulate the orphan symlinks created by the buggy pre-fix link-local.sh.
         orphan = project / ".claude" / "commands" / "spec.check.expectations.md"
-        orphan.symlink_to(REPO_ROOT / "commands" / "check.expectations.md")
+        orphan.symlink_to(REPO_ROOT / "commands" / "spec-check.expectations.md")
         assert orphan.is_symlink()
 
         result = _run_migration(project)
@@ -75,7 +75,7 @@ class TestMigrationV13:
         # New command linked.
         verify_link = project / ".claude" / "commands" / "spec.verify-output.md"
         assert verify_link.is_symlink()
-        assert verify_link.resolve() == (REPO_ROOT / "commands" / "verify-output.md").resolve()
+        assert verify_link.resolve() == (REPO_ROOT / "commands" / "spec-verify-output.md").resolve()
         # Pre-commit hook installed.
         hook = project / ".git" / "hooks" / "pre-commit"
         assert hook.exists()
@@ -153,7 +153,7 @@ class TestLinkLocalFilter:
     def test_orphan_expectations_symlinks_are_cleaned(self, tmp_path: Path) -> None:
         project = _fake_project(tmp_path / "proj", with_claude=True, with_git=False)
         orphan = project / ".claude" / "commands" / "spec.feature.expectations.md"
-        orphan.symlink_to(REPO_ROOT / "commands" / "feature.expectations.md")
+        orphan.symlink_to(REPO_ROOT / "commands" / "spec-feature.expectations.md")
         assert orphan.is_symlink()
 
         result = subprocess.run(

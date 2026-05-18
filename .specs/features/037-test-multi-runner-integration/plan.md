@@ -20,7 +20,7 @@ spec_ref: "spec.md"
 
 ## Summary
 
-Refactor `commands/test.md` Phase 4.5 (Visual) from a Playwright-only path into a runner-aware dispatcher consuming `.specs/surfaces.yaml`. Introduce a `RunnerHandler` Protocol unifying `WebRunnerHandler` (028), `XCUITestRunnerHandler` (030), and `MaestroRunnerHandler` (031). Fix `scripts/generate-surfaces.js` to enumerate Xcode test targets via `project.pbxproj` parsing instead of hardcoding a single `UITests` directory. Add a first-class `--visual` flag to `/spec.test` and runner-aware preflight messages. Closes the integration gap that left features 030/031 unreachable from `/spec.test`.
+Refactor `commands/spec-test.md` Phase 4.5 (Visual) from a Playwright-only path into a runner-aware dispatcher consuming `.specs/surfaces.yaml`. Introduce a `RunnerHandler` Protocol unifying `WebRunnerHandler` (028), `XCUITestRunnerHandler` (030), and `MaestroRunnerHandler` (031). Fix `scripts/generate-surfaces.js` to enumerate Xcode test targets via `project.pbxproj` parsing instead of hardcoding a single `UITests` directory. Add a first-class `--visual` flag to `/spec.test` and runner-aware preflight messages. Closes the integration gap that left features 030/031 unreachable from `/spec.test`.
 
 **Scope:** 17 atomic implementation steps, 4 Mermaid diagrams, 15+ files touched, ~14–20 h total. Backward-compatible: existing Playwright projects keep their exact pre-refactor behaviour, validated by a byte-level golden-file regression test.
 
@@ -261,7 +261,7 @@ export function fallbackGlobTestDirs(appPath) { ... }
 | `validator/ui_runner_xcuitest.py`                   | MODIFY   | FR-011, FR-012                                | Add `preflight_message()` (platform-aware) + `capture_screenshot(screen)` wrapper                |
 | `validator/ui_runner_maestro.py`                    | MODIFY   | FR-011, FR-013                                | Add `preflight_message()` (CLI/emulator) + `capture_screenshot(screen, ...)` wrapper             |
 | `validator/cli_commands/test.py` (or equivalent)    | MODIFY   | FR-008, FR-009, FR-010                        | Accept `--visual`; reject `--visual --no-visual` with exit 2; gate phase execution               |
-| `commands/test.md`                                  | MODIFY   | FR-008, FR-010, FR-014                        | Refactor Phase 4.5 narrative to dispatcher-shape; add `--visual` flag row                        |
+| `commands/spec-test.md`                                  | MODIFY   | FR-008, FR-010, FR-014                        | Refactor Phase 4.5 narrative to dispatcher-shape; add `--visual` flag row                        |
 | `scripts/generate-surfaces.js`                      | MODIFY   | FR-004, FR-005, FR-006, FR-007                | Replace single-line `testDir: join(appPath, "UITests")` with target enumeration                  |
 | `scripts/lib/pbxproj.js`                            | **NEW**  | FR-004, FR-005                                | pbxproj parser + fallback glob                                                                   |
 | `tests/test_phase_4_5_dispatcher.py`                | **NEW**  | AC-001..AC-004, AC-014, AC-015                | Unit tests: routing, skip, BLOCKED on detect=false                                               |
@@ -338,19 +338,19 @@ export function fallbackGlobTestDirs(appPath) { ... }
 ### Step 7 — `--visual` CLI flag wiring
 
 - In `validator/cli_commands/test.py` (or wherever `/spec.test` flags live), add `--visual` (no short form), reject `--visual --no-visual` with exit code 2 + message `--visual and --no-visual are mutually exclusive`, and gate so that only Phases 0, 4.5, 5 run when set.
-- Update `commands/test.md` Flags table to document `--visual`.
+- Update `commands/spec-test.md` Flags table to document `--visual`.
 - Add tests `tests/test_cli_unified.py::test_visual_flag_*`.
 - **FR covered:** FR-008.1, FR-009.1, FR-010.1
 - **Done when:** CLI tests pass; `pytest -q` green.
 
-### Step 8 — Refactor `commands/test.md` Phase 4.5 narrative (markdown-only)
+### Step 8 — Refactor `commands/spec-test.md` Phase 4.5 narrative (markdown-only)
 
 - Replace hardcoded Playwright instructions with the dispatcher flow (per §3.1).
 - Move the `toHaveScreenshot()` snippet generation into a sub-section explicitly gated on `runner: playwright`.
 - Document FR-014 table format.
 - Document edge cases from spec.md (10 of them) inline.
 - **FR covered:** FR-003.1, FR-010.2
-- **Done when:** `commands/test.md` re-renders cleanly; `livespec validate commands/test.md --format compact` (if applicable) returns 0; **manual diff vs current file shows no Playwright path removed — only conditionalised**.
+- **Done when:** `commands/spec-test.md` re-renders cleanly; `livespec validate commands/spec-test.md --format compact` (if applicable) returns 0; **manual diff vs current file shows no Playwright path removed — only conditionalised**.
 
 ### Step 9 — `pbxproj` parser library (`scripts/lib/pbxproj.js`)
 
@@ -405,7 +405,7 @@ export function fallbackGlobTestDirs(appPath) { ... }
 - Update `.specs/README.md` (set 037 Status to `Planned`, bump `Last updated`).
 - Append entry to `.specs/features/037.../changelog.md`.
 - Append summary to `.specs/changelog.md`.
-- **DoD:** all command-level checkboxes in `commands/plan.md` ticked.
+- **DoD:** all command-level checkboxes in `commands/spec-plan.md` ticked.
 
 ### Step 17 — Final regression sweep
 
@@ -459,7 +459,7 @@ The risk surface is Feature 010 (visual testing complete) and Feature 036 (multi
 1. **Identity guarantee for Playwright path.** When `surface.runner == "playwright"` the dispatcher invokes the same code path Phase 4.5 used pre-refactor (test-file generation, `docker-compose.visual.yml`, `--reset-baselines`). The only difference is the entry point; the body is unchanged.
 2. **`surfaces.yaml` missing** → legacy synthetic single-surface `runner: playwright` is created in memory (Step 5). No user with a 010-style project has to touch their config.
 3. **Step 14 golden-file regression test** captures the exact pre-refactor Markdown report on the Feature 010 sample and asserts byte-equality after refactor (modulo timestamps, scrubbed by the test harness).
-4. **`commands/test.md` refactor (Step 8)** is staged: the file is re-organised but every Playwright sub-section is preserved verbatim under a `runner: playwright` heading. No instruction is removed.
+4. **`commands/spec-test.md` refactor (Step 8)** is staged: the file is re-organised but every Playwright sub-section is preserved verbatim under a `runner: playwright` heading. No instruction is removed.
 5. **Existing `tests/test_ui_runner_xcuitest.py` and `tests/test_ui_runner_maestro.py` remain untouched** because Step 3 only **adds** a thin wrapper method; the wrapped methods keep their full keyword-argument shape.
 6. **Feature 036 multi-surface emission** — Step 10 builds on, not replaces, `buildSurfacesForDir()`. Web/monorepo logic (`<app>` + `<app>-visual`) is unchanged; only the `hasXcodeProject(appPath)` branch is rewritten.
 
@@ -489,7 +489,7 @@ Rationale:
 - Putting `playwright` first preserves the pre-refactor experience for mixed projects (web is the most common surface and users expect it to render first in the report).
 - Native runners follow alphabetically (`maestro`, `xcuitest`) — secondary, deterministic.
 
-The order is documented in `commands/test.md` Phase 4.5 narrative (Step 8) and asserted in `tests/test_phase_4_5_dispatcher.py::test_mixed_surfaces_iterate_in_stable_order`.
+The order is documented in `commands/spec-test.md` Phase 4.5 narrative (Step 8) and asserted in `tests/test_phase_4_5_dispatcher.py::test_mixed_surfaces_iterate_in_stable_order`.
 
 ---
 
@@ -499,7 +499,7 @@ The order is documented in `commands/test.md` Phase 4.5 narrative (Step 8) and a
 |-----------------------------------------------------------------------------------------------|------------|--------|------------------------------------------------------------------------------------------------------------------|
 | `@bacons/xcode` cannot parse a real-world `project.pbxproj` (esp. Xcode 16 JSON)              | Medium     | High   | Fallback path in FR-005 + integration test on at least one Xcode 15 ASCII fixture **and** one Xcode 16 JSON fixture |
 | Maestro `capture_screenshot(screen)` wrapper masks an existing failure mode                   | Low        | Medium | Step 3 adds the wrapper without altering the underlying method; all 031 tests must still pass unchanged          |
-| `commands/test.md` refactor accidentally drops a Playwright instruction                       | Medium     | High   | Step 14 byte-level golden diff + reviewer (livespec-verifier in plan-review mode) cross-checks both versions     |
+| `commands/spec-test.md` refactor accidentally drops a Playwright instruction                       | Medium     | High   | Step 14 byte-level golden diff + reviewer (livespec-verifier in plan-review mode) cross-checks both versions     |
 | Linux CI cannot exercise XCUITest paths even with mocks (subprocess detection)                | Medium     | Medium | All XCUITest integration tests monkeypatch `subprocess.run` and `platform.system()` so they run on Linux runners |
 | Feature 036 surface ordering changes break downstream consumers of `surfaces.yaml`            | Low        | Medium | Q2 decision pins lexicographic order; add explicit assertion in `tests/integration/test_surfaces_xcuitest.py`    |
 | Adding `--visual` accidentally inverts existing default behaviour (regression)                | Low        | High   | CLI tests in Step 7 cover: no flag (run all phases), `--visual` (only 0/4.5/5), `--no-visual` (skip 4.5)          |
@@ -528,7 +528,7 @@ The order is documented in `commands/test.md` Phase 4.5 narrative (Step 8) and a
 - [x] Backward-compat strategy documented (§8)
 - [x] Open questions answered (§9)
 - [x] Risk register populated (§10)
-- [ ] `commands/test.md` refactor reviewed against pre-refactor golden file (Step 14)
+- [ ] `commands/spec-test.md` refactor reviewed against pre-refactor golden file (Step 14)
 - [ ] `livespec validate plan.md --format compact` returns 0 (Step 17)
 
 ---

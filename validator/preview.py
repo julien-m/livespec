@@ -244,7 +244,7 @@ def _render_markdown(
         notes_block = "\n\n> **Context notes:** " + "; ".join(ctx.notes)
 
     header = (
-        f"# Preview — /spec.{expectations.command}\n\n"
+        f"# Preview — /{expectations.command}\n\n"
         f"- **Command:** `{expectations.command}`\n"
         f"- **Project root:** `{ctx_project_summary(ctx)}`\n"
         f"- **Generated:** {timestamp}\n"

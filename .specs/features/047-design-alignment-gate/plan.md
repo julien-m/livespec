@@ -38,8 +38,8 @@ Promote the CloudSkill mockup-code alignment workflow into LiveSpec as a reusabl
    - `system/testing/design-alignment.md`
    - `system/testing/design-alignment-quality.md`
    - `system/schemas/design-alignment-manifest.md`
-6. Update `commands/test.md` with Phase 4.5.0.
-7. Update `commands/test.expectations.md`.
+6. Update `commands/spec-test.md` with Phase 4.5.0.
+7. Update `commands/spec-test.expectations.md`.
 8. Add feature implementation/progress/changelog and update global indexes.
 9. Run focused and supporting tests.
 

@@ -7,10 +7,11 @@ shopt -s nullglob
 # Usage: link-local.sh <project-dir> <livespec-dir>
 #
 # Creates symlinks:
-#   .claude/commands/spec.<name>.md → <livespec-dir>/commands/<name>.md
+#   .claude/commands/spec-<name>.md → <livespec-dir>/commands/spec-<name>.md
+#   .claude/commands/spec.<name>.md → <livespec-dir>/commands/spec-<name>.md (legacy alias)
 #   .claude/agents/<name>.md        → <livespec-dir>/agents/<name>.md
 #
-# Excludes: init.md and migrate.md (these stay global only)
+# Excludes: spec-init.md and spec-migrate.md (these stay global only)
 
 PROJECT_DIR="${1:?Usage: link-local.sh <project-dir> <livespec-dir>}"
 LIVESPEC_DIR="${2:?Usage: link-local.sh <project-dir> <livespec-dir>}"
@@ -48,21 +49,28 @@ for orphan in "$PROJECT_DIR"/.claude/commands/spec.*.expectations.md; do
   rm -f "$orphan"
 done
 
-# Link commands (exclude init.md and migrate.md + sidecar metadata files)
+# Link commands (exclude spec-init.md and spec-migrate.md + sidecar metadata files)
 for src in "$LIVESPEC_DIR"/commands/*.md; do
   name="$(basename "$src" .md)"
-  # Skip init and migrate — they stay global
-  if [[ "$name" == "init" || "$name" == "migrate" ]]; then
-    continue
-  fi
   # Skip sidecar files (e.g. *.expectations.md) — they are metadata,
   # consumed by `livespec verify-output` directly from the LiveSpec
   # checkout, never invoked as slash commands.
   if [[ "$name" == *.expectations ]]; then
     continue
   fi
-  dest="$PROJECT_DIR/.claude/commands/spec.${name}.md"
+  # Only canonical command source files are linked.
+  if [[ "$name" != spec-* ]]; then
+    continue
+  fi
+  short_name="${name#spec-}"
+  # Skip init and migrate — they stay global
+  if [[ "$short_name" == "init" || "$short_name" == "migrate" ]]; then
+    continue
+  fi
+  dest="$PROJECT_DIR/.claude/commands/${name}.md"
   ln -sf "$src" "$dest"
+  legacy_dest="$PROJECT_DIR/.claude/commands/spec.${short_name}.md"
+  ln -sf "$src" "$legacy_dest"
   cmd_count=$((cmd_count + 1))
 done
 
@@ -75,7 +83,7 @@ for src in "$LIVESPEC_DIR"/agents/*.md; do
 done
 
 # Validate all symlinks resolve and are readable
-for link in "$PROJECT_DIR"/.claude/commands/spec.*.md; do
+for link in "$PROJECT_DIR"/.claude/commands/spec*.md; do
   if ! [[ -e "$link" && -r "$link" ]]; then
     echo "ERROR: broken or unreadable symlink: $link → $(readlink "$link")" >&2
     errors=$((errors + 1))

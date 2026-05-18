@@ -1,6 +1,6 @@
 # SHIP_RESULT Contract
 
-> Canonical return contract emitted by `/spec.feature` when called by `/spec.ship`. Drives the merge / branch-delete decision in the ship orchestrator.
+> Canonical return contract emitted by `/spec-feature` when called by `/spec-ship`. Drives the merge / branch-delete decision in the ship orchestrator.
 >
 > Implementation: [`validator/contracts.py`](../../validator/contracts.py) (`ShipResult`, `parse_ship_result`).
 >
@@ -43,7 +43,7 @@
 
 ## Critical safety property
 
-**`/spec.ship` MUST NOT invoke `livespec git delete <branch>` until the SHIP_RESULT is parsed AND validated.**
+**`/spec-ship` MUST NOT invoke `livespec git delete <branch>` until the SHIP_RESULT is parsed AND validated.**
 
 Without this gate, a malformed result (or an injected fake) could trigger a delete on the wrong branch. The parser is the single point of validation; the delete is gated on `result.status == "OK"` AND `result.branch == "feature/<resolved-slug>"`.
 

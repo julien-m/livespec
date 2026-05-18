@@ -36,8 +36,8 @@ Investigation of the existing codebase reveals that the command-level implementa
 
 | Area | Status | Evidence |
 |------|--------|----------|
-| `/spec.implement` Step 0a (Behavioral TDD RED phase) | Already implemented | `commands/implement.md` contains Step 0a |
-| `/spec.test` Phase 1.5 (Behavioral Audit) | Already implemented | `commands/test.md` contains Phase 1.5 |
+| `/spec.implement` Step 0a (Behavioral TDD RED phase) | Already implemented | `commands/spec-implement.md` contains Step 0a |
+| `/spec.test` Phase 1.5 (Behavioral Audit) | Already implemented | `commands/spec-test.md` contains Phase 1.5 |
 | Crash test execution | Already executed | `checks/crash-test-2026-04-14.md` — 13 components, 11/13 classified (85%) |
 | Crash test procedure documentation | **Missing** | No `checks/procedure.md` exists |
 | Unit tests for TDD and audit mechanisms | **Missing** | No `test_behavioral_tdd.py` exists |
@@ -52,7 +52,7 @@ Investigation of the existing codebase reveals that the command-level implementa
 
 ### Story 2 — Implementer writes behavioral tests before component code `P1`
 
-> Inherited from Feature 005 Story 2. Already implemented in `commands/implement.md` Step 0a.
+> Inherited from Feature 005 Story 2. Already implemented in `commands/spec-implement.md` Step 0a.
 
 When an implementer runs `/spec.implement` on a feature that has behavioral traits in its spec, the implementer subagent writes the behavioral tests first (RED phase) before writing any component code. The behavioral traits from `system/testing/ui-behavioral-taxonomy.md` map directly to concrete test patterns.
 
@@ -93,7 +93,7 @@ flowchart TD
 
 ### Story 4 — Test author audits behavioral coverage on existing code `P2`
 
-> Inherited from Feature 005 Story 4. Already implemented in `commands/test.md` Phase 1.5.
+> Inherited from Feature 005 Story 4. Already implemented in `commands/spec-test.md` Phase 1.5.
 
 When a test author runs `/spec.test` on a feature with UI components, the command detects which behavioral traits the components exhibit, then checks whether tests covering those traits already exist. It reports gaps without inventing spec.
 

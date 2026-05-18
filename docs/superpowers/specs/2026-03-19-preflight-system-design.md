@@ -381,7 +381,7 @@ Preflight dry run — 12 checks would be executed:
 |------|---------|
 | `.specs/preflight.md` | Manifest — source of truth for all checks |
 | `.specs/preflight-report.md` | Execution report (snapshot, overwritten each run) |
-| `commands/preflight.md` | New LiveSpec command definition (`spec.` prefix added by `install.sh` at symlink time) |
+| `commands/spec-preflight.md` | New LiveSpec command definition (`spec.` prefix added by `install.sh` at symlink time) |
 
 ### Modified files
 | File | Change |
@@ -391,7 +391,7 @@ Preflight dry run — 12 checks would be executed:
 | `commands/spec.implement.md` | Add Phase 0.5 (light preflight check) |
 | `commands/spec.feature.md` | Add Phase 0.5 (light preflight check) before implementation |
 | `commands/spec.stack.md` | Add post-modification hook for manifest regeneration |
-| `scripts/install.sh` | Add `preflight` to COMMANDS array (script adds `spec.` prefix automatically) — `commands/preflight.md` must exist first |
+| `scripts/install.sh` | Add `preflight` to COMMANDS array (script adds `spec.` prefix automatically) — `commands/spec-preflight.md` must exist first |
 | `system/spec-system.md` | Add `preflight.md` and `preflight-report.md` to the canonical `.specs/` layout section; add preflight check to `/spec.init` exit criteria checklist |
 | `system/templates/` | Add `preflight-manifest-template.md` and `preflight-report-template.md` (inside `templates/`, alongside existing templates) |
 
