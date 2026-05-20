@@ -239,6 +239,7 @@ See the available presets for guidance:
     ".agent-sync.local/"
     ".agents/skills/spec-*"
     ".claude/skills/spec-*"
+    ".claude/rules/*.md"
     ".claude/rules/livespec/"
     ".codex/agents/livespec-*.toml"
   )

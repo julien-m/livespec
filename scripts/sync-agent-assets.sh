@@ -113,9 +113,11 @@ project_shared_sources() {
     project_source "$agent" "$TARGET_ROOT/agents/$(basename "$agent")" "agent $(basename "$agent")"
   done
 
-  if [[ -d "$SOURCE_ROOT/rules/livespec" ]]; then
-    project_source "$SOURCE_ROOT/rules/livespec" "$TARGET_ROOT/rules/livespec" "rules livespec"
-  fi
+  local rule
+  for rule in "$SOURCE_ROOT"/rules/livespec/*.md; do
+    [[ -f "$rule" ]] || continue
+    project_source "$rule" "$TARGET_ROOT/rules/$(basename "$rule")" "rule $(basename "$rule")"
+  done
 }
 
 sync_skills() {
@@ -141,7 +143,14 @@ sync_agents() {
 
 sync_rules() {
   local root="$1"
-  if [[ -d "$root/rules/livespec" ]]; then
+  local rule
+  local has_rules=false
+  for rule in "$root"/rules/*.md "$root"/rules/livespec/*.md; do
+    [[ -f "$rule" ]] || continue
+    has_rules=true
+    break
+  done
+  if [[ "$has_rules" == true ]]; then
     run_cc_hub rule build --scope "$SCOPE" --targets "$TARGETS" --namespace livespec
   fi
 }

@@ -172,6 +172,7 @@ Thumbs.db
 .agent-sync.local/
 .agents/skills/spec-*
 .claude/skills/spec-*
+.claude/rules/*.md
 .claude/rules/livespec/
 .codex/agents/livespec-*.toml
 .claude/commands/spec.*.md

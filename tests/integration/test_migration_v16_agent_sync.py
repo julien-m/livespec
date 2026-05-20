@@ -65,6 +65,7 @@ def test_migration_v16_syncs_agent_assets_with_cc_hub(tmp_path: Path) -> None:
     assert ".agent-sync.local/" in gitignore
     assert ".agents/skills/spec-*" in gitignore
     assert ".claude/skills/spec-*" in gitignore
+    assert ".claude/rules/*.md" in gitignore
     assert ".claude/rules/livespec/" in gitignore
     assert ".codex/agents/livespec-*.toml" in gitignore
     legacy = project / ".claude" / "commands" / ("spec" + ".check.md")

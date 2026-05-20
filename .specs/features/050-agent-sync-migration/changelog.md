@@ -31,3 +31,11 @@
 - **Code modified:** `scripts/init.sh`, `scripts/migrate-agent-sync.sh`, `migrations/16/migrate.md`, `.gitignore`, tests
 - **AC impacted:** AC-007
 - **Author:** codex
+
+## 2026-05-20 — [Bugfix]: Build project rules from file symlinks
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `scripts/sync-agent-assets.sh`, `scripts/init.sh`, `.agent-sync/skills/spec-init/SKILL.md`, `migrations/16/migrate.md`, `.gitignore`, tests
+- **AC impacted:** AC-004, AC-007
+- **Author:** codex

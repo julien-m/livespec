@@ -781,6 +781,7 @@ through `cc-hub`:
    - `.agent-sync.local/`
    - `.agents/skills/spec-*`
    - `.claude/skills/spec-*`
+   - `.claude/rules/*.md`
    - `.claude/rules/livespec/`
    - `.codex/agents/livespec-*.toml`
    - `.specs/.livespec-path`

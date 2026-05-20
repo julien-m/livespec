@@ -2,7 +2,7 @@
 title: "Agent Sync Migration Implementation"
 feature: 050-agent-sync-migration
 status: Implemented
-updated: 2026-05-18
+updated: 2026-05-20
 ---
 
 # Implementation - Agent Sync Migration
@@ -14,8 +14,8 @@ updated: 2026-05-18
 | FR-001 | `.agent-sync/skills/spec-*/SKILL.md` | N/A (portable command content) | Implemented | 2026-05-18 |
 | FR-002 | `.agent-sync/skills/spec-*/expectations.md`, `validator/expectations.py` | N/A (expectation corpus) | Implemented | 2026-05-18 |
 | FR-003 | `.agent-sync/agents/livespec-*/*` | N/A (portable agent source) | Implemented | 2026-05-18 |
-| FR-004 | `.agent-sync/rules/livespec/*.md` | N/A (portable rule source) | Implemented | 2026-05-18 |
-| FR-005 | `scripts/sync-agent-assets.sh`, `scripts/link-local.sh`, `scripts/install.sh`, `scripts/init.sh` | N/A (shell migration glue) | Implemented | 2026-05-18 |
+| FR-004 | `.agent-sync/rules/livespec/*.md` | N/A (portable rule source) | Implemented | 2026-05-20 |
+| FR-005 | `scripts/sync-agent-assets.sh`, `scripts/link-local.sh`, `scripts/install.sh`, `scripts/init.sh` | N/A (shell migration glue) | Implemented | 2026-05-20 |
 | FR-006 | `migrations/16/migrate.md`, `scripts/migrate-agent-sync.sh`, `VERSION` | N/A (migration manifest) | Implemented | 2026-05-18 |
 | FR-007 | `validator/command_registry.py`, `validator/command_audit.py`, `validator/integrations.py`, `validator/cli_commands/*.py` | N/A (validator source change) | Implemented | 2026-05-18 |
 | FR-008 | `hooks/livespec-last-reviewed.py`, `scripts/audit-antidrift-coverage.sh` | N/A (hook source change) | Implemented | 2026-05-18 |
@@ -46,6 +46,7 @@ updated: 2026-05-18
 - Created `.agent-sync/rules/livespec/` for shared LiveSpec routing and command rules.
 - Added `scripts/sync-agent-assets.sh` and `scripts/migrate-agent-sync.sh`.
 - Updated `scripts/init.sh`, `scripts/install.sh`, and `scripts/link-local.sh` to use cc-hub instead of manual provider symlinks.
+- Updated rule sync to link individual project rule files before `cc-hub rule build`, matching provider output paths.
 - Updated command registry, command audit, expectations, integration, hook, and CLI helpers to read `.agent-sync/skills`.
 - Added migration 16 and bumped `VERSION` to `16`.
 - Updated tests and docs to treat `.agent-sync` as the canonical source.

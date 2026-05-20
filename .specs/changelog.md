@@ -3,9 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-18
+> Last updated: 2026-05-20
 
 ---
+
+## 2026-05-20 — [Bugfix]: Agent-sync project rule sync now links individual LiveSpec rule files before `cc-hub rule build`, so newly initialized projects receive usable `.agent-sync/rules/*.md` and provider rule outputs alongside the 20 `spec-*` skills and 4 `livespec-*` agents.
 
 ## 2026-05-18 — [Bugfix]: Completed command-name normalization leftovers — active docs, agent-sync skills/agents, CLI help, state-file schema, and project state files now use canonical `spec-*`; state-file migration now rewrites legacy dotted `owner_command` values and validates them; agent-sync migration now ignores provider outputs and removes relative legacy command symlinks.
 
