@@ -9,6 +9,8 @@
 
 ## 2026-05-20 — [Bugfix]: Agent-sync project rule sync now links individual LiveSpec rule files before `cc-hub rule build`, so newly initialized projects receive usable `.agent-sync/rules/*.md` and provider rule outputs alongside the 20 `spec-*` skills and 4 `livespec-*` agents.
 
+## 2026-05-20 — [Bugfix]: Downstream LiveSpec links now install under `.agent-sync.local/` instead of project `.agent-sync/`, preserving `.agent-sync/` for global/shared project assets while provider outputs still resolve through `cc-hub`.
+
 ## 2026-05-18 — [Bugfix]: Completed command-name normalization leftovers — active docs, agent-sync skills/agents, CLI help, state-file schema, and project state files now use canonical `spec-*`; state-file migration now rewrites legacy dotted `owner_command` values and validates them; agent-sync migration now ignores provider outputs and removes relative legacy command symlinks.
 
 ## 2026-05-18 — [Bugfix]: Global bootstrap now installs only `spec-init` and `spec-migrate` — `scripts/install.sh` no longer links LiveSpec rules globally; project rules remain synced by `/spec-init` through `.agent-sync` and `cc-hub`.

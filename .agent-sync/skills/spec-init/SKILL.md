@@ -778,7 +778,6 @@ through `cc-hub`:
 5. **Install pre-commit hook:** Execute `bash <livespec-dir>/scripts/install-hooks.sh <project-dir> <livespec-dir>` to install the `last_reviewed` hook (feature 039 FR-009). Idempotent — keyed off the `# livespec-expectations` marker. Skipped silently if the project has no `.git/` directory.
 6. **Write version:** Read `VERSION` from the LiveSpec repo, write to `.specs/livespec-version`
 7. **Update .gitignore:** Add the following patterns (if not already present):
-   - `.agent-sync.local/`
    - `.agents/skills/spec-*`
    - `.claude/skills/spec-*`
    - `.claude/rules/*.md`
@@ -892,7 +891,7 @@ flowchart TD
 > - `.conventions/index.md` — convention routing table (generated from stack, points into ai-ressources)
 > - `.conventions/manifest.yaml` — machine-readable mirror of the routing table
 > - `.agent-sync/` — LiveSpec shared skill/agent/rule source links
-> - `.agent-sync.local/` — optional project-local overlay (gitignored)
+> - `.agent-sync.local/` — project-local LiveSpec skill/agent/rule links
 > - `.specs/livespec-version` — version tracking (v2)
 >
 > **Next step:** Discover what to build first:
@@ -1011,7 +1010,7 @@ Before declaring success, verify:
 - [ ] `.agent-sync/agents/livespec-*` resolves for all 4 LiveSpec agents
 - [ ] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo
 - [ ] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory
-- [ ] `.gitignore` contains `.agent-sync.local/`, provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`
+- [ ] `.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`
 - [ ] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`
 - [ ] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)
 

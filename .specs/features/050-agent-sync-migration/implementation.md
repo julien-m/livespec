@@ -16,7 +16,7 @@ updated: 2026-05-20
 | FR-003 | `.agent-sync/agents/livespec-*/*` | N/A (portable agent source) | Implemented | 2026-05-18 |
 | FR-004 | `.agent-sync/rules/livespec/*.md` | N/A (portable rule source) | Implemented | 2026-05-20 |
 | FR-005 | `scripts/sync-agent-assets.sh`, `scripts/link-local.sh`, `scripts/install.sh`, `scripts/init.sh` | N/A (shell migration glue) | Implemented | 2026-05-20 |
-| FR-006 | `migrations/16/migrate.md`, `scripts/migrate-agent-sync.sh`, `VERSION` | N/A (migration manifest) | Implemented | 2026-05-18 |
+| FR-006 | `migrations/16/migrate.md`, `scripts/migrate-agent-sync.sh`, `VERSION` | N/A (migration manifest) | Implemented | 2026-05-20 |
 | FR-007 | `validator/command_registry.py`, `validator/command_audit.py`, `validator/integrations.py`, `validator/cli_commands/*.py` | N/A (validator source change) | Implemented | 2026-05-18 |
 | FR-008 | `hooks/livespec-last-reviewed.py`, `scripts/audit-antidrift-coverage.sh` | N/A (hook source change) | Implemented | 2026-05-18 |
 | FR-009 | `README.md`, `AGENTS.md`, `.specs/spec-system.md`, `system/*.md`, `.checks/livespec-routing-sync.md` | N/A (documentation source change) | Implemented | 2026-05-18 |
@@ -34,7 +34,7 @@ updated: 2026-05-20
 | AC-006 | `tests/test_command_aliases.py`, `tests/test_agent_sync_scripts.py` | Passed |
 | AC-007 | `tests/integration/test_migration_v16_agent_sync.py` | Passed |
 | AC-008 | `tests/test_command_registry.py`, `tests/test_command_audit_cli.py`, `tests/test_integrations.py` | Passed |
-| AC-009 | `tests/test_agent_sync_scripts.py`, `.gitignore` | Passed |
+| AC-009 | `tests/test_agent_sync_scripts.py`, `tests/integration/test_migration_v16_agent_sync.py` | Passed |
 | AC-010 | `bash scripts/check-coherence.sh`, source-path audit | Passed |
 | AC-011 | `python3 -m validator.cli command-audit --repo . --naming-policy hyphenated --json` | Passed |
 | AC-012 | `ruff check .`, `python3 -m pytest -q`, `bash scripts/check-coherence.sh`, feature validation | Passed |
@@ -47,6 +47,7 @@ updated: 2026-05-20
 - Added `scripts/sync-agent-assets.sh` and `scripts/migrate-agent-sync.sh`.
 - Updated `scripts/init.sh`, `scripts/install.sh`, and `scripts/link-local.sh` to use cc-hub instead of manual provider symlinks.
 - Updated rule sync to link individual project rule files before `cc-hub rule build`, matching provider output paths.
+- Updated project sync to place downstream LiveSpec links under `.agent-sync.local/` and point provider outputs there.
 - Updated command registry, command audit, expectations, integration, hook, and CLI helpers to read `.agent-sync/skills`.
 - Added migration 16 and bumped `VERSION` to `16`.
 - Updated tests and docs to treat `.agent-sync` as the canonical source.

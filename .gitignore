@@ -169,7 +169,6 @@ Thumbs.db
 
 # LiveSpec
 .specs/hooks/*.local.md
-.agent-sync.local/
 .agents/skills/spec-*
 .claude/skills/spec-*
 .claude/rules/*.md

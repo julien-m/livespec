@@ -4,7 +4,6 @@ name: agent-sync-migration
 description: Synchronize LiveSpec skills, agents, and rules through cc-hub
 ---
 
-GITIGNORE .agent-sync.local/
 GITIGNORE .agents/skills/spec-*
 GITIGNORE .claude/skills/spec-*
 GITIGNORE .claude/rules/*.md

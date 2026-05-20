@@ -15,7 +15,6 @@ shift 2
 PROJECT_DIR="$(cd "$PROJECT_DIR" && pwd -P)"
 LIVESPEC_DIR="$(cd "$LIVESPEC_DIR" && pwd -P)"
 SOURCE_ROOT="$LIVESPEC_DIR/.agent-sync"
-TARGET_ROOT="$PROJECT_DIR/.agent-sync"
 LOCAL_ROOT="$PROJECT_DIR/.agent-sync.local"
 
 SCOPE="project"
@@ -104,19 +103,19 @@ project_shared_sources() {
   local skill
   for skill in "$SOURCE_ROOT"/skills/spec-*; do
     [[ -d "$skill" ]] || continue
-    project_source "$skill" "$TARGET_ROOT/skills/$(basename "$skill")" "skill $(basename "$skill")"
+    project_source "$skill" "$LOCAL_ROOT/skills/$(basename "$skill")" "skill $(basename "$skill")"
   done
 
   local agent
   for agent in "$SOURCE_ROOT"/agents/livespec-*; do
     [[ -d "$agent" ]] || continue
-    project_source "$agent" "$TARGET_ROOT/agents/$(basename "$agent")" "agent $(basename "$agent")"
+    project_source "$agent" "$LOCAL_ROOT/agents/$(basename "$agent")" "agent $(basename "$agent")"
   done
 
   local rule
   for rule in "$SOURCE_ROOT"/rules/livespec/*.md; do
     [[ -f "$rule" ]] || continue
-    project_source "$rule" "$TARGET_ROOT/rules/$(basename "$rule")" "rule $(basename "$rule")"
+    project_source "$rule" "$LOCAL_ROOT/rules/$(basename "$rule")" "rule $(basename "$rule")"
   done
 }
 
@@ -125,7 +124,7 @@ sync_skills() {
   local skill
   for skill in "$root"/skills/spec-*; do
     [[ -d "$skill" ]] || continue
-    run_cc_hub skill link "$skill" --scope "$SCOPE" --targets "$TARGETS"
+    run_cc_hub skill link "$skill" --scope "$SCOPE" --targets "$TARGETS" --agent-sync-root .agent-sync.local
   done
 }
 
@@ -136,8 +135,8 @@ sync_agents() {
     [[ -d "$agent" ]] || continue
     local name
     name="$(basename "$agent")"
-    run_cc_hub agent build "$name" --scope "$SCOPE" --targets "$TARGETS"
-    run_cc_hub agent link "$name" --scope "$SCOPE" --targets "$TARGETS"
+    run_cc_hub agent build "$name" --scope "$SCOPE" --targets "$TARGETS" --agent-sync-root .agent-sync.local
+    run_cc_hub agent link "$name" --scope "$SCOPE" --targets "$TARGETS" --agent-sync-root .agent-sync.local
   done
 }
 
@@ -151,19 +150,13 @@ sync_rules() {
     break
   done
   if [[ "$has_rules" == true ]]; then
-    run_cc_hub rule build --scope "$SCOPE" --targets "$TARGETS" --namespace livespec
+    run_cc_hub rule build --scope "$SCOPE" --targets "$TARGETS" --namespace livespec --agent-sync-root .agent-sync.local
   fi
 }
 
 project_shared_sources
-sync_skills "$TARGET_ROOT"
-sync_agents "$TARGET_ROOT"
-sync_rules "$TARGET_ROOT"
-
-if [[ -d "$LOCAL_ROOT" ]]; then
-  sync_skills "$LOCAL_ROOT"
-  sync_agents "$LOCAL_ROOT"
-  sync_rules "$LOCAL_ROOT"
-fi
+sync_skills "$LOCAL_ROOT"
+sync_agents "$LOCAL_ROOT"
+sync_rules "$LOCAL_ROOT"
 
 echo "LiveSpec agent-sync assets synced through cc-hub"

@@ -39,3 +39,11 @@
 - **Code modified:** `scripts/sync-agent-assets.sh`, `scripts/init.sh`, `.agent-sync/skills/spec-init/SKILL.md`, `migrations/16/migrate.md`, `.gitignore`, tests
 - **AC impacted:** AC-004, AC-007
 - **Author:** codex
+
+## 2026-05-20 — [Bugfix]: Move project LiveSpec links to `.agent-sync.local`
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (AC-007, AC-009 local-root semantics)
+- **Code modified:** `scripts/sync-agent-assets.sh`, `scripts/migrate-agent-sync.sh`, `scripts/init.sh`, `.agent-sync/skills/spec-init/SKILL.md`, `migrations/16/migrate.md`, `.gitignore`, tests
+- **AC impacted:** AC-007, AC-009
+- **Author:** codex

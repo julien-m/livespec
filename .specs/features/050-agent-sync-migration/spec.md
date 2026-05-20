@@ -16,7 +16,8 @@ updated: 2026-05-18
 Migrate LiveSpec from Claude-only `commands/` and `agents/` source folders to a
 portable `.agent-sync/` source model shared by Claude Code and Codex. All
 installation, initialization, and migrations must use `cc-hub` to produce or
-link provider-native outputs. `.agent-sync.local/` must remain project-local.
+link provider-native outputs. Target-project LiveSpec links must live under
+`.agent-sync.local/`.
 
 ## User Scenarios & Testing
 
@@ -80,19 +81,19 @@ flowchart TD
 ### User Story 3 - Local project-only assets stay local (P2)
 
 As a LiveSpec maintainer, I want `.agent-sync.local/` for project-only skills,
-rules, or agents, so local experiments are never synchronized into other
-projects by mistake.
+rules, or agents, so local project assets stay out of shared/global
+`.agent-sync/` roots.
 
-**Independent test:** `.agent-sync.local/` is gitignored and sync applies it only
-when it exists inside the target project.
+**Independent test:** sync applies `.agent-sync.local/` only to the target
+project and provider outputs point to that local root.
 
 ```gherkin
 Feature: Local-only agent sync overlays
-  Scenario: Local overlay is not committed
-    Given a project contains .agent-sync.local
+  Scenario: Local root receives project assets
+    Given LiveSpec built-in assets are synced into a target project
     When LiveSpec syncs agent assets
-    Then local assets are linked after shared assets
-    And .agent-sync.local remains ignored by git
+    Then local assets are linked under .agent-sync.local
+    And provider outputs point to .agent-sync.local
 ```
 
 ```mermaid
@@ -100,7 +101,6 @@ flowchart TD
     A[shared .agent-sync] --> C[sync]
     B[target .agent-sync.local] --> C
     C --> D[provider outputs]
-    B --> E[gitignored]
 ```
 
 ## Acceptance Criteria
@@ -111,9 +111,9 @@ flowchart TD
 - **AC-004** - LiveSpec rules exist under `.agent-sync/rules/livespec/` and can be built for Claude and Codex through `cc-hub`.
 - **AC-005** - `scripts/link-local.sh` no longer creates manual `.claude/commands` or `.claude/agents` symlinks; it delegates to the cc-hub sync script.
 - **AC-006** - `scripts/install.sh` bootstraps only `spec-init` and `spec-migrate` globally through `cc-hub`; all other skills, agents, and rules remain project-scoped via `/spec-init`.
-- **AC-007** - Migration 16 syncs agent-sync assets through `cc-hub`, removes only LiveSpec-managed legacy symlinks, adds `.agent-sync.local/` to `.gitignore`, and sets version 16.
+- **AC-007** - Migration 16 syncs agent-sync assets through `cc-hub`, removes only LiveSpec-managed legacy symlinks, keeps project assets under `.agent-sync.local/`, and sets version 16.
 - **AC-008** - Command registry, expectations lookup, integrations, previews, and command-audit use `.agent-sync/skills` as the production source.
-- **AC-009** - `.agent-sync.local/` is gitignored and applied only as a target-project overlay.
+- **AC-009** - `.agent-sync.local/` is applied only as a target-project local root.
 - **AC-010** - Active docs and routing instructions describe `.agent-sync` as the source and do not present `commands/` or `agents/` as canonical.
 - **AC-011** - `command-audit` returns 20 commands, failed 0, score 5.
 - **AC-012** - Full deterministic verification passes: ruff, pytest, command-audit, coherence, and feature artifact validation.
@@ -138,7 +138,7 @@ flowchart TD
 | AgentSyncSkill | Portable command source in `.agent-sync/skills/spec-*/SKILL.md`. |
 | AgentSyncAgent | Portable agent source in `.agent-sync/agents/<name>/`. |
 | AgentSyncRule | Portable rule source in `.agent-sync/rules/livespec/*.md`. |
-| LocalOverlay | Target-project `.agent-sync.local/` assets applied after shared assets. |
+| LocalOverlay | Target-project `.agent-sync.local/` assets generated from shared LiveSpec assets. |
 
 ## Edge Cases
 

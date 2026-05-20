@@ -236,7 +236,6 @@ See the available presets for guidance:
   local gitignore="$PROJECT_DIR/.gitignore"
   local live_patterns=(
     ".specs/hooks/*.local.md"
-    ".agent-sync.local/"
     ".agents/skills/spec-*"
     ".claude/skills/spec-*"
     ".claude/rules/*.md"

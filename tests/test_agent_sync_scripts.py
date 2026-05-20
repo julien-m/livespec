@@ -49,8 +49,13 @@ def test_link_local_delegates_to_cc_hub_without_manual_claude_symlinks(
     assert "agent build" in log
     assert "agent link" in log
     assert "rule build" in log
-    assert (project / ".agent-sync" / "rules" / "commands.md").is_symlink()
-    assert (project / ".agent-sync" / "rules" / "routing.md").is_symlink()
+    assert "--agent-sync-root .agent-sync.local" in log
+    assert (project / ".agent-sync.local" / "skills" / "spec-init").is_symlink()
+    assert (project / ".agent-sync.local" / "agents" / "livespec-verifier").is_symlink()
+    assert (project / ".agent-sync.local" / "rules" / "commands.md").is_symlink()
+    assert (project / ".agent-sync.local" / "rules" / "routing.md").is_symlink()
+    assert not (project / ".agent-sync" / "skills" / "spec-init").exists()
+    assert not (project / ".agent-sync" / "agents" / "livespec-verifier").exists()
     assert not (project / ".agent-sync" / "rules" / "livespec").exists()
     assert not (project / ".claude" / "commands").exists()
     assert not (project / ".claude" / "agents").exists()
