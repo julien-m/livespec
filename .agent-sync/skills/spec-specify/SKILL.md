@@ -211,6 +211,17 @@ Before generating spec.md, check the target feature directory for seed context:
 
 3. **Seeded attribution:** When generating spec.md from a seed, the `Input` section must include a note: `Seeded from [parent-feature-number-name] -- see seed.absorbed.md for original context.`
 
+### Step 1.8 — Penflow UI Contract Resolution
+
+For UI features, prefer root `penflow/semantic-ui-tree.json` over legacy `.specs/flows/`, `native_behavioral`, or mockup-derived behavior.
+
+1. Run `livespec penflow-contract status --project . --json`.
+2. If status is `ready`, read `penflow/semantic-ui-tree.json`.
+3. Resolve matching `flow_id`, `screen_id`, `semantic_id`, and `test_id` by exact feature slug, screen id, visible text, or source map. Do not invent IDs.
+4. Add a `## Penflow Contract` section to `spec.md` listing the resolved IDs and any `[NEEDS CLARIFICATION]` mappings.
+5. If status is `absent`, proceed from scratch without Brainstorm: use the feature request, stack, and design workflow to define the UI contract, and do not read `.brainstorm/` as fallback behavior.
+6. If status is `incomplete` for a UI feature, report the missing Penflow files and continue only with explicit `[NEEDS CLARIFICATION]` markers.
+
 ### Step 2 — Auto-Number the Feature (atomic reservation)
 
 <!-- @spec FR-001: Atomic NNN reservation — .specs/features/015-global-write-locks/spec.md#fr-001 -->

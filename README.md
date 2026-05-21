@@ -26,6 +26,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | No traceability | **Implementation mapping** — every spec requirement links to `@spec` anchors in code |
 | Specs rot after launch | **Living docs** — specs updated when behavior changes |
 | No history | **Per-feature changelogs** — every change is recorded |
+| UI behavior hidden in screenshots | **Penflow contracts** — root `penflow/` owns semantic UI flow correctness |
 | No visual testing | **Playwright baselines** built into implementation + check |
 | Stack decisions lost | **Stack presets with decision trees** — know WHY you chose each tool |
 | One-time init | **Brainstorm-driven init** — AI interviews you before generating anything |
@@ -40,7 +41,7 @@ flowchart LR
     P["/spec-propose\nDiscover what\nto build"] --> S["/spec-specify\nWrite the spec\n(stories, AC, FR)"]
     S --> PL["/spec-plan\nTechnical plan\n(diagrams, steps)"]
     PL --> I["/spec-implement\nCode, test,\nmap to spec"]
-    I --> T["/spec-test\nAudit + generate\n+ run tests"]
+    I --> T["/spec-test\nAudit + Penflow\n+ visual gates"]
     T --> C["/spec-check\nVerify spec\nvs code"]
     C --> F["/spec-fix\nFix gaps\n(functional + visual)"]
     F --> E["/spec-explain\nLiving\ndocumentation"]
@@ -69,8 +70,8 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 | `/spec-specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
 | `/spec-plan` | Generate technical plan with sequence, state, and ER diagrams |
 | `/spec-implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
-| `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, capture visual baselines, verify design fidelity |
-| `/spec-check` | Compare spec vs actual code — find gaps, verify AC, detect visual drift |
+| `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, validate Penflow expected/actual UI trees, capture visual baselines, verify design fidelity |
+| `/spec-check` | Compare spec vs actual code — find gaps, verify AC, report Penflow contract status, detect visual drift |
 | `/spec-fix` | Fix implementation gaps from spec-check — functional and visual corrections with retry loop |
 | `/spec-explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec-stack` | Evolve your stack and analyze impact on existing features |
@@ -368,6 +369,14 @@ Key flags: `--roadmap`, `--features`, `--json`
 ## Project Structure Created by `/spec-init`
 
 ```
+# Optional: created when `.brainstorm/penflow/` exists or later UI workflow creates it.
+penflow/
+├── flow-ui-contract/       ← Flow/screen specs used to generate semantic tree
+├── semantic-ui-tree.json   ← Primary UI behavior contract
+├── expected-ui-tree.json   ← Design-derived structural baseline
+├── code-ir.json            ← UI implementation handoff
+└── actual-ui-tree.json     ← Runtime tree from external adapter (required only for UI runtime comparison)
+
 .specs/
 ├── README.md               ← Spec registry and artifact index (auto-maintained)
 ├── spec-system.md          ← The rules (READ FIRST — every tool reads this)

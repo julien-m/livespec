@@ -151,6 +151,18 @@ If the feature's `spec.md` contains a `## Screens` section:
 
 If no `## Screens` section exists → skip this step.
 
+### Step 2.6 — Penflow Code IR Input (UI features only)
+
+If root `penflow/` exists:
+
+1. Run `livespec penflow-contract status --project . --json`.
+2. Read `penflow/semantic-ui-tree.json` and `penflow/code-ir.json` when present.
+3. Add a `## Penflow Contract Inputs` section to `plan.md` with links to `penflow/semantic-ui-tree.json`, `penflow/code-ir.json`, and the relevant `flow_id` / `screen_id`.
+4. Use `code-ir.json` as the primary UI implementation input. `.specs/design/screens/` remains visual evidence, not behavioral source of truth.
+5. If `code-ir.json` is missing for a UI feature, mark the plan input as `[NEEDS CLARIFICATION]` and include the recovery command from the Penflow workflow.
+
+If root `penflow/` is absent, keep the plan from scratch: do not reference `.brainstorm/`; state that Penflow is `ABSENT` until the UI contract workflow creates root artifacts.
+
 ### Step 3 — Analyze Requirements
 
 From the spec, extract:

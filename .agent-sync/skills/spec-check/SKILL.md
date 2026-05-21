@@ -352,6 +352,22 @@ For each FR and AC:
 
 **Prerequisite:** Feature's `spec.md` has a `## Screens` section AND baselines exist in `.specs/features/NNN-feature-name/baselines/`. Skip entire step if either is absent.
 
+#### Step 8.P — Penflow Contract Status
+
+If root `penflow/` exists, run `livespec penflow-contract status --project . --require-actual --json` for UI runtime comparison and read `penflow/compare-report.json`, `penflow/review-report.md`, and `penflow/fix-report.md` when present. If root `penflow/` is absent, report `ABSENT` and do not read `.brainstorm/`.
+
+Report Penflow before screenshot drift:
+
+```markdown
+### Penflow Contract Status
+
+| Workspace | Semantic tree | Expected tree | Actual tree | Verdict |
+|---|---|---|---|---|
+| `penflow/` | present | present | present | PASS |
+```
+
+Missing `actual-ui-tree.json` is `BLOCKED` when UI runtime comparison is expected. Penflow `FAIL` or `BLOCKED` is blocking for UI flow correctness. Screenshot/pixel drift remains a separate visual regression signal and does not override Penflow correctness.
+
 <!-- @spec FR-007: maxDiffPixels for regression — .specs/features/003-visual-testing-fidelity/spec.md#fr-007 -->
 
 #### Step 8.0 — Staleness Gate (runs BEFORE pixel comparison)

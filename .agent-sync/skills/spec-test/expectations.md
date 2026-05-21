@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-05-18
+last_reviewed: 2026-05-21
 ---
 
 # Expectations — /spec-test
@@ -40,6 +40,10 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 - `test-results/`
 - `.specs/features/<feature>/baselines/`
 - `.specs/features/<feature>/design-alignment/`
+- `penflow/compare-report.json`
+- `penflow/compare-report.md`
+- `penflow/review-report.md`
+- `penflow/fix-report.md`
 
 **forbidden:**
 - `src/`
@@ -59,6 +63,12 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 
 - stdout marker: `Visual Gate Verdict: PASS | FAIL | BLOCKED` for `--visual` runs
 - stdout marker: `Design Alignment Verdict: PASS | FAIL | BLOCKED` for `--visual` runs when `ui.pen` is present or changed
+- stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED` for UI runs
+  - `ABSENT`: no root `penflow/`
+  - `PASS`: `actual-ui-tree.json` validates and matches `expected-ui-tree.json`
+  - `FAIL`: compare report contains structural drift
+  - `BLOCKED`: required artifacts, `actual-ui-tree.json`, or Penflow CLI are missing
+  - note: non-UI runs without runtime comparison can report `runtime_comparison: ABSENT` while final verdict remains `PASS` when root Penflow planning artifacts are ready
 
 ## 7. Exit Codes
 
@@ -109,6 +119,7 @@ verify:
         - contains: "Visual baselines"
         - contains: "Design Alignment Verdict"
         - contains: "Visual Gate Verdict"
+        - contains: "Penflow Contract Verdict"
         - contains: "PASS | FAIL | BLOCKED"
 ```
 

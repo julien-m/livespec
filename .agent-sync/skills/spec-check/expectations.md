@@ -1,7 +1,7 @@
 ---
 command: spec-check
 contract_version: "1.0"
-last_reviewed: 2026-05-18
+last_reviewed: 2026-05-21
 ---
 
 # Expectations — /spec-check
@@ -35,7 +35,9 @@ Verify spec vs code alignment and produce a gap report.
 - _(none)_
 
 **optional:**
-- _(none)_
+- `penflow/compare-report.json`
+- `penflow/review-report.md`
+- `penflow/fix-report.md`
 
 **forbidden:**
 - `src/`
@@ -57,6 +59,11 @@ Verify spec vs code alignment and produce a gap report.
   must_contain_sections:
   - "Gap Report"
   - "Findings"
+- stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED`
+  - `ABSENT`: no root `penflow/` and no `.brainstorm/` fallback is read
+  - `PASS`: Penflow compare report is aligned
+  - `FAIL`: Penflow compare report contains structural drift
+  - `BLOCKED`: required artifacts, `actual-ui-tree.json`, or Penflow CLI are missing for UI runtime comparison
 
 ## 7. Exit Codes
 
@@ -95,6 +102,7 @@ verify:
   must:
     - exit_code: 0
     - contains: "gap report"
+    - contains: "Penflow Contract Verdict"
   must_not:
     - contains: "Traceback"
 ```

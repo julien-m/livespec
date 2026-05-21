@@ -1,7 +1,7 @@
 ---
 command: spec-plan
 contract_version: "1.0"
-last_reviewed: 2026-05-18
+last_reviewed: 2026-05-21
 ---
 
 # Expectations — /spec-plan
@@ -19,6 +19,7 @@ Generate a technical plan with sequence, state, and ER diagrams.
 **stdout must_contain:**
 - "plan.md"
 - "<feature>"
+- "Penflow contract:"
 
 **stdout must_not_contain:**
 - "Traceback"
@@ -36,7 +37,7 @@ Generate a technical plan with sequence, state, and ER diagrams.
 - `.specs/features/<feature>/changelog.md`
 
 **optional:**
-- _(none)_
+- `## Penflow Contract Inputs` in plan.md for UI features
 
 **forbidden:**
 - `.specs/features/<feature>/spec.md`
@@ -60,6 +61,10 @@ Generate a technical plan with sequence, state, and ER diagrams.
   - "Technical Context"
   - "Constitution Check"
   - "Implementation Plan"
+- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
+  - `ABSENT`: no root `penflow/`; plan remains from scratch without `.brainstorm/`
+  - `BLOCKED`: UI plan needs `code-ir.json` or other root artifacts but they are missing
+  - `PASS`: required Penflow planning inputs are present
 
 ## 7. Exit Codes
 
@@ -100,6 +105,7 @@ verify:
     - exit_code: 0
     - exists: ".specs/features/<feature>/plan.md"
     - contains: "plan.md"
+    - contains: "Penflow contract"
   may:
     - contains: "mermaid"
   must_not:

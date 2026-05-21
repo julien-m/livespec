@@ -17,6 +17,7 @@ from . import (
     design_alignment_cmd,
     drivers_cmd,
     mutation_cmd,
+    penflow_contract_cmd,
     preflight_cmd,
     test_cmd,
     ui_runner_cmd,
@@ -35,6 +36,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     design_alignment_cmd.register(app)
     drivers_cmd.register(app)
     mutation_cmd.register(app)
+    penflow_contract_cmd.register(app)
     preflight_cmd.register(app)
     ui_runner_cmd.register(app)
     command_audit_cmd.register(app)

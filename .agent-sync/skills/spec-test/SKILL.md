@@ -471,6 +471,27 @@ Design Alignment Verdict: PASS | FAIL | BLOCKED
 
 `FAIL` or `BLOCKED` prevents baseline capture and prevents baseline approval. Only `PASS` may continue to Phase 4.5.1 and Phase 4.5.2.
 
+### 4.5.P — Penflow Contract Gate
+
+Runs before visual baseline generation/capture when root `penflow/` exists.
+
+**Reference workflow:** **Read** [`system/testing/penflow-contract.md`](../../../system/testing/penflow-contract.md).
+
+**Execution:**
+
+```bash
+livespec penflow-contract status --project . --require-actual --json
+penflow validate-actual penflow/actual-ui-tree.json --schema --json
+penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json \
+  --out penflow/compare-report.json \
+  --markdown penflow/compare-report.md \
+  --json
+penflow review-report penflow/compare-report.json --out penflow/review-report.md
+penflow fix-report penflow/compare-report.json --out penflow/fix-report.md
+```
+
+If status returns `runtime_comparison: BLOCKED`, stop before `penflow validate-actual` and print `Penflow Contract Verdict: BLOCKED`. `FAIL` or `BLOCKED` is blocking for UI flow correctness and prevents visual baseline approval. `ABSENT` allows legacy/non-UI fallback when no root `penflow/` exists or runtime comparison was not requested. Screenshots remain visual regression gates after Penflow passes.
+
 ### Selecting `dispatch` vs `converge`
 
 Before dispatching, inspect the rows in `.specs/surfaces.yaml`:

@@ -1,7 +1,7 @@
 ---
 command: spec-implement
 contract_version: "1.0"
-last_reviewed: 2026-05-18
+last_reviewed: 2026-05-21
 ---
 
 # Expectations — /spec-implement
@@ -20,6 +20,7 @@ Auto-implement a feature from its plan, write tests, run the visual gate for UI 
 **stdout must_contain:**
 - "PHASE_RESULT"
 - "implement"
+- "Penflow contract:"
 
 **stdout must_not_contain:**
 - "Traceback"
@@ -40,6 +41,9 @@ Auto-implement a feature from its plan, write tests, run the visual gate for UI 
 **optional:**
 - `.specs/features/<feature>/baselines/`
 - `.specs/features/<feature>/checks/<date>-test.md`
+- `penflow/compare-report.json`
+- `penflow/review-report.md`
+- `penflow/fix-report.md`
 
 **forbidden:**
 - `.specs/features/<feature>/spec.md`
@@ -65,6 +69,11 @@ Auto-implement a feature from its plan, write tests, run the visual gate for UI 
 - path: `.specs/features/<feature>/checks/<date>-test.md`
   must_contain_sections:
   - "Visual Gate Verdict"
+- stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED`
+  - `ABSENT`: no root `penflow/`; implementation continues from approved spec/plan without `.brainstorm/`
+  - `PASS`: expected and actual trees match before visual approval
+  - `FAIL`: Penflow compare found structural drift
+  - `BLOCKED`: required Penflow artifacts, `actual-ui-tree.json`, or CLI tooling are missing for UI runtime comparison
 
 ## 7. Exit Codes
 
@@ -104,6 +113,7 @@ verify:
   must:
     - exit_code: 0
     - contains: "PHASE_RESULT"
+    - contains: "Penflow contract"
     - exists: ".specs/features/<feature>/progress.md"
   may:
     - contains: "tests passed"

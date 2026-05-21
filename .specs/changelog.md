@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-20
+> Last updated: 2026-05-21
 
 ---
+
+## 2026-05-21 — [Feature 051 Bugfix]: Penflow actual-tree absence now reports `ABSENT` for from-scratch/non-UI runs and `BLOCKED` when UI runtime comparison requires `actual-ui-tree.json`; command expectations now include Penflow verdict outputs.
+
+## 2026-05-21 — [Feature 051]: Implemented: Integrate Penflow as LiveSpec primary UI contract — root `penflow/` workspace helper + CLI, command docs for init/specify/plan/implement/test/check, Penflow contract gate workflow, and screenshot regression gates preserved.
 
 ## 2026-05-20 — [Bugfix]: Agent-sync project rule sync now links individual LiveSpec rule files before `cc-hub rule build`, so newly initialized projects receive usable `.agent-sync/rules/*.md` and provider rule outputs alongside the 20 `spec-*` skills and 4 `livespec-*` agents.
 

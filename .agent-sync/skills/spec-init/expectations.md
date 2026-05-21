@@ -1,7 +1,7 @@
 ---
 command: spec-init
 contract_version: "1.0"
-last_reviewed: 2026-05-20
+last_reviewed: 2026-05-21
 ---
 
 # Expectations — /spec-init
@@ -20,6 +20,7 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
 **stdout must_contain:**
 - "LiveSpec initialized"
 - "`.specs/`"
+- "Penflow contract:"
 
 **stdout must_not_contain:**
 - "Traceback"
@@ -41,6 +42,7 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
 
 **optional:**
 - `.specs/stacks/_default.md`
+- `penflow/` when `.brainstorm/penflow/` exists
 
 **forbidden:**
 - `src/`
@@ -64,6 +66,10 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
   - "Vision"
   - "Users"
   - "Constraints"
+- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
+  - `ABSENT`: no root `penflow/` workspace on a from-scratch/non-UI init
+  - `BLOCKED`: copied or existing root `penflow/` misses required artifacts
+  - `PASS`: root `penflow/` has required planning artifacts
 
 ## 7. Exit Codes
 
@@ -103,6 +109,7 @@ verify:
   must:
     - exit_code: 0
     - contains: "LiveSpec initialized"
+    - contains: "Penflow contract"
     - exists: ".specs/spec-system.md"
     - exists: ".specs/project.md"
   may:

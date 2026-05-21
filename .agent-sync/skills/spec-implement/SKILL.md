@@ -106,10 +106,13 @@ flowchart TD
 6. `.specs/design/screens/*.png` — if feature has a `## Screens` section in spec.md, read the referenced mockup PNGs as visual targets for UI implementation
 7. `.specs/design/theme.css` — if exists, read as the authoritative theme for CSS variables (colors, spacing, typography)
 8. `.specs/design/theme.md` — if exists, read for install command and color palette reference
+9. `penflow/code-ir.json` — if root `penflow/` exists, read as the primary UI implementation input
+10. `penflow/expected-ui-tree.json` — if root `penflow/` exists, read as the design-derived structural baseline
+11. `penflow/semantic-ui-tree.json` — preserve every relevant `semantic_id`, `test_id`, `binding`, `entity`, `validations`, and `side_effects`
 
 <!-- @spec FR-005: Behavioral TDD step insertion, FR-006: Taxonomy test patterns — .specs/features/005-ui-behavioral-testing/spec.md#fr-005 -->
 
-9. **Behavioral AC detection:** Check whether spec.md contains a `## Behavioral AC` section.
+12. **Behavioral AC detection:** Check whether spec.md contains a `## Behavioral AC` section.
    - If present: extract all declared traits and their test patterns by reading `system/testing/ui-behavioral-taxonomy.md`. Record the list of traits + required test patterns for Phase 2.
    - If absent: no behavioral TDD step is added (AC-008).
    - If taxonomy is missing but `## Behavioral AC` exists: log WARNING — "Behavioral AC declared but taxonomy not found. Behavioral TDD step will be skipped. Create taxonomy or run /spec-specify --no-behavioral." (EC-005 graceful degradation — see taxonomy section 6.)
@@ -125,6 +128,10 @@ flowchart TD
 - Are there any `[DECISION NEEDED]` markers in the plan? Surface them before starting
 
 **Design fidelity:** When implementing UI components, reference the corresponding mockup PNG from `.specs/design/screens/`. Match the layout, colors, and spacing from the mockup. When creating `implementation.md`, add a "Visual Ref" column linking each UI-related FR to its mockup.
+
+**Penflow fidelity:** When implementing UI components for a feature with root `penflow/`, the code must preserve Penflow identifiers and business context. Do not rename `semantic_id` / `test_id` values, drop bindings/entities, or omit validations/side effects from the UI behavior. If the Penflow contract conflicts with a legacy `.specs/flows` or mockup-derived artifact, Penflow wins and the legacy path is reported as fallback.
+
+**From-scratch Penflow:** If root `penflow/` is absent, do not read `.brainstorm/` during implementation. Report Penflow as `ABSENT` and continue only with the approved spec, plan, stack, and current design artifacts.
 
 **Theme enforcement:** If `.specs/design/theme.css` exists, all UI implementation must use its CSS variables (`var(--primary)`, `var(--background)`, etc.) instead of hardcoded color/spacing values. If `theme.md` contains an install command, execute it as Step 0 before any UI code (skip if theme is already installed in the project).
 

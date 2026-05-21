@@ -1,7 +1,7 @@
 ---
 command: spec-specify
 contract_version: "1.0"
-last_reviewed: 2026-05-18
+last_reviewed: 2026-05-21
 ---
 
 # Expectations — /spec-specify
@@ -20,6 +20,7 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
 **stdout must_contain:**
 - "spec.md created"
 - "<feature>"
+- "Penflow contract:"
 
 **stdout must_not_contain:**
 - "Traceback"
@@ -40,6 +41,7 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
 
 **optional:**
 - `.specs/features/<feature>/seed.md`
+- `.specs/features/<feature>/spec.md` section `## Penflow Contract`
 
 **forbidden:**
 - `src/`
@@ -62,6 +64,10 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
   - "User Scenarios"
   - "Acceptance Criteria"
   - "Functional Requirements"
+- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
+  - `ABSENT`: no root `penflow/`; spec is generated from scratch without `.brainstorm/`
+  - `BLOCKED`: UI feature needs Penflow IDs but root artifacts are incomplete
+  - `PASS`: semantic tree was read and IDs were resolved or explicitly clarified
 
 ## 7. Exit Codes
 
@@ -101,6 +107,7 @@ verify:
   must:
     - exit_code: 0
     - contains: "spec.md created"
+    - contains: "Penflow contract"
     - exists: ".specs/features/<feature>/spec.md"
   may:
     - contains: "Gherkin"
