@@ -1,4 +1,5 @@
 <!-- @spec FR-003, FR-004, FR-005, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012: Reference doc — .specs/features/039-command-expectations-and-verify-output/spec.md -->
+<!-- @spec FR-011: Shared command runtime docs — .specs/features/052-deterministic-command-goal-contracts/spec.md#fr-011 -->
 
 # Command Expectations & Verify Output — Reference
 
@@ -196,6 +197,29 @@ discovery list will fail downstream coherence checks.
 `drift` and `error` are explicitly distinguished in the report and JSON
 output: drift = command succeeded but contract diverged; error = command itself
 crashed.
+
+## 8.5 Deterministic Command Goals
+
+Feature 052 layers deterministic runtime goals on top of this expectations system.
+The goal compiler reads the same expectations file resolved by §6, extracts the
+command Definition of Done from `.agent-sync/skills/<X>/SKILL.md`, normalizes
+active flags, and writes a canonical JSON payload with sorted keys and no
+wall-clock fields.
+
+CLI:
+
+```bash
+livespec goal render <command> --feature <feature> --flags "<flags>"
+livespec goal verify <command> --feature <feature> --flags "<flags>" [--run <artifact>]
+```
+
+Rules:
+
+- Same project state + command + feature + flags + expectations + SKILL.md → same canonical JSON and SHA-256 hash.
+- If `.conventions/index.md` exists, the goal embeds selected convention domains, source paths, source content, and content hashes. `code` is selected by default; `design-*` domains are selected for UI/mockup/visual/CSS/screen/theme/baseline/Penflow signals.
+- The rendered objective is a deterministic view of the canonical payload; it is safe to pass to host `create_goal(...)`.
+- `goal verify` reuses the `verify:` YAML rules and the latest run artifact, so it has the same success/drift/error/blocked semantics as `/spec-verify-output`.
+- A slash command may call `update_goal(complete)` only after `goal verify` exits 0.
 
 ## 9. Placeholders & Edge Cases (summary)
 

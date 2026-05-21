@@ -83,6 +83,7 @@
 | 049 | Command Naming Normalization | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/049-command-naming-normalization/spec.md), [plan](features/049-command-naming-normalization/plan.md), [implementation](features/049-command-naming-normalization/implementation.md) |
 | 050 | Agent Sync Migration | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/050-agent-sync-migration/spec.md), [plan](features/050-agent-sync-migration/plan.md), [implementation](features/050-agent-sync-migration/implementation.md) |
 | 051 | Integrate Penflow as LiveSpec Primary UI Contract | Implemented | 2026-05-21 | 2026-05-21 | [spec](features/051-integrate-penflow-primary-ui-contract/spec.md), [plan](features/051-integrate-penflow-primary-ui-contract/plan.md), [implementation](features/051-integrate-penflow-primary-ui-contract/implementation.md) |
+| 052 | Deterministic Command Goal Contracts | Implemented | 2026-05-21 | 2026-05-21 | [spec](features/052-deterministic-command-goal-contracts/spec.md), [plan](features/052-deterministic-command-goal-contracts/plan.md), [implementation](features/052-deterministic-command-goal-contracts/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -106,6 +107,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-05-21 | Bugfix | [Feature 052] Deterministic command goals now embed applicable `.conventions/index.md` domains for code and UI/mockup/visual work |
+| 2026-05-21 | Feature | [Feature 052] Implemented: Deterministic Command Goal Contracts — `livespec goal render/verify`, canonical hashable goal payloads, and expectation-backed completion gates |
 | 2026-05-21 | Feature | [Feature 051] Implemented: Integrate Penflow as LiveSpec primary UI contract — root `penflow/` helper/CLI and command docs while preserving screenshot gates |
 | 2026-05-18 | Feature | [Feature 050] Implemented: Agent Sync Migration — `.agent-sync` is now the canonical source for commands, agents, and rules; cc-hub syncs Claude/Codex outputs |
 | 2026-05-18 | Feature | [Feature 049] Implemented: Command Naming Normalization — canonical `/spec-*` slash commands with dotted aliases |

@@ -7,6 +7,14 @@
 
 ---
 
+## 2026-05-21 — [Feature 052] Fix: 4/4 anchor gaps closed — FR-011/012/014/015 `@spec` annotations added (100% FR verified)
+
+## 2026-05-21 — [Feature 052] Check: 73% FR verified (11/15), 100% AC verified (13/13), 4 FR with anchor gaps only — code complete, tests 12/12
+
+## 2026-05-21 — [Feature 052 Fix]: Deterministic command goals now embed applicable `.conventions/index.md` domains, including code conventions by default and design conventions for UI/mockup/visual tasks.
+
+## 2026-05-21 — [Feature 052]: Implemented: Deterministic Command Goal Contracts — `livespec goal render/verify`, canonical hashable goal payloads, expectation-backed completion gates, and shared anti-drift goal protocol.
+
 ## 2026-05-21 — [Feature 051 Bugfix]: Penflow actual-tree absence now reports `ABSENT` for from-scratch/non-UI runs and `BLOCKED` when UI runtime comparison requires `actual-ui-tree.json`; command expectations now include Penflow verdict outputs.
 
 ## 2026-05-21 — [Feature 051]: Implemented: Integrate Penflow as LiveSpec primary UI contract — root `penflow/` workspace helper + CLI, command docs for init/specify/plan/implement/test/check, Penflow contract gate workflow, and screenshot regression gates preserved.

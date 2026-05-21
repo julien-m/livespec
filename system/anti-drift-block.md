@@ -1,3 +1,5 @@
+<!-- @spec FR-011: Shared command runtime docs — .specs/features/052-deterministic-command-goal-contracts/spec.md#fr-011 -->
+
 # Anti-Drift Block
 
 > Reusable hardened-step template for all LiveSpec `.agent-sync` skills and agents.
@@ -138,6 +140,20 @@ unless an explicit override is declared.
 
 ## 5. Final consistency check (run before declaring DONE)
 
+### Runtime goal contract
+
+Before any slash command starts command-specific work, it MUST compile a deterministic runtime goal:
+
+```bash
+livespec goal render <command-name> --feature <feature-slug> --flags "<active-flags>"
+```
+
+- Use the rendered objective as the `create_goal(...)` objective when the host exposes a goal tool.
+- Persist or report the `goal_hash` in the command's execution notes when possible.
+- The goal is compiled from machine-readable `expectations.md`, the command Definition of Done,
+  normalized flags, and resolved feature state. It MUST NOT be rewritten or improvised by the LLM.
+- If goal rendering is blocked, emit the canonical BLOCKED line (§2) and stop.
+
 Before any command or agent reports `DONE`, verify the following programmatically (or via a
 checklist when programmatic verification is unavailable):
 
@@ -166,6 +182,18 @@ If finalization returns `drift`, `blocked`, or `error`, the slash command MUST
 emit the corresponding canonical ERROR/BLOCKED line and MUST NOT report success.
 `/spec-verify-output` may verify itself only through an already-recorded wrapper
 artifact to avoid recursive verification.
+
+After finalization, run the deterministic goal gate with the same command, feature,
+flags, and run artifact:
+
+```bash
+livespec goal verify <command-name> --feature <feature-slug> --flags "<active-flags>"
+```
+
+- `success` (exit 0): the command may report success and may call `update_goal(complete)`.
+- `drift` or `error` (exit 1): emit `ERROR step=<N> type=verification_failed ...` using the command's final step number and do not complete the goal.
+- `blocked` (exit 2): emit `BLOCKED at step <N> - verification_failed - goal verification blocked` using the command's final step number and return a resumable status.
+- Commands without feature context omit `--feature`; commands without active flags pass an empty flags string.
 
 ---
 
