@@ -12,6 +12,22 @@ argument-hint: "<feature-name>"
 
 > **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — runtime goal contract (§5), 6-field step shape (§1), ERROR/BLOCKED format (§2), finalization gate.
 
+## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
+
+La toute première action lors de `/spec-test` est de poser le goal durable.
+
+1. Résoudre feature et flags à partir des arguments de la commande (lecture seule, aucune action spec-test démarrée).
+2. Rendre le contrat :
+   ```bash
+   livespec goal render spec-test --feature <feature-slug> --flags "<active-flags>"
+   ```
+   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
+3. Appeler `create_goal(<texte intégral rendu>)` avec la totalité de la sortie comme objectif.
+4. La liste "Execution tasks (in order):" du rendu est la **liste de travail active** de ce run — exécuter chaque tâche dans l'ordre, jamais les phases SKILL.md directement.
+
+Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
+Si `create_goal` est indisponible → `BLOCKED at step 0 - dependency_unmet - create_goal unavailable` et stop.
+
 
 <!-- @spec FR-001: component-level snapshots, FR-002: reset-baselines workflow, FR-003: docker-compose gen, FR-004: human approval gate, FR-005: auto mode blocking, FR-006: maxDiffPixels threshold — .specs/features/003-visual-testing-fidelity/spec.md#fr-001 -->
 
