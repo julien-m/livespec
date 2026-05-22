@@ -153,6 +153,13 @@ livespec goal render <command-name> --feature <feature-slug> --flags "<active-fl
 - The goal is compiled from machine-readable `expectations.md`, the command Definition of Done,
   normalized flags, and resolved feature state. It MUST NOT be rewritten or improvised by the LLM.
 - If goal rendering is blocked, emit the canonical BLOCKED line (§2) and stop.
+- **After rendering, read the "Execution tasks (in order):" section from the output. This numbered
+  list is your active working task list for this execution run.** You MUST:
+  1. Execute each task in the numbered order — no reordering, no skipping
+  2. Capture observable evidence of completion before advancing to the next task (§1 form)
+  3. Consult the [`SKILL.md`](SKILL.md) phase descriptions for implementation detail on each task — but do NOT
+     treat the SKILL.md sections as a sequential execution plan; the goal task list is authoritative
+  4. If the goal output contains no `Execution tasks` section, fall back to the [`SKILL.md`](SKILL.md) phases
 
 Before any command or agent reports `DONE`, verify the following programmatically (or via a
 checklist when programmatic verification is unavailable):
