@@ -148,6 +148,15 @@ def refresh_conventions_command(
     conventions_dir.mkdir(parents=True, exist_ok=True)
     stack_text = stack_path.read_text(encoding="utf-8").lower()
     domains = ["code"]
+    if _is_web_ui_stack(stack_text):
+        domains.extend(
+            [
+                "design-tokens",
+                "design-components",
+                "design-views",
+                "design-quality",
+            ]
+        )
     index_path.write_text(_render_conventions_index(repo_root.name, domains), encoding="utf-8")
     manifest_path.write_text(_render_conventions_manifest(domains, stack_text), encoding="utf-8")
     typer.echo("conventions refreshed")
@@ -224,21 +233,97 @@ def _render_conventions_index(project_name: str, domains: list[str]) -> str:
                 "",
             ]
         )
+    if "design-tokens" in domains:
+        lines.extend(
+            [
+                "## design-tokens [CSS, colors, spacing, typography, motion, dark mode]",
+                "→ $AIRESOURCES/design/tokens/colors.md, spacing.md, typography.md, "
+                "motion.md, cross-platform.md",
+                "",
+            ]
+        )
+    if "design-components" in domains:
+        lines.extend(
+            [
+                "## design-components [button, input, form, toast, modal, nav, list, badge]",
+                "→ $AIRESOURCES/design/components/buttons.md, forms.md, navigation.md, "
+                "lists.md, modals.md, feedback.md",
+                "",
+            ]
+        )
+    if "design-views" in domains:
+        lines.extend(
+            [
+                "## design-views [page layout, dashboard, settings, auth, mockup specs]",
+                "→ $AIRESOURCES/design/references/app-views.md, app-views-catalog.md, "
+                "app-ui.md, mockup-specs.md",
+                "",
+            ]
+        )
+    if "design-quality" in domains:
+        lines.extend(
+            [
+                "## design-quality [a11y audit, WCAG, keyboard nav, ARIA, visual QA]",
+                "→ $AIRESOURCES/design/quality/accessibility.md, ui-rules.md",
+                "",
+            ]
+        )
     return "\n".join(lines)
 
 
 def _render_conventions_manifest(domains: list[str], stack_text: str) -> str:
-    stack_hint = "python" if "python" in stack_text else "generic"
+    if _is_web_ui_stack(stack_text):
+        stack_hint = "web"
+    elif "python" in stack_text:
+        stack_hint = "python"
+    else:
+        stack_hint = "generic"
     lines = ["version: 1", f"stack_hint: {stack_hint}", "domains:"]
     for domain in domains:
         lines.append(f"  - name: {domain}")
         lines.append("    files:")
-        lines.append("      - $AIRESOURCES/code-conventions/general.md")
-        lines.append("      - $AIRESOURCES/code-conventions/python.md")
-        lines.append("      - $AIRESOURCES/code-conventions/javascript.md")
-        lines.append("      - $AIRESOURCES/code-conventions/cli.md")
-        lines.append("      - $AIRESOURCES/code-conventions/stack-commands.md")
+        if domain == "code":
+            lines.append("      - $AIRESOURCES/code-conventions/general.md")
+            lines.append("      - $AIRESOURCES/code-conventions/python.md")
+            lines.append("      - $AIRESOURCES/code-conventions/javascript.md")
+            lines.append("      - $AIRESOURCES/code-conventions/cli.md")
+            lines.append("      - $AIRESOURCES/code-conventions/stack-commands.md")
+        elif domain == "design-tokens":
+            lines.append("      - $AIRESOURCES/design/tokens/colors.md")
+            lines.append("      - $AIRESOURCES/design/tokens/spacing.md")
+            lines.append("      - $AIRESOURCES/design/tokens/typography.md")
+            lines.append("      - $AIRESOURCES/design/tokens/motion.md")
+            lines.append("      - $AIRESOURCES/design/tokens/cross-platform.md")
+        elif domain == "design-components":
+            lines.append("      - $AIRESOURCES/design/components/buttons.md")
+            lines.append("      - $AIRESOURCES/design/components/forms.md")
+            lines.append("      - $AIRESOURCES/design/components/navigation.md")
+            lines.append("      - $AIRESOURCES/design/components/lists.md")
+            lines.append("      - $AIRESOURCES/design/components/modals.md")
+            lines.append("      - $AIRESOURCES/design/components/feedback.md")
+        elif domain == "design-views":
+            lines.append("      - $AIRESOURCES/design/references/app-views.md")
+            lines.append("      - $AIRESOURCES/design/references/app-views-catalog.md")
+            lines.append("      - $AIRESOURCES/design/references/app-ui.md")
+            lines.append("      - $AIRESOURCES/design/references/mockup-specs.md")
+        elif domain == "design-quality":
+            lines.append("      - $AIRESOURCES/design/quality/accessibility.md")
+            lines.append("      - $AIRESOURCES/design/quality/ui-rules.md")
     return "\n".join(lines) + "\n"
+
+
+def _is_web_ui_stack(stack_text: str) -> bool:
+    web_markers = (
+        "web",
+        "frontend",
+        "react",
+        "vite",
+        "next",
+        "dashboard",
+        "browser",
+        "typescript",
+    )
+    return any(marker in stack_text for marker in web_markers)
 
 
 __all__ = [

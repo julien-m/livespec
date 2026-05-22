@@ -215,12 +215,25 @@ Before generating spec.md, check the target feature directory for seed context:
 
 For UI features, prefer root `penflow/semantic-ui-tree.json` over legacy `.specs/flows/`, `native_behavioral`, or mockup-derived behavior.
 
-1. Run `livespec penflow-contract status --project . --json`.
-2. If status is `ready`, read `penflow/semantic-ui-tree.json`.
-3. Resolve matching `flow_id`, `screen_id`, `semantic_id`, and `test_id` by exact feature slug, screen id, visible text, or source map. Do not invent IDs.
-4. Add a `## Penflow Contract` section to `spec.md` listing the resolved IDs and any `[NEEDS CLARIFICATION]` mappings.
-5. If status is `absent`, proceed from scratch without Brainstorm: use the feature request, stack, and design workflow to define the UI contract, and do not read `.brainstorm/` as fallback behavior.
-6. If status is `incomplete` for a UI feature, report the missing Penflow files and continue only with explicit `[NEEDS CLARIFICATION]` markers.
+**From-Scratch Penflow Forward Contract:** if status is `absent` for a UI feature, run the same forward setup before generating `spec.md`:
+
+```bash
+penflow validate-flow-specs penflow/flow-ui-contract --json
+penflow export-semantic-tree penflow/flow-ui-contract --out penflow/semantic-ui-tree.json --json
+penflow validate-semantic-tree penflow/semantic-ui-tree.json --json
+penflow draft-pen-from-tree penflow/semantic-ui-tree.json --out penflow/ui.pen --json
+penflow validate-pen penflow/ui.pen --json
+penflow export-expected penflow/ui.pen --out penflow/expected-ui-tree.json --json
+penflow code-ir --from-context penflow/ui.pen --semantic-tree penflow/semantic-ui-tree.json --flow-id <feature_slug> --flow-name "<feature_description>" --out penflow/code-ir.json --json
+livespec penflow-contract status --project . --target web-desktop --json
+```
+
+1. Run `livespec penflow-contract status --project . --target web-desktop --json` for web desktop features; otherwise run `livespec penflow-contract status --project . --json`.
+2. If status is `absent` for a UI feature, create `penflow/flow-ui-contract/flows/<feature_slug>.md` and `penflow/flow-ui-contract/screens/<screen_id>.md`, then execute the From-Scratch Penflow Forward Contract. Do not read `.brainstorm/`.
+3. If status is `ready`, read `penflow/semantic-ui-tree.json` and `penflow/code-ir.json`.
+4. Resolve matching `flow_id`, `screen_id`, `semantic_id`, and `test_id` by exact feature slug, screen id, visible text, or source map. Do not invent IDs.
+5. Add a `## Penflow Contract` section to `spec.md` listing the resolved IDs and any `[NEEDS CLARIFICATION]` mappings.
+6. If status is `incomplete` for a UI feature, report `BLOCKED - penflow_forward_contract_failed` unless the missing mapping is explicitly marked `[NEEDS CLARIFICATION]` inside the generated flow/screen contract.
 
 ### Step 2 — Auto-Number the Feature (atomic reservation)
 

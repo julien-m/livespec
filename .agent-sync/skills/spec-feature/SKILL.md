@@ -6,7 +6,7 @@ description: Migrated Claude command /spec-feature
 # /spec-feature
 
 ---
-description: "Full feature pipeline: specify → plan → review → implement → test → commit"
+description: "Full feature pipeline: specify → plan → review → implement → test"
 argument-hint: "[feature description]"
 ---
 
@@ -29,15 +29,17 @@ Runs the full LiveSpec pipeline in a single command:
 ```mermaid
 flowchart TD
     START(["/spec-feature"]) --> ARG{"Argument\nprovided?"}
-    ARG -->|"yes"| P1
+    ARG -->|"yes"| P05["Phase 0.5\nPenflow forward contract\n(UI features)"]
     ARG -->|"no"| RESOLVE["Phase 0\nRoadmap resolution\n(main context, inline)"]
     RESOLVE --> CONFIRM{"User\nconfirms?"}
-    CONFIRM -->|"yes"| P1
+    CONFIRM -->|"yes"| P05
     CONFIRM -->|"no / empty"| ABORT
+    P05 -->|"non-UI or PASS"| P1
+    P05 -->|"BLOCKED"| ABORT
     P1["Spawn: Specify Agent\n(Phase 1 + 1.5)\nFresh context"]
     P1 --> PR1{"PHASE_RESULT\nspecify?"}
     PR1 -->|"BLOCKED"| ABORT
-    PR1 -->|"OK"| G1["Gate 1 + Branch proposal\n(main context)"]
+    PR1 -->|"OK"| G1["Gate 1\n(main context)"]
     G1 -->|"fix → re-spawn"| P1
     G1 -->|"abort"| ABORT(["Aborted"])
     G1 -->|"continue"| P2["Spawn: Plan Agent\n(Phase 2 + 2.5)\nFresh context"]
@@ -113,7 +115,7 @@ This convention is mirrored by `.agent-sync/agents/livespec-documenter/prompt.md
 
 > **Canonical contract (Chantier 2 / Feature 014):** the JSON-with-delimiter format defined in [`system/contracts/PHASE_RESULT.md`](../system/contracts/PHASE_RESULT.md) is the canonical form going forward. The legacy key-value blocks documented below remain parseable for backward compatibility but emit a `DeprecationWarning`. Use [`validator/contracts.py`](../validator/contracts.py) `parse_phase_result()` to consume agent output.
 
-Each phase agent **must** output a PHASE_RESULT block as its **last output**. The main context parses these fields to drive gates, branch proposals, and pipeline state updates. Field names are exact — no deviation.
+Each phase agent **must** output a PHASE_RESULT block as its **last output**. The main context parses these fields to drive gates and pipeline state updates. Field names are exact — no deviation.
 
 ### Universal Agent Contract
 
@@ -124,7 +126,7 @@ feature_name: NNN-feature-name          ← exact slug, e.g. 004-notifications
 feature_dir:  .specs/features/NNN-feature-name/
 feature_description: <original feature description text>
 active_flags: --auto --mono (etc.)
-conventions: <mandatory read list — sub-domains + ai-ressources file paths derived from .conventions/index.md, or NONE if .conventions/index.md is absent>
+conventions: <mandatory read list — sub-domains + ai-ressources file paths derived from .conventions/index.md, or NONE only if conventions refresh fails>
 ```
 
 The agent uses `feature_name` for all `livespec pipeline update` CLI calls.
@@ -194,6 +196,19 @@ These are two distinct protocols at different scopes:
 
 **Phase 3.5 (Test) dual output:** Phase 3.5 emits PHASE_RESULT for the main context AND preserves the existing `SHIP_RESULT: BLOCKED` when AC failures are detected and the pipeline is called from `/spec-ship`. Both are preserved — they serve different consumers.
 
+### Phase Agent Timeout and Artifact Recovery
+
+Phase agents must stop immediately after emitting `PHASE_RESULT`; no phase agent may keep editing README, changelog, or other docs after its required artifact and compact result are ready. The supervisor owns forward progress.
+
+If a phase agent reaches the command timeout, exits without a parseable `PHASE_RESULT`, or is interrupted, the supervisor must inspect artifacts before blocking:
+
+- Specify recovery: if `spec.md` exists but no PHASE_RESULT, parse `.specs/features/NNN-feature-name/spec.md`; if required sections exist and no `[DECISION NEEDED]` markers remain, synthesize `PHASE_RESULT: OK`, run `livespec pipeline update --feature NNN-feature-name --phase specify --status done --timestamp`, and continue to Gate 1. If missing, print `BLOCKED - phase_agent_timeout - specify missing spec.md or required sections`.
+- Plan recovery: if `plan.md exists but no PHASE_RESULT`, parse `.specs/features/NNN-feature-name/plan.md`; if it has Summary, Technical Context, Constitution Check, Implementation Plan, Testing Strategy, and no `[DECISION NEEDED]`, synthesize `PHASE_RESULT: OK`, run `livespec pipeline update --feature NNN-feature-name --phase plan --status done --timestamp`, and continue to Phase 2.5. If missing, print `BLOCKED - phase_agent_timeout - plan missing plan.md or required sections`.
+- Implement recovery: if `progress.md` and `implementation.md` exist but no PHASE_RESULT, verify app code changed, requirement mappings exist, and declared tests ran; then synthesize `PHASE_RESULT: OK`, run `livespec pipeline update --feature NNN-feature-name --phase implement --status done --timestamp`, and continue to Phase 3.5. If missing, print `BLOCKED - phase_agent_timeout - implement missing progress.md, implementation.md, code changes, or test proof`.
+- Test recovery: if test report artifacts exist but no PHASE_RESULT, parse pass/fail counts; continue only on zero failures. Otherwise print `BLOCKED - phase_agent_timeout - test result unavailable`.
+
+This recovery is not a bypass: it only converts already-written, validated phase artifacts into the compact result the supervisor needed.
+
 ### FINDINGS_DETAIL injection on retry
 
 When the main context re-spawns a phase agent due to review findings (in `--auto` mode or when the user requests a fix), `FINDINGS_DETAIL` is injected **directly into the agent prompt text**, appended after the base instructions:
@@ -217,10 +232,10 @@ The agent receives this as part of its initial prompt — no file write, no para
 spec-feature — Main Context (supervisor)
   │
   ├── [Phase 0]   Roadmap resolution (inline — user interaction)
+  ├── [Phase 0.5] From-Scratch Penflow Forward Contract (UI features)
   ├── [Phase 1]   Spawn → Specify Agent  (fresh context)
   │     └── Receives PHASE_RESULT (specify)
   ├── [Gate 1]    Display spec review findings + user decision (inline)
-  ├── [Branch]    Propose/create branch (inline)
   ├── [Phase 2]   Spawn → Plan Agent  (fresh context)
   │     └── Receives PHASE_RESULT (plan)
   ├── [Gate 2]    Display plan review findings + user decision (inline)
@@ -233,11 +248,11 @@ spec-feature — Main Context (supervisor)
 
 **What stays inline (main context):**
 - Phase 0: roadmap read + user confirmation + pipeline.md init
+- Phase 0.5: UI feature detection + Penflow forward contract generation/status gate
 - Gate 1 and Gate 2: display PHASE_RESULT findings, wait for user decision
-- Branch proposal: `git checkout -b feature/NNN-name` call
 - Phase 2.7: `livespec pipeline update` + `/spec-preflight --light` CLI calls
 - All `livespec pipeline update --status in_progress` calls before spawning each agent
-- Auto-commit sequence after Phase 3.5
+- Repository history guard after Phase 3.5
 
 **What runs in phase agents (isolated context):**
 - All file reads (spec.md, plan.md, constitution.md, stack.md, and every `ai-ressources/` file listed in the conventions payload)
@@ -269,10 +284,8 @@ spec-feature — Main Context (supervisor)
 
 | Flag | What it does |
 |------|-------------|
-| `--auto`, `-a` | Skip user gates. If spec or plan review returns findings → re-spawns the phase agent with `FINDINGS_DETAIL` injected into the prompt (max 2 retries each). Aborts if BLOCKING remain after 2 retries; proceeds if only WARNING/INFO remain. **Also commits automatically** at the end when audit + tests pass (see § Auto-Commit) |
+| `--auto`, `-a` | Skip user gates. If spec or plan review returns findings → re-spawns the phase agent with `FINDINGS_DETAIL` injected into the prompt (max 2 retries each). Aborts if BLOCKING remain after 2 retries; proceeds if only WARNING/INFO remain. Never creates repository history. |
 | `--resume`, `-r` | Resume the pipeline where it stopped (reads `pipeline.md`, spawns the first non-Done phase agent with the full resume state envelope — see § Resume) |
-| `--branch`, `-b` | Create a git branch `feature/NNN-name` immediately after spec review gate, no question asked |
-| `--no-branch`, `-B` | Skip the branch proposal entirely |
 | `--priority`, `-p` `P1\|P2\|P3` | Force all user stories in the spec to the given priority (P1=critical/MVP, P2=important, P3=nice-to-have) — passed to the Specify agent |
 | `--mono`, `-m` | Single-agent mode for the **implement phase's internal orchestration** only (no Superpowers sub-dispatch within implement). Does **not** disable the feature-level supervisor pattern — Specify, Plan, Implement, and Test still run as separate agents. |
 | `--economy`, `-e` | Disable **all** sub-agent dispatch: (1) feature-level supervisor — all phases run inline in the main context; (2) implement-level orchestration — no Superpowers sub-dispatch within implement. Preserves the exact pre-supervisor behavior end-to-end. Use for token-constrained environments. |
@@ -287,8 +300,10 @@ spec-feature — Main Context (supervisor)
 Create `.specs/features/NNN-feature-name/pipeline.md` to track pipeline state using the CLI:
 
 ```
-Run: livespec pipeline init --feature NNN-feature-name
+Run: livespec pipeline init --feature NNN-feature-name --description "<original feature description>" --flags "<normalized active flags>"
 ```
+
+Do not write `pipeline.md` by hand. Pass the original quoted description and normalized active flags to `livespec pipeline init`; for `/spec-feature "..." --auto --mono`, preserve `--auto --mono` exactly in the `--flags` value.
 
 This file is **distinct from `progress.md`** (which tracks individual implementation steps).
 
@@ -339,10 +354,71 @@ When no feature description is provided:
 
 After confirming the feature description:
 
-6. Run: `livespec pipeline init --feature NNN-feature-name`
-7. Write `Feature Description: <resolved description>` to the `pipeline.md` header (see § State Tracking). This persists the description for `--resume` without re-asking the user.
+6. Run: `livespec pipeline init --feature NNN-feature-name --description "<resolved description>" --flags "<normalized active flags>"`
+7. Verify `pipeline.md` contains `**Flags:**` with the normalized flags and `**Feature Description:** <resolved description>`. This persists the description for `--resume` without re-asking the user.
 
-When a feature description is provided → skip this phase entirely, proceed to Phase 1 as before.
+When a feature description is provided → resolve slug, initialize pipeline, then run Phase 0.5. A provided description skips only roadmap selection, never the Penflow forward contract gate for UI features.
+
+---
+
+## Phase 0.5 — From-Scratch Penflow Forward Contract (UI features)
+
+Run this phase after `feature_slug` and `feature_description` are resolved, before spawning Specify. Non-UI features may skip it with `Penflow Contract Verdict: ABSENT`; UI features must leave root `penflow/` ready before `/spec-specify`.
+
+Phase 0.5 is a synchronous hard gate. Do not mark Specify `In Progress`, do not spawn Specify, and do not write or edit application code until `livespec penflow-contract status --project . --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json` returns `PASS` for web desktop UI features.
+
+**UI detection:** treat the feature as UI when the description or roadmap item mentions screens, pages, dashboards, filters, forms, cards, navigation, layout, visual state, frontend, React, web UI, or user-facing interaction. In `--auto`, classify conservatively as UI when uncertain.
+
+**Convention Gate:** before generating `flow-ui-contract`, before `penflow draft-pen-from-tree`, and before implementation and tests, ensure `.conventions/index.md` exists. If it is absent, run `livespec conventions refresh --repo . --full` before generating `flow-ui-contract`, then build the conventions payload from `.conventions/index.md`. For web dashboard/UI features the payload must include `design-tokens`, `design-components`, `design-views`, and `design-quality` when those sub-domains exist, plus `code` for code/test phases. If any required UI sub-domain is missing from `.conventions/index.md`, record `conventions: missing-ui-domains` in the phase output and continue only if the project genuinely has no matching convention entry. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
+
+**From-Scratch Penflow Forward Contract:**
+
+1. Store feature-scoped design proof artifacts under `.specs/features/<feature_slug>/design/`: `.specs/features/<feature_slug>/design/flow-ui-contract/`, `.specs/features/<feature_slug>/design/ui.pen`, and `.specs/features/<feature_slug>/design/validation/`. The root `penflow/` is compatibility/cache for Penflow CLI inputs and copied/generated mirrors only.
+2. If root `penflow/` is absent for a UI feature, create `penflow/flow-ui-contract/flows/<feature_slug>.md` and one or more `penflow/flow-ui-contract/screens/<screen_id>.md` files from the feature request, then mirror them to `.specs/features/<feature_slug>/design/flow-ui-contract/`. This is command-owned contract generation, not manual artifact fabrication. Use stable `flow_id`, `screen_id`, `semantic_id`, and `test_id` values derived from `feature_slug`; mark uncertain behavior `[NEEDS CLARIFICATION]`.
+   - Use binding-safe snake_case screen IDs and screen filenames because Penflow derives data bindings as `<screen_id>.<field_name>`.
+   - Do not use kebab-case screen IDs: `bookings_dashboard.appointment_card` is valid; `bookings-dashboard.appointment_card` fails `binding_format`.
+   - In each screen frontmatter, set `screen: <snake_case_screen_id>` and `mockup: <snake_case_screen_id>.png`.
+   - For web desktop features, every screen frontmatter must also set `platform: web-desktop` and `viewport: "1440x900"` so generated mockups cannot fall back to mobile frame dimensions.
+   - Keep `flow:` as the flow slug from the flow file; screen IDs are allowed to differ from the flow slug.
+   - In `## Données affichées`, describe visible data in plain language. Do not write placeholder field names such as `ui.pageTitle`, `appointment.clientName`, or `appointment.serviceType`.
+   - Visible data bullets must start with a letter or underscore after slugification because Penflow derives binding fields from the bullet text. Rewrite numeric starts: `Three-column appointment card grid` is valid; `3-column appointment card grid` fails `binding_format`.
+   - Escape/backdrop must be flow transitions only. Do not add `Escape key`, `Backdrop click`, or `Click backdrop` as visible action rows in screen specs; only visible controls such as a close icon/button belong in `## Actions`.
+3. If root `penflow/` exists, do not overwrite existing files; add only missing flow/screen contract files for this feature and sync feature-owned copies.
+4. Resolve the Penflow executable before running any forward command:
+   - Prefer `penflow` from `PATH`.
+   - If missing and `/Users/julienm/projects/penflow/.venv/bin/penflow` exists, use that absolute executable for every Penflow command in this phase.
+   - If no executable is available, print `BLOCKED at step 0.5 - penflow_cli_missing - install or expose penflow` and stop.
+   - Never manually fabricate `ui.pen`, `semantic-ui-tree.json`, `expected-ui-tree.json`, or `code-ir.json` as a fallback for a missing Penflow CLI.
+5. Run the Penflow forward chain exactly from project root, replacing `penflow` with the resolved executable when needed:
+   ```bash
+   penflow validate-flow-specs penflow/flow-ui-contract --json
+   penflow export-semantic-tree penflow/flow-ui-contract --out penflow/semantic-ui-tree.json --json
+   penflow validate-semantic-tree penflow/semantic-ui-tree.json --json
+   penflow draft-pen-from-tree penflow/semantic-ui-tree.json --out penflow/ui.pen --json
+   penflow validate-pen penflow/ui.pen --json
+   penflow export-expected penflow/ui.pen --out penflow/expected-ui-tree.json --json
+   penflow code-ir --from-context penflow/ui.pen --semantic-tree penflow/semantic-ui-tree.json --flow-id <feature_slug> --flow-name "<feature_description>" --out penflow/code-ir.json --json
+   ```
+6. Run `livespec penflow-contract status --project . --target web-desktop --json` when stack/platform is web desktop; otherwise run `livespec penflow-contract status --project . --json`.
+7. Copy `penflow/ui.pen` and validation JSON/report outputs into `.specs/features/<feature_slug>/design/` and `.specs/features/<feature_slug>/design/validation/`.
+8. **Global LiveSpec Design Registry:** promote the generated Penflow design into the project-level registry used by `/spec-test`, `/spec-check`, and visual review:
+   - Copy `penflow/ui.pen` to `.specs/design/ui.pen`.
+   - Export the Penflow/Pencil mockup PNGs from `.specs/design/ui.pen` into `.specs/design/screens/<feature_slug>/`, using each screen spec's `mockup:` filename when present.
+   - Create `.specs/design/baselines/<feature_slug>/` as the destination for runtime screenshots later synced by `/spec-test`.
+   - Update `.specs/design/screens/index.md` with one row per exported mockup and source `Penflow generated mockup`.
+   - Update `.specs/design/changelog.md` with the feature slug, exported screens, source `penflow/ui.pen`, and current date.
+   - If the Pencil renderer/exporter is unavailable, or if no PNG is exported for a Penflow-backed UI screen, print `BLOCKED at step 0.5 - design_registry_sync_failed - Mockups missing for Penflow UI feature: <screen_names>` and stop. Do not treat a structurally valid `ui.pen` as visually validated.
+   - Re-run `livespec penflow-contract status --project . --target web-desktop --require-design-registry --feature NNN-feature-name --json` and require verdict `PASS`.
+9. **Mockup Factory UX Gate:** invoke `mockup-factory` from the workflow before Phase 1 and before any application code:
+   - Use the Penflow-local `mockup-factory` skill on root `penflow/` with the generated `flow-ui-contract`, `semantic-ui-tree.json`, `ui.pen`, `expected-ui-tree.json`, and `code-ir.json` as anchors.
+   - Run or record the Mockup Factory anchor checks: `penflow map-pencil-context penflow/ui.pen penflow/semantic-ui-tree.json --out penflow/pencil-context-map.json --json`, `penflow detect-drift penflow/flow-ui-contract penflow/semantic-ui-tree.json penflow/ui.pen --out .mockup-validation/NNN-feature-name/drift-report.json --markdown .mockup-validation/NNN-feature-name/drift-report.md --json`, and the visual evidence gate for every exported screen.
+   - Write `.mockup-validation/audit-report.md`, `.mockup-validation/NNN-feature-name/checklist.md`, `.mockup-validation/NNN-feature-name/manifest.json`, `.mockup-validation/NNN-feature-name/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and one exported PNG per audited screen.
+   - Require `.mockup-validation/visual-evidence/manifest.json` status `PASS`. `PASSED_WITH_WARNINGS`, `ESCALATED`, `BLOCKED`, or `BLOCKED_VISUAL_NOT_RUN` blocks `/spec-feature` because desktop UI mockups must be modern, non-mobile, free of placeholder field text, free of overflow, and visually inspected before code.
+   - Re-run `livespec penflow-contract status --project . --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json` and require verdict `PASS`.
+10. Verify these paths exist before Phase 1: `penflow/`, `penflow/flow-ui-contract/`, `penflow/ui.pen`, `penflow/semantic-ui-tree.json`, `penflow/expected-ui-tree.json`, `penflow/code-ir.json`, `penflow/pencil-context-map.json`, `.specs/features/<feature_slug>/design/ui.pen`, `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, `.specs/design/changelog.md`, `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`.
+11. If any command fails, status is not `PASS`, or any path is missing, print `BLOCKED at step 0.5 - penflow_forward_contract_failed - missing: <paths>` and stop. Do not continue to code against a bad mockup.
+
+These files are the primary UI behavior contract for Specify, Plan, Implement, and Test. `.brainstorm/` is not a fallback in from-scratch mode.
 
 ---
 
@@ -357,7 +433,7 @@ When a feature description is provided → skip this phase entirely, proceed to 
    - `feature_dir`: `.specs/features/NNN-feature-name/`
    - `feature_description`: from CLI argument or from `pipeline.md` Feature Description field
    - `active_flags`: `--priority P1` (if provided), `--auto` (if active)
-   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` if `.conventions/index.md` is absent.
+   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
 3. Spawn a **Specify agent** with the assembled Universal Agent Context and these instructions:
 
@@ -396,7 +472,7 @@ The main context displays findings and handles the user decision.
 
 **If `REVIEW: PASS` in PHASE_RESULT:**
 
-In `--auto` mode: proceed to Branch Proposal immediately.
+In `--auto` mode: proceed to Phase 2 immediately after Gate 1 succeeds.
 
 Interactive gate:
 > Phase 1 complete — Spec: `.specs/features/NNN-feature-name/spec.md`
@@ -418,7 +494,7 @@ Display gate with `FINDINGS_DETAIL` verbatim from PHASE_RESULT:
 > Type **continue** to proceed, describe changes to fix, or **abort**.
 
 **User options (interactive):**
-1. **continue** → proceed to Branch Proposal
+1. **continue** → proceed to Phase 2
 2. **describe changes** → re-spawn Specify agent with the change description appended to the base prompt (per FINDINGS_DETAIL injection mechanism in § PHASE_RESULT Schemas)
 3. **abort** → stop pipeline
 
@@ -428,22 +504,9 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --
 
 ---
 
-## Branch Proposal (Main Context, after Gate 1)
+## Repository History Guard (Main Context, after Gate 1)
 
-After Gate 1 resolves (user types **continue** or `--auto` proceeds), determine whether a git branch is needed. Use `SCOPE` and `FEATURE` fields from the Specify agent's PHASE_RESULT.
-
-- **`--branch` provided:** Run `git checkout -b feature/NNN-name` immediately, no question asked.
-- **`--no-branch` provided:** Skip entirely.
-- **Neither flag (default):**
-  - `SCOPE: M` or `SCOPE: L` → propose branch
-  - `SCOPE: S` → skip (no branch needed for small features)
-  - **`SCOPE` field absent or malformed** → default to **propose** (safe default — user can decline)
-
-> **When proposing:**
-> [One sentence explaining why a branch is recommended for this feature.]
-> Create branch `feature/NNN-name`? (yes / no)
-
-Once branch decision is resolved, spawn the Plan agent (Phase 2).
+After Gate 1 resolves, do not create branches, commits, tags, pushes, or any other repository history changes unless the current user request explicitly asks for that exact action. `/spec-feature` itself only edits working-tree files and pipeline metadata. Once this guard is acknowledged, spawn the Plan agent (Phase 2).
 
 ---
 
@@ -458,7 +521,7 @@ Once branch decision is resolved, spawn the Plan agent (Phase 2).
    - `feature_dir`: `.specs/features/NNN-feature-name/`
    - `feature_description`: from `pipeline.md` Feature Description field
    - `active_flags`: `--auto` (if active)
-   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` if `.conventions/index.md` is absent.
+   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
 3. Spawn a **Plan agent** with the assembled Universal Agent Context and these instructions:
 
@@ -472,12 +535,14 @@ Once branch decision is resolved, spawn the Plan agent (Phase 2).
    `.agent-sync/skills/spec-feature/SKILL.md § Phase 2.5`: dispatch the livespec-verifier agent in
    plan-review mode, collect its report, and include it in your PHASE_RESULT.
 
-   Output a PHASE_RESULT block (Plan agent schema from § PHASE_RESULT Schemas)
-   as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
-   ```
+	   Output a PHASE_RESULT block (Plan agent schema from § PHASE_RESULT Schemas)
+	   as the LAST thing you output, then stop immediately. Do not keep editing docs after plan.md is written.
+	   Do not ask the user any questions — proceed autonomously.
+	   ```
 
 4. Receive PHASE_RESULT from the Plan agent.
-   - If `PHASE_RESULT: BLOCKED` → display error, run `livespec pipeline update --feature NNN-feature-name --phase plan --status blocked`, stop.
+	   - If `PHASE_RESULT: BLOCKED` → display error, run `livespec pipeline update --feature NNN-feature-name --phase plan --status blocked`, stop.
+	   - If the agent exits or times out after writing `plan.md` but without PHASE_RESULT, apply § Phase Agent Timeout and Artifact Recovery before blocking.
 
 5. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status done --timestamp`
    *(Only if PHASE_RESULT: OK)*
@@ -546,7 +611,7 @@ This ensures all tools and credentials are available before the autonomous imple
    - `feature_dir`: `.specs/features/NNN-feature-name/`
    - `feature_description`: from `pipeline.md` Feature Description field
    - `active_flags`: `--mono` (if provided), `--step` (if provided), `--resume` (if provided), `--auto` (if active)
-   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` if `.conventions/index.md` is absent.
+   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
 3. Spawn an **Implement agent** with the assembled Universal Agent Context and these instructions:
 
@@ -589,14 +654,33 @@ This ensures all tools and credentials are available before the autonomous imple
    as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
    ```
 
-3. Receive PHASE_RESULT from the Test agent.
+3. **Phase 3.5 Runtime Evidence Gate** — for UI features with root `penflow/`, the Test agent must prove real rendered runtime fidelity before it may emit success:
+   - Open the implemented app in a real browser at `1440x900`.
+   - Capture screenshots from that browser session.
+   - Sync every approved runtime screenshot to `.specs/design/baselines/<feature_slug>/` and keep the feature-local copy under `.specs/features/<feature_slug>/baselines/`.
+   - Require the Global LiveSpec Design Registry paths `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md` before allowing Phase 3.5 success.
+   - Emit `penflow/actual-ui-tree.json` from the visible DOM/runtime accessibility surface. Do not copy or derive it from `penflow/expected-ui-tree.json`.
+   - Run:
+     ```bash
+     livespec penflow-contract status --project . --require-actual --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json
+     penflow validate-actual penflow/actual-ui-tree.json --schema --json
+     penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json --out penflow/compare-report.json --markdown penflow/compare-report.md --json
+     penflow review-report penflow/compare-report.json --out penflow/review-report.md
+     penflow fix-report penflow/compare-report.json --out penflow/fix-report.md
+     ```
+   - Require `Penflow Contract Verdict: PASS` only after the raw `penflow/compare-report.json` has `status: PASS` and zero `issues`; if the raw compare report is `FAIL`, missing, invalid, or has any issue, block and keep iterating.
+   - If the design registry has no matching mockup PNGs for a Penflow-backed UI feature, block with `Visual Gate Verdict: BLOCKED` and `Mockups missing for Penflow UI feature`; do not fall back to auto-approval.
+   - If the app does not expose enough `data-semantic-id`, `data-testid`, ARIA role, or visible text to build an actual tree from the browser, block and fix the implementation. Do not fabricate the runtime artifact.
+   - Do not run `livespec pipeline update --feature NNN-feature-name --phase test --status done`, do not report the visual gate as passed, and before emitting `PHASE_RESULT: OK`, confirm the runtime evidence gate passes.
 
-4. If `PHASE_RESULT: BLOCKED` (❌ AC coverage failures):
+4. Receive PHASE_RESULT from the Test agent.
+
+5. If `PHASE_RESULT: BLOCKED` (❌ AC coverage failures):
    - Interactive mode: report failures, no commit
    - Called from `/spec-ship`: output `SHIP_RESULT: BLOCKED` with test failure details
    Note: the Test agent emits PHASE_RESULT for the main context; the `SHIP_RESULT: BLOCKED` signal is the final external output of the entire pipeline when called from ship context. Both are preserved — they serve different consumers (main context vs ship orchestrator).
 
-5. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status done --timestamp`
+6. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status done --timestamp`
    *(Only if PHASE_RESULT: OK or only partial/warning AC coverage)*
 
 In `--auto` mode: no confirmation prompts, proceeds automatically.
@@ -645,7 +729,7 @@ When `--resume` is provided:
      - If absent (older pipeline.md): fall back to `title` field in `spec.md` frontmatter
      - If spec.md also absent: prompt user for the feature description
    - `active_flags`: original flags from `pipeline.md` Flags field + `--resume`
-   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` if `.conventions/index.md` is absent.
+   - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 5. Spawn the appropriate phase agent (Specify / Plan / Implement / Test) with the resume state envelope and `--resume` in the instructions.
    - For the **Implement agent**: the agent reads `progress.md` internally to resume at the first non-Done step.
 6. If `pipeline.md` doesn't exist (exit 1) → start fresh from Phase 1 (spawn Specify agent with original description)
@@ -654,37 +738,22 @@ When `--resume` is provided:
 
 ---
 
-## Auto-Commit (`--auto` only)
+## Git Finalization
+
+No commits are made by `/spec-feature` unless the user explicitly asks for a commit in the current request. Auto mode prepares commit context only; it must not invoke `/git.commit`, `git commit`, `git push`, or any wrapper that commits.
 
 When `--auto` is active and Phase 3.5 (Test) completes successfully:
 
-1. Run `/audit --fix` — Codex audits and fixes in a single pass. If violations remain → abort (no commit)
-2. Verify all tests pass
-3. Run: `livespec git stage --feature NNN-feature-name`
-   (Stages all feature files + modified roadmap.md and changelog.md)
-
-4. **Resolve commit hook** from 3 levels (global → project → local), applying inheritance rules from `system/hooks.md`:
-   - `~/.claude/livespec/hooks/commit.md`
-   - `.specs/hooks/commit.md`
-   - `.specs/hooks/commit.local.md`
-
-5. Run: `livespec commit-context write --feature NNN-feature-name`
-   (Writes `.specs/hooks/.commit-context.json` with resolved spec/plan/ADR paths)
-
-   Run: `livespec commit-context read`
-   (Read JSON output — use `spec_path`, `plan_path`, `adr_paths` in hook invocation step 6)
-
-6. **If commit hook found:** inject resolved hook content into context, follow its instructions (e.g., invoke `/git.commit "feat({{feature_name}}): <message>" --intent "implements {{feature_name}} — spec: {{spec_path}}, plan: {{plan_path}}, ADRs: {{adr_paths}}"`)
-
-7. **If no commit hook at any level:** invoke `/git.commit` without `--intent` (standard commit with Codex audit, no implementation intent)
-
-8. After `/git.commit` succeeds, run: `livespec commit-context clear`
-   (Removes `.specs/hooks/.commit-context.json`)
-
-9. Run the following for each phase to mark all complete:
+1. Run `/audit --fix` — Codex audits and fixes in a single pass. If violations remain → abort.
+2. Verify all tests pass.
+3. Run: `livespec git stage --feature NNN-feature-name` only when the user explicitly requested staging; otherwise leave files unstaged.
+4. Resolve commit hook from 3 levels (global → project → local) only to prepare context, applying inheritance rules from `system/hooks.md`.
+5. Run `livespec commit-context write --feature NNN-feature-name` and `livespec commit-context read` only when an explicit commit request will be executed next.
+6. If no explicit commit request exists, print `Commit: skipped - no explicit user authorization`.
+7. Run the following for each phase to mark all complete:
    `livespec pipeline update --feature NNN-feature-name --phase <phase> --status done --timestamp`
 
-**Without `--auto`:** no commit is made. The user commits manually.
+Interactive mode also makes no commit. The user commits manually or invokes `/git.commit` separately.
 
 ---
 
@@ -697,8 +766,7 @@ When `/spec-feature` is called by `/spec-ship` (via a spawned agent), the pipeli
 ```
 SHIP_RESULT: OK
 FEATURE: NNN-feature-name
-BRANCH: feature/NNN-feature-name
-COMMIT: <commit hash>
+HISTORY: skipped - no explicit user authorization
 FILES_CHANGED: <count>
 TESTS: <passed> passed, <failed> failed
 ```
@@ -708,7 +776,6 @@ TESTS: <passed> passed, <failed> failed
 ```
 SHIP_RESULT: BLOCKED
 FEATURE: NNN-feature-name
-BRANCH: feature/NNN-feature-name
 PHASE: <phase that failed>
 ERROR: <one-line description>
 ```
@@ -727,7 +794,7 @@ When all phases are done, display:
 > - Plan: `.specs/features/NNN-feature-name/plan.md`
 > - Review: PASS (or SKIPPED)
 > - Implementation: Done
-> - Commit: `<hash>` (if `--auto`)
+> - Commit: skipped - no explicit user authorization
 >
 > **Next:**
 > - Verify: `/spec-check NNN-feature-name`
@@ -765,7 +832,7 @@ If any phase fails:
 /spec-feature "Real-time notifications" --mono
 
 # Pipeline with specify flags
-/spec-feature "Payment processing" --branch --priority P1
+/spec-feature "Payment processing" --priority P1
 ```
 
 ---

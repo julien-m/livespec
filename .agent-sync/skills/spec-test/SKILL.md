@@ -477,10 +477,35 @@ Runs before visual baseline generation/capture when root `penflow/` exists.
 
 **Reference workflow:** **Read** [`system/testing/penflow-contract.md`](../../../system/testing/penflow-contract.md).
 
+#### Global LiveSpec Design Registry
+
+For Penflow-backed UI features, `/spec-test` must validate and maintain the project-level visual registry before it can approve screenshots:
+
+1. Require `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`.
+2. Require at least one matching mockup PNG under `.specs/design/screens/<feature_slug>/` for every screen declared in `spec.md ## Screens` or in `penflow/flow-ui-contract/screens/*.md`.
+3. Require Mockup Factory proof from Phase 0.5: `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/<feature_slug>/manifest.json`, `.mockup-validation/<feature_slug>/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and visual evidence PNGs. The visual-evidence manifest status must be `PASS`; warnings or skipped visual evidence block runtime baseline approval.
+4. If any registry path, mockup PNG, or Mockup Factory proof is missing, emit `Visual Gate Verdict: BLOCKED` and `Mockups missing or not validated for Penflow UI feature: <screen_names>`, then stop before baseline approval. Penflow-backed UI features must never auto-approve when mockups are missing or unaudited.
+5. Sync every approved runtime screenshot to `.specs/design/baselines/<feature_slug>/` while preserving the feature-local copy under `.specs/features/<feature_slug>/baselines/`.
+6. Update `.specs/design/screens/index.md` and `.specs/design/changelog.md` after new mockup exports or runtime baseline syncs so Strapt-style `.specs/design/` remains the visual source of truth.
+
+#### Web Runtime Adapter
+
+For web UI features, `/spec-test` must create runtime evidence from the implemented app before running Penflow comparison:
+
+1. Start the app with the project test/dev server command and open it in a real browser at `1440x900`.
+2. Capture screenshots from the browser session and store them with the feature evidence under `.specs/features/<feature>/baselines/`, then sync the approved copies to `.specs/design/baselines/<feature_slug>/`; the command must capture screenshots before approval.
+3. Use the project's existing Playwright setup when available; otherwise create a temporary Playwright runtime-evidence script/test and remove only the temporary wrapper if it is not part of the generated test suite.
+4. Evaluate the visible DOM/accessibility surface in the browser and write `penflow/actual-ui-tree.json`. Prefer nodes carrying `data-semantic-id`; fall back to `data-testid`, ARIA role/name, and visible text when needed. Every captured node must include `id`, `role`, `bbox`, and children per the Penflow actual-tree schema.
+5. The runtime tree must come from rendered DOM bounding boxes and visible content. Do not copy `penflow/expected-ui-tree.json`, do not hand-write a matching tree, and do not synthesize nodes that are not present in the browser.
+6. If the implementation lacks enough semantic markers to map expected nodes, fix the app to expose stable `data-semantic-id` or `data-testid` attributes, then rerun the browser capture.
+
+Do not mark `/spec-test` successful for a UI feature until `penflow/actual-ui-tree.json`, screenshots, global design registry artifacts, `penflow/compare-report.json`, and `penflow/compare-report.md` exist, Penflow reports `PASS`, and the raw `penflow/compare-report.json` has `status: PASS` plus zero `issues`.
+
 **Execution:**
 
 ```bash
-livespec penflow-contract status --project . --require-actual --json
+livespec penflow-contract status --project . --require-actual --target web-desktop --json
+livespec penflow-contract status --project . --require-actual --target web-desktop --require-design-registry --require-mockup-validation --feature <feature_slug> --json
 penflow validate-actual penflow/actual-ui-tree.json --schema --json
 penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json \
   --out penflow/compare-report.json \
@@ -490,7 +515,7 @@ penflow review-report penflow/compare-report.json --out penflow/review-report.md
 penflow fix-report penflow/compare-report.json --out penflow/fix-report.md
 ```
 
-If status returns `runtime_comparison: BLOCKED`, stop before `penflow validate-actual` and print `Penflow Contract Verdict: BLOCKED`. `FAIL` or `BLOCKED` is blocking for UI flow correctness and prevents visual baseline approval. `ABSENT` allows legacy/non-UI fallback when no root `penflow/` exists or runtime comparison was not requested. Screenshots remain visual regression gates after Penflow passes.
+If status returns `runtime_comparison: BLOCKED`, stop before `penflow validate-actual` and print `Penflow Contract Verdict: BLOCKED`. If the raw compare report is `FAIL`, invalid, or has any issue, print `Penflow Contract Verdict: FAIL`, block, and iterate until zero issues. `FAIL` or `BLOCKED` prevents visual baseline approval. `ABSENT` allows legacy/non-UI fallback when no root `penflow/` exists or runtime comparison was not requested. Screenshots remain visual regression gates after Penflow passes.
 
 ### Selecting `dispatch` vs `converge`
 
@@ -777,12 +802,19 @@ Approve baselines? [y/n/view <screen-name>]
 
 When running from `/spec-ship` or `/spec-feature` with `--auto`:
 
-1. If **no mockups available** → auto-approve all baselines with warning:
+1. If **no mockups available and root `penflow/` is absent** → legacy auto-approve all baselines with warning:
    ```
    Warning: No mockups found — baselines auto-approved without fidelity check.
    ```
 
-2. If **any baseline diff > 5%**:
+2. If **no mockups available and root `penflow/` exists** → block:
+   ```
+   Visual Gate Verdict: BLOCKED
+   Mockups missing for Penflow UI feature: <screen_names>
+   ```
+   Penflow-backed UI features must never auto-approve when mockups are missing; fix `.specs/design/screens/<feature_slug>/` or regenerate the Penflow/Pencil mockup exports first.
+
+3. If **any baseline diff > 5%**:
    - Delete all captured PNGs
    - Exit with:
      ```
@@ -792,7 +824,7 @@ When running from `/spec-ship` or `/spec-feature` with `--auto`:
      Fix the UI or update the mockup, then re-run spec-test --reset-baselines.
      ```
 
-3. If **all diffs ≤ 5%** → auto-approve, commit baselines, add to test report:
+4. If **all diffs ≤ 5%** → auto-approve, sync to the Global LiveSpec Design Registry, and add to test report:
    ```
    Baselines auto-approved (all diffs ≤ 5%)
    ```
@@ -814,10 +846,10 @@ After approval (Step B `y` or Step C auto-approve), write `baselines/baseline.ma
 | `mockup_version` | SHA-256 hex of mockup PNG binary at capture time. `"none"` if no mockup exists for this screen. |
 | `docker_image` | Image field from `docker-compose.visual.yml` if it exists; otherwise `"none"` |
 
-**Write sequence (order-dependent — write manifest AFTER PNGs committed):**
+**Write sequence (order-dependent — write manifest AFTER PNGs are approved and synced):**
 
 ```
-1. Commit PNGs (existing behavior)
+1. Preserve feature-local PNGs and sync approved copies into `.specs/design/baselines/<feature_slug>/`
 2. Collect provenance data for all approved screens
 3. Write baselines/baseline.manifest.yml (see system/schemas/baseline-manifest.md)
 4. Log: "Provenance manifest written: baselines/baseline.manifest.yml"

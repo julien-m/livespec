@@ -21,9 +21,11 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
 - "LiveSpec initialized"
 - "`.specs/`"
 - "Penflow contract:"
+- "Autonomous from-code: enabled" when `/spec-init --from-code` is made non-interactive by `--auto`, command-stream execution, or an instruction such as "Proceed autonomously"
 
 **stdout must_not_contain:**
 - "Traceback"
+- "waiting for human validation" in autonomous from-code mode
 
 **stderr:**
 - "_(none expected on happy path)_"
@@ -36,6 +38,11 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
 - `.specs/project.md`
 - `.specs/constitution.md`
 - `.specs/roadmap.md`
+- `.specs/.livespec-path`
+- `.agent-sync.local/skills/spec-feature`
+- `.claude/skills/spec-feature`
+- `.agents/skills/spec-feature`
+- `.codex/agents/livespec-verifier.toml`
 
 **update:**
 - `.gitignore`
@@ -57,7 +64,7 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
 - `any source files`
 
 **commit expectations:**
-- `feat(spec): initialize LiveSpec`
+- none unless explicitly authorized by the user
 
 ## 6. Produced Artifacts
 
@@ -90,17 +97,22 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
 
 - Typical range: 60–600 seconds
 - Factors: Brainstorm interactivity, number of clarifying turns, design tool detection
+- Autonomous from-code for a single-package Vite React app must_not hang; it must complete within 300 seconds or return `BLOCKED at step from-code-autonomous-timeout`.
 
 ## 10. Post-run Checks
 
 - [ ] `.specs/` directory present at repo root
 - [ ] spec-system.md is the canonical version
+- [ ] `/spec-feature` project command assets are present; missing assets are `BLOCKED`, not drift
 
 ## 11. Troubleshooting
 
 - **Symptom:** `.specs/` already exists
   **Cause:** previous init
   **Fix:** run /spec-migrate instead
+- **Symptom:** `Unknown command: /spec-feature` after init
+  **Cause:** Step 3.12 agent asset sync did not complete
+  **Fix:** rerun `/spec-init` after resolving `BLOCKED at step 3.12`
 
 ## 12. Verify Contract
 
@@ -112,6 +124,8 @@ verify:
     - contains: "Penflow contract"
     - exists: ".specs/spec-system.md"
     - exists: ".specs/project.md"
+    - exists: ".specs/.livespec-path"
+    - exists: ".claude/skills/spec-feature/SKILL.md"
   may:
     - contains: "stack"
   must_not:
@@ -158,6 +172,7 @@ exit 0
 | Scenario | Duration | Driver |
 |----------|----------|--------|
 | Fresh repo (small) | 60–180s | brainstorm rounds |
+| Autonomous from-code — single-package Vite React | <= 300s | bounded scan + Phase C/D/E |
 | Existing codebase reverse-engineer | 180–600s | code scan size |
 | Large monorepo | 300–900s | feature inference |
 

@@ -38,6 +38,7 @@ Generate a technical plan with sequence, state, and ER diagrams.
 
 **optional:**
 - `## Penflow Contract Inputs` in plan.md for UI features
+- `penflow/code-ir.json` generated or verified before UI plan output
 
 **forbidden:**
 - `.specs/features/<feature>/spec.md`
@@ -62,8 +63,8 @@ Generate a technical plan with sequence, state, and ER diagrams.
   - "Constitution Check"
   - "Implementation Plan"
 - stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
-  - `ABSENT`: no root `penflow/`; plan remains from scratch without `.brainstorm/`
-  - `BLOCKED`: UI plan needs `code-ir.json` or other root artifacts but they are missing
+  - `ABSENT`: non-UI feature without root `penflow/`
+  - `BLOCKED`: UI plan needs `code-ir.json` or other root artifacts but forward generation failed
   - `PASS`: required Penflow planning inputs are present
 
 ## 7. Exit Codes

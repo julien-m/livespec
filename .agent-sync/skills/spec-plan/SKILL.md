@@ -153,15 +153,25 @@ If no `## Screens` section exists → skip this step.
 
 ### Step 2.6 — Penflow Code IR Input (UI features only)
 
-If root `penflow/` exists:
+UI plans require the root Penflow contract before implementation. If root `penflow/` is absent for a UI feature, run the From-Scratch Penflow Forward Contract before writing `plan.md`; do not fall back to `.brainstorm/`.
 
-1. Run `livespec penflow-contract status --project . --json`.
-2. Read `penflow/semantic-ui-tree.json` and `penflow/code-ir.json` when present.
-3. Add a `## Penflow Contract Inputs` section to `plan.md` with links to `penflow/semantic-ui-tree.json`, `penflow/code-ir.json`, and the relevant `flow_id` / `screen_id`.
-4. Use `code-ir.json` as the primary UI implementation input. `.specs/design/screens/` remains visual evidence, not behavioral source of truth.
-5. If `code-ir.json` is missing for a UI feature, mark the plan input as `[NEEDS CLARIFICATION]` and include the recovery command from the Penflow workflow.
+```bash
+penflow validate-flow-specs penflow/flow-ui-contract --json
+penflow export-semantic-tree penflow/flow-ui-contract --out penflow/semantic-ui-tree.json --json
+penflow validate-semantic-tree penflow/semantic-ui-tree.json --json
+penflow draft-pen-from-tree penflow/semantic-ui-tree.json --out penflow/ui.pen --json
+penflow validate-pen penflow/ui.pen --json
+penflow export-expected penflow/ui.pen --out penflow/expected-ui-tree.json --json
+penflow code-ir --from-context penflow/ui.pen --semantic-tree penflow/semantic-ui-tree.json --flow-id <feature_slug> --flow-name "<feature_description>" --out penflow/code-ir.json --json
+livespec penflow-contract status --project . --target web-desktop --json
+```
 
-If root `penflow/` is absent, keep the plan from scratch: do not reference `.brainstorm/`; state that Penflow is `ABSENT` until the UI contract workflow creates root artifacts.
+1. Run `livespec penflow-contract status --project . --target web-desktop --json` for web desktop features; otherwise run `livespec penflow-contract status --project . --json`.
+2. If status is `absent` for a UI feature, create missing `penflow/flow-ui-contract` flow/screen specs from the approved `spec.md`, then execute the From-Scratch Penflow Forward Contract.
+3. Read `penflow/semantic-ui-tree.json` and `penflow/code-ir.json`.
+4. Add a `## Penflow Contract Inputs` section to `plan.md` with links to `penflow/semantic-ui-tree.json`, `penflow/code-ir.json`, and the relevant `flow_id` / `screen_id`.
+5. Use `penflow/code-ir.json` as the primary UI implementation input. `.specs/design/screens/` remains visual evidence, not behavioral source of truth.
+6. If `penflow/code-ir.json` is missing for a UI feature, print `BLOCKED - penflow_forward_contract_failed` and stop instead of producing a plan with absent UI contract inputs.
 
 ### Step 3 — Analyze Requirements
 

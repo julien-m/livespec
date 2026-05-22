@@ -317,7 +317,11 @@ Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · 
   if [[ -f "$sync_script" ]]; then
     local flags=()
     [[ "$DRY_RUN" == true ]] && flags+=(--dry-run)
-    bash "$sync_script" "$PROJECT_DIR" "$LIVESPEC_ROOT" --scope project --targets all "${flags[@]}"
+    if [[ "${#flags[@]}" -gt 0 ]]; then
+      bash "$sync_script" "$PROJECT_DIR" "$LIVESPEC_ROOT" --scope project --targets all "${flags[@]}"
+    else
+      bash "$sync_script" "$PROJECT_DIR" "$LIVESPEC_ROOT" --scope project --targets all
+    fi
   else
     warn "sync-agent-assets.sh not found at $sync_script — skipping agent asset sync."
     info "Run 'bash scripts/sync-agent-assets.sh <project> <livespec>' manually."

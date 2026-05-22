@@ -80,6 +80,33 @@ class TestPipelineInit:
         ]:
             assert f"| {phase} | Pending |" in content
 
+    def test_preserves_quoted_description_and_flags(self, specs_root: Path) -> None:
+        feature_dir = specs_root / "features" / "001-test"
+        description = (
+            "Professional desktop booking operations dashboard: build a professional "
+            "SaaS booking operations dashboard"
+        )
+        result = runner.invoke(
+            app,
+            [
+                "pipeline",
+                "init",
+                "--feature",
+                "001-test",
+                "--description",
+                description,
+                "--flags",
+                "--auto --mono",
+            ],
+            catch_exceptions=False,
+        )
+
+        assert result.exit_code == 0
+        content = (feature_dir / "pipeline.md").read_text()
+        assert "**Flags:** `--auto --mono`" in content
+        assert f"**Feature Description:** {description}" in content
+        assert "| Specify | Pending |" in content
+
     def test_error_if_feature_not_found(self, specs_root: Path) -> None:
         result = runner.invoke(app, ["pipeline", "init", "--feature", "999-nonexistent"])
         assert result.exit_code != 0

@@ -40,10 +40,25 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 - `test-results/`
 - `.specs/features/<feature>/baselines/`
 - `.specs/features/<feature>/design-alignment/`
-- `penflow/compare-report.json`
-- `penflow/compare-report.md`
 - `penflow/review-report.md`
 - `penflow/fix-report.md`
+
+**create for UI runs with root `penflow/`:**
+- `penflow/actual-ui-tree.json`
+- `penflow/compare-report.json`
+- `penflow/compare-report.md`
+- browser screenshot evidence under `.specs/features/<feature>/baselines/` or `penflow/screens/`
+- `.specs/design/baselines/<feature_slug>/` synced runtime screenshots in the Global LiveSpec Design Registry
+
+**require for UI runs with root `penflow/`:**
+- `.specs/design/ui.pen`
+- `.specs/design/screens/<feature_slug>/`
+- `.specs/design/screens/index.md`
+- `.specs/design/changelog.md`
+- `.mockup-validation/audit-report.md`
+- `.mockup-validation/<feature_slug>/checklist.md`
+- `.mockup-validation/visual-evidence/manifest.json` with status `PASS`
+- `.mockup-validation/visual-evidence/visual-report.md`
 
 **forbidden:**
 - `src/`
@@ -68,6 +83,8 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
   - `PASS`: `actual-ui-tree.json` validates and matches `expected-ui-tree.json`
   - `FAIL`: compare report contains structural drift
   - `BLOCKED`: required artifacts, `actual-ui-tree.json`, or Penflow CLI are missing
+  - `BLOCKED`: also required when the Global LiveSpec Design Registry has no matching mockup PNGs under `.specs/design/screens/<feature_slug>/`
+  - `BLOCKED`: also required when `--require-mockup-validation` reports missing Mockup Factory proof or visual-evidence status other than `PASS`
   - note: non-UI runs without runtime comparison can report `runtime_comparison: ABSENT` while final verdict remains `PASS` when root Penflow planning artifacts are ready
 
 ## 7. Exit Codes
@@ -94,6 +111,8 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 
 - [ ] Coverage report present in checks/
 - [ ] Suite exits 0
+- [ ] Penflow UI runs have Global LiveSpec Design Registry artifacts: `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`
+- [ ] Penflow UI runs have Mockup Factory PASS proof: `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/<feature_slug>/manifest.json`, `.mockup-validation/<feature_slug>/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and visual evidence PNGs
 
 ## 11. Troubleshooting
 

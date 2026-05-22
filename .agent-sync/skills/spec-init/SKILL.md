@@ -780,17 +780,26 @@ This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails 
 
 ### Step 3.12 — Sync Agent Assets
 
-After installing the CLAUDE.md section, sync LiveSpec skills, agents, and rules
-through `cc-hub`:
+After installing the CLAUDE.md section, sync LiveSpec skills, agents, and rules through `cc-hub`. This step is mandatory and blocking in every mode, including `--auto` and `--from-code`; skipping it leaves follow-up commands unavailable (`Unknown command: /spec-feature`).
 
-1. **Resolve LiveSpec repo path:** Resolve the currently executing `spec-init`
-   skill path and extract the repo root by stripping
-   `.agent-sync/skills/spec-init/SKILL.md`
-2. **Write path discovery file:** Write the resolved path to `.specs/.livespec-path`
-3. **Run sync script:** Execute `bash <livespec-dir>/scripts/sync-agent-assets.sh <project-dir> <livespec-dir> --scope project --targets all`
+1. **Resolve LiveSpec repo path:** Resolve the currently executing `spec-init` skill path to its physical `SKILL.md`. Accept global/user/project symlinks, then derive the repo root by stripping `.agent-sync/skills/spec-init/SKILL.md`. If the executing path is opaque, fall back in order to an existing `.specs/.livespec-path`, then the nearest ancestor containing both `.agent-sync/skills/spec-init/SKILL.md` and `scripts/sync-agent-assets.sh`.
+2. **Verify source repo:** `<livespec-dir>/scripts/sync-agent-assets.sh`, `<livespec-dir>/scripts/install-hooks.sh`, and `<livespec-dir>/VERSION` must exist. If any is missing, print `BLOCKED at step 3.12 - agent_asset_sync_failed - cannot resolve LiveSpec repo path` and stop.
+3. **Write path discovery file:** Write the resolved path to `.specs/.livespec-path`.
+4. **Run sync script:** Execute `bash <livespec-dir>/scripts/sync-agent-assets.sh <project-dir> <livespec-dir> --scope project --targets all`.
 5. **Install pre-commit hook:** Execute `bash <livespec-dir>/scripts/install-hooks.sh <project-dir> <livespec-dir>` to install the `last_reviewed` hook (feature 039 FR-009). Idempotent — keyed off the `# livespec-expectations` marker. Skipped silently if the project has no `.git/` directory.
-6. **Write version:** Read `VERSION` from the LiveSpec repo, write to `.specs/livespec-version`
-7. **Update .gitignore:** Add the following patterns (if not already present):
+6. **Write version:** Read `VERSION` from the LiveSpec repo, write to `.specs/livespec-version`.
+7. **Post-sync verification:** Verify all required command assets exist before continuing:
+   - `.specs/.livespec-path`
+   - `.agent-sync.local/skills/spec-feature/SKILL.md`
+   - `.agent-sync.local/skills/spec-specify/SKILL.md`
+   - `.agent-sync.local/skills/spec-plan/SKILL.md`
+   - `.agent-sync.local/skills/spec-implement/SKILL.md`
+   - `.agent-sync.local/skills/spec-test/SKILL.md`
+   - `.claude/skills/spec-feature/SKILL.md`
+   - `.agents/skills/spec-feature/SKILL.md`
+   - `.codex/agents/livespec-verifier.toml`
+8. **Failure handling:** If any verification path is missing, print `BLOCKED at step 3.12 - agent_asset_sync_failed - /spec-feature would be unavailable (Unknown command: /spec-feature); missing: <paths>` and stop before writing success output.
+9. **Update .gitignore:** Add the following patterns (if not already present):
    - `.agents/skills/spec-*`
    - `.claude/skills/spec-*`
    - `.claude/rules/*.md`
@@ -804,6 +813,7 @@ through `cc-hub`:
 
 **Output:**
 > Synced 20 spec skills, 4 agents, and LiveSpec rules through `cc-hub`
+> Post-sync verification: PASS
 
 ### Step 3.13 — Scaffold Visual Testing Helper (Playwright projects)
 
@@ -938,6 +948,30 @@ flowchart TD
 | `--from-code --stack` | Warning: "--stack ignored in --from-code mode (stack detected from code)." |
 | `--from-code --dry-run` | Show what would be scanned and generated, without writing files |
 
+### Non-Interactive Autonomous From-Code Mode
+
+When `/spec-init --from-code` runs in a non-interactive command stream or the prompt says `Proceed autonomously`, `do not ask questions`, `use defaults`, or equivalent, normalize active flags to `--from-code --auto`.
+
+- Print `Autonomous from-code: enabled` before scanning.
+- Do not wait for human validation, recap editing, or a second invocation.
+- Use the deterministic bootstrap backend below; run this command before any manual file creation:
+
+  ```bash
+  if [[ -L .agent-sync.local/skills/spec-init ]]; then
+    LIVESPEC_ROOT="$(cd "$(dirname "$(readlink .agent-sync.local/skills/spec-init)")/../.." && pwd -P)"
+  else
+    LIVESPEC_ROOT="/Users/julienm/projects/livespec"
+  fi
+  bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "$PWD" --timeout-seconds 300
+  ```
+
+- If this command exits 0, do not manually rewrite `.specs/` artifacts; verify its outputs and return.
+- On exit 0, return immediately with the command output summary. Do not call `Write`, `Edit`, or `MultiEdit` afterward for `.specs/`, `.conventions/`, `AGENTS.md`, or `CLAUDE.md`.
+- If this command exits non-zero, report the exact exit code and stderr/stdout tail; do not fall back to manual `.specs/` generation unless the user explicitly authorizes a recovery path.
+- The backend generates `.specs/bootstrap-recap.md` with `status: completed`, then completes Phase C/D/E artifacts in the same run.
+- For a single-package Vite React app, complete within 300 seconds or stop with `BLOCKED at step from-code-autonomous-timeout`.
+- Do not create repository history changes, branches, tags, or pushes unless the user explicitly authorizes them.
+
 ---
 
 ## From-Code Mode
@@ -951,6 +985,8 @@ The from-code flow:
 4. Generates `bootstrap-recap.md` with confidence tags (`[OBSERVED]`, `[INFERRED]`, `[SPECULATIVE]`)
 5. Human reviews and edits the recap, sets `status: validated`
 6. On re-run: validates the recap, then enters Phase C with the recap data
+
+In Non-Interactive Autonomous From-Code Mode, steps 5-6 happen without waiting: the command writes the validated recap and enters Phase C/D/E immediately.
 
 **After Phase C/D/E:** moves `bootstrap-recap.md` into `.specs/bootstrap-recap.md` with `status: completed`.
 

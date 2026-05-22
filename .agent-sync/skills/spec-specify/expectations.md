@@ -42,6 +42,9 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
 **optional:**
 - `.specs/features/<feature>/seed.md`
 - `.specs/features/<feature>/spec.md` section `## Penflow Contract`
+- `penflow/flow-ui-contract/` for UI features
+- `penflow/semantic-ui-tree.json` for UI features
+- `penflow/code-ir.json` for UI features
 
 **forbidden:**
 - `src/`
@@ -65,8 +68,8 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
   - "Acceptance Criteria"
   - "Functional Requirements"
 - stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
-  - `ABSENT`: no root `penflow/`; spec is generated from scratch without `.brainstorm/`
-  - `BLOCKED`: UI feature needs Penflow IDs but root artifacts are incomplete
+  - `ABSENT`: non-UI feature without root `penflow/`
+  - `BLOCKED`: UI feature forward contract generation failed
   - `PASS`: semantic tree was read and IDs were resolved or explicitly clarified
 
 ## 7. Exit Codes

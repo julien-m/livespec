@@ -8,7 +8,7 @@ last_reviewed: 2026-05-18
 
 ## 1. Purpose
 
-Run the full feature pipeline: specify → plan → review → implement → test → commit.
+Run the full feature pipeline: specify → plan → review → implement → test. Commit only when explicitly authorized.
 
 ## 2. Preconditions
 
@@ -33,10 +33,24 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 - `.specs/features/<feature>/spec.md`
 - `.specs/features/<feature>/plan.md`
 - `.specs/features/<feature>/progress.md`
+- `penflow/flow-ui-contract/` for UI features
+- `penflow/ui.pen` for UI features
+- `penflow/semantic-ui-tree.json` for UI features
+- `penflow/expected-ui-tree.json` for UI features
+- `penflow/code-ir.json` for UI features
+- `.specs/design/ui.pen` for UI features
+- `.specs/design/screens/<feature_slug>/` for UI feature mockup PNG exports
+- `.specs/design/baselines/<feature_slug>/` for UI feature runtime baseline sync
+- `.mockup-validation/audit-report.md` for UI feature Mockup Factory validation
+- `.mockup-validation/<feature_slug>/checklist.md` for UI feature Mockup Factory validation
+- `.mockup-validation/visual-evidence/manifest.json` for UI feature visual evidence PASS
+- `.mockup-validation/visual-evidence/visual-report.md` for UI feature visual evidence PASS
 
 **update:**
 - `.specs/roadmap.md`
 - `.specs/changelog.md`
+- `.specs/design/screens/index.md` for UI features
+- `.specs/design/changelog.md` for UI features
 
 **optional:**
 - _(none)_
@@ -54,13 +68,28 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 - _(none)_
 
 **commit expectations:**
-- `feat(<feature>): full pipeline`
+- none unless explicitly authorized
 
 ## 6. Produced Artifacts
 
 - path: `.specs/features/<feature>/implementation.md`
   must_contain_sections:
   - "FR mapping"
+- path: `.specs/design/ui.pen`
+  note: "Global LiveSpec Design Registry source for Penflow UI features"
+- path: `.specs/design/screens/<feature_slug>/`
+  note: "Global LiveSpec Design Registry mockup PNG exports; missing mockups block Penflow UI features"
+- path: `.specs/design/baselines/<feature_slug>/`
+  note: "Global LiveSpec Design Registry runtime screenshot destination"
+- path: `.mockup-validation/visual-evidence/manifest.json`
+  note: "Mockup Factory visual evidence; status must be PASS before any UI implementation code"
+- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | FAIL | PASS`
+  - `ABSENT`: feature is non-UI
+  - `BLOCKED`: UI forward contract generation failed
+  - `FAIL`: runtime raw compare report is `FAIL` or has issues
+  - `PASS`: UI forward/runtime artifacts were generated or verified, and runtime compare is `PASS` with zero issues when required
+  - `BLOCKED`: also required when `BLOCKED at step 0.5 - design_registry_sync_failed` reports `Mockups missing for Penflow UI feature`
+  - `BLOCKED`: also required when `--require-mockup-validation` reports missing Mockup Factory proof or visual-evidence status other than `PASS`
 
 ## 7. Exit Codes
 
@@ -86,12 +115,19 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 
 - [ ] progress.md exists and is complete
 - [ ] implementation.md maps every FR
+- [ ] UI features have `penflow/code-ir.json` before implementation
+- [ ] Global LiveSpec Design Registry has `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`
+- [ ] UI features have Mockup Factory PASS proof before implementation: `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/<feature_slug>/manifest.json`, `.mockup-validation/<feature_slug>/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and visual evidence PNGs
+- [ ] If a phase agent omits `PHASE_RESULT`, artifact recovery either advances safely or emits `BLOCKED - phase_agent_timeout`
 
 ## 11. Troubleshooting
 
 - **Symptom:** Stops at plan-review
   **Cause:** Plan invalid
   **Fix:** Address findings and resume
+- **Symptom:** `plan.md` exists but pipeline remains `Plan | In Progress`
+  **Cause:** Phase agent omitted `PHASE_RESULT` after writing the artifact
+  **Fix:** Supervisor applies Phase Agent Timeout and Artifact Recovery; if required sections are missing, retry `/spec-feature --resume <feature>`
 
 ## 12. Verify Contract
 
@@ -121,7 +157,7 @@ $ /spec-feature -a "Add CSV export"
 > Phase 2.7 (Preflight): READY
 > Phase 3 (Implement): 8/8 steps done — 14 files changed, 27 tests pass
 > Phase 3.5 (Test): AC coverage 9/9 — visual: skipped
-> Auto-commit: 1 commit pushed on feature/<feature>
+> Commit: skipped - no explicit user authorization
 exit 0
 ```
 
@@ -139,7 +175,7 @@ exit 0
 
 ### Aligned / Drift / Missing
 
-- **Aligned:** all 5 phases Done, AC coverage 100%, no review findings remain, one commit on the feature branch. Exit 0.
+- **Aligned:** all 5 phases Done, AC coverage 100%, no review findings remain, no commit unless explicitly authorized. Exit 0.
 - **Drift:** Phase 1.5 or 2.5 returns BLOCKING findings; in `--auto` mode pipeline retries up to 2× then aborts. Exit 1.
 - **Missing:** Preflight failed critical check (no git, no Python, no LLM creds). Exit 2 with the failing check name.
 
@@ -159,6 +195,6 @@ exit 0
 
 ### Post-run Actions
 
-- **On success:** open the commit, push, request review.
+- **On success:** report changed files and verification evidence. Do not create commits, tags, pushes, or branches unless the current user request explicitly asks for that exact repository-history action.
 - **On drift:** read `FINDINGS_DETAIL` in `pipeline.md`, fix the spec/plan, re-run with `--resume`.
 - **On blocked:** run `/spec-preflight` standalone to identify the missing prerequisite.

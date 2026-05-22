@@ -70,7 +70,7 @@ Auto-implement a feature from its plan, write tests, run the visual gate for UI 
   must_contain_sections:
   - "Visual Gate Verdict"
 - stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED`
-  - `ABSENT`: no root `penflow/`; implementation continues from approved spec/plan without `.brainstorm/`
+  - `ABSENT`: non-UI implementation without root `penflow/`
   - `PASS`: expected and actual trees match before visual approval
   - `FAIL`: Penflow compare found structural drift
   - `BLOCKED`: required Penflow artifacts, `actual-ui-tree.json`, or CLI tooling are missing for UI runtime comparison
@@ -99,6 +99,7 @@ Auto-implement a feature from its plan, write tests, run the visual gate for UI 
 
 - [ ] progress.md fully checked off
 - [ ] implementation.md maps every FR/AC
+- [ ] UI implementation consumed `penflow/code-ir.json`; missing UI Penflow artifacts are `BLOCKED`
 
 ## 11. Troubleshooting
 

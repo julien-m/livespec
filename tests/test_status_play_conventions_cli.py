@@ -85,3 +85,25 @@ def test_conventions_refresh_generates_index_and_manifest(tmp_path: Path) -> Non
     assert "conventions" in result.output
     assert (tmp_path / ".conventions" / "index.md").is_file()
     assert (tmp_path / ".conventions" / "manifest.yaml").is_file()
+
+
+def test_conventions_refresh_generates_web_design_domains(tmp_path: Path) -> None:
+    stacks = tmp_path / ".specs" / "stacks"
+    stacks.mkdir(parents=True)
+    (stacks / "_default.md").write_text(
+        "# Stack\n\n- React\n- Vite\n- Web dashboard\n", encoding="utf-8"
+    )
+
+    result = runner.invoke(app, ["conventions", "refresh", "--repo", str(tmp_path)])
+
+    assert result.exit_code == 0, result.output
+    index = (tmp_path / ".conventions" / "index.md").read_text(encoding="utf-8")
+    manifest = (tmp_path / ".conventions" / "manifest.yaml").read_text(encoding="utf-8")
+    for domain in (
+        "design-tokens",
+        "design-components",
+        "design-views",
+        "design-quality",
+    ):
+        assert f"## {domain}" in index
+        assert f"- name: {domain}" in manifest

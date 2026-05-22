@@ -129,9 +129,22 @@ flowchart TD
 
 **Design fidelity:** When implementing UI components, reference the corresponding mockup PNG from `.specs/design/screens/`. Match the layout, colors, and spacing from the mockup. When creating `implementation.md`, add a "Visual Ref" column linking each UI-related FR to its mockup.
 
-**Penflow fidelity:** When implementing UI components for a feature with root `penflow/`, the code must preserve Penflow identifiers and business context. Do not rename `semantic_id` / `test_id` values, drop bindings/entities, or omit validations/side effects from the UI behavior. If the Penflow contract conflicts with a legacy `.specs/flows` or mockup-derived artifact, Penflow wins and the legacy path is reported as fallback.
+**Penflow fidelity:** When implementing UI components for a feature with root `penflow/`, the code must preserve Penflow identifiers and business context. Expose stable `data-semantic-id` attributes for interactive, structural, and screen-root nodes from `penflow/semantic-ui-tree.json` / `penflow/code-ir.json`; add `data-testid` only as a secondary test selector. Do not rename `semantic_id` / `test_id` values, drop bindings/entities, or omit validations/side effects from the UI behavior. If the Penflow contract conflicts with a legacy `.specs/flows` or mockup-derived artifact, Penflow wins and the legacy path is reported as fallback.
 
-**From-scratch Penflow:** If root `penflow/` is absent, do not read `.brainstorm/` during implementation. Report Penflow as `ABSENT` and continue only with the approved spec, plan, stack, and current design artifacts.
+**From-scratch Penflow:** UI implementation requires the root contract. If root `penflow/` or `penflow/code-ir.json` is absent for a UI feature, run or recover the From-Scratch Penflow Forward Contract before editing app code; do not read `.brainstorm/` during implementation.
+
+```bash
+penflow validate-flow-specs penflow/flow-ui-contract --json
+penflow export-semantic-tree penflow/flow-ui-contract --out penflow/semantic-ui-tree.json --json
+penflow validate-semantic-tree penflow/semantic-ui-tree.json --json
+penflow draft-pen-from-tree penflow/semantic-ui-tree.json --out penflow/ui.pen --json
+penflow validate-pen penflow/ui.pen --json
+penflow export-expected penflow/ui.pen --out penflow/expected-ui-tree.json --json
+penflow code-ir --from-context penflow/ui.pen --semantic-tree penflow/semantic-ui-tree.json --flow-id <feature_slug> --flow-name "<feature_description>" --out penflow/code-ir.json --json
+livespec penflow-contract status --project . --target web-desktop --json
+```
+
+If the forward chain cannot produce `penflow/flow-ui-contract/`, `penflow/ui.pen`, `penflow/semantic-ui-tree.json`, `penflow/expected-ui-tree.json`, and `penflow/code-ir.json`, print `BLOCKED - penflow_forward_contract_failed` and stop. Non-UI features may still report Penflow as `ABSENT`.
 
 **Theme enforcement:** If `.specs/design/theme.css` exists, all UI implementation must use its CSS variables (`var(--primary)`, `var(--background)`, etc.) instead of hardcoded color/spacing values. If `theme.md` contains an install command, execute it as Step 0 before any UI code (skip if theme is already installed in the project).
 

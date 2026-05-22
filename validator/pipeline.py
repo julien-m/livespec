@@ -88,6 +88,19 @@ def _parse_pipeline(content: str) -> dict[str, str]:
     return result
 
 
+def _single_line(value: str) -> str:
+    """Collapse user-provided command text so pipeline headers stay parseable."""
+    return " ".join(value.split())
+
+
+def _format_flags(flags: str | None) -> str:
+    """Return the normalized pipeline Flags value."""
+    if flags is None:
+        return "none"
+    normalized = _single_line(flags)
+    return f"`{normalized}`" if normalized else "none"
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Commands
 # ──────────────────────────────────────────────────────────────────────────────
@@ -97,6 +110,12 @@ def _parse_pipeline(content: str) -> dict[str, str]:
 def init(
     feature: str = typer.Option(
         ..., "--feature", help="Feature directory name (e.g. 001-my-feature)"
+    ),
+    description: str | None = typer.Option(
+        None, "--description", help="Original feature description for resume prompts"
+    ),
+    flags: str | None = typer.Option(
+        None, "--flags", help='Normalized active flags, for example "--auto --mono"'
     ),
 ) -> None:
     """Create pipeline.md for a feature with all phases set to Pending.
@@ -110,10 +129,16 @@ def init(
 
     now = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M")
     rows = "\n".join(f"| {PHASE_MAP[slug]} | Pending | — |" for slug in PHASE_ORDER)
+    description_line = (
+        f"**Feature Description:** {_single_line(description)}\n"
+        if description is not None and _single_line(description)
+        else ""
+    )
     header = (
         f"# Pipeline — {feature}\n\n"
         f"**Started:** {now}\n"
-        f"**Flags:** none\n\n"
+        f"**Flags:** {_format_flags(flags)}\n"
+        f"{description_line}\n"
         f"| Phase | Status | Completed At |\n"
         f"|-------|--------|--------------|"
     )
