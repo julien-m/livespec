@@ -22,11 +22,11 @@ La toute première action lors de `/spec-ship` est de poser le goal durable.
    livespec goal render spec-ship --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-ship-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-ship-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-ship for <feature> — task list: .specs/.runs/goal-spec-ship-<hash8>.md
+   /goal hash:<hash> | spec-ship for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-ship-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -403,6 +403,61 @@ When all features are shipped:
 ```
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Verify no active goal exists
+- [always] Resolve flags from arguments
+- [always] Run `livespec goal render spec-ship --save` and save task file
+- [always] Emit `/goal` slash command with hash and task file reference
+
+### Phase 0 — Selection
+
+- [always] Read `.specs/roadmap.md` and count unchecked items per tier
+- [always] Display selection menu or resolve tier/count from flags
+- [always] Collect target feature list in roadmap order
+
+### Phase 0.1 — Target Branch Selection
+
+- [always] Detect available branches and current branch via git
+- [always] Display branch recommendation and prompt for confirmation
+- [always] Display full batch plan and wait for user confirmation
+- [always] Create `.specs/ship.md` with batch plan and Pending status for all features
+
+### Phase 0.5 — Preflight Full
+
+- [always] Run `/spec-preflight` in full mode (not --light)
+- [always] Block on critical failures; proceed with warnings
+
+### Phase 1..N — Per Feature Loop (repeated for each feature)
+
+- [always] Update `ship.md`: feature status → In Progress, record start time
+- [always] Ensure on target branch with `git checkout <target>`
+- [always] Create feature branch via `livespec git branch feature/NNN-name`
+- [always] Update `ship.md` with branch name
+- [always] Spawn agent with fresh context to execute `/spec-feature --auto --branch`
+- [always] Wait for spawned agent to complete and return SHIP_RESULT
+- [always] Parse SHIP_RESULT via `validator/contracts.py parse_ship_result()`
+- [always] Validate branch/slug consistency before any git operation
+- [always] Check AC coverage from test report (Test Gate)
+- [always] Switch to target branch: `git checkout <target>`
+- [always] Merge feature branch: `livespec git merge feature/NNN-name --no-ff`
+- [always] Delete feature branch: `livespec git delete feature/NNN-name`
+- [always] Update roadmap: mark feature `[x]` with link to spec
+- [always] Update `ship.md`: feature status → Done, record completion time
+- [always] Log progress and proceed to next feature
+
+### Phase N+1 — Completion
+
+- [always] Display ship summary with per-feature status and timing
+- [always] Report total features shipped and target branch
 
 ## Definition of Done (Command-Level)
 

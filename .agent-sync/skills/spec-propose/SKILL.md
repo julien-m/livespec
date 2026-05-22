@@ -22,11 +22,11 @@ La toute première action lors de `/spec-propose` est de poser le goal durable.
    livespec goal render spec-propose --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-propose-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-propose-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-propose for <feature> — task list: .specs/.runs/goal-spec-propose-<hash8>.md
+   /goal hash:<hash> | spec-propose for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-propose-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -328,6 +328,65 @@ When the Deferred section of `roadmap.md` has entries:
 # Combine flags
 /spec-propose --count 3 --mvp --auto
 ```
+
+---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `mvp` (--mvp flag active) · `role` (--role flag provided) · `roadmap` (.specs/roadmap.md present) · `multi` (--count > 1)
+
+### Phase 0 — Goal Lock & Hooks
+
+- [always] Read before-propose hooks (all 3 levels: global, project, local)
+- [always] Resolve flags (--count, --role, --mvp, --auto) from command arguments
+- [always] Verify no active goal exists
+- [always] Render and save goal contract via `livespec goal render spec-propose --save`
+- [always] Emit `/goal` slash command with hash and task-file reference
+
+### Phase 1 — Project Context
+
+- [always] Verify .specs/ exists (abort with /spec-init suggestion if absent)
+- [always] Read .specs/project.md (vision, users, roles, constraints, scale)
+- [always] Read .specs/constitution.md (architecture principles)
+- [always] Read .specs/stacks/_default.md (chosen stack and rationale)
+- [always] Read .specs/stacks/decisions/ADR-*.md (architecture decision records)
+
+### Phase 2 — Feature Inventory
+
+- [always] Scan .specs/features/*/spec.md: extract name, number, status, roles, entities, dependencies, priority
+- [always] Build feature inventory summary table
+
+### Phase 3 — Roadmap Analysis
+
+- [always] Read .specs/roadmap.md: parse priority tiers (MVP / Post-MVP / Future), unchecked items, Deferred section
+- [always] Cross-reference roadmap items vs existing feature inventory to find gaps
+- [always] Extract deferred items with source request, name, context, and date
+
+### Phase 4 — Gap Analysis
+
+- [always] Role coverage: map which roles from project.md are served by existing features, identify gaps
+- [always] Domain coverage: identify missing core capabilities (auth, CRUD, search, messaging, payments, settings, admin, analytics)
+- [always] Dependency analysis: detect prerequisite features not yet built, infer natural build order
+- [always] Status gaps: flag features stuck in intermediate states (Draft without plan, Planned without implementation)
+- [always] MVP critical path: identify minimum feature set for a working product
+
+### Phase 5 — Rank & Present
+
+- [always] Score candidates: MVP criticality, dependency unblocking, role coverage, scope fit, roadmap alignment, deferred intent (+1 boost)
+- [always] Filter candidates to MVP-critical only before ranking
+- [always] Filter candidates to those serving the specified role before ranking
+- [always] Present top N proposals with description, roles, reasoning, dependencies, estimated scope, and quick-start command
+- [always] Include deferred item origin context when proposal originates from Deferred section
+- [always] Present ranked table of N proposals with detailed reasoning for top pick
+- [always] Detect and surface edge cases: no features yet, all MVP done, status gaps, deferred items
+
+### Phase 6 — Actions & Finalize
+
+- [always] Offer actionable next steps unless --auto (spec-specify, spec-feature, spec-propose variants)
+- [always] Read after-propose hooks (all 3 levels: global, project, local)
 
 ---
 

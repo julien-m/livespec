@@ -14,12 +14,11 @@ from validator.command_registry import (
 def test_discovers_all_builtin_commands() -> None:
     commands = discover_commands(Path(".agent-sync/skills"))
 
-    assert len(commands) == 20
+    assert len(commands) == 19
     assert {command.name for command in commands} >= {
         "spec-check",
         "spec-explain",
         "spec-feature",
-        "spec-verify-output",
     }
     assert all(command.command_path.is_file() for command in commands)
     assert all(command.expectations_path.is_file() for command in commands)
@@ -62,8 +61,6 @@ def test_normalize_command_name_accepts_ids_and_slash_aliases() -> None:
     assert normalize_command_name("/spec-feature") == "spec-feature"
     assert normalize_command_name("spec-feature") == "spec-feature"
     assert normalize_command_name("/spec-feature") == "spec-feature"
-    assert normalize_command_name("verify-output") == "spec-verify-output"
-    assert normalize_command_name("/spec-verify-output") == "spec-verify-output"
 
 
 def test_every_builtin_command_has_dotted_and_hyphenated_aliases() -> None:

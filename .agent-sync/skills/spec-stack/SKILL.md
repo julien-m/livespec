@@ -23,11 +23,11 @@ La toute première action lors de `/spec-stack` est de poser le goal durable.
    livespec goal render spec-stack --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-stack-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-stack-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-stack for <feature> — task list: .specs/.runs/goal-spec-stack-<hash8>.md
+   /goal hash:<hash> | spec-stack for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-stack-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -353,6 +353,65 @@ Lists all ADRs chronologically with summaries:
 | `--force`, `-f` | Skip confirmation prompts |
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-stack --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase 1 — Show Current Stack (no-arg mode)
+
+- [always] Read stacks/_default.md and all ADRs in stacks/decisions/
+- [always] Display current stack table with layer, choice, and ADR reference
+
+### Phase 2 — Understand Change Request (change mode)
+
+- [always] Parse which layer is affected, what is replaced, and the reason
+- [always] Ask clarifying questions if scope is ambiguous (max 2)
+
+### Phase 3 — Impact Analysis
+
+- [always] Read all feature spec.md, plan.md, and implementation.md files
+- [always] Build impact table per layer (before/after, migration effort)
+- [always] Build affected features table with High/Medium/Low severity
+- [always] Classify migration strategy (big-bang / phased / hybrid)
+- [always] Document rollback trigger, window, owner, and validation checklist
+
+### Phase 4 — Confirm Change
+
+- [always] Present impact summary and offer Proceed / Adjust scope / Cancel
+
+### Phase 5 — Create ADR
+
+- [always] Generate ADR-NNN-short-name.md with context, decision, consequences, affected features
+- [always] Add ADR row to .specs/README.md Architecture Decisions table
+- [always] Regenerate Recent Activity section from .specs/changelog.md
+- [always] Update Last updated date in .specs/README.md
+
+### Phase 6 — Update Stack
+
+- [always] Update stacks/_default.md with new stack decisions
+- [always] Bump `updated` frontmatter field to today's date
+
+### Phase 7 — Regenerate Preflight
+
+- [always] Merge new stack checks into .specs/preflight.md if manifest exists
+- [always] Preserve Custom section; deduplicate checks; display diff of additions/removals
+
+### Phase 8 — Generate Migration Specs (optional)
+
+- [always] Offer to run `/spec-specify` for each High/Medium impact feature if user confirms
+
+### Phase D — Show Decisions (decisions mode)
+
+- [always] Read all ADRs and display chronological decisions table
 
 ## Definition of Done (Command-Level)
 

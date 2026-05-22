@@ -23,11 +23,11 @@ La toute première action lors de `/spec-explain` est de poser le goal durable.
    livespec goal render spec-explain --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-explain-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-explain-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-explain for <feature> — task list: .specs/.runs/goal-spec-explain-<hash8>.md
+   /goal hash:<hash> | spec-explain for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-explain-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -336,6 +336,37 @@ Default output mode: **concise executive explain**
 - Remaining diagrams listed as references
 
 If user wants full detail, use `--full` (or `--history`, `--diagrams-only`, `--code`, `--why`).
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 1 — Resolve Input
+
+- [always] Read before-explain hooks from all 3 levels
+- [always] Classify request intent (how / why / what changed / where)
+- [always] Match feature name or number to `.specs/features/NNN-*/`
+- [always] Search specs, ADRs, and changelog for natural-language questions
+- [always] Rank candidates and prompt user if multiple matches
+
+### Phase 2 — Read All Sources
+
+- [always] Read spec.md (user stories and flowcharts)
+- [always] Read plan.md (sequence, state, ER diagrams)
+- [always] Read implementation.md (file mapping)
+- [always] Read changelog.md (history of changes)
+- [always] Read ADR files from `.specs/stacks/decisions/`
+
+### Phase 3 — Produce Visual Summary
+
+- [always] Synthesize structured explanation across 8 sections
+- [always] Embed up to 2 diagrams inline, list remaining as references
+- [always] List all sources used for traceability
+- [always] Suggest next useful action (spec-check, spec-plan, spec-stack)
+- [always] Read after-explain hooks from all 3 levels
 
 ## Definition of Done (Command-Level)
 

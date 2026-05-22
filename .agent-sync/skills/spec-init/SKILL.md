@@ -22,11 +22,11 @@ La toute première action lors de `/spec-init` est de poser le goal durable.
    livespec goal render spec-init --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-init-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-init for <feature> — task list: .specs/.runs/goal-spec-init-<hash8>.md
+   /goal hash:<hash> | spec-init for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-init-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -1054,6 +1054,67 @@ If user already knows their stack, allow a compact flow:
 - Ask only 3 questions: project type, expected scale, must-have constraints.
 - Confirm preset and generate files.
 - Record skipped interview fields as `[NOT PROVIDED]` in `project.md`.
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-init --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase A — Brainstorm
+
+- [always] Detect .brainstorm/project-profile.md and present import/modify/ignore prompt
+- [always] If brainstorm detected and accepted: pre-fill project.md and skip to Phase B
+- [always] If no brainstorm: run 6-question conversational interview (Q1-Q6)
+- [always] Present project profile summary and confirm before proceeding
+
+### Phase B — Stack Decisions
+
+- [always] Run decision tree based on project profile signals
+- [always] Present recommended stack with justifications per layer
+- [always] Accept stack adjustments and confirm final stack
+- [always] Define testing strategy for the project type
+- [always] Ask dev tooling preferences (package manager, linter)
+- [always] Check design tool configuration; run wizard if not configured
+- [always] Detect and confirm brainstorm design/theme artifact import
+- [always] Bootstrap Penflow contract workspace if .brainstorm/penflow/ exists
+- [always] Import theme.css and write theme.md if brainstorm theme detected
+- [always] Create at least 1 ADR per significant stack choice
+
+### Phase C — Installation
+
+- [always] Create .specs/ directory structure with all required files
+- [always] Generate constitution.md from conversation and stack
+- [always] Generate project.md from Phase A answers
+- [always] Generate stacks/_default.md with `updated` frontmatter
+- [always] Generate testing/strategy.md from Phase B decisions
+- [always] Generate roadmap.md via inference matrix from project profile
+- [always] Create .specs/README.md with project name, ADRs, empty features table
+- [always] Install LiveSpec section in CLAUDE.md (create or update idempotently)
+- [always] Run sync-agent-assets.sh and verify all required skill/agent symlinks
+- [always] Install pre-commit hook via install-hooks.sh
+- [always] Write .specs/livespec-version and .specs/.livespec-path
+- [always] Update .gitignore with required patterns
+- [visual] Scaffold visual testing helpers if Playwright is available
+
+### Phase D — Preflight Setup
+
+- [always] Generate preflight.md from stack technologies catalog
+- [always] Scan .env for creds:* entries and add token checks
+- [always] Run 3-pass preflight engine (verify → auto-resolve → human blockers)
+- [always] Present human-required blockers grouped for resolution
+- [always] Ensure .gitignore has exact entry for .specs/preflight-report.md
+
+### Phase E — Post-Init Hooks
+
+- [always] Scan and resolve after-init hook chain (3 levels)
+- [always] Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook
 
 ### Exit Criteria (Must Pass)
 

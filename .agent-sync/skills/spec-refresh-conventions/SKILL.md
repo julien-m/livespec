@@ -22,11 +22,11 @@ La toute première action lors de `/spec-refresh-conventions` est de poser le go
    livespec goal render spec-refresh-conventions --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-refresh-conventions-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-refresh-conventions-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-refresh-conventions for <feature> — task list: .specs/.runs/goal-spec-refresh-conventions-<hash8>.md
+   /goal hash:<hash> | spec-refresh-conventions for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-refresh-conventions-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -160,6 +160,41 @@ If `--dry-run` is passed, run Steps 1-3 and display the report at Step 5, but do
 - Legacy `.conventions/conventions.md` deleted if it was present.
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-refresh-conventions --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase 1 — Guard
+
+- [always] Verify .specs/ directory exists; abort with message if missing
+
+### Phase 2 — Legacy Detection
+
+- [always] Delete .conventions/conventions.md if legacy compiled format is found
+
+### Phase 3 — Extract Stack Signals
+
+- [always] Read stacks/_default.md and project.md in full
+- [always] Extract flat list of keyword signals (technology names, architecture keywords)
+
+### Phase 4 — Run Bootstrap Path
+
+- [always] Read ~/.claude/livespec/references/conventions-sync.md and follow Bootstrap Path
+- [always] Invoke /conventions.refresh --full with extracted signals
+- [always] Write .conventions/index.md and .conventions/manifest.yaml
+
+### Phase 5 — Report
+
+- [always] Display verbose Conventions Bootstrap Report with signals, sub-domains, file count, and result
 
 ## Definition of Done
 

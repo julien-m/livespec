@@ -23,11 +23,11 @@ La toute première action lors de `/spec-fix` est de poser le goal durable.
    livespec goal render spec-fix --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-fix-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-fix for <feature> — task list: .specs/.runs/goal-spec-fix-<hash8>.md
+   /goal hash:<hash> | spec-fix for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-fix-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -368,6 +368,79 @@ Total: 6/8 gaps closed (75%)
 | `--no-visual` | `-V` | Fix everything except visual gaps |
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Preflight
+
+- [always] Verify `.specs/` directory exists
+- [always] Verify at least one feature directory exists in `.specs/features/`
+- [always] Verify provided feature directory exists (if feature name given)
+- [always] Read before-fix hooks from all 3 levels
+
+### Phase 1 — Resolve Feature
+
+- [always] Resolve feature from argument, current git branch, or prompt user
+
+### Phase 2 — Load or Generate Gap Report
+
+- [always] Look for most recent gap report in `.specs/features/NNN/checks/`
+- [always] Check report staleness (same calendar day + no commits since report date)
+- [always] Run spec-check inline and save gap report if missing or stale
+- [always] Exit if gap report shows 0 gaps
+
+### Phase 3 — Load Full Context
+
+- [always] Read spec-system.md, project.md, constitution.md, stacks/_default.md, testing/strategy.md
+- [always] Read feature spec.md, plan.md, implementation.md, progress.md
+- [always] Read design screens index and theme files (theme.css, theme.md)
+- [visual] Read mockup PNGs from `.specs/design/screens/`
+- [visual] Read current baseline PNGs from `baselines/`
+- [always] Read conventions from `.conventions/index.md` and referenced ai-ressources files
+
+### Phase 4 — Filter Gaps
+
+- [always] Parse gap report and apply flag filters (--visual, --functional, --fr, --ac)
+- [always] Run spec drift guard — detect gaps where code passes tests but diverges from spec
+- [always] Display filtered gap summary with counts
+
+### Phase 5 — Generate Fix Plan
+
+- [always] Generate targeted fix plan for each functional gap (read FR/AC, plan section, code locations)
+- [visual] Run pixel diff between mockup PNG and baseline PNG
+- [visual] Feed diff regions + source code + theme tokens to LLM for visual reasoning
+- [visual] Generate targeted CSS/layout correction steps per visual gap
+
+### Phase 6 — Execute Fixes
+
+- [always] Execute functional fixes in order (add @spec anchors, follow stack patterns, follow conventions)
+- [generate] Generate tests for new AC implementations
+- [always] Update progress.md with fix checkpoint
+- [visual] Apply CSS/layout/styling changes to match mockup
+- [visual] Enforce theme token usage — replace hardcoded values with CSS variables from theme.css
+
+### Phase 7 — Verify Fixes
+
+- [always] Run test suite from plan.md or testing/strategy.md
+- [visual] Re-capture Playwright screenshots after visual fixes
+- [always] Score results per gap (Fixed / Improved / Still failing)
+- [always] Apply iteration logic — exit early if all fixed or regression detected, retry remaining gaps up to max iterations
+
+### Phase 8 — Update Artifacts
+
+- [always] Update `implementation.md` — FR→code and AC→test mappings, status columns
+- [visual] Copy new Playwright screenshots to `baselines/`
+- [visual] Update Last Modified in `screens/index.md` if mockups regenerated
+- [always] Write feature changelog entry with gaps closed count and file list
+- [always] Write global `.specs/changelog.md` summary entry (with lock)
+- [always] Overwrite today's gap report in `checks/YYYY-MM-DD.md` with fixed items marked
+- [always] Update README.md status to Implemented if all gaps closed
+- [always] Read after-fix hooks from all 3 levels
 
 ## Definition of Done (Command-Level)
 

@@ -143,7 +143,6 @@ def _audit_command(
         _check_expectations(command),
         _check_expectations_identity(command),
         _check_docs_reference(repo_root, command),
-        _check_finalization_policy(repo_root, command),
         _check_naming(command, naming_policy),
     ]
     return CommandAuditEntry(command=command, checks=tuple(checks))
@@ -257,16 +256,6 @@ def _check_docs_reference(repo_root: Path, command: CommandInfo) -> AuditCheck:
     if missing:
         return AuditCheck("routing_docs", "FAIL", f"missing in {', '.join(missing)}")
     return AuditCheck("routing_docs", "PASS", "routing docs mention command")
-
-
-def _check_finalization_policy(repo_root: Path, command: CommandInfo) -> AuditCheck:
-    policy_path = repo_root / "system" / "anti-drift-block.md"
-    if not policy_path.is_file():
-        return AuditCheck("finalization_policy", "FAIL", "anti-drift policy missing")
-    text = policy_path.read_text(encoding="utf-8")
-    if "livespec run finalize" not in text:
-        return AuditCheck("finalization_policy", "FAIL", "run finalization policy missing")
-    return AuditCheck("finalization_policy", "PASS", "run finalization policy present")
 
 
 def _check_naming(

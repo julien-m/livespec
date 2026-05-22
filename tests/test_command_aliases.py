@@ -44,7 +44,6 @@ def test_link_local_creates_hyphenated_and_dotted_command_links(tmp_path: Path) 
     log = log_path.read_text(encoding="utf-8")
     assert "skill link" in log
     assert "spec-feature" in log
-    assert "spec-verify-output" in log
 
 
 def test_installer_dry_run_mentions_hyphenated_bootstrap_aliases() -> None:

@@ -150,15 +150,15 @@ Before any slash command starts command-specific work, it MUST compile a determi
 livespec goal render <command-name> --feature <feature-slug> --flags "<active-flags>" --save
 ```
 
-This writes a task file to `.specs/.runs/goal-<command>-<hash8>.md` and prints:
+This writes a task file to `$TMPDIR/livespec-goals/goal-<command>-<hash8>.md` and prints:
 ```
-hash:<full-sha256> | task-file:.specs/.runs/goal-<command>-<hash8>.md
+hash:<full-sha256> | task-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.md
 ```
 
 - **Read the task file** — it contains every execution task as a checkbox `[ ]` and the full Definition of Done.
 - **Immediately after rendering, emit the slash command `/goal`** with hash and file reference. Output exactly:
   ```
-  /goal hash:<hash> | <command> for <feature> — task list: .specs/.runs/goal-<command>-<hash8>.md
+  /goal hash:<hash> | <command> for <feature> — task list: $TMPDIR/livespec-goals/goal-<command>-<hash8>.md
   ```
   This compact form stays within the platform goal field character limit while preserving the full task list.
   This is mandatory — no flag bypasses it.
@@ -184,33 +184,6 @@ checklist when programmatic verification is unavailable):
 
 If any checkbox fails, emit the corresponding ERROR/BLOCKED line (using the §2 shape) and stop.
 Do NOT report DONE. The subtype for a §5 failure is `verification_failed`.
-
-### Runtime finalization gate
-
-Before a slash command reports success, its observable stdout, stderr, exit code,
-flags, cwd, git state, and filesystem effects MUST be recorded and verified via:
-
-```bash
-livespec run finalize --command <command-name> --exit-code <code> \
-  --stdout-file <captured-stdout> --stderr-file <captured-stderr> --cwd <project-root>
-```
-
-If finalization returns `drift`, `blocked`, or `error`, the slash command MUST
-emit the corresponding canonical ERROR/BLOCKED line and MUST NOT report success.
-`/spec-verify-output` may verify itself only through an already-recorded wrapper
-artifact to avoid recursive verification.
-
-After finalization, run the deterministic goal gate with the same command, feature,
-flags, and run artifact:
-
-```bash
-livespec goal verify <command-name> --feature <feature-slug> --flags "<active-flags>"
-```
-
-- `success` (exit 0): the command may report success.
-- `drift` or `error` (exit 1): emit `ERROR step=<N> type=verification_failed ...` using the command's final step number and do not complete the goal.
-- `blocked` (exit 2): emit `BLOCKED at step <N> - verification_failed - goal verification blocked` using the command's final step number and return a resumable status.
-- Commands without feature context omit `--feature`; commands without active flags pass an empty flags string.
 
 ---
 

@@ -22,11 +22,11 @@ La toute première action lors de `/spec-preflight` est de poser le goal durable
    livespec goal render spec-preflight --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-preflight-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-preflight-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-preflight for <feature> — task list: .specs/.runs/goal-spec-preflight-<hash8>.md
+   /goal hash:<hash> | spec-preflight for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-preflight-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -434,6 +434,42 @@ The migration that enriches `.specs/preflight.md` with entries from
 features 016-033 is shipped as migration v10 - run `/spec-migrate`.
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Manifest Setup
+
+- [always] Read before-preflight hooks from all 3 levels
+- [always] Read existing `.specs/preflight.md` manifest (or generate with --regenerate)
+- [always] Enforce gitignore entry for `.specs/preflight-report.md`
+
+### Phase 1 — Pass 1: Verify All
+
+- [always] Execute all `verify` commands in parallel (10s default timeout per check)
+- [always] Record status for each check: pass / fail / error
+
+### Phase 2 — Pass 2: Auto-Resolve Failures
+
+- [always] For each failed check with non-human resolve: prompt if source is manual, then execute install/resolve command
+- [always] Re-execute verify command after resolution attempt
+- [always] Mark check as resolved or failed; escalate unresolved to Pass 3
+
+### Phase 3 — Pass 3: Human Blockers
+
+- [always] Present all human-required failures grouped with resolve commands
+- [always] Wait for user action then re-run Pass 1 + Pass 2 until all checks pass or user skips
+- [always] Enforce gate: block if any critical check still failed after user skips
+
+### Phase 4 — Report Generation
+
+- [always] Write `.specs/preflight-report.md` with verdict (READY / WARNINGS / BLOCKED), summary table, and details per category
+- [always] Display inline output with check results and timing
+- [always] Read after-preflight hooks from all 3 levels
 
 ## Definition of Done (Command-Level)
 

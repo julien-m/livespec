@@ -23,11 +23,11 @@ La toute première action lors de `/spec-refine` est de poser le goal durable.
    livespec goal render spec-refine --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-refine-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-refine-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-refine for <feature> — task list: .specs/.runs/goal-spec-refine-<hash8>.md
+   /goal hash:<hash> | spec-refine for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-refine-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -593,6 +593,58 @@ If the project refinement involves adding/replacing a technology, redirect to `/
 | `--dry-run`, `-d` | Show proposed changes without applying them |
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-refine --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase 1 — Resolve Target
+
+- [always] If no argument: scan .specs/ and present interactive menu of artifacts and statuses
+- [always] Resolve target by feature number, name, or "project" keyword
+
+### Phase 2 — Eligibility Check
+
+- [always] Read spec.md status and verify eligibility rules (Draft/Review/Approved allowed)
+- [always] Warn on Planned status (plan may need regeneration after refine)
+- [always] Block on In Progress, Implemented, Deprecated, or existing implementation.md for plans
+
+### Phase 3 — Read Artifact
+
+- [always] Read target artifact (spec.md or plan.md) and relevant context files
+
+### Phase 4 — Present Current State and Converse
+
+- [always] Present summary of current artifact state and refinement options
+- [always] Ask 1-3 targeted questions based on selected refinement area (max 2 clarifications)
+- [always] Check recent .checks/ report and surface identified gaps as suggestions
+
+### Phase 5 — Modification by Diff
+
+- [always] Present before/after diff of proposed changes
+- [always] Apply changes only after confirmation (unless --auto)
+- [always] Preserve all existing AC/FR/SC numbering (never renumber)
+- [always] Enforce quality gates after applying changes
+
+### Phase 6 — Record Changes
+
+- [always] Add refinement entry to feature changelog.md or global .specs/changelog.md
+- [always] Update Last updated date in .specs/README.md
+- [always] Display downstream warnings when plan.md exists after spec refinement
+
+### Phase 7 — Roadmap and Re-evaluation
+
+- [always] Re-evaluate roadmap after project-level changes using inference matrix
+- [always] Propose adding new, stale, or modified roadmap items with before/after diff
+- [always] Apply roadmap changes after confirmation
 
 ## Definition of Done (Command-Level)
 

@@ -23,11 +23,11 @@ La toute première action lors de `/spec-plan` est de poser le goal durable.
    livespec goal render spec-plan --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-plan-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-plan-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-plan for <feature> — task list: .specs/.runs/goal-spec-plan-<hash8>.md
+   /goal hash:<hash> | spec-plan for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-plan-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -472,6 +472,71 @@ ABORT: "plan.md failed structural validation after 2 retries.
 ```
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-plan --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase 1 — Resolve Feature
+
+- [always] Resolve feature by name, git branch, or first Draft without plan.md
+- [always] Verify spec.md exists for target feature
+
+### Phase 2 — Read Context
+
+- [always] Read spec.md, constitution.md, stacks/_default.md, testing/strategy.md, project.md
+- [visual] Read mockup PNGs from .specs/design/screens/ and generate Design Reference section
+- [visual] Read theme.css and theme.md if they exist
+- [penflow] Run Penflow forward contract if penflow/ is absent for UI feature
+- [penflow] Read penflow/semantic-ui-tree.json and penflow/code-ir.json
+
+### Phase 3 — Analyze Requirements
+
+- [always] Extract all FR, AC, key entities, API interactions, state entities, infra dependencies
+- [always] Classify feature size (S/M/L) and apply output budget
+
+### Phase 4 — Generate Technical Context
+
+- [always] Auto-fill stack table from stacks/_default.md
+
+### Phase 5 — Constitution Check
+
+- [always] Verify planned approach against each constitution principle
+
+### Phase 6 — Generate Diagrams
+
+- [always] Determine which diagram types apply (sequence, state, ER)
+- [always] Generate Mermaid sequence diagram if feature has API interactions
+- [always] Generate Mermaid state diagram if feature has stateful entities
+- [always] Generate ER diagram if feature introduces new database tables
+
+### Phase 7 — File-by-File Plan
+
+- [always] Map each FR to concrete files by layer (infra, db, data, logic, API, UI, tests)
+- [always] Write FR sub-task numbers and descriptions for each step
+- [always] Resolve test commands and record in Resolved Test Commands table
+- [visual] Add theme installation Step 0 to plan if theme.css exists
+- [always] Map each test type to specific files and FR/AC
+
+### Phase 8 — Contracts and Sync
+
+- [always] Generate openapi.yaml if feature introduces new API endpoints
+- [always] Update .specs/README.md feature row Status to Planned
+- [always] Add plan entry to feature changelog.md and global .specs/changelog.md
+- [always] Run LLM plan review unless --no-review; retry on blocking findings
+- [always] Run `livespec validate` structural validation; retry on failure
+
+### Phase 9 — Present for Approval
+
+- [always] Display plan summary with diagram count, step count, and next action
 
 ## Definition of Done (Command-Level)
 

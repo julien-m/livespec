@@ -23,11 +23,11 @@ La toute première action lors de `/spec-feature` est de poser le goal durable.
    livespec goal render spec-feature --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-feature-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-feature for <feature> — task list: .specs/.runs/goal-spec-feature-<hash8>.md
+   /goal hash:<hash> | spec-feature for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-feature-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -857,6 +857,116 @@ If any phase fails:
 ```
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Verify no active goal exists
+- [always] Resolve feature slug and active flags from arguments
+- [always] Run `livespec goal render spec-feature --save` and save task file
+- [always] Emit `/goal` slash command with hash and task file reference
+
+### Phase 0 — Roadmap Resolution (no argument)
+
+- [always] Read `.specs/roadmap.md` and find first unchecked item
+- [always] Display next roadmap feature and prompt for confirmation
+- [always] Run `livespec pipeline init` with resolved description and flags
+
+### Phase 0.5 — Penflow Forward Contract
+
+- [penflow] Detect UI feature from description keywords
+- [penflow] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --full`
+- [penflow] Generate flow-ui-contract files under `penflow/flow-ui-contract/`
+- [penflow] Mirror contract files to `.specs/features/<slug>/design/flow-ui-contract/`
+- [penflow] Run `penflow validate-flow-specs` on flow-ui-contract directory
+- [penflow] Run `penflow export-semantic-tree` to produce `semantic-ui-tree.json`
+- [penflow] Run `penflow validate-semantic-tree` on semantic tree
+- [penflow] Run `penflow draft-pen-from-tree` to produce `ui.pen`
+- [penflow] Run `penflow validate-pen` on `ui.pen`
+- [penflow] Run `penflow export-expected` to produce `expected-ui-tree.json`
+- [penflow] Run `penflow code-ir` to produce `code-ir.json`
+- [penflow] Run `livespec penflow-contract status` and require PASS
+- [penflow] Sync `ui.pen` and validation outputs to feature design directory
+- [penflow] Promote design to Global LiveSpec Design Registry (`.specs/design/`)
+- [penflow] Export mockup PNGs into `.specs/design/screens/<slug>/`
+- [penflow] Create `.specs/design/baselines/<slug>/` destination
+- [penflow] Update `.specs/design/screens/index.md` and `changelog.md`
+- [penflow] Run `penflow map-pencil-context` to produce `pencil-context-map.json`
+- [penflow] Run `penflow detect-drift` and write drift-report artifacts
+- [penflow] Write `.mockup-validation/` audit artifacts and visual-evidence manifest
+- [penflow] Re-run `livespec penflow-contract status --require-design-registry --require-mockup-validation` and require PASS
+- [penflow] Verify all required paths exist before Phase 1
+
+### Phase 1 — Specify
+
+- [always] Run `livespec pipeline update --phase specify --status in_progress`
+- [always] Build Universal Agent Context with feature_name, feature_dir, feature_description, active_flags, conventions
+- [always] Spawn Specify agent with Universal Agent Context
+- [always] Receive and parse PHASE_RESULT from Specify agent
+- [always] Run `livespec pipeline update --phase specify --status done` on OK
+
+### Phase 1.5 — Spec Review Gate
+
+- [always] Display spec review findings from PHASE_RESULT
+- [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING)
+- [always] Run `livespec pipeline update --phase spec-review --status done`
+
+### Phase 2 — Plan
+
+- [always] Run `livespec pipeline update --phase plan --status in_progress`
+- [always] Build Universal Agent Context for plan phase with conventions
+- [always] Spawn Plan agent with Universal Agent Context
+- [always] Receive and parse PHASE_RESULT from Plan agent
+- [always] Run `livespec pipeline update --phase plan --status done` on OK
+
+### Phase 2.5 — Plan Review Gate
+
+- [always] Display plan review findings from PHASE_RESULT
+- [always] Update `plan.md` status to Approved on PASS
+- [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING)
+- [always] Run `livespec pipeline update --phase plan-review --status done`
+
+### Phase 2.7 — Preflight
+
+- [always] Run `/spec-preflight --light` with current feature context
+- [always] Write `preflight-report.md` with READY / WARNINGS / BLOCKED verdict
+- [always] Run `livespec pipeline update --phase preflight --status blocked` on critical failure
+
+### Phase 3 — Implement
+
+- [always] Run `livespec pipeline update --phase implement --status in_progress`
+- [always] Build Universal Agent Context for implement phase with conventions
+- [always] Spawn Implement agent with Universal Agent Context
+- [always] Receive and parse PHASE_RESULT from Implement agent
+- [always] Run `livespec pipeline update --phase implement --status done` on OK
+
+### Phase 3.5 — Test
+
+- [always] Run `livespec pipeline update --phase test --status in_progress`
+- [always] Spawn Test agent with `--auto --update` instructions
+- [visual] Open app in browser at 1440x900 and capture runtime screenshots
+- [visual] Sync approved screenshots to `.specs/design/baselines/<slug>/`
+- [penflow] Emit `penflow/actual-ui-tree.json` from live DOM/accessibility surface
+- [penflow] Run `penflow validate-actual` on actual UI tree
+- [penflow] Run `penflow compare-tree` expected vs actual and write compare-report
+- [penflow] Run `penflow review-report` and `penflow fix-report` on compare results
+- [penflow] Run `livespec penflow-contract status --require-actual` and require PASS
+- [always] Receive and parse PHASE_RESULT from Test agent
+- [always] Run `livespec pipeline update --phase test --status done` on OK or partial AC coverage
+
+### Phase 4 — Git Finalization
+
+- [always] Run `/audit --fix` and verify zero remaining violations
+- [always] Verify all tests pass after audit
+- [always] Run `livespec commit-context write` only if explicit commit requested
+- [always] Print `Commit: skipped - no explicit user authorization` if no commit requested
+- [always] Emit SHIP_RESULT block if called from `/spec-ship`
 
 ## Run Artifact Emission
 

@@ -23,11 +23,11 @@ La toute première action lors de `/spec-specify` est de poser le goal durable.
    livespec goal render spec-specify --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-specify-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-specify-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-specify for <feature> — task list: .specs/.runs/goal-spec-specify-<hash8>.md
+   /goal hash:<hash> | spec-specify for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-specify-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -907,6 +907,76 @@ flowchart TD
 | `--no-behavioral` | Skip behavioral AC injection (Step 5.7). Use when feature is confirmed non-UI or taxonomy not yet created |
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-specify --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase 1 — Parse and Scope
+
+- [always] Extract feature name, user action, and priority hints from input
+- [always] Analyze scope for independent domains and complexity flags
+- [always] Propose split if 2+ independent domains or complexity exceeded; add deferred items to roadmap
+- [always] Create seed.md files for each deferred sub-feature
+- [always] Load seed.md context if target feature directory already has a seed
+
+### Phase 1.8 — Penflow UI Contract Resolution
+
+- [penflow] Run `livespec penflow-contract status` to detect contract state
+- [penflow] Run From-Scratch Penflow Forward Contract if status is `absent` for UI feature
+
+### Phase 2 — Auto-Number and Create Directory
+
+- [always] Atomically reserve next NNN via `reserve_nnn()` call
+- [always] Create feature directory .specs/features/NNN-feature-name/
+
+### Phase 3 — Read Context
+
+- [always] Read project.md, constitution.md, stacks/_default.md
+
+### Phase 4 — Generate spec.md
+
+- [always] Generate user stories with Gherkin scenarios and Mermaid flowcharts
+- [always] Generate AC and FR sections with sequential numbering
+- [always] Generate Key Entities, Edge Cases, Success Criteria, and Infrastructure Requirements if needed
+- [penflow] Add Penflow Contract section with resolved IDs
+- [always] Inject `## Behavioral AC` section via LLM signal extraction and detect_traits() if UI signals found
+- [visual] Inject visual state assertions for detected traits with visual_states defined
+- [always] Run `livespec validate` structural validation; retry on failure (max 2)
+- [always] Run LLM spec review unless --no-review; retry on blocking findings
+
+### Phase 5 — Mockups and Surface Annotation
+
+- [visual] Detect UI feature and check design tool configuration
+- [visual] Import brainstorm mockups if screens/ is empty and .brainstorm/ has PNGs
+- [visual] Generate mockups via MCP for each identified screen
+- [visual] Export PNGs to .specs/design/screens/NNN-feature-name/ and screens/<name>.png
+- [visual] Update .specs/design/screens/index.md with new or modified screen rows
+- [visual] Add `## Screens` section to spec.md with versioned PNG references
+- [visual] Update .specs/design/changelog.md with screen entries
+- [always] Annotate `Surfaces:` field if .specs/surfaces.yaml has multiple Playwright surfaces
+
+### Phase 6 — Present and Confirm
+
+- [always] Run quality gate checks before presenting spec
+- [always] Present spec summary and offer next actions
+
+### Phase 7 — Sync Artifacts
+
+- [always] Rename seed.md to seed.absorbed.md if seed was loaded
+- [always] Add feature row to .specs/README.md Features table under lock
+- [always] Add initial entry to feature changelog.md under lock
+- [always] Add summary entry to global .specs/changelog.md under lock
+- [always] Match and check roadmap items; add deferred or ad-hoc items as needed
+- [always] Propose preflight manifest additions if spec has Infrastructure Requirements
 
 ## Definition of Done (Command-Level)
 

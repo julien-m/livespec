@@ -23,11 +23,11 @@ La toute première action lors de `/spec-play-coverage` est de poser le goal dur
    livespec goal render spec-play-coverage --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-play-coverage-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-play-coverage-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-play-coverage for <feature> — task list: .specs/.runs/goal-spec-play-coverage-<hash8>.md
+   /goal hash:<hash> | spec-play-coverage for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-play-coverage-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -83,6 +83,44 @@ bash "$SCRIPT" <FEATURE> <SOURCE_DIR>
 Replace `<FEATURE>` with the resolved feature name and `<SOURCE_DIR>` with the detected source directory.
 
 The script handles grep, JSON encoding, base64, and browser opening. Do **not** attempt to do these steps manually.
+
+---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-play-coverage --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase 1 — Resolve Feature
+
+- [always] Resolve feature by argument, git branch, or interactive selection
+
+### Phase 2 — Auto-detect Source Directory
+
+- [always] Check for common source directories (app/, src/, lib/, packages/)
+- [always] Select directory with most @spec anchor matches; fall back to .
+
+### Phase 3 — Run Coverage Script
+
+- [always] Resolve play-coverage.sh path from skill symlink chain
+- [always] Execute `bash play-coverage.sh <FEATURE> <SOURCE_DIR>`
+- [always] Open playground in browser with pre-loaded @spec anchor data
+
+## Definition of Done (Command-Level)
+
+`/spec-play-coverage` is complete only if all are true:
+
+- [ ] Feature resolved to a valid feature directory
+- [ ] Source directory detected with @spec anchor matches
+- [ ] play-coverage.sh executed without error
+- [ ] Playground opened in browser with coverage data loaded
 
 ---
 

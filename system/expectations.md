@@ -4,9 +4,8 @@
 # Command Expectations & Verify Output — Reference
 
 > The canonical reference for `.agent-sync/skills/<X>/expectations.md` contract files,
-> the `RunArtifact` JSON schema, the `verify:` YAML grammar, the override
-> resolver, the pre-commit `last_reviewed` hook, and the 4-state outcome
-> classifier consumed by `/spec-verify-output`.
+> the `verify:` YAML grammar, the override resolver, the pre-commit `last_reviewed`
+> hook, and the 4-state outcome classifier used by the goal contract system.
 
 ## 1. File Layout
 
@@ -15,7 +14,6 @@
 | `system/templates/command-expectations.template.md` | LiveSpec | Canonical 12-section template + `verify:` YAML stub. |
 | `.agent-sync/skills/<X>/expectations.md` | LiveSpec (builtin) | One per slash-command skill. Source of truth absent a project override. |
 | `.specs/expectations/<X>.md` | Per-project (override) | Totally replaces the builtin (no merge). |
-| `.specs/.runs/<X>-<ISO>.json` | Per-project (runtime) | Run artifact written by every `/spec-*` command. Gitignored. |
 
 ## 2. Frontmatter Schema
 
@@ -83,7 +81,7 @@ verify:
   must_not: []
 ```
 
-A `WhenBranch` activates only when `RunArtifact.flags` contains the declared
+A `WhenBranch` activates only when the command's active flags contain the declared
 flag. Multiple matching branches accumulate — their rules are logically ANDed
 with the base rules.
 
@@ -102,37 +100,7 @@ The verifier evaluates `must`, `may`, and `must_not` as **independent buckets**.
 Failing a `must` rule does not skip `must_not` evaluation, and vice versa.
 Overlapping substrings (e.g. `must: contains "error"` and
 `must_not: contains "fatal error"`) are both evaluated against the same raw
-output. Enforced by `tests/test_verify_output.py::test_must_not_rules_are_independent_of_must_rules_no_short_circuit`.
-
-## 5. `RunArtifact` JSON Schema
-
-Written under `.specs/.runs/<command>-<ISO>.json`.
-
-```json
-{
-  "command": "specify",
-  "timestamp": "2026-05-12T10:00:00Z",
-  "flags": ["--visual"],
-  "exit_code": 0,
-  "duration_ms": 312000,
-  "cwd": "/abs/path",
-  "git_state_before": {"branch": "main", "head_sha": "abc123", "dirty": []},
-  "git_state_after":  {"branch": "main", "head_sha": "abc123", "dirty": [".specs/features/001/spec.md"]},
-  "fs_observed": [
-    {"path": ".specs/features/001/spec.md", "change": "create"}
-  ],
-  "stdout": "...",
-  "stderr": "..."
-}
-```
-
-Required keys: `command`, `timestamp`, `flags`, `stdout`, `stderr`,
-`exit_code`, `duration_ms`, `cwd`, `git_state_before`, `git_state_after`,
-`fs_observed`.
-
-Artifacts are atomic-written (`.tmp` then `os.replace`). Lexicographically
-sortable timestamps; the verifier picks the latest filename (EC-009).
-Rotation: 21st artifact triggers move-to-`_archive/` of the oldest.
+output — no short-circuit.
 
 ## 6. Override Lookup
 
@@ -142,9 +110,8 @@ Rotation: 21st artifact triggers move-to-`_archive/` of the oldest.
 ```
 
 First file found wins. The override **totally replaces** the builtin —
-no prose merge, no YAML merge. If the override is malformed,
-`/spec-verify-output` exits 2 with `Blocked By: override missing verify: block`
-(or similar) — it does **NOT** silently fall back to the builtin (AC-007).
+no prose merge, no YAML merge. If the override is malformed, the goal compiler raises `ExpectationsInvalid`
+and the command is blocked — it does **NOT** silently fall back to the builtin.
 
 ## 7. Pre-commit Hook Contract
 
@@ -209,26 +176,18 @@ wall-clock fields.
 CLI:
 
 ```bash
-livespec goal render <command> --feature <feature> --flags "<flags>"
-livespec goal verify <command> --feature <feature> --flags "<flags>" [--run <artifact>]
+livespec goal render <command> --feature <feature> --flags "<flags>" --save
 ```
 
-Rules:
-
 - Same project state + command + feature + flags + expectations + SKILL.md → same canonical JSON and SHA-256 hash.
+- `--save` writes a Markdown task file to `$TMPDIR/livespec-goals/goal-<cmd>-<hash8>.md` and prints `hash:<sha256> | task-file:<path>`.
 - If `.conventions/index.md` exists, the goal embeds selected convention domains, source paths, source content, and content hashes. `code` is selected by default; `design-*` domains are selected for UI/mockup/visual/CSS/screen/theme/baseline/Penflow signals.
-- The rendered objective is a deterministic view of the canonical payload; it can be passed to the platform `/goal` slash command at command start.
-- `goal verify` reuses the `verify:` YAML rules and the latest run artifact, so it has the same success/drift/error/blocked semantics as `/spec-verify-output`.
 
 ## 9. Placeholders & Edge Cases (summary)
 
 - EC-001: whitespace-only diff to `.agent-sync/skills/X/SKILL.md` still triggers the hook.
 - EC-002: malformed override → blocked, no fallback to builtin.
-- EC-003: no run artifact → blocked.
-- EC-004: multiple active `when:` branches accumulate (ANDed).
-- EC-005: overlapping substrings are evaluated independently — no short-circuit.
-- EC-006: `<date>` placeholder resolves from artifact timestamp, never commit date.
-- EC-007: malformed artifact JSON → blocked with `ArtifactMalformed`.
-- EC-008: command rename → multi-file ceremony (§7).
-- EC-009: multiple artifacts → lexicographically latest wins.
-- EC-010: `when:` flag never accepted by command → branch never activates (no error).
+- EC-003: multiple active `when:` branches accumulate (ANDed).
+- EC-004: overlapping substrings are evaluated independently — no short-circuit.
+- EC-005: command rename → multi-file ceremony (§7).
+- EC-006: `when:` flag never accepted by command → branch never activates (no error).

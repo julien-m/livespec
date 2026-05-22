@@ -23,11 +23,11 @@ La toute première action lors de `/spec-implement` est de poser le goal durable
    livespec goal render spec-implement --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-implement-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-implement for <feature> — task list: .specs/.runs/goal-spec-implement-<hash8>.md
+   /goal hash:<hash> | spec-implement for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-implement-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -594,6 +594,85 @@ Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: 1` in settings.
 See `system/testing/failure-handling.md` for iteration limits per test type.
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-implement --save`
+- [always] Emit `/goal` slash command with task file reference
+- [always] Read generated task file and begin ordered execution
+
+### Phase 0.5 — Preflight Safety Contract
+
+- [always] Verify target feature directory exists
+- [always] Verify spec.md exists and status is not Deprecated
+- [always] Verify plan.md exists with no unresolved `[DECISION NEEDED]`
+- [always] Resolve project test commands from plan.md or discovery
+- [always] Run `/spec-preflight --light` and gate on critical failures
+
+### Phase 1 — Analyze
+
+- [always] Read spec.md, plan.md, constitution.md, stacks/_default.md, testing/strategy.md
+- [visual] Read mockup PNGs from .specs/design/screens/
+- [visual] Read theme.css and theme.md if they exist
+- [penflow] Read penflow/code-ir.json and penflow/semantic-ui-tree.json
+- [always] Detect behavioral AC section and load taxonomy if present
+- [always] Explore codebase for existing patterns, naming conventions, test utilities
+
+### Phase 2 — Plan Execution
+
+- [always] Build ordered todo list from plan.md steps
+- [always] Run Step 0a behavioral TDD if `## Behavioral AC` present (RED phase required)
+- [always] Create progress.md before any step transitions to Done
+- [always] Execute each plan step with code, targeted tests, and step gate verification
+- [always] Write checkpoint to progress.md after every step
+- [always] Block step advancement on failing tests until iteration limit or Blocked status
+
+### Phase 3 — Convert & Dispatch (Multi-agent)
+
+- [always] Build Task Payload per step (context, instructions, TDD commands, DoD)
+- [always] Inline conventions payload for selected sub-domains
+- [always] Dispatch to `superpowers:subagent-driven-development` per step
+- [always] Receive subagent results and write progress.md checkpoint
+
+### Phase 5 — Visual Baselines
+
+- [visual] Capture baselines with resolved visual test command
+- [visual] Store screenshots to .specs/features/NNN/baselines/
+- [visual] Block on missing visual tooling for UI features
+
+### Phase 6 — Validate
+
+- [always] Run full test suite: types → lint → unit → integration → E2E → visual
+- [visual] Confirm baseline PNG files have corresponding test references
+- [visual] Hold baseline commits until non-visual tests pass
+
+### Phase 6.5 — Mandatory Visual Gate
+
+- [visual] Run `/spec-test <feature> --auto --visual`
+- [visual] Block Phase 7 on FAIL or BLOCKED visual gate verdict
+
+### Phase 7 — Update implementation.md
+
+- [always] Map every FR and AC to source file with `@spec` anchor and status
+- [visual] Add visual baseline entries to implementation.md
+
+### Phase 8 — Update changelog.md
+
+- [always] Add entry to feature changelog.md
+- [always] Add summary entry to global .specs/changelog.md
+
+### Phase 8.5 — Finalize
+
+- [always] Update spec.md status to Implemented or In Progress
+- [always] Update .specs/README.md feature row and Recent Activity section
+- [always] Save execution log to logs/YYYY-MM-DD.md (unless --no-save)
 
 ## Definition of Done (Command-Level)
 

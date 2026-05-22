@@ -22,11 +22,11 @@ La toute première action lors de `/spec-migrate` est de poser le goal durable.
    livespec goal render spec-migrate --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-migrate-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-migrate-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-migrate for <feature> — task list: .specs/.runs/goal-spec-migrate-<hash8>.md
+   /goal hash:<hash> | spec-migrate for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-migrate-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -522,6 +522,89 @@ If `node` is not in PATH:
 If `migrate-visual-tests.js` exits with a non-zero code:
 - Warning logged with captured script output for debugging
 - Core migration unaffected, exit code remains 0
+
+---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-migrate --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase 1 — Resolve LiveSpec Repo Path
+
+- [always] Read .specs/.livespec-path; resolve from skill symlink chain if missing
+- [always] Verify resolved path contains a VERSION file
+- [always] Write .specs/.livespec-path if freshly resolved
+
+### Phase 2 — Compare Versions
+
+- [always] Read .specs/livespec-version (default: 1 if missing)
+- [always] Read VERSION from LiveSpec repo
+- [always] Skip to Phase 4.5 if project version already matches repo version
+
+### Phase 3 — Apply Migrations
+
+- [always] For each pending version: read migrations/N/migrate.md and execute migrate.sh
+- [always] Stop and report on non-zero migration script exit
+
+### Phase 4 — Validate
+
+- [always] Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve
+- [always] Verify .specs/livespec-version matches VERSION from repo
+
+### Phase 4.4 — Surface Resolution
+
+- [always] Read and validate .specs/surfaces.yaml if present
+- [always] Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces
+
+### Phase 4.5 — Visual Test Scaffolding
+
+- [always] Run migrate-visual-tests.js --generate (guard on script and Node.js availability)
+- [always] Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts
+
+### Phase 4.6 — Visual Test Reconciliation
+
+- [always] Stage scaffolded files to establish rollback boundary
+- [always] Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files
+- [always] Run Check 1: detect and remove duplicate coverage across entire test directory
+- [always] Run Check 2: fix syntax errors from merge (unbalanced braces, double });)
+- [always] Run Check 3: remove empty dead stubs from Preserved sections
+- [always] Run Check 4: warn on orphaned route tests without matching route files
+- [always] Run Check 5: verify slug/route/heading coherence and log warnings
+
+### Phase 4.7 — E2E Test Generation
+
+- [always] Scan for features with Gherkin but no E2E test file
+- [always] Filter non-visual features using Check 0 results or fresh classification
+- [always] Read route files, component source, fixtures, and existing tests for context
+- [always] Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions
+- [always] Verify generated files compile (TypeScript check if available)
+
+### Phase 5 — Report
+
+- [always] Display migration summary with version range and validation results
+- [always] Append visual scaffolding summary (files created, baseline dirs)
+- [always] Append reconciliation summary (fixes, warnings per check)
+- [always] Append E2E generation summary (files created, features skipped)
+
+## Definition of Done (Command-Level)
+
+`/spec-migrate` is complete only if all are true:
+
+- [ ] All pending migrations applied in order
+- [ ] `scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified
+- [ ] `.specs/livespec-version` matches `VERSION` from repo
+- [ ] Visual test scaffolding ran (or was skipped with warning if unavailable)
+- [ ] Visual test reconciliation ran all 6 checks on new files
+- [ ] E2E test generation ran for features with Gherkin and no existing tests
+- [ ] Migration summary displayed with visual and E2E results appended
 
 ---
 

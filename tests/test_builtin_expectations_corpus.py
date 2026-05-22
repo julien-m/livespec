@@ -14,8 +14,7 @@ from validator.expectations import REQUIRED_SECTIONS, parse_expectations
 SKILLS_DIR = Path(__file__).resolve().parents[1] / ".agent-sync" / "skills"
 MIN_REVIEW_DATE = "2026-05-12"
 
-# The 19-command invariant enumerated by AC-002, plus the 20th (verify-output)
-# acknowledged in the feature changelog and spec-system.md `### Command discovery`.
+# The 19-command invariant enumerated by AC-002.
 EXPECTED_COMMANDS: tuple[str, ...] = (
     "spec-init",
     "spec-migrate",
@@ -36,18 +35,17 @@ EXPECTED_COMMANDS: tuple[str, ...] = (
     "spec-refine",
     "spec-status",
     "spec-refresh-conventions",
-    "spec-verify-output",
 )
 
 
-def test_20_builtin_files_exist():
+def test_19_builtin_files_exist():
     for cmd in EXPECTED_COMMANDS:
         assert (SKILLS_DIR / cmd / "expectations.md").exists(), cmd
 
 
 def test_ac002_19_enumerated_commands_have_expectations():
-    """AC-002 freezes the 19-command list (verify-output is the 20th)."""
-    for cmd in EXPECTED_COMMANDS[:19]:
+    """AC-002 freezes the 19-command list."""
+    for cmd in EXPECTED_COMMANDS:
         assert (SKILLS_DIR / cmd / "expectations.md").exists()
 
 

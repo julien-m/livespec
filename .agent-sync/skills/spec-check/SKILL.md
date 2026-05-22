@@ -23,11 +23,11 @@ La toute première action lors de `/spec-check` est de poser le goal durable.
    livespec goal render spec-check --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-check-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-check-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-check for <feature> — task list: .specs/.runs/goal-spec-check-<hash8>.md
+   /goal hash:<hash> | spec-check for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-check-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -806,6 +806,74 @@ Ordered list of the most urgent actions across all checked features:
 | `--summary`, `-S` | Multi-spec: only display the consolidated report |
 | `--show-provenance` | Display baseline provenance table for the resolved feature (Step 3.1). Exits after display — does not run Steps 4–10. |
 | `--visual-status` | Scan all features and display the visual governance dashboard (Step 8.5). Exits after display. |
+
+---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `surfaces` (--surfaces flag) · `quality-only` (--quality flag) · `tree-only` (--tree-only flag) · `visual-status` (--visual-status flag) · `multi` (multiple features selected)
+
+### Phase 0 — Goal Lock & Hooks
+
+- [always] Read before-check hooks (all 3 levels: global, project, local)
+- [always] Resolve flags and feature argument (read-only)
+- [always] Verify no active goal exists
+- [always] Render and save goal contract via `livespec goal render spec-check --save`
+- [always] Emit `/goal` slash command with hash and task-file reference
+
+### Phase 1 — Tree Validation
+
+- [always] Validate system files presence in .specs/ (spec-system.md, constitution.md, project.md, README.md, changelog.md, stacks/_default.md, testing/strategy.md, ADRs)
+- [always] Validate feature directory naming pattern (`^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$`)
+- [always] Check feature completeness (spec.md, changelog.md, implementation.md, plan.md per status)
+- [always] Detect orphan files directly under features/
+- [always] Verify README.md features table sync vs disk
+- [always] Detect surface drift: validate surfaces.yaml vs filesystem, scan for unconfigured app directories
+
+### Phase 2 — Feature Selection
+
+- [always] If no argument: list features sorted by last-modified date and prompt for selection
+- [always] Resolve feature: argument → git branch → interactive selection
+
+### Phase 3 — Spec Quality Gates
+
+- [always] Evaluate spec.md quality gates (Gherkin, Mermaid flowcharts, AC format, FR→AC mapping, clarification markers)
+- [always] Evaluate plan.md quality gates if file exists (sequence/state/ER diagrams, constitution check, FR coverage)
+- [always] Check implementation quality gates (implementation.md, changelog.md, progress.md)
+
+### Phase 4 — Implementation Verification
+
+- [always] Read spec requirements: extract all AC, FR, SC from spec.md
+- [always] Read implementation map from implementation.md (FR/@spec anchors, AC/test mappings, visual baselines)
+- [always] Recovery mode if implementation.md absent: grep @spec anchors, infer AC coverage, mark as ~ Inferred
+- [always] Verify each FR/AC against actual code: assign ✅ Verified / ⚠️ Partial / ❌ Missing / 🔄 Drifted
+
+### Phase 5 — Visual & Design Checks
+
+- [visual] Run staleness gate: read baseline.manifest.yml, check browser version, check per-screen mockup SHA-256
+- [penflow] Run Penflow contract status via `livespec penflow-contract status --json`
+- [penflow] Read penflow/compare-report.json, review-report.md, fix-report.md when present
+- [visual] Run pixel regression via compareRegression() for each VALID baseline vs current screenshot
+- [visual] Check design fidelity: compare VALID baselines vs mockup PNGs (5% threshold)
+- [visual] Check theme token compliance if .specs/design/theme.css exists
+- [visual-status] Scan all features' baselines/, classify each screen (VALID/STALE-MOCKUP/STALE-BROWSER/NO-MANIFEST), render governance dashboard
+
+### Phase 6 — Gap Report & Persist
+
+- [always] Produce structured gap report (spec quality, FR table, AC table, summary)
+- [always] Save gap report to .specs/features/NNN/checks/YYYY-MM-DD.md
+- [always] Add check entry to feature changelog.md
+- [always] Add summary entry to global .specs/changelog.md
+- [always] Present suggested fixes for each gap with actionable commands
+- [always] Prompt to update implementation.md status (or auto-update if --update)
+
+### Phase 7 — Multi-Spec Consolidation
+
+- [always] Produce consolidated report: feature health table, cross-feature dependencies, aggregated stats, priority list
+- [always] Read after-check hooks (all 3 levels: global, project, local)
 
 ---
 

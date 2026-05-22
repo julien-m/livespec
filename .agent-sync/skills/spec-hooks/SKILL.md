@@ -23,11 +23,11 @@ La toute première action lors de `/spec-hooks` est de poser le goal durable.
    livespec goal render spec-hooks --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-hooks-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-hooks-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-hooks for <feature> — task list: .specs/.runs/goal-spec-hooks-<hash8>.md
+   /goal hash:<hash> | spec-hooks for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-hooks-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -349,6 +349,49 @@ Hook diagnostics accept canonical command names:
 Legacy aliases such as `/spec.check` are normalized to the matching `spec-check` command name.
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 0 — Goal Lock
+
+- [always] Lock goal contract via `livespec goal render spec-hooks --save`
+- [always] Emit `/goal` slash command with task file reference
+
+### Phase 1 — Resolve Command Name
+
+- [always] Normalize command name (strip spec- prefix, validate against known command list)
+- [always] If no argument: prepare to show hooks for all commands
+
+### Phase 2 — Scan Hook Locations (Diagnostic Mode)
+
+- [always] Scan Level 0 user integrations via `livespec integrations list`
+- [always] Scan global, project, and local hook files for before/after timing
+- [always] Scan step-level hooks if command is `implement`
+- [always] Parse frontmatter mode (extend / override) for each found file
+
+### Phase 3 — Display Results
+
+- [always] Show single-command hook chain or summary table for all commands
+- [always] Mark SKIPPED hooks when override mode is active
+- [always] Show first 10 lines of each hook file if --verbose
+
+### Phase C — Create Mode (if --create)
+
+- [always] Resolve target file path based on --global / --local flag
+- [always] Check if file already exists and offer edit if so
+- [always] Create .specs/hooks/ directory if missing; verify .gitignore for *.local.md
+- [always] Write hook file with YAML frontmatter template and variable placeholders
+- [always] Guide user to fill in Instructions section content
+
+### Phase E — Edit Mode (if --edit)
+
+- [always] Resolve target file; suggest --create if file missing
+- [always] Display current content and accept modifications
 
 ## Definition of Done (Command-Level)
 

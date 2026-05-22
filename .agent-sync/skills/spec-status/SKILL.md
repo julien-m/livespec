@@ -22,11 +22,11 @@ La toute première action lors de `/spec-status` est de poser le goal durable.
    livespec goal render spec-status --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-status-<hash8>.md`
+   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-status-<hash8>.md`
 4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
 5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal hash:<hash> | spec-status for <feature> — task list: .specs/.runs/goal-spec-status-<hash8>.md
+   /goal hash:<hash> | spec-status for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-status-<hash8>.md
    ```
 6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
@@ -261,6 +261,44 @@ Flags are combinable: `--json --roadmap` outputs roadmap JSON only.
 ```
 
 ---
+
+## Execution Tasks
+
+> Machine-readable task inventory parsed by `livespec goal render`.
+> Format: `- [branch] task description`
+> Active branches per run:
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+
+### Phase 1 — Read Project Context
+
+- [always] Read `.specs/project.md` and extract project name
+- [always] Abort with init message if `.specs/` does not exist
+
+### Phase 2 — Read Roadmap
+
+- [always] Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred)
+- [always] Count checked/unchecked items per tier
+- [always] Extract linked feature numbers from checked items
+
+### Phase 3 — Scan Features
+
+- [always] Scan `.specs/features/*/spec.md` for number, name, status, creation date
+- [always] Check presence of plan.md and implementation.md per feature
+- [always] Compute next action per feature using status/plan/impl matrix
+
+### Phase 4 — Detect Status Gaps
+
+- [always] Flag Draft features with no plan older than 7 days
+- [always] Flag features ready to implement (plan exists, no implementation)
+- [always] Detect deferred items and missing plans
+
+### Phase 5 — Present Output
+
+- [always] Render summary header with correct roadmap and feature counts
+- [always] Render roadmap section (skipped if `--features`)
+- [always] Render features table (skipped if `--roadmap`)
+- [always] Render status gaps section if actionable gaps detected
+- [always] Emit JSON payload instead of formatted output (if `--json`)
 
 ## Definition of Done (Command-Level)
 

@@ -7,15 +7,16 @@
 from __future__ import annotations
 
 import json
+import tempfile
 from pathlib import Path
 
 import typer
 
 from ..exceptions import ExpectationsInvalid, ExpectationsMissing, OverrideMalformed
-from ..goal_contracts import compile_command_goal, render_goal_task_file, verify_command_goal
+from ..goal_contracts import compile_command_goal, render_goal_task_file
 from ..specs_utils import find_specs_root
 
-goal_app = typer.Typer(name="goal", help="Render and verify command goal contracts.")
+goal_app = typer.Typer(name="goal", help="Render command goal contracts.")
 
 COMMAND_ARGUMENT = typer.Argument(..., help="Command name or alias.")
 FEATURE_OPTION = typer.Option(None, "--feature", help="Resolved feature slug.")
@@ -24,9 +25,8 @@ JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
 SAVE_OPTION = typer.Option(
     False,
     "--save",
-    help="Save task file to .specs/.runs/goal-<cmd>-<hash8>.md and emit hash+path on stdout.",
+    help="Save task file to $TMPDIR/livespec-goals/goal-<cmd>-<hash8>.md and emit hash+path on stdout.",
 )
-RUN_OPTION = typer.Option(None, "--run", help="Explicit run artifact path.")
 
 
 @goal_app.command("render")
@@ -52,9 +52,9 @@ def render_cmd(
         typer.echo(f"goal render blocked: {exc}", err=True)
         raise typer.Exit(2) from exc
     if save:
-        runs_dir = project_root / ".specs" / ".runs"
-        runs_dir.mkdir(parents=True, exist_ok=True)
-        task_file = runs_dir / f"goal-{goal.command}-{goal.goal_hash[:8]}.md"
+        goals_dir = Path(tempfile.gettempdir()) / "livespec-goals"
+        goals_dir.mkdir(parents=True, exist_ok=True)
+        task_file = goals_dir / f"goal-{goal.command}-{goal.goal_hash[:8]}.md"
         tmp = task_file.with_suffix(".tmp")
         tmp.write_text(render_goal_task_file(goal), encoding="utf-8")
         tmp.replace(task_file)
@@ -63,36 +63,6 @@ def render_cmd(
         typer.echo(json.dumps(goal.to_json_envelope(), indent=2))
     else:
         typer.echo(goal.objective)
-
-
-@goal_app.command("verify")
-def verify_cmd(
-    command: str = COMMAND_ARGUMENT,
-    feature: str | None = FEATURE_OPTION,
-    flags: str = FLAGS_OPTION,
-    run: Path | None = RUN_OPTION,
-    json_out: bool = JSON_OPTION,
-) -> None:
-    """Verify a command run artifact against its deterministic goal."""
-    project_root = _project_root()
-    livespec_root = _detect_livespec_root()
-    verification = verify_command_goal(
-        command,
-        project_root=project_root,
-        livespec_root=livespec_root,
-        feature=feature,
-        flags=flags,
-        run_path=run,
-    )
-    if json_out:
-        typer.echo(json.dumps(verification.to_json_envelope(), indent=2))
-    else:
-        typer.echo(
-            f"goal_hash={verification.goal.goal_hash} outcome={verification.outcome}"
-        )
-        if verification.report.blocked_reason:
-            typer.echo(f"blocked_reason={verification.report.blocked_reason}")
-    raise typer.Exit(verification.exit_code)
 
 
 def _project_root() -> Path:

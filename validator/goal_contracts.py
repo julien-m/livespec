@@ -15,15 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from .command_registry import normalize_command_name
-from .exceptions import (
-    ArtifactMalformed,
-    ExpectationsInvalid,
-    ExpectationsMissing,
-    OverrideMalformed,
-)
 from .expectations import ExpectationsFile, Rule, load_expectations
-from .run_artifact import find_latest_artifact, read_artifact
-from .verify_output import VerifyReport, blocked_report, evaluate
 
 GOAL_CONTRACT_VERSION = "1.0"
 CONVENTION_SIGNAL_FILES: tuple[str, ...] = ("spec.md", "plan.md")
@@ -64,38 +56,6 @@ class GoalContract:
             "canonical": self.payload,
             "canonical_json": self.canonical_json,
             "objective": self.objective,
-        }
-
-
-@dataclass(frozen=True)
-class GoalVerification:
-    """Completion-gate result for a command goal."""
-
-    goal: GoalContract
-    report: VerifyReport
-
-    @property
-    def outcome(self) -> str:
-        """Return the verify-output outcome."""
-        return self.report.outcome
-
-    @property
-    def exit_code(self) -> int:
-        """Return the CLI exit code for this verification."""
-        return self.report.exit_code
-
-    def to_json_envelope(self) -> dict[str, Any]:
-        """Return the CLI JSON envelope."""
-        return {
-            "command": self.goal.command,
-            "hash": self.goal.goal_hash,
-            "outcome": self.report.outcome,
-            "exit_code": self.exit_code,
-            "expectations": self.goal.payload.get("expectations"),
-            "artifact_path": str(self.report.artifact_path)
-            if self.report.artifact_path is not None
-            else None,
-            "blocked_reason": self.report.blocked_reason,
         }
 
 
@@ -187,75 +147,6 @@ def compile_command_goal(
         goal_hash=goal_hash,
         objective=objective,
     )
-
-
-def verify_command_goal(
-    command: str,
-    *,
-    project_root: Path,
-    livespec_root: Path,
-    feature: str | None = None,
-    flags: str | list[str] | tuple[str, ...] | None = None,
-    run_path: Path | None = None,
-) -> GoalVerification:
-    """Compile a goal and verify the latest run artifact against it."""
-    normalized_command = normalize_command_name(command)
-    try:
-        goal = compile_command_goal(
-            normalized_command,
-            project_root=project_root,
-            livespec_root=livespec_root,
-            feature=feature,
-            flags=flags,
-        )
-    except (ExpectationsInvalid, ExpectationsMissing, OverrideMalformed) as exc:
-        goal = _blocked_goal(
-            normalized_command,
-            project_root=project_root,
-            livespec_root=livespec_root,
-            feature=feature,
-            flags=flags,
-            reason=str(exc),
-        )
-        report = blocked_report(
-            command=normalized_command,
-            source_path=None,
-            artifact_path=run_path,
-            reason=str(exc),
-        )
-        return GoalVerification(goal=goal, report=report)
-
-    expectations = load_expectations(normalized_command, project_root, livespec_root)
-    runs_dir = project_root / ".specs" / ".runs"
-    artifact_path = run_path or find_latest_artifact(normalized_command, runs_dir)
-    if artifact_path is None or not artifact_path.exists():
-        report = blocked_report(
-            command=normalized_command,
-            source_path=expectations.source_path,
-            artifact_path=None,
-            reason=f"no run artifact found for {normalized_command!r} under {runs_dir}",
-        )
-        return GoalVerification(goal=goal, report=report)
-    try:
-        artifact = read_artifact(artifact_path)
-    except ArtifactMalformed as exc:
-        report = blocked_report(
-            command=normalized_command,
-            source_path=expectations.source_path,
-            artifact_path=artifact_path,
-            reason=f"malformed artifact at {exc.path}: {exc.reason}",
-        )
-        return GoalVerification(goal=goal, report=report)
-
-    normalized_flags = list(goal.payload["normalized_flags"])
-    report = evaluate(
-        expectations,
-        artifact,
-        scenario_flags=normalized_flags,
-        feature=feature,
-        artifact_path=artifact_path,
-    )
-    return GoalVerification(goal=goal, report=report)
 
 
 def _detect_visual_feature(project_root: Path, feature: str | None) -> bool:
@@ -356,7 +247,7 @@ def _extract_execution_tasks(
 def render_goal_task_file(goal: GoalContract) -> str:
     """Render a Markdown task file with checkboxes for agent step-by-step tracking.
 
-    The file is designed to be saved as ``.specs/.runs/goal-<cmd>-<hash8>.md``
+    The file is saved to ``$TMPDIR/livespec-goals/goal-<cmd>-<hash8>.md``
     and checked off by the agent as it completes each task.  The ``/goal``
     slash command is then emitted with just the hash and file reference so the
     platform goal field stays within its character limit.
@@ -393,22 +284,6 @@ def render_goal_task_file(goal: GoalContract) -> str:
             lines.append(f"- [ ] {item}")
     else:
         lines.append("- [ ] _(no DoD defined — use expectations only)_")
-    lines.append("")
-    lines.append("## Completion Gate")
-    lines.append("")
-    lines.append("When all tasks above are `[x]`, run:")
-    lines.append("```bash")
-    verify_cmd_parts = [f"livespec goal verify {payload['command']}"]
-    if payload.get("feature"):
-        verify_cmd_parts.append(f"--feature {payload['feature']}")
-    if payload["normalized_flags"]:
-        verify_cmd_parts.append(f"--flags \"{' '.join(payload['normalized_flags'])}\"")
-    lines.append(" ".join(verify_cmd_parts))
-    lines.append("```")
-    lines.append("")
-    lines.append("- `success` (exit 0): report DONE")
-    lines.append("- `drift/error` (exit 1): emit ERROR, do not complete goal")
-    lines.append("- `blocked` (exit 2): emit BLOCKED, return resumable status")
     return "\n".join(lines)
 
 
@@ -460,11 +335,6 @@ def render_goal_objective(goal: GoalContract) -> str:
         lines.append(f"- must {rule['kind']}: {rule['payload']}")
     for rule in payload["verify_rules"]["must_not"]:
         lines.append(f"- must_not {rule['kind']}: {rule['payload']}")
-    lines.append("")
-    lines.append("Completion gate:")
-    lines.append("- Run `livespec goal verify` with the same command, feature, and flags.")
-    lines.append("- Report success only when the verification outcome is success (exit 0).")
-    lines.append("- Report blocked or resumable status for drift, error, or blocked outcomes.")
     return "\n".join(lines)
 
 
@@ -546,44 +416,6 @@ def _goal_payload(
         },
     }
     return payload
-
-
-def _blocked_goal(
-    command: str,
-    *,
-    project_root: Path,
-    livespec_root: Path,
-    feature: str | None,
-    flags: str | list[str] | tuple[str, ...] | None,
-    reason: str,
-) -> GoalContract:
-    payload = {
-        "schema_version": GOAL_CONTRACT_VERSION,
-        "command": command,
-        "feature": feature,
-        "normalized_flags": normalize_goal_flags(flags),
-        "blocked_reason": reason,
-    }
-    canonical_json = _canonical_json(payload)
-    goal_hash = hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
-    project_display = _stable_path(
-        project_root,
-        project_root=project_root,
-        livespec_root=livespec_root,
-    )
-    return GoalContract(
-        command=command,
-        payload=payload,
-        canonical_json=canonical_json,
-        goal_hash=goal_hash,
-        objective=(
-            f"Goal hash: {goal_hash}\n"
-            f"Command: {command}\n"
-            f"Feature: {feature or 'none'}\n"
-            f"Blocked before goal compilation: {reason}\n"
-            f"Project: {project_display}"
-        ),
-    )
 
 
 def _compile_conventions_payload(
@@ -830,9 +662,8 @@ def _stable_path(path: Path, *, project_root: Path, livespec_root: Path) -> str:
 
 __all__ = [
     "GoalContract",
-    "GoalVerification",
     "compile_command_goal",
     "normalize_goal_flags",
     "render_goal_objective",
-    "verify_command_goal",
+    "render_goal_task_file",
 ]

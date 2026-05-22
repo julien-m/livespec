@@ -10,8 +10,6 @@ import typer
 
 from .cli_commands import register_unified_commands
 from .cli_commands.goal_cmd import goal_app
-from .cli_commands.run_cmd import run_app
-from .cli_commands.verify_output_cmd import register as register_verify_output
 from .commit_context import commit_context_app
 from .config import load_config
 from .drivers.cli import driver_app
@@ -39,9 +37,6 @@ app.add_typer(driver_app, name="spec-driver", hidden=True)
 app.add_typer(init_app, name="init")
 # @spec FR-001..005 (feature 035): unified short-form CLI surface.
 register_unified_commands(app)
-# @spec FR-006, FR-007 (feature 039): verify-output + run wrap/record.
-register_verify_output(app)
-app.add_typer(run_app, name="run")
 app.add_typer(goal_app, name="goal")
 # Feature: integration-markdown-pattern — hook resolution runtime CLI + L0 diagnostic.
 app.add_typer(hooks_app, name="hooks")
