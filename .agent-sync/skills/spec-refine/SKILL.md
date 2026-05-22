@@ -1,6 +1,6 @@
 ---
 name: spec-refine
-description: Migrated Claude command /spec-refine
+description: LiveSpec slash command /spec-refine
 ---
 
 # /spec-refine
@@ -33,7 +33,7 @@ La toute première action lors de `/spec-refine` est de poser le goal durable.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-refine
 
@@ -247,7 +247,7 @@ Apply these changes? (yes / no / modify)
 
 ### Step 4.5 — Stack Change Redirect
 
-If the change is clearly a stack change (adding/replacing a technology, framework swap, database migration), redirect:
+If the change is clearly a stack change (adding/replacing a technology, framework swap, database migration), redirect by presenting the next command. Execute it only after user confirmation in an independent native sub-agent:
 
 ```
 This looks like a stack change. Redirecting to /spec-stack which has dedicated
@@ -591,6 +591,15 @@ If the project refinement involves adding/replacing a technology, redirect to `/
 |---|---|
 | `--auto`, `-a` | Apply changes without confirmation prompts |
 | `--dry-run`, `-d` | Show proposed changes without applying them |
+
+---
+
+## Internal Command Invocations
+
+- [subagent] `/spec-stack change "description of the change"` — executable only after redirect confirmation; runs in an independent native sub-agent with its own goal.
+- [suggestion] `/spec-feature "description"` — displayed when refinement is unsafe because downstream artifacts exist.
+- [suggestion] `/spec-check NNN` — displayed to verify current spec-code alignment.
+- [suggestion] `/spec-plan NNN` — displayed when plan regeneration is needed after refinement.
 
 ---
 

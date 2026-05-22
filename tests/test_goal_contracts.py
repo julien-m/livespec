@@ -8,10 +8,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+from validator.exceptions import ExpectationsInvalid
 from validator.goal_contracts import (
     compile_command_goal,
     normalize_goal_flags,
     render_goal_objective,
+    render_goal_task_file,
 )
 
 EXPECTATIONS = """\
@@ -146,6 +150,69 @@ description: Demo command
 If any item fails, fix before returning final output.
 """
 
+EXECUTION_TASK_SKILL = """\
+---
+name: spec-demo
+description: Demo command
+---
+
+# /spec-demo
+
+## Execution Tasks
+
+- [always] Always task
+- [visual] Visual task
+- [penflow] Penflow task
+- [generate] Generate task
+- [visual-generate] Visual generate task
+- [execute] Execute task
+- [surfaces] Surfaces task
+- [quality-only] Quality task
+- [tree-only] Tree task
+- [visual-status] Visual status task
+- [multi] Multi task
+- [fix] Fix task
+
+## Definition of Done (Command-Level)
+
+- [ ] Done
+"""
+
+INLINE_INTERNAL_COMMAND_SKILL = """\
+---
+name: spec-demo
+description: Demo command
+---
+
+# /spec-demo
+
+## Internal Command Invocations
+
+- [inline] `/spec-fix <feature>` — forbidden nested execution.
+
+## Definition of Done (Command-Level)
+
+- [ ] Done
+"""
+
+SUBAGENT_INTERNAL_COMMAND_SKILL = """\
+---
+name: spec-demo
+description: Demo command
+---
+
+# /spec-demo
+
+## Internal Command Invocations
+
+- [subagent] `/spec-fix <feature>` — executable nested command with child goal.
+- [suggestion] `/spec-plan <feature>` — text-only next action.
+
+## Definition of Done (Command-Level)
+
+- [ ] Done
+"""
+
 
 def _fixture_roots(tmp_path: Path) -> tuple[Path, Path]:
     project_root = tmp_path / "project"
@@ -156,6 +223,210 @@ def _fixture_roots(tmp_path: Path) -> tuple[Path, Path]:
     (skill_dir / "expectations.md").write_text(EXPECTATIONS, encoding="utf-8")
     (skill_dir / "SKILL.md").write_text(SKILL, encoding="utf-8")
     return project_root, livespec_root
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def _write_execution_task_skill(livespec_root: Path) -> None:
+    skill_path = livespec_root / ".agent-sync" / "skills" / "spec-demo" / "SKILL.md"
+    skill_path.write_text(EXECUTION_TASK_SKILL, encoding="utf-8")
+
+
+def _write_internal_command_skill(livespec_root: Path, rows: list[str]) -> None:
+    skill_path = livespec_root / ".agent-sync" / "skills" / "spec-demo" / "SKILL.md"
+    skill_path.write_text(
+        f"""\
+---
+name: spec-demo
+description: Demo command
+---
+
+# /spec-demo
+
+## Internal Command Invocations
+
+{chr(10).join(rows)}
+
+## Definition of Done (Command-Level)
+
+- [ ] Done
+""",
+        encoding="utf-8",
+    )
+
+
+def _write_visual_feature(project_root: Path, feature: str = "001-visual") -> None:
+    feature_dir = project_root / ".specs" / "features" / feature
+    feature_dir.mkdir(parents=True)
+    (feature_dir / "spec.md").write_text(
+        "# Visual Feature\n\n## Screens\n\n- Home screen",
+        encoding="utf-8",
+    )
+
+
+def _write_complete_check_fix_scenario(project_root: Path) -> str:
+    feature = "001-visual-check-fix"
+    feature_dir = project_root / ".specs" / "features" / feature
+    feature_dir.mkdir(parents=True)
+    for path in (
+        project_root / ".specs" / "stacks",
+        project_root / ".specs" / "testing",
+        project_root / ".specs" / "design" / "screens" / feature,
+        project_root / ".specs" / "design" / "baselines" / feature,
+        project_root / "penflow",
+        project_root / "src",
+        project_root / "tests",
+        feature_dir / "checks",
+        feature_dir / "baselines",
+    ):
+        path.mkdir(parents=True, exist_ok=True)
+    (project_root / ".specs" / "spec-system.md").write_text("# System\n", encoding="utf-8")
+    (project_root / ".specs" / "constitution.md").write_text("# Constitution\n", encoding="utf-8")
+    (project_root / ".specs" / "project.md").write_text("# Project\n", encoding="utf-8")
+    (project_root / ".specs" / "README.md").write_text("# Registry\n", encoding="utf-8")
+    (project_root / ".specs" / "changelog.md").write_text("# Changelog\n", encoding="utf-8")
+    (project_root / ".specs" / "stacks" / "_default.md").write_text("# Stack\n", encoding="utf-8")
+    (project_root / ".specs" / "testing" / "strategy.md").write_text(
+        "# Testing\n",
+        encoding="utf-8",
+    )
+    (feature_dir / "spec.md").write_text(
+        """\
+# Visual Check Fix
+
+Status: Implemented
+
+## Screens
+
+- Dashboard: `.specs/design/screens/001-visual-check-fix/dashboard.png`
+
+## Penflow Contract
+
+- Target: web-desktop
+
+## Acceptance Criteria
+
+- AC-001: Dashboard renders current count.
+- AC-002: Dashboard has matching visual baseline.
+
+## Functional Requirements
+
+- FR-001: Render count mapped to AC-001.
+- FR-002: Preserve design fidelity mapped to AC-002.
+""",
+        encoding="utf-8",
+    )
+    (feature_dir / "plan.md").write_text(
+        """\
+# Plan
+
+## Testing Strategy
+
+- Run `pytest tests/test_dashboard.py`.
+""",
+        encoding="utf-8",
+    )
+    (feature_dir / "implementation.md").write_text(
+        """\
+# Implementation
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | src/dashboard.py | @spec FR-001 | ✅ Implemented | 2026-05-22 |
+| FR-002 | missing | missing | ❌ Missing | 2026-05-22 |
+
+| AC | Test File | Status |
+|---|---|---|
+| AC-001 | tests/test_dashboard.py | ✅ Implemented |
+| AC-002 | missing | ❌ Missing |
+""",
+        encoding="utf-8",
+    )
+    (feature_dir / "progress.md").write_text(
+        "# Progress\n- [x] Implemented initial count\n",
+        encoding="utf-8",
+    )
+    (feature_dir / "changelog.md").write_text("# Changelog\n", encoding="utf-8")
+    (feature_dir / "checks" / "2026-05-22.md").write_text(
+        """\
+# Gap Report
+
+## Findings
+
+- tree/spec quality: README status stale.
+- FR/AC mapping: FR-002 missing anchor.
+- tests: AC-002 missing visual assertion.
+- visual fidelity: dashboard drift 8.2%.
+- baseline manifest: stale browser version.
+- Penflow: compare-report status FAIL.
+- changelog/report: feature changelog missing fix entry.
+""",
+        encoding="utf-8",
+    )
+    (project_root / "src" / "dashboard.py").write_text(
+        """\
+def render_count(count: int) -> str:
+    # @spec FR-001: Render count — .specs/features/001-visual-check-fix/spec.md#fr-001
+    return f"Count: {count}"
+""",
+        encoding="utf-8",
+    )
+    (project_root / "tests" / "test_dashboard.py").write_text(
+        """\
+from src.dashboard import render_count
+
+
+def test_render_count() -> None:
+    assert render_count(2) == "Count: 2"
+""",
+        encoding="utf-8",
+    )
+    for image_path in (
+        project_root / ".specs" / "design" / "screens" / feature / "dashboard.png",
+        project_root / ".specs" / "design" / "baselines" / feature / "dashboard.png",
+        feature_dir / "baselines" / "dashboard.png",
+    ):
+        image_path.write_bytes(b"\x89PNG\r\n\x1a\n")
+    (project_root / ".specs" / "design" / "ui.pen").write_text("penflow ui", encoding="utf-8")
+    (project_root / ".specs" / "design" / "screens" / "index.md").write_text(
+        "# Screens\n- 001-visual-check-fix/dashboard.png\n",
+        encoding="utf-8",
+    )
+    (project_root / ".specs" / "design" / "changelog.md").write_text(
+        "# Design Changelog\n",
+        encoding="utf-8",
+    )
+    (feature_dir / "baselines" / "baseline.manifest.yml").write_text(
+        """\
+browser: chromium-120
+mockups:
+  dashboard.png: stale-sha
+""",
+        encoding="utf-8",
+    )
+    (project_root / "penflow" / "expected-ui-tree.json").write_text(
+        '{"screen":"dashboard"}',
+        encoding="utf-8",
+    )
+    (project_root / "penflow" / "actual-ui-tree.json").write_text(
+        '{"screen":"dashboard","drift":true}',
+        encoding="utf-8",
+    )
+    (project_root / "penflow" / "compare-report.json").write_text(
+        '{"status":"FAIL","issues":[{"id":"layout"}]}',
+        encoding="utf-8",
+    )
+    (project_root / "penflow" / "review-report.md").write_text(
+        "# Review\n- drift\n",
+        encoding="utf-8",
+    )
+    (project_root / "penflow" / "fix-report.md").write_text(
+        "# Fix\n- adjust layout\n",
+        encoding="utf-8",
+    )
+    return feature
 
 
 def _write_conventions(project_root: Path, ai_root: Path) -> None:
@@ -189,6 +460,17 @@ def _write_conventions(project_root: Path, ai_root: Path) -> None:
         "# Tokens\n- Use spacing tokens for mockups.\n",
         encoding="utf-8",
     )
+
+
+def _command_definition_of_done(skill_path: Path) -> list[str]:
+    text = skill_path.read_text(encoding="utf-8")
+    section = text.split("## Definition of Done (Command-Level)", 1)[1]
+    section = section.split("\n## ", 1)[0]
+    return [
+        line.removeprefix("- [ ]").strip()
+        for line in section.splitlines()
+        if line.strip().startswith("- [ ]")
+    ]
 
 
 def test_normalize_goal_flags_is_order_independent_and_preserves_values() -> None:
@@ -307,6 +589,432 @@ def test_compile_command_goal_extracts_definition_of_done(tmp_path: Path) -> Non
     assert goal.payload["expectations"]["source_path"].endswith(
         ".agent-sync/skills/spec-demo/expectations.md"
     )
+
+
+def test_compile_command_goal_accepts_documented_execution_task_branches(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_execution_task_skill(livespec_root)
+
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        flags="--visual-status",
+    )
+
+    assert "Visual status task" in goal.payload["execution_tasks"]
+
+
+def test_compile_command_goal_activates_spec_check_flag_branches(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_execution_task_skill(livespec_root)
+
+    expected_by_flags = {
+        "--all": "Multi task",
+        "--surfaces": "Surfaces task",
+        "--quality": "Quality task",
+        "--tree-only": "Tree task",
+        "--visual-status": "Visual status task",
+    }
+
+    for flags, expected_task in expected_by_flags.items():
+        goal = compile_command_goal(
+            "spec-demo",
+            project_root=project_root,
+            livespec_root=livespec_root,
+            flags=flags,
+        )
+        assert expected_task in goal.payload["execution_tasks"]
+
+
+def test_compile_command_goal_rejects_inline_internal_spec_invocation(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    skill_path = livespec_root / ".agent-sync" / "skills" / "spec-demo" / "SKILL.md"
+    skill_path.write_text(INLINE_INTERNAL_COMMAND_SKILL, encoding="utf-8")
+
+    with pytest.raises(ExpectationsInvalid, match="must use mode subagent"):
+        compile_command_goal(
+            "spec-demo",
+            project_root=project_root,
+            livespec_root=livespec_root,
+            flags=[],
+        )
+
+
+@pytest.mark.parametrize(
+    "mode",
+    ["direct", "cli", "api", "unknown", "Subagent"],
+)
+def test_compile_command_goal_rejects_any_unknown_internal_invocation_mode(
+    tmp_path: Path,
+    mode: str,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_internal_command_skill(
+        livespec_root,
+        [f"- [{mode}] `/spec-fix <feature>` — forbidden nested execution."],
+    )
+
+    with pytest.raises(ExpectationsInvalid, match="must use mode subagent"):
+        compile_command_goal(
+            "spec-demo",
+            project_root=project_root,
+            livespec_root=livespec_root,
+            flags=[],
+        )
+
+
+@pytest.mark.parametrize("mode", ["cli", "api"])
+def test_compile_command_goal_rejects_cli_api_fallback_for_non_spec_command(
+    tmp_path: Path,
+    mode: str,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_internal_command_skill(
+        livespec_root,
+        [f"- [{mode}] `livespec internal fix <feature>` — forbidden fallback."],
+    )
+
+    with pytest.raises(ExpectationsInvalid, match="must use mode subagent"):
+        compile_command_goal(
+            "spec-demo",
+            project_root=project_root,
+            livespec_root=livespec_root,
+            flags=[],
+        )
+
+
+def test_compile_command_goal_rejects_subagent_non_spec_fallback(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_internal_command_skill(
+        livespec_root,
+        ["- [subagent] `livespec internal fix <feature>` — forbidden fallback."],
+    )
+
+    with pytest.raises(ExpectationsInvalid, match="subagent rows must execute /spec"):
+        compile_command_goal(
+            "spec-demo",
+            project_root=project_root,
+            livespec_root=livespec_root,
+            flags=[],
+        )
+
+
+def test_compile_command_goal_rejects_executable_spec_invocation_without_section(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    skill_path = livespec_root / ".agent-sync" / "skills" / "spec-demo" / "SKILL.md"
+    skill_path.write_text(
+        """\
+---
+name: spec-demo
+description: Demo command
+---
+
+# /spec-demo
+
+Run `/spec-fix <feature>` before returning.
+
+## Definition of Done (Command-Level)
+
+- [ ] Done
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ExpectationsInvalid, match="requires ## Internal Command"):
+        compile_command_goal(
+            "spec-demo",
+            project_root=project_root,
+            livespec_root=livespec_root,
+            flags=[],
+        )
+
+
+@pytest.mark.parametrize(
+    "row",
+    [
+        "- [subagent] /spec-fix <feature> — missing command backticks.",
+        "- subagent `/spec-fix <feature>` — missing mode brackets.",
+        "- [subagent]",
+    ],
+)
+def test_compile_command_goal_rejects_malformed_internal_invocation_bullets(
+    tmp_path: Path,
+    row: str,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_internal_command_skill(livespec_root, [row])
+
+    with pytest.raises(ExpectationsInvalid, match="Malformed Internal Command"):
+        compile_command_goal(
+            "spec-demo",
+            project_root=project_root,
+            livespec_root=livespec_root,
+            flags=[],
+        )
+
+
+def test_compile_command_goal_accepts_subagent_internal_spec_invocation(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    skill_path = livespec_root / ".agent-sync" / "skills" / "spec-demo" / "SKILL.md"
+    skill_path.write_text(SUBAGENT_INTERNAL_COMMAND_SKILL, encoding="utf-8")
+
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        flags=[],
+    )
+
+    assert goal.payload["internal_command_invocations"] == [
+        {
+            "mode": "subagent",
+            "command": "/spec-fix <feature>",
+            "purpose": "executable nested command with child goal.",
+        },
+        {
+            "mode": "suggestion",
+            "command": "/spec-plan <feature>",
+            "purpose": "text-only next action.",
+        },
+    ]
+
+
+def test_compile_command_goal_ignores_horizontal_rule_in_internal_invocations(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    skill_path = livespec_root / ".agent-sync" / "skills" / "spec-demo" / "SKILL.md"
+    skill_path.write_text(
+        """\
+---
+name: spec-demo
+description: Demo command
+---
+
+# /spec-demo
+
+## Internal Command Invocations
+
+- [subagent] `/spec-fix <feature>` — executable nested command with child goal.
+
+---
+
+## Definition of Done (Command-Level)
+
+- [ ] Done
+""",
+        encoding="utf-8",
+    )
+
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        flags=[],
+    )
+
+    assert goal.payload["internal_command_invocations"] == [
+        {
+            "mode": "subagent",
+            "command": "/spec-fix <feature>",
+            "purpose": "executable nested command with child goal.",
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "spec-fix",
+        "spec-implement",
+        "spec-feature",
+        "spec-ship",
+        "spec-stack",
+        "spec-refine",
+        "spec-check",
+    ],
+)
+def test_compile_command_goal_accepts_updated_real_skills(
+    tmp_path: Path,
+    command: str,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    _write_conventions(project_root, tmp_path / "ai")
+    feature = _write_complete_check_fix_scenario(project_root)
+
+    goal = compile_command_goal(
+        command,
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature=feature,
+        flags="--fix --all" if command == "spec-check" else "",
+    )
+
+    assert goal.command == command
+    assert goal.goal_hash
+    assert isinstance(goal.payload["internal_command_invocations"], list)
+
+
+def test_compile_command_goal_preserves_existing_execution_task_branches(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_execution_task_skill(livespec_root)
+    _write_visual_feature(project_root)
+    (project_root / "penflow").mkdir()
+
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-visual",
+        flags=[],
+    )
+
+    assert goal.payload["execution_tasks"] == [
+        "Always task",
+        "Visual task",
+        "Penflow task",
+        "Generate task",
+        "Visual generate task",
+        "Execute task",
+    ]
+
+
+def test_compile_command_goal_activates_visual_tasks_for_spec_check_all(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    skill_dir = livespec_root / ".agent-sync" / "skills" / "spec-check"
+    skill_dir.mkdir(parents=True)
+    (skill_dir / "expectations.md").write_text(
+        EXPECTATIONS.replace("command: spec-demo", "command: spec-check"),
+        encoding="utf-8",
+    )
+    (skill_dir / "SKILL.md").write_text(
+        EXECUTION_TASK_SKILL.replace("name: spec-demo", "name: spec-check"),
+        encoding="utf-8",
+    )
+    _write_visual_feature(project_root, "001-visual")
+    nonvisual_dir = project_root / ".specs" / "features" / "002-nonvisual"
+    nonvisual_dir.mkdir(parents=True)
+    (nonvisual_dir / "spec.md").write_text(
+        "# Nonvisual Feature\n\n## Functional Requirements\n\n- FR-001",
+        encoding="utf-8",
+    )
+    (project_root / "penflow").mkdir()
+
+    goal = compile_command_goal(
+        "spec-check",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature=None,
+        flags="--all",
+    )
+
+    assert "Visual task" in goal.payload["execution_tasks"]
+    assert "Penflow task" in goal.payload["execution_tasks"]
+
+
+def test_compile_command_goal_activates_spec_check_fix_branch(
+    tmp_path: Path,
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_execution_task_skill(livespec_root)
+
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        flags="--fix",
+    )
+
+    assert "Fix task" in goal.payload["execution_tasks"]
+
+
+def test_spec_check_fix_all_complete_scenario_goal_requires_child_goals(
+    tmp_path: Path,
+) -> None:
+    project_root = tmp_path / "complete-project"
+    (project_root / ".specs").mkdir(parents=True)
+    _write_conventions(project_root, tmp_path / "ai")
+    feature = _write_complete_check_fix_scenario(project_root)
+
+    goal = compile_command_goal(
+        "spec-check",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature=None,
+        flags="--fix --all",
+    )
+    tasks = goal.payload["execution_tasks"]
+    task_file = render_goal_task_file(goal)
+
+    assert goal.payload["runtime_context"] == {
+        "is_visual_feature": True,
+        "has_penflow": True,
+    }
+    assert any("tree/spec quality" in task for task in tasks)
+    assert any("FR/AC mapping" in task for task in tasks)
+    assert any("missing or blocked tests" in task for task in tasks)
+    assert any("visual fidelity" in task for task in tasks)
+    assert any("absent or stale baseline manifests" in task for task in tasks)
+    assert any("Penflow drift" in task for task in tasks)
+    assert any("changelog/report drift" in task for task in tasks)
+    assert any("README sync" in task for task in tasks)
+    assert any("Create missing visual/Penflow prerequisites" in task for task in tasks)
+    assert any("Spawn independent native sub-agent to execute `/spec-fix" in task for task in tasks)
+    assert any(
+        "Spawn independent native sub-agent to re-run `/spec-check" in task
+        for task in tasks
+    )
+    assert any("Inspect child goal task files" in task for task in tasks)
+    assert any("canonical BLOCKED" in task for task in tasks)
+    assert "/spec-fix <feature> --auto --update" in task_file
+    assert "/spec-check <feature>" in task_file
+    assert feature in (project_root / ".specs" / "design" / "screens" / "index.md").read_text(
+        encoding="utf-8"
+    )
+    assert (project_root / "penflow" / "compare-report.json").exists()
+    assert (
+        project_root
+        / ".specs"
+        / "features"
+        / feature
+        / "baselines"
+        / "baseline.manifest.yml"
+    ).exists()
+
+
+def test_spec_check_dod_requires_tree_validation_report_not_pass() -> None:
+    dod = _command_definition_of_done(
+        _repo_root() / ".agent-sync/skills/spec-check/SKILL.md"
+    )
+
+    assert dod[0] == "Tree validation executed and reported (or skipped by --skip-tree)"
+    assert not any(
+        "tree validation" in item.lower() and "passed" in item.lower()
+        for item in dod
+    )
+    assert "Gap report produced and displayed" in dod
+    assert "Gap report saved to `checks/YYYY-MM-DD.md`" in dod
+    assert "Feature `changelog.md` has a check entry" in dod
+    assert "Global `.specs/changelog.md` has a summary entry" in dod
+    assert "If multi-spec: consolidated report produced" in dod
 
 
 def test_render_goal_objective_is_stable_text_from_payload(tmp_path: Path) -> None:

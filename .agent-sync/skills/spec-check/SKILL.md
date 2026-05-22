@@ -1,6 +1,6 @@
 ---
 name: spec-check
-description: Migrated Claude command /spec-check
+description: LiveSpec slash command /spec-check
 ---
 
 # /spec-check
@@ -33,7 +33,7 @@ La toute première action lors de `/spec-check` est de poser le goal durable.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-check
 
@@ -52,6 +52,7 @@ Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet -
 /spec-check feature --show-provenance  → Step 1 → Step 3 → Step 3.1 (provenance table) → exit
 /spec-check --visual-status       → Step 8.5 (governance dashboard) → exit
 /spec-check --surfaces            → Step 1 → Step 1.5 (surface drift detection) → exit
+/spec-check --fix --all           → check all features → spawn fix sub-agents → re-check → inspect child goals
 ```
 
 ```mermaid
@@ -715,6 +716,8 @@ To implement: `/spec-implement notifications --step 6`
 → To fix a specific FR: `/spec-fix [feature-name] --fr FR-NNN`
 ```
 
+These lines are suggestions unless `/spec-check` was invoked with `--fix`. With `--fix`, the command MUST spawn an independent native sub-agent for `/spec-fix`; it MUST NOT run `/spec-fix` inline while the parent goal is active.
+
 #### Update implementation.md (optional)
 
 > Would you like me to update `implementation.md` with the current status from this check?
@@ -809,12 +812,21 @@ Ordered list of the most urgent actions across all checked features:
 
 ---
 
+## Internal Command Invocations
+
+- [subagent] `/spec-fix <feature> --auto --update` — executable only when `--fix` is active; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-check <feature>` — executable re-check after a `--fix` child result; runs in an independent native sub-agent with its own goal.
+- [suggestion] `/spec-fix [feature-name]` — displayed as a next action when drift exists and `--fix` is not active.
+- [suggestion] `/spec-fix [feature-name] --visual` — displayed as a visual-only next action.
+- [suggestion] `/spec-fix [feature-name] --fr FR-NNN` — displayed as a targeted FR next action.
+- [suggestion] `/spec-implement notifications --step 6` — example next action in the gap report; not executed by `/spec-check`.
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
 > Format: `- [branch] task description`
 > Active branches per run:
-> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `surfaces` (--surfaces flag) · `quality-only` (--quality flag) · `tree-only` (--tree-only flag) · `visual-status` (--visual-status flag) · `multi` (multiple features selected)
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `surfaces` (--surfaces flag) · `quality-only` (--quality flag) · `tree-only` (--tree-only flag) · `visual-status` (--visual-status flag) · `multi` (multiple features selected) · `fix` (--fix flag)
 
 ### Phase 0 — Goal Lock & Hooks
 
@@ -870,6 +882,16 @@ Ordered list of the most urgent actions across all checked features:
 - [always] Present suggested fixes for each gap with actionable commands
 - [always] Prompt to update implementation.md status (or auto-update if --update)
 
+### Phase 6.5 — Fix Loop (`--fix`)
+
+- [fix] Classify fixable gaps across tree/spec quality, FR/AC mapping, missing or blocked tests, visual fidelity, absent or stale baseline manifests, Penflow drift, changelog/report drift, and README sync
+- [fix] Create missing visual/Penflow prerequisites required for an end-to-end fix attempt, or emit canonical BLOCKED with exact missing path/tool
+- [fix] Spawn independent native sub-agent to execute `/spec-fix <feature> --auto --update` for each feature with fixable gaps
+- [fix] Capture child `/spec-fix` goal hash, task-file path, final status, changed files, and gap closure summary
+- [fix] Spawn independent native sub-agent to re-run `/spec-check <feature>` after each fix attempt
+- [fix] Inspect child goal task files and require both fix and re-check child goals to be completed or explicitly BLOCKED
+- [fix] Write actionable warnings for any remaining gap; emit canonical BLOCKED when no safe fix path exists
+
 ### Phase 7 — Multi-Spec Consolidation
 
 - [always] Produce consolidated report: feature health table, cross-feature dependencies, aggregated stats, priority list
@@ -881,7 +903,7 @@ Ordered list of the most urgent actions across all checked features:
 
 `/spec-check` is complete only if all are true:
 
-- [ ] Tree validation passed (or `--skip-tree`)
+- [ ] Tree validation executed and reported (or skipped by --skip-tree)
 - [ ] Spec quality gates evaluated (per feature)
 - [ ] Gap report produced and displayed
 - [ ] Gap report saved to `checks/YYYY-MM-DD.md`
@@ -889,6 +911,7 @@ Ordered list of the most urgent actions across all checked features:
 - [ ] Global `.specs/changelog.md` has a summary entry
 - [ ] If `--update`: `implementation.md` status values refreshed
 - [ ] If multi-spec: consolidated report produced
+- [ ] If `--fix`: fix sub-agent goals executed, re-check sub-agent goals executed, child goal task files inspected, and remaining gaps are warnings or canonical BLOCKED
 
 ---
 

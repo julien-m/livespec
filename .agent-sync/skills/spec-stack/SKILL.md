@@ -1,6 +1,6 @@
 ---
 name: spec-stack
-description: Migrated Claude command /spec-stack
+description: LiveSpec slash command /spec-stack
 ---
 
 # /spec-stack
@@ -33,7 +33,7 @@ La toute première action lors de `/spec-stack` est de poser le goal durable.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-stack
 
@@ -302,14 +302,14 @@ updated: {today's date YYYY-MM-DD}
 ---
 ```
 
-This date is used by the `after-stack` hook, which always runs `/spec-refresh-conventions --full` on a stack change to rebuild `.conventions/index.md` + `.conventions/manifest.yaml` from scratch (the new format has no compiled file and no staleness check — the bundle is regenerated whenever the stack changes).
+This date is used by the `after-stack` hook, which rebuilds `.conventions/index.md` + `.conventions/manifest.yaml` from scratch on a stack change (the new format has no compiled file and no staleness check — the bundle is regenerated whenever the stack changes).
 
 #### Step 6 — Generate Migration Specs (optional)
 
 > Would you like me to create migration specs for the 4 affected features?
 > This will create `/spec-specify` tasks for each migration with the technical changes needed.
 
-If yes, run `/spec-specify "Migrate [feature] from Supabase to Firebase"` for each high/medium impact feature.
+If yes, spawn an independent native sub-agent for `/spec-specify "Migrate [feature] from Supabase to Firebase"` for each high/medium impact feature. Each child command must compile, emit, execute, and close its own goal.
 
 #### Step 7 — Regenerate Preflight Manifest
 
@@ -340,6 +340,14 @@ Lists all ADRs chronologically with summaries:
 | ADR-004 | 2024-03-05 | Stripe Connect for payments | Active |
 | ADR-005 | 2024-04-01 | Firebase migration | In Progress |
 ```
+
+---
+
+## Internal Command Invocations
+
+- [subagent] `/spec-specify "Migrate [feature] from <old> to <new>"` — executable only after migration-spec confirmation; runs in an independent native sub-agent with its own goal.
+- [suggestion] `/spec-plan <feature>` — displayed as a possible next action after stack impact analysis; not executed by `/spec-stack`.
+- [suggestion] `/spec-refresh-conventions --full` — described as hook behavior or operator recovery; not executed inline by `/spec-stack`.
 
 ---
 
@@ -407,7 +415,7 @@ Lists all ADRs chronologically with summaries:
 
 ### Phase 8 — Generate Migration Specs (optional)
 
-- [always] Offer to run `/spec-specify` for each High/Medium impact feature if user confirms
+- [always] Offer to spawn independent native sub-agent for `/spec-specify` for each High/Medium impact feature if user confirms
 
 ### Phase D — Show Decisions (decisions mode)
 

@@ -1,6 +1,6 @@
 ---
 name: spec-fix
-description: Migrated Claude command /spec-fix
+description: LiveSpec slash command /spec-fix
 ---
 
 # /spec-fix
@@ -33,7 +33,7 @@ La toute première action lors de `/spec-fix` est de poser le goal durable.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-fix
 
@@ -59,7 +59,7 @@ flowchart TD
     START(["/spec-fix"]) --> RESOLVE["Step 1\nResolve feature"]
     RESOLVE --> GAP{"Recent gap\nreport?"}
     GAP -->|"yes (< 24h)"| LOAD["Step 2\nLoad gap report"]
-    GAP -->|"no/stale"| CHECK["Run /spec-check\ninline"]
+    GAP -->|"no/stale"| CHECK["Spawn sub-agent\n/spec-check"]
     CHECK --> LOAD
 
     LOAD --> CONTEXT["Step 3\nLoad full context\n(spec, plan, mockups,\nconventions, stack)"]
@@ -121,8 +121,9 @@ Same logic as `spec-check` Step 3:
    - No commits touch `.specs/features/NNN/` since the report date (spec changes invalidate too)
    - If fresh → use existing gap report, display: `Using gap report from YYYY-MM-DD (N gaps found)`
 3. If not found or stale (report missing, from a previous day, or code/spec changed since):
-   - Run `spec-check` inline (same logic as Steps 3-9 of **Read** [`check.md`](check.md))
-   - Save the gap report to `checks/YYYY-MM-DD.md`
+   - Spawn an independent native sub-agent whose first prompt line is `/spec-check <feature>`.
+   - Require the sub-agent to compile, emit, execute, and close its own goal before returning the saved report path.
+   - Save or reuse the returned gap report at `checks/YYYY-MM-DD.md`
    - Display: `Fresh gap report generated (N gaps found)`
 4. If gap report shows 0 gaps:
    - Display: `No gaps found — nothing to fix`
@@ -369,6 +370,14 @@ Total: 6/8 gaps closed (75%)
 
 ---
 
+## Internal Command Invocations
+
+- [subagent] `/spec-check <feature>` — executable when the gap report is missing or stale; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-check <feature>` — executable after fixes for verification; runs in an independent native sub-agent with its own goal.
+- [suggestion] `/spec-refine <feature>` — displayed when the user chooses to change the spec instead of code.
+- [suggestion] `/spec-implement <feature>` — displayed when an unimplemented feature should be implemented instead of fixed.
+- [suggestion] `/spec-test <feature>` — displayed when only missing visual baselines/tests remain.
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
@@ -391,7 +400,7 @@ Total: 6/8 gaps closed (75%)
 
 - [always] Look for most recent gap report in `.specs/features/NNN/checks/`
 - [always] Check report staleness (same calendar day + no commits since report date)
-- [always] Run spec-check inline and save gap report if missing or stale
+- [always] Spawn independent native sub-agent for `/spec-check <feature>` and save gap report if missing or stale
 - [always] Exit if gap report shows 0 gaps
 
 ### Phase 3 — Load Full Context
@@ -428,6 +437,7 @@ Total: 6/8 gaps closed (75%)
 
 - [always] Run test suite from plan.md or testing/strategy.md
 - [visual] Re-capture Playwright screenshots after visual fixes
+- [always] Spawn independent native sub-agent for `/spec-check <feature>` to verify closure after fixes
 - [always] Score results per gap (Fixed / Improved / Still failing)
 - [always] Apply iteration logic — exit early if all fixed or regression detected, retry remaining gaps up to max iterations
 

@@ -169,7 +169,28 @@ hash:<full-sha256> | task-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.md
   4. If `--save` is unavailable or the task file has no tasks, fall back to the full render output (omit `--save`) and read the `Execution tasks (in order):` section
 - The goal is compiled from machine-readable `expectations.md`, the command Definition of Done, normalized flags, and resolved feature state. It MUST NOT be rewritten or improvised by the LLM.
 - If goal rendering fails, emit the canonical BLOCKED line (§2) and stop.
-- If Claude Code does not accept the `/goal` command, emit the canonical BLOCKED line (§2) and stop.
+- If the current environment does not accept the `/goal` command, emit the canonical BLOCKED line (§2) and stop.
+
+### Internal Command Invocations
+
+When a LiveSpec slash command needs another executable `/spec-*` command while its own goal is active:
+
+1. Do NOT run the nested slash command inline in the same session.
+2. Do NOT call a private CLI/API shortcut that bypasses the nested command goal.
+3. Spawn an independent native sub-agent for the nested slash command; the first line of its prompt MUST be the literal nested command (for example `/spec-fix`) so the sub-agent compiles, emits, executes, and closes its own goal.
+4. The parent may only read the sub-agent's structured result, child goal hash/task-file path, artifacts, and final status.
+5. Plain text next-step hints such as `Run /spec-plan next` are suggestions, not executed invocations.
+
+Each skill that can mention nested `/spec-*` calls MUST include a machine-readable section:
+
+```markdown
+## Internal Command Invocations
+
+- [subagent] `/spec-fix <feature>` — executable nested command; runs in an independent native sub-agent with its own goal.
+- [suggestion] `/spec-plan <feature>` — displayed only as an operator next step; not executed by this command.
+```
+
+`livespec goal render` rejects executable `/spec-*` entries marked `inline`, `direct`, `cli`, `api`, or any mode other than `subagent` or `suggestion`.
 
 Before any command or agent reports `DONE`, verify the following programmatically (or via a
 checklist when programmatic verification is unavailable):
@@ -250,7 +271,7 @@ optionally including `--feature <slug>` if available.
 
 ### Chained / pipeline invocations
 
-When `/spec-feature` (or `/spec-ship`) spawns subagents in sequence
+When `/spec-feature` (or `/spec-ship`) spawns independent native sub-agents in sequence
 (Specify, Plan, Implement, Test, …):
 
 **Decision LOCKED — option β: per-sub-command resolution.** The hook
@@ -260,18 +281,18 @@ executing — NOT the outer pipeline name. Implementation contract:
 1. When the user invokes `/spec-feature`, the OUTER command resolves
    `before-feature` / `after-feature` at its outer boundary with
    `<NAME> = feature`.
-2. Before spawning each subagent (Specify, Plan, Implement, Test, …),
-   the supervisor in `.agent-sync/skills/spec-feature/SKILL.md` MUST prepend a synthetic
-   invocation header to the subagent prompt, of the EXACT form:
+2. Before spawning each independent native sub-agent (Specify, Plan, Implement, Test, …),
+   the supervisor in [`../.agent-sync/skills/spec-feature/SKILL.md`](../.agent-sync/skills/spec-feature/SKILL.md) MUST prepend a synthetic
+   invocation header to the sub-agent prompt, of the EXACT form:
 
        /spec-<subcmd>
 
    where `<subcmd>` ∈ {`specify`, `plan`, `implement`, `test`, …}. This
-   single line is the FIRST line of the subagent's user turn, so the
-   subagent applies steps (1)–(4) of this directive against `<subcmd>`,
-   not `feature`. The same rule applies to `.agent-sync/skills/spec-ship/SKILL.md` (batch
+   single line is the FIRST line of the sub-agent's user turn, so the
+   sub-agent applies steps (1)–(4) of this directive against `<subcmd>`,
+   not `feature`. The same rule applies to [`../.agent-sync/skills/spec-ship/SKILL.md`](../.agent-sync/skills/spec-ship/SKILL.md) (batch
    wrapper).
-3. Each subagent therefore runs (with `--feature <slug>` included when feature
+3. Each sub-agent therefore runs (with `--feature <slug>` included when feature
    context is available):
 
        livespec hooks resolve --event before --command <subcmd> [--feature <slug>]

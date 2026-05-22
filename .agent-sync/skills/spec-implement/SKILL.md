@@ -1,6 +1,6 @@
 ---
 name: spec-implement
-description: Migrated Claude command /spec-implement
+description: LiveSpec slash command /spec-implement
 ---
 
 # /spec-implement
@@ -33,7 +33,7 @@ La toute première action lors de `/spec-implement` est de poser le goal durable
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-implement
 
@@ -45,7 +45,7 @@ Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet -
 
 `/spec-implement [feature-name]`
 
-Executes a full implementation pipeline from `plan.md` to working, tested, documented code. By default, uses multi-agent orchestration (supervisor + superpowers + documenter). Use `--mono` for single-agent mode.
+Executes a full implementation pipeline from `plan.md` to working, tested, documented code. By default, uses a supervisor plus independent native sub-agents for nested slash-command gates and implementation sub-tasks. Use `--mono` to disable only the implementation step's optional nested fan-out; slash-command gates still run in independent native sub-agents.
 
 ```mermaid
 flowchart TD
@@ -317,8 +317,8 @@ For each step, assemble the following payload:
   1. Read `.conventions/index.md`. If absent, set the conventions payload to `NONE` and skip the rest of this bullet.
   2. Select sub-domains relevant to this step: always include `code`; add `design-tokens`, `design-components`, `design-views` (and other visual sub-domains) if the step touches UI; add `design-dataviz`, `design-realtime`, `design-quality` based on the work signal.
   3. Resolve every `→ $AIRESOURCES/...` path for the selected sub-domains.
-  4. **Read** the content of each resolved file and inline it in the subagent payload under a `## Conventions (MANDATORY)` section, grouped by sub-domain. The subagent has fresh context — it cannot reload these files on its own.
-  5. State explicitly that the subagent MUST follow every rule in the listed files for any code it produces.
+  4. **Read** the content of each resolved file and inline it in the sub-agent payload under a `## Conventions (MANDATORY)` section, grouped by sub-domain. The sub-agent runs in an independent native environment — it cannot reload these files on its own.
+  5. State explicitly that the sub-agent MUST follow every rule in the listed files for any code it produces.
 - **Full content of `.specs/design/theme.css`** (if exists and step involves UI) — include so the subagent uses theme CSS variables for all color/spacing values. Add instruction: "Use CSS variables from theme.css (e.g., `var(--primary)`, `var(--secondary)`) for all colors and design tokens. Never hardcode colors when a matching CSS variable exists."
 
 **3. LiveSpec Mandatory Rules**
@@ -429,11 +429,13 @@ This phase runs after Phase 6 validation and before Phase 7 documentation. It is
 
 **Required command for visual features:**
 
+Spawn an independent native sub-agent whose first prompt line is:
+
 ```bash
 /spec-test <feature> --auto --visual
 ```
 
-The command may also execute the same `/spec-test` visual phases inline: audit, missing-test generation, execution, screenshot capture, baseline comparison, and design-fidelity comparison. Do not duplicate a weaker visual path in `/spec-implement`; `/spec-test` owns visual certification.
+Do not execute `/spec-test` inline while the `/spec-implement` goal is active. Do not duplicate a weaker visual path in `/spec-implement`; `/spec-test` owns visual certification and must compile, emit, execute, and close its own goal in the child sub-agent.
 
 **Gate behavior:**
 
@@ -546,8 +548,8 @@ db/migrations/           ← New migration files
 |---|---|
 | `--auto`, `-a` | Skip all confirmation prompts, full automatic pipeline |
 | `--no-save`, `-N` | Do not save execution logs (by default, logs are saved to `.specs/features/NNN/logs/YYYY-MM-DD.md`) |
-| `--mono`, `-m` | Single-agent mode — no orchestration, all phases executed directly (original APEX pipeline) |
-| `--economy`, `-e` | No subagents, direct tools only (slower but uses less tokens) |
+| `--mono`, `-m` | Single-agent mode for implementation step fan-out only; nested `/spec-*` gates still run in independent native sub-agents with their own goals. |
+| `--economy`, `-e` | Compact prompts and fewer optional review sub-agents; nested `/spec-*` gates still run in independent native sub-agents with their own goals. |
 | `--resume`, `-r` | Resume an interrupted implementation (reads `progress.md`, restarts at first non-`Done` step) |
 | `--no-visual`, `-V` | Skip visual baseline capture. For a visual feature this is partial-only: status must remain `In Progress`, never `Implemented`. |
 | `--step`, `-s` `[N]` | Start from step N (skip earlier steps, useful for partial re-runs) |
@@ -579,19 +581,28 @@ Supervisor (Orchestrator/Translator — never codes, never tests)
 1. Supervisor dispatches a Final Validation to Superpowers (full test suite regression check)
 2. Supervisor spawns Documenter to finalize `implementation.md`, changelogs, and README
 
-> **Note:** The `livespec-implementer` agent is only used for infrastructure provisioning (Phase 0). The `livespec-verifier` agent is only used for spec/plan review in `/spec-feature`. All feature code implementation, testing, and code review are handled by Superpowers' isolated subagents. The `livespec-documenter` agent is retained for post-implementation traceability.
+> **Note:** The `livespec-implementer` agent is only used for infrastructure provisioning (Phase 0). The `livespec-verifier` agent is only used for spec/plan review in `/spec-feature`. All feature code implementation, testing, and code review are handled by isolated implementation sub-agents. The `livespec-documenter` agent is retained for post-implementation traceability.
 
 All existing flags (`--resume`, `--auto`, `--no-save`, `--no-visual`, `--step`) work in multi-agent mode.
 
-Use `--mono` to disable orchestration and run all phases directly in a single agent (original APEX pipeline).
+Use `--mono` to disable optional implementation fan-out and keep implementation work in one native sub-agent. Nested `/spec-*` gates remain separate sub-agents with their own goals.
 
-Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: 1` in settings.
+Requires native sub-agent support in the current environment.
 
 ---
 
 ## Iteration Limits
 
 See `system/testing/failure-handling.md` for iteration limits per test type.
+
+---
+
+## Internal Command Invocations
+
+- [subagent] `/spec-preflight --light` — executable preflight gate; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-test <feature> --auto --visual` — executable visual certification gate; runs in an independent native sub-agent with its own goal.
+- [suggestion] `/spec-plan <feature>` — displayed when plan.md is missing; not executed by `/spec-implement`.
+- [suggestion] `/spec-implement <feature> --resume` — displayed for resumable blocked state.
 
 ---
 
@@ -614,7 +625,7 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 - [always] Verify spec.md exists and status is not Deprecated
 - [always] Verify plan.md exists with no unresolved `[DECISION NEEDED]`
 - [always] Resolve project test commands from plan.md or discovery
-- [always] Run `/spec-preflight --light` and gate on critical failures
+- [always] Spawn independent native sub-agent for `/spec-preflight --light` and gate on critical failures
 
 ### Phase 1 — Analyze
 
@@ -655,7 +666,7 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 
 ### Phase 6.5 — Mandatory Visual Gate
 
-- [visual] Run `/spec-test <feature> --auto --visual`
+- [visual] Spawn independent native sub-agent for `/spec-test <feature> --auto --visual`
 - [visual] Block Phase 7 on FAIL or BLOCKED visual gate verdict
 
 ### Phase 7 — Update implementation.md

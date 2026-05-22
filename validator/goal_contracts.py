@@ -15,13 +15,31 @@ from pathlib import Path
 from typing import Any
 
 from .command_registry import normalize_command_name
+from .exceptions import ExpectationsInvalid
 from .expectations import ExpectationsFile, Rule, load_expectations
 
 GOAL_CONTRACT_VERSION = "1.0"
 CONVENTION_SIGNAL_FILES: tuple[str, ...] = ("spec.md", "plan.md")
 EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
-    {"always", "visual", "penflow", "generate", "visual-generate", "execute"}
+    {
+        "always",
+        "visual",
+        "penflow",
+        "generate",
+        "visual-generate",
+        "execute",
+        "surfaces",
+        "quality-only",
+        "tree-only",
+        "visual-status",
+        "multi",
+        "fix",
+    }
 )
+ALLOWED_INTERNAL_INVOCATION_MODES: frozenset[str] = frozenset(
+    {"subagent", "suggestion"}
+)
+MARKDOWN_HORIZONTAL_RULES: frozenset[str] = frozenset({"---", "***", "___"})
 DESIGN_SIGNAL_WORDS: frozenset[str] = frozenset(
     {
         "--visual",
@@ -35,6 +53,12 @@ DESIGN_SIGNAL_WORDS: frozenset[str] = frozenset(
         "ui",
         "visual",
     }
+)
+SPEC_CHECK_ALL_FEATURE_FLAGS: frozenset[str] = frozenset({"--all", "-A"})
+# Match level-2 headings that declare visual/Penflow feature work.
+VISUAL_FEATURE_HEADING_RE = re.compile(
+    r"^##\s+(Screens|Penflow Contract)\b",
+    re.MULTILINE,
 )
 
 
@@ -154,16 +178,25 @@ def _detect_visual_feature(project_root: Path, feature: str | None) -> bool:
     if feature is None:
         return False
     spec_path = project_root / ".specs" / "features" / feature / "spec.md"
+    return _spec_has_visual_work(spec_path)
+
+
+def _detect_any_visual_feature(project_root: Path) -> bool:
+    """Return True if any feature spec declares visual work."""
+    features_dir = project_root / ".specs" / "features"
+    if not features_dir.is_dir():
+        return False
+    return any(
+        _spec_has_visual_work(spec_path)
+        for spec_path in sorted(features_dir.glob("*/spec.md"))
+    )
+
+
+def _spec_has_visual_work(spec_path: Path) -> bool:
+    """Return True if a feature spec declares visual work headings."""
     if not spec_path.exists():
         return False
-    # Match level-2 Screens or Penflow Contract headings in spec.md
-    return bool(
-        re.search(
-            r"^##\s+(Screens|Penflow Contract)\b",
-            spec_path.read_text(encoding="utf-8"),
-            re.MULTILINE,
-        )
-    )
+    return bool(VISUAL_FEATURE_HEADING_RE.search(spec_path.read_text(encoding="utf-8")))
 
 
 def _detect_penflow(project_root: Path) -> bool:
@@ -171,13 +204,51 @@ def _detect_penflow(project_root: Path) -> bool:
     return (project_root / "penflow").is_dir()
 
 
+def _flag_names(normalized_flags: list[str]) -> set[str]:
+    """Return flag names without values from normalized command tokens."""
+    return {token.split("=", 1)[0] for token in normalized_flags if token.startswith("-")}
+
+
+def _is_all_feature_spec_check(
+    *,
+    command: str,
+    feature: str | None,
+    normalized_flags: list[str],
+) -> bool:
+    """Return True when spec-check is compiling an all-feature goal."""
+    return (
+        command == "spec-check"
+        and feature is None
+        and bool(_flag_names(normalized_flags).intersection(SPEC_CHECK_ALL_FEATURE_FLAGS))
+    )
+
+
 def _active_execution_task_branches(
-    is_visual: bool, visual_enabled: bool, has_penflow: bool, audit_only: bool, no_generate: bool
+    *,
+    normalized_flags: list[str],
+    is_visual: bool,
+    visual_enabled: bool,
+    has_penflow: bool,
+    audit_only: bool,
+    no_generate: bool,
 ) -> set[str]:
     """Calculate which execution task branches are active based on context."""
     active: set[str] = {"always"}
+    flag_names = _flag_names(normalized_flags)
     visual_active = is_visual and visual_enabled
     generate_active = not audit_only and not no_generate
+    if flag_names.intersection({"--surfaces"}):
+        active.add("surfaces")
+    if flag_names.intersection({"--quality", "-q"}):
+        active.add("quality-only")
+    if flag_names.intersection({"--tree-only", "-t"}):
+        active.add("tree-only")
+    if flag_names.intersection({"--visual-status"}):
+        active.add("visual-status")
+    if flag_names.intersection({"--all", "-A", "--summary", "-S"}):
+        active.add("multi")
+    if flag_names.intersection({"--fix", "-x"}):
+        active.add("fix")
     if visual_active:
         active.add("visual")
         if has_penflow:
@@ -207,6 +278,12 @@ def _extract_execution_tasks(
       generate        — NOT --audit-only AND NOT --no-generate
       visual-generate — visual AND generate both active
       execute         — NOT --audit-only
+      surfaces        — --surfaces
+      quality-only    — --quality or -q
+      tree-only       — --tree-only or -t
+      visual-status   — --visual-status
+      multi           — --all/-A or --summary/-S
+      fix             — --fix or -x
     """
     if not skill_path.exists():
         return []
@@ -225,7 +302,12 @@ def _extract_execution_tasks(
     no_generate = "--no-generate" in normalized_flags
 
     active = _active_execution_task_branches(
-        is_visual, not no_visual, has_penflow, audit_only, no_generate
+        normalized_flags=normalized_flags,
+        is_visual=is_visual,
+        visual_enabled=not no_visual,
+        has_penflow=has_penflow,
+        audit_only=audit_only,
+        no_generate=no_generate,
     )
 
     tasks: list[str] = []
@@ -244,6 +326,106 @@ def _extract_execution_tasks(
     return tasks
 
 
+def _extract_internal_command_invocations(skill_path: Path) -> list[dict[str, str]]:
+    """Parse and validate executable internal slash-command invocations.
+
+    The ``## Internal Command Invocations`` section is the machine-readable
+    allowlist for nested slash calls. Executed ``/spec-*`` calls must run in an
+    independent native sub-agent so each sub-command can set and complete its
+    own goal. Text-only next-step hints use ``suggestion`` mode.
+    """
+    if not skill_path.exists():
+        return []
+    text = skill_path.read_text(encoding="utf-8")
+    # Locate the machine-readable invocation section by its level-2 heading.
+    match = re.search(
+        r"^##\s+Internal Command Invocations\s*$",
+        text,
+        flags=re.MULTILINE,
+    )
+    if match is None:
+        _reject_undocumented_internal_spec_invocation(skill_path, text)
+        return []
+    section = text[match.end() :]
+    next_heading = re.search(r"^##\s+", section, flags=re.MULTILINE)
+    if next_heading is not None:
+        section = section[: next_heading.start()]
+
+    invocations: list[dict[str, str]] = []
+    for line_number, line in enumerate(section.splitlines(), 1):
+        parsed = _parse_internal_invocation_line(
+            line,
+            skill_path=skill_path,
+            line_number=line_number,
+        )
+        if parsed is None:
+            continue
+        if parsed["mode"] not in ALLOWED_INTERNAL_INVOCATION_MODES:
+            raise ExpectationsInvalid(
+                skill_path.as_posix(),
+                "Internal Command Invocations rows must use mode subagent or suggestion "
+                f"at Internal Command Invocations line {line_number}: "
+                f"{parsed['mode']}"
+            )
+        if parsed["mode"] == "subagent" and not parsed["command"].startswith("/spec-"):
+            raise ExpectationsInvalid(
+                skill_path.as_posix(),
+                "Internal Command Invocations subagent rows must execute /spec-* "
+                f"commands at line {line_number}: {parsed['command']}"
+            )
+        invocations.append(parsed)
+    return invocations
+
+
+def _reject_undocumented_internal_spec_invocation(
+    skill_path: Path,
+    text: str,
+) -> None:
+    """Reject executable nested slash commands without an allowlist section."""
+    for line_number, line in enumerate(text.splitlines(), 1):
+        lowered = line.lower()
+        if "/spec-" not in lowered:
+            continue
+        if not any(verb in lowered for verb in ("run", "execute", "spawn")):
+            continue
+        raise ExpectationsInvalid(
+            skill_path.as_posix(),
+            "Executable internal /spec-* invocation requires "
+            "## Internal Command Invocations "
+            f"at line {line_number}: {line.strip()}"
+        )
+
+
+def _parse_internal_invocation_line(
+    line: str,
+    *,
+    skill_path: Path,
+    line_number: int,
+) -> dict[str, str] | None:
+    """Parse ``- [mode] `command` — purpose`` invocation rows."""
+    stripped = line.strip()
+    if stripped in MARKDOWN_HORIZONTAL_RULES:
+        return None
+    if not stripped or not stripped.startswith("-"):
+        return None
+    # Parse "- [mode] `command` — purpose" rows from the invocation allowlist.
+    match = re.match(r"^-\s+\[([^\]]+)\]\s+`([^`]+)`(?:\s+[—-]\s+(.+))?$", stripped)
+    if match is None:
+        raise ExpectationsInvalid(
+            skill_path.as_posix(),
+            "Malformed Internal Command Invocations bullet row at "
+            f"line {line_number}: {stripped}"
+        )
+    mode = match.group(1).strip()
+    command = match.group(2).strip()
+    purpose = (match.group(3) or "").strip()
+    return {
+        "mode": mode,
+        "command": command,
+        "purpose": purpose,
+    }
+
+
 def render_goal_task_file(goal: GoalContract) -> str:
     """Render a Markdown task file with checkboxes for agent step-by-step tracking.
 
@@ -257,17 +439,17 @@ def render_goal_task_file(goal: GoalContract) -> str:
     flags_str = ", ".join(payload["normalized_flags"]) or "none"
     lines = [
         f"# Goal Task File: {payload['command']}",
-        f"",
+        "",
         f"**Hash:** `{goal.goal_hash}`",
         f"**Command:** `{payload['command']}`",
         f"**Feature:** `{feature}`",
         f"**Flags:** `{flags_str}`",
-        f"",
-        f"> Check each task `[ ]` → `[x]` as you complete it.",
-        f"> This file is the authoritative task list for this execution run.",
-        f"",
-        f"## Execution Tasks",
-        f"",
+        "",
+        "> Check each task `[ ]` → `[x]` as you complete it.",
+        "> This file is the authoritative task list for this execution run.",
+        "",
+        "## Execution Tasks",
+        "",
     ]
     execution_tasks = list(payload.get("execution_tasks") or [])
     if execution_tasks:
@@ -350,6 +532,12 @@ def _goal_payload(
     skill_path = livespec_root / ".agent-sync" / "skills" / command / "SKILL.md"
     normalized_flags = normalize_goal_flags(flags)
     is_visual = _detect_visual_feature(project_root, feature)
+    if not is_visual and _is_all_feature_spec_check(
+        command=command,
+        feature=feature,
+        normalized_flags=normalized_flags,
+    ):
+        is_visual = _detect_any_visual_feature(project_root)
     has_penflow = _detect_penflow(project_root)
     execution_tasks = _extract_execution_tasks(
         skill_path,
@@ -367,6 +555,9 @@ def _goal_payload(
             "has_penflow": has_penflow,
         },
         "execution_tasks": execution_tasks,
+        "internal_command_invocations": _extract_internal_command_invocations(
+            skill_path
+        ),
         "expectations": {
             "command": expectations.command,
             "contract_version": expectations.contract_version,

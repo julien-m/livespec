@@ -1,6 +1,6 @@
 ---
 name: spec-ship
-description: Migrated Claude command /spec-ship
+description: LiveSpec slash command /spec-ship
 ---
 
 # /spec-ship
@@ -32,11 +32,11 @@ La toute première action lors de `/spec-ship` est de poser le goal durable.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-ship
 
-> Batch autopilot — selects features from the roadmap and runs `/spec-feature --auto --branch` for each, with preflight, audit, merge, and roadmap updates.
+> Batch autopilot — selects features from the roadmap and runs `/spec-feature --auto --branch` for each in an independent native sub-agent, with preflight, audit, merge, and roadmap updates.
 
 ---
 
@@ -44,7 +44,7 @@ Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet -
 
 `/spec-ship [flags]`
 
-Ships multiple features from the roadmap in sequence. **Each feature is executed by a spawned agent** with its own fresh context, preventing context window exhaustion on large batches. The main context stays lightweight — it only orchestrates, merges, and tracks progress.
+Ships multiple features from the roadmap in sequence. **Each feature is executed by an independent native sub-agent** with its own goal, preventing context window exhaustion on large batches. The main context stays lightweight — it only supervises, merges, and tracks progress.
 
 ```mermaid
 flowchart TD
@@ -58,7 +58,7 @@ flowchart TD
 
     subgraph LOOP ["Phase 1..N — Per Feature"]
         BRANCH_CREATE["Create branch\nfeature/NNN-name"]
-        SPAWN["Spawn agent\n/spec-feature --auto --branch"]
+        SPAWN["Spawn sub-agent\n/spec-feature --auto --branch"]
         WAIT["Wait for\nSHIP_RESULT"]
         PARSE{"Result\nOK?"}
         MERGE["Merge into\ntarget branch"]
@@ -85,7 +85,7 @@ flowchart TD
 To avoid context window exhaustion, each feature runs in a **separate spawned agent**:
 
 - **Main context (ship orchestrator):** reads roadmap, manages branches, parses agent results, merges, updates ship.md. Stays under ~10k tokens per feature cycle.
-- **Spawned agent (per feature):** executes `/spec-feature --auto --branch` with a fresh context. Handles specify, review, plan, implement, test, audit, and commit. Returns a structured `SHIP_RESULT` block (see `feature.md` § Ship Result).
+- **Spawned sub-agent (per feature):** executes `/spec-feature --auto --branch` in an independent native environment with its own goal. Handles specify, review, plan, implement, test, audit, and commit. Returns a structured `SHIP_RESULT` block (see [`../spec-feature/SKILL.md`](../spec-feature/SKILL.md) § Ship Result).
 
 The agent commits on its feature branch. The main context merges into the target branch after receiving `SHIP_RESULT: OK`.
 
@@ -230,12 +230,12 @@ For each feature in the batch (in roadmap order):
 3. Create feature branch: `livespec git branch feature/NNN-name`
 4. Update `ship.md`: record branch name
 
-### Step 2 — Spawn Agent
+### Step 2 — Spawn Sub-Agent
 
-Spawn a new agent with a fresh context to execute the feature pipeline:
+Spawn an independent native sub-agent to execute the feature pipeline:
 
 ```
-Agent prompt:
+Sub-agent prompt:
   /spec-feature
   You are working on project: <project name from .specs/project.md>
   Current branch: feature/NNN-name (already created and checked out)
@@ -246,20 +246,20 @@ Agent prompt:
   Read .specs/project.md and .specs/stacks/_default.md for project and stack context.
   Your hooks (before-feature, after-feature, and sub-command hooks) will resolve normally.
 
-  IMPORTANT: End your response with the SHIP_RESULT block (see feature.md § Ship Result).
+  IMPORTANT: End your response with the SHIP_RESULT block (see [`../spec-feature/SKILL.md`](../spec-feature/SKILL.md) § Ship Result).
 ```
 
 > **D-α (Hook resolution for chained invocations).** The first prompt line `/spec-feature`
-> is a synthetic invocation header consumed by the spawned agent's anti-drift directive
-> (`system/anti-drift-block.md § 7`) so that `livespec hooks resolve --event before
+> is a synthetic invocation header consumed by the spawned sub-agent's anti-drift directive
+> ([`../../../system/anti-drift-block.md`](../../../system/anti-drift-block.md) § 7) so that `livespec hooks resolve --event before
 > --command feature` is invoked at the outer pipeline boundary. The agent will then,
-> in turn, prepend `/spec.<subcmd>` headers when spawning its own Specify/Plan/…
-> subagents (see `.agent-sync/skills/spec-feature/SKILL.md`). Do NOT remove this line. See
+> in turn, prepend `/spec-<subcmd>` headers when spawning its own Specify/Plan/…
+> sub-agents (see `.agent-sync/skills/spec-feature/SKILL.md`). Do NOT remove this line. See
 > [`system/integrations.md`](../system/integrations.md) for the contract.
 
-The agent executes the full pipeline autonomously: specify → spec review → plan → plan review → preflight light → implement → audit → commit. Each agent gets a **fresh context window**, preventing exhaustion on large batches.
+The sub-agent executes the full pipeline autonomously: specify → spec review → plan → plan review → preflight light → implement → audit. Each sub-agent has an independent native environment and its own goal.
 
-**Wait for the agent to complete and return its result.**
+**Wait for the sub-agent to complete and return its result.**
 
 ### Step 3 — Parse Result
 
@@ -335,7 +335,7 @@ Display:
   → Next: 004-billing
 ```
 
-Proceed to next feature (spawn new agent with fresh context).
+Proceed to next feature (spawn an independent native sub-agent).
 
 ---
 
@@ -404,6 +404,15 @@ When all features are shipped:
 
 ---
 
+## Internal Command Invocations
+
+- [subagent] `/spec-preflight` — executable full preflight command; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-feature --auto --branch` — executable per-feature pipeline command; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-feature --resume <feature-name>` — executable resume command; runs in an independent native sub-agent with its own goal.
+- [suggestion] `/spec-ship --resume` — displayed when the batch is blocked and needs operator recovery.
+
+---
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
@@ -433,7 +442,7 @@ When all features are shipped:
 
 ### Phase 0.5 — Preflight Full
 
-- [always] Run `/spec-preflight` in full mode (not --light)
+- [always] Spawn independent native sub-agent for `/spec-preflight` in full mode (not --light)
 - [always] Block on critical failures; proceed with warnings
 
 ### Phase 1..N — Per Feature Loop (repeated for each feature)
@@ -442,8 +451,8 @@ When all features are shipped:
 - [always] Ensure on target branch with `git checkout <target>`
 - [always] Create feature branch via `livespec git branch feature/NNN-name`
 - [always] Update `ship.md` with branch name
-- [always] Spawn agent with fresh context to execute `/spec-feature --auto --branch`
-- [always] Wait for spawned agent to complete and return SHIP_RESULT
+- [always] Spawn independent native sub-agent to execute `/spec-feature --auto --branch`
+- [always] Wait for spawned sub-agent to complete and return SHIP_RESULT
 - [always] Parse SHIP_RESULT via `validator/contracts.py parse_ship_result()`
 - [always] Validate branch/slug consistency before any git operation
 - [always] Check AC coverage from test report (Test Gate)

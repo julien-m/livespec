@@ -1,6 +1,6 @@
 ---
 name: spec-feature
-description: Migrated Claude command /spec-feature
+description: LiveSpec slash command /spec-feature
 ---
 
 # /spec-feature
@@ -33,7 +33,7 @@ La toute première action lors de `/spec-feature` est de poser le goal durable.
    Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-feature
 
@@ -57,22 +57,22 @@ flowchart TD
     CONFIRM -->|"no / empty"| ABORT
     P05 -->|"non-UI or PASS"| P1
     P05 -->|"BLOCKED"| ABORT
-    P1["Spawn: Specify Agent\n(Phase 1 + 1.5)\nFresh context"]
+    P1["Spawn: Specify sub-agent\n(Phase 1 + 1.5)\nIndependent native environment"]
     P1 --> PR1{"PHASE_RESULT\nspecify?"}
     PR1 -->|"BLOCKED"| ABORT
     PR1 -->|"OK"| G1["Gate 1\n(main context)"]
     G1 -->|"fix → re-spawn"| P1
     G1 -->|"abort"| ABORT(["Aborted"])
-    G1 -->|"continue"| P2["Spawn: Plan Agent\n(Phase 2 + 2.5)\nFresh context"]
+    G1 -->|"continue"| P2["Spawn: Plan sub-agent\n(Phase 2 + 2.5)\nIndependent native environment"]
     P2 --> PR2{"PHASE_RESULT\nplan?"}
     PR2 -->|"BLOCKED"| ABORT
     PR2 -->|"OK"| G2["Gate 2\n(main context)"]
     G2 -->|"fix → re-spawn"| P2
     G2 -->|"abort"| ABORT
-    G2 -->|"continue"| P27["Phase 2.7\nPreflight\n(main context, inline)"]
+    G2 -->|"continue"| P27["Phase 2.7\nPreflight\nsub-agent"]
     P27 -->|"critical fail"| ABORT
-    P27 -->|"pass"| P3["Spawn: Implement Agent\n(Phase 3)\nFresh context"]
-    P3 --> P35["Spawn: Test Agent\n(Phase 3.5)\nFresh context"]
+    P27 -->|"pass"| P3["Spawn: Implement sub-agent\n(Phase 3)\nIndependent native environment"]
+    P3 --> P35["Spawn: Test sub-agent\n(Phase 3.5)\nIndependent native environment"]
     P35 --> DONE(["Pipeline\ncomplete"])
 
     style START fill:#e8f4f8,stroke:#2196F3
@@ -108,7 +108,7 @@ flowchart TD
 
 ### Identity guard (anti-leakage)
 
-Before spawning ANY subagent, validate the resolved `feature_slug` against this regex:
+Before spawning ANY sub-agent, validate the resolved `feature_slug` against this regex:
 
 ```
 ^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$
@@ -151,7 +151,7 @@ conventions: <mandatory read list — sub-domains + ai-ressources file paths der
 ```
 
 The agent uses `feature_name` for all `livespec pipeline update` CLI calls.
-The `conventions` field is the structured payload described in `~/.claude/livespec/references/conventions-sync.md` § Step 4 — the supervisor builds it by reading `.conventions/index.md`, selecting the relevant sub-domains for the phase, and resolving the `→ $AIRESOURCES/...` paths. The subagent MUST read every file in the list and follow its rules. The subagent does NOT need to read `.conventions/index.md` itself — the supervisor has already done the routing.
+The `conventions` field is the structured payload described in **Read** [`~/.claude/livespec/references/conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) § Step 4 — the supervisor builds it by reading `.conventions/index.md`, selecting the relevant sub-domains for the phase, and resolving the `→ $AIRESOURCES/...` paths. The sub-agent MUST read every file in the list and follow its rules. The sub-agent does NOT need to read `.conventions/index.md` itself — the supervisor has already done the routing.
 
 ### Specify agent schema
 
@@ -247,23 +247,23 @@ The agent receives this as part of its initial prompt — no file write, no para
 
 ## Agent Architecture (Supervisor Pattern)
 
-`/spec-feature` is a **pure supervisor** — it does not execute phase logic itself. It spawns an isolated agent per phase, receives a compact `PHASE_RESULT` block, and handles gates and pipeline state.
+`/spec-feature` is a **pure supervisor** — it does not execute phase logic itself. It spawns an independent native sub-agent per slash sub-command, receives a compact `PHASE_RESULT` block, and handles gates and pipeline state.
 
 ```
 spec-feature — Main Context (supervisor)
   │
   ├── [Phase 0]   Roadmap resolution (inline — user interaction)
   ├── [Phase 0.5] From-Scratch Penflow Forward Contract (UI features)
-  ├── [Phase 1]   Spawn → Specify Agent  (fresh context)
+  ├── [Phase 1]   Spawn → Specify sub-agent  (independent native environment)
   │     └── Receives PHASE_RESULT (specify)
   ├── [Gate 1]    Display spec review findings + user decision (inline)
-  ├── [Phase 2]   Spawn → Plan Agent  (fresh context)
+  ├── [Phase 2]   Spawn → Plan sub-agent  (independent native environment)
   │     └── Receives PHASE_RESULT (plan)
   ├── [Gate 2]    Display plan review findings + user decision (inline)
-  ├── [Phase 2.7] Preflight CLI call (inline — lightweight)
-  ├── [Phase 3]   Spawn → Implement Agent  (fresh context)
+  ├── [Phase 2.7] Spawn → Preflight sub-agent (independent native environment)
+  ├── [Phase 3]   Spawn → Implement sub-agent  (independent native environment)
   │     └── Receives PHASE_RESULT (implement)
-  └── [Phase 3.5] Spawn → Test Agent  (fresh context)
+  └── [Phase 3.5] Spawn → Test sub-agent  (independent native environment)
         └── Receives PHASE_RESULT (test)
 ```
 
@@ -271,11 +271,11 @@ spec-feature — Main Context (supervisor)
 - Phase 0: roadmap read + user confirmation + pipeline.md init
 - Phase 0.5: UI feature detection + Penflow forward contract generation/status gate
 - Gate 1 and Gate 2: display PHASE_RESULT findings, wait for user decision
-- Phase 2.7: `livespec pipeline update` + `/spec-preflight --light` CLI calls
+- Phase 2.7: display/gate the preflight result returned by its independent native sub-agent
 - All `livespec pipeline update --status in_progress` calls before spawning each agent
 - Repository history guard after Phase 3.5
 
-**What runs in phase agents (isolated context):**
+**What runs in phase sub-agents (independent native environment):**
 - All file reads (spec.md, plan.md, constitution.md, stack.md, and every `ai-ressources/` file listed in the conventions payload)
 - All generation (spec, plan, implementation code)
 - All tests and lint runs
@@ -283,12 +283,12 @@ spec-feature — Main Context (supervisor)
 - Hook resolution (before/after at all 3 levels)
 - `livespec pipeline update --status done` on success
 
-**`--economy` disables this pattern:** all phases run inline in the main context (original behavior). No sub-agents at any level.
+**`--economy` keeps goal isolation:** use compact prompts and skip optional nested review fan-out where allowed, but executable `/spec-*` sub-commands still run in independent native sub-agents with their own goals.
 
 **Context budget:**
 - Main context per phase cycle: ~200 tokens (PHASE_RESULT only)
 - Total main context for full pipeline: ~5-15k
-- Each phase agent: fresh context, 30-60k max
+- Each phase sub-agent: independent native environment, 30-60k max
 
 ---
 
@@ -309,7 +309,7 @@ spec-feature — Main Context (supervisor)
 | `--resume`, `-r` | Resume the pipeline where it stopped (reads `pipeline.md`, spawns the first non-Done phase agent with the full resume state envelope — see § Resume) |
 | `--priority`, `-p` `P1\|P2\|P3` | Force all user stories in the spec to the given priority (P1=critical/MVP, P2=important, P3=nice-to-have) — passed to the Specify agent |
 | `--mono`, `-m` | Single-agent mode for the **implement phase's internal orchestration** only (no Superpowers sub-dispatch within implement). Does **not** disable the feature-level supervisor pattern — Specify, Plan, Implement, and Test still run as separate agents. |
-| `--economy`, `-e` | Disable **all** sub-agent dispatch: (1) feature-level supervisor — all phases run inline in the main context; (2) implement-level orchestration — no Superpowers sub-dispatch within implement. Preserves the exact pre-supervisor behavior end-to-end. Use for token-constrained environments. |
+| `--economy`, `-e` | Use compact phase prompts and disable optional nested fan-out where allowed. It does **not** inline executable `/spec-*` sub-commands while the parent goal is active; Specify, Plan, Implement, Test, and Preflight still run in independent native sub-agents with their own goals. |
 | `--step`, `-s` | Pause after each implementation step for manual validation — passed to the Implement agent |
 
 > **Note:** Flags like `--no-review`, `--no-visual`, `--no-save`, and `--no-contracts` are intentionally **not** available on `/spec-feature`. This pipeline enforces all safety gates. These flags remain available on their respective sub-commands (`/spec-plan --no-contracts`, `/spec-implement --no-visual`, etc.) for power users running manual flows.
@@ -445,7 +445,7 @@ These files are the primary UI behavior contract for Specify, Plan, Implement, a
 
 ## Phase 1 — Specify (Supervisor Dispatch)
 
-> **Economy mode (`--economy`):** execute `.agent-sync/skills/spec-specify/SKILL.md` steps inline in the main context instead of spawning an agent.
+> **Economy mode (`--economy`):** spawn a compact independent native sub-agent for `/spec-specify`; never execute the slash sub-command inline while the parent goal is active.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase specify --status in_progress`
 
@@ -456,7 +456,7 @@ These files are the primary UI behavior contract for Specify, Plan, Implement, a
    - `active_flags`: `--priority P1` (if provided), `--auto` (if active)
    - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
-3. Spawn a **Specify agent** with the assembled Universal Agent Context and these instructions:
+3. Spawn a **Specify sub-agent** with the assembled Universal Agent Context and these instructions:
 
    ```
    /spec-specify
@@ -473,8 +473,8 @@ These files are the primary UI behavior contract for Specify, Plan, Implement, a
    ```
 
    > **D-α (Hook resolution for chained invocations).** The first line `/spec-specify`
-   > is a synthetic invocation header consumed by the subagent's anti-drift directive
-   > (`system/anti-drift-block.md § 7`) so that `livespec hooks resolve --event before
+   > is a synthetic invocation header consumed by the sub-agent's anti-drift directive
+   > ([`../../../system/anti-drift-block.md`](../../../system/anti-drift-block.md) § 7) so that `livespec hooks resolve --event before
    > --command specify` is invoked instead of `--command feature`. Do NOT remove this
    > line. See [`system/integrations.md`](../system/integrations.md) for the contract.
 
@@ -533,7 +533,7 @@ After Gate 1 resolves, do not create branches, commits, tags, pushes, or any oth
 
 ## Phase 2 — Plan (Supervisor Dispatch)
 
-> **Economy mode (`--economy`):** execute `.agent-sync/skills/spec-plan/SKILL.md` steps inline in the main context instead of spawning an agent.
+> **Economy mode (`--economy`):** spawn a compact independent native sub-agent for `/spec-plan`; never execute the slash sub-command inline while the parent goal is active.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status in_progress`
 
@@ -544,7 +544,7 @@ After Gate 1 resolves, do not create branches, commits, tags, pushes, or any oth
    - `active_flags`: `--auto` (if active)
    - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
-3. Spawn a **Plan agent** with the assembled Universal Agent Context and these instructions:
+3. Spawn a **Plan sub-agent** with the assembled Universal Agent Context and these instructions:
 
    ```
    /spec-plan
@@ -611,7 +611,7 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --
 Before starting implementation, run a light preflight check:
 
 1. If `.specs/preflight.md` does not exist → log warning and continue
-2. Run `/spec-preflight --light` with the current feature name as context
+2. Spawn an independent native sub-agent whose first prompt line is `/spec-preflight --light` with the current feature name as context
 3. Gate behavior:
    - Any `critical` check failed → **STOP**. Write `preflight-report.md` with BLOCKED verdict. Report blocker + recovery command. Run: `livespec pipeline update --feature NNN-feature-name --phase preflight --status blocked`
    - Only `warning` checks failed → write `preflight-report.md` with WARNINGS verdict, display warning, continue
@@ -623,7 +623,7 @@ This ensures all tools and credentials are available before the autonomous imple
 
 ## Phase 3 — Implement (Supervisor Dispatch)
 
-> **Economy mode (`--economy`):** execute `.agent-sync/skills/spec-implement/SKILL.md` steps inline in the main context instead of spawning an agent.
+> **Economy mode (`--economy`):** spawn a compact independent native sub-agent for `/spec-implement`; never execute the slash sub-command inline while the parent goal is active.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase implement --status in_progress`
 
@@ -634,7 +634,7 @@ This ensures all tools and credentials are available before the autonomous imple
    - `active_flags`: `--mono` (if provided), `--step` (if provided), `--resume` (if provided), `--auto` (if active)
    - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
-3. Spawn an **Implement agent** with the assembled Universal Agent Context and these instructions:
+3. Spawn an **Implement sub-agent** with the assembled Universal Agent Context and these instructions:
 
    ```
    /spec-implement
@@ -656,11 +656,11 @@ This ensures all tools and credentials are available before the autonomous imple
 
 ## Phase 3.5 — Test (Supervisor Dispatch)
 
-> **Economy mode (`--economy`):** execute `/spec-test <feature-name> --auto --update` inline in the main context instead of spawning an agent.
+> **Economy mode (`--economy`):** spawn a compact independent native sub-agent for `/spec-test <feature-name> --auto --update`; never execute the slash sub-command inline while the parent goal is active.
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status in_progress`
 
-2. Spawn a **Test agent** with `feature_name` and these instructions:
+2. Spawn a **Test sub-agent** with `feature_name` and these instructions:
 
    ```
    /spec-test
@@ -765,7 +765,7 @@ No commits are made by `/spec-feature` unless the user explicitly asks for a com
 
 When `--auto` is active and Phase 3.5 (Test) completes successfully:
 
-1. Run `/audit --fix` — Codex audits and fixes in a single pass. If violations remain → abort.
+1. Run `/audit --fix` — perform the quality audit and fixes in a single pass. If violations remain → abort.
 2. Verify all tests pass.
 3. Run: `livespec git stage --feature NNN-feature-name` only when the user explicitly requested staging; otherwise leave files unstaged.
 4. Resolve commit hook from 3 levels (global → project → local) only to prepare context, applying inheritance rules from `system/hooks.md`.
@@ -780,7 +780,7 @@ Interactive mode also makes no commit. The user commits manually or invokes `/gi
 
 ## Ship Result
 
-When `/spec-feature` is called by `/spec-ship` (via a spawned agent), the pipeline **must** end with a structured result block that the ship orchestrator can parse:
+When `/spec-feature` is called by `/spec-ship` (via an independent native sub-agent), the pipeline **must** end with a structured result block that the ship supervisor can parse:
 
 **On success:**
 
@@ -858,6 +858,16 @@ If any phase fails:
 
 ---
 
+## Internal Command Invocations
+
+- [subagent] `/spec-specify` — executable Phase 1 command; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-plan` — executable Phase 2 command; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-preflight --light` — executable Phase 2.7 command; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-implement` — executable Phase 3 command; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-test <feature-name> --auto --update` — executable Phase 3.5 command; runs in an independent native sub-agent with its own goal.
+- [suggestion] `/spec-check NNN-feature-name` — displayed after pipeline completion as a verification next step.
+- [suggestion] `/spec-feature --resume [feature-name]` — displayed on resumable BLOCKED state.
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
@@ -934,7 +944,7 @@ If any phase fails:
 
 ### Phase 2.7 — Preflight
 
-- [always] Run `/spec-preflight --light` with current feature context
+- [always] Spawn independent native sub-agent for `/spec-preflight --light` with current feature context
 - [always] Write `preflight-report.md` with READY / WARNINGS / BLOCKED verdict
 - [always] Run `livespec pipeline update --phase preflight --status blocked` on critical failure
 
