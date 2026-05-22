@@ -27,6 +27,9 @@ from .verify_output import VerifyReport, blocked_report, evaluate
 
 GOAL_CONTRACT_VERSION = "1.0"
 CONVENTION_SIGNAL_FILES: tuple[str, ...] = ("spec.md", "plan.md")
+EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
+    {"always", "visual", "penflow", "generate", "visual-generate", "execute"}
+)
 DESIGN_SIGNAL_WORDS: frozenset[str] = frozenset(
     {
         "--visual",
@@ -255,6 +258,101 @@ def verify_command_goal(
     return GoalVerification(goal=goal, report=report)
 
 
+def _detect_visual_feature(project_root: Path, feature: str | None) -> bool:
+    """Return True if the feature has visual work (## Screens or ## Penflow Contract)."""
+    if feature is None:
+        return False
+    spec_path = project_root / ".specs" / "features" / feature / "spec.md"
+    if not spec_path.exists():
+        return False
+    # Match level-2 Screens or Penflow Contract headings in spec.md
+    return bool(
+        re.search(
+            r"^##\s+(Screens|Penflow Contract)\b",
+            spec_path.read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+    )
+
+
+def _detect_penflow(project_root: Path) -> bool:
+    """Return True if a penflow/ directory exists at the project root."""
+    return (project_root / "penflow").is_dir()
+
+
+def _active_execution_task_branches(
+    is_visual: bool, visual_enabled: bool, has_penflow: bool, audit_only: bool, no_generate: bool
+) -> set[str]:
+    """Calculate which execution task branches are active based on context."""
+    active: set[str] = {"always"}
+    visual_active = is_visual and visual_enabled
+    generate_active = not audit_only and not no_generate
+    if visual_active:
+        active.add("visual")
+        if has_penflow:
+            active.add("penflow")
+        if generate_active:
+            active.add("visual-generate")
+    if generate_active:
+        active.add("generate")
+    if not audit_only:
+        active.add("execute")
+    return active
+
+
+def _extract_execution_tasks(
+    skill_path: Path,
+    *,
+    normalized_flags: list[str],
+    is_visual: bool,
+    has_penflow: bool,
+) -> list[str]:
+    """Parse ## Execution Tasks from the skill file and filter by active branches.
+
+    Branches:
+      always          — always included
+      visual          — is_visual AND NOT --no-visual
+      penflow         — visual AND has_penflow
+      generate        — NOT --audit-only AND NOT --no-generate
+      visual-generate — visual AND generate both active
+      execute         — NOT --audit-only
+    """
+    if not skill_path.exists():
+        return []
+    text = skill_path.read_text(encoding="utf-8")
+    # Find the machine-readable execution task section heading
+    match = re.search(r"^##\s+Execution Tasks\s*$", text, flags=re.MULTILINE)
+    if match is None:
+        return []
+    section = text[match.end() :]
+    next_heading = re.search(r"^##\s+", section, flags=re.MULTILINE)
+    if next_heading is not None:
+        section = section[: next_heading.start()]
+
+    no_visual = "--no-visual" in normalized_flags
+    audit_only = "--audit-only" in normalized_flags
+    no_generate = "--no-generate" in normalized_flags
+
+    active = _active_execution_task_branches(
+        is_visual, not no_visual, has_penflow, audit_only, no_generate
+    )
+
+    tasks: list[str] = []
+    for line in section.splitlines():
+        stripped = line.strip()
+        # Parse - [branch] task description format
+        m = re.match(r"^-\s+\[([^\]]+)\]\s+(.+)$", stripped)
+        if m is None:
+            continue
+        branch = m.group(1).strip()
+        if branch not in EXECUTION_TASK_BRANCHES:
+            raise ValueError(f"Unknown execution task branch '{branch}' in {skill_path}")
+        task = m.group(2).strip()
+        if branch in active:
+            tasks.append(task)
+    return tasks
+
+
 def render_goal_objective(goal: GoalContract) -> str:
     """Render stable human text from the canonical payload."""
     payload = goal.payload
@@ -271,6 +369,12 @@ def render_goal_objective(goal: GoalContract) -> str:
         lines.extend(f"- {item}" for item in definition_of_done)
     else:
         lines.append("- No Definition of Done found in command skill; use expectations only.")
+    execution_tasks = list(payload.get("execution_tasks") or [])
+    if execution_tasks:
+        lines.append("")
+        lines.append("Execution tasks (in order):")
+        for i, task in enumerate(execution_tasks, 1):
+            lines.append(f"  {i:>2}. {task}")
     conventions = payload.get("conventions", {})
     selected_domains = list(conventions.get("selected_domains") or [])
     if selected_domains:
@@ -316,11 +420,24 @@ def _goal_payload(
 ) -> dict[str, Any]:
     skill_path = livespec_root / ".agent-sync" / "skills" / command / "SKILL.md"
     normalized_flags = normalize_goal_flags(flags)
+    is_visual = _detect_visual_feature(project_root, feature)
+    has_penflow = _detect_penflow(project_root)
+    execution_tasks = _extract_execution_tasks(
+        skill_path,
+        normalized_flags=normalized_flags,
+        is_visual=is_visual,
+        has_penflow=has_penflow,
+    )
     payload = {
         "schema_version": GOAL_CONTRACT_VERSION,
         "command": command,
         "feature": feature,
         "normalized_flags": normalized_flags,
+        "runtime_context": {
+            "is_visual_feature": is_visual,
+            "has_penflow": has_penflow,
+        },
+        "execution_tasks": execution_tasks,
         "expectations": {
             "command": expectations.command,
             "contract_version": expectations.contract_version,
