@@ -148,14 +148,18 @@ Before any slash command starts command-specific work, it MUST compile a determi
 livespec goal render <command-name> --feature <feature-slug> --flags "<active-flags>"
 ```
 
-- **Immediately after rendering, call `create_goal(<full rendered text>)`.** This is mandatory —
-  no flag bypasses it. The rendered text (hash + execution tasks + Definition of Done) becomes the
-  durable, tracked goal for this command execution.
+- **Immediately after rendering, emit the slash command `/goal` with the full rendered text as objective.**
+  This is mandatory — no flag bypasses it. Output exactly:
+  ```
+  /goal <full rendered output from livespec goal render>
+  ```
+  The rendered text (hash + execution tasks + Definition of Done) becomes the durable, tracked goal
+  for this command execution.
 - Persist or report the `goal_hash` in the command's execution notes when possible.
 - The goal is compiled from machine-readable `expectations.md`, the command Definition of Done,
   normalized flags, and resolved feature state. It MUST NOT be rewritten or improvised by the LLM.
 - If goal rendering fails, emit the canonical BLOCKED line (§2) and stop.
-- If `create_goal` is unavailable in the current environment, emit the canonical BLOCKED line (§2) and stop.
+- If Claude Code does not accept the `/goal` command, emit the canonical BLOCKED line (§2) and stop.
 - **After rendering, read the "Execution tasks (in order):" section from the output. This numbered
   list is your active working task list for this execution run.** You MUST:
   1. Execute each task in the numbered order — no reordering, no skipping
