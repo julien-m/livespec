@@ -353,6 +353,65 @@ def _extract_execution_tasks(
     return tasks
 
 
+def render_goal_task_file(goal: GoalContract) -> str:
+    """Render a Markdown task file with checkboxes for agent step-by-step tracking.
+
+    The file is designed to be saved as ``.specs/.runs/goal-<cmd>-<hash8>.md``
+    and checked off by the agent as it completes each task.  The ``/goal``
+    slash command is then emitted with just the hash and file reference so the
+    platform goal field stays within its character limit.
+    """
+    payload = goal.payload
+    feature = payload.get("feature") or "none"
+    flags_str = ", ".join(payload["normalized_flags"]) or "none"
+    lines = [
+        f"# Goal Task File: {payload['command']}",
+        f"",
+        f"**Hash:** `{goal.goal_hash}`",
+        f"**Command:** `{payload['command']}`",
+        f"**Feature:** `{feature}`",
+        f"**Flags:** `{flags_str}`",
+        f"",
+        f"> Check each task `[ ]` → `[x]` as you complete it.",
+        f"> This file is the authoritative task list for this execution run.",
+        f"",
+        f"## Execution Tasks",
+        f"",
+    ]
+    execution_tasks = list(payload.get("execution_tasks") or [])
+    if execution_tasks:
+        for i, task in enumerate(execution_tasks, 1):
+            lines.append(f"- [ ] {i:>2}. {task}")
+    else:
+        lines.append("- [ ] _(no execution tasks defined — follow SKILL.md phases)_")
+    lines.append("")
+    lines.append("## Definition of Done")
+    lines.append("")
+    definition_of_done = list(payload["definition_of_done"])
+    if definition_of_done:
+        for item in definition_of_done:
+            lines.append(f"- [ ] {item}")
+    else:
+        lines.append("- [ ] _(no DoD defined — use expectations only)_")
+    lines.append("")
+    lines.append("## Completion Gate")
+    lines.append("")
+    lines.append("When all tasks above are `[x]`, run:")
+    lines.append("```bash")
+    verify_cmd_parts = [f"livespec goal verify {payload['command']}"]
+    if payload.get("feature"):
+        verify_cmd_parts.append(f"--feature {payload['feature']}")
+    if payload["normalized_flags"]:
+        verify_cmd_parts.append(f"--flags \"{' '.join(payload['normalized_flags'])}\"")
+    lines.append(" ".join(verify_cmd_parts))
+    lines.append("```")
+    lines.append("")
+    lines.append("- `success` (exit 0): report DONE")
+    lines.append("- `drift/error` (exit 1): emit ERROR, do not complete goal")
+    lines.append("- `blocked` (exit 2): emit BLOCKED, return resumable status")
+    return "\n".join(lines)
+
+
 def render_goal_objective(goal: GoalContract) -> str:
     """Render stable human text from the canonical payload."""
     payload = goal.payload

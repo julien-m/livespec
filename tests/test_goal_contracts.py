@@ -336,6 +336,6 @@ def test_anti_drift_block_documents_shared_goal_protocol() -> None:
 
     assert "livespec goal render <command-name>" in text
     assert "livespec goal verify <command-name>" in text
-    assert "/goal <" in text  # Exact /goal slash command form
+    assert "/goal hash:<" in text  # Exact /goal slash command form with hash+ref
     assert "/goal clear" in text  # Active goal precheck
     assert "already active" in text  # Precheck documentation

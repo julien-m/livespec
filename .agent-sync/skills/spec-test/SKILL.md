@@ -17,16 +17,20 @@ argument-hint: "<feature-name>"
 La toute première action lors de `/spec-test` est de poser le goal durable.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule, aucune action spec-test démarrée).
-2. Rendre le contrat :
+2. Vérifier qu'aucun goal n'est actif. Si un goal est actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
+3. Rendre et sauvegarder le contrat dans un fichier de tâches :
    ```bash
-   livespec goal render spec-test --feature <feature-slug> --flags "<active-flags>"
+   livespec goal render spec-test --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-3. Émettre la commande slash `/goal` avec la totalité du texte rendu comme objectif :
+   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-test-<hash8>.md`
+4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
+5. Émettre la commande slash `/goal` avec hash et référence au fichier :
    ```
-   /goal <full rendered output from step 2>
+   /goal hash:<hash> | spec-test for <feature> — task list: .specs/.runs/goal-spec-test-<hash8>.md
    ```
-4. La liste "Execution tasks (in order):" du rendu est la **liste de travail active** de ce run — exécuter chaque tâche dans l'ordre, jamais les phases SKILL.md directement.
+6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
+   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si Claude Code n'accepte pas la commande `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.

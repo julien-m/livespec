@@ -147,28 +147,29 @@ Before any slash command starts command-specific work, it MUST compile a determi
 **Precheck:** Before rendering, verify no goal is already active in the platform. If you see `The active goal is...` or similar, emit the canonical BLOCKED line (§2 `prerequisite_unmet`) and instruct the user to run `/goal clear` first.
 
 ```bash
-livespec goal render <command-name> --feature <feature-slug> --flags "<active-flags>"
+livespec goal render <command-name> --feature <feature-slug> --flags "<active-flags>" --save
 ```
 
-- **Immediately after rendering, emit the slash command `/goal` with the full rendered text as objective.**
-  This is mandatory — no flag bypasses it. Output exactly:
+This writes a task file to `.specs/.runs/goal-<command>-<hash8>.md` and prints:
+```
+hash:<full-sha256> | task-file:.specs/.runs/goal-<command>-<hash8>.md
+```
+
+- **Read the task file** — it contains every execution task as a checkbox `[ ]` and the full Definition of Done.
+- **Immediately after rendering, emit the slash command `/goal`** with hash and file reference. Output exactly:
   ```
-  /goal <full rendered output from livespec goal render>
+  /goal hash:<hash> | <command> for <feature> — task list: .specs/.runs/goal-<command>-<hash8>.md
   ```
-  The rendered text (hash + execution tasks + Definition of Done) becomes the durable, tracked goal
-  for this command execution.
-- Persist or report the `goal_hash` in the command's execution notes when possible.
-- The goal is compiled from machine-readable `expectations.md`, the command Definition of Done,
-  normalized flags, and resolved feature state. It MUST NOT be rewritten or improvised by the LLM.
+  This compact form stays within the platform goal field character limit while preserving the full task list.
+  This is mandatory — no flag bypasses it.
+- **The task file is the active working list for this run.** Check `[ ]` → `[x]` after each task. You MUST:
+  1. Execute tasks in order — no reordering, no skipping
+  2. Capture observable evidence before checking each task (§1 form)
+  3. Consult [`SKILL.md`](SKILL.md) phase descriptions for implementation detail — but do NOT treat SKILL.md sections as a sequential execution plan; the task file is authoritative
+  4. If `--save` is unavailable or the task file has no tasks, fall back to the full render output (omit `--save`) and read the `Execution tasks (in order):` section
+- The goal is compiled from machine-readable `expectations.md`, the command Definition of Done, normalized flags, and resolved feature state. It MUST NOT be rewritten or improvised by the LLM.
 - If goal rendering fails, emit the canonical BLOCKED line (§2) and stop.
 - If Claude Code does not accept the `/goal` command, emit the canonical BLOCKED line (§2) and stop.
-- **After rendering, read the "Execution tasks (in order):" section from the output. This numbered
-  list is your active working task list for this execution run.** You MUST:
-  1. Execute each task in the numbered order — no reordering, no skipping
-  2. Capture observable evidence of completion before advancing to the next task (§1 form)
-  3. Consult the [`SKILL.md`](SKILL.md) phase descriptions for implementation detail on each task — but do NOT
-     treat the SKILL.md sections as a sequential execution plan; the goal task list is authoritative
-  4. If the goal output contains no `Execution tasks` section, fall back to the [`SKILL.md`](SKILL.md) phases
 
 Before any command or agent reports `DONE`, verify the following programmatically (or via a
 checklist when programmatic verification is unavailable):

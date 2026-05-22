@@ -1,7 +1,7 @@
 ---
 command: spec-refresh-conventions
 contract_version: "1.0"
-last_reviewed: 2026-05-18
+last_reviewed: 2026-05-22
 ---
 
 # Expectations — /spec-refresh-conventions

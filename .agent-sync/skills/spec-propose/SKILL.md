@@ -11,6 +11,28 @@ description: "Analyze project context and propose the next feature(s) to build"
 
 > **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — runtime goal contract (§5), 6-field step shape (§1), ERROR/BLOCKED format (§2), finalization gate.
 
+## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
+
+La toute première action lors de `/spec-propose` est de poser le goal durable.
+
+1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
+3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+   ```bash
+   livespec goal render spec-propose --feature <feature-slug> --flags "<active-flags>" --save
+   ```
+   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
+   Le stdout affiche : `hash:<hash> | task-file:.specs/.runs/goal-spec-propose-<hash8>.md`
+4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
+5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   ```
+   /goal hash:<hash> | spec-propose for <feature> — task list: .specs/.runs/goal-spec-propose-<hash8>.md
+   ```
+6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
+   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+
+Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
+Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-propose
 

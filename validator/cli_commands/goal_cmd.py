@@ -12,7 +12,7 @@ from pathlib import Path
 import typer
 
 from ..exceptions import ExpectationsInvalid, ExpectationsMissing, OverrideMalformed
-from ..goal_contracts import compile_command_goal, verify_command_goal
+from ..goal_contracts import compile_command_goal, render_goal_task_file, verify_command_goal
 from ..specs_utils import find_specs_root
 
 goal_app = typer.Typer(name="goal", help="Render and verify command goal contracts.")
@@ -21,6 +21,11 @@ COMMAND_ARGUMENT = typer.Argument(..., help="Command name or alias.")
 FEATURE_OPTION = typer.Option(None, "--feature", help="Resolved feature slug.")
 FLAGS_OPTION = typer.Option("", "--flags", help="Space-separated active flags.")
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
+SAVE_OPTION = typer.Option(
+    False,
+    "--save",
+    help="Save task file to .specs/.runs/goal-<cmd>-<hash8>.md and emit hash+path on stdout.",
+)
 RUN_OPTION = typer.Option(None, "--run", help="Explicit run artifact path.")
 
 
@@ -30,6 +35,7 @@ def render_cmd(
     feature: str | None = FEATURE_OPTION,
     flags: str = FLAGS_OPTION,
     json_out: bool = JSON_OPTION,
+    save: bool = SAVE_OPTION,
 ) -> None:
     """Render a deterministic goal for a command invocation."""
     project_root = _project_root()
@@ -45,7 +51,15 @@ def render_cmd(
     except (ExpectationsInvalid, ExpectationsMissing, OverrideMalformed) as exc:
         typer.echo(f"goal render blocked: {exc}", err=True)
         raise typer.Exit(2) from exc
-    if json_out:
+    if save:
+        runs_dir = project_root / ".specs" / ".runs"
+        runs_dir.mkdir(parents=True, exist_ok=True)
+        task_file = runs_dir / f"goal-{goal.command}-{goal.goal_hash[:8]}.md"
+        tmp = task_file.with_suffix(".tmp")
+        tmp.write_text(render_goal_task_file(goal), encoding="utf-8")
+        tmp.replace(task_file)
+        typer.echo(f"hash:{goal.goal_hash} | task-file:{task_file}")
+    elif json_out:
         typer.echo(json.dumps(goal.to_json_envelope(), indent=2))
     else:
         typer.echo(goal.objective)
