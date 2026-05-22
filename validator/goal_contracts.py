@@ -404,7 +404,7 @@ def render_goal_objective(goal: GoalContract) -> str:
     lines.append("")
     lines.append("Completion gate:")
     lines.append("- Run `livespec goal verify` with the same command, feature, and flags.")
-    lines.append("- Call `update_goal(complete)` only when the verification outcome is success.")
+    lines.append("- Report success only when the verification outcome is success (exit 0).")
     lines.append("- Report blocked or resumable status for drift, error, or blocked outcomes.")
     return "\n".join(lines)
 

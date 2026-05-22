@@ -93,10 +93,9 @@ Create `validator/cli_commands/goal_cmd.py` and register it from `validator/cli.
 
 Update [system/anti-drift-block.md](../../../system/anti-drift-block.md) to require:
 
-- startup goal render
-- `create_goal` with rendered objective when the host exposes a goal tool
+- startup goal render + `/goal <rendered objective>` slash command
+- active goal check at start (block if goal already active — user must `/goal clear`)
 - final `livespec goal verify`
-- `update_goal(complete)` only when verification succeeds
 
 ### Step 4 — Documentation and mappings
 
@@ -113,6 +112,6 @@ Update [system/expectations.md](../../../system/expectations.md), create `implem
 
 ## Risks & Considerations
 
-- Goal tools (`create_goal`, `update_goal`) are host-agent APIs, not Python CLI APIs. The CLI therefore renders and verifies deterministic goal contracts; the shared command protocol instructs the executor when to call host goal tools.
+- `/goal <objective>` is a Claude Code slash command, not a Python CLI API. The CLI renders and verifies goal contracts; the SKILL.md protocol instructs the executor to emit `/goal` at start and check for an already-active goal.
 - Definition of Done extraction is Markdown-based. It is intentionally conservative: if no DoD section exists, the compiler returns an empty list instead of inventing conditions.
 - The first implementation gates command success through expectations verification. Richer DoD machine evaluation can be added later as a compatible extension.

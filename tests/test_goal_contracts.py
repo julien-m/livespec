@@ -335,6 +335,7 @@ def test_anti_drift_block_documents_shared_goal_protocol() -> None:
     text = Path("system/anti-drift-block.md").read_text(encoding="utf-8")
 
     assert "livespec goal render <command-name>" in text
-    assert "create_goal(...)" in text
     assert "livespec goal verify <command-name>" in text
-    assert "update_goal(complete)" in text
+    assert "/goal <" in text  # Exact /goal slash command form
+    assert "/goal clear" in text  # Active goal precheck
+    assert "already active" in text  # Precheck documentation

@@ -52,7 +52,7 @@ flowchart TD
     E --> F[Build canonical goal object]
     F --> G[Stable JSON serialization]
     G --> H[SHA-256 hash]
-    H --> I[Goal text for create_goal]
+    H --> I[Goal text for /goal slash command]
 ```
 
 ### Story 2 (P1) — Completion gate verifies the goal instead of trusting prose
@@ -78,7 +78,7 @@ Feature: Goal completion verification
     When `livespec goal verify spec-demo --feature 001-demo` runs
     Then the report outcome is `drift`
     And the exit code is 1
-    And the command must not call `update_goal(complete)`
+    And the command must not report success
 
   Scenario: Missing artifact blocks completion
     Given no `.specs/.runs/spec-demo-*.json` artifact exists
@@ -95,7 +95,7 @@ flowchart TD
     D -- No --> E[blocked exit 2]
     D -- Yes --> F[Evaluate expectations verify rules]
     F --> G{Outcome}
-    G -- success --> H[Allowed to update_goal complete]
+    G -- success --> H[Allowed to report success]
     G -- drift/error --> I[Do not complete goal]
     G -- blocked --> J[Return resumable blocked status]
 ```
@@ -194,7 +194,7 @@ flowchart TD
 - **FR-008:** Add `livespec goal render`.
 - **FR-009:** Add `livespec goal verify`.
 - **FR-010:** Reuse `validator.verify_output.evaluate()` for completion checks.
-- **FR-011:** Update shared command runtime docs so command executors know when to call `create_goal`, `update_goal(complete)`, or report blocked.
+- **FR-011:** Update shared command runtime docs so command executors know to emit exactly `/goal <rendered objective>`, check for an active goal at start (block with `/goal clear` guidance), and when to report blocked.
 - **FR-012:** Preserve backwards compatibility for existing RunArtifact JSON files.
 - **FR-013:** Parse `.conventions/index.md` into deterministic convention domains with keywords and `$AIRESOURCES` source references.
 - **FR-014:** Select convention domains from a deterministic task signal built from command, flags, expectations, and feature `spec.md`/`plan.md`.

@@ -217,9 +217,8 @@ Rules:
 
 - Same project state + command + feature + flags + expectations + SKILL.md → same canonical JSON and SHA-256 hash.
 - If `.conventions/index.md` exists, the goal embeds selected convention domains, source paths, source content, and content hashes. `code` is selected by default; `design-*` domains are selected for UI/mockup/visual/CSS/screen/theme/baseline/Penflow signals.
-- The rendered objective is a deterministic view of the canonical payload; it is safe to pass to host `create_goal(...)`.
+- The rendered objective is a deterministic view of the canonical payload; it can be passed to the platform `/goal` slash command at command start.
 - `goal verify` reuses the `verify:` YAML rules and the latest run artifact, so it has the same success/drift/error/blocked semantics as `/spec-verify-output`.
-- A slash command may call `update_goal(complete)` only after `goal verify` exits 0.
 
 ## 9. Placeholders & Edge Cases (summary)
 

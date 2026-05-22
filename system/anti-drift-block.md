@@ -144,6 +144,8 @@ unless an explicit override is declared.
 
 Before any slash command starts command-specific work, it MUST compile a deterministic runtime goal:
 
+**Precheck:** Before rendering, verify no goal is already active in the platform. If you see `The active goal is...` or similar, emit the canonical BLOCKED line (§2 `prerequisite_unmet`) and instruct the user to run `/goal clear` first.
+
 ```bash
 livespec goal render <command-name> --feature <feature-slug> --flags "<active-flags>"
 ```
@@ -204,7 +206,7 @@ flags, and run artifact:
 livespec goal verify <command-name> --feature <feature-slug> --flags "<active-flags>"
 ```
 
-- `success` (exit 0): the command may report success and may call `update_goal(complete)`.
+- `success` (exit 0): the command may report success.
 - `drift` or `error` (exit 1): emit `ERROR step=<N> type=verification_failed ...` using the command's final step number and do not complete the goal.
 - `blocked` (exit 2): emit `BLOCKED at step <N> - verification_failed - goal verification blocked` using the command's final step number and return a resumable status.
 - Commands without feature context omit `--feature`; commands without active flags pass an empty flags string.
