@@ -361,20 +361,20 @@ def render_goal_objective(goal: GoalContract) -> str:
         f"Command: {payload['command']}",
         f"Feature: {payload['feature'] or 'none'}",
         f"Flags: {', '.join(payload['normalized_flags']) or 'none'}",
-        "",
-        "Expected completion:",
     ]
-    definition_of_done = list(payload["definition_of_done"])
-    if definition_of_done:
-        lines.extend(f"- {item}" for item in definition_of_done)
-    else:
-        lines.append("- No Definition of Done found in command skill; use expectations only.")
     execution_tasks = list(payload.get("execution_tasks") or [])
     if execution_tasks:
         lines.append("")
         lines.append("Execution tasks (in order):")
         for i, task in enumerate(execution_tasks, 1):
             lines.append(f"  {i:>2}. {task}")
+    lines.append("")
+    lines.append("Definition of Done:")
+    definition_of_done = list(payload["definition_of_done"])
+    if definition_of_done:
+        lines.extend(f"- {item}" for item in definition_of_done)
+    else:
+        lines.append("- No Definition of Done found in command skill; use expectations only.")
     conventions = payload.get("conventions", {})
     selected_domains = list(conventions.get("selected_domains") or [])
     if selected_domains:
