@@ -19,7 +19,7 @@ feature: "052-deterministic-command-goal-contracts"
 | FR-008 | `validator/cli_commands/goal_cmd.py`, `validator/cli.py` | CLI module `@spec FR-008` | ✅ Implemented | 2026-05-21 |
 | FR-009 | `validator/cli_commands/goal_cmd.py`, `validator/goal_contracts.py` | CLI module `@spec FR-009` | ✅ Implemented | 2026-05-21 |
 | FR-010 | `validator/goal_contracts.py` | Module-level `@spec FR-010` | ✅ Implemented | 2026-05-21 |
-| FR-011 | `system/anti-drift-block.md`, `system/expectations.md` | `@spec FR-011` anchor in both files | ✅ Implemented | 2026-05-21 |
+| FR-011 | `system/anti-drift-block.md`, `system/expectations.md`, all `.agent-sync/skills/spec-*/SKILL.md` | `@spec FR-011` in system docs + explicit **Read** directive in every SKILL.md | ✅ Implemented | 2026-05-22 |
 | FR-012 | `validator/goal_contracts.py` | Module-level `@spec FR-012` | ✅ Implemented | 2026-05-21 |
 | FR-013 | `validator/goal_contracts.py` | Module-level `@spec FR-013` | ✅ Implemented | 2026-05-21 |
 | FR-014 | `validator/goal_contracts.py` | `@spec FR-014` on `_build_convention_signal_text()` (l.524) | ✅ Implemented | 2026-05-21 |

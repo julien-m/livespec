@@ -9,8 +9,7 @@ description: Migrated Claude command /spec-migrate
 description: "Upgrade a LiveSpec project to the latest version by running pending migrations"
 ---
 
-<!-- Anti-drift block injected via @import (Chantier 1, AUDIT.md). See system/anti-drift-block.md for the canonical 6-field step shape, ERROR/BLOCKED line formats, and timeout/retry policy. -->
-<!-- @import system/anti-drift-block.md -->
+> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — runtime goal contract (§5), 6-field step shape (§1), ERROR/BLOCKED format (§2), finalization gate.
 
 
 # Command: /spec-migrate

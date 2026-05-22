@@ -1,5 +1,14 @@
 # Changelog — Feature 052 — Deterministic Command Goal Contracts
 
+## 2026-05-22 — [Fix]: FR-011 runtime gap — @import replaced by explicit Read directive
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** All 20 `.agent-sync/skills/spec-*/SKILL.md`
+- **Gaps closed:** FR-011 runtime gap — `<!-- @import system/anti-drift-block.md -->` (HTML comment, never processed by Claude) replaced by `> **Read** [system/anti-drift-block.md](../../../system/anti-drift-block.md) before starting` directive that Claude actually executes
+- **Remaining:** None
+- **Author:** spec-fix
+
 ## 2026-05-21 — [Spec]: Spec + Plan
 
 - **Type:** Spec Update
