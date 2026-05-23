@@ -37,6 +37,9 @@ display the full Python stacktrace.
 | 3 | `EXIT_COVERAGE_FAIL` | Coverage threshold failed (used by `livespec test` and `livespec coverage`). |
 | 4 | `EXIT_CAPABILITY_UNSUPPORTED` | The active driver does not implement the requested capability (`livespec mutation` on a driver without a `mutation` block, etc.). |
 | 5 | `EXIT_PREFLIGHT_FAIL` | Preflight detected at least one critical missing tool. |
+| 6 | `EXIT_VISUAL_GATE_FAIL` | `livespec visual-gate validate` found comparison drift, a physical-copy violation under `.specs/features/<slug>/baselines/`, a runtime capture stored under `.specs/design/screens/`, or a Penflow / design-alignment FAIL verdict. |
+| 7 | `EXIT_VISUAL_GATE_BLOCKED` | `livespec visual-gate validate` could not decide because required artifacts, comparison reports, or Penflow workspace pieces are missing. A visual feature MUST NOT be marked done while this exit code is emitted. |
+| 8 | `EXIT_VISUAL_GATE_CLEANUP_DRIFT` | `livespec visual-gate cleanup --dry-run` found misplaced runtime captures that would be quarantined on `--apply`. |
 
 Every command also prints a structured one-line CI summary on stdout of
 the form:
@@ -386,6 +389,32 @@ LIVESPEC preflight · OK · failed=0 · manual_required=0 · installed=1
 ```
 
 ---
+
+## `livespec visual-gate`
+
+Aggregate Penflow + design-alignment + registry-link checks for one feature/target. Called by `/spec-check`, `/spec-fix`, `/spec-test`, `/spec-feature` before they can mark a visual step done.
+
+### Subcommands
+
+* `validate --feature <slug> [--command spec-check|spec-fix|spec-test|spec-feature] [--target web|ios|android|tauri] [--strict-links/--no-strict-links] [--project <path>] [--json]`
+  * Runs the deterministic visual-feature detection (P0-A), aggregates Penflow contract status, per-screen design-alignment reports, registry-link contract (symlink default with manifest fallback), and the runtime-under-`design/screens` detector.
+  * Exit `0` (PASS), `6` (FAIL), or `7` (BLOCKED).
+* `cleanup --feature <slug> [--dry-run/--apply] [--delete --force-delete] [--project <path>] [--json]`
+  * Detects runtime captures misplaced under `.specs/design/screens/<slug>/` whose sha256 matches an approved baseline. Default is `--dry-run` (archive mode is the only non-destructive mode and is implicit). `--apply` quarantines into `.specs/design/_quarantine/<ts>/`. `--delete` requires `--force-delete`.
+  * Writes `.specs/visual-gate/runs/<ts>/cleanup-report.json`.
+  * Exit `0` or `8` (drift found in dry-run mode).
+* `promote --feature <slug> --target <t> --screen <s> --run-id <ts> [--project <path>] [--json]`
+  * Copies `.specs/features/<slug>/run/<ts>/<target>/<screen>.png` into the canonical registry at `.specs/design/baselines/<slug>/<target>/<screen>.png` and creates a relative symlink in `.specs/features/<slug>/baselines/` (when the filesystem supports it).
+
+### Canonical layout
+
+| Path | Role |
+|------|------|
+| `.specs/design/screens/<slug>/<screen>.png` | Design / mockup registry. Runtime captures are forbidden here. |
+| `.specs/design/baselines/<slug>/<target>/<screen>.png` | Approved runtime baseline registry. Single physical copy. |
+| `.specs/features/<slug>/baselines/<screen>.png` | Relative symlink into the baseline registry (or manifest ref on filesystems without symlinks). |
+| `.specs/features/<slug>/run/<ts>/<target>/<screen>.png` | Runner output directory. The four supported targets are `web`, `ios`, `android`, `tauri`. |
+| `.specs/design/_quarantine/<ts>/...` | Cleanup quarantine. Move-only by default. |
 
 ## CI / GitHub Actions snippets
 

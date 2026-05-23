@@ -1261,6 +1261,9 @@ Run with --confirm to generate tests.
 - [visual] 4.5.3 Write baselines/baseline.manifest.yml: capture_date (ISO 8601 UTC) / approved_by (git config user.name or "auto (spec-ship/spec-feature)") / browser_version (from playwright --version output) / os (platform + version) / mockup_version (SHA-256 of mockup PNG, "none" if absent) / docker_image (from docker-compose.visual.yml or "none")
 - [visual] 4.5.3 Update .specs/design/screens/index.md and .specs/design/changelog.md after new mockup exports or runtime baseline syncs
 - [visual] Emit exactly one line: Visual Gate Verdict: PASS|FAIL|BLOCKED (PASS: all screens tested + baselined + diffs within threshold; FAIL: missing/stale/drift; BLOCKED: tooling/runner/app unavailable)
+- [visual] Phase 0 prereq: `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --json` ; exit 7 → générer prereqs (mockups, baselines, Penflow trees) AVANT Phase 4.5
+- [visual] Phase 4.5 strict: runners écrivent dans `.specs/features/<slug>/run/<ts>/<target>/<screen>.png` — JAMAIS sous `.specs/design/screens/`. Promotion via `livespec visual-gate promote --feature <slug> --target <t> --screen <s> --run-id <ts>`
+- [visual] Phase 4.5 final re-run: `livespec visual-gate validate --feature <slug> --command spec-test` ; exit_code != 0 ⇒ Visual Gate Verdict ≠ PASS, refuser le marquage `[x]`
 
 ### Phase 5 — Report
 
@@ -1289,6 +1292,7 @@ Run with --confirm to generate tests.
 - [ ] Feature `changelog.md` has test entry
 - [ ] Global `.specs/changelog.md` has summary entry
 - [ ] If multi-feature: consolidated report produced
+- [ ] For VISUAL features: `livespec visual-gate validate --feature <slug> --command spec-test` exited 0 ; exit 6/7 = `done` interdit, runner outputs hors `.specs/design/screens/`
 
 ---
 

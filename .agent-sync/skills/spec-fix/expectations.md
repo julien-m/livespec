@@ -1,7 +1,7 @@
 ---
 command: spec-fix
 contract_version: "1.0"
-last_reviewed: 2026-05-22
+last_reviewed: 2026-05-23
 ---
 
 # Expectations — /spec-fix
@@ -63,6 +63,16 @@ Fix implementation gaps from /spec-check — functional and visual corrections.
 | 0    | success | nothing |
 | 1    | drift   | inspect report, fix divergence |
 | 2    | blocked | restore precondition, retry |
+| 6    | visual gate FAIL after fix | iterate; do not mark done |
+| 7    | visual gate BLOCKED (prereqs missing) | generate prereqs first, retry |
+
+## 7b. Visual Gate (required after every visual fix)
+
+`/spec-fix` MUST call `livespec visual-gate validate --feature <slug> --command spec-fix [--target <t>]` after applying any CSS / JSX / SwiftUI / Maestro / Tauri fix touching a visual feature. The skill MUST NOT report `done` while the gate exit code is non-zero.
+
+When the gate exits 7 because mockups / baselines / Penflow trees / compare reports are missing, `/spec-fix` MUST generate the prerequisites (or surface them to the user) BEFORE touching code — fixing without baselines is the failure mode this gate exists to stop.
+
+Nested invocation: any call back into `/spec-check` runs through an independent sub-agent so the active `/spec-fix` goal is not violated.
 
 ## 8. Outcome Matrix
 

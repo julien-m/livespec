@@ -273,6 +273,20 @@ After all fixes are applied:
 - If any gap is ⚠️ Improved or ❌ Still failing AND iteration < max → retry Step 6 for remaining gaps only
 - If iteration = max → proceed to Step 8 with partial results
 
+### Step 7.G — Visual Gate (non-skippable)
+
+Pour toute feature visuelle, après chaque cycle de fix toucher à CSS/JSX/SwiftUI/Maestro/Tauri :
+
+```bash
+livespec visual-gate validate --feature <slug> --command spec-fix [--target <web|ios|android|tauri>] --json
+```
+
+- Exit `0` → fix accepté, Step 8 autorisé.
+- Exit `6` → fix rejeté ; consigner `link_violations` + `runtime_in_design_screens_violations` ; itérer (retry Step 6).
+- Exit `7` (mockups/baselines/Penflow/compare manquants) → **générer les prérequis AVANT** de toucher le code (skill peut appeler `livespec visual-gate cleanup --feature <slug> --apply` — le mode `archive` est le défaut — puis recréer les baselines via runner + `livespec visual-gate promote`). Ne **jamais** marquer `done` tant que `exit_code != 0`.
+
+**Nested sub-agent** : si `/spec-check` doit être ré-appelé pour valider la correction, le faire via Task tool dans un sub-agent indépendant ; le goal `/spec-fix` parent reste actif.
+
 ### Step 8 — Update Artifacts
 
 <!-- @spec FR-007: Acquire .specs/.LOCK around all global writes in Step 8 — .specs/features/015-global-write-locks/spec.md#fr-007 -->
@@ -437,6 +451,8 @@ Total: 6/8 gaps closed (75%)
 
 - [always] Run test suite from plan.md or testing/strategy.md
 - [visual] Re-capture Playwright screenshots after visual fixes
+- [visual] Run `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --json` — refuse `done` while exit_code != 0
+- [visual] If gate exit_code == 7 (prereqs missing): run `livespec visual-gate cleanup --feature <slug> --apply` (archive is default) + recreate baselines via runner + `livespec visual-gate promote` BEFORE touching code, then re-run gate
 - [always] Spawn independent native sub-agent for `/spec-check <feature>` to verify closure after fixes
 - [always] Score results per gap (Fixed / Improved / Still failing)
 - [always] Apply iteration logic — exit early if all fixed or regression detected, retry remaining gaps up to max iterations
@@ -468,6 +484,7 @@ Total: 6/8 gaps closed (75%)
 - [ ] Gap report updated with fix results
 - [ ] If all gaps closed: README status updated
 - [ ] Remaining gaps (if any) clearly listed
+- [ ] For VISUAL features: `livespec visual-gate validate --feature <slug> --command spec-fix` exited 0 ; exit 6/7 = `done` interdit
 
 ---
 

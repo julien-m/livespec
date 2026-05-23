@@ -22,6 +22,7 @@ from . import (
     test_cmd,
     ui_runner_cmd,
     utility_cmd,
+    visual_gate_cmd,
 )
 
 
@@ -41,6 +42,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     ui_runner_cmd.register(app)
     command_audit_cmd.register(app)
     utility_cmd.register(app)
+    visual_gate_cmd.register(app)
 
 
 __all__ = ["register_unified_commands"]

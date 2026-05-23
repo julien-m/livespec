@@ -583,6 +583,26 @@ This handler can be invoked without a feature argument: `spec-check --visual-sta
    No visual baselines found in this project.
    ```
 
+### Step 8.G — Visual Gate (non-skippable for VISUAL features)
+
+Avant de passer au Step 9, exécuter le gate Python canonique :
+
+```bash
+livespec visual-gate validate --feature <slug> --command spec-check [--target <web|ios|android|tauri>] --json
+```
+
+Mapping exit code → action :
+
+| Exit | Verdict | Step status |
+|---|---|---|
+| `0` | PASS | continuer Step 9 |
+| `6` | FAIL (link copy, runtime sous `design/screens`, alignment FAIL) | reporter FAIL ; ne JAMAIS cocher `[x]` ; suggérer `/spec-fix --visual` |
+| `7` | BLOCKED (mockup, baseline registry, compare-report, ou Penflow manquant ; conflit `weak_signals_only` ou `spec_declares_visual_but_no_artifacts`) | reporter BLOCKED ; ne JAMAIS auto-PASS ; lister exactement les artefacts manquants depuis `report.missing_artifacts` |
+
+**Règle absolue** : si le gate sort en 6 ou 7, aucun item de Phase 5 (`[visual]`, `[penflow]`) ne peut être coché `[x]`. La case `[x]` Definition of Done "Visual drift detection executed" est conditionnée à `exit_code == 0`.
+
+**Nested sub-agent** : avec `--fix`, l'invocation `/spec-fix` se fait via le Task tool dans un sub-agent natif indépendant (goal scopé feature) — le goal `/spec-check` parent reste actif et n'est jamais réutilisé. Après retour du sub-agent, ré-exécuter le gate ; ne marquer `[x]` qu'à `exit_code == 0` du second appel.
+
 ### Step 9 — Produce Gap Report
 
 Output a structured gap report. When spec quality was validated (Step 4), include a **Spec Quality** section before the FR/AC/Visual tables.
@@ -872,6 +892,8 @@ Ordered list of the most urgent actions across all checked features:
 - [visual] Check design fidelity: compare VALID baselines vs mockup PNGs (5% threshold)
 - [visual] Check theme token compliance if .specs/design/theme.css exists
 - [visual-status] Scan all features' baselines/, classify each screen (VALID/STALE-MOCKUP/STALE-BROWSER/NO-MANIFEST), render governance dashboard
+- [visual] Run `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --json` — PASS only if exit 0 ; FAIL on exit 6 ; BLOCKED on exit 7 with `missing_artifacts` listed verbatim
+- [visual] Refuse to mark [visual]/[penflow] tasks `[x]` while gate exit_code != 0 — "skipped due to missing prerequisites" est BLOCKED, jamais PASS
 
 ### Phase 6 — Gap Report & Persist
 
@@ -912,6 +934,7 @@ Ordered list of the most urgent actions across all checked features:
 - [ ] If `--update`: `implementation.md` status values refreshed
 - [ ] If multi-spec: consolidated report produced
 - [ ] If `--fix`: fix sub-agent goals executed, re-check sub-agent goals executed, child goal task files inspected, and remaining gaps are warnings or canonical BLOCKED
+- [ ] For VISUAL features: `livespec visual-gate validate --feature <slug> --command spec-check` exited 0 ; exit 6/7 = step BLOCKED, no `[x]`
 
 ---
 

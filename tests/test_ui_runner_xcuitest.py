@@ -557,7 +557,11 @@ def test_capture_screenshot_passes_unmodified_destination_to_xcodebuild(
         handler.capture_screenshot(
             destination="platform=watchOS Simulator,id=TEST-UUID-001",
             test_scheme="TestScheme",
-            platform="watchos"
+            platform="watchos",
+            # C6 strict: provide canonical output context so the runner does
+            # not bail out with `guard='missing_output_context'`.
+            feature_slug="030-watchos",
+            run_id="20260523T000000Z",
         )
 
     # Verify -destination argument is the unmodified id=UUID form, not rewritten to name=.

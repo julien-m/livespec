@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-05-22
+last_reviewed: 2026-05-23
 ---
 
 # Expectations — /spec-test
@@ -94,6 +94,14 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 | 0    | success | nothing |
 | 1    | drift   | inspect report, fix divergence |
 | 2    | blocked | restore precondition, retry |
+| 6    | visual gate FAIL (runtime under design/screens, physical copy, alignment FAIL) | run cleanup + re-test |
+| 7    | visual gate BLOCKED (prereqs / weak signals only) | generate baselines, do not auto-PASS |
+
+## 7b. Visual Gate (required for VISUAL features)
+
+`/spec-test` MUST call `livespec visual-gate validate --feature <slug> --command spec-test [--target <t>]` BEFORE returning. Phase 0 (prereqs) blocks on exit 7; phase visuel runs the runner (web/Playwright, iOS/XCUITest, Android/Maestro, Tauri) with `output_path` outside `.specs/design/screens/`; phase finale re-runs the gate.
+
+Runners write captures to `.specs/features/<slug>/run/<ts>/<target>/<screen>.png`. Promotion into the registry uses `livespec visual-gate promote`. The skill MUST NOT mark a visual test step done when the gate exit is 6 or 7.
 
 ## 8. Outcome Matrix
 

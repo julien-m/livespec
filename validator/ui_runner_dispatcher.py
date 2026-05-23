@@ -34,6 +34,7 @@ _RUNNER_PRIORITY: dict[str, int] = {
     "playwright": 0,
     "xcuitest": 1,
     "maestro": 2,
+    "tauri": 3,
 }
 
 
@@ -90,6 +91,7 @@ class VisualPhaseResult:
 def _resolve_registry() -> dict[str, type[RunnerHandler]]:
     """Lazy-import handlers so platform-specific code stays cold on Linux CI."""
     from validator.ui_runner_maestro import MaestroRunnerHandler
+    from validator.ui_runner_tauri import TauriRunnerHandler
     from validator.ui_runner_web import WebRunnerHandler
     from validator.ui_runner_xcuitest import XCUITestRunnerHandler
 
@@ -97,6 +99,7 @@ def _resolve_registry() -> dict[str, type[RunnerHandler]]:
         "playwright": cast(type[RunnerHandler], WebRunnerHandler),
         "xcuitest": cast(type[RunnerHandler], XCUITestRunnerHandler),
         "maestro": cast(type[RunnerHandler], MaestroRunnerHandler),
+        "tauri": cast(type[RunnerHandler], TauriRunnerHandler),
     }
 
 
@@ -114,6 +117,13 @@ _RUNNER_CONFIG_KEYS: dict[str, dict[str, str]] = {
         "launch_arguments": "launch_arguments",
         "onlyTesting": "only_testing",
         "only_testing": "only_testing",
+        # Visual-gate canonical run path inputs.
+        "outputPath": "output_path",
+        "output_path": "output_path",
+        "featureSlug": "feature_slug",
+        "feature_slug": "feature_slug",
+        "runId": "run_id",
+        "run_id": "run_id",
     },
     "maestro": {
         "avdName": "avd_name",
@@ -122,9 +132,37 @@ _RUNNER_CONFIG_KEYS: dict[str, dict[str, str]] = {
         "failFast": "fail_fast",
         "fail_fast": "fail_fast",
         "timeout": "timeout",
+        # Visual-gate canonical run path inputs.
+        "outputPath": "output_path",
+        "output_path": "output_path",
+        "featureSlug": "feature_slug",
+        "feature_slug": "feature_slug",
+        "runId": "run_id",
+        "run_id": "run_id",
     },
-    # Playwright handler ignores runnerConfig (uses playwright.config.ts directly).
-    "playwright": {},
+    # Tauri handler accepts output_path overrides plus an optional capture_fn
+    # injection (used by tests / programmatic callers).
+    "tauri": {
+        "outputPath": "output_path",
+        "output_path": "output_path",
+        "featureSlug": "feature_slug",
+        "feature_slug": "feature_slug",
+        "runId": "run_id",
+        "run_id": "run_id",
+    },
+    # Playwright handler (C6 strict): accept canonical run-path inputs +
+    # explicit legacy opt-in. The handler refuses to default to
+    # .specs/design/screens/ unless legacyDesignScreens=true is set.
+    "playwright": {
+        "outputPath": "output_path",
+        "output_path": "output_path",
+        "featureSlug": "feature_slug",
+        "feature_slug": "feature_slug",
+        "runId": "run_id",
+        "run_id": "run_id",
+        "legacyDesignScreens": "legacy_design_screens",
+        "legacy_design_screens": "legacy_design_screens",
+    },
 }
 
 

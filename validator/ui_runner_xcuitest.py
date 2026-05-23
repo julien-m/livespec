@@ -733,8 +733,17 @@ class XCUITestRunnerHandler:
         workspace: str | None = None,
         platform: str | None = None,
         only_testing: str | None = None,
+        output_path: Path | None = None,
+        feature_slug: str | None = None,
+        run_id: str | None = None,
     ) -> UICapabilityResult:
         """Run xcodebuild test, extract screenshots from .xcresult bundle.
+
+        ``output_path`` (or ``feature_slug`` + ``run_id``) drive the
+        destination directory for the extracted PNGs. When supplied, the
+        extracted attachments are written under that directory instead of
+        the legacy ``.specs/design/screens/`` layout — matching the C6
+        strict contract enforced by the visual gate.
 
         Args:
             screen: Screen identifier used for output naming.
@@ -744,10 +753,51 @@ class XCUITestRunnerHandler:
             project: Optional .xcodeproj path (relative to project_dir or absolute).
             workspace: Optional .xcworkspace path (takes precedence over project).
             platform: 'ios' or 'watchos' — used for scheme auto-detection.
+            only_testing: Restrict to one test target / class / method.
+            output_path: Explicit destination directory or PNG path for the
+                first attachment. Refused when it points under
+                ``.specs/design/screens/``.
+            feature_slug: Used with ``run_id`` to derive the canonical
+                ``.specs/features/<slug>/run/<run_id>/ios/`` directory when
+                ``output_path`` is omitted.
+            run_id: Timestamp folder for the canonical layout.
 
         Returns:
             Result containing the list of exported PNG paths on success.
         """
+        # Visual-gate guard: refuse capture when an explicit override targets
+        # the design-screens registry. Falls back to derived canonical path
+        # when feature_slug/run_id are supplied.
+        from validator.ui_runner_protocol import (
+            RuntimeOutputMisplacedError,
+            assert_output_not_in_design_screens,
+        )
+
+        if output_path is not None:
+            try:
+                assert_output_not_in_design_screens(output_path)
+            except RuntimeOutputMisplacedError as exc:
+                return UICapabilityResult(
+                    success=False,
+                    error=str(exc),
+                    metadata={"guard": "runtime_under_design_screens"},
+                )
+        elif feature_slug and run_id:
+            output_path = (
+                self.project_dir
+                / ".specs"
+                / "features"
+                / feature_slug
+                / "run"
+                / run_id
+                / "ios"
+            )
+        # Note: when neither `output_path` nor `feature_slug+run_id` are
+        # supplied, we defer the `missing_output_context` BLOCKED return
+        # until AFTER the capability/license checks below — this keeps
+        # capability-missing diagnostics (no macOS, no Xcode, no license)
+        # visible to operators instead of being shadowed by the
+        # output-context gate.
         if not self._check_macos():
             return UICapabilityResult(
                 success=False,
@@ -815,6 +865,25 @@ class XCUITestRunnerHandler:
         # unambiguous when an iPhone/Watch pair shares lookalike names). Folder
         # naming is handled separately via _friendly_destination_id below.
 
+        # C6 strict: only NOW (after capability/license/scheme checks) do we
+        # refuse callers that omitted the canonical output context. This
+        # ordering keeps capability-missing diagnostics visible to operators
+        # while still preventing writes under `.specs/design/screens/`.
+        if output_path is None:
+            return UICapabilityResult(
+                success=False,
+                error=(
+                    "XCUITest runner refuses to write into .specs/design/screens/ "
+                    "by default (C6 strict). Provide output_path or "
+                    "feature_slug+run_id to derive "
+                    ".specs/features/<slug>/run/<run_id>/ios/."
+                ),
+                metadata={
+                    "guard": "missing_output_context",
+                    "target": "ios",
+                },
+            )
+
         # Persist the .xcresult under the project so `livespec ui-runner inspect`
         # can read it after the dispatch returns. TemporaryDirectory would delete
         # it before the user has a chance to inspect the trees.
@@ -845,7 +914,13 @@ class XCUITestRunnerHandler:
             # exported_paths=[], leaving the .specs/design/screens/<dest>/
             # directory empty on repeat runs.
             destination_id = self._friendly_destination_id(destination)
-            cached_output_dir = self.project_dir / ".specs" / "design" / "screens"
+            # C6 strict: `output_path` is guaranteed non-None here because the
+            # function returns missing_output_context above when no canonical
+            # context was supplied.
+            assert output_path is not None  # narrows the type for the next line
+            cached_output_dir = (
+                output_path if output_path.suffix == "" else output_path.parent
+            )
             cached_paths = self._parse_xcresult(
                 xcresult_path, cached_output_dir, destination_id
             )
@@ -942,7 +1017,12 @@ class XCUITestRunnerHandler:
             )
 
         destination_id = self._friendly_destination_id(destination)
-        output_dir = self.project_dir / ".specs" / "design" / "screens"
+        # C6 strict: `output_path` is guaranteed non-None by the gate at the
+        # top of capture_screenshot; there is no fallback to design/screens.
+        assert output_path is not None
+        output_dir = (
+            output_path if output_path.suffix == "" else output_path.parent
+        )
         exported_paths = self._parse_xcresult(xcresult_path, output_dir, destination_id)
 
         first_path = exported_paths[0] if exported_paths else None

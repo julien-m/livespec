@@ -970,10 +970,17 @@ If any phase fails:
 - [always] Receive and parse PHASE_RESULT from Test agent
 - [always] Run `livespec pipeline update --phase test --status done` on OK or partial AC coverage
 
+### Phase 3.6 — Visual Gate (non-skippable for VISUAL features)
+
+- [visual] Run `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --json`
+- [visual] Exit 0 → autoriser Phase 4 ; exit 6 ou 7 → BLOQUER la finalisation et `--auto` ; consigner `link_violations`, `runtime_in_design_screens_violations`, `missing_artifacts`
+- [visual] Nested skills (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-fix`) tournent en sub-agents Task tool indépendants — chacun avec son goal — pour respecter la règle single-goal du parent `/spec-feature`
+
 ### Phase 4 — Git Finalization
 
 - [always] Run `/audit --fix` and verify zero remaining violations
 - [always] Verify all tests pass after audit
+- [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature` exit_code != 0 (VISUAL features only)
 - [always] Run `livespec commit-context write` only if explicit commit requested
 - [always] Print `Commit: skipped - no explicit user authorization` if no commit requested
 - [always] Emit SHIP_RESULT block if called from `/spec-ship`

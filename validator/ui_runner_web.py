@@ -11,10 +11,13 @@ expected screenshot, flow, and baseline-comparison commands.
 
 from __future__ import annotations
 
+import os
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
+
+LEGACY_DESIGN_SCREENS_ENV = "LIVESPEC_LEGACY_DESIGN_SCREENS"
 
 import yaml  # type: ignore[import-untyped]  # PyYAML is installed in the repo, but the stub package is not.
 
@@ -129,22 +132,126 @@ class WebRunnerHandler:
             )
         return ""
 
-    def capture_screenshot(self, screen: str) -> UICapabilityResult:
+    def capture_screenshot(
+        self,
+        screen: str,
+        output_path: Path | None = None,
+        feature_slug: str | None = None,
+        run_id: str | None = None,
+        legacy_design_screens: bool = False,
+        **_unused: Any,
+    ) -> UICapabilityResult:
         """Capture one tagged Playwright screenshot.
+
+        Output path resolution (C6 strict — visual-gate-fix cycle):
+        * ``output_path`` provided → guard runs; design-screens forbidden.
+        * ``output_path`` omitted but ``feature_slug`` + ``run_id`` provided →
+          canonical path
+          ``.specs/features/<slug>/run/<run_id>/web/<screen>.png`` is used.
+        * ``legacy_design_screens=True`` → explicit opt-in to the legacy
+          ``.specs/design/screens/<screen>.png`` path. No silent default.
+        * Otherwise → return a BLOCKED ``UICapabilityResult`` with
+          ``guard='missing_output_context'`` so the caller surfaces the
+          contract violation instead of writing into design/screens.
 
         Args:
             screen: Screen identifier matched against `@capture-<screen>` tags.
+            output_path: Optional explicit destination PNG path.
+            feature_slug: Feature slug used to derive the canonical run path.
+            run_id: Timestamp folder name under the feature's ``run/`` dir.
+            legacy_design_screens: Opt-in switch for the pre-visual-gate
+                ``.specs/design/screens/`` layout. Never the default.
 
         Returns:
-            Result object containing the expected screenshot path on success.
+            Result object containing the expected screenshot path on success
+            or the explicit ``guard`` diagnostic on contract failure.
         """
 
+        # Local import keeps the protocol module from importing the web runner
+        # at module load (web runner already imports its own deps lazily).
+        from validator.ui_runner_protocol import (
+            RuntimeOutputMisplacedError,
+            assert_output_not_in_design_screens,
+        )
+
         command = ["npx", "playwright", "test", "--grep", f"@capture-{screen}"]
-        output_path = self.project_dir / ".specs" / "design" / "screens" / f"{screen}.png"
+        if output_path is None:
+            if feature_slug and run_id:
+                output_path = (
+                    self.project_dir
+                    / ".specs"
+                    / "features"
+                    / feature_slug
+                    / "run"
+                    / run_id
+                    / "web"
+                    / f"{screen}.png"
+                )
+            elif legacy_design_screens:
+                # Legacy opt-in — only honoured when the explicit env var is
+                # set so production callers cannot accidentally re-enable
+                # the forbidden mockup-registry write path. Used exclusively
+                # by cleanup/migration tooling on pre-visual-gate apps.
+                if os.environ.get(LEGACY_DESIGN_SCREENS_ENV) != "1":
+                    return UICapabilityResult(
+                        success=False,
+                        error=(
+                            "legacy_design_screens=True is forbidden in normal "
+                            "execution. Set "
+                            f"{LEGACY_DESIGN_SCREENS_ENV}=1 explicitly to "
+                            "authorise the legacy .specs/design/screens/ "
+                            "destination (cleanup/migration tooling only)."
+                        ),
+                        metadata={
+                            "command": " ".join(command),
+                            "guard": "legacy_design_screens_disabled",
+                        },
+                    )
+                output_path = (
+                    self.project_dir / ".specs" / "design" / "screens" / f"{screen}.png"
+                )
+            else:
+                return UICapabilityResult(
+                    success=False,
+                    error=(
+                        "Web runner refuses to write into "
+                        ".specs/design/screens/ by default (C6 strict). "
+                        "Provide --output_path, feature_slug+run_id, or "
+                        "legacy_design_screens=True explicitly."
+                    ),
+                    metadata={
+                        "command": " ".join(command),
+                        "guard": "missing_output_context",
+                    },
+                )
+        if not legacy_design_screens:
+            try:
+                assert_output_not_in_design_screens(output_path)
+            except RuntimeOutputMisplacedError as exc:
+                return UICapabilityResult(
+                    success=False,
+                    error=str(exc),
+                    metadata={
+                        "command": " ".join(command),
+                        "guard": "runtime_under_design_screens",
+                    },
+                )
+        # Thread the resolved output_path through to Playwright so the test
+        # can write the PNG into the canonical location instead of relying on
+        # a hardcoded .specs/design/screens path. The test harness reads
+        # `LIVESPEC_SCREENSHOT_PATH` (and the per-screen variant) from env.
+        playwright_env = os.environ.copy()
+        playwright_env["LIVESPEC_SCREENSHOT_PATH"] = str(output_path)
+        playwright_env[f"LIVESPEC_SCREENSHOT_PATH_{screen.upper()}"] = str(output_path)
+        # Ensure the destination directory exists so Playwright can write
+        # directly into it without a "file not found" intermediate failure.
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         try:
             # This subprocess contract mirrors Feature 010: exit code 0 means the
-            # tagged Playwright test ran successfully and the PNG should exist at
-            # the conventional .specs path.
+            # tagged Playwright test ran successfully and the PNG must be at
+            # the path Playwright was instructed to write via the env vars
+            # above. If the test ignores those env vars, the result.output_path
+            # may still be missing — callers must check `output_path.exists()`.
             result = subprocess.run(
                 command,
                 cwd=self.project_dir,
@@ -152,6 +259,7 @@ class WebRunnerHandler:
                 text=True,
                 timeout=SCREENSHOT_TIMEOUT_SECONDS,
                 check=False,
+                env=playwright_env,
             )
         except subprocess.TimeoutExpired as error:
             return UICapabilityResult(
@@ -170,6 +278,25 @@ class WebRunnerHandler:
             )
 
         success = result.returncode == 0
+        # Anti-false-positive: Playwright exit 0 alone is not enough — if the
+        # PNG was not written at `output_path` we MUST refuse success so the
+        # gate cannot silently PASS on a runner that ignored the env vars.
+        if success and not output_path.exists():
+            return UICapabilityResult(
+                success=False,
+                error=(
+                    f"Playwright reported success but no PNG was written at "
+                    f"{output_path}. Check that the test honours "
+                    "LIVESPEC_SCREENSHOT_PATH (or per-screen variant)."
+                ),
+                metadata={
+                    "command": " ".join(command),
+                    "exit_code": result.returncode,
+                    "guard": "output_missing",
+                    "expected_output_path": str(output_path),
+                    "stdout_snippet": _truncate_stdout(result.stdout),
+                },
+            )
         return UICapabilityResult(
             success=success,
             output_path=output_path if success else None,

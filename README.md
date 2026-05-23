@@ -538,6 +538,29 @@ livespec validate --scorecard            # Quality scorecard
 livespec validate --contradiction-only   # Contradiction detection
 ```
 
+### Visual gate
+
+For features that produce UI, `/spec-check`, `/spec-fix`, `/spec-test`, and `/spec-feature` MUST call the canonical visual gate before reporting `done`:
+
+```bash
+livespec visual-gate validate --feature <slug> --command <spec-*> [--target web|ios|android|tauri] --json
+livespec visual-gate cleanup  --feature <slug> --dry-run         # then --apply (archive is the default mode)
+livespec visual-gate promote  --feature <slug> --target <t> --screen <s> --run-id <ts>
+```
+
+Exit codes: `0` PASS · `6` FAIL (link copy, runtime under `.specs/design/screens/`, alignment FAIL) · `7` BLOCKED (mockup / baseline registry / compare report missing) · `8` cleanup drift.
+
+Canonical layout (no duplicate physical copies):
+
+| Path | Role |
+|------|------|
+| `.specs/design/screens/<slug>/<screen>.png` | Mockup registry. Runtime captures forbidden here. |
+| `.specs/design/baselines/<slug>/<target>/<screen>.png` | Approved baseline registry — single physical copy. |
+| `.specs/features/<slug>/baselines/<screen>.png` | Relative symlink (or manifest ref). |
+| `.specs/features/<slug>/run/<ts>/<target>/<screen>.png` | Runner output. Targets: `web`, `ios`, `android`, `tauri`. |
+
+See [docs/cli-reference.md](docs/cli-reference.md#livespec-visual-gate) for the full contract.
+
 Plan review configuration (`.specs/semantic/config.yaml`):
 
 ```yaml

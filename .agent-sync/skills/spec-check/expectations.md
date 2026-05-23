@@ -1,7 +1,7 @@
 ---
 command: spec-check
 contract_version: "1.0"
-last_reviewed: 2026-05-22
+last_reviewed: 2026-05-23
 ---
 
 # Expectations — /spec-check
@@ -72,6 +72,16 @@ Verify spec vs code alignment and produce a gap report.
 | 0    | success | nothing |
 | 1    | drift   | inspect report, fix divergence |
 | 2    | blocked | restore precondition, retry |
+| 6    | visual gate FAIL (link copy, runtime under design/screens, alignment FAIL) | run `livespec visual-gate cleanup --feature <slug> --dry-run` then `/spec-fix` |
+| 7    | visual gate BLOCKED (missing mockup/baseline/compare report, weak signals only) | restore prereqs, no auto-PASS |
+
+## 7b. Visual Gate (required for VISUAL features)
+
+`/spec-check` MUST call `livespec visual-gate validate --feature <slug> --command spec-check [--target <t>]` and surface the verdict literally. Exit 0/6/7 propagate.
+
+Nested invocation: when `--fix` is requested, `/spec-fix` is called through an independent sub-agent (Task tool) with its own goal scope; the parent `/spec-check` goal is preserved. After the sub-agent returns, the gate is re-run; the parent step only marks `[x]` when the second gate exit is 0.
+
+A step listed in the goal MUST NOT be marked done while the gate exit is non-zero; "skipped due to missing prerequisites" is BLOCKED, not PASS.
 
 ## 8. Outcome Matrix
 

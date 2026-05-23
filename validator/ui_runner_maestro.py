@@ -669,23 +669,62 @@ class MaestroRunnerHandler:
         platform: str = "android",
         fail_fast: bool = False,
         timeout: int = FLOW_TIMEOUT_SECONDS,
+        output_path: Path | None = None,
+        feature_slug: str | None = None,
+        run_id: str | None = None,
     ) -> UICapabilityResult:
         """Run flows, extract tagged screenshots, fall back to adb screencap.
 
-        This combines flow execution with screenshot extraction. For flows
-        that use `takeScreenshot: <name>`, the PNGs from Maestro's output
-        are collected and renamed. For flows without takeScreenshot, adb
-        screencap is used at the end.
+        ``output_path`` is honoured as the destination directory (when a dir
+        is supplied) or as the destination PNG for the first capture (when a
+        file path is supplied). Combined with ``feature_slug`` + ``run_id``
+        the runner derives the canonical
+        ``.specs/features/<slug>/run/<run_id>/android/`` layout, mirroring
+        the web runner. When the caller supplies an ``output_path`` under
+        ``.specs/design/screens/`` the capture is refused (BLOCKED guard).
 
         Args:
+            screen: Screen identifier (matched against `takeScreenshot:` names).
             avd_name: AVD name override.
             platform: Platform filter.
             fail_fast: Stop on first failed flow.
             timeout: Per-flow timeout in seconds.
+            output_path: Optional explicit destination — directory or PNG file.
+            feature_slug: Used to derive the canonical run layout when
+                ``output_path`` is omitted.
+            run_id: Timestamp folder name under ``run/`` for the canonical
+                layout.
 
         Returns:
             UICapabilityResult with output_path pointing to first captured PNG.
         """
+        from validator.ui_runner_protocol import (
+            RuntimeOutputMisplacedError,
+            assert_output_not_in_design_screens,
+        )
+
+        if output_path is not None:
+            try:
+                assert_output_not_in_design_screens(output_path)
+            except RuntimeOutputMisplacedError as exc:
+                return UICapabilityResult(
+                    success=False,
+                    error=str(exc),
+                    metadata={"guard": "runtime_under_design_screens"},
+                )
+        elif feature_slug and run_id:
+            output_path = (
+                self.project_dir
+                / ".specs"
+                / "features"
+                / feature_slug
+                / "run"
+                / run_id
+                / "android"
+            )
+        # Note: the `missing_output_context` BLOCKED return is deferred
+        # until AFTER the SDK / Maestro / emulator capability checks below
+        # so operators see capability-missing diagnostics first.
         if not self._check_android_sdk():
             return UICapabilityResult(
                 success=False,
@@ -726,9 +765,29 @@ class MaestroRunnerHandler:
                     error=_ADB_NO_DEVICES_ERROR,
                 )
 
-        output_dir = self.project_dir / ".specs" / "design" / "screens"
-        if avd_name:
-            output_dir = output_dir / avd_name
+        # C6 strict: enforce the canonical run-path context now that the
+        # capability checks above have all passed. Without this the runner
+        # would silently default to `.specs/design/screens/`.
+        if output_path is None:
+            return UICapabilityResult(
+                success=False,
+                error=(
+                    "Maestro runner refuses to write into .specs/design/screens/ "
+                    "by default (C6 strict). Provide output_path or "
+                    "feature_slug+run_id to derive "
+                    ".specs/features/<slug>/run/<run_id>/android/."
+                ),
+                metadata={
+                    "guard": "missing_output_context",
+                    "target": "android",
+                },
+            )
+        if output_path.suffix.lower() == ".png":
+            # Single-file destination: use parent dir, preserve filename for
+            # the primary screen.
+            output_dir = output_path.parent
+        else:
+            output_dir = output_path
         output_dir.mkdir(parents=True, exist_ok=True)
 
         all_screenshots: list[Path] = []

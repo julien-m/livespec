@@ -25,6 +25,19 @@ EXIT_COVERAGE_FAIL: int = 3
 EXIT_CAPABILITY_UNSUPPORTED: int = 4
 #: ``livespec preflight`` detected at least one critical missing tool.
 EXIT_PREFLIGHT_FAIL: int = 5
+#: ``livespec visual-gate validate`` detected a comparison drift, a broken
+#: registry invariant (e.g. physical copy where a symlink is required), a
+#: runtime capture stored under ``.specs/design/screens/``, or a Penflow /
+#: design-alignment FAIL verdict.
+EXIT_VISUAL_GATE_FAIL: int = 6
+#: ``livespec visual-gate validate`` cannot decide because required artifacts,
+#: comparison reports, or Penflow workspace pieces are missing. The feature
+#: must NOT be marked done while this code is emitted.
+EXIT_VISUAL_GATE_BLOCKED: int = 7
+#: ``livespec visual-gate cleanup --dry-run`` found misplaced artifacts that
+#: would be moved/archived on ``--apply``. Implementation-side guard for the
+#: anti-false-positive E2E contract.
+EXIT_VISUAL_GATE_CLEANUP_DRIFT: int = 8
 
 __all__ = [
     "EXIT_CAPABILITY_UNSUPPORTED",
@@ -33,4 +46,7 @@ __all__ = [
     "EXIT_NO_DRIVER",
     "EXIT_OK",
     "EXIT_PREFLIGHT_FAIL",
+    "EXIT_VISUAL_GATE_BLOCKED",
+    "EXIT_VISUAL_GATE_CLEANUP_DRIFT",
+    "EXIT_VISUAL_GATE_FAIL",
 ]

@@ -1,7 +1,7 @@
 ---
 command: spec-feature
 contract_version: "1.0"
-last_reviewed: 2026-05-22
+last_reviewed: 2026-05-23
 ---
 
 # Expectations — /spec-feature
@@ -98,6 +98,14 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 | 0    | success | nothing |
 | 1    | drift   | inspect report, fix divergence |
 | 2    | blocked | restore precondition, retry |
+| 6    | visual gate FAIL after pipeline | iterate via `/spec-fix`; do not commit |
+| 7    | visual gate BLOCKED (missing baselines/mockups/compare reports) | generate prereqs or surface gap, no auto-PASS |
+
+## 7b. Visual Gate (required before feature completion)
+
+`/spec-feature` MUST call `livespec visual-gate validate --feature <slug> --command spec-feature [--target <t>]` AFTER implementation and tests, BEFORE commit. The skill MUST refuse to commit (and MUST refuse `--auto` continuation) when the gate exit is 6 or 7.
+
+Nested skill calls (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-fix`) inside the pipeline run as independent sub-agents (Task tool) so each can hold its own goal without colliding with the `/spec-feature` parent goal. The parent only re-aggregates verdicts after each sub-agent returns.
 
 ## 8. Outcome Matrix
 

@@ -15,7 +15,44 @@ from typing import Any, Protocol, runtime_checkable
 
 from validator.ui_runner_web import UICapabilityResult
 
-__all__ = ["RunnerHandler", "UICapabilityResult"]
+__all__ = [
+    "RunnerHandler",
+    "RuntimeOutputMisplacedError",
+    "UICapabilityResult",
+    "assert_output_not_in_design_screens",
+]
+
+
+class RuntimeOutputMisplacedError(RuntimeError):
+    """Raised when a runner attempts to write a capture under
+    ``.specs/design/screens/``.
+
+    The design-screens tree is the *mockup registry*; storing a runtime
+    capture there creates a circular comparison (the runtime artefact would
+    later be promoted as its own baseline). Every native runner must call
+    :func:`assert_output_not_in_design_screens` before persisting a PNG.
+    """
+
+
+def assert_output_not_in_design_screens(path: Path) -> None:
+    """Raise :class:`RuntimeOutputMisplacedError` when ``path`` lives under
+    ``.specs/design/screens/``.
+
+    Accepts either absolute or relative paths; works on any host since it
+    only inspects ``Path.parts``.
+    """
+    parts = path.parts
+    try:
+        specs_idx = parts.index(".specs")
+    except ValueError:
+        return
+    tail = parts[specs_idx:]
+    if len(tail) >= 3 and tail[1] == "design" and tail[2] == "screens":
+        raise RuntimeOutputMisplacedError(
+            f"Runtime capture attempted under .specs/design/screens/: {path}. "
+            "Write to .specs/features/<slug>/run/<ts>/<target>/<screen>.png "
+            "instead, then promote via `livespec visual-gate promote`."
+        )
 
 
 @runtime_checkable
