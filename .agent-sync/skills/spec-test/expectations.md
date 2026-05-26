@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-05-23
+last_reviewed: 2026-05-26
 ---
 
 # Expectations — /spec-test
@@ -51,7 +51,6 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 - `.specs/design/baselines/<feature_slug>/` synced runtime screenshots in the Global LiveSpec Design Registry
 
 **require for UI runs with root `penflow/`:**
-- `.specs/design/ui.pen`
 - `.specs/design/screens/<feature_slug>/`
 - `.specs/design/screens/index.md`
 - `.specs/design/changelog.md`
@@ -119,7 +118,7 @@ Runners write captures to `.specs/features/<slug>/run/<ts>/<target>/<screen>.png
 
 - [ ] Coverage report present in checks/
 - [ ] Suite exits 0
-- [ ] Penflow UI runs have Global LiveSpec Design Registry artifacts: `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`
+- [ ] Penflow UI runs have Global LiveSpec Design Registry artifacts: `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`
 - [ ] Penflow UI runs have Mockup Factory PASS proof: `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/<feature_slug>/manifest.json`, `.mockup-validation/<feature_slug>/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and visual evidence PNGs
 
 ## 11. Troubleshooting

@@ -14,23 +14,27 @@ argument-hint: "<target>"
 
 ## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
 
-La toute première action lors de `/spec-refine` est de poser le goal durable.
+La toute première action lors de `/spec-refine` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-refine --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-refine-<hash8>.md`
-4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
-5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-refine-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-refine-<hash8>.state.json`
+4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
+5. Émettre la commande slash `/goal` avec hash et références machine :
    ```
-   /goal hash:<hash> | spec-refine for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-refine-<hash8>.md
+   /goal hash:<hash> | spec-refine for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-refine-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-refine-<hash8>.state.json — mode:enforced
    ```
-6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
-   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
+   ```bash
+   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+   ```
+   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
+7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
@@ -596,7 +600,7 @@ If the project refinement involves adding/replacing a technology, redirect to `/
 
 ## Internal Command Invocations
 
-- [subagent] `/spec-stack change "description of the change"` — executable only after redirect confirmation; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-stack change "description of the change"` — executable only after redirect confirmation; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [suggestion] `/spec-feature "description"` — displayed when refinement is unsafe because downstream artifacts exist.
 - [suggestion] `/spec-check NNN` — displayed to verify current spec-code alignment.
 - [suggestion] `/spec-plan NNN` — displayed when plan regeneration is needed after refinement.
@@ -613,7 +617,7 @@ If the project refinement involves adding/replacing a technology, redirect to `/
 ### Phase 0 — Goal Lock
 
 - [always] Lock goal contract via `livespec goal render spec-refine --save`
-- [always] Emit `/goal` slash command with task file reference
+- [always] Emit `/goal` slash command with contract/state file reference
 
 ### Phase 1 — Resolve Target
 

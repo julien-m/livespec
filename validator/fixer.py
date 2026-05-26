@@ -139,10 +139,9 @@ def fix_file(
     # --- Frontmatter fixes ---
 
     # Fix empty title
-    if (
-        file_type in ("spec", "plan", "implementation", "stack")
-        and not metadata.get("title", "").strip()
-    ):
+    title = metadata.get("title")
+    title_missing = not isinstance(title, str) or not title.strip()
+    if file_type in ("spec", "plan", "implementation", "stack") and title_missing:
         metadata["title"] = _title_from_folder(path)
         metadata_changed = True
         actions.append(

@@ -254,7 +254,7 @@ def _run_single_review(
     constitution_content: str,
     model: str | None,
     check_result: PlanReviewCheckResult,
-) -> PlanReviewResult | None:
+) -> PlanReviewResult:
     """Run a single review and append to results.
 
     Args:

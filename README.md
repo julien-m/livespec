@@ -60,7 +60,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 
 ---
 
-## The 19 Commands
+## The 20 Commands
 
 | Command | What it does |
 |---|---|
@@ -83,6 +83,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 | `/spec-refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
 | `/spec-status` | Display factual status overview of roadmap and features |
 | `/spec-refresh-conventions` | Manually initialize or refresh project conventions from the LiveSpec stack |
+| `/spec-verify-output` | Verify a command run artifact against its expectations contract |
 
 ---
 
@@ -369,9 +370,10 @@ Key flags: `--roadmap`, `--features`, `--json`
 ## Project Structure Created by `/spec-init`
 
 ```
-# Optional: created when `.brainstorm/penflow/` exists or later UI workflow creates it.
+# Optional: imported from a Brainstorm project `penflow/` folder or created by later UI workflow.
 penflow/
 ├── flow-ui-contract/       ← Flow/screen specs used to generate semantic tree
+├── ui.pen                  ← Canonical Pencil/Penflow source; no other .pen is allowed
 ├── semantic-ui-tree.json   ← Primary UI behavior contract
 ├── expected-ui-tree.json   ← Design-derived structural baseline
 ├── code-ir.json            ← UI implementation handoff
@@ -543,7 +545,8 @@ livespec validate --contradiction-only   # Contradiction detection
 For features that produce UI, `/spec-check`, `/spec-fix`, `/spec-test`, and `/spec-feature` MUST call the canonical visual gate before reporting `done`:
 
 ```bash
-livespec visual-gate validate --feature <slug> --command <spec-*> [--target web|ios|android|tauri] --json
+livespec visual-gate certify --feature <slug> --command <spec-*> --target <t> --run-id <run-id> --json
+livespec visual-gate validate --feature <slug> --command <spec-*> --target <t> --receipt <receipt-path> --json
 livespec visual-gate cleanup  --feature <slug> --dry-run         # then --apply (archive is the default mode)
 livespec visual-gate promote  --feature <slug> --target <t> --screen <s> --run-id <ts>
 ```

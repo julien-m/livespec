@@ -6,6 +6,8 @@
 
 from __future__ import annotations
 
+import struct
+import zlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +15,30 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
+
+
+def _write_png(path: Path, color: tuple[int, int, int]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    width = 4
+    height = 4
+    row = bytes((*color, 255)) * width
+    raw = b"".join(b"\x00" + row for _ in range(height))
+    payload = (
+        b"\x89PNG\r\n\x1a\n"
+        + _png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+        + _png_chunk(b"IDAT", zlib.compress(raw))
+        + _png_chunk(b"IEND", b"")
+    )
+    path.write_bytes(payload)
+
+
+def _png_chunk(kind: bytes, data: bytes) -> bytes:
+    return (
+        struct.pack(">I", len(data))
+        + kind
+        + data
+        + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+    )
 
 
 def test_implement_requires_visual_gate_before_final_status() -> None:
@@ -69,6 +95,22 @@ def test_expectations_contracts_describe_visual_gate() -> None:
 
     assert "Visual Gate Verdict" in test
     assert "PASS | FAIL | BLOCKED" in test
+
+
+def test_visual_command_skills_require_oracle_receipts() -> None:
+    """Visual commands must rely on oracle receipts, not prompt assertions."""
+    for skill in (
+        "spec-check",
+        "spec-fix",
+        "spec-test",
+        "spec-implement",
+        "spec-feature",
+    ):
+        body = _read(f".agent-sync/skills/{skill}/SKILL.md")
+        assert "livespec visual-gate certify" in body
+        assert "livespec visual-gate validate --feature" in body
+        assert "visual_evidence_receipt_path" in body
+        assert "design-alignment is semantic-only" in body
 
 
 # ---------------------------------------------------------------------------
@@ -246,6 +288,141 @@ def test_variant_broken_symlink_in_feature_baselines_fails_gate(
     assert any(v.kind == "broken_symlink" for v in report.link_violations)
 
 
+def test_variant_legacy_manifest_missing_mockup_blocks_gate(tmp_path: Path) -> None:
+    """Legacy `screens[].mockup_version` rows must resolve a real mockup PNG."""
+    import json
+
+    from validator.visual_gate import validate_gate
+
+    slug = "vbm-legacy-manifest-missing-mockup"
+    feature_dir = _setup_minimal_visual_feature(tmp_path, slug)
+    manifest = feature_dir / "baselines" / "baseline.manifest.yml"
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    manifest.write_text(
+        json.dumps(
+            {
+                "schema_version": "1",
+                "feature": slug,
+                "screens": [
+                    {
+                        "screen": "missing-dashboard-state",
+                        "mockup_version": "sha256:" + "0" * 64,
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    report = validate_gate(
+        project_root=tmp_path,
+        feature_slug=slug,
+        command="spec-check",
+        target="web",
+        strict_links=True,
+    )
+
+    assert report.verdict == "BLOCKED"
+    assert any("missing-dashboard-state.png" in m for m in report.missing_artifacts)
+
+
+def test_variant_legacy_manifest_stale_mockup_hash_fails_gate(tmp_path: Path) -> None:
+    """Legacy `mockup_version` must match the current design-screen PNG hash."""
+    import json
+
+    from validator.visual_gate import validate_gate
+
+    slug = "vbm-legacy-manifest-stale-mockup"
+    feature_dir = _setup_minimal_visual_feature(tmp_path, slug)
+    manifest = feature_dir / "baselines" / "baseline.manifest.yml"
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    manifest.write_text(
+        json.dumps(
+            {
+                "schema_version": "1",
+                "feature": slug,
+                "screens": [
+                    {
+                        "screen": "dash",
+                        "mockup_version": "sha256:" + "0" * 64,
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    report = validate_gate(
+        project_root=tmp_path,
+        feature_slug=slug,
+        command="spec-check",
+        target="web",
+        strict_links=True,
+    )
+
+    assert report.verdict == "FAIL"
+    assert any(
+        v.kind == "manifest_mockup_sha_mismatch" for v in report.link_violations
+    )
+
+
+def test_variant_legacy_manifest_mockup_path_mapping_passes(tmp_path: Path) -> None:
+    """A baseline state may point at a differently named canonical mockup."""
+    import json
+
+    from validator.registry_links import sha256_of
+    from validator.visual_gate import certify_visual_evidence, validate_gate
+
+    slug = "vbm-legacy-manifest-mapped-mockup"
+    feature_dir = _setup_minimal_visual_feature(tmp_path, slug)
+    mockup_path = tmp_path / ".specs" / "design" / "screens" / slug / "dash.png"
+    _write_png(mockup_path, (10, 20, 30))
+    baseline_path = (
+        tmp_path / ".specs" / "design" / "baselines" / slug / "web" / "dash.png"
+    )
+    baseline_path.unlink()
+    runtime_path = (
+        tmp_path / ".specs" / "features" / slug / "run/manual/web/dash.png"
+    )
+    _write_png(runtime_path, (10, 20, 30))
+    manifest = feature_dir / "baselines" / "baseline.manifest.yml"
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    manifest.write_text(
+        json.dumps(
+            {
+                "schema_version": "1",
+                "feature": slug,
+                "screens": [
+                    {
+                        "screen": "01-dashboard-all-tab",
+                        "mockup_path": f".specs/design/screens/{slug}/dash.png",
+                        "mockup_version": f"sha256:{sha256_of(mockup_path)}",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    payload = certify_visual_evidence(
+        project_root=tmp_path,
+        feature_slug=slug,
+        command="spec-check",
+        target="web",
+        run_id="manual",
+    )
+
+    report = validate_gate(
+        project_root=tmp_path,
+        feature_slug=slug,
+        command="spec-check",
+        target="web",
+        strict_links=True,
+        receipt_path=tmp_path / str(payload["receipt_path"]),
+    )
+
+    assert report.verdict == "PASS"
+
+
 def test_variant_missing_compare_report_blocks_gate(tmp_path: Path) -> None:
     """`design-alignment/<screen>/` exists but compare files missing → BLOCKED.
 
@@ -409,9 +586,12 @@ def _write_normalized_contract(path: Path, screen: str) -> None:
     path.write_text(_json.dumps(payload), encoding="utf-8")
 
 
-def test_alignment_manifest_with_shared_sources_yields_pass(tmp_path: Path) -> None:
+def test_alignment_manifest_with_shared_sources_without_receipt_blocks_gate(
+    tmp_path: Path,
+) -> None:
     """Screen dir carrying only ``design-alignment.manifest.json`` referencing
-    shared normalized contracts under ``.specs/...`` → PASS (no-copy contract)."""
+    shared normalized contracts under ``.specs/...`` is semantic evidence only;
+    visual gate must still require a verified pixel receipt."""
     import json as _json
 
     from validator.visual_gate import validate_gate
@@ -448,8 +628,9 @@ def test_alignment_manifest_with_shared_sources_yields_pass(tmp_path: Path) -> N
         target="web",
         strict_links=True,
     )
-    assert report.verdict == "PASS", report.to_dict()
+    assert report.verdict == "BLOCKED", report.to_dict()
     assert any(r.screen == "dash" and r.verdict == "PASS" for r in report.alignment)
+    assert any("visual-evidence/receipt.json" in m for m in report.missing_artifacts)
     # No physical copy was created in the screen dir.
     assert not (screen_dir / "design-contract.json").exists()
     assert not (screen_dir / "runtime-contract.json").exists()

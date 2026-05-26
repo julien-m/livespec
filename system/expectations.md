@@ -146,7 +146,7 @@ All of these MUST be done **in the same commit**:
 6. Search tests for references to the old name (`grep -rn "<old>"`) and update.
 7. Add a changelog entry summarising the rename.
 
-The 19-file invariant (AC-002) is enforced against the **current** list in
+The command inventory invariant is enforced against the **current** list in
 `.specs/spec-system.md`; commits that rename a command without updating the
 discovery list will fail downstream coherence checks.
 
@@ -171,7 +171,9 @@ Feature 052 layers deterministic runtime goals on top of this expectations syste
 The goal compiler reads the same expectations file resolved by §6, extracts the
 command Definition of Done from `.agent-sync/skills/<X>/SKILL.md`, normalizes
 active flags, and writes a canonical JSON payload with sorted keys and no
-wall-clock fields.
+wall-clock fields. Runtime completion is stateful: the immutable `contract.json`
+lists ordered tasks and required evidence, while the mutable `state.json` can
+only be updated by `livespec goal prove`.
 
 CLI:
 
@@ -180,7 +182,9 @@ livespec goal render <command> --feature <feature> --flags "<flags>" --save
 ```
 
 - Same project state + command + feature + flags + expectations + SKILL.md → same canonical JSON and SHA-256 hash.
-- `--save` writes a Markdown task file to `$TMPDIR/livespec-goals/goal-<cmd>-<hash8>.md` and prints `hash:<sha256> | task-file:<path>`.
+- `--save` writes `$TMPDIR/livespec-goals/goal-<cmd>-<hash8>.contract.json` and `$TMPDIR/livespec-goals/goal-<cmd>-<hash8>.state.json`, then prints `hash:<sha256> | contract-file:<path> | state-file:<path>`.
+- `livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'` is the only mechanism allowed to mark a task `complete`; missing proof returns `REJECTED_NEEDS_ACTION`.
+- `livespec goal status --state <state-file>` reports aggregate completion before a command may emit `DONE`.
 - If `.conventions/index.md` exists, the goal embeds selected convention domains, source paths, source content, and content hashes. `code` is selected by default; `design-*` domains are selected for UI/mockup/visual/CSS/screen/theme/baseline/Penflow signals.
 
 ## 9. Placeholders & Edge Cases (summary)

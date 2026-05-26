@@ -217,9 +217,14 @@ def run_mutation_suite(specs_root: Path, work_dir: Path) -> list[MutationResult]
         details = ""
 
         try:
-            from validator.parser import validate_structure
+            from validator.engine import validate_all
 
-            structure_errors = validate_structure(mutated_path)
+            validation_results, _excluded = validate_all(mutated_path)
+            structure_errors = [
+                message
+                for result in validation_results
+                for message in result.errors
+            ]
             if structure_errors:
                 killed = True
                 killed_by = "L1"
@@ -234,11 +239,9 @@ def run_mutation_suite(specs_root: Path, work_dir: Path) -> list[MutationResult]
 
         if not killed:
             try:
-                from validator.coherence.graph_builder import build_graph
-                from validator.coherence.rule_engine import run_coherence_checks
+                from validator.coherence.rule_engine import run_coherence
 
-                graph = build_graph(mutated_path)
-                violations = run_coherence_checks(graph, mutated_path)
+                violations = run_coherence(mutated_path).violations
                 if violations:
                     killed = True
                     killed_by = "L2"

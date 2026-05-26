@@ -21,7 +21,7 @@ The Design Alignment Gate is only meaningful when Pencil and runtime captures sh
 
 | Problem | Verdict |
 |---|---|
-| Missing `ui.pen` for a new mockup-driven visual screen | `BLOCKED` |
+| Missing `penflow/ui.pen` for a new mockup-driven visual screen | `BLOCKED` |
 | Missing runtime contract | `BLOCKED` |
 | Frame/DPR/safe-area/header/shape mismatch | `BLOCKED` |
 | Missing runtime component | `FAIL` |
@@ -39,4 +39,4 @@ For `BLOCKED`, fix the capture setup before judging UI quality:
 - install fonts or configure documented aliases
 - regenerate the runtime contract
 
-For `FAIL`, fix implementation code to match the current approved `ui.pen`; do not update the baseline screenshot until the alignment gate passes.
+For `FAIL`, fix implementation code to match the current approved `penflow/ui.pen`; do not update the baseline screenshot until the alignment gate passes.

@@ -1,5 +1,44 @@
 # Changelog — Feature 052 — Deterministic Command Goal Contracts
 
+## 2026-05-23 — [Fix]: Visual proof now requires deterministic oracle receipts
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (`spec.md`, `implementation.md`, `progress.md`)
+- **Code modified:** `validator/goal_contracts.py`, `validator/visual_evidence.py`, `validator/visual_gate.py`, `validator/cli_commands/visual_gate_cmd.py`
+- **Docs modified:** `.agent-sync/skills/spec-{check,fix,test,implement,feature}/SKILL.md`
+- **Tests modified:** `tests/test_goal_contracts.py`, `tests/test_visual_evidence.py`, `tests/test_visual_gate_receipts.py`, `tests/test_visual_implementation_gate.py`
+- **AC impacted:** AC-006, AC-016
+- **Author:** codex
+
+## 2026-05-23 — [Fix]: Propagate project root to nested slash-command subagents
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (`spec.md`, `plan.md`, `implementation.md`, `progress.md`)
+- **Code modified:** `validator/goal_contracts.py`, `validator/command_audit.py`, `.agent-sync/skills/spec-{check,fix,feature,implement,ship,refine,stack}/SKILL.md`
+- **Docs modified:** `system/anti-drift-block.md`, `system/integrations.md`
+- **Tests modified:** `tests/test_goal_contracts.py`, `tests/test_command_audit_cli.py`
+- **AC impacted:** AC-017
+- **Author:** codex
+
+## 2026-05-23 — [Fix]: Command goal render false positives and read-only command Goal Lock tasks
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (`spec.md`, `implementation.md`, `progress.md`)
+- **Code modified:** `validator/goal_contracts.py`, `.agent-sync/skills/spec-status/SKILL.md`, `.agent-sync/skills/spec-explain/SKILL.md`
+- **Tests modified:** `tests/test_goal_contracts.py`
+- **AC impacted:** AC-005, AC-015, AC-016
+- **Author:** codex
+
+## 2026-05-23 — [Fix]: Replace Markdown task files with enforced contract/state proof
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (`spec.md`, `plan.md`, `implementation.md`, `progress.md`)
+- **Code modified:** `validator/goal_contracts.py`, `validator/cli_commands/goal_cmd.py`
+- **Docs modified:** `system/anti-drift-block.md`, `system/expectations.md`, all `.agent-sync/skills/spec-*/SKILL.md`
+- **Tests modified:** `tests/test_goal_contracts.py`
+- **AC impacted:** AC-005, AC-006, AC-007, AC-014, AC-015, AC-016
+- **Author:** codex
+
 ## 2026-05-22 — [Fix]: FR-011 runtime gap — @import replaced by explicit Read directive
 
 - **Type:** Bug Fix

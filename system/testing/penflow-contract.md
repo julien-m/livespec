@@ -10,6 +10,7 @@ Root layout:
 ```text
 penflow/
 ├── flow-ui-contract/
+├── ui.pen
 ├── semantic-ui-tree.json
 ├── expected-ui-tree.json
 ├── code-ir.json
@@ -22,9 +23,14 @@ penflow/
 
 Required for contract-ready planning/implementation:
 
+- `penflow/ui.pen`
 - `penflow/semantic-ui-tree.json`
 - `penflow/expected-ui-tree.json`
 - `penflow/code-ir.json`
+
+`penflow/ui.pen is the only allowed `.pen` file` in a LiveSpec project.
+Any duplicate `.pen` under `.specs/design/`, `.specs/features/*/design/`,
+or another path blocks the contract.
 
 Required for runtime comparison:
 
@@ -33,13 +39,13 @@ Required for runtime comparison:
 ## Global LiveSpec Design Registry
 
 Penflow-backed UI features must also populate the project-level design registry.
-Feature-local artifacts are proof copies; `.specs/design/` is the shared visual source of truth.
+PNG screenshots and baselines are visual evidence only; `penflow/ui.pen` remains
+the only Penflow/Pencil source file.
 
 Required registry layout:
 
 ```text
 .specs/design/
-├── ui.pen
 ├── screens/
 │   ├── index.md
 │   └── <feature_slug>/
@@ -50,9 +56,9 @@ Required registry layout:
 └── changelog.md
 ```
 
-If `.specs/design/ui.pen` or mockup PNGs under `.specs/design/screens/<feature_slug>/`
-are missing for a Penflow-backed UI feature, the visual gate is `BLOCKED`. Do not
-auto-approve runtime screenshots without mockups.
+If mockup PNGs under `.specs/design/screens/<feature_slug>/` are missing for a
+Penflow-backed UI feature, the visual gate is `BLOCKED`. Do not auto-approve
+runtime screenshots without mockups.
 
 ## Mockup Factory Validation
 
@@ -95,7 +101,7 @@ field so stdout stays parseable JSON.
 |---|---|---|
 | `PASS` | Expected and actual trees match. | Continue to screenshot regression gates. |
 | `FAIL` | Penflow compare found structural drift. | Block UI flow correctness. |
-| `BLOCKED` | Required Penflow artifacts, `actual-ui-tree.json`, or CLI validation are unavailable for a UI flow that requires runtime comparison. | Block until artifacts/tooling exist. |
+| `BLOCKED` | Required Penflow artifacts, duplicate `.pen` files, `actual-ui-tree.json`, or CLI validation are unavailable for a UI flow that requires runtime comparison. | Block until artifacts/tooling exist. |
 | `ABSENT` | No root `penflow/` workspace exists. | Non-UI or legacy projects may continue with fallback paths. |
 
 ## Command Sequence
@@ -123,7 +129,7 @@ artifacts are present.
 ## Rules
 
 - Do not treat Penflow flows under `.specs/features/` as the project registry; feature-local copies are audit evidence only.
-- Do not leave Penflow/Pencil artifacts only under feature-local directories; sync `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`.
+- Do not create or require secondary `.pen` files. Sync only PNG/mockup registry artifacts to `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`.
 - Do not generate runtime adapters in LiveSpec core.
 - Preserve `semantic_id`, `test_id`, `binding`, `entity`, `validations`, and `side_effects` in UI implementation.
 - Run Penflow before visual baseline approval; screenshot gates remain complementary visual regression gates.

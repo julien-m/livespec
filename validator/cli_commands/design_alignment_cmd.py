@@ -31,7 +31,7 @@ def compare_command(
         Path,
         typer.Option(
             "--design",
-            help="Path to .specs/design/ui.pen or normalized design contract JSON.",
+            help="Path to penflow/ui.pen or normalized design contract JSON.",
         ),
     ],
     runtime: Annotated[

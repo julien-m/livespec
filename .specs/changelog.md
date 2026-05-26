@@ -3,9 +3,23 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-21
+> Last updated: 2026-05-26
 
 ---
+
+## 2026-05-26 — [Feature 051 Fix]: LiveSpec now treats root `penflow/ui.pen` as the only allowed `.pen`, imports explicit Brainstorm `penflow/` sources, blocks duplicate `.pen` files, and removes `.specs/design/ui.pen` requirements from active command/docs paths.
+
+## 2026-05-26 — [Feature 051 Check]: Single `penflow/ui.pen` contract verified against real Brainstorm project `/Users/julienm/projects/project-brainstorm/projects/orch-single-uipen-20260526T152606Z`; virgin LiveSpec import produced only `penflow/ui.pen`.
+
+## 2026-05-23 — [Feature 052 Fix]: Visual goal proof now requires a deterministic `visual_evidence_receipt_path`; `visual-gate certify` writes verified PNG hash/diff receipts and visual commands validate receipts instead of worker-declared diffs.
+
+## 2026-05-23 — [Feature 004 Fix]: Visual gate now enforces legacy `baseline.manifest.yml` mockup evidence, supports `mockup_path` for runtime-state screenshots, and blocks missing/stale design mockups before PASS.
+
+## 2026-05-23 — [Feature 052 Fix]: Internal `/spec-*` subagent invocations now propagate the current LiveSpec project root/cwd and command audit rejects missing workdir guards.
+
+## 2026-05-23 — [Feature 052 Fix]: Goal rendering now ignores documentary `/spec-*` examples/recovery hints, skips Markdown checkboxes inside `Execution Tasks`, exposes top-level `worker_may_mark_tasks_complete=false`, and adds machine Goal Lock tasks to `/spec-status` + `/spec-explain`.
+
+## 2026-05-23 — [Feature 052 Fix]: Deterministic command goals now write `contract.json` + `state.json`, require `livespec goal prove/status`, and reject visual design-fidelity completion when mockup/baseline/runtime PNG proof is missing.
 
 ## 2026-05-21 — [Feature 052] Fix: 4/4 anchor gaps closed — FR-011/012/014/015 `@spec` annotations added (100% FR verified)
 

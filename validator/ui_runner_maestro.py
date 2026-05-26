@@ -782,12 +782,8 @@ class MaestroRunnerHandler:
                     "target": "android",
                 },
             )
-        if output_path.suffix.lower() == ".png":
-            # Single-file destination: use parent dir, preserve filename for
-            # the primary screen.
-            output_dir = output_path.parent
-        else:
-            output_dir = output_path
+        # Single-file destination: use parent dir, preserve filename for the primary screen.
+        output_dir = output_path.parent if output_path.suffix.lower() == ".png" else output_path
         output_dir.mkdir(parents=True, exist_ok=True)
 
         all_screenshots: list[Path] = []

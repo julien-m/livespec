@@ -151,23 +151,34 @@ def status_command(
 def bootstrap_command(
     project: Annotated[
         Path,
-        typer.Option("--project", help="Project root containing .brainstorm/penflow/."),
+        typer.Option("--project", help="LiveSpec project root receiving root penflow/."),
     ] = Path("."),
+    source: Annotated[
+        Path | None,
+        typer.Option(
+            "--source",
+            help="Explicit Brainstorm penflow/ directory to import into the LiveSpec project.",
+        ),
+    ] = None,
     json_output: Annotated[
         bool,
         typer.Option("--json", help="Emit machine-readable JSON."),
     ] = False,
 ) -> None:
-    """Copy ``.brainstorm/penflow/`` to root ``penflow/`` when absent.
+    """Copy a Brainstorm ``penflow/`` directory to root ``penflow/`` when absent.
 
     Args:
-        project: Project root containing optional ``.brainstorm/penflow/``.
+        project: LiveSpec project root receiving root ``penflow/``.
+        source: Optional explicit Brainstorm ``penflow/`` source directory.
         json_output: Emit parseable JSON instead of human-readable text.
 
     Side effects:
         May copy a Penflow workspace and writes the result to stdout.
     """
-    result = bootstrap_penflow_workspace(project.resolve())
+    result = bootstrap_penflow_workspace(
+        project.resolve(),
+        source_dir=source.resolve() if source is not None else None,
+    )
     if json_output:
         typer.echo(json.dumps(result.to_dict(), indent=2))
     else:

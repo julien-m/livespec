@@ -82,7 +82,6 @@ When LiveSpec is installed in a project, the `.specs/` directory is the source o
 │   └── ...
 │
 ├── design/
-│   ├── ui.<ext>            ← Design source file (tool-specific)
 │   ├── ui.pdf              ← Full PDF export
 │   ├── screens/            ← Per-screen PNG exports
 │   │   ├── *.png           ← Latest version of each screen
@@ -389,9 +388,9 @@ To prevent changelogs from growing unbounded:
 
 ### When working with DESIGN mockups
 
-1. Design mockups are centralized in `.specs/design/` — one source file per project
+1. Design mockup screenshots are centralized in `.specs/design/screens/`; Penflow projects keep the canonical `.pen` source at `penflow/ui.pen`
 2. PNGs in `screens/` are the reference for implementation — always the latest version
-3. The design source file (`ui.pen`, `ui.fig`, etc.) is saved manually by the user
+3. Do not create or require `.pen` files under `.specs/design/`; `penflow/ui.pen` is the only Penflow/Pencil source
 4. When a feature modifies existing screens, save the versioned PNG in `screens/<NNN-feature-name>/` and update the latest copy at `screens/<name>.png`
 5. The `## Screens` section in `spec.md` links features to their visual references
 6. Design fidelity threshold is 5% (more permissive than visual regression at 2%)

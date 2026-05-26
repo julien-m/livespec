@@ -3,33 +3,33 @@
 <!-- @spec FR-001: Global design alignment workflow — .specs/features/047-design-alignment-gate/spec.md#fr-001 -->
 
 > Reusable LiveSpec workflow derived from the CloudSkill Playbook — Mockup-Code Alignment.
-> It aligns Pencil mockups (`ui.pen`) with runtime UI contracts before approving a first or refreshed screenshot baseline.
+> It aligns the canonical Pencil mockup (`penflow/ui.pen`) with runtime UI contracts before approving a first or refreshed screenshot baseline.
 
 ## Purpose
 
-Use this protocol whenever a visual feature starts from a new mockup, a changed `ui.pen` design source, or a redesigned screen/state. It prevents the first screenshot baseline from becoming an accidental snapshot of an incorrect implementation.
+Use this protocol whenever a visual feature starts from a new mockup, a changed `penflow/ui.pen` design source, or a redesigned screen/state. It prevents the first screenshot baseline from becoming an accidental snapshot of an incorrect implementation.
 
 `Design Alignment Verdict: PASS | FAIL | BLOCKED`
 
 | Verdict | Meaning | Exit code |
 |---|---|---|
 | `PASS` | Design support matches runtime support and all required nodes/properties align. | 0 |
-| `FAIL` | Support matches, but runtime nodes/tokens/layout/states diverge from `ui.pen`. | 1 |
-| `BLOCKED` | Inputs or support are not comparable: missing `ui.pen`, missing runtime capture, frame/safe-area/header/DPR/shape mismatch, or unreadable contract. | 2 |
+| `FAIL` | Support matches, but runtime nodes/tokens/layout/states diverge from `penflow/ui.pen`. | 1 |
+| `BLOCKED` | Inputs or support are not comparable: missing `penflow/ui.pen`, missing runtime capture, frame/safe-area/header/DPR/shape mismatch, or unreadable contract. | 2 |
 
 ## Invocation Point
 
 `/spec-test --visual` runs this protocol before baseline capture when:
 
 - the feature has a `## Screens` section, and
-- `.specs/design/ui.pen` exists, and
+- `penflow/ui.pen` exists, and
 - the screen has no approved baseline, or the stored design hash differs from the current design source.
 
 For unchanged screens with approved baselines, use `system/testing/visual-baselines.md` instead.
 
 ## Worker: Pencil to Design Contract
 
-The design extractor reads `ui.pen`, verifies support normalization first, then emits one design contract per screen:
+The design extractor reads `penflow/ui.pen`, verifies support normalization first, then emits one design contract per screen:
 
 ```json
 {

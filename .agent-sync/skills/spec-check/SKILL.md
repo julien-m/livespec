@@ -14,23 +14,27 @@ argument-hint: "<feature-name>"
 
 ## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
 
-La toute première action lors de `/spec-check` est de poser le goal durable.
+La toute première action lors de `/spec-check` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-check --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-check-<hash8>.md`
-4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
-5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-check-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-check-<hash8>.state.json`
+4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
+5. Émettre la commande slash `/goal` avec hash et références machine :
    ```
-   /goal hash:<hash> | spec-check for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-check-<hash8>.md
+   /goal hash:<hash> | spec-check for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-check-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-check-<hash8>.state.json — mode:enforced
    ```
-6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
-   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
+   ```bash
+   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+   ```
+   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
+7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
@@ -585,23 +589,34 @@ This handler can be invoked without a feature argument: `spec-check --visual-sta
 
 ### Step 8.G — Visual Gate (non-skippable for VISUAL features)
 
-Avant de passer au Step 9, exécuter le gate Python canonique :
+Avant de passer au Step 9, produire puis vérifier une preuve oracle fraîche :
 
 ```bash
-livespec visual-gate validate --feature <slug> --command spec-check [--target <web|ios|android|tauri>] --json
+RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
+# capture runtime PNGs into .specs/features/<slug>/run/$RUN_ID/<target>/<screen>.png
+livespec visual-gate certify --feature <slug> --command spec-check --target <web|ios|android|tauri> --run-id "$RUN_ID" --json
+livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path> --json
 ```
+
+`design-alignment is semantic-only`: `design-alignment` JSON, Penflow tree match, compare reports, normalized JSON, worker-declared `actual_diff_percent`, and freeform verdicts are never pixel proof. The only acceptable proof for `visual.design_fidelity` / visual pixel tasks is:
+
+```json
+{"visual_evidence_receipt_path":"<receipt-path>"}
+```
+
+Submit that JSON to `livespec goal prove`; if `visual-gate certify` returns BLOCKED/FAIL or receipt-bound `validate` exits non-zero, repair or re-run capture until a PASS receipt exists.
 
 Mapping exit code → action :
 
 | Exit | Verdict | Step status |
 |---|---|---|
-| `0` | PASS | continuer Step 9 |
-| `6` | FAIL (link copy, runtime sous `design/screens`, alignment FAIL) | reporter FAIL ; ne JAMAIS cocher `[x]` ; suggérer `/spec-fix --visual` |
+| `0` | PASS | continuer Step 9 and submit `visual_evidence_receipt_path` |
+| `6` | FAIL (link copy, runtime sous `design/screens`, alignment FAIL) | reporter FAIL ; ne JAMAIS prouver `complete` ; suggérer `/spec-fix --visual` |
 | `7` | BLOCKED (mockup, baseline registry, compare-report, ou Penflow manquant ; conflit `weak_signals_only` ou `spec_declares_visual_but_no_artifacts`) | reporter BLOCKED ; ne JAMAIS auto-PASS ; lister exactement les artefacts manquants depuis `report.missing_artifacts` |
 
-**Règle absolue** : si le gate sort en 6 ou 7, aucun item de Phase 5 (`[visual]`, `[penflow]`) ne peut être coché `[x]`. La case `[x]` Definition of Done "Visual drift detection executed" est conditionnée à `exit_code == 0`.
+**Règle absolue** : si le gate sort en 6 ou 7, aucun item de Phase 5 (`[visual]`, `[penflow]`) ne peut être prouvé `complete`. Le statut Definition of Done "Visual drift detection executed" est conditionné à `exit_code == 0`.
 
-**Nested sub-agent** : avec `--fix`, l'invocation `/spec-fix` se fait via le Task tool dans un sub-agent natif indépendant (goal scopé feature) — le goal `/spec-check` parent reste actif et n'est jamais réutilisé. Après retour du sub-agent, ré-exécuter le gate ; ne marquer `[x]` qu'à `exit_code == 0` du second appel.
+**Nested sub-agent** : avec `--fix`, l'invocation `/spec-fix` se fait via le Task tool dans un sub-agent natif indépendant (goal scopé feature) — le goal `/spec-check` parent reste actif et n'est jamais réutilisé. Après retour du sub-agent, ré-exécuter le gate ; ne soumettre une preuve `ACCEPTED` qu'à `exit_code == 0` du second appel.
 
 ### Step 9 — Produce Gap Report
 
@@ -834,8 +849,8 @@ Ordered list of the most urgent actions across all checked features:
 
 ## Internal Command Invocations
 
-- [subagent] `/spec-fix <feature> --auto --update` — executable only when `--fix` is active; runs in an independent native sub-agent with its own goal.
-- [subagent] `/spec-check <feature>` — executable re-check after a `--fix` child result; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-fix <feature> --auto --update` — executable only when `--fix` is active; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-check <feature>` — executable re-check after a `--fix` child result; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [suggestion] `/spec-fix [feature-name]` — displayed as a next action when drift exists and `--fix` is not active.
 - [suggestion] `/spec-fix [feature-name] --visual` — displayed as a visual-only next action.
 - [suggestion] `/spec-fix [feature-name] --fr FR-NNN` — displayed as a targeted FR next action.
@@ -854,7 +869,7 @@ Ordered list of the most urgent actions across all checked features:
 - [always] Resolve flags and feature argument (read-only)
 - [always] Verify no active goal exists
 - [always] Render and save goal contract via `livespec goal render spec-check --save`
-- [always] Emit `/goal` slash command with hash and task-file reference
+- [always] Emit `/goal` slash command with hash and contract/state file references
 
 ### Phase 1 — Tree Validation
 
@@ -892,8 +907,9 @@ Ordered list of the most urgent actions across all checked features:
 - [visual] Check design fidelity: compare VALID baselines vs mockup PNGs (5% threshold)
 - [visual] Check theme token compliance if .specs/design/theme.css exists
 - [visual-status] Scan all features' baselines/, classify each screen (VALID/STALE-MOCKUP/STALE-BROWSER/NO-MANIFEST), render governance dashboard
-- [visual] Run `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --json` — PASS only if exit 0 ; FAIL on exit 6 ; BLOCKED on exit 7 with `missing_artifacts` listed verbatim
-- [visual] Refuse to mark [visual]/[penflow] tasks `[x]` while gate exit_code != 0 — "skipped due to missing prerequisites" est BLOCKED, jamais PASS
+- [visual] Capture fresh runtime PNGs to `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-check --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path> --json`
+- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
+- [visual] Refuse to prove [visual]/[penflow] tasks `complete` while gate exit_code != 0 — "skipped due to missing prerequisites" est BLOCKED, jamais PASS
 
 ### Phase 6 — Gap Report & Persist
 
@@ -909,9 +925,9 @@ Ordered list of the most urgent actions across all checked features:
 - [fix] Classify fixable gaps across tree/spec quality, FR/AC mapping, missing or blocked tests, visual fidelity, absent or stale baseline manifests, Penflow drift, changelog/report drift, and README sync
 - [fix] Create missing visual/Penflow prerequisites required for an end-to-end fix attempt, or emit canonical BLOCKED with exact missing path/tool
 - [fix] Spawn independent native sub-agent to execute `/spec-fix <feature> --auto --update` for each feature with fixable gaps
-- [fix] Capture child `/spec-fix` goal hash, task-file path, final status, changed files, and gap closure summary
+- [fix] Capture child `/spec-fix` goal hash, contract-file path, state-file path, final status, changed files, and gap closure summary
 - [fix] Spawn independent native sub-agent to re-run `/spec-check <feature>` after each fix attempt
-- [fix] Inspect child goal task files and require both fix and re-check child goals to be completed or explicitly BLOCKED
+- [fix] Inspect child goal state files and require both fix and re-check child goals to be completed or explicitly BLOCKED
 - [fix] Write actionable warnings for any remaining gap; emit canonical BLOCKED when no safe fix path exists
 
 ### Phase 7 — Multi-Spec Consolidation
@@ -933,8 +949,8 @@ Ordered list of the most urgent actions across all checked features:
 - [ ] Global `.specs/changelog.md` has a summary entry
 - [ ] If `--update`: `implementation.md` status values refreshed
 - [ ] If multi-spec: consolidated report produced
-- [ ] If `--fix`: fix sub-agent goals executed, re-check sub-agent goals executed, child goal task files inspected, and remaining gaps are warnings or canonical BLOCKED
-- [ ] For VISUAL features: `livespec visual-gate validate --feature <slug> --command spec-check` exited 0 ; exit 6/7 = step BLOCKED, no `[x]`
+- [ ] If `--fix`: fix sub-agent goals executed, re-check sub-agent goals executed, child goal state files inspected, and remaining gaps are warnings or canonical BLOCKED
+- [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-check` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = step BLOCKED, no accepted proof
 
 ---
 

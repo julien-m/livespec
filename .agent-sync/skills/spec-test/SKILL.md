@@ -14,29 +14,30 @@ argument-hint: "<feature-name>"
 
 ## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
 
-La toute première action lors de `/spec-test` est de poser le goal durable.
+La toute première action lors de `/spec-test` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule, aucune action spec-test démarrée).
-2. Vérifier qu'aucun goal n'est actif. Si un goal est actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
+3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-test --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-test-<hash8>.md`
-4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
-5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-test-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-test-<hash8>.state.json`
+4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
+5. Émettre la commande slash `/goal` avec hash et références machine :
    ```
-   /goal hash:<hash> | spec-test for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-test-<hash8>.md
+   /goal hash:<hash> | spec-test for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-test-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-test-<hash8>.state.json — mode:enforced
    ```
-6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
-   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
+   ```bash
+   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+   ```
+   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
+7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas la commande `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
-
-
-<!-- @spec FR-001: component-level snapshots, FR-002: reset-baselines workflow, FR-003: docker-compose gen, FR-004: human approval gate, FR-005: auto mode blocking, FR-006: maxDiffPixels threshold — .specs/features/003-visual-testing-fidelity/spec.md#fr-001 -->
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-test
 
@@ -463,21 +464,21 @@ For each test, map back to the AC it covers:
 <!-- @spec FR-005: test command integration — .specs/features/047-design-alignment-gate/spec.md#fr-005 -->
 ### 4.5.0 — Design Alignment Gate
 
-Runs before visual test generation and before baseline capture for screens backed by a new or changed `ui.pen` design source.
+Runs before visual test generation and before baseline capture for screens backed by a new or changed `penflow/ui.pen` design source.
 
 **Reference workflow:** read [`system/testing/design-alignment.md`](../system/testing/design-alignment.md) and [`system/testing/design-alignment-quality.md`](../system/testing/design-alignment-quality.md). Do not inline or weaken that procedure inside this command.
 
 **Trigger:**
 
 - Feature has a `## Screens` section
-- `.specs/design/ui.pen` exists
+- `penflow/ui.pen` exists
 - The screen has no approved baseline, or `design_hash` in `design-alignment.manifest.json` / `baseline.manifest.yml` differs from the current `ui.pen`
 
 **Execution:**
 
 ```bash
 livespec design-alignment compare \
-  --design .specs/design/ui.pen \
+  --design penflow/ui.pen \
   --runtime .specs/features/<feature>/design-alignment/<screen>.runtime.json \
   --screen <screen> \
   --output-dir .specs/features/<feature>/design-alignment/
@@ -503,7 +504,7 @@ Runs before visual baseline generation/capture when root `penflow/` exists.
 
 For Penflow-backed UI features, `/spec-test` must validate and maintain the project-level visual registry before it can approve screenshots:
 
-1. Require `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`.
+1. Require `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`.
 2. Require at least one matching mockup PNG under `.specs/design/screens/<feature_slug>/` for every screen declared in `spec.md ## Screens` or in `penflow/flow-ui-contract/screens/*.md`.
 3. Require Mockup Factory proof from Phase 0.5: `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/<feature_slug>/manifest.json`, `.mockup-validation/<feature_slug>/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and visual evidence PNGs. The visual-evidence manifest status must be `PASS`; warnings or skipped visual evidence block runtime baseline approval.
 4. If any registry path, mockup PNG, or Mockup Factory proof is missing, emit `Visual Gate Verdict: BLOCKED` and `Mockups missing or not validated for Penflow UI feature: <screen_names>`, then stop before baseline approval. Penflow-backed UI features must never auto-approve when mockups are missing or unaudited.
@@ -1242,8 +1243,8 @@ Run with --confirm to generate tests.
 
 - [visual] Skip phase 4.5 entirely if Phase 4 suite did not pass (any non-zero exit code)
 - [visual] Select dispatcher based on surfaces.yaml: all surfaces playwright → livespec ui-runner dispatch <screen...> --feature-dir .specs/features/NNN/; any surface xcuitest or maestro → livespec ui-runner converge --feature <slug>
-- [visual] 4.5.0 Design Alignment Gate — trigger: ui.pen exists AND (baseline absent or design_hash differs from ui.pen): run livespec design-alignment compare --design .specs/design/ui.pen --runtime .specs/features/<feature>/design-alignment/<screen>.runtime.json --screen <screen> --output-dir .specs/features/<feature>/design-alignment/; emit exactly one line: Design Alignment Verdict: PASS|FAIL|BLOCKED; FAIL or BLOCKED prevents baseline capture
-- [penflow] 4.5.P Registry check: verify .specs/design/ui.pen, .specs/design/screens/<slug>/, .specs/design/baselines/<slug>/, .specs/design/screens/index.md, .specs/design/changelog.md all exist
+- [visual] 4.5.0 Design Alignment Gate — trigger: penflow/ui.pen exists AND (baseline absent or design_hash differs from penflow/ui.pen): run livespec design-alignment compare --design penflow/ui.pen --runtime .specs/features/<feature>/design-alignment/<screen>.runtime.json --screen <screen> --output-dir .specs/features/<feature>/design-alignment/; emit exactly one line: Design Alignment Verdict: PASS|FAIL|BLOCKED; FAIL or BLOCKED prevents baseline capture
+- [penflow] 4.5.P Registry check: verify .specs/design/screens/<slug>/, .specs/design/baselines/<slug>/, .specs/design/screens/index.md, .specs/design/changelog.md all exist
 - [penflow] 4.5.P Mockup Factory proof: verify .mockup-validation/audit-report.md, .mockup-validation/<slug>/checklist.md, .mockup-validation/<slug>/manifest.json, .mockup-validation/<slug>/drift-report.json, .mockup-validation/visual-evidence/manifest.json (status must be PASS — warnings or skipped block approval), .mockup-validation/visual-evidence/visual-report.md, and visual evidence PNGs
 - [penflow] 4.5.P Web runtime: start app with project dev server; open in real browser at 1440x900; capture screenshots to .specs/features/<feature>/baselines/ then sync approved copies to .specs/design/baselines/<slug>/
 - [penflow] 4.5.P Runtime tree: evaluate rendered DOM/accessibility surface in browser using Playwright; write penflow/actual-ui-tree.json preferring data-semantic-id → data-testid → ARIA role/name → visible text; every node must include id, role, bbox, children; do NOT copy expected-ui-tree.json or hand-write nodes
@@ -1253,17 +1254,18 @@ Run with --confirm to generate tests.
 - [visual] 4.5.2 Baseline capture — if --reset-baselines: verify not in CI (CI env var), delete existing baseline PNGs (all or named screen only), then capture fresh screenshots; if not --reset-baselines: run visual tests in comparison mode only (never overwrite existing baselines)
 - [visual] 4.5.2 If docker-compose.visual.yml absent: generate with pinned Playwright Docker image (mcr.microsoft.com/playwright:v1.44.0-jammy), record image in baselines/.docker-version; if present: skip, log "docker-compose.visual.yml already exists"
 - [visual] 4.5.2 Retry failed capture up to 2 times; if still failing mark "Blocked — [error]" and skip screen
-- [visual] 4.5.3 Design fidelity: for each captured baseline PNG find corresponding mockup in .specs/design/screens/<screen-name>.png; compute pixel diff percentage using compareDesign()
+- [visual] 4.5.3 Design fidelity: for each captured runtime PNG find corresponding mockup in `.specs/design/screens/<slug>/<screen-name>.png`; compute pixel diff only through `livespec visual-gate certify`
 - [visual] 4.5.3 Interactive approval (not --auto): display approval table (screen / baseline path / diff vs mockup); accept y (approve all) / n (delete all captured PNGs + exit) / n <screen-name> (delete one, redisplay) / view <screen-name> (print paths, redisplay)
 - [visual] 4.5.3 --auto mode: if any diff > 5%, delete all captured PNGs and emit SHIP_RESULT: BLOCKED with screen name and percentage; if all diffs ≤ 5% auto-approve all
 - [penflow] 4.5.3 --auto mode with Penflow: if mockups absent emit Visual Gate Verdict: BLOCKED (never auto-approve Penflow features without mockups — must fix .specs/design/screens/<slug>/ first)
 - [visual] 4.5.3 After approval: sync approved screenshots to .specs/design/baselines/<slug>/ while preserving feature-local copies in .specs/features/<feature>/baselines/
 - [visual] 4.5.3 Write baselines/baseline.manifest.yml: capture_date (ISO 8601 UTC) / approved_by (git config user.name or "auto (spec-ship/spec-feature)") / browser_version (from playwright --version output) / os (platform + version) / mockup_version (SHA-256 of mockup PNG, "none" if absent) / docker_image (from docker-compose.visual.yml or "none")
 - [visual] 4.5.3 Update .specs/design/screens/index.md and .specs/design/changelog.md after new mockup exports or runtime baseline syncs
-- [visual] Emit exactly one line: Visual Gate Verdict: PASS|FAIL|BLOCKED (PASS: all screens tested + baselined + diffs within threshold; FAIL: missing/stale/drift; BLOCKED: tooling/runner/app unavailable)
-- [visual] Phase 0 prereq: `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --json` ; exit 7 → générer prereqs (mockups, baselines, Penflow trees) AVANT Phase 4.5
+- [visual] Run `livespec visual-gate certify --feature <slug> --command spec-test --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json`; emit exactly one line: Visual Gate Verdict: PASS|FAIL|BLOCKED
+- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
+- [visual] Phase 0 prereq probe: `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --json` without `--receipt` is allowed only to discover missing prerequisites; exit 7 is expected until mockups, baselines, Penflow trees, runtime capture, `certify`, and receipt-bound final `validate` exist. It never proves completion.
 - [visual] Phase 4.5 strict: runners écrivent dans `.specs/features/<slug>/run/<ts>/<target>/<screen>.png` — JAMAIS sous `.specs/design/screens/`. Promotion via `livespec visual-gate promote --feature <slug> --target <t> --screen <s> --run-id <ts>`
-- [visual] Phase 4.5 final re-run: `livespec visual-gate validate --feature <slug> --command spec-test` ; exit_code != 0 ⇒ Visual Gate Verdict ≠ PASS, refuser le marquage `[x]`
+- [visual] Phase 4.5 final re-run: `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json` ; exit_code != 0 ⇒ Visual Gate Verdict ≠ PASS, refuser la preuve `ACCEPTED`
 
 ### Phase 5 — Report
 
@@ -1292,7 +1294,7 @@ Run with --confirm to generate tests.
 - [ ] Feature `changelog.md` has test entry
 - [ ] Global `.specs/changelog.md` has summary entry
 - [ ] If multi-feature: consolidated report produced
-- [ ] For VISUAL features: `livespec visual-gate validate --feature <slug> --command spec-test` exited 0 ; exit 6/7 = `done` interdit, runner outputs hors `.specs/design/screens/`
+- [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-test` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit, runner outputs hors `.specs/design/screens/`
 
 ---
 

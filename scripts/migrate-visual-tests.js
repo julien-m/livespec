@@ -824,7 +824,7 @@ import * as path from 'path';${fixturesImport}
 // 1. Update ROUTE below with your actual feature route (e.g. '/login', '/dashboard')
 //    → See .specs/features/${dir}/spec.md for the correct route
 // 2. Update HEADING to match the actual <h1> text rendered on the page
-// 3. Export mockup from .specs/design/ui.pen → .specs/design/screens/current-*.png
+// 3. Export mockup from penflow/ui.pen → .specs/design/screens/current-*.png
 // 4. Run: npm run test:e2e:update   (captures initial baselines)
 // 5. Run: npm run test:e2e          (runs regression tests)
 // 6. Commit baselines + tests
@@ -879,7 +879,7 @@ ${beforeEachBlock}
       console.log(\`   Verify the captured baseline matches this Pencil mockup.\`);
     } else {
       console.warn(\`⚠️  Mockup not found: \${mockupPath}\`);
-      console.warn(\`   Export from .specs/design/ui.pen to enable design fidelity testing.\`);
+      console.warn(\`   Export from penflow/ui.pen to enable design fidelity testing.\`);
     }
     await expect(page).toHaveScreenshot('${slug}-full.png', { fullPage: true });
   });
@@ -1293,7 +1293,7 @@ function printCompletionReport({ generated, skipped, configUpdated, scriptsAdded
     console.log(`1. Review generated tests in ${TEST_DIR}/`);
     console.log('   Verify inferred ROUTE/HEADING values against spec.md and the app.\n');
     console.log('2. Ensure Pencil mockups exist:');
-    console.log('   Export from .specs/design/ui.pen → .specs/design/screens/');
+    console.log('   Export from penflow/ui.pen → .specs/design/screens/');
     console.log('   Name with pattern: current-NN-feature-viewport.png\n');
     console.log('3. Run E2E tests:');
     console.log('   npm run test:e2e\n');

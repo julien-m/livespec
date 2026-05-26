@@ -16,6 +16,8 @@ aggregates:
 * Canonical registry-link contract (``registry_links``): symlink-default
   with manifest fallback, no physical copy, no runtime capture under
   ``.specs/design/screens/``.
+* Legacy ``baseline.manifest.yml`` staleness rows
+  (``screens[].mockup_version``) when present.
 
 The module is import-safe (no IO at import time) and exits with the codes
 declared in :mod:`validator.cli_exit_codes`.
@@ -26,7 +28,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from validator.design_alignment.core import compare_contract_files
 from validator.design_alignment.models import AlignmentResult
@@ -35,21 +37,47 @@ from validator.penflow_contract import (
     get_penflow_contract_status,
 )
 from validator.registry_links import (
-    DESIGN_REGISTRY_DIR,
     BASELINES_DIRNAME,
+    DESIGN_REGISTRY_DIR,
+    SCREENS_DIRNAME,
     LinkViolation,
     ManifestStatus,
     detect_link_capability,
     expected_feature_local_path,
     expected_registry_baseline_path,
+    expected_registry_mockup_path,
     find_runtime_misplaced_under_design_screens,
+    sha256_of,
     validate_manifest,
+)
+from validator.visual_evidence import (
+    MAX_DESIGN_FIDELITY_THRESHOLD_PERCENT,
+    VisualComparison,
+    VisualReceipt,
+    VisualReceiptError,
+    compare_visual_images,
+    verify_visual_receipt,
+    write_visual_receipt,
 )
 
 Classification = Literal["VISUAL", "NON_VISUAL", "CONFLICT"]
 Verdict = Literal["PASS", "FAIL", "BLOCKED"]
 GateCommand = Literal["spec-check", "spec-fix", "spec-test", "spec-feature"]
 GateTarget = Literal["web", "ios", "android", "tauri"]
+
+
+def _as_mapping(value: object) -> dict[str, object] | None:
+    """Return a string-keyed mapping when dynamic JSON/YAML input is object-like."""
+    if not isinstance(value, dict):
+        return None
+    return cast(dict[str, object], value)
+
+
+def _as_list(value: object) -> list[object] | None:
+    """Return a list when dynamic JSON/YAML input is list-like."""
+    if not isinstance(value, list):
+        return None
+    return cast(list[object], value)
 
 
 @dataclass(frozen=True)
@@ -105,6 +133,22 @@ class VisualClassification:
         }
 
 
+def _alignment_results_factory() -> list[AlignmentResult]:
+    return []
+
+
+def _link_violations_factory() -> list[LinkViolation]:
+    return []
+
+
+def _path_list_factory() -> list[Path]:
+    return []
+
+
+def _str_list_factory() -> list[str]:
+    return []
+
+
 @dataclass(frozen=True)
 class GateReport:
     """Complete machine-readable gate report.
@@ -123,11 +167,12 @@ class GateReport:
     verdict: Verdict
     conflict_reason: str | None
     penflow: PenflowContractStatus | None
-    alignment: list[AlignmentResult] = field(default_factory=list)
-    link_violations: list[LinkViolation] = field(default_factory=list)
-    runtime_in_design_screens_violations: list[Path] = field(default_factory=list)
+    alignment: list[AlignmentResult] = field(default_factory=_alignment_results_factory)
+    link_violations: list[LinkViolation] = field(default_factory=_link_violations_factory)
+    runtime_in_design_screens_violations: list[Path] = field(default_factory=_path_list_factory)
     manifest_status: ManifestStatus | None = None
-    missing_artifacts: list[str] = field(default_factory=list)
+    visual_evidence: dict[str, object] | None = None
+    missing_artifacts: list[str] = field(default_factory=_str_list_factory)
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -145,8 +190,154 @@ class GateReport:
                 str(p) for p in self.runtime_in_design_screens_violations
             ],
             "manifest_status": _manifest_status_to_dict(self.manifest_status),
+            "visual_evidence": self.visual_evidence,
             "missing_artifacts": list(self.missing_artifacts),
         }
+
+
+def certify_visual_evidence(
+    *,
+    project_root: Path,
+    feature_slug: str,
+    command: GateCommand,
+    target: GateTarget,
+    run_id: str,
+    threshold_percent: float = 5.0,
+) -> dict[str, object]:
+    """Produce a visual evidence receipt for mockup/runtime PNG comparisons.
+
+    Args:
+        project_root: Project root containing `.specs/`.
+        feature_slug: Feature directory slug.
+        command: Calling LiveSpec command.
+        target: UI target.
+        run_id: Runtime capture run id under the feature `run/` directory.
+        threshold_percent: Design fidelity threshold.
+
+    Returns:
+        Machine-readable certification payload containing verdict and receipt.
+    """
+    if threshold_percent < 0 or threshold_percent > MAX_DESIGN_FIDELITY_THRESHOLD_PERCENT:
+        return {
+            "feature_slug": feature_slug,
+            "command": command,
+            "target": target,
+            "run_id": run_id,
+            "verdict": "BLOCKED",
+            "missing_artifacts": [
+                "threshold_percent must be between 0 and "
+                f"{MAX_DESIGN_FIDELITY_THRESHOLD_PERCENT:g}"
+            ],
+            "receipt_path": None,
+        }
+    mockup_dir = project_root / DESIGN_REGISTRY_DIR / "screens" / feature_slug
+    runtime_dir = (
+        project_root
+        / ".specs"
+        / "features"
+        / feature_slug
+        / "run"
+        / run_id
+        / target
+    )
+    evidence_dir = (
+        project_root
+        / ".specs"
+        / "features"
+        / feature_slug
+        / "run"
+        / run_id
+        / "visual-evidence"
+    )
+    mockups = sorted(mockup_dir.glob("*.png")) if mockup_dir.is_dir() else []
+    missing: list[str] = []
+    comparisons: list[VisualComparison] = []
+    if not mockups:
+        missing.append(str(mockup_dir))
+    for mockup in mockups:
+        runtime = runtime_dir / mockup.name
+        if not runtime.exists():
+            missing.append(str(runtime))
+            continue
+        screen = mockup.stem
+        comparisons.append(
+            compare_visual_images(
+                project_root=project_root,
+                feature_slug=feature_slug,
+                screen=screen,
+                target=target,
+                comparison_kind="mockup_runtime",
+                reference_path=mockup,
+                actual_path=runtime,
+                threshold_percent=threshold_percent,
+                diff_path=evidence_dir / f"{screen}.mockup-runtime.diff.png",
+            )
+        )
+        baseline = (
+            project_root
+            / DESIGN_REGISTRY_DIR
+            / BASELINES_DIRNAME
+            / feature_slug
+            / target
+            / mockup.name
+        )
+        if baseline.exists():
+            comparisons.append(
+                compare_visual_images(
+                    project_root=project_root,
+                    feature_slug=feature_slug,
+                    screen=screen,
+                    target=target,
+                    comparison_kind="baseline_runtime",
+                    reference_path=baseline,
+                    actual_path=runtime,
+                    threshold_percent=0.0,
+                    diff_path=evidence_dir / f"{screen}.baseline-runtime.diff.png",
+                )
+            )
+            comparisons.append(
+                compare_visual_images(
+                    project_root=project_root,
+                    feature_slug=feature_slug,
+                    screen=screen,
+                    target=target,
+                    comparison_kind="mockup_baseline",
+                    reference_path=mockup,
+                    actual_path=baseline,
+                    threshold_percent=threshold_percent,
+                    diff_path=evidence_dir / f"{screen}.mockup-baseline.diff.png",
+                )
+            )
+    if missing:
+        return {
+            "feature_slug": feature_slug,
+            "command": command,
+            "target": target,
+            "run_id": run_id,
+            "verdict": "BLOCKED",
+            "missing_artifacts": missing,
+            "receipt_path": None,
+        }
+    receipt_path = write_visual_receipt(
+        project_root=project_root,
+        feature_slug=feature_slug,
+        command=command,
+        target=target,
+        run_id=run_id,
+        comparisons=comparisons,
+        output_dir=evidence_dir,
+    )
+    receipt = verify_visual_receipt(receipt_path, project_root=project_root)
+    return {
+        "feature_slug": feature_slug,
+        "command": command,
+        "target": target,
+        "run_id": run_id,
+        "verdict": receipt.verdict,
+        "receipt_path": _project_relative(project_root, receipt_path),
+        "comparison_count": len(receipt.comparisons),
+        "missing_artifacts": [],
+    }
 
 
 def _manifest_status_to_dict(status: ManifestStatus | None) -> dict[str, object] | None:
@@ -288,34 +479,36 @@ def _surfaces_yaml_mentions_feature(project_root: Path, feature_slug: str) -> bo
     try:
         import yaml  # type: ignore[import-untyped]
 
-        parsed = yaml.safe_load(raw) or {}
+        parsed_raw: object = yaml.safe_load(raw) or {}
     except Exception:  # pragma: no cover - bad YAML → treat as no scoped mention
         return False
-    if not isinstance(parsed, dict):
+    parsed = _as_mapping(parsed_raw)
+    if parsed is None:
         return False
-    surfaces = parsed.get("surfaces")
-    if isinstance(surfaces, list):
-        for entry in surfaces:
-            if not isinstance(entry, dict):
+    surfaces = _as_list(parsed.get("surfaces"))
+    if surfaces is not None:
+        for entry_raw in surfaces:
+            entry = _as_mapping(entry_raw)
+            if entry is None:
                 continue
             for key in ("id", "feature", "feature_slug", "slug"):
                 value = entry.get(key)
                 if isinstance(value, str) and feature_slug in value:
                     return True
-            features = entry.get("features")
-            if isinstance(features, list) and any(
+            features = _as_list(entry.get("features"))
+            if features is not None and any(
                 isinstance(f, str) and feature_slug in f for f in features
             ):
                 return True
     # Fallback: top-level features map keyed by slug.
     features_top = parsed.get("features")
-    if isinstance(features_top, dict) and feature_slug in features_top:
+    feature_map = _as_mapping(features_top)
+    if feature_map is not None and feature_slug in feature_map:
         return True
-    if isinstance(features_top, list) and any(
-        isinstance(f, str) and feature_slug in f for f in features_top
-    ):
-        return True
-    return False
+    feature_list = _as_list(features_top)
+    return feature_list is not None and any(
+        isinstance(f, str) and feature_slug in f for f in feature_list
+    )
 
 
 def detect_visual_feature(
@@ -464,10 +657,11 @@ def _read_alignment_manifest_sources(
     except OSError as exc:
         return None, None, f"{manifest_path}: unreadable ({exc})", None
     try:
-        data = json.loads(raw_text)
+        data_raw: object = json.loads(raw_text)
     except json.JSONDecodeError as exc:
         return None, None, f"{manifest_path}: malformed JSON ({exc})", None
-    if not isinstance(data, dict):
+    data = _as_mapping(data_raw)
+    if data is None:
         return None, None, f"{manifest_path}: expected object at top level", None
     design_src = data.get("design_source")
     runtime_src = data.get("runtime_source")
@@ -588,6 +782,7 @@ def validate_gate(
     command: GateCommand,
     target: GateTarget | None,
     strict_links: bool = True,
+    receipt_path: Path | None = None,
 ) -> GateReport:
     """Run the visual gate against ``feature_slug`` and return a ``GateReport``."""
     classification = detect_visual_feature(
@@ -654,6 +849,7 @@ def validate_gate(
 
     link_violations: list[LinkViolation] = []
     manifest_status: ManifestStatus | None = None
+    missing: list[str] = []
     if strict_links:
         manifest_path = _baseline_manifest_path(project_root, feature_slug)
         manifest_status, violations = validate_manifest(
@@ -663,12 +859,18 @@ def validate_gate(
             target=target,
         )
         link_violations.extend(violations)
+        legacy_missing, legacy_violations = _legacy_manifest_mockup_checks(
+            manifest_path=manifest_path,
+            project_root=project_root,
+            feature_slug=feature_slug,
+        )
+        missing.extend(legacy_missing)
+        link_violations.extend(legacy_violations)
         # Even when no manifest is declared, scan feature-local baselines for
         # plain-file copies that should be symlinks.
         for plain in _detect_plain_copies(project_root, feature_slug, target):
             link_violations.append(plain)
 
-    missing: list[str] = []
     if classification.classification == "VISUAL":
         targets_to_check = _resolve_targets_for_check(
             project_root=project_root, feature_slug=feature_slug, target=target
@@ -690,6 +892,16 @@ def validate_gate(
             )
             if not registry_baselines_dir.exists():
                 missing.append(str(registry_baselines_dir))
+    visual_evidence, visual_evidence_verdict, visual_evidence_missing = (
+        _validate_visual_evidence_receipt(
+            project_root=project_root,
+            feature_slug=feature_slug,
+            command=command,
+            target=target,
+            receipt_path=receipt_path,
+        )
+    )
+    missing.extend(visual_evidence_missing)
     # Incomplete design-alignment dirs surface as missing artefacts so the
     # aggregated verdict goes BLOCKED instead of silently dropping the
     # broken screens on the floor.
@@ -701,6 +913,7 @@ def validate_gate(
         link_violations=link_violations,
         runtime_misplaced=runtime_misplaced,
         missing_artifacts=missing,
+        visual_evidence_verdict=visual_evidence_verdict,
     )
 
     return GateReport(
@@ -716,8 +929,92 @@ def validate_gate(
         link_violations=link_violations,
         runtime_in_design_screens_violations=runtime_misplaced,
         manifest_status=manifest_status,
+        visual_evidence=visual_evidence,
         missing_artifacts=missing,
     )
+
+
+def _validate_visual_evidence_receipt(
+    *,
+    project_root: Path,
+    feature_slug: str,
+    command: GateCommand,
+    target: GateTarget | None,
+    receipt_path: Path | None,
+) -> tuple[dict[str, object] | None, Verdict, list[str]]:
+    """Validate an explicit oracle receipt for a visual feature."""
+    expected = (
+        f".specs/features/{feature_slug}/run/<run-id>/visual-evidence/receipt.json "
+        "(pass it via --receipt)"
+    )
+    if receipt_path is None:
+        return None, "BLOCKED", [expected]
+    rel_receipt = _project_relative(project_root, receipt_path)
+    try:
+        receipt = verify_visual_receipt(
+            receipt_path,
+            project_root=project_root,
+            expected_feature_slug=feature_slug,
+            expected_command=command,
+            expected_target=target,
+        )
+    except VisualReceiptError as exc:
+        return (
+            {
+                "receipt_path": rel_receipt,
+                "verdict": "BLOCKED",
+                "error": str(exc),
+            },
+            "BLOCKED",
+            [f"{rel_receipt}: invalid visual evidence receipt ({exc})"],
+        )
+    evidence = _visual_receipt_to_gate_evidence(project_root, receipt_path, receipt)
+    missing = _missing_visual_receipt_requirements(
+        receipt=receipt, command=command, target=target
+    )
+    if missing:
+        evidence["verdict"] = "BLOCKED"
+        return evidence, "BLOCKED", missing
+    return evidence, receipt.verdict, []
+
+
+def _visual_receipt_to_gate_evidence(
+    project_root: Path,
+    receipt_path: Path,
+    receipt: VisualReceipt,
+) -> dict[str, object]:
+    return {
+        "receipt_path": _project_relative(project_root, receipt_path),
+        "verdict": receipt.verdict,
+        "command": receipt.command,
+        "target": receipt.target,
+        "run_id": receipt.run_id,
+        "comparison_count": len(receipt.comparisons),
+        "comparison_kinds": sorted({c.comparison_kind for c in receipt.comparisons}),
+    }
+
+
+def _missing_visual_receipt_requirements(
+    *,
+    receipt: VisualReceipt,
+    command: GateCommand,
+    target: GateTarget | None,
+) -> list[str]:
+    missing: list[str] = []
+    if receipt.command != command:
+        missing.append(
+            f"visual evidence receipt command={receipt.command} "
+            f"does not match requested command={command}"
+        )
+    if target is not None and receipt.target != target:
+        missing.append(
+            f"visual evidence receipt target={receipt.target} "
+            f"does not match requested target={target}"
+        )
+    kinds = {comparison.comparison_kind for comparison in receipt.comparisons}
+    if "mockup_runtime" not in kinds:
+        missing.append("visual evidence receipt missing mockup_runtime comparison")
+    return missing
 
 
 def _resolve_targets_for_check(
@@ -755,10 +1052,13 @@ def _resolve_targets_for_check(
     try:
         import yaml  # type: ignore[import-untyped]
 
-        parsed = yaml.safe_load(surfaces_path.read_text(encoding="utf-8")) or {}
+        parsed_raw: object = yaml.safe_load(
+            surfaces_path.read_text(encoding="utf-8")
+        ) or {}
     except Exception:  # pragma: no cover - bad YAML
         return []
-    if not isinstance(parsed, dict):
+    parsed = _as_mapping(parsed_raw)
+    if parsed is None:
         return []
     runner_to_target = {
         "playwright": "web",
@@ -767,12 +1067,14 @@ def _resolve_targets_for_check(
         "tauri": "tauri",
     }
     derived: list[str] = []
-    surfaces = parsed.get("surfaces")
-    if isinstance(surfaces, list):
-        for entry in surfaces:
-            if not isinstance(entry, dict):
+    surfaces = _as_list(parsed.get("surfaces"))
+    if surfaces is not None:
+        for entry_raw in surfaces:
+            entry = _as_mapping(entry_raw)
+            if entry is None:
                 continue
-            runner = str(entry.get("runner", "")).lower()
+            runner_value = entry.get("runner")
+            runner = runner_value.lower() if isinstance(runner_value, str) else ""
             if runner in runner_to_target:
                 t = runner_to_target[runner]
                 if t not in derived:
@@ -886,6 +1188,143 @@ def _detect_plain_copies(
     return out
 
 
+def _legacy_manifest_mockup_checks(
+    *,
+    manifest_path: Path,
+    project_root: Path,
+    feature_slug: str,
+) -> tuple[list[str], list[LinkViolation]]:
+    """Validate legacy staleness rows against canonical design-screen PNGs."""
+    if not manifest_path.exists():
+        return [], []
+    payload = _read_manifest_mapping(manifest_path)
+    if payload is None:
+        return [], []
+    raw_screens = _as_list(payload.get("screens"))
+    if raw_screens is None:
+        return [], []
+
+    missing: list[str] = []
+    violations: list[LinkViolation] = []
+    for raw_item in raw_screens:
+        raw = _as_mapping(raw_item)
+        if raw is None:
+            continue
+        screen = str(raw.get("screen", "")).strip()
+        if not screen:
+            continue
+        mockup_path, mockup_error = _resolve_legacy_mockup_path(
+            raw,
+            project_root=project_root,
+            feature_slug=feature_slug,
+            screen=screen,
+        )
+        if mockup_error is not None:
+            violations.append(
+                LinkViolation(
+                    kind="manifest_unreadable",
+                    feature_slug=feature_slug,
+                    target=None,
+                    screen=screen,
+                    path=manifest_path,
+                    message=mockup_error,
+                )
+            )
+            continue
+        if not mockup_path.exists():
+            missing.append(
+                f"{manifest_path}: mockup for screen '{screen}' not found at "
+                f"{mockup_path}"
+            )
+            continue
+        expected_hash = _legacy_mockup_hash(raw)
+        if expected_hash is None:
+            missing.append(f"{manifest_path}: screens[{screen}].mockup_version")
+            continue
+        actual_hash = sha256_of(mockup_path)
+        if actual_hash.lower() != expected_hash.lower():
+            violations.append(
+                LinkViolation(
+                    kind="manifest_mockup_sha_mismatch",
+                    feature_slug=feature_slug,
+                    target=None,
+                    screen=screen,
+                    path=mockup_path,
+                    message=(
+                        f"Legacy manifest mockup hash mismatch for screen "
+                        f"'{screen}': manifest={expected_hash[:12]}…, "
+                        f"actual={actual_hash[:12]}…. Refresh "
+                        f"`mockup_version` from {mockup_path}."
+                    ),
+                )
+            )
+    return missing, violations
+
+
+def _read_manifest_mapping(manifest_path: Path) -> dict[str, object] | None:
+    """Parse a JSON/YAML manifest and return a mapping when possible."""
+    try:
+        raw_text = manifest_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    try:
+        if manifest_path.suffix.lower() == ".json":
+            payload_raw: object = json.loads(raw_text)
+        else:
+            import yaml  # type: ignore[import-untyped]
+
+            payload_raw = yaml.safe_load(raw_text)
+    except Exception:
+        return None
+    return _as_mapping(payload_raw)
+
+
+def _resolve_legacy_mockup_path(
+    raw: dict[str, object],
+    *,
+    project_root: Path,
+    feature_slug: str,
+    screen: str,
+) -> tuple[Path, str | None]:
+    """Resolve optional ``mockup_path`` or the default screen-named mockup."""
+    raw_path = raw.get("mockup_path")
+    allowed_root = (
+        project_root / DESIGN_REGISTRY_DIR / SCREENS_DIRNAME / feature_slug
+    ).resolve()
+    if isinstance(raw_path, str) and raw_path.strip():
+        candidate = Path(raw_path)
+        if candidate.is_absolute():
+            resolved = candidate.resolve()
+        else:
+            resolved = (project_root / candidate).resolve()
+        try:
+            resolved.relative_to(allowed_root)
+        except ValueError:
+            return (
+                resolved,
+                "Legacy manifest mockup_path escapes "
+                f".specs/design/screens/{feature_slug}/.",
+            )
+        return resolved, None
+    return project_root / expected_registry_mockup_path(
+        feature_slug=feature_slug,
+        screen=screen,
+    ), None
+
+
+def _legacy_mockup_hash(raw: dict[str, object]) -> str | None:
+    """Return the lowercase sha256 value from ``mockup_version``."""
+    version = raw.get("mockup_version")
+    if not isinstance(version, str):
+        return None
+    prefix = "sha256:"
+    value = version.strip()
+    if not value.startswith(prefix):
+        return None
+    digest = value[len(prefix) :].lower()
+    return digest if len(digest) == 64 else None
+
+
 def _aggregate_verdict(
     *,
     penflow: PenflowContractStatus,
@@ -893,17 +1332,27 @@ def _aggregate_verdict(
     link_violations: list[LinkViolation],
     runtime_misplaced: list[Path],
     missing_artifacts: list[str],
+    visual_evidence_verdict: Verdict | None,
 ) -> Verdict:
     if runtime_misplaced:
+        return "FAIL"
+    if visual_evidence_verdict == "FAIL":
         return "FAIL"
     fail_violation_kinds = {
         "physical_copy_where_link_required",
         "broken_symlink",
+        "manifest_mockup_sha_mismatch",
         "manifest_sha_mismatch",
         "runtime_under_design_screens",
     }
     if any(v.kind in fail_violation_kinds for v in link_violations):
         return "FAIL"
+    if any(r.verdict == "FAIL" for r in alignment):
+        return "FAIL"
+    if penflow.runtime_comparison == "FAIL":
+        return "FAIL"
+    if visual_evidence_verdict == "BLOCKED":
+        return "BLOCKED"
     block_violation_kinds = {
         "manifest_missing_registry_path",
         "manifest_unreadable",
@@ -912,12 +1361,8 @@ def _aggregate_verdict(
     }
     if any(v.kind in block_violation_kinds for v in link_violations):
         return "BLOCKED"
-    if any(r.verdict == "FAIL" for r in alignment):
-        return "FAIL"
     if any(r.verdict == "BLOCKED" for r in alignment):
         return "BLOCKED"
-    if penflow.runtime_comparison == "FAIL":
-        return "FAIL"
     if penflow.runtime_comparison == "BLOCKED":
         return "BLOCKED"
     if missing_artifacts:
@@ -947,6 +1392,12 @@ def render_text_report(report: GateReport) -> str:
         lines.append("runtime captures misplaced under .specs/design/screens/:")
         for path in report.runtime_in_design_screens_violations:
             lines.append(f"  - {path}")
+    if report.visual_evidence is not None:
+        lines.append(
+            "visual evidence: "
+            f"verdict={report.visual_evidence.get('verdict')} "
+            f"receipt={report.visual_evidence.get('receipt_path')}"
+        )
     if report.alignment:
         lines.append("design-alignment screens:")
         for result in report.alignment:
@@ -999,12 +1450,16 @@ class CleanupAction:
         }
 
 
+def _cleanup_actions_factory() -> list[CleanupAction]:
+    return []
+
+
 @dataclass(frozen=True)
 class CleanupPlan:
     """Result of ``visual-gate cleanup --dry-run``."""
 
     feature_slug: str
-    actions: list[CleanupAction] = field(default_factory=list)
+    actions: list[CleanupAction] = field(default_factory=_cleanup_actions_factory)
     quarantine_root: Path | None = None
 
     @property
@@ -1188,21 +1643,24 @@ def _persist_manifest_entry(
     payload: dict[str, object]
     if manifest_path.exists():
         try:
-            payload = json.loads(manifest_path.read_text(encoding="utf-8")) or {}
+            payload_raw: object = json.loads(
+                manifest_path.read_text(encoding="utf-8")
+            ) or {}
         except (json.JSONDecodeError, ValueError):
             payload = {}
+        else:
+            payload = _as_mapping(payload_raw) or {}
     else:
-        payload = {}
-    if not isinstance(payload, dict):
         payload = {}
     payload.setdefault("feature_slug", feature_slug)
     payload.setdefault("target", target)
-    raw_entries = payload.get("entries")
-    entries: list[dict[str, object]] = (
-        [e for e in raw_entries if isinstance(e, dict)]
-        if isinstance(raw_entries, list)
-        else []
-    )
+    raw_entries = _as_list(payload.get("entries"))
+    entries: list[dict[str, object]] = []
+    if raw_entries is not None:
+        for entry_raw in raw_entries:
+            entry = _as_mapping(entry_raw)
+            if entry is not None:
+                entries.append(entry)
     registry_abs = project_root / registry_rel
     sha = sha256_of(registry_abs) if registry_abs.exists() else None
     new_entry: dict[str, object] = {
@@ -1229,6 +1687,13 @@ def _safe_symlink(target: Path, link_path: Path) -> None:
     _os.symlink(target, link_path)
 
 
+def _project_relative(project_root: Path, path: Path) -> str:
+    try:
+        return path.resolve().relative_to(project_root.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 __all__ = [
     "Classification",
     "CleanupAction",
@@ -1240,6 +1705,7 @@ __all__ = [
     "VisualClassification",
     "VisualFeatureSignals",
     "apply_cleanup",
+    "certify_visual_evidence",
     "detect_visual_feature",
     "plan_cleanup",
     "promote_baseline",

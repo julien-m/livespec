@@ -150,24 +150,31 @@ Before any slash command starts command-specific work, it MUST compile a determi
 livespec goal render <command-name> --feature <feature-slug> --flags "<active-flags>" --save
 ```
 
-This writes a task file to `$TMPDIR/livespec-goals/goal-<command>-<hash8>.md` and prints:
+This writes an immutable contract file and mutable state file to `$TMPDIR/livespec-goals/` and prints:
 ```
-hash:<full-sha256> | task-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.md
+hash:<full-sha256> | contract-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.state.json
 ```
 
-- **Read the task file** — it contains every execution task as a checkbox `[ ]` and the full Definition of Done.
-- **Immediately after rendering, emit the slash command `/goal`** with hash and file reference. Output exactly:
+- **Read the contract file and state file**. The contract contains ordered tasks, required evidence, invalid substitutes, and repair actions. The state contains only mutable task status.
+- **Immediately after rendering, emit the slash command `/goal`** with hash and machine references. Output exactly:
   ```
-  /goal hash:<hash> | <command> for <feature> — task list: $TMPDIR/livespec-goals/goal-<command>-<hash8>.md
+  /goal hash:<hash> | <command> for <feature> — contract-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.state.json — mode:enforced
   ```
-  This compact form stays within the platform goal field character limit while preserving the full task list.
+  This compact form stays within the platform goal field character limit while preserving the full contract.
   This is mandatory — no flag bypasses it.
-- **The task file is the active working list for this run.** Check `[ ]` → `[x]` after each task. You MUST:
+- **The contract file is the active working list for this run.** You MUST:
   1. Execute tasks in order — no reordering, no skipping
-  2. Capture observable evidence before checking each task (§1 form)
-  3. Consult [`SKILL.md`](SKILL.md) phase descriptions for implementation detail — but do NOT treat SKILL.md sections as a sequential execution plan; the task file is authoritative
-  4. If `--save` is unavailable or the task file has no tasks, fall back to the full render output (omit `--save`) and read the `Execution tasks (in order):` section
+  2. Capture observable evidence before proving each task (§1 form)
+  3. Submit evidence through:
+     ```bash
+     livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+     ```
+  4. Treat `ACCEPTED` as the only way a task becomes `complete`
+  5. Treat `REJECTED_NEEDS_ACTION` as a repair instruction: perform `repair_if_missing`, gather the missing proof, then resubmit
+  6. Consult [`SKILL.md`](SKILL.md) phase descriptions for implementation detail — but do NOT treat SKILL.md sections as a sequential execution plan; the contract file is authoritative
+  7. Before `DONE`, run `livespec goal status --state <state-file>` and require every required task to be complete or emit canonical BLOCKED
 - The goal is compiled from machine-readable `expectations.md`, the command Definition of Done, normalized flags, and resolved feature state. It MUST NOT be rewritten or improvised by the LLM.
+- A worker/executor MUST NOT mark task completion directly. Only `livespec goal prove` may update task status in the state file.
 - If goal rendering fails, emit the canonical BLOCKED line (§2) and stop.
 - If the current environment does not accept the `/goal` command, emit the canonical BLOCKED line (§2) and stop.
 
@@ -177,20 +184,22 @@ When a LiveSpec slash command needs another executable `/spec-*` command while i
 
 1. Do NOT run the nested slash command inline in the same session.
 2. Do NOT call a private CLI/API shortcut that bypasses the nested command goal.
-3. Spawn an independent native sub-agent for the nested slash command; the first line of its prompt MUST be the literal nested command (for example `/spec-fix`) so the sub-agent compiles, emits, executes, and closes its own goal.
-4. The parent may only read the sub-agent's structured result, child goal hash/task-file path, artifacts, and final status.
-5. Plain text next-step hints such as `Run /spec-plan next` are suggestions, not executed invocations.
+3. Resolve the current LiveSpec `project_root` before spawning.
+4. Spawn an independent native sub-agent for the nested slash command with its `cwd`/working directory fixed to `project_root`; if the native agent API has no cwd field, the prompt MUST first instruct `cd <project_root>` and **Read** [`../.specs/spec-system.md`](../.specs/spec-system.md) before any slash command.
+5. The first executable slash-command line in the prompt MUST be the literal nested command (for example `/spec-fix`) so the sub-agent compiles, emits, executes, and closes its own goal.
+6. The parent may only read the sub-agent's structured result, child goal hash, contract-file path, state-file path, artifacts, and final status.
+7. Plain text next-step hints such as `Run /spec-plan next` are suggestions, not executed invocations.
 
 Each skill that can mention nested `/spec-*` calls MUST include a machine-readable section:
 
 ```markdown
 ## Internal Command Invocations
 
-- [subagent] `/spec-fix <feature>` — executable nested command; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-fix <feature>` — executable nested command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../.specs/spec-system.md`](../.specs/spec-system.md) before command; child owns its goal.
 - [suggestion] `/spec-plan <feature>` — displayed only as an operator next step; not executed by this command.
 ```
 
-`livespec goal render` rejects executable `/spec-*` entries marked `inline`, `direct`, `cli`, `api`, or any mode other than `subagent` or `suggestion`.
+`livespec goal render` rejects executable `/spec-*` entries marked `inline`, `direct`, `cli`, `api`, any mode other than `subagent` or `suggestion`, or any `[subagent]` row that omits `project_root`, `cwd`/working directory, or **Read** [`../.specs/spec-system.md`](../.specs/spec-system.md).
 
 Before any command or agent reports `DONE`, verify the following programmatically (or via a
 checklist when programmatic verification is unavailable):
@@ -203,7 +212,7 @@ checklist when programmatic verification is unavailable):
 - [ ] Final report line is exactly `DONE` or the canonical BLOCKED line from §2
       (`BLOCKED at step <N> - <subtype> - <one-line reason>`) — no "should", "probably", or "hopefully".
 
-If any checkbox fails, emit the corresponding ERROR/BLOCKED line (using the §2 shape) and stop.
+If any checklist item fails, emit the corresponding ERROR/BLOCKED line (using the §2 shape) and stop.
 Do NOT report DONE. The subtype for a §5 failure is `verification_failed`.
 
 ---

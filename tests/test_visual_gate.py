@@ -121,7 +121,7 @@ def test_validate_gate_blocked_on_classification_conflict(tmp_path: Path) -> Non
     )
     assert report.verdict == "BLOCKED"
     assert verdict_to_exit_code(report.verdict) == EXIT_VISUAL_GATE_BLOCKED
-    assert "spec_declares_visual_but_no_artifacts" == report.conflict_reason
+    assert report.conflict_reason == "spec_declares_visual_but_no_artifacts"
 
 
 def test_validate_gate_fails_on_runtime_capture_misplaced_under_design_screens(

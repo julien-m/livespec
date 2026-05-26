@@ -14,26 +14,30 @@ argument-hint: "<feature description>"
 
 ## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
 
-La toute première action lors de `/spec-specify` est de poser le goal durable.
+La toute première action lors de `/spec-specify` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-specify --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-specify-<hash8>.md`
-4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
-5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-specify-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-specify-<hash8>.state.json`
+4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
+5. Émettre la commande slash `/goal` avec hash et références machine :
    ```
-   /goal hash:<hash> | spec-specify for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-specify-<hash8>.md
+   /goal hash:<hash> | spec-specify for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-specify-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-specify-<hash8>.state.json — mode:enforced
    ```
-6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
-   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
+   ```bash
+   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+   ```
+   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
+7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-specify
 
@@ -569,7 +573,7 @@ After generating spec.md, determine if the feature involves UI:
    - If `.specs/design/screens/` exists but contains no PNG files AND brainstorm design artifacts exist (`.brainstorm/mockups/*.png` or `.brainstorm/*.png`):
      - Display: "Design screens directory is empty but brainstorm mockups were found. Import into `.specs/design/`? [yes/no]"
      - On **yes** → run the brainstorm import procedure:
-       1. Copy source file (`.brainstorm/.../ui.<ext>` → `.specs/design/ui.<ext>`)
+      1. Copy non-Penflow source files to `.specs/design/`; `.pen` files must remain canonical at `penflow/ui.pen`
        2. Export via MCP or copy PNGs to `.specs/design/screens/` (strip numeric prefix: `01-dashboard.png` → `dashboard.png`)
        3. Generate `screens/index.md` from template with Source = `Brainstorm import`
        4. Initialize `changelog.md` sections for imported screens
@@ -588,7 +592,7 @@ After generating spec.md, determine if the feature involves UI:
    - Via MCP: export each screen as PNG to `.specs/design/screens/<NNN-feature-name>/<screen-name>.png` (immutable versioned copy)
    - Copy each PNG to `.specs/design/screens/<screen-name>.png` (latest copy — used by plan/implement/check)
    - Via MCP: export PDF to `.specs/design/ui.pdf`
-   - The source file (`ui.pen`, etc.) must be saved manually by the user
+   - Non-Penflow source files may be saved manually by the user; Penflow/Pencil source remains `penflow/ui.pen`
 
 5.5. **Update screen index:** After exporting PNGs, update `.specs/design/screens/index.md`:
    - For each **new** screen: add a row with Source = `spec-specify (NNN-feature-name)`, First Added = today, Last Modified = today
@@ -607,7 +611,7 @@ After generating spec.md, determine if the feature involves UI:
    Exported to .specs/design/screens/<NNN-feature-name>/
 
    → Open the design tool to review and save the source file:
-     open .specs/design/ui.<ext>
+     open <non-penflow-design-source>
 
    → Approve mockups to continue, or describe changes needed.
    ```
@@ -918,7 +922,7 @@ flowchart TD
 ### Phase 0 — Goal Lock
 
 - [always] Lock goal contract via `livespec goal render spec-specify --save`
-- [always] Emit `/goal` slash command with task file reference
+- [always] Emit `/goal` slash command with contract/state file reference
 
 ### Phase 1 — Parse and Scope
 

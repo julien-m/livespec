@@ -33,7 +33,7 @@ class Violation:
     rule_id: str
     severity: Severity
     message: str
-    context: dict[str, str] = field(default_factory=dict)
+    context: dict[str, object] = field(default_factory=dict)
     fix_hint: str | None = None
     suppress_if_creating: bool = False
 

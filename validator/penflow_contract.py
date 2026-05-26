@@ -15,6 +15,16 @@ from typing import Literal, TypeAlias, cast
 
 PENFLOW_DIRNAME = "penflow"
 BRAINSTORM_PENFLOW_DIR = Path(".brainstorm") / "penflow"
+CANONICAL_UI_PEN = Path(PENFLOW_DIRNAME) / "ui.pen"
+IGNORED_PEN_SCAN_DIRS = {
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "node_modules",
+    "test-results",
+}
 REQUIRED_ARTIFACTS: tuple[str, ...] = (
     "flow-ui-contract/",
     "ui.pen",
@@ -116,7 +126,7 @@ class PenflowContractStatus:
 
 @dataclass(frozen=True)
 class PenflowBootstrapResult:
-    """Result of copying ``.brainstorm/penflow/`` to root ``penflow/``."""
+    """Result of copying a Brainstorm ``penflow/`` source to root ``penflow/``."""
 
     source: Path
     destination: Path
@@ -195,6 +205,7 @@ def get_penflow_contract_status(
     missing = [name for name in REQUIRED_ARTIFACTS if name not in present]
     missing.extend(_invalid_required_artifacts(workspace, present))
     missing.extend(_ui_pen_quality_issues(workspace / "ui.pen", target=target))
+    missing.extend(_duplicate_pen_files(project_root))
     missing.extend(design_registry_missing)
     missing.extend(mockup_validation_missing)
     missing = list(dict.fromkeys(missing))
@@ -236,19 +247,25 @@ def get_penflow_contract_status(
     )
 
 
-def bootstrap_penflow_workspace(project_root: Path) -> PenflowBootstrapResult:
-    """Copy ``.brainstorm/penflow/`` to root ``penflow/`` if possible.
+def bootstrap_penflow_workspace(
+    project_root: Path,
+    *,
+    source_dir: Path | None = None,
+) -> PenflowBootstrapResult:
+    """Copy a Brainstorm ``penflow/`` directory to root ``penflow/`` if possible.
 
     The copy is intentionally non-destructive: an existing root workspace wins
     and is never overwritten.
 
     Args:
         project_root: LiveSpec project root.
+        source_dir: Explicit Brainstorm ``penflow/`` directory. If omitted,
+            LiveSpec falls back to the legacy in-project Brainstorm export.
 
     Returns:
         Copy result and post-copy workspace status.
     """
-    source = project_root / BRAINSTORM_PENFLOW_DIR
+    source = source_dir if source_dir is not None else project_root / BRAINSTORM_PENFLOW_DIR
     destination = project_root / PENFLOW_DIRNAME
     if destination.exists():
         return PenflowBootstrapResult(
@@ -304,7 +321,6 @@ def _design_registry_missing(project_root: Path, *, feature_slug: str | None) ->
     missing: list[str] = []
     design_root = project_root / ".specs" / "design"
     required_files = (
-        design_root / "ui.pen",
         design_root / "screens" / "index.md",
         design_root / "changelog.md",
     )
@@ -329,6 +345,21 @@ def _design_registry_missing(project_root: Path, *, feature_slug: str | None) ->
     if not feature_baselines.is_dir():
         missing.append(f".specs/design/baselines/{feature_slug}/")
     return missing
+
+
+def _duplicate_pen_files(project_root: Path) -> list[str]:
+    duplicates: list[str] = []
+    for path in project_root.rglob("*.pen"):
+        try:
+            relative = path.relative_to(project_root)
+        except ValueError:
+            continue
+        if any(part in IGNORED_PEN_SCAN_DIRS for part in relative.parts):
+            continue
+        if relative == CANONICAL_UI_PEN:
+            continue
+        duplicates.append(f"duplicate_pen:{relative.as_posix()}")
+    return duplicates
 
 
 def _mockup_validation_missing(
@@ -523,6 +554,7 @@ def _semantic_counts(path: Path) -> tuple[int, int, str | None]:
 
 # Export only the Penflow contract helpers used by the CLI and tests.
 __all__ = [
+    "CANONICAL_UI_PEN",
     "OPTIONAL_ARTIFACTS",
     "PENFLOW_DIRNAME",
     "REQUIRED_ARTIFACTS",

@@ -14,7 +14,7 @@ AGENT_SYNC = Path(".agent-sync")
 def test_agent_sync_contains_all_command_skills() -> None:
     skills = sorted((AGENT_SYNC / "skills").glob("spec-*"))
 
-    assert len(skills) == 19
+    assert len(skills) == 20
     for skill in skills:
         assert (skill / "SKILL.md").is_file(), skill
         assert (skill / "expectations.md").is_file(), skill
@@ -55,7 +55,7 @@ def test_command_registry_reads_agent_sync_skills() -> None:
     commands = discover_commands(AGENT_SYNC / "skills")
     feature = next(command for command in commands if command.name == "spec-feature")
 
-    assert len(commands) == 19
+    assert len(commands) == 20
     assert feature.command_path == AGENT_SYNC / "skills" / "spec-feature" / "SKILL.md"
     assert (
         feature.expectations_path

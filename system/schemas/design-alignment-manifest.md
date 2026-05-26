@@ -16,7 +16,7 @@ Written by `livespec design-alignment compare` and consumed by `/spec-test --vis
 |---|---|---|---|
 | `screen` | string | yes | Screen identifier from `spec.md ## Screens`. |
 | `verdict` | enum | yes | `PASS`, `FAIL`, or `BLOCKED`. |
-| `design_source` | string | yes | Path to `.specs/design/ui.pen` or normalized design contract. |
+| `design_source` | string | yes | Path to `penflow/ui.pen` or normalized design contract. |
 | `runtime_source` | string | yes | Path to runtime contract captured from browser/simulator. |
 | `design_hash` | string/null | yes | SHA-256 of the design source when readable. |
 | `runtime_hash` | string/null | yes | SHA-256 of runtime source when readable. |
@@ -30,7 +30,7 @@ Written by `livespec design-alignment compare` and consumed by `/spec-test --vis
 {
   "screen": "dashboard",
   "verdict": "PASS",
-  "design_source": ".specs/design/ui.pen",
+  "design_source": "penflow/ui.pen",
   "runtime_source": ".specs/features/047/design-alignment/dashboard.runtime.json",
   "design_hash": "abc123",
   "runtime_hash": "def456",

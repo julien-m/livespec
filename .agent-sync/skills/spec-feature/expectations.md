@@ -1,7 +1,7 @@
 ---
 command: spec-feature
 contract_version: "1.0"
-last_reviewed: 2026-05-23
+last_reviewed: 2026-05-26
 ---
 
 # Expectations — /spec-feature
@@ -38,7 +38,6 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 - `penflow/semantic-ui-tree.json` for UI features
 - `penflow/expected-ui-tree.json` for UI features
 - `penflow/code-ir.json` for UI features
-- `.specs/design/ui.pen` for UI features
 - `.specs/design/screens/<feature_slug>/` for UI feature mockup PNG exports
 - `.specs/design/baselines/<feature_slug>/` for UI feature runtime baseline sync
 - `.mockup-validation/audit-report.md` for UI feature Mockup Factory validation
@@ -75,8 +74,6 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 - path: `.specs/features/<feature>/implementation.md`
   must_contain_sections:
   - "FR mapping"
-- path: `.specs/design/ui.pen`
-  note: "Global LiveSpec Design Registry source for Penflow UI features"
 - path: `.specs/design/screens/<feature_slug>/`
   note: "Global LiveSpec Design Registry mockup PNG exports; missing mockups block Penflow UI features"
 - path: `.specs/design/baselines/<feature_slug>/`
@@ -124,7 +121,7 @@ Nested skill calls (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-tes
 - [ ] progress.md exists and is complete
 - [ ] implementation.md maps every FR
 - [ ] UI features have `penflow/code-ir.json` before implementation
-- [ ] Global LiveSpec Design Registry has `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`
+- [ ] Global LiveSpec Design Registry has `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`
 - [ ] UI features have Mockup Factory PASS proof before implementation: `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/<feature_slug>/manifest.json`, `.mockup-validation/<feature_slug>/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and visual evidence PNGs
 - [ ] If a phase agent omits `PHASE_RESULT`, artifact recovery either advances safely or emits `BLOCKED - phase_agent_timeout`
 

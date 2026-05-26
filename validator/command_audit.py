@@ -8,6 +8,8 @@
 #   — .specs/features/048-command-validation-hardening/spec.md#fr-006
 # @spec FR-006: hyphenated naming audit
 #   — .specs/features/049-command-naming-normalization/spec.md#fr-006
+# @spec FR-019: internal subagent project-root guard
+#   — .specs/features/052-deterministic-command-goal-contracts/spec.md#fr-019
 """
 
 from __future__ import annotations
@@ -18,6 +20,7 @@ from typing import Any
 
 from .command_registry import CommandInfo, CommandNamingPolicy, discover_commands
 from .expectations import ExpectationsInvalid, parse_expectations
+from .goal_contracts import validate_internal_command_invocation_guards
 
 
 @dataclass(frozen=True)
@@ -143,6 +146,7 @@ def _audit_command(
         _check_expectations(command),
         _check_expectations_identity(command),
         _check_docs_reference(repo_root, command),
+        _check_internal_subagent_workdir(command),
         _check_naming(command, naming_policy),
     ]
     return CommandAuditEntry(command=command, checks=tuple(checks))
@@ -256,6 +260,20 @@ def _check_docs_reference(repo_root: Path, command: CommandInfo) -> AuditCheck:
     if missing:
         return AuditCheck("routing_docs", "FAIL", f"missing in {', '.join(missing)}")
     return AuditCheck("routing_docs", "PASS", "routing docs mention command")
+
+
+def _check_internal_subagent_workdir(command: CommandInfo) -> AuditCheck:
+    if not command.command_path.is_file():
+        return AuditCheck("internal_subagent_workdir", "FAIL", "command Markdown is missing")
+    try:
+        validate_internal_command_invocation_guards(command.command_path)
+    except ExpectationsInvalid as exc:
+        return AuditCheck("internal_subagent_workdir", "FAIL", exc.reason)
+    return AuditCheck(
+        "internal_subagent_workdir",
+        "PASS",
+        "subagent internal commands propagate project_root and cwd",
+    )
 
 
 def _check_naming(

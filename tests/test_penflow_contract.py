@@ -257,6 +257,24 @@ def test_status_requires_ui_pen_and_flow_contract_for_ready_workspace(tmp_path: 
     assert "ui.pen" in status.missing
 
 
+def test_status_blocks_duplicate_pen_files_outside_canonical_workspace(tmp_path: Path) -> None:
+    (tmp_path / "penflow" / "flow-ui-contract").mkdir(parents=True)
+    _write_json(
+        tmp_path / "penflow" / "ui.pen",
+        {"children": [{"type": "frame", "width": 1440, "height": 900}]},
+    )
+    _write_json(tmp_path / "penflow" / "semantic-ui-tree.json", {"flows": [], "screens": []})
+    _write_json(tmp_path / "penflow" / "expected-ui-tree.json", {"screens": []})
+    _write_json(tmp_path / "penflow" / "code-ir.json", {"flows": []})
+    _write_json(tmp_path / ".specs" / "design" / "ui.pen", {"children": []})
+
+    status = get_penflow_contract_status(tmp_path)
+
+    assert status.state == "incomplete"
+    assert status.runtime_comparison == "BLOCKED"
+    assert "duplicate_pen:.specs/design/ui.pen" in status.missing
+
+
 def test_status_blocks_bad_desktop_web_mockup_quality(tmp_path: Path) -> None:
     (tmp_path / "penflow" / "flow-ui-contract").mkdir(parents=True)
     _write_json(
@@ -379,12 +397,11 @@ def test_status_blocks_missing_required_design_registry(tmp_path: Path) -> None:
     assert status.state == "incomplete"
     assert status.runtime_comparison == "BLOCKED"
     assert status.design_registry_required is True
-    assert ".specs/design/ui.pen" in status.design_registry_missing
     assert f".specs/design/screens/{feature_slug}/" in status.design_registry_missing
     assert f".specs/design/baselines/{feature_slug}/" in status.design_registry_missing
 
 
-def test_status_accepts_required_design_registry(tmp_path: Path) -> None:
+def test_status_accepts_required_design_registry_without_design_ui_pen(tmp_path: Path) -> None:
     feature_slug = "001-booking-dashboard"
     (tmp_path / "penflow" / "flow-ui-contract").mkdir(parents=True)
     _write_json(
@@ -394,7 +411,6 @@ def test_status_accepts_required_design_registry(tmp_path: Path) -> None:
     _write_json(tmp_path / "penflow" / "semantic-ui-tree.json", {"flows": [], "screens": []})
     _write_json(tmp_path / "penflow" / "expected-ui-tree.json", {"screens": []})
     _write_json(tmp_path / "penflow" / "code-ir.json", {"flows": []})
-    _write_json(tmp_path / ".specs" / "design" / "ui.pen", {"children": []})
     (tmp_path / ".specs" / "design" / "screens").mkdir(parents=True)
     (tmp_path / ".specs" / "design" / "screens" / "index.md").write_text(
         "# Screen Index\n",
@@ -504,6 +520,20 @@ def test_bootstrap_copies_brainstorm_penflow_without_overwriting(tmp_path: Path)
 
     assert second.copied is False
     assert second.reason == "workspace_exists"
+
+
+def test_bootstrap_imports_explicit_penflow_source_without_brainstorm_subdir(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "brainstorm-project" / "penflow"
+    destination_project = tmp_path / "livespec-project"
+    _write_json(source / "semantic-ui-tree.json", {"flows": [{"id": "onboarding"}], "screens": []})
+
+    result = bootstrap_penflow_workspace(destination_project, source_dir=source)
+
+    assert result.copied is True
+    assert result.source == source
+    assert (destination_project / "penflow" / "semantic-ui-tree.json").exists()
 
 
 def test_penflow_contract_status_cli_json(tmp_path: Path) -> None:
@@ -642,6 +672,31 @@ def test_penflow_contract_status_cli_blocks_required_mockup_validation(tmp_path:
     assert f".mockup-validation/{feature_slug}/checklist.md" in payload[
         "mockup_validation_missing"
     ]
+
+
+def test_penflow_contract_bootstrap_cli_accepts_source_penflow_dir(tmp_path: Path) -> None:
+    source = tmp_path / "brainstorm-project" / "penflow"
+    destination_project = tmp_path / "livespec-project"
+    _write_json(source / "semantic-ui-tree.json", {"flows": [{"id": "onboarding"}], "screens": []})
+
+    result = RUNNER.invoke(
+        app,
+        [
+            "penflow-contract",
+            "bootstrap",
+            "--project",
+            str(destination_project),
+            "--source",
+            str(source),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["copied"] is True
+    assert payload["source"] == str(source)
+    assert (destination_project / "penflow" / "semantic-ui-tree.json").exists()
 
 
 def test_penflow_contract_status_cli_fails_raw_compare_fail(tmp_path: Path) -> None:

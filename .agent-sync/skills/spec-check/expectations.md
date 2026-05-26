@@ -1,7 +1,7 @@
 ---
 command: spec-check
 contract_version: "1.0"
-last_reviewed: 2026-05-23
+last_reviewed: 2026-05-26
 ---
 
 # Expectations — /spec-check
@@ -77,9 +77,9 @@ Verify spec vs code alignment and produce a gap report.
 
 ## 7b. Visual Gate (required for VISUAL features)
 
-`/spec-check` MUST call `livespec visual-gate validate --feature <slug> --command spec-check [--target <t>]` and surface the verdict literally. Exit 0/6/7 propagate.
+`/spec-check` MUST call `livespec visual-gate certify --feature <slug> --command spec-check --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path> --json`, and surface the verdict literally. Exit 0/6/7 propagate.
 
-Nested invocation: when `--fix` is requested, `/spec-fix` is called through an independent sub-agent (Task tool) with its own goal scope; the parent `/spec-check` goal is preserved. After the sub-agent returns, the gate is re-run; the parent step only marks `[x]` when the second gate exit is 0.
+Nested invocation: when `--fix` is requested, `/spec-fix` is called through an independent sub-agent (Task tool) with its own goal scope; the parent `/spec-check` goal is preserved. After the sub-agent returns, the gate is re-run; the parent step only proves `complete` when the second gate exit is 0.
 
 A step listed in the goal MUST NOT be marked done while the gate exit is non-zero; "skipped due to missing prerequisites" is BLOCKED, not PASS.
 

@@ -14,7 +14,7 @@ from validator.command_registry import (
 def test_discovers_all_builtin_commands() -> None:
     commands = discover_commands(Path(".agent-sync/skills"))
 
-    assert len(commands) == 19
+    assert len(commands) == 20
     assert {command.name for command in commands} >= {
         "spec-check",
         "spec-explain",

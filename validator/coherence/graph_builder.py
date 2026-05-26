@@ -156,7 +156,8 @@ def _parse_features(specs_root: Path) -> list[FeatureInfo]:
             spec_mtime = spec_path.stat().st_mtime
             try:
                 post = frontmatter.load(str(spec_path))
-                status = post.metadata.get("status")
+                raw_status = post.metadata.get("status")
+                status = raw_status if isinstance(raw_status, str) else None
             except (yaml.YAMLError, OSError) as exc:
                 logging.warning("Failed to parse %s: %s", spec_path, exc)
 

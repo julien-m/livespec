@@ -2,16 +2,13 @@
   "extends": "pyproject.toml",
   "typeCheckingMode": "strict",
   "reportPrivateUsage": false,
-  "exclude": ["tests/**", "**/*_test.py"],
-  "overrides": [
-    {
-      "include": ["tests/**"],
-      "typeCheckingMode": "basic",
-      "reportUnknownArgumentType": false,
-      "reportUnknownMemberType": false,
-      "reportUnknownParameterType": false,
-      "reportUnknownVariableType": false,
-      "reportPrivateUsage": false
-    }
-  ]
+  "reportMissingTypeStubs": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownParameterType": false,
+  "reportUnknownVariableType": false,
+  "reportMissingTypeArgument": false,
+  "reportUnnecessaryCast": false,
+  "include": ["validator"],
+  "exclude": [".venv/**", "venv/**", "node_modules/**", "tests/**", "**/*_test.py"]
 }

@@ -103,7 +103,9 @@ def resolve_file_type(path: Path, specs_root: Path) -> str:
     except ValueError:
         return "unknown"
 
-    parts = rel.parts
+    parts = list(rel.parts)
+    if not parts:
+        return "unknown"
 
     # Feature files: features/<name>/<type>.md
     if parts[0] == "features" and len(parts) >= 3:

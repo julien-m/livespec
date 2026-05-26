@@ -4,7 +4,7 @@ feature: "052-deterministic-command-goal-contracts"
 spec_ref: ".specs/features/052-deterministic-command-goal-contracts/spec.md"
 status: Approved
 created: 2026-05-21
-updated: 2026-05-21
+updated: 2026-05-23
 ---
 
 # Plan — Feature 052 — Deterministic Command Goal Contracts
@@ -86,16 +86,23 @@ Extend `validator/goal_contracts.py` to:
 
 Create `validator/cli_commands/goal_cmd.py` and register it from `validator/cli.py` as:
 
-- `livespec goal render <command> [--feature X] [--flags "..."] [--json]`
-- `livespec goal verify <command> [--feature X] [--flags "..."] [--run PATH] [--json]`
+- `livespec goal render <command> [--feature X] [--flags "..."] [--json] [--save]`
+- `livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'`
+- `livespec goal status --state <state-file>`
 
 ### Step 3 — Shared command protocol
 
 Update [system/anti-drift-block.md](../../../system/anti-drift-block.md) to require:
 
-- startup goal render + `/goal <rendered objective>` slash command
+- startup goal render + `/goal hash:<hash> ... contract-file:... state-file:...` slash command
 - active goal check at start (block if goal already active — user must `/goal clear`)
-- final `livespec goal verify`
+- per-task `livespec goal prove`
+- final `livespec goal status`
+- Internal Command Invocation `[subagent]` rows resolve current LiveSpec `project_root`, set child `cwd`/working directory to that root, and fall back to `cd <project_root>` + **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before the child slash command when native cwd is unavailable
+
+### Step 3.5 — Internal subagent audit guard
+
+Extend `validator/goal_contracts.py` and `validator/command_audit.py` so `livespec goal render` and `livespec command-audit` reject executable nested `/spec-*` subagent rows missing `project_root`, `cwd`/working directory, or **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md).
 
 ### Step 4 — Documentation and mappings
 
@@ -104,10 +111,11 @@ Update [system/expectations.md](../../../system/expectations.md), create `implem
 ## Testing Strategy
 
 - Unit tests in `tests/test_goal_contracts.py`
-- CLI tests in `tests/test_goal_contracts_cli.py`
+- CLI tests in `tests/test_goal_contracts.py`
 - Convention selection tests covering code-only and UI/mockup goals
+- Audit regression in `tests/test_command_audit_cli.py` for a `[subagent]` row without `project_root`/cwd guard
 - Run targeted tests:
-  - `python3 -m pytest tests/test_goal_contracts.py tests/test_goal_contracts_cli.py`
+  - `python3 -m pytest tests/test_goal_contracts.py tests/test_visual_evidence.py tests/test_visual_gate_receipts.py`
   - `python3 -m pytest tests/test_expectations.py tests/test_verify_output.py tests/test_verify_output_cli.py`
 
 ## Risks & Considerations

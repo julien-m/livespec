@@ -172,10 +172,13 @@ by Decision D-α option β):
 
 1. `/spec-feature` resolves `before-feature` / `after-feature` at its
    outer boundary.
-2. Before spawning each subagent (Specify, Plan, Implement, Test, …) the
-   `.agent-sync/skills/spec-feature/SKILL.md` supervisor prepends a synthetic
-   `/spec.<subcmd>` invocation header to the subagent prompt. The
-   subagent then resolves `before-<subcmd>` / `after-<subcmd>`.
+2. Before spawning each subagent (Specify, Plan, Implement, Test, …), the
+   `.agent-sync/skills/spec-feature/SKILL.md` supervisor resolves the current
+   LiveSpec `project_root`, runs the subagent with `cwd`/working directory fixed
+   to that root, and prepends a synthetic `/spec-<subcmd>` invocation header.
+   If the native agent API has no cwd field, the prompt first instructs
+   `cd <project_root>` and **Read** [`../.specs/spec-system.md`](../.specs/spec-system.md).
+   The subagent then resolves `before-<subcmd>` / `after-<subcmd>`.
 3. The same rule applies to `.agent-sync/skills/spec-ship/SKILL.md` (batch wrapper).
 4. **No automatic propagation from outer to inner.** Integrations target
    sub-phases by listing them explicitly in `commands:`. To inject at
@@ -260,9 +263,12 @@ other.
 ## Adding a new subagent spawn site
 
 If a new `.agent-sync/skills/spec-*/SKILL.md` adds a subagent spawn, its prompt
-template MUST prepend a synthetic `/spec.<subcmd>` header so that the
-subagent's anti-drift directive resolves the correct command name. This
-rule is enforced by `tests/test_pipeline_chained_resolution.py`.
+template MUST propagate the current LiveSpec `project_root`, set child
+`cwd`/working directory to that root (or prompt `cd <project_root>` + **Read**
+[`../.specs/spec-system.md`](../.specs/spec-system.md) when no native cwd field
+exists), and prepend a synthetic `/spec-<subcmd>` header so the subagent's
+anti-drift directive resolves the correct command name. This is enforced by
+`tests/test_pipeline_chained_resolution.py` and command audit.
 
 ---
 

@@ -14,23 +14,27 @@ argument-hint: "<feature-name>"
 
 ## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
 
-La toute première action lors de `/spec-implement` est de poser le goal durable.
+La toute première action lors de `/spec-implement` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-implement --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.md`
-4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
-5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.state.json`
+4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
+5. Émettre la commande slash `/goal` avec hash et références machine :
    ```
-   /goal hash:<hash> | spec-implement for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-implement-<hash8>.md
+   /goal hash:<hash> | spec-implement for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.state.json — mode:enforced
    ```
-6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
-   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
+   ```bash
+   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+   ```
+   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
+7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
@@ -437,6 +441,8 @@ Spawn an independent native sub-agent whose first prompt line is:
 
 Do not execute `/spec-test` inline while the `/spec-implement` goal is active. Do not duplicate a weaker visual path in `/spec-implement`; `/spec-test` owns visual certification and must compile, emit, execute, and close its own goal in the child sub-agent.
 
+The child `/spec-test` must capture runtime PNGs to `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-test --target <t> --run-id <run-id> --json`, then run `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json`. `/spec-implement` accepts only the returned `visual_evidence_receipt_path`; `design-alignment is semantic-only` and cannot prove pixel fidelity.
+
 **Gate behavior:**
 
 | Visual Gate Verdict | `/spec-implement` behavior |
@@ -599,8 +605,8 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 
 ## Internal Command Invocations
 
-- [subagent] `/spec-preflight --light` — executable preflight gate; runs in an independent native sub-agent with its own goal.
-- [subagent] `/spec-test <feature> --auto --visual` — executable visual certification gate; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-preflight --light` — executable preflight gate; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-test <feature> --auto --visual` — executable visual certification gate; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [suggestion] `/spec-plan <feature>` — displayed when plan.md is missing; not executed by `/spec-implement`.
 - [suggestion] `/spec-implement <feature> --resume` — displayed for resumable blocked state.
 
@@ -616,8 +622,8 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 ### Phase 0 — Goal Lock
 
 - [always] Lock goal contract via `livespec goal render spec-implement --save`
-- [always] Emit `/goal` slash command with task file reference
-- [always] Read generated task file and begin ordered execution
+- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Read generated contract/state files and begin ordered proof-based execution
 
 ### Phase 0.5 — Preflight Safety Contract
 
@@ -667,6 +673,7 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 ### Phase 6.5 — Mandatory Visual Gate
 
 - [visual] Spawn independent native sub-agent for `/spec-test <feature> --auto --visual`
+- [visual] Require child evidence `{"visual_evidence_receipt_path":"<receipt-path>"}` from `livespec visual-gate certify` + `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path>`
 - [visual] Block Phase 7 on FAIL or BLOCKED visual gate verdict
 
 ### Phase 7 — Update implementation.md
@@ -692,7 +699,7 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 - [ ] `progress.md` exists with a checkpoint row for every step executed
 - [ ] Planned FR scope for this run is implemented or explicitly deferred
 - [ ] Relevant tests pass for touched scope (or blocker documented)
-- [ ] For visual features, `/spec-test <feature> --auto --visual` completed with `Visual Gate Verdict: PASS`
+- [ ] For visual features, `/spec-test <feature> --auto --visual` completed with `Visual Gate Verdict: PASS` and returned `visual_evidence_receipt_path`
 - [ ] For visual features, every `## Screens` row has a visual test, current baseline artifact, and passing design-fidelity comparison
 - [ ] If `--no-visual` was used on a visual feature, status is `In Progress` and the skipped gate is documented
 - [ ] `implementation.md` updated with FR/AC -> `@spec` mappings

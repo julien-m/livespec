@@ -14,23 +14,27 @@ argument-hint: "[feature description]"
 
 ## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
 
-La toute première action lors de `/spec-feature` est de poser le goal durable.
+La toute première action lors de `/spec-feature` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-feature --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.md`
-4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
-5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.state.json`
+4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
+5. Émettre la commande slash `/goal` avec hash et références machine :
    ```
-   /goal hash:<hash> | spec-feature for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-feature-<hash8>.md
+   /goal hash:<hash> | spec-feature for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.state.json — mode:enforced
    ```
-6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
-   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
+   ```bash
+   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+   ```
+   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
+7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
@@ -394,7 +398,7 @@ Phase 0.5 is a synchronous hard gate. Do not mark Specify `In Progress`, do not 
 
 **From-Scratch Penflow Forward Contract:**
 
-1. Store feature-scoped design proof artifacts under `.specs/features/<feature_slug>/design/`: `.specs/features/<feature_slug>/design/flow-ui-contract/`, `.specs/features/<feature_slug>/design/ui.pen`, and `.specs/features/<feature_slug>/design/validation/`. The root `penflow/` is compatibility/cache for Penflow CLI inputs and copied/generated mirrors only.
+1. Store feature-scoped design proof artifacts under `.specs/features/<feature_slug>/design/`: `.specs/features/<feature_slug>/design/flow-ui-contract/` and `.specs/features/<feature_slug>/design/validation/`. Root `penflow/` owns the canonical Penflow/Pencil source.
 2. If root `penflow/` is absent for a UI feature, create `penflow/flow-ui-contract/flows/<feature_slug>.md` and one or more `penflow/flow-ui-contract/screens/<screen_id>.md` files from the feature request, then mirror them to `.specs/features/<feature_slug>/design/flow-ui-contract/`. This is command-owned contract generation, not manual artifact fabrication. Use stable `flow_id`, `screen_id`, `semantic_id`, and `test_id` values derived from `feature_slug`; mark uncertain behavior `[NEEDS CLARIFICATION]`.
    - Use binding-safe snake_case screen IDs and screen filenames because Penflow derives data bindings as `<screen_id>.<field_name>`.
    - Do not use kebab-case screen IDs: `bookings_dashboard.appointment_card` is valid; `bookings-dashboard.appointment_card` fails `binding_format`.
@@ -421,10 +425,10 @@ Phase 0.5 is a synchronous hard gate. Do not mark Specify `In Progress`, do not 
    penflow code-ir --from-context penflow/ui.pen --semantic-tree penflow/semantic-ui-tree.json --flow-id <feature_slug> --flow-name "<feature_description>" --out penflow/code-ir.json --json
    ```
 6. Run `livespec penflow-contract status --project . --target web-desktop --json` when stack/platform is web desktop; otherwise run `livespec penflow-contract status --project . --json`.
-7. Copy `penflow/ui.pen` and validation JSON/report outputs into `.specs/features/<feature_slug>/design/` and `.specs/features/<feature_slug>/design/validation/`.
+7. Copy validation JSON/report outputs into `.specs/features/<feature_slug>/design/validation/`; do not copy `penflow/ui.pen` outside root `penflow/`.
 8. **Global LiveSpec Design Registry:** promote the generated Penflow design into the project-level registry used by `/spec-test`, `/spec-check`, and visual review:
-   - Copy `penflow/ui.pen` to `.specs/design/ui.pen`.
-   - Export the Penflow/Pencil mockup PNGs from `.specs/design/ui.pen` into `.specs/design/screens/<feature_slug>/`, using each screen spec's `mockup:` filename when present.
+   - Keep `penflow/ui.pen` as the only `.pen` file.
+   - Export the Penflow/Pencil mockup PNGs from `penflow/ui.pen` into `.specs/design/screens/<feature_slug>/`, using each screen spec's `mockup:` filename when present.
    - Create `.specs/design/baselines/<feature_slug>/` as the destination for runtime screenshots later synced by `/spec-test`.
    - Update `.specs/design/screens/index.md` with one row per exported mockup and source `Penflow generated mockup`.
    - Update `.specs/design/changelog.md` with the feature slug, exported screens, source `penflow/ui.pen`, and current date.
@@ -436,7 +440,7 @@ Phase 0.5 is a synchronous hard gate. Do not mark Specify `In Progress`, do not 
    - Write `.mockup-validation/audit-report.md`, `.mockup-validation/NNN-feature-name/checklist.md`, `.mockup-validation/NNN-feature-name/manifest.json`, `.mockup-validation/NNN-feature-name/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and one exported PNG per audited screen.
    - Require `.mockup-validation/visual-evidence/manifest.json` status `PASS`. `PASSED_WITH_WARNINGS`, `ESCALATED`, `BLOCKED`, or `BLOCKED_VISUAL_NOT_RUN` blocks `/spec-feature` because desktop UI mockups must be modern, non-mobile, free of placeholder field text, free of overflow, and visually inspected before code.
    - Re-run `livespec penflow-contract status --project . --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json` and require verdict `PASS`.
-10. Verify these paths exist before Phase 1: `penflow/`, `penflow/flow-ui-contract/`, `penflow/ui.pen`, `penflow/semantic-ui-tree.json`, `penflow/expected-ui-tree.json`, `penflow/code-ir.json`, `penflow/pencil-context-map.json`, `.specs/features/<feature_slug>/design/ui.pen`, `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, `.specs/design/changelog.md`, `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`.
+10. Verify these paths exist before Phase 1: `penflow/`, `penflow/flow-ui-contract/`, `penflow/ui.pen`, `penflow/semantic-ui-tree.json`, `penflow/expected-ui-tree.json`, `penflow/code-ir.json`, `penflow/pencil-context-map.json`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, `.specs/design/changelog.md`, `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`.
 11. If any command fails, status is not `PASS`, or any path is missing, print `BLOCKED at step 0.5 - penflow_forward_contract_failed - missing: <paths>` and stop. Do not continue to code against a bad mockup.
 
 These files are the primary UI behavior contract for Specify, Plan, Implement, and Test. `.brainstorm/` is not a fallback in from-scratch mode.
@@ -456,7 +460,7 @@ These files are the primary UI behavior contract for Specify, Plan, Implement, a
    - `active_flags`: `--priority P1` (if provided), `--auto` (if active)
    - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
-3. Spawn a **Specify sub-agent** with the assembled Universal Agent Context and these instructions:
+3. Spawn a **Specify agent** as an independent native sub-agent with the assembled Universal Agent Context and these instructions:
 
    ```
    /spec-specify
@@ -544,7 +548,7 @@ After Gate 1 resolves, do not create branches, commits, tags, pushes, or any oth
    - `active_flags`: `--auto` (if active)
    - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
-3. Spawn a **Plan sub-agent** with the assembled Universal Agent Context and these instructions:
+3. Spawn a **Plan agent** as an independent native sub-agent with the assembled Universal Agent Context and these instructions:
 
    ```
    /spec-plan
@@ -634,7 +638,7 @@ This ensures all tools and credentials are available before the autonomous imple
    - `active_flags`: `--mono` (if provided), `--step` (if provided), `--resume` (if provided), `--auto` (if active)
    - `conventions`: build the mandatory read list per `~/.claude/livespec/references/conventions-sync.md` § Load Path — ensure `.conventions/index.md` exists by running `livespec conventions refresh --repo . --full` if absent, then read `.conventions/index.md`, select sub-domains for this phase, resolve `ai-ressources/` paths. Set to `NONE` only if refresh fails and the command reports a non-UI/no-stack project.
 
-3. Spawn an **Implement sub-agent** with the assembled Universal Agent Context and these instructions:
+3. Spawn an **Implement agent** as an independent native sub-agent with the assembled Universal Agent Context and these instructions:
 
    ```
    /spec-implement
@@ -660,7 +664,7 @@ This ensures all tools and credentials are available before the autonomous imple
 
 1. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status in_progress`
 
-2. Spawn a **Test sub-agent** with `feature_name` and these instructions:
+2. Spawn a **Test agent** as an independent native sub-agent with `feature_name` and these instructions:
 
    ```
    /spec-test
@@ -679,7 +683,7 @@ This ensures all tools and credentials are available before the autonomous imple
    - Open the implemented app in a real browser at `1440x900`.
    - Capture screenshots from that browser session.
    - Sync every approved runtime screenshot to `.specs/design/baselines/<feature_slug>/` and keep the feature-local copy under `.specs/features/<feature_slug>/baselines/`.
-   - Require the Global LiveSpec Design Registry paths `.specs/design/ui.pen`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md` before allowing Phase 3.5 success.
+   - Require the Global LiveSpec Design Registry paths `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md` before allowing Phase 3.5 success.
    - Emit `penflow/actual-ui-tree.json` from the visible DOM/runtime accessibility surface. Do not copy or derive it from `penflow/expected-ui-tree.json`.
    - Run:
      ```bash
@@ -860,11 +864,11 @@ If any phase fails:
 
 ## Internal Command Invocations
 
-- [subagent] `/spec-specify` — executable Phase 1 command; runs in an independent native sub-agent with its own goal.
-- [subagent] `/spec-plan` — executable Phase 2 command; runs in an independent native sub-agent with its own goal.
-- [subagent] `/spec-preflight --light` — executable Phase 2.7 command; runs in an independent native sub-agent with its own goal.
-- [subagent] `/spec-implement` — executable Phase 3 command; runs in an independent native sub-agent with its own goal.
-- [subagent] `/spec-test <feature-name> --auto --update` — executable Phase 3.5 command; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-specify` — executable Phase 1 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-plan` — executable Phase 2 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-preflight --light` — executable Phase 2.7 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-implement` — executable Phase 3 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-test <feature-name> --auto --update` — executable Phase 3.5 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [suggestion] `/spec-check NNN-feature-name` — displayed after pipeline completion as a verification next step.
 - [suggestion] `/spec-feature --resume [feature-name]` — displayed on resumable BLOCKED state.
 
@@ -879,8 +883,8 @@ If any phase fails:
 
 - [always] Verify no active goal exists
 - [always] Resolve feature slug and active flags from arguments
-- [always] Run `livespec goal render spec-feature --save` and save task file
-- [always] Emit `/goal` slash command with hash and task file reference
+- [always] Run `livespec goal render spec-feature --save` and save contract/state files
+- [always] Emit `/goal` slash command with hash and contract/state file reference
 
 ### Phase 0 — Roadmap Resolution (no argument)
 
@@ -902,7 +906,7 @@ If any phase fails:
 - [penflow] Run `penflow export-expected` to produce `expected-ui-tree.json`
 - [penflow] Run `penflow code-ir` to produce `code-ir.json`
 - [penflow] Run `livespec penflow-contract status` and require PASS
-- [penflow] Sync `ui.pen` and validation outputs to feature design directory
+- [penflow] Sync validation outputs to feature design directory; keep `penflow/ui.pen` as the only `.pen`
 - [penflow] Promote design to Global LiveSpec Design Registry (`.specs/design/`)
 - [penflow] Export mockup PNGs into `.specs/design/screens/<slug>/`
 - [penflow] Create `.specs/design/baselines/<slug>/` destination
@@ -972,7 +976,8 @@ If any phase fails:
 
 ### Phase 3.6 — Visual Gate (non-skippable for VISUAL features)
 
-- [visual] Run `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --json`
+- [visual] Require the child `/spec-test` receipt or capture a fresh feature-level run: `livespec visual-gate certify --feature <slug> --command spec-feature --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path> --json`
+- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
 - [visual] Exit 0 → autoriser Phase 4 ; exit 6 ou 7 → BLOQUER la finalisation et `--auto` ; consigner `link_violations`, `runtime_in_design_screens_violations`, `missing_artifacts`
 - [visual] Nested skills (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-fix`) tournent en sub-agents Task tool indépendants — chacun avec son goal — pour respecter la règle single-goal du parent `/spec-feature`
 
@@ -980,7 +985,7 @@ If any phase fails:
 
 - [always] Run `/audit --fix` and verify zero remaining violations
 - [always] Verify all tests pass after audit
-- [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature` exit_code != 0 (VISUAL features only)
+- [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path>` exit_code != 0 (VISUAL features only)
 - [always] Run `livespec commit-context write` only if explicit commit requested
 - [always] Print `Commit: skipped - no explicit user authorization` if no commit requested
 - [always] Emit SHIP_RESULT block if called from `/spec-ship`

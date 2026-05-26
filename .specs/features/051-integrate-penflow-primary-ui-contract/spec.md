@@ -3,7 +3,7 @@ title: "Integrate Penflow as LiveSpec Primary UI Contract"
 status: Implemented
 priority: P1
 created: 2026-05-21
-updated: 2026-05-21
+updated: 2026-05-26
 ---
 
 # Feature 051 — Integrate Penflow as LiveSpec Primary UI Contract
@@ -114,6 +114,9 @@ flowchart TD
 - **AC-008:** Existing screenshot baseline and pixel-diff gates remain documented and are not removed.
 - **AC-009:** Legacy `.specs/flows`, `.specs/design/screens`, native behavioral, and design-alignment paths are classified as replaced, preserved, or fallback.
 - **AC-010:** Missing `actual-ui-tree.json` is reported as `ABSENT` for non-UI/no-workspace runs and `BLOCKED` when UI runtime comparison is explicitly required.
+- **AC-011:** LiveSpec imports a Brainstorm project only through an explicit Brainstorm `penflow/` directory and copies it to root `penflow/`.
+- **AC-012:** `penflow/ui.pen` is the only valid `.pen` file in a LiveSpec project; duplicate `.pen` files under `.specs/design/`, `.specs/features/*/design/`, or any other path block the Penflow contract.
+- **AC-013:** LiveSpec never requires or documents `penflow/ui.enriched.pen`, `.specs/design/ui.pen`, or `.specs/features/*/design/ui.pen`.
 
 ## Functional Requirements
 
@@ -126,6 +129,9 @@ flowchart TD
 - **FR-007:** Preserve screenshot regression and design-alignment gates as complementary visual validation.
 - **FR-008:** Document legacy path classification in the feature audit.
 - **FR-009:** Expose an explicit runtime comparison status so commands can distinguish from-scratch/non-UI absence from missing actual trees that block UI validation.
+- **FR-010:** Accept an explicit Brainstorm `penflow/` source directory for `livespec penflow-contract bootstrap`.
+- **FR-011:** Detect and block all `.pen` files except root `penflow/ui.pen`.
+- **FR-012:** Remove `.pen` requirements from the LiveSpec design registry; screenshots and baselines remain visual evidence, but `ui.pen` is canonical only at `penflow/ui.pen`.
 
 ## Key Entities
 
@@ -139,6 +145,8 @@ flowchart TD
 
 - Missing `penflow/` is `absent`, not a failed contract.
 - Existing `penflow/` is never overwritten by `.brainstorm/penflow/`.
+- Existing `penflow/` is never overwritten by an explicit Brainstorm `penflow/` source.
+- A project with `.specs/design/ui.pen`, `.specs/features/*/design/ui.pen`, or `penflow/ui.enriched.pen` is incomplete until the duplicate `.pen` is removed.
 - Missing `actual-ui-tree.json` blocks only when a UI flow requires runtime comparison.
 - Visual baselines can pass while Penflow fails; UI correctness still fails.
 - Penflow can pass while screenshots drift; visual regression still fails.

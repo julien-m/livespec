@@ -14,23 +14,27 @@ argument-hint: "<feature-name>"
 
 ## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
 
-La toute première action lors de `/spec-fix` est de poser le goal durable.
+La toute première action lors de `/spec-fix` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-fix --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.md`
-4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
-5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.state.json`
+4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
+5. Émettre la commande slash `/goal` avec hash et références machine :
    ```
-   /goal hash:<hash> | spec-fix for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-fix-<hash8>.md
+   /goal hash:<hash> | spec-fix for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.state.json — mode:enforced
    ```
-6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
-   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
+   ```bash
+   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+   ```
+   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
+7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
@@ -278,12 +282,21 @@ After all fixes are applied:
 Pour toute feature visuelle, après chaque cycle de fix toucher à CSS/JSX/SwiftUI/Maestro/Tauri :
 
 ```bash
-livespec visual-gate validate --feature <slug> --command spec-fix [--target <web|ios|android|tauri>] --json
+RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
+# re-capture runtime PNGs into .specs/features/<slug>/run/$RUN_ID/<target>/<screen>.png
+livespec visual-gate certify --feature <slug> --command spec-fix --target <web|ios|android|tauri> --run-id "$RUN_ID" --json
+livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path> --json
 ```
 
 - Exit `0` → fix accepté, Step 8 autorisé.
 - Exit `6` → fix rejeté ; consigner `link_violations` + `runtime_in_design_screens_violations` ; itérer (retry Step 6).
 - Exit `7` (mockups/baselines/Penflow/compare manquants) → **générer les prérequis AVANT** de toucher le code (skill peut appeler `livespec visual-gate cleanup --feature <slug> --apply` — le mode `archive` est le défaut — puis recréer les baselines via runner + `livespec visual-gate promote`). Ne **jamais** marquer `done` tant que `exit_code != 0`.
+
+`design-alignment is semantic-only`: JSON d'alignement, rapports Penflow, normalized JSON, `actual_diff_percent` déclaré par le worker, et verdicts libres ne prouvent jamais la fidélité pixel. La preuve acceptée par `goal prove` est exclusivement :
+
+```json
+{"visual_evidence_receipt_path":"<receipt-path>"}
+```
 
 **Nested sub-agent** : si `/spec-check` doit être ré-appelé pour valider la correction, le faire via Task tool dans un sub-agent indépendant ; le goal `/spec-fix` parent reste actif.
 
@@ -386,8 +399,8 @@ Total: 6/8 gaps closed (75%)
 
 ## Internal Command Invocations
 
-- [subagent] `/spec-check <feature>` — executable when the gap report is missing or stale; runs in an independent native sub-agent with its own goal.
-- [subagent] `/spec-check <feature>` — executable after fixes for verification; runs in an independent native sub-agent with its own goal.
+- [subagent] `/spec-check <feature>` — executable when the gap report is missing or stale; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-check <feature>` — executable after fixes for verification; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [suggestion] `/spec-refine <feature>` — displayed when the user chooses to change the spec instead of code.
 - [suggestion] `/spec-implement <feature>` — displayed when an unimplemented feature should be implemented instead of fixed.
 - [suggestion] `/spec-test <feature>` — displayed when only missing visual baselines/tests remain.
@@ -451,7 +464,8 @@ Total: 6/8 gaps closed (75%)
 
 - [always] Run test suite from plan.md or testing/strategy.md
 - [visual] Re-capture Playwright screenshots after visual fixes
-- [visual] Run `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --json` — refuse `done` while exit_code != 0
+- [visual] Re-capture runtime PNGs into `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-fix --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path> --json` — refuse `done` while exit_code != 0
+- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
 - [visual] If gate exit_code == 7 (prereqs missing): run `livespec visual-gate cleanup --feature <slug> --apply` (archive is default) + recreate baselines via runner + `livespec visual-gate promote` BEFORE touching code, then re-run gate
 - [always] Spawn independent native sub-agent for `/spec-check <feature>` to verify closure after fixes
 - [always] Score results per gap (Fixed / Improved / Still failing)
@@ -484,7 +498,7 @@ Total: 6/8 gaps closed (75%)
 - [ ] Gap report updated with fix results
 - [ ] If all gaps closed: README status updated
 - [ ] Remaining gaps (if any) clearly listed
-- [ ] For VISUAL features: `livespec visual-gate validate --feature <slug> --command spec-fix` exited 0 ; exit 6/7 = `done` interdit
+- [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-fix` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit
 
 ---
 

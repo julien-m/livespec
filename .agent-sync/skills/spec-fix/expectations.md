@@ -1,7 +1,7 @@
 ---
 command: spec-fix
 contract_version: "1.0"
-last_reviewed: 2026-05-23
+last_reviewed: 2026-05-26
 ---
 
 # Expectations — /spec-fix

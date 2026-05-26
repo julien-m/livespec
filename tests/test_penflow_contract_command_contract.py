@@ -16,11 +16,15 @@ def test_system_penflow_contract_doc_exists() -> None:
 
     assert "Penflow Contract Verdict: PASS | FAIL | BLOCKED | ABSENT" in body
     assert "penflow/semantic-ui-tree.json" in body
+    assert "penflow/ui.pen is the only allowed `.pen` file" in body
+    assert "duplicate `.pen`" in body
     assert "top-level `verdict`" in body
     assert "--require-actual" in body
     assert "runtime_comparison: BLOCKED" in body
     assert "screenshots remain visual regression gates" in body
-    assert ".specs/design/ui.pen" in body
+    assert ".specs/design/ui.pen" not in body
+    assert ".specs/features/<feature_slug>/design/ui.pen" not in body
+    assert "ui.enriched.pen" not in body
     assert ".specs/design/screens/<feature_slug>/" in body
     assert ".specs/design/baselines/<feature_slug>/" in body
     assert "Mockup Factory Validation" in body
@@ -33,8 +37,12 @@ def test_spec_init_supports_brainstorm_and_from_scratch_penflow() -> None:
     body = _read(".agent-sync/skills/spec-init/SKILL.md")
 
     assert "Step 3.5.5 — Penflow Contract Workspace Bootstrap" in body
-    assert ".brainstorm/penflow/" in body
-    assert "copy it to root `penflow/`" in body
+    assert "Brainstorm `penflow/` directory" in body
+    assert (
+        "livespec penflow-contract bootstrap --project . --source <brainstorm-project>/penflow"
+        in body
+    )
+    assert ".brainstorm/penflow/" not in body
     assert "continue from scratch" in body
     assert "state: absent" in body
 
@@ -192,9 +200,9 @@ def test_visual_feature_pipeline_requires_feature_local_design_proofs() -> None:
     body = _read(".agent-sync/skills/spec-feature/SKILL.md")
 
     assert ".specs/features/<feature_slug>/design/flow-ui-contract/" in body
-    assert ".specs/features/<feature_slug>/design/ui.pen" in body
+    assert ".specs/features/<feature_slug>/design/ui.pen" not in body
     assert ".specs/features/<feature_slug>/design/validation/" in body
-    assert "root `penflow/` is compatibility/cache" in body
+    assert "Root `penflow/` owns the canonical Penflow/Pencil source" in body
     assert "Do not continue to code against a bad mockup" in body
 
 
@@ -204,7 +212,9 @@ def test_visual_feature_pipeline_promotes_penflow_to_global_design_registry() ->
 
     for text in (body, expectations):
         assert "Global LiveSpec Design Registry" in text
-        assert ".specs/design/ui.pen" in text
+        assert ".specs/design/ui.pen" not in text
+        assert ".specs/features/<feature_slug>/design/ui.pen" not in text
+        assert "ui.enriched.pen" not in text
         assert ".specs/design/screens/<feature_slug>/" in text
         assert ".specs/design/baselines/<feature_slug>/" in text
         assert ".specs/design/screens/index.md" in text
@@ -240,7 +250,9 @@ def test_spec_test_requires_global_design_registry_for_penflow_visual_runs() -> 
 
     for text in (body, expectations):
         assert "Global LiveSpec Design Registry" in text
-        assert ".specs/design/ui.pen" in text
+        assert ".specs/design/ui.pen" not in text
+        assert ".specs/features/<feature_slug>/design/ui.pen" not in text
+        assert "ui.enriched.pen" not in text
         assert ".specs/design/screens/<feature_slug>/" in text
         assert ".specs/design/baselines/<feature_slug>/" in text
         assert ".specs/design/screens/index.md" in text

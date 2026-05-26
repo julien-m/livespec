@@ -1,5 +1,13 @@
 # Changelog — Feature 004: Visual Testing Governance
 
+### 2026-05-23 — Fix: Enforce legacy mockup hashes in visual gate
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (`spec.md`, `implementation.md`, `changelog.md`)
+- **Code modified:** `validator/visual_gate.py`, `validator/registry_links.py`, `system/schemas/baseline-manifest.md`, `tests/test_visual_implementation_gate.py`
+- **AC impacted:** AC-002, AC-005, AC-006
+- **Author:** codex
+
 ### 2026-04-14 — Feature: Visual Testing Governance implemented
 
 - **Type:** Feature

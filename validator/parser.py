@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import frontmatter
 import mistune
@@ -86,8 +86,12 @@ def parse_file(path: Path) -> ParsedFile:
     # Parse Markdown AST with mistune 3.x
     md = mistune.create_markdown(renderer="ast")
     ast_nodes = md(content)
+    if not isinstance(ast_nodes, list):
+        ast_nodes = []
 
-    headings, code_blocks = _extract_headings_and_blocks(ast_nodes)
+    headings, code_blocks = _extract_headings_and_blocks(
+        cast(list[dict[str, Any]], ast_nodes)
+    )
 
     return ParsedFile(
         metadata=metadata,

@@ -17,9 +17,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
-LEGACY_DESIGN_SCREENS_ENV = "LIVESPEC_LEGACY_DESIGN_SCREENS"
-
 import yaml  # type: ignore[import-untyped]  # PyYAML is installed in the repo, but the stub package is not.
+
+LEGACY_DESIGN_SCREENS_ENV = "LIVESPEC_LEGACY_DESIGN_SCREENS"
 
 DEFAULT_COMPARE_THRESHOLD = 0.05
 SCREENSHOT_TIMEOUT_SECONDS = 300

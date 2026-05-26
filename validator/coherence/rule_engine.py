@@ -84,7 +84,7 @@ def run_coherence(
             if v.suppress_if_creating and not no_suppress:
                 # Find the feature this violation relates to
                 feature_dir = v.context.get("feature_dir")
-                if feature_dir:
+                if isinstance(feature_dir, str) and feature_dir:
                     feature = graph.get_feature(feature_dir)
                     if feature and feature.spec_mtime:
                         age = now - feature.spec_mtime

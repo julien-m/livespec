@@ -62,6 +62,7 @@ Feature: Baseline provenance metadata
     When spec.test commits the baseline PNGs
     Then a baseline.manifest.yml is written to the feature's baselines/ directory
     And the manifest contains for each screen: capture_date, approved_by, browser_version, os, mockup_version, docker_image
+    And it may contain mockup_path when a runtime state name differs from the canonical mockup filename
 
   Scenario: spec.check --show-provenance displays the manifest
     Given a feature with baseline.manifest.yml
@@ -113,6 +114,20 @@ Feature: Mockup change invalidation
     Then the baseline is marked STALE in the check report
     And the report shows: "Mockup updated after baseline capture — baseline may no longer reflect current design"
     And the visual regression test is NOT run against a stale baseline
+
+  Scenario: Runtime state maps to a differently named mockup
+    Given baseline.manifest.yml records screen: "01-dashboard-all-tab"
+    And mockup_path points to ".specs/design/screens/001-dashboard/bookings_dashboard.png"
+    And mockup_version matches the SHA-256 of that PNG
+    When spec.check runs Step 8
+    Then the baseline is considered VALID
+
+  Scenario: Runtime state has no resolvable mockup
+    Given baseline.manifest.yml records screen: "01-dashboard-all-tab"
+    And no mockup_path is present
+    And ".specs/design/screens/<feature>/01-dashboard-all-tab.png" does not exist
+    When spec.check runs Step 8
+    Then visual validation is BLOCKED with the missing mockup path
 
   Scenario: Stale baseline is a warning, not a hard failure
     Given a stale baseline detected
@@ -220,10 +235,10 @@ Feature: Visual governance dashboard
 | AC | Description | Story |
 |----|-------------|-------|
 | AC-001 | spec.test writes `baseline.manifest.yml` to `baselines/` after every baseline approval (human or auto) | Story 1 |
-| AC-002 | The manifest records for each screen: `capture_date`, `approved_by`, `browser_version`, `os`, `mockup_version` (hash or mtime), `docker_image` | Story 1 |
+| AC-002 | The manifest records for each screen: `capture_date`, `approved_by`, `browser_version`, `os`, `mockup_version` (hash or mtime), `docker_image`, and optional `mockup_path` when `screen` is a runtime state name | Story 1 |
 | AC-003 | `spec.check --show-provenance` reads and displays `baseline.manifest.yml` as a table | Story 1 |
 | AC-004 | Missing `baseline.manifest.yml` triggers a WARNING (not an error) in spec.check | Story 1 |
-| AC-005 | spec.check Step 8 compares the current mockup hash/mtime against the manifest's `mockup_version` and marks the baseline STALE if the mockup is newer | Story 2 |
+| AC-005 | spec.check Step 8 resolves the mockup via `mockup_path` or `.specs/design/screens/<feature>/<screen>.png`, compares the current mockup hash/mtime against `mockup_version`, and refuses to pass if the mockup is missing or stale | Story 2 |
 | AC-006 | A stale baseline (any reason) is NOT used for visual regression comparison — the comparison is skipped with a warning | Story 2 |
 | AC-007 | Stale baselines produce a WARNING exit, not ERROR, in CI | Story 2 |
 | AC-008 | spec.check detects browser version changes by comparing current Playwright installed version against `browser_version` in manifest | Story 3 |
@@ -241,7 +256,7 @@ Feature: Visual governance dashboard
 | FR-001 | spec.test Phase 4.5.3 (Approval Gate) must write `baselines/baseline.manifest.yml` after every approved capture, recording the fields defined in AC-002 | AC-001, AC-002 |
 | FR-002 | `spec.check --show-provenance` flag must read `baseline.manifest.yml` and render a provenance table per screen | AC-003 |
 | FR-003 | spec.check Step 8 must validate baseline staleness before running pixel comparison: skip comparison and emit WARNING if baseline is STALE | AC-005, AC-006, AC-007 |
-| FR-004 | spec.check Step 8 must detect mockup changes by comparing the SHA-256 hash of the mockup PNG at baseline-capture time (stored in manifest) against the current hash | AC-005 |
+| FR-004 | spec.check Step 8 must detect mockup changes by resolving the canonical mockup PNG path and comparing the stored SHA-256 in `mockup_version` against the current hash | AC-005 |
 | FR-005 | spec.check Step 8 must detect browser version changes by reading `playwright --version` or equivalent and comparing against manifest `browser_version` | AC-008, AC-009 |
 | FR-006 | `spec.check --visual-status` flag must scan all features with `baselines/` directories and classify each baseline using all staleness signals | AC-010, AC-011 |
 | FR-007 | `baseline.manifest.yml` schema must be defined in `system/schemas/baseline-manifest.md` with required and optional fields | AC-001, AC-002 |
@@ -269,11 +284,12 @@ None — all provenance data is stored in `baseline.manifest.yml` files on the f
 ## Edge Cases
 
 1. **Mockup PNG deleted:** If the mockup no longer exists, the baseline is marked STALE with reason: `mockup_deleted` — not an error, just a warning.
-2. **No Playwright installed when running `--visual-status`:** Browser version comparison is skipped with: "Playwright not installed — browser version check skipped."
-3. **`baseline.manifest.yml` is corrupted or unparseable:** Treat as missing manifest (WARNING, not error). Don't crash spec.check.
-4. **Auto-approve from `spec.ship` records `approved_by: auto`:** Manifest is still written, just with the automated approval marker. Developers can audit and see which baselines were human-approved vs auto-approved.
-5. **Multiple screens with different staleness reasons:** Each screen has its own entry in the manifest — STALE-MOCKUP for screen A and VALID for screen B can coexist.
-6. **Migration v5 runs on a project with no baselines:** Generates no manifests (nothing to stub) and reports: "No baselines found — nothing to migrate."
+2. **Runtime state name differs from mockup name:** `mockup_path` must point to the canonical mockup PNG; without it, the visual gate blocks instead of assuming a same-name mockup exists.
+3. **No Playwright installed when running `--visual-status`:** Browser version comparison is skipped with: "Playwright not installed — browser version check skipped."
+4. **`baseline.manifest.yml` is corrupted or unparseable:** Treat as missing manifest (WARNING, not error). Don't crash spec.check.
+5. **Auto-approve from `spec.ship` records `approved_by: auto`:** Manifest is still written, just with the automated approval marker. Developers can audit and see which baselines were human-approved vs auto-approved.
+6. **Multiple screens with different staleness reasons:** Each screen has its own entry in the manifest — STALE-MOCKUP for screen A and VALID for screen B can coexist.
+7. **Migration v5 runs on a project with no baselines:** Generates no manifests (nothing to stub) and reports: "No baselines found — nothing to migrate."
 
 ---
 

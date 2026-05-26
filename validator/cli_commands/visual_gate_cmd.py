@@ -18,7 +18,7 @@ from __future__ import annotations
 import datetime as _dt
 import json
 from pathlib import Path
-from typing import Annotated, Literal, cast
+from typing import Annotated, Literal
 
 import typer
 
@@ -26,11 +26,14 @@ from validator.cli_exit_codes import (
     EXIT_OK,
     EXIT_VISUAL_GATE_BLOCKED,
     EXIT_VISUAL_GATE_CLEANUP_DRIFT,
+    EXIT_VISUAL_GATE_FAIL,
 )
+from validator.visual_evidence import VisualReceiptError
 from validator.visual_gate import (
     GateCommand,
     GateTarget,
     apply_cleanup,
+    certify_visual_evidence,
     plan_cleanup,
     promote_baseline,
     render_text_report,
@@ -55,15 +58,23 @@ def register(app: typer.Typer) -> None:
 
 
 def _timestamp() -> str:
-    return _dt.datetime.now(tz=_dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return _dt.datetime.now(tz=_dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+
+
+def _receipt_exit_code(verdict: str) -> int:
+    if verdict == "PASS":
+        return EXIT_OK
+    if verdict == "FAIL":
+        return EXIT_VISUAL_GATE_FAIL
+    return EXIT_VISUAL_GATE_BLOCKED
 
 
 @visual_gate_app.command("validate")
 def validate_command(
     feature: Annotated[
-        str,
+        str | None,
         typer.Option("--feature", help="Feature slug under .specs/features/."),
-    ],
+    ] = None,
     command: Annotated[
         str,
         typer.Option(
@@ -93,8 +104,18 @@ def validate_command(
         bool,
         typer.Option("--json", help="Emit machine-readable JSON."),
     ] = False,
+    receipt: Annotated[
+        Path | None,
+        typer.Option(
+            "--receipt",
+            help="Validate a visual evidence receipt instead of aggregating the gate.",
+        ),
+    ] = None,
 ) -> None:
     """Run the gate and exit 0 (PASS), 6 (FAIL), or 7 (BLOCKED)."""
+    if feature is None:
+        typer.echo("Error: --feature is required.", err=True)
+        raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
     if command not in ("spec-check", "spec-fix", "spec-test", "spec-feature"):
         typer.echo(
             "Error: --command must be one of spec-check, spec-fix, spec-test, spec-feature.",
@@ -107,18 +128,15 @@ def validate_command(
             err=True,
         )
         raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
-    # `command` and `target` have been validated against their literal
-    # alphabets above — pyright narrows automatically; mypy does not
-    # propagate the `in (...)` guard, hence the documented casts (NOT a
-    # blind silencing).
-    validated_command: GateCommand = cast(GateCommand, command)  # noqa: TC100
-    validated_target: GateTarget | None = cast("GateTarget | None", target)  # noqa: TC100
+    validated_command: GateCommand = command
+    validated_target: GateTarget | None = target
     report = validate_gate(
         project_root=project.resolve(),
         feature_slug=feature,
         command=validated_command,
         target=validated_target,
         strict_links=strict_links,
+        receipt_path=receipt,
     )
     if json_output:
         payload = report.to_dict()
@@ -127,6 +145,87 @@ def validate_command(
     else:
         typer.echo(render_text_report(report))
     raise typer.Exit(verdict_to_exit_code(report.verdict))
+
+
+@visual_gate_app.command("certify")
+def certify_command(
+    feature: Annotated[
+        str,
+        typer.Option("--feature", help="Feature slug under .specs/features/."),
+    ],
+    command: Annotated[
+        str,
+        typer.Option(
+            "--command",
+            help="Caller skill: spec-check | spec-fix | spec-test | spec-feature.",
+        ),
+    ],
+    target: Annotated[
+        str,
+        typer.Option("--target", help="UI target: web | ios | android | tauri."),
+    ],
+    run_id: Annotated[
+        str,
+        typer.Option("--run-id", help="Runtime capture run id under the feature run dir."),
+    ],
+    project: Annotated[
+        Path,
+        typer.Option("--project", help="Project root containing .specs/."),
+    ] = Path("."),
+    threshold_percent: Annotated[
+        float,
+        typer.Option(
+            "--threshold-percent",
+            help="Allowed mockup/runtime changed-pixel percentage.",
+        ),
+    ] = 5.0,
+    json_output: Annotated[
+        bool,
+        typer.Option("--json", help="Emit machine-readable JSON."),
+    ] = False,
+) -> None:
+    """Create a deterministic visual evidence receipt from real PNG files."""
+    if command not in ("spec-check", "spec-fix", "spec-test", "spec-feature"):
+        typer.echo(
+            "Error: --command must be one of spec-check, spec-fix, spec-test, spec-feature.",
+            err=True,
+        )
+        raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
+    if target not in ("web", "ios", "android", "tauri"):
+        typer.echo(
+            "Error: --target must be one of web, ios, android, tauri.",
+            err=True,
+        )
+        raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
+    try:
+        payload = certify_visual_evidence(
+            project_root=project.resolve(),
+            feature_slug=feature,
+            command=command,
+            target=target,
+            run_id=run_id,
+            threshold_percent=threshold_percent,
+        )
+    except (OSError, VisualReceiptError) as exc:
+        payload: dict[str, object] = {
+            "feature_slug": feature,
+            "command": command,
+            "target": target,
+            "run_id": run_id,
+            "verdict": "BLOCKED",
+            "receipt_path": None,
+            "missing_artifacts": [str(exc)],
+        }
+    verdict = str(payload["verdict"])
+    exit_code = _receipt_exit_code(verdict)
+    payload["exit_code"] = exit_code
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        typer.echo(f"Visual Evidence Certification Verdict: {verdict}")
+        if payload.get("receipt_path"):
+            typer.echo(f"receipt: {payload['receipt_path']}")
+    raise typer.Exit(exit_code)
 
 
 @visual_gate_app.command("cleanup")
@@ -260,12 +359,10 @@ def promote_command(
         )
         raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
     try:
-        # `target` validated against the literal alphabet above — cast is a
-        # documented narrowing for type checkers, not an unjustified ignore.
         registry, local = promote_baseline(
             project_root=project.resolve(),
             feature_slug=feature,
-            target=cast(GateTarget, target),
+            target=target,
             screen=screen,
             run_id=run_id,
         )

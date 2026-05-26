@@ -13,26 +13,30 @@ description: "Initialize LiveSpec in a project through a 3-phase conversational 
 
 ## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
 
-La toute première action lors de `/spec-init` est de poser le goal durable.
+La toute première action lors de `/spec-init` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat dans un fichier de tâches :
+3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-init --feature <feature-slug> --flags "<active-flags>" --save
    ```
    Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | task-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.md`
-4. Lire le fichier de tâches généré — il contient toutes les tâches en cases à cocher `[ ]`.
-5. Émettre la commande slash `/goal` avec hash et référence au fichier :
+   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.state.json`
+4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
+5. Émettre la commande slash `/goal` avec hash et références machine :
    ```
-   /goal hash:<hash> | spec-init for <feature> — task list: $TMPDIR/livespec-goals/goal-spec-init-<hash8>.md
+   /goal hash:<hash> | spec-init for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.state.json — mode:enforced
    ```
-6. Exécuter les tâches dans l'ordre indiqué dans le fichier, cocher `[ ]` → `[x]` après chaque tâche.
-   Les phases SKILL.md sont une référence d'implémentation — le fichier de tâches est la liste authoritative.
+6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
+   ```bash
+   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
+   ```
+   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
+7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si Claude Code n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
 # Command: /spec-init
 
@@ -409,22 +413,20 @@ Detection and confirmation happen here (Phase B context — decisions). File cop
 **Detection logic:**
 
 1. Check if `.brainstorm/mockups/` directory exists
-2. If not, check if `.brainstorm/ui.pen` (or `ui.fig`, `ui.excalidraw`, `ui.html`) exists at root level
+2. If not, check if `.brainstorm/ui.fig`, `.brainstorm/ui.excalidraw`, or `.brainstorm/ui.html` exists at root level. Penflow `.pen` sources are handled only by Step 3.5.5 and must land at `penflow/ui.pen`.
 3. If neither → skip silently
 4. If found:
    a. Glob `.brainstorm/mockups/*.png` (or `.brainstorm/*.png` if no `mockups/` dir)
    b. Check for `.brainstorm/mockups/index.md` (or `.brainstorm/index.md`)
-   c. Check for source file: `.brainstorm/mockups/ui.<ext>` (or `.brainstorm/ui.<ext>`)
+   c. Check for non-Penflow source file: `.brainstorm/mockups/ui.<ext>` (or `.brainstorm/ui.<ext>`)
    d. Display import summary
 
 **Design file detection order** (check each, take first match):
 
 ```
-.brainstorm/mockups/ui.pen
 .brainstorm/mockups/ui.fig
 .brainstorm/mockups/ui.excalidraw
 .brainstorm/mockups/ui.html
-.brainstorm/ui.pen
 .brainstorm/ui.fig
 .brainstorm/ui.excalidraw
 .brainstorm/ui.html
@@ -441,7 +443,7 @@ Detection and confirmation happen here (Phase B context — decisions). File cop
 
 > 🎨 **Brainstorm design artifacts detected:**
 >
->   📄 Source file: `.brainstorm/mockups/ui.pen`
+>   📄 Source file: `.brainstorm/mockups/ui.fig`
 >   🖼️  Screens: [N] PNGs found
 >      • [list each PNG by name]
 >   📋 Index: `.brainstorm/mockups/index.md` _(if exists)_
@@ -452,11 +454,11 @@ Detection and confirmation happen here (Phase B context — decisions). File cop
 **User response handling:**
 
 - **"import"** (or equivalent confirmation, or `--auto` flag):
-  1. **Copy design source file:** `.brainstorm/.../ui.<ext>` → `.specs/design/ui.<ext>`
+  1. **Copy non-Penflow design source file:** `.brainstorm/.../ui.<ext>` → `.specs/design/ui.<ext>`; never copy `.pen` here.
      - If `~/.claude/livespec/design.md` exists, verify extension matches configured tool
      - If mismatch → warn but still copy
   2. **Export screens via MCP** (preferred) **or copy PNGs** (fallback):
-     - If MCP available → open `.specs/design/ui.<ext>`, export each screen as PNG to `.specs/design/screens/<screen-name>.png`
+     - If MCP available → open the imported non-Penflow source file, export each screen as PNG to `.specs/design/screens/<screen-name>.png`
      - If MCP not available → copy PNGs directly to `.specs/design/screens/`, strip numeric prefix (`01-dashboard.png` → `dashboard.png`)
   3. **Generate screen index:** Create `.specs/design/screens/index.md` from `system/templates/screen-index-template.md`, populate with imported screens (Source = `Brainstorm import`, dates = today)
   4. **Initialize design changelog:** For each screen, add a section to `.specs/design/changelog.md`:
@@ -482,15 +484,15 @@ Detection and confirmation happen here (Phase B context — decisions). File cop
 | Flag | Behavior |
 |------|----------|
 | `--auto` | Auto-import without asking |
-| `--force` | Overwrite existing `.specs/design/ui.<ext>` if present |
+| `--force` | Overwrite existing imported design metadata if present |
 
 ### Step 3.5.5 — Penflow Contract Workspace Bootstrap
 
-If `.brainstorm/penflow/` exists, copy it to root `penflow/` before treating brainstorm mockups as any behavioral source. If no Brainstorm output exists, continue from scratch: create no `.brainstorm/` dependency, report Penflow as `ABSENT`, and let the first UI feature establish root `penflow/` artifacts through the Penflow/design workflow.
+If a Brainstorm `penflow/` directory is provided, import it to root `penflow/` before treating brainstorm mockups as any behavioral source. If no Brainstorm output exists, continue from scratch: create no Brainstorm dependency, report Penflow as `ABSENT`, and let the first UI feature establish root `penflow/` artifacts through the Penflow/design workflow.
 
-1. Check for `.brainstorm/penflow/`.
+1. Check whether the user or upstream workflow provided `<brainstorm-project>/penflow`.
 2. If root `penflow/` already exists, do not overwrite it; run `livespec penflow-contract status --project .` and continue.
-3. If root `penflow/` is absent, copy `.brainstorm/penflow/` to `penflow/`.
+3. If root `penflow/` is absent and a source exists, run `livespec penflow-contract bootstrap --project . --source <brainstorm-project>/penflow`.
 4. If neither source exists, run `livespec penflow-contract status --project . --json`, record `state: absent`, and continue without referencing Brainstorm again.
 5. Run `livespec penflow-contract status --project .` and record the result in command output.
 6. Treat root `penflow/` as the primary UI behavior contract; `.specs/design/screens/` remains a visual reference/export inventory only.
@@ -1065,7 +1067,7 @@ If user already knows their stack, allow a compact flow:
 ### Phase 0 — Goal Lock
 
 - [always] Lock goal contract via `livespec goal render spec-init --save`
-- [always] Emit `/goal` slash command with task file reference
+- [always] Emit `/goal` slash command with contract/state file reference
 
 ### Phase A — Brainstorm
 
@@ -1083,7 +1085,7 @@ If user already knows their stack, allow a compact flow:
 - [always] Ask dev tooling preferences (package manager, linter)
 - [always] Check design tool configuration; run wizard if not configured
 - [always] Detect and confirm brainstorm design/theme artifact import
-- [always] Bootstrap Penflow contract workspace if .brainstorm/penflow/ exists
+- [always] Bootstrap Penflow contract workspace if a Brainstorm `penflow/` source exists
 - [always] Import theme.css and write theme.md if brainstorm theme detected
 - [always] Create at least 1 ADR per significant stack choice
 

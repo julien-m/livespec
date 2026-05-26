@@ -30,6 +30,7 @@ import hashlib
 import json
 import os
 from collections.abc import Iterator
+from contextlib import suppress
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -41,6 +42,7 @@ LINK_MODE_FILE = Path(".specs") / "design" / ".link-mode"
 FEATURE_BASELINES_REL = Path("baselines")
 MANIFEST_FILENAME = "baseline.manifest.yml"
 MANIFEST_JSON_FILENAME = "manifest.json"
+MAX_HASH_FILE_BYTES = 100 * 1024 * 1024
 
 LinkMode = Literal["symlink", "manifest"]
 EntryKind = Literal["symlink", "ref"]
@@ -48,6 +50,7 @@ ViolationKind = Literal[
     "physical_copy_where_link_required",
     "broken_symlink",
     "manifest_missing_registry_path",
+    "manifest_mockup_sha_mismatch",
     "manifest_sha_mismatch",
     "runtime_under_design_screens",
     "manifest_unreadable",
@@ -154,20 +157,14 @@ def detect_link_capability(project_root: Path) -> LinkMode:
         # Always remove probe artefacts — even when the symlink attempt
         # raises, we must not leave `.specs/design/.probe/target.txt`
         # behind for downstream `find` / git status churn.
-        try:
+        with suppress(OSError):
             if link.is_symlink() or link.exists():
                 link.unlink()
-        except OSError:
-            pass
-        try:
+        with suppress(OSError):
             if target.exists():
                 target.unlink()
-        except OSError:
-            pass
-        try:
+        with suppress(OSError):
             probe_dir.rmdir()
-        except OSError:
-            pass
 
 
 def write_link_mode(project_root: Path, mode: LinkMode) -> Path:
@@ -230,6 +227,11 @@ def expected_feature_local_path(
 
 def sha256_of(path: Path) -> str:
     """Return the lowercase hex sha256 of a file's bytes."""
+    stat = path.stat()
+    if not path.is_file():
+        raise OSError(f"not a regular file: {path}")
+    if stat.st_size > MAX_HASH_FILE_BYTES:
+        raise OSError(f"file too large to hash: {path}")
     hasher = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(64 * 1024), b""):
@@ -456,7 +458,36 @@ def _iter_manifest_violations(
                 ),
             )
             continue
+        if entry.registry_path.is_absolute():
+            yield LinkViolation(
+                kind="manifest_unreadable",
+                feature_slug=status.feature_slug,
+                target=status.target,
+                screen=entry.screen,
+                path=entry.registry_path,
+                message=(
+                    f"Manifest entry '{entry.screen}' uses an absolute registry_path; "
+                    "registry paths must stay under .specs/design/baselines/."
+                ),
+            )
+            continue
         registry_abs = (project_root / entry.registry_path).resolve()
+        allowed_root = (project_root / DESIGN_REGISTRY_DIR / BASELINES_DIRNAME).resolve()
+        try:
+            registry_abs.relative_to(allowed_root)
+        except ValueError:
+            yield LinkViolation(
+                kind="manifest_unreadable",
+                feature_slug=status.feature_slug,
+                target=status.target,
+                screen=entry.screen,
+                path=registry_abs,
+                message=(
+                    f"Manifest entry '{entry.screen}' registry_path escapes "
+                    ".specs/design/baselines/."
+                ),
+            )
+            continue
         if not registry_abs.exists():
             yield LinkViolation(
                 kind="registry_path_missing",
@@ -507,6 +538,19 @@ def _iter_manifest_violations(
                     message=(
                         f"Manifest entry '{entry.screen}' has kind=symlink "
                         f"but no feature_local_path."
+                    ),
+                )
+                continue
+            if entry.feature_local_path.is_absolute():
+                yield LinkViolation(
+                    kind="manifest_unreadable",
+                    feature_slug=status.feature_slug,
+                    target=status.target,
+                    screen=entry.screen,
+                    path=entry.feature_local_path,
+                    message=(
+                        f"Manifest entry '{entry.screen}' uses an absolute "
+                        "feature_local_path."
                     ),
                 )
                 continue
@@ -603,13 +647,13 @@ __all__ = [
     "BASELINES_DIRNAME",
     "DESIGN_REGISTRY_DIR",
     "LINK_MODE_FILE",
-    "LinkMode",
-    "LinkViolation",
     "MANIFEST_FILENAME",
     "MANIFEST_JSON_FILENAME",
+    "SCREENS_DIRNAME",
+    "LinkMode",
+    "LinkViolation",
     "ManifestEntry",
     "ManifestStatus",
-    "SCREENS_DIRNAME",
     "ViolationKind",
     "check_link",
     "detect_link_capability",

@@ -36,6 +36,7 @@ screens:                               # List, required. One entry per captured 
     approved_by: "julienm"             # String, required. See Approved-by values below.
     browser_version: "chromium/1.44"   # String, required. Format: "<browser>/<version>".
     os: "Linux 6.1"                    # String, required. OS name + version.
+    mockup_path: ".specs/design/screens/003-visual-testing-fidelity/logo.png" # String, optional. Required when `screen` is not the mockup filename.
     mockup_version: "sha256:abc123..."  # String, required. SHA-256 of mockup PNG at capture. "none" if no mockup.
     docker_image: "mcr.microsoft.com/playwright:v1.44.0-jammy"  # String, required. "none" if local capture.
 ```
@@ -55,6 +56,7 @@ screens:                               # List, required. One entry per captured 
 | `approved_by` | Screen | String | Yes | Who approved this baseline |
 | `browser_version` | Screen | String | Yes | Playwright browser tag — format `"<browser>/<version>"` |
 | `os` | Screen | String | Yes | OS where Playwright ran — from `platform.system()` + version |
+| `mockup_path` | Screen | String | No | Canonical mockup PNG path, relative to project root. Required when `screen` names a runtime state rather than the mockup filename. |
 | `mockup_version` | Screen | String | Yes | `sha256:<hex>` hash of the mockup PNG at capture time. `"none"` if no mockup exists for this screen. |
 | `docker_image` | Screen | String | Yes | Full Docker image reference used for capture. `"none"` if Playwright ran outside Docker. |
 
@@ -78,8 +80,9 @@ sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 ```
 
 - SHA-256 of the mockup PNG binary content at the moment of capture
-- Used by `spec-check` to detect when a mockup has been updated since the baseline was captured
-- `"none"` when no mockup PNG exists for this screen in `.specs/design/screens/`
+- Used by `spec-check` / `visual-gate validate` to detect when a mockup has changed since the baseline was captured
+- Resolved from `mockup_path` when present; otherwise from `.specs/design/screens/<feature>/<screen>.png`
+- `"none"` only for migrated non-visual stubs; visual features must provide a resolvable mockup PNG
 
 ---
 
@@ -110,6 +113,7 @@ screens:
     approved_by: "julienm"
     browser_version: "chromium/1.44"
     os: "Linux 6.1"
+    mockup_path: ".specs/design/screens/003-visual-testing-fidelity/logo.png"
     mockup_version: "sha256:e3b0c44298fc1c149afbf4c8996fb924abc123def456"
     docker_image: "mcr.microsoft.com/playwright:v1.44.0-jammy"
   - screen: "dashboard"
@@ -117,6 +121,7 @@ screens:
     approved_by: "julienm"
     browser_version: "chromium/1.44"
     os: "Linux 6.1"
+    mockup_path: ".specs/design/screens/003-visual-testing-fidelity/dashboard.png"
     mockup_version: "sha256:abc987def654..."
     docker_image: "mcr.microsoft.com/playwright:v1.44.0-jammy"
 ```
@@ -148,8 +153,11 @@ screens:
 3. `generated_at` and `capture_date` must be valid ISO 8601 strings (or `null` for stubs)
 4. `approved_by` must be a non-empty string
 5. `browser_version` must match pattern `<browser>/<version>` or be `"unknown"`
-6. `mockup_version` must start with `"sha256:"` or be `"none"`
-7. Each `screen` value must be unique within a manifest (no duplicate entries)
+6. If `mockup_path` is present, it must resolve under the project root
+7. If `mockup_path` is absent, `.specs/design/screens/<feature>/<screen>.png` must exist for visual features
+8. `mockup_version` must start with `"sha256:"` or be `"none"`
+9. For visual features, `mockup_version` must equal the SHA-256 of the resolved mockup PNG
+10. Each `screen` value must be unique within a manifest (no duplicate entries)
 
 ---
 
