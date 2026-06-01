@@ -16,6 +16,7 @@ from . import (
     coverage_cmd,
     design_alignment_cmd,
     drivers_cmd,
+    migrate_cmd,
     mutation_cmd,
     penflow_contract_cmd,
     preflight_cmd,
@@ -43,6 +44,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     command_audit_cmd.register(app)
     utility_cmd.register(app)
     visual_gate_cmd.register(app)
+    migrate_cmd.register(app)
 
 
 __all__ = ["register_unified_commands"]

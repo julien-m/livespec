@@ -46,7 +46,7 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 
 ## Overview
 
-`/spec-migrate` compares the project's LiveSpec version against the current repo version and applies all pending migrations in order.
+`/spec-migrate` compares the project's LiveSpec version against the current repo version, asks the migration planner for the applicable set, then applies only the planned migrations in order.
 
 ```mermaid
 flowchart TD
@@ -59,8 +59,8 @@ flowchart TD
     READ --> CURRENT["Read VERSION from LiveSpec repo"]
     CURRENT --> CMP{"project == current?"}
     CMP -->|yes| UPTODATE["Already up to date (v{N})"]
-    CMP -->|no| LIST["List migrations from\nproject+1 to current"]
-    LIST --> LOOP["For each migration (in order):"]
+    CMP -->|no| PLAN["Run livespec migrate plan\n--project . --livespec <path> --json"]
+    PLAN --> LOOP["For each migration in apply:"]
     LOOP --> PARSE["Read migrations/N/migrate.md"]
     PARSE --> EXEC["Run scripts/migrate.sh\nwith migration file"]
     EXEC --> NEXT{"More migrations?"}
@@ -107,13 +107,39 @@ flowchart TD
 3. If equal → display `Already up to date (v{N})` and **fall through** to Step 4.5 (Visual Scaffolding)
 4. If project > repo → display error: "Project version (v{P}) is newer than repo (v{R}). This should not happen."
 
-### Step 3 — Apply migrations
+### Step 3 — Plan and apply migrations
 
-For each version N from `project_version + 1` to `repo_version`:
+Run the planner before executing any migration:
+
+```bash
+livespec migrate plan --project . --livespec <path> --json
+```
+
+The JSON shape is:
+
+```json
+{
+  "project_version": 10,
+  "target_version": 17,
+  "apply": [11, 12, 13, 14, 15, 16, 17],
+  "skipped": [{"version": 3, "reason": "superseded_by_17"}],
+  "invalid_restore_points": [3]
+}
+```
+
+Migration metadata fields supported in `migrations/N/migrate.md` frontmatter:
+
+- `supersedes`: historical replacement relationship.
+- `replaces_when_unapplied`: if the old migration is still pending, skip it and apply this migration instead.
+- `invalidates_restore_points`: restore points that must be reported as unsafe.
+
+Then execute only the migrations listed in `apply`, in order:
+
 1. Check `migrations/N/migrate.md` exists
 2. Display: `Applying migration vN: {description from frontmatter}`
 3. Execute: `bash scripts/migrate.sh migrations/N/migrate.md <project-dir> <livespec-dir>`
 4. If script exits non-zero → stop and report error
+5. After the loop, display any `invalid_restore_points` from the plan.
 
 ### Step 4 — Validate
 
@@ -504,6 +530,11 @@ If `.specs/.livespec-path` points to a non-existent directory:
 ### Missing migration file
 If `migrations/N/migrate.md` does not exist for a version in the range:
 - Display warning: `⚠️ No migration file for vN — skipping`
+
+### Invalid migration frontmatter
+If the planner cannot parse frontmatter or finds non-integer metadata:
+- Display error: `Error: <migration path>: <field> must contain only integers`
+- Do not run `scripts/migrate.sh`
 - Continue to next version
 
 ### Partial migration

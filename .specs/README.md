@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-05-21
+> Last updated: 2026-06-01
 
 
 ---
@@ -84,6 +84,7 @@
 | 050 | Agent Sync Migration | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/050-agent-sync-migration/spec.md), [plan](features/050-agent-sync-migration/plan.md), [implementation](features/050-agent-sync-migration/implementation.md) |
 | 051 | Integrate Penflow as LiveSpec Primary UI Contract | Implemented | 2026-05-21 | 2026-05-26 | [spec](features/051-integrate-penflow-primary-ui-contract/spec.md), [plan](features/051-integrate-penflow-primary-ui-contract/plan.md), [implementation](features/051-integrate-penflow-primary-ui-contract/implementation.md) |
 | 052 | Deterministic Command Goal Contracts | Implemented | 2026-05-21 | 2026-05-23 | [spec](features/052-deterministic-command-goal-contracts/spec.md), [plan](features/052-deterministic-command-goal-contracts/plan.md), [implementation](features/052-deterministic-command-goal-contracts/implementation.md) |
+| 053 | Migration Planner and Penflow Backfill | Implemented | 2026-06-01 | 2026-06-01 | [spec](features/053-migration-planner-penflow-backfill/spec.md), [plan](features/053-migration-planner-penflow-backfill/plan.md), [implementation](features/053-migration-planner-penflow-backfill/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -107,6 +108,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-01 | Feature | [Feature 053] Implemented: metadata-aware migration planning, restore-point invalidation reporting, and Migration 17 Penflow backfill reports |
 | 2026-05-26 | Bugfix | [Feature 051] Single Penflow source contract: root `penflow/ui.pen` only, explicit Brainstorm `penflow/` import, duplicate `.pen` blocking, and no `.specs/design/ui.pen` requirement |
 | 2026-05-23 | Bugfix | [Feature 052] Internal `/spec-*` subagent invocations propagate current LiveSpec project root/cwd and command audit rejects missing workdir guards |
 | 2026-05-23 | Bugfix | [Feature 052] Goal rendering ignores documentary `/spec-*` examples/recovery hints, skips Markdown checkboxes inside `Execution Tasks`, exposes top-level `worker_may_mark_tasks_complete=false`, and adds machine Goal Lock tasks to `/spec-status` + `/spec-explain` |

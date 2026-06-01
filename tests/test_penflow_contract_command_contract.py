@@ -206,6 +206,20 @@ def test_visual_feature_pipeline_requires_feature_local_design_proofs() -> None:
     assert "Do not continue to code against a bad mockup" in body
 
 
+def test_spec_migrate_documents_planner_and_penflow_backfill_metadata() -> None:
+    body = _read(".agent-sync/skills/spec-migrate/SKILL.md")
+    migration = _read("migrations/17/migrate.md")
+
+    assert "livespec migrate plan --project . --livespec <path> --json" in body
+    assert "execute only the migrations listed in `apply`" in body
+    assert "invalid_restore_points" in body
+    assert "supersedes" in body
+    assert "replaces_when_unapplied" in body
+    assert "invalidates_restore_points" in body
+    assert "RUN migrate-penflow-backfill.py" in migration
+    assert "SET_VERSION 17" in migration
+
+
 def test_visual_feature_pipeline_promotes_penflow_to_global_design_registry() -> None:
     body = _read(".agent-sync/skills/spec-feature/SKILL.md")
     expectations = _read(".agent-sync/skills/spec-feature/expectations.md")

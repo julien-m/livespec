@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-01 — [Feature 053]: Implemented metadata-aware migration planning and Migration 17 Penflow backfill reporting; `/spec-migrate` now documents planner-first execution, restore-point invalidation, and safe non-generation when runtime UI is unavailable.
+
 ## 2026-05-26 — [Feature 051 Fix]: LiveSpec now treats root `penflow/ui.pen` as the only allowed `.pen`, imports explicit Brainstorm `penflow/` sources, blocks duplicate `.pen` files, and removes `.specs/design/ui.pen` requirements from active command/docs paths.
 
 ## 2026-05-26 — [Feature 051 Check]: Single `penflow/ui.pen` contract verified against real Brainstorm project `/Users/julienm/projects/project-brainstorm/projects/orch-single-uipen-20260526T152606Z`; virgin LiveSpec import produced only `penflow/ui.pen`.
