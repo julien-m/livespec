@@ -60,7 +60,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 
 ---
 
-## The 20 Commands
+## The 21 Commands
 
 | Command | What it does |
 |---|---|
@@ -83,6 +83,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 | `/spec-refine` | Iteratively refine existing artifacts (project, feature spec, or plan) via guided conversation |
 | `/spec-status` | Display factual status overview of roadmap and features |
 | `/spec-refresh-conventions` | Manually initialize or refresh project conventions from the LiveSpec stack |
+| `/spec-refresh-from-brainstorm` | Sync brainstorm lifecycle deltas into LiveSpec through an interactive Impact Report |
 | `/spec-verify-output` | Verify a command run artifact against its expectations contract |
 
 ---
@@ -600,6 +601,7 @@ livespec/
 │       └── api-rest.md
 ├── .agent-sync/                    ← Portable source for skills, agents, and rules
 │   ├── skills/spec-*/              ← LiveSpec command skills + expectations.md
+│   ├── skills/source-command-cli/  ← Codex `/cli` picker for the LiveSpec CLI
 │   ├── agents/livespec-*/          ← Portable agent.yaml + prompt.md
 │   └── rules/livespec/             ← Rules built by cc-hub for Claude/Codex
 └── scripts/

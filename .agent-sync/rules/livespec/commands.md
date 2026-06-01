@@ -26,6 +26,7 @@
 | Coverage playground | `/spec-play-coverage` |
 | Vérifier la sortie d'une commande | `/spec-verify-output <command>` |
 | Refresh des conventions projet | `/spec-refresh-conventions` |
+| Synchroniser les events brainstorm vers LiveSpec | `/spec-refresh-from-brainstorm` |
 
 ## Commandes — détail
 
@@ -135,6 +136,11 @@ Raffine des artefacts spec existants via conversation guidée.
 Initialise ou rafraîchit les conventions projet depuis la stack LiveSpec (mode verbeux).
 **Usage** :
 - `/spec-refresh-conventions`
+
+### /spec-refresh-from-brainstorm
+Synchronise les deltas `brainstorm/lifecycle/` vers `.specs/` via un Impact Report interactif.
+**Usage** :
+- `/spec-refresh-from-brainstorm`
 
 ### /spec-ship
 Autopilot batch : ship plusieurs features depuis la roadmap, bout-en-bout.

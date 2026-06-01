@@ -795,7 +795,7 @@ The section content is minimal — a boot pointer to `spec-system.md` plus the c
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · `/spec-hooks` · `/spec-implement` · `/spec-init` · `/spec-migrate` · `/spec-plan` · `/spec-play-coverage` · `/spec-preflight` · `/spec-propose` · `/spec-refine` · `/spec-refresh-conventions` · `/spec-ship` · `/spec-specify` · `/spec-stack` · `/spec-status` · `/spec-test` · `/spec-verify-output`
+Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · `/spec-hooks` · `/spec-implement` · `/spec-init` · `/spec-migrate` · `/spec-plan` · `/spec-play-coverage` · `/spec-preflight` · `/spec-propose` · `/spec-refine` · `/spec-refresh-conventions` · `/spec-refresh-from-brainstorm` · `/spec-ship` · `/spec-specify` · `/spec-stack` · `/spec-status` · `/spec-test` · `/spec-verify-output`
 <!-- livespec:end -->
 ```
 
@@ -818,8 +818,12 @@ After installing the CLAUDE.md section, sync LiveSpec skills, agents, and rules 
    - `.agent-sync.local/skills/spec-plan/SKILL.md`
    - `.agent-sync.local/skills/spec-implement/SKILL.md`
    - `.agent-sync.local/skills/spec-test/SKILL.md`
+   - `.agent-sync.local/skills/spec-refresh-from-brainstorm/SKILL.md`
+   - `.agent-sync.local/skills/source-command-cli/SKILL.md`
    - `.claude/skills/spec-feature/SKILL.md`
+   - `.claude/skills/source-command-cli/SKILL.md`
    - `.agents/skills/spec-feature/SKILL.md`
+   - `.agents/skills/source-command-cli/SKILL.md`
    - `.codex/agents/livespec-verifier.toml`
 8. **Failure handling:** If any verification path is missing, print `BLOCKED at step 3.12 - agent_asset_sync_failed - /spec-feature would be unavailable (Unknown command: /spec-feature); missing: <paths>` and stop before writing success output.
 9. **Update .gitignore:** Add the following patterns (if not already present):
@@ -835,7 +839,7 @@ After installing the CLAUDE.md section, sync LiveSpec skills, agents, and rules 
    - `playwright-report/`
 
 **Output:**
-> Synced 20 spec skills, 4 agents, and LiveSpec rules through `cc-hub`
+> Synced 21 spec skills, 1 source-command-cli skill, 4 agents, and LiveSpec rules through `cc-hub`
 > Post-sync verification: PASS
 
 ### Step 3.13 — Scaffold Visual Testing Helper (Playwright projects)
@@ -1139,7 +1143,8 @@ Before declaring success, verify:
 - [ ] After-init hooks resolved and executed (Phase E)
 - [ ] `.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)
 - [ ] `scripts/sync-agent-assets.sh` completed through `cc-hub`
-- [ ] `.agent-sync/skills/spec-*` resolves for all 20 LiveSpec skills
+- [ ] `.agent-sync/skills/spec-*` resolves for all 21 LiveSpec skills
+- [ ] `.agent-sync/skills/source-command-cli` resolves
 - [ ] `.agent-sync/agents/livespec-*` resolves for all 4 LiveSpec agents
 - [ ] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo
 - [ ] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory

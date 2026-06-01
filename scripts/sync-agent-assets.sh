@@ -101,7 +101,7 @@ project_source() {
 
 project_shared_sources() {
   local skill
-  for skill in "$SOURCE_ROOT"/skills/spec-*; do
+  for skill in "$SOURCE_ROOT"/skills/spec-* "$SOURCE_ROOT"/skills/source-command-cli; do
     [[ -d "$skill" ]] || continue
     project_source "$skill" "$LOCAL_ROOT/skills/$(basename "$skill")" "skill $(basename "$skill")"
   done
@@ -122,7 +122,7 @@ project_shared_sources() {
 sync_skills() {
   local root="$1"
   local skill
-  for skill in "$root"/skills/spec-*; do
+  for skill in "$root"/skills/spec-* "$root"/skills/source-command-cli; do
     [[ -d "$skill" ]] || continue
     run_cc_hub skill link "$skill" --scope "$SCOPE" --targets "$TARGETS" --agent-sync-root .agent-sync.local
   done

@@ -46,11 +46,16 @@ def test_link_local_delegates_to_cc_hub_without_manual_claude_symlinks(
     assert result.returncode == 0, result.stderr
     log = log_path.read_text(encoding="utf-8")
     assert "skill link" in log
+    assert "spec-refresh-from-brainstorm" in log
+    assert "source-command-cli" in log
     assert "agent build" in log
     assert "agent link" in log
     assert "rule build" in log
     assert "--agent-sync-root .agent-sync.local" in log
     assert (project / ".agent-sync.local" / "skills" / "spec-init").is_symlink()
+    assert (
+        project / ".agent-sync.local" / "skills" / "source-command-cli"
+    ).is_symlink()
     assert (project / ".agent-sync.local" / "agents" / "livespec-verifier").is_symlink()
     assert (project / ".agent-sync.local" / "rules" / "commands.md").is_symlink()
     assert (project / ".agent-sync.local" / "rules" / "routing.md").is_symlink()

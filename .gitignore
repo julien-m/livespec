@@ -170,7 +170,9 @@ Thumbs.db
 # LiveSpec
 .specs/hooks/*.local.md
 .agents/skills/spec-*
+.agents/skills/source-command-cli
 .claude/skills/spec-*
+.claude/skills/source-command-cli
 .claude/rules/*.md
 .claude/rules/livespec/
 .codex/agents/livespec-*.toml

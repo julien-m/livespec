@@ -237,7 +237,9 @@ See the available presets for guidance:
   local live_patterns=(
     ".specs/hooks/*.local.md"
     ".agents/skills/spec-*"
+    ".agents/skills/source-command-cli"
     ".claude/skills/spec-*"
+    ".claude/skills/source-command-cli"
     ".claude/rules/*.md"
     ".claude/rules/livespec/"
     ".codex/agents/livespec-*.toml"
@@ -284,7 +286,7 @@ See the available presets for guidance:
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · `/spec-hooks` · `/spec-implement` · `/spec-init` · `/spec-migrate` · `/spec-plan` · `/spec-play-coverage` · `/spec-preflight` · `/spec-propose` · `/spec-refine` · `/spec-refresh-conventions` · `/spec-ship` · `/spec-specify` · `/spec-stack` · `/spec-status` · `/spec-test` · `/spec-verify-output`
+Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · `/spec-hooks` · `/spec-implement` · `/spec-init` · `/spec-migrate` · `/spec-plan` · `/spec-play-coverage` · `/spec-preflight` · `/spec-propose` · `/spec-refine` · `/spec-refresh-conventions` · `/spec-refresh-from-brainstorm` · `/spec-ship` · `/spec-specify` · `/spec-stack` · `/spec-status` · `/spec-test` · `/spec-verify-output`
 <!-- livespec:end -->'
 
   if [[ "$DRY_RUN" == true ]]; then

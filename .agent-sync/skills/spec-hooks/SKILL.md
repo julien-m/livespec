@@ -348,7 +348,7 @@ After creating the file, ask the user what the hook should do. Based on their an
 
 Hook diagnostics accept canonical command names:
 
-`spec-check`, `spec-explain`, `spec-feature`, `spec-fix`, `spec-hooks`, `spec-implement`, `spec-init`, `spec-migrate`, `spec-plan`, `spec-play-coverage`, `spec-preflight`, `spec-propose`, `spec-refine`, `spec-refresh-conventions`, `spec-ship`, `spec-specify`, `spec-stack`, `spec-status`, `spec-test`, `spec-verify-output`.
+`spec-check`, `spec-explain`, `spec-feature`, `spec-fix`, `spec-hooks`, `spec-implement`, `spec-init`, `spec-migrate`, `spec-plan`, `spec-play-coverage`, `spec-preflight`, `spec-propose`, `spec-refine`, `spec-refresh-conventions`, `spec-refresh-from-brainstorm`, `spec-ship`, `spec-specify`, `spec-stack`, `spec-status`, `spec-test`, `spec-verify-output`.
 
 Legacy aliases such as `/spec.check` are normalized to the matching `spec-check` command name.
 

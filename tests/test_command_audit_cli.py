@@ -17,7 +17,7 @@ def test_command_audit_reports_all_builtin_commands() -> None:
 
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
-    assert payload["summary"]["commands"] == 20
+    assert payload["summary"]["commands"] == 21
     assert payload["summary"]["score"] == 5
     assert payload["summary"]["failed"] == 0
     assert {entry["name"] for entry in payload["commands"]} >= {

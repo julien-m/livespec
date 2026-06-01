@@ -3,7 +3,7 @@
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · `/spec-hooks` · `/spec-implement` · `/spec-init` · `/spec-migrate` · `/spec-plan` · `/spec-play-coverage` · `/spec-preflight` · `/spec-propose` · `/spec-refine` · `/spec-refresh-conventions` · `/spec-ship` · `/spec-specify` · `/spec-stack` · `/spec-status` · `/spec-test` · `/spec-verify-output`
+Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · `/spec-hooks` · `/spec-implement` · `/spec-init` · `/spec-migrate` · `/spec-plan` · `/spec-play-coverage` · `/spec-preflight` · `/spec-propose` · `/spec-refine` · `/spec-refresh-conventions` · `/spec-refresh-from-brainstorm` · `/spec-ship` · `/spec-specify` · `/spec-stack` · `/spec-status` · `/spec-test` · `/spec-verify-output`
 
 User-level integrations: see [`system/integrations.md`](system/integrations.md).
 <!-- livespec:end -->
@@ -45,6 +45,7 @@ Source: `livespec/commands.md`
 | Coverage playground | `/spec-play-coverage` |
 | Vérifier la sortie d'une commande | `/spec-verify-output <command>` |
 | Refresh des conventions projet | `/spec-refresh-conventions` |
+| Synchroniser les events brainstorm vers LiveSpec | `/spec-refresh-from-brainstorm` |
 
 ## Commandes — détail
 
@@ -154,6 +155,11 @@ Raffine des artefacts spec existants via conversation guidée.
 Initialise ou rafraîchit les conventions projet depuis la stack LiveSpec (mode verbeux).
 **Usage** :
 - `/spec-refresh-conventions`
+
+### /spec-refresh-from-brainstorm
+Synchronise les deltas `brainstorm/lifecycle/` vers `.specs/` via un Impact Report interactif.
+**Usage** :
+- `/spec-refresh-from-brainstorm`
 
 ### /spec-ship
 Autopilot batch : ship plusieurs features depuis la roadmap, bout-en-bout.

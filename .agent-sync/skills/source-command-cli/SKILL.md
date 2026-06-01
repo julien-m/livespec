@@ -1,6 +1,6 @@
 ---
-name: "source-command-cli"
-description: "Interactive picker for the unified livespec CLI surface (test/coverage/drivers/mutation/preflight)"
+name: source-command-cli
+description: Interactive picker for the unified livespec CLI surface (test/coverage/drivers/mutation/preflight)
 ---
 
 # source-command-cli
@@ -13,7 +13,7 @@ Use this skill when the user asks to run the migrated source command `cli`.
 
 > Interactive entry point for the unified `livespec` CLI surface (Feature 035). Loads the canonical CLI reference, helps you pick the right subcommand, and runs it with the right flags.
 
-The full reference is **Read** [`docs/cli-reference.md`](../../docs/cli-reference.md). Read it before answering any user question about command flags or exit codes — do not infer.
+The full reference is **Read** [`docs/cli-reference.md`](../../../docs/cli-reference.md). Read it before answering any user question about command flags or exit codes — do not infer.
 
 ---
 
@@ -44,7 +44,7 @@ Shared flag on every command: `--debug` (print the full Python stacktrace on err
 3. **Always**:
    - Run from the repository root (the directory containing `.specs/`).
    - Display the structured summary line at the end of your answer so the user can grep CI logs in the same shape.
-   - On non-zero exit, look up the meaning in [`docs/cli-reference.md`](../../docs/cli-reference.md) and propose the next step (e.g. exit 5 → "run `livespec preflight --fix`").
+   - On non-zero exit, look up the meaning in [`docs/cli-reference.md`](../../../docs/cli-reference.md) and propose the next step (e.g. exit 5 → "run `livespec preflight --fix`").
 
 ---
 
