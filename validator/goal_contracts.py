@@ -10,9 +10,10 @@ import hashlib
 import json
 import re
 import shlex
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, TypeAlias, cast
 
 from .command_registry import normalize_command_name
 from .exceptions import ExpectationsInvalid
@@ -20,6 +21,7 @@ from .expectations import ExpectationsFile, Rule, load_expectations
 from .visual_evidence import VisualReceiptError, verify_visual_receipt
 
 GOAL_CONTRACT_VERSION = "2.0"
+RequiredConventions: TypeAlias = dict[str, str | list[str]]
 CONVENTION_SIGNAL_FILES: tuple[str, ...] = ("spec.md", "plan.md")
 EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
     {
@@ -37,9 +39,7 @@ EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
         "fix",
     }
 )
-ALLOWED_INTERNAL_INVOCATION_MODES: frozenset[str] = frozenset(
-    {"subagent", "suggestion"}
-)
+ALLOWED_INTERNAL_INVOCATION_MODES: frozenset[str] = frozenset({"subagent", "suggestion"})
 INTERNAL_SUBAGENT_GUARD_REQUIREMENTS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("project_root", ("project_root",)),
     ("cwd/working directory", ("cwd", "working directory", "workdir")),
@@ -69,9 +69,7 @@ GENERIC_REPAIR_ACTIONS: tuple[str, ...] = (
     "Run the described task and capture concrete evidence before proving it.",
     "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
 )
-VISUAL_DESIGN_REQUIRED_EVIDENCE: tuple[str, ...] = (
-    "visual_evidence_receipt_path",
-)
+VISUAL_DESIGN_REQUIRED_EVIDENCE: tuple[str, ...] = ("visual_evidence_receipt_path",)
 VISUAL_DESIGN_INVALID_SUBSTITUTES: tuple[str, ...] = (
     "normalized_json_alignment_only",
     "penflow_tree_match_without_png_comparison",
@@ -404,13 +402,13 @@ def _extract_internal_command_invocations(skill_path: Path) -> list[dict[str, st
                 skill_path.as_posix(),
                 "Internal Command Invocations rows must use mode subagent or suggestion "
                 f"at Internal Command Invocations line {line_number}: "
-                f"{parsed['mode']}"
+                f"{parsed['mode']}",
             )
         if parsed["mode"] == "subagent" and not parsed["command"].startswith("/spec-"):
             raise ExpectationsInvalid(
                 skill_path.as_posix(),
                 "Internal Command Invocations subagent rows must execute /spec-* "
-                f"commands at line {line_number}: {parsed['command']}"
+                f"commands at line {line_number}: {parsed['command']}",
             )
         if parsed["mode"] == "subagent":
             _validate_internal_subagent_context_guard(
@@ -434,9 +432,7 @@ def _validate_internal_subagent_context_guard(
     line_number: int,
 ) -> None:
     """Require project-root propagation on native nested slash-command rows."""
-    haystack = " ".join(
-        (invocation["command"], invocation["purpose"])
-    ).lower()
+    haystack = " ".join((invocation["command"], invocation["purpose"])).lower()
     missing = [
         label
         for label, accepted_terms in INTERNAL_SUBAGENT_GUARD_REQUIREMENTS
@@ -448,7 +444,7 @@ def _validate_internal_subagent_context_guard(
         skill_path.as_posix(),
         "Internal Command Invocations subagent rows must mention project_root, "
         "cwd/working directory, and .specs/spec-system.md "
-        f"at line {line_number}; missing: {', '.join(missing)}"
+        f"at line {line_number}; missing: {', '.join(missing)}",
     )
 
 
@@ -482,7 +478,7 @@ def _reject_undocumented_internal_spec_invocation(
             skill_path.as_posix(),
             "Executable internal /spec-* invocation requires "
             "## Internal Command Invocations "
-            f"at line {line_number}: {line.strip()}"
+            f"at line {line_number}: {line.strip()}",
         )
 
 
@@ -491,9 +487,7 @@ def _looks_like_executable_internal_invocation(line: str) -> bool:
     normalized = re.sub(r"^[-*]\s+", "", line.strip())
     normalized = re.sub(r"^\d+\.\s+", "", normalized)
     lowered = normalized.lower()
-    if lowered.startswith(
-        ("run ", "run `", "execute ", "execute `", "spawn ", "spawn `")
-    ):
+    if lowered.startswith(("run ", "run `", "execute ", "execute `", "spawn ", "spawn `")):
         return True
     return any(
         marker in lowered
@@ -557,8 +551,7 @@ def _parse_internal_invocation_line(
     if match is None:
         raise ExpectationsInvalid(
             skill_path.as_posix(),
-            "Malformed Internal Command Invocations bullet row at "
-            f"line {line_number}: {stripped}"
+            f"Malformed Internal Command Invocations bullet row at line {line_number}: {stripped}",
         )
     mode = match.group(1).strip()
     command = match.group(2).strip()
@@ -738,6 +731,20 @@ def render_goal_objective(goal: GoalContract) -> str:
         lines.append("Execution tasks (in order):")
         for i, task in enumerate(execution_tasks, 1):
             lines.append(f"  {i:>2}. {task}")
+    tasks = list(payload.get("tasks") or [])
+    # @spec FR-005: Render task-level convention replay
+    #   — .specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md#fr-005
+    convention_tasks = [
+        task for task in tasks if isinstance(task, dict) and task.get("required_conventions")
+    ]
+    if convention_tasks:
+        lines.append("")
+        lines.append("Task-level convention replay:")
+        for task in convention_tasks:
+            required = cast(dict[str, Any], task["required_conventions"])
+            domains = ", ".join(cast(list[str], required.get("domains") or []))
+            sources = ", ".join(cast(list[str], required.get("source_paths") or []))
+            lines.append(f"- {task['id']}: read_apply domains [{domains}] from {sources}")
     lines.append("")
     lines.append("Definition of Done:")
     definition_of_done = list(payload["definition_of_done"])
@@ -807,11 +814,19 @@ def _goal_payload(
         has_penflow=has_penflow,
     )
     definition_of_done = _extract_definition_of_done(skill_path)
+    conventions = _compile_conventions_payload(
+        command=command,
+        expectations=expectations,
+        project_root=project_root,
+        feature=feature,
+        normalized_flags=normalized_flags,
+    )
     tasks = _build_goal_tasks(
         command=command,
         execution_tasks=execution_tasks,
         definition_of_done=definition_of_done,
         visual_feature_slugs=visual_feature_slugs,
+        conventions=conventions,
     )
     payload = {
         "schema_version": GOAL_CONTRACT_VERSION,
@@ -833,9 +848,7 @@ def _goal_payload(
         },
         "execution_tasks": execution_tasks,
         "tasks": tasks,
-        "internal_command_invocations": _extract_internal_command_invocations(
-            skill_path
-        ),
+        "internal_command_invocations": _extract_internal_command_invocations(skill_path),
         "expectations": {
             "command": expectations.command,
             "contract_version": expectations.contract_version,
@@ -846,13 +859,7 @@ def _goal_payload(
                 livespec_root=livespec_root,
             ),
         },
-        "conventions": _compile_conventions_payload(
-            command=command,
-            expectations=expectations,
-            project_root=project_root,
-            feature=feature,
-            normalized_flags=normalized_flags,
-        ),
+        "conventions": conventions,
         "expectation_sections": {
             "purpose": _normalize_section_lines(expectations.prose_sections["1. Purpose"]),
             "preconditions": _normalize_section_lines(
@@ -893,18 +900,24 @@ def _build_goal_tasks(
     execution_tasks: list[str],
     definition_of_done: list[str],
     visual_feature_slugs: list[str],
+    conventions: Mapping[str, object],
 ) -> list[dict[str, Any]]:
     """Convert command task prose into enforced proof tasks."""
-    rows: list[tuple[str, str]] = [
-        ("execution", task)
-        for task in execution_tasks
-    ]
+    # Build base proof tasks first, then layer optional convention evidence onto
+    # every task when conventions were selected.
+    rows: list[tuple[str, str]] = [("execution", task) for task in execution_tasks]
     rows.extend(("definition_of_done", item) for item in definition_of_done)
     if not rows:
         rows.append(("execution", "Follow command SKILL.md phases and expectations."))
 
     tasks: list[dict[str, Any]] = []
     seen: set[str] = set()
+    required_conventions = _task_required_conventions(conventions)
+    required_convention_domains: list[str] = []
+    required_convention_sources: list[str] = []
+    if required_conventions is not None:
+        required_convention_domains = cast(list[str], required_conventions["domains"])
+        required_convention_sources = cast(list[str], required_conventions["source_paths"])
     for ordinal, (category, description) in enumerate(rows, 1):
         task_id = _unique_task_id(
             _task_id_for_description(command, category, ordinal, description),
@@ -925,26 +938,69 @@ def _build_goal_tasks(
                     seen,
                     ordinal,
                 )
-            task = {
+            required_evidence = list(_required_evidence_for_task(task_id, description))
+            repair_actions = list(_repair_actions_for_task(task_id, description))
+            if required_conventions is not None:
+                # @spec FR-002: Convention proof fields, FR-004: Convention repair actions
+                #   — .specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md#fr-002  # noqa: E501 - @spec anchor path must stay on one line
+                required_evidence.extend(
+                    [
+                        "convention_domains_recorded",
+                        "convention_sources_read",
+                        "conventions_applied_to_output",
+                    ]
+                )
+                repair_actions.append(
+                    "Read and apply conventions before retrying: "
+                    f"domains={', '.join(required_convention_domains)}; "
+                    f"sources={', '.join(required_convention_sources)}."
+                )
+            task: dict[str, Any] = {
                 "id": effective_id,
                 "ordinal": ordinal,
                 "category": category,
                 "description": effective_description,
-                "required_evidence": list(
-                    _required_evidence_for_task(task_id, description)
-                ),
-                "invalid_substitutes": list(
-                    _invalid_substitutes_for_task(task_id, description)
-                ),
-                "repair_if_missing": list(_repair_actions_for_task(task_id, description)),
+                "required_evidence": required_evidence,
+                "invalid_substitutes": list(_invalid_substitutes_for_task(task_id, description)),
+                "repair_if_missing": repair_actions,
                 "completion_actor": "goal",
                 "expected_evidence": {
                     "command": command,
                     "feature_slug": feature_slug,
                 },
             }
+            if required_conventions is not None:
+                task["required_conventions"] = required_conventions
             tasks.append(task)
     return tasks
+
+
+# @spec FR-001: Per-task convention payload
+#   — .specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md#fr-001
+def _task_required_conventions(conventions: Mapping[str, object]) -> RequiredConventions | None:
+    selected_domains = [
+        domain
+        for domain in cast(list[object], conventions.get("selected_domains") or [])
+        if isinstance(domain, dict)
+    ]
+    if not selected_domains:
+        return None
+    domains = [
+        str(domain["name"]) for domain in selected_domains if isinstance(domain.get("name"), str)
+    ]
+    source_paths = [
+        str(path)
+        for domain in selected_domains
+        for path in cast(list[object], domain.get("paths") or [])
+        if isinstance(path, str)
+    ]
+    if not domains or not source_paths:
+        return None
+    return {
+        "mode": "read_apply",
+        "domains": domains,
+        "source_paths": source_paths,
+    }
 
 
 def _unique_task_id(base_id: str, seen: set[str], ordinal: int) -> str:
@@ -1180,7 +1236,11 @@ def _validate_generic_evidence(
     for required in cast(list[object], task.get("required_evidence") or []):
         if not isinstance(required, str):
             continue
-        if not _required_evidence_satisfied(required, evidence, project_root):
+        if required.startswith("convention_") or required == "conventions_applied_to_output":
+            satisfied = _convention_evidence_satisfied(task, required, evidence)
+        else:
+            satisfied = _required_evidence_satisfied(required, evidence, project_root)
+        if not satisfied:
             missing.append(required)
     accepted = not missing
     return {
@@ -1190,6 +1250,56 @@ def _validate_generic_evidence(
         "invalid_substitutes": [],
         "required_actions": list(task["repair_if_missing"]),
     }
+
+
+# @spec FR-003: Validate convention evidence
+#   — .specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md#fr-003
+def _convention_evidence_satisfied(
+    task: Mapping[str, object],
+    required: str,
+    evidence: Mapping[str, object],
+) -> bool:
+    required_conventions = task.get("required_conventions")
+    if not isinstance(required_conventions, dict):
+        return True
+    required_domains = {
+        str(domain)
+        for domain in cast(list[object], required_conventions.get("domains") or [])
+        if isinstance(domain, str)
+    }
+    required_sources = {
+        str(source)
+        for source in cast(list[object], required_conventions.get("source_paths") or [])
+        if isinstance(source, str)
+    }
+    if required == "convention_domains_recorded":
+        provided_domains = _string_set_evidence(
+            evidence,
+            ("convention_domains", "convention_domains_recorded"),
+        )
+        return bool(required_domains) and required_domains.issubset(provided_domains)
+    if required == "convention_sources_read":
+        provided_sources = _string_set_evidence(
+            evidence,
+            ("convention_sources", "convention_source_paths", "convention_sources_read"),
+        )
+        return bool(required_sources) and required_sources.issubset(provided_sources)
+    if required == "conventions_applied_to_output":
+        return evidence.get(required) is True
+    return False
+
+
+def _string_set_evidence(evidence: Mapping[str, object], keys: tuple[str, ...]) -> set[str]:
+    """Collect string or list-of-string evidence values for convention checks."""
+    values: set[str] = set()
+    for key in keys:
+        value = evidence.get(key)
+        # Evidence may be one string or a list; other JSON values are invalid proof.
+        if isinstance(value, str) and value.strip():
+            values.add(value.strip())
+        elif isinstance(value, list):
+            values.update(item.strip() for item in value if isinstance(item, str) and item.strip())
+    return values
 
 
 def _required_evidence_satisfied(
@@ -1318,17 +1428,12 @@ def _compile_conventions_payload(
         normalized_flags=normalized_flags,
     )
     selected = [
-        domain
-        for domain in domains
-        if _should_select_convention_domain(domain, signal_text)
+        domain for domain in domains if _should_select_convention_domain(domain, signal_text)
     ]
     return {
         "available": True,
         "index_path": ".conventions/index.md",
-        "selected_domains": [
-            _render_convention_domain(domain, ai_root)
-            for domain in selected
-        ],
+        "selected_domains": [_render_convention_domain(domain, ai_root) for domain in selected],
     }
 
 
@@ -1363,11 +1468,7 @@ def _parse_convention_domains(
 
 
 def _parse_keyword_list(raw_keywords: str) -> list[str]:
-    return [
-        keyword.strip()
-        for keyword in raw_keywords.split(",")
-        if keyword.strip()
-    ]
+    return [keyword.strip() for keyword in raw_keywords.split(",") if keyword.strip()]
 
 
 def _parse_convention_refs(raw_refs: str, ai_root: Path | None) -> list[dict[str, Any]]:
@@ -1446,10 +1547,7 @@ def _render_convention_domain(
     domain: dict[str, Any],
     ai_root: Path | None,
 ) -> dict[str, Any]:
-    rendered_files = [
-        _render_convention_file(ref)
-        for ref in domain["refs"]
-    ]
+    rendered_files = [_render_convention_file(ref) for ref in domain["refs"]]
     return {
         "name": domain["name"],
         "keywords": list(domain["keywords"]),

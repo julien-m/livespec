@@ -162,6 +162,7 @@ def _png_chunk(kind: bytes, data: bytes) -> bytes:
         + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
     )
 
+
 SKILL = """\
 ---
 name: spec-demo
@@ -539,12 +540,8 @@ def test_compile_command_goal_is_reproducible_for_same_inputs(tmp_path: Path) ->
         "--priority=P1",
         "--strict",
     ]
-    assert first.payload["expectation_sections"]["filesystem_effects"] == [
-        "- creates demo.txt."
-    ]
-    assert first.payload["expectation_sections"]["post_run_checks"] == [
-        "- [ ] output checked."
-    ]
+    assert first.payload["expectation_sections"]["filesystem_effects"] == ["- creates demo.txt."]
+    assert first.payload["expectation_sections"]["post_run_checks"] == ["- [ ] output checked."]
     assert "timestamp" not in first.canonical_json.lower()
 
 
@@ -599,6 +596,105 @@ def test_compile_command_goal_adds_design_domain_for_ui_feature(tmp_path: Path) 
     assert [domain["name"] for domain in selected] == ["code", "design-tokens"]
     assert "design-tokens" in goal.objective
     assert "$AIRESOURCES/design/tokens.md" in goal.objective
+
+
+def test_rendered_goal_tasks_replay_required_conventions(tmp_path: Path) -> None:
+    """AC-001/AC-002/AC-007/AC-008: tasks replay convention domains and sources."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_conventions(project_root, tmp_path / "ai")
+    _write_execution_task_skill(livespec_root)
+
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-demo",
+        flags=[],
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+
+    first_task = contract["tasks"][0]
+    assert first_task["required_conventions"] == {
+        "mode": "read_apply",
+        "domains": ["code"],
+        "source_paths": [
+            "$AIRESOURCES/code-conventions/general.md",
+            "$AIRESOURCES/code-conventions/python.md",
+        ],
+    }
+    assert "convention_domains_recorded" in first_task["required_evidence"]
+    assert "convention_sources_read" in first_task["required_evidence"]
+    assert "conventions_applied_to_output" in first_task["required_evidence"]
+    assert any("Read and apply conventions" in action for action in first_task["repair_if_missing"])
+    assert "Task-level convention replay:" in goal.objective
+    assert "task.001.always_task" in goal.objective
+
+
+def test_goal_prove_rejects_missing_convention_evidence(tmp_path: Path) -> None:
+    """AC-003/AC-004/AC-005: convention-scoped tasks require convention proof."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_conventions(project_root, tmp_path / "ai")
+    _write_execution_task_skill(livespec_root)
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+    task_id = contract["tasks"][0]["id"]
+
+    result = prove_goal_task(
+        contract,
+        state,
+        task_id,
+        evidence={"output": "done", "success_criteria_met": True},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert result["missing_evidence"] == [
+        "convention_domains_recorded",
+        "convention_sources_read",
+        "conventions_applied_to_output",
+    ]
+
+
+def test_goal_prove_accepts_matching_convention_evidence(tmp_path: Path) -> None:
+    """AC-006: matching convention evidence satisfies convention-scoped tasks."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_conventions(project_root, tmp_path / "ai")
+    _write_execution_task_skill(livespec_root)
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+    task_id = contract["tasks"][0]["id"]
+
+    result = prove_goal_task(
+        contract,
+        state,
+        task_id,
+        evidence={
+            "output": "done",
+            "success_criteria_met": True,
+            "convention_domains": ["code"],
+            "convention_sources": [
+                "$AIRESOURCES/code-conventions/general.md",
+                "$AIRESOURCES/code-conventions/python.md",
+            ],
+            "conventions_applied_to_output": True,
+        },
+        project_root=project_root,
+    )
+
+    assert result["status"] == "ACCEPTED"
+    assert result["state"]["tasks"][task_id]["status"] == "complete"
 
 
 def test_compile_command_goal_extracts_definition_of_done(tmp_path: Path) -> None:
@@ -707,9 +803,7 @@ def test_goal_render_save_writes_contract_and_state_files(
     assert "state-file:" in result.output
 
     parts = dict(
-        item.strip().split(":", 1)
-        for item in result.output.strip().split("|")
-        if ":" in item
+        item.strip().split(":", 1) for item in result.output.strip().split("|") if ":" in item
     )
     contract_path = Path(parts["contract-file"])
     state_path = Path(parts["state-file"])
@@ -1014,9 +1108,7 @@ def test_compile_command_goal_accepts_subagent_internal_spec_invocation(
         {
             "mode": "subagent",
             "command": "/spec-fix <feature>",
-            "purpose": (
-                "guard: project_root cwd .specs/spec-system.md; child goal."
-            ),
+            "purpose": ("guard: project_root cwd .specs/spec-system.md; child goal."),
         },
         {
             "mode": "suggestion",
@@ -1064,9 +1156,7 @@ description: Demo command
         {
             "mode": "subagent",
             "command": "/spec-fix <feature>",
-            "purpose": (
-                "guard: project_root cwd .specs/spec-system.md; child goal."
-            ),
+            "purpose": ("guard: project_root cwd .specs/spec-system.md; child goal."),
         }
     ]
 
@@ -1216,8 +1306,7 @@ def test_spec_check_fix_all_complete_scenario_goal_requires_child_goals(
     assert any("Create missing visual/Penflow prerequisites" in task for task in tasks)
     assert any("Spawn independent native sub-agent to execute `/spec-fix" in task for task in tasks)
     assert any(
-        "Spawn independent native sub-agent to re-run `/spec-check" in task
-        for task in tasks
+        "Spawn independent native sub-agent to re-run `/spec-check" in task for task in tasks
     )
     assert any("Inspect child goal state files" in task for task in tasks)
     assert any("canonical BLOCKED" in task for task in tasks)
@@ -1229,12 +1318,7 @@ def test_spec_check_fix_all_complete_scenario_goal_requires_child_goals(
     )
     assert (project_root / "penflow" / "compare-report.json").exists()
     assert (
-        project_root
-        / ".specs"
-        / "features"
-        / feature
-        / "baselines"
-        / "baseline.manifest.yml"
+        project_root / ".specs" / "features" / feature / "baselines" / "baseline.manifest.yml"
     ).exists()
 
 
@@ -1254,17 +1338,12 @@ def test_spec_check_design_fidelity_contract_rejects_normalized_json_substitute(
         flags="--fix --all",
     )
     contract = json.loads(render_goal_contract_file(goal))
-    visual_task = next(
-        task for task in contract["tasks"] if task["id"] == "visual.design_fidelity"
-    )
+    visual_task = next(task for task in contract["tasks"] if task["id"] == "visual.design_fidelity")
 
     assert "visual_evidence_receipt_path" in visual_task["required_evidence"]
     assert "normalized_json_alignment_only" in visual_task["invalid_substitutes"]
     assert "worker_declared_diff_without_receipt" in visual_task["invalid_substitutes"]
-    assert any(
-        "export mockup PNG" in action
-        for action in visual_task["repair_if_missing"]
-    )
+    assert any("export mockup PNG" in action for action in visual_task["repair_if_missing"])
 
 
 def test_goal_prove_rejects_missing_visual_design_fidelity_evidence(
@@ -1352,14 +1431,7 @@ def test_goal_prove_accepts_visual_design_fidelity_receipt(
     feature = _write_complete_check_fix_scenario(project_root)
     mockup = project_root / ".specs" / "design" / "screens" / feature / "dashboard.png"
     runtime = (
-        project_root
-        / ".specs"
-        / "features"
-        / feature
-        / "run"
-        / "manual"
-        / "web"
-        / "dashboard.png"
+        project_root / ".specs" / "features" / feature / "run" / "manual" / "web" / "dashboard.png"
     )
     _write_png(mockup, (10, 20, 30))
     _write_png(runtime, (10, 20, 30))
@@ -1391,13 +1463,7 @@ def test_goal_prove_accepts_visual_design_fidelity_receipt(
         run_id="manual",
         comparisons=[comparison],
         output_dir=(
-            project_root
-            / ".specs"
-            / "features"
-            / feature
-            / "run"
-            / "manual"
-            / "visual-evidence"
+            project_root / ".specs" / "features" / feature / "run" / "manual" / "visual-evidence"
         ),
     )
     goal = compile_command_goal(
@@ -1508,15 +1574,10 @@ def test_goal_prove_rejects_visual_receipt_from_wrong_feature(
 
 
 def test_spec_check_dod_requires_tree_validation_report_not_pass() -> None:
-    dod = _command_definition_of_done(
-        _repo_root() / ".agent-sync/skills/spec-check/SKILL.md"
-    )
+    dod = _command_definition_of_done(_repo_root() / ".agent-sync/skills/spec-check/SKILL.md")
 
     assert dod[0] == "Tree validation executed and reported (or skipped by --skip-tree)"
-    assert not any(
-        "tree validation" in item.lower() and "passed" in item.lower()
-        for item in dod
-    )
+    assert not any("tree validation" in item.lower() and "passed" in item.lower() for item in dod)
     assert "Gap report produced and displayed" in dod
     assert "Gap report saved to `checks/YYYY-MM-DD.md`" in dod
     assert "Feature `changelog.md` has a check entry" in dod

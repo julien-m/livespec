@@ -9,12 +9,35 @@ import yaml
 from validator.command_registry import discover_commands
 
 AGENT_SYNC = Path(".agent-sync")
+EXPECTED_SPEC_COMMANDS = {
+    "spec-check",
+    "spec-explain",
+    "spec-feature",
+    "spec-fix",
+    "spec-hooks",
+    "spec-implement",
+    "spec-init",
+    "spec-migrate",
+    "spec-plan",
+    "spec-play-coverage",
+    "spec-preflight",
+    "spec-propose",
+    "spec-refine",
+    "spec-refresh-conventions",
+    "spec-refresh-from-brainstorm",
+    "spec-ship",
+    "spec-specify",
+    "spec-stack",
+    "spec-status",
+    "spec-test",
+    "spec-verify-output",
+}
 
 
 def test_agent_sync_contains_all_command_skills() -> None:
     skills = sorted((AGENT_SYNC / "skills").glob("spec-*"))
 
-    assert len(skills) == 20
+    assert {skill.name for skill in skills} == EXPECTED_SPEC_COMMANDS
     for skill in skills:
         assert (skill / "SKILL.md").is_file(), skill
         assert (skill / "expectations.md").is_file(), skill
@@ -27,9 +50,7 @@ def test_agent_sync_expectations_match_skill_names() -> None:
 
 
 def test_agent_sync_contains_portable_agents() -> None:
-    agents = {
-        path.name for path in sorted((AGENT_SYNC / "agents").glob("livespec-*"))
-    }
+    agents = {path.name for path in sorted((AGENT_SYNC / "agents").glob("livespec-*"))}
 
     assert agents == {
         "livespec-documenter",
@@ -55,18 +76,13 @@ def test_command_registry_reads_agent_sync_skills() -> None:
     commands = discover_commands(AGENT_SYNC / "skills")
     feature = next(command for command in commands if command.name == "spec-feature")
 
-    assert len(commands) == 20
+    assert {command.name for command in commands} == EXPECTED_SPEC_COMMANDS
     assert feature.command_path == AGENT_SYNC / "skills" / "spec-feature" / "SKILL.md"
-    assert (
-        feature.expectations_path
-        == AGENT_SYNC / "skills" / "spec-feature" / "expectations.md"
-    )
+    assert feature.expectations_path == AGENT_SYNC / "skills" / "spec-feature" / "expectations.md"
 
 
 def test_spec_migrate_documents_provider_skill_resolution() -> None:
-    text = (AGENT_SYNC / "skills" / "spec-migrate" / "SKILL.md").read_text(
-        encoding="utf-8"
-    )
+    text = (AGENT_SYNC / "skills" / "spec-migrate" / "SKILL.md").read_text(encoding="utf-8")
 
     assert "~/.claude/skills/spec-migrate" in text
     assert "~/.agents/skills/spec-migrate" in text

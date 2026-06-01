@@ -10,23 +10,39 @@ from validator.command_registry import (
     normalize_command_name,
 )
 
+EXPECTED_SPEC_COMMANDS = {
+    "spec-check",
+    "spec-explain",
+    "spec-feature",
+    "spec-fix",
+    "spec-hooks",
+    "spec-implement",
+    "spec-init",
+    "spec-migrate",
+    "spec-plan",
+    "spec-play-coverage",
+    "spec-preflight",
+    "spec-propose",
+    "spec-refine",
+    "spec-refresh-conventions",
+    "spec-refresh-from-brainstorm",
+    "spec-ship",
+    "spec-specify",
+    "spec-stack",
+    "spec-status",
+    "spec-test",
+    "spec-verify-output",
+}
+
 
 def test_discovers_all_builtin_commands() -> None:
     commands = discover_commands(Path(".agent-sync/skills"))
 
-    assert len(commands) == 20
-    assert {command.name for command in commands} >= {
-        "spec-check",
-        "spec-explain",
-        "spec-feature",
-    }
+    assert {command.name for command in commands} == EXPECTED_SPEC_COMMANDS
     assert all(command.command_path.is_file() for command in commands)
     assert all(command.expectations_path.is_file() for command in commands)
     assert all(command.command_path.name == "SKILL.md" for command in commands)
-    assert all(
-        command.expectations_path.name == "expectations.md"
-        for command in commands
-    )
+    assert all(command.expectations_path.name == "expectations.md" for command in commands)
 
 
 def test_hyphenated_slash_names_are_canonical_with_dotted_aliases() -> None:
@@ -36,9 +52,7 @@ def test_hyphenated_slash_names_are_canonical_with_dotted_aliases() -> None:
 
     assert command.canonical_slash == "/spec-feature"
     assert command.command_path == Path(".agent-sync/skills/spec-feature/SKILL.md")
-    assert command.expectations_path == Path(
-        ".agent-sync/skills/spec-feature/expectations.md"
-    )
+    assert command.expectations_path == Path(".agent-sync/skills/spec-feature/expectations.md")
     assert "/spec.feature" in command.legacy_slashes
 
 
