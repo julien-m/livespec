@@ -153,9 +153,20 @@ Read **all** of these before any fix attempt:
 | `.specs/design/theme.css` | Theme CSS variables (if exists) |
 | `.specs/design/theme.md` | Theme metadata and color palette (if exists) |
 | `.specs/features/NNN/baselines/*.png` | Current Playwright screenshots |
-| `.conventions/index.md` + every `→ $AIRESOURCES/...` source it references for the relevant sub-domains | Code & design conventions (if `.conventions/index.md` exists). See `~/.claude/livespec/references/conventions-sync.md` § Load Path. |
+| `.conventions/index.md` + every `→ $AIRESOURCES/...` source it references for selected sub-domains | Mandatory Code & design conventions payload. See `~/.claude/livespec/references/conventions-sync.md` § Load Path. |
 
 **Context loading is what differentiates spec-fix from manual correction.** The command has complete knowledge of what the code should do (spec), how it should be structured (plan, constitution), what it should look like (mockups), and what it currently looks like (baselines, implementation.md).
+
+**Conventions payload (mandatory):**
+
+1. Ensure `.conventions/index.md` exists before planning any fix. If absent, run `livespec conventions refresh --repo . --full`, then read the generated `.conventions/index.md`.
+2. If refresh fails, set conventions to `NONE` only for a confirmed non-UI/no-stack project. Otherwise emit `BLOCKED at step 3 - dependency_unmet - conventions bundle missing`.
+3. Select sub-domains from `.conventions/index.md`:
+   - Always include `code` for source and test fixes.
+   - For visual/UI fixes, include `design-tokens`, `design-components`, `design-views`, and `design-quality` when present.
+   - Include `design-dataviz` for charts/metrics and `design-realtime` for WebSocket/SSE/streaming/token-output behavior when present.
+4. If a UI fix lacks any expected UI domain in `.conventions/index.md`, record `conventions: missing-ui-domains` in the fix output and continue only when the project genuinely has no matching convention entry.
+5. Resolve every selected `→ $AIRESOURCES/...` path into `ai-ressources/`, **Read** each source file, and keep the loaded rules attached to the fix plan and execution notes.
 
 ### Step 4 — Filter Gaps
 
@@ -235,7 +246,7 @@ Execute the fix plan. For each gap:
 - Follow the same implementation rules as `spec-implement`:
   - Add `@spec` anchors for new code
   - Follow patterns from `stacks/_default.md`
-  - Follow every rule from the conventions payload built in Step 3 (sub-domains resolved from `.conventions/index.md` into `ai-ressources/` files). Skip this bullet if `.conventions/index.md` is absent.
+  - Follow every rule from the Conventions payload built in Step 3. Never skip conventions merely because `.conventions/index.md` was initially absent; refresh first, then block only if refresh fails outside a confirmed non-UI/no-stack project.
   - Generate tests for new AC implementations
 - Update `progress.md` with fix checkpoint
 
@@ -437,7 +448,9 @@ Total: 6/8 gaps closed (75%)
 - [always] Read design screens index and theme files (theme.css, theme.md)
 - [visual] Read mockup PNGs from `.specs/design/screens/`
 - [visual] Read current baseline PNGs from `baselines/`
-- [always] Read conventions from `.conventions/index.md` and referenced ai-ressources files
+- [always] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --repo . --full`; block if conventions remain missing outside a confirmed non-UI/no-stack project
+- [always] Build Conventions payload: always include `code`; include `design-tokens`, `design-components`, `design-views`, and `design-quality` for UI/visual fixes; add dataviz/realtime domains when signaled
+- [always] Read selected `ai-ressources/` convention files and attach them to fix planning/execution
 
 ### Phase 4 — Filter Gaps
 

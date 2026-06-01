@@ -318,11 +318,13 @@ For each step, assemble the following payload:
 - Relevant rules from `.specs/constitution.md` that apply to the files being touched.
 - Stack and patterns from `.specs/stacks/_default.md`.
 - **Conventions payload** — built per `~/.claude/livespec/references/conventions-sync.md` § Load Path:
-  1. Read `.conventions/index.md`. If absent, set the conventions payload to `NONE` and skip the rest of this bullet.
-  2. Select sub-domains relevant to this step: always include `code`; add `design-tokens`, `design-components`, `design-views` (and other visual sub-domains) if the step touches UI; add `design-dataviz`, `design-realtime`, `design-quality` based on the work signal.
-  3. Resolve every `→ $AIRESOURCES/...` path for the selected sub-domains.
-  4. **Read** the content of each resolved file and inline it in the sub-agent payload under a `## Conventions (MANDATORY)` section, grouped by sub-domain. The sub-agent runs in an independent native environment — it cannot reload these files on its own.
-  5. State explicitly that the sub-agent MUST follow every rule in the listed files for any code it produces.
+  1. Ensure `.conventions/index.md` exists. If absent, run `livespec conventions refresh --repo . --full`, then read `.conventions/index.md`.
+  2. Set to `NONE` only if refresh fails and the project is confirmed non-UI/no-stack; otherwise block before dispatch with `BLOCKED at phase 3.1 - dependency_unmet - conventions bundle missing`.
+  3. Select sub-domains relevant to this step: always include `code`; add `design-tokens`, `design-components`, `design-views`, and `design-quality` if the step touches UI; add `design-dataviz` and `design-realtime` based on the work signal.
+  4. If a UI step lacks expected UI sub-domains in `.conventions/index.md`, record `conventions: missing-ui-domains` in the step output and continue only when the project genuinely has no matching convention entry.
+  5. Resolve every `→ $AIRESOURCES/...` path for the selected sub-domains.
+  6. **Read** the content of each resolved file and inline it in the sub-agent payload under a `## Conventions (MANDATORY)` section, grouped by sub-domain. The sub-agent runs in an independent native environment — it cannot reload these files on its own.
+  7. State explicitly that the sub-agent MUST follow every rule in the listed files for any code it produces.
 - **Full content of `.specs/design/theme.css`** (if exists and step involves UI) — include so the subagent uses theme CSS variables for all color/spacing values. Add instruction: "Use CSS variables from theme.css (e.g., `var(--primary)`, `var(--secondary)`) for all colors and design tokens. Never hardcode colors when a matching CSS variable exists."
 
 **3. LiveSpec Mandatory Rules**
@@ -654,7 +656,9 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 ### Phase 3 — Convert & Dispatch (Multi-agent)
 
 - [always] Build Task Payload per step (context, instructions, TDD commands, DoD)
+- [always] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --repo . --full`; set to `NONE` only if refresh fails and the project is confirmed non-UI/no-stack
 - [always] Inline conventions payload for selected sub-domains
+- [always] Block or record `conventions: missing-ui-domains` when UI work lacks expected design convention domains
 - [always] Dispatch to `superpowers:subagent-driven-development` per step
 - [always] Receive subagent results and write progress.md checkpoint
 

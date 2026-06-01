@@ -374,6 +374,24 @@ For each FR and AC:
    - ❌ Missing — no implementation found at mapped location or mapping is absent
    - 🔄 Drifted — code changed but implementation.md not updated
 
+### Step 7.5 — Convention Compliance
+
+Load and audit project conventions before producing the gap report:
+
+1. If `.conventions/index.md` is missing, add a `convention gap`: "Conventions bundle missing — run `/spec-refresh-conventions`." Do not mark convention compliance as passing.
+2. If `.conventions/index.md` exists, **Read** `.conventions/index.md`, select sub-domains, resolve every `→ $AIRESOURCES/...` path to `ai-ressources/`, and read every referenced source file.
+3. Sub-domain selection:
+   - Always include `code` for implementation and test files.
+   - For UI files, screenshots, mockups, styling, layout, or component work, include `design-tokens`, `design-components`, `design-views`, and `design-quality` when present in the index.
+   - Include `design-dataviz` for charts/metrics and `design-realtime` for WebSocket/SSE/streaming/token-output behavior when present.
+4. Verify every mapped source/test file against the loaded rules:
+   - `code`: naming, file structure, imports, typing, validation, testing, comments, error handling.
+   - `design-tokens`: tokenized colors, spacing, typography, motion, dark mode.
+   - `design-components`: expected control/component patterns and states.
+   - `design-views`: page/screen layout, dashboard density, auth/settings/view patterns.
+   - `design-quality`: accessibility, keyboard behavior, ARIA, visual QA.
+5. Add a `Convention Compliance` section to the gap report. Any violated rule is a `convention gap` with severity, domain, file, evidence, and suggested `/spec-fix` target.
+
 ### Step 8 — Detect Visual Drift (UI features)
 
 **Prerequisite:** Feature's `spec.md` has a `## Screens` section AND baselines exist in `.specs/features/NNN-feature-name/baselines/`. Skip entire step if either is absent.
@@ -676,6 +694,16 @@ Output a structured gap report. When spec quality was validated (Step 4), includ
 
 > *Only shown when `.specs/design/theme.css` exists. Omit section otherwise.*
 
+### Convention Compliance
+
+| Domain | File | Status | Evidence | Fix |
+|---|---|---|---|---|
+| `code` | `src/components/NotificationPanel.tsx` | ✅ Compliant | typed props, test mapping, `@spec` anchor | — |
+| `design-tokens` | `src/components/NotificationPanel.tsx` | ❌ convention gap | hardcoded `#DC2626` instead of token | `/spec-fix notifications --visual` |
+| `design-components` | `src/components/NotificationPanel.tsx` | ⚠️ Partial | missing disabled state for bulk action | `/spec-fix notifications --fr FR-006` |
+
+> Show this section whenever `.conventions/index.md` exists or is expected. If the bundle is missing, report a single `convention gap` with recovery `/spec-refresh-conventions`.
+
 ### Summary
 
 - ✅ Verified: 5/10 (50%)
@@ -897,6 +925,8 @@ Ordered list of the most urgent actions across all checked features:
 - [always] Read implementation map from implementation.md (FR/@spec anchors, AC/test mappings, visual baselines)
 - [always] Recovery mode if implementation.md absent: grep @spec anchors, infer AC coverage, mark as ~ Inferred
 - [always] Verify each FR/AC against actual code: assign ✅ Verified / ⚠️ Partial / ❌ Missing / 🔄 Drifted
+- [always] Load `.conventions/index.md` when present, resolve selected `ai-ressources/` files, and check Convention Compliance for mapped source/test files
+- [always] Report missing convention bundle or violated rules as `convention gap` entries
 
 ### Phase 5 — Visual & Design Checks
 
@@ -913,7 +943,8 @@ Ordered list of the most urgent actions across all checked features:
 
 ### Phase 6 — Gap Report & Persist
 
-- [always] Produce structured gap report (spec quality, FR table, AC table, summary)
+- [always] Produce structured gap report (spec quality, FR table, AC table, Convention Compliance, summary)
+- [always] Include `Convention Compliance` section with domains checked, evidence, and convention gaps
 - [always] Save gap report to .specs/features/NNN/checks/YYYY-MM-DD.md
 - [always] Add check entry to feature changelog.md
 - [always] Add summary entry to global .specs/changelog.md
@@ -948,6 +979,7 @@ Ordered list of the most urgent actions across all checked features:
 - [ ] Feature `changelog.md` has a check entry
 - [ ] Global `.specs/changelog.md` has a summary entry
 - [ ] If `--update`: `implementation.md` status values refreshed
+- [ ] Convention Compliance checked against `.conventions/index.md` + selected `ai-ressources/` sources, or a `convention gap` explains why it could not run
 - [ ] If multi-spec: consolidated report produced
 - [ ] If `--fix`: fix sub-agent goals executed, re-check sub-agent goals executed, child goal state files inspected, and remaining gaps are warnings or canonical BLOCKED
 - [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-check` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = step BLOCKED, no accepted proof
