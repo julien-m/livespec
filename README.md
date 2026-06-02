@@ -60,7 +60,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 
 ---
 
-## The 21 Commands
+## The 22 Commands
 
 | Command | What it does |
 |---|---|
@@ -72,6 +72,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 | `/spec-implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
 | `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, validate Penflow expected/actual UI trees, capture visual baselines, verify design fidelity |
 | `/spec-check` | Compare spec vs actual code — find gaps, verify AC, report Penflow contract status, detect visual drift |
+| `/spec-doctor` | Project health audit — orchestrates coherence validation and reports stale mappings, missing tests, runner drift, unenforced hooks, lifecycle gaps, visual orphans |
 | `/spec-fix` | Fix implementation gaps from spec-check — functional and visual corrections with retry loop |
 | `/spec-explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec-stack` | Evolve your stack and analyze impact on existing features |
@@ -324,6 +325,19 @@ Full pipeline: specify → plan → plan review → implement, with validation g
 
 Key flags: `--auto`, `--resume`, `--branch`, `--priority`, `--mono`, `--economy`, `--step`
 
+### `/spec-doctor`
+
+Project-level health audit. `livespec doctor` orchestrates `livespec validate --coherence` and adds practical downstream checks for stale implementation maps, missing mapped tests, runner inclusion, hook enforcement, lifecycle ambiguity, visual evidence orphans, and cleanup safety.
+
+```bash
+livespec doctor
+livespec doctor --format json
+livespec doctor --strict
+livespec doctor --fix-plan
+```
+
+Key flags: `--format compact|full|json`, `--strict`, `--fix-plan`, `--apply-cleanup`; cleanup planning is read-only and destructive cleanup is refused.
+
 ### `/spec-preflight`
 
 Verify tooling, authentication, and API tokens are ready before implementation. Auto-installs what it can, groups human blockers, gates feature work until all critical checks pass.
@@ -533,6 +547,9 @@ livespec validate
 
 # Layer 2 — cross-file coherence
 livespec validate --coherence
+
+# Project health — coherence plus implementation/test/runner/hook/evidence drift
+livespec doctor
 
 # Layer 4 — LLM-based plan review
 livespec validate --plan-review          # Review with first configured reviewer

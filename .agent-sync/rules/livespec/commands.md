@@ -11,6 +11,7 @@
 | "Corrige X" / "fix the UI" / écart mockup ↔ code | `/spec-fix <feature>` |
 | "Teste l'interface" / "vérifie le rendu" | `/spec-test <feature>` (avec flags device/target) |
 | "Vérifie que tout est aligné" / spec ↔ code | `/spec-check` |
+| "Diagnostic santé projet" / stale mappings, tests, hooks, runners | `/spec-doctor` |
 | "Explique comment marche X" / "pourquoi a-t-on choisi Y" | `/spec-explain "<question ou feature>"` |
 | "Spécifie une feature" (sans coder) | `/spec-specify "<description>"` |
 | "Plan technique pour X" | `/spec-plan <feature>` |
@@ -39,6 +40,14 @@ Vérifie l'alignement spec ↔ code et produit un rapport d'écarts.
 - `/spec-check --quality feature` — qualité tests/code uniquement
 - `/spec-check --visual-status` — dashboard gouvernance visuelle
 - `/spec-check --surfaces` — détection de surface drift
+
+### /spec-doctor
+Audit santé projet : orchestre `livespec validate --coherence` et détecte mappings stale, tests manquants, runners non inclus, hooks non appliqués, lifecycle ambigu et orphelins visuels.
+**Usage** :
+- `/spec-doctor` — audit compact
+- `/spec-doctor --format json` — sortie machine
+- `/spec-doctor --strict` — warnings promus en erreurs
+- `/spec-doctor --fix-plan` — plan de cleanup read-only
 
 ### /spec-explain
 Documentation vivante — comprend comment une feature marche, ou répond à une question naturelle sur l'historique du projet.

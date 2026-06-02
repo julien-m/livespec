@@ -1,17 +1,17 @@
 ---
 title: "Spec Doctor Project Health"
-status: Draft
+status: Implemented
 priority: P1
 created: 2026-06-01
-updated: 2026-06-01
+updated: 2026-06-02
 ---
 
 # Feature 055 - Spec Doctor Project Health
 
 - **Feature Name:** Spec Doctor Project Health
-- **Branch:** `main`
+- **Branch:** `feature/055-spec-doctor-project-health`
 - **Date:** 2026-06-01
-- **Status:** Draft
+- **Status:** Implemented
 - **Input:** Add a project-level LiveSpec doctor command that validates real downstream project health. The command must not replace `livespec validate --coherence`; it should orchestrate that lower-level validator and add checks for stale mappings, missing tests, unused runners, unenforced hooks, superseded specs, orphaned artifacts, visual evidence, and future executable user journeys.
 
 ## User Scenarios & Testing

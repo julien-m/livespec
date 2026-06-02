@@ -32,7 +32,7 @@
 ## Canonical Slash Commands
 
 Canonical user-facing command names use the hyphenated `/spec-*` form:
-`check`, `explain`, `feature`, `fix`, `hooks`, `implement`, `init`, `migrate`,
+`check`, `doctor`, `explain`, `feature`, `fix`, `hooks`, `implement`, `init`, `migrate`,
 `plan`, `play-coverage`, `preflight`, `propose`, `refine`,
 `refresh-conventions`, `ship`, `specify`, `stack`, `status`, `test`, and
 `verify-output`.
@@ -330,9 +330,9 @@ This check is **non-blocking** — the command continues normally after the warn
 Detailed step-by-step instructions for each `/spec-*` command live as portable
 skills in `.agent-sync/skills/spec-*/SKILL.md`. `scripts/sync-agent-assets.sh`
 uses `cc-hub` to link those skills, rules, and agents into Claude Code and
-Codex provider outputs for each project. The 21 available commands are:
+Codex provider outputs for each project. The 22 available commands are:
 `/spec-init`, `/spec-migrate`, `/spec-propose`, `/spec-specify`, `/spec-plan`,
-`/spec-implement`, `/spec-test`, `/spec-check`, `/spec-fix`, `/spec-explain`,
+`/spec-implement`, `/spec-test`, `/spec-check`, `/spec-doctor`, `/spec-fix`, `/spec-explain`,
 `/spec-stack`, `/spec-feature`, `/spec-ship`, `/spec-preflight`, `/spec-hooks`,
 `/spec-play-coverage`, `/spec-refine`, `/spec-status`,
 `/spec-refresh-conventions`, `/spec-refresh-from-brainstorm`,

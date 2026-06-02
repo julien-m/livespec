@@ -12,6 +12,7 @@ from validator.command_registry import (
 
 EXPECTED_SPEC_COMMANDS = {
     "spec-check",
+    "spec-doctor",
     "spec-explain",
     "spec-feature",
     "spec-fix",
