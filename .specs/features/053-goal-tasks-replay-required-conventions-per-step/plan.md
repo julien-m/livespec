@@ -1,3 +1,12 @@
+---
+title: "Goal Tasks Replay Required Conventions Per Step Plan"
+feature: "053-goal-tasks-replay-required-conventions-per-step"
+spec_ref: ".specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md"
+status: Approved
+created: 2026-06-01
+updated: 2026-06-01
+---
+
 # Plan: Goal Tasks Replay Required Conventions Per Step
 
 - **Feature:** 053-goal-tasks-replay-required-conventions-per-step

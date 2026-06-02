@@ -1,6 +1,6 @@
-# Changelog - 053-migration-planner-penflow-backfill
+# Changelog - 054-migration-planner-penflow-backfill
 
-## 2026-06-01 - [Spec Update]: Feature specified and planned
+## 2026-06-01 — [Spec Update]: Feature specified and planned
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (initial spec and plan)
@@ -8,7 +8,7 @@
 - **AC impacted:** AC-001..AC-013
 - **Author:** codex
 
-## 2026-06-01 - [Feature]: Migration planner and Penflow backfill implemented
+## 2026-06-01 — [Feature]: Migration planner and Penflow backfill implemented
 
 - **Type:** Feature
 - **Spec modified:** Yes (status and implementation mapping)

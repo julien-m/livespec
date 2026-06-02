@@ -11,7 +11,7 @@ replaces_when_unapplied: [3]
 
 # Migration v17: Penflow Backfill + Migration Planner Metadata
 
-Feature 053 adds a planner for `/spec-migrate` and backfills root `penflow/`
+Feature 054 adds a planner for `/spec-migrate` and backfills root `penflow/`
 artifacts for older projects only when this can be done without inventing UI
 truth from legacy screenshots.
 

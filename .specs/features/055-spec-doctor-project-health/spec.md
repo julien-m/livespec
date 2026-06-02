@@ -6,7 +6,7 @@ created: 2026-06-01
 updated: 2026-06-01
 ---
 
-# Feature 054 - Spec Doctor Project Health
+# Feature 055 - Spec Doctor Project Health
 
 - **Feature Name:** Spec Doctor Project Health
 - **Branch:** `main`
@@ -161,7 +161,7 @@ flowchart TD
 - **FR-007:** Scan LiveSpec git hooks and report whether commit/push enforcement actually runs the configured checks.
 - **FR-008:** Scan visual baselines and receipts for orphaned, stale, or unmapped evidence.
 - **FR-009:** Support compact, full, and JSON report formats.
-- **FR-010:** Provide an optional internal journey scan hook for Feature 055 without making doctor depend on journeys being installed.
+- **FR-010:** Provide an optional internal journey scan hook for Feature 056 without making doctor depend on journeys being installed.
 - **FR-011:** Document `livespec doctor` in README and the command registry.
 - **FR-012:** Add unit and CLI tests for doctor findings, report formats, strict mode, and read-only behavior.
 

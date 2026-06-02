@@ -1,9 +1,17 @@
+---
+title: "Goal Tasks Replay Required Conventions Per Step"
+status: Implemented
+priority: P1
+created: 2026-06-01
+updated: 2026-06-01
+---
+
 # Feature Spec: Goal Tasks Replay Required Conventions Per Step
 
 - **Feature:** Goal Tasks Replay Required Conventions Per Step
 - **Branch:** main
 - **Date:** 2026-06-01
-- **Status:** Approved
+- **Status:** Implemented
 - **Input:** Goal tasks replay required conventions per step and reject proofs missing convention evidence.
 
 ## User Scenarios & Testing

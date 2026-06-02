@@ -84,9 +84,10 @@
 | 050 | Agent Sync Migration | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/050-agent-sync-migration/spec.md), [plan](features/050-agent-sync-migration/plan.md), [implementation](features/050-agent-sync-migration/implementation.md) |
 | 051 | Integrate Penflow as LiveSpec Primary UI Contract | Implemented | 2026-05-21 | 2026-05-26 | [spec](features/051-integrate-penflow-primary-ui-contract/spec.md), [plan](features/051-integrate-penflow-primary-ui-contract/plan.md), [implementation](features/051-integrate-penflow-primary-ui-contract/implementation.md) |
 | 052 | Deterministic Command Goal Contracts | Implemented | 2026-05-21 | 2026-05-23 | [spec](features/052-deterministic-command-goal-contracts/spec.md), [plan](features/052-deterministic-command-goal-contracts/plan.md), [implementation](features/052-deterministic-command-goal-contracts/implementation.md) |
-| 053 | Migration Planner and Penflow Backfill | Implemented | 2026-06-01 | 2026-06-01 | [spec](features/053-migration-planner-penflow-backfill/spec.md), [plan](features/053-migration-planner-penflow-backfill/plan.md), [implementation](features/053-migration-planner-penflow-backfill/implementation.md) |
-| 054 | Spec Doctor Project Health | Draft | 2026-06-01 | 2026-06-01 | [spec](features/054-spec-doctor-project-health/spec.md) |
-| 055 | Executable User Journeys | Draft | 2026-06-01 | 2026-06-01 | [spec](features/055-executable-user-journeys/spec.md) |
+| 053 | Goal Tasks Replay Required Conventions Per Step | Implemented | 2026-06-01 | 2026-06-01 | [spec](features/053-goal-tasks-replay-required-conventions-per-step/spec.md), [plan](features/053-goal-tasks-replay-required-conventions-per-step/plan.md), [implementation](features/053-goal-tasks-replay-required-conventions-per-step/implementation.md) |
+| 054 | Migration Planner and Penflow Backfill | Implemented | 2026-06-01 | 2026-06-01 | [spec](features/054-migration-planner-penflow-backfill/spec.md), [plan](features/054-migration-planner-penflow-backfill/plan.md), [implementation](features/054-migration-planner-penflow-backfill/implementation.md) |
+| 055 | Spec Doctor Project Health | Draft | 2026-06-01 | 2026-06-01 | [spec](features/055-spec-doctor-project-health/spec.md) |
+| 056 | Executable User Journeys | Draft | 2026-06-01 | 2026-06-01 | [spec](features/056-executable-user-journeys/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -110,9 +111,10 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-06-01 | Spec | [Feature 055] Spec created: Executable User Journeys — YAML canonical user journeys compiled ahead-of-time to native tests and audited by Spec Doctor |
-| 2026-06-01 | Spec | [Feature 054] Spec created: Spec Doctor Project Health — project-level health audit for stale mappings, missing tests, unenforced hooks, runners, visual evidence, and journeys |
-| 2026-06-01 | Feature | [Feature 053] Implemented: metadata-aware migration planning, restore-point invalidation reporting, and Migration 17 Penflow backfill reports |
+| 2026-06-01 | Spec | [Feature 056] Spec created: Executable User Journeys — YAML canonical user journeys compiled ahead-of-time to native tests and audited by Spec Doctor |
+| 2026-06-01 | Spec | [Feature 055] Spec created: Spec Doctor Project Health — project-level health audit for stale mappings, missing tests, unenforced hooks, runners, visual evidence, and journeys |
+| 2026-06-01 | Feature | [Feature 054] Implemented: metadata-aware migration planning, restore-point invalidation reporting, and Migration 17 Penflow backfill reports |
+| 2026-06-01 | Feature | [Feature 053] Implemented: goal tasks replay required conventions and proof validation rejects missing convention evidence |
 | 2026-05-26 | Bugfix | [Feature 051] Single Penflow source contract: root `penflow/ui.pen` only, explicit Brainstorm `penflow/` import, duplicate `.pen` blocking, and no `.specs/design/ui.pen` requirement |
 | 2026-05-23 | Bugfix | [Feature 052] Internal `/spec-*` subagent invocations propagate current LiveSpec project root/cwd and command audit rejects missing workdir guards |
 | 2026-05-23 | Bugfix | [Feature 052] Goal rendering ignores documentary `/spec-*` examples/recovery hints, skips Markdown checkboxes inside `Execution Tasks`, exposes top-level `worker_may_mark_tasks_complete=false`, and adds machine Goal Lock tasks to `/spec-status` + `/spec-explain` |

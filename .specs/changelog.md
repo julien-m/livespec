@@ -3,15 +3,17 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-05-26
+> Last updated: 2026-06-01
 
 ---
 
-## 2026-06-01 — [Feature 055]: Spec created: Executable User Journeys — canonical YAML user journeys, ahead-of-time compilation to native test frameworks, distinct functional regression reporting, and Spec Doctor stale-artifact checks.
+## 2026-06-01 — [Feature 056]: Spec created: Executable User Journeys — canonical YAML user journeys, ahead-of-time compilation to native test frameworks, distinct functional regression reporting, and Spec Doctor stale-artifact checks.
 
-## 2026-06-01 — [Feature 054]: Spec created: Spec Doctor Project Health — project-level doctor command for stale mappings, missing tests, runner inclusion, hooks, lifecycle drift, visual evidence, and future journey health.
+## 2026-06-01 — [Feature 055]: Spec created: Spec Doctor Project Health — project-level doctor command for stale mappings, missing tests, runner inclusion, hooks, lifecycle drift, visual evidence, and future journey health.
 
-## 2026-06-01 — [Feature 053]: Implemented metadata-aware migration planning and Migration 17 Penflow backfill reporting; `/spec-migrate` now documents planner-first execution, restore-point invalidation, and safe non-generation when runtime UI is unavailable.
+## 2026-06-01 — [Feature 054]: Implemented metadata-aware migration planning and Migration 17 Penflow backfill reporting; `/spec-migrate` now documents planner-first execution, restore-point invalidation, and safe non-generation when runtime UI is unavailable.
+
+## 2026-06-01 — [Feature 053]: Implemented goal task convention replay; every rendered goal task records required conventions and `livespec goal prove` rejects evidence missing convention usage.
 
 ## 2026-05-26 — [Feature 051 Fix]: LiveSpec now treats root `penflow/ui.pen` as the only allowed `.pen`, imports explicit Brainstorm `penflow/` sources, blocks duplicate `.pen` files, and removes `.specs/design/ui.pen` requirements from active command/docs paths.
 

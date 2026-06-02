@@ -47,7 +47,7 @@ def build_report(project: Path) -> BackfillReport:
     # @spec FR-010: Block when runtime UI source is absent
     # @spec FR-011: Report legacy .specs/design/ui.pen
     # @spec FR-012: Prevent secondary .pen creation
-    #   - .specs/features/053-migration-planner-penflow-backfill/spec.md#fr-008
+    #   - .specs/features/054-migration-planner-penflow-backfill/spec.md#fr-008
     """
     penflow = project / "penflow"
     legacy_ui_pen = project / ".specs" / "design" / "ui.pen"

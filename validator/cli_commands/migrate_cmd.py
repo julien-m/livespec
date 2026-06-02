@@ -36,7 +36,7 @@ def plan_command(
     """Print the metadata-aware migration plan.
 
     # @spec FR-005: Planner CLI
-    #   - .specs/features/053-migration-planner-penflow-backfill/spec.md#fr-005
+    #   - .specs/features/054-migration-planner-penflow-backfill/spec.md#fr-005
     """
     try:
         plan = build_migration_plan(project, livespec)

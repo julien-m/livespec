@@ -6,7 +6,7 @@ created: 2026-06-01
 updated: 2026-06-01
 ---
 
-# Feature 055 - Executable User Journeys
+# Feature 056 - Executable User Journeys
 
 - **Feature Name:** Executable User Journeys
 - **Branch:** `main`
@@ -165,7 +165,7 @@ flowchart TD
 - **FR-010:** Update `/spec-specify` to propose 1 to 3 journeys for interactive features.
 - **FR-011:** Update `/spec-feature` to generate, compile, and execute journeys as part of the feature pipeline.
 - **FR-012:** Update `/spec-test` to distinguish direct tests, executable journeys, and manual obligations.
-- **FR-013:** Add `scan_journeys(project_root)` so Feature 054 integrates with Feature 053 without duplicating doctor logic.
+- **FR-013:** Add `scan_journeys(project_root)` so Feature 055 integrates with Feature 056 without duplicating journey logic.
 
 ## Key Entities
 

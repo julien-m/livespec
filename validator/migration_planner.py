@@ -1,7 +1,7 @@
 """Metadata-aware migration planner for ``/spec-migrate``.
 
 # @spec FR-001: Migration planner module
-#   - .specs/features/053-migration-planner-penflow-backfill/spec.md#fr-001
+#   - .specs/features/054-migration-planner-penflow-backfill/spec.md#fr-001
 """
 
 from __future__ import annotations
@@ -128,7 +128,7 @@ def _read_target_version(repo_root: Path) -> int:
 
 def _parse_manifest(path: Path) -> MigrationManifest:
     # @spec FR-002: Optional migration metadata fields
-    #   - .specs/features/053-migration-planner-penflow-backfill/spec.md#fr-002
+    #   - .specs/features/054-migration-planner-penflow-backfill/spec.md#fr-002
     frontmatter = _load_frontmatter(path)
     fallback_version = _parse_int(path.parent.name, field="migration directory")
     version = _parse_int(frontmatter.get("version", fallback_version), field="version")
@@ -178,7 +178,7 @@ def _pending_replacements(
 ) -> dict[int, int]:
     # @spec FR-003: Skip only pending replaced migrations
     # @spec FR-004: Preserve already-applied migration history
-    #   - .specs/features/053-migration-planner-penflow-backfill/spec.md#fr-003
+    #   - .specs/features/054-migration-planner-penflow-backfill/spec.md#fr-003
     pending_set = set(pending)
     replacements: dict[int, int] = {}
     for replacement_version in pending:

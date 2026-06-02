@@ -1,3 +1,8 @@
+---
+title: "Goal Tasks Replay Required Conventions Per Step Implementation"
+feature: "053-goal-tasks-replay-required-conventions-per-step"
+---
+
 # Implementation: Goal Tasks Replay Required Conventions Per Step
 
 - **Feature:** 053-goal-tasks-replay-required-conventions-per-step
