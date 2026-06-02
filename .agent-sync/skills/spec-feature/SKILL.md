@@ -679,7 +679,13 @@ This ensures all tools and credentials are available before the autonomous imple
    as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
    ```
 
-3. **Phase 3.5 Runtime Evidence Gate** — for UI features with root `penflow/`, the Test agent must prove real rendered runtime fidelity before it may emit success:
+3. **Executable Journey Gate** — before functional test execution, run:
+   ```bash
+   livespec journey compile --feature <NNN-feature-name>
+   ```
+   If journeys exist, pass only when compilation succeeds; include executable/manual/disabled counts in the Test PHASE_RESULT. **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) for YAML and artifact rules.
+
+4. **Phase 3.5 Runtime Evidence Gate** — for UI features with root `penflow/`, the Test agent must prove real rendered runtime fidelity before it may emit success:
    - Open the implemented app in a real browser at `1440x900`.
    - Capture screenshots from that browser session.
    - Sync every approved runtime screenshot to `.specs/design/baselines/<feature_slug>/` and keep the feature-local copy under `.specs/features/<feature_slug>/baselines/`.
@@ -698,14 +704,14 @@ This ensures all tools and credentials are available before the autonomous imple
    - If the app does not expose enough `data-semantic-id`, `data-testid`, ARIA role, or visible text to build an actual tree from the browser, block and fix the implementation. Do not fabricate the runtime artifact.
    - Do not run `livespec pipeline update --feature NNN-feature-name --phase test --status done`, do not report the visual gate as passed, and before emitting `PHASE_RESULT: OK`, confirm the runtime evidence gate passes.
 
-4. Receive PHASE_RESULT from the Test agent.
+5. Receive PHASE_RESULT from the Test agent.
 
-5. If `PHASE_RESULT: BLOCKED` (❌ AC coverage failures):
+6. If `PHASE_RESULT: BLOCKED` (❌ AC coverage failures):
    - Interactive mode: report failures, no commit
    - Called from `/spec-ship`: output `SHIP_RESULT: BLOCKED` with test failure details
    Note: the Test agent emits PHASE_RESULT for the main context; the `SHIP_RESULT: BLOCKED` signal is the final external output of the entire pipeline when called from ship context. Both are preserved — they serve different consumers (main context vs ship orchestrator).
 
-6. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status done --timestamp`
+7. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status done --timestamp`
    *(Only if PHASE_RESULT: OK or only partial/warning AC coverage)*
 
 In `--auto` mode: no confirmation prompts, proceeds automatically.

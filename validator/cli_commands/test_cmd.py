@@ -25,6 +25,7 @@ from ._common import (
     resolve_primary_driver,
     run_with_debug,
 )
+from .journey_cmd import journey_category_counts
 
 
 def test_command(
@@ -46,9 +47,7 @@ def test_command(
         "--no-coverage",
         help="Skip the coverage capability (only useful with --mutation).",
     ),
-    debug: bool = typer.Option(
-        False, "--debug", help="Print the full stacktrace on error."
-    ),
+    debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
 ) -> None:
     """Run the project's tests through the active driver.
 
@@ -72,9 +71,7 @@ def test_command(
 
 def register(app: typer.Typer) -> None:
     """Register the ``test`` subcommand."""
-    app.command(
-        name="test", help="Run the active driver's coverage capability."
-    )(test_command)
+    app.command(name="test", help="Run the active driver's coverage capability.")(test_command)
 
 
 def _run_test(
@@ -91,6 +88,17 @@ def _run_test(
     if feature:
         typer.echo(f"Feature scope: {feature} (informational)")
 
+    executable_journeys, manual_journeys, disabled_journeys = journey_category_counts(
+        project_root,
+        feature,
+    )
+    # @spec FR-012: Separate journey reporting
+    # — .specs/features/056-executable-user-journeys/spec.md#fr-012
+    typer.echo("Direct tests: driver coverage capability")
+    typer.echo(f"Executable user journeys: {executable_journeys}")
+    typer.echo(f"Manual tests: {manual_journeys}")
+    typer.echo(f"Disabled journeys: {disabled_journeys}")
+
     coverage_pct: float | None = None
     threshold_pct = read_threshold_from_conventions(project_root)
 
@@ -98,9 +106,7 @@ def _run_test(
         try:
             result = run_capability(driver, "coverage", project_root=project_root)
         except CapabilityNotImplementedError:
-            typer.echo(
-                f"Error: driver {driver.name!r} has no coverage capability.", err=True
-            )
+            typer.echo(f"Error: driver {driver.name!r} has no coverage capability.", err=True)
             emit_summary("test", "FAIL", driver=driver.name, reason="no_coverage")
             raise typer.Exit(EXIT_CAPABILITY_UNSUPPORTED) from None
 
@@ -127,15 +133,11 @@ def _run_test(
             if lcov_path.exists():
                 coverage_pct = _percent_from_lcov(lcov_path)
 
-        coverage_str = (
-            f"{coverage_pct:.1f}%" if coverage_pct is not None else "not parsed"
-        )
+        coverage_str = f"{coverage_pct:.1f}%" if coverage_pct is not None else "not parsed"
         verdict = "OK"
         if coverage_pct is not None and coverage_pct < threshold_pct:
             verdict = "FAIL"
-        typer.echo(
-            f"Coverage: {coverage_str} (threshold {threshold_pct:.1f}%) · {verdict}"
-        )
+        typer.echo(f"Coverage: {coverage_str} (threshold {threshold_pct:.1f}%) · {verdict}")
         if verdict == "FAIL":
             emit_summary(
                 "test",
@@ -173,6 +175,8 @@ def _run_test(
         coverage=round(coverage_pct, 2) if coverage_pct is not None else "n/a",
         threshold=threshold_pct,
         mutation="ran" if mutation else "skipped",
+        journeys=executable_journeys,
+        manual=manual_journeys,
     )
     raise typer.Exit(EXIT_OK)
 

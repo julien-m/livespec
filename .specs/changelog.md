@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-06-02 — [Feature 056]: Implemented Executable User Journeys — `livespec journey validate/compile/test`, canonical YAML format reference, Playwright/XCUITest/Maestro compilers with source hashes, separated journey/manual/direct test reporting, and Spec Doctor stale/AC-FR drift checks.
+
+## 2026-06-02 — [Feature 056]: Plan created: Executable User Journeys — 10 implementation steps, 4 diagrams, no API contracts; adds canonical YAML journey validation, native compilers, category-aware test reporting, and Spec Doctor journey drift checks.
+
 ## 2026-06-02 — [Feature 055]: Implemented Spec Doctor Project Health — `livespec doctor`, `$spec-doctor` docs, stale mapping/test/runner/hook/lifecycle/visual audits, safe cleanup planning, JSON output, strict mode, and focused tests.
 
 ## 2026-06-01 — [Feature 056]: Spec created: Executable User Journeys — canonical YAML user journeys, ahead-of-time compilation to native test frameworks, distinct functional regression reporting, and Spec Doctor stale-artifact checks.

@@ -17,6 +17,7 @@ from . import (
     design_alignment_cmd,
     doctor_cmd,
     drivers_cmd,
+    journey_cmd,
     migrate_cmd,
     mutation_cmd,
     penflow_contract_cmd,
@@ -39,6 +40,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     design_alignment_cmd.register(app)
     doctor_cmd.register(app)
     drivers_cmd.register(app)
+    journey_cmd.register(app)
     mutation_cmd.register(app)
     penflow_contract_cmd.register(app)
     preflight_cmd.register(app)

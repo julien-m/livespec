@@ -9,6 +9,8 @@ import frontmatter
 
 from validator.coherence.rule_engine import run_coherence
 from validator.coherence.violation import Severity
+from validator.journeys import scan_journeys
+from validator.journeys.models import JourneySeverity
 
 from .models import CleanupAction, DoctorFinding, DoctorReport, DoctorSeverity, DoctorStatus
 
@@ -49,6 +51,7 @@ def run_doctor(
     findings.extend(_scan_runner_inclusion(project_root, specs_root, mapped_tests))
     findings.extend(_scan_hook_enforcement(project_root))
     findings.extend(_scan_lifecycle(specs_root))
+    findings.extend(_scan_journey_health(project_root))
     visual_findings, visual_actions = _scan_visual_orphans(specs_root)
     findings.extend(visual_findings)
     if fix_plan or apply_cleanup:
@@ -102,6 +105,26 @@ def _scan_coherence(specs_root: Path) -> list[DoctorFinding]:
             )
         )
     return findings
+
+
+def _scan_journey_health(project_root: Path) -> list[DoctorFinding]:
+    """Add executable user journey findings to the doctor report."""
+    # @spec FR-013: Journey scan handoff
+    # — .specs/features/056-executable-user-journeys/spec.md#fr-013
+    report = scan_journeys(project_root)
+    return [
+        DoctorFinding(
+            code=finding.code,
+            severity=_from_journey_severity(finding.severity),
+            category="journeys",
+            message=finding.message,
+            feature=finding.feature,
+            requirement=finding.requirement,
+            path=finding.path.as_posix(),
+            suggested_action="Run `livespec journey validate` or `livespec journey compile`.",
+        )
+        for finding in report.findings
+    ]
 
 
 def _scan_implementation_maps(
@@ -342,6 +365,15 @@ def _from_coherence_severity(severity: Severity) -> DoctorSeverity:
     if severity == Severity.ERROR:
         return DoctorSeverity.ERROR
     if severity == Severity.WARNING:
+        return DoctorSeverity.WARNING
+    return DoctorSeverity.INFO
+
+
+def _from_journey_severity(severity: JourneySeverity) -> DoctorSeverity:
+    """Map journey severities to doctor severities."""
+    if severity == JourneySeverity.ERROR:
+        return DoctorSeverity.ERROR
+    if severity == JourneySeverity.WARNING:
         return DoctorSeverity.WARNING
     return DoctorSeverity.INFO
 

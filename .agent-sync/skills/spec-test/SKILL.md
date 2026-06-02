@@ -171,6 +171,7 @@ Enter = most recent feature only
    - `spec.md` → extract all AC (with Gherkin scenarios) and FR
    - `implementation.md` → extract AC→test file mappings (Acceptance Criteria Mapping table)
    - Source files → grep `@spec FR-NNN` anchors for FR→file mappings
+   - `.specs/journeys/<feature-slug>/*.journey.yaml` → executable user journeys; **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) before classifying them.
 
 3. **If inside /spec-ship agent** (lean mode with `--auto`) → read `progress.md` from just-completed implementation for test results per step.
 
@@ -185,6 +186,8 @@ For each AC in `spec.md`:
    - ⚠️ **Partial** — test exists but doesn't cover all Gherkin steps
    - ❌ **Missing** — no test found for this AC
    - 🚫 **No Gherkin** — AC has no Gherkin scenario (cannot auto-generate)
+
+4. Separately report `Direct tests`, `Executable user journeys`, `Manual tests`, and `Disabled journeys`. Do not count compiled journeys as direct generated tests.
 
 ### Behavioral Audit (sub-phase 1.5 — if `## Behavioral AC` present)
 

@@ -382,6 +382,11 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
 - Use present tense, third person
 - All tests (unit, integration, E2E, visual) are derived from Gherkin, never from Mermaid
 
+#### Executable User Journeys
+- For interactive features, propose 1-3 canonical journeys under `.specs/journeys/<feature-slug>/`.
+- **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) before writing journey YAML.
+- Mark journeys `manual` only with `manual_reason`; use `disabled` only for intentionally visible non-executed flows.
+
 #### Mermaid Flowchart Rules
 - Use `flowchart TD` (top-down) for linear flows
 - Use `flowchart LR` (left-right) for state transitions
