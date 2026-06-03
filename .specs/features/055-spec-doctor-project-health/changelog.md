@@ -1,5 +1,14 @@
 # Changelog — 055 Spec Doctor Project Health
 
+## 2026-06-03 — [Bugfix]: Add downstream migration for spec-doctor
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `migrations/18/migrate.md`, `VERSION`, `tests/integration/test_migration_v18_agent_sync.py`
+- **Docs modified:** `implementation.md`
+- **AC impacted:** AC-014
+- **Author:** Codex
+
 ## 2026-06-03 — [Check]: Spec-code alignment verified
 
 - **Type:** Spec Update

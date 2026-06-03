@@ -2,7 +2,7 @@
 feature: 055-spec-doctor-project-health
 title: Spec Doctor Project Health
 status: Implemented
-updated: 2026-06-02
+updated: 2026-06-03
 ---
 
 # Implementation — 055 Spec Doctor Project Health
@@ -12,7 +12,7 @@ updated: 2026-06-02
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
 | FR-001 | `validator/cli_commands/doctor_cmd.py` | `@spec FR-001: Public doctor CLI` | ✅ Implemented | 2026-06-02 |
-| FR-002 | `.agent-sync/skills/spec-doctor/SKILL.md` | `Command: /spec-doctor` | ✅ Implemented | 2026-06-02 |
+| FR-002 | `.agent-sync/skills/spec-doctor/SKILL.md`, `migrations/18/migrate.md` | `Command: /spec-doctor` | ✅ Implemented | 2026-06-03 |
 | FR-003 | `validator/doctor/models.py`, `validator/doctor/scanner.py`, `validator/doctor/report.py` | `@spec FR-003: Doctor package orchestration` | ✅ Implemented | 2026-06-02 |
 | FR-004 | `validator/doctor/scanner.py` | `@spec FR-004: Reuse coherence engine` | ✅ Implemented | 2026-06-02 |
 | FR-005 | `validator/doctor/scanner.py` | `@spec FR-005: Implementation map scan` | ✅ Implemented | 2026-06-02 |
@@ -56,4 +56,6 @@ updated: 2026-06-02
 | `tests/test_doctor.py` | Focused CLI tests for doctor behavior. |
 | `.agent-sync/skills/spec-doctor/SKILL.md` | Agent-facing `$spec-doctor` / `/spec-doctor` command docs. |
 | `.agent-sync/skills/spec-doctor/expectations.md` | Verify-output contract for command audit. |
+| `migrations/18/migrate.md` | Re-runs agent asset sync so existing v17 projects receive `spec-doctor`. |
+| `VERSION` | Bumps LiveSpec target version to 18 for downstream migration planning. |
 | `README.md` | Command list and validator docs updated. |

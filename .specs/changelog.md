@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-03 — [Feature 055 Fix]: Migration 18 refreshes agent-sync assets so existing v17 projects receive `spec-doctor` and the journey-aware command skill updates via `$spec-migrate`.
+
 ## 2026-06-03 — [Feature 055] Check: 100% verified (12/12 FR, 14/14 AC) — `$spec-check --fix` verified Spec Doctor Project Health with a dated zero-gap check report and no feature-scoped gaps.
 
 ## 2026-06-03 — [Feature 056] Check: 100% verified (13/13 FR, 15/15 AC) — `$spec-check --fix` verified Executable User Journeys; AC-013/AC-015 gained direct tests, plan metadata/diagrams were repaired, and a dated zero-gap check report was saved.
