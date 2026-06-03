@@ -41,9 +41,9 @@ updated: 2026-06-02
 | AC-010 | `tests/test_journeys.py::test_doctor_reports_stale_and_removed_ac` | ✅ Implemented |
 | AC-011 | `tests/test_journeys.py::test_manual_disabled_and_executable_categories_are_reported` | ✅ Implemented |
 | AC-012 | `.agent-sync/skills/spec-feature/SKILL.md` | ✅ Implemented |
-| AC-013 | `tests/test_journeys.py::test_journey_validate_rejects_unknown_action` | ✅ Implemented |
+| AC-013 | `tests/test_journeys.py::test_journey_validate_rejects_unsupported_target` | ✅ Implemented |
 | AC-014 | `tests/test_journeys.py::test_manual_disabled_and_executable_categories_are_reported` | ✅ Implemented |
-| AC-015 | `tests/test_journeys.py::test_manual_disabled_and_executable_categories_are_reported` | ✅ Implemented |
+| AC-015 | `tests/test_journeys.py::test_manual_journey_requires_reason` | ✅ Implemented |
 
 ## Files Created/Modified
 

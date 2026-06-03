@@ -1,5 +1,16 @@
 # Changelog — 055 Spec Doctor Project Health
 
+## 2026-06-03 — [Check]: Spec-code alignment verified
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** `validator/goal_contracts.py`, `tests/test_goal_contracts.py`
+- **Checks modified:** `checks/2026-06-03.md`
+- **Coverage:** 26/26 verified (100%), 0 partial, 0 missing
+- **Report:** `checks/2026-06-03.md`
+- **AC impacted:** AC-001 through AC-014 verified
+- **Author:** Codex
+
 ## 2026-06-02 — [Feature]: Implement project doctor command
 
 - **Type:** Feature

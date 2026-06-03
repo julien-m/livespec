@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-02
+> Last updated: 2026-06-03
 
 ---
+
+## 2026-06-03 — [Feature 055] Check: 100% verified (12/12 FR, 14/14 AC) — `$spec-check --fix` verified Spec Doctor Project Health with a dated zero-gap check report and no feature-scoped gaps.
+
+## 2026-06-03 — [Feature 056] Check: 100% verified (13/13 FR, 15/15 AC) — `$spec-check --fix` verified Executable User Journeys; AC-013/AC-015 gained direct tests, plan metadata/diagrams were repaired, and a dated zero-gap check report was saved.
 
 ## 2026-06-02 — [Feature 056]: Implemented Executable User Journeys — `livespec journey validate/compile/test`, canonical YAML format reference, Playwright/XCUITest/Maestro compilers with source hashes, separated journey/manual/direct test reporting, and Spec Doctor stale/AC-FR drift checks.
 

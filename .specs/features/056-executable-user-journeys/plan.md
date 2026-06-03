@@ -1,8 +1,10 @@
 ---
 feature: 056-executable-user-journeys
 title: Executable User Journeys
+spec_ref: spec.md
 status: Approved
-updated: 2026-06-02
+created: 2026-06-02
+updated: 2026-06-03
 ---
 
 # Plan — 056 Executable User Journeys
@@ -42,7 +44,17 @@ Add canonical YAML journey sources, validation, ahead-of-time native compilers, 
 | 10 | `.agent-sync/skills/spec-specify/SKILL.md`, `spec-feature/SKILL.md`, `spec-test/SKILL.md` | Document command pipeline integration. |
 | 11 | `tests/test_journeys.py` | Validate CLI, compilers, doctor drift, and category reporting. |
 
-## Mermaid Sequence
+## Gherkin Scenarios + Mermaid Sequence Diagrams
+
+```gherkin
+Feature: Journey compilation
+  Scenario: Canonical journey compiles before native execution
+    Given a valid journey YAML source file
+    And the target surface has a compatible compiler
+    When the user runs "livespec journey compile --feature 012-auth"
+    Then LiveSpec validates the YAML first
+    And writes a deterministic native test artifact with the source hash
+```
 
 ```mermaid
 sequenceDiagram
@@ -57,7 +69,16 @@ sequenceDiagram
     C-->>CLI: native artifacts with source hash
 ```
 
-## State Diagram
+## Gherkin Scenarios + Mermaid State Diagrams
+
+```gherkin
+Feature: Journey lifecycle
+  Scenario: Executable, manual, disabled, and stale states are distinct
+    Given a valid journey YAML source file
+    When LiveSpec validates, compiles, and scans the journey
+    Then executable journeys can become compiled or stale
+    And manual and disabled journeys remain visible without executing
+```
 
 ```mermaid
 stateDiagram-v2
@@ -67,6 +88,37 @@ stateDiagram-v2
     Validated --> Disabled: disabled true
     Compiled --> Stale: source hash changes
     Stale --> Compiled: recompile
+```
+
+## Mermaid ER Diagrams
+
+```mermaid
+erDiagram
+    JourneyFile ||--o{ JourneyStep : contains
+    JourneyFile ||--o{ CompiledJourneyArtifact : generates
+    JourneyFile ||--o{ JourneyFinding : reports
+    JourneyFile {
+        string id
+        string feature
+        string title
+        string target_surface
+        string run_policy
+        string source_hash
+    }
+    JourneyStep {
+        string action
+        string payload
+    }
+    CompiledJourneyArtifact {
+        string output_path
+        string runner
+        string source_hash
+    }
+    JourneyFinding {
+        string code
+        string severity
+        string requirement
+    }
 ```
 
 ## Testing Strategy

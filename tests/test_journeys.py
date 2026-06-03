@@ -99,6 +99,21 @@ def test_journey_validate_rejects_unknown_action(
     assert "teleport" in result.output
 
 
+def test_journey_validate_rejects_unsupported_target(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    specs = _make_specs(tmp_path)
+    _write_journey(specs, target="desktop")
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(app, ["journey", "validate"])
+
+    assert result.exit_code == 1
+    assert "journey_target_unsupported" in result.output
+    assert "desktop" in result.output
+
+
 def test_wait_without_until_or_reason_is_warning(
     tmp_path: Path,
     monkeypatch: MonkeyPatch,
@@ -120,6 +135,24 @@ def test_wait_without_until_or_reason_is_warning(
     assert result.exit_code == 0, result.output
     assert "warnings=1" in result.output
     assert "wait_reason_missing" in result.output
+
+
+def test_manual_journey_requires_reason(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    specs = _make_specs(tmp_path)
+    _write_journey(
+        specs,
+        journey_id="manual",
+        extra="run_policy: manual\n",
+    )
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(app, ["journey", "validate"])
+
+    assert result.exit_code == 1
+    assert "journey_manual_reason_missing" in result.output
 
 
 def test_compile_generates_playwright_with_source_hash(
