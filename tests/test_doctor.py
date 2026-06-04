@@ -209,7 +209,7 @@ def test_doctor_lifecycle_allows_linked_supersession_only(
 
 
 def test_spec_doctor_skill_distinguishes_doctor_from_validate() -> None:
-    """The skill explains doctor as project health and validate as lower-level."""
+    """The skill explains doctor health, validate, and R3.2 traceability."""
     skill_path = Path(__file__).parents[1] / ".agent-sync" / "skills" / "spec-doctor" / "SKILL.md"
     content = skill_path.read_text()
 
@@ -217,3 +217,5 @@ def test_spec_doctor_skill_distinguishes_doctor_from_validate() -> None:
     assert "project health audit" in content
     assert "validate" in content
     assert "lower-level spec validator" in content
+    assert "R3.2" in content
+    assert "@spec(FR-xxx)" in content

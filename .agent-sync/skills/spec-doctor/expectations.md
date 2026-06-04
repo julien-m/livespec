@@ -1,14 +1,14 @@
 ---
 command: spec-doctor
 contract_version: "1.0"
-last_reviewed: 2026-06-02
+last_reviewed: 2026-06-04
 ---
 
 # Expectations — /spec-doctor
 
 ## 1. Purpose
 
-Run a project-level health audit that orchestrates coherence validation and detects stale mappings, missing tests, unenforced hooks, runner drift, lifecycle ambiguity, visual orphans, and cleanup safety.
+Run a project-level health audit that orchestrates coherence validation and detects stale mappings, missing tests, missing `@spec(...)` traceability anchors, unenforced hooks, runner drift, lifecycle ambiguity, visual orphans, and cleanup safety.
 
 ## 2. Preconditions
 
@@ -125,7 +125,7 @@ exit 1
 
 ### Aligned / Drift / Missing
 
-- **Aligned:** no stale mappings, runner gaps, hook gaps, lifecycle gaps, or visual orphans. Exit 0.
+- **Aligned:** no stale mappings, missing traceability anchors, runner gaps, hook gaps, lifecycle gaps, or visual orphans. Exit 0.
 - **Drift:** findings are reported with category, severity, evidence, and suggested action. Exit 1.
 - **Missing:** `.specs/` not initialized. Exit 2.
 

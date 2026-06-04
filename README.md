@@ -327,7 +327,7 @@ Key flags: `--auto`, `--resume`, `--branch`, `--priority`, `--mono`, `--economy`
 
 ### `/spec-doctor`
 
-Project-level health audit. `livespec doctor` orchestrates `livespec validate --coherence` and adds practical downstream checks for stale implementation maps, missing mapped tests, runner inclusion, hook enforcement, lifecycle ambiguity, visual evidence orphans, and cleanup safety.
+Project-level health audit. `livespec doctor` orchestrates `livespec validate --coherence` and adds practical downstream checks for stale implementation maps, missing mapped tests, runner inclusion, hook enforcement, lifecycle ambiguity, visual evidence orphans, cleanup safety, and `R3.2` traceability infos for mapped files missing `@spec(...)` anchors.
 
 ```bash
 livespec doctor
