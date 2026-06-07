@@ -383,8 +383,9 @@ Using `system/templates/spec-template.md` as the base, generate a complete spec 
 - All tests (unit, integration, E2E, visual) are derived from Gherkin, never from Mermaid
 
 #### Executable User Journeys
-- For interactive features, propose 1-3 canonical journeys under `.specs/journeys/<feature-slug>/`.
-- **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) before writing journey YAML.
+- For interactive features, propose 1-3 global v2 journey IDs under `.specs/journeys/<journey-id>/journey.yaml`; feature links are generated backlinks, not ownership directories.
+- Create or edit journey YAML through `$spec-journey create` / `$spec-journey edit`, not directly from `$spec-specify`.
+- **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) before proposing journey coverage.
 - Mark journeys `manual` only with `manual_reason`; use `disabled` only for intentionally visible non-executed flows.
 
 #### Mermaid Flowchart Rules

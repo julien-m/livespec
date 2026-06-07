@@ -43,6 +43,12 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 
 > Post-implementation test validation — audit AC coverage, generate missing tests from Gherkin, execute the full suite, capture visual baselines, and produce a test report.
 
+## User Journeys v2
+
+- Include global journeys from `.specs/journeys/<journey-id>/journey.yaml` in the coverage matrix.
+- Execute compiled covering and impacted journeys through `livespec journey run`; this does not compile.
+- Report direct tests, covering journeys, impacted journeys, manual journeys, disabled journeys, stale manifests, and missing manifests separately.
+
 ---
 
 ## Overview
@@ -171,7 +177,7 @@ Enter = most recent feature only
    - `spec.md` → extract all AC (with Gherkin scenarios) and FR
    - `implementation.md` → extract AC→test file mappings (Acceptance Criteria Mapping table)
    - Source files → grep `@spec FR-NNN` anchors for FR→file mappings
-   - `.specs/journeys/<feature-slug>/*.journey.yaml` → executable user journeys; **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) before classifying them.
+   - `.specs/journeys/<journey-id>/journey.yaml` → global v2 executable user journeys that cover this feature; legacy `.specs/journeys/<feature-slug>/*.journey.yaml` paths are migration-only via `livespec journey migrate --from-v1`. **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) before classifying them.
 
 3. **If inside /spec-ship agent** (lean mode with `--auto`) → read `progress.md` from just-completed implementation for test results per step.
 

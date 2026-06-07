@@ -43,6 +43,12 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 
 > End-to-end feature pipeline — chains specify, plan, plan review, and implement with validation gates between each phase.
 
+## User Journeys v2 Gate
+
+- After implementation, run impacted compiled journeys through `livespec journey run --feature <feature-slug>`; this command must not compile.
+- If `livespec journey impact` reports a blocking old journey, require `$spec-journey edit <journey-id>` classification before final test gate.
+- New cross-feature journeys for implemented or old features are created with `$spec-journey create` or `$spec-journey bootstrap --from-existing`, not `$spec-refine`.
+
 ---
 
 ## Overview
@@ -679,11 +685,12 @@ This ensures all tools and credentials are available before the autonomous imple
    as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
    ```
 
-3. **Executable Journey Gate** — before functional test execution, run:
+3. **Executable Journey Gate** — before functional test execution, analyze impacted journeys and run already compiled artifacts only:
    ```bash
-   livespec journey compile --feature <NNN-feature-name>
+   livespec journey impact --feature <NNN-feature-name> --json
+   livespec journey run --feature <NNN-feature-name> --json
    ```
-   If journeys exist, pass only when compilation succeeds; include executable/manual/disabled counts in the Test PHASE_RESULT. **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) for YAML and artifact rules.
+   If journeys exist, pass only when compiled artifacts are fresh and the compiled-only run succeeds; never compile during this test gate. Compilation is limited to explicit journey create/edit/compile workflows. Include executable/manual/disabled counts in the Test PHASE_RESULT. **Read** [`../../../system/testing/user-journeys.md`](../../../system/testing/user-journeys.md) for YAML and artifact rules.
 
 4. **Phase 3.5 Runtime Evidence Gate** — for UI features with root `penflow/`, the Test agent must prove real rendered runtime fidelity before it may emit success:
    - Open the implemented app in a real browser at `1440x900`.

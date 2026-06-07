@@ -1,58 +1,56 @@
-# Executable User Journeys
+# Executable User Journeys v2
 
-Canonical journey sources live at `.specs/journeys/<feature-slug>/<journey-id>.journey.yaml`.
+Canonical journey sources live at `.specs/journeys/<journey-id>/journey.yaml`.
+
+## Directory Contract
+
+- `journey.yaml`: portable source of truth.
+- `changelog.md`: concise history.
+- `decisions/*.md`: mandatory reason for edits after compilation.
+- `compiled/manifest.json`: source hash, compiler version, runner, native outputs, visual contracts.
+- `runs/`: local/CI evidence.
+- `.specs/features/<feature>/journeys.md`: generated backlink; do not edit manually.
 
 ## YAML Shape
 
 ```yaml
-id: login-happy-path
-feature: 012-auth
-title: User can log in
-run_policy: always
+schema_version: 2
+id: onboarding-first-project
+title: Onboarding first project
+status: active
+description: New user signs up and creates a first project.
 covers:
-  ac: [AC-001]
-  fr: [FR-001]
-target:
-  surface: web
+  - feature: 001-onboarding
+    kind: ac
+    ref: AC-001
+    reason: Signup starts the path.
+run_policy:
+  local: impacted
+  pre_push: smoke
+  ci: always
+targets:
+  - surface: web
+    runner: playwright
 steps:
-  - open: "/login"
-  - fill: { label: "Email", value: "user@example.com" }
-  - click: { role: "button", name: "Login" }
-  - wait: { seconds: 10, until: { text: "Dashboard" } }
-  - assert: { text: "Dashboard" }
+  - action: open
+    target: { route: /signup }
+privacy:
+  llm_allowed: false
+  retention: none
 ```
-
-## Required Fields
-
-- `id`, `feature`, `title`, `target.surface`, `steps`.
-- `target.surface`: `web`, `ios`, `watchos`, `android`, or `maestro`.
-- `run_policy`: `always`, `smoke`, `manual`, or `disabled`; default `always`.
-- `manual_reason`: required when `run_policy: manual`.
-- `disabled: true`: disables execution but remains visible to `livespec doctor`.
-
-## Actions
-
-- `open`: path or URL.
-- `click`: `{ role, name }`.
-- `fill`: `{ label, value }`.
-- `select`: `{ label, value }`.
-- `wait`: `{ seconds, until? }`; fixed waits without `until` require `reason` or warn.
-- `assert` / `assert_not`: `{ text }`.
-- `screenshot`, `back`, `press`.
 
 ## Commands
 
-- `livespec journey validate [--feature <slug>]`: schema/action validation.
-- `livespec journey compile [--feature <slug>]`: ahead-of-time native artifact generation.
-- `livespec journey test [--feature <slug>]`: compile plus category summary.
+- `livespec journey validate [--journey ID] [--feature SLUG] [--json]`: schema, refs, history, backlinks, privacy.
+- `livespec journey compile [--journey ID] [--feature SLUG] [--changed] [--force]`: compile on create/edit only.
+- `livespec journey run [--journey ID] [--feature SLUG] [--stage STAGE] [--json]`: run compiled artifacts; does not compile.
+- `livespec journey impact --changed-file PATH [--json]`: find journeys touched by changed labels, selectors, semantic IDs, visual targets.
+- `livespec journey migrate --from-v1`: convert `.specs/journeys/<feature>/*.journey.yaml` to v2.
+- `livespec journey list|inspect`: inspect global coverage.
 
-## Compilation
+## Execution Rules
 
-- Web → Playwright: `tests/e2e/journeys/<feature>/<id>.spec.ts`.
-- iOS/watchOS → XCUITest: `STRAPTUITests/Journeys/<Id>Journey.swift`.
-- Android/Maestro → `.specs/maestro/journeys/<feature>/<id>.yaml`.
-- Every compiled artifact embeds `livespec-journey-source-hash: <sha256>` for stale detection.
-
-## Doctor
-
-`livespec doctor` reports invalid YAML, missing/superseded AC/FR references, missing/stale compiled artifacts, manual journeys, and disabled journeys. Executable, manual, and disabled journeys never collapse into direct generated tests.
+- Create/edit validates, compiles once, runs once, and records history.
+- Run/test commands verify `compiled/manifest.json` source hash and fail with `journey_compiled_stale` if stale.
+- `manual` and `disabled` journeys are reported and never executed automatically.
+- LLM visual checks require `privacy.llm_allowed: true`; native checks are deterministic and blocking by default.

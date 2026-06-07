@@ -44,6 +44,11 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 > Compare spec vs actual code — find gaps, verify AC coverage, detect visual drift.
 > Validate `.specs/` tree structure, spec quality gates, and multi-feature alignment.
 
+## User Journeys v2 Checks
+
+- Validate `.specs/journeys/<journey-id>/journey.yaml`, generated feature backlinks, decisions, changelog entries, compiled manifests, stale artifacts, privacy policy, visual checks, and v1 leftovers.
+- Surface unresolved journey impacts as blocking gaps with suggested `$spec-journey edit <journey-id>` or `livespec journey migrate --from-v1`.
+
 ---
 
 ## Overview

@@ -39,27 +39,58 @@ def _write_journey(
     target: str = "web",
     extra: str = "",
 ) -> Path:
-    journey_dir = specs / "journeys" / feature
+    journey_dir = specs / "journeys" / journey_id
     journey_dir.mkdir(parents=True, exist_ok=True)
-    path = journey_dir / f"{journey_id}.journey.yaml"
+    path = journey_dir / "journey.yaml"
+    runner = (
+        "xcuitest"
+        if target in {"ios", "watchos"}
+        else "maestro"
+        if target == "maestro"
+        else "playwright"
+    )
+    status = (
+        "disabled"
+        if "disabled: true" in extra
+        else "manual"
+        if "run_policy: manual" in extra
+        else "active"
+    )
+    policy = "disabled" if status == "disabled" else "manual" if status == "manual" else "always"
     path.write_text(
-        f"""id: {journey_id}
-feature: {feature}
+        f"""schema_version: 2
+id: {journey_id}
 title: User can log in
-run_policy: always
+status: {status}
+description: User logs in.
 covers:
-  ac: [AC-001, AC-002]
-target:
-  surface: {target}
+  - feature: {feature}
+    kind: ac
+    ref: AC-001
+    reason: Login works.
+  - feature: {feature}
+    kind: ac
+    ref: AC-002
+    reason: Dashboard appears.
+run_policy:
+  local: {policy}
+targets:
+  - surface: {target}
+    runner: {runner}
 steps:
-  - open: "/login"
-  - fill: {{ label: "Email", value: "user@example.com" }}
-  - click: {{ role: "button", name: "Login" }}
-  - wait: {{ seconds: 10, until: {{ text: "Dashboard" }} }}
-  - assert: {{ text: "Dashboard" }}
-{extra}""",
+  - action: open
+    target: {{ route: "/login" }}
+  - action: click
+    target: {{ text: "Login", product_contract: true }}
+  - action: assert
+    target: {{ text: "Dashboard", product_contract: true }}
+privacy:
+  llm_allowed: false
+  retention: none
+""",
         encoding="utf-8",
     )
+    (journey_dir / "changelog.md").write_text("# Changelog\n", encoding="utf-8")
     return path
 
 
@@ -87,7 +118,7 @@ def test_journey_validate_rejects_unknown_action(
     specs = _make_specs(tmp_path)
     journey = _write_journey(specs)
     journey.write_text(
-        journey.read_text(encoding="utf-8").replace("- click:", "- teleport:"),
+        journey.read_text(encoding="utf-8").replace("- action: click", "- action: teleport"),
         encoding="utf-8",
     )
     monkeypatch.chdir(tmp_path)
@@ -95,7 +126,7 @@ def test_journey_validate_rejects_unknown_action(
     result = runner.invoke(app, ["journey", "validate"])
 
     assert result.exit_code == 1
-    assert "unknown action" in result.output
+    assert "journey_schema_invalid" in result.output
     assert "teleport" in result.output
 
 
@@ -118,26 +149,18 @@ def test_wait_without_until_or_reason_is_warning(
     tmp_path: Path,
     monkeypatch: MonkeyPatch,
 ) -> None:
-    """Fixed waits without a reason remain valid but are reported as warnings."""
+    """v2 validation reports no v1 fixed-wait warnings."""
     specs = _make_specs(tmp_path)
-    journey = _write_journey(specs)
-    journey.write_text(
-        journey.read_text(encoding="utf-8").replace(
-            '- wait: { seconds: 10, until: { text: "Dashboard" } }',
-            "- wait: { seconds: 10 }",
-        ),
-        encoding="utf-8",
-    )
+    _write_journey(specs)
     monkeypatch.chdir(tmp_path)
 
     result = runner.invoke(app, ["journey", "validate"])
 
     assert result.exit_code == 0, result.output
-    assert "warnings=1" in result.output
-    assert "wait_reason_missing" in result.output
+    assert "warnings=0" in result.output
 
 
-def test_manual_journey_requires_reason(
+def test_manual_journey_is_reported_without_execution(
     tmp_path: Path,
     monkeypatch: MonkeyPatch,
 ) -> None:
@@ -151,8 +174,8 @@ def test_manual_journey_requires_reason(
 
     result = runner.invoke(app, ["journey", "validate"])
 
-    assert result.exit_code == 1
-    assert "journey_manual_reason_missing" in result.output
+    assert result.exit_code == 0
+    assert "valid=1" in result.output
 
 
 def test_compile_generates_playwright_with_source_hash(
@@ -166,12 +189,12 @@ def test_compile_generates_playwright_with_source_hash(
 
     result = runner.invoke(app, ["journey", "compile", "--feature", "012-auth"])
 
-    artifact = tmp_path / "tests" / "e2e" / "journeys" / "012-auth" / "login_happy_path.spec.ts"
+    artifact = tmp_path / "tests" / "e2e" / "journeys" / "login_happy_path.spec.ts"
     assert result.exit_code == 0, result.output
     assert artifact.exists()
     text = artifact.read_text(encoding="utf-8")
     assert "livespec-journey-source-hash:" in text
-    assert 'page.waitForSelector("text=Dashboard", { timeout: 10000 })' in text
+    assert "livespec-journey-id: login-happy-path" in text
 
 
 def test_compile_generates_xcuitest_for_ios_and_watchos(

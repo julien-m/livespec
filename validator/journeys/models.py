@@ -39,7 +39,10 @@ class JourneyFile:
     title: str
     target_surface: str
     run_policy: str
+    runner: str
     steps: list[dict[str, JsonValue]]
+    schema_version: int = 1
+    covered_features: list[str] = field(default_factory=list)
     covers_ac: list[str] = field(default_factory=list)
     covers_fr: list[str] = field(default_factory=list)
     disabled: bool = False

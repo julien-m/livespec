@@ -3,6 +3,8 @@
 # @spec FR-001: test subcommand — .specs/features/035-unified-cli-surface/spec.md#fr-001
 # @spec AC-001: zero-arg run — .specs/features/035-unified-cli-surface/spec.md#ac-001
 # @spec AC-003: --mutation flag — .specs/features/035-unified-cli-surface/spec.md#ac-003
+# @spec FR-024, FR-026: compiled-only journey gate in livespec test
+# — .specs/features/057-cross-feature-user-journeys-v2/spec.md#fr-024
 
 from __future__ import annotations
 
@@ -19,6 +21,8 @@ from ..cli_resolvers import read_threshold_from_conventions
 from ..drivers.patch_coverage import parse_lcov
 from ..drivers.runner import run_capability
 from ..drivers.schemas import CapabilityNotImplementedError
+from ..journeys.paths import relative_to_project
+from ..journeys.runner import run_journeys
 from ._common import (
     emit_summary,
     require_specs_root,
@@ -98,6 +102,21 @@ def _run_test(
     typer.echo(f"Executable user journeys: {executable_journeys}")
     typer.echo(f"Manual tests: {manual_journeys}")
     typer.echo(f"Disabled journeys: {disabled_journeys}")
+    journey_run = run_journeys(project_root, feature=feature, execute=False)
+    for issue in journey_run.issues:
+        typer.echo(
+            f"{issue.severity.value} {issue.code} "
+            f"{relative_to_project(project_root, issue.path)}: {issue.message}"
+        )
+    if journey_run.error_count:
+        emit_summary(
+            "test",
+            "FAIL",
+            driver=driver.name,
+            journeys=len(journey_run.executed),
+            journey_errors=journey_run.error_count,
+        )
+        raise typer.Exit(EXIT_COVERAGE_FAIL)
 
     coverage_pct: float | None = None
     threshold_pct = read_threshold_from_conventions(project_root)

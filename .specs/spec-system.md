@@ -327,7 +327,7 @@ This check is **non-blocking** — the command continues normally after the warn
 
 ### Command discovery
 
-Detailed step-by-step instructions for each `/spec-*` command live as portable skills in `.agent-sync/skills/spec-*/SKILL.md`. `scripts/sync-agent-assets.sh` uses `cc-hub` to link those skills, rules, and agents into Claude Code and Codex provider outputs for each project. The 20 available commands are: `/spec-init`, `/spec-migrate`, `/spec-propose`, `/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-check`, `/spec-fix`, `/spec-explain`, `/spec-stack`, `/spec-feature`, `/spec-ship`, `/spec-preflight`, `/spec-hooks`, `/spec-play-coverage`, `/spec-refine`, `/spec-status`, `/spec-refresh-conventions`, `/spec-verify-output`.
+Detailed step-by-step instructions for each `/spec-*` command live as portable skills in `.agent-sync/skills/spec-*/SKILL.md`. `scripts/sync-agent-assets.sh` uses `cc-hub` to link those skills, rules, and agents into Claude Code and Codex provider outputs for each project. The 23 available commands are: `/spec-init`, `/spec-migrate`, `/spec-propose`, `/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-check`, `/spec-fix`, `/spec-explain`, `/spec-stack`, `/spec-feature`, `/spec-ship`, `/spec-preflight`, `/spec-hooks`, `/spec-play-coverage`, `/spec-refine`, `/spec-status`, `/spec-refresh-conventions`, `/spec-refresh-from-brainstorm`, `/spec-journey`, `/spec-verify-output`.
 
 ### Command Expectations & Verify Output
 

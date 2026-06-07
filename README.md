@@ -25,9 +25,10 @@ Six months later, nobody knows **why** something was built the way it was.
 | No visuals | **Mermaid diagrams mandatory** in every spec and plan |
 | No traceability | **Implementation mapping** — every spec requirement links to `@spec` anchors in code |
 | Specs rot after launch | **Living docs** — specs updated when behavior changes |
-| No history | **Per-feature changelogs** — every change is recorded |
+| No history | **Per-feature + journey changelogs** — every behavior and journey change is recorded |
 | UI behavior hidden in screenshots | **Penflow contracts** — root `penflow/` owns semantic UI flow correctness |
 | No visual testing | **Playwright baselines** built into implementation + check |
+| Regression flows tied to one feature | **Cross-feature User Journeys v2** — global journeys cover multiple features, compile once, and run as non-regression tests |
 | Stack decisions lost | **Stack presets with decision trees** — know WHY you chose each tool |
 | One-time init | **Brainstorm-driven init** — AI interviews you before generating anything |
 | Tool-specific | **Tool-agnostic** — works with Claude Code or any AI that reads Markdown |
@@ -41,7 +42,8 @@ flowchart LR
     P["/spec-propose\nDiscover what\nto build"] --> S["/spec-specify\nWrite the spec\n(stories, AC, FR)"]
     S --> PL["/spec-plan\nTechnical plan\n(diagrams, steps)"]
     PL --> I["/spec-implement\nCode, test,\nmap to spec"]
-    I --> T["/spec-test\nAudit + Penflow\n+ visual gates"]
+    I --> J["/spec-journey\nCross-feature\nregression flows"]
+    J --> T["/spec-test\nAudit + Penflow\n+ visual gates"]
     T --> C["/spec-check\nVerify spec\nvs code"]
     C --> F["/spec-fix\nFix gaps\n(functional + visual)"]
     F --> E["/spec-explain\nLiving\ndocumentation"]
@@ -50,6 +52,7 @@ flowchart LR
     style S fill:#e8f4f8,stroke:#2196F3
     style PL fill:#e8f4f8,stroke:#2196F3
     style I fill:#e8f4f8,stroke:#2196F3
+    style J fill:#e8f4f8,stroke:#2196F3
     style T fill:#e8f4f8,stroke:#2196F3
     style C fill:#e8f4f8,stroke:#2196F3
     style F fill:#e8f4f8,stroke:#2196F3
@@ -60,7 +63,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 
 ---
 
-## The 22 Commands
+## The 23 Commands
 
 | Command | What it does |
 |---|---|
@@ -71,6 +74,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 | `/spec-plan` | Generate technical plan with sequence, state, and ER diagrams |
 | `/spec-implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
 | `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, validate Penflow expected/actual UI trees, capture visual baselines, verify design fidelity |
+| `/spec-journey` | Create, edit, bootstrap, impact-check, inspect, compile, and run global User Journeys v2 across multiple features |
 | `/spec-check` | Compare spec vs actual code — find gaps, verify AC, report Penflow contract status, detect visual drift |
 | `/spec-doctor` | Project health audit — orchestrates coherence validation and reports stale mappings, missing tests, runner drift, unenforced hooks, lifecycle gaps, visual orphans |
 | `/spec-fix` | Fix implementation gaps from spec-check — functional and visual corrections with retry loop |
@@ -151,10 +155,13 @@ cd your-project
 # 7. Implement with auto-pipeline
 /spec-implement notifications
 
-# 8. Verify spec vs code
+# 8. Add a cross-feature regression journey when a flow spans features
+/spec-journey create
+
+# 9. Verify spec vs code
 /spec-check notifications
 
-# 9. Explain the feature (living docs)
+# 10. Explain the feature (living docs)
 /spec-explain "how do notifications work?"
 
 # Alternative: full pipeline in one command
@@ -177,7 +184,8 @@ Run each command individually with full control at every stage:
 /spec-specify "User can filter by date"   # 1. Generate spec.md
 /spec-plan date-filter                     # 2. Generate plan.md
 /spec-implement date-filter                # 3. Implement from plan
-/spec-check date-filter                    # 4. Verify spec vs code
+/spec-journey create                       # 4. Add cross-feature regression flow
+/spec-check date-filter                    # 5. Verify spec vs code
 ```
 
 ### Pipeline flow (`/spec-feature`)
@@ -199,6 +207,7 @@ Run the full pipeline in one command with validation gates between each phase:
 
 ```bash
 /spec-test date-filter                     # Audit + generate missing tests
+/spec-journey impact                       # Detect impacted old journeys
 /spec-check date-filter                    # Verify spec-code alignment
 /spec-explain "how does date filtering work?"  # Living documentation
 /spec-stack                                # View or evolve the stack
@@ -283,6 +292,33 @@ Audit test coverage against AC, generate missing tests from Gherkin scenarios, e
 ```
 
 Key flags: `--audit-only`, `--no-generate`, `--no-visual`, `--all`, `--auto`, `--update`
+
+### `/spec-journey`
+
+Create and govern cross-feature User Journeys v2. Journey sources live globally at `.specs/journeys/<journey-id>/journey.yaml` and reference every covered feature/FR/AC with qualified `covers` refs. They can be created for old or already implemented features without `/spec-refine`.
+
+```bash
+/spec-journey create                       # Interactive journey from free-form intent
+/spec-journey bootstrap --from-existing    # Propose journeys for old projects/features
+/spec-journey edit onboarding-first-project # Governed edit with decision + changelog
+/spec-journey impact                       # Detect changed files touching old journeys
+/spec-journey run                          # Run compiled artifacts only
+/spec-journey list
+/spec-journey inspect onboarding-first-project
+```
+
+Low-level CLI:
+
+```bash
+livespec journey validate [--journey ID] [--feature SLUG] [--json]
+livespec journey compile [--journey ID] [--feature SLUG] [--changed] [--force]
+livespec journey run [--journey ID] [--feature SLUG] [--impacted] [--all] [--json]
+livespec journey impact --changed-file PATH [--feature SLUG] [--json]
+livespec journey migrate --from-v1 [--apply] [--json]
+livespec journey list|inspect
+```
+
+Rules: create/edit compiles once; `run` never recompiles and fails on stale manifests. Edits require classification (`regression`, `intentional_update`, `obsolete`, `selector_fix`, or `coverage_expansion`) plus decision, changelog, validation, and run evidence. Visual checks may be native deterministic checks or strict JSON LLM screenshot checks. See [`system/testing/user-journeys.md`](system/testing/user-journeys.md).
 
 ### `/spec-check`
 
@@ -409,12 +445,20 @@ penflow/
 ├── testing/
 │   └── strategy.md         ← What to test, how, with which tools
 │
+├── journeys/
+│   └── onboarding-first-project/
+│       ├── journey.yaml     ← Global User Journey v2 source
+│       ├── compiled/        ← Native compiled artifact + manifest
+│       ├── decisions/       ← Required history for governed edits
+│       └── changelog.md     ← Journey change history
+│
 ├── features/
 │   └── 001-notifications/
 │       ├── spec.md          ← WHAT and WHY (user stories, Mermaid flows, AC, FR)
 │       ├── plan.md          ← HOW (sequence/state/ER diagrams, file-by-file plan)
 │       ├── implementation.md ← WHERE in code (FR/AC → @spec mapping)
 │       ├── changelog.md     ← WHEN (every change recorded)
+│       ├── journeys.md      ← Generated backlinks to global journeys
 │       ├── contracts/       ← API contracts (OpenAPI/GraphQL)
 │       └── baselines/       ← Playwright visual screenshots
 │

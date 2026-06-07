@@ -23,6 +23,7 @@
 | "Vérifie l'outillage / les credentials" | `/spec-preflight` |
 | "Lance le projet LiveSpec" (first-time setup) | `/spec-init` |
 | "Mets à jour LiveSpec" | `/spec-migrate` |
+| "Crée une user journey" / "bootstrap journeys anciennes features" | `/spec-journey create` ou `/spec-journey bootstrap --from-existing` |
 | Lifecycle hooks (before/after une commande) | `/spec-hooks <command> --create before\|after` |
 | Coverage playground | `/spec-play-coverage` |
 | Vérifier la sortie d'une commande | `/spec-verify-output <command>` |
@@ -104,6 +105,17 @@ Initialise LiveSpec dans un projet via un brainstorm conversationnel 3 phases.
 Met à jour LiveSpec — compare la version projet vs repo et applique les migrations en attente.
 **Usage** :
 - `/spec-migrate`
+
+### /spec-journey
+Crée, édite, bootstrap, impact-check, liste, inspecte et lance des User Journeys v2 globales.
+**Usage** :
+- `/spec-journey create` — création interactive depuis intention libre
+- `/spec-journey bootstrap --from-existing` — candidates pour anciennes features/projets
+- `/spec-journey edit <journey-id>` — édition gouvernée avec décision/changelog
+- `/spec-journey impact` — analyse des journeys impactées
+- `/spec-journey run` — exécution compiled-only
+- `/spec-journey list`
+- `/spec-journey inspect <journey-id>`
 
 ### /spec-plan
 Génère un plan technique avec diagrammes (sequence, state, ER).

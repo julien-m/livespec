@@ -3,7 +3,7 @@
 
 This project uses [LiveSpec](https://github.com/julien-m/livespec). **Read `.specs/spec-system.md` before any spec command or code modification.**
 
-Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · `/spec-hooks` · `/spec-implement` · `/spec-init` · `/spec-migrate` · `/spec-plan` · `/spec-play-coverage` · `/spec-preflight` · `/spec-propose` · `/spec-refine` · `/spec-refresh-conventions` · `/spec-refresh-from-brainstorm` · `/spec-ship` · `/spec-specify` · `/spec-stack` · `/spec-status` · `/spec-test` · `/spec-verify-output`
+Commands: `/spec-check` · `/spec-explain` · `/spec-feature` · `/spec-fix` · `/spec-hooks` · `/spec-implement` · `/spec-init` · `/spec-journey` · `/spec-migrate` · `/spec-plan` · `/spec-play-coverage` · `/spec-preflight` · `/spec-propose` · `/spec-refine` · `/spec-refresh-conventions` · `/spec-refresh-from-brainstorm` · `/spec-ship` · `/spec-specify` · `/spec-stack` · `/spec-status` · `/spec-test` · `/spec-verify-output`
 
 User-level integrations: see [`system/integrations.md`](system/integrations.md).
 <!-- livespec:end -->
@@ -29,6 +29,7 @@ Source: `livespec/commands.md`
 | "Ajoute plusieurs features" / "ship N features" | `/spec-ship` (interactif) ou `/spec-ship --count N` |
 | "Corrige X" / "fix the UI" / écart mockup ↔ code | `/spec-fix <feature>` |
 | "Teste l'interface" / "vérifie le rendu" | `/spec-test <feature>` (avec flags device/target) |
+| "Crée une user journey" / "bootstrap journeys anciennes features" | `/spec-journey create` ou `/spec-journey bootstrap --from-existing` |
 | "Vérifie que tout est aligné" / spec ↔ code | `/spec-check` |
 | "Explique comment marche X" / "pourquoi a-t-on choisi Y" | `/spec-explain "<question ou feature>"` |
 | "Spécifie une feature" (sans coder) | `/spec-specify "<description>"` |

@@ -1,294 +1,183 @@
-"""Schema validation for canonical journey YAML sources."""
+"""Project-aware validation for User Journeys v2 YAML sources."""
+
+# @spec FR-006, FR-017, FR-018: qualified refs, project-aware validation, and doctor findings source
+# — .specs/features/057-cross-feature-user-journeys-v2/spec.md#fr-017
 
 from __future__ import annotations
 
 import hashlib
+import re
 from pathlib import Path
 
-import yaml  # type: ignore[import-untyped]
+import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
+from pydantic import ValidationError
 
+from .history import validate_history
 from .models import JourneyFile, JourneyIssue, JourneySeverity, JsonValue, ValidationResult
-from .paths import iter_journey_paths
+from .paths import iter_journey_source_paths
+from .schema import CoverageRefKind, JourneyAction, JourneySourceV2, RunPolicyValue
 
-ALLOWED_ACTIONS = {
-    # @spec FR-005: v1 journey actions
-    # — .specs/features/056-executable-user-journeys/spec.md#fr-005
-    "open",
-    "click",
-    "fill",
-    "select",
-    "wait",
-    "assert",
-    "assert_not",
-    "screenshot",
-    "back",
-    "press",
-}
-RUN_POLICIES = {"always", "smoke", "manual", "disabled"}
-SUPPORTED_SURFACES = {"web", "ios", "watchos", "android", "maestro"}
+_AC_RE = re.compile(r"\*\*(AC-\d+):")
+_FR_RE = re.compile(r"\*\*(FR-\d+):")
 
 
 def validate_journeys(project_root: Path, feature: str | None = None) -> ValidationResult:
-    """Validate all journey files under the project.
+    """Validate all canonical v2 journey files under the project.
 
     Args:
         project_root: Project root containing `.specs/`.
-        feature: Optional feature slug.
+        feature: Optional covered feature slug to filter valid journeys.
 
     Returns:
-        Validation result with valid journeys and issues.
+        Validation result with valid journeys and blocking issues.
     """
-    # @spec FR-002: Journey validation package
-    # — .specs/features/056-executable-user-journeys/spec.md#fr-002
     journeys: list[JourneyFile] = []
     issues: list[JourneyIssue] = []
-    for path in iter_journey_paths(project_root, feature):
-        journey, path_issues = validate_journey_file(path)
+    for path in iter_journey_source_paths(project_root):
+        journey, path_issues = validate_journey_file(project_root, path)
         issues.extend(path_issues)
-        if journey is not None:
+        if journey is None:
+            continue
+        if feature is None or feature in journey.covered_features:
             journeys.append(journey)
     return ValidationResult(journeys=journeys, issues=issues)
 
 
-def validate_journey_file(path: Path) -> tuple[JourneyFile | None, list[JourneyIssue]]:
-    """Validate one journey YAML file.
-
-    Args:
-        path: `.journey.yaml` source path.
-
-    Returns:
-        A tuple of parsed journey or `None`, plus validation issues.
-    """
-    issues: list[JourneyIssue] = []
+def validate_journey_file(
+    project_root: Path,
+    path: Path,
+) -> tuple[JourneyFile | None, list[JourneyIssue]]:
+    """Validate one v2 `journey.yaml` source file."""
     try:
         raw_text = path.read_text(encoding="utf-8")
-        data = yaml.safe_load(raw_text)
+        raw_data = yaml.safe_load(raw_text)
     except (OSError, yaml.YAMLError) as exc:
         return None, [_issue("journey_yaml_invalid", JourneySeverity.ERROR, str(exc), path)]
-    if not isinstance(data, dict):
+    if not isinstance(raw_data, dict):
         return None, [
-            _issue(
-                "journey_schema_invalid",
-                JourneySeverity.ERROR,
-                "root must be a map",
-                path,
-            )
+            _issue("journey_schema_invalid", JourneySeverity.ERROR, "root must be a map", path)
         ]
+    try:
+        source = JourneySourceV2.model_validate(raw_data)
+    except ValidationError as exc:
+        return None, [_issue("journey_schema_invalid", JourneySeverity.ERROR, str(exc), path)]
 
-    journey_id = _required_str(data, "id", path, issues)
-    feature = _required_str(data, "feature", path, issues)
-    title = _required_str(data, "title", path, issues)
-    run_policy = _optional_str(data, "run_policy", "always")
-    disabled = bool(data.get("disabled", False)) or run_policy == "disabled"
-    target_surface = _target_surface(data, path, issues)
-    covers_ac, covers_fr = _covers(data)
-    steps = _steps(data, path, issues)
-    manual_reason = _optional_nullable_str(data, "manual_reason")
-
-    if run_policy not in RUN_POLICIES:
-        issues.append(
-            _issue(
-                "journey_run_policy_unknown",
-                JourneySeverity.ERROR,
-                f"unknown run_policy {run_policy!r}",
-                path,
-            )
-        )
-    if target_surface not in SUPPORTED_SURFACES:
-        issues.append(
-            _issue(
-                "journey_target_unsupported",
-                JourneySeverity.ERROR,
-                f"unsupported target surface {target_surface!r}",
-                path,
-            )
-        )
-    if run_policy == "manual" and not manual_reason:
-        issues.append(
-            _issue(
-                "journey_manual_reason_missing",
-                JourneySeverity.ERROR,
-                "manual journeys require manual_reason",
-                path,
-            )
-        )
-
+    source_hash = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()
+    issues = _validate_source_contract(project_root, path, source)
+    issues.extend(validate_history(project_root, source.id, source_hash))
     if any(issue.severity == JourneySeverity.ERROR for issue in issues):
         return None, issues
+    primary_feature = source.covers[0].feature
     return (
         JourneyFile(
             path=path,
-            journey_id=journey_id,
-            feature=feature,
-            title=title,
-            target_surface=target_surface,
-            run_policy=run_policy,
-            steps=steps,
-            covers_ac=covers_ac,
-            covers_fr=covers_fr,
-            disabled=disabled,
-            manual_reason=manual_reason,
-            source_hash=hashlib.sha256(raw_text.encode("utf-8")).hexdigest(),
+            journey_id=source.id,
+            feature=primary_feature,
+            title=source.title,
+            target_surface=source.targets[0].surface,
+            run_policy=_primary_policy(source),
+            runner=source.targets[0].runner.value,
+            steps=_legacy_steps(source),
+            schema_version=2,
+            covered_features=sorted({cover.feature for cover in source.covers}),
+            covers_ac=[cover.ref for cover in source.covers if cover.kind is CoverageRefKind.AC],
+            covers_fr=[cover.ref for cover in source.covers if cover.kind is CoverageRefKind.FR],
+            disabled=source.status.value == "disabled" or _primary_policy(source) == "disabled",
+            manual_reason=None,
+            source_hash=source_hash,
         ),
         issues,
     )
 
 
-def _steps(
-    data: dict[object, object],
+def _validate_source_contract(
+    project_root: Path,
     path: Path,
-    issues: list[JourneyIssue],
-) -> list[dict[str, JsonValue]]:
-    """Validate and normalize the journey step list."""
-    raw_steps = data.get("steps")
-    if not isinstance(raw_steps, list) or not raw_steps:
+    source: JourneySourceV2,
+) -> list[JourneyIssue]:
+    """Validate cross-file constraints after Pydantic schema parsing."""
+    issues: list[JourneyIssue] = []
+    if path.parent.name != source.id:
         issues.append(
             _issue(
-                "journey_steps_missing",
+                "journey_id_path_mismatch",
                 JourneySeverity.ERROR,
-                "steps must be a non-empty list",
+                "journey id must match its directory name",
                 path,
             )
         )
-        return []
+    changelog = path.parent / "changelog.md"
+    if not changelog.exists():
+        issues.append(
+            _issue(
+                "journey_changelog_missing",
+                JourneySeverity.ERROR,
+                "v2 journeys require changelog.md",
+                changelog,
+            )
+        )
+    for cover in source.covers:
+        spec_path = project_root / ".specs" / "features" / cover.feature / "spec.md"
+        if not spec_path.exists():
+            issues.append(
+                _issue(
+                    "journey_feature_missing",
+                    JourneySeverity.ERROR,
+                    f"covered feature {cover.feature} is missing",
+                    path,
+                )
+            )
+            continue
+        known_refs = _known_refs(spec_path, cover.kind)
+        if cover.ref not in known_refs:
+            issues.append(
+                _issue(
+                    "journey_requirement_missing",
+                    JourneySeverity.ERROR,
+                    f"{cover.feature} does not define {cover.ref}",
+                    path,
+                )
+            )
+    return issues
 
+
+def _known_refs(spec_path: Path, kind: CoverageRefKind) -> set[str]:
+    """Return requirement IDs declared in a feature spec file."""
+    text = spec_path.read_text(encoding="utf-8", errors="ignore")
+    return set(_AC_RE.findall(text) if kind is CoverageRefKind.AC else _FR_RE.findall(text))
+
+
+def _primary_policy(source: JourneySourceV2) -> str:
+    """Return the most representative policy for legacy category counts."""
+    if RunPolicyValue.DISABLED in source.run_policy.values():
+        return "disabled"
+    if RunPolicyValue.MANUAL in source.run_policy.values():
+        return "manual"
+    if RunPolicyValue.ALWAYS in source.run_policy.values():
+        return "always"
+    if RunPolicyValue.SMOKE in source.run_policy.values():
+        return "smoke"
+    return "impacted"
+
+
+def _legacy_steps(source: JourneySourceV2) -> list[dict[str, JsonValue]]:
+    """Convert v2 action models into the existing compiler step shape."""
     steps: list[dict[str, JsonValue]] = []
-    for index, raw_step in enumerate(raw_steps, start=1):
-        if not isinstance(raw_step, dict) or len(raw_step) != 1:
-            issues.append(
-                _issue(
-                    "journey_step_invalid",
-                    JourneySeverity.ERROR,
-                    f"step {index} must contain exactly one action",
-                    path,
-                )
-            )
+    for step in source.steps:
+        if step.action is JourneyAction.OPEN and step.target is not None:
+            steps.append({"open": step.target.route or ""})
             continue
-        action = next(iter(raw_step.keys()))
-        if not isinstance(action, str):
-            issues.append(
-                _issue(
-                    "journey_step_invalid",
-                    JourneySeverity.ERROR,
-                    f"step {index} action must be a string",
-                    path,
-                )
-            )
-            continue
-        if action not in ALLOWED_ACTIONS:
-            issues.append(
-                _issue(
-                    "journey_action_unknown",
-                    JourneySeverity.ERROR,
-                    f"unknown action {action!r} at step {index}",
-                    path,
-                )
-            )
-        value = raw_step[action]
-        if action == "wait" and isinstance(value, dict):
-            has_until = "until" in value
-            has_reason = bool(value.get("reason"))
-            if "seconds" in value and not has_until and not has_reason:
-                issues.append(
-                    _issue(
-                        "wait_reason_missing",
-                        JourneySeverity.WARNING,
-                        f"wait.seconds at step {index} needs until or reason",
-                        path,
-                    )
-                )
-        steps.append({action: _json_value(value)})
+        payload: dict[str, JsonValue] = {}
+        if step.target is not None:
+            payload = step.target.model_dump(mode="json", exclude_none=True)
+        if step.value is not None:
+            payload["value"] = step.value
+        if step.seconds is not None:
+            payload["seconds"] = step.seconds
+        if step.key is not None:
+            payload["key"] = step.key
+        steps.append({step.action.value: payload})
     return steps
-
-
-def _covers(data: dict[object, object]) -> tuple[list[str], list[str]]:
-    """Extract covered AC and FR identifiers from the `covers` block."""
-    covers = data.get("covers")
-    if not isinstance(covers, dict):
-        return [], []
-    return _str_list(covers.get("ac")), _str_list(covers.get("fr"))
-
-
-def _target_surface(
-    data: dict[object, object],
-    path: Path,
-    issues: list[JourneyIssue],
-) -> str:
-    """Extract target.surface from the journey payload."""
-    target = data.get("target")
-    if not isinstance(target, dict):
-        issues.append(
-            _issue(
-                "journey_target_missing",
-                JourneySeverity.ERROR,
-                "target.surface is required",
-                path,
-            )
-        )
-        return ""
-    surface = target.get("surface")
-    if not isinstance(surface, str) or not surface.strip():
-        issues.append(
-            _issue(
-                "journey_target_missing",
-                JourneySeverity.ERROR,
-                "target.surface is required",
-                path,
-            )
-        )
-        return ""
-    return surface.strip().lower()
-
-
-def _required_str(
-    data: dict[object, object],
-    key: str,
-    path: Path,
-    issues: list[JourneyIssue],
-) -> str:
-    """Read a required string field and append an issue when missing."""
-    value = data.get(key)
-    if isinstance(value, str) and value.strip():
-        return value.strip()
-    issues.append(
-        _issue(
-            "journey_field_missing",
-            JourneySeverity.ERROR,
-            f"{key} is required",
-            path,
-        )
-    )
-    return ""
-
-
-def _optional_str(data: dict[object, object], key: str, default: str) -> str:
-    """Read an optional string field."""
-    value = data.get(key)
-    return value.strip() if isinstance(value, str) and value.strip() else default
-
-
-def _optional_nullable_str(data: dict[object, object], key: str) -> str | None:
-    """Read an optional string field as `None` when absent or empty."""
-    value = data.get(key)
-    return value.strip() if isinstance(value, str) and value.strip() else None
-
-
-def _str_list(value: object) -> list[str]:
-    """Return a list of strings from a YAML scalar list."""
-    if not isinstance(value, list):
-        return []
-    return [item.strip() for item in value if isinstance(item, str) and item.strip()]
-
-
-def _json_value(value: object) -> JsonValue:
-    """Convert YAML values into the supported JSON-like type."""
-    if isinstance(value, str | int | float | bool) or value is None:
-        return value
-    if isinstance(value, list):
-        return [_json_value(item) for item in value]
-    if isinstance(value, dict):
-        return {str(key): _json_value(item) for key, item in value.items()}
-    return str(value)
 
 
 def _issue(code: str, severity: JourneySeverity, message: str, path: Path) -> JourneyIssue:

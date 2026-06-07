@@ -42,6 +42,12 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 
 > Upgrade a LiveSpec project to the latest version by applying pending migrations sequentially.
 
+## User Journeys v2 Migration
+
+- Include `livespec journey migrate --from-v1` when legacy `.specs/journeys/<feature>/*.journey.yaml` files exist.
+- Migration creates `.specs/journeys/<journey-id>/journey.yaml`, `changelog.md`, `decisions/`, generated feature backlinks, and migration findings for unresolved refs.
+- Normal v2 validation/run must not silently consume v1 files; v1 is migration-only.
+
 ---
 
 ## Overview

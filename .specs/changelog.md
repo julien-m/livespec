@@ -3,7 +3,17 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-03
+> Last updated: 2026-06-07
+
+---
+
+## 2026-06-07 — [Feature 057 Fix]: Added Migration 19 so existing v18 projects receive `$spec-journey`, User Journeys v2 routing, and updated command guidance through `$spec-migrate`; updated root README command documentation.
+
+## 2026-06-05 — [Feature 057 Fix]: Closed the `$spec-check` gaps for Cross-Feature User Journeys v2 — canonical 41 FR / 46 AC implementation mapping, global v2 journey skill wording, compiled-only journey gates, tighter impact detection, and Python convention fixes. Report: `features/057-cross-feature-user-journeys-v2/checks/2026-06-05.md`.
+
+## 2026-06-04 — [Feature 057] Check: Partial alignment — tests pass, but canonical traceability is incomplete (0/41 FR, 0/46 AC mapped in `implementation.md`) and stale v1/compile-at-test journey instructions remain in command skills. Report: `features/057-cross-feature-user-journeys-v2/checks/2026-06-04.md`.
+
+## 2026-06-04 — [Feature 057]: Implemented Cross-Feature User Journeys v2 — global journey directories, qualified cross-feature refs, history/decision governance, bootstrap/impact services, compiled-only runs, native/LLM visual checks, v1 migration, doctor findings, `$spec-journey`, and full non-integration suite verification.
 
 ---
 

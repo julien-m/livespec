@@ -19,6 +19,7 @@ EXPECTED_SPEC_COMMANDS = {
     "spec-hooks",
     "spec-implement",
     "spec-init",
+    "spec-journey",
     "spec-migrate",
     "spec-plan",
     "spec-play-coverage",
