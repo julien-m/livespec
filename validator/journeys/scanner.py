@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 from .backlinks import verify_feature_backlinks
-from .manifest import read_compiled_manifest
+from .manifest import COMPILER_VERSION, read_compiled_manifest
 from .models import JourneyFinding, JourneyReport, JourneySeverity
 from .paths import iter_journey_source_paths, iter_v1_journey_source_paths
 from .validator import validate_journeys
@@ -88,7 +88,9 @@ def _scan_manifest_stale_for_all_sources(
 ) -> list[JourneyFinding]:
     """Report stale manifests even when cross-file validation rejects the source."""
     existing_stale_paths = {
-        finding.path for finding in existing if finding.code == "journey_compiled_stale"
+        finding.path
+        for finding in existing
+        if finding.code in {"journey_compiled_stale", "journey_compiler_stale"}
     }
     findings: list[JourneyFinding] = []
     for path in iter_journey_source_paths(project_root):
@@ -103,6 +105,16 @@ def _scan_manifest_stale_for_all_sources(
                     code="journey_compiled_stale",
                     severity=JourneySeverity.ERROR,
                     message=f"Compiled manifest for journey {journey_id} has a stale source hash.",
+                    path=path,
+                )
+            )
+            continue
+        if manifest.compiler_version != COMPILER_VERSION:
+            findings.append(
+                JourneyFinding(
+                    code="journey_compiler_stale",
+                    severity=JourneySeverity.ERROR,
+                    message=f"Compiled manifest for journey {journey_id} uses an old compiler.",
                     path=path,
                 )
             )
@@ -166,6 +178,16 @@ def _scan_compiled_artifact(project_root: Path, journey: object) -> list[Journey
                 message=(
                     f"Compiled artifact for journey {typed.journey_id} has a stale source hash."
                 ),
+                path=typed.path,
+                feature=typed.feature,
+            )
+        ]
+    if manifest.compiler_version != COMPILER_VERSION:
+        return [
+            JourneyFinding(
+                code="journey_compiler_stale",
+                severity=JourneySeverity.ERROR,
+                message=f"Compiled artifact for journey {typed.journey_id} uses an old compiler.",
                 path=typed.path,
                 feature=typed.feature,
             )

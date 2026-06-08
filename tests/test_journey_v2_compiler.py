@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import json
 import shutil
+import subprocess
 from pathlib import Path
+
+from pytest import MonkeyPatch
 
 from tests.test_journey_v2_validation import _write_feature, _write_v2_journey
 from validator.journeys.compiler import compile_journeys
@@ -57,6 +60,71 @@ def test_compile_v2_generates_xcuitest_and_maestro_by_runner(tmp_path: Path) -> 
     )
     assert swift_artifact.exists()
     assert maestro_artifact.exists()
+
+
+def test_compile_v2_runs_xcodegen_for_xcuitest_project_yml(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """FR-029: XcodeGen projects regenerate xcodeproj after Swift journey output."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8").replace("runner: playwright", "runner: xcuitest"),
+        encoding="utf-8",
+    )
+    (tmp_path / "project.yml").write_text("name: App\n", encoding="utf-8")
+    calls: list[list[str]] = []
+
+    def fake_run(
+        argv: list[str],
+        **kwargs: object,
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(list(argv))
+        return subprocess.CompletedProcess(argv, 0, stdout="generated", stderr="")
+
+    monkeypatch.setattr("validator.journeys.compiler.shutil.which", lambda _: "/bin/xcodegen")
+    monkeypatch.setattr("validator.journeys.compiler.subprocess.run", fake_run)
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.message for issue in result.issues]
+    assert calls == [["xcodegen", "generate"]]
+
+
+def test_compile_v2_reports_xcodegen_failure_for_xcuitest_project_yml(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """FR-029: XcodeGen failures block stale Xcode project inclusion."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8").replace("runner: playwright", "runner: xcuitest"),
+        encoding="utf-8",
+    )
+    (tmp_path / "project.yml").write_text("name: App\n", encoding="utf-8")
+
+    def fake_run(
+        argv: list[str],
+        **kwargs: object,
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(argv, 1, stdout="", stderr="bad project")
+
+    monkeypatch.setattr("validator.journeys.compiler.shutil.which", lambda _: "/bin/xcodegen")
+    monkeypatch.setattr("validator.journeys.compiler.subprocess.run", fake_run)
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 1
+    assert result.issues[0].code == "journey_xcodegen_failed"
+    assert read_compiled_manifest(tmp_path, "onboarding-first-project") is None
 
 
 def test_compile_v2_rejects_ui_journey_for_pytest_and_cargo(tmp_path: Path) -> None:

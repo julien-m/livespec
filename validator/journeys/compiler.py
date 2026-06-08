@@ -6,6 +6,9 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
+from dataclasses import dataclass
 from pathlib import Path
 
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
@@ -13,12 +16,28 @@ import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
 from .capabilities import validate_runner_capability
 from .compiler_registry import get_compiler_backend
 from .manifest import write_compiled_manifest
-from .models import CompiledJourneyArtifact, CompileResult, JourneyFile, JourneyIssue, JsonValue
+from .models import (
+    CompiledJourneyArtifact,
+    CompileResult,
+    JourneyFile,
+    JourneyIssue,
+    JourneySeverity,
+    JsonValue,
+)
 from .paths import relative_to_project, slug_to_pascal, slug_to_snake, visual_contracts_dir
 from .schema import JourneySourceV2, JourneyTargetRef, VisualCheckMode
 from .validator import validate_journeys
 
 HASH_MARKER = "livespec-journey-source-hash:"
+
+
+@dataclass(frozen=True)
+class _PendingManifest:
+    """Compiled journey data waiting for an external project refresh."""
+
+    journey: JourneyFile
+    output_path: Path
+    visual_contract_paths: list[Path]
 
 
 def compile_journeys(
@@ -35,6 +54,7 @@ def compile_journeys(
     if validation.error_count:
         return CompileResult(artifacts=artifacts, issues=issues)
 
+    pending_xcuitest_manifests: list[_PendingManifest] = []
     for source in validation.journeys:
         if journey is not None and source.journey_id != journey:
             continue
@@ -49,6 +69,15 @@ def compile_journeys(
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(content, encoding="utf-8")
         visual_contract_paths = _write_visual_contracts(project_root, source)
+        if source.runner == "xcuitest":
+            pending_xcuitest_manifests.append(
+                _PendingManifest(
+                    journey=source,
+                    output_path=output_path,
+                    visual_contract_paths=visual_contract_paths,
+                )
+            )
+            continue
         write_compiled_manifest(
             project_root,
             journey_id=source.journey_id,
@@ -66,6 +95,29 @@ def compile_journeys(
                 runner=source.runner,
             )
         )
+    if pending_xcuitest_manifests:
+        xcodegen_issue = _run_xcodegen_if_needed(project_root)
+        if xcodegen_issue is not None:
+            issues.append(xcodegen_issue)
+        else:
+            for pending in pending_xcuitest_manifests:
+                write_compiled_manifest(
+                    project_root,
+                    journey_id=pending.journey.journey_id,
+                    source_path=pending.journey.path,
+                    source_hash=pending.journey.source_hash,
+                    runner=pending.journey.runner,
+                    native_output_paths=[pending.output_path],
+                    visual_contract_paths=pending.visual_contract_paths,
+                )
+                artifacts.append(
+                    CompiledJourneyArtifact(
+                        source_path=pending.journey.path,
+                        output_path=pending.output_path,
+                        source_hash=pending.journey.source_hash,
+                        runner=pending.journey.runner,
+                    )
+                )
     return CompileResult(artifacts=artifacts, issues=issues)
 
 
@@ -199,6 +251,56 @@ def _compile_maestro(project_root: Path, journey: JourneyFile) -> str:
     for step in journey.steps:
         flow.extend(_maestro_step(step))
     return yaml.safe_dump(flow, sort_keys=False)
+
+
+def _run_xcodegen_if_needed(project_root: Path) -> JourneyIssue | None:
+    """Regenerate XcodeGen projects after writing generated XCUITest Swift files."""
+    project_file = _xcodegen_project_path(project_root)
+    if project_file is None:
+        return None
+    if shutil.which("xcodegen") is None:
+        return JourneyIssue(
+            code="journey_xcodegen_missing",
+            severity=JourneySeverity.ERROR,
+            message="XcodeGen project detected but `xcodegen` is not on PATH.",
+            path=project_file,
+        )
+    try:
+        # XcodeGen reads project.yml/project.yaml from cwd, exits non-zero for invalid
+        # specs, and 120s covers large project regeneration without hanging CI forever.
+        result = subprocess.run(
+            ["xcodegen", "generate"],
+            cwd=str(project_root),
+            capture_output=True,
+            text=True,
+            timeout=120,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as error:
+        return JourneyIssue(
+            code="journey_xcodegen_failed",
+            severity=JourneySeverity.ERROR,
+            message=f"xcodegen generate timed out after {error.timeout}s",
+            path=project_file,
+        )
+    if result.returncode != 0:
+        output = (result.stderr or result.stdout or "").strip()
+        return JourneyIssue(
+            code="journey_xcodegen_failed",
+            severity=JourneySeverity.ERROR,
+            message=output or f"xcodegen generate exited with {result.returncode}",
+            path=project_file,
+        )
+    return None
+
+
+def _xcodegen_project_path(project_root: Path) -> Path | None:
+    """Return the XcodeGen project spec path when one is present."""
+    for filename in ("project.yml", "project.yaml"):
+        path = project_root / filename
+        if path.exists():
+            return path
+    return None
 
 
 def _playwright_step(step: dict[str, JsonValue]) -> list[str]:

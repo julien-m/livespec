@@ -13,7 +13,7 @@ from typing import cast
 from .paths import journey_manifest_path, relative_to_project
 
 MANIFEST_SCHEMA_VERSION = 1
-COMPILER_VERSION = "journeys-v2-1"
+COMPILER_VERSION = "journeys-v2-2"
 
 
 @dataclass(frozen=True)

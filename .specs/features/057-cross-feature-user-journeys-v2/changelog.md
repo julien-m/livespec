@@ -1,5 +1,15 @@
 # Changelog - Cross-Feature User Journeys v2
 
+## 2026-06-08 — [Fix]: Native journey execution and migration refresh
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `validator/journeys/runner.py`, `validator/journeys/compiler.py`, `validator/journeys/manifest.py`, `validator/journeys/scanner.py`, `validator/cli_commands/journey_cmd.py`, `validator/cli_commands/test_cmd.py`, `tests/test_journey_v2_runner.py`, `tests/test_journey_v2_compiler.py`, `tests/test_journey_v2_test_integration.py`, `.agent-sync/skills/spec-journey/SKILL.md`, `.agent-sync/skills/spec-test/SKILL.md`, `.agent-sync/skills/spec-feature/SKILL.md`, `.agent-sync/skills/spec-implement/SKILL.md`, `system/testing/user-journeys.md`, `README.md`, `VERSION`, `migrations/20/migrate.md`, `tests/integration/test_migration_v19_user_journeys.py`
+- **Gaps closed:** Native compiled artifacts now execute through Playwright, XCUITest, Maestro, pytest, or cargo dispatch; `livespec test` no longer uses freshness-only journey gates; XCUITest compilation runs `xcodegen generate` for XcodeGen projects; compiler version `journeys-v2-2` forces old manifests to be regenerated after migration.
+- **Remaining:** None for the native execution and migration gap.
+- **Verification:** `pytest tests/test_journey_v2_runner.py tests/test_journey_v2_test_integration.py tests/test_journey_v2_compiler.py -q`
+- **Author:** spec-fix
+
 ## 2026-06-07 - Fix: Migration 19 and README entrypoint
 
 - **Type:** Bug Fix

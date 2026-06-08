@@ -302,7 +302,7 @@ Create and govern cross-feature User Journeys v2. Journey sources live globally 
 /spec-journey bootstrap --from-existing    # Propose journeys for old projects/features
 /spec-journey edit onboarding-first-project # Governed edit with decision + changelog
 /spec-journey impact                       # Detect changed files touching old journeys
-/spec-journey run                          # Run compiled artifacts only
+/spec-journey run                          # Execute compiled native artifacts only
 /spec-journey list
 /spec-journey inspect onboarding-first-project
 ```
@@ -318,7 +318,7 @@ livespec journey migrate --from-v1 [--apply] [--json]
 livespec journey list|inspect
 ```
 
-Rules: create/edit compiles once; `run` never recompiles and fails on stale manifests. Edits require classification (`regression`, `intentional_update`, `obsolete`, `selector_fix`, or `coverage_expansion`) plus decision, changelog, validation, and run evidence. Visual checks may be native deterministic checks or strict JSON LLM screenshot checks. See [`system/testing/user-journeys.md`](system/testing/user-journeys.md).
+Rules: create/edit compiles once; `run` executes native artifacts without recompiling and fails on stale source or old compiler manifests. XCUITest compilation runs `xcodegen generate` when `project.yml`/`project.yaml` is present. Edits require classification (`regression`, `intentional_update`, `obsolete`, `selector_fix`, or `coverage_expansion`) plus decision, changelog, validation, and run evidence. Visual checks may be native deterministic checks or strict JSON LLM screenshot checks. **Read** [`system/testing/user-journeys.md`](system/testing/user-journeys.md).
 
 ### `/spec-check`
 

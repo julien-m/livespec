@@ -102,7 +102,7 @@ def _run_test(
     typer.echo(f"Executable user journeys: {executable_journeys}")
     typer.echo(f"Manual tests: {manual_journeys}")
     typer.echo(f"Disabled journeys: {disabled_journeys}")
-    journey_run = run_journeys(project_root, feature=feature, execute=False)
+    journey_run = run_journeys(project_root, feature=feature)
     for issue in journey_run.issues:
         typer.echo(
             f"{issue.severity.value} {issue.code} "

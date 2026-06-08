@@ -22,12 +22,15 @@ def _fake_cc_hub(bin_dir: Path, log_path: Path) -> None:
     script.chmod(0o755)
 
 
-def _run_migration_v19(
+def _run_migration(
     tmp_path: Path,
+    *,
+    from_version: str,
+    to_version: str,
 ) -> tuple[Path, str, subprocess.CompletedProcess[str]]:
     project = tmp_path / "project"
     (project / ".specs").mkdir(parents=True)
-    (project / ".specs" / "livespec-version").write_text("18\n", encoding="utf-8")
+    (project / ".specs" / "livespec-version").write_text(f"{from_version}\n", encoding="utf-8")
     log_path = tmp_path / "cc-hub.log"
     bin_dir = tmp_path / "bin"
     _fake_cc_hub(bin_dir, log_path)
@@ -38,7 +41,7 @@ def _run_migration_v19(
         [
             "bash",
             str(MIGRATE_SH),
-            str(REPO_ROOT / "migrations" / "19" / "migrate.md"),
+            str(REPO_ROOT / "migrations" / to_version / "migrate.md"),
             str(project),
             str(REPO_ROOT),
         ],
@@ -53,7 +56,7 @@ def _run_migration_v19(
 
 @pytest.mark.level_3a
 def test_migration_v19_refreshes_agent_assets_for_spec_journey(tmp_path: Path) -> None:
-    project, log, result = _run_migration_v19(tmp_path)
+    project, log, result = _run_migration(tmp_path, from_version="18", to_version="19")
 
     assert result.returncode == 0, result.stderr
     assert (project / ".specs" / "livespec-version").read_text().strip() == "19"
@@ -62,4 +65,15 @@ def test_migration_v19_refreshes_agent_assets_for_spec_journey(tmp_path: Path) -
     assert "spec-journey" in log
     assert "agent build" in log
     assert "rule build" in log
+    assert "--agent-sync-root .agent-sync.local" in log
+
+
+@pytest.mark.level_3a
+def test_migration_v20_refreshes_assets_after_native_runner_fix(tmp_path: Path) -> None:
+    project, log, result = _run_migration(tmp_path, from_version="19", to_version="20")
+
+    assert result.returncode == 0, result.stderr
+    assert (project / ".specs" / "livespec-version").read_text().strip() == "20"
+    assert (project / ".agent-sync.local" / "skills" / "spec-journey").is_symlink()
+    assert "spec-journey" in log
     assert "--agent-sync-root .agent-sync.local" in log

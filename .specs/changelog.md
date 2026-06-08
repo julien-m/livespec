@@ -3,9 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-07
+> Last updated: 2026-06-08
 
 ---
+
+## 2026-06-08 — [Feature 057 Fix]: User Journeys v2 now execute compiled native artifacts during `journey run`/`livespec test`, refresh XcodeGen projects after XCUITest compilation, and Migration 20 forces old compiled manifests to be regenerated.
 
 ## 2026-06-07 — [Feature 057 Fix]: Added Migration 19 so existing v18 projects receive `$spec-journey`, User Journeys v2 routing, and updated command guidance through `$spec-migrate`; updated root README command documentation.
 

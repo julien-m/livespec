@@ -46,8 +46,8 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 ## User Journeys v2
 
 - Include global journeys from `.specs/journeys/<journey-id>/journey.yaml` in the coverage matrix.
-- Execute compiled covering and impacted journeys through `livespec journey run`; this does not compile.
-- Report direct tests, covering journeys, impacted journeys, manual journeys, disabled journeys, stale manifests, and missing manifests separately.
+- Execute compiled covering and impacted journeys through `livespec journey run`; this runs native artifacts and does not compile.
+- Report direct tests, covering journeys, impacted journeys, manual journeys, disabled journeys, stale manifests, old compiler manifests, native runner failures, and missing manifests separately.
 
 ---
 

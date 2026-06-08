@@ -1,5 +1,6 @@
 ---
 title: "Plan - Cross-Feature User Journeys v2"
+spec_ref: spec.md
 status: Approved
 created: 2026-06-04
 updated: 2026-06-04

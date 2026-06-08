@@ -1,0 +1,27 @@
+{
+  "alignment": [],
+  "classification": "NON_VISUAL",
+  "command": "spec-fix",
+  "conflict_reason": null,
+  "exit_code": 0,
+  "feature_slug": "057-cross-feature-user-journeys-v2",
+  "link_violations": [],
+  "manifest_status": null,
+  "missing_artifacts": [],
+  "penflow": null,
+  "runtime_in_design_screens_violations": [],
+  "signals": {
+    "s1_spec_explicit_false": false,
+    "s1_spec_marker": false,
+    "s2_feature_screens": false,
+    "s3_penflow_workspace": false,
+    "s4_flow_ui_contract": false,
+    "s5_feature_baselines": false,
+    "s6_surfaces_yaml": false,
+    "strong_count": 0,
+    "weak_count": 0
+  },
+  "target": null,
+  "verdict": "PASS",
+  "visual_evidence": null
+}

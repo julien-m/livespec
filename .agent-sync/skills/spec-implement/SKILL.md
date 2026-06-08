@@ -45,7 +45,7 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 
 ## User Journeys v2 Gate
 
-- During post-step and final gates, run impacted existing journeys with `livespec journey run --feature <feature-slug>`; run is compiled-only.
+- During post-step and final gates, run impacted existing journeys with `livespec journey run --feature <feature-slug>`; run is compiled-only native execution.
 - If a code/spec/mockup/label/selector change impacts an old journey, classify it via `$spec-journey edit <journey-id>` before marking implementation complete.
 - Do not call `livespec journey compile` from the run gate; compile only on journey create/edit or explicit compile.
 

@@ -1,4 +1,5 @@
 ---
+title: "Implementation - Cross-Feature User Journeys v2"
 feature: 057-cross-feature-user-journeys-v2
 status: Implemented
 implemented: 2026-06-04
@@ -37,13 +38,13 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | FR-020 | `validator/journeys/impact.py` | `@spec FR-020` | ✅ Implemented | 2026-06-05 |
 | FR-021 | `validator/journeys/impact.py` | `@spec FR-021` | ✅ Implemented | 2026-06-05 |
 | FR-022 | `validator/cli_commands/journey_cmd.py` | `@spec FR-022` | ✅ Implemented | 2026-06-05 |
-| FR-023 | `validator/journeys/compiler.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-023` | ✅ Implemented | 2026-06-05 |
-| FR-024 | `validator/journeys/runner.py`, `validator/cli_commands/test_cmd.py` | `@spec FR-024` | ✅ Implemented | 2026-06-05 |
+| FR-023 | `validator/journeys/compiler.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-023` | ✅ Implemented | 2026-06-08 |
+| FR-024 | `validator/journeys/runner.py`, `validator/cli_commands/test_cmd.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-024` | ✅ Implemented | 2026-06-08 |
 | FR-025 | `.agent-sync/skills/spec-feature/SKILL.md`, `.agent-sync/skills/spec-implement/SKILL.md` | `@spec FR-025` | ✅ Implemented | 2026-06-05 |
-| FR-026 | `.agent-sync/skills/spec-test/SKILL.md`, `validator/cli_commands/test_cmd.py` | `@spec FR-026` | ✅ Implemented | 2026-06-05 |
-| FR-027 | `validator/journeys/runner.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-027` | ✅ Implemented | 2026-06-05 |
+| FR-026 | `.agent-sync/skills/spec-test/SKILL.md`, `validator/cli_commands/test_cmd.py` | `@spec FR-026` | ✅ Implemented | 2026-06-08 |
+| FR-027 | `validator/journeys/runner.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-027` | ✅ Implemented | 2026-06-08 |
 | FR-028 | `validator/journeys/compiler_registry.py`, `validator/journeys/capabilities.py`, `validator/journeys/compiler.py` | `@spec FR-028` | ✅ Implemented | 2026-06-05 |
-| FR-029 | `validator/journeys/manifest.py`, `validator/journeys/compiler.py` | `@spec FR-029` | ✅ Implemented | 2026-06-05 |
+| FR-029 | `validator/journeys/manifest.py`, `validator/journeys/compiler.py`, `validator/journeys/runner.py`, `validator/journeys/scanner.py` | `@spec FR-029` | ✅ Implemented | 2026-06-08 |
 | FR-030 | `validator/journeys/manifest.py`, `validator/journeys/compiler.py` | `@spec FR-030` | ✅ Implemented | 2026-06-05 |
 | FR-031 | `validator/journeys/schema.py` | `@spec FR-031` | ✅ Implemented | 2026-06-05 |
 | FR-032 | `validator/journeys/schema.py`, `validator/journeys/impact.py` | `@spec FR-032` | ✅ Implemented | 2026-06-05 |
@@ -121,11 +122,12 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | `validator/journeys/assignment.py` | Deterministic free-form assignment candidates with evidence. |
 | `validator/journeys/bootstrap.py` | Existing-project journey candidate bootstrap without writes. |
 | `validator/journeys/impact.py` | Journey impact detection from SmartTestSelector, product text, stable selectors, and visual targets. |
-| `validator/journeys/compiler.py` | Ahead-of-time compiler facade and native artifact generation. |
+| `validator/journeys/compiler.py` | Ahead-of-time compiler facade, native artifact generation, and XcodeGen refresh for generated XCUITest files. |
 | `validator/journeys/compiler_registry.py` | Runner backend registry. |
 | `validator/journeys/capabilities.py` | Unsupported capability rejection. |
-| `validator/journeys/manifest.py` | Compiled manifest read/write semantics. |
-| `validator/journeys/runner.py` | Compiled-only journey run selection and stale manifest checks. |
+| `validator/journeys/manifest.py` | Compiled manifest read/write semantics plus compiler versioning. |
+| `validator/journeys/runner.py` | Compiled-only journey run selection, run-policy gates, stale manifest checks, and native runner execution. |
+| `validator/journeys/scanner.py` | Doctor journey stale checks, including old compiler manifests. |
 | `validator/journeys/migration.py` | v1 `.journey.yaml` migration to v2 global directories. |
 | `validator/journeys/visual_contracts.py` | Native deterministic visual checks. |
 | `validator/journeys/llm_visual.py` | Strict JSON LLM screenshot evaluator. |
@@ -137,9 +139,9 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | `.agent-sync/skills/spec-specify/SKILL.md` | Global v2 journey proposal wording. |
 | `system/testing/user-journeys.md` | Canonical v2 journey documentation. |
 | `README.md` | Public command entrypoint now documents `/spec-journey` and User Journeys v2. |
-| `VERSION`, `migrations/19/migrate.md` | Migration point that refreshes agent-sync assets for existing v18 projects. |
+| `VERSION`, `migrations/19/migrate.md`, `migrations/20/migrate.md` | Migration points that refresh agent-sync assets and force old compiled journey manifests to regenerate. |
 | `tests/test_journey_v2_*.py` | Focused tests for schema, validation, history, assignment, impact, compile, run, CLI, migration, doctor, docs, and visual/LLM behavior. |
-| `tests/integration/test_migration_v19_user_journeys.py` | Integration proof that Migration 19 installs `spec-journey` assets. |
+| `tests/integration/test_migration_v19_user_journeys.py` | Integration proof that Migrations 19 and 20 refresh User Journeys assets. |
 
 ## Verification
 

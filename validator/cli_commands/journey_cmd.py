@@ -113,7 +113,6 @@ def run_command(
         journey=journey,
         feature=feature,
         stage=stage,
-        execute=False,
     )
     if json_output:
         typer.echo(
@@ -145,7 +144,7 @@ def test_command(
 ) -> None:
     """Deprecated alias for `journey run`; never compiles."""
     project_root = require_specs_root()
-    result = run_journeys(project_root, feature=feature, execute=False)
+    result = run_journeys(project_root, feature=feature)
     _emit_issues(project_root, result.issues)
     emit_summary(
         "journey test",
