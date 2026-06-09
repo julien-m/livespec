@@ -12,14 +12,26 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
+from typing import NotRequired, TypeAlias, TypedDict, Unpack
 from unittest.mock import Mock
 
 import pytest
-from pytest import MonkeyPatch
 
 from tests.test_journey_v2_validation import _write_feature, _write_v2_journey
 from validator.journeys.compiler import compile_journeys
 from validator.journeys.runner import run_journeys
+
+_JsonValue: TypeAlias = (
+    None | bool | int | float | str | list["_JsonValue"] | dict[str, "_JsonValue"]
+)
+
+
+class _RunKwargs(TypedDict, total=False):
+    cwd: NotRequired[str]
+    capture_output: NotRequired[bool]
+    text: NotRequired[bool]
+    timeout: NotRequired[int]
+    check: NotRequired[bool]
 
 
 def _setup_compiled(tmp_path: Path) -> Path:
@@ -49,6 +61,47 @@ def _setup_xcuitest_compiled_project(tmp_path: Path) -> None:
     assert compile_result.error_count == 0
     (tmp_path / "App.xcodeproj").mkdir()
     (tmp_path / "App.xcodeproj" / "project.pbxproj").write_text("", encoding="utf-8")
+
+
+def _setup_watch_xcuitest_compiled_project(tmp_path: Path) -> None:
+    """Create a watchOS fixture by moving the compiled artifact and manifest path."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    specs = tmp_path / ".specs"
+    compiled = tmp_path / "STRAPTUITests" / "Journeys" / "OnboardingFirstProjectJourney.swift"
+    watch_dir = tmp_path / "STRAPTWATCHUITests" / "Journeys"
+    watch_dir.mkdir(parents=True)
+    watch_artifact = watch_dir / "OnboardingFirstProjectWatchJourney.swift"
+    compiled.rename(watch_artifact)
+    manifest_path = specs / "journeys" / "onboarding-first-project" / "compiled" / "manifest.json"
+    manifest_data: _JsonValue = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest_data, dict):
+        raise AssertionError("compiled manifest JSON must be an object")
+    native_output_paths: list[_JsonValue] = [
+        "STRAPTWATCHUITests/Journeys/OnboardingFirstProjectWatchJourney.swift"
+    ]
+    manifest_data["native_output_paths"] = native_output_paths
+    manifest_path.write_text(json.dumps(manifest_data), encoding="utf-8")
+
+
+def _install_simctl_fake(
+    monkeypatch: pytest.MonkeyPatch,
+    devices: _JsonValue,
+) -> list[list[str]]:
+    """Monkeypatch runner subprocess calls and return captured argv calls."""
+    calls: list[list[str]] = []
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        # Match subprocess.run keyword arguments; this fake only inspects argv.
+        calls.append(list(argv))
+        if argv[:5] == ["xcrun", "simctl", "list", "devices", "available"]:
+            return subprocess.CompletedProcess(argv, 0, stdout=json.dumps(devices), stderr="")
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+    return calls
 
 
 def test_run_journeys_executes_manifest_artifacts_without_compiling(tmp_path: Path) -> None:
@@ -114,7 +167,7 @@ def test_run_journeys_reports_manual_and_disabled_without_execution(tmp_path: Pa
 
 def test_run_journeys_executes_playwright_artifact(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """FR-024: selected Playwright journeys invoke their compiled native artifact."""
     _setup_compiled(tmp_path)
@@ -145,7 +198,7 @@ def test_run_journeys_executes_playwright_artifact(
 
 def test_run_journeys_reports_native_runner_failure(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """AC-031: native runner failures block the journey gate."""
     _setup_compiled(tmp_path)
@@ -168,7 +221,7 @@ def test_run_journeys_reports_native_runner_failure(
 
 def test_run_journeys_executes_xcuitest_with_only_testing(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """FR-024: XCUITest journeys boot an available simulator and run one generated class."""
     specs = tmp_path / ".specs"
@@ -187,7 +240,7 @@ def test_run_journeys_executes_xcuitest_with_only_testing(
     (tmp_path / "App.xcodeproj").mkdir()
     (tmp_path / "App.xcodeproj" / "project.pbxproj").write_text("", encoding="utf-8")
     calls: list[list[str]] = []
-    devices = {
+    devices: _JsonValue = {
         "devices": {
             "com.apple.CoreSimulator.SimRuntime.iOS-9-3": [
                 {"name": "iPhone 6", "udid": "IPHONE-OLD", "isAvailable": True},
@@ -222,6 +275,121 @@ def test_run_journeys_executes_xcuitest_with_only_testing(
     assert destination == "platform=iOS Simulator,id=IPHONE-17"
     assert "iPhone 16" not in destination
     assert "-only-testing:STRAPTUITests/OnboardingFirstProjectJourney" in command
+
+
+# @spec FR-024: XCUITest simulator destination ranking and boot orchestration.
+def test_run_journeys_prefers_shutdown_simulator_over_booted_stale_device(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """FR-024: avoid reusing booted CoreSimulator devices that can wedge XCTest startup."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    devices: _JsonValue = {
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+                {
+                    "name": "iPhone 17 Pro",
+                    "udid": "BOOTED-STUCK",
+                    "state": "Booted",
+                    "isAvailable": True,
+                },
+                {
+                    "name": "iPhone 17 Pro Max",
+                    "udid": "FRESH-SHUTDOWN",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+                {
+                    "name": "iPad Air 11-inch",
+                    "udid": "IPAD-SHUTDOWN",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+            ],
+        },
+    }
+    monkeypatch.delenv("LIVESPEC_XCODE_DESTINATION", raising=False)
+    calls = _install_simctl_fake(monkeypatch, devices)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    assert calls[1] == ["xcrun", "simctl", "boot", "FRESH-SHUTDOWN"]
+    assert calls[2] == ["xcrun", "simctl", "bootstatus", "FRESH-SHUTDOWN", "-b"]
+    command = calls[3]
+    destination = command[command.index("-destination") + 1]
+    assert destination == "platform=iOS Simulator,id=FRESH-SHUTDOWN"
+
+
+# @spec FR-024: XCUITest simulator destination ranking and boot orchestration.
+def test_run_journeys_prefers_iphone_family_before_shutdown_ipad(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """FR-024: iOS journeys stay on iPhone even when an iPad is shutdown."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    devices: _JsonValue = {
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+                {
+                    "name": "iPad Air 11-inch",
+                    "udid": "IPAD-SHUTDOWN",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+                {
+                    "name": "iPhone 17 Pro",
+                    "udid": "IPHONE-BOOTED",
+                    "state": "Booted",
+                    "isAvailable": True,
+                },
+            ],
+        },
+    }
+    monkeypatch.delenv("LIVESPEC_XCODE_DESTINATION", raising=False)
+    calls = _install_simctl_fake(monkeypatch, devices)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    assert calls[1] == ["xcrun", "simctl", "bootstatus", "IPHONE-BOOTED", "-b"]
+    destination = calls[2][calls[2].index("-destination") + 1]
+    assert destination == "platform=iOS Simulator,id=IPHONE-BOOTED"
+
+
+# @spec FR-024: XCUITest simulator destination ranking and boot orchestration.
+def test_run_journeys_prefers_shutdown_iphone_over_newer_booted_iphone(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """FR-024: shutdown iPhones beat booted iPhones across runtime versions."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    devices: _JsonValue = {
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+                {
+                    "name": "iPhone 17 Pro",
+                    "udid": "NEWER-BOOTED",
+                    "state": "Booted",
+                    "isAvailable": True,
+                },
+            ],
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
+                {
+                    "name": "iPhone 16 Pro",
+                    "udid": "OLDER-SHUTDOWN",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+            ],
+        },
+    }
+    monkeypatch.delenv("LIVESPEC_XCODE_DESTINATION", raising=False)
+    calls = _install_simctl_fake(monkeypatch, devices)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    assert calls[1] == ["xcrun", "simctl", "boot", "OLDER-SHUTDOWN"]
+    destination = calls[3][calls[3].index("-destination") + 1]
+    assert destination == "platform=iOS Simulator,id=OLDER-SHUTDOWN"
 
 
 @pytest.mark.parametrize(
@@ -277,11 +445,16 @@ def test_run_journeys_executes_xcuitest_with_only_testing(
             "journey_simulator_discovery_invalid_json",
             "device fields name and udid must be strings",
         ),
+        (
+            "invalid_state_shape",
+            "journey_simulator_discovery_invalid_json",
+            "simctl device field state must be a string when present",
+        ),
     ],
 )
 def test_run_journeys_reports_simulator_discovery_errors(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch,
     failure: str,
     expected_code: str,
     expected_message: str,
@@ -307,29 +480,57 @@ def test_run_journeys_reports_simulator_discovery_errors(
         if failure == "invalid_json_devices_shape":
             return subprocess.CompletedProcess(argv, 0, stdout='{"devices": []}', stderr="")
         if failure == "invalid_is_available_shape":
-            devices = {
+            invalid_availability_payload: _JsonValue = {
                 "devices": {
                     "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
                         {"name": "iPhone 17", "udid": "IPHONE-17", "isAvailable": "false"},
                     ],
                 },
             }
-            return subprocess.CompletedProcess(argv, 0, stdout=json.dumps(devices), stderr="")
+            return subprocess.CompletedProcess(
+                argv, 0, stdout=json.dumps(invalid_availability_payload), stderr=""
+            )
         if failure == "invalid_runtime_devices_shape":
-            devices = {"devices": {"com.apple.CoreSimulator.SimRuntime.iOS-26-4": {}}}
-            return subprocess.CompletedProcess(argv, 0, stdout=json.dumps(devices), stderr="")
+            invalid_runtime_payload: _JsonValue = {
+                "devices": {"com.apple.CoreSimulator.SimRuntime.iOS-26-4": {}}
+            }
+            return subprocess.CompletedProcess(
+                argv, 0, stdout=json.dumps(invalid_runtime_payload), stderr=""
+            )
         if failure == "invalid_device_entry_shape":
-            devices = {"devices": {"com.apple.CoreSimulator.SimRuntime.iOS-26-4": ["iPhone 17"]}}
-            return subprocess.CompletedProcess(argv, 0, stdout=json.dumps(devices), stderr="")
+            invalid_entry_payload: _JsonValue = {
+                "devices": {"com.apple.CoreSimulator.SimRuntime.iOS-26-4": ["iPhone 17"]}
+            }
+            return subprocess.CompletedProcess(
+                argv, 0, stdout=json.dumps(invalid_entry_payload), stderr=""
+            )
         if failure == "invalid_device_identity_shape":
-            devices = {
+            invalid_identity_payload: _JsonValue = {
                 "devices": {
                     "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
                         {"name": "iPhone 17", "udid": None, "isAvailable": True},
                     ],
                 },
             }
-            return subprocess.CompletedProcess(argv, 0, stdout=json.dumps(devices), stderr="")
+            return subprocess.CompletedProcess(
+                argv, 0, stdout=json.dumps(invalid_identity_payload), stderr=""
+            )
+        if failure == "invalid_state_shape":
+            invalid_state_payload: _JsonValue = {
+                "devices": {
+                    "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
+                        {
+                            "name": "iPhone 17",
+                            "udid": "IPHONE-17",
+                            "state": None,
+                            "isAvailable": True,
+                        },
+                    ],
+                },
+            }
+            return subprocess.CompletedProcess(
+                argv, 0, stdout=json.dumps(invalid_state_payload), stderr=""
+            )
         return subprocess.CompletedProcess(argv, 0, stdout="{not json", stderr="")
 
     monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
@@ -344,12 +545,12 @@ def test_run_journeys_reports_simulator_discovery_errors(
 
 def test_run_journeys_reports_no_available_simulator_for_matching_platform(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """FR-024: XCUITest discovery fails clearly when no matching simulator is usable."""
     _setup_xcuitest_compiled_project(tmp_path)
     monkeypatch.delenv("LIVESPEC_XCODE_DESTINATION", raising=False)
-    devices = {
+    devices: _JsonValue = {
         "devices": {
             "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
                 {"name": "iPhone 17", "udid": "IPHONE-17", "isAvailable": False},
@@ -380,40 +581,11 @@ def test_run_journeys_reports_no_available_simulator_for_matching_platform(
 
 def test_run_journeys_executes_watch_xcuitest_on_available_watch_simulator(
     tmp_path: Path,
-    monkeypatch: MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """FR-024: watchOS XCUITest journeys resolve and boot a watch simulator."""
-    specs = tmp_path / ".specs"
-    specs.mkdir()
-    _write_feature(specs, "001-onboarding")
-    _write_feature(specs, "012-projects")
-    source = _write_v2_journey(specs)
-    source.write_text(
-        source.read_text(encoding="utf-8")
-        .replace("runner: playwright", "runner: xcuitest")
-        .replace("route: /signup", "route: strapt://signup"),
-        encoding="utf-8",
-    )
-    compile_result = compile_journeys(tmp_path, journey="onboarding-first-project")
-    assert compile_result.error_count == 0
-    compiled = tmp_path / "STRAPTUITests" / "Journeys" / "OnboardingFirstProjectJourney.swift"
-    watch_dir = tmp_path / "STRAPTWATCHUITests" / "Journeys"
-    watch_dir.mkdir(parents=True)
-    watch_artifact = watch_dir / "OnboardingFirstProjectWatchJourney.swift"
-    compiled.rename(watch_artifact)
-    manifest_path = specs / "journeys" / "onboarding-first-project" / "compiled" / "manifest.json"
-    manifest_data: object = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if not isinstance(manifest_data, dict):
-        raise AssertionError("compiled manifest JSON must be an object")
-    manifest = manifest_data
-    manifest["native_output_paths"] = [
-        "STRAPTWATCHUITests/Journeys/OnboardingFirstProjectWatchJourney.swift"
-    ]
-    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
-    (tmp_path / "App.xcodeproj").mkdir()
-    (tmp_path / "App.xcodeproj" / "project.pbxproj").write_text("", encoding="utf-8")
-    calls: list[list[str]] = []
-    devices = {
+    _setup_watch_xcuitest_compiled_project(tmp_path)
+    devices: _JsonValue = {
         "devices": {
             "com.apple.CoreSimulator.SimRuntime.iOS-26-4": [
                 {"name": "iPhone 17", "udid": "IPHONE-17", "isAvailable": True},
@@ -424,17 +596,7 @@ def test_run_journeys_executes_watch_xcuitest_on_available_watch_simulator(
         },
     }
     monkeypatch.delenv("LIVESPEC_XCODE_DESTINATION", raising=False)
-
-    def fake_run(
-        argv: list[str],
-        **kwargs: object,
-    ) -> subprocess.CompletedProcess[str]:
-        calls.append(list(argv))
-        if argv[:5] == ["xcrun", "simctl", "list", "devices", "available"]:
-            return subprocess.CompletedProcess(argv, 0, stdout=json.dumps(devices), stderr="")
-        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
-
-    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+    calls = _install_simctl_fake(monkeypatch, devices)
 
     result = run_journeys(tmp_path, journey="onboarding-first-project")
 
@@ -445,6 +607,44 @@ def test_run_journeys_executes_watch_xcuitest_on_available_watch_simulator(
     destination = command[command.index("-destination") + 1]
     assert destination == "platform=watchOS Simulator,id=WATCH-11"
     assert "-only-testing:STRAPTWATCHUITests/OnboardingFirstProjectWatchJourney" in command
+
+
+# @spec FR-024: XCUITest simulator destination ranking and boot orchestration.
+def test_run_journeys_prefers_shutdown_watch_over_newer_booted_watch(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FR-024: shutdown Apple Watch devices beat booted watches across runtimes."""
+    _setup_watch_xcuitest_compiled_project(tmp_path)
+    devices: _JsonValue = {
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.watchOS-26-5": [
+                {
+                    "name": "Apple Watch Series 11",
+                    "udid": "NEWER-WATCH-BOOTED",
+                    "state": "Booted",
+                    "isAvailable": True,
+                },
+            ],
+            "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
+                {
+                    "name": "Apple Watch Series 10",
+                    "udid": "OLDER-WATCH-SHUTDOWN",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+            ],
+        },
+    }
+    monkeypatch.delenv("LIVESPEC_XCODE_DESTINATION", raising=False)
+    calls = _install_simctl_fake(monkeypatch, devices)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    assert calls[1] == ["xcrun", "simctl", "boot", "OLDER-WATCH-SHUTDOWN"]
+    destination = calls[3][calls[3].index("-destination") + 1]
+    assert destination == "platform=watchOS Simulator,id=OLDER-WATCH-SHUTDOWN"
 
 
 def test_run_journeys_supports_injected_executor(tmp_path: Path) -> None:

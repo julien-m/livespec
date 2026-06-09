@@ -178,6 +178,8 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 - `git diff --check` → pass after W32 simulator discovery audit fixes.
 - `livespec validate --coherence` → 0 errors, 0 warnings, 2 infos after W32 simulator discovery audit fixes.
 - Strapt XCUITest destination resolution proof → iOS resolves to `platform=iOS Simulator,id=8C365700-3496-4DEF-BCA8-6D6EFC6C5723`; watchOS resolves to `platform=watchOS Simulator,id=659FC5B9-A363-45EF-84C0-23AD342BFEC9`; no `iPhone 16` destination emitted.
+- W49 Strapt XCUITest hang proof → W48 UDID `8C365700-3496-4DEF-BCA8-6D6EFC6C5723` stayed stuck before `Test Suite`; after runner selection hardening, `livespec journey run --journey import-workout-to-library --json` resolved a shutdown iPhone destination, reached `Testing started completed`, and returned explicit `** TEST FAILED **` instead of hanging.
+- W51/W53 simulator ranking correction → targeted checks verify one cross-runtime candidate list sorted by family, shutdown state, runtime rank, and device name, including watchOS shutdown precedence, non-string state validation, and bootstatus-only handling for already booted simulators. The code keeps UDID as a final deterministic identity tie-breaker, but no dedicated same-name UDID regression is claimed. V36 read-only verification also passed the targeted ruff, format, pytest, mypy, pyright, LiveSpec coherence, and LiveSpec doctor checks.
 - `ruff check .` → pass.
 - `ruff format --check .` → pass.
 - `pyright validator/journeys/compiler.py tests/test_journey_v2_compiler.py` → 0 errors.

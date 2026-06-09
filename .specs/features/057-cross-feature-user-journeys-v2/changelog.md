@@ -1,5 +1,25 @@
 # Changelog - Cross-Feature User Journeys v2
 
+### 2026-06-09 — Fix: 7 gaps closed (7 functional, 0 visual)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Updated [`validator/journeys/runner.py`](../../../validator/journeys/runner.py), [`tests/test_journey_v2_runner.py`](../../../tests/test_journey_v2_runner.py), [`implementation.md`](implementation.md), [`progress.md`](progress.md), [`checks/2026-06-09.md`](checks/2026-06-09.md), and [`../../changelog.md`](../../changelog.md).
+- **Gaps closed:** W51/W53 simulator ranking now builds one candidate list across runtimes and sorts by family, shutdown state, runtime rank, and device name; it preserves watchOS selection, validates non-string `state`, skips `simctl boot` for already booted devices, and keeps UDID only as an unclaimed deterministic tie-breaker.
+- **Remaining:** None for the W51/W53 runner-ranking fix; verification is scoped to the targeted runner, type, and LiveSpec checks recorded in [`checks/2026-06-09.md`](checks/2026-06-09.md).
+- **Verification:** V36 PASS: `git diff --check`; `ruff check validator/journeys/runner.py tests/test_journey_v2_runner.py`; `ruff format --check validator/journeys/runner.py tests/test_journey_v2_runner.py`; `pytest tests/test_journey_v2_runner.py -q` -> 27 passed; `mypy tests/test_journey_v2_runner.py validator/journeys/runner.py` -> no issues; `pyright validator/journeys/runner.py` -> 0 errors; `livespec validate --coherence` -> 0 errors, 0 warnings, 4 infos; `livespec doctor` -> OK, 0 errors, 0 warnings, 4 infos.
+- **Author:** spec-fix
+
+### 2026-06-09 — Fix: 3 gaps closed (3 functional, 0 visual)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Updated [`validator/journeys/runner.py`](../../../validator/journeys/runner.py), [`tests/test_journey_v2_runner.py`](../../../tests/test_journey_v2_runner.py), [`implementation.md`](implementation.md), [`progress.md`](progress.md), [`checks/2026-06-09.md`](checks/2026-06-09.md), and [`../../changelog.md`](../../changelog.md).
+- **Gaps closed:** W49 pre-XCTest hang where a simulator was reported `Booted` but `xcodebuild test` never reached `Test Suite`/`Test Case`. Compiled journey runs now prefer a shutdown available iPhone/watch simulator over an already-booted destination, then boot and await it explicitly.
+- **Remaining:** The targeted Strapt import journey now reaches XCTest and returns a real `TEST FAILED`; its functional assertion failure is downstream Strapt work, not this runner hang.
+- **Verification:** `pytest tests/test_journey_v2_runner.py -q` -> 23 passed; `ruff check validator/journeys/runner.py tests/test_journey_v2_runner.py` -> pass; `ruff format --check validator/journeys/runner.py tests/test_journey_v2_runner.py` -> pass; `pyright validator/journeys/runner.py` -> 0 errors; Strapt targeted `livespec journey run --journey import-workout-to-library --json` reached `Testing started completed` and returned `** TEST FAILED **` in ~54s instead of hanging.
+- **Author:** spec-fix
+
 ## 2026-06-09 — [Fix]: Close W31/W33/W35/W37 simulator-destination correction chain
 
 - **Type:** Bug Fix

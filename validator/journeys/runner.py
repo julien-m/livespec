@@ -33,6 +33,20 @@ RUNNER_TIMEOUT_SECONDS = 600
 SIMULATOR_COMMAND_TIMEOUT_SECONDS = 30
 # bootstatus can cold-start CoreSimulator, so it gets a wider bounded wait.
 SIMULATOR_BOOT_TIMEOUT_SECONDS = 120
+SIMULATOR_FAMILY_IPHONE = "iphone"
+SIMULATOR_FAMILY_WATCH = "watch"
+SIMULATOR_STATE_BOOTED = "booted"
+SIMULATOR_STATE_SHUTDOWN = "shutdown"
+# Lower values sort first in simulator candidate ranking tuples.
+SIMULATOR_PRIORITY_PREFERRED = 0
+SIMULATOR_PRIORITY_FALLBACK = 1
+SIMULATOR_RUNTIME_MARKER_IOS = "iOS"
+SIMULATOR_RUNTIME_MARKER_WATCHOS = "watchOS"
+XCUITEST_PLATFORM_IOS = "ios"
+XCUITEST_PLATFORM_WATCHOS = "watchos"
+XCODE_DESTINATION_IOS_SIMULATOR = "iOS Simulator"
+XCODE_DESTINATION_WATCHOS_SIMULATOR = "watchOS Simulator"
+XCODE_DESTINATION_FORMAT = "platform={platform},id={udid}"
 XCODE_DESTINATION_ENV = "LIVESPEC_XCODE_DESTINATION"
 XCODE_SCHEME_ENV = "LIVESPEC_XCODE_SCHEME"
 
@@ -43,7 +57,24 @@ class _SimulatorDevice:
 
     name: str
     udid: str
+    state: str
     is_available: bool
+
+
+@dataclass(frozen=True)
+class _XcodeDestination:
+    """Resolved Xcode destination plus simulator state needed by boot orchestration."""
+
+    value: str
+    simulator_state: str | None
+
+
+@dataclass(frozen=True)
+class _RunnerInvocation:
+    """Native runner command plus optional simulator metadata."""
+
+    argv: list[str]
+    simulator_state: str | None = None
 
 
 class SimulatorDiscoveryError(Exception):
@@ -180,20 +211,26 @@ def _run_manifest_artifacts(
                 artifact,
             )
         try:
-            argv = _runner_command(project_root, manifest.runner, artifact, executor)
+            invocation = _runner_command(project_root, manifest.runner, artifact, executor)
         except SimulatorDiscoveryError as error:
             return _issue(error.code, error.message, artifact)
-        if argv is None:
+        if invocation is None:
             return _issue(
                 "journey_native_runner_unsupported",
                 f"Unsupported native journey runner: {manifest.runner}",
                 source_path(project_root, source.id),
             )
         if manifest.runner == "xcuitest":
-            boot_issue = _boot_xcuitest_destination(project_root, artifact, argv, executor)
+            boot_issue = _boot_xcuitest_destination(
+                project_root,
+                artifact,
+                invocation.argv,
+                invocation.simulator_state,
+                executor,
+            )
             if boot_issue is not None:
                 return boot_issue
-        issue = _run_command(project_root, source.id, artifact, argv, executor)
+        issue = _run_command(project_root, source.id, artifact, invocation.argv, executor)
         if issue is not None:
             return issue
     return None
@@ -263,19 +300,19 @@ def _runner_command(
     runner: str,
     artifact: Path,
     executor: JourneyExecutor,
-) -> list[str] | None:
+) -> _RunnerInvocation | None:
     """Return the native command for one compiled journey artifact."""
     relative = artifact.relative_to(project_root).as_posix()
     if runner == "playwright":
-        return ["npx", "playwright", "test", relative]
+        return _RunnerInvocation(["npx", "playwright", "test", relative])
     if runner == "maestro":
-        return ["maestro", "test", relative]
+        return _RunnerInvocation(["maestro", "test", relative])
     if runner == "xcuitest":
         return _xcuitest_command(project_root, artifact, executor)
     if runner == "pytest":
-        return ["pytest", relative]
+        return _RunnerInvocation(["pytest", relative])
     if runner == "cargo":
-        return ["cargo", "test"]
+        return _RunnerInvocation(["cargo", "test"])
     return None
 
 
@@ -283,14 +320,14 @@ def _xcuitest_command(
     project_root: Path,
     artifact: Path,
     executor: JourneyExecutor,
-) -> list[str] | None:
+) -> _RunnerInvocation | None:
     """Build an xcodebuild command for a generated XCUITest journey class."""
     test_target = _xcuitest_target_name(artifact)
     class_name = artifact.stem
     platform = _xcuitest_platform(test_target, class_name)
-    destination = _xcode_destination(project_root, platform, executor)
+    resolved_destination = _xcode_destination(project_root, platform, executor)
     scheme = _xcode_scheme(project_root, test_target)
-    if destination is None or scheme is None:
+    if resolved_destination is None or scheme is None:
         return None
     command = ["xcodebuild", "test"]
     project_flag = _xcode_project_flag(project_root)
@@ -301,27 +338,42 @@ def _xcuitest_command(
             "-scheme",
             scheme,
             "-destination",
-            destination,
+            resolved_destination.value,
             f"-only-testing:{test_target}/{class_name}",
         ]
     )
-    return command
+    return _RunnerInvocation(command, resolved_destination.simulator_state)
 
 
 def _xcode_destination(
     project_root: Path,
     platform: str,
     executor: JourneyExecutor,
-) -> str | None:
+) -> _XcodeDestination | None:
     """Resolve an Xcode destination from explicit env or available simulators."""
     configured = _env_value(XCODE_DESTINATION_ENV, "")
     if configured is None:
         return None
     if configured:
-        return configured
+        return _XcodeDestination(configured, None)
     device = _first_available_simulator(project_root, platform, executor)
-    simulator_platform = "watchOS Simulator" if platform == "watchos" else "iOS Simulator"
-    return f"platform={simulator_platform},id={device.udid}"
+    return _XcodeDestination(
+        _xcode_destination_value(platform, device.udid),
+        device.state,
+    )
+
+
+def _xcode_destination_value(platform: str, udid: str) -> str:
+    """Build the Xcode destination string from named platform constants."""
+    simulator_platform = _xcode_destination_platform(platform)
+    return XCODE_DESTINATION_FORMAT.format(platform=simulator_platform, udid=udid)
+
+
+def _xcode_destination_platform(platform: str) -> str:
+    """Resolve the Xcode simulator platform label for a normalized journey platform."""
+    if platform == XCUITEST_PLATFORM_WATCHOS:
+        return XCODE_DESTINATION_WATCHOS_SIMULATOR
+    return XCODE_DESTINATION_IOS_SIMULATOR
 
 
 def _first_available_simulator(
@@ -329,27 +381,98 @@ def _first_available_simulator(
     platform: str,
     executor: JourneyExecutor,
 ) -> _SimulatorDevice:
-    """Select the newest available iOS/watchOS simulator compatible with the journey."""
+    """Select the most reliable available simulator compatible with the journey."""
     runtimes = _list_simulators(project_root, executor)
-    runtime_marker = "watchOS" if platform == "watchos" else "iOS"
+    runtime_marker = _simulator_runtime_marker(platform)
     runtime_keys = sorted(
         (key for key in runtimes if runtime_marker in key),
         key=lambda key: (_runtime_version_tuple(key, runtime_marker), key),
         reverse=True,
     )
-    # Newest runtimes win so old available devices do not mask current simulators.
-    for runtime_key in runtime_keys:
-        for device in runtimes[runtime_key]:
-            if not device.is_available:
-                continue
-            is_watch = "watch" in device.name.lower()
-            if platform == "watchos" and is_watch:
-                return device
-            if platform == "ios" and not is_watch:
-                return device
+    candidates = _available_simulator_candidates(runtimes, runtime_keys, platform)
+    if candidates:
+        _, device = min(
+            candidates, key=lambda candidate: _simulator_candidate_sort_key(candidate, platform)
+        )
+        return device
     raise SimulatorDiscoveryError(
         "journey_simulator_unavailable",
         f"No available {runtime_marker} simulator found for XCUITest journey",
+    )
+
+
+def _simulator_runtime_marker(platform: str) -> str:
+    """Resolve the CoreSimulator runtime marker for a normalized journey platform."""
+    if platform == XCUITEST_PLATFORM_WATCHOS:
+        return SIMULATOR_RUNTIME_MARKER_WATCHOS
+    return SIMULATOR_RUNTIME_MARKER_IOS
+
+
+# @spec FR-024: XCUITest runner selects reliable simulator destinations.
+def _available_simulator_candidates(
+    runtimes: dict[str, list[_SimulatorDevice]],
+    runtime_keys: list[str],
+    platform: str,
+) -> list[tuple[int, _SimulatorDevice]]:
+    """Collect devices before sorting so ranking applies across runtimes."""
+    candidates: list[tuple[int, _SimulatorDevice]] = []
+    for runtime_rank, runtime_key in enumerate(runtime_keys):
+        for device in runtimes[runtime_key]:
+            if device.is_available and _simulator_matches_platform(device, platform):
+                candidates.append((runtime_rank, device))
+    return candidates
+
+
+def _simulator_candidate_sort_key(
+    candidate: tuple[int, _SimulatorDevice],
+    platform: str,
+) -> tuple[int, int, int, str, str]:
+    """Rank family, state, runtime freshness, name, and UDID for stable selection."""
+    runtime_rank, device = candidate
+    # Family keeps iOS on phones; state precedes runtime to avoid wedged booted simulators.
+    return (
+        _simulator_family_priority(device, platform),
+        _simulator_state_priority(device),
+        runtime_rank,
+        device.name,
+        device.udid,
+    )
+
+
+def _simulator_matches_platform(device: _SimulatorDevice, platform: str) -> bool:
+    """Return whether a simulator device can execute the requested platform journey."""
+    is_watch = SIMULATOR_FAMILY_WATCH in device.name.lower()
+    if platform == XCUITEST_PLATFORM_WATCHOS:
+        return is_watch
+    if platform == XCUITEST_PLATFORM_IOS:
+        return not is_watch
+    return False
+
+
+def _simulator_family_priority(device: _SimulatorDevice, platform: str) -> int:
+    """Prefer phone/watch devices over broader simulator families for UI journeys."""
+    name = device.name.lower()
+    if platform == XCUITEST_PLATFORM_IOS:
+        return (
+            SIMULATOR_PRIORITY_PREFERRED
+            if SIMULATOR_FAMILY_IPHONE in name
+            else SIMULATOR_PRIORITY_FALLBACK
+        )
+    if platform == XCUITEST_PLATFORM_WATCHOS:
+        return (
+            SIMULATOR_PRIORITY_PREFERRED
+            if SIMULATOR_FAMILY_WATCH in name
+            else SIMULATOR_PRIORITY_FALLBACK
+        )
+    return SIMULATOR_PRIORITY_FALLBACK
+
+
+def _simulator_state_priority(device: _SimulatorDevice) -> int:
+    """Prefer shutdown devices because booted CoreSimulator sessions can wedge XCTest."""
+    return (
+        SIMULATOR_PRIORITY_PREFERRED
+        if device.state.lower() == SIMULATOR_STATE_SHUTDOWN
+        else SIMULATOR_PRIORITY_FALLBACK
     )
 
 
@@ -430,6 +553,9 @@ def _normalize_simulator_device(raw: object) -> _SimulatorDevice:
         )
     name = raw.get("name")
     udid = raw.get("udid")
+    # Backward compatibility: older simctl JSON payloads may omit state; keep this
+    # fallback until LiveSpec requires an Xcode version that always emits state.
+    state = raw.get("state", "")
     # Older simctl payloads omit isAvailable for usable devices.
     is_available = raw.get("isAvailable", True)
     if not isinstance(is_available, bool):
@@ -442,9 +568,15 @@ def _normalize_simulator_device(raw: object) -> _SimulatorDevice:
             "journey_simulator_discovery_invalid_json",
             "simctl device fields name and udid must be strings",
         )
+    if not isinstance(state, str):
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_invalid_json",
+            "simctl device field state must be a string when present",
+        )
     return _SimulatorDevice(
         name=name,
         udid=udid,
+        state=state,
         is_available=is_available,
     )
 
@@ -469,22 +601,15 @@ def _boot_xcuitest_destination(
     project_root: Path,
     artifact: Path,
     argv: list[str],
+    simulator_state: str | None,
     executor: JourneyExecutor,
 ) -> JourneyIssue | None:
-    """Boot an explicit UDID destination before running XCUITest."""
+    """Ensure an explicit UDID destination is ready before running XCUITest."""
     udid = _destination_udid(argv)
     if udid is None:
         return None
     try:
-        # Booting an already-running simulator is acceptable; the stderr text is normalized below.
-        boot = executor(
-            ["xcrun", "simctl", "boot", udid],
-            cwd=str(project_root),
-            capture_output=True,
-            text=True,
-            timeout=SIMULATOR_COMMAND_TIMEOUT_SECONDS,
-            check=False,
-        )
+        boot = _boot_simulator_if_needed(project_root, udid, simulator_state, executor)
     except FileNotFoundError:
         return _issue("journey_simulator_runner_missing", "xcrun simctl not found", artifact)
     except subprocess.TimeoutExpired as error:
@@ -493,9 +618,10 @@ def _boot_xcuitest_destination(
             f"Simulator {udid} boot timed out after {error.timeout}s",
             artifact,
         )
-    boot_error = (boot.stderr or boot.stdout or "").lower()
+    boot_error = "" if boot is None else (boot.stderr or boot.stdout or "").lower()
     if (
-        boot.returncode != 0
+        boot is not None
+        and boot.returncode != 0
         and "already booted" not in boot_error
         and "state: booted" not in boot_error
     ):
@@ -526,6 +652,27 @@ def _boot_xcuitest_destination(
     return None
 
 
+def _boot_simulator_if_needed(
+    project_root: Path,
+    udid: str,
+    simulator_state: str | None,
+    executor: JourneyExecutor,
+) -> subprocess.CompletedProcess[str] | None:
+    """Boot shutdown simulators and leave already-running destinations untouched."""
+    # @spec FR-024: Already-running simulators skip boot; bootstatus stays readiness gate.
+    if (simulator_state or "").lower() == SIMULATOR_STATE_BOOTED:
+        return None
+    # simctl boot failures are normalized by the caller; bootstatus remains readiness gate.
+    return executor(
+        ["xcrun", "simctl", "boot", udid],
+        cwd=str(project_root),
+        capture_output=True,
+        text=True,
+        timeout=SIMULATOR_COMMAND_TIMEOUT_SECONDS,
+        check=False,
+    )
+
+
 def _destination_udid(argv: list[str]) -> str | None:
     """Extract `id=<UDID>` from an xcodebuild command destination."""
     try:
@@ -542,7 +689,7 @@ def _destination_udid(argv: list[str]) -> str | None:
 def _xcuitest_platform(test_target: str, class_name: str) -> str:
     """Infer simulator platform from the generated XCUITest target and class names."""
     combined = f"{test_target} {class_name}".lower()
-    return "watchos" if "watch" in combined else "ios"
+    return XCUITEST_PLATFORM_WATCHOS if "watch" in combined else XCUITEST_PLATFORM_IOS
 
 
 def _xcuitest_target_name(artifact: Path) -> str:
