@@ -23,9 +23,11 @@ from pathlib import Path
 from pytest import MonkeyPatch
 
 from tests.test_journey_v2_validation import _write_feature, _write_v2_journey
+from validator.journeys import compiler as compiler_module
 from validator.journeys.capabilities import validate_runner_capability
 from validator.journeys.compiler import compile_journeys
 from validator.journeys.manifest import read_compiled_manifest
+from validator.journeys.models import ValidationResult
 
 
 def test_compile_v2_writes_manifest_and_playwright_artifact(tmp_path: Path) -> None:
@@ -273,8 +275,10 @@ def test_compile_v2_xcuitest_supports_negative_assertions_and_fill(
     assert manifest is not None
     text = (tmp_path / manifest.native_output_paths[0]).read_text(encoding="utf-8")
     assert "import Foundation" in text
-    assert 'process.arguments = ["simctl", "openurl", "booted", "myapp://signup"]' in text
-    assert 'XCTFail("simctl openurl timed out")' in text
+    assert 'openJourneyURL("myapp://signup", in: app)' in text
+    assert "app.open(url)" in text
+    assert "Process()" not in text
+    assert "launchEnvironment" not in text.split('openJourneyURL("myapp://signup", in: app)', 1)[1]
     assert (
         'app.descendants(matching: .any)["workout-name-field"].typeText("Morning Session")' in text
     )
@@ -284,6 +288,92 @@ def test_compile_v2_xcuitest_supports_negative_assertions_and_fill(
     )
     assert "let attachment = XCTAttachment(screenshot: screenshot)" in text
     assert "attachment.lifetime = .keepAlways" in text
+
+
+def test_compile_v2_xcuitest_injects_preconditions_before_launch(
+    tmp_path: Path,
+) -> None:
+    """AC-032: XCUITest launch environment reflects declared journey preconditions."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace("route: /signup", 'route: "myapp://signup"')
+        .replace(
+            "steps:\n",
+            """
+preconditions:
+  auth: pro
+  fixtures:
+    - imported-workout
+    - short-workout-boundaries
+  mocks:
+    - storekit-pro
+  feature_flags:
+    - paywall-v2
+steps:
+""".lstrip(),
+        ),
+        encoding="utf-8",
+    )
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+    assert result.error_count == 0, [issue.message for issue in result.issues]
+    assert manifest is not None
+    text = (tmp_path / manifest.native_output_paths[0]).read_text(encoding="utf-8")
+    launch_index = text.index("        app.launch()")
+    auth_index = text.index('app.launchEnvironment["UI_TEST_JOURNEY_AUTH"]')
+    fixtures_index = text.index('app.launchEnvironment["UI_TEST_JOURNEY_FIXTURES"]')
+    mocks_index = text.index('app.launchEnvironment["UI_TEST_JOURNEY_MOCKS"]')
+    flags_index = text.index('app.launchEnvironment["UI_TEST_JOURNEY_FEATURE_FLAGS"]')
+    open_index = text.index('openJourneyURL("myapp://signup", in: app)')
+    assert auth_index < launch_index
+    assert fixtures_index < launch_index
+    assert mocks_index < launch_index
+    assert flags_index < launch_index
+    assert launch_index < open_index
+    assert 'app.launchEnvironment["UI_TEST_JOURNEY_AUTH"] = "pro"' in text
+    assert (
+        'app.launchEnvironment["UI_TEST_JOURNEY_FIXTURES"] = '
+        '"[\\"imported-workout\\",\\"short-workout-boundaries\\"]"' in text
+    )
+    assert 'app.launchEnvironment["UI_TEST_JOURNEY_MOCKS"] = "[\\"storekit-pro\\"]"' in text
+    assert 'app.launchEnvironment["UI_TEST_JOURNEY_FEATURE_FLAGS"] = "[\\"paywall-v2\\"]"' in text
+    assert "Process()" not in text
+
+
+def test_compile_v2_fails_when_source_becomes_unreadable(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """FR-030: compiler fails explicitly when source cannot be reread after validation."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    real_validate = compiler_module.validate_journeys
+
+    def validate_then_remove(project_root: Path, feature: str | None = None) -> ValidationResult:
+        result = real_validate(project_root, feature)
+        source.unlink()
+        return result
+
+    monkeypatch.setattr(compiler_module, "validate_journeys", validate_then_remove)
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 1
+    assert result.artifacts == []
+    assert result.issues[0].code == "journey_source_unreadable"
+    assert result.issues[0].path == source
+    assert not (source.parent / "compiled" / "manifest.json").exists()
 
 
 def test_compile_v2_manifest_ends_with_newline(tmp_path: Path) -> None:

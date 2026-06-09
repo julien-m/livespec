@@ -1,5 +1,35 @@
 # Changelog - Cross-Feature User Journeys v2
 
+## 2026-06-09 — [Fix]: Requalify W15 mypy validation boundary
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Updated [`implementation.md`](implementation.md), [`progress.md`](progress.md), [`checks/2026-06-09.md`](checks/2026-06-09.md), and [`../../changelog.md`](../../changelog.md).
+- **Gaps closed:** C18 no longer presents `mypy .` as a passing project gate. The artifacts record the rerun result honestly: `mypy .` still fails with 52 pre-existing project-wide errors outside `validator/journeys/compiler.py` and `tests/test_journey_v2_compiler.py`; the touched W13/W15 files pass targeted `mypy` and `pyright`.
+- **Remaining:** Project-wide `mypy .` debt remains outside this feature-fix scope; downstream Strapt journeys still need recompilation by a fresh worker after LiveSpec is committed.
+- **Verification:** `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 19 passed; `ruff check .` → pass; `ruff format --check .` → pass; `mypy validator/journeys/compiler.py tests/test_journey_v2_compiler.py` → no issues in 2 source files; `pyright validator/journeys/compiler.py tests/test_journey_v2_compiler.py` → 0 errors; `mypy .` → 52 pre-existing errors in 27 files; `git diff --check` → pass; `livespec validate --coherence` → 0 errors, 0 warnings, 2 infos; `livespec doctor` → OK.
+- **Author:** spec-fix
+
+## 2026-06-09 — [Fix]: Close W14 compiler audit majors
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Updated [`validator/journeys/compiler.py`](../../../validator/journeys/compiler.py), [`tests/test_journey_v2_compiler.py`](../../../tests/test_journey_v2_compiler.py), [`implementation.md`](implementation.md), [`progress.md`](progress.md), [`checks/2026-06-09.md`](checks/2026-06-09.md), and [`../../changelog.md`](../../changelog.md).
+- **Gaps closed:** Project-level lint/format commands are documented as `ruff check .` and `ruff format --check .`; XCUITest regression coverage now asserts `auth` and `feature_flags` launch environment emission before `app.launch()`; the compiler returns `journey_source_unreadable` instead of silently compiling without preconditions when a source cannot be reread; XCUITest launch environment keys are centralized constants.
+- **Remaining:** Downstream Strapt journeys must be recompiled by a fresh worker after this LiveSpec compiler fix.
+- **Verification:** `pytest tests/test_journey_v2_compiler.py -q` → 14 passed; `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 19 passed; `ruff check .` → pass; `ruff format --check .` → pass; `git diff --check` → pass; `pyright validator/journeys/compiler.py tests/test_journey_v2_compiler.py` → 0 errors; `livespec validate --coherence` → 0 errors, 0 warnings, 2 infos; `livespec doctor` → OK; `mypy .` → fails with 52 pre-existing project-wide errors outside the W15 touched files.
+- **Author:** spec-fix
+
+## 2026-06-09 — [Fix]: XCUITest compiler honors journey preconditions before launch
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Updated [`validator/journeys/compiler.py`](../../../validator/journeys/compiler.py), [`tests/test_journey_v2_compiler.py`](../../../tests/test_journey_v2_compiler.py), [`implementation.md`](implementation.md), [`progress.md`](progress.md), [`checks/2026-06-09.md`](checks/2026-06-09.md), and [`../../changelog.md`](../../changelog.md).
+- **Gaps closed:** XCUITest artifacts now inject `preconditions.auth`, `preconditions.fixtures`, `preconditions.mocks`, and `preconditions.feature_flags` into `app.launchEnvironment` before `app.launch()`. XCUITest `open` now renders a generated `openJourneyURL(_:in:)` helper using `XCUIApplication.open(URL)` after launch, with no `Process`/`simctl` path and no post-launch `launchEnvironment` mutation.
+- **Remaining:** Downstream projects such as Strapt must be recompiled by a fresh worker to regenerate Swift journey files from this LiveSpec compiler change.
+- **Verification:** `pytest tests/test_journey_v2_compiler.py -q` → 13 passed; `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 18 passed; superseded by W15/W16 project lint/format and targeted type checks.
+- **Author:** spec-fix
+
 ## 2026-06-09 — [Fix]: Native compiler rejects incomplete journey outputs
 
 - **Type:** Bug Fix

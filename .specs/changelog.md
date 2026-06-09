@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-06-09 — [Feature 057 Fix]: Requalified W15 validation docs so `mypy .` is recorded as pre-existing project-wide type debt, while touched journey compiler files pass targeted `mypy` and `pyright`.
+
+## 2026-06-09 — [Feature 057 Fix]: Closed W14 compiler audit majors with explicit `journey_source_unreadable` failures before artifact writes, XCUITest auth/feature-flag launch assertions, centralized journey launch-environment keys, and compiler validation docs.
+
+## 2026-06-09 — [Feature 057 Fix]: XCUITest journey compilation now injects declared auth/fixtures/mocks/feature flags before `app.launch()` and renders `open` with `XCUIApplication.open(URL)` instead of `Process`/`simctl` or post-launch launch-environment mutation.
+
 ## 2026-06-09 — [Feature 057 Fix]: Native journey compilation now fails before writing incomplete artifacts for unsupported or malformed actions, emits concrete XCUITest code for supported fill/assert_not/URL-open/screenshot flows, bounds simctl openurl with a timeout, uses named test methods, and writes newline-terminated manifests.
 
 ## 2026-06-09 — [Feature 057 Fix]: Migration 20 now force-runs `livespec journey compile --force` for downstream projects, regenerating old `journeys-v2-1` manifests during migration instead of requiring a manual compile after version 20.

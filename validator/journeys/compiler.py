@@ -24,6 +24,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
+from pydantic import ValidationError
 
 from .capabilities import validate_runner_capability
 from .compiler_registry import get_compiler_backend
@@ -41,6 +42,18 @@ from .schema import JourneySourceV2, JourneyTargetRef, VisualCheckMode
 from .validator import validate_journeys
 
 HASH_MARKER = "livespec-journey-source-hash:"
+UI_TEST_JOURNEY_AUTH_ENV = "UI_TEST_JOURNEY_AUTH"
+UI_TEST_JOURNEY_FIXTURES_ENV = "UI_TEST_JOURNEY_FIXTURES"
+UI_TEST_JOURNEY_MOCKS_ENV = "UI_TEST_JOURNEY_MOCKS"
+UI_TEST_JOURNEY_FEATURE_FLAGS_ENV = "UI_TEST_JOURNEY_FEATURE_FLAGS"
+
+
+class _JourneySourceReadError(Exception):
+    """Raised when a compiled journey source cannot be loaded into the typed model."""
+
+    def __init__(self, path: Path, reason: str) -> None:
+        self.path = path
+        super().__init__(f"Cannot read journey source {path}: {reason}")
 
 
 @dataclass(frozen=True)
@@ -80,11 +93,16 @@ def compile_journeys(
         if capability_issue is not None:
             issues.append(_with_path(capability_issue, source.path))
             continue
+        try:
+            source_model = _read_source_model(source.path)
+        except _JourneySourceReadError as error:
+            issues.append(_source_read_issue(error))
+            continue
         output_path = _native_artifact_path(project_root, source)
-        content = _compile_native(project_root, source)
+        content = _compile_native(project_root, source, source_model)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(content, encoding="utf-8")
-        visual_contract_paths = _write_visual_contracts(project_root, source)
+        visual_contract_paths = _write_visual_contracts(project_root, source_model)
         if source.runner == "xcuitest":
             pending_xcuitest_manifests.append(
                 _PendingManifest(
@@ -147,12 +165,19 @@ def extract_source_hash(path: Path) -> str | None:
     return None
 
 
-def _write_visual_contracts(project_root: Path, journey: JourneyFile) -> list[Path]:
+def _source_read_issue(error: _JourneySourceReadError) -> JourneyIssue:
+    """Return a blocking compiler issue for an unreadable journey source."""
+    return JourneyIssue(
+        code="journey_source_unreadable",
+        severity=JourneySeverity.ERROR,
+        message=str(error),
+        path=error.path,
+    )
+
+
+def _write_visual_contracts(project_root: Path, source: JourneySourceV2) -> list[Path]:
     """Write screenshot-only LLM visual contracts for compiled journey checks."""
-    source = _read_source_model(journey.path)
-    if source is None:
-        return []
-    output_dir = visual_contracts_dir(project_root, journey.journey_id)
+    output_dir = visual_contracts_dir(project_root, source.id)
     paths: list[Path] = []
     for check in source.visual_checks:
         if check.mode not in {VisualCheckMode.LLM, VisualCheckMode.NATIVE_THEN_LLM}:
@@ -182,15 +207,20 @@ def _write_visual_contracts(project_root: Path, journey: JourneyFile) -> list[Pa
     return paths
 
 
-def _read_source_model(path: Path) -> JourneySourceV2 | None:
+def _read_source_model(path: Path) -> JourneySourceV2:
     """Read the typed source model used for visual contract compilation."""
     try:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except (OSError, yaml.YAMLError):
-        return None
+    except OSError as error:
+        raise _JourneySourceReadError(path, str(error)) from error
+    except yaml.YAMLError as error:
+        raise _JourneySourceReadError(path, str(error)) from error
     if not isinstance(data, dict):
-        return None
-    return JourneySourceV2.model_validate(data)
+        raise _JourneySourceReadError(path, "source root must be a mapping")
+    try:
+        return JourneySourceV2.model_validate(data)
+    except ValidationError as error:
+        raise _JourneySourceReadError(path, str(error)) from error
 
 
 def _native_artifact_path(project_root: Path, journey: JourneyFile) -> Path:
@@ -207,13 +237,13 @@ def _native_artifact_path(project_root: Path, journey: JourneyFile) -> Path:
     return project_root / ".specs" / "journeys" / journey.journey_id / "compiled" / filename
 
 
-def _compile_native(project_root: Path, journey: JourneyFile) -> str:
+def _compile_native(project_root: Path, journey: JourneyFile, source: JourneySourceV2) -> str:
     """Dispatch to the runner-specific compiler."""
     backend = get_compiler_backend(journey.runner)
     if backend is not None and backend.artifact_kind == "playwright":
-        return _compile_playwright(project_root, journey)
+        return _compile_playwright(project_root, journey, source)
     if backend is not None and backend.artifact_kind == "xcuitest":
-        return _compile_xcuitest(project_root, journey)
+        return _compile_xcuitest(project_root, journey, source)
     return _compile_maestro(project_root, journey)
 
 
@@ -227,7 +257,11 @@ def _header(project_root: Path, journey: JourneyFile, comment: str) -> list[str]
     ]
 
 
-def _compile_playwright(project_root: Path, journey: JourneyFile) -> str:
+def _compile_playwright(
+    project_root: Path,
+    journey: JourneyFile,
+    source: JourneySourceV2,
+) -> str:
     """Compile one web journey to a Playwright test file."""
     lines = [
         *_header(project_root, journey, "//"),
@@ -237,12 +271,16 @@ def _compile_playwright(project_root: Path, journey: JourneyFile) -> str:
     ]
     for step in journey.steps:
         lines.extend(f"  {line}" for line in _playwright_step(step))
-    lines.extend(f"  {line}" for line in _playwright_visual_steps(journey))
+    lines.extend(f"  {line}" for line in _playwright_visual_steps(source))
     lines.extend(["});", ""])
     return "\n".join(lines)
 
 
-def _compile_xcuitest(project_root: Path, journey: JourneyFile) -> str:
+def _compile_xcuitest(
+    project_root: Path,
+    journey: JourneyFile,
+    source: JourneySourceV2,
+) -> str:
     """Compile one Apple-platform journey to Swift/XCUITest."""
     method_name = f"test{slug_to_pascal(journey.journey_id)}Journey"
     lines = [
@@ -253,12 +291,40 @@ def _compile_xcuitest(project_root: Path, journey: JourneyFile) -> str:
         f"final class {slug_to_pascal(journey.journey_id)}Journey: XCTestCase {{",
         f"    func {method_name}() throws {{",
         "        let app = XCUIApplication()",
-        "        app.launch()",
     ]
+    lines.extend(f"        {line}" for line in _xcuitest_launch_environment(source))
+    lines.append("        app.launch()")
     for step in journey.steps:
         lines.extend(f"        {line}" for line in _xcuitest_step(step))
-    lines.extend(["    }", "}", ""])
+    lines.extend(["    }", "", *_xcuitest_helpers(journey.steps), "}", ""])
     return "\n".join(lines)
+
+
+def _xcuitest_launch_environment(source: JourneySourceV2) -> list[str]:
+    """Render journey preconditions as launch environment before app launch."""
+    preconditions = source.preconditions
+    lines: list[str] = []
+    if preconditions.auth:
+        lines.append(
+            f'app.launchEnvironment["{UI_TEST_JOURNEY_AUTH_ENV}"] = '
+            f"{_swift_literal(preconditions.auth)}"
+        )
+    if preconditions.fixtures:
+        lines.append(
+            f'app.launchEnvironment["{UI_TEST_JOURNEY_FIXTURES_ENV}"] = '
+            f"{_swift_literal(_json_list(preconditions.fixtures))}"
+        )
+    if preconditions.mocks:
+        lines.append(
+            f'app.launchEnvironment["{UI_TEST_JOURNEY_MOCKS_ENV}"] = '
+            f"{_swift_literal(_json_list(preconditions.mocks))}"
+        )
+    if preconditions.feature_flags:
+        lines.append(
+            f'app.launchEnvironment["{UI_TEST_JOURNEY_FEATURE_FLAGS_ENV}"] = '
+            f"{_swift_literal(_json_list(preconditions.feature_flags))}"
+        )
+    return lines
 
 
 def _compile_maestro(project_root: Path, journey: JourneyFile) -> str:
@@ -348,11 +414,8 @@ def _playwright_step(step: dict[str, JsonValue]) -> list[str]:
     raise ValueError(f"unsupported playwright action after capability validation: {action}")
 
 
-def _playwright_visual_steps(journey: JourneyFile) -> list[str]:
+def _playwright_visual_steps(source: JourneySourceV2) -> list[str]:
     """Render supported native visual checks into Playwright assertions."""
-    source = _read_source_model(journey.path)
-    if source is None:
-        return []
     lines: list[str] = []
     for check in source.visual_checks:
         if check.mode not in {VisualCheckMode.NATIVE, VisualCheckMode.NATIVE_THEN_LLM}:
@@ -429,7 +492,7 @@ def _xcuitest_step(step: dict[str, JsonValue]) -> list[str]:
     """Render one journey step into Swift/XCUITest."""
     action, payload = next(iter(step.items()))
     if action == "open" and isinstance(payload, str):
-        return _xcuitest_open_url(payload)
+        return [f"openJourneyURL({_swift_literal(payload)}, in: app)"]
     if action == "click" and isinstance(payload, dict):
         return [f"{_xcuitest_target(payload)}.tap()"]
     if action == "assert" and isinstance(payload, dict):
@@ -447,26 +510,6 @@ def _xcuitest_step(step: dict[str, JsonValue]) -> list[str]:
     raise ValueError(f"unsupported xcuitest action after capability validation: {action}")
 
 
-def _xcuitest_open_url(route: str) -> list[str]:
-    """Return Swift that opens a deep link in the booted simulator."""
-    return [
-        "let process = Process()",
-        'process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")',
-        f'process.arguments = ["simctl", "openurl", "booted", {_swift_literal(route)}]',
-        "try process.run()",
-        "// Bound simctl calls so a missing booted simulator cannot hang CI forever.",
-        "let deadline = Date().addingTimeInterval(10)",
-        "while process.isRunning && Date() < deadline {",
-        "    RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.1))",
-        "}",
-        "if process.isRunning {",
-        "    process.terminate()",
-        '    XCTFail("simctl openurl timed out")',
-        "}",
-        "XCTAssertEqual(process.terminationStatus, 0)",
-    ]
-
-
 def _xcuitest_screenshot() -> list[str]:
     """Return Swift that records screenshots as XCUITest attachments."""
     return [
@@ -475,6 +518,21 @@ def _xcuitest_screenshot() -> list[str]:
         'attachment.name = "journey-screenshot"',
         "attachment.lifetime = .keepAlways",
         "add(attachment)",
+    ]
+
+
+def _xcuitest_helpers(steps: list[dict[str, JsonValue]]) -> list[str]:
+    """Return Swift helpers required by rendered XCUITest steps."""
+    if not any(next(iter(step.items()))[0] == "open" for step in steps):
+        return []
+    return [
+        "    private func openJourneyURL(_ urlString: String, in app: XCUIApplication) {",
+        "        guard let url = URL(string: urlString) else {",
+        '            XCTFail("invalid journey URL: \\(urlString)")',
+        "            return",
+        "        }",
+        "        app.open(url)",
+        "    }",
     ]
 
 
@@ -537,6 +595,11 @@ def _literal(value: str) -> str:
 def _swift_literal(value: str) -> str:
     """Return a Swift string literal."""
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def _json_list(values: list[str]) -> str:
+    """Return compact JSON for launch environment list values."""
+    return json.dumps(values, separators=(",", ":"))
 
 
 def _with_path(issue: JourneyIssue, path: Path) -> JourneyIssue:
