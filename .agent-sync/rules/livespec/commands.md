@@ -1,7 +1,3 @@
-<!-- LiveSpec traceability anchors -->
-<!-- @spec(FR-004) -->
-<!-- @spec(FR-010) -->
-
 # LiveSpec Commands — Référence
 
 > **Chargé à la demande par `livespec-routing.md`.** Ne pas charger ce fichier par défaut.
