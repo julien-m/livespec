@@ -2,6 +2,9 @@
 name: spec-fix
 description: LiveSpec slash command /spec-fix
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-009) -->
+
 
 # /spec-fix
 

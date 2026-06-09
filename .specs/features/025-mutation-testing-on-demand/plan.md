@@ -1,3 +1,9 @@
+---
+created: 2026-05-07
+spec_ref: .specs/features/025-mutation-testing-on-demand/spec.md
+title: Plan — 025 Mutation Testing On-Demand
+---
+
 # Plan — 025 Mutation Testing On-Demand
 
 - **Feature:** 025-mutation-testing-on-demand
@@ -213,3 +219,12 @@ sequenceDiagram
 - **No CI integration.** The feature explicitly excludes per-PR runs (SC-001).
 
 *LiveSpec Plan 025 — Approved — 2026-05-07*
+
+## Summary
+
+Technical plan for Mutation Testing On Demand.
+
+## Testing Strategy
+
+- Run focused tests for the mapped implementation.
+- Run full project validation before completion.

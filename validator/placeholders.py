@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-011)
+
 """Placeholder resolver for verify-output rules.
 
 # @spec FR-011: placeholder resolver

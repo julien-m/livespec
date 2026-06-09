@@ -2,6 +2,13 @@
 name: spec-journey
 description: LiveSpec command for creating, editing, bootstrapping, impacting, and running User Journeys v2
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-013) -->
+<!-- @spec(FR-014) -->
+<!-- @spec(FR-015) -->
+<!-- @spec(FR-016) -->
+<!-- @spec(FR-041) -->
+
 
 # $spec-journey
 

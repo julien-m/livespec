@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 # @spec FR-003: validate_behavioral public API
 # .specs/features/044-behavioral-grammar-v1-shared/spec.md#fr-003
 # @spec FR-004: Kind detection rule
@@ -167,9 +170,7 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, object], str] | str:
     return dict(post.metadata), post.content
 
 
-def _detect_kind(
-    path: Path, metadata: dict[str, object]
-) -> Literal["flow", "screen"] | None:
+def _detect_kind(path: Path, metadata: dict[str, object]) -> Literal["flow", "screen"] | None:
     """Detect the behavioural artefact kind.
 
     Args:
@@ -292,20 +293,14 @@ def _check_sections(
     # 1. Missing mandatory sections → FAIL
     missing = [name for name in mandatory if name not in section_bodies]
     for name in missing:
-        diagnostics.append(
-            f'{path}: mandatory section "{name}" is missing'
-        )
+        diagnostics.append(f'{path}: mandatory section "{name}" is missing')
 
     # 2. Present-but-empty mandatory sections → FAIL
     empty = [
-        name
-        for name in mandatory
-        if name in section_bodies and not section_bodies[name].strip()
+        name for name in mandatory if name in section_bodies and not section_bodies[name].strip()
     ]
     for name in empty:
-        diagnostics.append(
-            f'{path}: mandatory section "{name}" is present but empty'
-        )
+        diagnostics.append(f'{path}: mandatory section "{name}" is present but empty')
 
     if missing or empty:
         return VALIDATION_RESULT.FAIL, diagnostics
@@ -316,17 +311,13 @@ def _check_sections(
     # 3a. Optional sections missing
     for name in optional:
         if name not in section_bodies:
-            deviations.append(
-                f'{path}: optional section "{name}" is absent (non-fatal)'
-            )
+            deviations.append(f'{path}: optional section "{name}" is absent (non-fatal)')
 
     # 3b. Extra unknown sections
     known = set(mandatory) | set(optional)
     extra = [h for h in headings if h not in known]
     for name in extra:
-        deviations.append(
-            f'{path}: unknown extra section "{name}" (non-fatal)'
-        )
+        deviations.append(f'{path}: unknown extra section "{name}" (non-fatal)')
 
     # 3c. Wrong order of mandatory sections
     encountered_mandatory_order = [h for h in headings if h in mandatory]
@@ -457,10 +448,7 @@ def _candidate_mockup_paths(specs_root: Path, slug: str) -> list[Path]:
 
     Order matches :data:`MOCKUP_EXTENSIONS` — `.pen` first, then `.png`.
     """
-    return [
-        specs_root / "design" / "screens" / f"{slug}.{ext}"
-        for ext in MOCKUP_EXTENSIONS
-    ]
+    return [specs_root / "design" / "screens" / f"{slug}.{ext}" for ext in MOCKUP_EXTENSIONS]
 
 
 def _has_readable_mockup(specs_root: Path, slug: str) -> bool:

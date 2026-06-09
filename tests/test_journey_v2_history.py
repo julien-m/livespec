@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-011)
+
 """Tests for User Journeys v2 history and decision governance."""
 
 from __future__ import annotations

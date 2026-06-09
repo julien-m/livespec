@@ -1,3 +1,9 @@
+---
+created: 2026-05-07
+spec_ref: .specs/features/026-conventions-propagation-by-stack/spec.md
+title: Conventions Propagation by Stack
+---
+
 # Plan: Conventions Propagation by Stack
 
 - **Feature:** 026-conventions-propagation-by-stack
@@ -193,3 +199,11 @@ jobs:
 ---
 
 *LiveSpec Plan 026 — 2026-05-07*
+
+## Summary
+
+Technical plan for Conventions Propagation By Stack.
+
+## Risks & Considerations
+
+- Keep this compatibility plan aligned with the living spec and implementation map.

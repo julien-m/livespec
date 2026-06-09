@@ -40,16 +40,12 @@ def test_driver_manifest_all_capabilities_optional() -> None:
 
 def test_driver_capability_requires_command_or_script() -> None:
     with pytest.raises(ValueError):
-        DriverManifest.model_validate(
-            {"name": "x", "coverage": {"report_path": "lcov.info"}}
-        )
+        DriverManifest.model_validate({"name": "x", "coverage": {"report_path": "lcov.info"}})
 
 
 def test_driver_capability_unknown_field_rejected() -> None:
     with pytest.raises(ValueError):
-        DriverManifest.model_validate(
-            {"name": "x", "coverage": {"command": "true", "bogus": 1}}
-        )
+        DriverManifest.model_validate({"name": "x", "coverage": {"command": "true", "bogus": 1}})
 
 
 # --- Loader (FR-008 / AC-014) -------------------------------------------------
@@ -167,18 +163,14 @@ def test_registry_skips_malformed_and_loads_rest(
 
 
 def test_run_capability_command_success(tmp_path: Path) -> None:
-    manifest = DriverManifest.model_validate(
-        {"name": "x", "snapshots": {"command": "echo hello"}}
-    )
+    manifest = DriverManifest.model_validate({"name": "x", "snapshots": {"command": "echo hello"}})
     result = run_capability(manifest, "snapshots", project_root=tmp_path)
     assert result.exit_code == 0
     assert "hello" in result.stdout
 
 
 def test_run_capability_command_failure(tmp_path: Path) -> None:
-    manifest = DriverManifest.model_validate(
-        {"name": "x", "snapshots": {"command": "false"}}
-    )
+    manifest = DriverManifest.model_validate({"name": "x", "snapshots": {"command": "false"}})
     result = run_capability(manifest, "snapshots", project_root=tmp_path)
     assert result.exit_code != 0
 
@@ -186,18 +178,14 @@ def test_run_capability_command_failure(tmp_path: Path) -> None:
 def test_run_capability_script_runs(tmp_path: Path) -> None:
     script = tmp_path / "run.sh"
     script.write_text("#!/usr/bin/env bash\necho from-script\n")
-    manifest = DriverManifest.model_validate(
-        {"name": "x", "snapshots": {"script": "run.sh"}}
-    )
+    manifest = DriverManifest.model_validate({"name": "x", "snapshots": {"script": "run.sh"}})
     result = run_capability(manifest, "snapshots", project_root=tmp_path)
     assert result.exit_code == 0
     assert "from-script" in result.stdout
 
 
 def test_run_capability_script_missing_raises(tmp_path: Path) -> None:
-    manifest = DriverManifest.model_validate(
-        {"name": "x", "snapshots": {"script": "no-such.sh"}}
-    )
+    manifest = DriverManifest.model_validate({"name": "x", "snapshots": {"script": "no-such.sh"}})
     with pytest.raises(FileNotFoundError):
         run_capability(manifest, "snapshots", project_root=tmp_path)
 
@@ -246,9 +234,7 @@ def test_run_capability_coverage_with_report_present(tmp_path: Path) -> None:
 
 def test_parse_lcov_basic(tmp_path: Path) -> None:
     p = tmp_path / "lcov.info"
-    p.write_text(
-        "TN:\nSF:src/foo.py\nDA:1,1\nDA:2,0\nDA:3,5\nend_of_record\n"
-    )
+    p.write_text("TN:\nSF:src/foo.py\nDA:1,1\nDA:2,0\nDA:3,5\nend_of_record\n")
     parsed = parse_lcov(p)
     assert parsed["src/foo.py"] == {1: True, 2: False, 3: True}
 
@@ -269,11 +255,7 @@ def test_parse_diff_added_lines() -> None:
 
 def test_compute_patch_coverage_full_partial_missing(tmp_path: Path) -> None:
     lcov = tmp_path / "lcov.info"
-    lcov.write_text(
-        "SF:src/foo.py\n"
-        "DA:1,1\nDA:2,1\nDA:3,0\nDA:4,1\n"
-        "end_of_record\n"
-    )
+    lcov.write_text("SF:src/foo.py\nDA:1,1\nDA:2,1\nDA:3,0\nDA:4,1\nend_of_record\n")
     diff = (
         "+++ b/src/foo.py\n"
         "@@ -0,0 +1,4 @@\n"

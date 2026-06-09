@@ -23,3 +23,9 @@ updated_at: '2026-04-14'
 | 5 | Add --visual-status flag to spec.check.md (FR-006) | Done | `.claude/commands/spec.check.md` | — | — |
 | 6 | Create migrations/5/migrate.md (FR-008) | Done | `migrations/5/migrate.md` | — | — |
 | 7 | Write unit tests (AC coverage) | Done | `tests/test_baseline_manifest.py`, `tests/fixtures/baseline_manifest/` (3 fixtures) | — | — |
+
+## Progress Table
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 | Complete | Historical progress captured before table normalization. |

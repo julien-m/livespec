@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-009)
+# @spec(FR-010)
+
 """CLI surface for root Penflow UI contract workspaces."""
 
 from __future__ import annotations
@@ -127,8 +132,7 @@ def status_command(
         typer.echo(f"Missing: {', '.join(status.missing) or 'none'}")
         if status.design_registry_required:
             typer.echo(
-                "Design registry missing: "
-                f"{', '.join(status.design_registry_missing) or 'none'}"
+                f"Design registry missing: {', '.join(status.design_registry_missing) or 'none'}"
             )
         if status.mockup_validation_required:
             typer.echo(

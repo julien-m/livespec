@@ -37,21 +37,15 @@ def test_atomic_command_invokes_hooks_resolve_cli(cmd: str, path: Path) -> None:
         f"invoke the resolver CLI so Level 0 integrations are included."
     )
     after_needle = "--event after"
-    assert after_needle in text, (
-        f"{path.name} does not document the `--event after` invocation."
-    )
+    assert after_needle in text, f"{path.name} does not document the `--event after` invocation."
 
 
 @pytest.mark.parametrize("cmd,path", ATOMIC_COMMANDS)
-def test_atomic_command_documents_level_0_integrations(
-    cmd: str, path: Path
-) -> None:
+def test_atomic_command_documents_level_0_integrations(cmd: str, path: Path) -> None:
     """The command file must mention `~/.config/livespec/` Level 0 integrations."""
     _ = cmd  # parametrized for symmetry / failure messages
     text = _read(path)
-    assert "~/.config/livespec/" in text, (
-        f"{path.name} does not mention Level 0 integrations path."
-    )
+    assert "~/.config/livespec/" in text, f"{path.name} does not mention Level 0 integrations path."
     assert "system/integrations.md" in text, (
         f"{path.name} does not link to `system/integrations.md`."
     )
@@ -68,9 +62,7 @@ def test_atomic_command_documents_all_four_levels(cmd: str, path: Path) -> None:
 
 
 @pytest.mark.parametrize("cmd,path", ATOMIC_COMMANDS)
-def test_atomic_command_does_not_use_legacy_3_levels_phrasing(
-    cmd: str, path: Path
-) -> None:
+def test_atomic_command_does_not_use_legacy_3_levels_phrasing(cmd: str, path: Path) -> None:
     """Guard against regression to the legacy 3-level callout."""
     text = _read(path)
     legacy = f"**Read** `before-{cmd}` hooks from all 3 levels"

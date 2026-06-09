@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(FR-009)
+# @spec(FR-010)
+# @spec(FR-011)
+# @spec(FR-012)
+
 """History and decision governance for User Journeys v2."""
 
 # @spec FR-009, FR-010, FR-011, FR-012: journey edit history and blocking

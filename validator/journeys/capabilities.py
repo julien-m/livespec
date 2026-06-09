@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-028)
+
 """Runner capability checks for User Journeys v2 compilation."""
 
 # @spec FR-028: reject unsupported runner capabilities before writing artifacts

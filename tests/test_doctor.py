@@ -1,3 +1,21 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-012)
+# @spec(AC-013)
+# @spec(AC-014)
+# @spec(AC-019)
+# @spec(FR-012)
+
 """Tests for the project-level LiveSpec doctor command."""
 
 from __future__ import annotations
@@ -89,6 +107,34 @@ def test_doctor_json_reports_stale_mapping_missing_test_and_hook(
     assert "hook_unenforced" in codes
 
 
+def test_doctor_ignores_prose_cells_with_dotted_words(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Doctor only treats plausible path cells as implementation mappings."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    (specs / "roadmap.md").write_text("- [x] [Auth](features/001-auth/)\n")
+    (specs / "README.md").write_text("| [001-auth](features/001-auth/) | Implemented |\n")
+    _write_feature(
+        specs,
+        implementation=(
+            "# Implementation\n\n"
+            "## Acceptance Criteria Mapping\n\n"
+            "| AC | Evidence | Status |\n"
+            "|---|---|---|\n"
+            "| AC-001 | Pre-existing plan_review.py prompt. | Implemented |\n"
+            "| AC-002 | `SdkTestRunner.run()` | Implemented |\n"
+        ),
+    )
+
+    monkeypatch.chdir(tmp_path)
+    result = runner.invoke(app, ["doctor", "--format", "json"])
+
+    report = _json_report(result.output)
+    assert "missing_test_file" not in _finding_codes(report)
+
+
 def test_doctor_strict_promotes_runner_warning_to_failure(
     tmp_path: Path,
     monkeypatch: MonkeyPatch,
@@ -118,6 +164,37 @@ def test_doctor_strict_promotes_runner_warning_to_failure(
     assert result.exit_code == 1
     report = _json_report(result.output)
     assert "test_not_in_runner" in _finding_codes(report)
+
+
+def test_doctor_runner_accepts_playwright_test_dir(
+    tmp_path: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Doctor treats a configured Playwright testDir as covering child test files."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    (specs / "roadmap.md").write_text("- [x] [Auth](features/001-auth/)\n")
+    (specs / "README.md").write_text("| [001-auth](features/001-auth/) | Implemented |\n")
+    visual_test = tmp_path / "tests" / "visual" / "auth.spec.ts"
+    visual_test.parent.mkdir(parents=True)
+    visual_test.write_text("test('auth', async () => {})\n")
+    (tmp_path / "playwright.config.ts").write_text('export default { testDir: "tests/visual" };\n')
+    _write_feature(
+        specs,
+        implementation=(
+            "# Implementation\n\n"
+            "## Acceptance Criteria Mapping\n\n"
+            "| AC | Test File | Status |\n"
+            "|---|---|---|\n"
+            "| AC-001 | `tests/visual/auth.spec.ts` | Implemented |\n"
+        ),
+    )
+
+    monkeypatch.chdir(tmp_path)
+    result = runner.invoke(app, ["doctor", "--format", "json"])
+
+    report = _json_report(result.output)
+    assert "test_not_in_runner" not in _finding_codes(report)
 
 
 def test_doctor_fix_plan_is_read_only(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
@@ -172,8 +249,7 @@ def test_doctor_apply_cleanup_refuses_destructive_actions(
     cleanup_actions = report["cleanup_actions"]
     assert isinstance(cleanup_actions, list)
     assert any(
-        isinstance(action, dict) and action.get("refused") is True
-        for action in cleanup_actions
+        isinstance(action, dict) and action.get("refused") is True for action in cleanup_actions
     )
 
 

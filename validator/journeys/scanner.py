@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(FR-009)
+# @spec(FR-013)
+# @spec(FR-018)
+# @spec(FR-029)
+
 """Spec Doctor integration and category reporting for journeys."""
 
 from __future__ import annotations

@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-010) -->
+<!-- @spec(FR-011) -->
+
 <!-- @spec FR-003, FR-004, FR-005, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012: Reference doc — .specs/features/039-command-expectations-and-verify-output/spec.md -->
 <!-- @spec FR-011: Shared command runtime docs — .specs/features/052-deterministic-command-goal-contracts/spec.md#fr-011 -->
 

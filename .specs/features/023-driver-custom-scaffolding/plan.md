@@ -1,3 +1,9 @@
+---
+created: 2026-05-07
+spec_ref: .specs/features/023-driver-custom-scaffolding/spec.md
+title: Plan — 023 Driver Custom Scaffolding & Graceful Degradation
+---
+
 # Plan — 023 Driver Custom Scaffolding & Graceful Degradation
 
 - **Feature:** 023-driver-custom-scaffolding
@@ -60,3 +66,25 @@ AC-001 → step 1 + 2 (sections present). AC-002 → tests. AC-003/004 → exist
 ---
 
 *LiveSpec Plan — 2026-05-07*
+
+## Summary
+
+Technical plan for Driver Custom Scaffolding.
+
+## Testing Strategy
+
+- Run focused tests for the mapped implementation.
+- Run full project validation before completion.
+
+## Risks & Considerations
+
+- Keep this compatibility plan aligned with the living spec and implementation map.
+
+## Traceability Flow
+
+```mermaid
+flowchart TD
+    Spec[spec.md] --> Plan[plan.md]
+    Plan --> Implementation[implementation.md]
+    Implementation --> Tests[verification]
+```

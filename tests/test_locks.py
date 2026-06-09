@@ -1,3 +1,14 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-010)
+
 """Tests for validator.locks (Chantier 3 / Feature 015, FR-001..010)."""
 
 from __future__ import annotations

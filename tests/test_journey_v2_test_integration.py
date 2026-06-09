@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-028)
+# @spec(AC-030)
+
 """Integration tests for `livespec test` and compiled User Journeys v2."""
 
 from __future__ import annotations

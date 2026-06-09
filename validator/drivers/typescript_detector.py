@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-004)
+
 """Detect the TypeScript/JavaScript test runner and package manager."""
 
 # @spec FR-002: Test runner detection (vitest > jest)

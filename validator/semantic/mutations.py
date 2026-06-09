@@ -221,9 +221,7 @@ def run_mutation_suite(specs_root: Path, work_dir: Path) -> list[MutationResult]
 
             validation_results, _excluded = validate_all(mutated_path)
             structure_errors = [
-                message
-                for result in validation_results
-                for message in result.errors
+                message for result in validation_results for message in result.errors
             ]
             if structure_errors:
                 killed = True

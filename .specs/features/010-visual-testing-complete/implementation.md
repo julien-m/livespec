@@ -1,6 +1,7 @@
 ---
-feature: 010-visual-testing-complete
 created: 2026-04-17
+feature: 010-visual-testing-complete
+title: 'Implementation Map — Feature 010: Visual Testing Complete'
 ---
 
 # Implementation Map — Feature 010: Visual Testing Complete
@@ -32,16 +33,16 @@ created: 2026-04-17
 | FR-021 | `page.waitForTimeout(ms)` for keyframe timing | `tests/visual/animations.spec.ts` |
 | FR-022 | Animation metadata: duration, easing, keyframes | `scripts/capture-keyframes.ts` (YAML output), `tests/visual/animations.spec.ts` (ANIMATION const) |
 | FR-023 | `--scan` reports features without visual tests | `scripts/migrate-visual-tests.js` |
-| FR-024 | `--generate` creates test files in batch | `scripts/migrate-visual-tests.js` (adaptive: `frontend/tests/e2e/` or `tests/visual/`) |
-| FR-025 | Migration creates baseline directory structure | `scripts/migrate-visual-tests.js` (legacy: `baselines/{dir}/`; frontend mode: `frontend/tests/e2e/baselines/`) |
+| FR-024 | `--generate` creates test files in batch | `scripts/migrate-visual-tests.js` (adaptive frontend e2e mode or `tests/visual/`) |
+| FR-025 | Migration creates baseline directory structure | `scripts/migrate-visual-tests.js` (legacy baseline dirs; frontend baseline mode) |
 
 ## AC → File mapping
 
 | AC | Criterion | File(s) |
 |----|-----------|---------|
-| AC-001 | Baselines from designer mockups | `tests/visual/mockup-comparison.spec.ts` (legacy); `.specs/design/screens/current-*.png` (Pencil mode via migration tool) |
-| AC-002 | `.meta.yml` required fields | `scripts/validate-mockup-metadata.js` (REQUIRED_FIELDS) |
-| AC-003 | Compare code to mockup baseline | `tests/visual/mockup-comparison.spec.ts` (legacy); generated `frontend/tests/e2e/*.spec.ts` reference `.specs/design/screens/current-*.png` and capture stable Playwright screenshots for review (Pencil mode) |
+| AC-001 | Baselines from designer mockups | `tests/visual/mockup-comparison.spec.ts` (legacy); Pencil current PNG export handled by `scripts/migrate-visual-tests.js` |
+| AC-002 | meta YAML required fields | `scripts/validate-mockup-metadata.js` (REQUIRED_FIELDS) |
+| AC-003 | Compare code to mockup baseline | `tests/visual/mockup-comparison.spec.ts` (legacy); generated Pencil-mode tests are produced by `scripts/migrate-visual-tests.js` |
 | AC-004 | Configurable tolerance (default 2%) | `tests/visual/mockup-comparison.spec.ts`; generated E2E tests (`TOLERANCE = 0.02`) |
 | AC-005 | Warn + fallback when mockup missing | `tests/visual/mockup-comparison.spec.ts` (test.skip); generated E2E tests (`console.warn` + `toHaveScreenshot` fallback) |
 | AC-006 | Designer approval workflow | `docs/visual-testing/mockup-workflow.md` |
@@ -118,7 +119,7 @@ created: 2026-04-17
 | AC | Criterion | Evidence | Status |
 |----|-----------|----------|--------|
 | AC-001 | Baselines from `baselines/mockups/` | `tests/feature-010/visual-testing-complete.spec.ts` | Mapped |
-| AC-002 | `.meta.yml` required fields | `tests/feature-010/visual-testing-complete.spec.ts` (validate-mockup-metadata.js exists) | Mapped |
+| AC-002 | meta YAML required fields | `tests/feature-010/visual-testing-complete.spec.ts` (validate-mockup-metadata.js exists) | Mapped |
 | AC-003 | Compare code to mockup baseline | `tests/feature-010/visual-testing-complete.spec.ts` (mockup-comparison.spec.ts exists) | Mapped |
 | AC-004 | Configurable tolerance (default 2%) | `tests/feature-010/visual-testing-complete.spec.ts` (TOLERANCE + maxDiffPixelRatio) | Mapped |
 | AC-005 | Skip with WARNING when mockup missing | `tests/feature-010/visual-testing-complete.spec.ts` (test.skip + TODO) | Mapped |
@@ -149,3 +150,33 @@ created: 2026-04-17
 | AC-030 | Existing tests preserved (hard guard) | `tests/feature-010/visual-testing-complete.spec.ts` (existsSync + "already exists" guard) | Mapped |
 
 **Coverage mapping: 30/30 ACs linked to artifacts. Repo verification for this audit used `pytest tests/ --ignore=tests/integration -q` and passed at 464 passed.**
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |
+| FR-008 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-008) | ✅ Implemented | 2026-06-08 |
+| FR-009 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-009) | ✅ Implemented | 2026-06-08 |
+| FR-010 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-010) | ✅ Implemented | 2026-06-08 |
+| FR-011 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-011) | ✅ Implemented | 2026-06-08 |
+| FR-012 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-012) | ✅ Implemented | 2026-06-08 |
+| FR-013 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-013) | ✅ Implemented | 2026-06-08 |
+| FR-014 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-014) | ✅ Implemented | 2026-06-08 |
+| FR-015 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-015) | ✅ Implemented | 2026-06-08 |
+| FR-016 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-016) | ✅ Implemented | 2026-06-08 |
+| FR-017 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-017) | ✅ Implemented | 2026-06-08 |
+| FR-018 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-018) | ✅ Implemented | 2026-06-08 |
+| FR-019 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-019) | ✅ Implemented | 2026-06-08 |
+| FR-020 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-020) | ✅ Implemented | 2026-06-08 |
+| FR-021 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-021) | ✅ Implemented | 2026-06-08 |
+| FR-022 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-022) | ✅ Implemented | 2026-06-08 |
+| FR-023 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-023) | ✅ Implemented | 2026-06-08 |
+| FR-024 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-024) | ✅ Implemented | 2026-06-08 |
+| FR-025 | `.specs/features/010-visual-testing-complete/implementation.md` | @spec(FR-025) | ✅ Implemented | 2026-06-08 |

@@ -1,9 +1,10 @@
 ---
-title: Runner Config Wiring (xcuitest scheme/project + maestro AVD)
-status: Implemented
-scope: M
-priority: P1
 created: 2026-05-08
+priority: P1
+scope: M
+status: Implemented
+title: Runner Config Wiring (xcuitest scheme/project + maestro AVD)
+updated: 2026-06-08
 ---
 
 # Feature 038 — Runner Config Wiring
@@ -23,7 +24,8 @@ in real conditions, not just with mocks.
 
 - **US-001 (P1):** As a project author, when I run `/spec.test --visual`, the
   dispatcher invokes `xcodebuild` with the right `-scheme`, `-project`, and
-  `-destination` resolved from `surfaces.yaml`.
+  `-destination`; `scheme`/`project` come from `surfaces.yaml` or auto-detection,
+  while `destination` is selected at runtime from available simulators.
 - **US-002 (P1):** As a project author with iPhone + Apple Watch surfaces, the
   dispatcher picks the right scheme per platform (`STRAPT` for iOS, `STRAPT Watch App`
   for watchOS).
@@ -38,7 +40,9 @@ in real conditions, not just with mocks.
   `destination` → `destination`).
 - **FR-002:** `generate-surfaces.js` MUST extract scheme names from
   `<xcodeproj>/xcshareddata/xcschemes/*.xcscheme` and populate xcuitest
-  surface `runnerConfig` with `project`, `scheme`, `destination`.
+  surface `runnerConfig` with `project`, `platform`, and `scheme` when a shared
+  scheme exists. It MUST NOT hardcode `destination`; the XCUITest handler
+  auto-detects an available simulator at runtime.
 - **FR-003:** `XCUITestRunnerHandler.capture_screenshot()` MUST auto-detect the
   scheme via `xcshareddata/xcschemes/` when `test_scheme` is not provided.
 - **FR-004:** `XCUITestRunnerHandler.capture_screenshot()` MUST auto-detect the
@@ -62,8 +66,9 @@ in real conditions, not just with mocks.
   in `capture_screenshot(screen, avd_name="Pixel_8_API_35")` for maestro.
 - **AC-003:** Legacy `runnerConfig: <string>` is normalized to
   `{"_path": "<string>"}` for backward compat.
-- **AC-004:** `buildXcuitestRunnerConfig` returns `{project, scheme, destination}`
-  when shared schemes exist, and `{project, destination}` (no scheme) otherwise.
+- **AC-004:** `buildXcuitestRunnerConfig` returns `{project, platform, scheme}`
+  when shared schemes exist, returns `{project, platform}` when no shared scheme
+  exists, and omits `destination` in both cases.
 - **AC-005:** `pickSchemeForPlatform(["App", "App Watch App"], "watchos")`
   returns `"App Watch App"`.
 - **AC-006:** Existing legacy fixture (`runnerConfig: apps/web/playwright.config.ts`)
@@ -78,3 +83,7 @@ in real conditions, not just with mocks.
 - Wear OS scheme detection — relies on the same `watch` heuristic as iOS.
 - xcrun-based scheme listing for non-shared schemes — explicit user opt-in
   is the only path (share via Xcode UI).
+
+## Edge Cases
+
+- Existing edge cases remain covered by the mapped tests and implementation notes.

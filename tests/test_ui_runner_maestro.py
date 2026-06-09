@@ -1,3 +1,15 @@
+# LiveSpec traceability anchors
+# @spec(AC-002)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-013)
+
 """Unit tests for the Android/Maestro UI runner.
 
 All tests mock subprocess and OS calls so they run on any host without
@@ -45,9 +57,7 @@ def android_project(tmp_path: Path) -> Path:
         'plugins { id("com.android.application") version "8.0" }\n'
     )
     (tmp_path / "app").mkdir()
-    (tmp_path / "app" / "build.gradle.kts").write_text(
-        'android { namespace = "com.example" }\n'
-    )
+    (tmp_path / "app" / "build.gradle.kts").write_text('android { namespace = "com.example" }\n')
     return tmp_path
 
 
@@ -81,18 +91,14 @@ def test_detect_build_gradle(tmp_path: Path) -> None:
 
 def test_detect_build_gradle_kts(tmp_path: Path) -> None:
     """Projects with build.gradle.kts are detected as Android projects."""
-    (tmp_path / "build.gradle.kts").write_text(
-        'plugins { id("com.android.application") }\n'
-    )
+    (tmp_path / "build.gradle.kts").write_text('plugins { id("com.android.application") }\n')
     handler = MaestroRunnerHandler(tmp_path)
     assert handler.detect() is True
 
 
 def test_detect_android_manifest(tmp_path: Path) -> None:
     """Projects with AndroidManifest.xml are detected as Android projects."""
-    (tmp_path / "AndroidManifest.xml").write_text(
-        '<manifest package="com.example"/>\n'
-    )
+    (tmp_path / "AndroidManifest.xml").write_text('<manifest package="com.example"/>\n')
     handler = MaestroRunnerHandler(tmp_path)
     assert handler.detect() is True
 
@@ -145,8 +151,8 @@ def test_check_android_sdk_missing_env(handler: MaestroRunnerHandler) -> None:
     with patch.dict("os.environ", {}, clear=True):
         # Remove both ANDROID_HOME and ANDROID_SDK_ROOT
         import os
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("ANDROID_HOME", "ANDROID_SDK_ROOT")}
+
+        env = {k: v for k, v in os.environ.items() if k not in ("ANDROID_HOME", "ANDROID_SDK_ROOT")}
         with patch.dict("os.environ", env, clear=True):
             assert handler._check_android_sdk() is False
 
@@ -189,9 +195,7 @@ _AVD_LIST_OUTPUT = """Available Android Virtual Devices:
 ---------
 """
 
-_ADB_DEVICES_WITH_EMULATOR = (
-    "List of devices attached\nemulator-5554\tdevice\n"
-)
+_ADB_DEVICES_WITH_EMULATOR = "List of devices attached\nemulator-5554\tdevice\n"
 _ADB_DEVICES_EMPTY = "List of devices attached\n"
 
 
@@ -272,14 +276,14 @@ def test_wait_for_boot_polls_boot_completed(handler: MaestroRunnerHandler) -> No
 
     assert result is True
     boot_checks = [
-        cmd for cmd in call_log
-        if "getprop" in " ".join(cmd) and "boot_completed" in " ".join(cmd)
+        cmd for cmd in call_log if "getprop" in " ".join(cmd) and "boot_completed" in " ".join(cmd)
     ]
     assert len(boot_checks) >= 1
 
 
 def test_wait_for_boot_timeout_returns_false(handler: MaestroRunnerHandler) -> None:
     """_wait_for_boot returns False when emulator does not boot within timeout."""
+
     def mock_run(cmd, *args, **kwargs):
         mock = MagicMock()
         mock.returncode = 0
@@ -386,16 +390,13 @@ def test_run_flow_executes_maestro_test(
     with (
         patch.object(handler, "_check_android_sdk", return_value=True),
         patch.object(handler, "_check_maestro", return_value=True),
-        patch.object(
-            handler, "_get_running_emulator", return_value="emulator-5554"
-        ),
+        patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
         patch("validator.ui_runner_maestro.subprocess.run", side_effect=mock_run),
     ):
         handler.run_flow()
 
     maestro_calls = [
-        cmd for cmd in called_cmds
-        if "maestro" in " ".join(cmd) and "test" in " ".join(cmd)
+        cmd for cmd in called_cmds if "maestro" in " ".join(cmd) and "test" in " ".join(cmd)
     ]
     assert len(maestro_calls) >= 1
 
@@ -405,9 +406,7 @@ def test_run_flow_no_flows_dir_returns_error(handler: MaestroRunnerHandler) -> N
     with (
         patch.object(handler, "_check_android_sdk", return_value=True),
         patch.object(handler, "_check_maestro", return_value=True),
-        patch.object(
-            handler, "_get_running_emulator", return_value="emulator-5554"
-        ),
+        patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
     ):
         result = handler.run_flow()
     assert result.success is False
@@ -442,9 +441,7 @@ def test_run_flow_continues_after_single_flow_failure(
     with (
         patch.object(handler, "_check_android_sdk", return_value=True),
         patch.object(handler, "_check_maestro", return_value=True),
-        patch.object(
-            handler, "_get_running_emulator", return_value="emulator-5554"
-        ),
+        patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
         patch("validator.ui_runner_maestro.subprocess.run", side_effect=mock_run),
     ):
         handler.run_flow()
@@ -476,9 +473,7 @@ def test_run_flow_fail_fast_stops_on_first_failure(
     with (
         patch.object(handler, "_check_android_sdk", return_value=True),
         patch.object(handler, "_check_maestro", return_value=True),
-        patch.object(
-            handler, "_get_running_emulator", return_value="emulator-5554"
-        ),
+        patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
         patch("validator.ui_runner_maestro.subprocess.run", side_effect=mock_run),
     ):
         result = handler.run_flow(fail_fast=True)
@@ -509,9 +504,7 @@ def test_find_maestro_screenshots_finds_tagged_pngs(
     assert all(p.suffix == ".png" for p in screenshots)
 
 
-def test_find_maestro_screenshots_empty_dir(
-    handler: MaestroRunnerHandler, tmp_path: Path
-) -> None:
+def test_find_maestro_screenshots_empty_dir(handler: MaestroRunnerHandler, tmp_path: Path) -> None:
     """_find_maestro_screenshots returns empty list for empty directory."""
     empty_dir = tmp_path / "empty"
     empty_dir.mkdir()
@@ -555,19 +548,13 @@ def test_capture_adb_screenshot_invokes_screencap(
         result = handler._capture_adb_screenshot("emulator-5554", output_path)
 
     assert result is True
-    screencap_calls = [
-        cmd for cmd in called_cmds if "screencap" in " ".join(cmd)
-    ]
-    pull_calls = [
-        cmd for cmd in called_cmds if "pull" in " ".join(cmd)
-    ]
+    screencap_calls = [cmd for cmd in called_cmds if "screencap" in " ".join(cmd)]
+    pull_calls = [cmd for cmd in called_cmds if "pull" in " ".join(cmd)]
     assert len(screencap_calls) >= 1
     assert len(pull_calls) >= 1
 
 
-def test_capture_adb_screenshot_uses_serial(
-    handler: MaestroRunnerHandler, tmp_path: Path
-) -> None:
+def test_capture_adb_screenshot_uses_serial(handler: MaestroRunnerHandler, tmp_path: Path) -> None:
     """_capture_adb_screenshot passes -s <serial> to adb."""
     output_path = tmp_path / "screen.png"
     captured_serial: list[str] = []
@@ -628,9 +615,7 @@ def test_capture_screenshot_uses_avd_subdirectory(
     with (
         patch.object(handler, "_check_android_sdk", return_value=True),
         patch.object(handler, "_check_maestro", return_value=True),
-        patch.object(
-            handler, "_get_running_emulator", return_value="emulator-5554"
-        ),
+        patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
         patch.object(
             handler,
             "_find_maestro_screenshots",
@@ -680,9 +665,7 @@ def test_per_device_baseline_path_includes_device_name(
     handler: MaestroRunnerHandler,
 ) -> None:
     """_resolve_baseline_path includes device name in per-device baseline path."""
-    path = handler._resolve_baseline_path(
-        screen="dashboard", avd_name="Pixel_Tablet_API_34"
-    )
+    path = handler._resolve_baseline_path(screen="dashboard", avd_name="Pixel_Tablet_API_34")
     assert "Pixel_Tablet_API_34" in str(path)
     assert "dashboard" in str(path)
 
@@ -719,9 +702,7 @@ def test_wearos_platform_emits_experimental_warning(
     with (
         patch.object(handler, "_check_android_sdk", return_value=True),
         patch.object(handler, "_check_maestro", return_value=True),
-        patch.object(
-            handler, "_get_running_emulator", return_value="emulator-5554"
-        ),
+        patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
         patch("validator.ui_runner_maestro.subprocess.run", side_effect=mock_run),
         patch(
             "validator.ui_runner_maestro.warnings.warn",
@@ -732,8 +713,7 @@ def test_wearos_platform_emits_experimental_warning(
 
     # At least one warning containing 'experimental' about Wear OS
     wearos_warnings = [
-        w for w in warnings_emitted
-        if "wear" in w.lower() or "experimental" in w.lower()
+        w for w in warnings_emitted if "wear" in w.lower() or "experimental" in w.lower()
     ]
     assert len(wearos_warnings) >= 1
 
@@ -830,9 +810,7 @@ def test_run_flow_timeout_returns_error(
     with (
         patch.object(handler, "_check_android_sdk", return_value=True),
         patch.object(handler, "_check_maestro", return_value=True),
-        patch.object(
-            handler, "_get_running_emulator", return_value="emulator-5554"
-        ),
+        patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
         patch("validator.ui_runner_maestro.subprocess.run", side_effect=mock_run),
     ):
         result = handler.run_flow()

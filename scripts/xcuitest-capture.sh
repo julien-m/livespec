@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-003)
+
 # xcuitest-capture.sh — Capture screenshots from XCUITest run on iOS/watchOS simulator.
 #
 # @spec FR-002: .xcresult parsing + HEIC→PNG — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-002

@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 """Uniform `RunnerHandler` Protocol consumed by the Phase 4.5 dispatcher.
 
 This module declares the contract that every concrete UI runner handler must

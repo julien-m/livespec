@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-004)
+
 """Graceful-degradation message when no driver matches the project."""
 
 # Feature 023: driver custom scaffolding & graceful degradation.
@@ -5,7 +8,6 @@
 # @spec FR-004: Structured degradation message with prefix and sections
 # @spec AC-006: Message includes prefix, signals, scaffold cmd, integration link
 # @spec AC-008: Stack inference falls back to "unknown" when no signals match
-
 
 from __future__ import annotations
 

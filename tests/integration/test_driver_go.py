@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-004)
+
 """Integration checks for the built-in Go driver manifest."""
 
 # @spec FR-004: Integration tests for the Go driver
@@ -18,15 +21,9 @@ from validator.drivers.loader import load_manifest
 from validator.drivers.registry import DriverRegistry
 from validator.drivers.schemas import DriverManifest
 
-_GO_DRIVER_PATH = (
-    Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "go.yaml"
-)
+_GO_DRIVER_PATH = Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "go.yaml"
 _GATE_SCRIPT_PATH = (
-    Path(__file__).resolve().parents[2]
-    / "livespec"
-    / "drivers"
-    / "scripts"
-    / "go-coverage-gate.sh"
+    Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "scripts" / "go-coverage-gate.sh"
 )
 
 
@@ -42,9 +39,7 @@ def test_registry_loads_go_driver() -> None:
     # @spec AC-001 — .specs/features/020-driver-go/spec.md#ac-001
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "go.mod").write_text(
-            "module example.com/x\n", encoding="utf-8"
-        )
+        (project_root / "go.mod").write_text("module example.com/x\n", encoding="utf-8")
 
         registry = DriverRegistry(project_root)
         drivers = registry.discover()

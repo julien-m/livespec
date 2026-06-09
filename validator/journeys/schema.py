@@ -1,3 +1,16 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-017)
+# @spec(FR-031)
+# @spec(FR-032)
+# @spec(FR-033)
+# @spec(FR-035)
+# @spec(FR-037)
+# @spec(FR-038)
+# @spec(FR-039)
+
 """Pydantic boundary models for User Journeys v2 YAML sources."""
 
 # @spec FR-001, FR-005, FR-006, FR-017: v2 journey model and validation boundary

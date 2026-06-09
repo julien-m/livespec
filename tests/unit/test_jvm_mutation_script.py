@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Unit tests for the jvm-mutation.sh + jvm-snapshots.sh + jvm-properties.sh scripts."""
 
 # @spec FR-006: Unit tests for the gate scripts
@@ -10,9 +13,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-_SCRIPTS_DIR = (
-    Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "scripts"
-)
+_SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "scripts"
 _MUTATION_SCRIPT = _SCRIPTS_DIR / "jvm-mutation.sh"
 _SNAPSHOTS_SCRIPT = _SCRIPTS_DIR / "jvm-snapshots.sh"
 _PROPERTIES_SCRIPT = _SCRIPTS_DIR / "jvm-properties.sh"
@@ -67,9 +68,7 @@ def test_mutation_pitest_absent_on_gradle_skips_with_setup_hint() -> None:
     # @spec AC-007
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "build.gradle").write_text(
-            "plugins { id 'java' }\n", encoding="utf-8"
-        )
+        (project_root / "build.gradle").write_text("plugins { id 'java' }\n", encoding="utf-8")
 
         result = _run(_MUTATION_SCRIPT, project_root)
 
@@ -82,9 +81,7 @@ def test_mutation_pitest_absent_on_maven_skips_with_setup_hint() -> None:
     # @spec AC-007
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "pom.xml").write_text(
-            "<project><build/></project>", encoding="utf-8"
-        )
+        (project_root / "pom.xml").write_text("<project><build/></project>", encoding="utf-8")
 
         result = _run(_MUTATION_SCRIPT, project_root)
 
@@ -136,9 +133,7 @@ def test_snapshots_no_library_skips() -> None:
     # @spec AC-005
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "build.gradle").write_text(
-            "plugins { id 'java' }\n", encoding="utf-8"
-        )
+        (project_root / "build.gradle").write_text("plugins { id 'java' }\n", encoding="utf-8")
 
         result = _run(_SNAPSHOTS_SCRIPT, project_root)
 
@@ -190,9 +185,7 @@ def test_properties_no_library_skips() -> None:
     # @spec AC-006
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "build.gradle").write_text(
-            "plugins { id 'java' }\n", encoding="utf-8"
-        )
+        (project_root / "build.gradle").write_text("plugins { id 'java' }\n", encoding="utf-8")
 
         result = _run(_PROPERTIES_SCRIPT, project_root)
 

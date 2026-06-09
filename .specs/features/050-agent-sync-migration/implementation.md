@@ -20,7 +20,7 @@ updated: 2026-05-20
 | FR-007 | `validator/command_registry.py`, `validator/command_audit.py`, `validator/integrations.py`, `validator/cli_commands/*.py` | N/A (validator source change) | Implemented | 2026-05-18 |
 | FR-008 | `hooks/livespec-last-reviewed.py`, `scripts/audit-antidrift-coverage.sh` | N/A (hook source change) | Implemented | 2026-05-18 |
 | FR-009 | `README.md`, `AGENTS.md`, `.specs/spec-system.md`, `system/*.md`, `.checks/livespec-routing-sync.md` | N/A (documentation source change) | Implemented | 2026-05-18 |
-| FR-010 | deleted `commands/`, deleted `agents/` | N/A (source layout removal) | Implemented | 2026-05-18 |
+| FR-010 | deleted `.agent-sync/skills/`, deleted `.agent-sync/agents/` | N/A (source layout removal) | Implemented | 2026-05-18 |
 
 ## Acceptance Criteria
 
@@ -51,4 +51,4 @@ updated: 2026-05-20
 - Updated command registry, command audit, expectations, integration, hook, and CLI helpers to read `.agent-sync/skills`.
 - Added migration 16 and bumped `VERSION` to `16`.
 - Updated tests and docs to treat `.agent-sync` as the canonical source.
-- Removed obsolete `commands/` and `agents/` source folders.
+- Removed obsolete `.agent-sync/skills/` and `.agent-sync/agents/` source folders.

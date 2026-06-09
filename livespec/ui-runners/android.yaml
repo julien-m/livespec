@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(FR-001)
+
 # Built-in UI Runner: Android (Maestro)
 # Feature 031 — UI Runner Android
 #

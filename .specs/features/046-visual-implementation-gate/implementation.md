@@ -1,14 +1,19 @@
+---
+feature: 046-visual-implementation-gate
+title: Implementation - Feature 046 - Visual Implementation Gate
+---
+
 # Implementation - Feature 046 - Visual Implementation Gate
 
 ## Requirement Mapping
 
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
-| [FR-001: Mandatory Phase 6.5 gate](spec.md#fr-001) | `commands/spec-implement.md` | `@spec FR-001: Mandatory visual gate — .specs/features/046-visual-implementation-gate/spec.md#fr-001` | ✅ Implemented | 2026-05-17 |
-| [FR-002: Tooling blocks UI features](spec.md#fr-002) | `commands/spec-implement.md` | `@spec FR-002: Tooling blocks UI — .specs/features/046-visual-implementation-gate/spec.md#fr-002` | ✅ Implemented | 2026-05-17 |
-| [FR-003: no-visual caps status](spec.md#fr-003) | `commands/spec-implement.md` | `@spec FR-003: no-visual caps status — .specs/features/046-visual-implementation-gate/spec.md#fr-003` | ✅ Implemented | 2026-05-17 |
-| [FR-004: Visual gate verdict](spec.md#fr-004) | `commands/spec-test.md` | `@spec FR-004: Visual gate verdict — .specs/features/046-visual-implementation-gate/spec.md#fr-004` | ✅ Implemented | 2026-05-17 |
-| [FR-005: Expectations updated](spec.md#fr-005) | `commands/spec-implement.expectations.md`, `commands/spec-test.expectations.md` | Covered by command expectation contract text | ✅ Implemented | 2026-05-17 |
+| [FR-001: Mandatory Phase 6.5 gate](spec.md#fr-001) | `.agent-sync/skills/spec-implement/SKILL.md` | `@spec FR-001: Mandatory visual gate — .specs/features/046-visual-implementation-gate/spec.md#fr-001` | ✅ Implemented | 2026-05-17 |
+| [FR-002: Tooling blocks UI features](spec.md#fr-002) | `.agent-sync/skills/spec-implement/SKILL.md` | `@spec FR-002: Tooling blocks UI — .specs/features/046-visual-implementation-gate/spec.md#fr-002` | ✅ Implemented | 2026-05-17 |
+| [FR-003: no-visual caps status](spec.md#fr-003) | `.agent-sync/skills/spec-implement/SKILL.md` | `@spec FR-003: no-visual caps status — .specs/features/046-visual-implementation-gate/spec.md#fr-003` | ✅ Implemented | 2026-05-17 |
+| [FR-004: Visual gate verdict](spec.md#fr-004) | `.agent-sync/skills/spec-test/SKILL.md` | `@spec FR-004: Visual gate verdict — .specs/features/046-visual-implementation-gate/spec.md#fr-004` | ✅ Implemented | 2026-05-17 |
+| [FR-005: Expectations updated](spec.md#fr-005) | `.agent-sync/skills/spec-implement/expectations.md`, `.agent-sync/skills/spec-test/expectations.md` | Covered by command expectation contract text | ✅ Implemented | 2026-05-17 |
 | [FR-006: Regression tests](spec.md#fr-006) | `tests/test_visual_implementation_gate.py` | `@spec FR-006: Regression tests — .specs/features/046-visual-implementation-gate/spec.md#fr-006` | ✅ Implemented | 2026-05-17 |
 
 ## Acceptance Criteria Mapping
@@ -32,7 +37,7 @@
 | `.specs/features/046-visual-implementation-gate/implementation.md` | Requirement mapping. |
 | `.specs/features/046-visual-implementation-gate/changelog.md` | Feature changelog. |
 | `tests/test_visual_implementation_gate.py` | Regression tests for visual gate command contracts. |
-| `commands/spec-implement.md` | Adds Phase 6.5 and stricter visual completion rules. |
-| `commands/spec-test.md` | Adds structured visual gate verdict. |
-| `commands/spec-implement.expectations.md` | Aligns implement contract with visual gate behavior. |
-| `commands/spec-test.expectations.md` | Aligns test contract with visual gate verdict. |
+| `.agent-sync/skills/spec-implement/SKILL.md` | Adds Phase 6.5 and stricter visual completion rules. |
+| `.agent-sync/skills/spec-test/SKILL.md` | Adds structured visual gate verdict. |
+| `.agent-sync/skills/spec-implement/expectations.md` | Aligns implement contract with visual gate behavior. |
+| `.agent-sync/skills/spec-test/expectations.md` | Aligns test contract with visual gate verdict. |

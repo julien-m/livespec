@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-005) -->
+<!-- @spec(FR-009) -->
+
 # LiveSpec System — Universal Spec Rules
 
 > **EVERY AI TOOL READS THIS FILE FIRST.**

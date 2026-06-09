@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-009)
+
 # Install the LiveSpec pre-commit `last_reviewed` hook.
 #
 # @spec FR-009: hook installer — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-009
@@ -54,7 +57,8 @@ else
             {
                 echo ""
                 echo "${MARKER}"
-                echo "python3 \"${HOOK_SRC}\" || exit 1"
+            echo "python3 \"${HOOK_SRC}\" || exit 1"
+            echo "livespec doctor --format json >/dev/null || exit 1"
             } >> "${HOOK_DST}"
             chmod +x "${HOOK_DST}"
         fi
@@ -63,6 +67,7 @@ else
 #!/usr/bin/env bash
 ${MARKER}
 python3 "${HOOK_SRC}" || exit 1
+livespec doctor --format json >/dev/null || exit 1
 EOF
         chmod +x "${HOOK_DST}"
         echo "Installed LiveSpec pre-commit hook at ${HOOK_DST}"

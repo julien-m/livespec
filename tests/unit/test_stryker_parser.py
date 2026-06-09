@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Unit tests for Stryker mutation report parsing."""
 
 # @spec FR-006: Unit tests for Stryker parser

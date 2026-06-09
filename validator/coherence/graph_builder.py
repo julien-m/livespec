@@ -81,14 +81,48 @@ class SpecGraph:
 # Regex for roadmap checklist items
 _CHECKLIST_RE = re.compile(r"^- \[([ xX])\]\s+(?:\[([^\]]+)\]\(([^)]+)\)|(.+))$", re.MULTILINE)
 
-# Regex for feature dir names (NNN-slug)
-_FEATURE_DIR_RE = re.compile(r"^(\d+)-(.+)$")
+# Regex for embedded feature links inside richer roadmap item copy.
+_FEATURE_LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]*features/[^)]+)\)")
+
+# Regex for feature dir names (NNN-slug) and legacy sub-feature dirs (NNN.M-slug).
+_FEATURE_DIR_RE = re.compile(r"^(\d+(?:\.\d+)?)-(.+)$")
 
 # Regex for @spec anchors (FR-xxx, AC-xxx)
 _SPEC_ANCHOR_RE = re.compile(r"@spec\(?((?:FR|AC)-\d+)\)?")
 
-# Regex for implementation.md file mapping (| FR-xxx | desc | path |)
-_IMPL_PATH_RE = re.compile(r"\|\s*((?:FR|AC)-\d+)\s*\|[^|]*\|\s*`?([^|`\n]+?)`?\s*\|")
+# Markdown table rows with pipe-delimited cells.
+_TABLE_ROW_RE = re.compile(r"^\|(.+)\|$")
+
+# Backticked file paths inside implementation map cells.
+_BACKTICK_PATH_RE = re.compile(r"`([^`]+)`")
+
+# Implementation map requirement identifiers.
+_REQ_RE = re.compile(r"^(?:FR|AC)-\d+$")
+
+_PATH_SUFFIXES = {
+    ".css",
+    ".html",
+    ".ini",
+    ".java",
+    ".js",
+    ".json",
+    ".kt",
+    ".lock",
+    ".md",
+    ".pdf",
+    ".pen",
+    ".png",
+    ".py",
+    ".rs",
+    ".sh",
+    ".swift",
+    ".toml",
+    ".ts",
+    ".tsx",
+    ".txt",
+    ".yaml",
+    ".yml",
+}
 
 
 def _parse_roadmap(specs_root: Path) -> list[RoadmapItem]:
@@ -112,6 +146,9 @@ def _parse_roadmap(specs_root: Path) -> list[RoadmapItem]:
         else:
             name = match.group(4).strip()
             link = None
+            embedded_link = _FEATURE_LINK_RE.search(name)
+            if embedded_link:
+                link = embedded_link.group(2)
 
         # Extract slug from link or name
         slug = name
@@ -143,7 +180,7 @@ def _parse_features(specs_root: Path) -> list[FeatureInfo]:
         if not m:
             continue
 
-        num = int(m.group(1))
+        num = int(m.group(1).split(".", 1)[0])
         slug = m.group(2)
 
         files = {name: (d / f"{name}.md").exists() for name in expected_files}
@@ -169,10 +206,15 @@ def _parse_features(specs_root: Path) -> list[FeatureInfo]:
             try:
                 impl_content = impl_path.read_text()
                 spec_anchors = _SPEC_ANCHOR_RE.findall(impl_content)
-                for pm in _IMPL_PATH_RE.finditer(impl_content):
-                    anchor_id = pm.group(1)
-                    file_path = pm.group(2).strip()
-                    impl_paths.setdefault(anchor_id, []).append(file_path)
+                for line in impl_content.splitlines():
+                    if not _TABLE_ROW_RE.match(line.strip()) or "---" in line:
+                        continue
+                    cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+                    if not cells or not _REQ_RE.match(cells[0]):
+                        continue
+                    anchor_id = cells[0]
+                    for file_path in _extract_paths_from_cells(cells[1:]):
+                        impl_paths.setdefault(anchor_id, []).append(file_path)
             except (yaml.YAMLError, OSError) as exc:
                 logging.warning("Failed to read %s: %s", impl_path, exc)
 
@@ -203,8 +245,11 @@ def _parse_readme(specs_root: Path) -> tuple[list[str], dict[str, str]]:
     statuses: dict[str, str] = {}
 
     # Look for table rows or links referencing features/NNN-name
-    feature_link_re = re.compile(r"features/(\d+-[^/)\s|]+)")
-    status_re = re.compile(r"\|\s*\[?(?:features/)?(\d+-[^/)\]\s|]+)\]?[^|]*\|\s*(\w[\w\s]*?)\s*\|")
+    feature_link_re = re.compile(r"features/(\d+(?:\.\d+)?-[^/)\s|]+)")
+    status_re = re.compile(
+        r"\|\s*\[?(?:features/)?(\d+(?:\.\d+)?-[^/)\]\s|]+)\]?[^|]*"
+        r"\|\s*(\w[\w\s]*?)\s*\|"
+    )
 
     for line in content.splitlines():
         for m in feature_link_re.finditer(line):
@@ -266,7 +311,7 @@ def _parse_changelog(specs_root: Path) -> list[str]:
 
     content = changelog_path.read_text()
     refs: list[str] = []
-    feature_ref_re = re.compile(r"(\d+-[\w-]+)")
+    feature_ref_re = re.compile(r"\b(\d{3}-[a-z0-9][a-z0-9-]*)\b")
 
     for line in content.splitlines():
         for m in feature_ref_re.finditer(line):
@@ -275,6 +320,40 @@ def _parse_changelog(specs_root: Path) -> list[str]:
                 refs.append(ref)
 
     return refs
+
+
+def _extract_paths_from_cells(cells: list[str]) -> list[str]:
+    """Extract plausible implementation paths from Markdown table cells."""
+    paths: list[str] = []
+    for cell in cells:
+        backticked_values = _BACKTICK_PATH_RE.findall(cell)
+        raw_values = backticked_values or [cell]
+        for raw_value in raw_values:
+            for value in re.split(r",|\n", raw_value):
+                cleaned = value.strip().strip("`")
+                if _looks_like_path(cleaned, explicit=bool(backticked_values)):
+                    paths.append(cleaned)
+    return paths
+
+
+def _looks_like_path(value: str, *, explicit: bool) -> bool:
+    """Return True when a table value resembles a file or glob path."""
+    if (
+        not value
+        or value.startswith(("@spec", "#", "/spec.", "/spec-"))
+        or value in {".reserved", ".specs/.LOCK"}
+    ):
+        return False
+    if any(token in value for token in ("(", ")", "{", "}", "[feature]")):
+        return False
+    if any(char.isspace() for char in value):
+        return False
+    path_part = value.split("::", 1)[0]
+    if "/" in path_part or path_part.startswith("."):
+        return True
+    if explicit:
+        return Path(path_part).suffix.lower() in _PATH_SUFFIXES
+    return False
 
 
 def build_graph(specs_root: Path) -> SpecGraph:

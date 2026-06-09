@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-024) -->
+<!-- @spec(AC-025) -->
+
 # Animation Testing Guide
 
 Validate transitions, keyframes, and animation correctness using timed screenshot captures.

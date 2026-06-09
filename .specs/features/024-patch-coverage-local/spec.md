@@ -1,3 +1,11 @@
+---
+created: 2026-05-06
+priority: P2
+status: Implemented
+title: Patch Coverage — Local Computation
+updated: 2026-06-08
+---
+
 # Feature Spec: Patch Coverage — Local Computation
 
 - **Feature:** Patch Coverage Local Computation

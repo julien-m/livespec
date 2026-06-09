@@ -23,21 +23,21 @@ status: Done
 
 | FR | Status | Files | Notes |
 |----|--------|-------|-------|
-| FR-001 | ✅ | `validator/behavioral_grammar.py` (`detect_mode`) · `commands/spec-specify.md` Step 4.5 | Precedence A > C > B implemented; `override` parameter added |
-| FR-002 | ✅ | `commands/spec-specify.md` Step 4.5 (Mode A falls through to existing Step 5) | Zero edits to F042 spec.md or transcription path |
+| FR-001 | ✅ | `validator/behavioral_grammar.py` (`detect_mode`) · `.agent-sync/skills/spec-specify/SKILL.md` Step 4.5 | Precedence A > C > B implemented; `override` parameter added |
+| FR-002 | ✅ | `.agent-sync/skills/spec-specify/SKILL.md` Step 4.5 (Mode A falls through to existing Step 5) | Zero edits to F042 spec.md or transcription path |
 | FR-003 | ✅ | `validator/native_behavioral_templates.py` (`FLOW_QUESTIONS`) · `validator/native_behavioral.py` (`run_native_interview`) | 8 frozen prompts in F044 canonical order |
 | FR-004 | ✅ | same module (`SCREEN_QUESTIONS`) | 8 frozen prompts for screens |
 | FR-005 | ✅ | `validator/native_behavioral.py` (`_normalise_answer`) | Empty / `skip` → `(to fill later)` |
 | FR-006 | ✅ ⚠️ | `validator/native_behavioral.py` (`run_mockup_derived`) · `MOCKUP_DERIVED_QUESTIONS` | 5 prompts over the remaining canonical screen sections (`Acteur`, `Source d'entrée`, `Sortie principale`, `Validations`, `Erreurs`); visual sections use `(to fill later — populated from mockup analysis)` placeholder (no decoder in stack — documented hook) |
 | FR-007 | ✅ | `run_native_interview`, `run_mockup_derived` | Mode B: `specStatus: manual`. Mode C: + `derivedFrom: native-mockups` |
 | FR-008 | ✅ | `apply_validation_gate` | Structured JSON log line per artefact |
-| FR-009 | ✅ | `apply_validation_gate` | FAIL → discard tmp + write `error.md` + print `BLOCKED` + return 1 |
+| FR-009 | ✅ | `validator/native_behavioral.py` (`apply_validation_gate`) | FAIL → discard tmp + write error report + print `BLOCKED` + return 1 |
 | FR-010 | ✅ | `apply_validation_gate` | PASS silent · WARNING write + log all diagnostics |
 | FR-011 | ✅ | `_render_body` | H2 headings byte-identical to F044 mandatory section names + canonical order |
 | FR-012 | ✅ | git diff verification | Zero bytes diff against F041–F044 spec.md |
 | FR-013 | ✅ | `run_mockup_derived` | Empty / unreadable mockup → fallback to Mode B + warning + no `derivedFrom` |
-| FR-014 | ✅ | `commands/spec-specify.md` Step 4.5 §4 (producer-side guard documented; module exposes parseable frontmatter) | Slash-command level guard |
-| FR-015 | ✅ | `commands/spec-specify.md` Step 4.5 §1 + §5 | `--native` / `--from-mockups` overrides; `--from-mockups` with no mockup → BLOCKED |
+| FR-014 | ✅ | `.agent-sync/skills/spec-specify/SKILL.md` Step 4.5 §4 (producer-side guard documented; module exposes parseable frontmatter) | Slash-command level guard |
+| FR-015 | ✅ | `.agent-sync/skills/spec-specify/SKILL.md` Step 4.5 §1 + §5 | `--native` / `--from-mockups` overrides; `--from-mockups` with no mockup → BLOCKED |
 | FR-016 | ✅ | `tests/test_native_behavioral_specs.py` | 4 detection branches covered |
 | FR-017 | ✅ | `tests/integration/test_native_behavioral_e2e.py` | E2E smoke asserts WARNING |
 
@@ -76,7 +76,7 @@ status: Done
 ## Files Modified
 
 - `validator/behavioral_grammar.py` — appended `GenerationMode`, `MOCKUP_EXTENSIONS`, `detect_mode()` and helpers; added `os` import; updated `__all__`. **Existing F044 behaviour and signatures untouched.**
-- `commands/spec-specify.md` — inserted **Step 4.5 — Native Behavioral Mode Detection** between existing Step 4 and Step 5. (`.claude/commands/spec.specify.md` is a symlink to this file — single source of truth.)
+- `.agent-sync/skills/spec-specify/SKILL.md` — inserted **Step 4.5 — Native Behavioral Mode Detection** between existing Step 4 and Step 5. (`.claude/.agent-sync/skills/spec.specify.md` is a symlink to this file — single source of truth.)
 
 ## Verification
 

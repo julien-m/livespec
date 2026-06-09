@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-012)
+# @spec(AC-013)
+
 """Tests for Migration 17 Penflow backfill behavior."""
 
 from __future__ import annotations

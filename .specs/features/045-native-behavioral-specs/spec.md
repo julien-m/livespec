@@ -1,6 +1,6 @@
 ---
 title: Native Behavioral Specs Generation (Interview + Mockup-Derived)
-status: Draft
+status: Implemented
 scope: L
 priority: P1
 created: 2026-05-14

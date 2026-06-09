@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-005)
+# @spec(FR-007)
+# @spec(FR-011)
+# @spec(FR-019)
+
 """Deterministic audit for LiveSpec command skill contracts.
 
 # @spec FR-003: deterministic command audit
@@ -212,9 +219,7 @@ def _check_expectations(command: CommandInfo) -> AuditCheck:
         rules.extend(branch.must_not)
     has_exit_code = any(rule.kind == "exit_code" for rule in rules)
     has_traceback_guard = any(
-        rule.verb == "must_not"
-        and rule.kind == "contains"
-        and str(rule.payload) == "Traceback"
+        rule.verb == "must_not" and rule.kind == "contains" and str(rule.payload) == "Traceback"
         for rule in rules
     )
     if not has_exit_code:

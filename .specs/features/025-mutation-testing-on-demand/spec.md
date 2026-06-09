@@ -1,3 +1,11 @@
+---
+created: 2026-05-06
+priority: P2
+status: Implemented
+title: Mutation Testing On-Demand
+updated: 2026-06-08
+---
+
 # Feature Spec: Mutation Testing On-Demand
 
 - **Feature:** Mutation Testing On-Demand

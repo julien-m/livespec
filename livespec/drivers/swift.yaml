@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 # @spec FR-001: Swift driver YAML with all 4 capabilities — .specs/features/019-driver-swift/spec.md#fr-001
 name: swift
 detect:

@@ -1,3 +1,11 @@
+---
+created: 2026-05-03
+priority: P2
+status: Implemented
+title: Supervisor↔Subagent Return Contracts
+updated: 2026-06-08
+---
+
 # Feature Spec: Supervisor↔Subagent Return Contracts
 
 - **Feature:** Supervisor↔Subagent Return Contracts

@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+
 """Metadata-aware migration planner for ``/spec-migrate``.
 
 # @spec FR-001: Migration planner module
@@ -71,9 +77,7 @@ def build_migration_plan(project_dir: Path, livespec_dir: Path) -> MigrationPlan
     target_version = _read_target_version(repo_root)
     manifests = load_migration_manifests(repo_root)
     pending = [
-        version
-        for version in sorted(manifests)
-        if project_version < version <= target_version
+        version for version in sorted(manifests) if project_version < version <= target_version
     ]
     replacements = _pending_replacements(manifests, pending)
     apply = [version for version in pending if version not in replacements]

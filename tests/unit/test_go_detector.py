@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Unit tests for Go go.mod parsing."""
 
 # @spec FR-005: Unit tests for go.mod parser
@@ -158,9 +161,7 @@ def test_has_go_dependency_substring_match() -> None:
         assert has_go_dependency(str(project_root), "GoPter") is True
         assert has_go_dependency(str(project_root), "go-snaps") is True
         # Full-path match.
-        assert (
-            has_go_dependency(str(project_root), "github.com/leanovate/gopter") is True
-        )
+        assert has_go_dependency(str(project_root), "github.com/leanovate/gopter") is True
         # Negative case.
         assert has_go_dependency(str(project_root), "cupaloy") is False
 

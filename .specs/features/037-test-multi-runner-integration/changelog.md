@@ -1,3 +1,13 @@
+## 2026-06-08 — [Spec Update]: Normalize changelog format
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **AC impacted:** None
+- **Author:** spec.doctor
+
+---
+
 # Feature 037 — Changelog
 
 ### 2026-05-08 — Spec: Feature specification created

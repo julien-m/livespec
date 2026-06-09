@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-026)
+# @spec(AC-044)
+
 """Tests for v1 to v2 journey migration."""
 
 from __future__ import annotations

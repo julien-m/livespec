@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-007)
+
 """Integration tests for Android/Maestro surface detection in generate-surfaces.js.
 
 These tests create temporary project fixtures and verify that the generator
@@ -49,25 +52,19 @@ def test_android_build_gradle_with_maestro_dir(tmp_path: Path) -> None:
     (tmp_path / "build.gradle").write_text("// Gradle build file\n")
     maestro_dir = tmp_path / "maestro"
     maestro_dir.mkdir()
-    (maestro_dir / "login.yaml").write_text(
-        "appId: com.example\n---\n- launchApp\n"
-    )
+    (maestro_dir / "login.yaml").write_text("appId: com.example\n---\n- launchApp\n")
 
     result = run_surfaces_script(tmp_path)
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     combined = result.stdout + result.stderr
-    assert "maestro" in combined.lower(), (
-        f"Expected 'maestro' in output but got:\n{combined}"
-    )
+    assert "maestro" in combined.lower(), f"Expected 'maestro' in output but got:\n{combined}"
 
 
 @pytest.mark.level_3a
 def test_android_build_gradle_kts_with_specs_maestro(tmp_path: Path) -> None:
     """Root-level build.gradle.kts + .specs/maestro/ triggers maestro detection."""
-    (tmp_path / "build.gradle.kts").write_text(
-        'plugins { id("com.android.application") }\n'
-    )
+    (tmp_path / "build.gradle.kts").write_text('plugins { id("com.android.application") }\n')
     specs_maestro = tmp_path / ".specs" / "maestro"
     specs_maestro.mkdir(parents=True)
     (specs_maestro / "dashboard.yaml").write_text(
@@ -78,9 +75,7 @@ def test_android_build_gradle_kts_with_specs_maestro(tmp_path: Path) -> None:
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     combined = result.stdout + result.stderr
-    assert "maestro" in combined.lower(), (
-        f"Expected 'maestro' in output but got:\n{combined}"
-    )
+    assert "maestro" in combined.lower(), f"Expected 'maestro' in output but got:\n{combined}"
 
 
 @pytest.mark.level_3a
@@ -128,9 +123,7 @@ def test_android_in_apps_dir_detected(tmp_path: Path) -> None:
     """apps/<app>/build.gradle + maestro/ triggers maestro surface in monorepo."""
     app_dir = tmp_path / "apps" / "android-app"
     app_dir.mkdir(parents=True)
-    (app_dir / "build.gradle.kts").write_text(
-        'plugins { id("com.android.application") }\n'
-    )
+    (app_dir / "build.gradle.kts").write_text('plugins { id("com.android.application") }\n')
     maestro_dir = app_dir / "maestro"
     maestro_dir.mkdir()
     (maestro_dir / "home.yaml").write_text("appId: com.example\n---\n- launchApp\n")
@@ -139,9 +132,7 @@ def test_android_in_apps_dir_detected(tmp_path: Path) -> None:
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     combined = result.stdout + result.stderr
-    assert "maestro" in combined.lower(), (
-        f"Expected 'maestro' in output but got:\n{combined}"
-    )
+    assert "maestro" in combined.lower(), f"Expected 'maestro' in output but got:\n{combined}"
 
 
 # ---------------------------------------------------------------------------

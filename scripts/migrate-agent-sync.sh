@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 set -euo pipefail
 
 # Migration v16 wrapper: remove only legacy LiveSpec-managed provider symlinks

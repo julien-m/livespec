@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-007)
+
 """Unit tests for Python module auto-detection."""
 
 # @spec FR-007: Unit tests for module detection — .specs/features/017-driver-python/spec.md#fr-007

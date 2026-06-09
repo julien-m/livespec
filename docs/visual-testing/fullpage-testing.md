@@ -1,3 +1,9 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-009) -->
+<!-- @spec(AC-010) -->
+<!-- @spec(FR-008) -->
+<!-- @spec(FR-009) -->
+
 # Full-Page Layout Testing Guide
 
 Validate full-page layout including z-index, content alignment, and scroll behavior.

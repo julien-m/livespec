@@ -1,3 +1,6 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-010) -->
+
 # LiveSpec Hooks — Resolution Protocol
 
 > **This file defines how lifecycle hooks work in LiveSpec.**

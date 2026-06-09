@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+
 """Typed report models for the LiveSpec project doctor."""
 
 from __future__ import annotations
@@ -6,9 +9,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import TypeAlias
 
-JsonValue: TypeAlias = (
-    str | int | float | bool | None | list["JsonValue"] | dict[str, "JsonValue"]
-)
+JsonValue: TypeAlias = str | int | float | bool | None | list["JsonValue"] | dict[str, "JsonValue"]
 
 
 class DoctorStatus(StrEnum):

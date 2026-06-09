@@ -10,6 +10,7 @@ from validator.coherence.graph_builder import SpecGraph
 from validator.coherence.violation import Severity, Violation
 
 _SPEC_ANCHOR_RE = re.compile(r"@spec\(?((?:FR|AC)-\d+)\)?")
+_LINE_SUFFIX_RE = re.compile(r"^(.+\.[A-Za-z0-9]+):\d+$")
 
 
 class R3_1_SourceFileNotFound:
@@ -38,8 +39,7 @@ class R3_1_SourceFileNotFound:
 
             for anchor_id, paths in feature.implementation_paths.items():
                 for file_path in paths:
-                    resolved = project_root / file_path
-                    if not resolved.exists():
+                    if not _mapped_path_exists(project_root, file_path):
                         violations.append(
                             Violation(
                                 rule_id=self.rule_id,
@@ -90,8 +90,8 @@ class R3_2_SpecAnchorMissing:
 
             for anchor_id, paths in feature.implementation_paths.items():
                 for file_path in paths:
-                    resolved = project_root / file_path
-                    if not resolved.exists():
+                    resolved = project_root / _path_part(file_path)
+                    if not resolved.is_file():
                         continue
 
                     try:
@@ -124,3 +124,20 @@ class R3_2_SpecAnchorMissing:
                         )
 
         return violations
+
+
+def _path_part(raw_path: str) -> str:
+    """Strip test selectors and Markdown line suffixes from a mapped path."""
+    path_part = raw_path.split("::", 1)[0]
+    match = _LINE_SUFFIX_RE.match(path_part)
+    if match:
+        return match.group(1)
+    return path_part
+
+
+def _mapped_path_exists(project_root: Path, raw_path: str) -> bool:
+    """Return whether a mapped path exists, supporting repo-relative globs."""
+    path_part = _path_part(raw_path)
+    if any(char in path_part for char in "*?["):
+        return any(project_root.glob(path_part))
+    return (project_root / path_part).exists()

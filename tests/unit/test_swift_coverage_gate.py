@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Unit tests for the swift-coverage-gate.sh escape-hatch script."""
 
 # @spec FR-006: Unit tests for swift-coverage-gate.sh

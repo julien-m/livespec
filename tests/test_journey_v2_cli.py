@@ -1,3 +1,12 @@
+# LiveSpec traceability anchors
+# @spec(AC-021)
+# @spec(AC-023)
+# @spec(AC-024)
+# @spec(AC-025)
+# @spec(AC-026)
+# @spec(AC-028)
+# @spec(AC-031)
+
 """CLI tests for User Journeys v2 commands."""
 
 from __future__ import annotations

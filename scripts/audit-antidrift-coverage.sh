@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-008)
+
 # audit-antidrift-coverage.sh — verify that every canonical LiveSpec command
 # imports `system/anti-drift-block.md`.
 #

@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+# @spec(FR-009)
+# @spec(FR-010)
+# @spec(FR-011)
+
 """Helpers for LiveSpec root ``penflow/`` UI contract workspaces.
 
 The module inspects and bootstraps Penflow artifacts only. Runtime adapters

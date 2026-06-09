@@ -504,9 +504,7 @@ def run_fix(
             runners = impacted_runners(files)
             scoped = filter_items(items, drivers=drivers, runners=runners)
 
-    return [
-        fix_item(item, auto=auto, dry_run=dry_run, prompt=prompt) for item in scoped
-    ]
+    return [fix_item(item, auto=auto, dry_run=dry_run, prompt=prompt) for item in scoped]
 
 
 # --- Summary ---------------------------------------------------------------
@@ -583,11 +581,7 @@ def parse_preflight_manifest(text: str) -> list[PreflightItem]:
         if not name:
             continue
         binary = _extract_field(body, "binary") or _extract_field(body, "tool")
-        install = (
-            _extract_field(body, "install")
-            or _extract_field(body, "auto_resolve")
-            or ""
-        )
+        install = _extract_field(body, "install") or _extract_field(body, "auto_resolve") or ""
         verify = _extract_field(body, "verify") or _extract_field(body, "check")
         installer, arg = _classify_install(install)
         if installer is None:
@@ -649,6 +643,7 @@ def _classify_install(cmd: str) -> tuple[InstallerKind | None, str]:
     if parts[0] == "xcode-select":
         return ("xcode-select", "")
     return ("manual", cmd)
+
 
 # `__all__` keeps the small public surface stable for the CLI entrypoint and
 # for tests that intentionally import the autofix primitives directly.

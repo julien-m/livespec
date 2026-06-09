@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-012)
+
 set -euo pipefail
 
 # Migration v14 wrapper: refresh command links after command-audit hardening.

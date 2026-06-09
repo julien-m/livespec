@@ -1,3 +1,27 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-012)
+# @spec(AC-013)
+# @spec(FR-001)
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-007)
+# @spec(FR-008)
+# @spec(FR-011)
+
 """Tests for validator.taxonomy — detect_traits, deduplicate_tests, load_taxonomy.
 
 Coverage mapping per FR-008:
@@ -52,8 +76,7 @@ class TestLoadTaxonomyStructure:
         taxonomy = load_taxonomy(_TAXONOMY_PATH)
         assert isinstance(taxonomy, Taxonomy)
         assert len(taxonomy.traits) == 22, (
-            f"Expected 22 traits, got {len(taxonomy.traits)}: "
-            f"{[t.name for t in taxonomy.traits]}"
+            f"Expected 22 traits, got {len(taxonomy.traits)}: {[t.name for t in taxonomy.traits]}"
         )
         assert len(taxonomy.transversal_patterns) == 6, (
             f"Expected 6 transversal patterns, "
@@ -314,9 +337,7 @@ class TestDeduplicateTests:
 class TestEc005Asymmetry:
     """ec-005-asymmetry.feature: fail-fast vs degrade gracefully."""
 
-    def test_detect_traits_raises_taxonomy_load_error_on_missing_file(
-        self, tmp_path: Path
-    ) -> None:
+    def test_detect_traits_raises_taxonomy_load_error_on_missing_file(self, tmp_path: Path) -> None:
         """detect_traits raises TaxonomyLoadError when taxonomy file missing. (AC-008)"""
         missing = tmp_path / "nonexistent-taxonomy.md"
         with pytest.raises(TaxonomyLoadError):

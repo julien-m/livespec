@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-013)
+# @spec(AC-014)
+# @spec(AC-015)
+# @spec(AC-016)
+# @spec(AC-017)
+
 """Tests for v2 journey auto-assignment and bootstrap services."""
 
 from __future__ import annotations

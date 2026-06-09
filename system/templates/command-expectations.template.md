@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-001) -->
+<!-- @spec(FR-001) -->
+
 <!-- @spec FR-001: Enriched template — .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-001 -->
 <!-- @spec FR-002: Sections 1-11 enrichment — .specs/features/040-expectations-rich-and-verify-preview/spec.md#fr-002 -->
 ---

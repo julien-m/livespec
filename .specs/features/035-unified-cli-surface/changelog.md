@@ -1,3 +1,13 @@
+## 2026-06-08 — [Spec Update]: Normalize changelog format
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **AC impacted:** None
+- **Author:** spec.doctor
+
+---
+
 # Changelog: 035-unified-cli-surface
 
 ## 2026-05-07 — Spec Update: Initial draft

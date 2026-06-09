@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(AC-006)
+
 """Supervisor↔Subagent return contracts.
 
 Spec anchors (Chantier 2 / Feature 014 — see
@@ -243,15 +246,11 @@ def parse_phase_result(text: str) -> PhaseResult:
         try:
             data = json.loads(body)
         except json.JSONDecodeError as exc:
-            raise ContractValidationError(
-                f"PHASE_RESULT body is not valid JSON: {exc}"
-            ) from exc
+            raise ContractValidationError(f"PHASE_RESULT body is not valid JSON: {exc}") from exc
         try:
             return PhaseResult.model_validate(data)
         except ValidationError as exc:
-            raise ContractValidationError(
-                f"PHASE_RESULT schema validation failed: {exc}"
-            ) from exc
+            raise ContractValidationError(f"PHASE_RESULT schema validation failed: {exc}") from exc
 
     # Legacy fallback
     legacy = _parse_legacy_kv_block(text, "PHASE_RESULT")
@@ -280,9 +279,7 @@ def parse_ship_result(text: str) -> ShipResult:
     """Extract and validate a SHIP_RESULT block from agent output."""
     block = _find_block_in_window(text, SHIP_RESULT_START, SHIP_RESULT_END)
     if block is None:
-        raise ContractParseError(
-            "no SHIP_RESULT delimiter pair found in the last 30 lines"
-        )
+        raise ContractParseError("no SHIP_RESULT delimiter pair found in the last 30 lines")
     _, body = block
     try:
         data = json.loads(body)
@@ -291,25 +288,19 @@ def parse_ship_result(text: str) -> ShipResult:
     try:
         return ShipResult.model_validate(data)
     except ValidationError as exc:
-        raise ContractValidationError(
-            f"SHIP_RESULT schema validation failed: {exc}"
-        ) from exc
+        raise ContractValidationError(f"SHIP_RESULT schema validation failed: {exc}") from exc
 
 
 def parse_superpowers_return(text: str) -> SuperpowersReturn:
     """Extract and validate a Superpowers return block from agent output."""
     block = _find_block_in_window(text, SUPERPOWERS_START, SUPERPOWERS_END)
     if block is None:
-        raise ContractParseError(
-            "no SUPERPOWERS_RETURN delimiter pair found in the last 30 lines"
-        )
+        raise ContractParseError("no SUPERPOWERS_RETURN delimiter pair found in the last 30 lines")
     _, body = block
     try:
         data = json.loads(body)
     except json.JSONDecodeError as exc:
-        raise ContractValidationError(
-            f"Superpowers return body is not valid JSON: {exc}"
-        ) from exc
+        raise ContractValidationError(f"Superpowers return body is not valid JSON: {exc}") from exc
     try:
         return SuperpowersReturn.model_validate(data)
     except ValidationError as exc:
@@ -368,6 +359,4 @@ def render_ship_result(result: ShipResult, digest: str) -> str:
 def render_superpowers_return(result: SuperpowersReturn, digest: str) -> str:
     """Serialise a SuperpowersReturn as the canonical delimiter-wrapped block."""
     body = result.model_dump_json(indent=2, exclude_none=False)
-    return (
-        f"⟪SUPERPOWERS_RETURN_START_{digest}⟫\n{body}\n⟪SUPERPOWERS_RETURN_END_{digest}⟫"
-    )
+    return f"⟪SUPERPOWERS_RETURN_START_{digest}⟫\n{body}\n⟪SUPERPOWERS_RETURN_END_{digest}⟫"

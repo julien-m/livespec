@@ -1,3 +1,13 @@
+## 2026-06-08 — [Spec Update]: Normalize changelog format
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **AC impacted:** None
+- **Author:** spec.doctor
+
+---
+
 # Changelog — Feature 003: Visual Testing Fidelity
 
 ### 2026-04-14 — Feature: Implementation complete

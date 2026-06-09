@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Unit tests for JVM build file parsing and pitest XML parsing."""
 
 # @spec FR-006: Unit tests for build file parser and pitest XML parser
@@ -137,9 +140,7 @@ def test_detect_build_tool_maven_only() -> None:
     """Only ``pom.xml`` -> ``"maven"``."""
     # @spec AC-010
     with tempfile.TemporaryDirectory() as tmpdir:
-        (Path(tmpdir) / "pom.xml").write_text(
-            '<?xml version="1.0"?><project/>', encoding="utf-8"
-        )
+        (Path(tmpdir) / "pom.xml").write_text('<?xml version="1.0"?><project/>', encoding="utf-8")
 
         assert detect_build_tool(tmpdir) == "maven"
 
@@ -149,9 +150,7 @@ def test_detect_build_tool_gradle_priority_over_maven() -> None:
     # @spec AC-010
     with tempfile.TemporaryDirectory() as tmpdir:
         (Path(tmpdir) / "build.gradle").write_text("// gradle", encoding="utf-8")
-        (Path(tmpdir) / "pom.xml").write_text(
-            '<?xml version="1.0"?><project/>', encoding="utf-8"
-        )
+        (Path(tmpdir) / "pom.xml").write_text('<?xml version="1.0"?><project/>', encoding="utf-8")
 
         assert detect_build_tool(tmpdir) == "gradle"
 
@@ -190,9 +189,7 @@ def test_parse_gradle_build_kotlin_dsl() -> None:
     """Kotlin DSL build files are walked the same way as Groovy."""
     # @spec AC-011
     with tempfile.TemporaryDirectory() as tmpdir:
-        (Path(tmpdir) / "build.gradle.kts").write_text(
-            _GRADLE_KOTLIN, encoding="utf-8"
-        )
+        (Path(tmpdir) / "build.gradle.kts").write_text(_GRADLE_KOTLIN, encoding="utf-8")
 
         tokens = parse_gradle_build(tmpdir)
 
@@ -256,9 +253,7 @@ def test_parse_maven_pom_missing_returns_empty() -> None:
 def test_parse_maven_pom_malformed_returns_empty() -> None:
     """Malformed XML -> empty list (no exception)."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        (Path(tmpdir) / "pom.xml").write_text(
-            "<project><not-closed", encoding="utf-8"
-        )
+        (Path(tmpdir) / "pom.xml").write_text("<project><not-closed", encoding="utf-8")
 
         assert parse_maven_pom(tmpdir) == []
 

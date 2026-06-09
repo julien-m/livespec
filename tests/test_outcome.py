@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-005)
+# @spec(AC-006)
+
 """Tests for validator/outcome.py.
 
 # @spec FR-012 — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-012

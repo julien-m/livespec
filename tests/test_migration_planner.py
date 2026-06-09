@@ -1,3 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+
 """Tests for metadata-aware LiveSpec migration planning."""
 
 from __future__ import annotations

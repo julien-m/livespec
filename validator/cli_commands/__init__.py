@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-005)
+
 """Unified CLI subcommand implementations (Feature 035).
 
 Each module in this package implements one top-level ``livespec`` subcommand

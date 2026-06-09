@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-004)
+
 """Detect syrupy availability and existing snapshot baselines."""
 
 # @spec FR-003, FR-004: Syrupy detection and first-run detection

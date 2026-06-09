@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+
 """Tests for ui.pen-to-runtime design alignment.
 
 # @spec FR-007: Alignment regression tests

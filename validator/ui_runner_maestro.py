@@ -1,3 +1,12 @@
+# LiveSpec traceability anchors
+# @spec(AC-002)
+# @spec(FR-001)
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-005)
+# @spec(FR-006)
+
 """Android UI runner support for Maestro YAML flow-based projects.
 
 This module provides an orchestrator around adb/emulator/maestro so the
@@ -37,15 +46,11 @@ _ANDROID_SDK_SKIP_ERROR = (
     "Install: https://developer.android.com/studio or set ANDROID_HOME."
 )
 _MAESTRO_MISSING_ERROR = (
-    "Maestro CLI not installed. "
-    "Install: curl -Ls https://get.maestro.mobile.dev | bash"
+    "Maestro CLI not installed. Install: curl -Ls https://get.maestro.mobile.dev | bash"
 )
-_WEAROS_EXPERIMENTAL_WARNING = (
-    "Wear OS support is experimental in Maestro — proceed with caution"
-)
+_WEAROS_EXPERIMENTAL_WARNING = "Wear OS support is experimental in Maestro — proceed with caution"
 _NO_FLOWS_ERROR = (
-    "No Maestro flows found. "
-    "Create YAML flows in .specs/maestro/ or maestro/ directory."
+    "No Maestro flows found. Create YAML flows in .specs/maestro/ or maestro/ directory."
 )
 _ADB_NO_DEVICES_ERROR = (
     "ADB sees no devices — emulator may not be running. "
@@ -106,9 +111,7 @@ def maestro_runner_manifest_path() -> Path:
     Returns:
         Absolute path to `livespec/ui-runners/android.yaml`.
     """
-    return (
-        Path(__file__).resolve().parent.parent / "livespec" / "ui-runners" / "android.yaml"
-    )
+    return Path(__file__).resolve().parent.parent / "livespec" / "ui-runners" / "android.yaml"
 
 
 # @spec FR-001: Android runner class — .specs/features/031-ui-runner-android/spec.md#fr-001
@@ -169,14 +172,9 @@ class MaestroRunnerHandler:
                 "curl -Ls 'https://get.maestro.mobile.dev' | bash"
             )
         if not self._check_android_sdk():
-            return (
-                "Android SDK not found — set ANDROID_HOME or install Android Studio"
-            )
+            return "Android SDK not found — set ANDROID_HOME or install Android Studio"
         if self._get_running_emulator() is None:
-            return (
-                "no Android emulator available — start one with "
-                "'emulator -avd <name>'"
-            )
+            return "no Android emulator available — start one with 'emulator -avd <name>'"
         return ""
 
     # ------------------------------------------------------------------
@@ -200,10 +198,9 @@ class MaestroRunnerHandler:
                 return True
 
         # Maestro flow directories
-        return (
-            (self.project_dir / "maestro").exists()
-            or (self.project_dir / ".specs" / "maestro").exists()
-        )
+        return (self.project_dir / "maestro").exists() or (
+            self.project_dir / ".specs" / "maestro"
+        ).exists()
 
     # ------------------------------------------------------------------
     # AVD management
@@ -230,7 +227,7 @@ class MaestroRunnerHandler:
             for line in result.stdout.splitlines():
                 stripped = line.strip()
                 if stripped.startswith("Name:"):
-                    avds.append(stripped[len("Name:"):].strip())
+                    avds.append(stripped[len("Name:") :].strip())
             return avds
         except (OSError, FileNotFoundError, subprocess.TimeoutExpired):
             return []
@@ -421,8 +418,13 @@ class MaestroRunnerHandler:
             # Step 1: screencap on device
             screencap_result = subprocess.run(
                 [
-                    "adb", "-s", serial,
-                    "shell", "screencap", "-p", SCREENCAP_REMOTE_PATH,
+                    "adb",
+                    "-s",
+                    serial,
+                    "shell",
+                    "screencap",
+                    "-p",
+                    SCREENCAP_REMOTE_PATH,
                 ],
                 capture_output=True,
                 text=True,
@@ -458,9 +460,7 @@ class MaestroRunnerHandler:
     # ------------------------------------------------------------------
 
     # @spec FR-005: per-device baseline path resolution — .specs/features/031-ui-runner-android/spec.md#fr-005  # noqa: E501
-    def _resolve_baseline_path(
-        self, screen: str, avd_name: str | None = None
-    ) -> Path:
+    def _resolve_baseline_path(self, screen: str, avd_name: str | None = None) -> Path:
         """Resolve the path where a baseline PNG should be stored.
 
         With device override, path includes the AVD name as a subdirectory.
@@ -601,12 +601,14 @@ class MaestroRunnerHandler:
                 )
                 combined_output = result.stdout + result.stderr
                 passed = self._parse_maestro_result(combined_output, result.returncode)
-                per_flow_results.append({
-                    "flow": flow_name,
-                    "passed": passed,
-                    "exit_code": result.returncode,
-                    "stdout_snippet": _truncate_stdout(combined_output),
-                })
+                per_flow_results.append(
+                    {
+                        "flow": flow_name,
+                        "passed": passed,
+                        "exit_code": result.returncode,
+                        "stdout_snippet": _truncate_stdout(combined_output),
+                    }
+                )
                 if not passed:
                     all_passed = False
                     if fail_fast:
@@ -620,11 +622,13 @@ class MaestroRunnerHandler:
                             },
                         )
             except subprocess.TimeoutExpired as exc:
-                per_flow_results.append({
-                    "flow": flow_name,
-                    "passed": False,
-                    "error": f"timed out after {exc.timeout}s",
-                })
+                per_flow_results.append(
+                    {
+                        "flow": flow_name,
+                        "passed": False,
+                        "error": f"timed out after {exc.timeout}s",
+                    }
+                )
                 all_passed = False
                 return UICapabilityResult(
                     success=False,
@@ -632,11 +636,13 @@ class MaestroRunnerHandler:
                     metadata={"flow_results": per_flow_results, "timeout": exc.timeout},
                 )
             except OSError as exc:
-                per_flow_results.append({
-                    "flow": flow_name,
-                    "passed": False,
-                    "error": str(exc),
-                })
+                per_flow_results.append(
+                    {
+                        "flow": flow_name,
+                        "passed": False,
+                        "error": str(exc),
+                    }
+                )
                 all_passed = False
                 if fail_fast:
                     return UICapabilityResult(
@@ -648,9 +654,7 @@ class MaestroRunnerHandler:
         failed_flows = [r["flow"] for r in per_flow_results if not r.get("passed")]
         return UICapabilityResult(
             success=all_passed,
-            error=(
-                f"Flows failed: {', '.join(failed_flows)}" if failed_flows else None
-            ),
+            error=(f"Flows failed: {', '.join(failed_flows)}" if failed_flows else None),
             metadata={
                 "flow_results": per_flow_results,
                 "serial": serial,
@@ -714,13 +718,7 @@ class MaestroRunnerHandler:
                 )
         elif feature_slug and run_id:
             output_path = (
-                self.project_dir
-                / ".specs"
-                / "features"
-                / feature_slug
-                / "run"
-                / run_id
-                / "android"
+                self.project_dir / ".specs" / "features" / feature_slug / "run" / run_id / "android"
             )
         # Note: the `missing_output_context` BLOCKED return is deferred
         # until AFTER the SDK / Maestro / emulator capability checks below
@@ -807,6 +805,7 @@ class MaestroRunnerHandler:
                         dest = output_dir / f"{flow_name}_{src.name}"
                         try:
                             import shutil
+
                             shutil.copy2(src, dest)
                             all_screenshots.append(dest)
                         except OSError:

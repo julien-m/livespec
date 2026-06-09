@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-006) -->
+<!-- @spec(FR-012) -->
+
 # Penflow Contract Gate
 
 Penflow is the primary UI behavior contract when a project has root `penflow/`.

@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 # @spec FR-001: TS/JS driver YAML with all 4 capabilities — .specs/features/018-driver-typescript-javascript/spec.md#fr-001
 name: typescript
 detect:

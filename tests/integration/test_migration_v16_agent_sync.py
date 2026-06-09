@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-007)
+# @spec(AC-009)
+
 """Integration tests for Migration 16 agent-sync installation."""
 
 from __future__ import annotations
@@ -24,9 +28,7 @@ def _fake_project(root: Path) -> Path:
     (root / ".agent-sync" / "skills").mkdir(parents=True)
     (root / ".agent-sync" / "agents").mkdir(parents=True)
     (root / ".agent-sync" / "rules").mkdir(parents=True)
-    (root / ".claude" / "commands" / ("spec" + ".check.md")).symlink_to(
-        "../../commands/check.md"
-    )
+    (root / ".claude" / "commands" / ("spec" + ".check.md")).symlink_to("../../commands/check.md")
     (root / ".agent-sync" / "skills" / "spec-init").symlink_to(
         REPO_ROOT / ".agent-sync" / "skills" / "spec-init"
     )
@@ -36,21 +38,15 @@ def _fake_project(root: Path) -> Path:
     (root / ".agent-sync" / "rules" / "routing.md").symlink_to(
         REPO_ROOT / ".agent-sync" / "rules" / "livespec" / "routing.md"
     )
-    (root / ".claude" / "skills" / "spec-init").symlink_to(
-        "../../.agent-sync/skills/spec-init"
-    )
-    (root / ".agents" / "skills" / "spec-init").symlink_to(
-        "../../.agent-sync/skills/spec-init"
-    )
+    (root / ".claude" / "skills" / "spec-init").symlink_to("../../.agent-sync/skills/spec-init")
+    (root / ".agents" / "skills" / "spec-init").symlink_to("../../.agent-sync/skills/spec-init")
     (root / ".claude" / "agents" / "livespec-verifier.md").symlink_to(
         "../../.agent-sync/agents/livespec-verifier/dist/claude.md"
     )
     (root / ".codex" / "agents" / "livespec-verifier.toml").symlink_to(
         "../../.agent-sync/agents/livespec-verifier/dist/codex.toml"
     )
-    (root / ".claude" / "rules" / "routing.md").symlink_to(
-        "../../.agent-sync/rules/routing.md"
-    )
+    (root / ".claude" / "rules" / "routing.md").symlink_to("../../.agent-sync/rules/routing.md")
     return root
 
 
@@ -58,8 +54,7 @@ def _fake_cc_hub(bin_dir: Path, log_path: Path) -> None:
     bin_dir.mkdir(parents=True)
     script = bin_dir / "cc-hub"
     script.write_text(
-        "#!/usr/bin/env bash\n"
-        "printf '%s\\n' \"$*\" >> \"${CC_HUB_LOG}\"\n",
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$*" >> "${CC_HUB_LOG}"\n',
         encoding="utf-8",
     )
     script.chmod(0o755)

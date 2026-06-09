@@ -2,6 +2,9 @@
 name: spec-migrate
 description: Migrated Claude command /spec-migrate
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-006) -->
+
 
 # /spec-migrate
 

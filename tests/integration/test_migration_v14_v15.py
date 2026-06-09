@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-007)
+# @spec(AC-012)
+
 """Integration tests for command validation/naming migrations."""
 
 from __future__ import annotations
@@ -24,8 +28,7 @@ def _fake_cc_hub(bin_dir: Path, log_path: Path) -> dict[str, str]:
     bin_dir.mkdir(parents=True)
     script = bin_dir / "cc-hub"
     script.write_text(
-        "#!/usr/bin/env bash\n"
-        "printf '%s\\n' \"$*\" >> \"${CC_HUB_LOG}\"\n",
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$*" >> "${CC_HUB_LOG}"\n',
         encoding="utf-8",
     )
     script.chmod(0o755)

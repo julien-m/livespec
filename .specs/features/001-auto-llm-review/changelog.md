@@ -1,4 +1,4 @@
-### 2026-04-13 -- Check: Spec-code alignment verified
+## 2026-04-13 — [Check]: Spec-code alignment verified
 
 - **Type:** Spec Update
 - **Spec modified:** No
@@ -9,7 +9,7 @@
 
 ---
 
-### 2026-04-13 -- Feature: Initial implementation of auto LLM review
+## 2026-04-13 — [Feature]: Initial implementation of auto LLM review
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -19,7 +19,7 @@
 
 ---
 
-### 2026-04-13 -- Plan: Technical plan generated
+## 2026-04-13 — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -29,7 +29,7 @@
 
 ---
 
-### 2026-04-13 -- Spec: Feature specification created
+## 2026-04-13 — [Spec]: Feature specification created
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (created -- all sections)

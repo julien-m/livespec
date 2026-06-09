@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(AC-010)
+
 """Tests for validator/placeholders.py.
 
 # @spec FR-011 / AC-010 — .specs/features/039-command-expectations-and-verify-output/spec.md#fr-011
@@ -10,8 +13,7 @@ from validator.placeholders import resolve, run_date_from_timestamp
 
 def test_resolve_feature():
     assert (
-        resolve("<feature>/spec.md", feature="001-foo", run_date="2026-05-12")
-        == "001-foo/spec.md"
+        resolve("<feature>/spec.md", feature="001-foo", run_date="2026-05-12") == "001-foo/spec.md"
     )
 
 

@@ -1,3 +1,11 @@
+---
+created: 2026-05-06
+priority: P2
+status: Implemented
+title: Driver Go — Built-in Test Orchestration Driver
+updated: 2026-06-08
+---
+
 # Feature Spec: Driver Go — Built-in Test Orchestration Driver
 
 - **Feature:** Driver Go

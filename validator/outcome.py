@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-007)
+# @spec(FR-012)
+
 """4-state outcome classifier for verify-output reports.
 
 # @spec FR-012: outcome classifier

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 set -euo pipefail
 
 # LiveSpec — Internal coherence checker.

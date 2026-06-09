@@ -1,3 +1,12 @@
+// LiveSpec traceability anchors
+// @spec(AC-001)
+// @spec(AC-003)
+// @spec(AC-004)
+// @spec(AC-005)
+// @spec(FR-001)
+// @spec(FR-003)
+// @spec(FR-004)
+
 import { test, expect } from '@playwright/test';
 import { existsSync } from 'fs';
 import * as path from 'path';

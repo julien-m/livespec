@@ -1,3 +1,8 @@
+---
+feature: 024-patch-coverage-local
+title: Implementation — 024 Patch Coverage Local Computation
+---
+
 # Implementation — 024 Patch Coverage Local Computation
 
 - **Feature:** 024-patch-coverage-local
@@ -50,3 +55,14 @@ mypy validator/drivers/patch_coverage.py → 0 errors
 
 - `summarise_patch_coverage` is the integration point for `/spec.test`: callers compute a `PatchCoverageReport` then format it. This keeps `run_capability` purely about subprocess execution (FR-003 from feature 016) and preserves AC-011 (missing-report-as-failure) intact.
 - `evaluate_patch_gate` returns failing files in input (insertion) order — Python dict order is preserved, which is the contract the tests exercise.
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/024-patch-coverage-local/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/024-patch-coverage-local/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/024-patch-coverage-local/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/024-patch-coverage-local/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/024-patch-coverage-local/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/024-patch-coverage-local/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |

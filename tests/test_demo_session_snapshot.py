@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-003)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-011)
+
 """Snapshot tests for AC-011 — init, test, feature have complete Section 13.
 
 # @spec AC-011: 3 expectations files have complete Section 13

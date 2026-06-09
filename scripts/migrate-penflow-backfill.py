@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+# LiveSpec traceability anchors
+# @spec(FR-008)
+# @spec(FR-009)
+# @spec(FR-010)
+# @spec(FR-011)
+# @spec(FR-012)
+
 """Migration v17: report and safely backfill root ``penflow/`` artifacts."""
 
 from __future__ import annotations

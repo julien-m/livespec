@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+
 """Typed models for canonical executable user journeys."""
 
 from __future__ import annotations

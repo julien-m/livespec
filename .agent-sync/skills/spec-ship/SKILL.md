@@ -2,6 +2,9 @@
 name: spec-ship
 description: LiveSpec slash command /spec-ship
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-003) -->
+
 
 # /spec-ship
 

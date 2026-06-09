@@ -1,9 +1,9 @@
 ---
+created: 2026-04-17
 feature: Behavioral TDD Audit
-title: Behavioral TDD Audit
 plan_status: Approved
 spec_ref: .specs/features/005.1-behavioral-tdd-audit/spec.md
-created: 2026-04-17
+title: Behavioral TDD Audit
 updated: 2026-04-17
 ---
 
@@ -155,3 +155,12 @@ All 5 tests must pass with 0 failures (SC-003).
 |------|----------|------------|
 | Tests depend on `commands/spec-implement.md` and `commands/spec-test.md` instruction format | Low | Tests validate detection logic (section presence), not instruction text; format-agnostic parsing |
 | Procedure document may become stale if taxonomy evolves | Low | Procedure includes explicit instruction to re-read taxonomy before each execution (EC-001) |
+
+## Traceability Flow
+
+```mermaid
+flowchart TD
+    Spec[spec.md] --> Plan[plan.md]
+    Plan --> Implementation[implementation.md]
+    Implementation --> Tests[verification]
+```

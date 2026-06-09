@@ -1,10 +1,10 @@
 ---
-type: spec
-title: Auto LLM Review
-feature: 001-auto-llm-review
-status: Planned
-priority: P1
 created: 2026-04-13
+feature: 001-auto-llm-review
+priority: P1
+status: Implemented
+title: Auto LLM Review
+type: spec
 updated: 2026-04-13
 ---
 

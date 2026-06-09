@@ -1,3 +1,11 @@
+---
+created: 2026-05-03
+priority: P2
+status: Implemented
+title: Global Write Locks & Atomic NNN Reservation
+updated: 2026-06-08
+---
+
 # Feature Spec: Global Write Locks & Atomic NNN Reservation
 
 - **Feature:** Global Write Locks & Atomic NNN Reservation

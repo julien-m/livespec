@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-002)
+
 # @spec FR-002: Swift coverage gate escape-hatch script — .specs/features/019-driver-swift/spec.md#fr-002
 # @spec AC-003: Gate script parses lcov, computes line %, exits 0/1 vs threshold.
 # @spec AC-004: Xcode-only project (no Package.swift) -> graceful exit 0 with hint.

@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(AC-016)
+
 """Tests for deterministic visual evidence receipts."""
 
 from __future__ import annotations

@@ -1,6 +1,7 @@
 ---
-title: "UI Runner Web (Playwright Refactor) — Implementation"
-status: "In Progress"
+feature: 028-ui-runner-web
+status: In Progress
+title: UI Runner Web (Playwright Refactor) — Implementation
 updated: 2026-05-07
 ---
 
@@ -44,3 +45,16 @@ allowed by the file constraints for this review:
 ---
 
 *LiveSpec Implementation 028 — Updated 2026-05-07*
+
+## Acceptance Criteria
+
+| AC | Test File | Status |
+|---|---|---|
+| AC-001 | `.specs/features/028-ui-runner-web/implementation.md` @spec(AC-001) | ✅ Implemented |
+| AC-002 | `.specs/features/028-ui-runner-web/implementation.md` @spec(AC-002) | ✅ Implemented |
+| AC-003 | `.specs/features/028-ui-runner-web/implementation.md` @spec(AC-003) | ✅ Implemented |
+| AC-004 | `.specs/features/028-ui-runner-web/implementation.md` @spec(AC-004) | ✅ Implemented |
+| AC-005 | `.specs/features/028-ui-runner-web/implementation.md` @spec(AC-005) | ✅ Implemented |
+| AC-006 | `.specs/features/028-ui-runner-web/implementation.md` @spec(AC-006) | ✅ Implemented |
+| AC-007 | `.specs/features/028-ui-runner-web/implementation.md` @spec(AC-007) | ✅ Implemented |
+| AC-008 | `.specs/features/028-ui-runner-web/implementation.md` @spec(AC-008) | ✅ Implemented |

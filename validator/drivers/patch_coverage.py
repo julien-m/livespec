@@ -1,9 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Local patch coverage computation — intersect lcov.info with git diff."""
 
 # @spec FR-005: Patch coverage is computed locally from lcov and unified diff data.
 # @spec AC-012: No hosted service participates in changed-line coverage calculation.
 # @spec AC-015: The implementation stays local and avoids external coverage vendors.
-
 
 from __future__ import annotations
 
@@ -148,9 +150,7 @@ def compute_patch_coverage(
             continue
         covered_lines_by_file = normalized_lcov[normalized_path]
         measured_lines: list[int] = [
-            line_number
-            for line_number in changed_lines
-            if line_number in covered_lines_by_file
+            line_number for line_number in changed_lines if line_number in covered_lines_by_file
         ]
         if not measured_lines:
             files[path] = 0.0 if changed_lines else 1.0

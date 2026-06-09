@@ -43,12 +43,8 @@ def _make_driver(
     coverage_cmd: str | None = "echo cov",
     snapshots_cmd: str | None = None,
 ) -> DriverManifest:
-    coverage = (
-        DriverCapability(command=coverage_cmd) if coverage_cmd is not None else None
-    )
-    snapshots = (
-        DriverCapability(command=snapshots_cmd) if snapshots_cmd is not None else None
-    )
+    coverage = DriverCapability(command=coverage_cmd) if coverage_cmd is not None else None
+    snapshots = DriverCapability(command=snapshots_cmd) if snapshots_cmd is not None else None
     return DriverManifest(
         name=name,
         detect=DetectRule(files=detect_files or []),
@@ -375,9 +371,7 @@ def test_init_test_config_typescript_project(runner: CliRunner, tmp_path: Path) 
     assert "lines: 70" in text
 
 
-def test_init_test_config_unsupported_stack_skips(
-    runner: CliRunner, tmp_path: Path
-) -> None:
+def test_init_test_config_unsupported_stack_skips(runner: CliRunner, tmp_path: Path) -> None:
     # AC-002: no driver match -> note + exit 0, no files written.
     result = runner.invoke(
         app,
@@ -388,9 +382,7 @@ def test_init_test_config_unsupported_stack_skips(
     assert not (tmp_path / CI_WORKFLOW_PATH).exists()
 
 
-def test_init_test_config_existing_vitest_is_patched(
-    runner: CliRunner, tmp_path: Path
-) -> None:
+def test_init_test_config_existing_vitest_is_patched(runner: CliRunner, tmp_path: Path) -> None:
     # SC-004: existing vitest.config.ts is patched (not overwritten).
     _seed_project(tmp_path, marker_files=["package.json"])
     vitest = tmp_path / "vitest.config.ts"
@@ -409,9 +401,7 @@ def test_init_test_config_existing_vitest_is_patched(
     assert "# livespec:testing:typescript-coverage:begin" in text
 
 
-def test_init_test_config_threshold_flag_propagates(
-    runner: CliRunner, tmp_path: Path
-) -> None:
+def test_init_test_config_threshold_flag_propagates(runner: CliRunner, tmp_path: Path) -> None:
     _seed_project(tmp_path, marker_files=["pyproject.toml"])
     result = runner.invoke(
         app,
@@ -429,9 +419,7 @@ def test_init_test_config_threshold_flag_propagates(
     assert "fail_under = 90" in text
 
 
-def test_init_test_config_updates_conventions_index(
-    runner: CliRunner, tmp_path: Path
-) -> None:
+def test_init_test_config_updates_conventions_index(runner: CliRunner, tmp_path: Path) -> None:
     _seed_project(tmp_path, marker_files=["pyproject.toml"])
     conv_dir = tmp_path / ".conventions"
     conv_dir.mkdir()
@@ -445,9 +433,7 @@ def test_init_test_config_updates_conventions_index(
     assert "## testing [test, coverage, snapshot, ci]" in text
 
 
-def test_init_test_config_refresh_only_skips_writes(
-    runner: CliRunner, tmp_path: Path
-) -> None:
+def test_init_test_config_refresh_only_skips_writes(runner: CliRunner, tmp_path: Path) -> None:
     # AC-006: spec-refresh-conventions reuses this surface to refresh testing
     # domain without rewriting project files.
     _seed_project(tmp_path, marker_files=["pyproject.toml"])

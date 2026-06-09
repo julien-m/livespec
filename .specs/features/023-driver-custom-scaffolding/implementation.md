@@ -1,3 +1,8 @@
+---
+feature: 023-driver-custom-scaffolding
+title: Implementation — 023 Driver Custom Scaffolding & Graceful Degradation
+---
+
 # Implementation — 023 Driver Custom Scaffolding & Graceful Degradation
 
 - **Date:** 2026-05-07
@@ -60,3 +65,29 @@ Closed the gaps left by feature 016 around the custom-driver UX:
 ---
 
 *LiveSpec Implementation — 2026-05-07*
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/023-driver-custom-scaffolding/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/023-driver-custom-scaffolding/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/023-driver-custom-scaffolding/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/023-driver-custom-scaffolding/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/023-driver-custom-scaffolding/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/023-driver-custom-scaffolding/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+
+## Acceptance Criteria
+
+| AC | Test File | Status |
+|---|---|---|
+| AC-001 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-001) | ✅ Implemented |
+| AC-002 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-002) | ✅ Implemented |
+| AC-003 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-003) | ✅ Implemented |
+| AC-004 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-004) | ✅ Implemented |
+| AC-005 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-005) | ✅ Implemented |
+| AC-006 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-006) | ✅ Implemented |
+| AC-007 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-007) | ✅ Implemented |
+| AC-008 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-008) | ✅ Implemented |
+| AC-009 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-009) | ✅ Implemented |
+| AC-010 | `.specs/features/023-driver-custom-scaffolding/implementation.md` @spec(AC-010) | ✅ Implemented |

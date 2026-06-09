@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# LiveSpec traceability anchors
+# @spec(FR-008)
+# @spec(FR-009)
+
 """Pre-commit hook — enforce `last_reviewed` bump on skill expectations files.
 
 # @spec FR-009: pre-commit hook
@@ -25,10 +29,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-RECOVERY_FMT = (
-    "Relis `.agent-sync/skills/{name}/expectations.md`, "
-    "bump `last_reviewed`, recommit."
-)
+RECOVERY_FMT = "Relis `.agent-sync/skills/{name}/expectations.md`, bump `last_reviewed`, recommit."
 
 
 def _staged_paths() -> list[str]:

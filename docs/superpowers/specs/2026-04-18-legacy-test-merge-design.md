@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-009) -->
+<!-- @spec(FR-008) -->
+
 # Design: Legacy Test Merge in migrate-visual-tests.js
 
 **Date:** 2026-04-18

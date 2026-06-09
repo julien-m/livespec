@@ -1,7 +1,8 @@
 ---
-title: "UI Runner Architecture — Technical Plan"
-status: "Approved"
 created: 2026-05-07
+spec_ref: .specs/features/027-ui-runner-architecture/spec.md
+status: Approved
+title: UI Runner Architecture — Technical Plan
 updated: 2026-05-07
 ---
 
@@ -226,3 +227,8 @@ This feature is ready to move from planning to implementation when:
 ---
 
 *LiveSpec Plan 027 — 2026-05-07*
+
+## Testing Strategy
+
+- Run focused tests for the mapped implementation.
+- Run full project validation before completion.

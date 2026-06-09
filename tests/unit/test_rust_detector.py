@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Unit tests for Cargo.toml dependency parsing and cargo-mutants JSON parser."""
 
 # @spec FR-005: Unit tests for Cargo.toml parser and cargo-mutants JSON parser
@@ -197,9 +200,7 @@ def test_has_cargo_manifest_false_when_absent() -> None:
 def test_parse_cargo_mutants_json_extracts_summary_object() -> None:
     """A single-object summary yields the expected counts."""
     # @spec FR-003, AC-008
-    payload = json.dumps(
-        {"caught": 12, "missed": 3, "timeout": 1, "unviable": 0}
-    )
+    payload = json.dumps({"caught": 12, "missed": 3, "timeout": 1, "unviable": 0})
 
     counts = parse_cargo_mutants_json(payload)
 

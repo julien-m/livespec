@@ -2,6 +2,10 @@
 name: spec-check
 description: LiveSpec slash command /spec-check
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-006) -->
+<!-- @spec(FR-007) -->
+
 
 # /spec-check
 

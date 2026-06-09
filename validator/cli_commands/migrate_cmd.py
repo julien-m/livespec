@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Migration planning CLI commands."""
 
 from __future__ import annotations
@@ -52,8 +55,7 @@ def plan_command(
         typer.echo(f"Apply: {', '.join(map(str, plan.apply)) or 'none'}")
         typer.echo(f"Skipped: {json.dumps(plan.skipped)}")
         typer.echo(
-            "Invalid restore points: "
-            f"{', '.join(map(str, plan.invalid_restore_points)) or 'none'}"
+            f"Invalid restore points: {', '.join(map(str, plan.invalid_restore_points)) or 'none'}"
         )
     raise typer.Exit(0)
 

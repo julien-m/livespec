@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-011)
+
 """State-file frontmatter validator.
 
 Spec anchors (Chantier 4 / Feature 013 — see
@@ -160,9 +163,7 @@ def _validate_value_shapes(meta: dict[str, Any], path: Path) -> list[StateFileVi
                 )
             )
     elif "feature_slug" in meta:
-        violations.append(
-            StateFileViolation(path, "wrong_type", "feature_slug must be str")
-        )
+        violations.append(StateFileViolation(path, "wrong_type", "feature_slug must be str"))
 
     # created_at / updated_at
     for date_key in ("created_at", "updated_at"):
@@ -233,9 +234,7 @@ def validate_state_file(path: Path) -> list[StateFileViolation]:
     try:
         post = frontmatter.load(str(path))
     except Exception as exc:
-        return [
-            StateFileViolation(path, "parse_error", f"could not parse frontmatter ({exc!s})")
-        ]
+        return [StateFileViolation(path, "parse_error", f"could not parse frontmatter ({exc!s})")]
     raw_meta: Any = post.metadata if post.metadata else {}  # type: ignore[no-any-expr]
     meta: dict[str, Any] = (
         {str(k): v for k, v in raw_meta.items()}  # type: ignore[reportUnknownVariableType]
@@ -356,9 +355,7 @@ def _git_dates(path: Path) -> tuple[str | None, str | None]:
     except (OSError, subprocess.TimeoutExpired):
         return None, None
     created = (
-        first.stdout.strip().splitlines()[-1]
-        if first.returncode == 0 and first.stdout
-        else None
+        first.stdout.strip().splitlines()[-1] if first.returncode == 0 and first.stdout else None
     )
     updated = last.stdout.strip() if last.returncode == 0 and last.stdout else None
     if created and not ISO_DATE_REGEX.match(created):

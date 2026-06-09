@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-013)
+# @spec(FR-014)
+# @spec(FR-016)
+
 """Deterministic feature/ref assignment for journey creation intents."""
 
 # @spec FR-013, FR-014, FR-016: journey assignment and implemented features

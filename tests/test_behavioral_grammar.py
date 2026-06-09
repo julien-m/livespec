@@ -185,4 +185,3 @@ def test_screen_missing_actor_returns_fail(tmp_path: Path) -> None:
     assert outcome.result == VALIDATION_RESULT.FAIL, outcome.diagnostics
     assert any("Acteur" in d for d in outcome.diagnostics), outcome.diagnostics
     assert outcome.kind == "screen"
-

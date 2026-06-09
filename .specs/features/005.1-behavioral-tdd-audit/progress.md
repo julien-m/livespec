@@ -21,3 +21,9 @@ updated_at: '2026-04-17'
 - **FR/AC:** FR-001, FR-004, FR-007, FR-008, FR-009 / AC-001, AC-004, AC-007, AC-008, AC-009
 - **Tests:** 5/5 passed
 - **Notes:** Tests validate behavioral AC detection, skip logic, coverage matrix structure, all-covered message, and taxonomy references in gap reports.
+
+## Progress Table
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 | Complete | Historical progress captured before table normalization. |

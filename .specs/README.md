@@ -74,9 +74,14 @@
 | 035 | Unified CLI Surface | Implemented | 2026-05-07 | 2026-05-07 | [spec](features/035-unified-cli-surface/spec.md) |
 | 036 | Multi-Surface Detection and Migration | Planned | 2026-05-07 | 2026-05-07 | [spec](features/036-multi-surface-detection-and-migration/spec.md) |
 | 037 | Test Multi-Runner Integration | Implemented | 2026-05-08 | 2026-05-08 | [spec](features/037-test-multi-runner-integration/spec.md), [plan](features/037-test-multi-runner-integration/plan.md), [implementation](features/037-test-multi-runner-integration/implementation.md) |
+| 038 | Runner Config Wiring | Implemented | 2026-05-08 | 2026-06-08 | [spec](features/038-runner-config-wiring/spec.md), [plan](features/038-runner-config-wiring/plan.md), [implementation](features/038-runner-config-wiring/implementation.md) |
+| 039 | Command Expectations and Verify Output | Implemented | 2026-05-12 | 2026-06-08 | [spec](features/039-command-expectations-and-verify-output/spec.md), [implementation](features/039-command-expectations-and-verify-output/implementation.md) |
+| 040 | Expectations Rich and Verify Preview | Implemented | 2026-05-12 | 2026-06-08 | [spec](features/040-expectations-rich-and-verify-preview/spec.md), [implementation](features/040-expectations-rich-and-verify-preview/implementation.md) |
 | 041 | Brainstorm Flow & Screen Specs Ingestion | Draft | 2026-05-13 | 2026-05-14 | [spec](features/041-spec-init-flow-specs-ingestion/spec.md) |
 | 042 | `/spec-specify` Derives from Imported Brainstorm Flows | Draft | 2026-05-13 | 2026-05-14 | [spec](features/042-spec-specify-from-brainstorm/spec.md) |
 | 043 | `/spec.sync-brainstorm` — Living Bridge to Brainstorm | Draft | 2026-05-13 | 2026-05-14 | [spec](features/043-spec-sync-brainstorm/spec.md) |
+| 044 | Behavioral Grammar v1.0 Shared | Implemented | 2026-05-14 | 2026-06-08 | [spec](features/044-behavioral-grammar-v1-shared/spec.md), [implementation](features/044-behavioral-grammar-v1-shared/implementation.md) |
+| 045 | Native Behavioral Specs | Implemented | 2026-05-14 | 2026-06-08 | [spec](features/045-native-behavioral-specs/spec.md), [implementation](features/045-native-behavioral-specs/implementation.md) |
 | 046 | Visual Implementation Gate | Implemented | 2026-05-17 | 2026-05-17 | [spec](features/046-visual-implementation-gate/spec.md), [plan](features/046-visual-implementation-gate/plan.md), [implementation](features/046-visual-implementation-gate/implementation.md) |
 | 047 | Design Alignment Gate | Implemented | 2026-05-17 | 2026-05-17 | [spec](features/047-design-alignment-gate/spec.md), [plan](features/047-design-alignment-gate/plan.md), [implementation](features/047-design-alignment-gate/implementation.md) |
 | 048 | Command Validation Hardening | Implemented | 2026-05-18 | 2026-05-18 | [spec](features/048-command-validation-hardening/spec.md), [plan](features/048-command-validation-hardening/plan.md), [implementation](features/048-command-validation-hardening/implementation.md) |

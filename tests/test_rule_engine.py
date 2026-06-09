@@ -111,12 +111,12 @@ class TestSuppressIfCreating:
         specs_root = tmp_path / ".specs"
         specs_root.mkdir(parents=True)
 
-        # Feature with status mismatch (Draft but checked) — R1.3 has suppress_if_creating=True
+        # Feature with status mismatch (Implemented but unchecked) — R1.3 suppresses fresh specs.
         feat = specs_root / "features" / "001-auth"
         feat.mkdir(parents=True)
-        (feat / "spec.md").write_text("---\nstatus: Draft\n---\n# Auth\n")
+        (feat / "spec.md").write_text("---\nstatus: Implemented\n---\n# Auth\n")
 
-        (specs_root / "roadmap.md").write_text("- [x] [Auth](features/001-auth/)\n")
+        (specs_root / "roadmap.md").write_text("- [ ] [Auth](features/001-auth/)\n")
 
         # spec.md was just created (mtime is now), so it's within the 30-min window
         result = run_coherence(specs_root, rule_ids=["R1.3"])
@@ -134,9 +134,9 @@ class TestSuppressIfCreating:
 
         feat = specs_root / "features" / "001-auth"
         feat.mkdir(parents=True)
-        (feat / "spec.md").write_text("---\nstatus: Draft\n---\n# Auth\n")
+        (feat / "spec.md").write_text("---\nstatus: Implemented\n---\n# Auth\n")
 
-        (specs_root / "roadmap.md").write_text("- [x] [Auth](features/001-auth/)\n")
+        (specs_root / "roadmap.md").write_text("- [ ] [Auth](features/001-auth/)\n")
 
         result = run_coherence(specs_root, rule_ids=["R1.3"], no_suppress=True)
         # With no_suppress, violations stay as-is (not suppressed)

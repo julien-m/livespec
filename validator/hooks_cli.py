@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """CLI surface for hook + integration resolution.
 
 Exposes two sub-applications wired into ``validator.cli``:
@@ -37,12 +40,8 @@ integrations_app = typer.Typer(
 
 @hooks_app.command("resolve")
 def hooks_resolve(
-    event: str = typer.Option(
-        ..., "--event", help="Hook event: 'before' or 'after'."
-    ),
-    command: str = typer.Option(
-        ..., "--command", help="LiveSpec command name or alias."
-    ),
+    event: str = typer.Option(..., "--event", help="Hook event: 'before' or 'after'."),
+    command: str = typer.Option(..., "--command", help="LiveSpec command name or alias."),
     feature: str | None = typer.Option(
         None,
         "--feature",
@@ -102,8 +101,7 @@ def integrations_list() -> None:
     typer.echo(f"{'NAME':<20} {'PHASE':<8} {'MODE':<10} {'ORDER':<6} COMMANDS  PATH")
     for i in results:
         typer.echo(
-            f"{i.name:<20} {i.phase:<8} {i.mode:<10} {i.order:<6} "
-            f"{','.join(i.commands)}  {i.path}"
+            f"{i.name:<20} {i.phase:<8} {i.mode:<10} {i.order:<6} {','.join(i.commands)}  {i.path}"
         )
     raise typer.Exit(0)
 

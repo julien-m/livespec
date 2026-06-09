@@ -1,3 +1,16 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-012)
+
 """Level 3A — Integration tests for visual scaffolding in spec-migrate.
 
 Tests invoke scripts/migrate-visual-tests.js directly on a controlled fixture
@@ -301,13 +314,14 @@ class TestMigrateVisualRouteScan:
             f"route-settings.spec.ts not generated. stdout:\n{result.stdout}"
         )
 
-    def test_route_test_uses_extracted_heading(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_route_test_uses_extracted_heading(self, fixture_migrate_visual_frontend: Path) -> None:
         """Route scan extracts h1 'Settings' from settings.tsx."""
         _run_generate(fixture_migrate_visual_frontend)
         route_file = (
-            fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+            fixture_migrate_visual_frontend
+            / "frontend"
+            / "tests"
+            / "e2e"
             / "route-settings.spec.ts"
         )
         content = route_file.read_text()
@@ -315,15 +329,13 @@ class TestMigrateVisualRouteScan:
             f"Heading not extracted correctly. Content:\n{content[:500]}"
         )
 
-    def test_skips_redirect_only_routes(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_skips_redirect_only_routes(self, fixture_migrate_visual_frontend: Path) -> None:
         """Profile page with redirect() and no h1 is not generated."""
         _run_generate(fixture_migrate_visual_frontend)
         e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
-        assert not (
-            e2e_dir / "route-profile.spec.ts"
-        ).exists(), "Redirect-only page should not get a route test"
+        assert not (e2e_dir / "route-profile.spec.ts").exists(), (
+            "Redirect-only page should not get a route test"
+        )
 
     def test_generates_not_found_test_from_root(
         self, fixture_migrate_visual_frontend: Path
@@ -341,12 +353,16 @@ class TestMigrateVisualRouteScan:
         """Running --generate twice overwrites route-* tests (no AC-030 protection)."""
         _run_generate(fixture_migrate_visual_frontend)
         route_test = (
-            fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
+            fixture_migrate_visual_frontend
+            / "frontend"
+            / "tests"
+            / "e2e"
             / "route-settings.spec.ts"
         )
         original_mtime = route_test.stat().st_mtime
 
         import time
+
         time.sleep(0.1)
         _run_generate(fixture_migrate_visual_frontend)
         new_mtime = route_test.stat().st_mtime
@@ -354,15 +370,11 @@ class TestMigrateVisualRouteScan:
             "route-settings.spec.ts was not overwritten on second run"
         )
 
-    def test_sentinel_includes_routes_count(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_sentinel_includes_routes_count(self, fixture_migrate_visual_frontend: Path) -> None:
         """Sentinel line includes routes= count reflecting route-scan results."""
         result = _run_generate(fixture_migrate_visual_frontend)
         _, _, routes = _parse_sentinel_routes(result.stdout)
-        assert routes >= 1, (
-            f"Sentinel routes= should be >= 1. stdout:\n{result.stdout}"
-        )
+        assert routes >= 1, f"Sentinel routes= should be >= 1. stdout:\n{result.stdout}"
 
 
 @pytest.mark.level_3a
@@ -381,11 +393,11 @@ class TestMigrateVisualDeleteSuperseded:
         _run_generate(fixture_migrate_visual_frontend)
 
         assert not old_test.exists(), (
-            "settings.spec.ts should be deleted after route-settings.spec.ts covers"
-            " /settings"
+            "settings.spec.ts should be deleted after route-settings.spec.ts covers /settings"
         )
-        assert (e2e_dir / "route-settings.spec.ts").exists(), \
+        assert (e2e_dir / "route-settings.spec.ts").exists(), (
             "route-settings.spec.ts should exist as replacement"
+        )
 
     def test_preserves_numbered_tests(self, fixture_migrate_visual_frontend: Path) -> None:
         """Numbered tests (001-*.spec.ts) are never deleted."""
@@ -464,9 +476,7 @@ class TestMigrateVisualLegacyMerge:
         self, fixture_migrate_visual_frontend: Path
     ) -> None:
         """Custom test blocks from legacy file are merged into route file."""
-        e2e_dir, _ = self._setup_legacy(
-            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
-        )
+        e2e_dir, _ = self._setup_legacy(fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT)
 
         result = _run_generate(fixture_migrate_visual_frontend)
         assert result.returncode == 0, f"Script failed:\n{result.stdout}\n{result.stderr}"
@@ -479,9 +489,7 @@ class TestMigrateVisualLegacyMerge:
         self, fixture_migrate_visual_frontend: Path
     ) -> None:
         """Standard test 'full page with data' not injected from legacy (dedup)."""
-        e2e_dir, _ = self._setup_legacy(
-            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
-        )
+        e2e_dir, _ = self._setup_legacy(fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT)
 
         _run_generate(fixture_migrate_visual_frontend)
         content = (e2e_dir / "route-settings.spec.ts").read_text()
@@ -493,37 +501,23 @@ class TestMigrateVisualLegacyMerge:
             "Custom tests should still be merged"
         )
 
-    def test_custom_imports_merged_from_legacy(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_custom_imports_merged_from_legacy(self, fixture_migrate_visual_frontend: Path) -> None:
         """Custom imports from legacy file are merged into route file."""
-        e2e_dir, _ = self._setup_legacy(
-            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
-        )
+        e2e_dir, _ = self._setup_legacy(fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT)
 
         _run_generate(fixture_migrate_visual_frontend)
         content = (e2e_dir / "route-settings.spec.ts").read_text()
-        assert (
-            "mockSettingsFormAPIs" in content
-        ), "Custom import not merged into route file"
+        assert "mockSettingsFormAPIs" in content, "Custom import not merged into route file"
 
-    def test_provenance_comment_present(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_provenance_comment_present(self, fixture_migrate_visual_frontend: Path) -> None:
         """Preserved custom tests are annotated with their source file."""
-        e2e_dir, _ = self._setup_legacy(
-            fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
-        )
+        e2e_dir, _ = self._setup_legacy(fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT)
 
         _run_generate(fixture_migrate_visual_frontend)
         content = (e2e_dir / "route-settings.spec.ts").read_text()
-        assert (
-            "Preserved from settings.spec.ts" in content
-        ), "Provenance comment missing"
+        assert "Preserved from settings.spec.ts" in content, "Provenance comment missing"
 
-    def test_legacy_file_deleted_after_merge(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_legacy_file_deleted_after_merge(self, fixture_migrate_visual_frontend: Path) -> None:
         """Legacy spec file is deleted after custom tests are merged."""
         e2e_dir, legacy = self._setup_legacy(
             fixture_migrate_visual_frontend, _LEGACY_SETTINGS_CONTENT
@@ -531,9 +525,7 @@ class TestMigrateVisualLegacyMerge:
 
         result = _run_generate(fixture_migrate_visual_frontend)
         assert result.returncode == 0
-        assert (
-            not legacy.exists()
-        ), "Legacy file should be deleted after successful merge"
+        assert not legacy.exists(), "Legacy file should be deleted after successful merge"
         assert (e2e_dir / "route-settings.spec.ts").exists()
         merged_content = (e2e_dir / "route-settings.spec.ts").read_text()
         assert "settings with form validation errors" in merged_content, (
@@ -599,8 +591,7 @@ class TestMigrateVisualNoWebProject:
         result = _run_generate(fixture_no_web)
         expected = "VISUAL_SCAFFOLD_RESULT: files=0 dirs=0 routes=0 reason=no-frontend"
         assert expected in result.stdout, (
-            f"Expected sentinel '{expected}' in stdout.\n"
-            f"Got stdout: {result.stdout}"
+            f"Expected sentinel '{expected}' in stdout.\nGot stdout: {result.stdout}"
         )
 
     def test_skip_message_in_output(self, fixture_no_web: Path) -> None:

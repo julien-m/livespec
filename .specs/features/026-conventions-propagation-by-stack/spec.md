@@ -1,3 +1,11 @@
+---
+created: 2026-05-06
+priority: P2
+status: Implemented
+title: Conventions Propagation by Stack
+updated: 2026-06-08
+---
+
 # Feature Spec: Conventions Propagation by Stack
 
 - **Feature:** Conventions Propagation by Stack

@@ -277,12 +277,8 @@ def main(argv: list[str]) -> int:
 
     if updated != original:
         readme_path.write_text(updated, encoding="utf-8")
-        activity_result = (
-            "activity regenerated" if activity_changed else "activity unchanged"
-        )
-        print(
-            f"  ▸ README audit: {status_changes} status correction(s), {activity_result}"
-        )
+        activity_result = "activity regenerated" if activity_changed else "activity unchanged"
+        print(f"  ▸ README audit: {status_changes} status correction(s), {activity_result}")
     else:
         print("  ▸ README audit: nothing to fix")
     return 0

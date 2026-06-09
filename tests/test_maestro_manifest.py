@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-003)
+
 """Tests for the Android/Maestro UI runner manifest (android.yaml).
 
 Validates schema structure, detect logic, capability coverage, and
@@ -14,12 +18,7 @@ from pathlib import Path
 import pytest
 import yaml  # type: ignore[import-untyped]
 
-MANIFEST_PATH = (
-    Path(__file__).resolve().parent.parent
-    / "livespec"
-    / "ui-runners"
-    / "android.yaml"
-)
+MANIFEST_PATH = Path(__file__).resolve().parent.parent / "livespec" / "ui-runners" / "android.yaml"
 
 # ---------------------------------------------------------------------------
 # Fixture
@@ -112,9 +111,7 @@ def test_manifest_detect_files_includes_build_gradle(manifest: dict) -> None:
 def test_manifest_detect_files_includes_build_gradle_kts(manifest: dict) -> None:
     """Detect files include 'build.gradle.kts'."""
     files = manifest["detect"].get("files", [])
-    assert "build.gradle.kts" in files, (
-        f"Expected 'build.gradle.kts' in detect.files: {files}"
-    )
+    assert "build.gradle.kts" in files, f"Expected 'build.gradle.kts' in detect.files: {files}"
 
 
 def test_manifest_detect_files_includes_android_manifest_xml(manifest: dict) -> None:
@@ -130,9 +127,7 @@ def test_manifest_detect_dirs_includes_maestro(manifest: dict) -> None:
     detect = manifest["detect"]
     # Accept either 'dirs' key or 'files' containing 'maestro/'
     detect_str = str(detect).lower()
-    assert "maestro" in detect_str, (
-        f"Expected 'maestro' in detect section: {detect}"
-    )
+    assert "maestro" in detect_str, f"Expected 'maestro' in detect section: {detect}"
 
 
 # ---------------------------------------------------------------------------
@@ -166,9 +161,7 @@ def test_manifest_has_run_flow_capability(manifest: dict) -> None:
 
 def test_manifest_has_compare_baseline_capability(manifest: dict) -> None:
     """Manifest capabilities include 'compare_baseline'."""
-    assert "compare_baseline" in manifest["capabilities"], (
-        "Missing 'compare_baseline' capability"
-    )
+    assert "compare_baseline" in manifest["capabilities"], "Missing 'compare_baseline' capability"
 
 
 def test_capture_screenshot_has_description(manifest: dict) -> None:
@@ -254,26 +247,20 @@ def test_manifest_has_at_least_one_destination(manifest: dict) -> None:
 
 def test_default_destination_is_android_emulator(manifest: dict) -> None:
     """Default destination is an Android Emulator."""
-    default_dest = next(
-        (d for d in manifest["destinations"] if d.get("default") is True), None
-    )
+    default_dest = next((d for d in manifest["destinations"] if d.get("default") is True), None)
     assert default_dest is not None, "No destination with default=true"
 
 
 def test_default_destination_has_avd_name(manifest: dict) -> None:
     """Default destination declares an AVD name."""
-    default_dest = next(
-        (d for d in manifest["destinations"] if d.get("default") is True), None
-    )
+    default_dest = next((d for d in manifest["destinations"] if d.get("default") is True), None)
     assert default_dest is not None
     assert default_dest.get("avd_name"), "Default destination missing avd_name"
 
 
 def test_default_avd_is_pixel_8_api_35(manifest: dict) -> None:
     """Default AVD name is 'Pixel_8_API_35' per spec AC-007."""
-    default_dest = next(
-        (d for d in manifest["destinations"] if d.get("default") is True), None
-    )
+    default_dest = next((d for d in manifest["destinations"] if d.get("default") is True), None)
     assert default_dest is not None
     # AC-007: default AVD is Pixel_8_API_35
     avd_name = default_dest.get("avd_name", "")
@@ -295,16 +282,12 @@ def test_manifest_has_scenarios_section(manifest: dict) -> None:
 def test_manifest_has_default_scenario(manifest: dict) -> None:
     """Manifest has a scenario named 'default'."""
     scenario_names = [s.get("name") for s in manifest["scenarios"]]
-    assert "default" in scenario_names, (
-        f"Expected 'default' scenario, got: {scenario_names}"
-    )
+    assert "default" in scenario_names, f"Expected 'default' scenario, got: {scenario_names}"
 
 
 def test_default_scenario_has_timeout(manifest: dict) -> None:
     """Default scenario has timeout_seconds configured."""
-    default_scenario = next(
-        (s for s in manifest["scenarios"] if s.get("name") == "default"), None
-    )
+    default_scenario = next((s for s in manifest["scenarios"] if s.get("name") == "default"), None)
     assert default_scenario is not None
     assert "timeout_seconds" in default_scenario, "Default scenario missing timeout_seconds"
 
@@ -317,6 +300,8 @@ def test_default_scenario_has_timeout(manifest: dict) -> None:
 def test_manifest_references_feature_010(manifest: dict) -> None:
     """Manifest references Feature 010 pixelmatch compatibility."""
     manifest_str = str(manifest).lower()
-    assert "pixelmatch" in manifest_str or "feature_010" in manifest_str or (
-        "compare_baseline" in manifest["capabilities"]
+    assert (
+        "pixelmatch" in manifest_str
+        or "feature_010" in manifest_str
+        or ("compare_baseline" in manifest["capabilities"])
     ), "Expected pixelmatch/Feature 010 reference in manifest"

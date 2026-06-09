@@ -89,9 +89,7 @@ def parse_file(path: Path) -> ParsedFile:
     if not isinstance(ast_nodes, list):
         ast_nodes = []
 
-    headings, code_blocks = _extract_headings_and_blocks(
-        cast(list[dict[str, Any]], ast_nodes)
-    )
+    headings, code_blocks = _extract_headings_and_blocks(cast(list[dict[str, Any]], ast_nodes))
 
     return ParsedFile(
         metadata=metadata,

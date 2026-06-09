@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-008)
+
 """CLI entry point for LiveSpec validator."""
 
 from __future__ import annotations
@@ -444,9 +448,7 @@ def validate(
 
         sf_report = validate_state_files(specs_root)
         if sf_report.ok:
-            typer.echo(
-                f"OK: {sf_report.files_checked} state file(s) checked, no schema violation."
-            )
+            typer.echo(f"OK: {sf_report.files_checked} state file(s) checked, no schema violation.")
             raise typer.Exit(0)
         typer.echo(
             f"FAIL: {len(sf_report.violations)} schema violation(s) "

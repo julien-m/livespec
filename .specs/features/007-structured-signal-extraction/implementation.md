@@ -1,19 +1,19 @@
 ---
-feature: "007"
-title: Structured Signal Extraction — Implementation
-status: Complete
 created: 2026-04-15
+feature: '007'
+status: Complete
+title: Structured Signal Extraction — Implementation
 ---
 
 # Implementation: 007 — Structured Signal Extraction
 
 ## Summary
 
-Refactored Step 5.7 sub-steps 2-3 in `commands/spec-specify.md` into a 3-phase pipeline and added 6 integration tests in `tests/test_specify_integration.py`.
+Refactored Step 5.7 sub-steps 2-3 in `.agent-sync/skills/spec-specify/SKILL.md` into a 3-phase pipeline and added 6 integration tests in `tests/test_specify_integration.py`.
 
 ## Files Modified
 
-### commands/spec-specify.md
+### .agent-sync/skills/spec-specify/SKILL.md
 
 Replaced sub-steps 2-3 of Step 5.7 with:
 
@@ -55,10 +55,22 @@ All tests call `detect_traits()` directly with fixed signal lists and real taxon
 
 ## FR/AC Coverage
 
-- FR-001: Pipeline refactoring — sub-steps 2-3 replaced in `commands/spec-specify.md`
+- FR-001: Pipeline refactoring — sub-steps 2-3 replaced in `.agent-sync/skills/spec-specify/SKILL.md`
 - FR-002: Structured JSON prompt — Phase 1 instructions with retry/fallback
-- FR-003: detect_traits delegation — Phase 2 in `commands/spec-specify.md`
+- FR-003: detect_traits delegation — Phase 2 in `.agent-sync/skills/spec-specify/SKILL.md`
 - FR-004: Phase 3 unchanged — sub-steps 4-8 byte-identical
 - FR-005: 6 integration tests in `tests/test_specify_integration.py`
 - FR-006: Real taxonomy data, no mocking
 - FR-007: 15/15 non-regression tests pass
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/007-structured-signal-extraction/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/007-structured-signal-extraction/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/007-structured-signal-extraction/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/007-structured-signal-extraction/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/007-structured-signal-extraction/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/007-structured-signal-extraction/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/007-structured-signal-extraction/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |

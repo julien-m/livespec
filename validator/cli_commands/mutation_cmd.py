@@ -30,22 +30,14 @@ def mutation_command(
     threshold: float | None = typer.Option(
         None,
         "--threshold",
-        help=(
-            "Mutation kill-rate threshold (0-100). Defaults to the "
-            "conventions value or 70."
-        ),
+        help=("Mutation kill-rate threshold (0-100). Defaults to the conventions value or 70."),
     ),
     report_path: Path | None = typer.Option(  # noqa: B008
         None,
         "--report-path",
-        help=(
-            "Markdown report destination. Defaults to "
-            ".specs/reports/mutation-YYYY-MM-DD.md."
-        ),
+        help=("Markdown report destination. Defaults to .specs/reports/mutation-YYYY-MM-DD.md."),
     ),
-    debug: bool = typer.Option(
-        False, "--debug", help="Print the full stacktrace on error."
-    ),
+    debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
 ) -> None:
     """Run mutation testing and append a historical Markdown report.
 
@@ -77,15 +69,11 @@ def _run_mutation(*, threshold: float | None, report_path: Path | None) -> None:
     driver = resolve_primary_driver(project_root)
 
     threshold_pct = (
-        threshold
-        if threshold is not None
-        else read_threshold_from_conventions(project_root)
+        threshold if threshold is not None else read_threshold_from_conventions(project_root)
     )
 
     today = _dt.date.today().isoformat()
-    target_path = report_path or (
-        project_root / ".specs" / "reports" / f"mutation-{today}.md"
-    )
+    target_path = report_path or (project_root / ".specs" / "reports" / f"mutation-{today}.md")
     target_path.parent.mkdir(parents=True, exist_ok=True)
 
     result = run_mutation(

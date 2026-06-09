@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 # Built-in UI Runner: iOS / watchOS (XCUITest)
 # Feature 030 — UI Runner iOS/watchOS
 #

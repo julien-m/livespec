@@ -1,3 +1,12 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-018)
+
 """Tests for User Journeys v2 path, index, backlink, and validation behavior."""
 
 from __future__ import annotations

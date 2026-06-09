@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Parse mutmut output into structured mutation-test results."""
 
 # @spec FR-005: Mutmut result parsing — .specs/features/017-driver-python/spec.md#fr-005

@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-029)
+# @spec(FR-030)
+
 """Compiled manifest semantics for User Journeys v2."""
 
 # @spec FR-029, FR-030: compiled manifest metadata and artifact marker traceability

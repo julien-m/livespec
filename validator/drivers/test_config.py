@@ -153,9 +153,7 @@ def _ci_setup_step(driver_name: str) -> str:
         )
     # Python and unknown drivers — Python is enough since LiveSpec runs on it.
     return (
-        "      - uses: actions/setup-python@v5\n"
-        "        with:\n"
-        "          python-version: '3.11'\n"
+        "      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.11'\n"
     )
 
 
@@ -173,11 +171,7 @@ def python_config(threshold: float) -> GeneratedFile:
     Returns:
         A ``GeneratedFile`` patching the ``[tool.coverage.report]`` table.
     """
-    body = (
-        "[tool.coverage.report]\n"
-        f"fail_under = {threshold:g}\n"
-        "show_missing = true\n"
-    )
+    body = f"[tool.coverage.report]\nfail_under = {threshold:g}\nshow_missing = true\n"
     return GeneratedFile(
         path=Path("pyproject.toml"),
         content=body,
@@ -252,7 +246,7 @@ def rust_config(threshold: float) -> GeneratedFile:
     body = (
         "# LiveSpec-managed cargo-tarpaulin config (feature 026).\n"
         "[report]\n"
-        "out = [\"Lcov\"]\n"
+        'out = ["Lcov"]\n'
         "[run]\n"
         f"fail-under = {threshold:g}\n"
     )
@@ -435,9 +429,9 @@ def update_conventions_testing_domain(
 
 def _render_conventions_block(plan: TestConfigPlan, driver: DriverManifest) -> str:
     """Render the conventions ``testing`` domain block for the index file."""
-    coverage_files = ", ".join(
-        str(f.path) for f in plan.files if f.path != CI_WORKFLOW_PATH
-    ) or "(none)"
+    coverage_files = (
+        ", ".join(str(f.path) for f in plan.files if f.path != CI_WORKFLOW_PATH) or "(none)"
+    )
     return (
         f"{_CONV_BEGIN}\n"
         "## testing [test, coverage, snapshot, ci]\n"

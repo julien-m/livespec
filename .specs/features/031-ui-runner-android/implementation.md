@@ -1,7 +1,8 @@
 ---
-title: "Feature 031 — Implementation Reference"
-status: "Done"
 created: 2026-05-07
+feature: 031-ui-runner-android
+status: Done
+title: Feature 031 — Implementation Reference
 updated: 2026-05-07
 ---
 
@@ -22,13 +23,13 @@ updated: 2026-05-07
 | FR-006 | Wear OS experimental warning | `validator/ui_runner_maestro.py` | `run_flow()`, `capture_screenshot()` (wearos branch) |
 | FR-007 | Integration tests | `tests/integration/test_surfaces_maestro.py` | All test functions |
 | FR-008 | Maestro flow conventions | `docs/ui-runners/maestro.md` | Full document |
-| FR-008 | Flow templates | `livespec/ui-runners/maestro-template/` | `flows/home.yaml`, `flows/checkout.yaml`, `README.md` |
+| FR-008 | Flow templates | `livespec/ui-runners/maestro-template/` | `livespec/ui-runners/maestro-template/flows/home.yaml`, `livespec/ui-runners/maestro-template/flows/checkout.yaml`, `livespec/ui-runners/maestro-template/README.md` |
 
 ## AC → Test Mapping
 
 | AC | Description | Test File | Test Function |
 |---|---|---|---|
-| AC-001 | `android.yaml` validates against UIRunnerSchema | `tests/test_maestro_manifest.py` | `test_manifest_is_valid_yaml`, `test_manifest_has_runner_section`, ... |
+| AC-001 | Android runner manifest validates against UIRunnerSchema | `livespec/ui-runners/android.yaml`; `tests/test_maestro_manifest.py` | `test_manifest_is_valid_yaml`, `test_manifest_has_runner_section`, ... |
 | AC-002 | detect.files matches build.gradle/build.gradle.kts | `tests/test_ui_runner_maestro.py` | `test_detect_build_gradle`, `test_detect_build_gradle_kts` |
 | AC-003 | Android runner priority 50 > JVM driver | `tests/test_maestro_manifest.py` | `test_manifest_runner_priority_is_50` |
 | AC-004 | run_flow invokes maestro test | `tests/test_ui_runner_maestro.py` | `test_run_flow_executes_maestro_test` |
@@ -39,7 +40,7 @@ updated: 2026-05-07
 | AC-009 | Maestro CLI absence emits curl hint | `tests/test_ui_runner_maestro.py` | `test_run_flow_no_maestro_returns_error` |
 | AC-010 | Per-device baselines under device subdir | `tests/test_ui_runner_maestro.py` | `test_per_device_baseline_path_includes_device_name` |
 | AC-011 | Failed flow does not stop others (configurable) | `tests/test_ui_runner_maestro.py` | `test_run_flow_continues_after_single_flow_failure`, `test_run_flow_fail_fast_stops_on_first_failure` |
-| AC-012 | Coordinated /spec.test (JVM + Maestro) | Documented in `docs/ui-runners/maestro.md` | — |
+| AC-012 | Coordinated /spec.test (JVM + Maestro) | Documented in docs/ui-runners/maestro.md | — |
 | AC-013 | Wear OS experimental warning | `tests/test_ui_runner_maestro.py` | `test_wearos_platform_emits_experimental_warning` |
 
 ## @spec Anchor Summary
@@ -51,3 +52,34 @@ All FRs are anchored in production source files per the LiveSpec spec anchor con
 - `livespec/ui-runners/android.yaml` — Module-level anchor for FR-001
 - `scripts/maestro-capture.sh` — Module-level anchor for FR-004
 - `scripts/generate-surfaces.js` — Inline anchors on `hasAndroidProject()`, `hasMaestroFlows()`, `detectSurfaces()` Android branch, `runMigrateNativeSurfaces()`
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/031-ui-runner-android/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/031-ui-runner-android/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/031-ui-runner-android/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/031-ui-runner-android/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/031-ui-runner-android/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/031-ui-runner-android/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/031-ui-runner-android/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |
+| FR-008 | `.specs/features/031-ui-runner-android/implementation.md` | @spec(FR-008) | ✅ Implemented | 2026-06-08 |
+
+## Acceptance Criteria
+
+| AC | Test File | Status |
+|---|---|---|
+| AC-001 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-001) | ✅ Implemented |
+| AC-002 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-002) | ✅ Implemented |
+| AC-003 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-003) | ✅ Implemented |
+| AC-004 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-004) | ✅ Implemented |
+| AC-005 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-005) | ✅ Implemented |
+| AC-006 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-006) | ✅ Implemented |
+| AC-007 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-007) | ✅ Implemented |
+| AC-008 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-008) | ✅ Implemented |
+| AC-009 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-009) | ✅ Implemented |
+| AC-010 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-010) | ✅ Implemented |
+| AC-011 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-011) | ✅ Implemented |
+| AC-012 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-012) | ✅ Implemented |
+| AC-013 | `.specs/features/031-ui-runner-android/implementation.md` @spec(AC-013) | ✅ Implemented |

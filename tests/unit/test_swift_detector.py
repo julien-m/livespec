@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Unit tests for Swift Package.swift parsing and Xcode-only detection."""
 
 # @spec FR-006: Unit tests for Swift detector

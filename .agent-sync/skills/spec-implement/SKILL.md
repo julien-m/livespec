@@ -2,6 +2,15 @@
 name: spec-implement
 description: LiveSpec slash command /spec-implement
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-006) -->
+<!-- @spec(AC-007) -->
+<!-- @spec(AC-008) -->
+<!-- @spec(AC-009) -->
+<!-- @spec(FR-005) -->
+<!-- @spec(FR-006) -->
+<!-- @spec(FR-025) -->
+
 
 # /spec-implement
 

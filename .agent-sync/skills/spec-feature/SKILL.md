@@ -2,6 +2,14 @@
 name: spec-feature
 description: LiveSpec slash command /spec-feature
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-012) -->
+<!-- @spec(FR-008) -->
+<!-- @spec(FR-011) -->
+<!-- @spec(FR-012) -->
+<!-- @spec(FR-025) -->
+<!-- @spec(FR-041) -->
+
 
 # /spec-feature
 

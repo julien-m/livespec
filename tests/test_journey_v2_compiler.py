@@ -1,3 +1,16 @@
+# LiveSpec traceability anchors
+# @spec(AC-002)
+# @spec(AC-016)
+# @spec(AC-018)
+# @spec(AC-024)
+# @spec(AC-027)
+# @spec(AC-032)
+# @spec(AC-033)
+# @spec(AC-034)
+# @spec(AC-037)
+# @spec(AC-038)
+# @spec(AC-040)
+
 """Tests for User Journeys v2 compiler registry and manifest semantics."""
 
 from __future__ import annotations

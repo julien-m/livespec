@@ -308,10 +308,12 @@ def test_converge_all_blocks_with_explicit_screens(tmp_path: Path) -> None:
     result = runner.invoke(
         app,
         [
-            "ui-runner", "converge",
+            "ui-runner",
+            "converge",
             "iphone-home",
             "--all",
-            "--project-dir", str(tmp_path),
+            "--project-dir",
+            str(tmp_path),
         ],
     )
     assert result.exit_code == 2

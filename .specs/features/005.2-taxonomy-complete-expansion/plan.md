@@ -1,3 +1,9 @@
+---
+created: 2026-04-17
+spec_ref: .specs/features/005.2-taxonomy-complete-expansion/spec.md
+title: Plan — Taxonomy Complete Expansion
+---
+
 # Plan — Taxonomy Complete Expansion
 
 **Feature:** 005.2-taxonomy-complete-expansion

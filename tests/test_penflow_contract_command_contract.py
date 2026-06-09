@@ -1,3 +1,17 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-012)
+# @spec(AC-013)
+
 """Command documentation tests for the Penflow UI contract integration."""
 
 from __future__ import annotations
@@ -97,13 +111,11 @@ def test_visual_feature_pipeline_requires_forward_penflow_generation() -> None:
             "penflow/semantic-ui-tree.json --json"
         ) in body
         assert (
-            "penflow draft-pen-from-tree penflow/semantic-ui-tree.json --out "
-            "penflow/ui.pen --json"
+            "penflow draft-pen-from-tree penflow/semantic-ui-tree.json --out penflow/ui.pen --json"
         ) in body
         assert "penflow validate-pen penflow/ui.pen --json" in body
         assert (
-            "penflow export-expected penflow/ui.pen --out "
-            "penflow/expected-ui-tree.json --json"
+            "penflow export-expected penflow/ui.pen --out penflow/expected-ui-tree.json --json"
         ) in body
         assert (
             "penflow code-ir --from-context penflow/ui.pen --semantic-tree "
@@ -253,8 +265,7 @@ def test_spec_feature_requires_mockup_factory_before_code() -> None:
     assert "--require-mockup-validation" in body
     assert "status `PASS`" in body
     assert (
-        "`PASSED_WITH_WARNINGS`, `ESCALATED`, `BLOCKED`, or "
-        "`BLOCKED_VISUAL_NOT_RUN` blocks"
+        "`PASSED_WITH_WARNINGS`, `ESCALATED`, `BLOCKED`, or `BLOCKED_VISUAL_NOT_RUN` blocks"
     ) in body
 
 
@@ -312,7 +323,7 @@ def test_spec_feature_requires_desktop_viewport_and_non_visual_modal_transitions
     body = _read(".agent-sync/skills/spec-feature/SKILL.md")
 
     assert "`platform: web-desktop`" in body
-    assert "`viewport: \"1440x900\"`" in body
+    assert '`viewport: "1440x900"`' in body
     assert "Escape/backdrop must be flow transitions only" in body
     assert "Do not add `Escape key`, `Backdrop click`, or `Click backdrop`" in body
     assert "visible action rows" in body

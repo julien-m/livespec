@@ -1,7 +1,7 @@
 ---
 command: spec-hooks
 contract_version: "1.0"
-last_reviewed: 2026-06-07
+last_reviewed: 2026-06-09
 ---
 
 # Expectations — /spec-hooks

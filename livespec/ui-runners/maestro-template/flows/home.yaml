@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-008)
+
 # @spec FR-008: Maestro flow template — .specs/features/031-ui-runner-android/spec.md#fr-008
 #
 # LiveSpec Maestro Flow Template: Home Screen

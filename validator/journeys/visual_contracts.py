@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-033)
+# @spec(FR-034)
+# @spec(FR-035)
+
 """Native deterministic visual checks for User Journeys v2."""
 
 # @spec FR-034, FR-035: native visual checks and visual modes

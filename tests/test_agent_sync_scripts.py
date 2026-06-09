@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-009)
+
 """Tests for cc-hub based agent-sync scripts."""
 
 from __future__ import annotations
@@ -11,8 +17,7 @@ def _fake_cc_hub(bin_dir: Path, log_path: Path) -> None:
     bin_dir.mkdir(parents=True)
     script = bin_dir / "cc-hub"
     script.write_text(
-        "#!/usr/bin/env bash\n"
-        "printf '%s\\n' \"$*\" >> \"${CC_HUB_LOG}\"\n",
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$*" >> "${CC_HUB_LOG}"\n',
         encoding="utf-8",
     )
     script.chmod(0o755)
@@ -53,9 +58,7 @@ def test_link_local_delegates_to_cc_hub_without_manual_claude_symlinks(
     assert "rule build" in log
     assert "--agent-sync-root .agent-sync.local" in log
     assert (project / ".agent-sync.local" / "skills" / "spec-init").is_symlink()
-    assert (
-        project / ".agent-sync.local" / "skills" / "source-command-cli"
-    ).is_symlink()
+    assert (project / ".agent-sync.local" / "skills" / "source-command-cli").is_symlink()
     assert (project / ".agent-sync.local" / "agents" / "livespec-verifier").is_symlink()
     assert (project / ".agent-sync.local" / "rules" / "commands.md").is_symlink()
     assert (project / ".agent-sync.local" / "rules" / "routing.md").is_symlink()

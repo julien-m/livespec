@@ -2,6 +2,12 @@
 name: spec-verify-output
 description: LiveSpec slash command /spec-verify-output
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-010) -->
+<!-- @spec(FR-005) -->
+<!-- @spec(FR-006) -->
+<!-- @spec(FR-007) -->
+
 
 # /spec-verify-output
 

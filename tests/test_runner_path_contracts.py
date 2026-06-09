@@ -29,9 +29,7 @@ def _bad_design_screens_path(tmp_path: Path) -> Path:
 
 def test_assert_output_not_in_design_screens_raises_for_relative_path() -> None:
     with pytest.raises(RuntimeOutputMisplacedError):
-        assert_output_not_in_design_screens(
-            Path(".specs/design/screens/foo/bar.png")
-        )
+        assert_output_not_in_design_screens(Path(".specs/design/screens/foo/bar.png"))
 
 
 def test_assert_output_not_in_design_screens_allows_canonical_run_path() -> None:
@@ -44,9 +42,7 @@ def test_web_runner_returns_failure_when_output_path_under_design_screens(
     tmp_path: Path,
 ) -> None:
     handler = WebRunnerHandler(tmp_path)
-    outcome = handler.capture_screenshot(
-        "dash", output_path=_bad_design_screens_path(tmp_path)
-    )
+    outcome = handler.capture_screenshot("dash", output_path=_bad_design_screens_path(tmp_path))
     assert outcome.success is False
     assert outcome.metadata.get("guard") == "runtime_under_design_screens"
 
@@ -66,9 +62,7 @@ def test_web_runner_accepts_feature_slug_run_id_canonical_path(tmp_path: Path) -
     # path-resolution branch by passing a non-existent project. The subprocess
     # call will fail but the early path computation happens first. We assert
     # that the *guard* did not fire and that the resolved path matches.
-    outcome = handler.capture_screenshot(
-        "dash", feature_slug="050-foo", run_id="20260523T000000Z"
-    )
+    outcome = handler.capture_screenshot("dash", feature_slug="050-foo", run_id="20260523T000000Z")
     # Subprocess will fail in tmp_path (no npx); the important invariant is
     # that the path was NOT under .specs/design/screens/.
     assert outcome.metadata.get("guard") != "missing_output_context"
@@ -104,9 +98,7 @@ def test_xcuitest_runner_returns_failure_when_output_path_under_design_screens(
     tmp_path: Path,
 ) -> None:
     handler = XCUITestRunnerHandler(tmp_path)
-    outcome = handler.capture_screenshot(
-        "dash", output_path=_bad_design_screens_path(tmp_path)
-    )
+    outcome = handler.capture_screenshot("dash", output_path=_bad_design_screens_path(tmp_path))
     assert outcome.success is False
     assert outcome.metadata.get("guard") == "runtime_under_design_screens"
 
@@ -115,9 +107,7 @@ def test_maestro_runner_returns_failure_when_output_path_under_design_screens(
     tmp_path: Path,
 ) -> None:
     handler = MaestroRunnerHandler(tmp_path)
-    outcome = handler.capture_screenshot(
-        "dash", output_path=_bad_design_screens_path(tmp_path)
-    )
+    outcome = handler.capture_screenshot("dash", output_path=_bad_design_screens_path(tmp_path))
     assert outcome.success is False
     assert outcome.metadata.get("guard") == "runtime_under_design_screens"
 
@@ -131,9 +121,7 @@ def test_tauri_runner_returns_failure_when_output_path_under_design_screens(
     marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text('[package]\nname = "demo"\n', encoding="utf-8")
     handler = TauriRunnerHandler(tmp_path)
-    outcome = handler.capture_screenshot(
-        "dash", output_path=_bad_design_screens_path(tmp_path)
-    )
+    outcome = handler.capture_screenshot("dash", output_path=_bad_design_screens_path(tmp_path))
     assert outcome.success is False
     assert outcome.metadata.get("guard") == "runtime_under_design_screens"
 

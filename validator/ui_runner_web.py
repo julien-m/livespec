@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+
 """Web UI runner support for Playwright-based projects.
 
 This module provides a small adapter around the existing Feature 010 shell
@@ -127,9 +130,7 @@ class WebRunnerHandler:
                 "(no package.json found)"
             )
         if not any(self.project_dir.glob("playwright*.config.*")):
-            return (
-                "@playwright/test not installed — npm install -D @playwright/test"
-            )
+            return "@playwright/test not installed — npm install -D @playwright/test"
         return ""
 
     def capture_screenshot(
@@ -207,9 +208,7 @@ class WebRunnerHandler:
                             "guard": "legacy_design_screens_disabled",
                         },
                     )
-                output_path = (
-                    self.project_dir / ".specs" / "design" / "screens" / f"{screen}.png"
-                )
+                output_path = self.project_dir / ".specs" / "design" / "screens" / f"{screen}.png"
             else:
                 return UICapabilityResult(
                     success=False,
@@ -265,8 +264,7 @@ class WebRunnerHandler:
             return UICapabilityResult(
                 success=False,
                 error=(
-                    "Playwright screenshot timed out after "
-                    f"{error.timeout}s for screen={screen}"
+                    f"Playwright screenshot timed out after {error.timeout}s for screen={screen}"
                 ),
                 metadata={"timeout": error.timeout, "command": " ".join(command)},
             )

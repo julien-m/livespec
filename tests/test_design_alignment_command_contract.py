@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-009)
+# @spec(AC-010)
+
 """Command-contract tests for the Design Alignment Gate."""
 
 from __future__ import annotations

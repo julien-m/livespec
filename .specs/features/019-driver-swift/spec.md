@@ -1,3 +1,11 @@
+---
+created: 2026-05-06
+priority: P2
+status: Implemented
+title: Driver Swift — Built-in Test Orchestration Driver
+updated: 2026-06-08
+---
+
 # Feature Spec: Driver Swift — Built-in Test Orchestration Driver
 
 - **Feature:** Driver Swift

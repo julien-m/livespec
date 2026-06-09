@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+
 """Driver registry — discovers and matches drivers against the project root."""
 
 # @spec FR-002: Registry scans shipped manifests first, then project overrides.
@@ -5,7 +8,6 @@
 # @spec AC-004: Custom manifests under .specs/drivers override built-ins by name.
 # @spec AC-005: detect.files patterns are matched against the project root.
 # @spec AC-006: Custom manifests sort before built-ins, then alphabetical by filename.
-
 
 from __future__ import annotations
 

@@ -5,7 +5,7 @@
 
 ---
 
-## 2026-04-13 -- Fix: Added missing @spec anchors
+## 2026-04-13 — [Fix]: Added missing @spec anchors
 
 - **Type:** Fix
 - **Scope:** Feature 002
@@ -14,7 +14,7 @@
 
 ---
 
-## 2026-04-13 -- Check: Spec-code alignment verified
+## 2026-04-13 — [Check]: Spec-code alignment verified
 
 - **Type:** Check
 - **Scope:** Feature 002
@@ -23,7 +23,7 @@
 
 ---
 
-## 2026-04-13 -- Plan: Plan created
+## 2026-04-13 — [Plan]: Plan created
 
 - **Type:** Plan
 - **Scope:** Feature 002
@@ -32,7 +32,7 @@
 
 ---
 
-## 2026-04-13 -- Spec: Spec created
+## 2026-04-13 — [Spec]: Spec created
 
 - **Type:** Spec
 - **Scope:** Feature 002

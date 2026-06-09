@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-018)
+
 """CLI surface for the visual feature gate (``livespec visual-gate``).
 
 # @spec FR-100: Visual gate CLI surface — feature TBD (visual-gate-fix cycle)
@@ -274,8 +277,7 @@ def cleanup_command(
     """
     if delete and not force_delete:
         typer.echo(
-            "Error: --delete requires --force-delete to acknowledge "
-            "irreversible removal.",
+            "Error: --delete requires --force-delete to acknowledge irreversible removal.",
             err=True,
         )
         raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
@@ -337,8 +339,7 @@ def promote_command(
         typer.Option(
             "--run-id",
             help=(
-                "Timestamp folder name under .specs/features/<slug>/run/ "
-                "produced by the runner."
+                "Timestamp folder name under .specs/features/<slug>/run/ produced by the runner."
             ),
         ),
     ],

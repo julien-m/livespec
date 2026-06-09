@@ -1,3 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(FR-001)
+# @spec(FR-006)
+# @spec(FR-007)
+
 """Phase 4.5 runner-aware dispatcher (Feature 037).
 
 Reads `.specs/surfaces.yaml`, iterates each surface in stable order, resolves a
@@ -180,11 +188,7 @@ def _runner_config_to_kwargs(surface: Surface) -> dict[str, Any]:
     for source_key, target_key in mapping.items():
         if source_key in surface.runner_config:
             kwargs[target_key] = surface.runner_config[source_key]
-    if (
-        "platform" not in kwargs
-        and surface.platform is not None
-        and "platform" in mapping.values()
-    ):
+    if "platform" not in kwargs and surface.platform is not None and "platform" in mapping.values():
         kwargs["platform"] = surface.platform
     return kwargs
 
@@ -220,18 +224,14 @@ class Phase4_5Dispatcher:
         """Load surfaces.yaml or fall back to a synthetic Playwright surface."""
         surfaces_path = self.project_dir / ".specs" / "surfaces.yaml"
         if not surfaces_path.exists():
-            logger.info(
-                "INFO: surfaces.yaml missing — using legacy single playwright surface"
-            )
+            logger.info("INFO: surfaces.yaml missing — using legacy single playwright surface")
             return [self._legacy_single_surface()]
         try:
             parsed: Any = yaml.safe_load(surfaces_path.read_text(encoding="utf-8")) or {}
         except yaml.YAMLError as exc:  # pragma: no cover - defensive
             logger.warning("WARNING: surfaces.yaml is invalid (%s) — using legacy fallback", exc)
             return [self._legacy_single_surface()]
-        raw: dict[str, Any] = (
-            cast(dict[str, Any], parsed) if isinstance(parsed, dict) else {}
-        )
+        raw: dict[str, Any] = cast(dict[str, Any], parsed) if isinstance(parsed, dict) else {}
         entries_raw = raw.get("surfaces", [])
         entries = cast(list[Any], entries_raw) if isinstance(entries_raw, list) else []
         loaded: list[Surface] = []
@@ -298,9 +298,7 @@ class Phase4_5Dispatcher:
 
         if not handler.detect():
             message = handler.preflight_message() or f"{surface.runner} preflight failed"
-            logger.error(
-                "BLOCKED at step preflight - tooling_missing - %s", message
-            )
+            logger.error("BLOCKED at step preflight - tooling_missing - %s", message)
             return [
                 VisualPhaseResult(
                     surface_id=surface.id,
@@ -379,9 +377,7 @@ class Phase4_5Dispatcher:
                 outcome.metadata.get("exported_paths", []) if outcome.metadata else []
             )
             exported_paths: list[Any] = (
-                cast(list[Any], exported_paths_raw)
-                if isinstance(exported_paths_raw, list)
-                else []
+                cast(list[Any], exported_paths_raw) if isinstance(exported_paths_raw, list) else []
             )
             cached = bool(outcome.metadata.get("cached")) if outcome.metadata else False
             empty_attachments = (

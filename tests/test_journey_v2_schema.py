@@ -1,3 +1,15 @@
+# LiveSpec traceability anchors
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-018)
+# @spec(AC-035)
+# @spec(AC-036)
+# @spec(AC-037)
+# @spec(AC-039)
+# @spec(AC-042)
+# @spec(AC-043)
+
 """Tests for User Journeys v2 schema boundary models."""
 
 from __future__ import annotations

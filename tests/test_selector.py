@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(AC-020)
+
 """Unit tests for the smart test selector.
 
 See .specs/features/033-smart-test-selection/spec.md#fr-009 for details.

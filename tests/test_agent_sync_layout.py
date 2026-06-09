@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-045)
+
 """Tests for LiveSpec's canonical agent-sync source layout."""
 
 from __future__ import annotations

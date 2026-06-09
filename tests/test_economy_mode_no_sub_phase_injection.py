@@ -22,9 +22,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-FEATURE_MD = (
-    Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-feature" / "SKILL.md"
-)
+FEATURE_MD = Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-feature" / "SKILL.md"
 
 
 def _economy_blockquote_sections() -> list[str]:

@@ -1,3 +1,13 @@
+## 2026-06-08 — [Spec Update]: Normalize changelog format
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **AC impacted:** None
+- **Author:** spec.doctor
+
+---
+
 # Changelog — Feature 004: Visual Testing Governance
 
 ### 2026-05-23 — Fix: Enforce legacy mockup hashes in visual gate

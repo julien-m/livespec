@@ -1,3 +1,8 @@
+// LiveSpec traceability anchors
+// @spec(AC-004)
+// @spec(AC-005)
+// @spec(FR-002)
+
 // @spec FR-004: enumerate Xcode test targets — .specs/features/037-test-multi-runner-integration/spec.md#fr-004
 // @spec FR-005: fallback when pbxproj parse fails — .specs/features/037-test-multi-runner-integration/spec.md#fr-005
 // @spec FR-007: watch/widget classification — .specs/features/037-test-multi-runner-integration/spec.md#fr-007

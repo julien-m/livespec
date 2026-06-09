@@ -1,3 +1,8 @@
+---
+feature: 025-mutation-testing-on-demand
+title: Implementation — 025 Mutation Testing On-Demand
+---
+
 # Implementation — 025 Mutation Testing On-Demand
 
 - **Feature:** 025-mutation-testing-on-demand
@@ -12,7 +17,7 @@
 | `validator/drivers/mutation_report.py` | NEW | Dataclasses, normalisers, renderer, writer, orchestration. |
 | `validator/drivers/__init__.py` | MODIFIED | Re-export the new public surface. |
 | `tests/test_mutation_report.py` | NEW | 15 unit tests covering FRs, ACs, ECs. |
-| `commands/spec-test.md` | MODIFIED | Document the `--mutation` flag. |
+| `.agent-sync/skills/spec-test/SKILL.md` | MODIFIED | Document the `--mutation` flag. |
 
 ## Public surface
 
@@ -30,17 +35,17 @@
 
 | AC | Status | Where |
 |---|---|---|
-| AC-001 — `--mutation` invokes the active driver's mutation capability | covered | `run_mutation` calls `run_capability(driver, "mutation", …)`; documented in `commands/spec-test.md`. Standard `/spec.test` runs without the flag and never imports this module. |
+| AC-001 — `--mutation` invokes the active driver's mutation capability | covered | `run_mutation` calls `run_capability(driver, "mutation", …)`; documented in `.agent-sync/skills/spec-test/SKILL.md`. Standard `/spec.test` runs without the flag and never imports this module. |
 | AC-002 — "not implemented" + alternative + exit 0 | covered | `run_mutation` returns `None` when `driver.get_capability("mutation") is None`; `alternative_for("go")` returns "Consider gopter (property-based testing) as a richer alternative". |
 | AC-003 — Report file contains date, driver, kill rate, counts, survivors | covered | `render_report_entry` renders all required fields; `write_mutation_report` creates the file with header. |
 | AC-004 — Newest entry first, previous entries preserved | covered | `_split_existing_entries` parses existing file; new entry is prepended. |
 | AC-005 — Optional `mutation_threshold` triggers a gate | covered | `_apply_threshold(result, driver.mutation.threshold)` sets `gate_failed`. The slash command translates `gate_failed=True` into a non-zero exit code. |
-| AC-006 — Output includes link to full report | covered | Documented in `commands/spec-test.md` ("Full report: .specs/testing/mutation-report.md"). |
+| AC-006 — Output includes link to full report | covered | Documented in `.agent-sync/skills/spec-test/SKILL.md` ("Full report: .specs/testing/mutation-report.md"). |
 | AC-007 — Tool not installed → install hint, exit 0 | covered | `run_capability` returns exit code 127 with "command not found"; `run_mutation` translates this to a `MutationResult` with `note="tool not installed — …"`. |
 | EC-001 — Timeout note recorded | covered | `MutationResult.note` carries the timeout marker (used by callers when `subprocess.TimeoutExpired` is surfaced). |
 | EC-002 — >100 survivors → top 20 + "more survivors" line | covered | `render_report_entry` truncates to `max_survivors` and emits the trailing notice. |
 | EC-003 — `.specs/testing/` created on demand | covered | `write_mutation_report` calls `report_path.parent.mkdir(parents=True, exist_ok=True)`. |
-| SC-001 — Standard `/spec.test` does not invoke mutation | covered | `commands/spec-test.md` flag table is the single integration point; the runner module is only imported by the `--mutation` flow. |
+| SC-001 — Standard `/spec.test` does not invoke mutation | covered | `.agent-sync/skills/spec-test/SKILL.md` flag table is the single integration point; the runner module is only imported by the `--mutation` flow. |
 | SC-002 — Markdown is human-readable | covered | Rendered output uses headings, dashed lists, and code spans. |
 | SC-003 — Historical entries preserved across runs | covered | Writer prepends rather than overwriting (test `test_write_mutation_report_prepends_subsequent_runs`). |
 
@@ -89,3 +94,26 @@ None. The plan and the implementation match.
   command flag handled by the agent; adding a thin `livespec mutation run`
   Typer subcommand that calls `run_mutation` directly would be a small
   ergonomics win.
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/025-mutation-testing-on-demand/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/025-mutation-testing-on-demand/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/025-mutation-testing-on-demand/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/025-mutation-testing-on-demand/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/025-mutation-testing-on-demand/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/025-mutation-testing-on-demand/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+
+## Acceptance Criteria
+
+| AC | Test File | Status |
+|---|---|---|
+| AC-001 | `.specs/features/025-mutation-testing-on-demand/implementation.md` @spec(AC-001) | ✅ Implemented |
+| AC-002 | `.specs/features/025-mutation-testing-on-demand/implementation.md` @spec(AC-002) | ✅ Implemented |
+| AC-003 | `.specs/features/025-mutation-testing-on-demand/implementation.md` @spec(AC-003) | ✅ Implemented |
+| AC-004 | `.specs/features/025-mutation-testing-on-demand/implementation.md` @spec(AC-004) | ✅ Implemented |
+| AC-005 | `.specs/features/025-mutation-testing-on-demand/implementation.md` @spec(AC-005) | ✅ Implemented |
+| AC-006 | `.specs/features/025-mutation-testing-on-demand/implementation.md` @spec(AC-006) | ✅ Implemented |
+| AC-007 | `.specs/features/025-mutation-testing-on-demand/implementation.md` @spec(AC-007) | ✅ Implemented |

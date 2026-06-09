@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 # @spec FR-001: Python driver YAML with all 4 capabilities — .specs/features/017-driver-python/spec.md#fr-001
 name: python
 detect:

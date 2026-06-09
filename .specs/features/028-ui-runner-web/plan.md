@@ -1,6 +1,8 @@
 ---
-title: "UI Runner Web (Playwright Refactor) — Plan"
-status: "Approved"
+created: 2026-05-07
+spec_ref: .specs/features/028-ui-runner-web/spec.md
+status: Approved
+title: UI Runner Web (Playwright Refactor) — Plan
 updated: 2026-05-07
 ---
 

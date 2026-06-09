@@ -1,8 +1,8 @@
 ---
-title: "Smart Test Selection"
-status: "In Progress"
-priority: "P2"
 created: 2026-05-06
+priority: P2
+status: Implemented
+title: Smart Test Selection
 updated: 2026-05-07
 ---
 

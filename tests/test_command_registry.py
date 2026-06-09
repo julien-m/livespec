@@ -1,3 +1,13 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-003)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-011)
+# @spec(AC-045)
+# @spec(FR-010)
+# @spec(FR-011)
+
 """Tests for the canonical LiveSpec command registry."""
 
 from __future__ import annotations

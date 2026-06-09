@@ -60,9 +60,7 @@ def test_capture_screenshot_returns_capability_unsupported_when_driver_missing(
     _seed_tauri_app(tmp_path)
     monkeypatch.setattr("validator.ui_runner_tauri.shutil.which", lambda _bin: None)
     handler = TauriRunnerHandler(tmp_path)
-    outcome = handler.capture_screenshot(
-        "dash", feature_slug="050-foo", run_id="20260523T000000Z"
-    )
+    outcome = handler.capture_screenshot("dash", feature_slug="050-foo", run_id="20260523T000000Z")
     assert outcome.success is False
     assert outcome.metadata.get("capability_state") == "tauri_driver_missing"
     assert outcome.metadata.get("target") == "tauri"
@@ -89,9 +87,7 @@ def test_capture_screenshot_returns_capability_unsupported_when_no_capture_fn(
         lambda _bin: "/usr/local/bin/tauri-driver",
     )
     handler = TauriRunnerHandler(tmp_path)
-    outcome = handler.capture_screenshot(
-        "dash", feature_slug="050-foo", run_id="20260523T000000Z"
-    )
+    outcome = handler.capture_screenshot("dash", feature_slug="050-foo", run_id="20260523T000000Z")
     assert outcome.success is False
     assert outcome.metadata.get("capability_state") == "no_capture_implementation"
 
@@ -112,9 +108,7 @@ def test_capture_screenshot_invokes_injected_capture_fn(
         return True
 
     handler = TauriRunnerHandler(tmp_path, capture_fn=fake_capture)
-    outcome = handler.capture_screenshot(
-        "home", feature_slug="050-foo", run_id="20260523T000000Z"
-    )
+    outcome = handler.capture_screenshot("home", feature_slug="050-foo", run_id="20260523T000000Z")
     assert outcome.success is True
     assert outcome.output_path is not None
     assert outcome.output_path.exists()

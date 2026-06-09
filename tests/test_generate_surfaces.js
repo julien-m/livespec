@@ -1,3 +1,12 @@
+// LiveSpec traceability anchors
+// @spec(AC-003)
+// @spec(AC-004)
+// @spec(AC-005)
+// @spec(AC-006)
+// @spec(FR-002)
+// @spec(FR-005)
+// @spec(FR-006)
+
 // Tests for scripts/generate-surfaces.js — multi-surface detection and migration.
 // Feature 036.
 

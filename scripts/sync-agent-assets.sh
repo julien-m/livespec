@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 set -euo pipefail
 shopt -s nullglob
 

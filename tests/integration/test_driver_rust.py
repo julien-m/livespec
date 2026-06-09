@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-004)
+
 """Integration checks for the built-in Rust driver manifest."""
 
 # @spec FR-004: Integration tests for the Rust driver
@@ -16,9 +19,7 @@ from validator.drivers.rust_detector import (
 )
 from validator.drivers.schemas import DriverManifest
 
-_RUST_DRIVER_PATH = (
-    Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "rust.yaml"
-)
+_RUST_DRIVER_PATH = Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "rust.yaml"
 
 
 def _load_rust_manifest() -> DriverManifest:

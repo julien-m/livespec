@@ -8,6 +8,9 @@ supersedes: [3]
 invalidates_restore_points: [3]
 replaces_when_unapplied: [3]
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-007) -->
+
 
 # Migration v17: Penflow Backfill + Migration Planner Metadata
 

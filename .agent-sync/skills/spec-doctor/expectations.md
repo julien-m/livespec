@@ -1,8 +1,11 @@
 ---
 command: spec-doctor
 contract_version: "1.0"
-last_reviewed: 2026-06-04
+last_reviewed: 2026-06-09
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-011) -->
+
 
 # Expectations — /spec-doctor
 

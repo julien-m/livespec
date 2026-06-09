@@ -196,8 +196,10 @@ def normalise_pitest(
     suite reproduced an unstable behaviour) — consistent with the kill-rate
     semantics used by Stryker.
     """
-    killed = int(counts.get("killed", 0)) + int(counts.get("memory_error", 0)) + int(
-        counts.get("run_error", 0)
+    killed = (
+        int(counts.get("killed", 0))
+        + int(counts.get("memory_error", 0))
+        + int(counts.get("run_error", 0))
     )
     survived = int(counts.get("survived", 0))
     timeout = int(counts.get("timed_out", 0))
@@ -310,17 +312,13 @@ def render_report_entry(
     if survivors:
         shown = list(survivors[:max_survivors])
         lines.append("")
-        lines.append(
-            f"- Survivors (showing {len(shown)} of {len(survivors)}):"
-        )
+        lines.append(f"- Survivors (showing {len(shown)} of {len(survivors)}):")
         for surv in shown:
             descr = f" — {surv.description}" if surv.description else ""
             lines.append(f"  - `{surv.file}:{surv.line}`{descr}")
         if len(survivors) > max_survivors:
             extra = len(survivors) - max_survivors
-            lines.append(
-                f"  - … {extra} more survivors — run tool directly for full list"
-            )
+            lines.append(f"  - … {extra} more survivors — run tool directly for full list")
     else:
         lines.append("")
         lines.append("- Survivors: 0")
@@ -411,9 +409,7 @@ def _apply_threshold(result: MutationResult, threshold: float | None) -> Mutatio
     )
 
 
-def _dispatch_parser(
-    driver: DriverManifest, capability_result: CapabilityResult
-) -> MutationResult:
+def _dispatch_parser(driver: DriverManifest, capability_result: CapabilityResult) -> MutationResult:
     """Dispatch the capability output to the matching per-driver parser.
 
     Args:
@@ -588,8 +584,7 @@ def mutation_result_to_dict(result: MutationResult) -> dict[str, object]:
         "timeout": result.timeout,
         "no_coverage": result.no_coverage,
         "survivors": [
-            {"file": s.file, "line": s.line, "description": s.description}
-            for s in result.survivors
+            {"file": s.file, "line": s.line, "description": s.description} for s in result.survivors
         ],
         "note": result.note,
         "gate_failed": result.gate_failed,

@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-015)
+
 """Bootstrap User Journeys v2 candidates from existing LiveSpec projects."""
 
 # @spec FR-015: bootstrap existing specs into candidate cross-feature journeys without writing

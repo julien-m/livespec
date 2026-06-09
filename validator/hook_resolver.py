@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Hook-injection chain resolver (Level 0 → Level 1 → Level 2 → Level 3).
 
 This module is the SINGLE source of truth for the runtime resolution of
@@ -164,17 +167,11 @@ def resolve_injection_chain(
     * ``override`` at Level 3 → only L3 is kept among L1/L2/L3 (L0 still injected).
     """
     if event not in VALID_PHASES:
-        raise ValueError(
-            f"event must be one of {sorted(VALID_PHASES)}, got: {event!r}"
-        )
+        raise ValueError(f"event must be one of {sorted(VALID_PHASES)}, got: {event!r}")
     command = normalize_command_name(command)
 
     cwd = project_root if project_root is not None else Path.cwd()
-    ctx = (
-        feature_ctx
-        if feature_ctx is not None
-        else _build_feature_ctx(command, None, cwd)
-    )
+    ctx = feature_ctx if feature_ctx is not None else _build_feature_ctx(command, None, cwd)
 
     # --- Level 0 -----------------------------------------------------------
     all_l0 = discover_integrations(
@@ -186,13 +183,9 @@ def resolve_injection_chain(
     overrides = [i for i in l0_matching if i.mode == "override"]
     if len(overrides) > 1:
         paths = ", ".join(str(o.path) for o in overrides)
-        raise ValueError(
-            f"Multiple override integrations for event {event}-{command}: {paths}"
-        )
+        raise ValueError(f"Multiple override integrations for event {event}-{command}: {paths}")
 
-    l0_bodies = (
-        [overrides[0].body] if overrides else [i.body for i in l0_matching]
-    )
+    l0_bodies = [overrides[0].body] if overrides else [i.body for i in l0_matching]
 
     # --- Level 1/2/3 -------------------------------------------------------
     global_dir = global_hooks_dir if global_hooks_dir is not None else GLOBAL_HOOKS_DIR

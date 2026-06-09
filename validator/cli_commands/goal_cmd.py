@@ -1,3 +1,12 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-008)
+# @spec(FR-009)
+# @spec(FR-010)
+# @spec(FR-016)
+
 """``livespec goal`` — render and prove deterministic command goals.
 
 # @spec FR-008, FR-009, FR-016, FR-017, FR-018
@@ -162,9 +171,7 @@ def _detect_livespec_root() -> Path:
     """Resolve the LiveSpec checkout root by walking parents of this module."""
     here = Path(__file__).resolve()
     for parent in here.parents:
-        if (parent / ".agent-sync" / "skills").is_dir() and (
-            parent / "validator"
-        ).is_dir():
+        if (parent / ".agent-sync" / "skills").is_dir() and (parent / "validator").is_dir():
             return parent
     return here.parents[2]
 

@@ -365,15 +365,11 @@ def _bucket_for_kind(kind: str, *, in_tabbar: bool) -> str | None:
 
 # Match a `tapFirstAvailable([...])` or `tapAnyTab([...])` call
 # inside a test method whose body contains `snapshot("<screen>")`.
-_TAP_PATTERN = re.compile(
-    r"(?P<call>tap(?:FirstAvailable|AnyTab))\(\s*\[(?P<args>[^\]]*)\]"
-)
+_TAP_PATTERN = re.compile(r"(?P<call>tap(?:FirstAvailable|AnyTab))\(\s*\[(?P<args>[^\]]*)\]")
 _SNAPSHOT_PATTERN = re.compile(r"snapshot\(\"(?P<name>[^\"]+)\"\)")
 
 
-def rewrite_swift_candidates(
-    swift_path: Path, inventories: dict[str, dict[str, list[str]]]
-) -> int:
+def rewrite_swift_candidates(swift_path: Path, inventories: dict[str, dict[str, list[str]]]) -> int:
     """Rewrite the candidate lists of `tapFirstAvailable`/`tapAnyTab` calls.
 
     For each test method that contains `snapshot("<screen>")`, look up the
@@ -435,9 +431,7 @@ def _split_methods(text: str) -> list[str]:
     return parts
 
 
-def _replace_taps_in_method(
-    method_text: str, inv: dict[str, list[str]]
-) -> tuple[str, bool]:
+def _replace_taps_in_method(method_text: str, inv: dict[str, list[str]]) -> tuple[str, bool]:
     """Replace tap candidate lists in one method with the discovered labels.
 
     `tapAnyTab(...)` is updated with `tabs`. `tapFirstAvailable(...)` prefers

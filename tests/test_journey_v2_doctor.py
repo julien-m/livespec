@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-019)
+# @spec(AC-044)
+
 """Doctor scanner tests for User Journeys v2."""
 
 from __future__ import annotations

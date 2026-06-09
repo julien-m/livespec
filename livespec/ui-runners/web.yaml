@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 # Built-in UI Runner: Web (Playwright)
 # Reference implementation for Feature 027 UI Runner Architecture
 # Validates the 027 pattern on a known, proven Playwright + pixelmatch implementation

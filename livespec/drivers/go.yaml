@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 # @spec FR-001: Go driver YAML — .specs/features/020-driver-go/spec.md#fr-001
 # Mutation capability is intentionally omitted: go-mutesting is unmaintained
 # and there is no maintained Go mutation testing tool. The runner surfaces

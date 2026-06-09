@@ -1,3 +1,13 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-016)
+
 """Regression tests for mandatory visual certification during implementation.
 
 # @spec FR-006: Regression tests
@@ -132,9 +142,7 @@ def _setup_minimal_visual_feature(project_root: Path, slug: str) -> Path:
     screen_png.parent.mkdir(parents=True, exist_ok=True)
     screen_png.write_bytes(b"mockup-png")
     # Approved baseline registry.
-    baseline = (
-        project_root / ".specs" / "design" / "baselines" / slug / "web" / "dash.png"
-    )
+    baseline = project_root / ".specs" / "design" / "baselines" / slug / "web" / "dash.png"
     baseline.parent.mkdir(parents=True, exist_ok=True)
     baseline.write_bytes(b"approved-baseline")
     return feature_dir
@@ -147,9 +155,7 @@ def test_variant_missing_mockup_blocks_gate(tmp_path: Path) -> None:
     slug = "vbm-missing-mockup"
     feature_dir = tmp_path / ".specs" / "features" / slug
     feature_dir.mkdir(parents=True, exist_ok=True)
-    (feature_dir / "spec.md").write_text(
-        "---\nvisual: true\n---\n# Spec\n", encoding="utf-8"
-    )
+    (feature_dir / "spec.md").write_text("---\nvisual: true\n---\n# Spec\n", encoding="utf-8")
     report = validate_gate(
         project_root=tmp_path,
         feature_slug=slug,
@@ -170,9 +176,7 @@ def test_variant_missing_baseline_manifest_target_dir_blocks_gate(
     slug = "vbm-no-baseline-target"
     feature_dir = tmp_path / ".specs" / "features" / slug
     feature_dir.mkdir(parents=True, exist_ok=True)
-    (feature_dir / "spec.md").write_text(
-        "---\nvisual: true\n---\n# Spec\n", encoding="utf-8"
-    )
+    (feature_dir / "spec.md").write_text("---\nvisual: true\n---\n# Spec\n", encoding="utf-8")
     screen_png = tmp_path / ".specs" / "design" / "screens" / slug / "dash.png"
     screen_png.parent.mkdir(parents=True, exist_ok=True)
     screen_png.write_bytes(b"mockup")
@@ -195,12 +199,8 @@ def test_variant_runtime_under_design_screens_fails_gate(tmp_path: Path) -> None
     _setup_minimal_visual_feature(tmp_path, slug)
     # Overwrite the mockup with the SAME bytes as the approved baseline →
     # circular comparison.
-    baseline_bytes = (
-        tmp_path / ".specs/design/baselines" / slug / "web" / "dash.png"
-    ).read_bytes()
-    (tmp_path / ".specs/design/screens" / slug / "dash.png").write_bytes(
-        baseline_bytes
-    )
+    baseline_bytes = (tmp_path / ".specs/design/baselines" / slug / "web" / "dash.png").read_bytes()
+    (tmp_path / ".specs/design/screens" / slug / "dash.png").write_bytes(baseline_bytes)
     report = validate_gate(
         project_root=tmp_path,
         feature_slug=slug,
@@ -218,9 +218,7 @@ def test_variant_physical_copy_instead_of_symlink_fails_gate(tmp_path: Path) -> 
 
     slug = "vbm-physical-copy"
     _setup_minimal_visual_feature(tmp_path, slug)
-    feature_local = (
-        tmp_path / ".specs/features" / slug / "baselines" / "dash.png"
-    )
+    feature_local = tmp_path / ".specs/features" / slug / "baselines" / "dash.png"
     feature_local.parent.mkdir(parents=True, exist_ok=True)
     feature_local.write_bytes(b"physical-copy-not-symlink")
     report = validate_gate(
@@ -231,9 +229,7 @@ def test_variant_physical_copy_instead_of_symlink_fails_gate(tmp_path: Path) -> 
         strict_links=True,
     )
     assert report.verdict == "FAIL"
-    assert any(
-        v.kind == "physical_copy_where_link_required" for v in report.link_violations
-    )
+    assert any(v.kind == "physical_copy_where_link_required" for v in report.link_violations)
 
 
 def test_variant_broken_symlink_in_feature_baselines_fails_gate(
@@ -247,9 +243,7 @@ def test_variant_broken_symlink_in_feature_baselines_fails_gate(
 
     slug = "vbm-broken-symlink"
     _setup_minimal_visual_feature(tmp_path, slug)
-    feature_local = (
-        tmp_path / ".specs/features" / slug / "baselines" / "dash.png"
-    )
+    feature_local = tmp_path / ".specs/features" / slug / "baselines" / "dash.png"
     feature_local.parent.mkdir(parents=True, exist_ok=True)
     os.symlink("does-not-exist.png", feature_local)
     # JSON is a valid YAML subset, so the production yaml.safe_load parses
@@ -264,12 +258,8 @@ def test_variant_broken_symlink_in_feature_baselines_fails_gate(
                     {
                         "screen": "dash",
                         "kind": "symlink",
-                        "registry_path": (
-                            f".specs/design/baselines/{slug}/web/dash.png"
-                        ),
-                        "feature_local_path": (
-                            f".specs/features/{slug}/baselines/dash.png"
-                        ),
+                        "registry_path": (f".specs/design/baselines/{slug}/web/dash.png"),
+                        "feature_local_path": (f".specs/features/{slug}/baselines/dash.png"),
                         "sha256": None,
                     }
                 ],
@@ -361,9 +351,7 @@ def test_variant_legacy_manifest_stale_mockup_hash_fails_gate(tmp_path: Path) ->
     )
 
     assert report.verdict == "FAIL"
-    assert any(
-        v.kind == "manifest_mockup_sha_mismatch" for v in report.link_violations
-    )
+    assert any(v.kind == "manifest_mockup_sha_mismatch" for v in report.link_violations)
 
 
 def test_variant_legacy_manifest_mockup_path_mapping_passes(tmp_path: Path) -> None:
@@ -377,13 +365,9 @@ def test_variant_legacy_manifest_mockup_path_mapping_passes(tmp_path: Path) -> N
     feature_dir = _setup_minimal_visual_feature(tmp_path, slug)
     mockup_path = tmp_path / ".specs" / "design" / "screens" / slug / "dash.png"
     _write_png(mockup_path, (10, 20, 30))
-    baseline_path = (
-        tmp_path / ".specs" / "design" / "baselines" / slug / "web" / "dash.png"
-    )
+    baseline_path = tmp_path / ".specs" / "design" / "baselines" / slug / "web" / "dash.png"
     baseline_path.unlink()
-    runtime_path = (
-        tmp_path / ".specs" / "features" / slug / "run/manual/web/dash.png"
-    )
+    runtime_path = tmp_path / ".specs" / "features" / slug / "run/manual/web/dash.png"
     _write_png(runtime_path, (10, 20, 30))
     manifest = feature_dir / "baselines" / "baseline.manifest.yml"
     manifest.parent.mkdir(parents=True, exist_ok=True)
@@ -436,9 +420,7 @@ def test_variant_missing_compare_report_blocks_gate(tmp_path: Path) -> None:
     slug = "vbm-no-compare-report"
     _setup_minimal_visual_feature(tmp_path, slug)
     # Create an INCOMPLETE design-alignment dir (no design/runtime contracts).
-    alignment_dir = (
-        tmp_path / ".specs/features" / slug / "design-alignment" / "dash"
-    )
+    alignment_dir = tmp_path / ".specs/features" / slug / "design-alignment" / "dash"
     alignment_dir.mkdir(parents=True, exist_ok=True)
     report = validate_gate(
         project_root=tmp_path,
@@ -463,9 +445,7 @@ def test_variant_compare_report_fail_propagates_to_gate(tmp_path: Path) -> None:
     slug = "vbm-alignment-fail"
     _setup_minimal_visual_feature(tmp_path, slug)
     # Seed a design-alignment screen dir with contracts that will FAIL.
-    screen_dir = (
-        tmp_path / ".specs/features" / slug / "design-alignment" / "dash"
-    )
+    screen_dir = tmp_path / ".specs/features" / slug / "design-alignment" / "dash"
     screen_dir.mkdir(parents=True, exist_ok=True)
     design = {
         "screen": "dash",
@@ -479,23 +459,15 @@ def test_variant_compare_report_fail_propagates_to_gate(tmp_path: Path) -> None:
             "header_height": 0,
             "decorative_shell": False,
         },
-        "nodes": [
-            {"id": "n1", "name": "btn", "type": "button", "text": "Click"}
-        ],
+        "nodes": [{"id": "n1", "name": "btn", "type": "button", "text": "Click"}],
     }
     runtime_drift = {
         "screen": "dash",
         "support": design["support"],
-        "nodes": [
-            {"id": "n1", "name": "btn", "type": "button", "text": "Tap me"}
-        ],
+        "nodes": [{"id": "n1", "name": "btn", "type": "button", "text": "Tap me"}],
     }
-    (screen_dir / "design-contract.json").write_text(
-        json.dumps(design), encoding="utf-8"
-    )
-    (screen_dir / "runtime-contract.json").write_text(
-        json.dumps(runtime_drift), encoding="utf-8"
-    )
+    (screen_dir / "design-contract.json").write_text(json.dumps(design), encoding="utf-8")
+    (screen_dir / "runtime-contract.json").write_text(json.dumps(runtime_drift), encoding="utf-8")
     report = validate_gate(
         project_root=tmp_path,
         feature_slug=slug,
@@ -578,9 +550,7 @@ def _write_normalized_contract(path: Path, screen: str) -> None:
             "header_height": 0,
             "decorative_shell": False,
         },
-        "nodes": [
-            {"id": "n1", "name": "btn", "type": "button", "text": "Click"}
-        ],
+        "nodes": [{"id": "n1", "name": "btn", "type": "button", "text": "Click"}],
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(_json.dumps(payload), encoding="utf-8")
@@ -598,9 +568,7 @@ def test_alignment_manifest_with_shared_sources_without_receipt_blocks_gate(
 
     slug = "vbm-shared-manifest"
     _setup_minimal_visual_feature(tmp_path, slug)
-    alignment_root = (
-        tmp_path / ".specs/features" / slug / "design-alignment"
-    )
+    alignment_root = tmp_path / ".specs/features" / slug / "design-alignment"
     shared_design = alignment_root / "normalized-design.json"
     shared_runtime = alignment_root / "normalized-runtime.json"
     _write_normalized_contract(shared_design, "dash")
@@ -610,12 +578,8 @@ def test_alignment_manifest_with_shared_sources_without_receipt_blocks_gate(
     screen_dir.mkdir(parents=True, exist_ok=True)
     manifest = {
         "screen": "dash",
-        "design_source": (
-            f".specs/features/{slug}/design-alignment/normalized-design.json"
-        ),
-        "runtime_source": (
-            f".specs/features/{slug}/design-alignment/normalized-runtime.json"
-        ),
+        "design_source": (f".specs/features/{slug}/design-alignment/normalized-design.json"),
+        "runtime_source": (f".specs/features/{slug}/design-alignment/normalized-runtime.json"),
     }
     (screen_dir / "design-alignment.manifest.json").write_text(
         _json.dumps(manifest), encoding="utf-8"
@@ -643,9 +607,7 @@ def test_alignment_manifest_malformed_keeps_blocked(tmp_path: Path) -> None:
 
     slug = "vbm-manifest-malformed"
     _setup_minimal_visual_feature(tmp_path, slug)
-    screen_dir = (
-        tmp_path / ".specs/features" / slug / "design-alignment" / "dash"
-    )
+    screen_dir = tmp_path / ".specs/features" / slug / "design-alignment" / "dash"
     screen_dir.mkdir(parents=True, exist_ok=True)
     (screen_dir / "design-alignment.manifest.json").write_text(
         '{"screen": "dash"}', encoding="utf-8"
@@ -659,10 +621,7 @@ def test_alignment_manifest_malformed_keeps_blocked(tmp_path: Path) -> None:
         strict_links=True,
     )
     assert report.verdict == "BLOCKED"
-    assert any(
-        "design_source" in m or "runtime_source" in m
-        for m in report.missing_artifacts
-    )
+    assert any("design_source" in m or "runtime_source" in m for m in report.missing_artifacts)
 
 
 def test_alignment_manifest_unresolved_source_keeps_blocked(tmp_path: Path) -> None:
@@ -673,9 +632,7 @@ def test_alignment_manifest_unresolved_source_keeps_blocked(tmp_path: Path) -> N
 
     slug = "vbm-manifest-unresolved"
     _setup_minimal_visual_feature(tmp_path, slug)
-    screen_dir = (
-        tmp_path / ".specs/features" / slug / "design-alignment" / "dash"
-    )
+    screen_dir = tmp_path / ".specs/features" / slug / "design-alignment" / "dash"
     screen_dir.mkdir(parents=True, exist_ok=True)
     manifest = {
         "screen": "dash",

@@ -2,6 +2,9 @@
 name: spec-plan
 description: Migrated Claude command /spec-plan
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-005) -->
+
 
 # /spec-plan
 

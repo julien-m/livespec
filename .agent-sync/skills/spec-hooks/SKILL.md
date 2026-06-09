@@ -2,6 +2,9 @@
 name: spec-hooks
 description: Migrated Claude command /spec-hooks
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-010) -->
+
 
 # /spec-hooks
 

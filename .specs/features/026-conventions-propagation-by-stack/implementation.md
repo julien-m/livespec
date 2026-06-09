@@ -1,3 +1,8 @@
+---
+feature: 026-conventions-propagation-by-stack
+title: Conventions Propagation by Stack
+---
+
 # Implementation: Conventions Propagation by Stack
 
 - **Feature:** 026-conventions-propagation-by-stack
@@ -57,3 +62,15 @@ Implemented per-stack test config propagation as a pure-Python module
 - `pick_primary_driver` resolves polyglot projects deterministically by
   match count; ties fall back to the input order from `DriverRegistry`
   (custom drivers > built-ins, alphabetical within each tier).
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/026-conventions-propagation-by-stack/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/026-conventions-propagation-by-stack/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/026-conventions-propagation-by-stack/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/026-conventions-propagation-by-stack/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/026-conventions-propagation-by-stack/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/026-conventions-propagation-by-stack/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/026-conventions-propagation-by-stack/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |

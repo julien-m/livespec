@@ -1,4 +1,12 @@
 #!/usr/bin/env node
+// LiveSpec traceability anchors
+// @spec(AC-004)
+// @spec(AC-006)
+// @spec(FR-001)
+// @spec(FR-002)
+// @spec(FR-005)
+// @spec(FR-006)
+
 // Migration script: generates .specs/surfaces.yaml from filesystem detection.
 // Idempotent: skips if surfaces.yaml already exists (unless --force or --migrate-surfaces).
 //

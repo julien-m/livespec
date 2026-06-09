@@ -152,9 +152,7 @@ def _patch_run(
 
     calls: list[RunCall] = []
 
-    def fake_run(
-        cmd: Sequence[str] | str, **kwargs: object
-    ) -> subprocess.CompletedProcess[str]:
+    def fake_run(cmd: Sequence[str] | str, **kwargs: object) -> subprocess.CompletedProcess[str]:
         calls.append((cmd, kwargs))
         return result
 
@@ -178,9 +176,7 @@ def test_fix_item_installs_when_missing(monkeypatch: pytest.MonkeyPatch) -> None
     def fake_which_2(b: str) -> str | None:
         return "/usr/bin/" + b if state["installed"] else None
 
-    def fake_run(
-        cmd: Sequence[str] | str, **kwargs: object
-    ) -> subprocess.CompletedProcess[str]:
+    def fake_run(cmd: Sequence[str] | str, **kwargs: object) -> subprocess.CompletedProcess[str]:
         del kwargs
         state["installed"] = True
         return subprocess.CompletedProcess(args=cmd, returncode=0, stdout="", stderr="")
@@ -215,9 +211,7 @@ def test_fix_item_failed_install(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(af, "_which", fake_which_4)
     _patch_run(
         monkeypatch,
-        subprocess.CompletedProcess(
-            args=[], returncode=1, stdout="", stderr="boom"
-        ),
+        subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="boom"),
     )
     item = PreflightItem("x", "x", "brew", "x")
     res = fix_item(item)
@@ -248,9 +242,7 @@ def test_fix_item_auto_skips_unsafe_prompt(monkeypatch: pytest.MonkeyPatch) -> N
     def fake_which_5(b: str) -> str | None:
         return "/usr/bin/" + b if state2["installed"] else None
 
-    def fake_run_2(
-        cmd: Sequence[str] | str, **kwargs: object
-    ) -> subprocess.CompletedProcess[str]:
+    def fake_run_2(cmd: Sequence[str] | str, **kwargs: object) -> subprocess.CompletedProcess[str]:
         del kwargs
         state2["installed"] = True
         return subprocess.CompletedProcess(args=cmd, returncode=0, stdout="", stderr="")
@@ -285,9 +277,7 @@ def test_run_fix_smart_scoping_skips_unrelated(
     def fake_which_7(b: str) -> str:
         return "/usr/bin/" + b
 
-    def fake_changed_files(
-        repo: Path, *, base: str = "HEAD~1", head: str = "HEAD"
-    ) -> list[str]:
+    def fake_changed_files(repo: Path, *, base: str = "HEAD~1", head: str = "HEAD") -> list[str]:
         del repo, base, head
         return ["app.py"]
 
@@ -307,9 +297,7 @@ def test_run_fix_full_disables_smart_scoping(
     def fake_which_8(b: str) -> str:
         return "/usr/bin/" + b
 
-    def fake_changed_files_2(
-        repo: Path, *, base: str = "HEAD~1", head: str = "HEAD"
-    ) -> list[str]:
+    def fake_changed_files_2(repo: Path, *, base: str = "HEAD~1", head: str = "HEAD") -> list[str]:
         del repo, base, head
         return ["app.py"]
 
@@ -329,9 +317,7 @@ def test_run_fix_no_changes_falls_back_to_full(
     def fake_which_9(b: str) -> str:
         return "/usr/bin/" + b
 
-    def fake_changed_files_3(
-        repo: Path, *, base: str = "HEAD~1", head: str = "HEAD"
-    ) -> list[str]:
+    def fake_changed_files_3(repo: Path, *, base: str = "HEAD~1", head: str = "HEAD") -> list[str]:
         del repo, base, head
         return []
 
@@ -370,10 +356,7 @@ def test_exit_code_for_priority() -> None:
     assert exit_code_for([FixResult(item, "manual_required")]) == 2
     assert exit_code_for([FixResult(item, "failed")]) == 1
     # failed wins over manual_required
-    assert (
-        exit_code_for([FixResult(item, "manual_required"), FixResult(item, "failed")])
-        == 1
-    )
+    assert exit_code_for([FixResult(item, "manual_required"), FixResult(item, "failed")]) == 1
 
 
 # --- Manifest parsing ------------------------------------------------------

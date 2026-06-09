@@ -1,7 +1,8 @@
 ---
-title: "Unified CLI Surface — Plan"
-status: "Approved"
 created: 2026-05-07
+spec_ref: .specs/features/035-unified-cli-surface/spec.md
+status: Approved
+title: Unified CLI Surface — Plan
 updated: 2026-05-07
 ---
 
@@ -54,3 +55,25 @@ Add 5 new Typer subcommands (`test`, `coverage`, `drivers`, `mutation`, `preflig
 | 3 | Coverage threshold failed |
 | 4 | Capability not supported by driver |
 | 5 | Preflight critical failure |
+
+## Summary
+
+Technical plan for Unified Cli Surface.
+
+## Testing Strategy
+
+- Run focused tests for the mapped implementation.
+- Run full project validation before completion.
+
+## Risks & Considerations
+
+- Keep this compatibility plan aligned with the living spec and implementation map.
+
+## Traceability Flow
+
+```mermaid
+flowchart TD
+    Spec[spec.md] --> Plan[plan.md]
+    Plan --> Implementation[implementation.md]
+    Implementation --> Tests[verification]
+```

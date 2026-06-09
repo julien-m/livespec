@@ -1,10 +1,12 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+
 """Run driver capabilities as subprocesses."""
 
 # @spec FR-003: Driver capabilities execute through one subprocess-based API.
 # @spec AC-009: Command-backed capabilities capture stdout, stderr, and exit status.
 # @spec AC-010: Script-backed capabilities run the referenced file instead of a command.
 # @spec AC-011: Coverage capabilities fail when the declared report artifact is missing.
-
 
 from __future__ import annotations
 

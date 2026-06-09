@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Unit tests for TypeScript/JavaScript runner and package manager detection."""
 
 # @spec FR-006: Unit tests for runner detection and parser
@@ -142,10 +145,7 @@ def test_has_dependency_finds_in_dev_dependencies() -> None:
             {"devDependencies": {"@stryker-mutator/core": "^8.0.0"}},
         )
 
-        assert (
-            has_dependency(str(project_root), "@stryker-mutator/core", dev_only=True)
-            is True
-        )
+        assert has_dependency(str(project_root), "@stryker-mutator/core", dev_only=True) is True
 
 
 def test_has_dependency_returns_false_when_absent() -> None:

@@ -1,3 +1,13 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-007)
+# @spec(FR-008)
+# @spec(FR-010)
+# @spec(FR-013)
+
 """Project health scanner for ``livespec doctor``."""
 
 from __future__ import annotations
@@ -20,6 +30,31 @@ _TABLE_ROW_RE = re.compile(r"^\|(.+)\|$")
 _BACKTICK_PATH_RE = re.compile(r"`([^`]+)`")
 # Requirement identifiers accepted by implementation maps.
 _REQ_RE = re.compile(r"^(?:FR|AC)-\d+$")
+
+_PATH_SUFFIXES = {
+    ".css",
+    ".html",
+    ".ini",
+    ".java",
+    ".js",
+    ".json",
+    ".kt",
+    ".lock",
+    ".md",
+    ".pdf",
+    ".pen",
+    ".png",
+    ".py",
+    ".rs",
+    ".sh",
+    ".swift",
+    ".toml",
+    ".ts",
+    ".tsx",
+    ".txt",
+    ".yaml",
+    ".yml",
+}
 
 
 def run_doctor(
@@ -151,10 +186,10 @@ def _scan_implementation_maps(
             requirement = cells[0]
             for raw_path in _extract_paths_from_cells(cells[1:]):
                 resolved = _resolve_project_path(project_root, raw_path)
-                is_test_mapping = requirement.startswith("AC-") or "test" in section
+                is_test_mapping = "test" in section or _is_test_reference(raw_path)
                 if is_test_mapping:
                     mapped_tests.append(resolved)
-                if resolved.exists():
+                if _mapped_path_exists(project_root, raw_path):
                     continue
                 findings.append(
                     DoctorFinding(
@@ -188,7 +223,7 @@ def _scan_runner_inclusion(
             relative_path = test_path.relative_to(project_root).as_posix()
         else:
             relative_path = test_path.as_posix()
-        if relative_path in runner_text or test_path.name in runner_text:
+        if _runner_mentions_test(relative_path, test_path.name, runner_text):
             continue
         if _is_default_pytest_discovered(test_path, project_root):
             continue
@@ -205,6 +240,15 @@ def _scan_runner_inclusion(
             )
         )
     return findings
+
+
+def _runner_mentions_test(relative_path: str, test_name: str, runner_text: str) -> bool:
+    """Return whether runner metadata includes a test path, file, or parent dir."""
+    if relative_path in runner_text or test_name in runner_text:
+        return True
+    parts = relative_path.split("/")
+    parent_dirs = ("/".join(parts[:idx]) for idx in range(1, len(parts)))
+    return any(parent_dir and parent_dir in runner_text for parent_dir in parent_dirs)
 
 
 def _scan_hook_enforcement(project_root: Path) -> list[DoctorFinding]:
@@ -307,6 +351,8 @@ def _runner_config_text(project_root: Path, specs_root: Path) -> str:
         specs_root / "surfaces.yaml",
         specs_root / "surfaces.yml",
         specs_root / "testing" / "strategy.md",
+        project_root / "playwright.config.ts",
+        project_root / "playwright.config.js",
         project_root / "pytest.ini",
         project_root / "pyproject.toml",
     ]
@@ -323,28 +369,62 @@ def _extract_paths_from_cells(cells: list[str]) -> list[str]:
     """Extract path-like values from Markdown table cells."""
     paths: list[str] = []
     for cell in cells:
-        raw_values = _BACKTICK_PATH_RE.findall(cell) or [cell]
+        backticked_values = _BACKTICK_PATH_RE.findall(cell)
+        raw_values = backticked_values or [cell]
         for raw_value in raw_values:
             for value in re.split(r",|\n", raw_value):
                 cleaned = value.strip().strip("`")
-                if _looks_like_path(cleaned):
+                if _looks_like_path(cleaned, explicit=bool(backticked_values)):
                     paths.append(cleaned)
     return paths
 
 
-def _looks_like_path(value: str) -> bool:
+def _looks_like_path(value: str, *, explicit: bool) -> bool:
     """Return True when a table value resembles a file path."""
-    if not value or value.startswith("@spec"):
+    if (
+        not value
+        or value.startswith(("@spec", "#", "/spec.", "/spec-"))
+        or value in {".reserved", ".specs/.LOCK"}
+    ):
         return False
-    return "/" in value or "." in Path(value).name
+    if any(token in value for token in ("(", ")", "{", "}", "[feature]")):
+        return False
+    if any(char.isspace() for char in value):
+        return False
+    path_part = value.split("::", 1)[0]
+    if "/" in path_part or path_part.startswith("."):
+        return True
+    if explicit:
+        return Path(path_part).suffix.lower() in _PATH_SUFFIXES
+    return False
 
 
 def _resolve_project_path(project_root: Path, raw_path: str) -> Path:
     """Resolve a mapping path relative to the project root."""
-    path = Path(raw_path)
+    path = Path(_path_part(raw_path))
     if path.is_absolute():
         return path
     return project_root / path
+
+
+def _mapped_path_exists(project_root: Path, raw_path: str) -> bool:
+    """Return True when a mapped file path, test selector, or glob resolves."""
+    path_part = _path_part(raw_path)
+    path = Path(path_part)
+    if any(char in path_part for char in "*?[]"):
+        if path.is_absolute():
+            return any(path.parent.glob(path.name))
+        return any(project_root.glob(path_part))
+    return _resolve_project_path(project_root, raw_path).exists()
+
+
+def _path_part(raw_path: str) -> str:
+    """Strip test selectors and Markdown line suffixes from a mapped path."""
+    path_part = raw_path.split("::", 1)[0]
+    match = re.match(r"^(.+\.[A-Za-z0-9]+):\d+$", path_part)
+    if match:
+        return match.group(1)
+    return path_part
 
 
 def _is_default_pytest_discovered(test_path: Path, project_root: Path) -> bool:
@@ -357,6 +437,20 @@ def _is_default_pytest_discovered(test_path: Path, project_root: Path) -> bool:
         and relative.parts[0] == "tests"
         and relative.name.startswith("test_")
         and relative.suffix == ".py"
+    )
+
+
+def _is_test_reference(raw_path: str) -> bool:
+    """Return True when a mapped path points to an executable test artifact."""
+    path_part = _path_part(raw_path)
+    path = Path(path_part)
+    lower = path_part.lower()
+    return (
+        lower.startswith("tests/")
+        or "/tests/" in lower
+        or "uitests/" in lower
+        or path.name.startswith("test_")
+        or path.name.endswith((".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"))
     )
 
 

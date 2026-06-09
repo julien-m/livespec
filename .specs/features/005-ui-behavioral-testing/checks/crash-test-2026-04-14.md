@@ -1,3 +1,8 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-012) -->
+<!-- @spec(AC-013) -->
+<!-- @spec(FR-009) -->
+
 # Crash Test Report — UI Behavioral Taxonomy
 
 <!-- @spec FR-009: Crash test on real components — .specs/features/005-ui-behavioral-testing/spec.md#fr-009 -->

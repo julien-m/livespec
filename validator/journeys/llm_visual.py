@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-035)
+# @spec(FR-036)
+# @spec(FR-037)
+# @spec(FR-038)
+# @spec(FR-039)
+
 """LLM visual contract evaluator for User Journeys v2."""
 
 # @spec FR-036, FR-037, FR-038, FR-039: LLM screenshots, strict JSON, privacy

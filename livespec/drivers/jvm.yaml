@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 # @spec FR-001: JVM driver YAML — .specs/features/022-driver-jvm/spec.md#fr-001
 # Single driver covers Java + Kotlin (Gradle Groovy DSL, Gradle Kotlin DSL, Maven).
 # Capabilities all use shell escape hatches because the Gradle vs Maven dispatch

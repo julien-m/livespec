@@ -1,3 +1,11 @@
+---
+created: 2026-05-12
+priority: P2
+status: Implemented
+title: Feature 040 — Rich Expectations Format & Project-Aware Preview
+updated: 2026-06-08
+---
+
 # Feature 040 — Rich Expectations Format & Project-Aware Preview
 
 - **Feature Name:** Rich Expectations Format & `verify-output --preview`

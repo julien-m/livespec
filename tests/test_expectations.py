@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-004)
+# @spec(AC-006)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-011)
+
 """Tests for validator/expectations.py (parser + override resolver).
 
 # @spec FR-003: parser tests
@@ -249,9 +256,9 @@ def test_when_branches_parse(tmp_path):
         '    - contains: "Traceback"\n',
         (
             '    - contains: "Traceback"\n'
-            '  when:\n'
+            "  when:\n"
             '    - flag: "--visual"\n'
-            '      must:\n'
+            "      must:\n"
             '        - contains: "baselines"\n'
         ),
     )
@@ -265,11 +272,11 @@ def test_when_branches_parse(tmp_path):
 
 def test_produces_artifact_rule_parses(tmp_path):
     body = MINIMAL_VALID.replace(
-        '    - exit_code: 0\n',
+        "    - exit_code: 0\n",
         (
-            '    - exit_code: 0\n'
+            "    - exit_code: 0\n"
             '    - produces_artifact: "spec.md"\n'
-            '      contains_sections:\n'
+            "      contains_sections:\n"
             '        - "User Scenarios"\n'
         ),
     )

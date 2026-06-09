@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+
 """Detect JVM (Java + Kotlin) build dependencies and parse pitest XML output."""
 
 # @spec FR-002: Build tool detection (Gradle priority over Maven).

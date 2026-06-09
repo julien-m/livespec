@@ -279,12 +279,15 @@ def test_run_mutation_writes_report_when_path_provided(tmp_path: Path) -> None:
 
     # The mutmut parser also calls into a subprocess to extract survivors via
     # `mutmut results`; stub the helper so the test stays hermetic.
-    with mock.patch(
-        "validator.drivers.mutation_report.run_capability",
-        return_value=cap_result,
-    ), mock.patch(
-        "validator.drivers.mutmut_parser.extract_surviving_mutants",
-        return_value=[],
+    with (
+        mock.patch(
+            "validator.drivers.mutation_report.run_capability",
+            return_value=cap_result,
+        ),
+        mock.patch(
+            "validator.drivers.mutmut_parser.extract_surviving_mutants",
+            return_value=[],
+        ),
     ):
         result = run_mutation(driver, report_path=report_path)
 
@@ -306,12 +309,15 @@ def test_run_mutation_applies_threshold_gate() -> None:
         stdout=stdout,
         stderr="",
     )
-    with mock.patch(
-        "validator.drivers.mutation_report.run_capability",
-        return_value=cap_result,
-    ), mock.patch(
-        "validator.drivers.mutmut_parser.extract_surviving_mutants",
-        return_value=[],
+    with (
+        mock.patch(
+            "validator.drivers.mutation_report.run_capability",
+            return_value=cap_result,
+        ),
+        mock.patch(
+            "validator.drivers.mutmut_parser.extract_surviving_mutants",
+            return_value=[],
+        ),
     ):
         result = run_mutation(driver, report_path=None)
 

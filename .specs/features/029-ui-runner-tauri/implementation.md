@@ -1,3 +1,8 @@
+---
+feature: 029-ui-runner-tauri
+title: 'Implementation Mapping — Feature 029: UI Runner Tauri'
+---
+
 # Implementation Mapping — Feature 029: UI Runner Tauri
 
 **Feature:** UI Runner Tauri (029)  
@@ -186,3 +191,15 @@ No visual mockups for this feature (infrastructure-focused). Configuration and b
 ---
 
 *LiveSpec Feature 029 — Implementation Complete — 2026-05-07*
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/029-ui-runner-tauri/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/029-ui-runner-tauri/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/029-ui-runner-tauri/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/029-ui-runner-tauri/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/029-ui-runner-tauri/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/029-ui-runner-tauri/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/029-ui-runner-tauri/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |

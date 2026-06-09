@@ -2,7 +2,7 @@
 type: spec
 title: Layer 3 CLI Surface
 feature: 002-layer-3-cli-surface
-status: Draft
+status: Implemented
 priority: P1
 created: 2026-04-13
 updated: 2026-04-13

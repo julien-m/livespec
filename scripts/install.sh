@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-005)
+
 set -euo pipefail
 
 # LiveSpec bootstrap installer for portable Claude/Codex bootstrap skills.

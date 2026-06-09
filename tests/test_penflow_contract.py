@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-002)
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-012)
+# @spec(AC-013)
+
 """Tests for root Penflow UI contract workspace helpers."""
 
 from __future__ import annotations
@@ -669,9 +676,7 @@ def test_penflow_contract_status_cli_blocks_required_mockup_validation(tmp_path:
     payload = json.loads(result.output)
     assert payload["verdict"] == "BLOCKED"
     assert payload["mockup_validation_required"] is True
-    assert f".mockup-validation/{feature_slug}/checklist.md" in payload[
-        "mockup_validation_missing"
-    ]
+    assert f".mockup-validation/{feature_slug}/checklist.md" in payload["mockup_validation_missing"]
 
 
 def test_penflow_contract_bootstrap_cli_accepts_source_penflow_dir(tmp_path: Path) -> None:

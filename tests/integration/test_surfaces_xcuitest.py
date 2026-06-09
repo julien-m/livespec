@@ -43,6 +43,7 @@ def run_surfaces_script(
 # iOS/watchOS (xcuitest) detection
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.level_3a
 def test_xcodeproj_at_root_detected_as_xcuitest(tmp_path: Path) -> None:
     """A root-level .xcodeproj directory triggers xcuitest surface detection."""
@@ -55,9 +56,7 @@ def test_xcodeproj_at_root_detected_as_xcuitest(tmp_path: Path) -> None:
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     combined = result.stdout + result.stderr
-    assert "xcuitest" in combined.lower(), (
-        f"Expected 'xcuitest' in output but got:\n{combined}"
-    )
+    assert "xcuitest" in combined.lower(), f"Expected 'xcuitest' in output but got:\n{combined}"
 
 
 @pytest.mark.level_3a
@@ -66,16 +65,14 @@ def test_package_swift_at_root_detected_as_xcuitest(tmp_path: Path) -> None:
     (tmp_path / "Package.swift").write_text(
         "// swift-tools-version: 5.9\n"
         "import PackageDescription\n"
-        "let package = Package(name: \"MyLib\")\n"
+        'let package = Package(name: "MyLib")\n'
     )
 
     result = run_surfaces_script(tmp_path)
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     combined = result.stdout + result.stderr
-    assert "xcuitest" in combined.lower(), (
-        f"Expected 'xcuitest' in output but got:\n{combined}"
-    )
+    assert "xcuitest" in combined.lower(), f"Expected 'xcuitest' in output but got:\n{combined}"
 
 
 @pytest.mark.level_3a
@@ -91,14 +88,13 @@ def test_xcodeproj_in_apps_dir_detected(tmp_path: Path) -> None:
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     combined = result.stdout + result.stderr
-    assert "xcuitest" in combined.lower(), (
-        f"Expected 'xcuitest' in output but got:\n{combined}"
-    )
+    assert "xcuitest" in combined.lower(), f"Expected 'xcuitest' in output but got:\n{combined}"
 
 
 # ---------------------------------------------------------------------------
 # Android (maestro) detection
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.level_3a
 def test_android_with_maestro_dir_detected(tmp_path: Path) -> None:
@@ -108,9 +104,7 @@ def test_android_with_maestro_dir_detected(tmp_path: Path) -> None:
         'plugins { id("com.android.application") version "8.0" }\n'
     )
     (tmp_path / "app").mkdir()
-    (tmp_path / "app" / "build.gradle.kts").write_text(
-        'android { namespace = "com.example" }\n'
-    )
+    (tmp_path / "app" / "build.gradle.kts").write_text('android { namespace = "com.example" }\n')
     maestro_dir = tmp_path / "maestro"
     maestro_dir.mkdir()
     (maestro_dir / "login.yaml").write_text("appId: com.example\n---\n- launchApp\n")
@@ -119,9 +113,7 @@ def test_android_with_maestro_dir_detected(tmp_path: Path) -> None:
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     combined = result.stdout + result.stderr
-    assert "maestro" in combined.lower(), (
-        f"Expected 'maestro' in output but got:\n{combined}"
-    )
+    assert "maestro" in combined.lower(), f"Expected 'maestro' in output but got:\n{combined}"
 
 
 @pytest.mark.level_3a
@@ -153,14 +145,13 @@ def test_android_with_specs_maestro_dir_detected(tmp_path: Path) -> None:
 
     assert result.returncode == 0, f"Script failed: {result.stderr}"
     combined = result.stdout + result.stderr
-    assert "maestro" in combined.lower(), (
-        f"Expected 'maestro' in output but got:\n{combined}"
-    )
+    assert "maestro" in combined.lower(), f"Expected 'maestro' in output but got:\n{combined}"
 
 
 # ---------------------------------------------------------------------------
 # Migration v12 (--migrate-native)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.level_3a
 def test_migrate_native_appends_ios_surface_to_existing_manifest(tmp_path: Path) -> None:

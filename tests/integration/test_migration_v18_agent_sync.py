@@ -16,8 +16,7 @@ def _fake_cc_hub(bin_dir: Path, log_path: Path) -> None:
     bin_dir.mkdir(parents=True)
     script = bin_dir / "cc-hub"
     script.write_text(
-        "#!/usr/bin/env bash\n"
-        "printf '%s\\n' \"$*\" >> \"${CC_HUB_LOG}\"\n",
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$*" >> "${CC_HUB_LOG}"\n',
         encoding="utf-8",
     )
     script.chmod(0o755)

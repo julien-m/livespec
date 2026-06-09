@@ -5,6 +5,9 @@ description: "Refresh LiveSpec agent-sync assets so older projects receive spec-
 date: 2026-06-03
 kind: asset-sync
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-002) -->
+
 
 # Migration v18: Agent Asset Refresh for Spec Doctor
 

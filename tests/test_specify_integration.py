@@ -1,3 +1,12 @@
+# LiveSpec traceability anchors
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-008)
+
 """Integration tests for Feature 007 — Structured Signal Extraction.
 
 These tests validate the Phase 2 contract of the 3-phase pipeline:
@@ -19,9 +28,7 @@ from validator.taxonomy import (
     detect_traits,
 )
 
-_TAXONOMY_PATH = (
-    Path(__file__).parent.parent / "system" / "testing" / "ui-behavioral-taxonomy.md"
-)
+_TAXONOMY_PATH = Path(__file__).parent.parent / "system" / "testing" / "ui-behavioral-taxonomy.md"
 
 
 @pytest.fixture(autouse=True)

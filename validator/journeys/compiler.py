@@ -1,3 +1,15 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+# @spec(FR-007)
+# @spec(FR-008)
+# @spec(FR-009)
+# @spec(FR-023)
+# @spec(FR-028)
+# @spec(FR-029)
+# @spec(FR-030)
+# @spec(FR-034)
+# @spec(FR-036)
+
 """Ahead-of-time compiler facade for User Journeys v2."""
 
 # @spec FR-023, FR-028, FR-029, FR-030, FR-036: compile, manifest, LLM capture

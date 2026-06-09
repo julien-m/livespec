@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+
 """Pydantic v2 schemas for the LiveSpec test driver subsystem."""
 
 # @spec FR-001: YAML driver schema with detect rules plus optional capability blocks.
@@ -53,9 +56,7 @@ class DriverCapability(BaseModel):
     def _at_least_one_executable(self) -> DriverCapability:
         """Reject capability blocks that do not define any executable action."""
         if self.command is None and self.script is None:
-            raise ValueError(
-                "DriverCapability requires either 'command' or 'script' (got neither)"
-            )
+            raise ValueError("DriverCapability requires either 'command' or 'script' (got neither)")
         return self
 
 

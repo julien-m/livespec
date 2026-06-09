@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Unit tests for the go-coverage-gate.sh escape-hatch script."""
 
 # @spec FR-005: Unit tests for go-coverage-gate.sh
@@ -12,11 +15,7 @@ import tempfile
 from pathlib import Path
 
 _SCRIPT_PATH = (
-    Path(__file__).resolve().parents[2]
-    / "livespec"
-    / "drivers"
-    / "scripts"
-    / "go-coverage-gate.sh"
+    Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "scripts" / "go-coverage-gate.sh"
 )
 
 
@@ -65,9 +64,7 @@ def _run_gate(
 
 def _seed_go_mod(project_root: Path) -> None:
     """Create a minimal ``go.mod`` so the gate's project check passes."""
-    (project_root / "go.mod").write_text(
-        "module example.com/test\n\ngo 1.22\n", encoding="utf-8"
-    )
+    (project_root / "go.mod").write_text("module example.com/test\n\ngo 1.22\n", encoding="utf-8")
 
 
 def test_script_exists_and_executable() -> None:
@@ -83,9 +80,7 @@ def test_gate_passes_when_above_threshold() -> None:
         project_root = Path(tmpdir)
         _seed_go_mod(project_root)
         coverprofile = project_root / "coverage.out"
-        coverprofile.write_text(
-            _make_coverprofile(stmts_total=100, stmts_hit=78), encoding="utf-8"
-        )
+        coverprofile.write_text(_make_coverprofile(stmts_total=100, stmts_hit=78), encoding="utf-8")
         lcov_path = project_root / "coverage" / "lcov.info"
 
         result = _run_gate(
@@ -112,9 +107,7 @@ def test_gate_fails_when_below_threshold() -> None:
         project_root = Path(tmpdir)
         _seed_go_mod(project_root)
         coverprofile = project_root / "coverage.out"
-        coverprofile.write_text(
-            _make_coverprofile(stmts_total=100, stmts_hit=55), encoding="utf-8"
-        )
+        coverprofile.write_text(_make_coverprofile(stmts_total=100, stmts_hit=55), encoding="utf-8")
         lcov_path = project_root / "coverage" / "lcov.info"
 
         result = _run_gate(
@@ -138,9 +131,7 @@ def test_gate_default_threshold_is_70() -> None:
         project_root = Path(tmpdir)
         _seed_go_mod(project_root)
         coverprofile = project_root / "coverage.out"
-        coverprofile.write_text(
-            _make_coverprofile(stmts_total=100, stmts_hit=69), encoding="utf-8"
-        )
+        coverprofile.write_text(_make_coverprofile(stmts_total=100, stmts_hit=69), encoding="utf-8")
         lcov_path = project_root / "coverage" / "lcov.info"
 
         result = _run_gate(

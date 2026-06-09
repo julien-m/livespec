@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-004)
+
 """Detect Swift Package Manager dependencies and Xcode-only project layouts."""
 
 # @spec FR-003: Package.swift dependency parser

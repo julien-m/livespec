@@ -1,3 +1,8 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-011) -->
+<!-- @spec(FR-009) -->
+<!-- @spec(FR-011) -->
+
 # Crash Test Procedure — Behavioral Taxonomy Validation
 
 <!-- @spec AC-011: Crash test procedure — .specs/features/005.1-behavioral-tdd-audit/spec.md#ac-011 -->

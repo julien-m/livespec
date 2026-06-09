@@ -1,3 +1,16 @@
+# LiveSpec traceability anchors
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-012)
+# @spec(AC-014)
+# @spec(FR-007)
+# @spec(FR-008)
+
 """Unit tests for the iOS/watchOS XCUITest UI runner.
 
 All tests mock subprocess and platform calls so they run on any OS without
@@ -36,6 +49,7 @@ from validator.ui_runner_xcuitest import (
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def handler(tmp_path: Path) -> XCUITestRunnerHandler:
     """Return a handler pointed at a temp project directory."""
@@ -56,7 +70,7 @@ def package_swift_project(tmp_path: Path) -> Path:
     (tmp_path / "Package.swift").write_text(
         "// swift-tools-version: 5.9\n"
         "import PackageDescription\n"
-        "let package = Package(name: \"MyLib\")\n"
+        'let package = Package(name: "MyLib")\n'
     )
     return tmp_path
 
@@ -66,6 +80,7 @@ def package_swift_project(tmp_path: Path) -> Path:
 # ---------------------------------------------------------------------------
 
 # @spec FR-001: project detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-001
+
 
 def test_detect_xcodeproj(xcodeproj_project: Path) -> None:
     """Projects with .xcodeproj directory are detected as iOS projects."""
@@ -96,6 +111,7 @@ def test_detect_xcuitest_runner_function(xcodeproj_project: Path) -> None:
 
 # @spec FR-006: non-macOS skipped — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-006
 
+
 def test_non_macos_capture_screenshot_returns_skipped(
     handler: XCUITestRunnerHandler,
 ) -> None:
@@ -123,6 +139,7 @@ def test_non_macos_run_flow_returns_skipped(handler: XCUITestRunnerHandler) -> N
 # ---------------------------------------------------------------------------
 
 # @spec FR-006: Xcode license detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-006
+
 
 def test_missing_xcrun_capture_returns_error(handler: XCUITestRunnerHandler) -> None:
     """When xcrun is not found, capture_screenshot returns Xcode install hint."""
@@ -161,6 +178,7 @@ def test_get_toolchain_path_returns_path_on_success(handler: XCUITestRunnerHandl
 # ---------------------------------------------------------------------------
 
 # @spec FR-006: license detection — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-006
+
 
 def test_xcode_license_not_accepted_returns_error(handler: XCUITestRunnerHandler) -> None:
     """When xcodebuild reports license not accepted, capture_screenshot returns recovery hint."""
@@ -222,21 +240,25 @@ def test_check_xcode_license_returns_true_when_accepted(
 # @spec FR-003: simulator boot orchestration
 # .specs/features/030-ui-runner-ios-watchos/spec.md#fr-003
 
-_SIMCTL_JSON_BOOTED = json.dumps({
-    "devices": {
-        "com.apple.CoreSimulator.SimRuntime.iOS-18-0": [
-            {"udid": "TEST-UDID-001", "name": "iPhone 16", "state": "Booted"},
-        ]
+_SIMCTL_JSON_BOOTED = json.dumps(
+    {
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.iOS-18-0": [
+                {"udid": "TEST-UDID-001", "name": "iPhone 16", "state": "Booted"},
+            ]
+        }
     }
-})
+)
 
-_SIMCTL_JSON_SHUTDOWN = json.dumps({
-    "devices": {
-        "com.apple.CoreSimulator.SimRuntime.iOS-18-0": [
-            {"udid": "TEST-UDID-001", "name": "iPhone 16", "state": "Shutdown"},
-        ]
+_SIMCTL_JSON_SHUTDOWN = json.dumps(
+    {
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.iOS-18-0": [
+                {"udid": "TEST-UDID-001", "name": "iPhone 16", "state": "Shutdown"},
+            ]
+        }
     }
-})
+)
 
 _SIMCTL_JSON_EMPTY = json.dumps({"devices": {}})
 
@@ -266,9 +288,7 @@ def test_simulator_boot_already_booted(handler: XCUITestRunnerHandler) -> None:
     boot_calls = [
         cmd
         for cmd in call_log
-        if "boot" in " ".join(cmd)
-        and "status" not in " ".join(cmd)
-        and "list" not in " ".join(cmd)
+        if "boot" in " ".join(cmd) and "status" not in " ".join(cmd) and "list" not in " ".join(cmd)
     ]
     assert len(boot_calls) == 0
 
@@ -304,9 +324,7 @@ def test_simulator_boot_from_shutdown(handler: XCUITestRunnerHandler) -> None:
     boot_calls = [
         cmd
         for cmd in call_log
-        if "boot" in " ".join(cmd)
-        and "list" not in " ".join(cmd)
-        and "status" not in " ".join(cmd)
+        if "boot" in " ".join(cmd) and "list" not in " ".join(cmd) and "status" not in " ".join(cmd)
     ]
     assert len(boot_calls) >= 1
 
@@ -315,6 +333,7 @@ def test_simulator_boot_device_not_found_returns_false(
     handler: XCUITestRunnerHandler,
 ) -> None:
     """When simulator UDID is not in simctl output, _boot_simulator boots it (no early exit)."""
+
     # If UDID doesn't exist in the list JSON, we still attempt the boot command
     def mock_run(cmd, *args, **kwargs):
         joined = " ".join(str(c) for c in cmd)
@@ -381,18 +400,20 @@ def test_find_simulator_udid_not_found(handler: XCUITestRunnerHandler) -> None:
 # Friendly destination id (folder naming, stable across UDID changes)
 # ---------------------------------------------------------------------------
 
-_SIMCTL_JSON_WATCH = json.dumps({
-    "devices": {
-        "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
-            {
-                "udid": "C566988B-648F-4B35-AE30-A369C841335E",
-                "name": "Apple Watch Series 11 (46mm)",
-                "state": "Shutdown",
-                "isAvailable": True,
-            },
-        ],
+_SIMCTL_JSON_WATCH = json.dumps(
+    {
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
+                {
+                    "udid": "C566988B-648F-4B35-AE30-A369C841335E",
+                    "name": "Apple Watch Series 11 (46mm)",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+            ],
+        }
     }
-})
+)
 
 
 def test_friendly_destination_id_resolves_udid_to_platform_name(
@@ -416,9 +437,7 @@ def test_friendly_destination_id_uses_name_when_no_udid(
         "validator.ui_runner_xcuitest.subprocess.run",
         side_effect=AssertionError("simctl must not be invoked when name is present"),
     ):
-        out = handler._friendly_destination_id(
-            "platform=iOS Simulator,name=iPhone 16"
-        )
+        out = handler._friendly_destination_id("platform=iOS Simulator,name=iPhone 16")
     assert out == "ios_iphone_16"
 
 
@@ -426,18 +445,20 @@ def test_friendly_destination_id_stable_across_udid_changes(
     handler: XCUITestRunnerHandler,
 ) -> None:
     """Recreating the simulator (new UDID, same name, same runtime) yields same folder."""
-    simctl_v2 = json.dumps({
-        "devices": {
-            "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
-                {
-                    "udid": "FFFFFFFF-9999-9999-9999-FFFFFFFFFFFF",
-                    "name": "Apple Watch Series 11 (46mm)",
-                    "state": "Shutdown",
-                    "isAvailable": True,
-                },
-            ],
+    simctl_v2 = json.dumps(
+        {
+            "devices": {
+                "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
+                    {
+                        "udid": "FFFFFFFF-9999-9999-9999-FFFFFFFFFFFF",
+                        "name": "Apple Watch Series 11 (46mm)",
+                        "state": "Shutdown",
+                        "isAvailable": True,
+                    },
+                ],
+            }
         }
-    })
+    )
     mock_v1 = MagicMock(returncode=0, stdout=_SIMCTL_JSON_WATCH)
     mock_v2 = MagicMock(returncode=0, stdout=simctl_v2)
 
@@ -489,26 +510,28 @@ def test_friendly_destination_id_includes_os_version_for_multi_runtime_disambigu
 ) -> None:
     """Same-name simulators on different runtimes get different folder names."""
     # Two Apple Watch Series 11 (46mm) devices on different watchOS runtimes.
-    multi_runtime = json.dumps({
-        "devices": {
-            "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
-                {
-                    "udid": "C566988B-648F-4B35-AE30-A369C841335E",
-                    "name": "Apple Watch Series 11 (46mm)",
-                    "state": "Shutdown",
-                    "isAvailable": True,
-                },
-            ],
-            "com.apple.CoreSimulator.SimRuntime.watchOS-26-5": [
-                {
-                    "udid": "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE",
-                    "name": "Apple Watch Series 11 (46mm)",
-                    "state": "Shutdown",
-                    "isAvailable": True,
-                },
-            ],
+    multi_runtime = json.dumps(
+        {
+            "devices": {
+                "com.apple.CoreSimulator.SimRuntime.watchOS-26-4": [
+                    {
+                        "udid": "C566988B-648F-4B35-AE30-A369C841335E",
+                        "name": "Apple Watch Series 11 (46mm)",
+                        "state": "Shutdown",
+                        "isAvailable": True,
+                    },
+                ],
+                "com.apple.CoreSimulator.SimRuntime.watchOS-26-5": [
+                    {
+                        "udid": "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE",
+                        "name": "Apple Watch Series 11 (46mm)",
+                        "state": "Shutdown",
+                        "isAvailable": True,
+                    },
+                ],
+            }
         }
-    })
+    )
     mock_v264 = MagicMock(returncode=0, stdout=_SIMCTL_JSON_WATCH)
     mock_multi = MagicMock(returncode=0, stdout=multi_runtime)
 
@@ -551,9 +574,10 @@ def test_capture_screenshot_passes_unmodified_destination_to_xcodebuild(
         mock.stderr = ""
         return mock
 
-    with patch(
-        "validator.ui_runner_xcuitest.subprocess.run", side_effect=mock_run
-    ), patch("validator.ui_runner_xcuitest.platform.system", return_value="Darwin"):
+    with (
+        patch("validator.ui_runner_xcuitest.subprocess.run", side_effect=mock_run),
+        patch("validator.ui_runner_xcuitest.platform.system", return_value="Darwin"),
+    ):
         handler.capture_screenshot(
             destination="platform=watchOS Simulator,id=TEST-UUID-001",
             test_scheme="TestScheme",
@@ -578,30 +602,38 @@ def test_capture_screenshot_passes_unmodified_destination_to_xcodebuild(
 _XCRESULT_JSON_PNG = {
     "_type": {"_name": "ActionsInvocationRecord"},
     "actions": {
-        "_values": [{
-            "actionResult": {
-                "testsRef": {
-                    "id": {"_value": "test-ref-1"}
-                }
-            },
-            "testPlanRunSummaries": {
-                "_values": [{
-                    "testableSummaries": {
-                        "_values": [{
-                            "tests": {
-                                "_values": [{
-                                    "_type": {"_name": "ActionTestAttachment"},
-                                    "name": {"_value": "main_screen"},
-                                    "uniformTypeIdentifier": {"_value": "public.png"},
-                                    "payloadRef": {"id": {"_value": "att-payload-001"}},
-                                }]
+        "_values": [
+            {
+                "actionResult": {"testsRef": {"id": {"_value": "test-ref-1"}}},
+                "testPlanRunSummaries": {
+                    "_values": [
+                        {
+                            "testableSummaries": {
+                                "_values": [
+                                    {
+                                        "tests": {
+                                            "_values": [
+                                                {
+                                                    "_type": {"_name": "ActionTestAttachment"},
+                                                    "name": {"_value": "main_screen"},
+                                                    "uniformTypeIdentifier": {
+                                                        "_value": "public.png"
+                                                    },
+                                                    "payloadRef": {
+                                                        "id": {"_value": "att-payload-001"}
+                                                    },
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
                             }
-                        }]
-                    }
-                }]
+                        }
+                    ]
+                },
             }
-        }]
-    }
+        ]
+    },
 }
 
 
@@ -624,6 +656,7 @@ def test_xcresult_parsing_png(tmp_path: Path) -> None:
         if "xcresulttool" in joined and "export" in joined and "attachments" in joined:
             # New Xcode 26 API: writes attachments + manifest.json into output-path
             import os
+
             out_path = None
             for i, arg in enumerate(cmd):
                 if arg == "--output-path" and i + 1 < len(cmd):
@@ -632,19 +665,20 @@ def test_xcresult_parsing_png(tmp_path: Path) -> None:
             if out_path:
                 os.makedirs(out_path, exist_ok=True)
                 (Path(out_path) / "abc-uuid.png").write_bytes(b"\x89PNG\r\n\x1a\n")
-                manifest = [{
-                    "testIdentifier": "Tests/test_main()",
-                    "attachments": [{
-                        "exportedFileName": "abc-uuid.png",
-                        "suggestedHumanReadableName": (
-                            "main_screen_0_"
-                            "12345678-90AB-CDEF-1234-567890ABCDEF.png"
-                        ),
-                    }],
-                }]
-                (Path(out_path) / "manifest.json").write_text(
-                    json.dumps(manifest)
-                )
+                manifest = [
+                    {
+                        "testIdentifier": "Tests/test_main()",
+                        "attachments": [
+                            {
+                                "exportedFileName": "abc-uuid.png",
+                                "suggestedHumanReadableName": (
+                                    "main_screen_0_12345678-90AB-CDEF-1234-567890ABCDEF.png"
+                                ),
+                            }
+                        ],
+                    }
+                ]
+                (Path(out_path) / "manifest.json").write_text(json.dumps(manifest))
             mock.returncode = 0
             mock.stdout = ""
         else:
@@ -702,6 +736,7 @@ def test_xcresult_heic_conversion(tmp_path: Path) -> None:
         if "xcresulttool" in joined and "export" in joined and "attachments" in joined:
             # New Xcode 26 API: writes a HEIC + manifest.json into output-path
             import os
+
             out_path = None
             for i, arg in enumerate(cmd):
                 if arg == "--output-path" and i + 1 < len(cmd):
@@ -710,19 +745,20 @@ def test_xcresult_heic_conversion(tmp_path: Path) -> None:
             if out_path:
                 os.makedirs(out_path, exist_ok=True)
                 (Path(out_path) / "heic-uuid.heic").write_bytes(b"ftyp")
-                manifest = [{
-                    "testIdentifier": "Tests/test_watch()",
-                    "attachments": [{
-                        "exportedFileName": "heic-uuid.heic",
-                        "suggestedHumanReadableName": (
-                            "watch_screen_0_"
-                            "12345678-90AB-CDEF-1234-567890ABCDEF.heic"
-                        ),
-                    }],
-                }]
-                (Path(out_path) / "manifest.json").write_text(
-                    json.dumps(manifest)
-                )
+                manifest = [
+                    {
+                        "testIdentifier": "Tests/test_watch()",
+                        "attachments": [
+                            {
+                                "exportedFileName": "heic-uuid.heic",
+                                "suggestedHumanReadableName": (
+                                    "watch_screen_0_12345678-90AB-CDEF-1234-567890ABCDEF.heic"
+                                ),
+                            }
+                        ],
+                    }
+                ]
+                (Path(out_path) / "manifest.json").write_text(json.dumps(manifest))
             mock.returncode = 0
             mock.stdout = ""
         elif "sips" in joined:
@@ -752,6 +788,7 @@ def test_xcresult_heic_conversion(tmp_path: Path) -> None:
 
 # @spec FR-005: launch_arguments injection
 # .specs/features/030-ui-runner-ios-watchos/spec.md#fr-005
+
 
 def test_launch_arguments_propagated_to_env(handler: XCUITestRunnerHandler) -> None:
     """_build_env includes XCUI_LAUNCH_ARGS when launch_arguments are provided."""
@@ -861,6 +898,7 @@ def test_filter_destinations_empty_list(handler: XCUITestRunnerHandler) -> None:
 # compare_baseline
 # ---------------------------------------------------------------------------
 
+
 def test_compare_baseline_missing_script(handler: XCUITestRunnerHandler) -> None:
     """compare_baseline returns error when pixelmatch-cli.js is not found."""
     result = handler.compare_baseline("baseline.png", "screenshot.png")
@@ -904,6 +942,7 @@ def test_compare_baseline_delegates_to_pixelmatch(tmp_path: Path) -> None:
 # Manifest loading
 # ---------------------------------------------------------------------------
 
+
 def test_xcuitest_manifest_path_points_to_ios_yaml() -> None:
     """xcuitest_runner_manifest_path() returns path to ios.yaml."""
     path = xcuitest_runner_manifest_path()
@@ -923,6 +962,7 @@ def test_load_xcuitest_runner_manifest() -> None:
 # Coordinated execution markers (pytest.mark.macos)
 # These tests require a real macOS + Xcode environment and are skipped in CI.
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.macos
 def test_real_simulator_boot_integration(tmp_path: Path) -> None:  # pragma: no cover

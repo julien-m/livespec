@@ -2,6 +2,11 @@
 name: spec-init
 description: Migrated Claude command /spec-init
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-003) -->
+<!-- @spec(FR-010) -->
+<!-- @spec(FR-012) -->
+
 
 # /spec-init
 

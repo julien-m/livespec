@@ -1,4 +1,5 @@
 ---
+title: Default Stack
 updated: 2026-04-13
 ---
 
@@ -64,3 +65,7 @@ The LLM provider is NOT part of the stack — it is user-configured via `~/.conf
 ---
 
 *Updated by `spec-init --from-code` on 2026-04-13. Bump `updated` date on every stack change via `/spec-stack`.*
+
+## Rationale
+
+- Keep the stack explicit so LiveSpec commands can derive conventions and validation behavior deterministically.

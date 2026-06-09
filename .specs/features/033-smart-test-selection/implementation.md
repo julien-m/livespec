@@ -1,3 +1,8 @@
+---
+feature: 033-smart-test-selection
+title: Implementation — Smart Test Selection
+---
+
 # Implementation — Smart Test Selection
 
 **Feature:** 033-smart-test-selection
@@ -153,3 +158,18 @@ N/A (backend Python module, no UI)
 ---
 
 *Implementation updated by Codex — 2026-05-07*
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |
+| FR-008 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-008) | ✅ Implemented | 2026-06-08 |
+| FR-009 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-009) | ✅ Implemented | 2026-06-08 |
+| FR-010 | `.specs/features/033-smart-test-selection/implementation.md` | @spec(FR-010) | ✅ Implemented | 2026-06-08 |

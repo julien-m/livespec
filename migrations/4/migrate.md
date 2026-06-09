@@ -3,6 +3,9 @@ version: 4
 description: "Upgrade visual testing to v4 standards: maxDiffPixels threshold, Docker render pinning"
 date: 2026-04-14
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-013) -->
+
 
 <!-- @spec FR-009: migration v4 manifest — .specs/features/003-visual-testing-fidelity/spec.md#fr-009 -->
 

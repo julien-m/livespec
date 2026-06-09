@@ -36,14 +36,10 @@ def test_expected_registry_paths_match_canonical_layout() -> None:
     )
     assert baseline == Path(".specs/design/baselines/001-foo/web/dashboard.png")
 
-    mockup = expected_registry_mockup_path(
-        feature_slug="001-foo", screen="dashboard.png"
-    )
+    mockup = expected_registry_mockup_path(feature_slug="001-foo", screen="dashboard.png")
     assert mockup == Path(".specs/design/screens/001-foo/dashboard.png")
 
-    local = expected_feature_local_path(
-        feature_slug="001-foo", screen="dashboard"
-    )
+    local = expected_feature_local_path(feature_slug="001-foo", screen="dashboard")
     assert local == Path(".specs/features/001-foo/baselines/dashboard.png")
 
 
@@ -144,9 +140,7 @@ def test_is_runtime_capture_misplaced_true_on_hash_collision(tmp_path: Path) -> 
     _make_png(baseline, payload)
     registry_root = tmp_path / ".specs/design/baselines/foo"
 
-    assert is_runtime_capture_misplaced(
-        candidate=misplaced, registry_baselines_dir=registry_root
-    )
+    assert is_runtime_capture_misplaced(candidate=misplaced, registry_baselines_dir=registry_root)
 
 
 def test_is_runtime_capture_misplaced_false_when_no_collision(tmp_path: Path) -> None:

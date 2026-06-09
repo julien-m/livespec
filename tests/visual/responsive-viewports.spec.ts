@@ -1,3 +1,10 @@
+// LiveSpec traceability anchors
+// @spec(AC-012)
+// @spec(AC-014)
+// @spec(AC-015)
+// @spec(FR-012)
+// @spec(FR-013)
+
 import { test, expect } from '@playwright/test';
 
 // @spec FR-010: Viewport matrix: mobile (375×667), tablet (768×1024), desktop (1920×1080) — spec.md#fr-010

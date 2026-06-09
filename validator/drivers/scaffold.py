@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Scaffold a custom driver YAML for an unsupported stack."""
 
 # Feature 023: driver custom scaffolding & graceful degradation.
@@ -10,7 +13,6 @@
 # @spec AC-005: detect.files pre-filled when stack name is recognized
 # @spec EC-001: Hyphenated/dotted stack names sanitized to valid filename
 # @spec EC-002: .specs/drivers/ created if missing
-
 
 from __future__ import annotations
 
@@ -128,8 +130,6 @@ def scaffold_custom_driver(
     target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / f"{sanitized}.yaml"
     if target.exists() and not force:
-        raise DriverFileExistsError(
-            f"Driver {target} already exists. Use --force to overwrite."
-        )
+        raise DriverFileExistsError(f"Driver {target} already exists. Use --force to overwrite.")
     target.write_text(_render_template(sanitized), encoding="utf-8")
     return target

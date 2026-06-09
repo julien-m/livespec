@@ -1,3 +1,7 @@
+---
+{}
+---
+
 # Progress: Goal Tasks Replay Required Conventions Per Step
 
 feature_slug: 053-goal-tasks-replay-required-conventions-per-step
@@ -10,3 +14,9 @@ status: Implemented
 - [x] Step 4: Enforce convention evidence in goal prove
 - [x] Step 5: Render task-level convention replay in goal objective
 - [x] Step 6: Run targeted tests and command audit
+
+## Progress Table
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 | Complete | Historical progress captured before table normalization. |

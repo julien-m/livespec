@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-008)
+# @spec(FR-019)
+# @spec(FR-020)
+# @spec(FR-021)
+# @spec(FR-032)
+
 """Impact analysis for global User Journeys v2."""
 
 # @spec FR-008, FR-019, FR-020, FR-021: impact records and pre-failure journey impact detection

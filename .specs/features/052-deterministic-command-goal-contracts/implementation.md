@@ -40,8 +40,8 @@ feature: "052-deterministic-command-goal-contracts"
 | AC-005 | `tests/test_goal_contracts.py::{test_render_goal_contract_and_state_replace_markdown_task_file,test_goal_render_save_writes_contract_and_state_files}` | ✅ Implemented |
 | AC-006 | `tests/test_goal_contracts.py::{test_goal_prove_rejects_missing_visual_design_fidelity_evidence,test_goal_prove_accepts_visual_design_fidelity_receipt}` | ✅ Implemented |
 | AC-007 | `tests/test_goal_contracts.py::test_anti_drift_block_documents_shared_goal_protocol` | ✅ Implemented |
-| AC-008 | `tests/test_goal_contracts_cli.py::test_goal_render_json_outputs_hash_and_canonical_payload` | ✅ Implemented |
-| AC-009 | `tests/test_goal_contracts.py`, `tests/test_goal_contracts_cli.py` | ✅ Implemented |
+| AC-008 | `tests/test_goal_contracts.py` | ✅ Implemented |
+| AC-009 | `tests/test_goal_contracts.py` | ✅ Implemented |
 | AC-010 | `system/expectations.md` | ✅ Implemented |
 | AC-011 | `tests/test_goal_contracts.py::test_compile_command_goal_embeds_code_convention_domains` | ✅ Implemented |
 | AC-012 | `tests/test_goal_contracts.py::test_compile_command_goal_embeds_code_convention_domains` | ✅ Implemented |

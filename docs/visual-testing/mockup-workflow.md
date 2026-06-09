@@ -1,3 +1,8 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-006) -->
+<!-- @spec(FR-002) -->
+<!-- @spec(FR-005) -->
+
 # Mockup Workflow Guide
 
 Designer-driven visual baseline workflow for Figma → code fidelity testing.

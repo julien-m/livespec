@@ -1,3 +1,6 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-019) -->
+
 # LiveSpec — User-Level Integrations (Level 0)
 
 > Markdown instructions in `~/.config/livespec/*.md` that LiveSpec injects

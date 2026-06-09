@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(AC-004)
+# @spec(AC-008)
+# @spec(FR-010)
+
 """Tests for validator.integrations (Level 0 user integration discovery)."""
 
 from __future__ import annotations
@@ -51,18 +56,14 @@ def test_integration_commands_accept_slash_aliases(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_absent_directory_returns_empty(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
+def test_absent_directory_returns_empty(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     missing = tmp_path / "does-not-exist"
     assert discover_integrations(integrations_dir=missing) == []
     captured = capsys.readouterr()
     assert captured.err == ""
 
 
-def test_empty_directory_returns_empty(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
+def test_empty_directory_returns_empty(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     empty = tmp_path / "empty"
     empty.mkdir()
     assert discover_integrations(integrations_dir=empty) == []
@@ -271,8 +272,7 @@ def test_template_variables_left_literal_at_discovery(tmp_path: Path) -> None:
     d.mkdir()
     _write(
         d / "x.md",
-        "---\nintegration: x\ncommands: [plan]\n---\n"
-        "Feature is {{feature_name}}.\n",
+        "---\nintegration: x\ncommands: [plan]\n---\nFeature is {{feature_name}}.\n",
     )
     result = resolve_for("before", "plan", integrations_dir=d)
     assert "{{feature_name}}" in result[0].body

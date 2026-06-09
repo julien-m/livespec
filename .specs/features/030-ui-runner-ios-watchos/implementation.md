@@ -1,7 +1,8 @@
 ---
-title: "UI Runner iOS / watchOS — Implementation"
-status: "Done"
 created: 2026-05-07
+feature: 030-ui-runner-ios-watchos
+status: Done
+title: UI Runner iOS / watchOS — Implementation
 updated: 2026-05-07
 ---
 
@@ -11,7 +12,7 @@ updated: 2026-05-07
 
 | FR | Description | File | @spec Anchor |
 |---|---|---|---|
-| FR-001 | Author `ios.yaml` manifest | `livespec/ui-runners/ios.yaml` | `# @spec FR-001: iOS/watchOS runner manifest` |
+| FR-001 | Author iOS runner manifest | `livespec/ui-runners/ios.yaml` | `# @spec FR-001: iOS/watchOS runner manifest` |
 | FR-001 | Manifest runner Python module | `validator/ui_runner_xcuitest.py` | `# @spec FR-001: iOS/watchOS XCUITest manifest runner` |
 | FR-001 | Surface detection in generate-surfaces.js | `scripts/generate-surfaces.js` | `// @spec FR-001: iOS/watchOS surface detection` |
 | FR-002 | .xcresult bundle parsing + HEIC→PNG | `validator/ui_runner_xcuitest.py` | `# @spec FR-002: .xcresult parsing + HEIC→PNG` |
@@ -81,3 +82,36 @@ updated: 2026-05-07
 ---
 
 *Implementation completed 2026-05-07*
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |
+| FR-008 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-008) | ✅ Implemented | 2026-06-08 |
+| FR-009 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-009) | ✅ Implemented | 2026-06-08 |
+
+## Acceptance Criteria
+
+| AC | Test File | Status |
+|---|---|---|
+| AC-001 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-001) | ✅ Implemented |
+| AC-002 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-002) | ✅ Implemented |
+| AC-003 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-003) | ✅ Implemented |
+| AC-004 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-004) | ✅ Implemented |
+| AC-005 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-005) | ✅ Implemented |
+| AC-006 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-006) | ✅ Implemented |
+| AC-007 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-007) | ✅ Implemented |
+| AC-008 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-008) | ✅ Implemented |
+| AC-009 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-009) | ✅ Implemented |
+| AC-010 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-010) | ✅ Implemented |
+| AC-011 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-011) | ✅ Implemented |
+| AC-012 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-012) | ✅ Implemented |
+| AC-013 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-013) | ✅ Implemented |
+| AC-014 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` @spec(AC-014) | ✅ Implemented |

@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+
 # @spec FR-003: Flow question templates
 # .specs/features/045-native-behavioral-specs/spec.md#fr-003
 # @spec FR-004: Screen question templates
@@ -50,8 +53,7 @@ FLOW_QUESTIONS: tuple[InterviewQuestion, ...] = (
     InterviewQuestion(
         section_id="Acteur",
         prompt_template=(
-            "Acteur — Qui déclenche ce flow ? "
-            "(rôle utilisateur, système amont, cron, webhook…)"
+            "Acteur — Qui déclenche ce flow ? (rôle utilisateur, système amont, cron, webhook…)"
         ),
         kind="flow",
     ),
@@ -74,8 +76,7 @@ FLOW_QUESTIONS: tuple[InterviewQuestion, ...] = (
     InterviewQuestion(
         section_id="Étapes nominales",
         prompt_template=(
-            "Étapes nominales — Liste numérotée des étapes du chemin "
-            "heureux, sans erreurs."
+            "Étapes nominales — Liste numérotée des étapes du chemin heureux, sans erreurs."
         ),
         kind="flow",
     ),
@@ -90,8 +91,7 @@ FLOW_QUESTIONS: tuple[InterviewQuestion, ...] = (
     InterviewQuestion(
         section_id="Erreurs & exceptions",
         prompt_template=(
-            "Erreurs & exceptions — Quels échecs sont attendus et "
-            "comment le flow réagit ?"
+            "Erreurs & exceptions — Quels échecs sont attendus et comment le flow réagit ?"
         ),
         kind="flow",
     ),
@@ -106,8 +106,7 @@ FLOW_QUESTIONS: tuple[InterviewQuestion, ...] = (
     InterviewQuestion(
         section_id="Postconditions",
         prompt_template=(
-            "Postconditions — Quel état du système est vrai APRÈS la "
-            "réussite du flow ?"
+            "Postconditions — Quel état du système est vrai APRÈS la réussite du flow ?"
         ),
         kind="flow",
     ),
@@ -118,63 +117,49 @@ FLOW_QUESTIONS: tuple[InterviewQuestion, ...] = (
 SCREEN_QUESTIONS: tuple[InterviewQuestion, ...] = (
     InterviewQuestion(
         section_id="Acteur",
-        prompt_template=(
-            "Acteur — Quel rôle voit cet écran ?"
-        ),
+        prompt_template=("Acteur — Quel rôle voit cet écran ?"),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="Source d'entrée",
-        prompt_template=(
-            "Source d'entrée — D'où arrive l'utilisateur sur cet écran ?"
-        ),
+        prompt_template=("Source d'entrée — D'où arrive l'utilisateur sur cet écran ?"),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="Sortie principale",
-        prompt_template=(
-            "Sortie principale — Quel écran ou état suit en cas de "
-            "succès ?"
-        ),
+        prompt_template=("Sortie principale — Quel écran ou état suit en cas de succès ?"),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="Données affichées",
         prompt_template=(
-            "Données affichées — Quels champs / blocs / listes sont "
-            "rendus à l'écran ?"
+            "Données affichées — Quels champs / blocs / listes sont rendus à l'écran ?"
         ),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="Actions",
-        prompt_template=(
-            "Actions — Quels boutons / interactions / raccourcis sont "
-            "offerts ?"
-        ),
+        prompt_template=("Actions — Quels boutons / interactions / raccourcis sont offerts ?"),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="Validations",
         prompt_template=(
-            "Validations — Quelles règles de saisie / contraintes "
-            "synchrones sont appliquées ?"
+            "Validations — Quelles règles de saisie / contraintes synchrones sont appliquées ?"
         ),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="États UI",
         prompt_template=(
-            "États UI — Quels états visuels existent ? "
-            "(loading, empty, error, populated…)"
+            "États UI — Quels états visuels existent ? (loading, empty, error, populated…)"
         ),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="Erreurs",
         prompt_template=(
-            "Erreurs — Quels messages d'erreur peuvent s'afficher et "
-            "dans quels cas ?"
+            "Erreurs — Quels messages d'erreur peuvent s'afficher et dans quels cas ?"
         ),
         kind="screen",
     ),
@@ -192,24 +177,17 @@ SCREEN_QUESTIONS: tuple[InterviewQuestion, ...] = (
 MOCKUP_DERIVED_QUESTIONS: tuple[InterviewQuestion, ...] = (
     InterviewQuestion(
         section_id="Acteur",
-        prompt_template=(
-            "Acteur — Quel rôle voit cet écran ?"
-        ),
+        prompt_template=("Acteur — Quel rôle voit cet écran ?"),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="Source d'entrée",
-        prompt_template=(
-            "Source d'entrée — D'où arrive l'utilisateur sur cet écran ?"
-        ),
+        prompt_template=("Source d'entrée — D'où arrive l'utilisateur sur cet écran ?"),
         kind="screen",
     ),
     InterviewQuestion(
         section_id="Sortie principale",
-        prompt_template=(
-            "Sortie principale — Quel écran ou état suit en cas de "
-            "succès ?"
-        ),
+        prompt_template=("Sortie principale — Quel écran ou état suit en cas de succès ?"),
         kind="screen",
     ),
     InterviewQuestion(

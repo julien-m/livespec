@@ -95,9 +95,7 @@ class SmartTestSelector:
         "node_modules",
         "venv",
     }
-    TEST_FILE_SUFFIXES: ClassVar[set[str]] = {
-        ".go", ".js", ".py", ".rs", ".ts"
-    }
+    TEST_FILE_SUFFIXES: ClassVar[set[str]] = {".go", ".js", ".py", ".rs", ".ts"}
 
     def __init__(self, specs_root: Path | str) -> None:
         """Initialize the selector.

@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-017)
+
 # @spec FR-017: E2E smoke fixture (no brainstorm, no mockups, all skip → WARNING)
 # .specs/features/045-native-behavioral-specs/spec.md#fr-017
 """End-to-end smoke for F045 native behavioral generation."""
@@ -28,9 +31,7 @@ def test_e2e_smoke_no_brainstorm_no_mockups_skip_all(tmp_path: Path) -> None:
     # No brainstorm, no flow file, no mockups.
     assert detect_mode("booking", specs_root) is GenerationMode.NATIVE_INTERVIEW
 
-    artefact = run_native_interview(
-        "booking", "flow", specs_root, asker=lambda q: "skip"
-    )
+    artefact = run_native_interview("booking", "flow", specs_root, asker=lambda q: "skip")
 
     rc = apply_validation_gate(artefact, feature_dir)
     assert rc == 0  # WARNING is not blocking

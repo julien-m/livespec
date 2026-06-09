@@ -3,6 +3,9 @@ version: 14
 description: "Command validation hardening — audit-backed command surface and local coverage artifacts"
 date: 2026-05-18
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-012) -->
+
 
 # Migration v14: Command Validation Hardening
 

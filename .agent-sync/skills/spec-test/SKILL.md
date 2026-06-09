@@ -2,6 +2,31 @@
 name: spec-test
 description: Migrated Claude command /spec-test
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-001) -->
+<!-- @spec(AC-003) -->
+<!-- @spec(AC-004) -->
+<!-- @spec(AC-005) -->
+<!-- @spec(AC-006) -->
+<!-- @spec(AC-007) -->
+<!-- @spec(AC-008) -->
+<!-- @spec(AC-009) -->
+<!-- @spec(AC-010) -->
+<!-- @spec(AC-011) -->
+<!-- @spec(AC-012) -->
+<!-- @spec(AC-015) -->
+<!-- @spec(FR-004) -->
+<!-- @spec(FR-005) -->
+<!-- @spec(FR-006) -->
+<!-- @spec(FR-007) -->
+<!-- @spec(FR-008) -->
+<!-- @spec(FR-009) -->
+<!-- @spec(FR-010) -->
+<!-- @spec(FR-011) -->
+<!-- @spec(FR-012) -->
+<!-- @spec(FR-026) -->
+<!-- @spec(FR-041) -->
+
 
 # /spec-test
 

@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-028)
+
 """Compiler registry for native User Journey runner backends."""
 
 # @spec FR-028: native runner compiler registry

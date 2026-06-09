@@ -1,3 +1,14 @@
+// LiveSpec traceability anchors
+// @spec(AC-022)
+// @spec(AC-023)
+// @spec(AC-024)
+// @spec(AC-025)
+// @spec(AC-026)
+// @spec(FR-019)
+// @spec(FR-020)
+// @spec(FR-021)
+// @spec(FR-022)
+
 import { test, expect } from '@playwright/test';
 
 // @spec FR-019: Animation tests capture keyframes at 0%, 50%, 100% — spec.md#fr-019

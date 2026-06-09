@@ -1,3 +1,21 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-013)
+# @spec(AC-014)
+# @spec(AC-015)
+# @spec(AC-035)
+# @spec(AC-046)
+
 """Tests for executable user journey validation, compilation, and reporting."""
 
 from __future__ import annotations

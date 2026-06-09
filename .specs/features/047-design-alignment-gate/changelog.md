@@ -1,3 +1,13 @@
+## 2026-06-08 — [Spec Update]: Normalize changelog format
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **AC impacted:** None
+- **Author:** spec.doctor
+
+---
+
 # Changelog - Feature 047 - Design Alignment Gate
 
 ## 2026-05-17 — Feature: Design Alignment Gate

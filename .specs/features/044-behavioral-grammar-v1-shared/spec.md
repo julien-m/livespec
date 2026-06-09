@@ -1,6 +1,6 @@
 ---
 title: Behavioral Grammar v1.0 — Shared Canonical Reference & Validator
-status: Draft
+status: Implemented
 scope: S
 priority: P1
 created: 2026-05-14

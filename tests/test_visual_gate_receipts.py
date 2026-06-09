@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(AC-016)
+
 """CLI tests for visual-gate receipt certification."""
 
 from __future__ import annotations

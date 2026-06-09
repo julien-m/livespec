@@ -13,8 +13,7 @@ def _fake_cc_hub(bin_dir: Path, log_path: Path) -> None:
     bin_dir.mkdir(parents=True)
     script = bin_dir / "cc-hub"
     script.write_text(
-        "#!/usr/bin/env bash\n"
-        "printf '%s\\n' \"$*\" >> \"${CC_HUB_LOG}\"\n",
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$*" >> "${CC_HUB_LOG}"\n',
         encoding="utf-8",
     )
     script.chmod(0o755)
@@ -87,35 +86,35 @@ def test_from_code_autonomous_bootstrap_script_completes_vite_react(
     assert (project / ".specs/spec-system.md").exists()
     assert (project / ".specs/project.md").exists()
     assert (project / ".specs/roadmap.md").exists()
-    assert (project / ".specs/stacks/_default.md").read_text(
-        encoding="utf-8"
-    ).startswith("---\nupdated:")
+    assert (
+        (project / ".specs/stacks/_default.md")
+        .read_text(encoding="utf-8")
+        .startswith("---\nupdated:")
+    )
     readme = (project / ".specs/README.md").read_text(encoding="utf-8")
     assert "<!-- readme:features:start -->" in readme
     assert "<!-- readme:decisions:start -->" in readme
     assert "<!-- readme:activity:start -->" in readme
     assert (project / ".specs/preflight.md").exists()
     assert (project / ".specs/preflight-report.md").exists()
-    assert (project / ".specs/bootstrap-recap.md").read_text(
-        encoding="utf-8"
-    ).startswith("---\nstatus: completed")
+    assert (
+        (project / ".specs/bootstrap-recap.md")
+        .read_text(encoding="utf-8")
+        .startswith("---\nstatus: completed")
+    )
     assert not (project / "bootstrap-recap.md").exists()
     assert list((project / ".specs/stacks/decisions").glob("ADR-*.md"))
     assert (project / ".specs/.livespec-path").read_text(encoding="utf-8").strip()
     assert (project / ".conventions/index.md").exists()
-    assert ".specs/.livespec-path" in (project / ".gitignore").read_text(
-        encoding="utf-8"
-    )
+    assert ".specs/.livespec-path" in (project / ".gitignore").read_text(encoding="utf-8")
     assert "skill link" in log_path.read_text(encoding="utf-8")
 
 
 def test_spec_init_skill_uses_concrete_autonomous_bootstrap_command() -> None:
-    body = (ROOT / ".agent-sync/skills/spec-init/SKILL.md").read_text(
-        encoding="utf-8"
-    )
+    body = (ROOT / ".agent-sync/skills/spec-init/SKILL.md").read_text(encoding="utf-8")
 
     assert "scripts/init-from-code-autonomous.sh" in body
-    assert "bash \"$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh\" \"$PWD\"" in body
+    assert 'bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "$PWD"' in body
     assert "--timeout-seconds 300" in body
     assert "run this command before any manual file creation" in body
     assert "If this command exits 0, do not manually rewrite `.specs/` artifacts" in body

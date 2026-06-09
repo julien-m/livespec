@@ -1,3 +1,12 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-007)
+# @spec(FR-008)
+# @spec(FR-009)
+# @spec(FR-010)
+
 """Parser + override resolver for command expectations files.
 
 # @spec FR-003: ExpectationsFile parser
@@ -60,9 +69,7 @@ SECTION13_SUBSECTIONS: tuple[str, ...] = (
 # Minimum number of non-empty content lines per Section 13 sub-section.
 SECTION13_MIN_CONTENT_LINES: int = 3
 
-RULE_KINDS: frozenset[str] = frozenset(
-    {"contains", "exists", "exit_code", "produces_artifact"}
-)
+RULE_KINDS: frozenset[str] = frozenset({"contains", "exists", "exit_code", "produces_artifact"})
 
 
 @dataclass(frozen=True)
@@ -293,9 +300,7 @@ def _extract_sections(path: Path, body: str) -> dict[str, str]:
         # AC-008 mandates a precise message when Section 13 is the missing one.
         # @spec AC-008: section 13 missing message —
         #   .specs/features/040-expectations-rich-and-verify-preview/spec.md#ac-008
-        if missing == ["13. Demo Session"] or (
-            "13. Demo Session" in missing and len(missing) == 1
-        ):
+        if missing == ["13. Demo Session"] or ("13. Demo Session" in missing and len(missing) == 1):
             raise ExpectationsInvalid(
                 str(path),
                 f"section 13 missing in {path.as_posix()}",

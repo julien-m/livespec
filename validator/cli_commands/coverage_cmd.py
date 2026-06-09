@@ -53,14 +53,9 @@ def coverage_command(
     report_path: Path | None = typer.Option(  # noqa: B008
         None,
         "--report-path",
-        help=(
-            "lcov.info path (defaults to the active driver's "
-            "coverage.report_path field)."
-        ),
+        help=("lcov.info path (defaults to the active driver's coverage.report_path field)."),
     ),
-    debug: bool = typer.Option(
-        False, "--debug", help="Print the full stacktrace on error."
-    ),
+    debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
 ) -> None:
     """Compute patch coverage and print a summary plus a CI line.
 
@@ -84,9 +79,9 @@ def coverage_command(
 
 def register(app: typer.Typer) -> None:
     """Register the ``coverage`` subcommand."""
-    app.command(
-        name="coverage", help="Compute patch coverage vs the base branch."
-    )(coverage_command)
+    app.command(name="coverage", help="Compute patch coverage vs the base branch.")(
+        coverage_command
+    )
 
 
 def _run_coverage(

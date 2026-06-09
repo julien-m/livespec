@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-003)
+
 """Detect Rust crate dependencies and parse cargo-mutants JSON output."""
 
 # @spec FR-002: Cargo.toml dependency parser using tomllib (no shell grep)

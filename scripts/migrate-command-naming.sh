@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-008)
+
 set -euo pipefail
 
 # Migration v15 wrapper: install hyphenated slash-command links and keep dotted aliases.

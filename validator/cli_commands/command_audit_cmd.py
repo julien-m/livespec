@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+
 """CLI command for deterministic command contract audits."""
 
 from __future__ import annotations

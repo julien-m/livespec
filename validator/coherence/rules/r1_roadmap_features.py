@@ -140,36 +140,6 @@ class R1_3_StatusRoadmapMismatch:
                         suppress_if_creating=True,
                     )
                 )
-            elif (
-                status
-                in (
-                    "Draft",
-                    "Planned",
-                    "In Progress",
-                    "Approved",
-                    "Review",
-                )
-                and item.checked
-            ):
-                violations.append(
-                    Violation(
-                        rule_id=self.rule_id,
-                        severity=Severity.ERROR,
-                        message=(
-                            f"Feature '{dir_name}' has status '{status}' "
-                            f"but roadmap item '{item.name}' is checked"
-                        ),
-                        context={
-                            "dir_name": dir_name,
-                            "status": status,
-                            "checked": item.checked,
-                        },
-                        fix_hint=(
-                            "Uncheck the roadmap item or update the feature status to Implemented"
-                        ),
-                        suppress_if_creating=True,
-                    )
-                )
         return violations
 
 

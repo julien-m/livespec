@@ -94,11 +94,42 @@ class TestBuildGraph:
         assert done_item.link is None
         assert done_item.checked is True
 
+    def test_roadmap_item_with_embedded_feature_link(self, specs_dir: Path) -> None:
+        roadmap = specs_dir / "roadmap.md"
+        roadmap.write_text(
+            "- [x] **Spec Doctor** — project health command "
+            "→ [055-spec-doctor](features/055-spec-doctor-project-health/spec.md)\n"
+        )
+
+        graph = build_graph(specs_dir)
+
+        item = graph.roadmap[0]
+        assert item.link == "features/055-spec-doctor-project-health/spec.md"
+        assert item.slug == "055-spec-doctor-project-health"
+
     def test_features_detected(self, specs_dir: Path) -> None:
         graph = build_graph(specs_dir)
         assert len(graph.features) == 2
         dirs = {f.dir_name for f in graph.features}
         assert dirs == {"001-auth", "002-search"}
+
+    def test_decimal_sub_feature_dirs_detected(self, specs_dir: Path) -> None:
+        sub_feature_dir = specs_dir / "features" / "005.1-behavioral-tdd-audit"
+        sub_feature_dir.mkdir(parents=True)
+        (sub_feature_dir / "spec.md").write_text(
+            "---\nstatus: Implemented\n---\n# Behavioral TDD Audit\n"
+        )
+
+        roadmap = specs_dir / "roadmap.md"
+        roadmap.write_text("- [x] [Behavioral TDD Audit](features/005.1-behavioral-tdd-audit/)\n")
+
+        graph = build_graph(specs_dir)
+
+        sub_feature = graph.get_feature("005.1-behavioral-tdd-audit")
+        assert sub_feature is not None
+        assert sub_feature.num == 5
+        assert sub_feature.slug == "behavioral-tdd-audit"
+        assert graph.feature_dirs == {"001-auth", "002-search", "005.1-behavioral-tdd-audit"}
 
     def test_feature_files_map(self, specs_dir: Path) -> None:
         graph = build_graph(specs_dir)
@@ -128,6 +159,20 @@ class TestBuildGraph:
         assert "AC-001" in auth.implementation_paths
         assert "src/auth/redirect.ts" in auth.implementation_paths["AC-001"]
 
+    def test_implementation_paths_ignore_prose_with_dotted_words(self, specs_dir: Path) -> None:
+        implementation = specs_dir / "features" / "001-auth" / "implementation.md"
+        implementation.write_text(
+            "# Implementation\n\n"
+            "| AC-001 | Pre-existing plan_review.py prompt. | Implemented |\n"
+            "| AC-002 | `SdkTestRunner.run()` | Implemented |\n"
+        )
+
+        graph = build_graph(specs_dir)
+
+        auth = graph.get_feature("001-auth")
+        assert auth is not None
+        assert auth.implementation_paths == {}
+
     def test_spec_anchors_parsed(self, specs_dir: Path) -> None:
         graph = build_graph(specs_dir)
         auth = graph.get_feature("001-auth")
@@ -138,6 +183,17 @@ class TestBuildGraph:
         graph = build_graph(specs_dir)
         assert "001-auth" in graph.readme_entries
         assert "002-search" in graph.readme_entries
+
+    def test_readme_entries_accept_decimal_sub_features(self, specs_dir: Path) -> None:
+        readme = specs_dir / "README.md"
+        readme.write_text(
+            "| 005.1 | Behavioral TDD Audit | Implemented | "
+            "[spec](features/005.1-behavioral-tdd-audit/spec.md) |\n"
+        )
+
+        graph = build_graph(specs_dir)
+
+        assert "005.1-behavioral-tdd-audit" in graph.readme_entries
 
     def test_readme_statuses(self, specs_dir: Path) -> None:
         graph = build_graph(specs_dir)
@@ -159,6 +215,13 @@ class TestBuildGraph:
         graph = build_graph(specs_dir)
         assert "001-auth" in graph.changelog_refs
         assert "002-search" in graph.changelog_refs
+
+    def test_changelog_dates_are_not_feature_refs(self, specs_dir: Path) -> None:
+        (specs_dir / "changelog.md").write_text("## 2026-06-08 — [Feature 001]: Updated 001-auth\n")
+
+        graph = build_graph(specs_dir)
+
+        assert graph.changelog_refs == ["001-auth"]
 
     def test_feature_dirs_property(self, specs_dir: Path) -> None:
         graph = build_graph(specs_dir)

@@ -1,3 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-011)
+
 """Corpus test: every builtin expectations file parses and is well-formed.
 
 # @spec AC-002, AC-003 — .specs/features/039-command-expectations-and-verify-output/spec.md

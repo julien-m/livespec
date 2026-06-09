@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-016)
+
 # @spec FR-016: Mode-detection unit tests for 4 branches
 # .specs/features/045-native-behavioral-specs/spec.md#fr-016
 # @spec FR-017: E2E smoke (in companion integration file)
@@ -146,9 +149,7 @@ def test_skip_becomes_to_fill_later(specs_root: Path) -> None:
 
 
 def test_empty_answer_becomes_to_fill_later(specs_root: Path) -> None:
-    artefact = run_native_interview(
-        "foo", "flow", specs_root, asker=_const_asker("")
-    )
+    artefact = run_native_interview("foo", "flow", specs_root, asker=_const_asker(""))
     # All 8 sections should contain placeholder.
     assert artefact.body.count(PLACEHOLDER_TO_FILL) == 8
 
@@ -159,9 +160,7 @@ def test_empty_answer_becomes_to_fill_later(specs_root: Path) -> None:
 def test_native_frontmatter_specStatus_manual_no_brainstormSource(
     specs_root: Path,
 ) -> None:
-    artefact = run_native_interview(
-        "foo", "flow", specs_root, asker=_const_asker("body")
-    )
+    artefact = run_native_interview("foo", "flow", specs_root, asker=_const_asker("body"))
     assert artefact.frontmatter.get("specStatus") == "manual"
     assert "brainstormSource" not in artefact.frontmatter
     assert "derivedFrom" not in artefact.frontmatter
@@ -266,9 +265,7 @@ def test_mockup_zero_bytes_falls_back_to_modeb_no_derivedFrom(
 def test_validator_gate_PASS_writes_silently(
     specs_root: Path, feature_dir: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    artefact = run_native_interview(
-        "foo", "flow", specs_root, asker=_const_asker("body content")
-    )
+    artefact = run_native_interview("foo", "flow", specs_root, asker=_const_asker("body content"))
     # Add Notes optional section to body to suppress WARNING about it.
     artefact = NativeArtefact(
         path=artefact.path,
@@ -287,9 +284,7 @@ def test_validator_gate_PASS_writes_silently(
 def test_validator_gate_WARNING_writes_and_logs(
     specs_root: Path, feature_dir: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    artefact = run_native_interview(
-        "foo", "flow", specs_root, asker=_const_asker("skip")
-    )
+    artefact = run_native_interview("foo", "flow", specs_root, asker=_const_asker("skip"))
     rc = apply_validation_gate(artefact, feature_dir)
     assert rc == 0
     assert artefact.path.exists()
@@ -332,9 +327,7 @@ def test_validator_gate_FAIL_discards_and_blocks(
 def test_validator_invoked_per_artefact_log_line(
     specs_root: Path, feature_dir: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    artefact = run_native_interview(
-        "foo", "flow", specs_root, asker=_const_asker("skip")
-    )
+    artefact = run_native_interview("foo", "flow", specs_root, asker=_const_asker("skip"))
     apply_validation_gate(artefact, feature_dir)
     err = capsys.readouterr().err
     # Exactly one structured log line per artefact.
@@ -351,14 +344,8 @@ def test_body_byte_equivalent_to_f041_import(specs_root: Path) -> None:
     order. We extract H2 headings from a Mode B body and assert they
     equal `MANDATORY_FLOW_SECTIONS` exactly.
     """
-    artefact = run_native_interview(
-        "foo", "flow", specs_root, asker=_const_asker("body content")
-    )
-    headings = [
-        line[3:].strip()
-        for line in artefact.body.splitlines()
-        if line.startswith("## ")
-    ]
+    artefact = run_native_interview("foo", "flow", specs_root, asker=_const_asker("body content"))
+    headings = [line[3:].strip() for line in artefact.body.splitlines() if line.startswith("## ")]
     from validator.behavioral_grammar import MANDATORY_FLOW_SECTIONS
 
     assert tuple(headings) == MANDATORY_FLOW_SECTIONS

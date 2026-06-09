@@ -1,7 +1,7 @@
 ---
 feature: Structured Signal Extraction
 title: Structured Signal Extraction
-status: Draft
+status: Implemented
 priority: P1
 branch: feature/007-structured-signal-extraction
 created: 2026-04-15

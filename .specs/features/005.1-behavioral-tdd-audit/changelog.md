@@ -1,3 +1,13 @@
+## 2026-06-08 — [Spec Update]: Normalize changelog format
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **AC impacted:** None
+- **Author:** spec.doctor
+
+---
+
 # Changelog — 005.1-behavioral-tdd-audit
 
 ## 2026-04-17 — Feature: Spec created for behavioral TDD audit completion

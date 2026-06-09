@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-006)
+# @spec(AC-007)
+
 """Tests for validator.state_files (Chantier 4 / Feature 013, FR-005/006)."""
 
 from __future__ import annotations
@@ -128,10 +135,7 @@ class TestValidateStateFile:
 
         violations = validate_state_file(p)
 
-        assert any(
-            v.rule == "wrong_value" and "spec-feature" in v.message
-            for v in violations
-        )
+        assert any(v.rule == "wrong_value" and "spec-feature" in v.message for v in violations)
 
     def test_rejects_non_iso_date(self, tmp_path: Path) -> None:
         p = tmp_path / ".specs" / "features" / "001-foo" / "pipeline.md"

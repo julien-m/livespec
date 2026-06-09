@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-001) -->
+<!-- @spec(FR-041) -->
+
 # Executable User Journeys v2
 
 Canonical journey sources live at `.specs/journeys/<journey-id>/journey.yaml`.

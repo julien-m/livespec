@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Integration checks for the built-in JVM driver manifest."""
 
 # @spec FR-005: Integration tests for the JVM driver
@@ -44,9 +47,7 @@ def test_registry_loads_jvm_driver_on_gradle() -> None:
     # @spec AC-001 — .specs/features/022-driver-jvm/spec.md#ac-001
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "build.gradle").write_text(
-            "plugins { id 'java' }\n", encoding="utf-8"
-        )
+        (project_root / "build.gradle").write_text("plugins { id 'java' }\n", encoding="utf-8")
 
         registry = DriverRegistry(project_root)
         drivers = registry.discover()
@@ -59,9 +60,7 @@ def test_registry_loads_jvm_driver_on_gradle_kts() -> None:
     # @spec AC-001, AC-011
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "build.gradle.kts").write_text(
-            "plugins { id(\"java\") }\n", encoding="utf-8"
-        )
+        (project_root / "build.gradle.kts").write_text('plugins { id("java") }\n', encoding="utf-8")
 
         registry = DriverRegistry(project_root)
         drivers = registry.discover()
@@ -74,9 +73,7 @@ def test_registry_loads_jvm_driver_on_maven() -> None:
     # @spec AC-001
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "pom.xml").write_text(
-            '<?xml version="1.0"?><project/>', encoding="utf-8"
-        )
+        (project_root / "pom.xml").write_text('<?xml version="1.0"?><project/>', encoding="utf-8")
 
         registry = DriverRegistry(project_root)
         drivers = registry.discover()
@@ -280,11 +277,7 @@ def test_gradle_priority_over_maven_in_detect_build_tool() -> None:
     # @spec AC-010
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "build.gradle").write_text(
-            "plugins { id 'java' }\n", encoding="utf-8"
-        )
-        (project_root / "pom.xml").write_text(
-            '<?xml version="1.0"?><project/>', encoding="utf-8"
-        )
+        (project_root / "build.gradle").write_text("plugins { id 'java' }\n", encoding="utf-8")
+        (project_root / "pom.xml").write_text('<?xml version="1.0"?><project/>', encoding="utf-8")
 
         assert detect_build_tool(str(project_root)) == "gradle"

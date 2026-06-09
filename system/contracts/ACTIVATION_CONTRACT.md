@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-004) -->
+<!-- @spec(AC-008) -->
+
 # Activation Contract
 
 > Hardened entry-point guard for all `livespec-*` agents. Active filesystem verification replaces blind trust of caller-supplied flags.

@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-004) -->
+<!-- @spec(FR-009) -->
+
 <!-- livespec:start -->
 ## LiveSpec
 

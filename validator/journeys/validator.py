@@ -1,3 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-004)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-017)
+# @spec(FR-018)
+
 """Project-aware validation for User Journeys v2 YAML sources."""
 
 # @spec FR-006, FR-017, FR-018: qualified refs, project-aware validation, and doctor findings source

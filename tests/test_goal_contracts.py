@@ -1,3 +1,19 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-011)
+# @spec(AC-012)
+# @spec(AC-013)
+# @spec(AC-014)
+# @spec(AC-017)
+
 """Tests for deterministic command goal contracts.
 
 # @spec FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-013, FR-014, FR-015, FR-019

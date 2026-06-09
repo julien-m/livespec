@@ -1,3 +1,15 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-001) -->
+<!-- @spec(AC-002) -->
+<!-- @spec(AC-007) -->
+<!-- @spec(FR-001) -->
+<!-- @spec(FR-003) -->
+<!-- @spec(FR-004) -->
+<!-- @spec(FR-005) -->
+<!-- @spec(FR-006) -->
+<!-- @spec(FR-008) -->
+<!-- @spec(FR-012) -->
+
 # UI Behavioral Taxonomy
 
 <!-- @spec FR-001: Behavioral taxonomy source of truth — .specs/features/005-ui-behavioral-testing/spec.md#fr-001 -->

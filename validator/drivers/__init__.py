@@ -1,8 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-007)
+
 """LiveSpec test driver subsystem — public API."""
 
 # @spec FR-007: Slash commands consume one stable Python API for driver execution.
 # @spec AC-013: The public surface exposes a single run_capability entry point.
-
 
 from .degradation import format_degradation_message, infer_stack_slug
 from .loader import load_manifest

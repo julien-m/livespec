@@ -1,3 +1,22 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-007)
+# @spec(FR-009)
+# @spec(FR-010)
+# @spec(FR-012)
+# @spec(FR-013)
+# @spec(FR-014)
+# @spec(FR-015)
+# @spec(FR-016)
+# @spec(FR-017)
+# @spec(FR-018)
+# @spec(FR-019)
+
 """Deterministic command goal contract compiler.
 
 # @spec FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-010, FR-012, FR-013, FR-019

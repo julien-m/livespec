@@ -1,4 +1,9 @@
 #!/usr/bin/env ts-node
+// LiveSpec traceability anchors
+// @spec(AC-023)
+// @spec(FR-020)
+// @spec(FR-022)
+
 // @spec FR-019: Capture keyframes at 0%, 50%, 100% — .specs/features/010-visual-testing-complete/spec.md#fr-019
 // @spec FR-020: Save to baselines/animations/[feature]/[component]-[percent].png — spec.md#fr-020
 // @spec FR-022: Output YAML metadata with duration, easing, keyframe percentages — spec.md#fr-022

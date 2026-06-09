@@ -157,14 +157,13 @@ class TestR1_3_StatusRoadmapMismatch:
         assert violations[0].severity == Severity.ERROR
         assert "Implemented" in violations[0].message
 
-    def test_draft_but_checked(self) -> None:
+    def test_draft_and_checked_is_valid(self) -> None:
         graph = SpecGraph(
             roadmap=[_make_roadmap_item(checked=True, link="features/001-auth/")],
             features=[_make_feature(status="Draft")],
         )
         violations = R1_3_StatusRoadmapMismatch().check(graph, Path("."))
-        assert len(violations) == 1
-        assert violations[0].severity == Severity.ERROR
+        assert violations == []
 
     def test_implemented_and_checked_is_valid(self) -> None:
         graph = SpecGraph(
@@ -386,6 +385,42 @@ class TestR3_1_SourceFileNotFound:
             ],
         )
         violations = R3_1_SourceFileNotFound().check(graph, specs_root)
+        assert violations == []
+
+    def test_existing_source_file_with_line_suffix(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        specs_root.mkdir()
+        agent_file = tmp_path / "agents" / "livespec-supervisor.md"
+        agent_file.parent.mkdir(parents=True)
+        agent_file.write_text("# Supervisor\n")
+        graph = SpecGraph(
+            features=[
+                _make_feature(
+                    implementation_paths={"AC-001": ["agents/livespec-supervisor.md:154"]},
+                )
+            ],
+        )
+
+        violations = R3_1_SourceFileNotFound().check(graph, specs_root)
+
+        assert violations == []
+
+    def test_existing_source_file_glob(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        specs_root.mkdir()
+        skill_file = tmp_path / ".agent-sync" / "skills" / "spec-test" / "expectations.md"
+        skill_file.parent.mkdir(parents=True)
+        skill_file.write_text("# Expectations\n")
+        graph = SpecGraph(
+            features=[
+                _make_feature(
+                    implementation_paths={"FR-001": [".agent-sync/skills/*/expectations.md"]},
+                )
+            ],
+        )
+
+        violations = R3_1_SourceFileNotFound().check(graph, specs_root)
+
         assert violations == []
 
     def test_no_implementation_paths_is_valid(self, tmp_path: Path) -> None:

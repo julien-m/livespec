@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+
 """Parse Stryker mutation reports into structured results."""
 
 # @spec FR-003: Stryker JSON report parser

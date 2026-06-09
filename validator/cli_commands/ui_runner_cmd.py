@@ -386,9 +386,7 @@ def _emit_check(
     typer.echo(f"Phase 4.5 preflight: {status}")
     typer.echo(f"  Handlers: {', '.join(registry)}")
     for surface in surfaces:
-        line = (
-            f"  - {surface['id']} [{surface['runner']}] -> {surface['status']}"
-        )
+        line = f"  - {surface['id']} [{surface['runner']}] -> {surface['status']}"
         if surface["note"]:
             line += f" -- {surface['note']}"
         typer.echo(line)
@@ -641,9 +639,7 @@ def converge_command(
             raise typer.Exit(code=2)
         feature_path = (project_path / ".specs" / "features" / feature).resolve()
         if not feature_path.is_dir():
-            typer.echo(
-                f"Feature directory not found at {feature_path}", err=True
-            )
+            typer.echo(f"Feature directory not found at {feature_path}", err=True)
             raise typer.Exit(code=2)
         feature_screens = _discover_screens_in_feature(feature_path)
         if not feature_screens:
@@ -678,6 +674,7 @@ def converge_command(
     # crashed prior run can be reaped without a manual `rm`.
     import os
     import time
+
     lock_file = bundles_dir / "converge.lock"
     if lock_file.exists():
         try:
@@ -766,9 +763,7 @@ def _converge_loop(
             test_target = bundle.stem  # e.g. "STRAPTUITests"
             swift_dir = project_path / test_target
             if not swift_dir.exists():
-                typer.echo(
-                    f"  ~ {test_target}: no matching Swift directory at {swift_dir}"
-                )
+                typer.echo(f"  ~ {test_target}: no matching Swift directory at {swift_dir}")
                 continue
             swift_files = list(swift_dir.glob("*.swift"))
             if not swift_files:
@@ -779,20 +774,15 @@ def _converge_loop(
             if not trees:
                 typer.echo(f"  ~ {test_target}: no <screen>.tree.txt attachments")
                 continue
-            inventories = {
-                screen: parse_tree_elements(text) for screen, text in trees.items()
-            }
+            inventories = {screen: parse_tree_elements(text) for screen, text in trees.items()}
             for swift_file in swift_files:
                 changed = rewrite_swift_candidates(swift_file, inventories)
                 total_patched += changed
-                typer.echo(
-                    f"  → {test_target}/{swift_file.name}: patched {changed} method(s)"
-                )
+                typer.echo(f"  → {test_target}/{swift_file.name}: patched {changed} method(s)")
 
         if total_patched == 0:
             typer.echo(
-                f"\n✓ Converged after {iteration} iteration(s) — "
-                f"no more candidates to inject."
+                f"\n✓ Converged after {iteration} iteration(s) — no more candidates to inject."
             )
             raise typer.Exit(code=0)
 
@@ -858,9 +848,7 @@ def scaffold_command(
     # from the global install, so we resolve relative to this module.
     livespec_root = Path(__file__).resolve().parents[2]
     template_name = "xcuitest" if target_lower == "ios" else "maestro"
-    template_dir = (
-        livespec_root / "livespec" / "ui-runners" / f"{template_name}-template"
-    )
+    template_dir = livespec_root / "livespec" / "ui-runners" / f"{template_name}-template"
 
     if not template_dir.exists():
         typer.echo(
@@ -903,7 +891,7 @@ def scaffold_command(
     if target_lower == "ios" and copied:
         typer.echo(
             "\nNext: add LSSampleUITests.swift to your UITests target in Xcode "
-            "(File > Add Files to \"<project>\"...), share the test scheme "
+            '(File > Add Files to "<project>"...), share the test scheme '
             "(Product > Scheme > Manage Schemes > tick 'Shared'), then re-run "
             "`livespec ui-runner dispatch`."
         )

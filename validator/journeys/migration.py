@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-040)
+
 """Migration from feature-scoped v1 journeys to global v2 journeys."""
 
 # @spec FR-040: migrate v1 feature-scoped journeys to global v2 directories

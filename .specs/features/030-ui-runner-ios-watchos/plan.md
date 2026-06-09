@@ -1,7 +1,8 @@
 ---
-title: "UI Runner iOS / watchOS — Technical Plan"
-status: "Approved"
 created: 2026-05-07
+spec_ref: .specs/features/030-ui-runner-ios-watchos/spec.md
+status: Approved
+title: UI Runner iOS / watchOS — Technical Plan
 updated: 2026-05-07
 ---
 
@@ -809,3 +810,11 @@ All conform to the `UIRunner` interface defined in Feature 027.
 ---
 
 *Technical Plan — Feature 030 — 2026-05-07*
+
+## Summary
+
+Technical plan for Ui Runner Ios Watchos.
+
+## Risks & Considerations
+
+- Keep this compatibility plan aligned with the living spec and implementation map.

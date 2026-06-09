@@ -1,3 +1,13 @@
+// LiveSpec traceability anchors
+// @spec(AC-007)
+// @spec(AC-008)
+// @spec(AC-009)
+// @spec(AC-010)
+// @spec(AC-011)
+// @spec(FR-006)
+// @spec(FR-007)
+// @spec(FR-008)
+
 import { test, expect } from '@playwright/test';
 
 // @spec FR-006: Full-page tests capture entire viewport — .specs/features/010-visual-testing-complete/spec.md#fr-006

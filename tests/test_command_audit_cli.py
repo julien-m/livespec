@@ -1,3 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(AC-005)
+# @spec(AC-008)
+# @spec(AC-011)
+# @spec(AC-017)
+# @spec(AC-029)
+# @spec(FR-011)
+
 """Tests for ``livespec command-audit``."""
 
 from __future__ import annotations

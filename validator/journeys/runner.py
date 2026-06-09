@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-024)
+# @spec(FR-027)
+# @spec(FR-029)
+
 """Compiled-only execution planner for User Journeys v2."""
 
 # @spec FR-024, FR-027: compiled-only journey execution and stage run policies

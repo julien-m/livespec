@@ -1,3 +1,14 @@
+---
+created: 2026-05-03
+priority: P2
+status: Implemented
+title: State Model & Identity Resolution
+updated: 2026-06-08
+---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-010) -->
+
+
 # Feature Spec: State Model & Identity Resolution
 
 ## Header

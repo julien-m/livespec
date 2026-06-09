@@ -87,8 +87,7 @@ class TauriRunnerHandler:
                 app_path=None,
                 driver_path=None,
                 reason=(
-                    f"No Tauri app detected — expected {TAURI_APP_MARKER} "
-                    f"under {self.project_dir}."
+                    f"No Tauri app detected — expected {TAURI_APP_MARKER} under {self.project_dir}."
                 ),
             )
         driver = shutil.which(TAURI_DRIVER_BIN)
@@ -238,9 +237,7 @@ class TauriRunnerHandler:
         """
         screen = str(kwargs.get("screen", "main"))
         raw_output_path = kwargs.get("output_path")
-        output_path = (
-            Path(raw_output_path) if isinstance(raw_output_path, (str, Path)) else None
-        )
+        output_path = Path(raw_output_path) if isinstance(raw_output_path, (str, Path)) else None
         feature_slug = kwargs.get("feature_slug")
         run_id = kwargs.get("run_id")
         return self.capture_screenshot(

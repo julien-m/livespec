@@ -1,3 +1,14 @@
+# LiveSpec traceability anchors
+# @spec(AC-007)
+# @spec(AC-013)
+# @spec(FR-001)
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-008)
+
 """iOS/watchOS UI runner support for XCUITest-based projects.
 
 This module provides an orchestrator around xcrun/xcodebuild so the validator
@@ -27,7 +38,7 @@ import yaml  # type: ignore[import-untyped]
 
 DEFAULT_COMPARE_THRESHOLD = 0.05
 SCREENSHOT_TIMEOUT_SECONDS = 1200  # 20 min — first build of a large iOS app
-FLOW_TIMEOUT_SECONDS = 1800        # 30 min — flow runs are longer than single captures
+FLOW_TIMEOUT_SECONDS = 1800  # 30 min — flow runs are longer than single captures
 COMPARE_TIMEOUT_SECONDS = 60
 SIMULATOR_BOOT_TIMEOUT_SECONDS = 120
 XCRESULTTOOL_TIMEOUT_SECONDS = 60
@@ -171,9 +182,7 @@ class XCUITestRunnerHandler:
             readable hint covering the missing piece (host OS, xcrun, etc.).
         """
         if not self._check_macos():
-            return (
-                f"XCUITest runner requires macOS host (current: {platform.system().lower()})"
-            )
+            return f"XCUITest runner requires macOS host (current: {platform.system().lower()})"
         if self._get_toolchain_path() is None:
             return "xcrun simctl not found — install Xcode CLI tools"
         if not self._check_xcode_license():
@@ -439,9 +448,7 @@ class XCUITestRunnerHandler:
         # canonical reference and might be stale if a name= contradicts it.
         if udid is not None:
             devices_data = self._list_simulators()
-            runtimes = cast(
-                dict[str, list[dict[str, Any]]], devices_data.get("devices", {})
-            )
+            runtimes = cast(dict[str, list[dict[str, Any]]], devices_data.get("devices", {}))
             for runtime_key, devs in runtimes.items():
                 matched = next((d for d in devs if d.get("udid") == udid), None)
                 if matched is None:
@@ -632,9 +639,7 @@ class XCUITestRunnerHandler:
 
         return exported
 
-    def _iter_manifest_attachments(
-        self, manifest: object
-    ) -> list[dict[str, str]]:
+    def _iter_manifest_attachments(self, manifest: object) -> list[dict[str, str]]:
         """Flatten `xcresulttool export attachments` manifest into one list.
 
         The manifest groups attachments per test method:
@@ -707,11 +712,7 @@ class XCUITestRunnerHandler:
         # if they look like an index + UUID. The UUID always contains hyphens
         # in canonical 8-4-4-4-12 form, so check for that.
         parts = stem.split("_")
-        if (
-            len(parts) >= 3
-            and parts[-1].count("-") >= 4
-            and parts[-2].isdigit()
-        ):
+        if len(parts) >= 3 and parts[-1].count("-") >= 4 and parts[-2].isdigit():
             stem = "_".join(parts[:-2])
         # Tree dumps share the screen name but with a `.tree` infix: strip it.
         if stem.endswith(".tree"):
@@ -784,13 +785,7 @@ class XCUITestRunnerHandler:
                 )
         elif feature_slug and run_id:
             output_path = (
-                self.project_dir
-                / ".specs"
-                / "features"
-                / feature_slug
-                / "run"
-                / run_id
-                / "ios"
+                self.project_dir / ".specs" / "features" / feature_slug / "run" / run_id / "ios"
             )
         # Note: when neither `output_path` nor `feature_slug+run_id` are
         # supplied, we defer the `missing_output_context` BLOCKED return
@@ -825,9 +820,11 @@ class XCUITestRunnerHandler:
             xcodeproj = self._find_xcodeproj()
             if xcodeproj is not None:
                 if project is None and workspace is None:
-                    rel = xcodeproj.relative_to(self.project_dir) if (
-                        xcodeproj.is_relative_to(self.project_dir)
-                    ) else xcodeproj
+                    rel = (
+                        xcodeproj.relative_to(self.project_dir)
+                        if (xcodeproj.is_relative_to(self.project_dir))
+                        else xcodeproj
+                    )
                     if xcodeproj.suffix == ".xcworkspace":
                         workspace = str(rel)
                     else:
@@ -918,12 +915,8 @@ class XCUITestRunnerHandler:
             # function returns missing_output_context above when no canonical
             # context was supplied.
             assert output_path is not None  # narrows the type for the next line
-            cached_output_dir = (
-                output_path if output_path.suffix == "" else output_path.parent
-            )
-            cached_paths = self._parse_xcresult(
-                xcresult_path, cached_output_dir, destination_id
-            )
+            cached_output_dir = output_path if output_path.suffix == "" else output_path.parent
+            cached_paths = self._parse_xcresult(xcresult_path, cached_output_dir, destination_id)
             return UICapabilityResult(
                 success=True,
                 output_path=cached_paths[0] if cached_paths else None,
@@ -1020,9 +1013,7 @@ class XCUITestRunnerHandler:
         # C6 strict: `output_path` is guaranteed non-None by the gate at the
         # top of capture_screenshot; there is no fallback to design/screens.
         assert output_path is not None
-        output_dir = (
-            output_path if output_path.suffix == "" else output_path.parent
-        )
+        output_dir = output_path if output_path.suffix == "" else output_path.parent
         exported_paths = self._parse_xcresult(xcresult_path, output_dir, destination_id)
 
         first_path = exported_paths[0] if exported_paths else None
@@ -1309,9 +1300,7 @@ class XCUITestRunnerHandler:
             return []
         return sorted(p.stem for p in schemes_dir.glob("*.xcscheme"))
 
-    def _autodetect_scheme(
-        self, xcodeproj: Path, platform: str | None = None
-    ) -> str | None:
+    def _autodetect_scheme(self, xcodeproj: Path, platform: str | None = None) -> str | None:
         """Pick the most likely scheme for the given platform from shared schemes.
 
         Args:

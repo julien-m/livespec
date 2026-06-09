@@ -48,8 +48,7 @@ def _fake_cc_hub(bin_dir: Path, log_path: Path) -> dict[str, str]:
     bin_dir.mkdir(parents=True)
     script = bin_dir / "cc-hub"
     script.write_text(
-        "#!/usr/bin/env bash\n"
-        "printf '%s\\n' \"$*\" >> \"${CC_HUB_LOG}\"\n",
+        '#!/usr/bin/env bash\nprintf \'%s\\n\' "$*" >> "${CC_HUB_LOG}"\n',
         encoding="utf-8",
     )
     script.chmod(0o755)
@@ -161,9 +160,7 @@ class TestLinkLocalFilter:
     def test_legacy_orphan_symlinks_are_not_recreated_by_agent_sync(self, tmp_path: Path) -> None:
         project = _fake_project(tmp_path / "proj", with_claude=True, with_git=False)
         orphan = project / ".claude" / "commands" / "spec.feature.expectations.md"
-        orphan.symlink_to(
-            REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "expectations.md"
-        )
+        orphan.symlink_to(REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "expectations.md")
         assert orphan.is_symlink()
         env = _fake_cc_hub(tmp_path / "bin", tmp_path / "cc-hub.log")
 

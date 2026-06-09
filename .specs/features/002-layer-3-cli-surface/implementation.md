@@ -1,10 +1,10 @@
 ---
-type: implementation
-title: Layer 3 CLI Surface
-feature: 002-layer-3-cli-surface
-spec_ref: spec.md
-plan_ref: plan.md
 created: 2026-04-13
+feature: 002-layer-3-cli-surface
+plan_ref: plan.md
+spec_ref: spec.md
+title: Layer 3 CLI Surface
+type: implementation
 updated: 2026-04-13
 ---
 
@@ -48,3 +48,17 @@ updated: 2026-04-13
 | AC-008 | Covered | `test_sdk_isolated_format_json` |
 | AC-009 | Covered | `SdkTestRunner.run()` streams to stderr via Popen |
 | AC-010 | Covered | `test_sdk_isolated_help_text_contains_flag` |
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |
+| FR-008 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-008) | ✅ Implemented | 2026-06-08 |
+| FR-009 | `.specs/features/002-layer-3-cli-surface/implementation.md` | @spec(FR-009) | ✅ Implemented | 2026-06-08 |

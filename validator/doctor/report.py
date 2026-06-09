@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-009)
+
 """Output renderers for ``livespec doctor``."""
 
 from __future__ import annotations

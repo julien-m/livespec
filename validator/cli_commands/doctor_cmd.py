@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+# @spec(FR-009)
+
 """CLI command for project-level LiveSpec health audits."""
 
 from __future__ import annotations

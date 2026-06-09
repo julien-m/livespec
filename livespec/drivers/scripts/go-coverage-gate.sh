@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-002)
+
 # @spec FR-002: Go coverage gate escape-hatch script — .specs/features/020-driver-go/spec.md#fr-002
 # @spec AC-002: Gate runs `go test -coverprofile` and converts to lcov.
 # @spec AC-003: Gate applies threshold and exits 0/1.

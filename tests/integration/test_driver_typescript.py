@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Integration checks for the built-in TypeScript/JavaScript driver manifest."""
 
 # @spec FR-005: Integration tests for the TS/JS driver

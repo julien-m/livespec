@@ -1,4 +1,15 @@
 #!/usr/bin/env node
+// LiveSpec traceability anchors
+// @spec(AC-001)
+// @spec(AC-003)
+// @spec(AC-027)
+// @spec(AC-028)
+// @spec(AC-029)
+// @spec(AC-030)
+// @spec(FR-023)
+// @spec(FR-024)
+// @spec(FR-025)
+
 // @spec FR-023: --scan lists features without visual tests — .specs/features/010-visual-testing-complete/spec.md#fr-023
 // @spec FR-024: --generate creates test files for missing features — spec.md#fr-024
 // @spec FR-025: Creates baseline directory structure — spec.md#fr-025

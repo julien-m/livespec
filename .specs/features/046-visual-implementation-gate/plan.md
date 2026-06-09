@@ -1,3 +1,9 @@
+---
+created: 2026-05-18
+spec_ref: .specs/features/046-visual-implementation-gate/spec.md
+title: Plan - Feature 046 - Visual Implementation Gate
+---
+
 # Plan - Feature 046 - Visual Implementation Gate
 
 ## Summary
@@ -46,3 +52,12 @@ Tighten the command-layer contract so `/spec.implement` delegates visual certifi
 
 - This feature changes command contracts, not executable command Python. The regression tests therefore assert the required command text and expectation-contract invariants directly.
 - The existing `/spec.test` visual runner details remain the source of execution behavior; `/spec.implement` should call into that path rather than duplicate implementation details.
+
+## Traceability Flow
+
+```mermaid
+flowchart TD
+    Spec[spec.md] --> Plan[plan.md]
+    Plan --> Implementation[implementation.md]
+    Implementation --> Tests[verification]
+```

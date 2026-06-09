@@ -188,18 +188,10 @@ def read_link_mode(project_root: Path) -> LinkMode | None:
     return None
 
 
-def expected_registry_baseline_path(
-    *, feature_slug: str, target: str, screen: str
-) -> Path:
+def expected_registry_baseline_path(*, feature_slug: str, target: str, screen: str) -> Path:
     """Return the canonical registry path for an approved baseline."""
     safe_screen = screen if screen.endswith(".png") else f"{screen}.png"
-    return (
-        DESIGN_REGISTRY_DIR
-        / BASELINES_DIRNAME
-        / feature_slug
-        / target
-        / safe_screen
-    )
+    return DESIGN_REGISTRY_DIR / BASELINES_DIRNAME / feature_slug / target / safe_screen
 
 
 def expected_registry_mockup_path(*, feature_slug: str, screen: str) -> Path:
@@ -213,13 +205,7 @@ def expected_feature_local_path(
 ) -> Path:
     """Return the feature-local symlink path for a baseline screen."""
     safe_screen = screen if screen.endswith(".png") else f"{screen}.png"
-    rel = (
-        Path(".specs")
-        / "features"
-        / feature_slug
-        / FEATURE_BASELINES_REL
-        / safe_screen
-    )
+    rel = Path(".specs") / "features" / feature_slug / FEATURE_BASELINES_REL / safe_screen
     if project_root is None:
         return rel
     return project_root / rel
@@ -239,9 +225,7 @@ def sha256_of(path: Path) -> str:
     return hasher.hexdigest()
 
 
-def is_runtime_capture_misplaced(
-    *, candidate: Path, registry_baselines_dir: Path
-) -> bool:
+def is_runtime_capture_misplaced(*, candidate: Path, registry_baselines_dir: Path) -> bool:
     """Return True when ``candidate`` lives under ``.specs/design/screens/`` AND
     its sha256 matches at least one baseline under ``registry_baselines_dir``.
 
@@ -257,11 +241,7 @@ def is_runtime_capture_misplaced(
     # screens registry; runtime captures elsewhere are out of scope here.
     if "/.specs/design/screens/" not in str(candidate_resolved) + "/":
         parts = candidate_resolved.parts
-        if not (
-            ".specs" in parts
-            and "design" in parts
-            and "screens" in parts
-        ):
+        if not (".specs" in parts and "design" in parts and "screens" in parts):
             return False
     if not registry_baselines_dir.exists():
         return False
@@ -326,8 +306,7 @@ def check_link(
                 screen=screen,
                 path=feature_local_path,
                 message=(
-                    f"Symlink {feature_local_path} resolves to {real} but "
-                    f"expected {expected_real}."
+                    f"Symlink {feature_local_path} resolves to {real} but expected {expected_real}."
                 ),
             )
         return None
@@ -426,11 +405,7 @@ def validate_manifest(
         for raw in entries_list:
             if isinstance(raw, dict):
                 entries.append(ManifestEntry.from_mapping(cast(dict[str, Any], raw)))
-    resolved_target = (
-        target
-        if target is not None
-        else str(payload_dict.get("target") or "")
-    )
+    resolved_target = target if target is not None else str(payload_dict.get("target") or "")
     status = ManifestStatus(
         path=manifest_path,
         found=True,
@@ -453,9 +428,7 @@ def _iter_manifest_violations(
                 target=status.target,
                 screen=entry.screen,
                 path=status.path,
-                message=(
-                    f"Manifest entry '{entry.screen}' has no registry_path."
-                ),
+                message=(f"Manifest entry '{entry.screen}' has no registry_path."),
             )
             continue
         if entry.registry_path.is_absolute():
@@ -495,10 +468,7 @@ def _iter_manifest_violations(
                 target=status.target,
                 screen=entry.screen,
                 path=registry_abs,
-                message=(
-                    f"Registry baseline missing for screen '{entry.screen}': "
-                    f"{registry_abs}."
-                ),
+                message=(f"Registry baseline missing for screen '{entry.screen}': {registry_abs}."),
             )
             continue
         if entry.sha256:
@@ -549,8 +519,7 @@ def _iter_manifest_violations(
                     screen=entry.screen,
                     path=entry.feature_local_path,
                     message=(
-                        f"Manifest entry '{entry.screen}' uses an absolute "
-                        "feature_local_path."
+                        f"Manifest entry '{entry.screen}' uses an absolute feature_local_path."
                     ),
                 )
                 continue
@@ -594,14 +563,10 @@ def find_runtime_misplaced_under_design_screens(
         return []
 
     baseline_sources: list[Path] = []
-    registry_baselines = (
-        project_root / DESIGN_REGISTRY_DIR / BASELINES_DIRNAME / feature_slug
-    )
+    registry_baselines = project_root / DESIGN_REGISTRY_DIR / BASELINES_DIRNAME / feature_slug
     if registry_baselines.exists():
         baseline_sources.append(registry_baselines)
-    feature_local_baselines = (
-        project_root / ".specs" / "features" / feature_slug / "baselines"
-    )
+    feature_local_baselines = project_root / ".specs" / "features" / feature_slug / "baselines"
     if feature_local_baselines.exists():
         baseline_sources.append(feature_local_baselines)
     if not baseline_sources:

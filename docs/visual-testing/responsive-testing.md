@@ -1,3 +1,7 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-016) -->
+<!-- @spec(FR-014) -->
+
 # Responsive Viewport Testing Guide
 
 Test UI across mobile, tablet, and desktop breakpoints with separate baselines per viewport.

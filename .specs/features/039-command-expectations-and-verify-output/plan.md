@@ -1,3 +1,9 @@
+---
+created: 2026-05-18
+spec_ref: .specs/features/039-command-expectations-and-verify-output/spec.md
+title: Plan — Feature 039 — Command Expectations & `/spec.verify-output`
+---
+
 # Plan — Feature 039 — Command Expectations & `/spec.verify-output`
 
 ## Summary

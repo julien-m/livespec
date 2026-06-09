@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-018)
+
 """Deterministic PNG comparison and visual evidence receipts."""
 
 from __future__ import annotations
@@ -158,9 +161,7 @@ def compare_visual_images(
     diff_sha = sha256_file(diff_abs)
 
     verdict: VisualVerdict = (
-        "PASS"
-        if metrics.actual_percent <= threshold_percent and not metrics.issues
-        else "FAIL"
+        "PASS" if metrics.actual_percent <= threshold_percent and not metrics.issues else "FAIL"
     )
     return VisualComparison(
         feature_slug=feature_slug,
@@ -578,8 +579,8 @@ def _read_png_rgba(path: Path) -> _PngImage:
         if chunk_type == b"IHDR":
             if length != 13:
                 raise VisualReceiptError(f"png_malformed:{path}")
-            width, height, bit_depth, color_type, _compression, _filter, interlace = (
-                struct.unpack(">IIBBBBB", chunk_data)
+            width, height, bit_depth, color_type, _compression, _filter, interlace = struct.unpack(
+                ">IIBBBBB", chunk_data
             )
         elif chunk_type == b"PLTE":
             palette = chunk_data

@@ -1,3 +1,9 @@
+---
+created: 2026-05-07
+spec_ref: .specs/features/024-patch-coverage-local/spec.md
+title: Plan — 024 Patch Coverage Local Computation
+---
+
 # Plan — 024 Patch Coverage Local Computation
 
 - **Feature:** 024-patch-coverage-local
@@ -74,3 +80,21 @@ Public API (after this feature):
 
 - **Module path deviation:** spec mentions `livespec/coverage/patch.py`. We document the actual home (`validator/drivers/patch_coverage.py`) and keep the public surface stable to avoid breaking feature 016/017 callers.
 - **Auto-integration scope:** FR-005 wires "after CapabilityResult is returned" — we provide a pure helper rather than mutating `run_capability`'s contract, preserving the existing invariants from feature 016 (AC-009/AC-011). Callers (`/spec.test`, CLI) compose via `compute_patch_coverage` + `summarise_patch_coverage` after the runner returns. This avoids subprocess coupling inside the runner.
+
+## Summary
+
+Technical plan for Patch Coverage Local.
+
+## Testing Strategy
+
+- Run focused tests for the mapped implementation.
+- Run full project validation before completion.
+
+## Traceability Flow
+
+```mermaid
+flowchart TD
+    Spec[spec.md] --> Plan[plan.md]
+    Plan --> Implementation[implementation.md]
+    Implementation --> Tests[verification]
+```

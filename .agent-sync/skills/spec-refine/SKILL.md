@@ -2,6 +2,9 @@
 name: spec-refine
 description: LiveSpec slash command /spec-refine
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-009) -->
+
 
 # /spec-refine
 

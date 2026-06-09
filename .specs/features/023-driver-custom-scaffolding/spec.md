@@ -1,3 +1,11 @@
+---
+created: 2026-05-06
+priority: P2
+status: Implemented
+title: Driver Custom Scaffolding & Graceful Degradation
+updated: 2026-06-08
+---
+
 # Feature Spec: Driver Custom Scaffolding & Graceful Degradation
 
 - **Feature:** Driver Custom Scaffolding & Graceful Degradation

@@ -1,7 +1,8 @@
 ---
-type: implementation
-feature: 001-auto-llm-review
 created: 2026-04-13
+feature: 001-auto-llm-review
+title: 'Implementation Map: Auto LLM Review'
+type: implementation
 updated: 2026-04-13
 ---
 
@@ -59,3 +60,19 @@ updated: 2026-04-13
 | validator/orchestrator.py | Added SpecReviewEntry, SpecReviewCheckResult, run_spec_review() |
 | validator/exceptions.py | Added SpecReviewError exception class |
 | tests/test_cli.py | Added 5 CLI review tests |
+
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| FR-001 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-001) | ✅ Implemented | 2026-06-08 |
+| FR-002 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-002) | ✅ Implemented | 2026-06-08 |
+| FR-003 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-003) | ✅ Implemented | 2026-06-08 |
+| FR-004 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
+| FR-005 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
+| FR-006 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |
+| FR-008 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-008) | ✅ Implemented | 2026-06-08 |
+| FR-009 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-009) | ✅ Implemented | 2026-06-08 |
+| FR-010 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-010) | ✅ Implemented | 2026-06-08 |
+| FR-011 | `.specs/features/001-auto-llm-review/implementation.md` | @spec(FR-011) | ✅ Implemented | 2026-06-08 |

@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-009)
+# @spec(AC-010)
+
 """Tests for deterministic utility command backends."""
 
 from __future__ import annotations
@@ -12,9 +16,7 @@ from validator.cli import app
 runner = CliRunner()
 
 
-def test_status_outputs_json_without_mutating_project(
-    monkeypatch: object, tmp_path: Path
-) -> None:
+def test_status_outputs_json_without_mutating_project(monkeypatch: object, tmp_path: Path) -> None:
     specs = tmp_path / ".specs"
     feature_dir = specs / "features" / "001-demo"
     feature_dir.mkdir(parents=True)
@@ -75,9 +77,7 @@ def test_play_coverage_writes_data_json_without_opening_browser(tmp_path: Path) 
 def test_conventions_refresh_generates_index_and_manifest(tmp_path: Path) -> None:
     stacks = tmp_path / ".specs" / "stacks"
     stacks.mkdir(parents=True)
-    (stacks / "_default.md").write_text(
-        "# Stack\n\n- Python\n- CLI\n", encoding="utf-8"
-    )
+    (stacks / "_default.md").write_text("# Stack\n\n- Python\n- CLI\n", encoding="utf-8")
 
     result = runner.invoke(app, ["conventions", "refresh", "--repo", str(tmp_path)])
 

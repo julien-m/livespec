@@ -1,3 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(AC-012)
+# @spec(AC-013)
+# @spec(AC-017)
+# @spec(AC-029)
+# @spec(AC-030)
+# @spec(AC-045)
+
 """Static documentation and skill tests for User Journeys v2."""
 
 from __future__ import annotations

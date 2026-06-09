@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-009)
+
 # @spec FR-003: Mode B native interview generator
 # .specs/features/045-native-behavioral-specs/spec.md#fr-003
 # @spec FR-004: Mode B screen interview
@@ -70,9 +76,7 @@ from validator.native_behavioral_templates import (
 PLACEHOLDER_TO_FILL = "(to fill later)"
 """@spec FR-005: Empty/skip placeholder body — spec.md#fr-005"""
 
-PLACEHOLDER_MOCKUP_VISUAL = (
-    "(to fill later — populated from mockup analysis)"
-)
+PLACEHOLDER_MOCKUP_VISUAL = "(to fill later — populated from mockup analysis)"
 """@spec FR-006: Mode C visual-section placeholder — spec.md#fr-006
 
 The stack does not embed an image decoder; this string is the explicit
@@ -287,9 +291,7 @@ def run_mockup_derived(
     chosen = _pick_priority_mockup(mockup_paths)
     if chosen is None:
         emit("mockup unreadable — falling back to native interview")
-        return run_native_interview(
-            slug=slug, kind="screen", specs_root=specs_root, asker=asker
-        )
+        return run_native_interview(slug=slug, kind="screen", specs_root=specs_root, asker=asker)
 
     # Log additional mockups that were ignored, for traceability.
     for path in mockup_paths:

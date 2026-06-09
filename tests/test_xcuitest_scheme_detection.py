@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(AC-007)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-008)
+
 """XCUITest scheme/project auto-detection tests (Feature 038).
 
 These tests pin the contract that XCUITestRunnerHandler can recover scheme
@@ -57,9 +63,7 @@ def test_find_xcodeproj_returns_none_when_absent(tmp_path: Path) -> None:
 
 
 def test_list_shared_schemes_reads_xcshareddata(tmp_path: Path) -> None:
-    xcodeproj = _make_xcodeproj(
-        tmp_path, "STRAPT", schemes=["STRAPT", "STRAPT Watch App"]
-    )
+    xcodeproj = _make_xcodeproj(tmp_path, "STRAPT", schemes=["STRAPT", "STRAPT Watch App"])
     handler = XCUITestRunnerHandler(tmp_path)
     schemes = handler._list_shared_schemes(xcodeproj)
     assert schemes == ["STRAPT", "STRAPT Watch App"]
@@ -72,22 +76,15 @@ def test_list_shared_schemes_empty_when_none_shared(tmp_path: Path) -> None:
 
 
 def test_autodetect_scheme_picks_ios_first(tmp_path: Path) -> None:
-    xcodeproj = _make_xcodeproj(
-        tmp_path, "STRAPT", schemes=["STRAPT", "STRAPT Watch App"]
-    )
+    xcodeproj = _make_xcodeproj(tmp_path, "STRAPT", schemes=["STRAPT", "STRAPT Watch App"])
     handler = XCUITestRunnerHandler(tmp_path)
     assert handler._autodetect_scheme(xcodeproj, platform="ios") == "STRAPT"
 
 
 def test_autodetect_scheme_picks_watch_for_watchos(tmp_path: Path) -> None:
-    xcodeproj = _make_xcodeproj(
-        tmp_path, "STRAPT", schemes=["STRAPT", "STRAPT Watch App"]
-    )
+    xcodeproj = _make_xcodeproj(tmp_path, "STRAPT", schemes=["STRAPT", "STRAPT Watch App"])
     handler = XCUITestRunnerHandler(tmp_path)
-    assert (
-        handler._autodetect_scheme(xcodeproj, platform="watchos")
-        == "STRAPT Watch App"
-    )
+    assert handler._autodetect_scheme(xcodeproj, platform="watchos") == "STRAPT Watch App"
 
 
 def test_autodetect_scheme_returns_none_when_no_schemes(tmp_path: Path) -> None:
@@ -156,8 +153,7 @@ def test_autodetect_destination_picks_first_available_iphone(
     )
     handler._list_simulators = lambda: fake  # type: ignore[method-assign]
     assert (
-        handler._autodetect_destination(platform="ios")
-        == "platform=iOS Simulator,name=iPhone 17"
+        handler._autodetect_destination(platform="ios") == "platform=iOS Simulator,name=iPhone 17"
     )
 
 
@@ -173,8 +169,7 @@ def test_autodetect_destination_skips_unavailable_devices(tmp_path: Path) -> Non
     )
     handler._list_simulators = lambda: fake  # type: ignore[method-assign]
     assert (
-        handler._autodetect_destination(platform="ios")
-        == "platform=iOS Simulator,name=iPhone 17"
+        handler._autodetect_destination(platform="ios") == "platform=iOS Simulator,name=iPhone 17"
     )
 
 
@@ -210,8 +205,7 @@ def test_autodetect_destination_excludes_watch_for_ios(tmp_path: Path) -> None:
     )
     handler._list_simulators = lambda: fake  # type: ignore[method-assign]
     assert (
-        handler._autodetect_destination(platform="ios")
-        == "platform=iOS Simulator,name=iPhone 17"
+        handler._autodetect_destination(platform="ios") == "platform=iOS Simulator,name=iPhone 17"
     )
 
 
@@ -236,6 +230,5 @@ def test_autodetect_destination_prefers_newest_runtime(tmp_path: Path) -> None:
     handler._list_simulators = lambda: fake  # type: ignore[method-assign]
     # Reverse-sorted runtime keys → iOS-26-4 wins → iPhone 17 returned.
     assert (
-        handler._autodetect_destination(platform="ios")
-        == "platform=iOS Simulator,name=iPhone 17"
+        handler._autodetect_destination(platform="ios") == "platform=iOS Simulator,name=iPhone 17"
     )

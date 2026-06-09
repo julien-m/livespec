@@ -1,3 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(AC-003)
+# @spec(AC-008)
+# @spec(FR-003)
+# @spec(FR-005)
+# @spec(FR-007)
+# @spec(FR-008)
+
 """Domain exceptions for the LiveSpec validator."""
 
 from __future__ import annotations
@@ -124,9 +132,7 @@ class ExpectationsMissing(Exception):
 
     def __init__(self, command: str, searched_paths: list[str]) -> None:
         paths_str = ", ".join(searched_paths)
-        super().__init__(
-            f"No expectations file for {command!r} (searched: {paths_str})"
-        )
+        super().__init__(f"No expectations file for {command!r} (searched: {paths_str})")
         self.command = command
         self.searched_paths = searched_paths
 

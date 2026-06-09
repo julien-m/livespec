@@ -2,7 +2,7 @@
 
 ---
 
-## 2026-04-17 -- Test: Test phase audit and execution
+## 2026-04-17 — [Test]: Test phase audit and execution
 
 - **Type:** Test
 - **Spec modified:** No
@@ -18,7 +18,7 @@
 
 ---
 
-## 2026-04-17 -- Implement: Feature implemented
+## 2026-04-17 — [Implement]: Feature implemented
 
 - **Type:** Implementation
 - **Spec modified:** Yes (status Draft -> Implemented)
@@ -31,7 +31,7 @@
 
 ---
 
-## 2026-04-17 -- Plan: Implementation plan created
+## 2026-04-17 — [Plan]: Implementation plan created
 
 - **Type:** Plan
 - **Spec modified:** No
@@ -42,7 +42,7 @@
 
 ---
 
-## 2026-04-17 -- Spec: Initial specification created
+## 2026-04-17 — [Spec]: Initial specification created
 
 - **Type:** Feature
 - **Spec modified:** Yes (sections: all -- initial creation)

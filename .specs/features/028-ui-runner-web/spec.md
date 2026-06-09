@@ -1,6 +1,6 @@
 ---
 title: "UI Runner Web (Playwright Refactor)"
-status: "Draft"
+status: "Implemented"
 priority: "P2"
 created: 2026-05-06
 updated: 2026-05-06

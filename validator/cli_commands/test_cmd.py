@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-012)
+# @spec(FR-024)
+# @spec(FR-026)
+
 """``livespec test`` — run tests via the active driver."""
 
 # @spec FR-001: test subcommand — .specs/features/035-unified-cli-surface/spec.md#fr-001

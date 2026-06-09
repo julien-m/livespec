@@ -29,7 +29,7 @@ def _extract_first_line_after(marker_regex: str, text: str) -> str:
     m = re.search(marker_regex, text)
     assert m, f"marker not found: {marker_regex}"
     # Find next opening ``` after the marker
-    rest = text[m.end():]
+    rest = text[m.end() :]
     fence = re.search(r"```[a-zA-Z]*\n(.*?)```", rest, re.DOTALL)
     assert fence, f"no fenced code block after {marker_regex}"
     block = fence.group(1)
@@ -48,14 +48,10 @@ def _extract_first_line_after(marker_regex: str, text: str) -> str:
         (r"Spawn a \*\*Test agent\*\*", "/spec-test"),
     ],
 )
-def test_feature_supervisor_emits_subcommand_header(
-    marker: str, expected: str
-) -> None:
+def test_feature_supervisor_emits_subcommand_header(marker: str, expected: str) -> None:
     text = _read(FEATURE_MD)
     first = _extract_first_line_after(marker, text)
-    assert first == expected, (
-        f"expected first line {expected!r} after {marker!r}, got {first!r}"
-    )
+    assert first == expected, f"expected first line {expected!r} after {marker!r}, got {first!r}"
 
 
 def test_ship_supervisor_emits_feature_header() -> None:

@@ -158,9 +158,7 @@ def detect_runners(project: Path) -> set[str]:
         found.add("android")
     if (project / "src-tauri").is_dir():
         found.add("tauri")
-    if (project / "playwright.config.ts").exists() or (
-        project / "playwright.config.js"
-    ).exists():
+    if (project / "playwright.config.ts").exists() or (project / "playwright.config.js").exists():
         found.add("web")
     return found
 
@@ -200,10 +198,7 @@ def enrich(text: str, block: str) -> str:
     if not block.strip():
         return text
 
-    section = (
-        f"\n{LIVESPEC_SECTION_HEADING}\n\n"
-        f"{LIVESPEC_START}\n{block}{LIVESPEC_END}\n"
-    )
+    section = f"\n{LIVESPEC_SECTION_HEADING}\n\n{LIVESPEC_START}\n{block}{LIVESPEC_END}\n"
 
     if LIVESPEC_START in text and LIVESPEC_END in text:
         # Replace only the managed slice so user-authored content outside the

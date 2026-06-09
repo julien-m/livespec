@@ -173,9 +173,7 @@ def test_validate_gate_fails_on_physical_copy_in_feature_baselines(tmp_path: Pat
         strict_links=True,
     )
     assert report.verdict == "FAIL"
-    assert any(
-        v.kind == "physical_copy_where_link_required" for v in report.link_violations
-    )
+    assert any(v.kind == "physical_copy_where_link_required" for v in report.link_violations)
 
 
 def test_render_text_report_includes_verdict_and_classification(tmp_path: Path) -> None:
@@ -233,7 +231,7 @@ def test_apply_cleanup_quarantines_files_and_is_idempotent(tmp_path: Path) -> No
     applied = apply_cleanup(plan)
     assert applied
     assert not src.exists()
-    assert (plan.quarantine_root and plan.quarantine_root.exists())
+    assert plan.quarantine_root and plan.quarantine_root.exists()
 
     # Second run: no drift, no actions.
     plan2 = plan_cleanup(
@@ -247,9 +245,7 @@ def test_apply_cleanup_quarantines_files_and_is_idempotent(tmp_path: Path) -> No
 
 def test_write_cleanup_report_produces_json(tmp_path: Path) -> None:
     slug = "032-report"
-    plan = plan_cleanup(
-        project_root=tmp_path, feature_slug=slug, timestamp="20260523T000010Z"
-    )
+    plan = plan_cleanup(project_root=tmp_path, feature_slug=slug, timestamp="20260523T000010Z")
     report_path = write_cleanup_report(
         project_root=tmp_path,
         plan=plan,

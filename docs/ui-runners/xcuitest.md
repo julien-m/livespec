@@ -1,3 +1,6 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-009) -->
+
 # iOS/watchOS UI Runner (XCUITest)
 
 <!-- @spec FR-009: developer documentation — .specs/features/030-ui-runner-ios-watchos/spec.md#fr-009 -->

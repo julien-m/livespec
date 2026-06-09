@@ -1,9 +1,11 @@
 ---
-type: plan
-feature: 003-visual-testing-fidelity
 created: 2026-04-14
-updated: 2026-04-14
+feature: 003-visual-testing-fidelity
+spec_ref: .specs/features/003-visual-testing-fidelity/spec.md
 status: Planned
+title: Visual Testing Fidelity
+type: plan
+updated: 2026-04-14
 ---
 
 # Plan: Visual Testing Fidelity

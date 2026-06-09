@@ -1,7 +1,7 @@
 ---
 command: spec-journey
 contract_version: "1.0"
-last_reviewed: 2026-06-08
+last_reviewed: 2026-06-09
 ---
 
 # Expectations — $spec-journey

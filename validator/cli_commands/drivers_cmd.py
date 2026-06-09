@@ -28,9 +28,7 @@ def drivers_command(
         "--json",
         help="Emit a JSON array suitable for tooling instead of a human table.",
     ),
-    debug: bool = typer.Option(
-        False, "--debug", help="Print the full stacktrace on error."
-    ),
+    debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
 ) -> None:
     """List built-in and custom drivers seen by the registry.
 
@@ -69,16 +67,20 @@ def _run_drivers(*, as_json: bool) -> None:
     if as_json:
         # EC-003 requires tooling mode to degrade to ``[]`` when nothing matches,
         # so scripts can treat "no usable driver" as an empty result set.
-        payload = [] if not matching_drivers else [
-            {
-                "name": d.name,
-                "source": "custom" if d.is_custom else "built-in",
-                "match": d.name in matching,
-                "primary": d.name == primary_name,
-                "capabilities": d.implemented_capabilities(),
-            }
-            for d in all_drivers
-        ]
+        payload = (
+            []
+            if not matching_drivers
+            else [
+                {
+                    "name": d.name,
+                    "source": "custom" if d.is_custom else "built-in",
+                    "match": d.name in matching,
+                    "primary": d.name == primary_name,
+                    "capabilities": d.implemented_capabilities(),
+                }
+                for d in all_drivers
+            ]
+        )
         typer.echo(json.dumps(payload, indent=2))
     else:
         # AC-006 — fixed-width table for human consumption.

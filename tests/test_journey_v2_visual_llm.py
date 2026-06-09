@@ -1,3 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(AC-038)
+# @spec(AC-039)
+# @spec(AC-040)
+# @spec(AC-041)
+# @spec(AC-042)
+# @spec(AC-043)
+
 """Tests for User Journeys v2 native and LLM visual checks."""
 
 from __future__ import annotations

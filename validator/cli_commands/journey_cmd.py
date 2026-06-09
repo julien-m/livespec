@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+# @spec(FR-022)
+# @spec(FR-023)
+# @spec(FR-024)
+# @spec(FR-027)
+
 """CLI commands for global User Journeys v2."""
 
 # @spec FR-022, FR-023, FR-024, FR-027, FR-040: journey CLI, run, policies, migration

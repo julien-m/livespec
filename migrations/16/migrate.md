@@ -3,6 +3,9 @@ version: 16
 name: agent-sync-migration
 description: Synchronize LiveSpec skills, agents, and rules through cc-hub
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-006) -->
+
 
 GITIGNORE .agents/skills/spec-*
 GITIGNORE .claude/skills/spec-*

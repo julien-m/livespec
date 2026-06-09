@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+
 """Integration checks for the built-in Swift driver manifest."""
 
 # @spec FR-005: Integration tests for the Swift driver
@@ -16,9 +19,7 @@ from validator.drivers.swift_detector import (
     parse_package_dependencies,
 )
 
-_SWIFT_DRIVER_PATH = (
-    Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "swift.yaml"
-)
+_SWIFT_DRIVER_PATH = Path(__file__).resolve().parents[2] / "livespec" / "drivers" / "swift.yaml"
 _GATE_SCRIPT_PATH = (
     Path(__file__).resolve().parents[2]
     / "livespec"

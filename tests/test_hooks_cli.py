@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-004)
+# @spec(FR-010)
+
 """End-to-end CLI tests for `livespec hooks resolve` and `livespec integrations list`."""
 
 from __future__ import annotations
@@ -12,9 +16,7 @@ from validator.integrations import _reset_warnings_for_tests
 
 
 @pytest.fixture(autouse=True)
-def _isolate_user_config(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> Path:
+def _isolate_user_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Redirect ~/.config/livespec to a tmp dir per test (autouse).
 
     This prevents test pollution from the developer's real user config and
@@ -69,11 +71,7 @@ def test_hooks_resolve_active_integration_returns_body(
     cfg.mkdir(parents=True)
     marker = "MOCKUPS_INTEGRATION_MARKER_abc123"
     (cfg / "mockups.md").write_text(
-        "---\n"
-        "integration: mockups\n"
-        "commands: [plan]\n"
-        "---\n"
-        f"{marker}\n",
+        f"---\nintegration: mockups\ncommands: [plan]\n---\n{marker}\n",
         encoding="utf-8",
     )
     result = runner.invoke(app, ["hooks", "resolve", "--event", "before", "--command", "plan"])
@@ -88,8 +86,7 @@ def test_hooks_resolve_accepts_hyphenated_command_alias(
     cfg.mkdir(parents=True)
     marker = "ALIAS_INTEGRATION_MARKER"
     (cfg / "alias.md").write_text(
-        "---\nintegration: alias\ncommands: [/spec-plan]\n---\n"
-        f"{marker}\n",
+        f"---\nintegration: alias\ncommands: [/spec-plan]\n---\n{marker}\n",
         encoding="utf-8",
     )
 

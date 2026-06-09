@@ -1,3 +1,9 @@
+---
+created: 2026-05-18
+spec_ref: .specs/features/040-expectations-rich-and-verify-preview/spec.md
+title: Plan — Feature 040 — Rich Expectations Format & Verify Preview
+---
+
 # Plan — Feature 040 — Rich Expectations Format & Verify Preview
 
 **Status:** Draft
@@ -136,3 +142,12 @@ Two-track implementation: (1) document/format work — enrich the template + mig
 - `tests/test_expectations.py` (minor)
 - `tests/test_builtin_expectations_corpus.py` (minor)
 - `.specs/changelog.md`
+
+## Traceability Flow
+
+```mermaid
+flowchart TD
+    Spec[spec.md] --> Plan[plan.md]
+    Plan --> Implementation[implementation.md]
+    Implementation --> Tests[verification]
+```

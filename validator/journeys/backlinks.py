@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-007)
+
 """Generated feature backlinks for global User Journeys v2."""
 
 # @spec FR-007: generated feature backlinks for every covered feature

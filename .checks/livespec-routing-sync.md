@@ -1,3 +1,6 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-009) -->
+
 # LiveSpec Routing Sync
 
 ## When

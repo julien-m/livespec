@@ -1,3 +1,11 @@
+---
+created: 2026-05-12
+priority: P2
+status: Implemented
+title: Feature 039 — Command Expectations & Verify Output
+updated: 2026-06-08
+---
+
 # Feature 039 — Command Expectations & Verify Output
 
 - **Feature Name:** Command Expectations & `/spec.verify-output`

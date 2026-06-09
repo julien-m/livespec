@@ -48,7 +48,7 @@ status: Implemented
 |---|---|---|
 | AC-001 | `test_registry_loads_jvm_driver_on_gradle`, `test_registry_loads_jvm_driver_on_gradle_kts`, `test_registry_loads_jvm_driver_on_maven`, `test_jvm_driver_detect_files` | Implemented |
 | AC-002 | `test_coverage_capability_uses_script_escape_hatch`, `test_gate_jacoco_present_with_lcov_passes` (gate runs build tool only when not in probe-only mode; integration test asserts script wiring) | Implemented |
-| AC-003 | `test_coverage_capability_uses_script_escape_hatch` (asserts `report_path: build/reports/jacoco/test/lcov.info` and `threshold: 80`); gate script handles Maven path `target/site/jacoco/lcov.info` natively | Implemented |
+| AC-003 | `tests/unit/test_jvm_coverage_gate.py` asserts the script escape hatch and gate behavior; the gate script handles Maven Jacoco output natively | Implemented |
 | AC-004 | `test_gate_jacoco_absent_on_gradle_skips_with_setup_guide`, `test_gate_jacoco_absent_on_maven_skips_with_setup_guide` | Implemented |
 | AC-005 | `test_snapshots_capability_uses_script_escape_hatch`, `test_snapshots_no_library_skips`, `test_snapshots_kotest_detected_on_gradle_kts`, `test_snapshots_approvaltests_detected_on_maven` | Implemented |
 | AC-006 | `test_properties_capability_uses_script_escape_hatch`, `test_properties_no_library_skips`, `test_properties_jqwik_detected_on_maven`, `test_properties_kotest_property_detected_on_gradle_kts` | Implemented |

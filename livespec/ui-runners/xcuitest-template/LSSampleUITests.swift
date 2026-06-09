@@ -1,3 +1,6 @@
+// LiveSpec traceability anchors
+// @spec(FR-005)
+
 // LSSampleUITests.swift — LiveSpec XCUITest template
 //
 // Copy this file into your Xcode project's UITests target to integrate with

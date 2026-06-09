@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+# @spec(FR-004)
+# @spec(FR-007)
+# @spec(FR-008)
+# @spec(FR-009)
+
 """Tests for behavioral TDD and audit mechanisms.
 
 Validates that:
@@ -14,15 +21,9 @@ from pathlib import Path
 
 # Real command files — used for content-based validation
 _IMPLEMENT_CMD = (
-    Path(__file__).parent.parent
-    / ".agent-sync"
-    / "skills"
-    / "spec-implement"
-    / "SKILL.md"
+    Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-implement" / "SKILL.md"
 )
-_TEST_CMD = (
-    Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-test" / "SKILL.md"
-)
+_TEST_CMD = Path(__file__).parent.parent / ".agent-sync" / "skills" / "spec-test" / "SKILL.md"
 
 
 # ---------------------------------------------------------------------------
@@ -71,9 +72,7 @@ def _build_audit_output(
                 covered += 1
             else:
                 gaps.append((trait, pattern_name))
-            lines.append(
-                f"| {trait} | {pattern_name} | `{keyword}` | {status} | {notes} |"
-            )
+            lines.append(f"| {trait} | {pattern_name} | `{keyword}` | {status} | {notes} |")
 
     lines.append("")
     pct = int(covered / total * 100) if total > 0 else 0
@@ -82,9 +81,7 @@ def _build_audit_output(
     if gaps:
         lines.append(f"**Gaps:** {len(gaps)}")
         for trait, _pattern_name in gaps:
-            lines.append(
-                f"  -> See taxonomy: {taxonomy_path}#{trait}"
-            )
+            lines.append(f"  -> See taxonomy: {taxonomy_path}#{trait}")
     else:
         lines.append("All behavioral traits covered")
 

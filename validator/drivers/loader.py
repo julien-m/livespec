@@ -1,8 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-008)
+
 """YAML loader for driver manifests."""
 
 # @spec FR-008: Manifest loading validates YAML shape and schema before use.
 # @spec AC-014: Malformed driver files are logged and skipped without aborting discovery.
-
 
 from __future__ import annotations
 

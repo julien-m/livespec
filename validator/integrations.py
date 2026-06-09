@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+# @spec(FR-007)
+
 """User-level Markdown integrations (Level 0 of hook resolution).
 
 This module discovers and parses Markdown integration files in
@@ -137,9 +141,7 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, Any] | None, str]:
     if raw is None:
         raw = {}
     if not isinstance(raw, dict):
-        raise ValueError(
-            f"frontmatter is not a mapping (got {type(raw).__name__})"
-        )
+        raise ValueError(f"frontmatter is not a mapping (got {type(raw).__name__})")
     fm: dict[str, Any] = {}
     raw_dict = cast(dict[Any, Any], raw)
     for k, v in raw_dict.items():
@@ -329,9 +331,7 @@ def resolve_for(
     overrides = [i for i in candidates if i.mode == "override"]
     if len(overrides) > 1:
         paths = ", ".join(str(o.path) for o in overrides)
-        raise ValueError(
-            f"Multiple override integrations for event {event}-{command}: {paths}"
-        )
+        raise ValueError(f"Multiple override integrations for event {event}-{command}: {paths}")
     if overrides:
         return [overrides[0]]
     return candidates

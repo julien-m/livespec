@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+
 """Schema validation tests for the iOS/watchOS XCUITest runner manifest.
 
 Tests that ios.yaml exists, is valid YAML, and satisfies the UIRunnerSchema
@@ -17,9 +22,7 @@ from typing import Any
 import pytest
 import yaml
 
-MANIFEST_PATH = (
-    Path(__file__).resolve().parent.parent / "livespec" / "ui-runners" / "ios.yaml"
-)
+MANIFEST_PATH = Path(__file__).resolve().parent.parent / "livespec" / "ui-runners" / "ios.yaml"
 
 
 @pytest.fixture(scope="module")
@@ -32,6 +35,7 @@ def manifest() -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Existence and parsability
 # ---------------------------------------------------------------------------
+
 
 def test_manifest_file_exists() -> None:
     """ios.yaml must exist at the expected path."""
@@ -47,6 +51,7 @@ def test_manifest_is_valid_yaml(manifest: dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 # Runner section
 # ---------------------------------------------------------------------------
+
 
 def test_manifest_has_runner_section(manifest: dict[str, Any]) -> None:
     """Manifest must have a 'runner' top-level section."""
@@ -79,6 +84,7 @@ def test_manifest_runner_has_platforms(manifest: dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 # Detect section
 # ---------------------------------------------------------------------------
+
 
 def test_manifest_has_detect_section(manifest: dict[str, Any]) -> None:
     """Manifest must have a 'detect' section for project detection."""
@@ -117,6 +123,7 @@ def test_manifest_detect_logic_is_or(manifest: dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 # Capabilities section
 # ---------------------------------------------------------------------------
+
 
 def test_manifest_has_capabilities_section(manifest: dict[str, Any]) -> None:
     """Manifest must have a 'capabilities' section."""
@@ -175,6 +182,7 @@ def test_manifest_capture_screenshot_has_launch_arguments_param(
 # Destinations section
 # ---------------------------------------------------------------------------
 
+
 def test_manifest_has_destinations_section(manifest: dict[str, Any]) -> None:
     """Manifest must have a 'destinations' array."""
     assert "destinations" in manifest
@@ -222,6 +230,7 @@ def test_manifest_has_watchos_simulator_destination(
 # ---------------------------------------------------------------------------
 # Scenarios section
 # ---------------------------------------------------------------------------
+
 
 def test_manifest_has_scenarios_section(manifest: dict[str, Any]) -> None:
     """Manifest must have a 'scenarios' list."""

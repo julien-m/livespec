@@ -1,7 +1,9 @@
 ---
-feature: Visual Testing Governance
-status: Planned
 created: 2026-04-14
+feature: Visual Testing Governance
+spec_ref: .specs/features/004-visual-testing-governance/spec.md
+status: Planned
+title: Visual Testing Governance
 updated: 2026-04-14
 ---
 

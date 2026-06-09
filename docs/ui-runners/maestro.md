@@ -1,3 +1,6 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-008) -->
+
 # Android UI Runner (Maestro)
 
 <!-- @spec FR-008: developer documentation — .specs/features/031-ui-runner-android/spec.md#fr-008 -->

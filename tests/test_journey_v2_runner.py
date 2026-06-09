@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-016)
+# @spec(AC-025)
+# @spec(AC-027)
+# @spec(AC-028)
+# @spec(AC-031)
+
 """Tests for compiled-only User Journeys v2 run semantics."""
 
 from __future__ import annotations

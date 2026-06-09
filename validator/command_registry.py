@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-001)
+# @spec(FR-002)
+# @spec(FR-007)
+# @spec(FR-009)
+# @spec(FR-013)
+
 """Canonical registry for LiveSpec slash command skills.
 
 # @spec FR-001: canonical command registry

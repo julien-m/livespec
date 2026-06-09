@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-003)
+
 """Detect Go module dependencies declared in ``go.mod``."""
 
 # @spec FR-003: go.mod dependency parser

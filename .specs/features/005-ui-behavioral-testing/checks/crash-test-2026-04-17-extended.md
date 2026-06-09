@@ -1,3 +1,10 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-012) -->
+<!-- @spec(AC-013) -->
+<!-- @spec(FR-001) -->
+<!-- @spec(FR-009) -->
+<!-- @spec(FR-010) -->
+
 # Extended Crash Test Report — 2026-04-17
 
 <!-- @spec FR-009: Extended crash test 15 components — .specs/features/005.2-taxonomy-complete-expansion/spec.md#fr-009 -->

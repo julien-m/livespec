@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Integration checks for the built-in Python driver manifest."""
 
 # @spec FR-006: Integration tests for all 4 capabilities

@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+
 """Detect the Python module target used by the built-in driver."""
 
 # @spec FR-002: Module auto-detection logic — .specs/features/017-driver-python/spec.md#fr-002
@@ -50,7 +53,7 @@ def detect_python_module(project_root: str) -> str:
             pyproject_data.get("tool", {})
             .get("pytest", {})
             .get("ini_options", {})
-            .get("testpaths", [])
+            .get("testpaths", []),
         )
         for testpath in testpaths:
             if isinstance(testpath, str):

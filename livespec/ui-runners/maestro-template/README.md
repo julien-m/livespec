@@ -1,3 +1,6 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-008) -->
+
 # LiveSpec Maestro Flow Template
 
 <!-- @spec FR-008: Maestro flow conventions — .specs/features/031-ui-runner-android/spec.md#fr-008 -->

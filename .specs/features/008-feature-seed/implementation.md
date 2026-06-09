@@ -1,16 +1,21 @@
+---
+feature: 008-feature-seed
+title: Implementation — 008 Feature Seed
+---
+
 # Implementation — 008 Feature Seed
 
 ## Requirement Mapping
 
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |-------------|---------|-------------|--------|---------------|
-| FR-001 | commands/spec-specify.md | `@spec FR-001: Seed creation step after split` | ✅ Implemented | 2026-04-16 |
-| FR-002 | commands/spec-specify.md | `@spec FR-002: Seed detection and context injection` | ✅ Implemented | 2026-04-16 |
-| FR-003 | commands/spec-specify.md | `@spec FR-003: Seed absorption after spec generation` | ✅ Implemented | 2026-04-16 |
-| FR-004 | commands/spec-specify.md | `@spec FR-004: 4-field Markdown schema with placeholders` | ✅ Implemented | 2026-04-16 |
+| FR-001 | .agent-sync/skills/spec-specify/SKILL.md | `@spec FR-001: Seed creation step after split` | ✅ Implemented | 2026-04-16 |
+| FR-002 | .agent-sync/skills/spec-specify/SKILL.md | `@spec FR-002: Seed detection and context injection` | ✅ Implemented | 2026-04-16 |
+| FR-003 | .agent-sync/skills/spec-specify/SKILL.md | `@spec FR-003: Seed absorption after spec generation` | ✅ Implemented | 2026-04-16 |
+| FR-004 | .agent-sync/skills/spec-specify/SKILL.md | `@spec FR-004: 4-field Markdown schema with placeholders` | ✅ Implemented | 2026-04-16 |
 | FR-005 | .specs/spec-system.md | `@spec FR-005: Document seed artifacts in spec-system` | ✅ Implemented | 2026-04-16 |
-| FR-006 | commands/spec-specify.md | `@spec FR-006: Origin field structure` | ✅ Implemented | 2026-04-16 |
-| FR-007 | commands/spec-specify.md | `@spec FR-007: Seeded attribution in Input section` | ✅ Implemented | 2026-04-16 |
+| FR-006 | .agent-sync/skills/spec-specify/SKILL.md | `@spec FR-006: Origin field structure` | ✅ Implemented | 2026-04-16 |
+| FR-007 | .agent-sync/skills/spec-specify/SKILL.md | `@spec FR-007: Seeded attribution in Input section` | ✅ Implemented | 2026-04-16 |
 
 ## Acceptance Criteria Mapping
 
@@ -32,7 +37,7 @@
 
 | File | What Changed |
 |------|-------------|
-| `commands/spec-specify.md` | Added Step 1.7 (Seed Detection), Step 1.5.5.1 (Seed Creation), Step 7.3 (Seed Absorption) |
+| `.agent-sync/skills/spec-specify/SKILL.md` | Added Step 1.7 (Seed Detection), Step 1.5.5.1 (Seed Creation), Step 7.3 (Seed Absorption) |
 | `.specs/spec-system.md` | Added seed.md and seed.absorbed.md to directory tree and documentation subsections |
 
 ## Files Created

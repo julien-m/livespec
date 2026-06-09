@@ -1,3 +1,10 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-019) -->
+<!-- @spec(AC-020) -->
+<!-- @spec(AC-021) -->
+<!-- @spec(FR-016) -->
+<!-- @spec(FR-018) -->
+
 # Cross-Browser Testing Guide
 
 Detect rendering differences across Chromium, Firefox, and WebKit (Safari) browser engines.

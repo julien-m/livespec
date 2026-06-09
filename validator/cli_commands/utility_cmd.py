@@ -1,3 +1,8 @@
+# LiveSpec traceability anchors
+# @spec(FR-007)
+# @spec(FR-008)
+# @spec(FR-009)
+
 """Deterministic utility command backends for LiveSpec."""
 
 from __future__ import annotations
@@ -23,9 +28,7 @@ conventions_app = typer.Typer(name="conventions", help="Manage LiveSpec conventi
 
 def register(app: typer.Typer) -> None:
     """Register deterministic utility commands."""
-    app.command(name="status", help="Show a read-only LiveSpec project status.")(
-        status_command
-    )
+    app.command(name="status", help="Show a read-only LiveSpec project status.")(status_command)
     app.command(
         name="play-coverage",
         help="Build spec anchor coverage data for the coverage playground.",

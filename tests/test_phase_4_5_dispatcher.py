@@ -1,3 +1,13 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-007)
+# @spec(FR-001)
+# @spec(FR-006)
+# @spec(FR-007)
+# @spec(FR-008)
+
 """Phase 4.5 dispatcher unit tests with in-memory fake handlers.
 
 These tests pin the routing contract: each registered runner key resolves to
@@ -138,9 +148,7 @@ def test_dispatcher_routes_maestro(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_dispatcher_skips_unknown_runner(
-    tmp_path: Path, caplog: Any
-) -> None:
+def test_dispatcher_skips_unknown_runner(tmp_path: Path, caplog: Any) -> None:
     surfaces = [Surface(id="legacy", runner="tauri")]
     registry: dict[str, Any] = {}
     dispatcher = _build_dispatcher(tmp_path, surfaces, registry)
@@ -153,14 +161,10 @@ def test_dispatcher_skips_unknown_runner(
     )
 
 
-def test_dispatcher_blocked_when_detect_returns_false(
-    tmp_path: Path, caplog: Any
-) -> None:
+def test_dispatcher_blocked_when_detect_returns_false(tmp_path: Path, caplog: Any) -> None:
     surfaces = [Surface(id="ios", runner="xcuitest")]
     registry = {
-        "xcuitest": _make_handler(
-            "xcuitest", detect_value=False, preflight="missing tooling"
-        )
+        "xcuitest": _make_handler("xcuitest", detect_value=False, preflight="missing tooling")
     }
     dispatcher = _build_dispatcher(tmp_path, surfaces, registry)
     with caplog.at_level(logging.ERROR, logger="validator.ui_runner_dispatcher"):

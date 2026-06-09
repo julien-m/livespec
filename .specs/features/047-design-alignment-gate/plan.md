@@ -1,3 +1,9 @@
+---
+created: 2026-05-18
+spec_ref: .specs/features/047-design-alignment-gate/spec.md
+title: Plan - Feature 047 - Design Alignment Gate
+---
+
 # Plan - Feature 047 - Design Alignment Gate
 
 ## Summary
@@ -54,3 +60,12 @@ Promote the CloudSkill mockup-code alignment workflow into LiveSpec as a reusabl
 
 - The first version compares normalized contracts, not raw binary Pencil internals. This is deliberate: it gives LiveSpec a stable contract and lets future Pencil adapters evolve without changing verdict semantics.
 - Runtime extraction differs by platform; this feature defines the common comparator and CLI. UI runners can produce the runtime contract in follow-up work while already consuming the same verdict model.
+
+## Traceability Flow
+
+```mermaid
+flowchart TD
+    Spec[spec.md] --> Plan[plan.md]
+    Plan --> Implementation[implementation.md]
+    Implementation --> Tests[verification]
+```

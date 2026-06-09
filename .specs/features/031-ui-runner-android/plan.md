@@ -1,7 +1,8 @@
 ---
-title: "UI Runner Android (Maestro) — Technical Plan"
-status: "Approved"
 created: 2026-05-07
+spec_ref: .specs/features/031-ui-runner-android/spec.md
+status: Approved
+title: UI Runner Android (Maestro) — Technical Plan
 updated: 2026-05-07
 ---
 
@@ -307,3 +308,11 @@ Total: 13 files (within 12-file limit per step — split into Step 1 tests + Ste
 ---
 
 *Technical Plan — Feature 031 — 2026-05-07*
+
+## Summary
+
+Technical plan for Ui Runner Android.
+
+## Risks & Considerations
+
+- Keep this compatibility plan aligned with the living spec and implementation map.

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-008)
+
 set -euo pipefail
 
 # LiveSpec — build spec coverage playground data.

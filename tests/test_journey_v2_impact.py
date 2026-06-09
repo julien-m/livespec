@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(AC-007)
+# @spec(AC-020)
+# @spec(AC-021)
+# @spec(AC-022)
+# @spec(AC-036)
+
 """Tests for JourneyImpactAnalyzer."""
 
 from __future__ import annotations

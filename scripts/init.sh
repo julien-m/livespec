@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-005)
+# @spec(FR-010)
+
 # LiveSpec init script
 # Installs the LiveSpec spec system in a project directory
 #

@@ -2,6 +2,9 @@
 name: spec-doctor
 description: LiveSpec project health command /spec-doctor
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-002) -->
+
 
 # /spec-doctor
 

@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+// LiveSpec traceability anchors
+// @spec(AC-002)
+// @spec(FR-002)
+
 // @spec FR-002: Validate mockup baseline metadata — .specs/features/010-visual-testing-complete/spec.md#fr-002
 // Usage:
 //   node scripts/validate-mockup-metadata.js [directory]

@@ -3,6 +3,9 @@ version: 15
 description: "Command naming normalization — hyphenated slash commands with dotted aliases"
 date: 2026-05-18
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-008) -->
+
 
 # Migration v15: Command Naming Normalization
 

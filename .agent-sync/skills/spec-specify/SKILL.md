@@ -2,6 +2,23 @@
 name: spec-specify
 description: Migrated Claude command /spec-specify
 ---
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(AC-002) -->
+<!-- @spec(AC-003) -->
+<!-- @spec(AC-004) -->
+<!-- @spec(AC-005) -->
+<!-- @spec(AC-008) -->
+<!-- @spec(FR-001) -->
+<!-- @spec(FR-002) -->
+<!-- @spec(FR-003) -->
+<!-- @spec(FR-004) -->
+<!-- @spec(FR-006) -->
+<!-- @spec(FR-007) -->
+<!-- @spec(FR-010) -->
+<!-- @spec(FR-014) -->
+<!-- @spec(FR-015) -->
+<!-- @spec(FR-041) -->
+
 
 # /spec-specify
 

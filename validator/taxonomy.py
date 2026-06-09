@@ -1,3 +1,25 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-002)
+# @spec(AC-003)
+# @spec(AC-004)
+# @spec(AC-005)
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-014)
+# @spec(AC-015)
+# @spec(FR-001)
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-005)
+# @spec(FR-006)
+# @spec(FR-007)
+
 """Parse ui-behavioral-taxonomy.md and expose detect_traits / deduplicate_tests.
 
 @spec FR-001 — load_taxonomy — .specs/features/006-taxonomy-testing-infra/spec.md#fr-001

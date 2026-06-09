@@ -1,9 +1,11 @@
+# LiveSpec traceability anchors
+# @spec(FR-006)
+
 """Typer subcommand: livespec spec.driver --new <stack>."""
 
 # Feature 023: driver custom scaffolding.
 # @spec FR-001: livespec spec.driver --new <stack> CLI
 # @spec AC-010: After scaffold, prints path + reminder + integration command
-
 
 from __future__ import annotations
 
@@ -21,9 +23,7 @@ def root(
     new: str | None = typer.Option(
         None, "--new", help="Create .specs/drivers/<stack>.yaml from template"
     ),
-    force: bool = typer.Option(
-        False, "--force", help="Overwrite existing driver file"
-    ),
+    force: bool = typer.Option(False, "--force", help="Overwrite existing driver file"),
 ) -> None:
     """Handle ``livespec spec.driver`` root options.
 

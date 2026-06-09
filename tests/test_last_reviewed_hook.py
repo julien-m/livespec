@@ -1,3 +1,6 @@
+# LiveSpec traceability anchors
+# @spec(AC-008)
+
 """Integration tests for the pre-commit `last_reviewed` hook.
 
 # @spec FR-009, AC-008 — .specs/features/039-command-expectations-and-verify-output/spec.md
@@ -11,11 +14,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-HOOK = (
-    Path(__file__).resolve().parents[1]
-    / "hooks"
-    / "livespec-last-reviewed.py"
-)
+HOOK = Path(__file__).resolve().parents[1] / "hooks" / "livespec-last-reviewed.py"
 
 
 def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -55,7 +54,7 @@ def _make_expectations(repo: Path, name: str, last_reviewed: str) -> None:
     (repo / ".agent-sync" / "skills" / name).mkdir(parents=True, exist_ok=True)
     (repo / f".agent-sync/skills/{name}/expectations.md").write_text(
         (
-            f"---\ncommand: {name}\ncontract_version: \"1.0\"\n"
+            f'---\ncommand: {name}\ncontract_version: "1.0"\n'
             f"last_reviewed: {last_reviewed}\n---\n\n# x\n"
         ),
         encoding="utf-8",

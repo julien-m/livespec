@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-004)
+
 # maestro-capture.sh — Capture screenshots from an Android emulator via adb.
 #
 # Wraps the adb screencap pipeline used by the Maestro runner as a convenience

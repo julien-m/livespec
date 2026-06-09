@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-005)
+# @spec(FR-018)
+
 """Visual feature gate for ``/spec-check``, ``/spec-fix``, ``/spec-test``,
 ``/spec-feature``.
 
@@ -94,8 +98,10 @@ class VisualFeatureSignals:
 
     @property
     def strong_count(self) -> int:
-        return int(self.s2_feature_screens) + int(self.s3_penflow_workspace) + int(
-            self.s4_flow_ui_contract
+        return (
+            int(self.s2_feature_screens)
+            + int(self.s3_penflow_workspace)
+            + int(self.s4_flow_ui_contract)
         )
 
     @property
@@ -225,29 +231,14 @@ def certify_visual_evidence(
             "run_id": run_id,
             "verdict": "BLOCKED",
             "missing_artifacts": [
-                "threshold_percent must be between 0 and "
-                f"{MAX_DESIGN_FIDELITY_THRESHOLD_PERCENT:g}"
+                f"threshold_percent must be between 0 and {MAX_DESIGN_FIDELITY_THRESHOLD_PERCENT:g}"
             ],
             "receipt_path": None,
         }
     mockup_dir = project_root / DESIGN_REGISTRY_DIR / "screens" / feature_slug
-    runtime_dir = (
-        project_root
-        / ".specs"
-        / "features"
-        / feature_slug
-        / "run"
-        / run_id
-        / target
-    )
+    runtime_dir = project_root / ".specs" / "features" / feature_slug / "run" / run_id / target
     evidence_dir = (
-        project_root
-        / ".specs"
-        / "features"
-        / feature_slug
-        / "run"
-        / run_id
-        / "visual-evidence"
+        project_root / ".specs" / "features" / feature_slug / "run" / run_id / "visual-evidence"
     )
     mockups = sorted(mockup_dir.glob("*.png")) if mockup_dir.is_dir() else []
     missing: list[str] = []
@@ -354,9 +345,7 @@ def _manifest_status_to_dict(status: ManifestStatus | None) -> dict[str, object]
                 "screen": e.screen,
                 "kind": e.kind,
                 "registry_path": str(e.registry_path),
-                "feature_local_path": (
-                    str(e.feature_local_path) if e.feature_local_path else None
-                ),
+                "feature_local_path": (str(e.feature_local_path) if e.feature_local_path else None),
                 "sha256": e.sha256,
                 "approved_at": e.approved_at,
             }
@@ -511,9 +500,7 @@ def _surfaces_yaml_mentions_feature(project_root: Path, feature_slug: str) -> bo
     )
 
 
-def detect_visual_feature(
-    *, project_root: Path, feature_slug: str
-) -> VisualClassification:
+def detect_visual_feature(*, project_root: Path, feature_slug: str) -> VisualClassification:
     """Apply the P0-A deterministic detection table."""
     feature_dir = _feature_dir(project_root, feature_slug)
     spec_md = feature_dir / "spec.md"
@@ -536,15 +523,10 @@ def detect_visual_feature(
         )
 
     s2_feature_screens = (
-        (feature_dir / "design").is_dir()
-        and any((feature_dir / "design").rglob("*.png"))
+        (feature_dir / "design").is_dir() and any((feature_dir / "design").rglob("*.png"))
     ) or (
         (project_root / DESIGN_REGISTRY_DIR / "screens" / feature_slug).is_dir()
-        and any(
-            (project_root / DESIGN_REGISTRY_DIR / "screens" / feature_slug).rglob(
-                "*.png"
-            )
-        )
+        and any((project_root / DESIGN_REGISTRY_DIR / "screens" / feature_slug).rglob("*.png"))
     )
     s3_penflow = _has_feature_scoped_penflow(project_root, feature_slug)
     s4_flow_ui = (feature_dir / "design" / "flow-ui-contract").is_dir()
@@ -607,9 +589,7 @@ def _iter_alignment_screens(project_root: Path, feature_slug: str) -> list[Path]
     return sorted([p for p in base.iterdir() if p.is_dir()])
 
 
-def _resolve_manifest_source(
-    raw: str, *, screen_dir: Path, project_root: Path
-) -> Path | None:
+def _resolve_manifest_source(raw: str, *, screen_dir: Path, project_root: Path) -> Path | None:
     """Resolve a ``design_source``/``runtime_source`` reference from a manifest.
 
     Resolution order:
@@ -693,9 +673,7 @@ def _read_alignment_manifest_sources(
     return design_path, runtime_path, None, data
 
 
-def _run_alignment_for_screen(
-    screen_dir: Path, *, project_root: Path
-) -> AlignmentResult | None:
+def _run_alignment_for_screen(screen_dir: Path, *, project_root: Path) -> AlignmentResult | None:
     """Run design-alignment compare for ``screen_dir``.
 
     Prefer local ``design-contract.json`` / ``runtime-contract.json`` when
@@ -707,10 +685,8 @@ def _run_alignment_for_screen(
     design_path: Path | None = screen_dir / "design-contract.json"
     runtime_path: Path | None = screen_dir / "runtime-contract.json"
     if not design_path.exists() or not runtime_path.exists():
-        manifest_design, manifest_runtime, _err, _raw = (
-            _read_alignment_manifest_sources(
-                screen_dir, project_root=project_root
-            )
+        manifest_design, manifest_runtime, _err, _raw = _read_alignment_manifest_sources(
+            screen_dir, project_root=project_root
         )
         if manifest_design is None or manifest_runtime is None:
             return None
@@ -724,9 +700,7 @@ def _run_alignment_for_screen(
     )
 
 
-def _alignment_dir_incomplete_reasons(
-    screen_dir: Path, *, project_root: Path
-) -> list[str]:
+def _alignment_dir_incomplete_reasons(screen_dir: Path, *, project_root: Path) -> list[str]:
     """Return missing-file reasons for an incomplete ``design-alignment/<screen>/``.
 
     A "complete" screen dir must either (a) carry both ``design-contract.json``
@@ -741,9 +715,7 @@ def _alignment_dir_incomplete_reasons(
         return []
     manifest_path = screen_dir / "design-alignment.manifest.json"
     if manifest_path.exists():
-        _d, _r, err, _raw = _read_alignment_manifest_sources(
-            screen_dir, project_root=project_root
-        )
+        _d, _r, err, _raw = _read_alignment_manifest_sources(screen_dir, project_root=project_root)
         if err is None:
             return []
         return [err]
@@ -785,9 +757,7 @@ def validate_gate(
     receipt_path: Path | None = None,
 ) -> GateReport:
     """Run the visual gate against ``feature_slug`` and return a ``GateReport``."""
-    classification = detect_visual_feature(
-        project_root=project_root, feature_slug=feature_slug
-    )
+    classification = detect_visual_feature(project_root=project_root, feature_slug=feature_slug)
 
     if classification.classification == "NON_VISUAL":
         return GateReport(
@@ -828,9 +798,7 @@ def validate_gate(
     alignment_results: list[AlignmentResult] = []
     incomplete_alignment: list[str] = []
     for screen_dir in _iter_alignment_screens(project_root, feature_slug):
-        result = _run_alignment_for_screen(
-            screen_dir, project_root=project_root
-        )
+        result = _run_alignment_for_screen(screen_dir, project_root=project_root)
         if result is not None:
             alignment_results.append(result)
             continue
@@ -838,9 +806,7 @@ def validate_gate(
         # evidence under the strict gate (incomplete artefacts cannot
         # silently disappear, otherwise a skipped compare would PASS).
         incomplete_alignment.extend(
-            _alignment_dir_incomplete_reasons(
-                screen_dir, project_root=project_root
-            )
+            _alignment_dir_incomplete_reasons(screen_dir, project_root=project_root)
         )
 
     runtime_misplaced = find_runtime_misplaced_under_design_screens(
@@ -969,9 +935,7 @@ def _validate_visual_evidence_receipt(
             [f"{rel_receipt}: invalid visual evidence receipt ({exc})"],
         )
     evidence = _visual_receipt_to_gate_evidence(project_root, receipt_path, receipt)
-    missing = _missing_visual_receipt_requirements(
-        receipt=receipt, command=command, target=target
-    )
+    missing = _missing_visual_receipt_requirements(receipt=receipt, command=command, target=target)
     if missing:
         evidence["verdict"] = "BLOCKED"
         return evidence, "BLOCKED", missing
@@ -1034,9 +998,7 @@ def _resolve_targets_for_check(
     """
     if target is not None:
         return [str(target)]
-    baselines_root = (
-        project_root / DESIGN_REGISTRY_DIR / BASELINES_DIRNAME / feature_slug
-    )
+    baselines_root = project_root / DESIGN_REGISTRY_DIR / BASELINES_DIRNAME / feature_slug
     if baselines_root.is_dir():
         existing = sorted(
             p.name
@@ -1052,9 +1014,7 @@ def _resolve_targets_for_check(
     try:
         import yaml  # type: ignore[import-untyped]
 
-        parsed_raw: object = yaml.safe_load(
-            surfaces_path.read_text(encoding="utf-8")
-        ) or {}
+        parsed_raw: object = yaml.safe_load(surfaces_path.read_text(encoding="utf-8")) or {}
     except Exception:  # pragma: no cover - bad YAML
         return []
     parsed = _as_mapping(parsed_raw)
@@ -1094,13 +1054,10 @@ def _missing_artifacts_from_signals(
     if not signals.s3_penflow_workspace:
         missing.append("penflow/ workspace at project root")
     if not signals.s4_flow_ui_contract:
-        missing.append(
-            f".specs/features/{feature_slug}/design/flow-ui-contract/"
-        )
+        missing.append(f".specs/features/{feature_slug}/design/flow-ui-contract/")
     if target is not None:
         missing.append(
-            f".specs/design/baselines/{feature_slug}/{target}/ "
-            f"(approved baseline registry)"
+            f".specs/design/baselines/{feature_slug}/{target}/ (approved baseline registry)"
         )
     return missing
 
@@ -1109,9 +1066,7 @@ def _detect_plain_copies(
     project_root: Path, feature_slug: str, target: GateTarget | None
 ) -> list[LinkViolation]:
     out: list[LinkViolation] = []
-    baselines_dir = (
-        project_root / ".specs" / "features" / feature_slug / "baselines"
-    )
+    baselines_dir = project_root / ".specs" / "features" / feature_slug / "baselines"
     if not baselines_dir.exists():
         return out
     # Use scandir-style iteration so broken symlinks are surfaced
@@ -1233,8 +1188,7 @@ def _legacy_manifest_mockup_checks(
             continue
         if not mockup_path.exists():
             missing.append(
-                f"{manifest_path}: mockup for screen '{screen}' not found at "
-                f"{mockup_path}"
+                f"{manifest_path}: mockup for screen '{screen}' not found at {mockup_path}"
             )
             continue
         expected_hash = _legacy_mockup_hash(raw)
@@ -1288,9 +1242,7 @@ def _resolve_legacy_mockup_path(
 ) -> tuple[Path, str | None]:
     """Resolve optional ``mockup_path`` or the default screen-named mockup."""
     raw_path = raw.get("mockup_path")
-    allowed_root = (
-        project_root / DESIGN_REGISTRY_DIR / SCREENS_DIRNAME / feature_slug
-    ).resolve()
+    allowed_root = (project_root / DESIGN_REGISTRY_DIR / SCREENS_DIRNAME / feature_slug).resolve()
     if isinstance(raw_path, str) and raw_path.strip():
         candidate = Path(raw_path)
         if candidate.is_absolute():
@@ -1302,8 +1254,7 @@ def _resolve_legacy_mockup_path(
         except ValueError:
             return (
                 resolved,
-                "Legacy manifest mockup_path escapes "
-                f".specs/design/screens/{feature_slug}/.",
+                f"Legacy manifest mockup_path escapes .specs/design/screens/{feature_slug}/.",
             )
         return resolved, None
     return project_root / expected_registry_mockup_path(
@@ -1442,9 +1393,7 @@ class CleanupAction:
     def to_dict(self) -> dict[str, object]:
         return {
             "source": str(self.source),
-            "quarantine_target": (
-                str(self.quarantine_target) if self.quarantine_target else None
-            ),
+            "quarantine_target": (str(self.quarantine_target) if self.quarantine_target else None),
             "kind": self.kind,
             "reason": self.reason,
         }
@@ -1469,9 +1418,7 @@ class CleanupPlan:
     def to_dict(self) -> dict[str, object]:
         return {
             "feature_slug": self.feature_slug,
-            "quarantine_root": (
-                str(self.quarantine_root) if self.quarantine_root else None
-            ),
+            "quarantine_root": (str(self.quarantine_root) if self.quarantine_root else None),
             "actions": [a.to_dict() for a in self.actions],
             "has_drift": self.has_drift,
         }
@@ -1488,12 +1435,7 @@ def plan_cleanup(
     misplaced = find_runtime_misplaced_under_design_screens(
         project_root=project_root, feature_slug=feature_slug
     )
-    quarantine_root = (
-        project_root
-        / DESIGN_REGISTRY_DIR
-        / "_quarantine"
-        / timestamp
-    )
+    quarantine_root = project_root / DESIGN_REGISTRY_DIR / "_quarantine" / timestamp
     actions: list[CleanupAction] = []
     for source in misplaced:
         rel = source.relative_to(project_root)
@@ -1546,9 +1488,7 @@ def write_cleanup_report(
         "feature_slug": plan.feature_slug,
         "planned": [a.to_dict() for a in plan.actions],
         "applied": [a.to_dict() for a in applied],
-        "quarantine_root": (
-            str(plan.quarantine_root) if plan.quarantine_root else None
-        ),
+        "quarantine_root": (str(plan.quarantine_root) if plan.quarantine_root else None),
         "has_drift": plan.has_drift,
     }
     target = run_dir / "cleanup-report.json"
@@ -1576,14 +1516,7 @@ def promote_baseline(
     """
     safe_screen = screen if screen.endswith(".png") else f"{screen}.png"
     run_capture = (
-        project_root
-        / ".specs"
-        / "features"
-        / feature_slug
-        / "run"
-        / run_id
-        / target
-        / safe_screen
+        project_root / ".specs" / "features" / feature_slug / "run" / run_id / target / safe_screen
     )
     if not run_capture.exists():
         raise FileNotFoundError(f"Run capture not found: {run_capture}")
@@ -1606,9 +1539,10 @@ def promote_baseline(
         if feature_local_path.is_symlink() or feature_local_path.exists():
             feature_local_path.unlink()
         # Compute the relative path from the symlink dir to the registry file.
-        rel_target = Path(
-            *([".."] * (len(feature_local_path.parent.relative_to(project_root).parts)))
-        ) / registry_rel
+        rel_target = (
+            Path(*([".."] * (len(feature_local_path.parent.relative_to(project_root).parts))))
+            / registry_rel
+        )
         _safe_symlink(rel_target, feature_local_path)
     else:
         # manifest mode: symlink unsupported → persist a manifest.json entry
@@ -1643,9 +1577,7 @@ def _persist_manifest_entry(
     payload: dict[str, object]
     if manifest_path.exists():
         try:
-            payload_raw: object = json.loads(
-                manifest_path.read_text(encoding="utf-8")
-            ) or {}
+            payload_raw: object = json.loads(manifest_path.read_text(encoding="utf-8")) or {}
         except (json.JSONDecodeError, ValueError):
             payload = {}
         else:
@@ -1669,14 +1601,10 @@ def _persist_manifest_entry(
         "registry_path": str(registry_rel),
         "sha256": sha,
     }
-    entries = [
-        e for e in entries if str(e.get("screen", "")) != new_entry["screen"]
-    ]
+    entries = [e for e in entries if str(e.get("screen", "")) != new_entry["screen"]]
     entries.append(new_entry)
     payload["entries"] = entries
-    manifest_path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
-    )
+    manifest_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
     return manifest_path
 
 

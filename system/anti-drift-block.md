@@ -1,3 +1,8 @@
+<!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-004) -->
+<!-- @spec(FR-011) -->
+<!-- @spec(FR-019) -->
+
 <!-- @spec FR-011: Shared command runtime docs — .specs/features/052-deterministic-command-goal-contracts/spec.md#fr-011 -->
 
 # Anti-Drift Block

@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(AC-003)
+# @spec(FR-006)
+
 """Unit tests for the jvm-coverage-gate.sh escape-hatch script."""
 
 # @spec FR-006: Unit tests for the gate script
@@ -62,9 +66,7 @@ def test_gate_jacoco_absent_on_gradle_skips_with_setup_guide() -> None:
     # @spec AC-004
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "build.gradle").write_text(
-            "plugins { id 'java' }\n", encoding="utf-8"
-        )
+        (project_root / "build.gradle").write_text("plugins { id 'java' }\n", encoding="utf-8")
 
         result = _run_gate(project_root)
 
@@ -77,9 +79,7 @@ def test_gate_jacoco_absent_on_maven_skips_with_setup_guide() -> None:
     # @spec AC-004
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "pom.xml").write_text(
-            "<project><build/></project>", encoding="utf-8"
-        )
+        (project_root / "pom.xml").write_text("<project><build/></project>", encoding="utf-8")
 
         result = _run_gate(project_root)
 
@@ -93,7 +93,7 @@ def test_gate_jacoco_present_on_gradle_kts_lcov_missing_warns() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
         (project_root / "build.gradle.kts").write_text(
-            "plugins { id(\"jacoco\") }\n", encoding="utf-8"
+            'plugins { id("jacoco") }\n', encoding="utf-8"
         )
 
         result = _run_gate(project_root)
@@ -108,9 +108,7 @@ def test_gate_jacoco_present_with_lcov_passes() -> None:
     # @spec AC-003
     with tempfile.TemporaryDirectory() as tmpdir:
         project_root = Path(tmpdir)
-        (project_root / "build.gradle").write_text(
-            "plugins { id 'jacoco' }\n", encoding="utf-8"
-        )
+        (project_root / "build.gradle").write_text("plugins { id 'jacoco' }\n", encoding="utf-8")
         lcov_path = project_root / "build" / "reports" / "jacoco" / "test"
         lcov_path.mkdir(parents=True)
         (lcov_path / "lcov.info").write_text("TN:\nSF:foo\nDA:1,1\n", encoding="utf-8")
@@ -129,9 +127,7 @@ def test_gate_gradle_priority_over_maven() -> None:
         # Gradle file with no JaCoCo, Maven file WITH JaCoCo.
         # If Gradle priority works, we should see the no-JaCoCo skip-message
         # (because the Gradle file is consulted, not pom.xml).
-        (project_root / "build.gradle").write_text(
-            "plugins { id 'java' }\n", encoding="utf-8"
-        )
+        (project_root / "build.gradle").write_text("plugins { id 'java' }\n", encoding="utf-8")
         (project_root / "pom.xml").write_text(
             "<project><build><plugins><plugin>"
             "<artifactId>jacoco-maven-plugin</artifactId>"

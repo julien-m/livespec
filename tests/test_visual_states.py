@@ -1,3 +1,9 @@
+# LiveSpec traceability anchors
+# @spec(AC-001)
+# @spec(AC-013)
+# @spec(AC-014)
+# @spec(FR-008)
+
 """Tests for VisualState parsing in validator/taxonomy.py.
 
 @spec FR-001, FR-002: Visual state taxonomy and parsing
@@ -39,10 +45,16 @@ class TestVisualStateParsing:
         """Load the real taxonomy and assert traits with visual states have >= 2 states."""
         # Traits documented as having visual states (5 core + 6 from 005.2 expansion)
         traits_with_visual_states = {
-            "is_submittable", "async_action", "has_overlay",
-            "dismissible_layer", "has_validation",
-            "is_navigable", "is_sortable", "shows_notification",
-            "has_drag_drop", "has_date_picker",
+            "is_submittable",
+            "async_action",
+            "has_overlay",
+            "dismissible_layer",
+            "has_validation",
+            "is_navigable",
+            "is_sortable",
+            "shows_notification",
+            "has_drag_drop",
+            "has_date_picker",
         }
         taxonomy = load_taxonomy(_TAXONOMY_PATH)
         for trait in taxonomy.traits:

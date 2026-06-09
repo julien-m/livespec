@@ -262,9 +262,7 @@ def test_all_documented_template_vars_handled() -> None:
 
     from validator.hook_resolver import _build_feature_ctx
 
-    hooks_md = (
-        Path(__file__).parent.parent / "system" / "hooks.md"
-    ).read_text(encoding="utf-8")
+    hooks_md = (Path(__file__).parent.parent / "system" / "hooks.md").read_text(encoding="utf-8")
     documented = set(re.findall(r"\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}", hooks_md))
 
     ctx = _build_feature_ctx("plan", "042-foo", Path.cwd())
@@ -285,9 +283,7 @@ def test_all_documented_template_vars_handled() -> None:
         "adr_paths",
     }
     orphans = documented - resolver_known
-    assert orphans == set(), (
-        f"undocumented {{var}} placeholders in hook_resolver: {orphans}"
-    )
+    assert orphans == set(), f"undocumented {{var}} placeholders in hook_resolver: {orphans}"
     # Sanity: feature_name and command must resolve when feature_slug given.
     assert ctx["feature_name"] == "042-foo"
     assert ctx["command"] == "plan"

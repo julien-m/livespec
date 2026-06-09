@@ -1,3 +1,10 @@
+# LiveSpec traceability anchors
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-004)
+# @spec(FR-007)
+# @spec(FR-040)
+
 """Filesystem path helpers for journey sources and generated artifacts."""
 
 # @spec FR-002, FR-003, FR-004, FR-007, FR-040: global v2 layout and v1 discovery

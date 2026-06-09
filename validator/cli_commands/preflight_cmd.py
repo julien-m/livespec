@@ -29,9 +29,7 @@ def preflight_command(
         "--full",
         help="Disable smart scoping — verify every item, not just the impacted ones.",
     ),
-    debug: bool = typer.Option(
-        False, "--debug", help="Print the full stacktrace on error."
-    ),
+    debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
 ) -> None:
     """Run the project preflight check.
 
@@ -65,16 +63,13 @@ def _run_preflight(*, fix: bool, full: bool) -> None:
 
     if not manifest_path.exists():
         typer.echo(
-            f"Error: {manifest_path} not found. "
-            "Run /spec-preflight --regenerate to generate it.",
+            f"Error: {manifest_path} not found. Run /spec-preflight --regenerate to generate it.",
             err=True,
         )
         emit_summary("preflight", "FAIL", reason="manifest_missing")
         raise typer.Exit(EXIT_PREFLIGHT_FAIL)
 
-    items = preflight_autofix.parse_preflight_manifest(
-        manifest_path.read_text(encoding="utf-8")
-    )
+    items = preflight_autofix.parse_preflight_manifest(manifest_path.read_text(encoding="utf-8"))
     if not items:
         typer.echo("Preflight: no fixable items declared in manifest.")
         emit_summary("preflight", "OK", items=0)
