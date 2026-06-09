@@ -46,6 +46,8 @@ UI_TEST_JOURNEY_AUTH_ENV = "UI_TEST_JOURNEY_AUTH"
 UI_TEST_JOURNEY_FIXTURES_ENV = "UI_TEST_JOURNEY_FIXTURES"
 UI_TEST_JOURNEY_MOCKS_ENV = "UI_TEST_JOURNEY_MOCKS"
 UI_TEST_JOURNEY_FEATURE_FLAGS_ENV = "UI_TEST_JOURNEY_FEATURE_FLAGS"
+XCUITEST_ASSERT_EXISTS_TIMEOUT_SECONDS = 5
+XCUITEST_ASSERT_NOT_EXISTS_TIMEOUT_SECONDS = 1
 
 
 class _JourneySourceReadError(Exception):
@@ -496,9 +498,17 @@ def _xcuitest_step(step: dict[str, JsonValue]) -> list[str]:
     if action == "click" and isinstance(payload, dict):
         return [f"{_xcuitest_target(payload)}.tap()"]
     if action == "assert" and isinstance(payload, dict):
-        return [f"XCTAssertTrue({_xcuitest_target(payload)}.exists)"]
+        return [
+            "assertJourneyElementExists("
+            f"{_xcuitest_target(payload)}, {_swift_literal(_target_identifier(payload))}"
+            ")"
+        ]
     if action == "assert_not" and isinstance(payload, dict):
-        return [f"XCTAssertFalse({_xcuitest_target(payload)}.exists)"]
+        return [
+            "assertJourneyElementDoesNotExist("
+            f"{_xcuitest_target(payload)}, {_swift_literal(_target_identifier(payload))}"
+            ")"
+        ]
     if action == "fill" and isinstance(payload, dict):
         value = _swift_literal(str(payload.get("value", "")))
         target = _xcuitest_target(payload)
@@ -523,8 +533,46 @@ def _xcuitest_screenshot() -> list[str]:
 
 def _xcuitest_helpers(steps: list[dict[str, JsonValue]]) -> list[str]:
     """Return Swift helpers required by rendered XCUITest steps."""
-    if not any(next(iter(step.items()))[0] == "open" for step in steps):
-        return []
+    actions = {next(iter(step.items()))[0] for step in steps}
+    helpers: list[str] = []
+    if actions & {"assert", "assert_not"}:
+        helpers.extend(_xcuitest_assertion_helpers())
+    if "open" in actions:
+        if helpers:
+            helpers.append("")
+        helpers.extend(_xcuitest_open_helpers())
+    return helpers
+
+
+def _xcuitest_assertion_helpers() -> list[str]:
+    """Return Swift helpers that wait before asserting journey element state."""
+    return [
+        "    private func assertJourneyElementExists(",
+        "        _ element: XCUIElement,",
+        "        _ identifier: String,",
+        f"        timeout: TimeInterval = {XCUITEST_ASSERT_EXISTS_TIMEOUT_SECONDS}",
+        "    ) {",
+        "        XCTAssertTrue(",
+        "            element.waitForExistence(timeout: timeout),",
+        '            "Expected journey element to exist: \\(identifier)"',
+        "        )",
+        "    }",
+        "",
+        "    private func assertJourneyElementDoesNotExist(",
+        "        _ element: XCUIElement,",
+        "        _ identifier: String,",
+        f"        timeout: TimeInterval = {XCUITEST_ASSERT_NOT_EXISTS_TIMEOUT_SECONDS}",
+        "    ) {",
+        "        XCTAssertFalse(",
+        "            element.waitForExistence(timeout: timeout),",
+        '            "Expected journey element to stay absent: \\(identifier)"',
+        "        )",
+        "    }",
+    ]
+
+
+def _xcuitest_open_helpers() -> list[str]:
+    """Return Swift helpers required by rendered XCUITest open steps."""
     return [
         "    private func openJourneyURL(_ urlString: String, in app: XCUIApplication) {",
         "        guard let url = URL(string: urlString) else {",

@@ -1,5 +1,15 @@
 # Changelog - Cross-Feature User Journeys v2
 
+## 2026-06-09 — Fix: 3/3 gaps closed — XCUITest assertions wait for element state
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Updated [`validator/journeys/compiler.py`](../../../validator/journeys/compiler.py), [`tests/test_journey_v2_compiler.py`](../../../tests/test_journey_v2_compiler.py), [`implementation.md`](implementation.md), [`progress.md`](progress.md), [`checks/2026-06-09.md`](checks/2026-06-09.md), and [`../../changelog.md`](../../changelog.md).
+- **Gaps closed:** XCUITest `assert` and `assert_not` steps now compile to generated helper calls that use `waitForExistence(timeout:)` before `XCTAssertTrue` / `XCTAssertFalse`; compiled Swift steps no longer read `.exists` immediately on `app.descendants(matching: .any)[...]`.
+- **Remaining:** Downstream projects such as Strapt must recompile journeys with this LiveSpec compiler before retrying the commit-skill audit.
+- **Verification:** `pytest tests/test_journey_v2_compiler.py -q` → 15 passed; `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 20 passed; `ruff check .` → pass after line-length cleanup; targeted `pyright` and `mypy` on touched compiler/test files → pass.
+- **Author:** spec-fix
+
 ## 2026-06-09 — [Fix]: Requalify W15 mypy validation boundary
 
 - **Type:** Bug Fix

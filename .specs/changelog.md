@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-09 — [Feature 057] Fix: 3/3 gaps closed — XCUITest journey assertions now use generated `waitForExistence` helpers for `assert` and `assert_not`, eliminating immediate `.exists` reads from compiled Swift steps.
+
 ## 2026-06-09 — [Feature 057 Fix]: Requalified W15 validation docs so `mypy .` is recorded as pre-existing project-wide type debt, while touched journey compiler files pass targeted `mypy` and `pyright`.
 
 ## 2026-06-09 — [Feature 057 Fix]: Closed W14 compiler audit majors with explicit `journey_source_unreadable` failures before artifact writes, XCUITest auth/feature-flag launch assertions, centralized journey launch-environment keys, and compiler validation docs.

@@ -160,10 +160,13 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 - `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 18 passed.
 - `pytest tests/test_journey_v2_compiler.py -q` → 14 passed.
 - `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 19 passed.
+- `pytest tests/test_journey_v2_compiler.py -q` → 15 passed.
+- `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 20 passed.
 - `ruff check .` → pass.
 - `ruff format --check .` → pass.
 - `pyright validator/journeys/compiler.py tests/test_journey_v2_compiler.py` → 0 errors.
 - `mypy validator/journeys/compiler.py tests/test_journey_v2_compiler.py` → no issues in 2 source files.
+- Generated XCUITest assertion scan → no immediate `XCTAssertTrue/False(app.descendants(...).exists)` in compiler output; assertions use `waitForExistence(timeout:)` helpers.
 - `mypy .` → fails with 52 errors in 27 files outside `validator/journeys/compiler.py` and `tests/test_journey_v2_compiler.py`; this is recorded as pre-existing project type debt, not a passing W15/W16 gate.
 - `git diff --check` → pass.
 - `livespec validate --coherence` → 0 errors, 0 warnings, 2 infos.

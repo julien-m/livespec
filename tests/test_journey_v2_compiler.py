@@ -282,12 +282,61 @@ def test_compile_v2_xcuitest_supports_negative_assertions_and_fill(
     assert (
         'app.descendants(matching: .any)["workout-name-field"].typeText("Morning Session")' in text
     )
-    assert (
-        'XCTAssertFalse(app.descendants(matching: .any)["watch-short-workout-save-button"].exists)'
-        in text
+    negative_assertion = (
+        "assertJourneyElementDoesNotExist(app.descendants(matching: .any)"
+        '["watch-short-workout-save-button"], "watch-short-workout-save-button")'
     )
+    immediate_negative_assertion = (
+        'XCTAssertFalse(app.descendants(matching: .any)["watch-short-workout-save-button"].exists)'
+    )
+    assert negative_assertion in text
+    assert "element.waitForExistence(timeout: timeout)" in text
+    assert immediate_negative_assertion not in text
     assert "let attachment = XCTAttachment(screenshot: screenshot)" in text
     assert "attachment.lifetime = .keepAlways" in text
+
+
+def test_compile_v2_xcuitest_waits_for_assertions(
+    tmp_path: Path,
+) -> None:
+    """AC-032: XCUITest assertions wait for UI state instead of reading `.exists` directly."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace(
+            "  - action: open\n    target:\n      route: /signup\n",
+            """
+  - action: open
+    target:
+      route: "myapp://signup"
+  - action: assert
+    target:
+      test_id: welcome
+""",
+        ),
+        encoding="utf-8",
+    )
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+    assert result.error_count == 0, [issue.message for issue in result.issues]
+    assert manifest is not None
+    text = (tmp_path / manifest.native_output_paths[0]).read_text(encoding="utf-8")
+    expected_assertion = (
+        'assertJourneyElementExists(app.descendants(matching: .any)["welcome"], "welcome")'
+    )
+    assert expected_assertion in text
+    assert "private func assertJourneyElementExists(" in text
+    assert "XCTAssertTrue(app.descendants(matching: .any)" not in text
+    assert "XCTAssertFalse(app.descendants(matching: .any)" not in text
+    assert "element.waitForExistence(timeout: timeout)" in text
+    assert "XCTAssertTrue(" in text
 
 
 def test_compile_v2_xcuitest_injects_preconditions_before_launch(
