@@ -3,7 +3,7 @@ title: "Implementation - Cross-Feature User Journeys v2"
 feature: 057-cross-feature-user-journeys-v2
 status: Implemented
 implemented: 2026-06-04
-last_verified: 2026-06-07
+last_verified: 2026-06-09
 ---
 
 # Implementation - Cross-Feature User Journeys v2
@@ -55,7 +55,7 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | FR-037 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-037` | ✅ Implemented | 2026-06-05 |
 | FR-038 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-038` | ✅ Implemented | 2026-06-05 |
 | FR-039 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-039` | ✅ Implemented | 2026-06-05 |
-| FR-040 | `validator/journeys/migration.py`, `validator/journeys/paths.py` | `@spec FR-040` | ✅ Implemented | 2026-06-05 |
+| FR-040 | `validator/journeys/migration.py`, `validator/journeys/paths.py`, `migrations/20/migrate.md`, `scripts/migrate-journeys-compile.sh` | `@spec FR-040` | ✅ Implemented | 2026-06-09 |
 | FR-041 | `.agent-sync/skills/spec-journey/SKILL.md`, `system/testing/user-journeys.md`, `.agent-sync/skills/spec-test/SKILL.md`, `.agent-sync/skills/spec-feature/SKILL.md`, `.agent-sync/skills/spec-specify/SKILL.md` | `@spec FR-041` | ✅ Implemented | 2026-06-05 |
 
 ## Acceptance Criteria Mapping
@@ -87,7 +87,7 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | AC-023 | `tests/test_journey_v2_cli.py` | ✅ Implemented |
 | AC-024 | `tests/test_journey_v2_cli.py`, `tests/test_journey_v2_compiler.py` | ✅ Implemented |
 | AC-025 | `tests/test_journey_v2_cli.py`, `tests/test_journey_v2_runner.py` | ✅ Implemented |
-| AC-026 | `tests/test_journey_v2_cli.py`, `tests/test_journey_v2_migration.py` | ✅ Implemented |
+| AC-026 | `tests/test_journey_v2_cli.py`, `tests/test_journey_v2_migration.py`, `tests/integration/test_migration_v19_user_journeys.py` | ✅ Implemented |
 | AC-027 | `tests/test_journey_v2_compiler.py`, `tests/test_journey_v2_runner.py` | ✅ Implemented |
 | AC-028 | `tests/test_journey_v2_runner.py`, `tests/test_journey_v2_cli.py`, `tests/test_journey_v2_test_integration.py` | ✅ Implemented |
 | AC-029 | `tests/test_journey_v2_docs_skills.py`, `tests/test_command_audit_cli.py` | ✅ Implemented |
@@ -139,14 +139,16 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | `.agent-sync/skills/spec-specify/SKILL.md` | Global v2 journey proposal wording. |
 | `system/testing/user-journeys.md` | Canonical v2 journey documentation. |
 | `README.md` | Public command entrypoint now documents `/spec-journey` and User Journeys v2. |
-| `VERSION`, `migrations/19/migrate.md`, `migrations/20/migrate.md` | Migration points that refresh agent-sync assets and force old compiled journey manifests to regenerate. |
+| `VERSION`, `migrations/19/migrate.md`, `migrations/20/migrate.md`, `scripts/migrate-journeys-compile.sh` | Migration points that refresh agent-sync assets and force old compiled journey manifests to regenerate. |
 | `tests/test_journey_v2_*.py` | Focused tests for schema, validation, history, assignment, impact, compile, run, CLI, migration, doctor, docs, and visual/LLM behavior. |
-| `tests/integration/test_migration_v19_user_journeys.py` | Integration proof that Migrations 19 and 20 refresh User Journeys assets. |
+| `tests/integration/test_migration_v19_user_journeys.py` | Integration proof that Migrations 19 and 20 refresh User Journeys assets and force v20 journey recompilation. |
 
 ## Verification
 
 - `pytest tests/test_journey_v2_*.py -q` → 38 passed.
 - `pytest tests/ --ignore=tests/integration -q` → pass in spec-fix verification.
 - `pytest tests/integration/test_migration_v19_user_journeys.py tests/test_journey_v2_docs_skills.py tests/test_command_registry.py tests/test_agent_sync_layout.py -q` → pass in migration/README verification.
+- `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 12 passed.
 - Changed-file `ruff check` and `ruff format --check` → pass in spec-fix verification.
+- `bash -n scripts/migrate-journeys-compile.sh` → pass.
 - `pyright validator/` → pass in spec-fix verification.

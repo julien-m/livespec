@@ -1,5 +1,15 @@
 # Changelog - Cross-Feature User Journeys v2
 
+## 2026-06-09 — [Fix]: Migration 20 force-recompiles v2 journeys
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `migrations/20/migrate.md`, `scripts/migrate-journeys-compile.sh`, `tests/integration/test_migration_v19_user_journeys.py`, `.specs/features/057-cross-feature-user-journeys-v2/implementation.md`, `.specs/features/057-cross-feature-user-journeys-v2/progress.md`, `.specs/features/057-cross-feature-user-journeys-v2/checks/2026-06-09.md`, `.specs/changelog.md`, `.specs/README.md`
+- **Gaps closed:** Migration 20 now runs `livespec journey compile --force` via `migrate-journeys-compile.sh`, so migrated downstream projects regenerate every v2 journey manifest instead of only syncing assets and setting version 20.
+- **Remaining:** None for the Migration 20 force-recompile gap.
+- **Verification:** `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q`; `ruff check tests/integration/test_migration_v19_user_journeys.py`; `ruff format --check tests/integration/test_migration_v19_user_journeys.py`; `bash -n scripts/migrate-journeys-compile.sh`
+- **Author:** spec-fix
+
 ## 2026-06-08 — [Fix]: Native journey execution and migration refresh
 
 - **Type:** Bug Fix

@@ -2,7 +2,7 @@
 feature: 057-cross-feature-user-journeys-v2
 status: Implemented
 created: 2026-06-04
-updated: 2026-06-07
+updated: 2026-06-09
 ---
 
 # Progress - Cross-Feature User Journeys v2
@@ -41,3 +41,4 @@ updated: 2026-06-07
 - 2026-06-05: `$spec-fix` closed check gaps: implementation mapping now covers 41 FR and 46 AC, journey skills use global v2 paths and compiled-only run gates, impact detection uses SmartTestSelector plus stable target signals, and Python convention gaps were fixed.
 - 2026-06-07: Migration 19 added so existing v18 projects re-run agent asset sync and receive `$spec-journey`, User Journeys v2 routing, and updated command guidance; root README now documents `/spec-journey`.
 - 2026-06-08: `$spec-fix` corrected the native execution gap: `livespec journey run`, `livespec test`, and feature/implement gates now execute compiled native artifacts without recompiling; XCUITest compilation refreshes XcodeGen projects; compiler `journeys-v2-2` makes old manifests stale so migrated projects must explicitly regenerate journeys.
+- 2026-06-09: `$spec-fix` made Migration 20 run `migrate-journeys-compile.sh`, which invokes `livespec journey compile --force` from the migrated project root; regression coverage proves old `journeys-v2-1` manifests are rewritten to the current compiler version.

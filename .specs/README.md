@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-02
+> Last updated: 2026-06-09
 
 
 ---
@@ -93,7 +93,7 @@
 | 054 | Migration Planner and Penflow Backfill | Implemented | 2026-06-01 | 2026-06-01 | [spec](features/054-migration-planner-penflow-backfill/spec.md), [plan](features/054-migration-planner-penflow-backfill/plan.md), [implementation](features/054-migration-planner-penflow-backfill/implementation.md) |
 | 055 | Spec Doctor Project Health | Implemented | 2026-06-01 | 2026-06-02 | [spec](features/055-spec-doctor-project-health/spec.md), [plan](features/055-spec-doctor-project-health/plan.md), [implementation](features/055-spec-doctor-project-health/implementation.md) |
 | 056 | Executable User Journeys | Implemented | 2026-06-01 | 2026-06-02 | [spec](features/056-executable-user-journeys/spec.md), [plan](features/056-executable-user-journeys/plan.md), [implementation](features/056-executable-user-journeys/implementation.md) |
-| 057 | Cross-Feature User Journeys v2 | Implemented | 2026-06-04 | 2026-06-08 | [spec](features/057-cross-feature-user-journeys-v2/spec.md), [plan](features/057-cross-feature-user-journeys-v2/plan.md), [implementation](features/057-cross-feature-user-journeys-v2/implementation.md) |
+| 057 | Cross-Feature User Journeys v2 | Implemented | 2026-06-04 | 2026-06-09 | [spec](features/057-cross-feature-user-journeys-v2/spec.md), [plan](features/057-cross-feature-user-journeys-v2/plan.md), [implementation](features/057-cross-feature-user-journeys-v2/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -117,6 +117,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-09 | Bugfix | [Feature 057] Migration 20 now force-recompiles v2 journeys so old `journeys-v2-1` manifests are regenerated during downstream migration |
 | 2026-06-08 | Bugfix | [Feature 057] Fixed native journey execution: compiled artifacts now run through native runners, XCUITest compile refreshes XcodeGen, and Migration 20 forces old manifests to regenerate |
 | 2026-06-07 | Bugfix | [Feature 057] Added Migration 19 so existing v18 projects receive `$spec-journey`, User Journeys v2 routing, and updated command guidance |
 | 2026-06-05 | Bugfix | [Feature 057] Fixed check gaps: canonical FR/AC implementation mapping, global v2 journey skill wording, compiled-only gates, impact detection, and convention fixes |
