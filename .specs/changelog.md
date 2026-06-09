@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-09 — [Feature 057 Fix]: Closed the W31/W33/W35/W37 XCUITest simulator-destination correction chain accepted by V22 using the V21 W37 scope proof: journey runs resolve iOS/watchOS destinations from available `simctl` devices, pass `id=<UDID>` to `xcodebuild`, and boot/await the selected simulator instead of defaulting to unavailable `iPhone 16`. Strapt recompile, `$spec-test`, journey runs, `$git-commit`, and push remain out of scope.
+
 ## 2026-06-09 — [Feature 057] Fix: 3/3 gaps closed — XCUITest journey assertions now use generated `waitForExistence` helpers for `assert` and `assert_not`, eliminating immediate `.exists` reads from compiled Swift steps.
 
 ## 2026-06-09 — [Feature 057 Fix]: Requalified W15 validation docs so `mypy .` is recorded as pre-existing project-wide type debt, while touched journey compiler files pass targeted `mypy` and `pyright`.

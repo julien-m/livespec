@@ -1,5 +1,26 @@
 # Changelog - Cross-Feature User Journeys v2
 
+## 2026-06-09 — [Fix]: Close W31/W33/W35/W37 simulator-destination correction chain
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Updated [`validator/journeys/runner.py`](../../../validator/journeys/runner.py), [`tests/test_journey_v2_runner.py`](../../../tests/test_journey_v2_runner.py), [`implementation.md`](implementation.md), [`progress.md`](progress.md), [`checks/2026-06-09.md`](checks/2026-06-09.md), and [`../../changelog.md`](../../changelog.md).
+- **Gaps closed:** Runtime journey execution no longer defaults to unavailable `platform=iOS Simulator,name=iPhone 16`; XCUITest journeys resolve available iOS/watchOS simulators via `xcrun simctl list devices available --json`, use `id=<UDID>` destinations, and boot/await the resolved simulator before `xcodebuild test`.
+- **Scope proof:** W39 brief records `V21 PASS on W37`; V22 accepted this W38/W39 correction using that V21 W37 scope proof. This entry intentionally covers only the W31/W33/W35/W37 chain and removes the W32/W34/W36 audit-finalization claims flagged by W38.
+- **Remaining:** Strapt recompile, `$spec-test`, journey run, `$git-commit`, and push were not run.
+- **Verification:** `pytest tests/test_journey_v2_runner.py tests/test_journey_v2_cli.py -q` -> 25 passed; targeted Ruff format/check, Pyright, `git diff --check`, and `livespec validate --coherence` pass. Details are recorded in [`checks/2026-06-09.md`](checks/2026-06-09.md).
+- **Author:** spec-fix
+
+## 2026-06-09 — [Fix]: Resolve XCUITest journey destinations from available simulators
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Updated [`validator/journeys/runner.py`](../../../validator/journeys/runner.py), [`tests/test_journey_v2_runner.py`](../../../tests/test_journey_v2_runner.py), [`implementation.md`](implementation.md), [`progress.md`](progress.md), [`checks/2026-06-09.md`](checks/2026-06-09.md), and [`../../changelog.md`](../../changelog.md).
+- **Gaps closed:** Runtime journey execution no longer defaults to unavailable `platform=iOS Simulator,name=iPhone 16`; XCUITest journeys resolve available iOS/watchOS simulators via `xcrun simctl list devices available --json`, use `id=<UDID>` destinations, and boot/await the resolved simulator before `xcodebuild test`.
+- **Remaining:** A later fresh worker must `$git-commit` LiveSpec, then a fresh Strapt worker must recompile journeys with the updated LiveSpec before retrying `$spec-test`.
+- **Verification:** `pytest tests/test_journey_v2_runner.py tests/test_journey_v2_cli.py -q` → 14 passed; targeted `ruff`/`pyright` on touched runner files pass; Strapt destination resolution proof emits iOS UDID `8C365700-3496-4DEF-BCA8-6D6EFC6C5723` and watchOS UDID `659FC5B9-A363-45EF-84C0-23AD342BFEC9`, with no `iPhone 16` destination.
+- **Author:** spec-fix
+
 ## 2026-06-09 — Fix: 3/3 gaps closed — XCUITest assertions wait for element state
 
 - **Type:** Bug Fix

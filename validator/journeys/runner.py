@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import subprocess
 from dataclasses import dataclass, field
@@ -28,7 +29,30 @@ from .schema import JourneySourceV2, RunPolicyValue, RunStage
 # Native UI regressions can boot simulators/browsers; 10 minutes avoids short CI
 # flake while still bounding hung runners.
 RUNNER_TIMEOUT_SECONDS = 600
-DEFAULT_XCODE_DESTINATION = "platform=iOS Simulator,name=iPhone 16"
+# simctl list should be quick; 30s bounds host CLI hangs without hiding startup lag.
+SIMULATOR_COMMAND_TIMEOUT_SECONDS = 30
+# bootstatus can cold-start CoreSimulator, so it gets a wider bounded wait.
+SIMULATOR_BOOT_TIMEOUT_SECONDS = 120
+XCODE_DESTINATION_ENV = "LIVESPEC_XCODE_DESTINATION"
+XCODE_SCHEME_ENV = "LIVESPEC_XCODE_SCHEME"
+
+
+@dataclass(frozen=True)
+class _SimulatorDevice:
+    """Simulator device metadata needed to select and boot XCUITest destinations."""
+
+    name: str
+    udid: str
+    is_available: bool
+
+
+class SimulatorDiscoveryError(Exception):
+    """Typed failure while discovering simulator destinations."""
+
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
 
 
 class JourneyExecutor(Protocol):
@@ -155,13 +179,20 @@ def _run_manifest_artifacts(
                 f"compiled artifact missing: {output_path}",
                 artifact,
             )
-        argv = _runner_command(project_root, manifest.runner, artifact)
+        try:
+            argv = _runner_command(project_root, manifest.runner, artifact, executor)
+        except SimulatorDiscoveryError as error:
+            return _issue(error.code, error.message, artifact)
         if argv is None:
             return _issue(
                 "journey_native_runner_unsupported",
                 f"Unsupported native journey runner: {manifest.runner}",
                 source_path(project_root, source.id),
             )
+        if manifest.runner == "xcuitest":
+            boot_issue = _boot_xcuitest_destination(project_root, artifact, argv, executor)
+            if boot_issue is not None:
+                return boot_issue
         issue = _run_command(project_root, source.id, artifact, argv, executor)
         if issue is not None:
             return issue
@@ -227,7 +258,12 @@ def _run_subprocess(
     )
 
 
-def _runner_command(project_root: Path, runner: str, artifact: Path) -> list[str] | None:
+def _runner_command(
+    project_root: Path,
+    runner: str,
+    artifact: Path,
+    executor: JourneyExecutor,
+) -> list[str] | None:
     """Return the native command for one compiled journey artifact."""
     relative = artifact.relative_to(project_root).as_posix()
     if runner == "playwright":
@@ -235,7 +271,7 @@ def _runner_command(project_root: Path, runner: str, artifact: Path) -> list[str
     if runner == "maestro":
         return ["maestro", "test", relative]
     if runner == "xcuitest":
-        return _xcuitest_command(project_root, artifact)
+        return _xcuitest_command(project_root, artifact, executor)
     if runner == "pytest":
         return ["pytest", relative]
     if runner == "cargo":
@@ -243,11 +279,16 @@ def _runner_command(project_root: Path, runner: str, artifact: Path) -> list[str
     return None
 
 
-def _xcuitest_command(project_root: Path, artifact: Path) -> list[str] | None:
+def _xcuitest_command(
+    project_root: Path,
+    artifact: Path,
+    executor: JourneyExecutor,
+) -> list[str] | None:
     """Build an xcodebuild command for a generated XCUITest journey class."""
     test_target = _xcuitest_target_name(artifact)
     class_name = artifact.stem
-    destination = _env_value("LIVESPEC_XCODE_DESTINATION", DEFAULT_XCODE_DESTINATION)
+    platform = _xcuitest_platform(test_target, class_name)
+    destination = _xcode_destination(project_root, platform, executor)
     scheme = _xcode_scheme(project_root, test_target)
     if destination is None or scheme is None:
         return None
@@ -265,6 +306,243 @@ def _xcuitest_command(project_root: Path, artifact: Path) -> list[str] | None:
         ]
     )
     return command
+
+
+def _xcode_destination(
+    project_root: Path,
+    platform: str,
+    executor: JourneyExecutor,
+) -> str | None:
+    """Resolve an Xcode destination from explicit env or available simulators."""
+    configured = _env_value(XCODE_DESTINATION_ENV, "")
+    if configured is None:
+        return None
+    if configured:
+        return configured
+    device = _first_available_simulator(project_root, platform, executor)
+    simulator_platform = "watchOS Simulator" if platform == "watchos" else "iOS Simulator"
+    return f"platform={simulator_platform},id={device.udid}"
+
+
+def _first_available_simulator(
+    project_root: Path,
+    platform: str,
+    executor: JourneyExecutor,
+) -> _SimulatorDevice:
+    """Select the newest available iOS/watchOS simulator compatible with the journey."""
+    runtimes = _list_simulators(project_root, executor)
+    runtime_marker = "watchOS" if platform == "watchos" else "iOS"
+    runtime_keys = sorted(
+        (key for key in runtimes if runtime_marker in key),
+        key=lambda key: (_runtime_version_tuple(key, runtime_marker), key),
+        reverse=True,
+    )
+    # Newest runtimes win so old available devices do not mask current simulators.
+    for runtime_key in runtime_keys:
+        for device in runtimes[runtime_key]:
+            if not device.is_available:
+                continue
+            is_watch = "watch" in device.name.lower()
+            if platform == "watchos" and is_watch:
+                return device
+            if platform == "ios" and not is_watch:
+                return device
+    raise SimulatorDiscoveryError(
+        "journey_simulator_unavailable",
+        f"No available {runtime_marker} simulator found for XCUITest journey",
+    )
+
+
+def _list_simulators(
+    project_root: Path,
+    executor: JourneyExecutor,
+) -> dict[str, list[_SimulatorDevice]]:
+    """Return normalized `simctl list devices` output grouped by runtime."""
+    try:
+        # xcrun exposes host state; check=False lets LiveSpec map failures
+        # to stable issue codes.
+        completed = executor(
+            ["xcrun", "simctl", "list", "devices", "available", "--json"],
+            cwd=str(project_root),
+            capture_output=True,
+            text=True,
+            timeout=SIMULATOR_COMMAND_TIMEOUT_SECONDS,
+            check=False,
+        )
+    except FileNotFoundError as error:
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_missing",
+            "xcrun simctl not found while discovering available simulators",
+        ) from error
+    except subprocess.TimeoutExpired as error:
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_timeout",
+            f"simctl list devices timed out after {error.timeout}s",
+        ) from error
+    if completed.returncode != 0:
+        message = (
+            completed.stderr
+            or completed.stdout
+            or f"simctl list devices exited {completed.returncode}"
+        ).strip()
+        raise SimulatorDiscoveryError("journey_simulator_discovery_failed", message)
+    try:
+        parsed: object = json.loads(completed.stdout)
+    except json.JSONDecodeError as error:
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_invalid_json",
+            f"simctl list devices returned invalid JSON: {error.msg}",
+        ) from error
+    if not isinstance(parsed, dict):
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_invalid_json",
+            "simctl list devices JSON root must be an object",
+        )
+    devices = parsed.get("devices")
+    if not isinstance(devices, dict):
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_invalid_json",
+            "simctl list devices JSON missing object field: devices",
+        )
+    normalized: dict[str, list[_SimulatorDevice]] = {}
+    for runtime_key, raw_devices in devices.items():
+        if not isinstance(runtime_key, str):
+            raise SimulatorDiscoveryError(
+                "journey_simulator_discovery_invalid_json",
+                "simctl devices field runtime keys must be strings",
+            )
+        if not isinstance(raw_devices, list):
+            raise SimulatorDiscoveryError(
+                "journey_simulator_discovery_invalid_json",
+                "simctl runtime device entry must be a list",
+            )
+        normalized_devices = [_normalize_simulator_device(raw) for raw in raw_devices]
+        normalized[runtime_key] = normalized_devices
+    return normalized
+
+
+def _normalize_simulator_device(raw: object) -> _SimulatorDevice:
+    """Convert one `simctl` device object into the fields the runner needs."""
+    if not isinstance(raw, dict):
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_invalid_json",
+            "simctl device entry must be an object",
+        )
+    name = raw.get("name")
+    udid = raw.get("udid")
+    # Older simctl payloads omit isAvailable for usable devices.
+    is_available = raw.get("isAvailable", True)
+    if not isinstance(is_available, bool):
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_invalid_json",
+            "simctl device field isAvailable must be a boolean when present",
+        )
+    if not isinstance(name, str) or not isinstance(udid, str):
+        raise SimulatorDiscoveryError(
+            "journey_simulator_discovery_invalid_json",
+            "simctl device fields name and udid must be strings",
+        )
+    return _SimulatorDevice(
+        name=name,
+        udid=udid,
+        is_available=is_available,
+    )
+
+
+def _runtime_version_tuple(runtime_key: str, runtime_marker: str) -> tuple[int, ...]:
+    """Return numeric runtime version parts so iOS-26-4 sorts after iOS-9-3."""
+    marker_index = runtime_key.find(runtime_marker)
+    if marker_index == -1:
+        return ()
+    suffix = runtime_key[marker_index + len(runtime_marker) :].lstrip(".-_ ")
+    version_parts: list[int] = []
+    for part in suffix.replace(".", "-").split("-"):
+        if part.isdigit():
+            version_parts.append(int(part))
+            continue
+        if version_parts:
+            break
+    return tuple(version_parts)
+
+
+def _boot_xcuitest_destination(
+    project_root: Path,
+    artifact: Path,
+    argv: list[str],
+    executor: JourneyExecutor,
+) -> JourneyIssue | None:
+    """Boot an explicit UDID destination before running XCUITest."""
+    udid = _destination_udid(argv)
+    if udid is None:
+        return None
+    try:
+        # Booting an already-running simulator is acceptable; the stderr text is normalized below.
+        boot = executor(
+            ["xcrun", "simctl", "boot", udid],
+            cwd=str(project_root),
+            capture_output=True,
+            text=True,
+            timeout=SIMULATOR_COMMAND_TIMEOUT_SECONDS,
+            check=False,
+        )
+    except FileNotFoundError:
+        return _issue("journey_simulator_runner_missing", "xcrun simctl not found", artifact)
+    except subprocess.TimeoutExpired as error:
+        return _issue(
+            "journey_simulator_boot_timeout",
+            f"Simulator {udid} boot timed out after {error.timeout}s",
+            artifact,
+        )
+    boot_error = (boot.stderr or boot.stdout or "").lower()
+    if (
+        boot.returncode != 0
+        and "already booted" not in boot_error
+        and "state: booted" not in boot_error
+    ):
+        message = (boot.stderr or boot.stdout or f"simctl boot exited {boot.returncode}").strip()
+        return _issue("journey_simulator_boot_failed", message, artifact)
+    try:
+        ready = executor(
+            ["xcrun", "simctl", "bootstatus", udid, "-b"],
+            cwd=str(project_root),
+            capture_output=True,
+            text=True,
+            timeout=SIMULATOR_BOOT_TIMEOUT_SECONDS,
+            check=False,
+        )
+    except FileNotFoundError:
+        return _issue("journey_simulator_runner_missing", "xcrun simctl not found", artifact)
+    except subprocess.TimeoutExpired as error:
+        return _issue(
+            "journey_simulator_boot_timeout",
+            f"Simulator {udid} bootstatus timed out after {error.timeout}s",
+            artifact,
+        )
+    if ready.returncode != 0:
+        message = (
+            ready.stderr or ready.stdout or f"simctl bootstatus exited {ready.returncode}"
+        ).strip()
+        return _issue("journey_simulator_boot_failed", message, artifact)
+    return None
+
+
+def _destination_udid(argv: list[str]) -> str | None:
+    """Extract `id=<UDID>` from an xcodebuild command destination."""
+    try:
+        destination = argv[argv.index("-destination") + 1]
+    except (ValueError, IndexError):
+        return None
+    for part in destination.split(","):
+        key, separator, value = part.strip().partition("=")
+        if separator and key == "id" and value:
+            return value
+    return None
+
+
+def _xcuitest_platform(test_target: str, class_name: str) -> str:
+    """Infer simulator platform from the generated XCUITest target and class names."""
+    combined = f"{test_target} {class_name}".lower()
+    return "watchos" if "watch" in combined else "ios"
 
 
 def _xcuitest_target_name(artifact: Path) -> str:
@@ -286,8 +564,8 @@ def _xcode_project_flag(project_root: Path) -> list[str]:
 
 
 def _xcode_scheme(project_root: Path, test_target: str) -> str | None:
-    """Infer the scheme used to run a generated XCUITest target."""
-    configured = _env_value("LIVESPEC_XCODE_SCHEME", "")
+    """Infer the XCUITest scheme, honoring `LIVESPEC_XCODE_SCHEME` first."""
+    configured = _env_value(XCODE_SCHEME_ENV, "")
     if configured is None:
         return None
     if configured:

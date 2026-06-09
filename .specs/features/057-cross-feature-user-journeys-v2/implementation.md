@@ -39,7 +39,7 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | FR-021 | `validator/journeys/impact.py` | `@spec FR-021` | ✅ Implemented | 2026-06-05 |
 | FR-022 | `validator/cli_commands/journey_cmd.py` | `@spec FR-022` | ✅ Implemented | 2026-06-05 |
 | FR-023 | `validator/journeys/compiler.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-023` | ✅ Implemented | 2026-06-08 |
-| FR-024 | `validator/journeys/runner.py`, `validator/cli_commands/test_cmd.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-024` | ✅ Implemented | 2026-06-08 |
+| FR-024 | `validator/journeys/runner.py`, `validator/cli_commands/test_cmd.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-024` | ✅ Implemented | 2026-06-09 |
 | FR-025 | `.agent-sync/skills/spec-feature/SKILL.md`, `.agent-sync/skills/spec-implement/SKILL.md` | `@spec FR-025` | ✅ Implemented | 2026-06-05 |
 | FR-026 | `.agent-sync/skills/spec-test/SKILL.md`, `validator/cli_commands/test_cmd.py` | `@spec FR-026` | ✅ Implemented | 2026-06-08 |
 | FR-027 | `validator/journeys/runner.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-027` | ✅ Implemented | 2026-06-08 |
@@ -162,6 +162,22 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 - `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 19 passed.
 - `pytest tests/test_journey_v2_compiler.py -q` → 15 passed.
 - `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 20 passed.
+- `pytest tests/test_journey_v2_runner.py tests/test_journey_v2_cli.py -q` → 14 passed.
+- `pytest tests/test_journey_v2_runner.py tests/test_journey_v2_cli.py -q` → 18 passed after W32 simulator discovery audit fixes.
+- Red run `pytest tests/test_journey_v2_runner.py -q` → failed on `invalid_is_available_shape` and no-available-simulator regressions before W34 fixes.
+- `pytest tests/test_journey_v2_runner.py -q` → 19 passed after W34 simulator discovery audit fixes.
+- Red run `pytest tests/test_journey_v2_runner.py::test_run_journeys_reports_simulator_discovery_errors -q` → 4 failed, 7 passed before W36 nested-shape fixes.
+- `pytest tests/test_journey_v2_runner.py::test_run_journeys_reports_simulator_discovery_errors -q` → 11 passed after W36 nested-shape fixes.
+- `pytest tests/test_journey_v2_runner.py tests/test_journey_v2_cli.py -q` → 26 passed after W36 nested-shape fixes.
+- `ruff format --check validator/journeys/runner.py tests/test_journey_v2_runner.py` → 2 files already formatted after W36 nested-shape fixes.
+- `ruff check validator/journeys/runner.py tests/test_journey_v2_runner.py` → pass.
+- `ruff check validator/journeys/runner.py tests/test_journey_v2_runner.py` → pass after W32 simulator discovery audit fixes.
+- `ruff format validator/journeys/runner.py tests/test_journey_v2_runner.py` → 2 files left unchanged.
+- `ruff format --check validator/journeys/runner.py tests/test_journey_v2_runner.py` → pass.
+- `pyright validator/journeys/runner.py tests/test_journey_v2_runner.py` → 0 errors.
+- `git diff --check` → pass after W32 simulator discovery audit fixes.
+- `livespec validate --coherence` → 0 errors, 0 warnings, 2 infos after W32 simulator discovery audit fixes.
+- Strapt XCUITest destination resolution proof → iOS resolves to `platform=iOS Simulator,id=8C365700-3496-4DEF-BCA8-6D6EFC6C5723`; watchOS resolves to `platform=watchOS Simulator,id=659FC5B9-A363-45EF-84C0-23AD342BFEC9`; no `iPhone 16` destination emitted.
 - `ruff check .` → pass.
 - `ruff format --check .` → pass.
 - `pyright validator/journeys/compiler.py tests/test_journey_v2_compiler.py` → 0 errors.
