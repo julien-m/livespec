@@ -43,9 +43,9 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | FR-025 | `.agent-sync/skills/spec-feature/SKILL.md`, `.agent-sync/skills/spec-implement/SKILL.md` | `@spec FR-025` | ✅ Implemented | 2026-06-05 |
 | FR-026 | `.agent-sync/skills/spec-test/SKILL.md`, `validator/cli_commands/test_cmd.py` | `@spec FR-026` | ✅ Implemented | 2026-06-08 |
 | FR-027 | `validator/journeys/runner.py`, `validator/cli_commands/journey_cmd.py` | `@spec FR-027` | ✅ Implemented | 2026-06-08 |
-| FR-028 | `validator/journeys/compiler_registry.py`, `validator/journeys/capabilities.py`, `validator/journeys/compiler.py` | `@spec FR-028` | ✅ Implemented | 2026-06-05 |
-| FR-029 | `validator/journeys/manifest.py`, `validator/journeys/compiler.py`, `validator/journeys/runner.py`, `validator/journeys/scanner.py` | `@spec FR-029` | ✅ Implemented | 2026-06-08 |
-| FR-030 | `validator/journeys/manifest.py`, `validator/journeys/compiler.py` | `@spec FR-030` | ✅ Implemented | 2026-06-05 |
+| FR-028 | `validator/journeys/compiler_registry.py`, `validator/journeys/capabilities.py`, `validator/journeys/compiler.py` | `@spec FR-028` | ✅ Implemented | 2026-06-09 |
+| FR-029 | `validator/journeys/manifest.py`, `validator/journeys/compiler.py`, `validator/journeys/runner.py`, `validator/journeys/scanner.py` | `@spec FR-029` | ✅ Implemented | 2026-06-09 |
+| FR-030 | `validator/journeys/manifest.py`, `validator/journeys/compiler.py` | `@spec FR-030` | ✅ Implemented | 2026-06-09 |
 | FR-031 | `validator/journeys/schema.py` | `@spec FR-031` | ✅ Implemented | 2026-06-05 |
 | FR-032 | `validator/journeys/schema.py`, `validator/journeys/impact.py` | `@spec FR-032` | ✅ Implemented | 2026-06-05 |
 | FR-033 | `validator/journeys/schema.py`, `validator/journeys/visual_contracts.py` | `@spec FR-033` | ✅ Implemented | 2026-06-05 |
@@ -149,6 +149,10 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 - `pytest tests/ --ignore=tests/integration -q` → pass in spec-fix verification.
 - `pytest tests/integration/test_migration_v19_user_journeys.py tests/test_journey_v2_docs_skills.py tests/test_command_registry.py tests/test_agent_sync_layout.py -q` → pass in migration/README verification.
 - `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 12 passed.
+- `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 17 passed.
+- `ruff check validator/journeys/capabilities.py validator/journeys/compiler.py validator/journeys/manifest.py tests/test_journey_v2_compiler.py` → pass.
+- `ruff format --check validator/journeys/capabilities.py validator/journeys/compiler.py validator/journeys/manifest.py tests/test_journey_v2_compiler.py` → pass.
+- `pyright validator/` → 0 errors, 0 warnings, 0 informations.
 - Changed-file `ruff check` and `ruff format --check` → pass in spec-fix verification.
 - `bash -n scripts/migrate-journeys-compile.sh` → pass.
 - `pyright validator/` → pass in spec-fix verification.

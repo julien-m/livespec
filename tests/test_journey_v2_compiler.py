@@ -23,6 +23,7 @@ from pathlib import Path
 from pytest import MonkeyPatch
 
 from tests.test_journey_v2_validation import _write_feature, _write_v2_journey
+from validator.journeys.capabilities import validate_runner_capability
 from validator.journeys.compiler import compile_journeys
 from validator.journeys.manifest import read_compiled_manifest
 
@@ -59,7 +60,13 @@ def test_compile_v2_generates_xcuitest_and_maestro_by_runner(tmp_path: Path) -> 
     _write_feature(specs, "012-projects")
     source = _write_v2_journey(specs)
     base = source.read_text(encoding="utf-8")
-    source.write_text(base.replace("runner: playwright", "runner: xcuitest"), encoding="utf-8")
+    source.write_text(
+        base.replace("runner: playwright", "runner: xcuitest").replace(
+            "route: /signup",
+            'route: "myapp://signup"',
+        ),
+        encoding="utf-8",
+    )
     ios_result = compile_journeys(tmp_path, journey="onboarding-first-project")
     shutil.rmtree(source.parent / "compiled")
     source.write_text(base.replace("runner: playwright", "runner: maestro"), encoding="utf-8")
@@ -73,6 +80,9 @@ def test_compile_v2_generates_xcuitest_and_maestro_by_runner(tmp_path: Path) -> 
     )
     assert swift_artifact.exists()
     assert maestro_artifact.exists()
+    swift_text = swift_artifact.read_text(encoding="utf-8")
+    assert "func testOnboardingFirstProjectJourney() throws" in swift_text
+    assert "testJourney()" not in swift_text
 
 
 def test_compile_v2_runs_xcodegen_for_xcuitest_project_yml(
@@ -86,7 +96,9 @@ def test_compile_v2_runs_xcodegen_for_xcuitest_project_yml(
     _write_feature(specs, "012-projects")
     source = _write_v2_journey(specs)
     source.write_text(
-        source.read_text(encoding="utf-8").replace("runner: playwright", "runner: xcuitest"),
+        source.read_text(encoding="utf-8")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace("route: /signup", 'route: "myapp://signup"'),
         encoding="utf-8",
     )
     (tmp_path / "project.yml").write_text("name: App\n", encoding="utf-8")
@@ -119,7 +131,9 @@ def test_compile_v2_reports_xcodegen_failure_for_xcuitest_project_yml(
     _write_feature(specs, "012-projects")
     source = _write_v2_journey(specs)
     source.write_text(
-        source.read_text(encoding="utf-8").replace("runner: playwright", "runner: xcuitest"),
+        source.read_text(encoding="utf-8")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace("route: /signup", 'route: "myapp://signup"'),
         encoding="utf-8",
     )
     (tmp_path / "project.yml").write_text("name: App\n", encoding="utf-8")
@@ -156,6 +170,134 @@ def test_compile_v2_rejects_ui_journey_for_pytest_and_cargo(tmp_path: Path) -> N
 
     assert result.error_count == 1
     assert result.issues[0].code == "journey_capability_unsupported"
+
+
+def test_compile_v2_rejects_unsupported_xcuitest_steps_before_writing(
+    tmp_path: Path,
+) -> None:
+    """AC-037: XCUITest compile rejects unsupported portable steps before output."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace(
+            "  - action: open\n    target:\n      route: /signup\n",
+            "  - action: wait\n    seconds: 5\n",
+        ),
+        encoding="utf-8",
+    )
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    swift_artifact = tmp_path / "STRAPTUITests" / "Journeys" / "OnboardingFirstProjectJourney.swift"
+    assert result.error_count == 1
+    assert result.issues[0].code == "journey_capability_unsupported"
+    assert not swift_artifact.exists()
+
+
+def test_compile_v2_rejects_xcuitest_open_without_url_before_writing(
+    tmp_path: Path,
+) -> None:
+    """AC-037: XCUITest open requires a URL or deep link, not a relative route."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8").replace("runner: playwright", "runner: xcuitest"),
+        encoding="utf-8",
+    )
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    swift_artifact = tmp_path / "STRAPTUITests" / "Journeys" / "OnboardingFirstProjectJourney.swift"
+    assert result.error_count == 1
+    assert result.issues[0].code == "journey_capability_unsupported"
+    assert "URL/deep link" in result.issues[0].message
+    assert not swift_artifact.exists()
+
+
+def test_compile_v2_rejects_malformed_step_payloads_before_writing() -> None:
+    """AC-037: capability validation rejects malformed compiler step dictionaries."""
+    issue = validate_runner_capability(
+        "xcuitest",
+        "broken-journey",
+        [{"click": {}, "assert": {"test_id": "save"}}, {"fill": {"test_id": "name"}}],
+    )
+
+    assert issue is not None
+    assert issue.code == "journey_capability_unsupported"
+    assert "malformed step dictionary" in issue.message
+
+
+def test_compile_v2_xcuitest_supports_negative_assertions_and_fill(
+    tmp_path: Path,
+) -> None:
+    """AC-032: XCUITest compiler emits concrete code for supported actions."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace(
+            "  - action: open\n    target:\n      route: /signup\n",
+            """
+  - action: open
+    target:
+      route: "myapp://signup"
+  - action: fill
+    target:
+      test_id: workout-name-field
+    value: Morning Session
+  - action: assert_not
+    target:
+      test_id: watch-short-workout-save-button
+  - action: screenshot
+""",
+        ),
+        encoding="utf-8",
+    )
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+    assert result.error_count == 0, [issue.message for issue in result.issues]
+    assert manifest is not None
+    text = (tmp_path / manifest.native_output_paths[0]).read_text(encoding="utf-8")
+    assert "import Foundation" in text
+    assert 'process.arguments = ["simctl", "openurl", "booted", "myapp://signup"]' in text
+    assert 'XCTFail("simctl openurl timed out")' in text
+    assert (
+        'app.descendants(matching: .any)["workout-name-field"].typeText("Morning Session")' in text
+    )
+    assert (
+        'XCTAssertFalse(app.descendants(matching: .any)["watch-short-workout-save-button"].exists)'
+        in text
+    )
+    assert "let attachment = XCTAttachment(screenshot: screenshot)" in text
+    assert "attachment.lifetime = .keepAlways" in text
+
+
+def test_compile_v2_manifest_ends_with_newline(tmp_path: Path) -> None:
+    """FR-029: manifest writer preserves formatter-friendly JSON output."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    assert (source.parent / "compiled" / "manifest.json").read_bytes().endswith(b"\n")
 
 
 def test_compile_v2_writes_llm_visual_contracts_into_manifest(tmp_path: Path) -> None:

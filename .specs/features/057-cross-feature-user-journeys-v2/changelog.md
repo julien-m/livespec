@@ -1,5 +1,15 @@
 # Changelog - Cross-Feature User Journeys v2
 
+## 2026-06-09 — [Fix]: Native compiler rejects incomplete journey outputs
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `validator/journeys/capabilities.py`, `validator/journeys/compiler.py`, `validator/journeys/manifest.py`, `tests/test_journey_v2_compiler.py`, `.specs/features/057-cross-feature-user-journeys-v2/implementation.md`, `.specs/features/057-cross-feature-user-journeys-v2/progress.md`, `.specs/features/057-cross-feature-user-journeys-v2/checks/2026-06-09.md`, `.specs/changelog.md`, `.specs/README.md`
+- **Gaps closed:** Generated XCUITest artifacts no longer retain unsupported actions as comments; supported XCUITest output now includes named test methods, broad identifier lookup, URL-only deep-link opening with timeout, fill, screenshot attachments, and `assert_not`; unsupported actions, malformed step dictionaries, missing target/value payloads, and non-URL XCUITest opens fail capability validation before native files are written; manifests end with a trailing newline.
+- **Remaining:** Strapt must be recompiled by a fresh worker against this LiveSpec change; Strapt journey-source issues such as condition-based waits remain downstream validation work.
+- **Verification:** `pytest tests/test_journey_v2_compiler.py tests/test_journey_v2_cli.py tests/integration/test_migration_v19_user_journeys.py -q` → 17 passed; `ruff check validator/journeys/capabilities.py validator/journeys/compiler.py validator/journeys/manifest.py tests/test_journey_v2_compiler.py`; `ruff format --check validator/journeys/capabilities.py validator/journeys/compiler.py validator/journeys/manifest.py tests/test_journey_v2_compiler.py`; `pyright validator/`
+- **Author:** spec-fix
+
 ## 2026-06-09 — [Fix]: Migration 20 force-recompiles v2 journeys
 
 - **Type:** Bug Fix

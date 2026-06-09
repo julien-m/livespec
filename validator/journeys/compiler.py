@@ -72,7 +72,11 @@ def compile_journeys(
             continue
         if not source.is_executable:
             continue
-        capability_issue = validate_runner_capability(source.runner, source.journey_id)
+        capability_issue = validate_runner_capability(
+            source.runner,
+            source.journey_id,
+            source.steps,
+        )
         if capability_issue is not None:
             issues.append(_with_path(capability_issue, source.path))
             continue
@@ -240,12 +244,14 @@ def _compile_playwright(project_root: Path, journey: JourneyFile) -> str:
 
 def _compile_xcuitest(project_root: Path, journey: JourneyFile) -> str:
     """Compile one Apple-platform journey to Swift/XCUITest."""
+    method_name = f"test{slug_to_pascal(journey.journey_id)}Journey"
     lines = [
         *_header(project_root, journey, "//"),
+        "import Foundation",
         "import XCTest",
         "",
         f"final class {slug_to_pascal(journey.journey_id)}Journey: XCTestCase {{",
-        "    func testJourney() throws {",
+        f"    func {method_name}() throws {{",
         "        let app = XCUIApplication()",
         "        app.launch()",
     ]
@@ -325,13 +331,21 @@ def _playwright_step(step: dict[str, JsonValue]) -> list[str]:
         return [f"await page.getByText({_literal(target)}).click();"]
     if action == "assert" and isinstance(payload, dict):
         return [f"await expect(page.getByText({_literal(_target_text(payload))})).toBeVisible();"]
+    if action == "assert_not" and isinstance(payload, dict):
+        return [
+            f"await expect(page.getByText({_literal(_target_text(payload))})).not.toBeVisible();"
+        ]
+    if action == "fill" and isinstance(payload, dict):
+        target = _playwright_locator(_target_from_payload(payload))
+        value = str(payload.get("value", ""))
+        return [f"await {target}.fill({_literal(value)});"]
     if action == "screenshot":
         return ["await page.screenshot();"]
     if action == "back":
         return ["await page.goBack();"]
     if action == "press" and isinstance(payload, dict):
         return [f"await page.keyboard.press({_literal(str(payload.get('key', 'Enter')))});"]
-    return [f"// Unsupported compile step retained for review: {action}"]
+    raise ValueError(f"unsupported playwright action after capability validation: {action}")
 
 
 def _playwright_visual_steps(journey: JourneyFile) -> list[str]:
@@ -414,13 +428,60 @@ def _playwright_locator(target: JourneyTargetRef) -> str:
 def _xcuitest_step(step: dict[str, JsonValue]) -> list[str]:
     """Render one journey step into Swift/XCUITest."""
     action, payload = next(iter(step.items()))
+    if action == "open" and isinstance(payload, str):
+        return _xcuitest_open_url(payload)
     if action == "click" and isinstance(payload, dict):
-        return [f"app.buttons[{_swift_literal(_target_text(payload))}].tap()"]
+        return [f"{_xcuitest_target(payload)}.tap()"]
     if action == "assert" and isinstance(payload, dict):
-        return [f"XCTAssertTrue(app.staticTexts[{_swift_literal(_target_text(payload))}].exists)"]
+        return [f"XCTAssertTrue({_xcuitest_target(payload)}.exists)"]
+    if action == "assert_not" and isinstance(payload, dict):
+        return [f"XCTAssertFalse({_xcuitest_target(payload)}.exists)"]
+    if action == "fill" and isinstance(payload, dict):
+        value = _swift_literal(str(payload.get("value", "")))
+        target = _xcuitest_target(payload)
+        return [f"{target}.tap()", f"{target}.typeText({value})"]
+    if action == "screenshot":
+        return _xcuitest_screenshot()
     if action == "back":
         return ['app.buttons["Back"].tap()']
-    return [f"// Unsupported compile step retained for review: {action}"]
+    raise ValueError(f"unsupported xcuitest action after capability validation: {action}")
+
+
+def _xcuitest_open_url(route: str) -> list[str]:
+    """Return Swift that opens a deep link in the booted simulator."""
+    return [
+        "let process = Process()",
+        'process.executableURL = URL(fileURLWithPath: "/usr/bin/xcrun")',
+        f'process.arguments = ["simctl", "openurl", "booted", {_swift_literal(route)}]',
+        "try process.run()",
+        "// Bound simctl calls so a missing booted simulator cannot hang CI forever.",
+        "let deadline = Date().addingTimeInterval(10)",
+        "while process.isRunning && Date() < deadline {",
+        "    RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.1))",
+        "}",
+        "if process.isRunning {",
+        "    process.terminate()",
+        '    XCTFail("simctl openurl timed out")',
+        "}",
+        "XCTAssertEqual(process.terminationStatus, 0)",
+    ]
+
+
+def _xcuitest_screenshot() -> list[str]:
+    """Return Swift that records screenshots as XCUITest attachments."""
+    return [
+        "let screenshot = app.screenshot()",
+        "let attachment = XCTAttachment(screenshot: screenshot)",
+        'attachment.name = "journey-screenshot"',
+        "attachment.lifetime = .keepAlways",
+        "add(attachment)",
+    ]
+
+
+def _xcuitest_target(payload: dict[str, JsonValue]) -> str:
+    """Return a broad XCUITest element lookup for stable journey identifiers."""
+    identifier = _target_identifier(payload)
+    return f"app.descendants(matching: .any)[{_swift_literal(identifier)}]"
 
 
 def _maestro_step(step: dict[str, JsonValue]) -> list[dict[str, object]]:
@@ -432,9 +493,15 @@ def _maestro_step(step: dict[str, JsonValue]) -> list[dict[str, object]]:
         return [{"tapOn": _target_text(payload)}]
     if action == "assert" and isinstance(payload, dict):
         return [{"assertVisible": _target_text(payload)}]
+    if action == "assert_not" and isinstance(payload, dict):
+        return [{"assertNotVisible": _target_text(payload)}]
+    if action == "fill" and isinstance(payload, dict):
+        return [{"tapOn": _target_text(payload)}, {"inputText": str(payload.get("value", ""))}]
     if action == "back":
         return [{"back": True}]
-    return [{"comment": f"Unsupported compile step retained for review: {action}"}]
+    if action == "press" and isinstance(payload, dict):
+        return [{"pressKey": str(payload.get("key", "Enter"))}]
+    raise ValueError(f"unsupported maestro action after capability validation: {action}")
 
 
 def _target_text(payload: dict[str, JsonValue]) -> str:
@@ -444,6 +511,22 @@ def _target_text(payload: dict[str, JsonValue]) -> str:
         if isinstance(value, str) and value:
             return value
     return ""
+
+
+def _target_identifier(payload: dict[str, JsonValue]) -> str:
+    """Choose a stable identifier before falling back to product text."""
+    for key in ("test_id", "semantic_id", "accessibility_label", "name", "text", "label", "route"):
+        value = payload.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return ""
+
+
+def _target_from_payload(payload: dict[str, JsonValue]) -> JourneyTargetRef:
+    """Rebuild a typed target from a legacy compiler payload."""
+    return JourneyTargetRef.model_validate(
+        {key: value for key, value in payload.items() if key != "value"}
+    )
 
 
 def _literal(value: str) -> str:

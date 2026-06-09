@@ -117,6 +117,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-09 | Bugfix | [Feature 057] Hardened native journey compilation: unsupported or malformed actions fail before output, supported XCUITest fill/assert_not/URL-open/screenshot flows emit concrete code, and manifests end with newlines |
 | 2026-06-09 | Bugfix | [Feature 057] Migration 20 now force-recompiles v2 journeys so old `journeys-v2-1` manifests are regenerated during downstream migration |
 | 2026-06-08 | Bugfix | [Feature 057] Fixed native journey execution: compiled artifacts now run through native runners, XCUITest compile refreshes XcodeGen, and Migration 20 forces old manifests to regenerate |
 | 2026-06-07 | Bugfix | [Feature 057] Added Migration 19 so existing v18 projects receive `$spec-journey`, User Journeys v2 routing, and updated command guidance |

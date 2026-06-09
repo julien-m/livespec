@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-09 — [Feature 057 Fix]: Native journey compilation now fails before writing incomplete artifacts for unsupported or malformed actions, emits concrete XCUITest code for supported fill/assert_not/URL-open/screenshot flows, bounds simctl openurl with a timeout, uses named test methods, and writes newline-terminated manifests.
+
 ## 2026-06-09 — [Feature 057 Fix]: Migration 20 now force-runs `livespec journey compile --force` for downstream projects, regenerating old `journeys-v2-1` manifests during migration instead of requiring a manual compile after version 20.
 
 ## 2026-06-08 — [Feature 057 Fix]: User Journeys v2 now execute compiled native artifacts during `journey run`/`livespec test`, refresh XcodeGen projects after XCUITest compilation, and Migration 20 forces old compiled manifests to be regenerated.
