@@ -1002,6 +1002,7 @@ flowchart TD
 - [always] Add feature row to .specs/README.md Features table under lock
 - [always] Add initial entry to feature changelog.md under lock
 - [always] Add summary entry to global .specs/changelog.md under lock
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
 - [always] Match and check roadmap items; add deferred or ad-hoc items as needed
 - [always] Propose preflight manifest additions if spec has Infrastructure Requirements
 

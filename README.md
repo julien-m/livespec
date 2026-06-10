@@ -630,6 +630,19 @@ Canonical layout (no duplicate physical copies):
 
 See [docs/cli-reference.md](docs/cli-reference.md#livespec-visual-gate) for the full contract.
 
+### Registry finalization
+
+End-of-command registry updates (feature changelog, global `.specs/changelog.md`, README row + Recent Activity, spec status) are written deterministically by `livespec finalize` — atomically and idempotently under `.specs/.LOCK`. The six registry-finalizing commands (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-fix`, `/spec-stack`, `/spec-feature`) prove the `finalize.registry` goal task with the verify receipt:
+
+```bash
+livespec finalize apply  --feature <slug> --command <spec-*> --entry-file <entry.md> [--status <Status>] [--retry]
+livespec finalize verify --feature <slug> --command <spec-*> --json
+```
+
+Idempotence marker: `<!-- finalize:<cmd>:<date>:<hash8> -->` (identity is `<cmd>` + `hash8`; re-runs are zero-write). Exit codes: `0` OK · `9` BLOCKED (`policy_blocked` lock timeout / `state_invalid` hash mismatch) · `10` verify FAIL (R1/R4/R6 violations or missing marker). `--retry` adds backoff+jitter (~45s budget) for parallel `/spec-ship`. Distinct from Feature 048 *run finalization* (RunArtifact verification) — `livespec finalize` governs registry artifacts only.
+
+See [docs/cli-reference.md](docs/cli-reference.md#livespec-finalize) for the full contract.
+
 Plan review configuration (`.specs/semantic/config.yaml`):
 
 ```yaml

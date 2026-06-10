@@ -34,10 +34,11 @@ import errno
 import fcntl
 import hashlib
 import os
+import random
 import re
 import secrets
 import time
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from pathlib import Path
@@ -50,6 +51,12 @@ DEFAULT_LOCK_TIMEOUT_SECONDS = 10
 
 DEFAULT_LOCK_RETRY_INTERVAL_SECONDS = 0.05
 """Sleep between flock attempts during the timeout window."""
+
+# 45s ≈ 4-5 parallel /spec-ship finalizations serialized behind one lock
+# (Feature 058 AC-009); named constant so tests and docs share one source.
+FINALIZE_RETRY_TOTAL_BUDGET_SECONDS: float = 45.0
+"""@spec FR-007: ~45s opt-in retry budget
+— .specs/features/058-deterministic-finalization/spec.md#fr-007"""
 
 LOCK_FILENAME = ".LOCK"
 RESERVED_MARKER = ".reserved"
@@ -83,6 +90,30 @@ class NnnCollisionError(FileExistsError):
     """
 
 
+# ─── Opt-in retry policy (Feature 058 FR-007) ────────────────────────────────
+
+
+@dataclass(frozen=True)
+class LockRetryPolicy:
+    """Opt-in exponential backoff + jitter policy for :func:`acquire_lock`.
+
+    @spec FR-007: Opt-in retry mode on acquire_lock
+    — .specs/features/058-deterministic-finalization/spec.md#fr-007
+
+    Attributes:
+        base_delay: First backoff delay in seconds.
+        multiplier: Exponential growth factor applied after each attempt.
+        jitter: Maximum random seconds added to each delay (de-synchronizes
+            parallel ``/spec-ship`` pipelines).
+        total_budget: Wall-clock budget before giving up (AC-009).
+    """
+
+    base_delay: float = 0.5
+    multiplier: float = 2.0
+    jitter: float = 0.25
+    total_budget: float = FINALIZE_RETRY_TOTAL_BUDGET_SECONDS
+
+
 # ─── Dataclass for reservation result ────────────────────────────────────────
 
 
@@ -104,20 +135,31 @@ def acquire_lock(
     specs_root: Path,
     timeout: float = DEFAULT_LOCK_TIMEOUT_SECONDS,
     poll_interval: float = DEFAULT_LOCK_RETRY_INTERVAL_SECONDS,
+    retry_policy: LockRetryPolicy | None = None,
+    _sleep: Callable[[float], None] = time.sleep,
+    _clock: Callable[[], float] = time.monotonic,
 ) -> Iterator[Path]:
     """Acquire an exclusive flock on ``<specs_root>/.LOCK`` for the with-block duration.
 
     Args:
         specs_root: Root of ``.specs/`` (the lock file lives directly inside it).
-        timeout: Maximum seconds to wait for the lock.
+        timeout: Maximum seconds to wait for the lock (default, non-retry path).
         poll_interval: Seconds to sleep between non-blocking acquisition attempts.
+        retry_policy: Opt-in backoff+jitter retry (Feature 058 FR-007). When
+            ``None`` (default), the existing single-window contract applies
+            unchanged (AC-010).
+        _sleep: Module-private injectable sleep used by the retry loop for
+            deterministic tests. The default path always uses ``time.sleep``.
+        _clock: Module-private injectable monotonic clock paired with
+            ``_sleep`` for deterministic retry-budget tests.
 
     Yields:
         The path to the lock file (mostly informational; the caller does not
         need to interact with it).
 
     Raises:
-        LockAcquisitionError: Lock could not be acquired within ``timeout``.
+        LockAcquisitionError: Lock could not be acquired within ``timeout``
+            (default path) or within ``retry_policy.total_budget`` (retry path).
 
     Example:
         >>> with acquire_lock(Path(".specs")):
@@ -131,16 +173,21 @@ def acquire_lock(
 
     fd: IO[bytes] = lock_path.open("a+b")
     try:
-        while True:
-            try:
-                fcntl.flock(fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                break
-            except BlockingIOError:
-                if time.monotonic() >= deadline:
-                    raise LockAcquisitionError(
-                        f"could not acquire {lock_path} within {timeout}s"
-                    ) from None
-                time.sleep(poll_interval)
+        if retry_policy is None:
+            # AC-010: this branch is the pre-existing single-window contract —
+            # do not alter it when extending the retry path.
+            while True:
+                try:
+                    fcntl.flock(fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError:
+                    if time.monotonic() >= deadline:
+                        raise LockAcquisitionError(
+                            f"could not acquire {lock_path} within {timeout}s"
+                        ) from None
+                    time.sleep(poll_interval)
+        else:
+            _acquire_with_retry(fd, lock_path, retry_policy, _sleep, _clock)
         try:
             yield lock_path
         finally:
@@ -148,6 +195,37 @@ def acquire_lock(
                 fcntl.flock(fd.fileno(), fcntl.LOCK_UN)
     finally:
         fd.close()
+
+
+def _acquire_with_retry(
+    fd: IO[bytes],
+    lock_path: Path,
+    policy: LockRetryPolicy,
+    sleep_fn: Callable[[float], None],
+    clock_fn: Callable[[], float],
+) -> None:
+    """Retry non-blocking flock attempts with exponential backoff + jitter.
+
+    @spec FR-007: backoff+jitter retry within ~45s budget
+    — .specs/features/058-deterministic-finalization/spec.md#fr-007
+    """
+    retry_deadline = clock_fn() + policy.total_budget
+    delay = policy.base_delay
+    while True:
+        try:
+            fcntl.flock(fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return
+        except BlockingIOError:
+            now = clock_fn()
+            if now >= retry_deadline:
+                raise LockAcquisitionError(
+                    f"could not acquire {lock_path} within {policy.total_budget}s retry budget"
+                ) from None
+            # Jitter de-synchronizes parallel /spec-ship finalizers; the sleep
+            # is capped at the remaining budget so total wait stays ~45s ±jitter.
+            remaining = retry_deadline - now
+            sleep_fn(min(delay + random.uniform(0.0, policy.jitter), remaining))
+            delay *= policy.multiplier
 
 
 # ─── Atomic write (FR-004) ───────────────────────────────────────────────────

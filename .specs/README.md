@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-09
+> Last updated: 2026-06-10
 
 
 ---
@@ -35,7 +35,7 @@
 <!-- readme:features:start -->
 | # | Feature | Status | Created | Updated | Spec |
 |---|---|---|---|---|---|
-| 001 | Auto LLM Review | Implemented | 2026-04-13 | 2026-04-13 | [spec](features/001-auto-llm-review/spec.md) |
+| 001 | Auto LLM Review | Implemented | 2026-04-13 | 2026-06-10 | [spec](features/001-auto-llm-review/spec.md) |
 | 002 | Layer 3 CLI Surface | Implemented | 2026-04-13 | 2026-04-14 | [spec](features/002-layer-3-cli-surface/spec.md) |
 | 003 | Visual Testing Fidelity | Implemented | 2026-04-14 | 2026-04-14 | [spec](features/003-visual-testing-fidelity/spec.md) |
 | 004 | Visual Testing Governance | Implemented | 2026-04-14 | 2026-04-14 | [spec](features/004-visual-testing-governance/spec.md) |
@@ -94,6 +94,7 @@
 | 055 | Spec Doctor Project Health | Implemented | 2026-06-01 | 2026-06-02 | [spec](features/055-spec-doctor-project-health/spec.md), [plan](features/055-spec-doctor-project-health/plan.md), [implementation](features/055-spec-doctor-project-health/implementation.md) |
 | 056 | Executable User Journeys | Implemented | 2026-06-01 | 2026-06-02 | [spec](features/056-executable-user-journeys/spec.md), [plan](features/056-executable-user-journeys/plan.md), [implementation](features/056-executable-user-journeys/implementation.md) |
 | 057 | Cross-Feature User Journeys v2 | Implemented | 2026-06-04 | 2026-06-09 | [spec](features/057-cross-feature-user-journeys-v2/spec.md), [plan](features/057-cross-feature-user-journeys-v2/plan.md), [implementation](features/057-cross-feature-user-journeys-v2/implementation.md) |
+| 058 | Deterministic Finalization | Implemented | 2026-06-10 | 2026-06-10 | [spec](features/058-deterministic-finalization/spec.md), [plan](features/058-deterministic-finalization/plan.md), [implementation](features/058-deterministic-finalization/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -117,42 +118,24 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-06-09 | Bugfix | [Feature 057] Hardened native journey compilation: unsupported or malformed actions fail before output, supported XCUITest fill/assert_not/URL-open/screenshot flows emit concrete code, and manifests end with newlines |
-| 2026-06-09 | Bugfix | [Feature 057] Migration 20 now force-recompiles v2 journeys so old `journeys-v2-1` manifests are regenerated during downstream migration |
-| 2026-06-08 | Bugfix | [Feature 057] Fixed native journey execution: compiled artifacts now run through native runners, XCUITest compile refreshes XcodeGen, and Migration 20 forces old manifests to regenerate |
-| 2026-06-07 | Bugfix | [Feature 057] Added Migration 19 so existing v18 projects receive `$spec-journey`, User Journeys v2 routing, and updated command guidance |
-| 2026-06-05 | Bugfix | [Feature 057] Fixed check gaps: canonical FR/AC implementation mapping, global v2 journey skill wording, compiled-only gates, impact detection, and convention fixes |
-| 2026-06-04 | Feature | [Feature 057] Implemented: Cross-Feature User Journeys v2 — global journeys, governed edits, compiled-only runs, visual contracts, migration, doctor findings, and `$spec-journey` |
-| 2026-06-02 | Feature | [Feature 056] Implemented: Executable User Journeys — YAML validation, native compilers, journey CLI, separate category reporting, and Spec Doctor drift checks |
-| 2026-06-02 | Plan | [Feature 056] Plan created: Executable User Journeys — canonical YAML journeys, ahead-of-time native compilation, separated journey reporting, and Spec Doctor drift checks |
-| 2026-06-01 | Spec | [Feature 056] Spec created: Executable User Journeys — YAML canonical user journeys compiled ahead-of-time to native tests and audited by Spec Doctor |
-| 2026-06-01 | Spec | [Feature 055] Spec created: Spec Doctor Project Health — project-level health audit for stale mappings, missing tests, unenforced hooks, runners, visual evidence, and journeys |
-| 2026-06-01 | Feature | [Feature 054] Implemented: metadata-aware migration planning, restore-point invalidation reporting, and Migration 17 Penflow backfill reports |
-| 2026-06-01 | Feature | [Feature 053] Implemented: goal tasks replay required conventions and proof validation rejects missing convention evidence |
-| 2026-05-26 | Bugfix | [Feature 051] Single Penflow source contract: root `penflow/ui.pen` only, explicit Brainstorm `penflow/` import, duplicate `.pen` blocking, and no `.specs/design/ui.pen` requirement |
-| 2026-05-23 | Bugfix | [Feature 052] Internal `/spec-*` subagent invocations propagate current LiveSpec project root/cwd and command audit rejects missing workdir guards |
-| 2026-05-23 | Bugfix | [Feature 052] Goal rendering ignores documentary `/spec-*` examples/recovery hints, skips Markdown checkboxes inside `Execution Tasks`, exposes top-level `worker_may_mark_tasks_complete=false`, and adds machine Goal Lock tasks to `/spec-status` + `/spec-explain` |
-| 2026-05-23 | Bugfix | [Feature 052] Deterministic command goals write `contract.json` + `state.json`, require `livespec goal prove/status`, and reject visual design-fidelity completion when PNG proof is missing |
-| 2026-05-21 | Bugfix | [Feature 052] Deterministic command goals now embed applicable `.conventions/index.md` domains for code and UI/mockup/visual work |
-| 2026-05-21 | Feature | [Feature 052] Implemented: Deterministic Command Goal Contracts — `livespec goal render/verify`, canonical hashable goal payloads, and expectation-backed completion gates |
-| 2026-05-21 | Feature | [Feature 051] Implemented: Integrate Penflow as LiveSpec primary UI contract — root `penflow/` helper/CLI and command docs while preserving screenshot gates |
-| 2026-05-18 | Feature | [Feature 050] Implemented: Agent Sync Migration — `.agent-sync` is now the canonical source for commands, agents, and rules; cc-hub syncs Claude/Codex outputs |
-| 2026-05-18 | Feature | [Feature 049] Implemented: Command Naming Normalization — canonical `/spec-*` slash commands with dotted aliases |
-| 2026-05-18 | Feature | [Feature 048] Implemented: Command Validation Hardening — command-audit score 5/5, run finalization, deterministic utility backends |
-| 2026-05-18 | Spec | [Feature 049] Spec created: Command Naming Normalization — canonical `/spec-*` names, dotted aliases, migration after Feature 048 |
-| 2026-05-18 | Spec | [Feature 048] Spec created: Command Validation Hardening — 5/5 command audit, deterministic backends, mandatory run finalization |
-| 2026-05-17 | Feature | [Feature 047] Implemented: Design Alignment Gate — reusable `ui.pen` → runtime alignment gate for `/spec-test --visual` |
-| 2026-05-17 | Feature | [Feature 046] Implemented: Visual Implementation Gate — mandatory `/spec-test --auto --visual` before UI feature finalization |
-| 2026-05-13 | Spec | [Feature 043] Spec created: `/spec.sync-brainstorm` — Living Bridge to Brainstorm — 5 stories, 17 AC, 18 FR |
-| 2026-05-13 | Spec | [Feature 042] Spec created: `/spec-specify` Derives from Imported Brainstorm Flows — 3 stories, 13 AC, 13 FR |
-| 2026-05-13 | Spec | [Feature 041] Spec created: Brainstorm Flow & Screen Specs Ingestion — 3 stories, 14 AC, 12 FR |
-| 2026-05-13 | Update | [Migration v13] Backfill command-expectations wiring — re-link `.claude/commands/`, install `last_reviewed` hook, wire `/spec-verify-output` and ignore `.specs/.runs/` + `.specs/.previews/` |
-| 2026-05-12 | Feature | [Feature 040] Implemented: Rich Expectations Format & Verify Preview — Section 13 mandatory, preview mode added, +15 tests, 0 regressions |
-| 2026-05-12 | Feature | [Feature 039] Implemented: Command Expectations & /spec-verify-output — 20 builtin expectations files, verify-output CLI + slash-command |
-| 2026-05-08 | Feature | [Feature 037] Implemented: Test Multi-Runner Integration — runner-aware dispatcher, `--visual` flag documented, 0 regressions |
-| 2026-05-08 | Spec | [Feature 037] Spec created: Test Multi-Runner Integration — 5 stories, 15 AC, 15 FR |
+| 2026-06-10 | Feature | 001 auto-llm-review: fix cc-hub codex provider schema passing (temp file + envelope unwrap + strict-mode normalization) |
+| 2026-06-10 | Feature | 058 deterministic-finalization: full /spec-feature pipeline complete (specify, plan, implement, test all green) |
+| 2026-06-10 | Feature | [Feature 058] Test: 100% AC covered (12/12), 0 tests generated — 135/135 feature tests passing incl. chaos |
+| 2026-06-10 | Feature | [Feature 058] Implemented: Deterministic Finalization — livespec finalize apply/verify, finalize.registry goal evidence family, opt-in lock retry |
+| 2026-06-10 | Plan | [Feature 058] Plan created: Deterministic Finalization — 9 implementation steps, 4 diagrams |
+| 2026-06-10 | Spec | [Feature 058] Spec created: Deterministic Finalization — 4 stories, 12 AC, 10 FR |
+| 2026-06-09 | Bugfix | [Feature 057] Fix: 7/7 gaps closed (7 functional, 0 visual) — W51/W53 runner-ranking |
+| 2026-06-09 | Bugfix | [Feature 057] Fix: 3/3 gaps closed (3 functional, 0 visual) — XCUITest pre-suite hang |
+| 2026-06-09 | Bugfix | [Feature 057 Fix]: Closed the W31/W33/W35/W37 XCUITest simulator-destination correction chain accepted by V22 using the V21 W37 scope proof: journey runs resolve iOS/watchOS destinations from available `simctl` devices, pass `id=<UDID>` to `xcodebuild`, and boot/await the selected simulator instead of defaulting to unavailable `iPhone 16`. Strapt recompile, `$spec-test`, journey runs, `$git-commit`, and push remain out of scope. |
+| 2026-06-09 | Bugfix | [Feature 057] Fix: 3/3 gaps closed — XCUITest journey assertions now use generated `waitForExistence` helpers for `assert` and `assert_not`, eliminating immediate `.exists` reads from compiled Swift steps. |
 <!-- readme:activity:end -->
 
 ---
 
 *Maintained automatically by LiveSpec commands. Do not remove section markers.*
+
+<!-- finalize:spec-implement:2026-06-10:9a1dbf71 -->
+
+<!-- finalize:spec-feature:2026-06-10:96deb6de -->
+
+<!-- finalize:spec-fix:2026-06-10:24ee3265 -->

@@ -37,6 +37,7 @@ from typing import Any, TypeAlias, cast
 from .command_registry import normalize_command_name
 from .exceptions import ExpectationsInvalid
 from .expectations import ExpectationsFile, Rule, load_expectations
+from .finalize import FinalizeReceiptError, verify_finalize_receipt
 from .visual_evidence import VisualReceiptError, verify_visual_receipt
 
 GOAL_CONTRACT_VERSION = "2.0"
@@ -103,6 +104,20 @@ VISUAL_DESIGN_REPAIR_ACTIONS: tuple[str, ...] = (
     "run `livespec visual-gate certify --feature <slug> --command <command> "
     "--target <target> --run-id <run-id> --json` and submit the generated receipt.json path",
 )
+# @spec FR-005: finalize.registry evidence family constants
+#   — .specs/features/058-deterministic-finalization/spec.md#fr-005
+FINALIZE_REQUIRED_EVIDENCE: tuple[str, ...] = ("finalize_receipt_path",)
+FINALIZE_INVALID_SUBSTITUTES: tuple[str, ...] = (
+    "prose_finalization_claim",
+    "exit_code_without_receipt",
+    "declared_file_list_without_receipt",
+)
+FINALIZE_REPAIR_ACTIONS: tuple[str, ...] = (
+    "run `livespec finalize apply --feature <slug> --command <command> --entry-file <entry.md>`",
+    "run `livespec finalize verify --feature <slug> --command <command>` and "
+    "submit the generated receipt.json path",
+)
+
 # Match level-2 headings that declare visual/Penflow feature work.
 VISUAL_FEATURE_HEADING_RE = re.compile(
     r"^##\s+(Screens|Penflow Contract)\b",
@@ -1047,6 +1062,10 @@ def _task_id_for_description(
         return "visual.pixel_regression"
     if "staleness gate" in lowered or "baseline.manifest" in lowered:
         return "visual.baseline_manifest"
+    # @spec FR-005: route finalize wording to the finalize.registry family
+    #   — .specs/features/058-deterministic-finalization/spec.md#fr-005
+    if "finalize registry" in lowered or "livespec finalize" in lowered:
+        return "finalize.registry"
     if "penflow contract status" in lowered:
         return "penflow.contract_status"
     if "penflow drift" in lowered:
@@ -1080,6 +1099,8 @@ def _required_evidence_for_task(task_id: str, description: str) -> tuple[str, ..
         return VISUAL_DESIGN_REQUIRED_EVIDENCE
     if task_id == "visual.pixel_regression":
         return ("visual_evidence_receipt_path",)
+    if task_id == "finalize.registry":
+        return FINALIZE_REQUIRED_EVIDENCE
     if task_id.startswith("fix.child_goal"):
         return (
             "child_goal_hash_recorded",
@@ -1111,6 +1132,8 @@ def _invalid_substitutes_for_task(task_id: str, description: str) -> tuple[str, 
         return VISUAL_DESIGN_INVALID_SUBSTITUTES
     if task_id == "visual.pixel_regression":
         return ("worker_declared_diff_without_receipt",)
+    if task_id == "finalize.registry":
+        return FINALIZE_INVALID_SUBSTITUTES
     if "visual" in description.lower():
         return ("verbal_visual_confirmation_without_artifact",)
     return ()
@@ -1126,6 +1149,8 @@ def _repair_actions_for_task(task_id: str, description: str) -> tuple[str, ...]:
             "--target <target> --run-id <run-id> --json` and submit the generated "
             "receipt.json path",
         )
+    if task_id == "finalize.registry":
+        return FINALIZE_REPAIR_ACTIONS
     if task_id.startswith("fix.child_goal"):
         return (
             "spawn the required independent native sub-agent and let it create its own goal",
@@ -1174,6 +1199,13 @@ def _validate_task_evidence(
         ("visual.design_fidelity.", "visual.pixel_regression")
     ):
         return _validate_visual_receipt_evidence(
+            task,
+            evidence,
+            contract=contract,
+            project_root=project_root,
+        )
+    if task_id == "finalize.registry" or task_id.startswith("finalize.registry."):
+        return _validate_finalize_receipt_evidence(
             task,
             evidence,
             contract=contract,
@@ -1234,6 +1266,61 @@ def _validate_visual_receipt_evidence(
             if not any(c.comparison_kind == required_kind for c in receipt.comparisons):
                 missing.append(f"{required_kind}_comparison_exists")
 
+    accepted = not missing and not invalid
+    return {
+        "status": "ACCEPTED" if accepted else "REJECTED_NEEDS_ACTION",
+        "accepted": accepted,
+        "missing_evidence": missing,
+        "invalid_substitutes": invalid,
+        "required_actions": list(task["repair_if_missing"]),
+    }
+
+
+# @spec FR-005: finalize.registry rejects all substitute evidence,
+#   FR-006: verify_finalize_receipt wired into goal prove
+#   — .specs/features/058-deterministic-finalization/spec.md#fr-005
+def _validate_finalize_receipt_evidence(
+    task: dict[str, Any],
+    evidence: dict[str, Any],
+    *,
+    contract: dict[str, Any],
+    project_root: Path | None,
+) -> dict[str, Any]:
+    missing: list[str] = []
+    invalid: list[str] = []
+    receipt_path = evidence.get("finalize_receipt_path")
+    if not isinstance(receipt_path, str) or not receipt_path.strip():
+        # Name each substitute so the rejection explains exactly which proxy
+        # was offered instead of the receipt (AC-008).
+        if evidence.get("output") or evidence.get("prose") or evidence.get("registry_updated"):
+            invalid.append("prose_finalization_claim")
+        if "exit_code" in evidence:
+            invalid.append("exit_code_without_receipt")
+        if "files" in evidence or "paths" in evidence or "file_list" in evidence:
+            invalid.append("declared_file_list_without_receipt")
+        missing.append("finalize_receipt_path")
+    elif project_root is None:
+        missing.append("project_root_for_receipt_verification")
+    else:
+        expected = dict(task.get("expected_evidence") or {})
+        expected_feature = expected.get("feature_slug")
+        if not isinstance(expected_feature, str) or not expected_feature:
+            contract_feature = contract.get("feature")
+            expected_feature = contract_feature if isinstance(contract_feature, str) else None
+        expected_command = contract.get("command")
+        expected_command = expected_command if isinstance(expected_command, str) else None
+        try:
+            receipt = verify_finalize_receipt(
+                Path(receipt_path),
+                project_root=project_root,
+                expected_feature_slug=expected_feature,
+                expected_command=expected_command,
+            )
+        except (OSError, FinalizeReceiptError) as exc:
+            missing.append(f"finalize_receipt_valid:{exc}")
+        else:
+            if receipt.verdict != "PASS":
+                missing.append("finalize_receipt_verdict_pass")
     accepted = not missing and not invalid
     return {
         "status": "ACCEPTED" if accepted else "REJECTED_NEEDS_ACTION",

@@ -1,0 +1,31 @@
+{
+  "command": "spec-fix",
+  "created_at": "2026-06-10T12:29:28.235293+00:00",
+  "feature_slug": "001-auto-llm-review",
+  "files": [
+    {
+      "path": ".specs/features/001-auto-llm-review/changelog.md",
+      "sha256": "523cbc40554b2fac84e926629227d591785aef00a23240f32768a3968d325600"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "2c5dd043a3a9d47c9fdeba5750cc0add90eac8f39d447267192d17938eecd80e"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "563f819eba5e9e4a28990242c27770465751df70576a22c852eb89211a1676da"
+    },
+    {
+      "path": ".specs/features/001-auto-llm-review/spec.md",
+      "sha256": "76e3b10e0e068f7bfe4904348de7dca2776972283330f4ea6dd29b54219f5343"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "80ab4bd923d2cc9130220569b753d7b357d8f0fe8801d36e41f69c793c9e7b46",
+  "receipt_hash": "b846a5540d5dc4a2b3c8894958802995182d5b4259252d15be810931cd0ca322",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

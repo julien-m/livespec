@@ -40,6 +40,8 @@ display the full Python stacktrace.
 | 6 | `EXIT_VISUAL_GATE_FAIL` | `livespec visual-gate validate` found comparison drift, a physical-copy violation under `.specs/features/<slug>/baselines/`, a runtime capture stored under `.specs/design/screens/`, or a Penflow / design-alignment FAIL verdict. |
 | 7 | `EXIT_VISUAL_GATE_BLOCKED` | `livespec visual-gate validate` could not decide because required artifacts, comparison reports, or Penflow workspace pieces are missing. A visual feature MUST NOT be marked done while this exit code is emitted. |
 | 8 | `EXIT_VISUAL_GATE_CLEANUP_DRIFT` | `livespec visual-gate cleanup --dry-run` found misplaced runtime captures that would be quarantined on `--apply`. |
+| 9 | `EXIT_FINALIZE_BLOCKED` | `livespec finalize apply` was blocked — lock timeout (`policy_blocked`) or post-write hash mismatch / partial apply (`state_invalid`). No registry state may be claimed finalized while this code is emitted. |
+| 10 | `EXIT_FINALIZE_VERIFY_FAIL` | `livespec finalize verify` found coherence violations (R1/R4/R6 scoped to the feature) or a missing finalize marker for the expected command. |
 
 Every command also prints a structured one-line CI summary on stdout of
 the form:
@@ -415,6 +417,49 @@ Aggregate Penflow + design-alignment + registry-link checks for one feature/targ
 | `.specs/features/<slug>/baselines/<screen>.png` | Relative symlink into the baseline registry (or manifest ref on filesystems without symlinks). |
 | `.specs/features/<slug>/run/<ts>/<target>/<screen>.png` | Runner output directory. The four supported targets are `web`, `ios`, `android`, `tauri`. |
 | `.specs/design/_quarantine/<ts>/...` | Cleanup quarantine. Move-only by default. |
+
+## `livespec finalize`
+
+Deterministic end-of-command **registry finalization** (Feature 058): writes the
+feature changelog entry, the global `.specs/changelog.md` summary, the README
+feature row + Recent Activity regeneration, and the spec status — atomically,
+idempotently, and under `.specs/.LOCK`.
+
+> **Naming note:** Feature 048 introduced *run finalization* (RunArtifact
+> verification against `expectations.md`). `livespec finalize` is *registry*
+> finalization and exclusively governs registry artifacts — the two surfaces
+> are distinct.
+
+### Subcommands
+
+* `apply --feature <slug> --command <cmd> --entry-file <path> [--status <Status>] [--summary <line>] [--retry/--no-retry] [--run-id <id>] [--json]`
+  * The entry file and summary are **date-free** — dates are rendered at write
+    time so the idempotence identity (`<cmd>` + `hash8` of the canonical
+    payload) is stable across days.
+  * Each touched file is stamped with `<!-- finalize:<cmd>:<date>:<hash8> -->`;
+    a byte-identical re-run performs zero writes and reports
+    `already_finalized` (exit 0).
+  * `--status` omitted skips the spec-status target (the three changelog/README
+    targets are still written).
+  * `--retry` enables exponential backoff + jitter on the lock (~45s budget,
+    `FINALIZE_RETRY_TOTAL_BUDGET_SECONDS`) for parallel `/spec-ship` safety.
+    Without it, the default single 10s lock window applies unchanged.
+  * Rebuilds a missing `README.md` from artifacts and rotates previous-year
+    global changelog entries into `.specs/archive/changelog-YYYY.md`.
+  * Prints the receipt path on stdout (`--json` emits an envelope with
+    `outcome`, `receipt_path`, `written`, `skipped`).
+  * Exit `0`, or `9` with a canonical `BLOCKED ... policy_blocked` /
+    `BLOCKED ... state_invalid` line.
+* `verify --feature <slug> [--command <cmd>] [--run-id <id>] [--json]`
+  * Registry read-only: never mutates the registry files; re-evaluates
+    coherence rules R1/R4/R6 scoped to the feature and (with `--command`)
+    checks the finalize markers.
+  * Its only write is the JSON receipt (`.specs/features/<slug>/run/<run-id>/finalize/receipt.json`)
+    with verdict, per-file sha256, and violated rule IDs. The receipt is the
+    only evidence accepted by the `finalize.registry` goal task
+    (`verify_finalize_receipt()` re-validates schema, hashes, feature, command,
+    and verdict).
+  * Exit `0` (PASS) or `10` (FAIL).
 
 ## CI / GitHub Actions snippets
 

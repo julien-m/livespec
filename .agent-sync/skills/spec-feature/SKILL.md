@@ -1006,6 +1006,7 @@ If any phase fails:
 
 - [always] Run `/audit --fix` and verify zero remaining violations
 - [always] Verify all tests pass after audit
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
 - [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path>` exit_code != 0 (VISUAL features only)
 - [always] Run `livespec commit-context write` only if explicit commit requested
 - [always] Print `Commit: skipped - no explicit user authorization` if no commit requested

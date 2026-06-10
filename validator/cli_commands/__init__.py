@@ -22,6 +22,7 @@ from . import (
     design_alignment_cmd,
     doctor_cmd,
     drivers_cmd,
+    finalize_cmd,
     journey_cmd,
     migrate_cmd,
     mutation_cmd,
@@ -54,6 +55,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     utility_cmd.register(app)
     visual_gate_cmd.register(app)
     migrate_cmd.register(app)
+    finalize_cmd.register(app)
 
 
 __all__ = ["register_unified_commands"]

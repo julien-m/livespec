@@ -538,6 +538,7 @@ ABORT: "plan.md failed structural validation after 2 retries.
 - [always] Generate openapi.yaml if feature introduces new API endpoints
 - [always] Update .specs/README.md feature row Status to Planned
 - [always] Add plan entry to feature changelog.md and global .specs/changelog.md
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
 - [always] Run LLM plan review unless --no-review; retry on blocking findings
 - [always] Run `livespec validate` structural validation; retry on failure
 

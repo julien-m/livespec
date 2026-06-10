@@ -1914,3 +1914,232 @@ def test_anti_drift_block_documents_shared_goal_protocol() -> None:
     assert "state-file:" in text
     assert "livespec goal prove" in text
     assert "[ ]` → `[x]" not in text
+
+
+# ─── finalize.registry evidence family (Feature 058, FR-005/FR-006) ──────────
+
+FINALIZE_SKILL = """\
+---
+name: spec-demo
+description: Demo command
+---
+
+# /spec-demo
+
+## Execution Tasks
+
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` \
+and prove finalize.registry with the receipt path
+
+## Definition of Done (Command-Level)
+
+- [ ] Done
+"""
+
+
+def _finalize_fixture(tmp_path: Path) -> tuple[Path, Path]:
+    """Fixture roots with the finalize execution-task skill and a .specs tree."""
+    from tests.test_finalize import _make_specs_tree
+
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    skill_path = livespec_root / ".agent-sync" / "skills" / "spec-demo" / "SKILL.md"
+    skill_path.write_text(FINALIZE_SKILL, encoding="utf-8")
+    _make_specs_tree(project_root)
+    return project_root, livespec_root
+
+
+def _finalize_contract_and_state(project_root: Path, livespec_root: Path) -> tuple[dict, dict]:
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="004-notifications",
+        flags="",
+    )
+    return (
+        json.loads(render_goal_contract_file(goal)),
+        json.loads(render_goal_state_file(goal)),
+    )
+
+
+def test_finalize_registry_task_requires_receipt_path(tmp_path: Path) -> None:
+    """AC-007: the finalize execution-task line must compile to the
+    finalize.registry task whose only accepted evidence is the receipt path."""
+    project_root, livespec_root = _finalize_fixture(tmp_path)
+    contract, _state = _finalize_contract_and_state(project_root, livespec_root)
+    task = next(task for task in contract["tasks"] if task["id"] == "finalize.registry")
+    assert "finalize_receipt_path" in task["required_evidence"]
+    assert "prose_finalization_claim" in task["invalid_substitutes"]
+    assert any("livespec finalize apply" in action for action in task["repair_if_missing"])
+
+
+def test_goal_prove_rejects_prose_finalization_claim(tmp_path: Path) -> None:
+    """AC-008: prose claims without a receipt are invalid substitutes."""
+    project_root, livespec_root = _finalize_fixture(tmp_path)
+    contract, state = _finalize_contract_and_state(project_root, livespec_root)
+    result = prove_goal_task(
+        contract,
+        state,
+        "finalize.registry",
+        evidence={"output": "All registry files were updated", "success_criteria_met": True},
+        project_root=project_root,
+    )
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "finalize_receipt_path" in result["missing_evidence"]
+    assert "prose_finalization_claim" in result["invalid_substitutes"]
+    assert result["state"]["tasks"]["finalize.registry"]["status"] == "pending"
+
+
+def test_goal_prove_rejects_exit_code_and_file_list_substitutes(tmp_path: Path) -> None:
+    """AC-008: exit codes and declared file lists are not finalization proof."""
+    project_root, livespec_root = _finalize_fixture(tmp_path)
+    contract, state = _finalize_contract_and_state(project_root, livespec_root)
+    result = prove_goal_task(
+        contract,
+        state,
+        "finalize.registry",
+        evidence={"exit_code": 0, "files": [".specs/README.md", ".specs/changelog.md"]},
+        project_root=project_root,
+    )
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "exit_code_without_receipt" in result["invalid_substitutes"]
+    assert "declared_file_list_without_receipt" in result["invalid_substitutes"]
+
+
+def test_goal_prove_accepts_valid_finalize_receipt(tmp_path: Path) -> None:
+    """AC-007: a real PASS receipt from finalize verify completes the task."""
+    from validator.finalize import ApplyRequest, apply_finalization, verify_finalization
+
+    project_root, livespec_root = _finalize_fixture(tmp_path)
+    request = ApplyRequest(
+        feature_slug="004-notifications",
+        command="spec-demo",
+        status="Implemented",
+        entry_body="Feature: Implemented notifications",
+        global_summary="[Feature 004] Implemented: Notifications",
+        run_id="goal-run",
+    )
+    apply_finalization(project_root, request)
+    verify_result = verify_finalization(
+        project_root,
+        "004-notifications",
+        expected_command="spec-demo",
+        run_id="goal-run",
+    )
+    assert verify_result.verdict == "PASS"
+    contract, state = _finalize_contract_and_state(project_root, livespec_root)
+    result = prove_goal_task(
+        contract,
+        state,
+        "finalize.registry",
+        evidence={"finalize_receipt_path": str(verify_result.receipt_path)},
+        project_root=project_root,
+    )
+    assert result["status"] == "ACCEPTED"
+    assert result["state"]["tasks"]["finalize.registry"]["status"] == "complete"
+
+
+def test_goal_prove_rejects_tampered_finalize_receipt(tmp_path: Path) -> None:
+    """AC-008 / SC-004: a registry file edited after verify makes the receipt
+    stale; the proof must be rejected with the named evidence."""
+    from validator.finalize import ApplyRequest, apply_finalization, verify_finalization
+
+    project_root, livespec_root = _finalize_fixture(tmp_path)
+    request = ApplyRequest(
+        feature_slug="004-notifications",
+        command="spec-demo",
+        status="Implemented",
+        entry_body="Feature: Implemented notifications",
+        global_summary="[Feature 004] Implemented: Notifications",
+        run_id="goal-run",
+    )
+    apply_finalization(project_root, request)
+    verify_result = verify_finalization(
+        project_root,
+        "004-notifications",
+        expected_command="spec-demo",
+        run_id="goal-run",
+    )
+    readme = project_root / ".specs" / "README.md"
+    readme.write_text(readme.read_text(encoding="utf-8") + "\ntampered\n", encoding="utf-8")
+    contract, state = _finalize_contract_and_state(project_root, livespec_root)
+    result = prove_goal_task(
+        contract,
+        state,
+        "finalize.registry",
+        evidence={"finalize_receipt_path": str(verify_result.receipt_path)},
+        project_root=project_root,
+    )
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert any(item.startswith("finalize_receipt_valid:") for item in result["missing_evidence"])
+
+
+def test_goal_prove_rejects_fail_verdict_finalize_receipt(tmp_path: Path) -> None:
+    """AC-008: a FAIL-verdict receipt names the PASS requirement."""
+    from validator.finalize import ApplyRequest, apply_finalization, verify_finalization
+
+    project_root, livespec_root = _finalize_fixture(tmp_path)
+    request = ApplyRequest(
+        feature_slug="004-notifications",
+        command="spec-demo",
+        status="Implemented",
+        entry_body="Feature: Implemented notifications",
+        global_summary="[Feature 004] Implemented: Notifications",
+        run_id="goal-run",
+    )
+    apply_finalization(project_root, request)
+    # Corrupt the registry BEFORE verify so verify emits a FAIL receipt whose
+    # file hashes still match the (corrupted) on-disk state.
+    readme = project_root / ".specs" / "README.md"
+    readme.write_text(
+        "\n".join(
+            line
+            for line in readme.read_text(encoding="utf-8").splitlines()
+            if "004-notifications" not in line and not line.startswith("| 004 ")
+        ),
+        encoding="utf-8",
+    )
+    verify_result = verify_finalization(
+        project_root,
+        "004-notifications",
+        expected_command="spec-demo",
+        run_id="goal-run-fail",
+    )
+    assert verify_result.verdict == "FAIL"
+    contract, state = _finalize_contract_and_state(project_root, livespec_root)
+    result = prove_goal_task(
+        contract,
+        state,
+        "finalize.registry",
+        evidence={"finalize_receipt_path": str(verify_result.receipt_path)},
+        project_root=project_root,
+    )
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "finalize_receipt_verdict_pass" in result["missing_evidence"]
+
+
+@pytest.mark.parametrize(
+    "command",
+    ["spec-specify", "spec-plan", "spec-implement", "spec-fix", "spec-stack", "spec-feature"],
+)
+def test_six_registry_commands_carry_finalize_registry_task(
+    tmp_path: Path,
+    command: str,
+) -> None:
+    """FR-005 (AC-007): every registry-finalizing command's real contract must
+    include the finalize.registry task so DONE structurally requires the receipt."""
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    _write_conventions(project_root, tmp_path / "ai")
+    feature = _write_complete_check_fix_scenario(project_root)
+    goal = compile_command_goal(
+        command,
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature=feature,
+        flags="",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    finalize_tasks = [task for task in contract["tasks"] if task["id"] == "finalize.registry"]
+    assert finalize_tasks, f"{command} contract lacks the finalize.registry task"
+    assert "finalize_receipt_path" in finalize_tasks[0]["required_evidence"]

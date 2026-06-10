@@ -406,6 +406,7 @@ Lists all ADRs chronologically with summaries:
 - [always] Add ADR row to .specs/README.md Architecture Decisions table
 - [always] Regenerate Recent Activity section from .specs/changelog.md
 - [always] Update Last updated date in .specs/README.md
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
 
 ### Phase 6 — Update Stack
 

@@ -36,3 +36,14 @@
 - **Code modified:** None
 - **AC impacted:** AC-001 through AC-014 (all defined)
 - **Author:** spec.specify
+
+### 2026-06-10 — ## [Bugfix]: cc-hub codex provider — schema passing repaired
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** examples/provider-cchub.py
+- **AC impacted:** none (provider bridge example)
+- **Author:** claude
+- **Detail:** `_call_codex` passed the JSON schema inline to `cc-hub codex --schema`, which only accepts a file path (os error 63). Now writes the schema to a temp file, unwraps the response_format envelope, and normalizes `additionalProperties: false` for OpenAI strict mode. Verified end-to-end with the real plan-review `_REVIEW_SCHEMA`.
+
+<!-- finalize:spec-fix:2026-06-10:24ee3265 -->

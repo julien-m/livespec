@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import tempfile
 
 # Default model when none is specified
 DEFAULT_MODEL = "anthropic/claude-sonnet-4.6"
@@ -68,8 +69,49 @@ def _call_codex(prompt: str, json_schema: dict | None, model: str) -> str:
     """Call via cc-hub codex for OpenAI models."""
     cmd = ["cc-hub", "codex", prompt, "--model", model]
     if json_schema:
-        cmd.extend(["--schema", json.dumps(json_schema)])
+        # `cc-hub codex --schema` only accepts a FILE PATH (unlike `cc-hub ask`,
+        # which also takes inline JSON). Passing inline JSON makes cc-hub treat
+        # the payload as a filename → "File name too long" (os error 63).
+        schema_path = _write_schema_tempfile(_normalize_schema_for_codex(json_schema))
+        cmd.extend(["--schema", schema_path])
     return _run(cmd)
+
+
+def _normalize_schema_for_codex(json_schema: dict) -> dict:
+    """Recursively add `additionalProperties: false` to every object node.
+
+    OpenAI strict structured-output mode (used by Codex) rejects any object
+    schema where `additionalProperties` is not explicitly false. LiveSpec
+    schemas are provider-agnostic, so this adaptation lives at the codex
+    boundary only.
+    """
+    # Unwrap the OpenRouter/OpenAI response_format envelope ({"name", "strict",
+    # "schema": {...}}) — Codex expects the bare JSON Schema with a root "type".
+    inner = json_schema.get("schema")
+    if "type" not in json_schema and isinstance(inner, dict):
+        json_schema = inner
+    normalized = _normalize_schema_node(json_schema)
+    return normalized if isinstance(normalized, dict) else json_schema
+
+
+def _normalize_schema_node(node: object) -> object:
+    if isinstance(node, dict):
+        normalized = {key: _normalize_schema_node(value) for key, value in node.items()}
+        if normalized.get("type") == "object" and "additionalProperties" not in normalized:
+            normalized["additionalProperties"] = False
+        return normalized
+    if isinstance(node, list):
+        return [_normalize_schema_node(item) for item in node]
+    return node
+
+
+def _write_schema_tempfile(json_schema: dict) -> str:
+    """Persist the schema to a temp .json file and return its path."""
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", prefix="livespec-schema-", delete=False, encoding="utf-8"
+    ) as handle:
+        json.dump(json_schema, handle)
+        return handle.name
 
 
 def _wants_json(prompt: str) -> bool:

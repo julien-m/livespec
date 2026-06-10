@@ -3,9 +3,24 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-09
+> Last updated: 2026-06-10
 
 ---
+
+## 2026-06-10 — 001 auto-llm-review: fix cc-hub codex provider schema passing (temp file + envelope unwrap + strict-mode normalization)
+<!-- finalize:spec-fix:2026-06-10:24ee3265 -->
+
+## 2026-06-10 — 058 deterministic-finalization: full /spec-feature pipeline complete (specify, plan, implement, test all green)
+<!-- finalize:spec-feature:2026-06-10:96deb6de -->
+
+## 2026-06-10 — [Feature 058] Test: 100% AC covered (12/12), 0 tests generated — 135/135 feature tests passing incl. chaos
+
+## 2026-06-10 — [Feature 058] Implemented: Deterministic Finalization — livespec finalize apply/verify, finalize.registry goal evidence family, opt-in lock retry
+<!-- finalize:spec-implement:2026-06-10:9a1dbf71 -->
+
+## 2026-06-10 — [Feature 058] Plan created: Deterministic Finalization — 9 implementation steps, 4 diagrams
+
+## 2026-06-10 — [Feature 058] Spec created: Deterministic Finalization — 4 stories, 12 AC, 10 FR
 
 ## 2026-06-09 — [Feature 057] Fix: 7/7 gaps closed (7 functional, 0 visual) — W51/W53 runner-ranking
 

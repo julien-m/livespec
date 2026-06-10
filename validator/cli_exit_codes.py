@@ -38,10 +38,21 @@ EXIT_VISUAL_GATE_BLOCKED: int = 7
 #: would be moved/archived on ``--apply``. Implementation-side guard for the
 #: anti-false-positive E2E contract.
 EXIT_VISUAL_GATE_CLEANUP_DRIFT: int = 8
+#: ``livespec finalize apply`` was blocked: lock timeout (``policy_blocked``),
+#: post-write hash mismatch, or partial apply (``state_invalid``). No DONE may
+#: be claimed while this code is emitted (Feature 058, AC-004).
+# @spec FR-008: Exit-code mapping for finalize failures
+#   — .specs/features/058-deterministic-finalization/spec.md#fr-008
+EXIT_FINALIZE_BLOCKED: int = 9
+#: ``livespec finalize verify`` found coherence violations (R1/R4/R6) or a
+#: missing finalize marker for the expected command (Feature 058, AC-006).
+EXIT_FINALIZE_VERIFY_FAIL: int = 10
 
 __all__ = [
     "EXIT_CAPABILITY_UNSUPPORTED",
     "EXIT_COVERAGE_FAIL",
+    "EXIT_FINALIZE_BLOCKED",
+    "EXIT_FINALIZE_VERIFY_FAIL",
     "EXIT_MISSING_SPECS",
     "EXIT_NO_DRIVER",
     "EXIT_OK",

@@ -709,6 +709,7 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 
 - [always] Update spec.md status to Implemented or In Progress
 - [always] Update .specs/README.md feature row and Recent Activity section
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
 - [always] Save execution log to logs/YYYY-MM-DD.md (unless --no-save)
 
 ## Definition of Done (Command-Level)

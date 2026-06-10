@@ -1,0 +1,31 @@
+{
+  "command": "spec-implement",
+  "created_at": "2026-06-10T11:29:40.528438+00:00",
+  "feature_slug": "058-deterministic-finalization",
+  "files": [
+    {
+      "path": ".specs/features/058-deterministic-finalization/changelog.md",
+      "sha256": "50b4e4b76f5eba3f70b5effc7ae684af3d8aea5bf8c4c46ec437f08e3de8f344"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "d2538efa03a427483e30bab4e5fd52d722c516cf11ee045744df47daf1034a5e"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "3036ee932caf57fd0377a4f587c0c62a2b47adf21fb91211fc02d395bd842fdb"
+    },
+    {
+      "path": ".specs/features/058-deterministic-finalization/spec.md",
+      "sha256": "f738f714b7a0c4552e0ea8a0c50f9ad11232ec8ecb5a03025c59110edf0ae531"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "90322c4c65bb3d632428b3fe8bdffb39f26d51ee08084c1a746b99ee87f95bd7",
+  "receipt_hash": "f8be8c304b10df5e0201e525e25f41aa2aea2fad4e4ab93d9f0e022e379583a6",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

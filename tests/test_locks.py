@@ -21,9 +21,11 @@ import pytest
 
 from validator.locks import (
     DEFAULT_LOCK_TIMEOUT_SECONDS,
+    FINALIZE_RETRY_TOTAL_BUDGET_SECONDS,
     LOCK_FILENAME,
     RESERVED_MARKER,
     LockAcquisitionError,
+    LockRetryPolicy,
     NnnCollisionError,
     NnnReservation,
     acquire_lock,
@@ -106,6 +108,133 @@ class TestAcquireLockCrossProcess:
                 pass
         finally:
             proc.join(timeout=5)
+
+
+# ─── Opt-in lock retry (Feature 058 FR-007, AC-009, AC-010) ──────────────────
+
+
+class _FakeClock:
+    """Deterministic monotonic clock advanced only by the paired fake sleep."""
+
+    def __init__(self) -> None:
+        self.now = 0.0
+
+    def __call__(self) -> float:
+        return self.now
+
+
+class _FakeSleep:
+    """Records requested delays and advances the fake clock instead of sleeping."""
+
+    def __init__(self, clock: _FakeClock) -> None:
+        self._clock = clock
+        self.delays: list[float] = []
+
+    def __call__(self, seconds: float) -> None:
+        self.delays.append(seconds)
+        self._clock.now += seconds
+
+
+class _ContendedFlock:
+    """fcntl.flock stand-in that stays contended until ``release_at`` on the fake clock."""
+
+    def __init__(self, clock: _FakeClock, release_at: float) -> None:
+        self._clock = clock
+        self._release_at = release_at
+        self.attempts = 0
+
+    # _fd intentionally unused: flock stand-in only inspects flags, not the descriptor
+    def __call__(self, _fd: int, flags: int) -> None:
+        import fcntl as _fcntl
+
+        if flags & _fcntl.LOCK_UN:
+            return
+        self.attempts += 1
+        if self._clock.now < self._release_at:
+            raise BlockingIOError
+
+
+class TestLockRetryPolicy:
+    """@spec FR-007: Opt-in retry with backoff+jitter
+    — .specs/features/058-deterministic-finalization/spec.md#fr-007"""
+
+    def test_total_budget_named_constant_defaults_to_45s(self) -> None:
+        """AC-009 requires the budget to be a named constant defaulting to 45s."""
+        assert FINALIZE_RETRY_TOTAL_BUDGET_SECONDS == 45.0
+        assert LockRetryPolicy().total_budget == FINALIZE_RETRY_TOTAL_BUDGET_SECONDS
+
+    def test_retry_succeeds_after_transient_contention(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A lock held for 20s must be acquired by `--retry` once contention
+        clears, instead of failing at the default 10s window (Story 4)."""
+        from validator import locks as locks_module
+
+        specs = tmp_path / ".specs"
+        clock = _FakeClock()
+        sleep = _FakeSleep(clock)
+        flock = _ContendedFlock(clock, release_at=20.0)
+        monkeypatch.setattr(locks_module.fcntl, "flock", flock)
+        with acquire_lock(specs, retry_policy=LockRetryPolicy(), _sleep=sleep, _clock=clock):
+            pass
+        assert clock.now >= 20.0
+        assert flock.attempts > 1
+
+    def test_backoff_delays_grow_exponentially(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Backoff must be exponential (base 0.5s, x2) so parallel /spec-ship
+        pipelines do not hammer the lock at a fixed interval."""
+        from validator import locks as locks_module
+
+        specs = tmp_path / ".specs"
+        clock = _FakeClock()
+        sleep = _FakeSleep(clock)
+        flock = _ContendedFlock(clock, release_at=10.0)
+        monkeypatch.setattr(locks_module.fcntl, "flock", flock)
+        policy = LockRetryPolicy(base_delay=0.5, multiplier=2.0, jitter=0.1)
+        with acquire_lock(specs, retry_policy=policy, _sleep=sleep, _clock=clock):
+            pass
+        # Each planned delay doubles; jitter (≤0.1s) cannot mask the doubling.
+        assert len(sleep.delays) >= 3
+        for previous, current in zip(sleep.delays, sleep.delays[1:], strict=False):
+            assert current > previous
+
+    def test_retry_budget_exhausted_raises_after_about_45s(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """When the lock never frees, retry must give up close to the 45s
+        budget (±5s tolerance per AC-009) and raise LockAcquisitionError."""
+        from validator import locks as locks_module
+
+        specs = tmp_path / ".specs"
+        clock = _FakeClock()
+        sleep = _FakeSleep(clock)
+        flock = _ContendedFlock(clock, release_at=float("inf"))
+        monkeypatch.setattr(locks_module.fcntl, "flock", flock)
+        with (
+            pytest.raises(LockAcquisitionError, match="retry budget"),
+            acquire_lock(specs, retry_policy=LockRetryPolicy(), _sleep=sleep, _clock=clock),
+        ):
+            pass
+        assert 40.0 <= clock.now <= 50.0
+
+    def test_no_policy_keeps_existing_single_window_contract(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AC-010: without --retry the behavior is the existing acquire_lock
+        contract — single timeout window, no backoff retries."""
+        from validator import locks as locks_module
+
+        specs = tmp_path / ".specs"
+        clock = _FakeClock()
+        flock = _ContendedFlock(clock, release_at=float("inf"))
+        monkeypatch.setattr(locks_module.fcntl, "flock", flock)
+        with (
+            pytest.raises(LockAcquisitionError, match=r"within 0\.2s"),
+            acquire_lock(specs, timeout=0.2, poll_interval=0.01),
+        ):
+            pass
 
 
 # ─── atomic_write (FR-004) ───────────────────────────────────────────────────

@@ -496,6 +496,7 @@ Total: 6/8 gaps closed (75%)
 - [always] Write global `.specs/changelog.md` summary entry (with lock)
 - [always] Overwrite today's gap report in `checks/YYYY-MM-DD.md` with fixed items marked
 - [always] Update README.md status to Implemented if all gaps closed
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
 - [always] Read after-fix hooks from all 3 levels
 
 ## Definition of Done (Command-Level)
