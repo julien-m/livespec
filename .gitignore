@@ -194,3 +194,6 @@ AUDIT-CODEX.md
 
 # LiveSpec local preview artifacts (feature 040, --save output)
 .specs/.previews/
+
+# Global write-lock target (feature 015/058) — runtime flock artifact
+.specs/.LOCK
