@@ -13,10 +13,12 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shlex
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, cast
 
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
 from pydantic import ValidationError
@@ -29,6 +31,9 @@ from .schema import JourneySourceV2, RunPolicyValue, RunStage
 # Native UI regressions can boot simulators/browsers; 10 minutes avoids short CI
 # flake while still bounding hung runners.
 RUNNER_TIMEOUT_SECONDS = 600
+# XCUITest journeys should either reach XCTest or fail explicitly; W75 showed
+# 10-minute xcodebuild hangs leave JSON callers without useful progress.
+XCUITEST_RUNNER_TIMEOUT_SECONDS = 120
 # simctl list should be quick; 30s bounds host CLI hangs without hiding startup lag.
 SIMULATOR_COMMAND_TIMEOUT_SECONDS = 30
 # bootstatus can cold-start CoreSimulator, so it gets a wider bounded wait.
@@ -75,6 +80,16 @@ class _RunnerInvocation:
 
     argv: list[str]
     simulator_state: str | None = None
+    timeout_seconds: int = RUNNER_TIMEOUT_SECONDS
+
+
+@dataclass(frozen=True)
+class _XcodeSurfaceConfig:
+    """XCUITest target metadata resolved from `.specs/surfaces.yaml`."""
+
+    test_target: str | None = None
+    scheme: str | None = None
+    destination: str | None = None
 
 
 class SimulatorDiscoveryError(Exception):
@@ -211,7 +226,7 @@ def _run_manifest_artifacts(
                 artifact,
             )
         try:
-            invocation = _runner_command(project_root, manifest.runner, artifact, executor)
+            invocation = _runner_command(project_root, source, manifest.runner, artifact, executor)
         except SimulatorDiscoveryError as error:
             return _issue(error.code, error.message, artifact)
         if invocation is None:
@@ -230,7 +245,14 @@ def _run_manifest_artifacts(
             )
             if boot_issue is not None:
                 return boot_issue
-        issue = _run_command(project_root, source.id, artifact, invocation.argv, executor)
+        issue = _run_command(
+            project_root,
+            source.id,
+            artifact,
+            invocation.argv,
+            invocation.timeout_seconds,
+            executor,
+        )
         if issue is not None:
             return issue
     return None
@@ -241,16 +263,18 @@ def _run_command(
     journey_id: str,
     artifact: Path,
     argv: list[str],
+    timeout_seconds: int,
     executor: JourneyExecutor,
 ) -> JourneyIssue | None:
     """Execute one native journey command and convert process failures to issues."""
     try:
+        _emit_runner_progress(journey_id, argv, timeout_seconds)
         completed = executor(
             argv,
             cwd=str(project_root),
             capture_output=True,
             text=True,
-            timeout=RUNNER_TIMEOUT_SECONDS,
+            timeout=timeout_seconds,
             check=False,
         )
     except FileNotFoundError:
@@ -260,19 +284,47 @@ def _run_command(
             artifact,
         )
     except subprocess.TimeoutExpired as error:
+        output = _process_output(error.stderr, error.stdout)
+        detail = f"\n{output}" if output else ""
         return _issue(
             "journey_native_run_timeout",
-            f"Journey {journey_id} timed out after {error.timeout}s",
+            f"Journey {journey_id} timed out after {error.timeout}s{detail}",
             artifact,
         )
     if completed.returncode != 0:
-        output = (completed.stderr or completed.stdout or "").strip()
+        output = _process_output(completed.stderr, completed.stdout)
         return _issue(
             "journey_native_run_failed",
             output or f"Native runner exited with {completed.returncode}",
             artifact,
         )
     return None
+
+
+def _emit_runner_progress(journey_id: str, argv: list[str], timeout_seconds: int) -> None:
+    """Emit progress on stderr so JSON stdout remains parseable while runners execute."""
+    command = shlex.join(argv)
+    print(
+        f"livespec journey run: executing {journey_id} with timeout={timeout_seconds}s: {command}",
+        file=sys.stderr,
+        flush=True,
+    )
+
+
+def _process_output(stderr: object, stdout: object) -> str:
+    """Combine process streams so native runner failures keep all available diagnostics."""
+    parts: list[str] = []
+    for stream in (stderr, stdout):
+        if isinstance(stream, bytes):
+            text = stream.decode("utf-8", errors="replace")
+        elif isinstance(stream, str):
+            text = stream
+        else:
+            text = ""
+        stripped = text.strip()
+        if stripped:
+            parts.append(stripped)
+    return "\n".join(parts)
 
 
 def _run_subprocess(
@@ -297,6 +349,7 @@ def _run_subprocess(
 
 def _runner_command(
     project_root: Path,
+    source: JourneySourceV2,
     runner: str,
     artifact: Path,
     executor: JourneyExecutor,
@@ -308,7 +361,7 @@ def _runner_command(
     if runner == "maestro":
         return _RunnerInvocation(["maestro", "test", relative])
     if runner == "xcuitest":
-        return _xcuitest_command(project_root, artifact, executor)
+        return _xcuitest_command(project_root, source, artifact, executor)
     if runner == "pytest":
         return _RunnerInvocation(["pytest", relative])
     if runner == "cargo":
@@ -318,15 +371,23 @@ def _runner_command(
 
 def _xcuitest_command(
     project_root: Path,
+    source: JourneySourceV2,
     artifact: Path,
     executor: JourneyExecutor,
 ) -> _RunnerInvocation | None:
     """Build an xcodebuild command for a generated XCUITest journey class."""
-    test_target = _xcuitest_target_name(artifact)
     class_name = artifact.stem
-    platform = _xcuitest_platform(test_target, class_name)
-    resolved_destination = _xcode_destination(project_root, platform, executor)
-    scheme = _xcode_scheme(project_root, test_target)
+    fallback_test_target = _xcuitest_target_name(artifact)
+    platform = _xcuitest_platform(source, fallback_test_target, class_name)
+    surface_config = _xcode_surface_config(project_root, platform)
+    test_target = surface_config.test_target or fallback_test_target
+    resolved_destination = _xcode_destination(
+        project_root,
+        platform,
+        executor,
+        surface_config.destination,
+    )
+    scheme = _xcode_scheme(project_root, test_target, surface_config.scheme)
     if resolved_destination is None or scheme is None:
         return None
     command = ["xcodebuild", "test"]
@@ -342,13 +403,18 @@ def _xcuitest_command(
             f"-only-testing:{test_target}/{class_name}",
         ]
     )
-    return _RunnerInvocation(command, resolved_destination.simulator_state)
+    return _RunnerInvocation(
+        command,
+        resolved_destination.simulator_state,
+        XCUITEST_RUNNER_TIMEOUT_SECONDS,
+    )
 
 
 def _xcode_destination(
     project_root: Path,
     platform: str,
     executor: JourneyExecutor,
+    configured_destination: str | None = None,
 ) -> _XcodeDestination | None:
     """Resolve an Xcode destination from explicit env or available simulators."""
     configured = _env_value(XCODE_DESTINATION_ENV, "")
@@ -356,6 +422,8 @@ def _xcode_destination(
         return None
     if configured:
         return _XcodeDestination(configured, None)
+    if configured_destination:
+        return _XcodeDestination(configured_destination, None)
     device = _first_available_simulator(project_root, platform, executor)
     return _XcodeDestination(
         _xcode_destination_value(platform, device.udid),
@@ -686,8 +754,18 @@ def _destination_udid(argv: list[str]) -> str | None:
     return None
 
 
-def _xcuitest_platform(test_target: str, class_name: str) -> str:
-    """Infer simulator platform from the generated XCUITest target and class names."""
+def _xcuitest_platform(
+    source: JourneySourceV2,
+    test_target: str,
+    class_name: str,
+) -> str:
+    """Infer simulator platform from journey targets before legacy path/name fallback."""
+    for target in source.targets:
+        if target.runner.value == "xcuitest" and target.surface in {
+            XCUITEST_PLATFORM_IOS,
+            XCUITEST_PLATFORM_WATCHOS,
+        }:
+            return target.surface
     combined = f"{test_target} {class_name}".lower()
     return XCUITEST_PLATFORM_WATCHOS if "watch" in combined else XCUITEST_PLATFORM_IOS
 
@@ -710,13 +788,70 @@ def _xcode_project_flag(project_root: Path) -> list[str]:
     return []
 
 
-def _xcode_scheme(project_root: Path, test_target: str) -> str | None:
+def _xcode_surface_config(project_root: Path, platform: str) -> _XcodeSurfaceConfig:
+    """Resolve XCUITest target metadata from the project surface registry."""
+    surfaces_path = project_root / ".specs" / "surfaces.yaml"
+    if not surfaces_path.exists():
+        return _XcodeSurfaceConfig()
+    try:
+        parsed = yaml.safe_load(surfaces_path.read_text(encoding="utf-8")) or {}
+    except yaml.YAMLError:
+        return _XcodeSurfaceConfig()
+    if not isinstance(parsed, dict):
+        return _XcodeSurfaceConfig()
+    raw_surfaces = parsed.get("surfaces", [])
+    surfaces = cast(list[object], raw_surfaces) if isinstance(raw_surfaces, list) else []
+    for raw_surface in surfaces:
+        if not isinstance(raw_surface, dict):
+            continue
+        surface = cast(dict[object, object], raw_surface)
+        if str(surface.get("runner", "")).lower() != "xcuitest":
+            continue
+        surface_platform = str(surface.get("platform", "")).lower()
+        runner_config = _surface_runner_config(surface.get("runnerConfig"))
+        config_platform = str(runner_config.get("platform", "")).lower()
+        if surface_platform != platform and config_platform != platform:
+            continue
+        return _XcodeSurfaceConfig(
+            test_target=_non_empty_str(
+                runner_config.get("onlyTesting") or runner_config.get("only_testing")
+            )
+            or _non_empty_str(surface.get("name"))
+            or _non_empty_str(surface.get("testDir")),
+            scheme=_non_empty_str(runner_config.get("scheme")),
+            destination=_non_empty_str(runner_config.get("destination")),
+        )
+    return _XcodeSurfaceConfig()
+
+
+def _surface_runner_config(raw_config: object) -> dict[str, object]:
+    """Return structured surface runner config; legacy string configs carry no Xcode data."""
+    if isinstance(raw_config, dict):
+        return cast(dict[str, object], raw_config)
+    return {}
+
+
+def _non_empty_str(value: object) -> str | None:
+    """Normalize optional YAML string values."""
+    if not isinstance(value, str):
+        return None
+    stripped = value.strip()
+    return stripped or None
+
+
+def _xcode_scheme(
+    project_root: Path,
+    test_target: str,
+    configured_scheme: str | None = None,
+) -> str | None:
     """Infer the XCUITest scheme, honoring `LIVESPEC_XCODE_SCHEME` first."""
     configured = _env_value(XCODE_SCHEME_ENV, "")
     if configured is None:
         return None
     if configured:
         return configured
+    if configured_scheme:
+        return configured_scheme
     suffixes = ("UITests", "UI Tests")
     for suffix in suffixes:
         if test_target.endswith(suffix):

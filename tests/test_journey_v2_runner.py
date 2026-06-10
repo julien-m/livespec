@@ -219,6 +219,87 @@ def test_run_journeys_reports_native_runner_failure(
     assert "failed" in result.issues[0].message
 
 
+def test_run_journeys_preserves_native_runner_stdout_and_stderr_on_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """AC-031: native runner failures keep both process streams for diagnosis."""
+    _setup_compiled(tmp_path)
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(
+            argv,
+            1,
+            stdout="assertion detail from stdout",
+            stderr="xcodebuild summary from stderr",
+        )
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 1
+    assert "xcodebuild summary from stderr" in result.issues[0].message
+    assert "assertion detail from stdout" in result.issues[0].message
+
+
+def test_run_journeys_reports_timeout_with_captured_native_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """AC-031: timeouts include captured native output when subprocess exposes it."""
+    _setup_compiled(tmp_path)
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        raise subprocess.TimeoutExpired(
+            argv,
+            600,
+            output="partial stdout before timeout",
+            stderr="partial stderr before timeout",
+        )
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 1
+    assert result.issues[0].code == "journey_native_run_timeout"
+    assert "timed out after 600s" in result.issues[0].message
+    assert "partial stderr before timeout" in result.issues[0].message
+    assert "partial stdout before timeout" in result.issues[0].message
+
+
+def test_run_journeys_emits_native_runner_progress_to_stderr(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """FR-024: JSON callers still get stderr progress while native runners execute."""
+    _setup_compiled(tmp_path)
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0
+    stderr = capsys.readouterr().err
+    assert "livespec journey run: executing onboarding-first-project" in stderr
+    assert "timeout=600s" in stderr
+    assert "npx playwright test" in stderr
+
+
 def test_run_journeys_executes_xcuitest_with_only_testing(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -275,6 +356,122 @@ def test_run_journeys_executes_xcuitest_with_only_testing(
     assert destination == "platform=iOS Simulator,id=IPHONE-17"
     assert "iPhone 16" not in destination
     assert "-only-testing:STRAPTUITests/OnboardingFirstProjectJourney" in command
+
+
+def test_run_journeys_uses_bounded_xcuitest_timeout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """FR-024: hung XCUITest runs fail faster than the generic native timeout."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    devices: _JsonValue = {
+        "devices": {
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+                {
+                    "name": "iPhone 17 Pro",
+                    "udid": "FRESH-SHUTDOWN",
+                    "state": "Shutdown",
+                    "isAvailable": True,
+                },
+            ],
+        },
+    }
+    calls: list[tuple[list[str], int]] = []
+
+    def fake_run(
+        argv: list[str],
+        **kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        timeout = kwargs.get("timeout")
+        if not isinstance(timeout, int):
+            raise AssertionError("runner timeout must be an int")
+        calls.append((list(argv), timeout))
+        if argv[:5] == ["xcrun", "simctl", "list", "devices", "available"]:
+            return subprocess.CompletedProcess(argv, 0, stdout=json.dumps(devices), stderr="")
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.delenv("LIVESPEC_XCODE_DESTINATION", raising=False)
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    xcodebuild_calls = [
+        (argv, timeout) for argv, timeout in calls if argv[:2] == ["xcodebuild", "test"]
+    ]
+    assert len(xcodebuild_calls) == 1
+    assert xcodebuild_calls[0][1] == 120
+    assert "timeout=120s" in capsys.readouterr().err
+
+
+def test_run_journeys_uses_surfaces_yaml_for_shared_watch_xcuitest_artifact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FR-024: shared Swift journey files still run against the declared watch surface."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8")
+        .replace("surface: web", "surface: watchos")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace("route: /signup", "route: strapt://signup"),
+        encoding="utf-8",
+    )
+    (specs / "surfaces.yaml").write_text(
+        """
+surfaces:
+  - id: straptuitests
+    name: STRAPTUITests
+    runner: xcuitest
+    platform: ios
+    runnerConfig:
+      scheme: STRAPT
+      onlyTesting: STRAPTUITests
+      destination: platform=iOS Simulator,id=IPHONE-CONFIG
+  - id: straptwatchuitests
+    name: STRAPTWATCHUITests
+    runner: xcuitest
+    platform: watchos
+    runnerConfig:
+      scheme: STRAPT Watch App
+      onlyTesting: STRAPTWATCHUITests
+      destination: platform=watchOS Simulator,id=WATCH-CONFIG
+""".lstrip(),
+        encoding="utf-8",
+    )
+    compile_result = compile_journeys(tmp_path, journey="onboarding-first-project")
+    assert compile_result.error_count == 0
+    (tmp_path / "App.xcodeproj").mkdir()
+    (tmp_path / "App.xcodeproj" / "project.pbxproj").write_text("", encoding="utf-8")
+    calls: list[list[str]] = []
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(list(argv))
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.delenv("LIVESPEC_XCODE_DESTINATION", raising=False)
+    monkeypatch.delenv("LIVESPEC_XCODE_SCHEME", raising=False)
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    command = next(argv for argv in calls if argv[:2] == ["xcodebuild", "test"])
+    assert command[command.index("-scheme") + 1] == "STRAPT Watch App"
+    assert command[command.index("-destination") + 1] == (
+        "platform=watchOS Simulator,id=WATCH-CONFIG"
+    )
+    assert "-only-testing:STRAPTWATCHUITests/OnboardingFirstProjectJourney" in command
+    assert ["xcrun", "simctl", "boot", "WATCH-CONFIG"] in calls
+    assert all("IPHONE-CONFIG" not in " ".join(argv) for argv in calls)
 
 
 # @spec FR-024: XCUITest simulator destination ranking and boot orchestration.
