@@ -1238,6 +1238,53 @@ def test_compile_command_goal_preserves_existing_execution_task_branches(
     ]
 
 
+def test_compile_command_goal_respects_explicit_visual_false_marker(
+    tmp_path: Path,
+) -> None:
+    """A spec with `visual: false` front-matter never activates visual tasks.
+
+    Invariant: the goal renderer must agree with the visual-gate P0-A table —
+    a CLI-only feature documenting a `## Penflow Contract` heading would
+    otherwise receive receipt-bound visual tasks it can never prove.
+    """
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_execution_task_skill(livespec_root)
+    feature = "002-cli-only"
+    feature_dir = project_root / ".specs" / "features" / feature
+    feature_dir.mkdir(parents=True)
+    (feature_dir / "spec.md").write_text(
+        """\
+---
+id: 002-cli-only
+visual: false
+---
+
+# CLI Feature
+
+## Penflow Contract
+
+| ID | Artifact |
+|----|----------|
+| C99 | `report.json` |
+""",
+        encoding="utf-8",
+    )
+    (project_root / "penflow").mkdir()
+
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature=feature,
+        flags=[],
+    )
+
+    assert goal.payload["runtime_context"]["is_visual_feature"] is False
+    assert goal.payload["runtime_context"]["visual_feature_slugs"] == []
+    assert "Visual task" not in goal.payload["execution_tasks"]
+    assert "Penflow task" not in goal.payload["execution_tasks"]
+
+
 def test_compile_command_goal_activates_visual_tasks_for_spec_check_all(
     tmp_path: Path,
 ) -> None:

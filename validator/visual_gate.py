@@ -410,6 +410,17 @@ def _scan_inline_markers(raw: str) -> tuple[bool, bool]:
     return has_marker, explicit_false
 
 
+def spec_declares_visual_false(spec_md: Path) -> bool:
+    """Return True when ``spec.md`` explicitly opts out of visual work.
+
+    Shared entry point for the P0-A explicit `visual: false` marker so other
+    classifiers (e.g. the goal-contract renderer) stay consistent with
+    :func:`detect_visual_feature`.
+    """
+    _, explicit_false = _read_spec_visual_marker(spec_md)
+    return explicit_false
+
+
 def _has_feature_scoped_penflow(project_root: Path, feature_slug: str) -> bool:
     """Return True only when the Penflow workspace carries evidence for this slug.
 

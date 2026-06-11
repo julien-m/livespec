@@ -39,6 +39,7 @@ from .exceptions import ExpectationsInvalid
 from .expectations import ExpectationsFile, Rule, load_expectations
 from .finalize import FinalizeReceiptError, verify_finalize_receipt
 from .visual_evidence import VisualReceiptError, verify_visual_receipt
+from .visual_gate import spec_declares_visual_false
 
 GOAL_CONTRACT_VERSION = "2.0"
 RequiredConventions: TypeAlias = dict[str, str | list[str]]
@@ -265,6 +266,11 @@ def _detect_visual_feature_slugs(project_root: Path) -> list[str]:
 def _spec_has_visual_work(spec_path: Path) -> bool:
     """Return True if a feature spec declares visual work headings."""
     if not spec_path.exists():
+        return False
+    # Explicit `visual: false` opt-out (P0-A marker, see visual_gate) overrides the
+    # heading heuristic — CLI-only features documenting a `## Penflow Contract`
+    # must not receive receipt-bound visual tasks they can never prove.
+    if spec_declares_visual_false(spec_path):
         return False
     return bool(VISUAL_FEATURE_HEADING_RE.search(spec_path.read_text(encoding="utf-8")))
 
