@@ -191,6 +191,78 @@ livespec goal render <command> --feature <feature> --flags "<flags>" --save
 - `livespec goal status --state <state-file>` reports aggregate completion before a command may emit `DONE`.
 - If `.conventions/index.md` exists, the goal embeds selected convention domains, source paths, source content, and content hashes. `code` is selected by default; `design-*` domains are selected for UI/mockup/visual/CSS/screen/theme/baseline/Penflow signals.
 
+## 8.6 RunArtifact v2 (goal archive)
+
+`livespec goal archive --contract <p> --state <p> [--feature <slug>] [--exit-code N]
+[--stdout-file <p>] [--stderr-file <p>] [--json]` snapshots a goal contract+state
+pair (from `$TMPDIR/livespec-goals/`, read-only) into a durable, self-contained
+JSON artifact under `.specs/.runs/` (gitignored). Implemented by
+[`validator/run_artifacts.py`](../validator/run_artifacts.py) +
+[`validator/run_receipts.py`](../validator/run_receipts.py); consumed by
+`livespec verify-output` via the shared rule engine
+[`validator/verify_output.py`](../validator/verify_output.py).
+
+### Filename grammar
+
+```
+.specs/.runs/<command>-<ISO-fs>-<hash8>.json
+```
+
+- `<ISO-fs>` = UTC timestamp with colons replaced by dashes and subsecond
+  precision — the timestamp leads, so the lexicographically greatest filename
+  is the latest run.
+- `<hash8>` = first 8 chars of the goal hash — distinct goals never collide,
+  so no lock is needed.
+- Same-goal collision: filenames include subsecond precision, so repeated
+  archives create distinct files and never overwrite an existing artifact.
+- Atomic write: temp file + rename.
+
+### v2 field set
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `schema_version` | `"2.0"` | constant |
+| `goal_hash` | string | contract/state must agree, else blocked (exit 2, nothing written) |
+| `command` | string | from the contract |
+| `feature` | string \| null | `--feature` override, else contract value |
+| `flags` | string[] | normalized flags from the contract |
+| `exit_code` | int \| null | null when `--exit-code` omitted |
+| `timestamp` | ISO 8601 UTC | `<date>` placeholder resolves from here, never the wall clock |
+| `stdout` / `stderr` | string (optional) | present only when `--stdout-file`/`--stderr-file` were given |
+| `goal` | object | `{status, tasks[{id, ordinal, status, accepted_evidence}]}` |
+| `receipts` | object[] | `{kind: finalize\|visual, path, verified, verdict, error}` |
+| `verify_rules` | object | copied verbatim from the contract (self-contained artifact) |
+| `verify_result` | object | `{outcome, rules[{verb, kind, status, detail}]}` |
+
+**Superseded (039 FR-005):** v1's unobservable fields — `git_state_before`,
+`git_state_after`, `fs_observed`, `duration_ms` — are dropped from v2 and never
+appear in any emitted artifact.
+
+### SKIP semantics (honest evidence absence)
+
+- No `--stdout-file`/`--stderr-file` → every `contains` rule reports **SKIP**
+  with a descriptive detail; SKIP never counts toward failed `must` rules.
+- `exit_code: null` → every `exit_code` rule reports **SKIP** (same rule).
+- All-`contains` rules without transcript → outcome derives from goal
+  completion + exit code alone (may legitimately be `success`).
+
+### Receipt re-verification
+
+At archive time every `finalize_receipt_path` / `visual_evidence_receipt_path`
+found in accepted task evidence is re-verified for **integrity only**
+(`verify_finalize_receipt` / `verify_visual_receipt`): `expected_command` is
+never checked; `expected_feature_slug` only when `--feature` is given. A
+tampered or missing receipt records `verified: false` and forces
+`verify_result.outcome = "error"`.
+
+### Exit codes
+
+| Outcome | Exit |
+|---------|------|
+| success | 0 |
+| drift / error | 1 |
+| blocked (unreadable inputs, hash mismatch — nothing written) | 2 |
+
 ## 9. Placeholders & Edge Cases (summary)
 
 - EC-001: whitespace-only diff to `.agent-sync/skills/X/SKILL.md` still triggers the hook.

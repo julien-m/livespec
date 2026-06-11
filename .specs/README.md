@@ -76,6 +76,7 @@
 | 037 | Test Multi-Runner Integration | Implemented | 2026-05-08 | 2026-05-08 | [spec](features/037-test-multi-runner-integration/spec.md), [plan](features/037-test-multi-runner-integration/plan.md), [implementation](features/037-test-multi-runner-integration/implementation.md) |
 | 038 | Runner Config Wiring | Implemented | 2026-05-08 | 2026-06-08 | [spec](features/038-runner-config-wiring/spec.md), [plan](features/038-runner-config-wiring/plan.md), [implementation](features/038-runner-config-wiring/implementation.md) |
 | 039 | Command Expectations and Verify Output | Implemented | 2026-05-12 | 2026-06-08 | [spec](features/039-command-expectations-and-verify-output/spec.md), [implementation](features/039-command-expectations-and-verify-output/implementation.md) |
+| 039.1 | Goal Archive & Run Artifacts v2 | Implemented | 2026-06-10 | 2026-06-10 | [spec](features/039.1-goal-archive-run-artifacts/spec.md), [plan](features/039.1-goal-archive-run-artifacts/plan.md), [implementation](features/039.1-goal-archive-run-artifacts/implementation.md) |
 | 040 | Expectations Rich and Verify Preview | Implemented | 2026-05-12 | 2026-06-08 | [spec](features/040-expectations-rich-and-verify-preview/spec.md), [implementation](features/040-expectations-rich-and-verify-preview/implementation.md) |
 | 041 | Brainstorm Flow & Screen Specs Ingestion | Draft | 2026-05-13 | 2026-05-14 | [spec](features/041-spec-init-flow-specs-ingestion/spec.md) |
 | 042 | `/spec-specify` Derives from Imported Brainstorm Flows | Draft | 2026-05-13 | 2026-05-14 | [spec](features/042-spec-specify-from-brainstorm/spec.md) |
@@ -118,16 +119,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-10 | Feature | [Feature 039.1] /spec-feature pipeline complete — all phases done, audit findings fixed, gates green |
+| 2026-06-10 | Feature | [Feature 039.1] Test: 100% AC covered (13/13), 0 tests generated, feature suite green; full baseline has 1 pre-existing failure |
+| 2026-06-10 | Feature | [Feature 039.1] Implemented: Goal Archive & Run Artifacts v2 — livespec goal archive (RunArtifact v2), shared verify-output engine, real preview.py, 039/040 truth-fixes |
+| 2026-06-10 | Plan | [Feature 039.1] Plan created: Goal Archive & Run Artifacts v2 — 9 implementation steps, 4 diagrams |
+| 2026-06-10 | Spec | [Feature 039.1] Spec created: Goal Archive & Run Artifacts v2 — 5 stories, 13 AC, 11 FR |
 | 2026-06-10 | Feature | 001 auto-llm-review: fix cc-hub codex provider schema passing (temp file + envelope unwrap + strict-mode normalization) |
 | 2026-06-10 | Feature | 058 deterministic-finalization: full /spec-feature pipeline complete (specify, plan, implement, test all green) |
 | 2026-06-10 | Feature | [Feature 058] Test: 100% AC covered (12/12), 0 tests generated — 135/135 feature tests passing incl. chaos |
 | 2026-06-10 | Feature | [Feature 058] Implemented: Deterministic Finalization — livespec finalize apply/verify, finalize.registry goal evidence family, opt-in lock retry |
 | 2026-06-10 | Plan | [Feature 058] Plan created: Deterministic Finalization — 9 implementation steps, 4 diagrams |
-| 2026-06-10 | Spec | [Feature 058] Spec created: Deterministic Finalization — 4 stories, 12 AC, 10 FR |
-| 2026-06-09 | Bugfix | [Feature 057] Fix: 7/7 gaps closed (7 functional, 0 visual) — W51/W53 runner-ranking |
-| 2026-06-09 | Bugfix | [Feature 057] Fix: 3/3 gaps closed (3 functional, 0 visual) — XCUITest pre-suite hang |
-| 2026-06-09 | Bugfix | [Feature 057 Fix]: Closed the W31/W33/W35/W37 XCUITest simulator-destination correction chain accepted by V22 using the V21 W37 scope proof: journey runs resolve iOS/watchOS destinations from available `simctl` devices, pass `id=<UDID>` to `xcodebuild`, and boot/await the selected simulator instead of defaulting to unavailable `iPhone 16`. Strapt recompile, `$spec-test`, journey runs, `$git-commit`, and push remain out of scope. |
-| 2026-06-09 | Bugfix | [Feature 057] Fix: 3/3 gaps closed — XCUITest journey assertions now use generated `waitForExistence` helpers for `assert` and `assert_not`, eliminating immediate `.exists` reads from compiled Swift steps. |
 <!-- readme:activity:end -->
 
 ---
@@ -139,3 +140,13 @@
 <!-- finalize:spec-feature:2026-06-10:96deb6de -->
 
 <!-- finalize:spec-fix:2026-06-10:24ee3265 -->
+
+<!-- finalize:spec-specify:2026-06-10:de700238 -->
+
+<!-- finalize:spec-plan:2026-06-10:362ef347 -->
+
+<!-- finalize:spec-implement:2026-06-10:2395e303 -->
+
+<!-- finalize:spec-test:2026-06-10:cea2d0c7 -->
+
+<!-- finalize:spec-feature:2026-06-10:645cecd3 -->

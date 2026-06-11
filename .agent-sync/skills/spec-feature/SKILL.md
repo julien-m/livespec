@@ -1014,21 +1014,24 @@ If any phase fails:
 
 ## Run Artifact Emission
 
-> **Run artifact:** at the end of execution, the command MUST emit a run
-> artifact via:
+> **Run artifact:** at the end of execution, the command MUST archive its goal
+> contract+state as a durable RunArtifact v2 via:
 >
 > ```
-> livespec run record \
->   --command feature \
->   --exit-code <N> \
->   --flags "<flags>" \
->   --stdout-file <captured.out> \
->   --stderr-file <captured.err>
+> livespec goal archive \
+>   --contract <contract-file> \
+>   --state <state-file> \
+>   --feature <slug> \
+>   [--exit-code <N>] \
+>   [--stdout-file <captured.out>] \
+>   [--stderr-file <captured.err>]
 > ```
 >
-> The artifact lands in `.specs/.runs/feature-<ISO>.json` and is consumed by
-> `/spec-verify-output feature`. See `system/expectations.md` for the
-> RunArtifact schema and `.agent-sync/skills/spec-feature/expectations.md` for the contract.
+> The artifact lands in `.specs/.runs/<command>-<ISO-fs>-<hash8>.json` and is
+> consumed by `/spec-verify-output feature`. The `$TMPDIR` contract/state files
+> are never modified. **Read** [`../../../system/expectations.md`](../../../system/expectations.md)
+> § RunArtifact v2 (goal archive) for the schema and **Read** [`expectations.md`](expectations.md)
+> for the contract.
 
 ---
 

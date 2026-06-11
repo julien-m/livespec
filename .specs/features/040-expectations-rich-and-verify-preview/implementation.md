@@ -13,13 +13,13 @@ title: Implementation — Feature 040
 | FR-002 (sections 1-11 rich) | `system/templates/command-expectations.template.md` | inline | ✅ | 2026-05-12 |
 | FR-003 (parser Section 13) | `validator/expectations.py` | `# @spec FR-003: Section 13 parser/enforcement` | ✅ | 2026-05-12 |
 | FR-004 (migrate 20 files) | `.agent-sync/skills/*/expectations.md` (×20), `scripts/migrate_expectations_section13.py` | — | ✅ | 2026-05-12 |
-| FR-005 (--preview flag) | `.agent-sync/skills/spec-verify-output/SKILL.md` | `# @spec FR-005: --preview and --save flags` | ✅ | 2026-05-12 |
-| FR-006 (render_preview) | `validator/preview.py` | `# @spec FR-006: render_preview implementation` | ✅ | 2026-05-12 |
-| FR-007 (placeholder resolver) | `validator/preview.py` | `# @spec FR-007: placeholder resolver` | ✅ | 2026-05-12 |
-| FR-008 (--save writes file) | `.agent-sync/skills/spec-verify-output/SKILL.md` | `# @spec FR-008: --save writes file` | ✅ | 2026-05-12 |
-| FR-009 (canonical error strings) | `validator/expectations.py`, `validator/preview.py`, `.agent-sync/skills/spec-verify-output/SKILL.md` | `# @spec FR-009`, `# @spec AC-008`, `# @spec AC-009` | ✅ | 2026-05-12 |
+| FR-005 (--preview flag) | [`validator/cli_commands/verify_output_cmd.py`](../../../validator/cli_commands/verify_output_cmd.py) (real CLI — feature 039.1), [`.agent-sync/skills/spec-verify-output/SKILL.md`](../../../.agent-sync/skills/spec-verify-output/SKILL.md) | Feature 039.1 implementation; see [features/039.1-goal-archive-run-artifacts/spec.md#fr-005](../039.1-goal-archive-run-artifacts/spec.md#fr-005) (`# @spec FR-005: verify-output CLI`) | ✅ | 2026-06-10 |
+| FR-006 (render_preview) | [`validator/preview.py`](../../../validator/preview.py) (real implementation — feature 039.1) | Feature 039.1 implementation; see [features/039.1-goal-archive-run-artifacts/spec.md#fr-008](../039.1-goal-archive-run-artifacts/spec.md#fr-008) (`# @spec FR-008: render_preview 4 sources + save_preview`) | ✅ | 2026-06-10 |
+| FR-007 (placeholder resolver) | [`validator/preview.py`](../../../validator/preview.py) (`_substitute`, `build_project_context`) | Feature 039.1 implementation; see [features/039.1-goal-archive-run-artifacts/spec.md#fr-008](../039.1-goal-archive-run-artifacts/spec.md#fr-008) | ✅ | 2026-06-10 |
+| FR-008 (--save writes file) | [`validator/preview.py`](../../../validator/preview.py) (`save_preview`), [`validator/cli_commands/verify_output_cmd.py`](../../../validator/cli_commands/verify_output_cmd.py) | Feature 039.1 implementation; see [features/039.1-goal-archive-run-artifacts/spec.md#fr-008](../039.1-goal-archive-run-artifacts/spec.md#fr-008) | ✅ | 2026-06-10 |
+| FR-009 (canonical error strings) | [`validator/expectations.py`](../../../validator/expectations.py), [`validator/cli_commands/verify_output_cmd.py`](../../../validator/cli_commands/verify_output_cmd.py) (`_run_preview`) | Feature 039.1 implementation; see [features/039.1-goal-archive-run-artifacts/spec.md#fr-009](../039.1-goal-archive-run-artifacts/spec.md#fr-009) (`# @spec FR-009`, `# @spec AC-008`, `# @spec AC-009`, `# @spec AC-011`) | ✅ | 2026-06-10 |
 | FR-010 (section 12 unchanged) | `validator/expectations.py` | feature 039 anchors | ✅ | 2026-05-12 |
-| FR-011 (tests) | `tests/test_preview.py`, `tests/test_verify_output_preview_cli.py`, `tests/test_demo_session_snapshot.py` | — | ✅ | 2026-05-12 |
+| FR-011 (tests) | [`tests/test_preview.py`](../../../tests/test_preview.py) (unit + CLI — feature 039.1), [`tests/test_demo_session_snapshot.py`](../../../tests/test_demo_session_snapshot.py) | — | ✅ | 2026-06-10 |
 | FR-012 (docs) | `.agent-sync/skills/spec-verify-output/SKILL.md` | — | ✅ | 2026-05-12 |
 | FR-013 (verify-output.expectations.md self) | `.agent-sync/skills/spec-verify-output/expectations.md` | — | ✅ | 2026-05-12 |
 | FR-014 (last_reviewed bumped) | all 20 `.agent-sync/skills/*/expectations.md` | — | ✅ | 2026-05-12 |

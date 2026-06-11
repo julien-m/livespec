@@ -1,7 +1,7 @@
 ---
 command: spec-verify-output
 contract_version: "1.0"
-last_reviewed: 2026-06-09
+last_reviewed: 2026-06-10
 ---
 
 # Expectations — /spec-verify-output
@@ -36,11 +36,11 @@ Verify a command's latest run artifact against its expectations contract.
 - _(none)_
 
 **optional:**
-- _(none)_
+- `.specs/.previews/<command>-<ISO>.md` — only under `--preview --save` (see §13)
 
 **forbidden:**
 - `src/`
-- `.specs/`
+- `.specs/` — everything except the `.specs/.previews/` carve-out above
 
 ## 5. Git Effects
 
@@ -155,4 +155,4 @@ exit_code 0
 
 - **On success:** done; CI may archive the report.
 - **On drift:** inspect the failing rule's `detail`, fix the command or the expectation.
-- **On blocked:** run the command at least once (`livespec run wrap <cmd>` produces the artifact), or fix the override file.
+- **On blocked:** run the target command through its goal workflow, then archive the resulting contract/state with `livespec goal archive`, or fix the override file.

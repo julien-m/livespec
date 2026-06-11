@@ -3,9 +3,26 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-10
+> Last updated: 2026-06-11
 
 ---
+
+## 2026-06-11 — [Feature 039.1] Check: 100% verified (11/11 FR, 13/13 AC); warnings recorded for AC format, tree hygiene, and oversized tests
+
+## 2026-06-10 — [Feature 039.1] /spec-feature pipeline complete — all phases done, audit findings fixed, gates green
+<!-- finalize:spec-feature:2026-06-10:645cecd3 -->
+
+## 2026-06-10 — [Feature 039.1] Test: 100% AC covered (13/13), 0 tests generated, feature suite green; full baseline has 1 pre-existing failure
+<!-- finalize:spec-test:2026-06-10:cea2d0c7 -->
+
+## 2026-06-10 — [Feature 039.1] Implemented: Goal Archive & Run Artifacts v2 — livespec goal archive (RunArtifact v2), shared verify-output engine, real preview.py, 039/040 truth-fixes
+<!-- finalize:spec-implement:2026-06-10:2395e303 -->
+
+## 2026-06-10 — [Feature 039.1] Plan created: Goal Archive & Run Artifacts v2 — 9 implementation steps, 4 diagrams
+<!-- finalize:spec-plan:2026-06-10:362ef347 -->
+
+## 2026-06-10 — [Feature 039.1] Spec created: Goal Archive & Run Artifacts v2 — 5 stories, 13 AC, 11 FR
+<!-- finalize:spec-specify:2026-06-10:de700238 -->
 
 ## 2026-06-10 — 001 auto-llm-review: fix cc-hub codex provider schema passing (temp file + envelope unwrap + strict-mode normalization)
 <!-- finalize:spec-fix:2026-06-10:24ee3265 -->

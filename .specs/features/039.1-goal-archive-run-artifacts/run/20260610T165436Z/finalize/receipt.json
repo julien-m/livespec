@@ -1,0 +1,31 @@
+{
+  "command": "spec-plan",
+  "created_at": "2026-06-10T16:54:36.188256+00:00",
+  "feature_slug": "039.1-goal-archive-run-artifacts",
+  "files": [
+    {
+      "path": ".specs/features/039.1-goal-archive-run-artifacts/changelog.md",
+      "sha256": "bc126331b9afc1e454044be30eaa853288b5b9944268ea0ea2094420f0bdf5d2"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "682e3bee6bab40f07750f8458ba7d73e0c6d404acae339eaeb20942949dbe89d"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "eece120bf909dabd702e42e9ff7236c9574e576eaddb9c67e23e30634f717c6d"
+    },
+    {
+      "path": ".specs/features/039.1-goal-archive-run-artifacts/spec.md",
+      "sha256": "317fc4f2bb393910ebbe3a8f55444144ceb8dcfd8b74398f0127e8d2c499ef75"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "362ef3470439c8fb509da4f69bdfce96b5ac6a83a7ccd9f99a477f49620e9d15",
+  "receipt_hash": "e6accee0233fb702dc0bb145711dde522c155c860f02a024a1364fbbb3eee857",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

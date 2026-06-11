@@ -1,9 +1,9 @@
 ---
 feature: 039-command-expectations-and-verify-output
-title: Implementation — Feature 039 — Command Expectations & `/spec.verify-output`
+title: Implementation — Feature 039 — Command Expectations & `/spec-verify-output`
 ---
 
-# Implementation — Feature 039 — Command Expectations & `/spec.verify-output`
+# Implementation — Feature 039 — Command Expectations & `/spec-verify-output`
 
 > Maps every FR and AC from `spec.md` to the `@spec` anchor in source code.
 
@@ -15,9 +15,9 @@ title: Implementation — Feature 039 — Command Expectations & `/spec.verify-o
 | FR-002 | 20 builtin expectations files | `.agent-sync/skills/*/expectations.md` (20 files) |
 | FR-003 | ExpectationsFile schema validator | `validator/expectations.py` (`parse_expectations`), `validator/exceptions.py` (`ExpectationsMissing`, `ExpectationsInvalid`) |
 | FR-004 | verify YAML grammar | `validator/expectations.py` (`_extract_verify_block`, `_build_verify_block`, `_parse_rule_list`, `_resolve_rule_kind`) |
-| FR-005 | RunArtifact JSON schema | `validator/goal_contracts.py`, `validator/exceptions.py` (`ArtifactMalformed`) |
-| FR-006 | Run-artifact emitter | `.agent-sync/skills/spec-verify-output/SKILL.md`, `validator/cli_commands/goal_cmd.py` |
-| FR-007 | `/spec.verify-output` evaluator + CLI | `.agent-sync/skills/spec-verify-output/SKILL.md`, `validator/expectations.py`, `validator/outcome.py` |
+| FR-005 | RunArtifact JSON schema | [`validator/run_artifacts.py`](../../../validator/run_artifacts.py) (v1 schema superseded by v2 — feature 039.1), [`validator/exceptions.py`](../../../validator/exceptions.py) (`ArtifactMalformed`) |
+| FR-006 | Run-artifact emitter | [`validator/run_artifacts.py`](../../../validator/run_artifacts.py) (`archive_goal_run`), [`validator/cli_commands/goal_cmd.py`](../../../validator/cli_commands/goal_cmd.py) (`goal archive`) |
+| FR-007 | `/spec-verify-output` evaluator + CLI | [`validator/verify_output.py`](../../../validator/verify_output.py), [`validator/cli_commands/verify_output_cmd.py`](../../../validator/cli_commands/verify_output_cmd.py), [`.agent-sync/skills/spec-verify-output/SKILL.md`](../../../.agent-sync/skills/spec-verify-output/SKILL.md) |
 | FR-008 | Total override no merge | `validator/expectations.py` (`load_expectations`), `validator/exceptions.py` (`OverrideMalformed`) |
 | FR-009 | Pre-commit hook | `hooks/livespec-last-reviewed.py`, `scripts/install-hooks.sh` |
 | FR-010 | when: branch activator | `validator/expectations.py`, `validator/goal_contracts.py` |
@@ -46,13 +46,13 @@ title: Implementation — Feature 039 — Command Expectations & `/spec.verify-o
 |----|-------------|----------|
 | EC-001 | Whitespace-only edit triggers hook | `tests/test_last_reviewed_hook.py::test_pre_commit_hook_whitespace_change_still_blocks` |
 | EC-002 | Malformed override blocks (no fallback) | `tests/test_expectations.py::test_override_malformed_blocks_no_fallback` |
-| EC-003 | No artifact -> blocked | `.agent-sync/skills/spec-verify-output/SKILL.md` |
+| EC-003 | No artifact -> blocked | `validator/cli_commands/verify_output_cmd.py` (`_resolve_artifact_path`), `tests/test_verify_output_cli.py::TestArtifactSelection::test_missing_artifact_blocks_exit_2` |
 | EC-004 | Multiple when: branches accumulate | `tests/test_verify_output.py::test_when_branch_multiple_flags_resolution_order` |
 | EC-005 | Overlapping substrings — no short-circuit | `tests/test_expectations.py`, `tests/test_builtin_expectations_corpus.py` |
 | EC-006 | <date> from artifact timestamp, not commit date | `tests/test_placeholders.py` |
-| EC-007 | Malformed artifact JSON -> blocked | `validator/exceptions.py` catches `ArtifactMalformed` |
+| EC-007 | Malformed artifact JSON -> blocked | `validator/run_artifacts.py` (`load_run_artifact` raises `ArtifactMalformed`), `tests/test_verify_output_cli.py::TestArtifactSelection::test_malformed_artifact_blocks_naming_path` |
 | EC-008 | Command rename ceremony | Documented in `system/expectations.md` §7 "Renaming a command" |
-| EC-009 | Multiple artifacts -> lexicographically latest | `tests/test_run_artifact.py::test_find_latest_artifact_picks_lex_last` |
+| EC-009 | Multiple artifacts -> lexicographically latest | `tests/test_run_artifact.py::TestArtifactHelpers::test_find_latest_artifact_picks_lex_last` |
 | EC-010 | when: flag never accepted -> no error | `tests/test_verify_output.py::test_when_branch_irrelevant_flag_no_error` |
 
 ## File Inventory
