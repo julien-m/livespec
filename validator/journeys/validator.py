@@ -20,10 +20,23 @@ from pathlib import Path
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
 from pydantic import ValidationError
 
+from .fixtures import (
+    BootstrapAmbiguityError,
+    FixturesContractV1,
+    read_fixtures_contract,
+    render_contract_skeleton,
+    resolve_bootstrap,
+)
 from .history import validate_history
 from .models import JourneyFile, JourneyIssue, JourneySeverity, JsonValue, ValidationResult
-from .paths import iter_journey_source_paths
-from .schema import CoverageRefKind, JourneyAction, JourneySourceV2, RunPolicyValue
+from .paths import fixtures_contract_path, iter_journey_source_paths
+from .schema import (
+    CoverageRefKind,
+    JourneyAction,
+    JourneyRunner,
+    JourneySourceV2,
+    RunPolicyValue,
+)
 
 _AC_RE = re.compile(r"\*\*(AC-\d+):")
 _FR_RE = re.compile(r"\*\*(FR-\d+):")
@@ -72,6 +85,7 @@ def validate_journey_file(
 
     source_hash = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()
     issues = _validate_source_contract(project_root, path, source)
+    issues.extend(_validate_fixtures_contract(project_root, path, source))
     issues.extend(validate_history(project_root, source.id, source_hash))
     if any(issue.severity == JourneySeverity.ERROR for issue in issues):
         return None, issues
@@ -143,6 +157,109 @@ def _validate_source_contract(
                     "journey_requirement_missing",
                     JourneySeverity.ERROR,
                     f"{cover.feature} does not define {cover.ref}",
+                    path,
+                )
+            )
+    return issues
+
+
+def _validate_fixtures_contract(
+    project_root: Path,
+    path: Path,
+    source: JourneySourceV2,
+) -> list[JourneyIssue]:
+    """Enforce the fixtures bootstrap contract for XCUITest fixture journeys."""
+    # @spec FR-004: Five blocking fixture-contract validation rules
+    # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-004
+    preconditions = source.preconditions
+    # Exemption: journeys without fixtures and mocks never require a contract
+    # (AC-014); Playwright/Maestro enforcement is deferred to a future feature.
+    if not preconditions.fixtures and not preconditions.mocks:
+        return []
+    xcuitest_surfaces = sorted(
+        {target.surface for target in source.targets if target.runner is JourneyRunner.XCUITEST}
+    )
+    if not xcuitest_surfaces:
+        return []
+    contract, contract_issue = read_fixtures_contract(project_root)
+    if contract_issue is not None:
+        return [contract_issue]
+    if contract is None:
+        skeleton = render_contract_skeleton(
+            preconditions.fixtures,
+            preconditions.mocks,
+            xcuitest_surfaces,
+        )
+        return [
+            _issue(
+                "journey_fixture_contract_missing",
+                JourneySeverity.ERROR,
+                "journey declares fixtures/mocks but .specs/journeys/fixtures.yaml "
+                f"is missing. Paste-ready skeleton:\n{skeleton}",
+                fixtures_contract_path(project_root),
+            )
+        ]
+    issues = _validate_contract_references(path, source, contract, xcuitest_surfaces)
+    issues.extend(_validate_bootstrap_resolution(path, source, contract, xcuitest_surfaces))
+    return issues
+
+
+def _validate_contract_references(
+    path: Path,
+    source: JourneySourceV2,
+    contract: FixturesContractV1,
+    xcuitest_surfaces: list[str],
+) -> list[JourneyIssue]:
+    """Check declared fixture/mock ids and surfaces against the contract maps."""
+    issues: list[JourneyIssue] = []
+    references = [
+        ("fixture", source.preconditions.fixtures, contract.fixtures),
+        ("mock", source.preconditions.mocks, contract.mocks),
+    ]
+    for kind, declared_ids, contract_map in references:
+        for declared_id in declared_ids:
+            entry = contract_map.get(declared_id)
+            if entry is None:
+                issues.append(
+                    _issue(
+                        "journey_fixture_unknown",
+                        JourneySeverity.ERROR,
+                        f"{kind} '{declared_id}' is not declared in fixtures.yaml",
+                        path,
+                    )
+                )
+                continue
+            for surface in xcuitest_surfaces:
+                if surface not in entry.surfaces:
+                    issues.append(
+                        _issue(
+                            "journey_fixture_surface_unsupported",
+                            JourneySeverity.ERROR,
+                            f"{kind} '{declared_id}' does not support surface "
+                            f"'{surface}' (declared: {', '.join(entry.surfaces)})",
+                            path,
+                        )
+                    )
+    return issues
+
+
+def _validate_bootstrap_resolution(
+    path: Path,
+    source: JourneySourceV2,
+    contract: FixturesContractV1,
+    xcuitest_surfaces: list[str],
+) -> list[JourneyIssue]:
+    """Dry-run resolve_bootstrap per surface to surface ambiguity at validation."""
+    issues: list[JourneyIssue] = []
+    for surface in xcuitest_surfaces:
+        try:
+            resolve_bootstrap(source, contract, surface)
+        except BootstrapAmbiguityError as error:
+            issues.append(
+                _issue(
+                    "journey_bootstrap_ambiguous",
+                    JourneySeverity.ERROR,
+                    f"surface '{surface}': {error}",
                     path,
                 )
             )

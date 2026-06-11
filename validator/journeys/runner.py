@@ -23,6 +23,7 @@ from typing import Protocol, cast
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
 from pydantic import ValidationError
 
+from .fixtures import BOOTSTRAP_FAILURE_PREFIX, fixtures_contract_hash
 from .manifest import COMPILER_VERSION, CompiledManifest, read_compiled_manifest
 from .models import JourneyIssue, JourneySeverity
 from .paths import iter_journey_source_paths
@@ -189,6 +190,20 @@ def run_journeys(
                 )
             )
             continue
+        # @spec FR-007: Contract hash staleness check
+        # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-007
+        # Check order locked (plan review finding #3): source_hash above, then
+        # compiler_version, then this hash — pre-v2-3 manifests (tolerant "")
+        # surface journey_compiler_stale, never a spurious hash mismatch.
+        if manifest.fixtures_contract_hash != fixtures_contract_hash(project_root):
+            issues.append(
+                _issue(
+                    "journey_compiled_stale",
+                    "compiled manifest fixtures contract hash is stale",
+                    source_path,
+                )
+            )
+            continue
         if execute:
             run_issue = _run_manifest_artifacts(
                 project_root,
@@ -293,11 +308,29 @@ def _run_command(
         )
     if completed.returncode != 0:
         output = _process_output(completed.stderr, completed.stdout)
+        # @spec FR-008: Bootstrap failure prefix reclassification
+        # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-008
+        # Scan only the captured process output — never .xcresult bundles.
+        bootstrap_line = _bootstrap_failure_line(output)
+        if bootstrap_line is not None:
+            return _issue(
+                "journey_bootstrap_marker_missing",
+                f"{bootstrap_line}\n{output}",
+                artifact,
+            )
         return _issue(
             "journey_native_run_failed",
             output or f"Native runner exited with {completed.returncode}",
             artifact,
         )
+    return None
+
+
+def _bootstrap_failure_line(output: str) -> str | None:
+    """Return the first generated-helper bootstrap failure line, if any."""
+    for line in output.splitlines():
+        if BOOTSTRAP_FAILURE_PREFIX in line:
+            return line.strip()
     return None
 
 

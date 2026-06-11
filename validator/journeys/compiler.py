@@ -28,6 +28,13 @@ from pydantic import ValidationError
 
 from .capabilities import validate_runner_capability
 from .compiler_registry import get_compiler_backend
+from .fixtures import (
+    BOOTSTRAP_FAILURE_PREFIX,
+    BootstrapPlan,
+    FixturesContractV1,
+    read_fixtures_contract_with_hash,
+    resolve_bootstrap,
+)
 from .manifest import write_compiled_manifest
 from .models import (
     CompiledJourneyArtifact,
@@ -81,6 +88,13 @@ def compile_journeys(
     if validation.error_count:
         return CompileResult(artifacts=artifacts, issues=issues)
 
+    # @spec FR-005: Derived bootstrap waits enter codegen, FR-006: contract hash
+    # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-005
+    # Single contract read per compile invocation (plan review finding #6):
+    # the hash is derived from the same bytes the parsed contract came from.
+    # Validation is already green here, so the issue branch cannot trigger.
+    contract, contract_hash, _ = read_fixtures_contract_with_hash(project_root)
+
     pending_xcuitest_manifests: list[_PendingManifest] = []
     for source in validation.journeys:
         if journey is not None and source.journey_id != journey:
@@ -101,7 +115,7 @@ def compile_journeys(
             issues.append(_source_read_issue(error))
             continue
         output_path = _native_artifact_path(project_root, source)
-        content = _compile_native(project_root, source, source_model)
+        content = _compile_native(project_root, source, source_model, contract)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(content, encoding="utf-8")
         visual_contract_paths = _write_visual_contracts(project_root, source_model)
@@ -122,6 +136,7 @@ def compile_journeys(
             runner=source.runner,
             native_output_paths=[output_path],
             visual_contract_paths=visual_contract_paths,
+            fixtures_contract_hash=contract_hash,
         )
         artifacts.append(
             CompiledJourneyArtifact(
@@ -145,6 +160,7 @@ def compile_journeys(
                     runner=pending.journey.runner,
                     native_output_paths=[pending.output_path],
                     visual_contract_paths=pending.visual_contract_paths,
+                    fixtures_contract_hash=contract_hash,
                 )
                 artifacts.append(
                     CompiledJourneyArtifact(
@@ -239,13 +255,21 @@ def _native_artifact_path(project_root: Path, journey: JourneyFile) -> Path:
     return project_root / ".specs" / "journeys" / journey.journey_id / "compiled" / filename
 
 
-def _compile_native(project_root: Path, journey: JourneyFile, source: JourneySourceV2) -> str:
+def _compile_native(
+    project_root: Path,
+    journey: JourneyFile,
+    source: JourneySourceV2,
+    contract: FixturesContractV1 | None,
+) -> str:
     """Dispatch to the runner-specific compiler."""
     backend = get_compiler_backend(journey.runner)
     if backend is not None and backend.artifact_kind == "playwright":
         return _compile_playwright(project_root, journey, source)
     if backend is not None and backend.artifact_kind == "xcuitest":
-        return _compile_xcuitest(project_root, journey, source)
+        # Validation already rejected ambiguous derivations, so resolve_bootstrap
+        # cannot raise here; the plan is None for fixture-less journeys (AC-014).
+        plan = resolve_bootstrap(source, contract, journey.target_surface)
+        return _compile_xcuitest(project_root, journey, source, plan)
     return _compile_maestro(project_root, journey)
 
 
@@ -282,8 +306,11 @@ def _compile_xcuitest(
     project_root: Path,
     journey: JourneyFile,
     source: JourneySourceV2,
+    plan: BootstrapPlan | None = None,
 ) -> str:
     """Compile one Apple-platform journey to Swift/XCUITest."""
+    # @spec FR-005: Bootstrap waits emitted after app.launch()
+    # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-005
     method_name = f"test{slug_to_pascal(journey.journey_id)}Journey"
     lines = [
         *_header(project_root, journey, "//"),
@@ -296,10 +323,30 @@ def _compile_xcuitest(
     ]
     lines.extend(f"        {line}" for line in _xcuitest_launch_environment(source))
     lines.append("        app.launch()")
+    lines.extend(f"        {line}" for line in _xcuitest_bootstrap_waits(plan))
     for step in journey.steps:
         lines.extend(f"        {line}" for line in _xcuitest_step(step))
-    lines.extend(["    }", "", *_xcuitest_helpers(journey.steps), "}", ""])
+    lines.extend(["    }", "", *_xcuitest_helpers(journey.steps, plan), "}", ""])
     return "\n".join(lines)
+
+
+def _xcuitest_bootstrap_waits(plan: BootstrapPlan | None) -> list[str]:
+    """Render derived bootstrap waits between app.launch() and business steps."""
+    if plan is None:
+        return []
+    # Deterministic emission order — ready_marker, expected_screen, then sorted
+    # required_markers — is part of the artifact content hash; reordering would
+    # mark every consumer artifact stale and break the SC-003 ordering proof.
+    markers: list[str] = []
+    if plan.ready_marker is not None:
+        markers.append(plan.ready_marker)
+    if plan.expected_screen is not None:
+        markers.append(plan.expected_screen)
+    markers.extend(plan.required_markers)
+    return [
+        f"waitForJourneyBootstrap(app, {_swift_literal(marker)}, timeout: {plan.timeout_seconds})"
+        for marker in markers
+    ]
 
 
 def _xcuitest_launch_environment(source: JourneySourceV2) -> list[str]:
@@ -531,7 +578,10 @@ def _xcuitest_screenshot() -> list[str]:
     ]
 
 
-def _xcuitest_helpers(steps: list[dict[str, JsonValue]]) -> list[str]:
+def _xcuitest_helpers(
+    steps: list[dict[str, JsonValue]],
+    plan: BootstrapPlan | None = None,
+) -> list[str]:
     """Return Swift helpers required by rendered XCUITest steps."""
     actions = {next(iter(step.items()))[0] for step in steps}
     helpers: list[str] = []
@@ -541,7 +591,31 @@ def _xcuitest_helpers(steps: list[dict[str, JsonValue]]) -> list[str]:
         if helpers:
             helpers.append("")
         helpers.extend(_xcuitest_open_helpers())
+    # The Step 2 collapse rule guarantees a non-None plan carries >=1 wait,
+    # so the helper is only emitted when at least one call site exists.
+    if plan is not None:
+        if helpers:
+            helpers.append("")
+        helpers.extend(_xcuitest_bootstrap_helpers())
     return helpers
+
+
+def _xcuitest_bootstrap_helpers() -> list[str]:
+    """Return the Swift helper that waits for one bootstrap marker."""
+    return [
+        "    private func waitForJourneyBootstrap(",
+        "        _ app: XCUIApplication,",
+        "        _ marker: String,",
+        "        timeout: TimeInterval",
+        "    ) {",
+        "        guard app.descendants(matching: .any)[marker]",
+        "            .waitForExistence(timeout: timeout) else {",
+        f"            XCTFail(\"{BOOTSTRAP_FAILURE_PREFIX} marker '\\(marker)' "
+        'not found within \\(Int(timeout))s")',
+        "            return",
+        "        }",
+        "    }",
+    ]
 
 
 def _xcuitest_assertion_helpers() -> list[str]:

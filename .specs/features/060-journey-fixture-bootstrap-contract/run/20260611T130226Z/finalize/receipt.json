@@ -1,0 +1,31 @@
+{
+  "command": "spec-plan",
+  "created_at": "2026-06-11T13:02:26.210746+00:00",
+  "feature_slug": "060-journey-fixture-bootstrap-contract",
+  "files": [
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/changelog.md",
+      "sha256": "b943fc04ca4a1cfd3c735165e1513566c2029a79d9233edfc64b099f2e07c973"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "551bcdd9b3e24217547207f7c9be17a91a2c99375466317345297da3fac65c98"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "62406992eed27cd445e87e94a6472da93be4a1fce8c1fe998a224c85f894b3de"
+    },
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/spec.md",
+      "sha256": "d5a267c677f06430e84f6937f0cc7079ecc7bc94e857bead78faa3f45c3af66a"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "8bbd6ff27512c6d3517d61861b742e1d0b65a8c94fe53541ce1283d552feaa67",
+  "receipt_hash": "d8b1aae94f84cded0773779d5b4439ceae78b6b2ad73113ddc5aad64142fa969",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

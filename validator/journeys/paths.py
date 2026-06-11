@@ -25,6 +25,13 @@ def journey_source_root(project_root: Path) -> Path:
     return project_root / ".specs" / "journeys"
 
 
+def fixtures_contract_path(project_root: Path) -> Path:
+    """Return the project-local journey fixtures contract path."""
+    # @spec FR-001: fixtures_contract_path helper
+    # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-001
+    return journey_source_root(project_root) / "fixtures.yaml"
+
+
 def journey_directory(project_root: Path, journey_id: str) -> Path:
     """Return the canonical v2 directory for a global journey ID."""
     return journey_source_root(project_root) / journey_id

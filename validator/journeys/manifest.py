@@ -18,13 +18,17 @@ from typing import cast
 from .paths import journey_manifest_path, relative_to_project
 
 MANIFEST_SCHEMA_VERSION = 1
-COMPILER_VERSION = "journeys-v2-2"
+# journeys-v2-3: fixture bootstrap contract waits (feature 060) — bumping the
+# version invalidates every pre-contract compiled manifest unconditionally.
+COMPILER_VERSION = "journeys-v2-3"
 
 
 @dataclass(frozen=True)
 class CompiledManifest:
     """Metadata written after successful ahead-of-time journey compilation."""
 
+    # @spec FR-006: Version bump and additive fixtures_contract_hash
+    # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-006
     journey_id: str
     source_path: str
     source_hash: str
@@ -32,6 +36,7 @@ class CompiledManifest:
     runner: str
     native_output_paths: list[str] = field(default_factory=list)
     visual_contract_paths: list[str] = field(default_factory=list)
+    fixtures_contract_hash: str = ""
     schema_version: int = MANIFEST_SCHEMA_VERSION
 
 
@@ -44,6 +49,7 @@ def write_compiled_manifest(
     runner: str,
     native_output_paths: list[Path],
     visual_contract_paths: list[Path] | None = None,
+    fixtures_contract_hash: str = "",
 ) -> CompiledManifest:
     """Write a v2 compiled manifest and return the persisted model."""
     manifest = CompiledManifest(
@@ -58,6 +64,7 @@ def write_compiled_manifest(
         visual_contract_paths=[
             relative_to_project(project_root, path) for path in (visual_contract_paths or [])
         ],
+        fixtures_contract_hash=fixtures_contract_hash,
     )
     path = journey_manifest_path(project_root, journey_id)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -94,6 +101,11 @@ def read_compiled_manifest(project_root: Path, journey_id: str) -> CompiledManif
         visual_contract_paths=[str(item) for item in visual_contract_paths if isinstance(item, str)]
         if isinstance(visual_contract_paths, list)
         else [],
+        # Backward compatibility: pre-060 manifests lack the field; they are
+        # already rejected by the compiler-version check, so the tolerant ""
+        # default never needs conditional staleness logic. Removable once no
+        # consumer project predates journeys-v2-3.
+        fixtures_contract_hash=str(data.get("fixtures_contract_hash", "")),
         schema_version=int(data.get("schema_version", 0)),
     )
 

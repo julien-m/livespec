@@ -1,0 +1,36 @@
+{
+  "command": "spec-specify",
+  "created_at": "2026-06-11T12:29:42.176993+00:00",
+  "feature_slug": "060-journey-fixture-bootstrap-contract",
+  "files": [
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/changelog.md",
+      "sha256": "a523b481cf84b7cb940133a5f0f73029304f3015c726c2339ae5aa502bb2f5b0"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "5145add875caba56297dd3f11cd13f7e450488cfa1ff9111d2e4f85490c2d009"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "b5f110d229a5d6bc6e9dd8ee3672769553634051a535a158e6586ad0f35e069b"
+    },
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/spec.md",
+      "sha256": "600d03369a3c94a76e9ffd2210e8ee2cc2ed8847726194e08b8fa62dd2c6a75f"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "b9f89a76a1167585c59f93d430cb0bd3973fd529acebf111522217f56b23e692",
+  "receipt_hash": "025ada9f3ce0ea25696d1f48c1938794691c5f093adc9f9235feced9f9930294",
+  "schema_version": "1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "message": "Feature '060-journey-fixture-bootstrap-contract' is not referenced in any roadmap item",
+      "rule_id": "R1.2"
+    }
+  ]
+}

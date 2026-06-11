@@ -75,6 +75,9 @@ def _write_journey(
         else "active"
     )
     policy = "disabled" if status == "disabled" else "manual" if status == "manual" else "always"
+    # XCUITest open steps require a URL/deep link (feature 057 capability gate);
+    # web/maestro keep the relative route.
+    route = "myapp://login" if runner == "xcuitest" else "/login"
     path.write_text(
         f"""schema_version: 2
 id: {journey_id}
@@ -97,7 +100,7 @@ targets:
     runner: {runner}
 steps:
   - action: open
-    target: {{ route: "/login" }}
+    target: {{ route: "{route}" }}
   - action: click
     target: {{ text: "Login", product_contract: true }}
   - action: assert

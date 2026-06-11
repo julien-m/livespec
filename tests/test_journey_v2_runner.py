@@ -881,3 +881,136 @@ def test_run_journeys_rejects_unsupported_manifest_runner(tmp_path: Path) -> Non
     assert result.executed == []
     assert result.error_count == 1
     assert result.issues[0].code == "journey_native_runner_unsupported"
+
+
+def test_run_journeys_reclassifies_bootstrap_failure_prefix(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """AC-010: the bootstrap prefix on non-zero exit reclassifies the issue."""
+    _setup_compiled(tmp_path)
+    calls: list[list[str]] = []
+    bootstrap_line = "JOURNEY_BOOTSTRAP_FAILURE: marker 'session-list' not found within 15s"
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        calls.append(list(argv))
+        return subprocess.CompletedProcess(
+            argv,
+            65,
+            stdout=f"Test Suite started\n{bootstrap_line}\nTest Suite failed",
+            stderr="xcodebuild summary",
+        )
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 1
+    issue = result.issues[0]
+    assert issue.code == "journey_bootstrap_marker_missing"
+    # The matched line leads the message; the full output is appended after.
+    assert issue.message.splitlines()[0] == bootstrap_line
+    assert "Test Suite failed" in issue.message
+    assert "xcodebuild summary" in issue.message
+    # No xcresult parsing: only the native runner command itself was executed.
+    assert len(calls) == 1
+    assert all("xcresult" not in part for call in calls for part in call)
+
+
+def test_run_journeys_keeps_native_run_failed_without_prefix(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """AC-010: non-zero exits without the prefix keep journey_native_run_failed."""
+    _setup_compiled(tmp_path)
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(argv, 1, stdout="business assertion failed", stderr="")
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 1
+    assert result.issues[0].code == "journey_native_run_failed"
+
+
+def test_run_journeys_ignores_prefix_on_passing_run(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Edge case: stray prefix text in a passing run changes nothing."""
+    _setup_compiled(tmp_path)
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(
+            argv,
+            0,
+            stdout="log noise JOURNEY_BOOTSTRAP_FAILURE: not a real failure",
+            stderr="",
+        )
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    assert result.executed == ["onboarding-first-project"]
+
+
+def test_run_journeys_fails_stale_contract_hash_without_recompiling(tmp_path: Path) -> None:
+    """AC-009: a fixtures.yaml change after compilation marks artifacts stale."""
+    specs = _setup_compiled(tmp_path)
+    contract_path = specs / "journeys" / "fixtures.yaml"
+    contract_path.write_text("schema_version: 1\n", encoding="utf-8")
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project", execute=False)
+
+    assert result.error_count == 1
+    assert result.issues[0].code == "journey_compiled_stale"
+    assert "fixtures contract" in result.issues[0].message
+
+
+def test_run_journeys_fails_when_contract_deleted_after_compile(tmp_path: Path) -> None:
+    """AC-009: deleting the contract after compile is a hash mismatch."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    _write_v2_journey(specs)
+    contract_path = specs / "journeys" / "fixtures.yaml"
+    contract_path.write_text("schema_version: 1\n", encoding="utf-8")
+    compile_result = compile_journeys(tmp_path, journey="onboarding-first-project")
+    assert compile_result.error_count == 0
+    contract_path.unlink()
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project", execute=False)
+
+    assert result.error_count == 1
+    assert result.issues[0].code == "journey_compiled_stale"
+
+
+def test_run_journeys_reports_compiler_stale_before_contract_hash(tmp_path: Path) -> None:
+    """AC-008: pre-v2-3 manifests report journey_compiler_stale, never a hash mismatch."""
+    specs = _setup_compiled(tmp_path)
+    manifest_path = specs / "journeys" / "onboarding-first-project" / "compiled" / "manifest.json"
+    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    data["compiler_version"] = "journeys-v2-2"
+    # Tolerant reader: pre-060 manifests have no fixtures_contract_hash field.
+    data.pop("fixtures_contract_hash", None)
+    manifest_path.write_text(json.dumps(data), encoding="utf-8")
+    (specs / "journeys" / "fixtures.yaml").write_text("schema_version: 1\n", encoding="utf-8")
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project", execute=False)
+
+    assert result.error_count == 1
+    assert result.issues[0].code == "journey_compiler_stale"

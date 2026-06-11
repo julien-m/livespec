@@ -20,15 +20,18 @@ import typer
 
 from validator.cli_commands._common import emit_summary, require_specs_root
 from validator.journeys import compile_journeys, scan_journeys, validate_journeys
+from validator.journeys.fixtures import scaffold_fixtures_contract
 from validator.journeys.impact import analyze_journey_impacts
 from validator.journeys.index import build_journey_index
 from validator.journeys.migration import migrate_v1_journeys
 from validator.journeys.models import JourneyIssue
-from validator.journeys.paths import relative_to_project
+from validator.journeys.paths import fixtures_contract_path, relative_to_project
 from validator.journeys.runner import run_journeys
 from validator.journeys.schema import RunStage
 
 journey_app = typer.Typer(help="Validate, compile, run, and inspect User Journeys v2.")
+fixtures_app = typer.Typer(help="Manage the journey fixtures bootstrap contract.")
+journey_app.add_typer(fixtures_app, name="fixtures")
 RunStageOption = Annotated[RunStage, typer.Option("--stage", help="Run policy stage.")]
 ChangedFileOption = Annotated[
     list[Path] | None,
@@ -254,6 +257,31 @@ def migrate_command(
             errors=len(result.issues),
         )
     raise typer.Exit(0 if not result.issues else 1)
+
+
+@fixtures_app.command(name="scaffold")
+def fixtures_scaffold_command() -> None:
+    """Scaffold .specs/journeys/fixtures.yaml from existing journey fixtures."""
+    # @spec FR-009: journey fixtures scaffold CLI subcommand
+    # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-009
+    project_root = require_specs_root()
+    if fixtures_contract_path(project_root).exists():
+        # Idempotence: the existing contract is never touched; the no-op exits 0
+        # so migration v21 stays green on already-scaffolded projects.
+        typer.echo("fixtures contract already present")
+        emit_summary("journey fixtures scaffold", "OK", scaffolded=0)
+        return
+    try:
+        written = scaffold_fixtures_contract(project_root)
+    except OSError as error:
+        typer.echo(f"failed to write fixtures contract: {error}", err=True)
+        raise typer.Exit(1) from error
+    if written is None:
+        typer.echo("no fixture journeys found")
+        emit_summary("journey fixtures scaffold", "OK", scaffolded=0)
+        return
+    typer.echo(f"scaffolded: {relative_to_project(project_root, written)}")
+    emit_summary("journey fixtures scaffold", "OK", scaffolded=1)
 
 
 def journey_category_counts(project_root: Path, feature: str | None = None) -> tuple[int, int, int]:

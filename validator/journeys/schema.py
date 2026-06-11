@@ -199,6 +199,15 @@ class JourneyTarget(JourneyBaseModel):
         return value
 
 
+class BootstrapOverride(JourneyBaseModel):
+    """Journey-level bootstrap override under `preconditions.bootstrap`."""
+
+    # @spec FR-003: Optional preconditions.bootstrap override
+    # — .specs/features/060-journey-fixture-bootstrap-contract/spec.md#fr-003
+    expected_screen: str | None = None
+    required_markers: list[str] = Field(default_factory=list)
+
+
 class Preconditions(JourneyBaseModel):
     """Project state required before running a journey."""
 
@@ -206,6 +215,7 @@ class Preconditions(JourneyBaseModel):
     fixtures: list[str] = Field(default_factory=list)
     feature_flags: list[str] = Field(default_factory=list)
     mocks: list[str] = Field(default_factory=list)
+    bootstrap: BootstrapOverride | None = None
 
 
 class JourneyStep(JourneyBaseModel):
@@ -275,6 +285,7 @@ class JourneySourceV2(JourneyBaseModel):
 
 
 __all__ = [
+    "BootstrapOverride",
     "CoverageRef",
     "CoverageRefKind",
     "JourneyAction",

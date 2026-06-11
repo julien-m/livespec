@@ -7,6 +7,20 @@
 
 ---
 
+## 2026-06-11 — [Feature 060] ### Pipeline: /spec-feature completed end-to-end
+<!-- finalize:spec-feature:2026-06-11:61c37125 -->
+
+## 2026-06-11 — [Feature 060] Test: 100% AC covered (15/15), 0 tests generated — 102/102 feature tests (0 skips), full no-LLM suite green, ruff + pyright clean
+
+## 2026-06-11 — [Feature 060] Implemented: Journey Fixture Bootstrap Contract — fixtures.yaml contract, derived XCUITest bootstrap waits, 5 blocking validation rules, journeys-v2-3 + contract hash staleness, bootstrap failure reclassification, scaffold CLI + migration v21
+<!-- finalize:spec-implement:2026-06-11:b2cd1c13 -->
+
+## 2026-06-11 — Plan created: Journey Fixture Bootstrap Contract — 11 implementation steps, 4 diagrams
+<!-- finalize:spec-plan:2026-06-11:8bbd6ff2 -->
+
+## 2026-06-11 — [Feature 060] Spec created: Journey Fixture Bootstrap Contract — 5 stories, 15 AC, 11 FR
+<!-- finalize:spec-specify:2026-06-11:15d1d511 -->
+
 ## 2026-06-11 — [Feature 059] /spec-feature pipeline complete — all phases done, 15 audit findings fixed, target gates green; full baseline has 1 pre-existing protected failure
 <!-- finalize:spec-feature:2026-06-11:4089ae8a -->
 

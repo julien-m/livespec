@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import subprocess
@@ -347,6 +348,23 @@ def test_compile_v2_xcuitest_injects_preconditions_before_launch(
     specs.mkdir()
     _write_feature(specs, "001-onboarding")
     _write_feature(specs, "012-projects")
+    # Feature 060: fixture journeys now require a contract; seed-only entries
+    # (no screens/markers, no bootstrap key) keep this codegen wait-free.
+    (specs / "journeys" / "fixtures.yaml").parent.mkdir(parents=True, exist_ok=True)
+    (specs / "journeys" / "fixtures.yaml").write_text(
+        """
+schema_version: 1
+fixtures:
+  imported-workout:
+    surfaces: [web]
+  short-workout-boundaries:
+    surfaces: [web]
+mocks:
+  storekit-pro:
+    surfaces: [web]
+""".lstrip(),
+        encoding="utf-8",
+    )
     source = _write_v2_journey(specs)
     source.write_text(
         source.read_text(encoding="utf-8")
@@ -483,6 +501,218 @@ privacy:
     assert contract["instructions"] == (
         "Verify that the card keeps visible padding and centered text."
     )
+
+
+FIXTURES_CONTRACT_YAML = """
+schema_version: 1
+bootstrap:
+  ready_marker:
+    ios: ui-test-bootstrap-ready
+  timeout_seconds: 20
+fixtures:
+  imported-workout:
+    surfaces: [ios]
+    expected_screen:
+      ios: iphone-session-page
+    required_markers:
+      ios: [zz-last-marker, session-exercise-list]
+  short-workout-boundaries:
+    surfaces: [ios]
+    required_markers:
+      ios: [boundary-marker, session-exercise-list]
+mocks:
+  storekit-pro:
+    surfaces: [ios]
+""".lstrip()
+
+
+def _setup_xcuitest_fixture_project(tmp_path: Path, *, contract: str | None) -> Path:
+    """Build an XCUITest journey declaring fixtures, with an optional contract."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace("surface: web", "surface: ios")
+        .replace("route: /signup", 'route: "myapp://signup"')
+        .replace(
+            "steps:\n",
+            """
+preconditions:
+  fixtures:
+    - imported-workout
+    - short-workout-boundaries
+  mocks:
+    - storekit-pro
+steps:
+""".lstrip(),
+        ),
+        encoding="utf-8",
+    )
+    if contract is not None:
+        contract_path = specs / "journeys" / "fixtures.yaml"
+        contract_path.write_text(contract, encoding="utf-8")
+    return source
+
+
+def test_compile_v2_xcuitest_emits_bootstrap_waits_in_order(tmp_path: Path) -> None:
+    """AC-005: waits follow app.launch() in ready -> screen -> sorted marker order."""
+    _setup_xcuitest_fixture_project(tmp_path, contract=FIXTURES_CONTRACT_YAML)
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+    assert result.error_count == 0, [issue.message for issue in result.issues]
+    assert manifest is not None
+    text = (tmp_path / manifest.native_output_paths[0]).read_text(encoding="utf-8")
+    fixtures_index = text.index('app.launchEnvironment["UI_TEST_JOURNEY_FIXTURES"]')
+    launch_index = text.index("        app.launch()")
+    ready_index = text.index('waitForJourneyBootstrap(app, "ui-test-bootstrap-ready", timeout: 20)')
+    screen_index = text.index('waitForJourneyBootstrap(app, "iphone-session-page", timeout: 20)')
+    marker_indices = [
+        text.index(f'waitForJourneyBootstrap(app, "{marker}", timeout: 20)')
+        for marker in ("boundary-marker", "session-exercise-list", "zz-last-marker")
+    ]
+    first_step_index = text.index('openJourneyURL("myapp://signup", in: app)')
+    assert fixtures_index < launch_index < ready_index < screen_index
+    assert screen_index < marker_indices[0] < marker_indices[1] < marker_indices[2]
+    assert marker_indices[2] < first_step_index
+    assert "private func waitForJourneyBootstrap(" in text
+    assert (
+        "XCTFail(\"JOURNEY_BOOTSTRAP_FAILURE: marker '\\(marker)' "
+        'not found within \\(Int(timeout))s")' in text
+    )
+
+
+def test_compile_v2_xcuitest_seed_only_fixture_waits_ready_only(tmp_path: Path) -> None:
+    """AC-002: a fixture without navigation derives a ready-marker-only wait."""
+    contract = """
+schema_version: 1
+bootstrap:
+  ready_marker:
+    ios: ui-test-bootstrap-ready
+fixtures:
+  imported-workout:
+    surfaces: [ios]
+  short-workout-boundaries:
+    surfaces: [ios]
+mocks:
+  storekit-pro:
+    surfaces: [ios]
+""".lstrip()
+    _setup_xcuitest_fixture_project(tmp_path, contract=contract)
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+    assert result.error_count == 0, [issue.message for issue in result.issues]
+    assert manifest is not None
+    text = (tmp_path / manifest.native_output_paths[0]).read_text(encoding="utf-8")
+    assert text.count("waitForJourneyBootstrap(app, ") == 1
+    assert 'waitForJourneyBootstrap(app, "ui-test-bootstrap-ready", timeout: 15)' in text
+
+
+def test_compile_v2_fixture_less_codegen_is_identity_snapshot(tmp_path: Path) -> None:
+    """AC-014 / SC-005: fixture-less journeys keep byte-identical codegen."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    source.write_text(
+        source.read_text(encoding="utf-8")
+        .replace("runner: playwright", "runner: xcuitest")
+        .replace("route: /signup", 'route: "myapp://signup"'),
+        encoding="utf-8",
+    )
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+    assert result.error_count == 0, [issue.message for issue in result.issues]
+    assert manifest is not None
+    text = (tmp_path / manifest.native_output_paths[0]).read_text(encoding="utf-8")
+    # Snapshot captured from the journeys-v2-2 compiler before this feature:
+    # the artifact body must stay byte-identical (only the manifest version moves).
+    expected = f"""// livespec-journey-id: onboarding-first-project
+// livespec-journey-source-hash: {manifest.source_hash}
+// livespec-journey-source: .specs/journeys/onboarding-first-project/journey.yaml
+import Foundation
+import XCTest
+
+final class OnboardingFirstProjectJourney: XCTestCase {{
+    func testOnboardingFirstProjectJourney() throws {{
+        let app = XCUIApplication()
+        app.launch()
+        openJourneyURL("myapp://signup", in: app)
+    }}
+
+    private func openJourneyURL(_ urlString: String, in app: XCUIApplication) {{
+        guard let url = URL(string: urlString) else {{
+            XCTFail("invalid journey URL: \\(urlString)")
+            return
+        }}
+        app.open(url)
+    }}
+}}
+"""
+    assert text == expected
+    assert "waitForJourneyBootstrap" not in text
+
+
+def test_compile_v2_manifest_records_version_bump_and_contract_hash(tmp_path: Path) -> None:
+    """AC-008 / AC-009: manifests record journeys-v2-3 and the contract sha256."""
+    _setup_xcuitest_fixture_project(tmp_path, contract=FIXTURES_CONTRACT_YAML)
+    contract_path = tmp_path / ".specs" / "journeys" / "fixtures.yaml"
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+    assert result.error_count == 0, [issue.message for issue in result.issues]
+    assert manifest is not None
+    assert manifest.compiler_version == "journeys-v2-3"
+    expected_hash = hashlib.sha256(contract_path.read_bytes()).hexdigest()
+    assert manifest.fixtures_contract_hash == expected_hash
+
+
+def test_compile_v2_manifest_contract_hash_empty_without_contract(tmp_path: Path) -> None:
+    """AC-009: fixture-less projects record an empty contract hash."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    _write_v2_journey(specs)
+
+    result = compile_journeys(tmp_path, journey="onboarding-first-project")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    assert manifest is not None
+    assert manifest.compiler_version == "journeys-v2-3"
+    assert manifest.fixtures_contract_hash == ""
+
+
+def test_manifest_reader_tolerates_missing_contract_hash_field(tmp_path: Path) -> None:
+    """AC-009: manifests written without the field parse with "" and schema 1."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_feature(specs, "012-projects")
+    source = _write_v2_journey(specs)
+    compile_journeys(tmp_path, journey="onboarding-first-project")
+    manifest_path = source.parent / "compiled" / "manifest.json"
+    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    del data["fixtures_contract_hash"]
+    manifest_path.write_text(json.dumps(data), encoding="utf-8")
+
+    manifest = read_compiled_manifest(tmp_path, "onboarding-first-project")
+
+    assert manifest is not None
+    assert manifest.fixtures_contract_hash == ""
+    assert manifest.schema_version == 1
 
 
 def test_compile_v2_writes_playwright_native_visual_assertions(tmp_path: Path) -> None:
