@@ -19,7 +19,8 @@
   "files_changed_count": integer,            // required, >= 0
   "timestamp":           "YYYY-MM-DDTHH:MM:SS",  // required, ISO 8601 prefix
   "commit_hash":         "string" | null,    // optional, present on status=OK
-  "error":               "string" | null     // optional, present on status=BLOCKED
+  "error":               "string" | null,    // optional, present on status=BLOCKED
+  "run_artifact":        "string" | null     // child pipeline's spec-feature .specs/.runs/ artifact (059 AC-011)
 }
 ```
 
@@ -36,20 +37,27 @@
   "files_changed_count": 13,
   "timestamp": "2026-05-04T15:32:18",
   "commit_hash": "c99d3f6b2",
-  "error": null
+  "error": null,
+  "run_artifact": ".specs/.runs/spec-feature-2026-06-11T10-00-00.000000-e9c4d1f7.json"
 }
 ⟪SHIP_RESULT_END_e9c4d1f7⟫
 ```
 
 ## Critical safety property
 
-**`/spec-ship` MUST NOT invoke `livespec git delete <branch>` until the SHIP_RESULT is parsed AND validated.**
+**`/spec-ship` MUST NOT invoke `livespec git merge` or `livespec git delete <branch>` until the SHIP_RESULT is parsed AND validated AND the child run artifact re-verifies as `success`.**
 
-Without this gate, a malformed result (or an injected fake) could trigger a delete on the wrong branch. The parser is the single point of validation; the delete is gated on `result.status == "OK"` AND `result.branch == "feature/<resolved-slug>"`.
+Without this gate, a malformed result (or an injected fake) could trigger a merge/delete on the wrong branch. The parser is the single point of text validation; merge/delete are gated on ALL of:
+
+1. `result.status == "OK"` AND `result.branch == "feature/<resolved-slug>"` (existing gate).
+2. `result.run_artifact` is non-null and `livespec verify-output spec-feature --run <result.run_artifact> --json` re-evaluates to `verify_result.outcome == "success"` (059 AC-011/AC-012). The artifact path is **only a pointer, never a verdict** — the trust decision derives from independently re-evaluating the on-disk artifact.
+3. The artifact's `command` is `spec-feature` and its `feature` equals `result.feature_slug` (foreign/stale artifacts are Blocked).
+
+`status: OK` with a null/absent/unreadable/malformed `run_artifact`, or a non-success machine outcome, marks the feature **Blocked** in `ship.md` — an OK without a verifiable artifact is not trusted. `status: BLOCKED` is never overturned by a passing artifact (artifact backing demotes, never promotes — EC-007).
 
 ## Parser behaviour
 
-Identical to PHASE_RESULT: scans last 30 lines, last matching pair wins, JSON body validated against `ShipResult`. No legacy fallback (SHIP_RESULT is a Chantier-2 introduction).
+Identical to PHASE_RESULT: scans last 30 lines, last matching pair wins, JSON body validated against `ShipResult`. Legacy key-value blocks are also tolerated for compatibility with older agent prompts; `RUN_ARTIFACT:` maps to `run_artifact` and blank/missing values normalize to `null`.
 
 ## Caller behaviour
 

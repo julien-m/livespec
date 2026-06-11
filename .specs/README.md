@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-10
+> Last updated: 2026-06-11
 
 
 ---
@@ -96,6 +96,7 @@
 | 056 | Executable User Journeys | Implemented | 2026-06-01 | 2026-06-02 | [spec](features/056-executable-user-journeys/spec.md), [plan](features/056-executable-user-journeys/plan.md), [implementation](features/056-executable-user-journeys/implementation.md) |
 | 057 | Cross-Feature User Journeys v2 | Implemented | 2026-06-04 | 2026-06-09 | [spec](features/057-cross-feature-user-journeys-v2/spec.md), [plan](features/057-cross-feature-user-journeys-v2/plan.md), [implementation](features/057-cross-feature-user-journeys-v2/implementation.md) |
 | 058 | Deterministic Finalization | Implemented | 2026-06-10 | 2026-06-10 | [spec](features/058-deterministic-finalization/spec.md), [plan](features/058-deterministic-finalization/plan.md), [implementation](features/058-deterministic-finalization/implementation.md) |
+| 059 | Pipeline Verify Phase | Implemented | 2026-06-11 | 2026-06-11 | [spec](features/059-pipeline-verify-phase/spec.md), [plan](features/059-pipeline-verify-phase/plan.md), [implementation](features/059-pipeline-verify-phase/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -119,16 +120,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-11 | Feature | [Feature 059] /spec-feature pipeline complete — all phases done, 15 audit findings fixed, target gates green; full baseline has 1 pre-existing protected failure |
+| 2026-06-11 | Feature | [Feature 059] Test: 100% AC covered (15/15), 0 tests generated — targeted 218/218, unit 1824 passed (1 pre-existing protected failure), integration 3a 75/75 |
+| 2026-06-11 | Feature | [Feature 059] Implemented: Pipeline Verify Phase — enforced archive.run, supervisor Verify phase, artifact-backed SHIP_RESULT, transcript capture |
+| 2026-06-11 | Plan | [Feature 059] Plan created: Pipeline Verify Phase — 10 implementation steps, 3 diagrams |
+| 2026-06-11 | Spec | [Feature 059] Spec created: Pipeline Verify Phase — 4 stories, 15 AC, 11 FR |
+| 2026-06-11 | Check | [Feature 039.1] Check: 100% verified (11/11 FR, 13/13 AC); warnings recorded for AC format, tree hygiene, and oversized tests |
 | 2026-06-10 | Feature | [Feature 039.1] /spec-feature pipeline complete — all phases done, audit findings fixed, gates green |
 | 2026-06-10 | Feature | [Feature 039.1] Test: 100% AC covered (13/13), 0 tests generated, feature suite green; full baseline has 1 pre-existing failure |
 | 2026-06-10 | Feature | [Feature 039.1] Implemented: Goal Archive & Run Artifacts v2 — livespec goal archive (RunArtifact v2), shared verify-output engine, real preview.py, 039/040 truth-fixes |
 | 2026-06-10 | Plan | [Feature 039.1] Plan created: Goal Archive & Run Artifacts v2 — 9 implementation steps, 4 diagrams |
-| 2026-06-10 | Spec | [Feature 039.1] Spec created: Goal Archive & Run Artifacts v2 — 5 stories, 13 AC, 11 FR |
-| 2026-06-10 | Feature | 001 auto-llm-review: fix cc-hub codex provider schema passing (temp file + envelope unwrap + strict-mode normalization) |
-| 2026-06-10 | Feature | 058 deterministic-finalization: full /spec-feature pipeline complete (specify, plan, implement, test all green) |
-| 2026-06-10 | Feature | [Feature 058] Test: 100% AC covered (12/12), 0 tests generated — 135/135 feature tests passing incl. chaos |
-| 2026-06-10 | Feature | [Feature 058] Implemented: Deterministic Finalization — livespec finalize apply/verify, finalize.registry goal evidence family, opt-in lock retry |
-| 2026-06-10 | Plan | [Feature 058] Plan created: Deterministic Finalization — 9 implementation steps, 4 diagrams |
 <!-- readme:activity:end -->
 
 ---
@@ -150,3 +151,13 @@
 <!-- finalize:spec-test:2026-06-10:cea2d0c7 -->
 
 <!-- finalize:spec-feature:2026-06-10:645cecd3 -->
+
+<!-- finalize:spec-specify:2026-06-11:799a2740 -->
+
+<!-- finalize:spec-plan:2026-06-11:79911967 -->
+
+<!-- finalize:spec-implement:2026-06-11:0cb1ffd0 -->
+
+<!-- finalize:spec-test:2026-06-11:58a3c008 -->
+
+<!-- finalize:spec-feature:2026-06-11:4089ae8a -->

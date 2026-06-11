@@ -171,6 +171,10 @@ conventions: <mandatory read list — sub-domains + ai-ressources file paths der
 The agent uses `feature_name` for all `livespec pipeline update` CLI calls.
 The `conventions` field is the structured payload described in **Read** [`~/.claude/livespec/references/conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) § Step 4 — the supervisor builds it by reading `.conventions/index.md`, selecting the relevant sub-domains for the phase, and resolving the `→ $AIRESOURCES/...` paths. The sub-agent MUST read every file in the list and follow its rules. The sub-agent does NOT need to read `.conventions/index.md` itself — the supervisor has already done the routing.
 
+<!-- @spec FR-006: RUN_ARTIFACT field in all goal-locked phase schemas — .specs/features/059-pipeline-verify-phase/spec.md#fr-006 -->
+
+> **RUN_ARTIFACT (059 AC-008):** every goal-locked phase schema carries a `RUN_ARTIFACT:` line (canonical JSON key `run_artifact`). The agent sets it to the **exact `.specs/.runs/` path printed by its own `livespec goal archive`** — the same path accepted for its `archive.run` proof. The supervisor verifies this exact artifact in the § Supervisor Verify Phase. Legacy blocks without the line parse with `run_artifact = null`.
+
 ### Specify agent schema
 
 ```
@@ -184,6 +188,7 @@ REVIEW: PASS | FINDINGS
 FINDINGS_COUNT: N BLOCKING, N WARNING, N INFO
 FINDINGS_DETAIL:
   [verbatim verifier findings table — omit entire field if REVIEW: PASS]
+RUN_ARTIFACT: .specs/.runs/spec-specify-<ISO-fs>-<hash8>.json
 SUMMARY: 2-3 sentences describing what the spec covers
 ```
 
@@ -199,8 +204,22 @@ REVIEW: PASS | FINDINGS
 FINDINGS_COUNT: N BLOCKING, N WARNING, N INFO
 FINDINGS_DETAIL:
   [verbatim verifier findings table — omit entire field if REVIEW: PASS]
+RUN_ARTIFACT: .specs/.runs/spec-plan-<ISO-fs>-<hash8>.json
 SUMMARY: 2-3 sentences describing the implementation approach
 ```
+
+### Preflight agent schema
+
+```
+PHASE_RESULT: OK | BLOCKED
+PHASE: preflight
+FEATURE: NNN-feature-name
+VERDICT: READY | WARNINGS | BLOCKED
+RUN_ARTIFACT: .specs/.runs/spec-preflight-<ISO-fs>-<hash8>.json
+SUMMARY: 1-2 sentences of preflight outcome
+```
+
+Consumed by Phase 2.7. The Preflight result rides the same PHASE_RESULT contract with `phase: preflight`; the READY/WARNINGS/BLOCKED verdict goes in `extra` (canonical JSON) or the `VERDICT:` line (legacy KV).
 
 ### Implement agent schema
 
@@ -211,6 +230,7 @@ FEATURE: NNN-feature-name
 FILES_CHANGED: N
 STEPS_DONE: N/total
 TESTS: N passed, N failed
+RUN_ARTIFACT: .specs/.runs/spec-implement-<ISO-fs>-<hash8>.json
 BLOCKED_REASON: one line (only if BLOCKED)
 SUMMARY: 2-3 sentences of what was implemented
 ```
@@ -223,6 +243,7 @@ PHASE: test
 FEATURE: NNN-feature-name
 AC_COVERAGE: N/total ACs covered
 TESTS: N passed, N failed
+RUN_ARTIFACT: .specs/.runs/spec-test-<ISO-fs>-<hash8>.json
 BLOCKED_REASON: one line (only if BLOCKED)
 SUMMARY: 2-3 sentences of test results
 ```
@@ -246,7 +267,34 @@ If a phase agent reaches the command timeout, exits without a parseable `PHASE_R
 - Implement recovery: if `progress.md` and `implementation.md` exist but no PHASE_RESULT, verify app code changed, requirement mappings exist, and declared tests ran; then synthesize `PHASE_RESULT: OK`, run `livespec pipeline update --feature NNN-feature-name --phase implement --status done --timestamp`, and continue to Phase 3.5. If missing, print `BLOCKED - phase_agent_timeout - implement missing progress.md, implementation.md, code changes, or test proof`.
 - Test recovery: if test report artifacts exist but no PHASE_RESULT, parse pass/fail counts; continue only on zero failures. Otherwise print `BLOCKED - phase_agent_timeout - test result unavailable`.
 
-This recovery is not a bypass: it only converts already-written, validated phase artifacts into the compact result the supervisor needed.
+This recovery is not a bypass: it only converts already-written, validated phase artifacts into the compact result the supervisor needed. Synthesized PHASE_RESULTs have `run_artifact = null` → the § Supervisor Verify Phase step 2 fallback (latest sub-command artifact) applies before the phase is considered done.
+
+### Supervisor Verify Phase
+
+<!-- @spec FR-007: Supervisor Verify phase — .specs/features/059-pipeline-verify-phase/spec.md#fr-007 -->
+
+Executed by the supervisor **after parsing each goal-locked PHASE_RESULT** (Specify, Plan, Preflight, Implement, Test) and before any `pipeline update --status done` for that phase. The declaration alone is never trusted — the machine verdict of the archived run artifact is cross-checked.
+
+1. **Resolve the sub-command** (`spec-specify`, `spec-plan`, `spec-preflight`, `spec-implement`, `spec-test`) via alias normalization (`validator/command_registry.py` `canonical_command_name`).
+2. **Resolve the artifact.** `RUN_ARTIFACT` present → run:
+   ```bash
+   livespec verify-output <sub-command> --run <RUN_ARTIFACT> --json
+   ```
+   Absent (legacy agent output or § Phase Agent Timeout and Artifact Recovery) → fall back to the lexicographically latest `.specs/.runs/<sub-command>-*.json` and verify that path. None found → `BLOCKED at step <N> - verification_failed - no run artifact for <sub-command>` — a phase without any run artifact cannot pass Verify. The fallback artifact still passes steps 3-4 below, so it can never silently promote a stale or foreign success.
+3. **Explicit command-identity check (EC-005):** compare the loaded artifact's `command` field against the resolved sub-command. A mismatch is `blocked` — it is checked explicitly, never assumed from rule evaluation.
+3b. **Explicit feature-identity check:** compare the loaded artifact's `feature` field against the parsed `PHASE_RESULT.feature_slug`. A mismatch emits `BLOCKED at step <N> - verification_failed - foreign feature artifact` — without this check, the latest fallback (step 2) could satisfy an `OK` declaration with another feature's successful artifact.
+4. **Cross-check matrix** — exhaustive over the declared status domain (`status` is `Literal["OK","BLOCKED"]`; there is no third declared state) × machine outcome domain (top-level `outcome` from the `livespec verify-output --json` envelope):
+
+   | Declared | Machine outcome | Supervisor action |
+   |---|---|---|
+   | OK | success | `livespec pipeline update --feature <slug> --phase <phase> --status done`, spawn next phase |
+   | OK | drift | `BLOCKED at step <N> - verification_failed - declared OK but machine outcome drift`; `pipeline update --status blocked`; no next spawn |
+   | OK | error | same canonical BLOCKED path (reason names `error`) |
+   | OK | blocked | same canonical BLOCKED path (reason names `blocked`) |
+   | OK | artifact missing/foreign | canonical BLOCKED (steps 2-3b above) |
+   | BLOCKED | any (incl. success) | existing blocked handling — machine verdict never overturns a declared failure (EC-006) |
+
+The Verify phase demotes, never promotes: a passing artifact cannot un-block a declared `BLOCKED` (EC-006), and a declared `OK` over a non-success artifact always blocks the pipeline.
 
 ### FINDINGS_DETAIL injection on retry
 
@@ -486,6 +534,11 @@ These files are the primary UI behavior contract for Specify, Plan, Implement, a
    `.agent-sync/skills/spec-feature/SKILL.md § Phase 1.5`: dispatch the livespec-verifier agent in
    spec-review mode, collect its report, and include it in your PHASE_RESULT.
 
+   Capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture
+   ($TMPDIR/livespec-goals/transcripts/spec-specify-<hash8>.out/.err) and pass them to
+   `livespec goal archive --stdout-file/--stderr-file`. Set RUN_ARTIFACT to the exact
+   artifact path printed by your own `goal archive` (the path proven for archive.run).
+
    Output a PHASE_RESULT block (Specify agent schema from § PHASE_RESULT Schemas)
    as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
    ```
@@ -498,9 +551,10 @@ These files are the primary UI behavior contract for Specify, Plan, Implement, a
 
 4. Receive PHASE_RESULT from the Specify agent.
    - If `PHASE_RESULT: BLOCKED` → display error, run `livespec pipeline update --feature NNN-feature-name --phase specify --status blocked`, stop.
+   - If `PHASE_RESULT: OK` → run the § Supervisor Verify Phase (`livespec verify-output spec-specify --run <RUN_ARTIFACT> --json`, cross-check matrix). On disagreement → canonical BLOCKED, `pipeline update --status blocked`, stop.
 
 5. Run: `livespec pipeline update --feature NNN-feature-name --phase specify --status done --timestamp`
-   *(Only if PHASE_RESULT: OK)*
+   *(Only if PHASE_RESULT: OK AND Verify outcome success)*
 
 ---
 
@@ -574,6 +628,11 @@ After Gate 1 resolves, do not create branches, commits, tags, pushes, or any oth
    `.agent-sync/skills/spec-feature/SKILL.md § Phase 2.5`: dispatch the livespec-verifier agent in
    plan-review mode, collect its report, and include it in your PHASE_RESULT.
 
+	   Capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture
+	   ($TMPDIR/livespec-goals/transcripts/spec-plan-<hash8>.out/.err) and pass them to
+	   `livespec goal archive --stdout-file/--stderr-file`. Set RUN_ARTIFACT to the exact
+	   artifact path printed by your own `goal archive` (the path proven for archive.run).
+
 	   Output a PHASE_RESULT block (Plan agent schema from § PHASE_RESULT Schemas)
 	   as the LAST thing you output, then stop immediately. Do not keep editing docs after plan.md is written.
 	   Do not ask the user any questions — proceed autonomously.
@@ -582,9 +641,10 @@ After Gate 1 resolves, do not create branches, commits, tags, pushes, or any oth
 4. Receive PHASE_RESULT from the Plan agent.
 	   - If `PHASE_RESULT: BLOCKED` → display error, run `livespec pipeline update --feature NNN-feature-name --phase plan --status blocked`, stop.
 	   - If the agent exits or times out after writing `plan.md` but without PHASE_RESULT, apply § Phase Agent Timeout and Artifact Recovery before blocking.
+	   - If `PHASE_RESULT: OK` → run the § Supervisor Verify Phase (`livespec verify-output spec-plan --run <RUN_ARTIFACT> --json`, cross-check matrix). On disagreement → canonical BLOCKED, `pipeline update --status blocked`, stop.
 
 5. Run: `livespec pipeline update --feature NNN-feature-name --phase plan --status done --timestamp`
-   *(Only if PHASE_RESULT: OK)*
+   *(Only if PHASE_RESULT: OK AND Verify outcome success)*
 
 ---
 
@@ -629,8 +689,9 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --
 Before starting implementation, run a light preflight check:
 
 1. If `.specs/preflight.md` does not exist → log warning and continue
-2. Spawn an independent native sub-agent whose first prompt line is `/spec-preflight --light` with the current feature name as context
-3. Gate behavior:
+2. Spawn an independent native sub-agent whose first prompt line is `/spec-preflight --light` with the current feature name as context. Instruct it to capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture, pass them to `livespec goal archive --stdout-file/--stderr-file`, and return a PHASE_RESULT (Preflight agent schema, `phase: preflight`) whose `RUN_ARTIFACT` is the exact artifact path printed by its own `goal archive`.
+3. Receive the Preflight PHASE_RESULT and run the § Supervisor Verify Phase (`livespec verify-output spec-preflight --run <RUN_ARTIFACT> --json`, cross-check matrix). On disagreement → canonical BLOCKED, `livespec pipeline update --feature NNN-feature-name --phase preflight --status blocked`, stop.
+4. Gate behavior:
    - Any `critical` check failed → **STOP**. Write `preflight-report.md` with BLOCKED verdict. Report blocker + recovery command. Run: `livespec pipeline update --feature NNN-feature-name --phase preflight --status blocked`
    - Only `warning` checks failed → write `preflight-report.md` with WARNINGS verdict, display warning, continue
    - All pass → write `preflight-report.md` with READY verdict, continue to Phase 3
@@ -660,15 +721,21 @@ This ensures all tools and credentials are available before the autonomous imple
 
    [Universal Agent Context fields: feature_name, feature_dir, feature_description, active_flags, conventions]
 
+   Capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture
+   ($TMPDIR/livespec-goals/transcripts/spec-implement-<hash8>.out/.err) and pass them to
+   `livespec goal archive --stdout-file/--stderr-file`. Set RUN_ARTIFACT to the exact
+   artifact path printed by your own `goal archive` (the path proven for archive.run).
+
    Output a PHASE_RESULT block (Implement agent schema from § PHASE_RESULT Schemas)
    as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
    ```
 
 4. Receive PHASE_RESULT from the Implement agent.
    - If `PHASE_RESULT: BLOCKED` → display error with `BLOCKED_REASON`, run `livespec pipeline update --feature NNN-feature-name --phase implement --status blocked`, stop.
+   - If `PHASE_RESULT: OK` → run the § Supervisor Verify Phase (`livespec verify-output spec-implement --run <RUN_ARTIFACT> --json`, cross-check matrix). On disagreement → canonical BLOCKED, `pipeline update --status blocked`, stop.
 
 5. Run: `livespec pipeline update --feature NNN-feature-name --phase implement --status done --timestamp`
-   *(Only if PHASE_RESULT: OK)*
+   *(Only if PHASE_RESULT: OK AND Verify outcome success)*
 
 ---
 
@@ -688,6 +755,11 @@ This ensures all tools and credentials are available before the autonomous imple
 
    This command audits AC coverage, generates missing tests, runs the full test suite,
    and captures visual baselines if skipped during implement.
+
+   Capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture
+   ($TMPDIR/livespec-goals/transcripts/spec-test-<hash8>.out/.err) and pass them to
+   `livespec goal archive --stdout-file/--stderr-file`. Set RUN_ARTIFACT to the exact
+   artifact path printed by your own `goal archive` (the path proven for archive.run).
 
    Output a PHASE_RESULT block (Test agent schema from § PHASE_RESULT Schemas)
    as the LAST thing you output. Do not ask the user any questions — proceed autonomously.
@@ -720,6 +792,7 @@ This ensures all tools and credentials are available before the autonomous imple
    - Do not run `livespec pipeline update --feature NNN-feature-name --phase test --status done`, do not report the visual gate as passed, and before emitting `PHASE_RESULT: OK`, confirm the runtime evidence gate passes.
 
 5. Receive PHASE_RESULT from the Test agent.
+   - If `PHASE_RESULT: OK` → run the § Supervisor Verify Phase (`livespec verify-output spec-test --run <RUN_ARTIFACT> --json`, cross-check matrix). On disagreement → canonical BLOCKED, `pipeline update --status blocked`, stop.
 
 6. If `PHASE_RESULT: BLOCKED` (❌ AC coverage failures):
    - Interactive mode: report failures, no commit
@@ -807,6 +880,8 @@ Interactive mode also makes no commit. The user commits manually or invokes `/gi
 
 When `/spec-feature` is called by `/spec-ship` (via an independent native sub-agent), the pipeline **must** end with a structured result block that the ship supervisor can parse:
 
+<!-- @spec FR-008: SHIP_RESULT run_artifact emission — .specs/features/059-pipeline-verify-phase/spec.md#fr-008 -->
+
 **On success:**
 
 ```
@@ -815,6 +890,7 @@ FEATURE: NNN-feature-name
 HISTORY: skipped - no explicit user authorization
 FILES_CHANGED: <count>
 TESTS: <passed> passed, <failed> failed
+RUN_ARTIFACT: .specs/.runs/spec-feature-<ISO-fs>-<hash8>.json
 ```
 
 **On failure:**
@@ -824,9 +900,12 @@ SHIP_RESULT: BLOCKED
 FEATURE: NNN-feature-name
 PHASE: <phase that failed>
 ERROR: <one-line description>
+RUN_ARTIFACT: .specs/.runs/spec-feature-<ISO-fs>-<hash8>.json
 ```
 
-This block is the **last thing output** by the agent. The ship orchestrator reads `SHIP_RESULT:` to decide whether to merge or stop.
+In the canonical JSON SHIP_RESULT (see `system/contracts/SHIP_RESULT.md`) the field is `run_artifact: string | null`. The main context sets it to its **own** `spec-feature` run artifact path — the exact path printed by its `livespec goal archive` and proven for its `archive.run` task — so `/spec-ship` verifies the exact child pipeline run (059 AC-011, EC-011: never "latest").
+
+This block is the **last thing output** by the agent. The ship orchestrator reads `SHIP_RESULT:` AND re-verifies `run_artifact` via `livespec verify-output spec-feature --run <path> --json` before deciding whether to merge or stop.
 
 ---
 
@@ -944,6 +1023,7 @@ If any phase fails:
 - [always] Build Universal Agent Context with feature_name, feature_dir, feature_description, active_flags, conventions
 - [always] Spawn Specify agent with Universal Agent Context
 - [always] Receive and parse PHASE_RESULT from Specify agent
+- [always] Run supervisor Verify phase: livespec verify-output spec-specify --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
 - [always] Run `livespec pipeline update --phase specify --status done` on OK
 
 ### Phase 1.5 — Spec Review Gate
@@ -958,6 +1038,7 @@ If any phase fails:
 - [always] Build Universal Agent Context for plan phase with conventions
 - [always] Spawn Plan agent with Universal Agent Context
 - [always] Receive and parse PHASE_RESULT from Plan agent
+- [always] Run supervisor Verify phase: livespec verify-output spec-plan --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
 - [always] Run `livespec pipeline update --phase plan --status done` on OK
 
 ### Phase 2.5 — Plan Review Gate
@@ -970,6 +1051,7 @@ If any phase fails:
 ### Phase 2.7 — Preflight
 
 - [always] Spawn independent native sub-agent for `/spec-preflight --light` with current feature context
+- [always] Run supervisor Verify phase: livespec verify-output spec-preflight --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
 - [always] Write `preflight-report.md` with READY / WARNINGS / BLOCKED verdict
 - [always] Run `livespec pipeline update --phase preflight --status blocked` on critical failure
 
@@ -979,6 +1061,7 @@ If any phase fails:
 - [always] Build Universal Agent Context for implement phase with conventions
 - [always] Spawn Implement agent with Universal Agent Context
 - [always] Receive and parse PHASE_RESULT from Implement agent
+- [always] Run supervisor Verify phase: livespec verify-output spec-implement --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
 - [always] Run `livespec pipeline update --phase implement --status done` on OK
 
 ### Phase 3.5 — Test
@@ -993,6 +1076,7 @@ If any phase fails:
 - [penflow] Run `penflow review-report` and `penflow fix-report` on compare results
 - [penflow] Run `livespec penflow-contract status --require-actual` and require PASS
 - [always] Receive and parse PHASE_RESULT from Test agent
+- [always] Run supervisor Verify phase: livespec verify-output spec-test --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
 - [always] Run `livespec pipeline update --phase test --status done` on OK or partial AC coverage
 
 ### Phase 3.6 — Visual Gate (non-skippable for VISUAL features)

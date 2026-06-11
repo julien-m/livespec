@@ -30,7 +30,12 @@ from ..exceptions import (
 from ..expectations import load_expectations
 from ..outcome import exit_code_for
 from ..preview import render_preview, save_preview
-from ..run_artifacts import find_latest_artifact, load_run_artifact, recheck_receipts
+from ..run_artifacts import (
+    find_latest_artifact,
+    goal_tasks_incomplete,
+    load_run_artifact,
+    recheck_receipts,
+)
 from ..specs_utils import find_specs_root
 from ..verify_output import evaluate_rules, render_report, to_json_envelope
 
@@ -100,7 +105,9 @@ def verify_output_command(
         active_flags=active_flags,
         feature=placeholder_feature,
         project_root=project_root,
-        goal_incomplete=any(task.get("status") != "complete" for task in tasks),
+        # @spec FR-004: re-derivation shares the archive.run exclusion rule
+        #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-004
+        goal_incomplete=goal_tasks_incomplete(tasks),
         receipt_error=any(not check.verified for check in receipt_checks),
     )
     if json_out:

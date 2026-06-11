@@ -531,3 +531,91 @@ class TestTruthFixes:
             "tests/test_preview.py" not in text
             or (REPO_ROOT / "tests" / "test_preview.py").exists()
         )
+
+
+def _task(task_id: str, *, ordinal: int, status: str) -> dict[str, Any]:
+    return {
+        "ordinal": ordinal,
+        "description": task_id,
+        "status": status,
+        "attempts": [],
+        "accepted_evidence": {"output": "x"} if status == "complete" else None,
+        "last_rejection": None,
+    }
+
+
+class TestArchiveRunExclusion:
+    """Feature 059 AC-006/EC-001: archive.run never forces a drift outcome."""
+
+    def test_only_archive_run_pending_is_success(self, project_root: Path) -> None:
+        """SC-004: the snapshot legitimately shows archive.run pending."""
+        tasks = {
+            "task.001.do_thing": _task("task.001.do_thing", ordinal=1, status="complete"),
+            "archive.run": _task("archive.run", ordinal=2, status="pending"),
+        }
+        result = archive_goal_run(
+            make_contract(),
+            make_state(tasks=tasks),
+            project_root=project_root,
+            exit_code=0,
+            now=FROZEN_NOW,
+        )
+        assert result.outcome == "success"
+        assert result.artifact is not None
+        snapshot_ids = {task["id"]: task["status"] for task in result.artifact["goal"]["tasks"]}
+        assert snapshot_ids["archive.run"] == "pending"
+
+    def test_other_pending_with_archive_run_pending_is_drift(self, project_root: Path) -> None:
+        tasks = {
+            "task.001.do_thing": _task("task.001.do_thing", ordinal=1, status="pending"),
+            "archive.run": _task("archive.run", ordinal=2, status="pending"),
+        }
+        result = archive_goal_run(
+            make_contract(),
+            make_state(tasks=tasks),
+            project_root=project_root,
+            exit_code=0,
+            now=FROZEN_NOW,
+        )
+        assert result.outcome == "drift"
+
+    def test_pre_059_snapshot_with_pending_task_stays_drift(self, project_root: Path) -> None:
+        """AC-007: snapshots without archive.run keep their pre-059 classification."""
+        tasks = {
+            "task.001.pending": _task("task.001.pending", ordinal=1, status="pending"),
+        }
+        result = archive_goal_run(
+            make_contract(),
+            make_state(tasks=tasks),
+            project_root=project_root,
+            exit_code=0,
+            now=FROZEN_NOW,
+        )
+        assert result.outcome == "drift"
+
+    def test_pre_059_fully_complete_snapshot_stays_success(self, project_root: Path) -> None:
+        result = archive_goal_run(
+            make_contract(),
+            make_state(),
+            project_root=project_root,
+            exit_code=0,
+            now=FROZEN_NOW,
+        )
+        assert result.outcome == "success"
+
+    def test_goal_tasks_incomplete_helper_excludes_archive_run(self) -> None:
+        """AC-006: the shared helper is the single classification rule."""
+        from validator.run_artifacts import goal_tasks_incomplete
+
+        assert goal_tasks_incomplete([{"id": "task.001", "status": "pending"}]) is True
+        assert goal_tasks_incomplete([{"id": "task.001", "status": "complete"}]) is False
+        assert goal_tasks_incomplete([{"id": "archive.run", "status": "pending"}]) is False
+        assert (
+            goal_tasks_incomplete(
+                [
+                    {"id": "task.001", "status": "complete"},
+                    {"id": "archive.run", "status": "pending"},
+                ]
+            )
+            is False
+        )

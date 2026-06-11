@@ -304,3 +304,117 @@ class TestGoalArchiveCli:
         assert "outcome:drift" in result.output
         artifacts = list((project / ".specs" / ".runs").glob("spec-status-*.json"))
         assert len(artifacts) == 1
+
+
+CONTAINS_RULES: dict[str, Any] = {
+    "must": [{"verb": "must", "kind": "contains", "payload": "validation OK"}],
+    "may": [],
+    "must_not": [],
+    "when": [],
+}
+
+
+def write_contains_pair(tmp_path: Path) -> tuple[Path, Path]:
+    """Write a contract/state pair whose verify rules carry one contains rule."""
+    contract_file, state_file = write_pair(tmp_path)
+    contract = json.loads(contract_file.read_text(encoding="utf-8"))
+    contract["canonical"]["verify_rules"] = CONTAINS_RULES
+    contract_file.write_text(json.dumps(contract), encoding="utf-8")
+    return contract_file, state_file
+
+
+def _archive_args(
+    contract_file: Path,
+    state_file: Path,
+    *extra: str,
+) -> list[str]:
+    return [
+        "goal",
+        "archive",
+        "--contract",
+        str(contract_file),
+        "--state",
+        str(state_file),
+        "--exit-code",
+        "0",
+        *extra,
+    ]
+
+
+def _latest_artifact(project: Path) -> dict[str, Any]:
+    path = sorted((project / ".specs" / ".runs").glob("spec-specify-*.json"))[-1]
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+# @spec FR-010: SKIP semantics independent of transcript availability
+#   — .specs/features/059-pipeline-verify-phase/spec.md#fr-010
+class TestTranscriptContainsRules:
+    """Feature 059 FR-009/FR-010: transcripts make contains rules real (AC-013/AC-014)."""
+
+    def test_contains_rule_passes_against_embedded_transcript(self, project: Path) -> None:
+        contract_file, state_file = write_contains_pair(project)
+        out_file = project / "captured.out"
+        out_file.write_text("step 1 ... validation OK ... done", encoding="utf-8")
+
+        result = runner.invoke(
+            app,
+            _archive_args(contract_file, state_file, "--stdout-file", str(out_file)),
+        )
+
+        assert result.exit_code == 0, result.output
+        rules = _latest_artifact(project)["verify_result"]["rules"]
+        contains = [r for r in rules if r["kind"] == "contains"]
+        assert contains and all(r["status"] == "PASS" for r in contains)
+
+    def test_contains_rule_fails_when_needle_absent_from_transcript(self, project: Path) -> None:
+        contract_file, state_file = write_contains_pair(project)
+        out_file = project / "captured.out"
+        out_file.write_text("step 1 ... validation FAILED", encoding="utf-8")
+
+        result = runner.invoke(
+            app,
+            _archive_args(contract_file, state_file, "--stdout-file", str(out_file)),
+        )
+
+        # A failing must-contains rule classifies the run as drift (exit 1).
+        assert result.exit_code == 1, result.output
+        rules = _latest_artifact(project)["verify_result"]["rules"]
+        contains = [r for r in rules if r["kind"] == "contains"]
+        assert contains and all(r["status"] == "FAIL" for r in contains)
+
+    def test_contains_rule_skips_without_transcript_and_archive_succeeds(
+        self, project: Path
+    ) -> None:
+        """AC-014: honest absence — SKIP with a descriptive detail, archive succeeds."""
+        contract_file, state_file = write_contains_pair(project)
+
+        result = runner.invoke(app, _archive_args(contract_file, state_file))
+
+        assert result.exit_code == 0, result.output
+        rules = _latest_artifact(project)["verify_result"]["rules"]
+        contains = [r for r in rules if r["kind"] == "contains"]
+        assert contains and all(r["status"] == "SKIP" for r in contains)
+        assert all("no transcript embedded" in r["detail"] for r in contains)
+
+    def test_executor_truncated_transcript_is_accepted(
+        self, project: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """EC-009: a file truncated to the most recent bytes under the bound passes."""
+        from validator.cli_commands import goal_cmd
+
+        monkeypatch.setattr(goal_cmd, "MAX_TRANSCRIPT_BYTES", 32)
+        contract_file, state_file = write_contains_pair(project)
+        oversized = "x" * 64 + "validation OK"
+        # Executor-side truncation keeps the most recent bytes (tail -c semantics).
+        truncated = oversized[-32:]
+        out_file = project / "captured.out"
+        out_file.write_text(truncated, encoding="utf-8")
+
+        result = runner.invoke(
+            app,
+            _archive_args(contract_file, state_file, "--stdout-file", str(out_file)),
+        )
+
+        assert result.exit_code == 0, result.output
+        artifact = _latest_artifact(project)
+        assert artifact["stdout"].endswith("validation OK")

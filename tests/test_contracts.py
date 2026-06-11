@@ -182,9 +182,21 @@ class TestShipResultParser:
         assert result.status == "OK"
         assert result.commit_hash == "c99d3f6b2"
 
-    def test_no_legacy_fallback(self) -> None:
-        with pytest.raises(ContractParseError):
-            parse_ship_result("SHIP_RESULT: OK\nFEATURE: 013-foo\n")
+    def test_legacy_kv_ship_result_parses(self) -> None:
+        text = (
+            "SHIP_RESULT: OK\n"
+            "FEATURE: 013-state-model-identity-resolution\n"
+            "BRANCH: feature/013-state-model-identity-resolution\n"
+            "FILES_CHANGED_COUNT: 13\n"
+            "TIMESTAMP: 2026-05-04T15:32:18\n"
+            "COMMIT_HASH: c99d3f6b2\n"
+            "RUN_ARTIFACT: .specs/.runs/spec-feature-2026-06-11T10-00-00.000000-abcd1234.json\n"
+        )
+        with pytest.deprecated_call():
+            result = parse_ship_result(text)
+        assert result.run_artifact == (
+            ".specs/.runs/spec-feature-2026-06-11T10-00-00.000000-abcd1234.json"
+        )
 
     def test_missing_status_fails(self) -> None:
         bad = _valid_ship_payload()
@@ -283,3 +295,150 @@ class TestSchemaModels:
     def test_phase_result_forbids_extra_keys(self) -> None:
         with pytest.raises(ValidationError):
             PhaseResult.model_validate(_valid_phase_payload() | {"surprise": 42})
+
+
+# ─── run_artifact field (Feature 059, FR-006/FR-008) ────────────────────────
+
+
+class TestPhaseResultRunArtifact:
+    """AC-008: PHASE_RESULT carries the archived run artifact path."""
+
+    def test_json_block_with_run_artifact_parses(self) -> None:
+        payload = _valid_phase_payload(
+            run_artifact=".specs/.runs/spec-specify-2026-06-11T10-00-00.000000-abcd1234.json"
+        )
+        result = parse_phase_result(_wrap("PHASE_RESULT", payload))
+        assert result.run_artifact == (
+            ".specs/.runs/spec-specify-2026-06-11T10-00-00.000000-abcd1234.json"
+        )
+
+    def test_block_without_run_artifact_parses_as_none(self) -> None:
+        """Legacy tolerance: pre-059 blocks stay parseable."""
+        result = parse_phase_result(_wrap("PHASE_RESULT", _valid_phase_payload()))
+        assert result.run_artifact is None
+
+    def test_non_string_run_artifact_fails_validation(self) -> None:
+        payload = _valid_phase_payload(run_artifact=42)
+        with pytest.raises(ContractValidationError):
+            parse_phase_result(_wrap("PHASE_RESULT", payload))
+
+    def test_preflight_phase_validates(self) -> None:
+        """FR-006: the Preflight sub-agent result rides the same contract."""
+        payload = _valid_phase_payload(phase="preflight", extra={"verdict": "READY"})
+        result = parse_phase_result(_wrap("PHASE_RESULT", payload))
+        assert result.phase == "preflight"
+        assert result.extra["verdict"] == "READY"
+
+    def test_unknown_top_level_key_still_rejected(self) -> None:
+        """extra: forbid regression guard after the field addition."""
+        payload = _valid_phase_payload(run_artifacts="typo-key")
+        with pytest.raises(ContractValidationError):
+            parse_phase_result(_wrap("PHASE_RESULT", payload))
+
+    def test_render_roundtrip_includes_run_artifact(self) -> None:
+        original = PhaseResult.model_validate(
+            _valid_phase_payload(run_artifact=".specs/.runs/spec-plan-x-aaaaaaaa.json")
+        )
+        parsed = parse_phase_result(render_phase_result(original, "deadbeef"))
+        assert parsed == original
+        assert parsed.run_artifact == ".specs/.runs/spec-plan-x-aaaaaaaa.json"
+
+
+class TestPhaseResultLegacyRunArtifact:
+    """AC-008: the legacy KV form maps RUN_ARTIFACT to the typed field."""
+
+    def test_legacy_kv_run_artifact_maps_to_field(self) -> None:
+        legacy = (
+            "PHASE_RESULT: OK\n"
+            "PHASE: implement\n"
+            "FEATURE: 013-state-model-identity-resolution\n"
+            "RUN_ARTIFACT: .specs/.runs/spec-implement-2026-06-11T10-00-00.000000-abcd1234.json\n"
+            "SUMMARY: Legacy block.\n"
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            result = parse_phase_result(legacy)
+        assert result.run_artifact == (
+            ".specs/.runs/spec-implement-2026-06-11T10-00-00.000000-abcd1234.json"
+        )
+        assert "RUN_ARTIFACT" not in result.extra
+
+    def test_legacy_kv_without_run_artifact_is_none(self) -> None:
+        legacy = (
+            "PHASE_RESULT: OK\n"
+            "PHASE: implement\n"
+            "FEATURE: 013-state-model-identity-resolution\n"
+            "SUMMARY: Legacy block.\n"
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            result = parse_phase_result(legacy)
+        assert result.run_artifact is None
+
+    def test_legacy_kv_blank_run_artifact_normalizes_to_none(self) -> None:
+        """Malformed tolerance — the supervisor then takes the AC-010 fallback."""
+        legacy = (
+            "PHASE_RESULT: OK\n"
+            "PHASE: implement\n"
+            "FEATURE: 013-state-model-identity-resolution\n"
+            "RUN_ARTIFACT:    \n"
+            "SUMMARY: Legacy block.\n"
+        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            result = parse_phase_result(legacy)
+        assert result.run_artifact is None
+
+
+class TestShipResultRunArtifact:
+    """AC-011: SHIP_RESULT carries the child pipeline's run artifact path."""
+
+    def test_ship_result_with_run_artifact_parses(self) -> None:
+        payload = _valid_ship_payload(
+            run_artifact=".specs/.runs/spec-feature-2026-06-11T10-00-00.000000-abcd1234.json"
+        )
+        result = parse_ship_result(_wrap("SHIP_RESULT", payload, digest="e9c4d1f7"))
+        assert result.run_artifact == (
+            ".specs/.runs/spec-feature-2026-06-11T10-00-00.000000-abcd1234.json"
+        )
+
+    def test_ship_result_without_run_artifact_is_none(self) -> None:
+        result = parse_ship_result(_wrap("SHIP_RESULT", _valid_ship_payload()))
+        assert result.run_artifact is None
+
+    def test_legacy_ship_result_without_run_artifact_is_none(self) -> None:
+        text = (
+            "SHIP_RESULT: OK\n"
+            "FEATURE: 013-state-model-identity-resolution\n"
+            "BRANCH: feature/013-state-model-identity-resolution\n"
+            "FILES_CHANGED_COUNT: 13\n"
+            "TIMESTAMP: 2026-05-04T15:32:18\n"
+        )
+        with pytest.deprecated_call():
+            result = parse_ship_result(text)
+        assert result.run_artifact is None
+
+    def test_legacy_ship_result_blank_run_artifact_is_none(self) -> None:
+        text = (
+            "SHIP_RESULT: OK\n"
+            "FEATURE: 013-state-model-identity-resolution\n"
+            "BRANCH: feature/013-state-model-identity-resolution\n"
+            "FILES_CHANGED_COUNT: 13\n"
+            "TIMESTAMP: 2026-05-04T15:32:18\n"
+            "RUN_ARTIFACT:    \n"
+        )
+        with pytest.deprecated_call():
+            result = parse_ship_result(text)
+        assert result.run_artifact is None
+
+    def test_ship_result_unknown_key_still_rejected(self) -> None:
+        payload = _valid_ship_payload(artifact_path="wrong-key")
+        with pytest.raises(ContractValidationError):
+            parse_ship_result(_wrap("SHIP_RESULT", payload))
+
+    def test_ship_result_roundtrip_includes_run_artifact(self) -> None:
+        original = ShipResult.model_validate(
+            _valid_ship_payload(run_artifact=".specs/.runs/spec-feature-x-aaaaaaaa.json")
+        )
+        parsed = parse_ship_result(render_ship_result(original, "deadbeef"))
+        assert parsed == original

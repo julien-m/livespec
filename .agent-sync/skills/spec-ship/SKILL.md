@@ -254,6 +254,9 @@ Sub-agent prompt:
   Your hooks (before-feature, after-feature, and sub-command hooks) will resolve normally.
 
   IMPORTANT: End your response with the SHIP_RESULT block (see [`../spec-feature/SKILL.md`](../spec-feature/SKILL.md) § Ship Result).
+  The SHIP_RESULT MUST include `run_artifact` set to your own spec-feature run artifact path
+  (the exact `.specs/.runs/spec-feature-*.json` printed by your `livespec goal archive` and
+  proven for your archive.run task). An OK without a verifiable artifact is not trusted.
 ```
 
 > **D-α (Hook resolution for chained invocations).** The first prompt line `/spec-feature`
@@ -296,8 +299,24 @@ if result.branch != f"feature/{result.feature_slug}":
     sys.exit(1)
 ```
 
-- **`result.status == "OK"` AND branch/slug consistent** → proceed to Step 3.5
-- **Any failure above** → STOP (see Error Handling). The validation gate explicitly prevents `livespec git delete` from being invoked on a malformed or injected result.
+#### Artifact cross-check (059 AC-011/AC-012 — executes BEFORE Step 3.5/Step 4, i.e. before any `livespec git merge`/`livespec git delete`)
+
+<!-- @spec FR-008: Ship Step 3 artifact gate — .specs/features/059-pipeline-verify-phase/spec.md#fr-008 -->
+
+`result.run_artifact` in the SHIP_RESULT text is **only a pointer, never a verdict** — every trust decision below derives from independently loading and re-evaluating the on-disk artifact, so no self-declared text field is trusted.
+
+1. Read `result.run_artifact` from the parsed `ShipResult`. Null/absent → mark the feature `Blocked` in `ship.md` (an OK without a verifiable artifact is not trusted) — no merge, no delete.
+2. **Independent load + identity validation:** run
+   ```bash
+   livespec verify-output spec-feature --run <result.run_artifact> --json
+   ```
+   This loads the artifact from disk (schema v2 validation) and **re-evaluates** its verify rules with the shared engine; exit 2 (path missing, unreadable, or malformed v2) → `Blocked`. Then check artifact identity by reading `<result.run_artifact>` from disk and checking its top-level `command` and `feature` fields: `command` must be `spec-feature` and, defense-in-depth, `feature` must equal `result.feature_slug` — a foreign, wrong-feature, or stale-other-run artifact is `Blocked` (EC-005 mirrored at ship scope; the `--json` envelope's `command` echoes the REQUESTED command, so identity must come from the artifact file itself). The child's goal-hash integrity is internal to the artifact: its `archive.run` proof already bound artifact↔contract hash; ship re-verifies the outcome, not the child's `$TMPDIR` contract (which no longer needs to exist).
+3. **Derive the verdict from the machine re-evaluation:** read the top-level `outcome` field of the `livespec verify-output --json` envelope (NOT the `verify_result` text stored inside the artifact, and not the SHIP_RESULT text). `status: OK` + outcome `success` → proceed to Step 3.5 as today. `status: OK` + outcome `drift`/`error`/`blocked` → feature `Blocked` in `ship.md`, no merge, no branch delete (machine verdict overrides text).
+4. `status: BLOCKED` → existing handling regardless of artifact outcome (artifact backing demotes, never promotes — EC-007).
+5. **Staleness/concurrency (EC-011):** ship always reads the **exact** path from each child's SHIP_RESULT, never "latest" — artifact filenames are timestamp+hash8-unique, so a concurrent child's artifact can never be selected by mistake.
+
+- **`result.status == "OK"` AND branch/slug consistent AND artifact outcome `success`** → proceed to Step 3.5
+- **Any failure above** → STOP (see Error Handling). The validation gate explicitly prevents `livespec git merge` and `livespec git delete` from being invoked on a malformed, injected, or artifact-contradicted result.
 
 ### Step 3.5 — Test Gate
 
@@ -462,6 +481,7 @@ When all features are shipped:
 - [always] Wait for spawned sub-agent to complete and return SHIP_RESULT
 - [always] Parse SHIP_RESULT via `validator/contracts.py parse_ship_result()`
 - [always] Validate branch/slug consistency before any git operation
+- [always] Cross-check SHIP_RESULT against the exact child run artifact via livespec verify-output spec-feature --run <run_artifact> --json (command + feature identity, then outcome) before any merge/delete; mark Blocked on non-success, foreign, or missing artifact
 - [always] Check AC coverage from test report (Test Gate)
 - [always] Switch to target branch: `git checkout <target>`
 - [always] Merge feature branch: `livespec git merge feature/NNN-name --no-ff`

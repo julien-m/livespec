@@ -27,6 +27,9 @@ from .run_receipts import ReceiptCheck, recheck_receipts, verify_evidence_receip
 from .verify_output import evaluate_rules
 
 RUN_ARTIFACT_SCHEMA_VERSION = "2.0"
+# @spec FR-001: archive.run task id shared by compiler injection and classifier
+#   — .specs/features/059-pipeline-verify-phase/spec.md#fr-001
+ARCHIVE_RUN_TASK_ID = "archive.run"
 _COMMAND_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 _GOAL_HASH_RE = re.compile(r"^[a-f0-9]{64}$")
 
@@ -189,7 +192,31 @@ def _goal_snapshot(state: dict[str, Any]) -> dict[str, Any]:
 
 def _goal_incomplete(goal_snapshot: dict[str, Any]) -> bool:
     tasks = cast(list[dict[str, Any]], goal_snapshot["tasks"])
-    return any(task["status"] != "complete" for task in tasks)
+    return goal_tasks_incomplete(tasks)
+
+
+# @spec FR-004: Classifier excludes archive.run
+#   — .specs/features/059-pipeline-verify-phase/spec.md#fr-004
+# @spec FR-005: Pre-059 artifact tolerance (no schema change, exclusion never matches)
+#   — .specs/features/059-pipeline-verify-phase/spec.md#fr-005
+def goal_tasks_incomplete(tasks: list[dict[str, Any]]) -> bool:
+    """Return True when at least one required goal task is pending.
+
+    Tasks whose id is ``archive.run`` are excluded: the artifact snapshot is
+    taken before the archive proof is accepted, so ``archive.run`` pending is
+    the expected shape of every enforced artifact (059 AC-006/EC-001).
+    Pre-059 snapshots contain no ``archive.run`` id, so the exclusion never
+    matches and their classification is unchanged (AC-007).
+
+    Args:
+        tasks: Goal snapshot task dicts (``id``/``status`` keys).
+
+    Returns:
+        True when a non-archive task is not ``complete``.
+    """
+    return any(
+        task.get("status") != "complete" for task in tasks if task.get("id") != ARCHIVE_RUN_TASK_ID
+    )
 
 
 def _contract_verify_rules(contract: dict[str, Any]) -> dict[str, Any]:
@@ -272,11 +299,13 @@ def _list_of(value: object) -> list[object]:
 
 
 __all__ = [
+    "ARCHIVE_RUN_TASK_ID",
     "RUN_ARTIFACT_SCHEMA_VERSION",
     "ArchiveResult",
     "ReceiptCheck",
     "archive_goal_run",
     "find_latest_artifact",
+    "goal_tasks_incomplete",
     "load_run_artifact",
     "recheck_receipts",
 ]

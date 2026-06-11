@@ -93,11 +93,19 @@ class PhaseResult(BaseModel):
     """
 
     status: Literal["OK", "BLOCKED"]
-    phase: Literal["specify", "plan", "implement", "test"]
+    # @spec FR-006: preflight rides the same PHASE_RESULT contract
+    #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-006
+    phase: Literal["specify", "plan", "preflight", "implement", "test"]
     feature_slug: str = Field(pattern=SLUG_REGEX.pattern)
     summary: str = Field(min_length=1, max_length=500)
     duration_ms: int = Field(ge=0)
     blocked_reason: str | None = None
+    # @spec FR-006: RUN_ARTIFACT field, legacy-tolerant (None when absent)
+    #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-006
+    # Path shape is enforced (file under .specs/.runs/): absolute OR relative
+    # prefixes are both accepted because executors legitimately emit either
+    # (the archive.run prove validator resolves both the same way).
+    run_artifact: str | None = Field(default=None, pattern=r"^(.*/)?\.specs/\.runs/[^/]+\.json$")
     extra: dict[str, Any] = Field(default_factory=dict)
 
     model_config = {"extra": "forbid"}
@@ -114,6 +122,11 @@ class ShipResult(BaseModel):
     timestamp: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
     commit_hash: str | None = None
     error: str | None = None
+    # @spec FR-008: SHIP_RESULT run_artifact gates merge/delete
+    #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-008
+    # Same constrained shape as PhaseResult.run_artifact — this path gates
+    # merge/branch-delete decisions, so arbitrary strings are rejected.
+    run_artifact: str | None = Field(default=None, pattern=r"^(.*/)?\.specs/\.runs/[^/]+\.json$")
 
     model_config = {"extra": "forbid"}
 
@@ -278,17 +291,32 @@ def parse_phase_result(text: str) -> PhaseResult:
 def parse_ship_result(text: str) -> ShipResult:
     """Extract and validate a SHIP_RESULT block from agent output."""
     block = _find_block_in_window(text, SHIP_RESULT_START, SHIP_RESULT_END)
-    if block is None:
-        raise ContractParseError("no SHIP_RESULT delimiter pair found in the last 30 lines")
-    _, body = block
+    if block is not None:
+        _, body = block
+        try:
+            data = json.loads(body)
+        except json.JSONDecodeError as exc:
+            raise ContractValidationError(f"SHIP_RESULT body is not valid JSON: {exc}") from exc
+        try:
+            return ShipResult.model_validate(data)
+        except ValidationError as exc:
+            raise ContractValidationError(f"SHIP_RESULT schema validation failed: {exc}") from exc
+
+    legacy = _parse_legacy_kv_block(text, "SHIP_RESULT")
+    if legacy is None:
+        raise ContractParseError("no SHIP_RESULT block found in the last 30 lines")
+    warnings.warn(
+        "SHIP_RESULT parsed via legacy key-value format. "
+        "Migrate to the delimiter+JSON format (see system/contracts/SHIP_RESULT.md).",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     try:
-        data = json.loads(body)
-    except json.JSONDecodeError as exc:
-        raise ContractValidationError(f"SHIP_RESULT body is not valid JSON: {exc}") from exc
-    try:
-        return ShipResult.model_validate(data)
+        return ShipResult.model_validate(_legacy_to_ship_result(legacy))
     except ValidationError as exc:
-        raise ContractValidationError(f"SHIP_RESULT schema validation failed: {exc}") from exc
+        raise ContractValidationError(
+            f"SHIP_RESULT (legacy format) failed schema validation: {exc}"
+        ) from exc
 
 
 def parse_superpowers_return(text: str) -> SuperpowersReturn:
@@ -315,6 +343,10 @@ def parse_superpowers_return(text: str) -> SuperpowersReturn:
 def _legacy_to_phase_result(fields: dict[str, str]) -> dict[str, Any]:
     """Convert a legacy key-value PHASE_RESULT block to the modern JSON shape."""
     phase_value = fields.get("PHASE", "implement").lower()
+    # Legacy bridge for 059 RUN_ARTIFACT: pre-JSON agents emit the path as an
+    # uppercase KV line; blank values normalize to None so the supervisor takes
+    # the AC-010 latest-artifact fallback instead of verifying an empty path.
+    run_artifact = fields.get("RUN_ARTIFACT", "").strip() or None
     return {
         "status": fields["PHASE_RESULT"],
         "phase": phase_value,
@@ -322,6 +354,7 @@ def _legacy_to_phase_result(fields: dict[str, str]) -> dict[str, Any]:
         "summary": fields.get("SUMMARY", "(no summary in legacy block)"),
         "duration_ms": int(fields.get("DURATION_MS", "0") or 0),
         "blocked_reason": fields.get("BLOCKED_REASON") or None,
+        "run_artifact": run_artifact,
         "extra": {
             k: v
             for k, v in fields.items()
@@ -333,8 +366,24 @@ def _legacy_to_phase_result(fields: dict[str, str]) -> dict[str, Any]:
                 "SUMMARY",
                 "DURATION_MS",
                 "BLOCKED_REASON",
+                "RUN_ARTIFACT",
             }
         },
+    }
+
+
+def _legacy_to_ship_result(fields: dict[str, str]) -> dict[str, Any]:
+    """Convert a legacy key-value SHIP_RESULT block to the modern JSON shape."""
+    run_artifact = fields.get("RUN_ARTIFACT", "").strip() or None
+    return {
+        "status": fields["SHIP_RESULT"],
+        "feature_slug": fields.get("FEATURE", ""),
+        "branch": fields.get("BRANCH", ""),
+        "files_changed_count": int(fields.get("FILES_CHANGED_COUNT", "0") or 0),
+        "timestamp": fields.get("TIMESTAMP", ""),
+        "commit_hash": fields.get("COMMIT_HASH") or None,
+        "error": fields.get("ERROR") or None,
+        "run_artifact": run_artifact,
     }
 
 

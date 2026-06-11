@@ -191,3 +191,113 @@ class TestScenarioFlag:
             app, ["verify-output", "specify", "--scenario=--visual", "--json"]
         )
         assert json.loads(with_scenario.output)["outcome"] == "drift"
+
+
+class TestArchiveRunExclusion:
+    """Feature 059 AC-006/AC-007: the CLI re-derivation shares the classifier rule."""
+
+    def test_only_archive_run_pending_verifies_as_success(self, project: Path) -> None:
+        runs = project / ".specs" / ".runs"
+        path = write_artifact(runs)
+        artifact = json.loads(path.read_text(encoding="utf-8"))
+        artifact["goal"]["tasks"].append(
+            {
+                "id": "archive.run",
+                "ordinal": 2,
+                "status": "pending",
+                "accepted_evidence": None,
+            }
+        )
+        path.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
+
+        result = runner.invoke(app, ["verify-output", "specify", "--json"])
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(result.output)["outcome"] == "success"
+
+    def test_other_pending_task_still_drifts(self, project: Path) -> None:
+        runs = project / ".specs" / ".runs"
+        path = write_artifact(runs)
+        artifact = json.loads(path.read_text(encoding="utf-8"))
+        artifact["goal"]["tasks"][0]["status"] = "pending"
+        path.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
+
+        result = runner.invoke(app, ["verify-output", "specify", "--json"])
+
+        assert result.exit_code == 1
+        assert json.loads(result.output)["outcome"] == "drift"
+
+    def test_pre_059_artifact_without_archive_run_verifies_cleanly(self, project: Path) -> None:
+        """AC-007: pre-059 artifacts never require the archive task's presence."""
+        write_artifact(project / ".specs" / ".runs")
+
+        result = runner.invoke(app, ["verify-output", "specify", "--json"])
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(result.output)["outcome"] == "success"
+
+
+class TestVerifyMatrixSubstrate:
+    """Feature 059 FR-007 (AC-009/AC-010): one fixture artifact per outcome
+    class — the exact machine verdicts the supervisor Verify matrix consumes."""
+
+    def test_outcome_success_exit_0(self, project: Path) -> None:
+        path = write_artifact(project / ".specs" / ".runs")
+        result = runner.invoke(app, ["verify-output", "specify", "--run", str(path), "--json"])
+        assert result.exit_code == 0
+        assert json.loads(result.output)["outcome"] == "success"
+
+    def test_outcome_drift_exit_1(self, project: Path) -> None:
+        rules = {
+            "must": [{"verb": "must", "kind": "contains", "payload": "absent needle"}],
+            "may": [],
+            "must_not": [],
+            "when": [],
+        }
+        path = write_artifact(project / ".specs" / ".runs", stdout="other text", verify_rules=rules)
+        result = runner.invoke(app, ["verify-output", "specify", "--run", str(path), "--json"])
+        assert result.exit_code == 1
+        assert json.loads(result.output)["outcome"] == "drift"
+
+    def test_outcome_error_exit_1(self, project: Path) -> None:
+        path = write_artifact(project / ".specs" / ".runs", exit_code=3)
+        result = runner.invoke(app, ["verify-output", "specify", "--run", str(path), "--json"])
+        assert result.exit_code == 1
+        assert json.loads(result.output)["outcome"] == "error"
+
+    def test_outcome_blocked_exit_2_on_malformed_artifact(self, project: Path) -> None:
+        runs = project / ".specs" / ".runs"
+        runs.mkdir(parents=True)
+        bad = runs / "spec-specify-2026-06-11T10-00-00-aaaaaaaa.json"
+        bad.write_text("{not json", encoding="utf-8")
+        result = runner.invoke(app, ["verify-output", "specify", "--run", str(bad), "--json"])
+        assert result.exit_code == 2
+        assert json.loads(result.output.splitlines()[0])["outcome"] == "blocked"
+
+    def test_outcome_blocked_exit_2_on_missing_run_path(self, project: Path) -> None:
+        result = runner.invoke(
+            app,
+            ["verify-output", "specify", "--run", str(project / "nope.json"), "--json"],
+        )
+        assert result.exit_code == 2
+        assert json.loads(result.output.splitlines()[0])["outcome"] == "blocked"
+
+    def test_foreign_command_artifact_requires_explicit_supervisor_check(
+        self, project: Path
+    ) -> None:
+        """EC-005 substrate: verify-output does NOT compare the artifact command
+        to the requested command — the supervisor Verify phase performs that
+        identity check explicitly by reading the artifact's command field."""
+        path = write_artifact(
+            project / ".specs" / ".runs",
+            name="spec-plan-2026-06-11T10-00-00-aaaaaaaa.json",
+            command="spec-plan",
+        )
+        result = runner.invoke(app, ["verify-output", "specify", "--run", str(path), "--json"])
+        assert result.exit_code == 0
+        envelope = json.loads(result.output)
+        assert envelope["command"] == "spec-specify"
+        artifact = json.loads(path.read_text(encoding="utf-8"))
+        # The mismatch is observable from the artifact itself (supervisor step 3).
+        assert artifact["command"] == "spec-plan"
+        assert artifact["command"] != envelope["command"]

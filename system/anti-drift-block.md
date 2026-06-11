@@ -183,6 +183,50 @@ hash:<full-sha256> | contract-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>
 - If goal rendering fails, emit the canonical BLOCKED line (§2) and stop.
 - If the current environment does not accept the `/goal` command, emit the canonical BLOCKED line (§2) and stop.
 
+### Transcript capture
+
+<!-- @spec FR-009: Transcript capture protocol — .specs/features/059-pipeline-verify-phase/spec.md#fr-009 -->
+
+During the run, append the stdout/stderr of key CLI executions (e.g. `livespec validate`, `pytest`, `livespec finalize verify`) to a transcript pair under `$TMPDIR/livespec-goals/transcripts/`:
+
+```bash
+T="$TMPDIR/livespec-goals/transcripts"; mkdir -p "$T"
+# <hash8> = first 8 chars of the active goal hash — pairs the transcript to the contract.
+# pipefail-safe: capture the WRAPPED command's exit code, not tee's — a plain
+# pipe would record tee's status and let `goal archive --exit-code` archive a
+# false success.
+set -o pipefail
+set +e
+<cli command> 2>>"$T/<command>-<hash8>.err" | tee -a "$T/<command>-<hash8>.out"
+cmd_status=${PIPESTATUS[0]}
+set -e
+```
+
+Pass `"$cmd_status"` (the wrapped command's status) to `livespec goal archive --exit-code` — never the pipeline's last status.
+
+Rules:
+
+- **Truncation is executor-side (EC-009):** before archiving, if a file exceeds `MAX_TRANSCRIPT_BYTES` (10 MiB), truncate it keeping the **most recent** bytes (`tail -c <bound> file > tmp && mv tmp file`) — most recent output is the diagnostic payload. `goal archive` keeps rejecting oversized inputs with blocked/exit 2.
+- **Unreadable transcripts (EC-008):** if a transcript file is missing or unreadable at archive time, **omit** the flag instead of passing a broken path — `goal archive` blocks (exit 2) on unreadable input.
+- **Honest absence (AC-014, FR-010):** when no transcript is captured, run `goal archive` without `--stdout-file`/`--stderr-file`; every `contains` rule reports SKIP with a descriptive detail and the archive still succeeds. Absence is never converted into a failure.
+
+### Archive & prove archive.run
+
+<!-- @spec FR-009: Archive-then-prove protocol — .specs/features/059-pipeline-verify-phase/spec.md#fr-009 -->
+
+Every rendered contract ends with an injected `archive.run` task (last ordinal). Before `DONE`:
+
+1. Archive the run, passing the transcripts when captured:
+   ```bash
+   livespec goal archive --contract <c> --state <s> [--feature <slug>] [--exit-code <n>] [--stdout-file <out>] [--stderr-file <err>]
+   ```
+2. Prove the injected last task with the **printed artifact path**:
+   ```bash
+   livespec goal prove --contract <c> --state <s> --task archive.run --evidence '{"run_artifact_path": "<printed .specs/.runs/ path>"}'
+   ```
+
+`goal status` can only report the goal complete after this proof (EC-010). Prose claims, exit codes, and `$TMPDIR` contract/state paths are named invalid substitutes; the artifact must live under `.specs/.runs/` and match the contract's goal hash and command.
+
 ### Internal Command Invocations
 
 When a LiveSpec slash command needs another executable `/spec-*` command while its own goal is active:

@@ -26,6 +26,7 @@ import json
 import struct
 import zlib
 from pathlib import Path
+from typing import Any
 
 import pytest
 from typer.testing import CliRunner
@@ -2190,3 +2191,435 @@ def test_six_registry_commands_carry_finalize_registry_task(
     finalize_tasks = [task for task in contract["tasks"] if task["id"] == "finalize.registry"]
     assert finalize_tasks, f"{command} contract lacks the finalize.registry task"
     assert "finalize_receipt_path" in finalize_tasks[0]["required_evidence"]
+
+
+# ─── archive.run injected task (Feature 059, FR-001/FR-002/FR-003) ───────────
+
+
+def _demo_contract_and_state(
+    project_root: Path,
+    livespec_root: Path,
+    *,
+    feature: str | None = "001-demo",
+    flags: str = "",
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Compile the spec-demo fixture goal and return contract+state dicts."""
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature=feature,
+        flags=flags,
+    )
+    return (
+        json.loads(render_goal_contract_file(goal)),
+        json.loads(render_goal_state_file(goal)),
+    )
+
+
+@pytest.mark.parametrize(
+    ("with_execution_tasks", "feature", "flags"),
+    [
+        (False, None, ""),
+        (False, "001-demo", "--strict"),
+        (True, None, ""),
+        (True, "001-demo", "--strict --auto"),
+    ],
+)
+def test_every_contract_carries_exactly_one_archive_run_task(
+    tmp_path: Path,
+    with_execution_tasks: bool,
+    feature: str | None,
+    flags: str,
+) -> None:
+    """AC-001: archive.run is injected compiler-side for every command/feature/flags."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    if with_execution_tasks:
+        _write_execution_task_skill(livespec_root)
+
+    contract, state = _demo_contract_and_state(
+        project_root, livespec_root, feature=feature, flags=flags
+    )
+
+    archive_tasks = [task for task in contract["tasks"] if task["id"] == "archive.run"]
+    assert len(archive_tasks) == 1
+    assert "archive.run" in state["tasks"]
+    assert state["tasks"]["archive.run"]["status"] == "pending"
+
+
+def test_archive_run_task_has_strictly_highest_ordinal(tmp_path: Path) -> None:
+    """AC-002: archive.run snapshots all prior evidence — always the last ordinal."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_execution_task_skill(livespec_root)
+
+    contract, _state = _demo_contract_and_state(project_root, livespec_root)
+
+    archive_task = next(task for task in contract["tasks"] if task["id"] == "archive.run")
+    other_ordinals = [task["ordinal"] for task in contract["tasks"] if task["id"] != "archive.run"]
+    assert all(archive_task["ordinal"] > ordinal for ordinal in other_ordinals)
+    assert archive_task["ordinal"] == max(task["ordinal"] for task in contract["tasks"])
+
+
+def test_archive_run_task_evidence_family_matches_constants(tmp_path: Path) -> None:
+    """AC-003: required evidence, named substitutes, and repair actions are fixed."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+
+    contract, _state = _demo_contract_and_state(project_root, livespec_root)
+
+    task = next(task for task in contract["tasks"] if task["id"] == "archive.run")
+    assert task["required_evidence"] == ["run_artifact_path"]
+    assert task["invalid_substitutes"] == [
+        "prose_archive_claim",
+        "exit_code_without_artifact",
+        "tmpdir_contract_state_paths_without_artifact",
+    ]
+    assert task["category"] == "injected"
+    assert "livespec goal archive" in task["description"]
+    assert any("livespec goal archive" in action for action in task["repair_if_missing"])
+    assert any("artifact path" in action for action in task["repair_if_missing"])
+
+
+def test_archive_run_task_skips_convention_evidence_layering(tmp_path: Path) -> None:
+    """AC-003: the synthetic compiler task never carries convention proof fields."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_conventions(project_root, tmp_path / "ai")
+    _write_execution_task_skill(livespec_root)
+
+    contract, _state = _demo_contract_and_state(project_root, livespec_root)
+
+    task = next(task for task in contract["tasks"] if task["id"] == "archive.run")
+    assert task["required_evidence"] == ["run_artifact_path"]
+    assert "required_conventions" not in task
+    # Prose tasks keep convention layering — the injection must not strip them.
+    prose_task = contract["tasks"][0]
+    assert "convention_domains_recorded" in prose_task["required_evidence"]
+
+
+def test_archive_run_injection_preserves_hash_determinism(tmp_path: Path) -> None:
+    """AC-002: same inputs → same canonical JSON and hash with the injected task."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+
+    rendered = [
+        compile_command_goal(
+            "spec-demo",
+            project_root=project_root,
+            livespec_root=livespec_root,
+            feature="001-demo",
+            flags="--strict",
+        )
+        for _ in range(5)
+    ]
+
+    first = rendered[0]
+    assert all(goal.goal_hash == first.goal_hash for goal in rendered)
+    assert all(goal.canonical_json == first.canonical_json for goal in rendered)
+    assert '"archive.run"' in first.canonical_json
+
+
+# ─── archive.run prove validator (Feature 059, FR-003) ───────────────────────
+
+
+def _archive_fixture_artifact(
+    project_root: Path,
+    contract: dict[str, Any],
+    state: dict[str, Any],
+) -> Path:
+    """Archive the fixture goal and return the written artifact path."""
+    from validator.run_artifacts import archive_goal_run
+
+    result = archive_goal_run(contract, state, project_root=project_root, exit_code=0)
+    assert result.path is not None
+    return result.path
+
+
+def test_archive_run_prove_rejects_prose_claim(tmp_path: Path) -> None:
+    """AC-003: prose without an artifact path names prose_archive_claim."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"output": "I archived the run", "success_criteria_met": True},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "prose_archive_claim" in result["invalid_substitutes"]
+    assert "run_artifact_path" in result["missing_evidence"]
+    assert any("livespec goal archive" in action for action in result["required_actions"])
+    assert result["state"]["tasks"]["archive.run"]["status"] == "pending"
+
+
+def test_archive_run_prove_rejects_exit_code_substitute(tmp_path: Path) -> None:
+    """AC-003: an exit code is not an artifact."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"exit_code": 0},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "exit_code_without_artifact" in result["invalid_substitutes"]
+
+
+def test_archive_run_prove_rejects_tmpdir_contract_state_paths(tmp_path: Path) -> None:
+    """AC-003: $TMPDIR contract/state paths are not the durable artifact."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={
+            "contract_file": "/tmp/livespec-goals/goal-spec-demo-abcd1234.contract.json",
+            "state_file": "/tmp/livespec-goals/goal-spec-demo-abcd1234.state.json",
+        },
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "tmpdir_contract_state_paths_without_artifact" in result["invalid_substitutes"]
+
+
+def test_archive_run_prove_rejects_path_outside_specs_runs(tmp_path: Path) -> None:
+    """AC-004: containment — the artifact must live under .specs/.runs/."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+    outside = project_root / "artifact.json"
+    outside.write_text("{}", encoding="utf-8")
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"run_artifact_path": str(outside)},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "run_artifact_under_specs_runs" in result["missing_evidence"]
+
+
+def test_archive_run_prove_rejects_malformed_artifact_file(tmp_path: Path) -> None:
+    """AC-004 (chaos-style fixture, unmarked so it runs at every level): a
+    malformed v2 file is named in the rejection."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+    runs_dir = project_root / ".specs" / ".runs"
+    runs_dir.mkdir(parents=True)
+    bad = runs_dir / "spec-demo-2026-06-11T10-00-00.000000-deadbeef.json"
+    bad.write_text("{truncated", encoding="utf-8")
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"run_artifact_path": str(bad)},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert any(item.startswith("run_artifact_valid:") for item in result["missing_evidence"])
+
+
+def test_archive_run_prove_rejects_foreign_goal_artifact(tmp_path: Path) -> None:
+    """AC-004: an artifact archived under another goal hash is rejected."""
+    from tests.test_run_artifact import make_contract, make_state
+
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+    foreign = _archive_fixture_artifact(
+        project_root,
+        make_contract(command="spec-demo", goal_hash="f" * 64),
+        make_state(command="spec-demo", goal_hash="f" * 64),
+    )
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"run_artifact_path": str(foreign)},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "run_artifact_goal_hash_match" in result["missing_evidence"]
+
+
+def test_archive_run_prove_rejects_foreign_command_artifact(tmp_path: Path) -> None:
+    """AC-004: an artifact archived for another command is rejected."""
+    from tests.test_run_artifact import make_contract, make_state
+
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+    goal_hash = str(contract["goal_hash"])
+    foreign = _archive_fixture_artifact(
+        project_root,
+        make_contract(command="spec-other", goal_hash=goal_hash),
+        make_state(command="spec-other", goal_hash=goal_hash),
+    )
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"run_artifact_path": str(foreign)},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "run_artifact_command_match" in result["missing_evidence"]
+
+
+def test_archive_run_prove_accepts_matching_artifact_read_only(tmp_path: Path) -> None:
+    """AC-004/AC-005: a matching .specs/.runs/ artifact is accepted without re-archiving."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+    artifact_path = _archive_fixture_artifact(project_root, contract, state)
+    runs_dir = project_root / ".specs" / ".runs"
+    listing_before = sorted(path.name for path in runs_dir.iterdir())
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"run_artifact_path": str(artifact_path)},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "ACCEPTED"
+    assert result["state"]["tasks"]["archive.run"]["status"] == "complete"
+    # Read-only bootstrap: the proof never writes anything under .specs/.runs/.
+    assert sorted(path.name for path in runs_dir.iterdir()) == listing_before
+
+
+def test_archive_run_prove_accepts_non_latest_matching_artifact(tmp_path: Path) -> None:
+    """EC-002: any artifact with a matching goal hash is accepted, not only the latest."""
+    from tests.test_run_artifact import make_contract, make_state
+
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+    matching = _archive_fixture_artifact(project_root, contract, state)
+    # A later artifact for the same command but another goal makes `matching` non-latest.
+    _archive_fixture_artifact(
+        project_root,
+        make_contract(command="spec-demo", goal_hash="9" * 64),
+        make_state(command="spec-demo", goal_hash="9" * 64),
+    )
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"run_artifact_path": str(matching)},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "ACCEPTED"
+    # Meaningful postcondition: the accepted evidence records the non-latest
+    # matching artifact path, proving EC-002 (no latest-only restriction).
+    accepted = result["state"]["tasks"]["archive.run"]["accepted_evidence"]
+    assert accepted["run_artifact_path"] == str(matching)
+
+
+def test_archive_run_prove_rejects_deleted_artifact_with_repair(tmp_path: Path) -> None:
+    """EC-003: artifact deleted between archive and prove → repair instructs re-archive."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root)
+    artifact_path = _archive_fixture_artifact(project_root, contract, state)
+    artifact_path.unlink()
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"run_artifact_path": str(artifact_path)},
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert any(item.startswith("run_artifact_valid:") for item in result["missing_evidence"])
+    assert any("livespec goal archive" in action for action in result["required_actions"])
+
+
+# ─── Feature 059 Step 9 — registry sweep + end-to-end proof chain ─────────────
+
+
+@pytest.mark.level_3a
+def test_every_registry_command_contract_ends_with_archive_run(tmp_path: Path) -> None:
+    """SC-001: sweep over the real command registry — every goal-locked
+    contract's max-ordinal task id is archive.run."""
+    from validator.command_registry import discover_commands
+
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    commands = discover_commands(_repo_root() / ".agent-sync" / "skills")
+    assert commands, "registry discovery returned no commands"
+
+    for info in commands:
+        goal = compile_command_goal(
+            info.name,
+            project_root=project_root,
+            livespec_root=_repo_root(),
+            feature=None,
+            flags="",
+        )
+        contract = json.loads(render_goal_contract_file(goal))
+        last_task = max(contract["tasks"], key=lambda task: int(task["ordinal"]))
+        assert last_task["id"] == "archive.run", (
+            f"{info.name} contract max-ordinal task is {last_task['id']!r}"
+        )
+
+
+def test_archive_run_end_to_end_drill(tmp_path: Path) -> None:
+    """SC-002/SC-004 drill: prove prior tasks → archive → prove archive.run
+    → ACCEPTED on first attempt; the artifact outcome is success while its
+    snapshot still shows archive.run pending (self-reference exclusion)."""
+    from validator.run_artifacts import archive_goal_run
+
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    contract, state = _demo_contract_and_state(project_root, livespec_root, flags="")
+
+    # Prove every prior (non-archive) task with generic evidence.
+    for task in contract["tasks"]:
+        if task["id"] == "archive.run":
+            continue
+        result = prove_goal_task(
+            contract,
+            state,
+            str(task["id"]),
+            evidence={"output": "done", "success_criteria_met": True},
+            project_root=project_root,
+        )
+        assert result["status"] == "ACCEPTED", result
+        state = result["state"]
+
+    archive = archive_goal_run(contract, state, project_root=project_root, exit_code=0)
+    assert archive.path is not None
+    # SC-004: success despite archive.run pending in the embedded snapshot.
+    assert archive.outcome == "success"
+    assert archive.artifact is not None
+    snapshot = {task["id"]: task["status"] for task in archive.artifact["goal"]["tasks"]}
+    assert snapshot["archive.run"] == "pending"
+    assert archive.artifact["verify_result"]["outcome"] == "success"
+
+    # SC-002: the printed artifact path is accepted on the first attempt.
+    proof = prove_goal_task(
+        contract,
+        state,
+        "archive.run",
+        evidence={"run_artifact_path": str(archive.path)},
+        project_root=project_root,
+    )
+    assert proof["status"] == "ACCEPTED"
+    final_state = proof["state"]
+    assert all(task["status"] == "complete" for task in final_state["tasks"].values())
+    assert final_state["status"] == "complete"
