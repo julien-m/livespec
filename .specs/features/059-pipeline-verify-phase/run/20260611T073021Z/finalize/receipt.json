@@ -1,0 +1,31 @@
+{
+  "command": "spec-specify",
+  "created_at": "2026-06-11T07:30:21.744960+00:00",
+  "feature_slug": "059-pipeline-verify-phase",
+  "files": [
+    {
+      "path": ".specs/features/059-pipeline-verify-phase/changelog.md",
+      "sha256": "87eba558d1cfb74433b1d319fac3838e91384834f12c1c3a3572d733e48ebd71"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "201989e0b0dda9b8f783f0e891eb4004319130e1a45f9a60399c16d2173420f9"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "b29e92c1598f9e5d4bbbbfb8ce23daa6860813aa0a37a1e7a60c746a2371ace9"
+    },
+    {
+      "path": ".specs/features/059-pipeline-verify-phase/spec.md",
+      "sha256": "5d4df52398868061b11b5f5e3980bb7ec95b7b7fb6d651eac33bc7616b9951cc"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "799a2740ff8383a30cdc64f816753171ad398ee8fb7dec77c34b2df7bc758945",
+  "receipt_hash": "9dba7c53581cad545717e92dc6c72281b32bcf9874a252bd199fa332688b3f58",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}
