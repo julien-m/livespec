@@ -144,6 +144,10 @@ flowchart TD
 - **AC-015:** Le receipt conventions est un artefact d'audit uniquement (preuve de traçabilite).
   L'exigence anti-forgerie DURE est la re-execution par le superviseur (feature 063, must:).
   Un receipt PASS seul ne constitue pas une preuve de conformite suffisante.
+- **AC-016:** `delegate_to` ignore une commande dont l'id declare ne correspond pas au basename
+  de l'executable reel, afin qu'un id linter spoofe ne puisse pas desactiver un builtin.
+- **AC-017:** Les erreurs de lecture de fichier source produisent une violation `file_read_error`
+  bloquante au lieu d'un traceback.
 
 ## Functional Requirements
 
@@ -174,6 +178,8 @@ flowchart TD
 - PASS receipts with error violations are rejected.
 - Receipts become invalid when the gates file changes after receipt creation.
 - Stale constitution metadata blocks verification until gates are regenerated.
+- Spoofed linter ids do not delegate builtin coverage unless the executable basename matches.
+- Unreadable source files block verification with an auditable violation.
 
 ## Success Criteria
 

@@ -27,7 +27,7 @@ from .visual_evidence import sha256_file
 
 GateSeverityInput = Literal["warning", "error"]
 SourceKind = Literal["builtin", "linter", "system"]
-_BLOCKING_VIOLATION_RULES = frozenset({"linter_timeout", "file_encoding_error"})
+_BLOCKING_VIOLATION_RULES = frozenset({"linter_timeout", "file_encoding_error", "file_read_error"})
 
 
 class GateSeverity(StrEnum):
@@ -102,15 +102,7 @@ class GateResult:
 
 
 def verify_conventions(project_root: Path, *, report: bool = False) -> GateResult:
-    """Run deterministic conventions verification.
-
-    Args:
-        project_root: Project root.
-        report: Write debt report artifacts when true.
-
-    Returns:
-        Gate result with PASS/FAIL/BLOCKED verdict.
-    """
+    """Run deterministic conventions verification for a project root."""
     gates = load_conventions_gates(gates_path(project_root))
     blockers = _command_blockers(project_root, gates)
     violations = [] if blockers else _collect_violations(project_root, gates)
@@ -215,9 +207,11 @@ def _collect_violations(project_root: Path, gates: ConventionsGates) -> list[Gat
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError as exc:
             message = f"{rel} is not valid UTF-8: {exc.reason}"
-            violations.append(
-                GateViolation("file_encoding_error", rel, 1, GateSeverity.ERROR, message, "system")
-            )
+            violations.append(_system_error("file_encoding_error", rel, message))
+            continue
+        except (PermissionError, OSError) as exc:
+            message = f"{rel} could not be read: {exc}"
+            violations.append(_system_error("file_read_error", rel, message))
             continue
         analysis = adapter_for_path(path).analyze(path, text)
         violations.extend(_file_length_violations(rel, text, gates))
@@ -496,3 +490,7 @@ def _violation(
     source: SourceKind = "builtin",
 ) -> GateViolation:
     return GateViolation(rule_id, path, line, GateSeverity(severity), message, source)
+
+
+def _system_error(rule_id: str, path: str, message: str) -> GateViolation:
+    return GateViolation(rule_id, path, 1, GateSeverity.ERROR, message, "system")

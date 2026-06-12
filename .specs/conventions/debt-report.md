@@ -3,7 +3,7 @@
 Verdict: FAIL
 
 Files: 200/487 reported
-Violations: 1543/6346 listed
+Violations: 1546/6350 listed
 
 ## node_modules/typescript/lib/typescript.js (error, 1405 total)
 - error builtin.max_file_lines:1 200276 lines > 500
@@ -695,6 +695,29 @@ Violations: 1543/6346 listed
 - warning builtin.max_function_lines:1446 _archive_run_artifact_mismatches has 33 lines > 30
 - ... 2 more violation(s) omitted
 
+## tests/test_conventions_verify.py (error, 21 total)
+- error builtin.token_scale:76 padding uses 10, outside token scale
+- warning builtin.max_file_lines:1 416 lines > 400
+- warning builtin.max_function_lines:27 _write_project has 59 lines > 30
+- warning builtin.doc_coverage:88 public API lacks docs
+- warning builtin.doc_coverage:106 public API lacks docs
+- warning builtin.max_function_lines:127 test_verify_extracts_ruff_flat_json_violations has 35 lines > 30
+- warning builtin.doc_coverage:127 public API lacks docs
+- warning builtin.max_function_lines:164 test_delegate_to_non_covering_linter_keeps_builtin_threshold has 34 lines > 30
+- warning builtin.doc_coverage:164 public API lacks docs
+- warning builtin.max_function_lines:200 test_delegate_to_unknown_wired_linter_does_not_disable_builtin has 39 lines > 30
+- warning builtin.doc_coverage:200 public API lacks docs
+- warning builtin.doc_coverage:241 public API lacks docs
+- warning builtin.doc_coverage:273 public API lacks docs
+- warning builtin.doc_coverage:297 public API lacks docs
+- warning builtin.doc_coverage:310 public API lacks docs
+- warning builtin.doc_coverage:324 public API lacks docs
+- warning builtin.doc_coverage:335 public API lacks docs
+- warning builtin.doc_coverage:345 public API lacks docs
+- warning builtin.doc_coverage:353 public API lacks docs
+- warning builtin.doc_coverage:372 public API lacks docs
+- ... 1 more violation(s) omitted
+
 ## validator/ui_runner_maestro.py (error, 21 total)
 - error builtin.max_file_lines:1 964 lines > 500
 - error builtin.suppression_directives:17 suppression directive `# noqa` exceeds budget 0
@@ -837,25 +860,6 @@ Violations: 1543/6346 listed
 - warning builtin.doc_coverage:201 public API lacks docs
 - warning builtin.doc_coverage:239 public API lacks docs
 - warning builtin.doc_coverage:307 public API lacks docs
-
-## tests/test_conventions_verify.py (error, 17 total)
-- error builtin.token_scale:76 padding uses 10, outside token scale
-- warning builtin.max_function_lines:27 _write_project has 59 lines > 30
-- warning builtin.doc_coverage:88 public API lacks docs
-- warning builtin.doc_coverage:106 public API lacks docs
-- warning builtin.max_function_lines:127 test_verify_extracts_ruff_flat_json_violations has 35 lines > 30
-- warning builtin.doc_coverage:127 public API lacks docs
-- warning builtin.max_function_lines:164 test_delegate_to_non_covering_linter_keeps_builtin_threshold has 34 lines > 30
-- warning builtin.doc_coverage:164 public API lacks docs
-- warning builtin.max_function_lines:200 test_delegate_to_unknown_wired_linter_does_not_disable_builtin has 39 lines > 30
-- warning builtin.doc_coverage:200 public API lacks docs
-- warning builtin.doc_coverage:241 public API lacks docs
-- warning builtin.doc_coverage:265 public API lacks docs
-- warning builtin.doc_coverage:278 public API lacks docs
-- warning builtin.doc_coverage:292 public API lacks docs
-- warning builtin.doc_coverage:303 public API lacks docs
-- warning builtin.doc_coverage:313 public API lacks docs
-- warning builtin.doc_coverage:336 public API lacks docs
 
 ## tests/test_phase_4_5_dispatcher.py (error, 17 total)
 - error builtin.suppression_directives:18 suppression directive `# noqa` exceeds budget 0
@@ -1567,9 +1571,9 @@ Violations: 1543/6346 listed
 
 ## validator/conventions_gate.py (error, 4 total)
 - error builtin.suppression_directives:19 suppression directive `# type: ignore` exceeds budget 0
-- warning builtin.max_file_lines:1 498 lines > 400
-- warning builtin.max_function_lines:265 _function_length_violations has 31 lines > 30
-- warning builtin.max_function_lines:390 _linter_violations has 49 lines > 30
+- warning builtin.max_file_lines:1 496 lines > 400
+- warning builtin.max_function_lines:259 _function_length_violations has 31 lines > 30
+- warning builtin.max_function_lines:384 _linter_violations has 49 lines > 30
 
 ## validator/drivers/patch_coverage.py (error, 4 total)
 - error builtin.max_function_lines:107 compute_patch_coverage has 66 lines > 60

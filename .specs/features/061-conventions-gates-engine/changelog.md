@@ -1,5 +1,13 @@
 # Changelog - 061-conventions-gates-engine
 
+## 2026-06-12 — [Bugfix]: Critic cycle 4 id-spoof and read-error hardening
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (AC-016, AC-017)
+- **Code modified:** validator/conventions_delegate.py, validator/conventions_gate.py, tests/test_conventions_verify.py
+- **AC impacted:** AC-016, AC-017
+- **Author:** spec-fix worker (Codex)
+
 ## 2026-06-12 — [Bugfix]: Critic cycle 3 hardening
 
 - **Type:** Bugfix

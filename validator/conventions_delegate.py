@@ -5,7 +5,10 @@
 
 from __future__ import annotations
 
-from .conventions_gates import CommandGroups
+import os
+import shlex
+
+from .conventions_gates import CommandGroups, GateCommand
 
 _LINTER_RULE_CAPABILITIES: dict[str, frozenset[str]] = {
     "swiftlint": frozenset({"builtin.max_file_lines", "builtin.max_function_lines"}),
@@ -19,6 +22,15 @@ def is_rule_delegated(commands: CommandGroups, delegate_to: str | None, rule_id:
         return False
     return any(
         command.id == delegate_to
+        and _command_id_matches_executable(command)
         and rule_id in _LINTER_RULE_CAPABILITIES.get(command.id, frozenset())
         for command in commands.lint + commands.format + commands.typecheck
     )
+
+
+def _command_id_matches_executable(command: GateCommand) -> bool:
+    try:
+        executable = shlex.split(command.run)[0]
+    except (IndexError, ValueError):
+        return False
+    return os.path.basename(executable) == command.id

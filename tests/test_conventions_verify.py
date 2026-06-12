@@ -238,11 +238,43 @@ def test_delegate_to_unknown_wired_linter_does_not_disable_builtin(tmp_path: Pat
     assert any(v.rule_id == "builtin.max_function_lines" for v in result.violations)
 
 
+def test_delegate_to_spoofed_linter_id_does_not_disable_builtin(tmp_path: Path) -> None:
+    project_root = _write_project(tmp_path)
+    gates_path = project_root / ".specs" / "conventions-gates.yaml"
+    text = gates_path.read_text(encoding="utf-8")
+    text = text.replace("lint: []", 'lint:\n    - id: swiftlint\n      run: "true"')
+    text = text.replace(
+        "max_function_lines: {target: 3, limit: 5}",
+        "max_function_lines: {target: 3, limit: 5, delegate_to: swiftlint}",
+    )
+    (project_root / "src" / "long.py").write_text(
+        '"""module."""\n\n'
+        "def too_long() -> None:\n"
+        "    x = 1\n"
+        "    x = 2\n"
+        "    x = 3\n"
+        "    x = 4\n"
+        "    x = 5\n"
+        "    x = 6\n",
+        encoding="utf-8",
+    )
+    gates_path.write_text(text, encoding="utf-8")
+    gates = load_conventions_gates(gates_path)
+
+    assert not is_rule_delegated(
+        gates.commands,
+        "swiftlint",
+        "builtin.max_function_lines",
+    )
+    result = verify_conventions(project_root)
+    assert any(v.rule_id == "builtin.max_function_lines" for v in result.violations)
+
+
 def test_delegate_to_covering_linter_disables_builtin_threshold(tmp_path: Path) -> None:
     project_root = _write_project(tmp_path)
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
-    tool = bin_dir / "swiftlint-json"
+    tool = bin_dir / "swiftlint"
     tool.write_text("#!/usr/bin/env sh\nprintf '[]\\n'\n", encoding="utf-8")
     tool.chmod(tool.stat().st_mode | stat.S_IXUSR)
     gates = project_root / ".specs" / "conventions-gates.yaml"
@@ -308,6 +340,33 @@ def test_invalid_source_encoding_blocks_without_traceback(tmp_path: Path) -> Non
 
     assert result.verdict is GateVerdict.BLOCKED
     assert any(v.rule_id == "file_encoding_error" for v in result.violations)
+
+
+def test_unreadable_source_file_blocks_without_traceback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = _write_project(tmp_path)
+    (project_root / "src" / "unreadable.py").write_text('"""module."""\n', encoding="utf-8")
+    original_read_text = Path.read_text
+
+    def read_text_or_raise(
+        self: Path,
+        encoding: str | None = None,
+        errors: str | None = None,
+    ) -> str:
+        if self.name == "unreadable.py":
+            raise PermissionError("denied")
+        return original_read_text(self, encoding=encoding, errors=errors)
+
+    monkeypatch.setattr(Path, "read_text", read_text_or_raise)
+
+    result = verify_conventions(project_root)
+
+    assert result.verdict is GateVerdict.BLOCKED
+    assert any(
+        v.rule_id == "file_read_error" and v.path == "src/unreadable.py" for v in result.violations
+    )
 
 
 def test_cli_verify_json_exit_codes_and_gates_init(tmp_path: Path) -> None:
