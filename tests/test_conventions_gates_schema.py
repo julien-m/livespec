@@ -43,6 +43,12 @@ def test_generate_gates_uses_two_level_thresholds_and_source_hash(tmp_path: Path
     assert {command.id for command in gates.commands.lint} == {"ruff", "eslint"}
 
 
+def test_load_real_repo_gates_file() -> None:
+    gates = load_conventions_gates(Path("."))
+
+    assert gates.schema_version == 1
+
+
 def test_load_gates_rejects_invalid_threshold_order(tmp_path: Path) -> None:
     gates_path = tmp_path / "gates.yaml"
     gates_path.write_text(

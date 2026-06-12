@@ -8,7 +8,6 @@ commands:
   - id: ruff
     run: ruff check . --output-format json
     config: pyproject.toml
-    wiring: []
   format: []
   typecheck: []
 builtin:

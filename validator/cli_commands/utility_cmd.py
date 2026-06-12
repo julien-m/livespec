@@ -17,7 +17,12 @@ import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency wi
 
 from ..cli_commands._common import emit_summary
 from ..conventions_gate import verify_conventions
-from ..conventions_gates import gates_path, generate_conventions_gates, load_conventions_gates
+from ..conventions_gates import (
+    ConventionsGates,
+    gates_path,
+    generate_conventions_gates,
+    load_conventions_gates,
+)
 
 REPO_OPTION = typer.Option(Path("."), "--repo", help="Project repository root.")
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
@@ -408,7 +413,7 @@ def _is_web_ui_stack(stack_text: str) -> bool:
 
 def _scaffold_swiftlint(
     repo_root: Path,
-    gates: object,
+    gates: ConventionsGates,
     *,
     apply: bool,
     sync_limits: bool,

@@ -129,6 +129,8 @@ def load_conventions_gates(path: Path) -> ConventionsGates:
     Raises:
         ValueError: If YAML is unreadable, malformed, or schema-invalid.
     """
+    if path.is_dir():
+        path = gates_path(path)
     try:
         raw: Any = yaml.safe_load(path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:
