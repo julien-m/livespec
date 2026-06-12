@@ -4,7 +4,7 @@
 
 - **Type:** Refactor
 - **Spec modified:** Yes (AC-013, AC-016, FR-007)
-- **Code modified:** validator/conventions_gates.py, validator/conventions_gate.py, tests/test_conventions_gates_schema.py, tests/test_conventions_verify.py
+- **Code modified:** validator/conventions_gates.py, validator/conventions_gate.py, validator/conventions_delegate.py (deleted), tests/test_conventions_gates_schema.py, tests/test_conventions_verify.py
 - **AC impacted:** AC-013, AC-016
 - **Author:** spec-fix worker (Codex)
 

@@ -128,3 +128,31 @@ def test_conventions_gates_v1_rejects_delegate_and_wiring_fields() -> None:
 
     with pytest.raises(ValueError, match="Extra inputs are not permitted"):
         ConventionsGates.model_validate(payload)
+
+
+def test_conventions_gates_v1_rejects_command_delegate_to_field() -> None:
+    payload = {
+        "schema_version": 1,
+        "generated_from": {
+            "constitution": ".specs/constitution.md",
+            "constitution_sha256": "0" * 64,
+            "stack": ".specs/stacks/_default.md",
+        },
+        "commands": {
+            "lint": [
+                {
+                    "id": "ruff",
+                    "run": "ruff check . --output-format json",
+                    "delegate_to": "ruff",
+                }
+            ]
+        },
+        "builtin": {
+            "max_file_lines": {"target": 400, "limit": 500},
+            "max_function_lines": {"target": 30, "limit": 60},
+        },
+        "scope": "repo",
+    }
+
+    with pytest.raises(ValueError, match="Extra inputs are not permitted"):
+        ConventionsGates.model_validate(payload)
