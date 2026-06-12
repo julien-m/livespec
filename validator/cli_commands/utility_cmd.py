@@ -23,6 +23,7 @@ from ..conventions_gates import (
     generate_conventions_gates,
     load_conventions_gates,
 )
+from ..conventions_rules import RulebookStaleError, compile_conventions_rulebook
 
 REPO_OPTION = typer.Option(Path("."), "--repo", help="Project repository root.")
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
@@ -226,6 +227,64 @@ def conventions_verify_command(
         typer.echo(f"violations: {len(result.violations)}")
         for blocker in result.blockers:
             typer.echo(f"BLOCKED: {blocker.message}", err=True)
+    raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
+
+
+@conventions_app.command("compile")
+def conventions_compile_command(
+    repo: Path = REPO_OPTION,
+    force: bool = typer.Option(False, "--force", help="Overwrite stale rulebook."),
+    json_out: bool = JSON_OPTION,
+) -> None:
+    """Compile a self-contained semantic conventions rulebook.
+
+    # @spec FR-009: Register conventions compile
+    #   — .specs/features/062-conventions-rulebook-semantic/spec.md#fr-009
+    """
+    try:
+        path = compile_conventions_rulebook(repo.resolve(), force=force)
+    except RulebookStaleError as exc:
+        message = (
+            f"conventions rulebook stale: {exc}. "
+            "Re-run with --force after reviewing convention source changes."
+        )
+        if json_out:
+            typer.echo(json.dumps({"status": "stale", "error": message}, indent=2))
+        else:
+            typer.echo(message, err=True)
+        raise typer.Exit(1) from exc
+    except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
+        if json_out:
+            typer.echo(json.dumps({"status": "blocked", "error": str(exc)}, indent=2))
+        else:
+            typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(2) from exc
+    if json_out:
+        typer.echo(json.dumps({"status": "written", "path": str(path)}, indent=2))
+    else:
+        typer.echo(f"conventions rulebook written: {path}")
+    raise typer.Exit(0)
+
+
+@conventions_app.command("semantic")
+def conventions_semantic_command(
+    repo: Path = REPO_OPTION,
+    json_out: bool = JSON_OPTION,
+) -> None:
+    """Run Layer 4 semantic conventions Engine C.
+
+    # @spec FR-005: Engine C executable path
+    #   — .specs/features/062-conventions-rulebook-semantic/spec.md#fr-005
+    """
+    from ..conventions_engine_c import run_semantic_conventions
+
+    result = run_semantic_conventions(repo.resolve())
+    if json_out:
+        typer.echo(json.dumps(result.model_dump(mode="json"), indent=2, sort_keys=True))
+    else:
+        typer.echo(f"Semantic conventions verdict: {result.verdict.value}")
+        for blocker in result.blockers:
+            typer.echo(f"BLOCKED: {blocker}", err=True)
     raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
 
 
@@ -452,6 +511,8 @@ def _read_swiftlint_payload(path: Path) -> dict[str, object]:
 __all__ = [
     "build_status_report",
     "conventions_app",
+    "conventions_compile_command",
+    "conventions_semantic_command",
     "play_coverage_command",
     "refresh_conventions_command",
     "register",

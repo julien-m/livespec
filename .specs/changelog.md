@@ -3,9 +3,12 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-11
+> Last updated: 2026-06-12
 
 ---
+
+## 2026-06-12 — [Feature 062] Implemented: Conventions Rulebook Semantic — self-contained rulebook compiler, direct provider Engine C, waiver-aware verdicts, compile CLI
+<!-- finalize:spec-implement:2026-06-12:3e197383 -->
 
 ## 2026-06-12 — [Feature 061 Refactor] Remove delegate_to and command wiring from conventions gates schema v1
 
