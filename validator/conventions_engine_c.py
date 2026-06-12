@@ -111,7 +111,7 @@ def run_semantic_conventions(
     Returns:
         Deterministic PASS, FAIL, or BLOCKED result.
     """
-    del model
+    del model  # Deprecated: Engine C must never reuse the caller's implementation model.
     root = project_root.resolve()
     rulebook = load_conventions_rules(rules_path or rulebook_path(root))
     current_date = today or datetime.now(UTC).date()
@@ -170,7 +170,10 @@ def _configured_review_model(project_root: Path) -> str:
         return configured
     provider_loader = getattr(llm_provider, "_load_provider", None)
     if callable(provider_loader):
-        provider = provider_loader()
+        try:
+            provider = provider_loader()
+        except llm_provider.LLMProviderNotConfigured:
+            provider = None
         provider_model = getattr(provider, "review_model", "")
         if isinstance(provider_model, str) and provider_model.strip():
             return provider_model.strip()

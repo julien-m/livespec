@@ -255,19 +255,22 @@ def conventions_compile_command(
             typer.echo(message, err=True)
         raise typer.Exit(1) from exc
     except LLMProviderNotConfigured as exc:
+        blocker = str(exc) or "LLM provider is not configured."
+        next_step = "Configure the LLM provider, then rerun conventions compile."
         if json_out:
             typer.echo(
                 json.dumps(
                     {
                         "verdict": "BLOCKED",
                         "reason": "provider_not_configured",
-                        "blockers": [str(exc)],
+                        "blockers": [blocker],
+                        "next_step": next_step,
                     },
                     indent=2,
                 )
             )
         else:
-            typer.echo(f"BLOCKED: provider_not_configured: {exc}", err=True)
+            typer.echo(f"BLOCKED: provider_not_configured: {blocker} {next_step}", err=True)
         raise typer.Exit(2) from exc
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
         if json_out:
@@ -297,15 +300,21 @@ def conventions_semantic_command(
     try:
         result = run_semantic_conventions(repo.resolve())
     except FileNotFoundError as exc:
+        next_step = "Run conventions compile for this repo, then rerun conventions semantic."
         if json_out:
             typer.echo(
                 json.dumps(
-                    {"verdict": "BLOCKED", "reason": "rulebook_missing", "blockers": [str(exc)]},
+                    {
+                        "verdict": "BLOCKED",
+                        "reason": "rulebook_missing",
+                        "blockers": [str(exc)],
+                        "next_step": next_step,
+                    },
                     indent=2,
                 )
             )
         else:
-            typer.echo(f"BLOCKED: rulebook_missing: {exc}", err=True)
+            typer.echo(f"BLOCKED: rulebook_missing: {exc} {next_step}", err=True)
         raise typer.Exit(2) from exc
     except ValueError as exc:
         if json_out:
