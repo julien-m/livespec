@@ -160,6 +160,9 @@ flowchart TD
   non-blocking findings, waiver application, and provider-down behavior.
 - **AC-021:** New production modules remain below 500 lines each.
 - **AC-022:** Source files implementing FRs include `@spec` anchors linking to this spec.
+- **AC-023:** Engine C reads `review_model` from `.specs/semantic/config.yaml` or provider
+  config, falls back to `claude-3-5-sonnet-latest`, and never uses the caller's implementation
+  model for semantic review calls.
 
 ## Functional Requirements
 

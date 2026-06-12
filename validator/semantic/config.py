@@ -45,6 +45,7 @@ class SemanticConfig:
     multi_model_divergence_threshold: float = 0.25
 
     # Plan review
+    review_model: str = ""
     review_reviewers: list[str] = field(default_factory=list)
     review_confidence_threshold: float = 3.0
 

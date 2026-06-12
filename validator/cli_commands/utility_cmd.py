@@ -24,6 +24,7 @@ from ..conventions_gates import (
     load_conventions_gates,
 )
 from ..conventions_rules import RulebookStaleError, compile_conventions_rulebook
+from ..llm_provider import LLMProviderNotConfigured
 
 REPO_OPTION = typer.Option(Path("."), "--repo", help="Project repository root.")
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
@@ -253,6 +254,21 @@ def conventions_compile_command(
         else:
             typer.echo(message, err=True)
         raise typer.Exit(1) from exc
+    except LLMProviderNotConfigured as exc:
+        if json_out:
+            typer.echo(
+                json.dumps(
+                    {
+                        "verdict": "BLOCKED",
+                        "reason": "provider_not_configured",
+                        "blockers": [str(exc)],
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            typer.echo(f"BLOCKED: provider_not_configured: {exc}", err=True)
+        raise typer.Exit(2) from exc
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
         if json_out:
             typer.echo(json.dumps({"status": "blocked", "error": str(exc)}, indent=2))
@@ -278,7 +294,30 @@ def conventions_semantic_command(
     """
     from ..conventions_engine_c import run_semantic_conventions
 
-    result = run_semantic_conventions(repo.resolve())
+    try:
+        result = run_semantic_conventions(repo.resolve())
+    except FileNotFoundError as exc:
+        if json_out:
+            typer.echo(
+                json.dumps(
+                    {"verdict": "BLOCKED", "reason": "rulebook_missing", "blockers": [str(exc)]},
+                    indent=2,
+                )
+            )
+        else:
+            typer.echo(f"BLOCKED: rulebook_missing: {exc}", err=True)
+        raise typer.Exit(2) from exc
+    except ValueError as exc:
+        if json_out:
+            typer.echo(
+                json.dumps(
+                    {"verdict": "BLOCKED", "reason": "rulebook_invalid", "blockers": [str(exc)]},
+                    indent=2,
+                )
+            )
+        else:
+            typer.echo(f"BLOCKED: rulebook_invalid: {exc}", err=True)
+        raise typer.Exit(2) from exc
     if json_out:
         typer.echo(json.dumps(result.model_dump(mode="json"), indent=2, sort_keys=True))
     else:

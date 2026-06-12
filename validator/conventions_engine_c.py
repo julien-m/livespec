@@ -24,9 +24,11 @@ from validator.conventions_rules import (
     load_conventions_rules,
     rulebook_path,
 )
+from validator.semantic.config import load_semantic_config
 
 ProviderFindingSeverity = Literal["blocking", "warning", "info"]
 MAX_SOURCE_EXCERPT_CHARS = 4000
+DEFAULT_REVIEW_MODEL = "claude-3-5-sonnet-latest"
 
 
 class ProviderCallError(RuntimeError):
@@ -103,15 +105,17 @@ def run_semantic_conventions(
         project_root: Repository root containing the compiled rulebook.
         source_texts: Optional source excerpts keyed by repository-relative path.
         rules_path: Optional explicit rulebook path.
-        model: Optional model passed to the configured provider.
+        model: Deprecated implementation model argument. Engine C always uses a review model.
         today: Date used for waiver expiry checks; defaults to current UTC date.
 
     Returns:
         Deterministic PASS, FAIL, or BLOCKED result.
     """
+    del model
     root = project_root.resolve()
     rulebook = load_conventions_rules(rules_path or rulebook_path(root))
     current_date = today or datetime.now(UTC).date()
+    review_model = _configured_review_model(root)
     findings: list[SemanticFinding] = []
     provider_calls = 0
     for domain, rules in _rules_by_domain(rulebook).items():
@@ -122,7 +126,7 @@ def run_semantic_conventions(
                 domain=domain,
                 rules=rules,
                 source_texts=source_texts or {},
-                model=model,
+                model=review_model,
             )
             domain_findings = _normalize_findings(
                 domain, rules, batch, rulebook.waivers, current_date
@@ -158,6 +162,19 @@ def _rules_by_domain(rulebook: ConventionsRules) -> dict[str, list[CompiledConve
             continue
         grouped.setdefault(rule.domain, []).append(rule)
     return dict(sorted(grouped.items()))
+
+
+def _configured_review_model(project_root: Path) -> str:
+    configured = load_semantic_config(project_root / ".specs").review_model.strip()
+    if configured:
+        return configured
+    provider_loader = getattr(llm_provider, "_load_provider", None)
+    if callable(provider_loader):
+        provider = provider_loader()
+        provider_model = getattr(provider, "review_model", "")
+        if isinstance(provider_model, str) and provider_model.strip():
+            return provider_model.strip()
+    return DEFAULT_REVIEW_MODEL
 
 
 def _call_domain_provider(

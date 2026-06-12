@@ -123,10 +123,13 @@ def load_conventions_rules(path: Path) -> ConventionsRules:
         Validated rulebook model.
 
     Raises:
+        FileNotFoundError: If the rulebook YAML does not exist.
         ValueError: If the YAML root is missing or malformed.
     """
     if path.is_dir():
         path = rulebook_path(path)
+    if not path.is_file():
+        raise FileNotFoundError(path)
     try:
         raw: object = yaml.safe_load(path.read_text(encoding="utf-8"))
     except (OSError, yaml.YAMLError) as exc:

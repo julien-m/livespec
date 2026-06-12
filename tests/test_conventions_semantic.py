@@ -101,6 +101,40 @@ def test_engine_c_batches_one_provider_call_per_domain(
     assert len(calls) == 2
 
 
+def test_engine_c_uses_configured_review_model_not_implementation_model(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _write_rulebook(tmp_path)
+    config_dir = tmp_path / ".specs" / "semantic"
+    config_dir.mkdir()
+    (config_dir / "config.yaml").write_text("review_model: reviewer-model\n", encoding="utf-8")
+    models: list[str | None] = []
+
+    def fake_call_llm(
+        _prompt: str,
+        json_schema: dict[str, object] | None = None,
+        model: str | None = None,
+        temperature: int | None = None,
+    ) -> str:
+        models.append(model)
+        assert json_schema is not None
+        assert temperature == 0
+        return json.dumps({"findings": []})
+
+    monkeypatch.setattr("validator.conventions_engine_c.llm_provider.call_llm", fake_call_llm)
+
+    result = run_semantic_conventions(
+        tmp_path,
+        source_texts={"src/app.py": "def x():\n    return None\n"},
+        model="implementation-model",
+    )
+
+    assert result.verdict is SemanticConventionVerdict.PASS
+    assert models == ["reviewer-model", "reviewer-model"]
+    assert "implementation-model" not in models
+
+
 def test_blocking_finding_fails_and_non_blocking_is_preserved(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -261,3 +295,16 @@ def test_conventions_semantic_cli_json_pass(
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
     assert payload["verdict"] == "PASS"
+
+
+def test_conventions_semantic_cli_missing_rulebook_blocks(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / ".specs").mkdir()
+
+    result = runner.invoke(app, ["conventions", "semantic", "--repo", str(tmp_path), "--json"])
+
+    assert result.exit_code == 2, result.output
+    payload = json.loads(result.output)
+    assert payload["verdict"] == "BLOCKED"
+    assert payload["reason"] == "rulebook_missing"

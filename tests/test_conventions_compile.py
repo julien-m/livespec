@@ -22,6 +22,7 @@ from validator.conventions_rules import (
     compile_conventions_rulebook,
     load_conventions_rules,
 )
+from validator.llm_provider import LLMProviderNotConfigured
 
 runner = CliRunner()
 
@@ -174,3 +175,25 @@ def test_conventions_compile_cli_json_output(
     payload = json.loads(result.output)
     assert payload["status"] == "written"
     assert payload["path"].endswith(".specs/conventions-rulebook.yaml")
+
+
+def test_conventions_compile_cli_provider_not_configured_blocks(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = _write_conventions_project(tmp_path)
+
+    def raise_not_configured(*_args: object, **_kwargs: object) -> str:
+        raise LLMProviderNotConfigured()
+
+    monkeypatch.setattr("validator.conventions_rules.llm_provider.call_llm", raise_not_configured)
+
+    result = runner.invoke(
+        app,
+        ["conventions", "compile", "--repo", str(project_root), "--force", "--json"],
+    )
+
+    assert result.exit_code == 2, result.output
+    payload = json.loads(result.output)
+    assert payload["verdict"] == "BLOCKED"
+    assert payload["reason"] == "provider_not_configured"
