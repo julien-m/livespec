@@ -134,6 +134,13 @@ flowchart TD
   worst-first with warnings, errors, and suppression counts.
 - **AC-009:** `livespec conventions scaffold --apply --sync-limits` syncs managed SwiftLint limits.
 - **AC-010:** Pytest coverage for 061 runs with zero skipped tests.
+- **AC-011:** Ruff flat JSON diagnostics are parsed as linter violations and make the gate fail.
+- **AC-012:** Conventions receipts are rejected when their `gates_sha256` differs from the current
+  `.specs/conventions-gates.yaml`.
+- **AC-013:** `delegate_to` disables a builtin only when the target command is known or wired to
+  cover that specific rule.
+- **AC-014:** Verification blocks when `generated_from.constitution_sha256` is stale, and
+  `.specs/conventions/debt.json` remains a regenerable ignored artifact.
 
 ## Functional Requirements
 
@@ -145,6 +152,8 @@ flowchart TD
 - **FR-004:** Provide conventions receipt and debt report modules.
 - **FR-005:** Register `conventions verify`, `conventions gates init`, and `conventions scaffold`.
 - **FR-006:** Add pytest coverage for schema, verify, CLI, adapters, report, and receipt.
+- **FR-007:** Parse Ruff flat JSON, validate current gates hashes in receipts, and enforce
+  rule-specific delegation/staleness guards.
 
 ## Key Entities
 
@@ -160,6 +169,8 @@ flowchart TD
 - Missing or mismatched linter versions produce BLOCKED, not FAIL.
 - Unknown extensions use fallback partial coverage.
 - PASS receipts with error violations are rejected.
+- Receipts become invalid when the gates file changes after receipt creation.
+- Stale constitution metadata blocks verification until gates are regenerated.
 
 ## Success Criteria
 

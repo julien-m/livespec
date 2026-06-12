@@ -3,7 +3,7 @@
 Verdict: FAIL
 
 Files: 200/487 reported
-Violations: 1532/6334 listed
+Violations: 1538/6341 listed
 
 ## node_modules/typescript/lib/typescript.js (error, 1405 total)
 - error builtin.max_file_lines:1 200276 lines > 500
@@ -1086,6 +1086,20 @@ Violations: 1532/6334 listed
 - warning builtin.max_function_lines:93 provides has 46 lines > 30
 - warning builtin.max_function_lines:104 that has 35 lines > 30
 
+## tests/test_conventions_verify.py (error, 12 total)
+- error builtin.token_scale:72 padding uses 10, outside token scale
+- warning builtin.max_function_lines:23 _write_project has 59 lines > 30
+- warning builtin.doc_coverage:84 public API lacks docs
+- warning builtin.doc_coverage:102 public API lacks docs
+- warning builtin.max_function_lines:123 test_verify_extracts_ruff_flat_json_violations has 35 lines > 30
+- warning builtin.doc_coverage:123 public API lacks docs
+- warning builtin.max_function_lines:160 test_delegate_to_non_covering_linter_keeps_builtin_threshold has 34 lines > 30
+- warning builtin.doc_coverage:160 public API lacks docs
+- warning builtin.doc_coverage:196 public API lacks docs
+- warning builtin.doc_coverage:220 public API lacks docs
+- warning builtin.doc_coverage:233 public API lacks docs
+- warning builtin.doc_coverage:256 public API lacks docs
+
 ## validator/cli_commands/ui_runner_cmd.py (error, 12 total)
 - error builtin.max_file_lines:1 967 lines > 500
 - error builtin.suppression_directives:9 suppression directive `# noqa` exceeds budget 0
@@ -1299,15 +1313,6 @@ Violations: 1532/6334 listed
 - warning builtin.max_function_lines:140 extractRouteFromSpec has 34 lines > 30
 - warning builtin.max_function_lines:201 translateScenario has 44 lines > 30
 - warning builtin.max_function_lines:252 scanFeatures has 48 lines > 30
-
-## tests/test_conventions_verify.py (error, 7 total)
-- error builtin.token_scale:67 padding uses 10, outside token scale
-- warning builtin.max_function_lines:22 _write_project has 55 lines > 30
-- warning builtin.doc_coverage:79 public API lacks docs
-- warning builtin.doc_coverage:97 public API lacks docs
-- warning builtin.doc_coverage:118 public API lacks docs
-- warning builtin.doc_coverage:142 public API lacks docs
-- warning builtin.doc_coverage:165 public API lacks docs
 
 ## tests/test_visual_implementation_gate.py (error, 7 total)
 - error builtin.max_file_lines:1 654 lines > 500
@@ -1555,6 +1560,12 @@ Violations: 1532/6334 listed
 - error builtin.max_function_lines:235 cleanup_command has 86 lines > 60
 - error builtin.max_function_lines:324 promote_command has 66 lines > 60
 
+## validator/conventions_gate.py (error, 4 total)
+- error builtin.suppression_directives:19 suppression directive `# type: ignore` exceeds budget 0
+- warning builtin.max_file_lines:1 477 lines > 400
+- warning builtin.max_function_lines:257 _function_length_violations has 31 lines > 30
+- warning builtin.max_function_lines:382 _linter_violations has 39 lines > 30
+
 ## validator/drivers/patch_coverage.py (error, 4 total)
 - error builtin.max_function_lines:107 compute_patch_coverage has 66 lines > 60
 - warning builtin.max_function_lines:28 parse_lcov has 32 lines > 30
@@ -1685,11 +1696,6 @@ Violations: 1532/6334 listed
 - error builtin.suppression_directives:53 suppression directive `# noqa` exceeds budget 0
 - error builtin.max_function_lines:87 _run_coverage has 90 lines > 60
 - warning builtin.max_function_lines:35 coverage_command has 43 lines > 30
-
-## validator/conventions_gate.py (error, 3 total)
-- error builtin.suppression_directives:20 suppression directive `# type: ignore` exceeds budget 0
-- warning builtin.max_file_lines:1 487 lines > 400
-- warning builtin.max_function_lines:234 _function_length_violations has 31 lines > 30
 
 ## validator/drivers/loader.py (error, 3 total)
 - error builtin.suppression_directives:15 suppression directive `# type: ignore` exceeds budget 0

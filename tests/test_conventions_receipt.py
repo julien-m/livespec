@@ -73,3 +73,21 @@ def test_verify_rejects_pass_receipt_with_error_violation(tmp_path: Path) -> Non
 
     with pytest.raises(ConventionsReceiptError, match=r"verdict_inconsistent|receipt_hash"):
         verify_conventions_receipt(receipt_path, project_root=tmp_path)
+
+
+def test_verify_rejects_receipt_when_gates_file_changed(tmp_path: Path) -> None:
+    gates = tmp_path / ".specs" / "conventions-gates.yaml"
+    gates.parent.mkdir(parents=True)
+    gates.write_text("schema_version: 1\n", encoding="utf-8")
+    result = GateResult(verdict=GateVerdict.PASS, violations=[], blockers=[])
+    receipt_path = write_conventions_receipt(
+        project_root=tmp_path,
+        feature_slug="061-conventions-gates-engine",
+        run_id="run-3",
+        result=result,
+        gates_path=gates,
+    )
+    gates.write_text("schema_version: 1\nchanged: true\n", encoding="utf-8")
+
+    with pytest.raises(ConventionsReceiptError, match="gates_sha256_mismatch"):
+        verify_conventions_receipt(receipt_path, project_root=tmp_path)

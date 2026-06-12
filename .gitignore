@@ -188,6 +188,9 @@ AUDIT-CODEX.md
 # Preflight report — execution artifact, never versioned
 .specs/preflight-report.md
 
+# Conventions debt JSON is regenerable; keep the Markdown report versioned.
+.specs/conventions/debt.json
+
 # LiveSpec local run artifacts (feature 039)
 .specs/.runs/
 /.tmp-orchestrate/

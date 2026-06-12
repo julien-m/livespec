@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Literal, cast
 
 from .conventions_gate import GateResult
+from .conventions_gates import gates_path
 from .visual_evidence import receipt_payload_hash, sha256_file
 
 ORACLE_NAME = "livespec-conventions-gate"
@@ -102,6 +103,7 @@ def verify_conventions_receipt(
     violations = _list_field(payload, "violations")
     blockers = _list_field(payload, "blockers")
     _check_verdict_consistency(cast(ReceiptVerdict, verdict), violations, blockers)
+    _check_current_gates_hash(project_root, payload)
     if payload.get("receipt_hash") != receipt_payload_hash(payload):
         raise ConventionsReceiptError("receipt_hash_mismatch")
     return ConventionsReceipt(
@@ -133,6 +135,16 @@ def _check_verdict_consistency(
         raise ConventionsReceiptError("verdict_inconsistent")
     if verdict == "BLOCKED" and not blockers:
         raise ConventionsReceiptError("verdict_inconsistent")
+
+
+def _check_current_gates_hash(project_root: Path, payload: dict[str, Any]) -> None:
+    current_gates = gates_path(project_root)
+    try:
+        current_sha = sha256_file(current_gates)
+    except OSError as exc:
+        raise ConventionsReceiptError("gates_file_unreadable") from exc
+    if _string_field(payload, "gates_sha256") != current_sha:
+        raise ConventionsReceiptError("gates_sha256_mismatch")
 
 
 def _resolve_within_project(project_root: Path, path: Path) -> Path:

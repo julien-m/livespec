@@ -1,5 +1,13 @@
 # Changelog - 061-conventions-gates-engine
 
+## 2026-06-12 — [Bugfix]: Critic P0/P1 hardening
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (AC-011 through AC-014, FR-007)
+- **Code modified:** validator/conventions_gate.py, validator/conventions_linter.py, validator/conventions_delegate.py, validator/conventions_receipt.py, tests/test_conventions_verify.py, tests/test_conventions_receipt.py, .gitignore
+- **AC impacted:** AC-011 through AC-014
+- **Author:** spec-fix worker (Codex)
+
 ## 2026-06-12 — [Spec]: Conventions Gates Engine specified
 
 - **Spec modified:** Yes (created)

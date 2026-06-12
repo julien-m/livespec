@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import fnmatch
-import json
 import re
 import shlex
 import subprocess
@@ -19,9 +18,12 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
 
+from .conventions_delegate import is_rule_delegated
 from .conventions_gates import ConventionsGates, GateCommand, gates_path, load_conventions_gates
 from .conventions_lang import adapter_for_path
 from .conventions_lang.base import SourceAnalysis
+from .conventions_linter import LinterViolationPayload, parse_linter_json
+from .visual_evidence import sha256_file
 
 GateSeverityInput = Literal["warning", "error"]
 SourceKind = Literal["builtin", "linter", "system"]
@@ -120,11 +122,32 @@ def verify_conventions(project_root: Path, *, report: bool = False) -> GateResul
 
 
 def _command_blockers(project_root: Path, gates: ConventionsGates) -> list[GateBlocker]:
-    blockers: list[GateBlocker] = []
+    blockers = _staleness_blockers(project_root, gates)
     for command in gates.commands.lint + gates.commands.format + gates.commands.typecheck:
         blockers.extend(_version_blockers(command))
         blockers.extend(_sync_limit_blockers(project_root, gates, command))
     return blockers
+
+
+def _staleness_blockers(project_root: Path, gates: ConventionsGates) -> list[GateBlocker]:
+    constitution = project_root / gates.generated_from.constitution
+    if not constitution.is_file():
+        return [
+            GateBlocker(
+                "gates_source_missing",
+                f"{gates.generated_from.constitution} not found",
+                "Run `livespec conventions gates init --force` after restoring the source.",
+            )
+        ]
+    if sha256_file(constitution) == gates.generated_from.constitution_sha256:
+        return []
+    return [
+        GateBlocker(
+            "gates_stale",
+            "constitution hash differs from generated_from.constitution_sha256",
+            "Run `livespec conventions gates init --force` and review the gates diff.",
+        )
+    ]
 
 
 def _version_blockers(command: GateCommand) -> list[GateBlocker]:
@@ -216,7 +239,7 @@ def _source_files(project_root: Path, gates: ConventionsGates) -> list[Path]:
 def _file_length_violations(rel: str, text: str, gates: ConventionsGates) -> list[GateViolation]:
     count = len(text.splitlines())
     rule = gates.builtin.max_file_lines
-    if _delegated_to_command(gates, rule.delegate_to):
+    if is_rule_delegated(gates.commands, rule.delegate_to, "builtin.max_file_lines"):
         return []
     if count > rule.limit:
         return [
@@ -237,7 +260,7 @@ def _function_length_violations(
     gates: ConventionsGates,
 ) -> list[GateViolation]:
     rule = gates.builtin.max_function_lines
-    if _delegated_to_command(gates, rule.delegate_to):
+    if is_rule_delegated(gates.commands, rule.delegate_to, "builtin.max_function_lines"):
         return []
     violations: list[GateViolation] = []
     for function in analysis.functions:
@@ -368,8 +391,22 @@ def _linter_violations(project_root: Path, gates: ConventionsGates) -> list[Gate
             timeout=120,
             check=False,
         )
-        violations.extend(_parse_linter_json(command, completed.stdout))
-        if completed.returncode not in (0, 1) and not violations:
+        parsed = parse_linter_json(command, completed.stdout)
+        violations.extend(_linter_payload_to_violation(item) for item in parsed)
+        if completed.returncode == 1 and not parsed:
+            violations.append(
+                GateViolation(
+                    f"linter.{command.id}",
+                    ".",
+                    1,
+                    GateSeverity.ERROR,
+                    completed.stderr.strip()
+                    or completed.stdout.strip()
+                    or f"{command.id} reported violations but produced no parseable JSON",
+                    "linter",
+                )
+            )
+        elif completed.returncode not in (0, 1):
             violations.append(
                 GateViolation(
                     f"linter.{command.id}",
@@ -383,48 +420,10 @@ def _linter_violations(project_root: Path, gates: ConventionsGates) -> list[Gate
     return violations
 
 
-def _parse_linter_json(command: GateCommand, stdout: str) -> list[GateViolation]:
-    if not stdout.strip():
-        return []
-    try:
-        raw: object = json.loads(stdout)
-    except json.JSONDecodeError:
-        return []
-    items = raw if isinstance(raw, list) else [raw]
-    violations: list[GateViolation] = []
-    for item in items:
-        if not isinstance(item, dict):
-            continue
-        payload = cast(dict[str, Any], item)
-        path = str(payload.get("filePath") or payload.get("filename") or ".")
-        messages = payload.get("messages", [])
-        if isinstance(messages, list):
-            violations.extend(_messages_to_violations(command, path, messages))
-    return violations
-
-
-def _messages_to_violations(
-    command: GateCommand,
-    path: str,
-    messages: list[object],
-) -> list[GateViolation]:
-    violations: list[GateViolation] = []
-    for message in messages:
-        if not isinstance(message, dict):
-            continue
-        payload = cast(dict[str, Any], message)
-        severity = "error" if int(payload.get("severity", 2)) >= 2 else "warning"
-        violations.append(
-            _violation(
-                f"linter.{command.id}",
-                path,
-                int(payload.get("line", 1)),
-                cast(GateSeverityInput, severity),
-                str(payload.get("message", "linter violation")),
-                "linter",
-            )
-        )
-    return violations
+def _linter_payload_to_violation(payload: LinterViolationPayload) -> GateViolation:
+    return _violation(
+        payload.rule_id, payload.path, payload.line, payload.severity, payload.message, "linter"
+    )
 
 
 def _result_from(violations: list[GateViolation], blockers: list[GateBlocker]) -> GateResult:
@@ -465,15 +464,6 @@ def _matches_import(rel: str, module: str, import_pattern: str) -> bool:
         expected = import_pattern[:-3].split("/")[-1]
         return expected in normalized or expected in rel
     return False
-
-
-def _delegated_to_command(gates: ConventionsGates, delegate_to: str | None) -> bool:
-    if not delegate_to:
-        return False
-    return any(
-        command.id == delegate_to
-        for command in gates.commands.lint + gates.commands.format + gates.commands.typecheck
-    )
 
 
 def _violation(
