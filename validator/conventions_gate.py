@@ -18,7 +18,6 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
 
-from .conventions_delegate import is_rule_delegated
 from .conventions_gates import ConventionsGates, GateCommand, gates_path, load_conventions_gates
 from .conventions_lang import adapter_for_path
 from .conventions_lang.base import SourceAnalysis
@@ -241,8 +240,6 @@ def _source_files(project_root: Path, gates: ConventionsGates) -> list[Path]:
 def _file_length_violations(rel: str, text: str, gates: ConventionsGates) -> list[GateViolation]:
     count = len(text.splitlines())
     rule = gates.builtin.max_file_lines
-    if is_rule_delegated(gates.commands, rule.delegate_to, "builtin.max_file_lines"):
-        return []
     if count > rule.limit:
         return [
             _violation("builtin.max_file_lines", rel, 1, "error", f"{count} lines > {rule.limit}")
@@ -262,8 +259,6 @@ def _function_length_violations(
     gates: ConventionsGates,
 ) -> list[GateViolation]:
     rule = gates.builtin.max_function_lines
-    if is_rule_delegated(gates.commands, rule.delegate_to, "builtin.max_function_lines"):
-        return []
     violations: list[GateViolation] = []
     for function in analysis.functions:
         if function.line_count > rule.limit:

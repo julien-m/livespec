@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-12 — [Feature 061 Refactor] Remove delegate_to and command wiring from conventions gates schema v1
+
 ## 2026-06-12 — [Feature 061 Fix] Critic cycle 4: bind delegate_to to executable basename and block unreadable source files
 
 ## 2026-06-12 — [Feature 061 Fix] Critic cycle 3: ignore freestyle delegate wiring, block timeout/encoding failures, document receipt audit boundary

@@ -88,7 +88,7 @@ def test_conventions_gates_model_round_trips_minimal_yaml() -> None:
                 ]
             },
             "builtin": {
-                "max_file_lines": {"target": 400, "limit": 500, "delegate_to": "ruff"},
+                "max_file_lines": {"target": 400, "limit": 500},
                 "max_function_lines": {"target": 30, "limit": 60},
                 "suppression_directives": {"budget": 0, "whitelist": []},
             },
@@ -98,5 +98,33 @@ def test_conventions_gates_model_round_trips_minimal_yaml() -> None:
         }
     )
 
-    assert gates.commands.lint[0].delegate_to is None
+    assert gates.commands.lint[0].id == "ruff"
     assert gates.builtin.suppression_directives.budget == 0
+
+
+def test_conventions_gates_v1_rejects_delegate_and_wiring_fields() -> None:
+    payload = {
+        "schema_version": 1,
+        "generated_from": {
+            "constitution": ".specs/constitution.md",
+            "constitution_sha256": "0" * 64,
+            "stack": ".specs/stacks/_default.md",
+        },
+        "commands": {
+            "lint": [
+                {
+                    "id": "ruff",
+                    "run": "ruff check . --output-format json",
+                    "wiring": [{"kind": "covers_rule", "rule": "builtin.max_file_lines"}],
+                }
+            ]
+        },
+        "builtin": {
+            "max_file_lines": {"target": 400, "limit": 500, "delegate_to": "ruff"},
+            "max_function_lines": {"target": 30, "limit": 60},
+        },
+        "scope": "repo",
+    }
+
+    with pytest.raises(ValueError, match="Extra inputs are not permitted"):
+        ConventionsGates.model_validate(payload)

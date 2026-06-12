@@ -51,8 +51,6 @@ class GateCommand(GatesBaseModel):
     run: str
     version: str | None = None
     config: str | None = None
-    delegate_to: str | None = None
-    wiring: list[dict[str, str]] = Field(default_factory=list)
 
 
 class CommandGroups(GatesBaseModel):
@@ -68,7 +66,6 @@ class ThresholdRule(GatesBaseModel):
 
     target: int
     limit: int
-    delegate_to: str | None = None
 
     @model_validator(mode="after")
     def validate_order(self) -> ThresholdRule:

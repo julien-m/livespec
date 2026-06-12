@@ -137,15 +137,15 @@ flowchart TD
 - **AC-011:** Ruff flat JSON diagnostics are parsed as linter violations and make the gate fail.
 - **AC-012:** Conventions receipts are rejected when their `gates_sha256` differs from the current
   `.specs/conventions-gates.yaml`.
-- **AC-013:** `delegate_to` disables a builtin only when the target command id is present in
-  LiveSpec's trusted linter capability map for that specific rule.
+- **AC-013:** Schema v1 rejects `delegate_to` and command `wiring`; declared linters never disable
+  builtin checks.
 - **AC-014:** Verification blocks when `generated_from.constitution_sha256` is stale, and
   `.specs/conventions/debt.json` remains a regenerable ignored artifact.
 - **AC-015:** Le receipt conventions est un artefact d'audit uniquement (preuve de traçabilite).
   L'exigence anti-forgerie DURE est la re-execution par le superviseur (feature 063, must:).
   Un receipt PASS seul ne constitue pas une preuve de conformite suffisante.
-- **AC-016:** `delegate_to` ignore une commande dont l'id declare ne correspond pas au basename
-  de l'executable reel, afin qu'un id linter spoofe ne puisse pas desactiver un builtin.
+- **AC-016:** Builtin file/function thresholds stay active even when a linter such as SwiftLint is
+  declared in `commands.lint`.
 - **AC-017:** Les erreurs de lecture de fichier source produisent une violation `file_read_error`
   bloquante au lieu d'un traceback.
 
@@ -159,8 +159,8 @@ flowchart TD
 - **FR-004:** Provide conventions receipt and debt report modules.
 - **FR-005:** Register `conventions verify`, `conventions gates init`, and `conventions scaffold`.
 - **FR-006:** Add pytest coverage for schema, verify, CLI, adapters, report, and receipt.
-- **FR-007:** Parse Ruff flat JSON, validate current gates hashes in receipts, enforce trusted
-  rule-specific delegation, and block operational verifier crashes.
+- **FR-007:** Parse Ruff flat JSON, validate current gates hashes in receipts, reject delegation
+  fields from schema v1, and block operational verifier crashes.
 
 ## Key Entities
 
@@ -178,7 +178,8 @@ flowchart TD
 - PASS receipts with error violations are rejected.
 - Receipts become invalid when the gates file changes after receipt creation.
 - Stale constitution metadata blocks verification until gates are regenerated.
-- Spoofed linter ids do not delegate builtin coverage unless the executable basename matches.
+- `delegate_to` and command `wiring` are rejected in schema v1.
+- Builtin checks always run alongside declared linters.
 - Unreadable source files block verification with an auditable violation.
 
 ## Success Criteria
