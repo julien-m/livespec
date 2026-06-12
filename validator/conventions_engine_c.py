@@ -28,7 +28,6 @@ from validator.semantic.config import load_semantic_config
 
 ProviderFindingSeverity = Literal["blocking", "warning", "info"]
 MAX_SOURCE_EXCERPT_CHARS = 4000
-DEFAULT_REVIEW_MODEL = "claude-3-5-sonnet-latest"
 
 
 class ProviderCallError(RuntimeError):
@@ -164,20 +163,12 @@ def _rules_by_domain(rulebook: ConventionsRules) -> dict[str, list[CompiledConve
     return dict(sorted(grouped.items()))
 
 
-def _configured_review_model(project_root: Path) -> str:
+def _configured_review_model(project_root: Path) -> str | None:
+    """Return the review model to use, or None to use the provider's configured default."""
     configured = load_semantic_config(project_root / ".specs").review_model.strip()
     if configured:
         return configured
-    provider_loader = getattr(llm_provider, "_load_provider", None)
-    if callable(provider_loader):
-        try:
-            provider = provider_loader()
-        except llm_provider.LLMProviderNotConfigured:
-            provider = None
-        provider_model = getattr(provider, "review_model", "")
-        if isinstance(provider_model, str) and provider_model.strip():
-            return provider_model.strip()
-    return DEFAULT_REVIEW_MODEL
+    return None
 
 
 def _call_domain_provider(
@@ -237,7 +228,7 @@ def _call_provider(prompt: str, json_schema: dict[str, object], *, model: str | 
 
 
 def _normalize_findings(
-    domain: str,
+    _domain: str,
     rules: list[CompiledConventionRule],
     batch: ProviderFindingBatch,
     waivers: list[ConventionWaiver],

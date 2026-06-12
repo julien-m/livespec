@@ -63,7 +63,10 @@ def load_semantic_config(specs_root: Path) -> SemanticConfig:
     if not config_path.exists():
         return SemanticConfig()
 
-    raw = yaml.safe_load(config_path.read_text())
+    try:
+        raw = yaml.safe_load(config_path.read_text())
+    except yaml.YAMLError as exc:
+        raise ValueError(f"Invalid semantic config: {config_path}") from exc
     if not isinstance(raw, dict):
         return SemanticConfig()
 

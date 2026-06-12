@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
 from typer.testing import CliRunner
@@ -136,16 +135,13 @@ def test_engine_c_uses_configured_review_model_not_implementation_model(
     assert "implementation-model" not in models
 
 
-def test_engine_c_uses_provider_review_model_when_project_config_missing(
+
+def test_engine_c_passes_none_to_provider_when_no_review_model_is_configured(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     _write_rulebook(tmp_path)
     models: list[str | None] = []
-    monkeypatch.setattr(
-        "validator.conventions_engine_c.llm_provider._load_provider",
-        lambda: SimpleNamespace(review_model="provider-review-model"),
-    )
 
     def fake_call_llm(
         _prompt: str,
@@ -163,40 +159,7 @@ def test_engine_c_uses_provider_review_model_when_project_config_missing(
     result = run_semantic_conventions(tmp_path, source_texts={"src/app.py": "def x(): pass\n"})
 
     assert result.verdict is SemanticConventionVerdict.PASS
-    assert models == ["provider-review-model", "provider-review-model"]
-
-
-def test_engine_c_uses_default_review_model_when_provider_config_unavailable(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    _write_rulebook(tmp_path)
-    models: list[str | None] = []
-
-    def raise_not_configured() -> None:
-        raise LLMProviderNotConfigured()
-
-    def fake_call_llm(
-        _prompt: str,
-        json_schema: dict[str, object] | None = None,
-        model: str | None = None,
-        temperature: int | None = None,
-    ) -> str:
-        models.append(model)
-        assert json_schema is not None
-        assert temperature == 0
-        return json.dumps({"findings": []})
-
-    monkeypatch.setattr(
-        "validator.conventions_engine_c.llm_provider._load_provider",
-        raise_not_configured,
-    )
-    monkeypatch.setattr("validator.conventions_engine_c.llm_provider.call_llm", fake_call_llm)
-
-    result = run_semantic_conventions(tmp_path, source_texts={"src/app.py": "def x(): pass\n"})
-
-    assert result.verdict is SemanticConventionVerdict.PASS
-    assert models == ["claude-3-5-sonnet-latest", "claude-3-5-sonnet-latest"]
+    assert models == [None, None]
 
 
 def test_blocking_finding_fails_and_non_blocking_is_preserved(

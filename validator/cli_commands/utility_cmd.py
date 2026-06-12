@@ -274,9 +274,14 @@ def conventions_compile_command(
         raise typer.Exit(2) from exc
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
         if json_out:
-            typer.echo(json.dumps({"status": "blocked", "error": str(exc)}, indent=2))
+            typer.echo(
+                json.dumps(
+                    {"verdict": "BLOCKED", "reason": "rulebook_error", "blockers": [str(exc)]},
+                    indent=2,
+                )
+            )
         else:
-            typer.echo(f"Error: {exc}", err=True)
+            typer.echo(f"BLOCKED: rulebook_error: {exc}", err=True)
         raise typer.Exit(2) from exc
     if json_out:
         typer.echo(json.dumps({"status": "written", "path": str(path)}, indent=2))
