@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-11
+> Last updated: 2026-06-12
 
 
 ---
@@ -98,6 +98,7 @@
 | 058 | Deterministic Finalization | Implemented | 2026-06-10 | 2026-06-10 | [spec](features/058-deterministic-finalization/spec.md), [plan](features/058-deterministic-finalization/plan.md), [implementation](features/058-deterministic-finalization/implementation.md) |
 | 059 | Pipeline Verify Phase | Implemented | 2026-06-11 | 2026-06-11 | [spec](features/059-pipeline-verify-phase/spec.md), [plan](features/059-pipeline-verify-phase/plan.md), [implementation](features/059-pipeline-verify-phase/implementation.md) |
 | 060 | Journey Fixture Bootstrap Contract | Implemented | 2026-06-11 | 2026-06-11 | [spec](features/060-journey-fixture-bootstrap-contract/spec.md), [plan](features/060-journey-fixture-bootstrap-contract/plan.md), [implementation](features/060-journey-fixture-bootstrap-contract/implementation.md) |
+| 061 | Conventions Gates Engine | Implemented | 2026-06-12 | 2026-06-12 | [spec](features/061-conventions-gates-engine/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -121,6 +122,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-12 | Feature | [Feature 061] Feature: Initial conventions gates engine |
 | 2026-06-11 | Feature | [Feature 060] ### Pipeline: /spec-feature completed end-to-end |
 | 2026-06-11 | Feature | [Feature 060] Test: 100% AC covered (15/15), 0 tests generated — 102/102 feature tests (0 skips), full no-LLM suite green, ruff + pyright clean |
 | 2026-06-11 | Bugfix | [Feature 060] Implemented: Journey Fixture Bootstrap Contract — fixtures.yaml contract, derived XCUITest bootstrap waits, 5 blocking validation rules, journeys-v2-3 + contract hash staleness, bootstrap failure reclassification, scaffold CLI + migration v21 |
@@ -130,7 +132,6 @@
 | 2026-06-11 | Check | [Feature 059] Check: 100% verified (11/11 FR, 15/15 AC); target implementation healthy, global tree/spec hygiene warnings recorded |
 | 2026-06-11 | Feature | [Feature 059] Test: 100% AC covered (15/15), 0 tests generated — targeted 218/218, unit 1824 passed (1 pre-existing protected failure), integration 3a 75/75 |
 | 2026-06-11 | Feature | [Feature 059] Implemented: Pipeline Verify Phase — enforced archive.run, supervisor Verify phase, artifact-backed SHIP_RESULT, transcript capture |
-| 2026-06-11 | Plan | [Feature 059] Plan created: Pipeline Verify Phase — 10 implementation steps, 3 diagrams |
 <!-- readme:activity:end -->
 
 ---
@@ -170,3 +171,5 @@
 <!-- finalize:spec-implement:2026-06-11:b2cd1c13 -->
 
 <!-- finalize:spec-feature:2026-06-11:61c37125 -->
+
+<!-- finalize:spec-feature:2026-06-12:a140dc75 -->

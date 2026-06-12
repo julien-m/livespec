@@ -13,8 +13,11 @@ from pathlib import Path
 from typing import Any
 
 import typer
+import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
 
 from ..cli_commands._common import emit_summary
+from ..conventions_gate import verify_conventions
+from ..conventions_gates import gates_path, generate_conventions_gates, load_conventions_gates
 
 REPO_OPTION = typer.Option(Path("."), "--repo", help="Project repository root.")
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
@@ -24,6 +27,8 @@ NO_OPEN_OPTION = typer.Option(False, "--no-open", help="Do not open a browser.")
 FULL_OPTION = typer.Option(False, "--full", help="Regenerate even when present.")
 
 conventions_app = typer.Typer(name="conventions", help="Manage LiveSpec conventions.")
+gates_app = typer.Typer(name="gates", help="Manage conventions gates.")
+conventions_app.add_typer(gates_app, name="gates")
 
 
 def register(app: typer.Typer) -> None:
@@ -165,6 +170,78 @@ def refresh_conventions_command(
     typer.echo("conventions refreshed")
     typer.echo(f"  updated  {index_path.relative_to(repo_root)}")
     typer.echo(f"  updated  {manifest_path.relative_to(repo_root)}")
+    raise typer.Exit(0)
+
+
+@gates_app.command("init")
+def conventions_gates_init_command(
+    repo: Path = REPO_OPTION,
+    force: bool = typer.Option(False, "--force", help="Overwrite existing gates file."),
+) -> None:
+    """Generate `.specs/conventions-gates.yaml` from project sources.
+
+    # @spec FR-001: Gates init generator
+    #   — .specs/features/061-conventions-gates-engine/spec.md#fr-001
+    """
+    try:
+        path = generate_conventions_gates(repo.resolve(), force=force)
+    except FileExistsError:
+        typer.echo("conventions gates already present", err=True)
+        raise typer.Exit(1) from None
+    except FileNotFoundError as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(2) from exc
+    typer.echo(f"conventions gates written: {path}")
+    raise typer.Exit(0)
+
+
+@conventions_app.command("verify")
+def conventions_verify_command(
+    repo: Path = REPO_OPTION,
+    json_out: bool = JSON_OPTION,
+    report: bool = typer.Option(False, "--report", help="Write debt report artifacts."),
+) -> None:
+    """Verify conventions deterministically.
+
+    # @spec FR-002: Deterministic conventions verify
+    #   — .specs/features/061-conventions-gates-engine/spec.md#fr-002
+    """
+    try:
+        result = verify_conventions(repo.resolve(), report=report)
+    except (FileNotFoundError, ValueError) as exc:
+        if json_out:
+            typer.echo(json.dumps({"verdict": "BLOCKED", "blockers": [str(exc)]}, indent=2))
+        else:
+            typer.echo(f"BLOCKED: {exc}", err=True)
+        raise typer.Exit(2) from exc
+    if json_out:
+        typer.echo(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+    else:
+        typer.echo(f"Conventions verdict: {result.verdict.value}")
+        typer.echo(f"violations: {len(result.violations)}")
+        for blocker in result.blockers:
+            typer.echo(f"BLOCKED: {blocker.message}", err=True)
+    raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
+
+
+@conventions_app.command("scaffold")
+def conventions_scaffold_command(
+    repo: Path = REPO_OPTION,
+    apply: bool = typer.Option(False, "--apply", help="Write scaffold files."),
+    sync_limits: bool = typer.Option(False, "--sync-limits", help="Sync managed linter limits."),
+) -> None:
+    """Scaffold conventions linter config.
+
+    # @spec FR-005: scaffold --sync-limits
+    #   — .specs/features/061-conventions-gates-engine/spec.md#fr-005
+    """
+    repo_root = repo.resolve()
+    gates = load_conventions_gates(gates_path(repo_root))
+    changed = _scaffold_swiftlint(repo_root, gates, apply=apply, sync_limits=sync_limits)
+    if changed:
+        typer.echo("\n".join(changed))
+    else:
+        typer.echo("conventions scaffold: no changes")
     raise typer.Exit(0)
 
 
@@ -327,6 +404,44 @@ def _is_web_ui_stack(stack_text: str) -> bool:
         "typescript",
     )
     return any(marker in stack_text for marker in web_markers)
+
+
+def _scaffold_swiftlint(
+    repo_root: Path,
+    gates: object,
+    *,
+    apply: bool,
+    sync_limits: bool,
+) -> list[str]:
+    # The scaffold only owns these generated limit keys; all other user
+    # SwiftLint configuration is preserved to avoid weakening human rules.
+    path = repo_root / ".swiftlint.yml"
+    payload = _read_swiftlint_payload(path)
+    builtins = gates.builtin
+    payload["file_length"] = {
+        "warning": builtins.max_file_lines.target,
+        "error": builtins.max_file_lines.limit,
+    }
+    payload["function_body_length"] = {
+        "warning": builtins.max_function_lines.target,
+        "error": builtins.max_function_lines.limit,
+    }
+    if not apply:
+        return [f"would update {path.relative_to(repo_root)}"]
+    if not sync_limits and path.exists():
+        return [f"skipped existing {path.relative_to(repo_root)}"]
+    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    return [f"updated {path.relative_to(repo_root)}"]
+
+
+def _read_swiftlint_payload(path: Path) -> dict[str, object]:
+    if not path.is_file():
+        return {}
+    try:
+        raw: object = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    except yaml.YAMLError:
+        return {}
+    return raw if isinstance(raw, dict) else {}
 
 
 __all__ = [

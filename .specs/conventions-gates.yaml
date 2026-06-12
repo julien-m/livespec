@@ -1,0 +1,56 @@
+schema_version: 1
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9
+  stack: .specs/stacks/_default.md
+commands:
+  lint:
+  - id: ruff
+    run: ruff check . --output-format json
+    config: pyproject.toml
+    wiring: []
+  format: []
+  typecheck: []
+builtin:
+  max_file_lines:
+    target: 400
+    limit: 500
+  max_function_lines:
+    target: 30
+    limit: 60
+  file_header:
+    swift: ^//\n//  [^\n]+\.swift
+    python: null
+  doc_coverage:
+    require_public_api: true
+  token_scale:
+    scale:
+    - 2
+    - 4
+    - 8
+    - 12
+    - 16
+    - 24
+    - 32
+    - 40
+    - 48
+    - 64
+    - 80
+    properties:
+    - padding
+    - margin
+    - spacing
+  suppression_directives:
+    budget: 0
+    whitelist: []
+  import_rules: []
+coverage:
+  python: full
+exclusions:
+- .specs/**
+- .git/**
+- .venv/**
+- .ruff_cache/**
+- '**/__pycache__/**'
+- '**/Generated/**'
+scope: repo

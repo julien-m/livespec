@@ -1,0 +1,33 @@
+# LiveSpec traceability anchors
+# @spec FR-003: Adapter registry — .specs/features/061-conventions-gates-engine/spec.md#fr-003
+
+"""Extension-to-adapter registry for conventions checks."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from .base import LanguageAdapter
+from .generic import GenericAdapter
+from .python_adapter import PythonAdapter
+from .swift_adapter import SwiftAdapter
+from .typescript_adapter import TypeScriptAdapter
+
+_PYTHON = PythonAdapter()
+_TYPESCRIPT = TypeScriptAdapter()
+_SWIFT = SwiftAdapter()
+_GENERIC = GenericAdapter()
+
+_ADAPTERS: dict[str, LanguageAdapter] = {
+    ".py": _PYTHON,
+    ".ts": _TYPESCRIPT,
+    ".tsx": _TYPESCRIPT,
+    ".js": _TYPESCRIPT,
+    ".jsx": _TYPESCRIPT,
+    ".swift": _SWIFT,
+}
+
+
+def adapter_for_path(path: Path) -> LanguageAdapter:
+    """Return the adapter for `path`, or a partial fallback."""
+    return _ADAPTERS.get(path.suffix.lower(), _GENERIC)

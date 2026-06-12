@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-06-12 — [Feature 061] Feature: Initial conventions gates engine
+<!-- finalize:spec-feature:2026-06-12:a140dc75 -->
+
 ## 2026-06-11 — [Feature 060] ### Pipeline: /spec-feature completed end-to-end
 <!-- finalize:spec-feature:2026-06-11:61c37125 -->
 

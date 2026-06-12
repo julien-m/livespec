@@ -1,0 +1,31 @@
+{
+  "command": "spec-feature",
+  "created_at": "2026-06-12T17:00:32.996801+00:00",
+  "feature_slug": "061-conventions-gates-engine",
+  "files": [
+    {
+      "path": ".specs/features/061-conventions-gates-engine/changelog.md",
+      "sha256": "7b211f29865a3f3a93c708bba8ba8e089a678a491702c379c5d35e9811432bca"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "69a5c4ad24058e7d7e1936e0acab815e000798843a3871ec116beaaf3e164cf6"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "0a354aed24f23b4955396afcead3a60dcbfaf2f7caa213f97735936b1f73d88b"
+    },
+    {
+      "path": ".specs/features/061-conventions-gates-engine/spec.md",
+      "sha256": "204561032fd0165064d8b7705fce8075a09d88a669df20a836495a7edd4b6615"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "2f64ee81c389939ff9079ae88015057050154ee1bc92ca8a2c064b2664de1636",
+  "receipt_hash": "1f4a0ff140220d0a9213cb6c4cf19856eab8f0ce3ebc620b1a20b92cbf01b686",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}
