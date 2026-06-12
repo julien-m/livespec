@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-12 — [Feature 061 Fix] Critic cycle 3: ignore freestyle delegate wiring, block timeout/encoding failures, document receipt audit boundary
+
 ## 2026-06-12 — [Feature 061 Fix] Critic P0/P1 hardening: Ruff JSON parsing, gates hash receipt validation, rule-specific delegate_to, stale gates blocking, ignored debt.json
 
 ## 2026-06-12 — [Feature 061] Feature: Initial conventions gates engine

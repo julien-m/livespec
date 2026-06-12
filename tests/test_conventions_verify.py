@@ -9,13 +9,17 @@ from __future__ import annotations
 
 import json
 import stat
+import subprocess
 from hashlib import sha256
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from validator.cli import app
+from validator.conventions_delegate import is_rule_delegated
 from validator.conventions_gate import GateSeverity, GateVerdict, verify_conventions
+from validator.conventions_gates import load_conventions_gates
 
 runner = CliRunner()
 
@@ -193,6 +197,47 @@ def test_delegate_to_non_covering_linter_keeps_builtin_threshold(tmp_path: Path)
     assert any(v.rule_id == "builtin.max_function_lines" for v in result.violations)
 
 
+def test_delegate_to_unknown_wired_linter_does_not_disable_builtin(tmp_path: Path) -> None:
+    project_root = _write_project(tmp_path)
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    tool = bin_dir / "custom-lint"
+    tool.write_text("#!/usr/bin/env sh\nprintf '[]\\n'\n", encoding="utf-8")
+    tool.chmod(tool.stat().st_mode | stat.S_IXUSR)
+    gates_path = project_root / ".specs" / "conventions-gates.yaml"
+    text = gates_path.read_text(encoding="utf-8")
+    text = text.replace(
+        "lint: []",
+        f'lint:\n    - id: custom-lint\n      run: "{tool}"\n      wiring:\n'
+        "        - kind: covers_rule\n          rule: builtin.max_function_lines",
+    )
+    text = text.replace(
+        "max_function_lines: {target: 3, limit: 5}",
+        "max_function_lines: {target: 3, limit: 5, delegate_to: custom-lint}",
+    )
+    (project_root / "src" / "long.py").write_text(
+        '"""module."""\n\n'
+        "def too_long() -> None:\n"
+        "    x = 1\n"
+        "    x = 2\n"
+        "    x = 3\n"
+        "    x = 4\n"
+        "    x = 5\n"
+        "    x = 6\n",
+        encoding="utf-8",
+    )
+    gates_path.write_text(text, encoding="utf-8")
+    gates = load_conventions_gates(gates_path)
+
+    assert not is_rule_delegated(
+        gates.commands,
+        "custom-lint",
+        "builtin.max_function_lines",
+    )
+    result = verify_conventions(project_root)
+    assert any(v.rule_id == "builtin.max_function_lines" for v in result.violations)
+
+
 def test_delegate_to_covering_linter_disables_builtin_threshold(tmp_path: Path) -> None:
     project_root = _write_project(tmp_path)
     bin_dir = tmp_path / "bin"
@@ -228,6 +273,41 @@ def test_stale_constitution_hash_blocks_verification(tmp_path: Path) -> None:
 
     assert result.verdict is GateVerdict.BLOCKED
     assert any(blocker.code == "gates_stale" for blocker in result.blockers)
+
+
+def test_linter_timeout_blocks_without_traceback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = _write_project(tmp_path)
+    gates = project_root / ".specs" / "conventions-gates.yaml"
+    gates.write_text(
+        gates.read_text(encoding="utf-8").replace(
+            "lint: []",
+            'lint:\n    - id: slow-lint\n      run: "slow-lint --json"',
+        ),
+        encoding="utf-8",
+    )
+
+    def raise_timeout(*_args: object, **_kwargs: object) -> subprocess.CompletedProcess[str]:
+        raise subprocess.TimeoutExpired(cmd="slow-lint --json", timeout=120)
+
+    monkeypatch.setattr("validator.conventions_gate.subprocess.run", raise_timeout)
+
+    result = verify_conventions(project_root)
+
+    assert result.verdict is GateVerdict.BLOCKED
+    assert any(v.rule_id == "linter_timeout" for v in result.violations)
+
+
+def test_invalid_source_encoding_blocks_without_traceback(tmp_path: Path) -> None:
+    project_root = _write_project(tmp_path)
+    (project_root / "src" / "bad_encoding.py").write_bytes(b"\xff\xfe\xfa")
+
+    result = verify_conventions(project_root)
+
+    assert result.verdict is GateVerdict.BLOCKED
+    assert any(v.rule_id == "file_encoding_error" for v in result.violations)
 
 
 def test_cli_verify_json_exit_codes_and_gates_init(tmp_path: Path) -> None:

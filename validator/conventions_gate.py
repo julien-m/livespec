@@ -22,11 +22,12 @@ from .conventions_delegate import is_rule_delegated
 from .conventions_gates import ConventionsGates, GateCommand, gates_path, load_conventions_gates
 from .conventions_lang import adapter_for_path
 from .conventions_lang.base import SourceAnalysis
-from .conventions_linter import LinterViolationPayload, parse_linter_json
+from .conventions_linter import parse_linter_json
 from .visual_evidence import sha256_file
 
 GateSeverityInput = Literal["warning", "error"]
 SourceKind = Literal["builtin", "linter", "system"]
+_BLOCKING_VIOLATION_RULES = frozenset({"linter_timeout", "file_encoding_error"})
 
 
 class GateSeverity(StrEnum):
@@ -209,9 +210,16 @@ def _sync_limit_blockers(
 def _collect_violations(project_root: Path, gates: ConventionsGates) -> list[GateViolation]:
     violations: list[GateViolation] = []
     for path in _source_files(project_root, gates):
-        text = path.read_text(encoding="utf-8")
-        analysis = adapter_for_path(path).analyze(path, text)
         rel = path.relative_to(project_root).as_posix()
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            message = f"{rel} is not valid UTF-8: {exc.reason}"
+            violations.append(
+                GateViolation("file_encoding_error", rel, 1, GateSeverity.ERROR, message, "system")
+            )
+            continue
+        analysis = adapter_for_path(path).analyze(path, text)
         violations.extend(_file_length_violations(rel, text, gates))
         violations.extend(_function_length_violations(rel, analysis, gates))
         violations.extend(_file_header_violations(rel, text, analysis, gates))
@@ -382,17 +390,27 @@ def _import_rule_violations(
 def _linter_violations(project_root: Path, gates: ConventionsGates) -> list[GateViolation]:
     violations: list[GateViolation] = []
     for command in gates.commands.lint:
-        completed = subprocess.run(
-            command.run,
-            cwd=project_root,
-            shell=True,
-            text=True,
-            capture_output=True,
-            timeout=120,
-            check=False,
-        )
+        try:
+            completed = subprocess.run(
+                command.run,
+                cwd=project_root,
+                shell=True,
+                text=True,
+                capture_output=True,
+                timeout=120,
+                check=False,
+            )
+        except subprocess.TimeoutExpired as exc:
+            message = f"{command.id} timed out after {exc.timeout} seconds"
+            violations.append(
+                GateViolation("linter_timeout", ".", 1, GateSeverity.ERROR, message, "system")
+            )
+            continue
         parsed = parse_linter_json(command, completed.stdout)
-        violations.extend(_linter_payload_to_violation(item) for item in parsed)
+        violations.extend(
+            _violation(item.rule_id, item.path, item.line, item.severity, item.message, "linter")
+            for item in parsed
+        )
         if completed.returncode == 1 and not parsed:
             violations.append(
                 GateViolation(
@@ -420,14 +438,17 @@ def _linter_violations(project_root: Path, gates: ConventionsGates) -> list[Gate
     return violations
 
 
-def _linter_payload_to_violation(payload: LinterViolationPayload) -> GateViolation:
-    return _violation(
-        payload.rule_id, payload.path, payload.line, payload.severity, payload.message, "linter"
-    )
-
-
 def _result_from(violations: list[GateViolation], blockers: list[GateBlocker]) -> GateResult:
     if blockers:
+        return GateResult(GateVerdict.BLOCKED, violations, blockers)
+    blocking_violations = [
+        violation for violation in violations if violation.rule_id in _BLOCKING_VIOLATION_RULES
+    ]
+    if blocking_violations:
+        blockers = [
+            GateBlocker(violation.rule_id, violation.message, violation.fix_hint)
+            for violation in blocking_violations
+        ]
         return GateResult(GateVerdict.BLOCKED, violations, blockers)
     has_errors = any(
         (v.severity.value if isinstance(v.severity, GateSeverity) else v.severity) == "error"

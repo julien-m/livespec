@@ -38,11 +38,12 @@ updated: 2026-06-12
 | [AC-007](spec.md#ac-007) | tests/test_conventions_receipt.py | ✅ |
 | [AC-008](spec.md#ac-008) | tests/test_conventions_verify.py | ✅ |
 | [AC-009](spec.md#ac-009) | tests/test_conventions_verify.py | ✅ |
-| [AC-010](spec.md#ac-010) | `python3 -m pytest tests/test_conventions_*.py -q` -> 14 passed, 0 skipped | ✅ |
+| [AC-010](spec.md#ac-010) | `python3 -m pytest tests/test_conventions_*.py -q` -> 17 passed, 0 skipped | ✅ |
 | [AC-011](spec.md#ac-011) | tests/test_conventions_verify.py::test_verify_extracts_ruff_flat_json_violations | ✅ |
 | [AC-012](spec.md#ac-012) | tests/test_conventions_receipt.py::test_verify_rejects_receipt_when_gates_file_changed | ✅ |
-| [AC-013](spec.md#ac-013) | tests/test_conventions_verify.py::test_delegate_to_non_covering_linter_keeps_builtin_threshold | ✅ |
+| [AC-013](spec.md#ac-013) | tests/test_conventions_verify.py::test_delegate_to_non_covering_linter_keeps_builtin_threshold, tests/test_conventions_verify.py::test_delegate_to_unknown_wired_linter_does_not_disable_builtin | ✅ |
 | [AC-014](spec.md#ac-014) | tests/test_conventions_verify.py::test_stale_constitution_hash_blocks_verification, .gitignore | ✅ |
+| [AC-015](spec.md#ac-015) | spec.md | ✅ |
 
 ## Files Created/Modified
 

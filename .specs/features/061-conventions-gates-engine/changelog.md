@@ -1,5 +1,13 @@
 # Changelog - 061-conventions-gates-engine
 
+## 2026-06-12 — [Bugfix]: Critic cycle 3 hardening
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (AC-013 wording, AC-015)
+- **Code modified:** validator/conventions_delegate.py, validator/conventions_gate.py, tests/test_conventions_verify.py
+- **AC impacted:** AC-013, AC-015
+- **Author:** spec-fix worker (Codex)
+
 ## 2026-06-12 — [Bugfix]: Critic P0/P1 hardening
 
 - **Type:** Bugfix
