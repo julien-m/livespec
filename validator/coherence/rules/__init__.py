@@ -24,6 +24,11 @@ from validator.coherence.rules.r4_readme_sync import (
 )
 from validator.coherence.rules.r5_stack_preflight import R5_1_StackNoPreflight
 from validator.coherence.rules.r6_changelog_refs import R6_1_ChangelogFeatureMissing
+from validator.coherence.rules.r7_conventions_gates import (
+    R7_1_ConventionsGatesMissingOrStale,
+    R7_2_ConventionsExclusionTooBroad,
+    R7_3_ConventionsRulebookSourcesStale,
+)
 from validator.coherence.violation import CoherenceRule
 
 # Immutable by convention — do not mutate at runtime
@@ -42,6 +47,9 @@ ALL_RULES: list[CoherenceRule] = [
     R4_3_ReadmeStatusMismatch(),
     R5_1_StackNoPreflight(),
     R6_1_ChangelogFeatureMissing(),
+    R7_1_ConventionsGatesMissingOrStale(),
+    R7_2_ConventionsExclusionTooBroad(),
+    R7_3_ConventionsRulebookSourcesStale(),
 ]
 
 

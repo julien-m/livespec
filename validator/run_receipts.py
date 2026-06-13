@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
+from .conventions_receipt import ConventionsReceiptError, verify_conventions_receipt
 from .finalize_receipt import FinalizeReceiptError, verify_finalize_receipt
 from .visual_evidence import VisualReceiptError, verify_visual_receipt
 
@@ -22,6 +23,7 @@ from .visual_evidence import VisualReceiptError, verify_visual_receipt
 _RECEIPT_EVIDENCE_KEYS: tuple[tuple[str, str], ...] = (
     ("finalize_receipt_path", "finalize"),
     ("visual_evidence_receipt_path", "visual"),
+    ("conventions_receipt_path", "conventions"),
 )
 
 
@@ -111,13 +113,13 @@ def verify_one_receipt(
     project_root: Path,
     feature: str | None,
 ) -> ReceiptCheck:
-    """Integrity-only re-verification of one finalize/visual receipt.
+    """Integrity-only re-verification of one finalize/visual/conventions receipt.
 
     ``expected_command`` is never checked (receipts are frequently emitted by
     child commands); ``expected_feature_slug`` is checked only when the caller
     scoped the run with ``--feature`` (AC-006, EC-008).
     """
-    if kind not in {"finalize", "visual"}:
+    if kind not in {"finalize", "visual", "conventions"}:
         return ReceiptCheck(
             kind=kind,
             path=path,
@@ -127,7 +129,13 @@ def verify_one_receipt(
         )
     receipt_path = Path(path)
     try:
-        if kind == "visual":
+        if kind == "conventions":
+            receipt = verify_conventions_receipt(
+                receipt_path,
+                project_root=project_root,
+                expected_feature_slug=feature,
+            )
+        elif kind == "visual":
             receipt = verify_visual_receipt(
                 receipt_path,
                 project_root=project_root,
@@ -141,7 +149,7 @@ def verify_one_receipt(
                 expected_feature_slug=feature,
                 expected_command=None,
             )
-    except (FinalizeReceiptError, VisualReceiptError) as exc:
+    except (ConventionsReceiptError, FinalizeReceiptError, VisualReceiptError) as exc:
         return ReceiptCheck(kind=kind, path=path, verified=False, verdict=None, error=str(exc))
     return ReceiptCheck(
         kind=kind,

@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-12
+> Last updated: 2026-06-13
 
 
 ---
@@ -100,6 +100,7 @@
 | 060 | Journey Fixture Bootstrap Contract | Implemented | 2026-06-11 | 2026-06-11 | [spec](features/060-journey-fixture-bootstrap-contract/spec.md), [plan](features/060-journey-fixture-bootstrap-contract/plan.md), [implementation](features/060-journey-fixture-bootstrap-contract/implementation.md) |
 | 061 | Conventions Gates Engine | Implemented | 2026-06-12 | 2026-06-12 | [spec](features/061-conventions-gates-engine/spec.md) |
 | 062 | Conventions Rulebook Semantic | Implemented | 2026-06-12 | 2026-06-12 | [spec](features/062-conventions-rulebook-semantic/spec.md), [plan](features/062-conventions-rulebook-semantic/plan.md), [implementation](features/062-conventions-rulebook-semantic/implementation.md) |
+| 063 | Conventions Blocking Pipeline | Implemented | 2026-06-13 | 2026-06-13 | [spec](features/063-conventions-blocking-pipeline/spec.md), [plan](features/063-conventions-blocking-pipeline/plan.md), [implementation](features/063-conventions-blocking-pipeline/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -123,6 +124,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-13 | Feature | [Feature 063] Implemented: Conventions Blocking Pipeline — hard conventions receipt gate, R7 coherence, supervisor diff/hash/fresh locks |
 | 2026-06-12 | Feature | [Feature 062] Implemented: Conventions Rulebook Semantic — self-contained rulebook compiler, direct provider Engine C, waiver-aware verdicts, compile CLI |
 | 2026-06-12 | Feature | [Feature 061 Refactor] Remove delegate_to and command wiring from conventions gates schema v1 |
 | 2026-06-12 | Bugfix | [Feature 061 Fix] Critic cycle 4: bind delegate_to to executable basename and block unreadable source files |
@@ -131,7 +133,6 @@
 | 2026-06-12 | Feature | [Feature 061] Feature: Initial conventions gates engine |
 | 2026-06-11 | Feature | [Feature 060] ### Pipeline: /spec-feature completed end-to-end |
 | 2026-06-11 | Feature | [Feature 060] Test: 100% AC covered (15/15), 0 tests generated — 102/102 feature tests (0 skips), full no-LLM suite green, ruff + pyright clean |
-| 2026-06-11 | Bugfix | [Feature 060] Implemented: Journey Fixture Bootstrap Contract — fixtures.yaml contract, derived XCUITest bootstrap waits, 5 blocking validation rules, journeys-v2-3 + contract hash staleness, bootstrap failure reclassification, scaffold CLI + migration v21 |
 <!-- readme:activity:end -->
 
 ---

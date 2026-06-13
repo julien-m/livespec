@@ -21,6 +21,9 @@ from typing import Any
 
 import pytest
 
+from validator.conventions_gate import GateResult, GateVerdict, GateViolation
+from validator.conventions_gates import gates_path
+from validator.conventions_receipt import write_conventions_receipt
 from validator.exceptions import ArtifactMalformed
 from validator.finalize_receipt import write_receipt
 from validator.run_artifacts import (
@@ -345,6 +348,69 @@ def _state_with_receipt(receipt_path: Path, project_root: Path) -> dict[str, Any
     return make_state(tasks=tasks)
 
 
+def _write_conventions_gates(project_root: Path) -> Path:
+    path = gates_path(project_root)
+    constitution = project_root / ".specs" / "constitution.md"
+    constitution.parent.mkdir(parents=True, exist_ok=True)
+    constitution.write_text("# Constitution\n", encoding="utf-8")
+    path.write_text(
+        """\
+schema_version: 1
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: 1e573f647f46d0e508830de88db17ac2b096487ad15f73dbd608d5d35640ed94
+  stack: .specs/stacks/_default.md
+commands: {}
+builtin: {}
+coverage: {}
+exclusions: []
+scope: repo
+""",
+        encoding="utf-8",
+    )
+    return path
+
+
+def _make_conventions_receipt(project_root: Path, *, verdict: GateVerdict) -> Path:
+    gates = _write_conventions_gates(project_root)
+    return write_conventions_receipt(
+        project_root=project_root,
+        feature_slug="001-x",
+        run_id=f"r-{verdict.value.lower()}",
+        result=GateResult(
+            verdict=verdict,
+            violations=[
+                GateViolation(
+                    rule_id="max_file_lines",
+                    path="src/too_long.py",
+                    line=501,
+                    severity="error",
+                    message="file too long",
+                    source="builtin",
+                )
+            ],
+            blockers=[],
+        ),
+        gates_path=gates,
+    )
+
+
+def _state_with_conventions_receipt(receipt_path: Path, project_root: Path) -> dict[str, Any]:
+    tasks = {
+        "conventions.gate": {
+            "ordinal": 1,
+            "description": "conventions",
+            "status": "complete",
+            "attempts": [],
+            "accepted_evidence": {
+                "conventions_receipt_path": receipt_path.relative_to(project_root).as_posix()
+            },
+            "last_rejection": None,
+        }
+    }
+    return make_state(tasks=tasks)
+
+
 class TestReceiptIntegrity:
     def test_valid_receipt_recorded_as_verified(self, project_root: Path) -> None:
         receipt = _make_finalize_receipt(project_root)
@@ -418,6 +484,39 @@ class TestReceiptIntegrity:
         assert unscoped.artifact is not None
         assert unscoped.artifact["receipts"][0]["verified"] is True
         assert unscoped.outcome == "success"
+
+    def test_conventions_fail_receipt_is_drift_not_error(self, project_root: Path) -> None:
+        receipt = _make_conventions_receipt(project_root, verdict=GateVerdict.FAIL)
+        rules = {
+            "must": [
+                {
+                    "verb": "must",
+                    "kind": "receipt_verdict",
+                    "payload": {
+                        "kind": "conventions",
+                        "verdict": "PASS",
+                        "required_if_exists": True,
+                    },
+                }
+            ],
+            "may": [],
+            "must_not": [],
+            "when": [],
+        }
+
+        result = archive_goal_run(
+            make_contract(feature="001-x", verify_rules=rules),
+            _state_with_conventions_receipt(receipt, project_root),
+            project_root=project_root,
+            feature="001-x",
+            exit_code=0,
+            now=FROZEN_NOW,
+        )
+
+        assert result.artifact is not None
+        assert result.artifact["receipts"][0]["verified"] is True
+        assert result.artifact["receipts"][0]["verdict"] == "FAIL"
+        assert result.outcome == "drift"
 
 
 class TestArtifactHelpers:

@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-06-09
+last_reviewed: 2026-06-13
 ---
 
 # Expectations — /spec-test
@@ -134,6 +134,7 @@ verify:
   must:
     - exit_code: 0
     - contains: "passed"
+    - receipt_verdict: {"kind": "conventions", "verdict": "PASS", "required_if_exists": true}
   may:
     - contains: "coverage"
   must_not:

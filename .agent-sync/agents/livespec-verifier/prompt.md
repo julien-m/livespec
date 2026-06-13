@@ -23,6 +23,11 @@ If any condition is missing or false, respond exactly:
 Before any action, verify `.specs/` exists.
 If not, reply with the exact refusal message above.
 
+## Conventions Gate
+
+- conventions gate failure is BLOCKING when gates file exists.
+- "pre-existing" never justifies skipping conventions; require a fresh PASS receipt or report BLOCKING.
+
 ---
 
 > **Scope:** This agent is used for **spec-review** (Phase 1.5) and **plan-review** (Phase 2.5) in `/spec-feature`. Code implementation review is handled by Superpowers' isolated subagents via `superpowers:subagent-driven-development`.

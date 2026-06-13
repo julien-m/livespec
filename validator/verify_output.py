@@ -161,6 +161,8 @@ def _evaluate_rule(
         return _evaluate_exists(verb, payload, feature, run_date, project_root)
     if kind == "produces_artifact":
         return _evaluate_produces_artifact(verb, payload, feature, run_date, project_root)
+    if kind == "receipt_verdict":
+        return _evaluate_receipt_verdict(verb, payload, artifact, project_root)
     return RuleResult(verb=verb, kind=kind, status="SKIP", detail=f"unknown rule kind {kind!r}")
 
 
@@ -268,6 +270,71 @@ def _evaluate_produces_artifact(
         kind="produces_artifact",
         status=_status(verb, matched),
         detail=detail,
+    )
+
+
+def _evaluate_receipt_verdict(
+    verb: str,
+    payload: Any,
+    artifact: dict[str, Any],
+    project_root: Path,
+) -> RuleResult:
+    """Require an archived receipt kind to carry an expected verdict."""
+    if not isinstance(payload, dict):
+        return RuleResult(
+            verb=verb,
+            kind="receipt_verdict",
+            status=_status(verb, False),
+            detail="receipt_verdict payload must be a mapping",
+        )
+    data = cast(dict[str, Any], payload)
+    receipt_kind = str(data.get("kind", ""))
+    expected = str(data.get("verdict", "PASS"))
+    if not receipt_kind or expected not in {"PASS", "FAIL", "BLOCKED"}:
+        return RuleResult(
+            verb=verb,
+            kind="receipt_verdict",
+            status=_status(verb, False),
+            detail="receipt_verdict requires kind and verdict PASS|FAIL|BLOCKED",
+        )
+    if receipt_kind == "conventions" and data.get("required_if_exists") is True:
+        gates = project_root / ".specs" / "conventions-gates.yaml"
+        if not gates.exists():
+            return RuleResult(
+                verb=verb,
+                kind="receipt_verdict",
+                status="SKIP",
+                detail="conventions gates absent; receipt_verdict skipped",
+            )
+    receipts_raw = artifact.get("receipts")
+    receipts = cast(list[object], receipts_raw) if isinstance(receipts_raw, list) else []
+    matches = [
+        cast(dict[str, Any], item)
+        for item in receipts
+        if isinstance(item, dict) and item.get("kind") == receipt_kind
+    ]
+    if not matches:
+        return RuleResult(
+            verb=verb,
+            kind="receipt_verdict",
+            status=_status(verb, False),
+            detail=f"receipt {receipt_kind} missing",
+        )
+    actual = str(matches[-1].get("verdict", ""))
+    verified = matches[-1].get("verified") is True
+    if not verified:
+        return RuleResult(
+            verb=verb,
+            kind="receipt_verdict",
+            status=_status(verb, False),
+            detail=f"receipt {receipt_kind} unverified",
+        )
+    matched = verified and actual == expected
+    return RuleResult(
+        verb=verb,
+        kind="receipt_verdict",
+        status=_status(verb, matched),
+        detail=f"receipt {receipt_kind} expected={expected} actual={actual} verified={verified}",
     )
 
 

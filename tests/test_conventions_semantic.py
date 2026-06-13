@@ -135,7 +135,6 @@ def test_engine_c_uses_configured_review_model_not_implementation_model(
     assert "implementation-model" not in models
 
 
-
 def test_engine_c_passes_none_to_provider_when_no_review_model_is_configured(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

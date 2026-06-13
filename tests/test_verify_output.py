@@ -346,6 +346,144 @@ class TestPlaceholders:
         # 040 EC-006: re-verifying an old artifact later yields identical results.
         assert report.rules[0].status == "PASS"
 
+
+class TestReceiptVerdictRules:
+    def test_conventions_rule_skips_when_gates_absent(self, tmp_path: Path) -> None:
+        rules = rules_of(
+            must=[
+                {
+                    "verb": "must",
+                    "kind": "receipt_verdict",
+                    "payload": {
+                        "kind": "conventions",
+                        "verdict": "PASS",
+                        "required_if_exists": True,
+                    },
+                }
+            ]
+        )
+
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(exit_code=0),
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+
+        assert report.rules[0].status == "SKIP"
+        assert "conventions gates absent" in report.rules[0].detail
+        assert report.outcome == "success"
+
+    def test_conventions_rule_fails_when_gates_exist_and_receipt_missing(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        (tmp_path / ".specs").mkdir()
+        (tmp_path / ".specs" / "conventions-gates.yaml").write_text("schema_version: 1\n")
+        rules = rules_of(
+            must=[
+                {
+                    "verb": "must",
+                    "kind": "receipt_verdict",
+                    "payload": {
+                        "kind": "conventions",
+                        "verdict": "PASS",
+                        "required_if_exists": True,
+                    },
+                }
+            ]
+        )
+
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(exit_code=0),
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+
+        assert report.rules[0].status == "FAIL"
+        assert "receipt conventions missing" in report.rules[0].detail
+        assert report.outcome == "drift"
+
+    def test_conventions_rule_passes_for_pass_receipt(self, tmp_path: Path) -> None:
+        (tmp_path / ".specs").mkdir()
+        (tmp_path / ".specs" / "conventions-gates.yaml").write_text("schema_version: 1\n")
+        artifact = make_artifact(exit_code=0)
+        artifact["receipts"] = [
+            {
+                "kind": "conventions",
+                "path": ".specs/conventions/runs/r1/receipt.json",
+                "verified": True,
+                "verdict": "PASS",
+                "error": None,
+            }
+        ]
+        rules = rules_of(
+            must=[
+                {
+                    "verb": "must",
+                    "kind": "receipt_verdict",
+                    "payload": {
+                        "kind": "conventions",
+                        "verdict": "PASS",
+                        "required_if_exists": True,
+                    },
+                }
+            ]
+        )
+
+        report = evaluate_rules(
+            rules,
+            artifact=artifact,
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+
+        assert report.rules[0].status == "PASS"
+        assert report.outcome == "success"
+
+    def test_conventions_rule_fails_for_unverified_pass_receipt(self, tmp_path: Path) -> None:
+        (tmp_path / ".specs").mkdir()
+        (tmp_path / ".specs" / "conventions-gates.yaml").write_text("schema_version: 1\n")
+        artifact = make_artifact(exit_code=0)
+        artifact["receipts"] = [
+            {
+                "kind": "conventions",
+                "path": ".specs/conventions/runs/r1/receipt.json",
+                "verified": False,
+                "verdict": "PASS",
+                "error": "receipt_hash_mismatch",
+            }
+        ]
+        rules = rules_of(
+            must=[
+                {
+                    "verb": "must",
+                    "kind": "receipt_verdict",
+                    "payload": {
+                        "kind": "conventions",
+                        "verdict": "PASS",
+                        "required_if_exists": True,
+                    },
+                }
+            ]
+        )
+
+        report = evaluate_rules(
+            rules,
+            artifact=artifact,
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+
+        assert report.rules[0].status == "FAIL"
+        assert "receipt conventions unverified" in report.rules[0].detail
+        assert report.outcome == "drift"
+
     def test_feature_placeholder_resolved(self, tmp_path: Path) -> None:
         feature_dir = tmp_path / ".specs" / "features" / "004-demo"
         feature_dir.mkdir(parents=True)

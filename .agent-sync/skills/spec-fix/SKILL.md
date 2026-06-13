@@ -42,6 +42,12 @@ La toute première action lors de `/spec-fix` est de poser le goal durable avec 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
+## STEP 0.9 — Conventions Gate (OBLIGATOIRE avant PHASE_RESULT)
+
+Avant tout `PHASE_RESULT`, résoudre le feature slug effectif, puis exécuter `livespec conventions verify --json --feature <slug>`.
+Si verdict `FAIL` ou `BLOCKED` → `PHASE_RESULT: BLOCKED - conventions_gate_failed` et inclure `extra.conventions_verdict`.
+Si verdict `PASS`, soumettre le `conventions_receipt_path` au goal et inclure `extra.conventions_verdict: PASS`.
+
 # Command: /spec-fix
 
 > Targeted correction of implementation gaps. Loads full project context (spec, plan, mockups, conventions), executes fixes, and verifies with a retry loop.

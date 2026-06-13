@@ -1,7 +1,7 @@
 ---
 command: spec-implement
 contract_version: "1.0"
-last_reviewed: 2026-06-10
+last_reviewed: 2026-06-13
 ---
 
 # Expectations — /spec-implement
@@ -116,6 +116,7 @@ verify:
     - contains: "PHASE_RESULT"
     - contains: "Penflow contract"
     - exists: ".specs/features/<feature>/progress.md"
+    - receipt_verdict: {"kind": "conventions", "verdict": "PASS", "required_if_exists": true}
   may:
     - contains: "tests passed"
   must_not:

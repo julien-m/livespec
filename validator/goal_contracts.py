@@ -35,6 +35,8 @@ from pathlib import Path
 from typing import Any, TypeAlias, cast
 
 from .command_registry import normalize_command_name
+from .conventions_gates import gates_path
+from .conventions_receipt import ConventionsReceiptError, verify_conventions_receipt
 from .exceptions import ArtifactMalformed, ExpectationsInvalid
 from .expectations import ExpectationsFile, Rule, load_expectations
 from .finalize import FinalizeReceiptError, verify_finalize_receipt
@@ -134,6 +136,8 @@ ARCHIVE_REPAIR_ACTIONS: tuple[str, ...] = (
 ARCHIVE_RUN_TASK_DESCRIPTION = (
     "Archive the run via `livespec goal archive` and prove archive.run with the artifact path"
 )
+CONVENTIONS_REQUIRED_EVIDENCE: tuple[str, ...] = ("conventions_receipt_path",)
+CONVENTIONS_VERIFY_COMMAND = "livespec conventions verify --json --feature <slug>"
 
 # Match level-2 headings that declare visual/Penflow feature work.
 VISUAL_FEATURE_HEADING_RE = re.compile(
@@ -884,6 +888,7 @@ def _goal_payload(
         definition_of_done=definition_of_done,
         visual_feature_slugs=visual_feature_slugs,
         conventions=conventions,
+        conventions_gate_exists=gates_path(project_root).exists(),
     )
     payload = {
         "schema_version": GOAL_CONTRACT_VERSION,
@@ -958,6 +963,7 @@ def _build_goal_tasks(
     definition_of_done: list[str],
     visual_feature_slugs: list[str],
     conventions: Mapping[str, object],
+    conventions_gate_exists: bool,
 ) -> list[dict[str, Any]]:
     """Convert command task prose into enforced proof tasks."""
     # Build base proof tasks first, then layer optional convention evidence onto
@@ -1011,6 +1017,12 @@ def _build_goal_tasks(
                     "Read and apply conventions before retrying: "
                     f"domains={', '.join(required_convention_domains)}; "
                     f"sources={', '.join(required_convention_sources)}."
+                )
+            if conventions_gate_exists:
+                required_evidence.extend(CONVENTIONS_REQUIRED_EVIDENCE)
+                repair_actions.append(
+                    f"Run `{CONVENTIONS_VERIFY_COMMAND}` and submit the generated "
+                    "conventions receipt path."
                 )
             task: dict[str, Any] = {
                 "id": effective_id,
@@ -1273,7 +1285,12 @@ def _validate_task_evidence(
             contract=contract,
             project_root=project_root,
         )
-    return _validate_generic_evidence(task, evidence, project_root=project_root)
+    return _validate_generic_evidence(
+        task,
+        evidence,
+        contract=contract,
+        project_root=project_root,
+    )
 
 
 def _validate_visual_receipt_evidence(
@@ -1498,6 +1515,7 @@ def _validate_generic_evidence(
     task: dict[str, Any],
     evidence: dict[str, Any],
     *,
+    contract: dict[str, Any],
     project_root: Path | None,
 ) -> dict[str, Any]:
     missing: list[str] = []
@@ -1505,6 +1523,16 @@ def _validate_generic_evidence(
         missing.extend(task["required_evidence"])
     for required in cast(list[object], task.get("required_evidence") or []):
         if not isinstance(required, str):
+            continue
+        if required == "conventions_receipt_path":
+            missing.extend(
+                _conventions_receipt_missing_items(
+                    task,
+                    evidence,
+                    contract=contract,
+                    project_root=project_root,
+                )
+            )
             continue
         if required.startswith("convention_") or required == "conventions_applied_to_output":
             satisfied = _convention_evidence_satisfied(task, required, evidence)
@@ -1520,6 +1548,46 @@ def _validate_generic_evidence(
         "invalid_substitutes": [],
         "required_actions": list(task["repair_if_missing"]),
     }
+
+
+def _conventions_receipt_missing_items(
+    task: Mapping[str, object],
+    evidence: Mapping[str, object],
+    *,
+    contract: Mapping[str, object],
+    project_root: Path | None,
+) -> list[str]:
+    """Validate conventions receipt evidence and return missing proof labels."""
+    receipt_path = evidence.get("conventions_receipt_path")
+    if not isinstance(receipt_path, str) or not receipt_path.strip():
+        return ["conventions_receipt_path"]
+    if project_root is None:
+        return ["project_root_for_receipt_verification"]
+    submitted = Path(receipt_path)
+    resolved = (
+        submitted.resolve() if submitted.is_absolute() else (project_root / submitted).resolve()
+    )
+    try:
+        resolved.relative_to(project_root.resolve())
+    except ValueError:
+        return [f"conventions_receipt_valid:path_outside_project:{receipt_path}"]
+    expected = task.get("expected_evidence")
+    expected_feature = None
+    if isinstance(expected, dict) and isinstance(expected.get("feature_slug"), str):
+        expected_feature = str(expected["feature_slug"])
+    elif isinstance(contract.get("feature"), str):
+        expected_feature = str(contract["feature"])
+    try:
+        receipt = verify_conventions_receipt(
+            resolved,
+            project_root=project_root,
+            expected_feature_slug=expected_feature,
+        )
+    except (OSError, ConventionsReceiptError) as exc:
+        return [f"conventions_receipt_valid:{exc}"]
+    if receipt.verdict != "PASS":
+        return ["conventions_receipt_verdict_pass"]
+    return []
 
 
 # @spec FR-003: Validate convention evidence

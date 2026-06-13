@@ -64,6 +64,12 @@ La toute première action lors de `/spec-test` est de poser le goal durable avec
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
+## STEP 0.9 — Conventions Gate (OBLIGATOIRE avant PHASE_RESULT)
+
+Avant tout `PHASE_RESULT`, exécuter `livespec conventions verify --json --feature <slug>` pour chaque feature testée; avec `--all`, chaque feature testée doit avoir un receipt PASS.
+Si verdict `FAIL` ou `BLOCKED` → `PHASE_RESULT: BLOCKED - conventions_gate_failed` et inclure `extra.conventions_verdict`.
+Si verdict `PASS`, soumettre le `conventions_receipt_path` au goal et inclure `extra.conventions_verdict: PASS`.
+
 # Command: /spec-test
 
 > Post-implementation test validation — audit AC coverage, generate missing tests from Gherkin, execute the full suite, capture visual baselines, and produce a test report.

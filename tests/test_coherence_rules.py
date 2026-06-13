@@ -27,6 +27,11 @@ from validator.coherence.rules.r4_readme_sync import (
 )
 from validator.coherence.rules.r5_stack_preflight import R5_1_StackNoPreflight
 from validator.coherence.rules.r6_changelog_refs import R6_1_ChangelogFeatureMissing
+from validator.coherence.rules.r7_conventions_gates import (
+    R7_1_ConventionsGatesMissingOrStale,
+    R7_2_ConventionsExclusionTooBroad,
+    R7_3_ConventionsRulebookSourcesStale,
+)
 from validator.coherence.violation import Severity
 
 
@@ -625,3 +630,159 @@ class TestR6_1_ChangelogFeatureMissing:
         )
         violations = R6_1_ChangelogFeatureMissing().check(graph, Path("."))
         assert violations == []
+
+
+# ---------------------------------------------------------------------------
+# R7 — Conventions Gates
+# ---------------------------------------------------------------------------
+
+
+def _write_constitution(specs_root: Path, text: str = "max file lines and ruff\n") -> None:
+    specs_root.mkdir(parents=True, exist_ok=True)
+    (specs_root / "constitution.md").write_text(text, encoding="utf-8")
+
+
+class TestR7_1_ConventionsGatesMissingOrStale:
+    def test_constitution_declares_limits_but_gates_absent(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        _write_constitution(specs_root)
+
+        violations = R7_1_ConventionsGatesMissingOrStale().check(SpecGraph(), specs_root)
+
+        assert len(violations) == 1
+        assert violations[0].severity == Severity.ERROR
+        assert "conventions-gates.yaml" in violations[0].message
+
+    def test_constitution_hash_stale(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        _write_constitution(specs_root)
+        (specs_root / "conventions-gates.yaml").write_text(
+            """\
+schema_version: 1
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+  stack: .specs/stacks/_default.md
+commands: {}
+builtin: {}
+coverage: {}
+exclusions: []
+scope: repo
+""",
+            encoding="utf-8",
+        )
+
+        violations = R7_1_ConventionsGatesMissingOrStale().check(SpecGraph(), specs_root)
+
+        assert len(violations) == 1
+        assert violations[0].severity == Severity.ERROR
+        assert "constitution_sha256" in violations[0].message
+
+
+class TestR7_2_ConventionsExclusionTooBroad:
+    def test_exclusion_matching_more_than_30_percent_of_repo_is_error(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        specs_root.mkdir(parents=True)
+        for path in (
+            tmp_path / "src" / "a.py",
+            tmp_path / "src" / "b.py",
+            tmp_path / "src" / "c.py",
+            tmp_path / "tests" / "test_a.py",
+        ):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("x\n", encoding="utf-8")
+        (specs_root / "conventions-gates.yaml").write_text(
+            """\
+schema_version: 1
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+  stack: .specs/stacks/_default.md
+commands: {}
+builtin: {}
+coverage: {}
+exclusions:
+  - src/**
+scope: repo
+""",
+            encoding="utf-8",
+        )
+
+        violations = R7_2_ConventionsExclusionTooBroad().check(SpecGraph(), specs_root)
+
+        assert len(violations) == 1
+        assert violations[0].severity == Severity.ERROR
+        assert "src/**" in violations[0].message
+
+    def test_standard_tooling_exclusion_is_ignored(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        specs_root.mkdir(parents=True)
+        for path in (
+            tmp_path / ".venv" / "lib" / "a.py",
+            tmp_path / ".venv" / "lib" / "b.py",
+            tmp_path / ".venv" / "lib" / "c.py",
+            tmp_path / "src" / "app.py",
+        ):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("x\n", encoding="utf-8")
+        (specs_root / "conventions-gates.yaml").write_text(
+            """\
+schema_version: 1
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+  stack: .specs/stacks/_default.md
+commands: {}
+builtin: {}
+coverage: {}
+exclusions:
+  - .venv/**
+scope: repo
+""",
+            encoding="utf-8",
+        )
+
+        violations = R7_2_ConventionsExclusionTooBroad().check(SpecGraph(), specs_root)
+
+        assert violations == []
+
+
+class TestR7_3_ConventionsRulebookSourcesStale:
+    def test_rulebook_source_hash_stale(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        specs_root.mkdir(parents=True)
+        ai_root = tmp_path / "ai"
+        source = ai_root / "code-conventions" / "general.md"
+        source.parent.mkdir(parents=True)
+        source.write_text("# General\ncurrent\n", encoding="utf-8")
+        conventions = tmp_path / ".conventions"
+        conventions.mkdir()
+        (conventions / "index.md").write_text(
+            f"""\
+# Conventions
+> `$AIRESOURCES` = `{ai_root.as_posix()}`
+
+## code [code]
+→ $AIRESOURCES/code-conventions/general.md
+""",
+            encoding="utf-8",
+        )
+        (specs_root / "conventions-rulebook.yaml").write_text(
+            """\
+schema_version: 1
+compiled_at: "2026-06-13T00:00:00+00:00"
+sources:
+  - path: $AIRESOURCES/code-conventions/general.md
+    sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+rules: []
+unenforceable: []
+waivers: []
+""",
+            encoding="utf-8",
+        )
+
+        violations = R7_3_ConventionsRulebookSourcesStale().check(SpecGraph(), specs_root)
+
+        assert len(violations) == 1
+        assert violations[0].severity == Severity.ERROR
+        assert "$AIRESOURCES/code-conventions/general.md" in violations[0].message

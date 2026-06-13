@@ -69,7 +69,9 @@ SECTION13_SUBSECTIONS: tuple[str, ...] = (
 # Minimum number of non-empty content lines per Section 13 sub-section.
 SECTION13_MIN_CONTENT_LINES: int = 3
 
-RULE_KINDS: frozenset[str] = frozenset({"contains", "exists", "exit_code", "produces_artifact"})
+RULE_KINDS: frozenset[str] = frozenset(
+    {"contains", "exists", "exit_code", "produces_artifact", "receipt_verdict"}
+)
 
 
 @dataclass(frozen=True)
@@ -77,7 +79,7 @@ class Rule:
     """A single assertion inside a verify block."""
 
     verb: str  # "must" | "may" | "must_not"
-    kind: str  # "contains" | "exists" | "exit_code" | "produces_artifact"
+    kind: str  # "contains" | "exists" | "exit_code" | "produces_artifact" | "receipt_verdict"
     payload: Any  # str | int | dict (for produces_artifact)
 
 
@@ -422,6 +424,21 @@ def _resolve_rule_kind(
             "path": str(item["produces_artifact"]),
             "contains_sections": [str(s) for s in sections_list],
         }
+    if "receipt_verdict" in keys:
+        payload = item["receipt_verdict"]
+        if not isinstance(payload, dict):
+            raise ExpectationsInvalid(str(path), f"verify.{verb}.receipt_verdict must be a mapping")
+        payload_dict = cast(dict[Any, Any], payload)
+        kind = payload_dict.get("kind")
+        verdict = payload_dict.get("verdict")
+        if not isinstance(kind, str) or not kind:
+            raise ExpectationsInvalid(str(path), "verify.receipt_verdict.kind must be a string")
+        if verdict not in {"PASS", "FAIL", "BLOCKED"}:
+            raise ExpectationsInvalid(
+                str(path),
+                "verify.receipt_verdict.verdict must be PASS, FAIL, or BLOCKED",
+            )
+        return "receipt_verdict", payload
     for kind in ("contains", "exists", "exit_code"):
         if kind in keys:
             return kind, item[kind]

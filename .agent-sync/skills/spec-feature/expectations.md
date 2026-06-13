@@ -1,7 +1,7 @@
 ---
 command: spec-feature
 contract_version: "1.0"
-last_reviewed: 2026-06-11
+last_reviewed: 2026-06-13
 ---
 
 # Expectations — /spec-feature
@@ -141,6 +141,7 @@ verify:
   must:
     - exit_code: 0
     - contains: "PHASE_RESULT"
+    - receipt_verdict: {"kind": "conventions", "verdict": "PASS", "required_if_exists": true}
   must_not:
     - contains: "Traceback"
   when:

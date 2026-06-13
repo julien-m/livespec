@@ -32,6 +32,9 @@ import pytest
 from typer.testing import CliRunner
 
 from validator.cli import app
+from validator.conventions_gate import GateResult, GateVerdict, GateViolation
+from validator.conventions_gates import gates_path
+from validator.conventions_receipt import write_conventions_receipt
 from validator.exceptions import ExpectationsInvalid
 from validator.goal_contracts import (
     compile_command_goal,
@@ -511,6 +514,53 @@ def _write_conventions(project_root: Path, ai_root: Path) -> None:
     )
 
 
+def _write_conventions_gates(project_root: Path) -> Path:
+    path = gates_path(project_root)
+    constitution = project_root / ".specs" / "constitution.md"
+    constitution.parent.mkdir(parents=True, exist_ok=True)
+    constitution.write_text("# Constitution\n", encoding="utf-8")
+    path.write_text(
+        """\
+schema_version: 1
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: 1e573f647f46d0e508830de88db17ac2b096487ad15f73dbd608d5d35640ed94
+  stack: .specs/stacks/_default.md
+commands: {}
+builtin: {}
+coverage: {}
+exclusions: []
+scope: repo
+""",
+        encoding="utf-8",
+    )
+    return path
+
+
+def _write_fail_conventions_receipt(project_root: Path) -> Path:
+    gates = _write_conventions_gates(project_root)
+    return write_conventions_receipt(
+        project_root=project_root,
+        feature_slug="001-demo",
+        run_id="r-fail",
+        result=GateResult(
+            verdict=GateVerdict.FAIL,
+            violations=[
+                GateViolation(
+                    rule_id="max_file_lines",
+                    path="src/too_long.py",
+                    line=501,
+                    severity="error",
+                    message="file too long",
+                    source="builtin",
+                )
+            ],
+            blockers=[],
+        ),
+        gates_path=gates,
+    )
+
+
 def _command_definition_of_done(skill_path: Path) -> list[str]:
     text = skill_path.read_text(encoding="utf-8")
     section = text.split("## Definition of Done (Command-Level)", 1)[1]
@@ -712,6 +762,104 @@ def test_goal_prove_accepts_matching_convention_evidence(tmp_path: Path) -> None
 
     assert result["status"] == "ACCEPTED"
     assert result["state"]["tasks"][task_id]["status"] == "complete"
+
+
+def test_final_tasks_require_conventions_receipt_when_gates_exist(tmp_path: Path) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_conventions(project_root, tmp_path / "ai")
+    _write_conventions_gates(project_root)
+    _write_execution_task_skill(livespec_root)
+
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    final_tasks = [task for task in contract["tasks"] if task["id"] != "archive.run"]
+
+    assert final_tasks
+    assert all("conventions_receipt_path" in task["required_evidence"] for task in final_tasks)
+
+
+def test_goal_prove_rejects_non_pass_conventions_receipt(tmp_path: Path) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_conventions(project_root, tmp_path / "ai")
+    receipt = _write_fail_conventions_receipt(project_root)
+    _write_execution_task_skill(livespec_root)
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+    task_id = contract["tasks"][0]["id"]
+
+    result = prove_goal_task(
+        contract,
+        state,
+        task_id,
+        evidence={
+            "output": "done",
+            "success_criteria_met": True,
+            "convention_domains": ["code"],
+            "convention_sources": [
+                "$AIRESOURCES/code-conventions/general.md",
+                "$AIRESOURCES/code-conventions/python.md",
+            ],
+            "conventions_applied_to_output": True,
+            "conventions_receipt_path": receipt.relative_to(project_root).as_posix(),
+        },
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert "conventions_receipt_verdict_pass" in result["missing_evidence"]
+
+
+def test_goal_prove_rejects_conventions_receipt_outside_project(tmp_path: Path) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_conventions(project_root, tmp_path / "ai")
+    _write_conventions_gates(project_root)
+    _write_execution_task_skill(livespec_root)
+    outside = tmp_path / "outside-receipt.json"
+    outside.write_text("{}", encoding="utf-8")
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+    task_id = contract["tasks"][0]["id"]
+
+    result = prove_goal_task(
+        contract,
+        state,
+        task_id,
+        evidence={
+            "output": "done",
+            "success_criteria_met": True,
+            "convention_domains": ["code"],
+            "convention_sources": [
+                "$AIRESOURCES/code-conventions/general.md",
+                "$AIRESOURCES/code-conventions/python.md",
+            ],
+            "conventions_applied_to_output": True,
+            "conventions_receipt_path": outside.as_posix(),
+        },
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert any(
+        item.startswith("conventions_receipt_valid:path_outside_project")
+        for item in result["missing_evidence"]
+    )
 
 
 def test_compile_command_goal_extracts_definition_of_done(tmp_path: Path) -> None:
