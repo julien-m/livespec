@@ -67,6 +67,28 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 
 ---
 
+## Conventions Enforcement
+
+LiveSpec enforces project conventions through three engines:
+
+- **Engine A — deterministic subprocess:** lint, format, typecheck, and built-in repo checks from `.specs/conventions-gates.yaml`.
+- **Engine B — visual receipt:** Penflow/design/visual evidence receipts for UI workflows.
+- **Engine C — Layer 4 LLM review:** semantic conventions from the compiled rulebook when deterministic checks are not enough.
+
+Primary CLI commands:
+
+```bash
+livespec conventions gates init --force
+livespec conventions compile --force
+livespec conventions scaffold --apply
+livespec conventions verify --report
+livespec conventions supervisor-gate --base-ref <ref> --head-ref <ref>
+```
+
+For debt remediation, run `/spec-fix --conventions`. See [`system/conventions-enforcement.md`](system/conventions-enforcement.md) for the full architecture, human operations, anti-bypass locks, and CLI reference.
+
+---
+
 ## The 23 Commands
 
 | Command | What it does |

@@ -633,6 +633,7 @@ Before a plan is considered complete:
 Before implementation is considered complete:
 - [ ] `progress.md` exists with a checkpoint row for **every** step (BLOCKING — enables `--resume`)
 - [ ] `implementation.md` is created and all FR/AC have status ✅
+- [ ] Before any `PHASE_RESULT: OK` for implement/test/fix: receipt from `livespec conventions verify` is PASS at repo scope; no pre-existing exemption is allowed.
 - [ ] All tests pass
 - [ ] `changelog.md` has an entry
 - [ ] For visual features: Playwright baselines captured in `baselines/`

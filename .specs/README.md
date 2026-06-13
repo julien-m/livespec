@@ -102,6 +102,7 @@
 | 062 | Conventions Rulebook Semantic | Implemented | 2026-06-12 | 2026-06-12 | [spec](features/062-conventions-rulebook-semantic/spec.md), [plan](features/062-conventions-rulebook-semantic/plan.md), [implementation](features/062-conventions-rulebook-semantic/implementation.md) |
 | 063 | Conventions Blocking Pipeline | Implemented | 2026-06-13 | 2026-06-13 | [spec](features/063-conventions-blocking-pipeline/spec.md), [plan](features/063-conventions-blocking-pipeline/plan.md), [implementation](features/063-conventions-blocking-pipeline/implementation.md) |
 | 064 | Conventions Bootstrap Remediation | Implemented | 2026-06-13 | 2026-06-13 | [spec](features/064-conventions-bootstrap-remediation/spec.md), [plan](features/064-conventions-bootstrap-remediation/plan.md), [implementation](features/064-conventions-bootstrap-remediation/implementation.md) |
+| 065 | Conventions Migration Docs | Implemented | 2026-06-13 | 2026-06-13 | [spec](features/065-conventions-migration-docs/spec.md), [plan](features/065-conventions-migration-docs/plan.md), [implementation](features/065-conventions-migration-docs/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -125,6 +126,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-13 | Feature | [Feature 065] Implemented: Conventions Migration Docs — migration v22, conventions enforcement reference, README/spec-system/agent docs |
 | 2026-06-13 | Bugfix | [Feature 064 Fix] Correct Ruff scaffold semantics: remove file line-count as Ruff line-length and enable PLR |
 | 2026-06-13 | Feature | [Feature 064] Implemented: Conventions Bootstrap Remediation — preflight gates checks, scaffold templates, spec-fix conventions mode, split conventions CLI |
 | 2026-06-13 | Feature | [Feature 063] Implemented: Conventions Blocking Pipeline — hard conventions receipt gate, R7 coherence, supervisor diff/hash/fresh locks |

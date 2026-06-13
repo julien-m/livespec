@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-13 — [Feature 065] Implemented: Conventions Migration Docs — migration v22, conventions enforcement reference, README/spec-system/agent docs
+
 ## 2026-06-13 — [Feature 064 Fix] Correct Ruff scaffold semantics: remove file line-count as Ruff line-length and enable PLR
 
 ## 2026-06-13 — [Feature 064] Implemented: Conventions Bootstrap Remediation — preflight gates checks, scaffold templates, spec-fix conventions mode, split conventions CLI
