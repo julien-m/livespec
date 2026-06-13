@@ -1,0 +1,29 @@
+# Implementation — Conventions Bootstrap Remediation
+
+## Summary
+
+Implemented conventions bootstrap remediation for existing projects:
+
+- Preflight now adds conventions-derived checks when `.specs/conventions-gates.yaml` exists.
+- `preflight --fix` can run `livespec conventions scaffold --apply` through the trusted auto-fix dispatcher.
+- `conventions scaffold --apply` renders Python Ruff and TypeScript ESLint templates from gates limits and skips existing configs unless `--sync-limits` is set.
+- `spec-fix --conventions` is documented as a worst-first debt burn-down mode with a strict non-regression gate.
+- Conventions CLI routes moved from `utility_cmd.py` into `validator/cli_commands/conventions_cmd.py`; `utility_cmd.py` now keeps only utility commands and wiring.
+
+## Code Map
+
+| AC | Implementation |
+|---|---|
+| AC-001, AC-002, AC-003 | **Read** [`validator/preflight_autofix.py`](../../../validator/preflight_autofix.py) for `conventions_preflight_items`. |
+| AC-004 | **Read** [`validator/preflight_autofix.py`](../../../validator/preflight_autofix.py) for blocking rulebook provider checks. |
+| AC-005 | **Read** [`validator/preflight_autofix.py`](../../../validator/preflight_autofix.py) and [`validator/cli_commands/preflight_cmd.py`](../../../validator/cli_commands/preflight_cmd.py) for scaffold auto-fix wiring. |
+| AC-006, AC-007 | **Read** [`templates/conventions/python_ruff.toml.tmpl`](../../../templates/conventions/python_ruff.toml.tmpl) and [`templates/conventions/typescript_eslint.json.tmpl`](../../../templates/conventions/typescript_eslint.json.tmpl). |
+| AC-008, AC-009 | **Read** [`validator/cli_commands/conventions_scaffold.py`](../../../validator/cli_commands/conventions_scaffold.py) for language detection, rendering, and overwrite policy. |
+| AC-010, AC-011, AC-012 | **Read** [`.agent-sync/skills/spec-fix/SKILL.md`](../../../.agent-sync/skills/spec-fix/SKILL.md) for `--conventions` mode. |
+| AC-013, AC-014, AC-015, AC-016 | **Read** [`validator/cli_commands/conventions_cmd.py`](../../../validator/cli_commands/conventions_cmd.py), [`validator/cli_commands/conventions_scaffold.py`](../../../validator/cli_commands/conventions_scaffold.py), and [`validator/cli_commands/utility_cmd.py`](../../../validator/cli_commands/utility_cmd.py) for the split and route preservation. |
+
+## Tests
+
+- **Read** [`tests/test_preflight_autofix.py`](../../../tests/test_preflight_autofix.py) for preflight-derived gates checks.
+- **Read** [`tests/test_status_play_conventions_cli.py`](../../../tests/test_status_play_conventions_cli.py) for scaffold behavior and split line-limit coverage.
+- **Read** [`tests/test_conventions_pipeline_docs.py`](../../../tests/test_conventions_pipeline_docs.py) for `spec-fix --conventions` documentation coverage.

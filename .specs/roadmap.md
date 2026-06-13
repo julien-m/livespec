@@ -50,6 +50,7 @@
 - [x] **Conventions Gates Engine** — `.specs/conventions-gates.yaml`, deterministic conventions verify engine, adapter registry, conventions receipt, debt report, and CLI registration for gates init/verify/scaffold. · Scope: L · Priority: P1 → [061-conventions-gates-engine](features/061-conventions-gates-engine/spec.md)
 - [x] **Conventions Rulebook Semantic** — self-contained conventions rulebook compiler plus Layer 4 semantic Engine C with direct provider calls, waiver-aware verdicts, and compile CLI. · Scope: L · Priority: P1 · Deps: 061 → [062-conventions-rulebook-semantic](features/062-conventions-rulebook-semantic/spec.md)
 - [x] **Conventions Blocking Pipeline** — hard repo-wide conventions receipt gate across run receipts, run artifacts, verify-output, goal contracts, command docs, R7 coherence, and supervisor locks. · Scope: L · Priority: P1 · Deps: 061, 062 → [063-conventions-blocking-pipeline](features/063-conventions-blocking-pipeline/spec.md)
+- [x] **Conventions Bootstrap Remediation** — conventions-specific preflight items, Python/TypeScript scaffold templates, `/spec-fix --conventions` debt burn-down docs, and split conventions CLI dogfood. · Scope: L · Priority: P1 · Deps: 061, 062, 063 → [064-conventions-bootstrap-remediation](features/064-conventions-bootstrap-remediation/spec.md)
 <!-- roadmap:mvp:end -->
 
 ---

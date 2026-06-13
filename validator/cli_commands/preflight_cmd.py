@@ -70,6 +70,7 @@ def _run_preflight(*, fix: bool, full: bool) -> None:
         raise typer.Exit(EXIT_PREFLIGHT_FAIL)
 
     items = preflight_autofix.parse_preflight_manifest(manifest_path.read_text(encoding="utf-8"))
+    items.extend(preflight_autofix.conventions_preflight_items(project_root))
     if not items:
         typer.echo("Preflight: no fixable items declared in manifest.")
         emit_summary("preflight", "OK", items=0)

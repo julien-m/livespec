@@ -25,11 +25,16 @@ from __future__ import annotations
 import dataclasses
 import os
 import re
+import shlex
 import shutil
 import subprocess
+import sys
 from collections.abc import Callable, Iterable, Sequence
 from pathlib import Path
-from typing import Final, Literal
+from typing import TYPE_CHECKING, Final, Literal
+
+if TYPE_CHECKING:
+    from .conventions_gates import GateCommand
 
 # --- Models -----------------------------------------------------------------
 
@@ -46,6 +51,7 @@ InstallerKind = Literal[
     "avdmanager",
     "sdkmanager",
     "xcode-license",
+    "conventions-scaffold",
 ]
 
 ItemStatus = Literal[
@@ -320,9 +326,169 @@ def build_install_cmd(item: PreflightItem) -> tuple[Sequence[str] | str, bool]:
         if not url:
             raise ValueError(f"Untrusted curl-pipe installer: {arg!r}")
         return (f"curl -fsSL {url} | sh", True)
+    if kind == "conventions-scaffold":
+        return (["livespec", "conventions", "scaffold", "--repo", arg, "--apply"], False)
     if kind == "manual":
         raise ValueError("manual installer cannot be dispatched")
     raise ValueError(f"Unknown installer kind: {kind!r}")
+
+
+def conventions_preflight_items(project_root: Path) -> list[PreflightItem]:
+    """Build preflight items declared by conventions gates.
+
+    Args:
+        project_root: Repository root that may contain conventions gates and rulebook files.
+
+    Returns:
+        Preflight items for linter binaries, pinned versions, configs, scaffold, and provider.
+
+    Side effects:
+        Reads `.specs/conventions-gates.yaml` and optionally the conventions rulebook.
+    """
+    from .conventions_gates import gates_path, load_conventions_gates
+
+    gates_file = gates_path(project_root)
+    if not gates_file.is_file():
+        return []
+    gates = load_conventions_gates(gates_file)
+    groups = (
+        ("lint", gates.commands.lint),
+        ("format", gates.commands.format),
+        ("typecheck", gates.commands.typecheck),
+    )
+    items, config_paths = _conventions_command_items(project_root, groups)
+    items.insert(0, _conventions_scaffold_item(project_root, config_paths))
+    provider_item = _conventions_provider_item(project_root)
+    if provider_item:
+        items.append(provider_item)
+    return items
+
+
+def _conventions_command_items(
+    project_root: Path,
+    groups: Iterable[tuple[str, list[GateCommand]]],
+) -> tuple[list[PreflightItem], list[Path]]:
+    items: list[PreflightItem] = []
+    config_paths: list[Path] = []
+    for group, commands in groups:
+        for command in commands:
+            try:
+                parts = shlex.split(command.run)
+            except ValueError:
+                items.append(_invalid_conventions_command_item(group, command))
+                continue
+            if not parts:
+                # Empty command rows cannot produce a binary check, so skip them.
+                continue
+            binary = parts[0]
+            items.append(
+                PreflightItem(
+                    f"conventions {group} binary: {binary}",
+                    binary,
+                    "manual",
+                    "",
+                    manual_steps=(f"Install {binary} so `{command.run}` can run.",),
+                )
+            )
+            if command.version:
+                # The shell exits 0 only when `--version` contains the pinned
+                # version string declared by the gates file.
+                items.append(
+                    PreflightItem(
+                        f"conventions {group} version: {binary}",
+                        None,
+                        "manual",
+                        "",
+                        verify_cmd=(
+                            "sh",
+                            "-c",
+                            f"{shlex.quote(binary)} --version | grep -F "
+                            f"{shlex.quote(command.version)}",
+                        ),
+                        manual_steps=(f"Install pinned {binary} version: {command.version}.",),
+                    )
+                )
+            if command.config:
+                config_path = _safe_conventions_config_path(project_root, command.config)
+                if config_path is None:
+                    items.append(_unsafe_conventions_config_item(group, command.config))
+                    continue
+                config_paths.append(config_path)
+                items.append(
+                    PreflightItem(
+                        f"conventions {group} config: {command.config}",
+                        None,
+                        "manual",
+                        "",
+                        verify_cmd=("test", "-f", str(config_path)),
+                        manual_steps=(f"Create {command.config} or run conventions scaffold.",),
+                    )
+                )
+    return items, config_paths
+
+
+def _invalid_conventions_command_item(group: str, command: GateCommand) -> PreflightItem:
+    return PreflightItem(
+        f"conventions {group} command invalid: {command.id}",
+        None,
+        "manual",
+        "",
+        manual_steps=(f"Fix invalid shell syntax in conventions command `{command.id}`.",),
+        safe_for_auto=False,
+    )
+
+
+def _unsafe_conventions_config_item(group: str, config: str) -> PreflightItem:
+    return PreflightItem(
+        f"conventions {group} config unsafe: {config}",
+        None,
+        "manual",
+        "",
+        manual_steps=(f"Replace unsafe conventions config path `{config}` with a repo path.",),
+        safe_for_auto=False,
+    )
+
+
+def _safe_conventions_config_path(project_root: Path, config: str) -> Path | None:
+    raw = Path(config)
+    if raw.is_absolute() or ".." in raw.parts:
+        return None
+    return project_root / raw
+
+
+def _conventions_scaffold_item(project_root: Path, config_paths: Sequence[Path]) -> PreflightItem:
+    scaffold_check = " && ".join(f"test -f {shlex.quote(str(path))}" for path in config_paths)
+    return PreflightItem(
+        "conventions scaffold",
+        None,
+        "conventions-scaffold",
+        str(project_root),
+        verify_cmd=("sh", "-c", scaffold_check or "true"),
+    )
+
+
+def _conventions_provider_item(project_root: Path) -> PreflightItem | None:
+    from .conventions_rules import load_conventions_rules, rulebook_path
+
+    try:
+        rulebook = load_conventions_rules(rulebook_path(project_root))
+    except (FileNotFoundError, ValueError):
+        return None
+    if any(rule.blocking for rule in rulebook.rules):
+        return PreflightItem(
+            "conventions llm provider",
+            None,
+            "manual",
+            "",
+            verify_cmd=(
+                sys.executable,
+                "-c",
+                "from validator import llm_provider; "
+                "raise SystemExit(0 if llm_provider.is_available() else 1)",
+            ),
+            manual_steps=("Configure ~/.config/livespec/provider.py with call_llm().",),
+        )
+    return None
 
 
 def _verify(item: PreflightItem) -> bool:
@@ -654,6 +820,7 @@ __all__ = [
     "PreflightItem",
     "build_install_cmd",
     "changed_files",
+    "conventions_preflight_items",
     "exit_code_for",
     "filter_items",
     "fix_item",

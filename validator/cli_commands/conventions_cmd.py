@@ -1,0 +1,270 @@
+# LiveSpec traceability anchors
+# @spec(FR-009)
+
+"""Conventions CLI commands for LiveSpec."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+from pathlib import Path
+
+import typer
+
+from ..conventions_diffguard import (
+    base_hash_snapshot,
+    changed_protected_conventions_paths,
+    compare_base_hashes,
+    git_changed_paths,
+    supervisor_conventions_gate,
+)
+from ..conventions_gate import verify_conventions
+from ..conventions_gates import (
+    gates_path,
+    generate_conventions_gates,
+    load_conventions_gates,
+)
+from ..conventions_rules import RulebookStaleError, compile_conventions_rulebook
+from ..llm_provider import LLMProviderNotConfigured
+from .conventions_scaffold import (
+    is_web_ui_stack,
+    render_conventions_index,
+    render_conventions_manifest,
+    scaffold_linter_configs,
+)
+
+REPO_OPTION = typer.Option(Path("."), "--repo", help="Project repository root.")
+JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
+FULL_OPTION = typer.Option(False, "--full", help="Regenerate even when present.")
+WORKER_RECEIPT_OPTION = typer.Option(
+    None,
+    "--worker-receipt",
+    help="Optional worker-provided conventions receipt JSON.",
+)
+
+conventions_app = typer.Typer(name="conventions", help="Manage LiveSpec conventions.")
+gates_app = typer.Typer(name="gates", help="Manage conventions gates.")
+conventions_app.add_typer(gates_app, name="gates")
+
+
+@conventions_app.command("refresh")
+def refresh_conventions_command(repo: Path = REPO_OPTION, full: bool = FULL_OPTION) -> None:
+    """Refresh the project conventions bundle."""
+    repo_root = repo.resolve()
+    stack_path = repo_root / ".specs" / "stacks" / "_default.md"
+    if not stack_path.is_file():
+        typer.echo("Error: .specs/stacks/_default.md not found", err=True)
+        raise typer.Exit(2)
+    conventions_dir = repo_root / ".conventions"
+    index_path = conventions_dir / "index.md"
+    manifest_path = conventions_dir / "manifest.yaml"
+    if index_path.is_file() and manifest_path.is_file() and not full:
+        typer.echo("conventions already present")
+        raise typer.Exit(0)
+
+    conventions_dir.mkdir(parents=True, exist_ok=True)
+    stack_text = stack_path.read_text(encoding="utf-8").lower()
+    domains = ["code"]
+    if is_web_ui_stack(stack_text):
+        domains += ["design-tokens", "design-components", "design-views", "design-quality"]
+    index_path.write_text(render_conventions_index(repo_root.name, domains), encoding="utf-8")
+    manifest_path.write_text(render_conventions_manifest(domains, stack_text), encoding="utf-8")
+    typer.echo("conventions refreshed")
+    typer.echo(f"  updated  {index_path.relative_to(repo_root)}")
+    typer.echo(f"  updated  {manifest_path.relative_to(repo_root)}")
+    raise typer.Exit(0)
+
+
+@gates_app.command("init")
+def conventions_gates_init_command(
+    repo: Path = REPO_OPTION,
+    force: bool = typer.Option(False, "--force", help="Overwrite existing gates file."),
+) -> None:
+    """Generate `.specs/conventions-gates.yaml` from project sources."""
+    try:
+        path = generate_conventions_gates(repo.resolve(), force=force)
+    except FileExistsError:
+        typer.echo("conventions gates already present", err=True)
+        raise typer.Exit(1) from None
+    except FileNotFoundError as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(2) from exc
+    typer.echo(f"conventions gates written: {path}")
+    raise typer.Exit(0)
+
+
+@conventions_app.command("verify")
+def conventions_verify_command(
+    repo: Path = REPO_OPTION,
+    json_out: bool = JSON_OPTION,
+    report: bool = typer.Option(False, "--report", help="Write debt report artifacts."),
+) -> None:
+    """Verify conventions deterministically."""
+    try:
+        result = verify_conventions(repo.resolve(), report=report)
+    except (FileNotFoundError, ValueError) as exc:
+        payload = {"verdict": "BLOCKED", "blockers": [str(exc)]}
+        typer.echo(
+            json.dumps(payload, indent=2) if json_out else f"BLOCKED: {exc}",
+            err=not json_out,
+        )
+        raise typer.Exit(2) from exc
+    if json_out:
+        typer.echo(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+    else:
+        typer.echo(f"Conventions verdict: {result.verdict.value}")
+        typer.echo(f"violations: {len(result.violations)}")
+        for blocker in result.blockers:
+            typer.echo(f"BLOCKED: {blocker.message}", err=True)
+    raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
+
+
+@conventions_app.command("supervisor-gate")
+def conventions_supervisor_gate_command(
+    repo: Path = REPO_OPTION,
+    base_ref: str = typer.Option(..., "--base-ref", help="Base git ref for diff/hash guards."),
+    head_ref: str = typer.Option("HEAD", "--head-ref", help="Head git ref for diff guard."),
+    worker_receipt: Path | None = WORKER_RECEIPT_OPTION,
+    json_out: bool = JSON_OPTION,
+) -> None:
+    """Run supervisor-only conventions locks before accepting pipeline output."""
+    repo_root = repo.resolve()
+    try:
+        payload, exit_code = _build_supervisor_gate_payload(
+            repo_root,
+            base_ref=base_ref,
+            head_ref=head_ref,
+            worker_receipt=worker_receipt,
+        )
+    except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:
+        payload = {"verdict": "BLOCKED", "reason": "supervisor_gate_error", "blockers": [str(exc)]}
+        exit_code = 2
+    if json_out:
+        typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        typer.echo(f"Conventions supervisor verdict: {payload['verdict']}")
+        if payload.get("reason"):
+            typer.echo(f"BLOCKED: {payload['reason']}", err=True)
+    raise typer.Exit(exit_code)
+
+
+def _build_supervisor_gate_payload(
+    repo_root: Path,
+    *,
+    base_ref: str,
+    head_ref: str,
+    worker_receipt: Path | None,
+) -> tuple[dict[str, object], int]:
+    changed_paths = git_changed_paths(repo_root, base_ref=base_ref, head_ref=head_ref)
+    protected_paths = changed_protected_conventions_paths(repo_root, changed_paths=changed_paths)
+    if protected_paths:
+        return (
+            {
+                "verdict": "BLOCKED",
+                "reason": "gate_files_modified_in_pipeline",
+                "protected_paths": protected_paths,
+            },
+            2,
+    )
+    hash_blockers = compare_base_hashes(repo_root, base_hash_snapshot(repo_root, base_ref=base_ref))
+    if hash_blockers:
+        return (
+            {"verdict": "BLOCKED", "reason": "base_hash_mismatch", "blockers": hash_blockers},
+            2,
+        )
+    result = supervisor_conventions_gate(
+        repo_root,
+        worker_receipt=_read_worker_receipt(repo_root, worker_receipt),
+        run_verify=lambda root: verify_conventions(root),
+    )
+    return (
+        {
+            "verdict": result.verdict,
+            "source": result.source,
+            "stale_worker_verdict": result.stale_worker_verdict,
+        },
+        {"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict],
+    )
+
+
+def _read_worker_receipt(repo_root: Path, worker_receipt: Path | None) -> dict[str, object] | None:
+    if worker_receipt is None:
+        return None
+    path = worker_receipt if worker_receipt.is_absolute() else repo_root / worker_receipt
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+@conventions_app.command("compile")
+def conventions_compile_command(
+    repo: Path = REPO_OPTION,
+    force: bool = typer.Option(False, "--force", help="Overwrite stale rulebook."),
+    json_out: bool = JSON_OPTION,
+) -> None:
+    """Compile a self-contained semantic conventions rulebook."""
+    try:
+        path = compile_conventions_rulebook(repo.resolve(), force=force)
+    except RulebookStaleError as exc:
+        message = f"conventions rulebook stale: {exc}. Re-run with --force after reviewing changes."
+        typer.echo(
+            json.dumps({"status": "stale", "error": message}, indent=2)
+            if json_out
+            else message
+        )
+        raise typer.Exit(1) from exc
+    except LLMProviderNotConfigured as exc:
+        _blocked("provider_not_configured", str(exc), json_out)
+        raise typer.Exit(2) from exc
+    except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
+        _blocked("rulebook_error", str(exc), json_out)
+        raise typer.Exit(2) from exc
+    typer.echo(
+        json.dumps({"status": "written", "path": str(path)}, indent=2)
+        if json_out
+        else f"conventions rulebook written: {path}"
+    )
+    raise typer.Exit(0)
+
+
+@conventions_app.command("semantic")
+def conventions_semantic_command(repo: Path = REPO_OPTION, json_out: bool = JSON_OPTION) -> None:
+    """Run Layer 4 semantic conventions Engine C."""
+    from ..conventions_engine_c import run_semantic_conventions
+
+    try:
+        result = run_semantic_conventions(repo.resolve())
+    except FileNotFoundError as exc:
+        _blocked("rulebook_missing", f"{exc} Run conventions compile first.", json_out)
+        raise typer.Exit(2) from exc
+    except ValueError as exc:
+        _blocked("rulebook_invalid", str(exc), json_out)
+        raise typer.Exit(2) from exc
+    if json_out:
+        typer.echo(json.dumps(result.model_dump(mode="json"), indent=2, sort_keys=True))
+    else:
+        typer.echo(f"Semantic conventions verdict: {result.verdict.value}")
+        for blocker in result.blockers:
+            typer.echo(f"BLOCKED: {blocker}", err=True)
+    raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
+
+
+@conventions_app.command("scaffold")
+def conventions_scaffold_command(
+    repo: Path = REPO_OPTION,
+    apply: bool = typer.Option(False, "--apply", help="Write scaffold files."),
+    sync_limits: bool = typer.Option(False, "--sync-limits", help="Sync managed linter limits."),
+) -> None:
+    """Scaffold conventions linter config."""
+    repo_root = repo.resolve()
+    gates = load_conventions_gates(gates_path(repo_root))
+    changed = scaffold_linter_configs(repo_root, gates, apply=apply, sync_limits=sync_limits)
+    typer.echo("\n".join(changed) if changed else "conventions scaffold: no changes")
+    raise typer.Exit(0)
+
+
+def _blocked(reason: str, blocker: str, json_out: bool) -> None:
+    if json_out:
+        payload = {"verdict": "BLOCKED", "reason": reason, "blockers": [blocker]}
+        typer.echo(json.dumps(payload, indent=2))
+    else:
+        typer.echo(f"BLOCKED: {reason}: {blocker}", err=True)
+

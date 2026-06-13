@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-13 — [Feature 064] Implemented: Conventions Bootstrap Remediation — preflight gates checks, scaffold templates, spec-fix conventions mode, split conventions CLI
+
 ## 2026-06-13 — [Feature 063 Fix] Wire supervisor-gate CLI, fix R7.2 denominator, scope conventions receipt to implementation commands
 
 ## 2026-06-13 — [Feature 063] Implemented: Conventions Blocking Pipeline — hard conventions receipt gate, R7 coherence, supervisor diff/hash/fresh locks

@@ -29,6 +29,17 @@ def test_final_command_skills_verify_conventions_before_phase_result() -> None:
         assert "extra.conventions_verdict" in text
 
 
+def test_spec_fix_documents_conventions_burndown_mode() -> None:
+    text = _text(".agent-sync/skills/spec-fix/SKILL.md")
+
+    assert "--conventions" in text
+    assert "debt.json" in text
+    assert "verify --report" in text
+    assert "worst-first" in text
+    assert "strictly decreasing" in text
+    assert "zero new violations" in text
+
+
 def test_agent_prompts_treat_conventions_gate_as_blocking() -> None:
     verifier = _text(".agent-sync/agents/livespec-verifier/prompt.md")
     supervisor = _text(".agent-sync/agents/livespec-supervisor/prompt.md")

@@ -111,6 +111,57 @@ def test_conventions_refresh_generates_web_design_domains(tmp_path: Path) -> Non
         assert f"- name: {domain}" in manifest
 
 
+def test_conventions_scaffold_applies_python_ruff_template(tmp_path: Path) -> None:
+    _write_stack(tmp_path, "- Python\n- CLI\n")
+    _write_conventions_gates(tmp_path)
+
+    result = runner.invoke(app, ["conventions", "scaffold", "--repo", str(tmp_path), "--apply"])
+
+    assert result.exit_code == 0, result.output
+    assert "updated pyproject.toml" in result.output
+    config = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
+    assert "[tool.ruff]" in config
+    assert "line-length = 500" in config
+    assert "max-statements = 60" in config
+
+
+def test_conventions_scaffold_applies_typescript_eslint_template(tmp_path: Path) -> None:
+    _write_stack(tmp_path, "- TypeScript\n- React\n")
+    _write_conventions_gates(tmp_path)
+
+    result = runner.invoke(app, ["conventions", "scaffold", "--repo", str(tmp_path), "--apply"])
+
+    assert result.exit_code == 0, result.output
+    assert "updated .eslintrc.json" in result.output
+    config = json.loads((tmp_path / ".eslintrc.json").read_text(encoding="utf-8"))
+    assert config["rules"]["max-lines"][1]["max"] == 500
+    assert config["rules"]["max-statements"][1] == 60
+
+
+def test_conventions_scaffold_does_not_overwrite_without_sync_limits(tmp_path: Path) -> None:
+    _write_stack(tmp_path, "- Python\n- CLI\n")
+    _write_conventions_gates(tmp_path)
+    config_path = tmp_path / "pyproject.toml"
+    config_path.write_text("[tool.custom]\nkeep = true\n", encoding="utf-8")
+
+    result = runner.invoke(app, ["conventions", "scaffold", "--repo", str(tmp_path), "--apply"])
+
+    assert result.exit_code == 0, result.output
+    assert "skipped existing pyproject.toml" in result.output
+    assert config_path.read_text(encoding="utf-8") == "[tool.custom]\nkeep = true\n"
+
+
+def test_conventions_cli_is_split_from_utility_command_module() -> None:
+    root = Path(__file__).resolve().parents[1]
+    utility = root / "validator" / "cli_commands" / "utility_cmd.py"
+    conventions = root / "validator" / "cli_commands" / "conventions_cmd.py"
+
+    assert conventions.is_file()
+    assert len(utility.read_text(encoding="utf-8").splitlines()) < 400
+    assert len(conventions.read_text(encoding="utf-8").splitlines()) < 400
+    assert "conventions_app =" not in utility.read_text(encoding="utf-8")
+
+
 def test_conventions_supervisor_gate_blocks_protected_diff(tmp_path: Path) -> None:
     repo = _init_conventions_git_repo(tmp_path)
     (repo / ".specs" / "conventions-gates.yaml").write_text(
@@ -182,7 +233,7 @@ def test_conventions_supervisor_gate_uses_fresh_verification(
         return GateResult(verdict=GateVerdict.FAIL, violations=[], blockers=[])
 
     monkeypatch.setattr(
-        "validator.cli_commands.utility_cmd.verify_conventions",
+        "validator.cli_commands.conventions_cmd.verify_conventions",
         fail_fresh_verification,
     )
     result = runner.invoke(
@@ -222,10 +273,26 @@ def _init_conventions_git_repo(tmp_path: Path) -> Path:
     return repo
 
 
+def _write_stack(repo: Path, body: str) -> None:
+    stack = repo / ".specs" / "stacks"
+    stack.mkdir(parents=True)
+    (stack / "_default.md").write_text(f"# Stack\n\n{body}", encoding="utf-8")
+
+
+def _write_conventions_gates(repo: Path) -> None:
+    (repo / ".specs").mkdir(exist_ok=True)
+    (repo / ".specs" / "constitution.md").write_text("limits\n", encoding="utf-8")
+    (repo / ".specs" / "conventions-gates.yaml").write_text(_gates_yaml(repo), encoding="utf-8")
+
+
 def _gates_yaml(repo: Path, *, exclusions: list[str] | None = None) -> str:
     from validator.visual_evidence import sha256_file
 
-    exclusion_lines = "\n".join(f"  - {item}" for item in exclusions or [])
+    exclusion_payload = "[]" if not exclusions else "\n" + "\n".join(
+        f"  - {item}" for item in exclusions
+    )
+    # Render the minimal gates document used by CLI tests, preserving the
+    # generated constitution hash and optional exclusions.
     return f"""\
 schema_version: 1
 generated_from:
@@ -235,8 +302,7 @@ generated_from:
 commands: {{}}
 builtin: {{}}
 coverage: {{}}
-exclusions:
-{exclusion_lines}
+exclusions: {exclusion_payload}
 scope: repo
 """
 

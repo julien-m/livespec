@@ -64,8 +64,21 @@ Si verdict `PASS`, soumettre le `conventions_receipt_path` au goal et inclure `e
 /spec-fix feature-name --ac AC-002   → fix specific AC
 /spec-fix feature-name --dry-run     → show what would be fixed without changing code
 /spec-fix feature-name --resume      → resume interrupted fix session
+/spec-fix feature-name --conventions → burn down conventions debt worst-first
 /spec-fix --all                      → fix all features with gaps
 ```
+
+### `--conventions` Mode
+
+When `--conventions` is present, `/spec-fix` targets conventions debt instead of regular
+gap categories:
+
+1. Load the latest conventions debt report from [`debt.json`](debt.json); if missing or stale, rerun
+   `livespec conventions verify --report` and load the regenerated report.
+2. Sort violations worst-first by blocking status, severity, affected surface, and repeat count.
+3. Apply one focused remediation batch at a time, then rerun conventions verification.
+4. The mode may finish only when debt is strictly decreasing and there are zero new violations.
+   If either condition fails, emit `PHASE_RESULT: BLOCKED - conventions_debt_not_decreasing`.
 
 ```mermaid
 flowchart TD

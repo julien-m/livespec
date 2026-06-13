@@ -142,6 +142,64 @@ def test_build_install_cmd_avdmanager() -> None:
     assert "-n" in cmd and "Pixel_8_API_35" in cmd
 
 
+def test_build_install_cmd_conventions_scaffold(tmp_path: Path) -> None:
+    item = PreflightItem(
+        "conventions scaffold",
+        None,
+        "conventions-scaffold",
+        str(tmp_path),
+    )
+
+    cmd, shell = build_install_cmd(item)
+
+    assert cmd == [
+        "livespec",
+        "conventions",
+        "scaffold",
+        "--repo",
+        str(tmp_path),
+        "--apply",
+    ]
+    assert shell is False
+
+
+def test_conventions_preflight_items_from_gates(tmp_path: Path) -> None:
+    _write_conventions_gates(tmp_path)
+
+    items = af.conventions_preflight_items(tmp_path)
+
+    names = {item.name for item in items}
+    assert "conventions lint binary: ruff" in names
+    assert "conventions lint version: ruff" in names
+    assert "conventions lint config: pyproject.toml" in names
+    assert "conventions scaffold" in names
+
+
+def test_conventions_preflight_requires_llm_for_blocking_rulebook(tmp_path: Path) -> None:
+    _write_conventions_gates(tmp_path)
+    (tmp_path / ".specs" / "conventions-rulebook.yaml").write_text(
+        """\
+schema_version: 1
+compiled_at: now
+sources: []
+rules:
+  - id: C001
+    domain: code
+    description: Must be reviewed semantically.
+    check: Ask the provider.
+    source_excerpt: Must be reviewed semantically.
+    blocking: true
+    applies_to: []
+    source_paths: []
+""",
+        encoding="utf-8",
+    )
+
+    items = af.conventions_preflight_items(tmp_path)
+
+    assert any(item.name == "conventions llm provider" for item in items)
+
+
 # --- fix_item flow ---------------------------------------------------------
 
 
@@ -404,3 +462,33 @@ def test_render_guide_numbered_steps() -> None:
     g = render_guide(item)
     assert "1. Open App Store" in g
     assert "2. Install Xcode" in g
+
+
+def _write_conventions_gates(repo: Path) -> None:
+    from validator.visual_evidence import sha256_file
+
+    specs = repo / ".specs"
+    specs.mkdir()
+    (specs / "constitution.md").write_text("line limits\n", encoding="utf-8")
+    # Build the minimal gates fixture needed for preflight discovery tests; the
+    # hash keeps it consistent with the generated gates schema.
+    (specs / "conventions-gates.yaml").write_text(
+        f"""\
+schema_version: 1
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: {sha256_file(specs / "constitution.md")}
+  stack: .specs/stacks/_default.md
+commands:
+  lint:
+    - id: ruff
+      run: ruff check . --output-format json
+      version: ruff 0.12.0
+      config: pyproject.toml
+builtin: {{}}
+coverage: {{}}
+exclusions: []
+scope: repo
+""",
+        encoding="utf-8",
+    )

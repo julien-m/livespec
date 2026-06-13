@@ -9,46 +9,19 @@ from __future__ import annotations
 
 import json
 import re
-import subprocess
 from pathlib import Path
 from typing import Any
 
 import typer
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
 
 from ..cli_commands._common import emit_summary
-from ..conventions_diffguard import (
-    base_hash_snapshot,
-    changed_protected_conventions_paths,
-    compare_base_hashes,
-    git_changed_paths,
-    supervisor_conventions_gate,
-)
-from ..conventions_gate import verify_conventions
-from ..conventions_gates import (
-    ConventionsGates,
-    gates_path,
-    generate_conventions_gates,
-    load_conventions_gates,
-)
-from ..conventions_rules import RulebookStaleError, compile_conventions_rulebook
-from ..llm_provider import LLMProviderNotConfigured
+from .conventions_cmd import conventions_app, refresh_conventions_command
 
 REPO_OPTION = typer.Option(Path("."), "--repo", help="Project repository root.")
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
 SOURCE_DIR_OPTION = typer.Option(Path("."), "--source-dir", help="Source dir to scan.")
 FEATURE_OPTION = typer.Option("", "--feature", help="Feature slug for the payload.")
 NO_OPEN_OPTION = typer.Option(False, "--no-open", help="Do not open a browser.")
-FULL_OPTION = typer.Option(False, "--full", help="Regenerate even when present.")
-WORKER_RECEIPT_OPTION = typer.Option(
-    None,
-    "--worker-receipt",
-    help="Optional worker-provided conventions receipt JSON.",
-)
-
-conventions_app = typer.Typer(name="conventions", help="Manage LiveSpec conventions.")
-gates_app = typer.Typer(name="gates", help="Manage conventions gates.")
-conventions_app.add_typer(gates_app, name="gates")
 
 
 def register(app: typer.Typer) -> None:
@@ -65,10 +38,7 @@ def register(app: typer.Typer) -> None:
     app.add_typer(conventions_app, name="conventions")
 
 
-def status_command(
-    repo: Path = REPO_OPTION,
-    json_out: bool = JSON_OPTION,
-) -> None:
+def status_command(repo: Path = REPO_OPTION, json_out: bool = JSON_OPTION) -> None:
     """Show a factual read-only status summary.
 
     # @spec FR-007: deterministic status backend
@@ -106,11 +76,10 @@ def build_status_report(repo_root: Path) -> dict[str, Any]:
             status = _frontmatter_value(spec_path, "status") or "Unknown"
             statuses[status] = statuses.get(status, 0) + 1
 
-    roadmap = _roadmap_counts(specs / "roadmap.md")
     return {
         "project_root": str(repo_root),
         "features": {"total": total, "by_status": statuses},
-        "roadmap": roadmap,
+        "roadmap": _roadmap_counts(specs / "roadmap.md"),
     }
 
 
@@ -148,314 +117,6 @@ def play_coverage_command(
     else:
         typer.echo(f"playground coverage data written: {target}")
         typer.echo(f"anchors: {len(anchors)}")
-    raise typer.Exit(0)
-
-
-@conventions_app.command("refresh")
-def refresh_conventions_command(
-    repo: Path = REPO_OPTION,
-    full: bool = FULL_OPTION,
-) -> None:
-    """Refresh the project conventions bundle.
-
-    # @spec FR-009: deterministic conventions refresh backend
-    #   — .specs/features/048-command-validation-hardening/spec.md#fr-009
-    """
-    repo_root = repo.resolve()
-    stack_path = repo_root / ".specs" / "stacks" / "_default.md"
-    if not stack_path.is_file():
-        typer.echo("Error: .specs/stacks/_default.md not found", err=True)
-        raise typer.Exit(2)
-    conventions_dir = repo_root / ".conventions"
-    index_path = conventions_dir / "index.md"
-    manifest_path = conventions_dir / "manifest.yaml"
-    if index_path.is_file() and manifest_path.is_file() and not full:
-        typer.echo("conventions already present")
-        raise typer.Exit(0)
-
-    conventions_dir.mkdir(parents=True, exist_ok=True)
-    stack_text = stack_path.read_text(encoding="utf-8").lower()
-    domains = ["code"]
-    if _is_web_ui_stack(stack_text):
-        domains.extend(
-            [
-                "design-tokens",
-                "design-components",
-                "design-views",
-                "design-quality",
-            ]
-        )
-    index_path.write_text(_render_conventions_index(repo_root.name, domains), encoding="utf-8")
-    manifest_path.write_text(_render_conventions_manifest(domains, stack_text), encoding="utf-8")
-    typer.echo("conventions refreshed")
-    typer.echo(f"  updated  {index_path.relative_to(repo_root)}")
-    typer.echo(f"  updated  {manifest_path.relative_to(repo_root)}")
-    raise typer.Exit(0)
-
-
-@gates_app.command("init")
-def conventions_gates_init_command(
-    repo: Path = REPO_OPTION,
-    force: bool = typer.Option(False, "--force", help="Overwrite existing gates file."),
-) -> None:
-    """Generate `.specs/conventions-gates.yaml` from project sources.
-
-    # @spec FR-001: Gates init generator
-    #   — .specs/features/061-conventions-gates-engine/spec.md#fr-001
-    """
-    try:
-        path = generate_conventions_gates(repo.resolve(), force=force)
-    except FileExistsError:
-        typer.echo("conventions gates already present", err=True)
-        raise typer.Exit(1) from None
-    except FileNotFoundError as exc:
-        typer.echo(f"Error: {exc}", err=True)
-        raise typer.Exit(2) from exc
-    typer.echo(f"conventions gates written: {path}")
-    raise typer.Exit(0)
-
-
-@conventions_app.command("verify")
-def conventions_verify_command(
-    repo: Path = REPO_OPTION,
-    json_out: bool = JSON_OPTION,
-    report: bool = typer.Option(False, "--report", help="Write debt report artifacts."),
-) -> None:
-    """Verify conventions deterministically.
-
-    # @spec FR-002: Deterministic conventions verify
-    #   — .specs/features/061-conventions-gates-engine/spec.md#fr-002
-    """
-    try:
-        result = verify_conventions(repo.resolve(), report=report)
-    except (FileNotFoundError, ValueError) as exc:
-        if json_out:
-            typer.echo(json.dumps({"verdict": "BLOCKED", "blockers": [str(exc)]}, indent=2))
-        else:
-            typer.echo(f"BLOCKED: {exc}", err=True)
-        raise typer.Exit(2) from exc
-    if json_out:
-        typer.echo(json.dumps(result.to_dict(), indent=2, sort_keys=True))
-    else:
-        typer.echo(f"Conventions verdict: {result.verdict.value}")
-        typer.echo(f"violations: {len(result.violations)}")
-        for blocker in result.blockers:
-            typer.echo(f"BLOCKED: {blocker.message}", err=True)
-    raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
-
-
-@conventions_app.command("supervisor-gate")
-def conventions_supervisor_gate_command(
-    repo: Path = REPO_OPTION,
-    base_ref: str = typer.Option(..., "--base-ref", help="Base git ref for diff/hash guards."),
-    head_ref: str = typer.Option("HEAD", "--head-ref", help="Head git ref for diff guard."),
-    worker_receipt: Path | None = WORKER_RECEIPT_OPTION,
-    json_out: bool = JSON_OPTION,
-) -> None:
-    """Run supervisor-only conventions locks before accepting pipeline output."""
-    repo_root = repo.resolve()
-    try:
-        payload, exit_code = _build_supervisor_gate_payload(
-            repo_root,
-            base_ref=base_ref,
-            head_ref=head_ref,
-            worker_receipt=worker_receipt,
-        )
-    except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:
-        payload = {
-            "verdict": "BLOCKED",
-            "reason": "supervisor_gate_error",
-            "blockers": [str(exc)],
-        }
-        exit_code = 2
-    if json_out:
-        typer.echo(json.dumps(payload, indent=2, sort_keys=True))
-    else:
-        typer.echo(f"Conventions supervisor verdict: {payload['verdict']}")
-        if payload.get("reason"):
-            typer.echo(f"BLOCKED: {payload['reason']}", err=True)
-    raise typer.Exit(exit_code)
-
-
-def _build_supervisor_gate_payload(
-    repo_root: Path,
-    *,
-    base_ref: str,
-    head_ref: str,
-    worker_receipt: Path | None,
-) -> tuple[dict[str, object], int]:
-    changed_paths = git_changed_paths(repo_root, base_ref=base_ref, head_ref=head_ref)
-    protected_paths = changed_protected_conventions_paths(repo_root, changed_paths=changed_paths)
-    if protected_paths:
-        return (
-            {
-                "verdict": "BLOCKED",
-                "reason": "gate_files_modified_in_pipeline",
-                "protected_paths": protected_paths,
-            },
-            2,
-        )
-    snapshot = base_hash_snapshot(repo_root, base_ref=base_ref)
-    hash_blockers = compare_base_hashes(repo_root, snapshot)
-    if hash_blockers:
-        return (
-            {
-                "verdict": "BLOCKED",
-                "reason": "base_hash_mismatch",
-                "blockers": hash_blockers,
-            },
-            2,
-        )
-    result = supervisor_conventions_gate(
-        repo_root,
-        worker_receipt=_read_worker_receipt(repo_root, worker_receipt),
-        run_verify=lambda root: verify_conventions(root),
-    )
-    return (
-        {
-            "verdict": result.verdict,
-            "source": result.source,
-            "stale_worker_verdict": result.stale_worker_verdict,
-        },
-        {"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict],
-    )
-
-
-def _read_worker_receipt(repo_root: Path, worker_receipt: Path | None) -> dict[str, object] | None:
-    if worker_receipt is None:
-        return None
-    path = worker_receipt if worker_receipt.is_absolute() else repo_root / worker_receipt
-    return json.loads(path.read_text(encoding="utf-8"))
-
-
-@conventions_app.command("compile")
-def conventions_compile_command(
-    repo: Path = REPO_OPTION,
-    force: bool = typer.Option(False, "--force", help="Overwrite stale rulebook."),
-    json_out: bool = JSON_OPTION,
-) -> None:
-    """Compile a self-contained semantic conventions rulebook.
-
-    # @spec FR-009: Register conventions compile
-    #   — .specs/features/062-conventions-rulebook-semantic/spec.md#fr-009
-    """
-    try:
-        path = compile_conventions_rulebook(repo.resolve(), force=force)
-    except RulebookStaleError as exc:
-        message = (
-            f"conventions rulebook stale: {exc}. "
-            "Re-run with --force after reviewing convention source changes."
-        )
-        if json_out:
-            typer.echo(json.dumps({"status": "stale", "error": message}, indent=2))
-        else:
-            typer.echo(message, err=True)
-        raise typer.Exit(1) from exc
-    except LLMProviderNotConfigured as exc:
-        blocker = str(exc) or "LLM provider is not configured."
-        next_step = "Configure the LLM provider, then rerun conventions compile."
-        if json_out:
-            typer.echo(
-                json.dumps(
-                    {
-                        "verdict": "BLOCKED",
-                        "reason": "provider_not_configured",
-                        "blockers": [blocker],
-                        "next_step": next_step,
-                    },
-                    indent=2,
-                )
-            )
-        else:
-            typer.echo(f"BLOCKED: provider_not_configured: {blocker} {next_step}", err=True)
-        raise typer.Exit(2) from exc
-    except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
-        if json_out:
-            typer.echo(
-                json.dumps(
-                    {"verdict": "BLOCKED", "reason": "rulebook_error", "blockers": [str(exc)]},
-                    indent=2,
-                )
-            )
-        else:
-            typer.echo(f"BLOCKED: rulebook_error: {exc}", err=True)
-        raise typer.Exit(2) from exc
-    if json_out:
-        typer.echo(json.dumps({"status": "written", "path": str(path)}, indent=2))
-    else:
-        typer.echo(f"conventions rulebook written: {path}")
-    raise typer.Exit(0)
-
-
-@conventions_app.command("semantic")
-def conventions_semantic_command(
-    repo: Path = REPO_OPTION,
-    json_out: bool = JSON_OPTION,
-) -> None:
-    """Run Layer 4 semantic conventions Engine C.
-
-    # @spec FR-005: Engine C executable path
-    #   — .specs/features/062-conventions-rulebook-semantic/spec.md#fr-005
-    """
-    from ..conventions_engine_c import run_semantic_conventions
-
-    try:
-        result = run_semantic_conventions(repo.resolve())
-    except FileNotFoundError as exc:
-        next_step = "Run conventions compile for this repo, then rerun conventions semantic."
-        if json_out:
-            typer.echo(
-                json.dumps(
-                    {
-                        "verdict": "BLOCKED",
-                        "reason": "rulebook_missing",
-                        "blockers": [str(exc)],
-                        "next_step": next_step,
-                    },
-                    indent=2,
-                )
-            )
-        else:
-            typer.echo(f"BLOCKED: rulebook_missing: {exc} {next_step}", err=True)
-        raise typer.Exit(2) from exc
-    except ValueError as exc:
-        if json_out:
-            typer.echo(
-                json.dumps(
-                    {"verdict": "BLOCKED", "reason": "rulebook_invalid", "blockers": [str(exc)]},
-                    indent=2,
-                )
-            )
-        else:
-            typer.echo(f"BLOCKED: rulebook_invalid: {exc}", err=True)
-        raise typer.Exit(2) from exc
-    if json_out:
-        typer.echo(json.dumps(result.model_dump(mode="json"), indent=2, sort_keys=True))
-    else:
-        typer.echo(f"Semantic conventions verdict: {result.verdict.value}")
-        for blocker in result.blockers:
-            typer.echo(f"BLOCKED: {blocker}", err=True)
-    raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
-
-
-@conventions_app.command("scaffold")
-def conventions_scaffold_command(
-    repo: Path = REPO_OPTION,
-    apply: bool = typer.Option(False, "--apply", help="Write scaffold files."),
-    sync_limits: bool = typer.Option(False, "--sync-limits", help="Sync managed linter limits."),
-) -> None:
-    """Scaffold conventions linter config.
-
-    # @spec FR-005: scaffold --sync-limits
-    #   — .specs/features/061-conventions-gates-engine/spec.md#fr-005
-    """
-    repo_root = repo.resolve()
-    gates = load_conventions_gates(gates_path(repo_root))
-    changed = _scaffold_swiftlint(repo_root, gates, apply=apply, sync_limits=sync_limits)
-    if changed:
-        typer.echo("\n".join(changed))
-    else:
-        typer.echo("conventions scaffold: no changes")
     raise typer.Exit(0)
 
 
@@ -511,158 +172,9 @@ def _scan_spec_anchors(source_root: Path) -> list[dict[str, Any]]:
     return anchors
 
 
-def _render_conventions_index(project_name: str, domains: list[str]) -> str:
-    lines = [
-        f"# Conventions · {project_name}",
-        "",
-        "> Generated by `livespec conventions refresh`.",
-        "",
-    ]
-    if "code" in domains:
-        lines.extend(
-            [
-                "## code [code, tests, logging, naming, Python, CLI, architecture]",
-                "→ $AIRESOURCES/code-conventions/general.md, python.md, "
-                "javascript.md, cli.md, stack-commands.md",
-                "",
-            ]
-        )
-    if "design-tokens" in domains:
-        lines.extend(
-            [
-                "## design-tokens [CSS, colors, spacing, typography, motion, dark mode]",
-                "→ $AIRESOURCES/design/tokens/colors.md, spacing.md, typography.md, "
-                "motion.md, cross-platform.md",
-                "",
-            ]
-        )
-    if "design-components" in domains:
-        lines.extend(
-            [
-                "## design-components [button, input, form, toast, modal, nav, list, badge]",
-                "→ $AIRESOURCES/design/components/buttons.md, forms.md, navigation.md, "
-                "lists.md, modals.md, feedback.md",
-                "",
-            ]
-        )
-    if "design-views" in domains:
-        lines.extend(
-            [
-                "## design-views [page layout, dashboard, settings, auth, mockup specs]",
-                "→ $AIRESOURCES/design/references/app-views.md, app-views-catalog.md, "
-                "app-ui.md, mockup-specs.md",
-                "",
-            ]
-        )
-    if "design-quality" in domains:
-        lines.extend(
-            [
-                "## design-quality [a11y audit, WCAG, keyboard nav, ARIA, visual QA]",
-                "→ $AIRESOURCES/design/quality/accessibility.md, ui-rules.md",
-                "",
-            ]
-        )
-    return "\n".join(lines)
-
-
-def _render_conventions_manifest(domains: list[str], stack_text: str) -> str:
-    if _is_web_ui_stack(stack_text):
-        stack_hint = "web"
-    elif "python" in stack_text:
-        stack_hint = "python"
-    else:
-        stack_hint = "generic"
-    lines = ["version: 1", f"stack_hint: {stack_hint}", "domains:"]
-    for domain in domains:
-        lines.append(f"  - name: {domain}")
-        lines.append("    files:")
-        if domain == "code":
-            lines.append("      - $AIRESOURCES/code-conventions/general.md")
-            lines.append("      - $AIRESOURCES/code-conventions/python.md")
-            lines.append("      - $AIRESOURCES/code-conventions/javascript.md")
-            lines.append("      - $AIRESOURCES/code-conventions/cli.md")
-            lines.append("      - $AIRESOURCES/code-conventions/stack-commands.md")
-        elif domain == "design-tokens":
-            lines.append("      - $AIRESOURCES/design/tokens/colors.md")
-            lines.append("      - $AIRESOURCES/design/tokens/spacing.md")
-            lines.append("      - $AIRESOURCES/design/tokens/typography.md")
-            lines.append("      - $AIRESOURCES/design/tokens/motion.md")
-            lines.append("      - $AIRESOURCES/design/tokens/cross-platform.md")
-        elif domain == "design-components":
-            lines.append("      - $AIRESOURCES/design/components/buttons.md")
-            lines.append("      - $AIRESOURCES/design/components/forms.md")
-            lines.append("      - $AIRESOURCES/design/components/navigation.md")
-            lines.append("      - $AIRESOURCES/design/components/lists.md")
-            lines.append("      - $AIRESOURCES/design/components/modals.md")
-            lines.append("      - $AIRESOURCES/design/components/feedback.md")
-        elif domain == "design-views":
-            lines.append("      - $AIRESOURCES/design/references/app-views.md")
-            lines.append("      - $AIRESOURCES/design/references/app-views-catalog.md")
-            lines.append("      - $AIRESOURCES/design/references/app-ui.md")
-            lines.append("      - $AIRESOURCES/design/references/mockup-specs.md")
-        elif domain == "design-quality":
-            lines.append("      - $AIRESOURCES/design/quality/accessibility.md")
-            lines.append("      - $AIRESOURCES/design/quality/ui-rules.md")
-    return "\n".join(lines) + "\n"
-
-
-def _is_web_ui_stack(stack_text: str) -> bool:
-    web_markers = (
-        "web",
-        "frontend",
-        "react",
-        "vite",
-        "next",
-        "dashboard",
-        "browser",
-        "typescript",
-    )
-    return any(marker in stack_text for marker in web_markers)
-
-
-def _scaffold_swiftlint(
-    repo_root: Path,
-    gates: ConventionsGates,
-    *,
-    apply: bool,
-    sync_limits: bool,
-) -> list[str]:
-    # The scaffold only owns these generated limit keys; all other user
-    # SwiftLint configuration is preserved to avoid weakening human rules.
-    path = repo_root / ".swiftlint.yml"
-    payload = _read_swiftlint_payload(path)
-    builtins = gates.builtin
-    payload["file_length"] = {
-        "warning": builtins.max_file_lines.target,
-        "error": builtins.max_file_lines.limit,
-    }
-    payload["function_body_length"] = {
-        "warning": builtins.max_function_lines.target,
-        "error": builtins.max_function_lines.limit,
-    }
-    if not apply:
-        return [f"would update {path.relative_to(repo_root)}"]
-    if not sync_limits and path.exists():
-        return [f"skipped existing {path.relative_to(repo_root)}"]
-    path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
-    return [f"updated {path.relative_to(repo_root)}"]
-
-
-def _read_swiftlint_payload(path: Path) -> dict[str, object]:
-    if not path.is_file():
-        return {}
-    try:
-        raw: object = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    except yaml.YAMLError:
-        return {}
-    return raw if isinstance(raw, dict) else {}
-
-
 __all__ = [
     "build_status_report",
     "conventions_app",
-    "conventions_compile_command",
-    "conventions_semantic_command",
     "play_coverage_command",
     "refresh_conventions_command",
     "register",
