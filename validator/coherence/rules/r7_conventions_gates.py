@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import fnmatch
 import re
+import subprocess
 from hashlib import sha256
 from pathlib import Path
 
@@ -22,6 +23,8 @@ _STANDARD_TOOLING_EXCLUSIONS = {
     "**/__pycache__/**",
     "**/Generated/**",
 }
+_DENOMINATOR_EXCLUDED_PREFIXES = (".git/", ".ruff_cache/", ".specs/", ".venv/")
+_DENOMINATOR_EXCLUDED_SEGMENTS = frozenset({"__pycache__", "Generated"})
 
 
 class R7_1_ConventionsGatesMissingOrStale:
@@ -48,7 +51,9 @@ class R7_1_ConventionsGatesMissingOrStale:
             loaded = load_conventions_gates(gates)
         except (OSError, ValueError) as exc:
             return [_violation(self.rule_id, f"conventions-gates.yaml invalid: {exc}")]
-        source = specs_root.parent / loaded.generated_from.constitution
+        canonical = specs_root / "constitution.md"
+        declared = specs_root.parent / loaded.generated_from.constitution
+        source = canonical if canonical.is_file() else declared
         if not source.is_file() or sha256_file(source) != loaded.generated_from.constitution_sha256:
             return [_violation(self.rule_id, "conventions gates constitution_sha256 is stale")]
         return []
@@ -115,15 +120,38 @@ def _constitution_declares_conventions(path: Path) -> bool:
 
 
 def _repo_files(project_root: Path) -> list[str]:
+    candidates = _git_tracked_files(project_root)
+    if candidates is None:
+        candidates = _walk_repo_files(project_root)
+    return sorted(path for path in candidates if _is_source_denominator_path(path))
+
+
+def _git_tracked_files(project_root: Path) -> list[str] | None:
+    try:
+        output = subprocess.check_output(
+            ["git", "-C", str(project_root), "ls-files"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return [line.strip() for line in output.splitlines() if line.strip()]
+
+
+def _walk_repo_files(project_root: Path) -> list[str]:
     files: list[str] = []
     for path in project_root.rglob("*"):
         if not path.is_file():
             continue
         rel = path.relative_to(project_root).as_posix()
-        if rel.startswith(".git/"):
-            continue
         files.append(rel)
     return files
+
+
+def _is_source_denominator_path(rel: str) -> bool:
+    if rel.startswith(_DENOMINATOR_EXCLUDED_PREFIXES):
+        return False
+    return not any(segment in _DENOMINATOR_EXCLUDED_SEGMENTS for segment in rel.split("/"))
 
 
 def _airesources_root(index_path: Path) -> Path | None:

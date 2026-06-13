@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from hashlib import sha256
 from pathlib import Path
 
 from validator.coherence.graph_builder import FeatureInfo, RoadmapItem, SpecGraph
@@ -678,6 +679,37 @@ scope: repo
         assert violations[0].severity == Severity.ERROR
         assert "constitution_sha256" in violations[0].message
 
+    def test_canonical_constitution_takes_precedence_over_declared_path(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        specs_root = tmp_path / ".specs"
+        _write_constitution(specs_root, text="ruff limits changed\n")
+        declared = tmp_path / "custom-constitution.md"
+        declared.write_text("ruff limits old\n", encoding="utf-8")
+        declared_hash = sha256(declared.read_bytes()).hexdigest()
+        (specs_root / "conventions-gates.yaml").write_text(
+            f"""\
+schema_version: 1
+generated_from:
+  constitution: custom-constitution.md
+  constitution_sha256: {declared_hash}
+  stack: .specs/stacks/_default.md
+commands: {{}}
+builtin: {{}}
+coverage: {{}}
+exclusions: []
+scope: repo
+""",
+            encoding="utf-8",
+        )
+
+        violations = R7_1_ConventionsGatesMissingOrStale().check(SpecGraph(), specs_root)
+
+        assert len(violations) == 1
+        assert violations[0].severity == Severity.ERROR
+        assert "constitution_sha256" in violations[0].message
+
 
 class TestR7_2_ConventionsExclusionTooBroad:
     def test_exclusion_matching_more_than_30_percent_of_repo_is_error(self, tmp_path: Path) -> None:
@@ -745,6 +777,42 @@ scope: repo
         violations = R7_2_ConventionsExclusionTooBroad().check(SpecGraph(), specs_root)
 
         assert violations == []
+
+    def test_exclusion_ratio_ignores_tooling_files_in_denominator(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        specs_root.mkdir(parents=True)
+        for index in range(20):
+            path = tmp_path / ".venv" / "lib" / f"dep_{index}.py"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("x\n", encoding="utf-8")
+        for path in (
+            tmp_path / "src" / "a.py",
+            tmp_path / "src" / "b.py",
+            tmp_path / "tests" / "test_a.py",
+        ):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("x\n", encoding="utf-8")
+        (specs_root / "conventions-gates.yaml").write_text(
+            """\
+schema_version: 1
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+  stack: .specs/stacks/_default.md
+commands: {}
+builtin: {}
+coverage: {}
+exclusions:
+  - src/**
+scope: repo
+""",
+            encoding="utf-8",
+        )
+
+        violations = R7_2_ConventionsExclusionTooBroad().check(SpecGraph(), specs_root)
+
+        assert len(violations) == 1
+        assert "src/**" in violations[0].message
 
 
 class TestR7_3_ConventionsRulebookSourcesStale:

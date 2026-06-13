@@ -375,6 +375,35 @@ class TestReceiptVerdictRules:
         assert "conventions gates absent" in report.rules[0].detail
         assert report.outcome == "success"
 
+    def test_conventions_rule_defaults_to_required_if_exists_when_gates_absent(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        rules = rules_of(
+            must=[
+                {
+                    "verb": "must",
+                    "kind": "receipt_verdict",
+                    "payload": {
+                        "kind": "conventions",
+                        "verdict": "PASS",
+                    },
+                }
+            ]
+        )
+
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(exit_code=0),
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+
+        assert report.rules[0].status == "SKIP"
+        assert "conventions gates absent" in report.rules[0].detail
+        assert report.outcome == "success"
+
     def test_conventions_rule_fails_when_gates_exist_and_receipt_missing(
         self,
         tmp_path: Path,

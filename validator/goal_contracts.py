@@ -138,6 +138,9 @@ ARCHIVE_RUN_TASK_DESCRIPTION = (
 )
 CONVENTIONS_REQUIRED_EVIDENCE: tuple[str, ...] = ("conventions_receipt_path",)
 CONVENTIONS_VERIFY_COMMAND = "livespec conventions verify --json --feature <slug>"
+_CONVENTIONS_GATED_COMMANDS: frozenset[str] = frozenset(
+    {"spec-implement", "spec-test", "spec-fix", "spec-feature", "spec-ship"}
+)
 
 # Match level-2 headings that declare visual/Penflow feature work.
 VISUAL_FEATURE_HEADING_RE = re.compile(
@@ -1018,7 +1021,7 @@ def _build_goal_tasks(
                     f"domains={', '.join(required_convention_domains)}; "
                     f"sources={', '.join(required_convention_sources)}."
                 )
-            if conventions_gate_exists:
+            if conventions_gate_exists and command in _CONVENTIONS_GATED_COMMANDS:
                 required_evidence.extend(CONVENTIONS_REQUIRED_EVIDENCE)
                 repair_actions.append(
                     f"Run `{CONVENTIONS_VERIFY_COMMAND}` and submit the generated "

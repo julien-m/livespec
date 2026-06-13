@@ -764,7 +764,7 @@ def test_goal_prove_accepts_matching_convention_evidence(tmp_path: Path) -> None
     assert result["state"]["tasks"][task_id]["status"] == "complete"
 
 
-def test_final_tasks_require_conventions_receipt_when_gates_exist(tmp_path: Path) -> None:
+def test_conventions_gate_not_required_for_unlisted_command(tmp_path: Path) -> None:
     project_root, livespec_root = _fixture_roots(tmp_path)
     _write_conventions(project_root, tmp_path / "ai")
     _write_conventions_gates(project_root)
@@ -780,18 +780,55 @@ def test_final_tasks_require_conventions_receipt_when_gates_exist(tmp_path: Path
     final_tasks = [task for task in contract["tasks"] if task["id"] != "archive.run"]
 
     assert final_tasks
+    assert all("conventions_receipt_path" not in task["required_evidence"] for task in final_tasks)
+
+
+def test_conventions_gate_not_required_for_spec_plan(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    _write_conventions_gates(project_root)
+
+    goal = compile_command_goal(
+        "spec-plan",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    final_tasks = [task for task in contract["tasks"] if task["id"] != "archive.run"]
+
+    assert final_tasks
+    assert all("conventions_receipt_path" not in task["required_evidence"] for task in final_tasks)
+
+
+def test_conventions_gate_required_for_spec_implement(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    _write_conventions_gates(project_root)
+
+    goal = compile_command_goal(
+        "spec-implement",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    final_tasks = [task for task in contract["tasks"] if task["id"] != "archive.run"]
+
+    assert final_tasks
     assert all("conventions_receipt_path" in task["required_evidence"] for task in final_tasks)
 
 
 def test_goal_prove_rejects_non_pass_conventions_receipt(tmp_path: Path) -> None:
-    project_root, livespec_root = _fixture_roots(tmp_path)
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    (project_root / ".specs").mkdir()
     _write_conventions(project_root, tmp_path / "ai")
     receipt = _write_fail_conventions_receipt(project_root)
-    _write_execution_task_skill(livespec_root)
     goal = compile_command_goal(
-        "spec-demo",
+        "spec-implement",
         project_root=project_root,
-        livespec_root=livespec_root,
+        livespec_root=_repo_root(),
         feature="001-demo",
     )
     contract = json.loads(render_goal_contract_file(goal))
@@ -821,16 +858,17 @@ def test_goal_prove_rejects_non_pass_conventions_receipt(tmp_path: Path) -> None
 
 
 def test_goal_prove_rejects_conventions_receipt_outside_project(tmp_path: Path) -> None:
-    project_root, livespec_root = _fixture_roots(tmp_path)
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    (project_root / ".specs").mkdir()
     _write_conventions(project_root, tmp_path / "ai")
     _write_conventions_gates(project_root)
-    _write_execution_task_skill(livespec_root)
     outside = tmp_path / "outside-receipt.json"
     outside.write_text("{}", encoding="utf-8")
     goal = compile_command_goal(
-        "spec-demo",
+        "spec-implement",
         project_root=project_root,
-        livespec_root=livespec_root,
+        livespec_root=_repo_root(),
         feature="001-demo",
     )
     contract = json.loads(render_goal_contract_file(goal))

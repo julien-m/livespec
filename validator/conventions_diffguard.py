@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import subprocess
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 
 from .conventions_gate import GateResult
@@ -37,6 +39,24 @@ def changed_protected_conventions_paths(
     """Return changed paths that are protected conventions gate inputs."""
     protected = _protected_conventions_paths(project_root)
     return sorted(path for path in changed_paths if path in protected)
+
+
+def git_changed_paths(project_root: Path, *, base_ref: str, head_ref: str) -> list[str]:
+    """Return paths changed between two git refs for supervisor diff checks."""
+    output = subprocess.check_output(
+        ["git", "-C", str(project_root), "diff", "--name-only", f"{base_ref}..{head_ref}"],
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    return [line.strip() for line in output.splitlines() if line.strip()]
+
+
+def base_hash_snapshot(project_root: Path, *, base_ref: str) -> BaseHashSnapshot:
+    """Read protected conventions file hashes from a git base ref."""
+    return BaseHashSnapshot(
+        gates_sha256=_git_blob_sha256(project_root, base_ref, ".specs/conventions-gates.yaml"),
+        rules_sha256=_git_blob_sha256(project_root, base_ref, ".specs/conventions-rulebook.yaml"),
+    )
 
 
 def compare_base_hashes(project_root: Path, snapshot: BaseHashSnapshot) -> list[str]:
@@ -89,10 +109,23 @@ def _sha256_or_empty(path: Path) -> str:
         return ""
 
 
+def _git_blob_sha256(project_root: Path, ref: str, rel_path: str) -> str:
+    try:
+        content = subprocess.check_output(
+            ["git", "-C", str(project_root), "show", f"{ref}:{rel_path}"],
+            stderr=subprocess.STDOUT,
+        )
+    except subprocess.CalledProcessError:
+        return ""
+    return sha256(content).hexdigest()
+
+
 __all__ = [
     "BaseHashSnapshot",
     "FreshGateResult",
+    "base_hash_snapshot",
     "changed_protected_conventions_paths",
     "compare_base_hashes",
+    "git_changed_paths",
     "supervisor_conventions_gate",
 ]

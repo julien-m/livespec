@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-13 — [Feature 063 Fix] Wire supervisor-gate CLI, fix R7.2 denominator, scope conventions receipt to implementation commands
+
 ## 2026-06-13 — [Feature 063] Implemented: Conventions Blocking Pipeline — hard conventions receipt gate, R7 coherence, supervisor diff/hash/fresh locks
 
 ## 2026-06-12 — [Feature 062] Implemented: Conventions Rulebook Semantic — self-contained rulebook compiler, direct provider Engine C, waiver-aware verdicts, compile CLI

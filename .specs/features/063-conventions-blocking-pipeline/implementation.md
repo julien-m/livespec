@@ -13,7 +13,7 @@
 | FR-007 | [`.agent-sync/skills/spec-implement/SKILL.md`](../../../.agent-sync/skills/spec-implement/SKILL.md), [`.agent-sync/skills/spec-test/SKILL.md`](../../../.agent-sync/skills/spec-test/SKILL.md), [`.agent-sync/skills/spec-fix/SKILL.md`](../../../.agent-sync/skills/spec-fix/SKILL.md), [`.agent-sync/skills/spec-*/expectations.md`](../../../.agent-sync/skills/spec-implement/expectations.md) | command docs contract | Implemented | 2026-06-13 |
 | FR-008 | [`.agent-sync/agents/livespec-verifier/prompt.md`](../../../.agent-sync/agents/livespec-verifier/prompt.md), [`.agent-sync/agents/livespec-supervisor/prompt.md`](../../../.agent-sync/agents/livespec-supervisor/prompt.md) | prompt hard gate text | Implemented | 2026-06-13 |
 | FR-009 | [`validator/coherence/rules/r7_conventions_gates.py`](../../../validator/coherence/rules/r7_conventions_gates.py), [`validator/coherence/rules/__init__.py`](../../../validator/coherence/rules/__init__.py) | R7 registration | Implemented | 2026-06-13 |
-| FR-010 | [`validator/conventions_diffguard.py`](../../../validator/conventions_diffguard.py) | supervisor lock helpers | Implemented | 2026-06-13 |
+| FR-010 | [`validator/conventions_diffguard.py`](../../../validator/conventions_diffguard.py), [`validator/cli_commands/utility_cmd.py`](../../../validator/cli_commands/utility_cmd.py) | supervisor lock helpers + `conventions supervisor-gate` CLI | Implemented | 2026-06-13 |
 
 ## Acceptance Criteria Mapping
 
@@ -31,21 +31,23 @@
 | AC-010 | [`tests/test_coherence_rules.py`](../../../tests/test_coherence_rules.py) | Implemented |
 | AC-011 | [`tests/test_coherence_rules.py`](../../../tests/test_coherence_rules.py) | Implemented |
 | AC-012 | [`tests/test_coherence_rules.py`](../../../tests/test_coherence_rules.py) | Implemented |
-| AC-013 | [`tests/test_conventions_diffguard.py`](../../../tests/test_conventions_diffguard.py) | Implemented |
-| AC-014 | [`tests/test_conventions_diffguard.py`](../../../tests/test_conventions_diffguard.py) | Implemented |
-| AC-015 | [`tests/test_conventions_diffguard.py`](../../../tests/test_conventions_diffguard.py) | Implemented |
+| AC-013 | [`tests/test_conventions_diffguard.py`](../../../tests/test_conventions_diffguard.py), [`tests/test_status_play_conventions_cli.py`](../../../tests/test_status_play_conventions_cli.py) | Implemented |
+| AC-014 | [`tests/test_conventions_diffguard.py`](../../../tests/test_conventions_diffguard.py), [`tests/test_status_play_conventions_cli.py`](../../../tests/test_status_play_conventions_cli.py) | Implemented |
+| AC-015 | [`tests/test_conventions_diffguard.py`](../../../tests/test_conventions_diffguard.py), [`tests/test_status_play_conventions_cli.py`](../../../tests/test_status_play_conventions_cli.py) | Implemented |
 
 ## Files Created/Modified
 
 - Created [`validator/coherence/rules/r7_conventions_gates.py`](../../../validator/coherence/rules/r7_conventions_gates.py) for R7 coherence checks.
 - Created [`validator/conventions_diffguard.py`](../../../validator/conventions_diffguard.py) for supervisor locks.
 - Created [`tests/test_run_receipts.py`](../../../tests/test_run_receipts.py), [`tests/test_conventions_diffguard.py`](../../../tests/test_conventions_diffguard.py), and [`tests/test_conventions_pipeline_docs.py`](../../../tests/test_conventions_pipeline_docs.py).
+- Updated [`validator/cli_commands/utility_cmd.py`](../../../validator/cli_commands/utility_cmd.py) with `livespec conventions supervisor-gate`.
 - Updated receipt, verify-output, expectations, goal contract, command skill, agent prompt, and coherence registry files.
 
 ## Verification
 
 - Targeted tests: 22 passed.
-- Full tests: `2079 passed, 40 skipped, 194 warnings`.
+- Cycle 2 targeted tests: 17 passed.
+- Full tests: `2088 passed, 40 skipped, 194 warnings`.
 - Ruff: `ruff check .` passed.
 - Format: `ruff format --check .` passed.
 - Pyright: `0 errors, 0 warnings, 0 informations`.

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,13 @@ import typer
 import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
 
 from ..cli_commands._common import emit_summary
+from ..conventions_diffguard import (
+    base_hash_snapshot,
+    changed_protected_conventions_paths,
+    compare_base_hashes,
+    git_changed_paths,
+    supervisor_conventions_gate,
+)
 from ..conventions_gate import verify_conventions
 from ..conventions_gates import (
     ConventionsGates,
@@ -32,6 +40,11 @@ SOURCE_DIR_OPTION = typer.Option(Path("."), "--source-dir", help="Source dir to 
 FEATURE_OPTION = typer.Option("", "--feature", help="Feature slug for the payload.")
 NO_OPEN_OPTION = typer.Option(False, "--no-open", help="Do not open a browser.")
 FULL_OPTION = typer.Option(False, "--full", help="Regenerate even when present.")
+WORKER_RECEIPT_OPTION = typer.Option(
+    None,
+    "--worker-receipt",
+    help="Optional worker-provided conventions receipt JSON.",
+)
 
 conventions_app = typer.Typer(name="conventions", help="Manage LiveSpec conventions.")
 gates_app = typer.Typer(name="gates", help="Manage conventions gates.")
@@ -229,6 +242,90 @@ def conventions_verify_command(
         for blocker in result.blockers:
             typer.echo(f"BLOCKED: {blocker.message}", err=True)
     raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
+
+
+@conventions_app.command("supervisor-gate")
+def conventions_supervisor_gate_command(
+    repo: Path = REPO_OPTION,
+    base_ref: str = typer.Option(..., "--base-ref", help="Base git ref for diff/hash guards."),
+    head_ref: str = typer.Option("HEAD", "--head-ref", help="Head git ref for diff guard."),
+    worker_receipt: Path | None = WORKER_RECEIPT_OPTION,
+    json_out: bool = JSON_OPTION,
+) -> None:
+    """Run supervisor-only conventions locks before accepting pipeline output."""
+    repo_root = repo.resolve()
+    try:
+        payload, exit_code = _build_supervisor_gate_payload(
+            repo_root,
+            base_ref=base_ref,
+            head_ref=head_ref,
+            worker_receipt=worker_receipt,
+        )
+    except (OSError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:
+        payload = {
+            "verdict": "BLOCKED",
+            "reason": "supervisor_gate_error",
+            "blockers": [str(exc)],
+        }
+        exit_code = 2
+    if json_out:
+        typer.echo(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        typer.echo(f"Conventions supervisor verdict: {payload['verdict']}")
+        if payload.get("reason"):
+            typer.echo(f"BLOCKED: {payload['reason']}", err=True)
+    raise typer.Exit(exit_code)
+
+
+def _build_supervisor_gate_payload(
+    repo_root: Path,
+    *,
+    base_ref: str,
+    head_ref: str,
+    worker_receipt: Path | None,
+) -> tuple[dict[str, object], int]:
+    changed_paths = git_changed_paths(repo_root, base_ref=base_ref, head_ref=head_ref)
+    protected_paths = changed_protected_conventions_paths(repo_root, changed_paths=changed_paths)
+    if protected_paths:
+        return (
+            {
+                "verdict": "BLOCKED",
+                "reason": "gate_files_modified_in_pipeline",
+                "protected_paths": protected_paths,
+            },
+            2,
+        )
+    snapshot = base_hash_snapshot(repo_root, base_ref=base_ref)
+    hash_blockers = compare_base_hashes(repo_root, snapshot)
+    if hash_blockers:
+        return (
+            {
+                "verdict": "BLOCKED",
+                "reason": "base_hash_mismatch",
+                "blockers": hash_blockers,
+            },
+            2,
+        )
+    result = supervisor_conventions_gate(
+        repo_root,
+        worker_receipt=_read_worker_receipt(repo_root, worker_receipt),
+        run_verify=lambda root: verify_conventions(root),
+    )
+    return (
+        {
+            "verdict": result.verdict,
+            "source": result.source,
+            "stale_worker_verdict": result.stale_worker_verdict,
+        },
+        {"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict],
+    )
+
+
+def _read_worker_receipt(repo_root: Path, worker_receipt: Path | None) -> dict[str, object] | None:
+    if worker_receipt is None:
+        return None
+    path = worker_receipt if worker_receipt.is_absolute() else repo_root / worker_receipt
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @conventions_app.command("compile")
