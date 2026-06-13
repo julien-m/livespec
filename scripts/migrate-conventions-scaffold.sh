@@ -14,4 +14,4 @@ if [[ ! -f .specs/conventions-gates.yaml ]]; then
   exit 0
 fi
 
-livespec conventions scaffold --apply
+livespec conventions scaffold --apply || true

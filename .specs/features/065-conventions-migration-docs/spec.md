@@ -18,8 +18,8 @@ Feature: Migration v22 conventions bootstrap
   Scenario: Migration manifest wires every conventions step
     Given a LiveSpec project upgrades through migration v22
     When the migration runner reads `migrations/22/migrate.md`
-    Then it sets the project version to 22
-    And it runs agent-sync refresh, gates init, compile, scaffold, and first verify wrappers
+    Then it runs agent-sync refresh, gates init, compile, scaffold, and first verify wrappers
+    And it sets the project version to 22 after every wrapper has completed
 
   Scenario: First conventions verify records debt without blocking migration
     Given the upgraded project has conventions debt
@@ -88,12 +88,12 @@ flowchart TD
 
 ## Acceptance Criteria
 
-- AC-001: `migrations/22/migrate.md` exists and includes `SET_VERSION 22`.
+- AC-001: `migrations/22/migrate.md` exists and sets `SET_VERSION 22` after every `RUN` instruction.
 - AC-002: Migration v22 runs `migrate-agent-sync.sh`, `migrate-conventions-gates-init.sh`, `migrate-conventions-compile.sh`, `migrate-conventions-scaffold.sh`, and `migrate-conventions-first-verify.sh`.
-- AC-003: `scripts/migrate-conventions-gates-init.sh` exists, is executable, uses `set -euo pipefail`, and runs `livespec conventions gates init --force` as a no-error migration wrapper.
-- AC-004: `scripts/migrate-conventions-compile.sh` exists, is executable, uses `set -euo pipefail`, and only runs `livespec conventions compile --force` when `.conventions/manifest.yaml` exists.
-- AC-005: `scripts/migrate-conventions-scaffold.sh` exists, is executable, uses `set -euo pipefail`, and only runs `livespec conventions scaffold --apply` when the gates file exists.
-- AC-006: `scripts/migrate-conventions-first-verify.sh` exists, is executable, uses `set -euo pipefail`, runs `livespec conventions verify --report --semantic-full || true`, and always exits 0.
+- AC-003: `scripts/migrate-conventions-gates-init.sh` exists, is executable, uses `set -euo pipefail`, and runs `livespec conventions gates init --force || true` as a no-error migration wrapper.
+- AC-004: `scripts/migrate-conventions-compile.sh` exists, is executable, uses `set -euo pipefail`, and only runs `livespec conventions compile --force || true` when `.conventions/manifest.yaml` exists.
+- AC-005: `scripts/migrate-conventions-scaffold.sh` exists, is executable, uses `set -euo pipefail`, and only runs `livespec conventions scaffold --apply || true` when the gates file exists.
+- AC-006: `scripts/migrate-conventions-first-verify.sh` exists, is executable, uses `set -euo pipefail`, runs `livespec conventions verify --report || true`, and always exits 0.
 - AC-007: `system/conventions-enforcement.md` documents the three engines: A deterministic subprocess, B visual receipt, and C Layer 4 LLM review.
 - AC-008: `system/conventions-enforcement.md` documents `conventions-gates.yaml` and conventions rulebook schema responsibilities.
 - AC-009: `system/conventions-enforcement.md` includes human operation guidance for constitution changes, ai-ressources changes, false-positive waivers, linter config, adding languages, and dirty project recovery.

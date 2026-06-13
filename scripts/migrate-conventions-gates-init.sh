@@ -19,4 +19,4 @@ if [[ ! -f .specs/constitution.md || ! -f .specs/stacks/_default.md ]]; then
   exit 0
 fi
 
-livespec conventions gates init --force
+livespec conventions gates init --force || true

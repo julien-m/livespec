@@ -14,5 +14,5 @@ if [[ ! -f .specs/conventions-gates.yaml ]]; then
   exit 0
 fi
 
-livespec conventions verify --report --semantic-full || true
+livespec conventions verify --report || true
 exit 0

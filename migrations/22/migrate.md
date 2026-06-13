@@ -20,9 +20,9 @@ verification report without blocking the migration.
 The first verify step is advisory and always exits 0. Blocking starts on the
 next implement/test/fix pipeline run, where conventions receipts are mandatory.
 
-SET_VERSION 22
 RUN migrate-agent-sync.sh
 RUN migrate-conventions-gates-init.sh
 RUN migrate-conventions-compile.sh
 RUN migrate-conventions-scaffold.sh
 RUN migrate-conventions-first-verify.sh
+SET_VERSION 22

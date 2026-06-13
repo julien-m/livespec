@@ -15,3 +15,11 @@
 - **Code modified:** Yes (migration scripts, migration manifest, system docs, README, agent docs)
 - **AC impacted:** AC-001 through AC-014
 - **Author:** Codex
+
+## 2026-06-13 — Bugfix: Make migration v22 advisory and version last
+
+- **Type:** Bugfix
+- **Spec modified:** Yes (AC-001, AC-003 through AC-006)
+- **Code modified:** migrations/22/migrate.md, scripts/migrate-conventions-*.sh, tests/test_conventions_migration_docs.py
+- **AC impacted:** AC-001, AC-003, AC-004, AC-005, AC-006
+- **Author:** Codex

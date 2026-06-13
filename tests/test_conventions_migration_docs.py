@@ -27,6 +27,16 @@ def test_migration_v22_manifest_contains_required_steps() -> None:
         assert step in text
 
 
+def test_migration_v22_sets_version_after_all_run_steps() -> None:
+    text = _text("migrations/22/migrate.md")
+    instructions = [
+        line.strip() for line in text.splitlines() if line.startswith(("RUN ", "SET_VERSION "))
+    ]
+
+    assert instructions[-1] == "SET_VERSION 22"
+    assert all(instruction.startswith("RUN ") for instruction in instructions[:-1])
+
+
 def test_migration_v22_scripts_exist_and_are_executable() -> None:
     scripts = [
         "scripts/migrate-conventions-gates-init.sh",
@@ -42,6 +52,25 @@ def test_migration_v22_scripts_exist_and_are_executable() -> None:
         text = path.read_text(encoding="utf-8")
         assert text.startswith("#!/usr/bin/env bash\n")
         assert "set -euo pipefail" in text
+
+
+def test_migration_v22_scripts_use_advisory_livespec_commands() -> None:
+    assert "livespec conventions gates init --force || true" in _text(
+        "scripts/migrate-conventions-gates-init.sh"
+    )
+    assert "livespec conventions compile --force || true" in _text(
+        "scripts/migrate-conventions-compile.sh"
+    )
+    assert "livespec conventions scaffold --apply || true" in _text(
+        "scripts/migrate-conventions-scaffold.sh"
+    )
+
+
+def test_first_verify_uses_supported_verify_flags() -> None:
+    text = _text("scripts/migrate-conventions-first-verify.sh")
+
+    assert "--semantic-full" not in text
+    assert "livespec conventions verify --report || true" in text
 
 
 def test_conventions_enforcement_reference_has_required_sections() -> None:

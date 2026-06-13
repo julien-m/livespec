@@ -10,3 +10,4 @@
 - [x] Update README, spec-system, CLAUDE/AGENTS guidance.
 - [x] Update implementation mapping.
 - [x] Run full verification.
+- [x] Cycle 2: move SET_VERSION after RUN steps, make wrappers advisory, and remove invalid verify flag.

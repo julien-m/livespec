@@ -14,4 +14,4 @@ if [[ ! -f .conventions/manifest.yaml ]]; then
   exit 0
 fi
 
-livespec conventions compile --force
+livespec conventions compile --force || true
