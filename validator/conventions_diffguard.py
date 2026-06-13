@@ -11,7 +11,7 @@ from pathlib import Path
 from .conventions_gate import GateResult
 from .conventions_gates import gates_path, load_conventions_gates
 from .conventions_rules import rulebook_path
-from .visual_evidence import sha256_file
+from .visual_evidence import VisualReceiptError, sha256_file
 
 
 @dataclass(frozen=True)
@@ -105,7 +105,10 @@ def _protected_conventions_paths(project_root: Path) -> set[str]:
 def _sha256_or_empty(path: Path) -> str:
     try:
         return sha256_file(path)
-    except OSError:
+    except (OSError, VisualReceiptError):
+        # Missing or unreadable files are treated as empty hash so that absent
+        # optional files (e.g. rulebook not yet compiled) don't crash the
+        # hash-guard comparison — a mismatch will be reported via blockers.
         return ""
 
 
