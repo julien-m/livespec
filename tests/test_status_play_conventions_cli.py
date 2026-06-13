@@ -120,8 +120,9 @@ def test_conventions_scaffold_applies_python_ruff_template(tmp_path: Path) -> No
     assert result.exit_code == 0, result.output
     assert "updated pyproject.toml" in result.output
     config = (tmp_path / "pyproject.toml").read_text(encoding="utf-8")
-    assert "[tool.ruff]" in config
-    assert "line-length = 500" in config
+    assert "File line-count limit (500 lines) is enforced by the LiveSpec gate" in config
+    assert "line-length =" not in config
+    assert 'select = ["E", "F", "I", "PLR"]' in config
     assert "max-statements = 60" in config
 
 
@@ -288,8 +289,8 @@ def _write_conventions_gates(repo: Path) -> None:
 def _gates_yaml(repo: Path, *, exclusions: list[str] | None = None) -> str:
     from validator.visual_evidence import sha256_file
 
-    exclusion_payload = "[]" if not exclusions else "\n" + "\n".join(
-        f"  - {item}" for item in exclusions
+    exclusion_payload = (
+        "[]" if not exclusions else "\n" + "\n".join(f"  - {item}" for item in exclusions)
     )
     # Render the minimal gates document used by CLI tests, preserving the
     # generated constitution hash and optional exclusions.

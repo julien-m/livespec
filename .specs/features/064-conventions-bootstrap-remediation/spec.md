@@ -50,7 +50,8 @@ Feature: Conventions scaffold templates
     Given a Python stack and conventions gates with file and function limits
     When conventions scaffold runs with apply
     Then a Ruff config is written from the Python template
-    And the file and function limits match the gates limit values
+    And Ruff enables Pylint rules for function statement limits
+    And the file line-count limit remains enforced by the LiveSpec gate
 
   Scenario: Existing config is human-owned
     Given a linter config already exists
@@ -140,7 +141,7 @@ flowchart TD
 - AC-003: Preflight checks enforce referenced linter config file existence.
 - AC-004: Preflight checks require an LLM provider when the conventions rulebook contains blocking Engine C rules.
 - AC-005: `preflight --fix` can execute conventions scaffold actions via `livespec conventions scaffold --apply`.
-- AC-006: `templates/conventions/python_ruff.toml.tmpl` renders Ruff line limits from gates values.
+- AC-006: `templates/conventions/python_ruff.toml.tmpl` enables `PLR` for Ruff Pylint checks, renders `max-statements` from gates values, and does not map file line-count limits to Ruff `line-length`.
 - AC-007: `templates/conventions/typescript_eslint.json.tmpl` renders ESLint max-lines and max-statements limits from gates values.
 - AC-008: `conventions scaffold --apply` detects Python and TypeScript stacks and writes the appropriate config when missing.
 - AC-009: `conventions scaffold --apply` never overwrites an existing config unless `--sync-limits` is set.

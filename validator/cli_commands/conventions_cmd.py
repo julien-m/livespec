@@ -165,7 +165,7 @@ def _build_supervisor_gate_payload(
                 "protected_paths": protected_paths,
             },
             2,
-    )
+        )
     hash_blockers = compare_base_hashes(repo_root, base_hash_snapshot(repo_root, base_ref=base_ref))
     if hash_blockers:
         return (
@@ -206,9 +206,7 @@ def conventions_compile_command(
     except RulebookStaleError as exc:
         message = f"conventions rulebook stale: {exc}. Re-run with --force after reviewing changes."
         typer.echo(
-            json.dumps({"status": "stale", "error": message}, indent=2)
-            if json_out
-            else message
+            json.dumps({"status": "stale", "error": message}, indent=2) if json_out else message
         )
         raise typer.Exit(1) from exc
     except LLMProviderNotConfigured as exc:
@@ -267,4 +265,3 @@ def _blocked(reason: str, blocker: str, json_out: bool) -> None:
         typer.echo(json.dumps(payload, indent=2))
     else:
         typer.echo(f"BLOCKED: {reason}: {blocker}", err=True)
-

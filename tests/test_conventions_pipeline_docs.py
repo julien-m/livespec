@@ -40,6 +40,15 @@ def test_spec_fix_documents_conventions_burndown_mode() -> None:
     assert "zero new violations" in text
 
 
+def test_python_ruff_template_enables_pylint_rules_without_file_length_as_line_width() -> None:
+    rendered = _text("templates/conventions/python_ruff.toml.tmpl")
+    rendered = rendered.replace("{{max_file_lines}}", "500")
+    rendered = rendered.replace("{{max_function_lines}}", "60")
+
+    assert 'select = ["E", "F", "I", "PLR"]' in rendered
+    assert "line-length = 500" not in rendered
+
+
 def test_agent_prompts_treat_conventions_gate_as_blocking() -> None:
     verifier = _text(".agent-sync/agents/livespec-verifier/prompt.md")
     supervisor = _text(".agent-sync/agents/livespec-supervisor/prompt.md")

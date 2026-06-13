@@ -125,6 +125,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-13 | Bugfix | [Feature 064 Fix] Correct Ruff scaffold semantics: remove file line-count as Ruff line-length and enable PLR |
 | 2026-06-13 | Feature | [Feature 064] Implemented: Conventions Bootstrap Remediation — preflight gates checks, scaffold templates, spec-fix conventions mode, split conventions CLI |
 | 2026-06-13 | Feature | [Feature 063] Implemented: Conventions Blocking Pipeline — hard conventions receipt gate, R7 coherence, supervisor diff/hash/fresh locks |
 | 2026-06-12 | Feature | [Feature 062] Implemented: Conventions Rulebook Semantic — self-contained rulebook compiler, direct provider Engine C, waiver-aware verdicts, compile CLI |

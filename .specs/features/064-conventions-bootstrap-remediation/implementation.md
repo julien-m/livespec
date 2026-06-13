@@ -6,7 +6,7 @@ Implemented conventions bootstrap remediation for existing projects:
 
 - Preflight now adds conventions-derived checks when `.specs/conventions-gates.yaml` exists.
 - `preflight --fix` can run `livespec conventions scaffold --apply` through the trusted auto-fix dispatcher.
-- `conventions scaffold --apply` renders Python Ruff and TypeScript ESLint templates from gates limits and skips existing configs unless `--sync-limits` is set.
+- `conventions scaffold --apply` renders Python Ruff and TypeScript ESLint templates from gates limits and skips existing configs unless `--sync-limits` is set. The Ruff template enables `PLR` for statement-count checks and leaves file line-count enforcement to the LiveSpec gate instead of setting Ruff `line-length`.
 - `spec-fix --conventions` is documented as a worst-first debt burn-down mode with a strict non-regression gate.
 - Conventions CLI routes moved from `utility_cmd.py` into `validator/cli_commands/conventions_cmd.py`; `utility_cmd.py` now keeps only utility commands and wiring.
 
