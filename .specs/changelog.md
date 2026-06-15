@@ -3,9 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-13
+> Last updated: 2026-06-15
 
 ---
+
+## 2026-06-15 — [Feature 066] Implemented: Handoff Input Compatibility — handoff-first Brainstorm import docs, Penflow bootstrap source resolution, lifecycle sync contract
 
 ## 2026-06-13 — [Feature 065 Fix] Make migration v22 scripts advisory, move SET_VERSION last, remove invalid semantic flag
 

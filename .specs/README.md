@@ -103,6 +103,7 @@
 | 063 | Conventions Blocking Pipeline | Implemented | 2026-06-13 | 2026-06-13 | [spec](features/063-conventions-blocking-pipeline/spec.md), [plan](features/063-conventions-blocking-pipeline/plan.md), [implementation](features/063-conventions-blocking-pipeline/implementation.md) |
 | 064 | Conventions Bootstrap Remediation | Implemented | 2026-06-13 | 2026-06-13 | [spec](features/064-conventions-bootstrap-remediation/spec.md), [plan](features/064-conventions-bootstrap-remediation/plan.md), [implementation](features/064-conventions-bootstrap-remediation/implementation.md) |
 | 065 | Conventions Migration Docs | Implemented | 2026-06-13 | 2026-06-13 | [spec](features/065-conventions-migration-docs/spec.md), [plan](features/065-conventions-migration-docs/plan.md), [implementation](features/065-conventions-migration-docs/implementation.md) |
+| 066 | Handoff Input Compatibility | Implemented | 2026-06-15 | 2026-06-15 | [spec](features/066-handoff-input-compatibility/spec.md), [plan](features/066-handoff-input-compatibility/plan.md), [implementation](features/066-handoff-input-compatibility/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -126,6 +127,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-15 | Feature | [Feature 066] Implemented: Handoff Input Compatibility — handoff-first Brainstorm import docs, Penflow bootstrap source resolution, lifecycle sync contract |
 | 2026-06-13 | Feature | [Feature 065] Implemented: Conventions Migration Docs — migration v22, conventions enforcement reference, README/spec-system/agent docs |
 | 2026-06-13 | Bugfix | [Feature 064 Fix] Correct Ruff scaffold semantics: remove file line-count as Ruff line-length and enable PLR |
 | 2026-06-13 | Feature | [Feature 064] Implemented: Conventions Bootstrap Remediation — preflight gates checks, scaffold templates, spec-fix conventions mode, split conventions CLI |

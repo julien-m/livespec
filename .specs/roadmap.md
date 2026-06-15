@@ -52,6 +52,7 @@
 - [x] **Conventions Blocking Pipeline** — hard repo-wide conventions receipt gate across run receipts, run artifacts, verify-output, goal contracts, command docs, R7 coherence, and supervisor locks. · Scope: L · Priority: P1 · Deps: 061, 062 → [063-conventions-blocking-pipeline](features/063-conventions-blocking-pipeline/spec.md)
 - [x] **Conventions Bootstrap Remediation** — conventions-specific preflight items, Python/TypeScript scaffold templates, `/spec-fix --conventions` debt burn-down docs, and split conventions CLI dogfood. · Scope: L · Priority: P1 · Deps: 061, 062, 063 → [064-conventions-bootstrap-remediation](features/064-conventions-bootstrap-remediation/spec.md)
 - [x] **Conventions Migration Docs** — migration v22 wrappers plus conventions enforcement reference docs for engines, locks, human operations, README/spec-system/agent guidance. · Scope: M · Priority: P1 · Deps: 061, 062, 063, 064 → [065-conventions-migration-docs](features/065-conventions-migration-docs/spec.md)
+- [x] **Handoff Input Compatibility** — accept Project Brainstorm `handoff/livespec`, `handoff/penflow`, and lifecycle handoff paths at LiveSpec import/sync boundaries while preserving legacy fallbacks and root internal contracts. · Scope: M · Priority: P1 → [066-handoff-input-compatibility](features/066-handoff-input-compatibility/spec.md)
 <!-- roadmap:mvp:end -->
 
 ---

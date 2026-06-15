@@ -15,31 +15,33 @@ argument-hint: ""
 
 ## Vue d'ensemble
 
-Lit `brainstorm/lifecycle/` via le symlink `./brainstorm`, valide les events postérieurs au curseur, affiche un Impact Report, puis applique uniquement les actions confirmées une par une par l'utilisateur.
+Lit le lifecycle Brainstorm via le symlink `./brainstorm` en essayant d'abord `brainstorm/handoff/livespec/lifecycle/`, puis le legacy `brainstorm/lifecycle/`. Valide les events postérieurs au curseur, affiche un Impact Report, puis applique uniquement les actions confirmées une par une par l'utilisateur.
 
 **Principe absolu :** `brainstorm/` est lu en source externe. Ne jamais modifier `.specs/` sans réponse explicite `o`.
 
 ## Workflow
 
 1. **Préconditions bloquantes**
-   - Vérifier que `./brainstorm/` est un symlink et que `./brainstorm/lifecycle/log.ndjson` est lisible.
+   - Vérifier que `./brainstorm/` est un symlink.
+   - Résoudre le dossier lifecycle : `./brainstorm/handoff/livespec/lifecycle/` si `log.ndjson` y est lisible, sinon legacy `./brainstorm/lifecycle/`.
+   - Si les deux existent, canonical lifecycle wins : utiliser `brainstorm/handoff/livespec/lifecycle/`.
    - Inférer `<slug>` depuis la cible du symlink.
-   - Si absent ou cassé : `BLOCKED at step 0 - prerequisite_unmet - symlink brainstorm manquant; créer ln -s ~/projects/project-brainstorm/projects/<slug> brainstorm`.
+   - Si absent ou cassé : `BLOCKED at step 0 - prerequisite_unmet - symlink brainstorm ou lifecycle manquant; créer ln -s ~/projects/project-brainstorm/projects/<slug> brainstorm`.
 
 2. **Curseur**
-   - Lire `./brainstorm/lifecycle/.refresh-cursor` si présent.
+   - Lire `<lifecycle>/.refresh-cursor` si présent.
    - Format attendu : `{"event_id":"E-000003","ts":"2026-06-10T08:00:00Z","hash":"<sha256hex>"}` sur une ligne, sans newline final.
    - Si absent, traiter tous les events depuis `E-000001`.
 
 3. **Deltas + intégrité**
-   - Lire `log.ndjson` ligne par ligne, sélectionner les events strictement postérieurs au curseur (`ts` + `event_id`).
+   - Lire `<lifecycle>/log.ndjson` ligne par ligne, sélectionner les events strictement postérieurs au curseur (`ts` + `event_id`).
    - Valider la chaîne `prev_hash` selon le contrat §2 : canonicalisation JSON, SHA-256, comparaison avec l'event suivant.
    - Si divergence : `BLOCKED at step 2 - corrupted_log - event_id <E-XXXXXX>; prev_hash déclaré <x>; calculé <y>`.
-   - Lire `state.yaml` pour les statuts courants.
+   - Lire `<lifecycle>/state.yaml` pour les statuts courants.
    - Si aucun delta : afficher `Aucun nouvel event depuis le dernier refresh (curseur : <event_id>). Rien à faire.` puis terminer.
 
 4. **Mutations**
-   - Pour chaque `mutation-created`, lire `./brainstorm/lifecycle/mutations/<mutation_id>/impacts.yaml`.
+   - Pour chaque `mutation-created`, lire `<lifecycle>/mutations/<mutation_id>/impacts.yaml`.
    - Utiliser `impacts.yaml` comme source de vérité. Ignorer `artefacts_touched`, qui n'est qu'un index rapide.
 
 5. **Impact Report**
@@ -67,7 +69,7 @@ Lit `brainstorm/lifecycle/` via le symlink `./brainstorm`, valide les events pos
        Action      : <description précise>
        Appliquer ? [o / n / d(iférer)]
      ```
-   - `o` applique; `n` ignore définitivement cet event; `d` écrit `./brainstorm/lifecycle/.refresh-deferred.yaml` au format contrat §11.
+   - `o` applique; `n` ignore définitivement cet event; `d` écrit `<lifecycle>/.refresh-deferred.yaml` au format contrat §11.
    - Aucune action groupée, aucune application implicite.
 
 7. **Actions confirmées**
@@ -96,7 +98,7 @@ updated: <YYYY-MM-DD>
 
 8. **Curseur final**
    - Après traitement, avancer le curseur au dernier event lu et validé, même si son action était no-op ou signalement.
-   - Écrire `./brainstorm/lifecycle/.refresh-cursor` en une ligne sans newline final : `{"event_id":"<id>","ts":"<ts>","hash":"<sha256hex>"}`.
+   - Écrire `<lifecycle>/.refresh-cursor` en une ligne sans newline final : `{"event_id":"<id>","ts":"<ts>","hash":"<sha256hex>"}`.
    - Proposer le commit `chore: refresh brainstorm sync cursor (<event_id>)`; ne jamais committer sans confirmation.
 
 ## Garde-fous

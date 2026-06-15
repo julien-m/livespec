@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Literal, TypeAlias, cast
 
 PENFLOW_DIRNAME = "penflow"
+HANDOFF_PENFLOW_DIR = Path("handoff") / "penflow"
 BRAINSTORM_PENFLOW_DIR = Path(".brainstorm") / "penflow"
 CANONICAL_UI_PEN = Path(PENFLOW_DIRNAME) / "ui.pen"
 IGNORED_PEN_SCAN_DIRS = {
@@ -28,6 +29,7 @@ IGNORED_PEN_SCAN_DIRS = {
     ".pytest_cache",
     ".ruff_cache",
     ".venv",
+    "handoff",
     "node_modules",
     "test-results",
 }
@@ -258,7 +260,7 @@ def bootstrap_penflow_workspace(
     *,
     source_dir: Path | None = None,
 ) -> PenflowBootstrapResult:
-    """Copy a Brainstorm ``penflow/`` directory to root ``penflow/`` if possible.
+    """Copy a Brainstorm Penflow handoff directory to root ``penflow/`` if possible.
 
     The copy is intentionally non-destructive: an existing root workspace wins
     and is never overwritten.
@@ -266,12 +268,13 @@ def bootstrap_penflow_workspace(
     Args:
         project_root: LiveSpec project root.
         source_dir: Explicit Brainstorm ``penflow/`` directory. If omitted,
-            LiveSpec falls back to the legacy in-project Brainstorm export.
+            LiveSpec tries ``handoff/penflow`` before the legacy in-project
+            Brainstorm export.
 
     Returns:
         Copy result and post-copy workspace status.
     """
-    source = source_dir if source_dir is not None else project_root / BRAINSTORM_PENFLOW_DIR
+    source = source_dir if source_dir is not None else _default_penflow_source(project_root)
     destination = project_root / PENFLOW_DIRNAME
     if destination.exists():
         return PenflowBootstrapResult(
@@ -298,6 +301,14 @@ def bootstrap_penflow_workspace(
         reason="copied",
         status=get_penflow_contract_status(project_root),
     )
+
+
+def _default_penflow_source(project_root: Path) -> Path:
+    for relative in (HANDOFF_PENFLOW_DIR, BRAINSTORM_PENFLOW_DIR):
+        source = project_root / relative
+        if source.exists():
+            return source
+    return project_root / HANDOFF_PENFLOW_DIR
 
 
 def _invalid_required_artifacts(workspace: Path, present: list[str]) -> list[str]:
@@ -561,6 +572,7 @@ def _semantic_counts(path: Path) -> tuple[int, int, str | None]:
 # Export only the Penflow contract helpers used by the CLI and tests.
 __all__ = [
     "CANONICAL_UI_PEN",
+    "HANDOFF_PENFLOW_DIR",
     "OPTIONAL_ARTIFACTS",
     "PENFLOW_DIRNAME",
     "REQUIRED_ARTIFACTS",

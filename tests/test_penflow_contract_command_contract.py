@@ -51,14 +51,38 @@ def test_spec_init_supports_brainstorm_and_from_scratch_penflow() -> None:
     body = _read(".agent-sync/skills/spec-init/SKILL.md")
 
     assert "Step 3.5.5 — Penflow Contract Workspace Bootstrap" in body
-    assert "Brainstorm `penflow/` directory" in body
-    assert (
-        "livespec penflow-contract bootstrap --project . --source <brainstorm-project>/penflow"
-        in body
+    assert "Brainstorm `handoff/penflow/` or legacy `penflow/` directory" in body
+    bootstrap_command = (
+        "livespec penflow-contract bootstrap --project . --source "
+        "<brainstorm-project>/handoff/penflow"
     )
+    assert bootstrap_command in body
+    assert "<brainstorm-project>/penflow" in body
     assert ".brainstorm/penflow/" not in body
     assert "continue from scratch" in body
     assert "state: absent" in body
+
+
+def test_spec_init_documents_handoff_livespec_brainstorm_inputs() -> None:
+    body = _read(".agent-sync/skills/spec-init/SKILL.md")
+    expectations = _read(".agent-sync/skills/spec-init/expectations.md")
+
+    assert "handoff/livespec/project-profile.md" in body
+    assert "handoff/livespec/*.md" in body
+    assert "handoff/livespec/mockups/" in body
+    assert "handoff/livespec/theme.css" in body
+    assert "legacy `.brainstorm/project-profile.md`" in body
+    assert "`penflow/` when `handoff/penflow/` or legacy `penflow/` exists" in expectations
+
+
+def test_spec_refresh_from_brainstorm_resolves_handoff_lifecycle_first() -> None:
+    body = _read(".agent-sync/skills/spec-refresh-from-brainstorm/SKILL.md")
+    expectations = _read(".agent-sync/skills/spec-refresh-from-brainstorm/expectations.md")
+
+    assert "brainstorm/handoff/livespec/lifecycle/" in body
+    assert "brainstorm/lifecycle/" in body
+    assert "canonical lifecycle wins" in body
+    assert "brainstorm/handoff/livespec/lifecycle/log.ndjson" in expectations
 
 
 def test_spec_init_requires_post_sync_command_asset_verification() -> None:

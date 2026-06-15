@@ -447,7 +447,7 @@ Key flags: `--roadmap`, `--features`, `--json`
 ## Project Structure Created by `/spec-init`
 
 ```
-# Optional: imported from a Brainstorm project `penflow/` folder or created by later UI workflow.
+# Optional: imported from a Brainstorm `handoff/penflow/` folder, legacy `penflow/`, or created by later UI workflow.
 penflow/
 ├── flow-ui-contract/       ← Flow/screen specs used to generate semantic tree
 ├── ui.pen                  ← Canonical Pencil/Penflow source; no other .pen is allowed

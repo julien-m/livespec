@@ -1,7 +1,7 @@
 ---
 command: spec-init
 contract_version: "1.0"
-last_reviewed: 2026-06-09
+last_reviewed: 2026-06-15
 ---
 
 # Expectations — /spec-init
@@ -49,7 +49,7 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
 
 **optional:**
 - `.specs/stacks/_default.md`
-- `penflow/` when `.brainstorm/penflow/` exists
+- `penflow/` when `handoff/penflow/` or legacy `penflow/` exists
 
 **forbidden:**
 - `src/`

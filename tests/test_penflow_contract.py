@@ -529,6 +529,49 @@ def test_bootstrap_copies_brainstorm_penflow_without_overwriting(tmp_path: Path)
     assert second.reason == "workspace_exists"
 
 
+def test_bootstrap_prefers_handoff_penflow_before_legacy_brainstorm(
+    tmp_path: Path,
+) -> None:
+    _write_json(
+        tmp_path / "handoff" / "penflow" / "semantic-ui-tree.json",
+        {"flows": [{"id": "canonical"}], "screens": []},
+    )
+    _write_json(
+        tmp_path / ".brainstorm" / "penflow" / "semantic-ui-tree.json",
+        {"flows": [{"id": "legacy"}], "screens": []},
+    )
+
+    result = bootstrap_penflow_workspace(tmp_path)
+
+    assert result.copied is True
+    assert result.source == tmp_path / "handoff" / "penflow"
+    assert json.loads(
+        (tmp_path / "penflow" / "semantic-ui-tree.json").read_text(encoding="utf-8")
+    ) == {"flows": [{"id": "canonical"}], "screens": []}
+
+
+def test_status_ignores_handoff_penflow_source_duplicate_after_import(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "penflow" / "flow-ui-contract").mkdir(parents=True)
+    _write_json(
+        tmp_path / "penflow" / "ui.pen",
+        {"children": [{"type": "frame", "width": 1440, "height": 900}]},
+    )
+    _write_json(tmp_path / "penflow" / "semantic-ui-tree.json", {"flows": [], "screens": []})
+    _write_json(tmp_path / "penflow" / "expected-ui-tree.json", {"screens": []})
+    _write_json(tmp_path / "penflow" / "code-ir.json", {"flows": []})
+    _write_json(
+        tmp_path / "handoff" / "penflow" / "ui.pen",
+        {"children": [{"type": "frame", "width": 1440, "height": 900}]},
+    )
+
+    status = get_penflow_contract_status(tmp_path)
+
+    assert status.state == "ready"
+    assert "duplicate_pen:handoff/penflow/ui.pen" not in status.missing
+
+
 def test_bootstrap_imports_explicit_penflow_source_without_brainstorm_subdir(
     tmp_path: Path,
 ) -> None:

@@ -1,7 +1,7 @@
 ---
 command: spec-refresh-from-brainstorm
 contract_version: "1.0"
-last_reviewed: 2026-06-01
+last_reviewed: 2026-06-15
 ---
 
 # Expectations — /spec-refresh-from-brainstorm
@@ -13,7 +13,7 @@ Sync brainstorm lifecycle deltas into LiveSpec specs through an interactive Impa
 ## 2. Preconditions
 
 - `brainstorm/` is a symlink in the project root.
-- `brainstorm/lifecycle/log.ndjson` is readable.
+- `brainstorm/handoff/livespec/lifecycle/log.ndjson` is readable, or legacy `brainstorm/lifecycle/log.ndjson` is readable.
 - `.specs/` exists.
 
 ## 3. Observable Signals
@@ -35,10 +35,10 @@ Sync brainstorm lifecycle deltas into LiveSpec specs through an interactive Impa
 
 **update:**
 - `.specs/features/`
-- `brainstorm/lifecycle/.refresh-cursor`
+- `brainstorm/handoff/livespec/lifecycle/.refresh-cursor` or legacy `brainstorm/lifecycle/.refresh-cursor`
 
 **optional:**
-- `brainstorm/lifecycle/.refresh-deferred.yaml`
+- `brainstorm/handoff/livespec/lifecycle/.refresh-deferred.yaml` or legacy `brainstorm/lifecycle/.refresh-deferred.yaml`
 
 **forbidden:**
 - `src/`
@@ -47,7 +47,7 @@ Sync brainstorm lifecycle deltas into LiveSpec specs through an interactive Impa
 
 **expected dirty paths:**
 - `.specs/`
-- `brainstorm/lifecycle/.refresh-cursor`
+- the resolved lifecycle `.refresh-cursor`
 
 **forbidden changes:**
 - `src/`
@@ -123,7 +123,7 @@ Action [1/1]: Créer — onboarding-reminder
 
 ```
 .specs/features/NNN-onboarding-reminder/spec.md
-brainstorm/lifecycle/.refresh-cursor
+brainstorm/handoff/livespec/lifecycle/.refresh-cursor
 ```
 
 The cursor records the last validated event.

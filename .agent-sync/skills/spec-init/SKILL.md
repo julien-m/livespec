@@ -113,17 +113,19 @@ Before starting the interview, check if a brainstorm from `project-brainstorm` a
 
 **Detection logic:**
 
-1. Check if the file `.brainstorm/project-profile.md` exists in the current directory
+1. Resolve the Brainstorm LiveSpec profile source in this order:
+   a. `handoff/livespec/project-profile.md`
+   b. legacy `.brainstorm/project-profile.md`
 2. If the file does NOT exist or is unreadable (broken symlink, empty, malformed) → skip this section entirely, proceed to **Conversation Flow** below
 3. If the file exists and is readable:
-   a. Read `.brainstorm/project-profile.md`
-   b. Glob `.brainstorm/*.md` to discover additional brainstorm files
+   a. Read the resolved profile
+   b. Glob sibling Markdown files (`handoff/livespec/*.md` or legacy `.brainstorm/*.md`) to discover additional brainstorm files
    c. Display the import summary (see format below)
    d. Wait for user response
 
 **Import summary format:**
 
-> 🔗 **Brainstorm detected** (`.brainstorm/project-profile.md`)
+> 🔗 **Brainstorm detected** (`handoff/livespec/project-profile.md` or legacy `.brainstorm/project-profile.md`)
 >
 > **Vision:** [First line of "What the project does" from the Vision section]
 > **Users:** [N] roles ([comma-separated role names from the Users table])
@@ -150,7 +152,7 @@ Before starting the interview, check if a brainstorm from `project-brainstorm` a
 | `04-definition.md` | definition |
 | `05-plan.md` | plan |
 
-Only list files that actually exist in `.brainstorm/`.
+Only list files that actually exist in the resolved brainstorm context directory.
 
 **User response handling:**
 
@@ -417,41 +419,49 @@ Detection and confirmation happen here (Phase B context — decisions). File cop
 
 **Detection logic:**
 
-1. Check if `.brainstorm/mockups/` directory exists
-2. If not, check if `.brainstorm/ui.fig`, `.brainstorm/ui.excalidraw`, or `.brainstorm/ui.html` exists at root level. Penflow `.pen` sources are handled only by Step 3.5.5 and must land at `penflow/ui.pen`.
+1. Check if `handoff/livespec/mockups/` directory exists; fall back to legacy `.brainstorm/mockups/`
+2. If not, check if `handoff/livespec/ui.fig`, `handoff/livespec/ui.excalidraw`, or `handoff/livespec/ui.html` exists; fall back to legacy `.brainstorm/ui.fig`, `.brainstorm/ui.excalidraw`, or `.brainstorm/ui.html`. Penflow `.pen` sources are handled only by Step 3.5.5 and must land at `penflow/ui.pen`.
 3. If neither → skip silently
 4. If found:
-   a. Glob `.brainstorm/mockups/*.png` (or `.brainstorm/*.png` if no `mockups/` dir)
-   b. Check for `.brainstorm/mockups/index.md` (or `.brainstorm/index.md`)
-   c. Check for non-Penflow source file: `.brainstorm/mockups/ui.<ext>` (or `.brainstorm/ui.<ext>`)
+   a. Glob resolved `mockups/*.png` (or sibling `*.png` if no `mockups/` dir)
+   b. Check for resolved `mockups/index.md` (or sibling `index.md`)
+   c. Check for non-Penflow source file: resolved `mockups/ui.<ext>` (or sibling `ui.<ext>`)
    d. Display import summary
 
 **Design file detection order** (check each, take first match):
 
 ```
-.brainstorm/mockups/ui.fig
-.brainstorm/mockups/ui.excalidraw
-.brainstorm/mockups/ui.html
-.brainstorm/ui.fig
-.brainstorm/ui.excalidraw
-.brainstorm/ui.html
+handoff/livespec/mockups/ui.fig
+handoff/livespec/mockups/ui.excalidraw
+handoff/livespec/mockups/ui.html
+handoff/livespec/ui.fig
+handoff/livespec/ui.excalidraw
+handoff/livespec/ui.html
+legacy .brainstorm/mockups/ui.fig
+legacy .brainstorm/mockups/ui.excalidraw
+legacy .brainstorm/mockups/ui.html
+legacy .brainstorm/ui.fig
+legacy .brainstorm/ui.excalidraw
+legacy .brainstorm/ui.html
 ```
 
 **PNG detection order:**
 
 ```
-.brainstorm/mockups/*.png    (preferred — dedicated mockups dir)
-.brainstorm/*.png            (fallback — PNGs at brainstorm root)
+handoff/livespec/mockups/*.png    (preferred)
+handoff/livespec/*.png            (fallback)
+legacy .brainstorm/mockups/*.png
+legacy .brainstorm/*.png
 ```
 
 **Import summary format:**
 
 > 🎨 **Brainstorm design artifacts detected:**
 >
->   📄 Source file: `.brainstorm/mockups/ui.fig`
+>   📄 Source file: `handoff/livespec/mockups/ui.fig`
 >   🖼️  Screens: [N] PNGs found
 >      • [list each PNG by name]
->   📋 Index: `.brainstorm/mockups/index.md` _(if exists)_
+>   📋 Index: `handoff/livespec/mockups/index.md` _(if exists)_
 >
 >   → **Import** into `.specs/design/`? (recommended — design assets join the spec pipeline)
 >   → **Skip**? (import later via `/spec-specify`)
@@ -459,7 +469,7 @@ Detection and confirmation happen here (Phase B context — decisions). File cop
 **User response handling:**
 
 - **"import"** (or equivalent confirmation, or `--auto` flag):
-  1. **Copy non-Penflow design source file:** `.brainstorm/.../ui.<ext>` → `.specs/design/ui.<ext>`; never copy `.pen` here.
+  1. **Copy non-Penflow design source file:** resolved `handoff/livespec/.../ui.<ext>` or legacy `.brainstorm/.../ui.<ext>` → `.specs/design/ui.<ext>`; never copy `.pen` here.
      - If `~/.claude/livespec/design.md` exists, verify extension matches configured tool
      - If mismatch → warn but still copy
   2. **Export screens via MCP** (preferred) **or copy PNGs** (fallback):
@@ -493,14 +503,15 @@ Detection and confirmation happen here (Phase B context — decisions). File cop
 
 ### Step 3.5.5 — Penflow Contract Workspace Bootstrap
 
-If a Brainstorm `penflow/` directory is provided, import it to root `penflow/` before treating brainstorm mockups as any behavioral source. If no Brainstorm output exists, continue from scratch: create no Brainstorm dependency, report Penflow as `ABSENT`, and let the first UI feature establish root `penflow/` artifacts through the Penflow/design workflow.
+If a Brainstorm `handoff/penflow/` or legacy `penflow/` directory is provided, import it to root `penflow/` before treating brainstorm mockups as any behavioral source. If no Brainstorm output exists, continue from scratch: create no Brainstorm dependency, report Penflow as `ABSENT`, and let the first UI feature establish root `penflow/` artifacts through the Penflow/design workflow.
 
-1. Check whether the user or upstream workflow provided `<brainstorm-project>/penflow`.
+1. Check whether the user or upstream workflow provided `<brainstorm-project>/handoff/penflow`, then legacy `<brainstorm-project>/penflow`.
 2. If root `penflow/` already exists, do not overwrite it; run `livespec penflow-contract status --project .` and continue.
-3. If root `penflow/` is absent and a source exists, run `livespec penflow-contract bootstrap --project . --source <brainstorm-project>/penflow`.
-4. If neither source exists, run `livespec penflow-contract status --project . --json`, record `state: absent`, and continue without referencing Brainstorm again.
-5. Run `livespec penflow-contract status --project .` and record the result in command output.
-6. Treat root `penflow/` as the primary UI behavior contract; `.specs/design/screens/` remains a visual reference/export inventory only.
+3. If root `penflow/` is absent and a handoff source exists, run `livespec penflow-contract bootstrap --project . --source <brainstorm-project>/handoff/penflow`.
+4. If only the legacy source exists, run `livespec penflow-contract bootstrap --project . --source <brainstorm-project>/penflow`.
+5. If neither source exists, run `livespec penflow-contract status --project . --json`, record `state: absent`, and continue without referencing Brainstorm again.
+6. Run `livespec penflow-contract status --project .` and record the result in command output.
+7. Treat root `penflow/` as the primary UI behavior contract; `.specs/design/screens/` remains a visual reference/export inventory only.
 
 This step does not import Penflow flows into `.specs/features/` or `.specs/flows/`.
 
@@ -510,15 +521,15 @@ Detection and import of theme CSS generated by Brander (Section 1.5 of project-b
 
 **Detection logic:**
 
-1. Check if `.brainstorm/theme.css` exists
+1. Check if `handoff/livespec/theme.css` exists; fall back to legacy `.brainstorm/theme.css`
 2. If not → skip silently
 3. If found:
-   a. Read `.brainstorm/project-profile.md` → extract the `## Theme` section (Source, Install command, Verify URL)
+   a. Read `handoff/livespec/project-profile.md` or legacy `.brainstorm/project-profile.md` → extract the `## Theme` section (Source, Install command, Verify URL)
    b. Display import summary
 
 **Import summary format:**
 
-> 🎨 **Brainstorm theme detected** (`.brainstorm/theme.css`)
+> 🎨 **Brainstorm theme detected** (`handoff/livespec/theme.css` or legacy `.brainstorm/theme.css`)
 >
 >   **Source:** [tweakcn/claude (Mode A) | Generated from logo (Mode B) | Adapted from tweakcn/minimal (Mode C)]
 >   **Install:** `bunx shadcn@latest add <url>` *(if Mode A/C and stack includes shadcn)*
@@ -532,7 +543,7 @@ If Step 3.6 already showed an import prompt, merge theme into the same prompt ra
 **User response handling:**
 
 - **"import"** (or equivalent confirmation, or `--auto` flag):
-  1. **Copy theme file:** `.brainstorm/theme.css` → `.specs/design/theme.css`
+  1. **Copy theme file:** resolved `handoff/livespec/theme.css` or legacy `.brainstorm/theme.css` → `.specs/design/theme.css`
   2. **Extract metadata:** Parse the `## Theme` section from `project-profile.md`:
      - `source` — the theme origin (tweakcn name, "Generated from logo", "Adapted from…")
      - `install` — the shadcn install command (if present)
@@ -548,7 +559,7 @@ If Step 3.6 already showed an import prompt, merge theme into the same prompt ra
 
      ## Color Palette
 
-     [Copy the Color Palette table from `.brainstorm/04b-branding.md` Theme CSS section, if available]
+     [Copy the Color Palette table from `handoff/livespec/theme.md` or legacy `.brainstorm/04b-branding.md` Theme CSS section, if available]
      ```
   4. **Add to changelog:** Append entry to `.specs/design/changelog.md`:
      ```markdown
@@ -1080,7 +1091,7 @@ If user already knows their stack, allow a compact flow:
 
 ### Phase A — Brainstorm
 
-- [always] Detect .brainstorm/project-profile.md and present import/modify/ignore prompt
+- [always] Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt
 - [always] If brainstorm detected and accepted: pre-fill project.md and skip to Phase B
 - [always] If no brainstorm: run 6-question conversational interview (Q1-Q6)
 - [always] Present project profile summary and confirm before proceeding
@@ -1094,7 +1105,7 @@ If user already knows their stack, allow a compact flow:
 - [always] Ask dev tooling preferences (package manager, linter)
 - [always] Check design tool configuration; run wizard if not configured
 - [always] Detect and confirm brainstorm design/theme artifact import
-- [always] Bootstrap Penflow contract workspace if a Brainstorm `penflow/` source exists
+- [always] Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists
 - [always] Import theme.css and write theme.md if brainstorm theme detected
 - [always] Create at least 1 ADR per significant stack choice
 
