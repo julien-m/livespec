@@ -124,6 +124,7 @@ flowchart TD
 - **AC-011:** Absent/incomplete Penflow without detectable runtime UI writes a BLOCKED report instead of generating fake artifacts from mockups.
 - **AC-012:** Legacy `.specs/design/ui.pen` is reported as duplicate legacy evidence and is not promoted as canonical.
 - **AC-013:** No `.pen` file is created outside `penflow/ui.pen`.
+- **AC-014:** Any non-migration LiveSpec command executed from a stale initialized project exits non-zero before command work and tells the user to run `/spec-migrate` or `livespec migrate`; internal scripts launched by the migration runner are exempt so migrations can repair stale projects.
 
 ## Functional Requirements
 
@@ -139,6 +140,7 @@ flowchart TD
 - **FR-010:** Refuse or block absent/incomplete backfill when no current runtime UI source is detectable.
 - **FR-011:** Detect legacy `.specs/design/ui.pen` and report it as non-canonical evidence.
 - **FR-012:** Prevent secondary `.pen` creation; only `penflow/ui.pen` may be canonical.
+- **FR-013:** Add a shared migration guard that compares `.specs/livespec-version` with repo `VERSION`, blocks normal CLI commands when stale, keeps `init`, `migrate`, and help available, and bypasses only internal migration-runner subprocesses.
 
 ## Key Entities
 

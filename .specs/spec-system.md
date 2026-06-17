@@ -315,19 +315,23 @@ For a given event (e.g., `before-plan`), Read files at 3 levels in order:
 
 **`implement` step hooks:** In addition to `before-implement`/`after-implement` (once), resolve `before-implement-step`/`after-implement-step` before and after EACH implementation step.
 
-### Version Check (ADVISORY)
+### Version Check (BLOCKING)
 
 Before executing any `/spec-*` command (except `/spec-init` and `/spec-migrate`):
 
 1. Read `.specs/livespec-version` — if missing, assume v1
 2. Resolve the LiveSpec repo path from `.specs/.livespec-path` (if missing, resolve from command symlink chain)
 3. Read `VERSION` from the LiveSpec repo
-4. If project version < repo version, display:
+4. If project version < repo version, abort before any command-specific work and display:
 
-> ⚠️ This project uses LiveSpec v{project}. Current version is v{repo}.
-> Run `/spec-migrate` to update.
+```text
+Error: LiveSpec project is not migrated.
+Project version: v{project}
+Required version: v{repo}
+Run /spec-migrate or livespec migrate before running this command.
+```
 
-This check is **non-blocking** — the command continues normally after the warning.
+This check is **blocking** — the command exits non-zero and does not continue. `/spec-init`, `/spec-migrate`, and help output remain available so the user can recover.
 
 ### Command discovery
 

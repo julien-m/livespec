@@ -10,6 +10,14 @@
 
 # Changelog - Feature 046 - Visual Implementation Gate
 
+## 2026-06-17 — [Test]: Measure and expand visual_gate branch coverage
+
+- **Type:** Test
+- **Spec modified:** No
+- **Code modified:** [tests/test_visual_gate.py](../../../tests/test_visual_gate.py), [tests/test_visual_gate_receipts.py](../../../tests/test_visual_gate_receipts.py), [pyproject.toml](../../../pyproject.toml), [.github/workflows/ci.yml](../../../.github/workflows/ci.yml)
+- **AC impacted:** AC-005, AC-006
+- **Author:** codex
+
 ## 2026-05-17 — Feature: Mandatory visual implementation gate
 
 - **Type:** Feature

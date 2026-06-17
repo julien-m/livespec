@@ -990,6 +990,8 @@ def test_goal_render_save_writes_contract_and_state_files(
 ) -> None:
     project_root = tmp_path / "project"
     (project_root / ".specs").mkdir(parents=True)
+    version = (Path(__file__).resolve().parents[1] / "VERSION").read_text(encoding="utf-8")
+    (project_root / ".specs" / "livespec-version").write_text(version, encoding="utf-8")
     _write_conventions(project_root, tmp_path / "ai")
     _write_complete_check_fix_scenario(project_root)
     monkeypatch.chdir(project_root)

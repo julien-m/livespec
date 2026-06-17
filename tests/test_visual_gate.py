@@ -16,6 +16,8 @@ from validator.cli_exit_codes import (
     EXIT_VISUAL_GATE_FAIL,
 )
 from validator.visual_gate import (
+    VisualClassification,
+    VisualFeatureSignals,
     apply_cleanup,
     detect_visual_feature,
     plan_cleanup,
@@ -44,6 +46,27 @@ def _png(path: Path) -> None:
 # ---------------------------------------------------------------------------
 # Detection (P0-A)
 # ---------------------------------------------------------------------------
+
+
+def test_visual_classification_to_dict_includes_signals() -> None:
+    signals = VisualFeatureSignals(
+        s1_spec_marker=True,
+        s1_spec_explicit_false=False,
+        s2_feature_screens=True,
+        s3_penflow_workspace=False,
+        s4_flow_ui_contract=False,
+        s5_feature_baselines=False,
+        s6_surfaces_yaml=False,
+    )
+    payload = VisualClassification(
+        classification="CONFLICT",
+        signals=signals,
+        conflict_reason="manual_review_required",
+    ).to_dict()
+
+    assert payload["classification"] == "CONFLICT"
+    assert payload["signals"] == signals.to_dict()
+    assert payload["conflict_reason"] == "manual_review_required"
 
 
 def test_detect_visual_feature_returns_non_visual_when_marker_false(
@@ -86,6 +109,45 @@ def test_detect_visual_feature_conflict_when_spec_declares_but_no_artifacts(
     classification = detect_visual_feature(project_root=tmp_path, feature_slug=slug)
     assert classification.classification == "CONFLICT"
     assert classification.conflict_reason == "spec_declares_visual_but_no_artifacts"
+
+
+def test_detect_visual_feature_returns_non_visual_without_spec_or_signals(
+    tmp_path: Path,
+) -> None:
+    classification = detect_visual_feature(project_root=tmp_path, feature_slug="005-empty")
+
+    assert classification.classification == "NON_VISUAL"
+    assert classification.signals.strong_count == 0
+    assert classification.signals.weak_count == 0
+
+
+def test_detect_visual_feature_uses_feature_scoped_penflow_index(tmp_path: Path) -> None:
+    slug = "006-penflow-index"
+    _write_spec(tmp_path, slug, marker=None)
+    penflow = tmp_path / "penflow"
+    penflow.mkdir()
+    (penflow / "index.yaml").write_text(f"features:\n  - {slug}\n", encoding="utf-8")
+
+    classification = detect_visual_feature(project_root=tmp_path, feature_slug=slug)
+
+    assert classification.classification == "VISUAL"
+    assert classification.signals.s3_penflow_workspace is True
+
+
+def test_detect_visual_feature_surfaces_yaml_is_weak_signal(tmp_path: Path) -> None:
+    slug = "007-surfaces"
+    _write_spec(tmp_path, slug, marker=None)
+    (tmp_path / ".specs").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".specs" / "surfaces.yaml").write_text(
+        f"surfaces:\n  - id: {slug}-dashboard\n    runner: playwright\n",
+        encoding="utf-8",
+    )
+
+    classification = detect_visual_feature(project_root=tmp_path, feature_slug=slug)
+
+    assert classification.classification == "CONFLICT"
+    assert classification.signals.s6_surfaces_yaml is True
+    assert "s6_surfaces_yaml" in str(classification.conflict_reason)
 
 
 # ---------------------------------------------------------------------------
@@ -190,6 +252,60 @@ def test_render_text_report_includes_verdict_and_classification(tmp_path: Path) 
     assert "classification=NON_VISUAL" in text
 
 
+def test_render_text_report_includes_all_diagnostic_sections(tmp_path: Path) -> None:
+    from validator.design_alignment.models import AlignmentResult
+    from validator.penflow_contract import PenflowContractStatus
+    from validator.registry_links import LinkViolation
+    from validator.visual_gate import GateReport, VisualFeatureSignals
+
+    report = GateReport(
+        feature_slug="021-render-full",
+        command="spec-check",
+        target="web",
+        classification="VISUAL",
+        signals=VisualFeatureSignals(
+            s1_spec_marker=True,
+            s1_spec_explicit_false=False,
+            s2_feature_screens=True,
+            s3_penflow_workspace=True,
+            s4_flow_ui_contract=True,
+            s5_feature_baselines=False,
+            s6_surfaces_yaml=False,
+        ),
+        verdict="BLOCKED",
+        conflict_reason="manual-conflict",
+        penflow=PenflowContractStatus(
+            workspace=tmp_path / "penflow",
+            state="ready",
+            runtime_comparison="BLOCKED",
+        ),
+        alignment=[AlignmentResult(screen="dash", verdict="BLOCKED")],
+        link_violations=[
+            LinkViolation(
+                kind="registry_path_missing",
+                feature_slug="021-render-full",
+                target="web",
+                screen="dash",
+                path=tmp_path / "missing.png",
+                message="registry missing",
+            )
+        ],
+        runtime_in_design_screens_violations=[tmp_path / ".specs/design/screens/dash.png"],
+        visual_evidence={"verdict": "BLOCKED", "receipt_path": "receipt.json"},
+        missing_artifacts=["missing-baseline"],
+    )
+
+    text = render_text_report(report)
+
+    assert "conflict_reason: manual-conflict" in text
+    assert "missing artifacts:" in text
+    assert "link violations:" in text
+    assert "runtime captures misplaced" in text
+    assert "visual evidence:" in text
+    assert "design-alignment screens:" in text
+    assert "penflow: state=ready runtime_comparison=BLOCKED" in text
+
+
 # ---------------------------------------------------------------------------
 # Cleanup (P0-D)
 # ---------------------------------------------------------------------------
@@ -241,6 +357,28 @@ def test_apply_cleanup_quarantines_files_and_is_idempotent(tmp_path: Path) -> No
     )
     assert not plan2.has_drift
     assert apply_cleanup(plan2) == []
+
+
+def test_apply_cleanup_delete_mode_removes_misplaced_files(tmp_path: Path) -> None:
+    slug = "031-delete"
+    payload = b"shared"
+    src = tmp_path / ".specs/design/screens" / slug / "dash.png"
+    base = tmp_path / ".specs/design/baselines" / slug / "web" / "dash.png"
+    for path in (src, base):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(payload)
+
+    plan = plan_cleanup(
+        project_root=tmp_path,
+        feature_slug=slug,
+        timestamp="20260523T000003Z",
+        mode="delete",
+    )
+    applied = apply_cleanup(plan)
+
+    assert applied
+    assert not src.exists()
+    assert plan.quarantine_root is None
 
 
 def test_write_cleanup_report_produces_json(tmp_path: Path) -> None:
@@ -298,3 +436,31 @@ def test_promote_baseline_raises_for_missing_run_capture(tmp_path: Path) -> None
             screen="dash",
             run_id="20260523T000000Z",
         )
+
+
+def test_promote_baseline_manifest_mode_persists_manifest_entry(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    slug = "042-promote-manifest"
+    run_capture = (
+        tmp_path / ".specs/features" / slug / "run" / "20260523T000000Z" / "web" / "dash.png"
+    )
+    run_capture.parent.mkdir(parents=True, exist_ok=True)
+    run_capture.write_bytes(b"runtime")
+    monkeypatch.setattr("validator.visual_gate.detect_link_capability", lambda _root: "manifest")
+
+    registry, local = promote_baseline(
+        project_root=tmp_path,
+        feature_slug=slug,
+        target="web",
+        screen="dash",
+        run_id="20260523T000000Z",
+    )
+
+    manifest = tmp_path / ".specs/features" / slug / "baselines" / "manifest.json"
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    assert registry.exists()
+    assert local is None
+    assert payload["entries"][0]["screen"] == "dash"
+    assert payload["entries"][0]["registry_path"].endswith("dash.png")

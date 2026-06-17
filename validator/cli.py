@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import shutil
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -23,9 +24,11 @@ from .exceptions import SpecsRootNotFoundError
 from .fixer import fix_all
 from .git_ops import git_app
 from .hooks_cli import hooks_app, integrations_app
+from .migration_planner import MigrationPlannerError
 from .pipeline import pipeline_app
 from .reporter import report, report_excluded, report_score_only
 from .specs_utils import find_specs_root
+from .version_guard import ProjectMigrationRequiredError, enforce_project_migrated
 
 if TYPE_CHECKING:
     from .sdk_test_runner import SdkTestResult
@@ -45,6 +48,37 @@ app.add_typer(goal_app, name="goal")
 # Feature: integration-markdown-pattern — hook resolution runtime CLI + L0 diagnostic.
 app.add_typer(hooks_app, name="hooks")
 app.add_typer(integrations_app, name="integrations")
+
+_MIGRATION_GUARD_ALLOWLIST = {"init", "migrate"}
+
+
+@app.callback(invoke_without_command=True)
+def migration_guard_callback(ctx: typer.Context) -> None:
+    """Block normal commands when the target project has pending migrations."""
+    args = _root_args(ctx)
+    if _should_skip_migration_guard(args):
+        return
+    try:
+        enforce_project_migrated(args, cwd=Path.cwd())
+    except (ProjectMigrationRequiredError, MigrationPlannerError) as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+
+
+def _root_args(ctx: typer.Context) -> list[str]:
+    argv = list(sys.argv[1:])
+    if argv:
+        return argv
+    invoked = ctx.invoked_subcommand
+    return ([invoked] if invoked else []) + list(ctx.args)
+
+
+def _should_skip_migration_guard(args: list[str]) -> bool:
+    if not args:
+        return True
+    if any(arg in {"--help", "-h"} for arg in args):
+        return True
+    return args[0] in _MIGRATION_GUARD_ALLOWLIST
 
 
 def _find_specs_root(start: Path | None = None) -> Path:

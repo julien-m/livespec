@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-15
+> Last updated: 2026-06-17
 
 ---
+
+## 2026-06-17 — [Feature 054 Fix] Block stale projects before normal LiveSpec commands and require migration
+
+## 2026-06-17 — [Feature 046 Test] Measure visual_gate branch coverage and add targeted coverage tests
 
 ## 2026-06-15 — [Feature 066] Implemented: Handoff Input Compatibility — handoff-first Brainstorm import docs, Penflow bootstrap source resolution, lifecycle sync contract
 

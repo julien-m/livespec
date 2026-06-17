@@ -119,6 +119,10 @@ For debt remediation, run `/spec-fix --conventions`. See [`system/conventions-en
 
 ---
 
+LiveSpec commands are migration-gated: if [`.specs/livespec-version`](.specs/livespec-version) is older than repo [`VERSION`](VERSION), normal commands fail before doing work and instruct the user to run `/spec-migrate` or `livespec migrate`. `/spec-init`, `/spec-migrate`, and help output remain available for recovery.
+
+---
+
 ## User Integrations (`~/.config/livespec/*.md`)
 
 LiveSpec supports **user-level Markdown integrations**: drop a `<name>.md`

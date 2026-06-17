@@ -21,6 +21,7 @@ feature: "054-migration-planner-penflow-backfill"
 | FR-010 | `scripts/migrate-penflow-backfill.py` | `build_report()` `@spec FR-010` | Implemented | 2026-06-01 |
 | FR-011 | `scripts/migrate-penflow-backfill.py` | `build_report()` `@spec FR-011` | Implemented | 2026-06-01 |
 | FR-012 | `scripts/migrate-penflow-backfill.py` | `build_report()` `@spec FR-012` | Implemented | 2026-06-01 |
+| FR-013 | [validator/version_guard.py](../../../validator/version_guard.py), [validator/cli.py](../../../validator/cli.py), [scripts/migrate.sh](../../../scripts/migrate.sh), [.specs/spec-system.md](../../spec-system.md) | Blocking migration guard callback with internal migration-runner bypass | Implemented | 2026-06-17 |
 
 ## Acceptance Criteria Mapping
 
@@ -39,6 +40,7 @@ feature: "054-migration-planner-penflow-backfill"
 | AC-011 | `tests/test_penflow_backfill_migration.py::test_penflow_backfill_blocks_absent_runtime_without_fake_penflow` | Implemented |
 | AC-012 | `tests/test_penflow_backfill_migration.py::test_penflow_backfill_reports_legacy_design_ui_pen_without_promoting_it` | Implemented |
 | AC-013 | `tests/test_penflow_backfill_migration.py::test_penflow_backfill_creates_no_secondary_pen_files` | Implemented |
+| AC-014 | `tests/test_version_guard.py` | Implemented |
 
 ## Files Created/Modified
 
@@ -54,7 +56,12 @@ feature: "054-migration-planner-penflow-backfill"
 | `tests/test_migration_planner.py` | Planner unit and CLI tests |
 | `tests/test_penflow_backfill_migration.py` | Migration 17 behavior tests |
 | `tests/test_penflow_contract_command_contract.py` | Command documentation contract regression |
+| [validator/version_guard.py](../../../validator/version_guard.py) | Blocks stale initialized projects before normal LiveSpec command execution |
+| [scripts/migrate.sh](../../../scripts/migrate.sh) | Marks internal migration subprocesses so migration repairs are not self-blocked by the stale-project guard |
+| [tests/test_version_guard.py](../../../tests/test_version_guard.py) | Stale/up-to-date/missing-version/help/migrate guard tests |
 
 ## Verification
 
 - `pytest tests/test_migration_planner.py tests/test_penflow_backfill_migration.py tests/test_penflow_contract_command_contract.py -q` - 34 passed.
+- `python3 -m pytest tests/test_version_guard.py -q` - 11 passed.
+- `/tmp/livespec-cov-venv-32421/bin/python -m pytest tests/integration/ -m level_3a -v --tb=short` - 75 passed after adding the internal migration-runner bypass.

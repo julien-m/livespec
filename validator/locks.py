@@ -38,7 +38,7 @@ import random
 import re
 import secrets
 import time
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass
 from pathlib import Path
@@ -138,7 +138,7 @@ def acquire_lock(
     retry_policy: LockRetryPolicy | None = None,
     _sleep: Callable[[float], None] = time.sleep,
     _clock: Callable[[], float] = time.monotonic,
-) -> Iterator[Path]:
+) -> Generator[Path, None, None]:
     """Acquire an exclusive flock on ``<specs_root>/.LOCK`` for the with-block duration.
 
     Args:

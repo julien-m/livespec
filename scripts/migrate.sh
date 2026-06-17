@@ -93,9 +93,9 @@ while IFS= read -r line || [[ -n "$line" ]]; do
       fi
       echo "  ▸ RUN $script $script_args"
       if [[ "$script" == *.py ]]; then
-        python3 "$LIVESPEC_DIR/scripts/$script" "$PROJECT_DIR" "$LIVESPEC_DIR" $script_args
+        LIVESPEC_MIGRATION_IN_PROGRESS=1 LIVESPEC_MIGRATION_PROJECT="$PROJECT_DIR" LIVESPEC_MIGRATION_LIVESPEC="$LIVESPEC_DIR" python3 "$LIVESPEC_DIR/scripts/$script" "$PROJECT_DIR" "$LIVESPEC_DIR" $script_args
       else
-        "$LIVESPEC_DIR/scripts/$script" "$PROJECT_DIR" "$LIVESPEC_DIR" $script_args
+        LIVESPEC_MIGRATION_IN_PROGRESS=1 LIVESPEC_MIGRATION_PROJECT="$PROJECT_DIR" LIVESPEC_MIGRATION_LIVESPEC="$LIVESPEC_DIR" "$LIVESPEC_DIR/scripts/$script" "$PROJECT_DIR" "$LIVESPEC_DIR" $script_args
       fi
       echo "  ✓ RUN $script complete"
       ;;
