@@ -15,6 +15,7 @@ from validator.cli_exit_codes import (
     EXIT_VISUAL_GATE_BLOCKED,
     EXIT_VISUAL_GATE_FAIL,
 )
+from validator.penflow_contract import PenflowContractStatus, RuntimeComparisonState
 from validator.visual_gate import (
     GateReport,
     VisualClassification,
@@ -657,7 +658,7 @@ def test_resolve_legacy_mockup_path_absolute_escape(tmp_path: Path) -> None:
     slug = "107-abs"
     screens_dir = tmp_path / ".specs/design/screens" / slug
     screens_dir.mkdir(parents=True)
-    raw = {"mockup_path": "/etc/passwd"}
+    raw: dict[str, object] = {"mockup_path": "/etc/passwd"}
     _path, err = _resolve_legacy_mockup_path(
         raw, project_root=tmp_path, feature_slug=slug, screen="dash"
     )
@@ -669,7 +670,7 @@ def test_resolve_legacy_mockup_path_relative_escape(tmp_path: Path) -> None:
     slug = "108-rel"
     screens_dir = tmp_path / ".specs/design/screens" / slug
     screens_dir.mkdir(parents=True)
-    raw = {"mockup_path": "../../other/file.png"}
+    raw: dict[str, object] = {"mockup_path": "../../other/file.png"}
     _path, err = _resolve_legacy_mockup_path(
         raw, project_root=tmp_path, feature_slug=slug, screen="dash"
     )
@@ -986,9 +987,7 @@ def test_resolve_targets_surfaces_unknown_runner(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _make_penflow(runtime_comparison: str) -> object:
-    from validator.penflow_contract import PenflowContractStatus
-
+def _make_penflow(runtime_comparison: RuntimeComparisonState) -> PenflowContractStatus:
     return PenflowContractStatus(
         workspace=Path("/tmp"), state="ready", runtime_comparison=runtime_comparison
     )
@@ -1266,6 +1265,7 @@ def test_read_alignment_manifest_sources_malformed_json(tmp_path: Path) -> None:
     (screen_dir / "design-alignment.manifest.json").write_text("not json", encoding="utf-8")
     d, _r, err, _raw = _read_alignment_manifest_sources(screen_dir, project_root=tmp_path)
     assert d is None
+    assert err is not None
     assert "malformed" in err
 
 
@@ -1275,6 +1275,7 @@ def test_read_alignment_manifest_sources_non_object(tmp_path: Path) -> None:
     (screen_dir / "design-alignment.manifest.json").write_text("[1, 2]", encoding="utf-8")
     d, _r, err, _raw = _read_alignment_manifest_sources(screen_dir, project_root=tmp_path)
     assert d is None
+    assert err is not None
     assert "object" in err
 
 
@@ -1284,6 +1285,7 @@ def test_read_alignment_manifest_sources_missing_fields(tmp_path: Path) -> None:
     (screen_dir / "design-alignment.manifest.json").write_text('{"other": true}', encoding="utf-8")
     d, _r, err, _raw = _read_alignment_manifest_sources(screen_dir, project_root=tmp_path)
     assert d is None
+    assert err is not None
     assert "missing" in err.lower() or "design_source" in err
 
 
@@ -1296,6 +1298,7 @@ def test_read_alignment_manifest_sources_unresolved(tmp_path: Path) -> None:
     )
     d, _r, err, _raw = _read_alignment_manifest_sources(screen_dir, project_root=tmp_path)
     assert d is None
+    assert err is not None
     assert "unresolved" in err
 
 

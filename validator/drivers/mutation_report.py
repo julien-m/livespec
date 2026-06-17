@@ -436,8 +436,8 @@ def _dispatch_parser(driver: DriverManifest, capability_result: CapabilityResult
             if capability_result.report_path
             else Path("reports/mutation/mutation.json")
         )
-        parsed = load_stryker_report(report_path)
-        return normalise_stryker(parsed, driver=name)
+        stryker_result = load_stryker_report(report_path)
+        return normalise_stryker(stryker_result, driver=name)
 
     if name == "jvm":
         counts = parse_pitest_xml(stdout)

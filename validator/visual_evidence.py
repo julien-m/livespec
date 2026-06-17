@@ -378,9 +378,13 @@ def _comparison_from_dict(data: dict[str, Any]) -> VisualComparison:
     comparison_kind = _string_field(data, "comparison_kind")
     if comparison_kind not in ("mockup_runtime", "baseline_runtime", "mockup_baseline"):
         raise VisualReceiptError("comparison_kind_invalid")
+    # Membership validation above narrows the runtime value; mypy needs the explicit Literal cast.
+    comparison_kind_typed = cast(ComparisonKind, comparison_kind)
     verdict = _string_field(data, "verdict")
     if verdict not in ("PASS", "FAIL", "BLOCKED"):
         raise VisualReceiptError("comparison_verdict_invalid")
+    # Membership validation above narrows the runtime value; mypy needs the explicit Literal cast.
+    verdict_typed = cast(VisualVerdict, verdict)
     issues_raw: object = data.get("issues", [])
     issues = (
         tuple(str(issue) for issue in cast(list[object], issues_raw))
@@ -391,7 +395,7 @@ def _comparison_from_dict(data: dict[str, Any]) -> VisualComparison:
         feature_slug=_string_field(data, "feature_slug"),
         screen=_string_field(data, "screen"),
         target=_string_field(data, "target"),
-        comparison_kind=comparison_kind,
+        comparison_kind=comparison_kind_typed,
         reference_path=_string_field(data, "reference_path"),
         actual_path=_string_field(data, "actual_path"),
         diff_path=_string_field(data, "diff_path"),
@@ -404,7 +408,7 @@ def _comparison_from_dict(data: dict[str, Any]) -> VisualComparison:
         diff_pixels=_int_field(data, "diff_pixels"),
         threshold_percent=_float_field(data, "threshold_percent"),
         actual_diff_percent=_float_field(data, "actual_diff_percent"),
-        verdict=verdict,
+        verdict=verdict_typed,
         issues=issues,
     )
 

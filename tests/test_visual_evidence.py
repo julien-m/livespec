@@ -192,7 +192,7 @@ def test_visual_receipt_rejects_escaping_paths(tmp_path: Path) -> None:
         threshold_percent=5.0,
         diff_path=tmp_path / ".specs/features/001-visual/run/manual/visual-evidence/dash.diff.png",
     )
-    payload = {
+    payload: dict[str, object] = {
         "schema_version": "1",
         "oracle": "livespec-visual-evidence",
         "oracle_version": "1",

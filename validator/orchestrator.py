@@ -96,9 +96,9 @@ def run_contradiction_check(
                                 )
                             )
                     except Exception as exc:
-                        err = ContradictionComparisonError(doc_a, doc_b, str(exc))
-                        logger.warning("%s", err)
-                        check_result.comparison_errors.append(str(err))
+                        comparison_error = ContradictionComparisonError(doc_a, doc_b, str(exc))
+                        logger.warning("%s", comparison_error)
+                        check_result.comparison_errors.append(str(comparison_error))
 
     return check_result
 

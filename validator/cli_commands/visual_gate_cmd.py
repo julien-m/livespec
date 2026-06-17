@@ -72,6 +72,40 @@ def _receipt_exit_code(verdict: str) -> int:
     return EXIT_VISUAL_GATE_BLOCKED
 
 
+def _parse_gate_command(value: str) -> GateCommand:
+    if value == "spec-check":
+        return "spec-check"
+    if value == "spec-fix":
+        return "spec-fix"
+    if value == "spec-test":
+        return "spec-test"
+    if value == "spec-feature":
+        return "spec-feature"
+    typer.echo(
+        "Error: --command must be one of spec-check, spec-fix, spec-test, spec-feature.",
+        err=True,
+    )
+    raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
+
+
+def _parse_gate_target(value: str | None, *, required: bool) -> GateTarget | None:
+    if value == "web":
+        return "web"
+    if value == "ios":
+        return "ios"
+    if value == "android":
+        return "android"
+    if value == "tauri":
+        return "tauri"
+    if value is None and not required:
+        return None
+    typer.echo(
+        "Error: --target must be one of web, ios, android, tauri.",
+        err=True,
+    )
+    raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
+
+
 @visual_gate_app.command("validate")
 def validate_command(
     feature: Annotated[
@@ -119,20 +153,8 @@ def validate_command(
     if feature is None:
         typer.echo("Error: --feature is required.", err=True)
         raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
-    if command not in ("spec-check", "spec-fix", "spec-test", "spec-feature"):
-        typer.echo(
-            "Error: --command must be one of spec-check, spec-fix, spec-test, spec-feature.",
-            err=True,
-        )
-        raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
-    if target is not None and target not in ("web", "ios", "android", "tauri"):
-        typer.echo(
-            "Error: --target must be one of web, ios, android, tauri.",
-            err=True,
-        )
-        raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
-    validated_command: GateCommand = command
-    validated_target: GateTarget | None = target
+    validated_command = _parse_gate_command(command)
+    validated_target = _parse_gate_target(target, required=False)
     report = validate_gate(
         project_root=project.resolve(),
         feature_slug=feature,
@@ -188,32 +210,23 @@ def certify_command(
     ] = False,
 ) -> None:
     """Create a deterministic visual evidence receipt from real PNG files."""
-    if command not in ("spec-check", "spec-fix", "spec-test", "spec-feature"):
-        typer.echo(
-            "Error: --command must be one of spec-check, spec-fix, spec-test, spec-feature.",
-            err=True,
-        )
-        raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
-    if target not in ("web", "ios", "android", "tauri"):
-        typer.echo(
-            "Error: --target must be one of web, ios, android, tauri.",
-            err=True,
-        )
-        raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
+    validated_command = _parse_gate_command(command)
+    validated_target = _parse_gate_target(target, required=True)
+    assert validated_target is not None
     try:
-        payload = certify_visual_evidence(
+        payload: dict[str, object] = certify_visual_evidence(
             project_root=project.resolve(),
             feature_slug=feature,
-            command=command,
-            target=target,
+            command=validated_command,
+            target=validated_target,
             run_id=run_id,
             threshold_percent=threshold_percent,
         )
     except (OSError, VisualReceiptError) as exc:
-        payload: dict[str, object] = {
+        payload = {
             "feature_slug": feature,
-            "command": command,
-            "target": target,
+            "command": validated_command,
+            "target": validated_target,
             "run_id": run_id,
             "verdict": "BLOCKED",
             "receipt_path": None,
@@ -353,17 +366,13 @@ def promote_command(
     ] = False,
 ) -> None:
     """Promote a runtime capture into the registry + create the symlink."""
-    if target not in ("web", "ios", "android", "tauri"):
-        typer.echo(
-            "Error: --target must be one of web, ios, android, tauri.",
-            err=True,
-        )
-        raise typer.Exit(EXIT_VISUAL_GATE_BLOCKED)
+    validated_target = _parse_gate_target(target, required=True)
+    assert validated_target is not None
     try:
         registry, local = promote_baseline(
             project_root=project.resolve(),
             feature_slug=feature,
-            target=target,
+            target=validated_target,
             screen=screen,
             run_id=run_id,
         )
@@ -373,7 +382,7 @@ def promote_command(
     if json_output:
         payload = {
             "feature": feature,
-            "target": target,
+            "target": validated_target,
             "screen": screen,
             "run_id": run_id,
             "registry_path": str(registry),

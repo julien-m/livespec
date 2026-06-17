@@ -130,24 +130,30 @@ def verify_one_receipt(
     receipt_path = Path(path)
     try:
         if kind == "conventions":
-            receipt = verify_conventions_receipt(
-                receipt_path,
-                project_root=project_root,
-                expected_feature_slug=feature,
+            verdict = str(
+                verify_conventions_receipt(
+                    receipt_path,
+                    project_root=project_root,
+                    expected_feature_slug=feature,
+                ).verdict
             )
         elif kind == "visual":
-            receipt = verify_visual_receipt(
-                receipt_path,
-                project_root=project_root,
-                expected_feature_slug=feature,
-                expected_command=None,
+            verdict = str(
+                verify_visual_receipt(
+                    receipt_path,
+                    project_root=project_root,
+                    expected_feature_slug=feature,
+                    expected_command=None,
+                ).verdict
             )
         else:
-            receipt = verify_finalize_receipt(
-                receipt_path,
-                project_root=project_root,
-                expected_feature_slug=feature,
-                expected_command=None,
+            verdict = str(
+                verify_finalize_receipt(
+                    receipt_path,
+                    project_root=project_root,
+                    expected_feature_slug=feature,
+                    expected_command=None,
+                ).verdict
             )
     except (ConventionsReceiptError, FinalizeReceiptError, VisualReceiptError) as exc:
         return ReceiptCheck(kind=kind, path=path, verified=False, verdict=None, error=str(exc))
@@ -155,7 +161,7 @@ def verify_one_receipt(
         kind=kind,
         path=path,
         verified=True,
-        verdict=str(receipt.verdict),
+        verdict=verdict,
         error=None,
     )
 

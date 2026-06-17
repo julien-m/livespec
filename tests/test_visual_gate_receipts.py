@@ -89,7 +89,10 @@ def test_visual_gate_certify_blocks_missing_runtime_capture(tmp_path: Path) -> N
 
     assert payload["verdict"] == "BLOCKED"
     assert payload["receipt_path"] is None
-    assert any("run/manual/web/dash.png" in item for item in payload["missing_artifacts"])
+    missing_artifacts = payload["missing_artifacts"]
+    assert isinstance(missing_artifacts, list)
+    assert all(isinstance(item, str) for item in missing_artifacts)
+    assert any("run/manual/web/dash.png" in item for item in missing_artifacts)
 
 
 def test_visual_gate_certify_includes_baseline_comparisons(tmp_path: Path) -> None:

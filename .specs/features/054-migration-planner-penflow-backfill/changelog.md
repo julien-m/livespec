@@ -1,5 +1,13 @@
 # Changelog - 054-migration-planner-penflow-backfill
 
+## 2026-06-17 — [Refactor]: Type migration planner payload for mypy gate
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** [validator/migration_planner.py](../../../validator/migration_planner.py)
+- **AC impacted:** AC-001
+- **Author:** codex
+
 ## 2026-06-01 — [Spec Update]: Feature specified and planned
 
 - **Type:** Spec Update

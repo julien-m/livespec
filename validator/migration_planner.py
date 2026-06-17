@@ -81,7 +81,7 @@ def build_migration_plan(project_dir: Path, livespec_dir: Path) -> MigrationPlan
     ]
     replacements = _pending_replacements(manifests, pending)
     apply = [version for version in pending if version not in replacements]
-    skipped = [
+    skipped: list[dict[str, int | str]] = [
         {"version": version, "reason": f"superseded_by_{replacement}"}
         for version, replacement in sorted(replacements.items())
     ]

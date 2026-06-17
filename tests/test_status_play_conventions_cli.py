@@ -10,6 +10,7 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from validator.cli import app
@@ -224,7 +225,7 @@ def test_conventions_supervisor_gate_blocks_current_hash_mismatch(tmp_path: Path
 
 
 def test_conventions_supervisor_gate_uses_fresh_verification(
-    monkeypatch: object,
+    monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
     repo = _init_conventions_git_repo(tmp_path)

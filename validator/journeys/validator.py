@@ -22,7 +22,9 @@ from pydantic import ValidationError
 
 from .fixtures import (
     BootstrapAmbiguityError,
+    FixtureContract,
     FixturesContractV1,
+    MockContract,
     read_fixtures_contract,
     render_contract_skeleton,
     resolve_bootstrap,
@@ -212,34 +214,59 @@ def _validate_contract_references(
 ) -> list[JourneyIssue]:
     """Check declared fixture/mock ids and surfaces against the contract maps."""
     issues: list[JourneyIssue] = []
-    references = [
-        ("fixture", source.preconditions.fixtures, contract.fixtures),
-        ("mock", source.preconditions.mocks, contract.mocks),
-    ]
-    for kind, declared_ids, contract_map in references:
-        for declared_id in declared_ids:
-            entry = contract_map.get(declared_id)
-            if entry is None:
+    issues.extend(
+        _validate_reference_surfaces(
+            path,
+            ids=source.preconditions.fixtures,
+            entries=contract.fixtures,
+            reference_kind="fixture",
+            xcuitest_surfaces=xcuitest_surfaces,
+        )
+    )
+    issues.extend(
+        _validate_reference_surfaces(
+            path,
+            ids=source.preconditions.mocks,
+            entries=contract.mocks,
+            reference_kind="mock",
+            xcuitest_surfaces=xcuitest_surfaces,
+        )
+    )
+    return issues
+
+
+def _validate_reference_surfaces(
+    path: Path,
+    *,
+    ids: list[str],
+    entries: dict[str, FixtureContract] | dict[str, MockContract],
+    reference_kind: str,
+    xcuitest_surfaces: list[str],
+) -> list[JourneyIssue]:
+    issues: list[JourneyIssue] = []
+    for reference_id in ids:
+        entry = entries.get(reference_id)
+        if entry is None:
+            issues.append(
+                _issue(
+                    "journey_fixture_unknown",
+                    JourneySeverity.ERROR,
+                    f"{reference_kind} '{reference_id}' is not declared in fixtures.yaml",
+                    path,
+                )
+            )
+            continue
+        for surface in xcuitest_surfaces:
+            if surface not in entry.surfaces:
                 issues.append(
                     _issue(
-                        "journey_fixture_unknown",
+                        "journey_fixture_surface_unsupported",
                         JourneySeverity.ERROR,
-                        f"{kind} '{declared_id}' is not declared in fixtures.yaml",
+                        f"{reference_kind} '{reference_id}' does not support surface "
+                        f"'{surface}' (declared: {', '.join(entry.surfaces)})",
                         path,
                     )
                 )
-                continue
-            for surface in xcuitest_surfaces:
-                if surface not in entry.surfaces:
-                    issues.append(
-                        _issue(
-                            "journey_fixture_surface_unsupported",
-                            JourneySeverity.ERROR,
-                            f"{kind} '{declared_id}' does not support surface "
-                            f"'{surface}' (declared: {', '.join(entry.surfaces)})",
-                            path,
-                        )
-                    )
     return issues
 
 

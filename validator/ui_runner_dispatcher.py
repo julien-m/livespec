@@ -387,6 +387,7 @@ class Phase4_5Dispatcher:
                 and len(exported_paths) == 0
                 and not cached
             )
+            error: str | None
             if empty_attachments:
                 status = "blocked"
                 error = (

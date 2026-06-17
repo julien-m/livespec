@@ -693,16 +693,20 @@ def _run_alignment_for_screen(screen_dir: Path, *, project_root: Path) -> Alignm
     when no comparison can be run — the caller surfaces this as BLOCKED via
     :func:`_alignment_dir_incomplete_reasons`.
     """
-    design_path: Path | None = screen_dir / "design-contract.json"
-    runtime_path: Path | None = screen_dir / "runtime-contract.json"
+    design_path = screen_dir / "design-contract.json"
+    runtime_path = screen_dir / "runtime-contract.json"
     if not design_path.exists() or not runtime_path.exists():
         manifest_design, manifest_runtime, _err, _raw = _read_alignment_manifest_sources(
             screen_dir, project_root=project_root
         )
         if manifest_design is None or manifest_runtime is None:
             return None
-        design_path = manifest_design
-        runtime_path = manifest_runtime
+        return compare_contract_files(
+            design_path=manifest_design,
+            runtime_path=manifest_runtime,
+            screen=screen_dir.name,
+            output_dir=screen_dir,
+        )
     return compare_contract_files(
         design_path=design_path,
         runtime_path=runtime_path,

@@ -45,7 +45,7 @@ from validator.locks import LockAcquisitionError, WriteHashMismatchError
 class TestHash8Canonicalization:
     def test_hash8_is_first_8_hex_of_payload_hash(self) -> None:
         """Identity is cmd+hash8: hash8 must be a stable prefix of the full hash."""
-        payload = {
+        payload: dict[str, object] = {
             "feature_slug": "004-notifications",
             "command": "spec-specify",
             "status": "Draft",
@@ -59,7 +59,7 @@ class TestHash8Canonicalization:
     def test_hash8_is_date_free_and_stable_across_days(self) -> None:
         """Re-running an identical apply on a later date must produce the same
         hash8 (Edge Case 1) — no volatile field may enter the canonical payload."""
-        payload = {
+        payload: dict[str, object] = {
             "feature_slug": "004-notifications",
             "command": "spec-specify",
             "status": "Draft",
@@ -70,14 +70,14 @@ class TestHash8Canonicalization:
 
     def test_hash8_is_field_order_independent(self) -> None:
         """Canonical JSON sorts keys, so insertion order must not change identity."""
-        ordered = {
+        ordered: dict[str, object] = {
             "command": "spec-specify",
             "entry_body": "Body",
             "feature_slug": "004-n",
             "global_summary": "Sum",
             "status": "Draft",
         }
-        reordered = {
+        reordered: dict[str, object] = {
             "status": "Draft",
             "global_summary": "Sum",
             "feature_slug": "004-n",
@@ -88,7 +88,7 @@ class TestHash8Canonicalization:
 
     def test_payload_content_changes_identity(self) -> None:
         """Different payloads must never collide on the apply identity."""
-        base = {
+        base: dict[str, object] = {
             "feature_slug": "004-n",
             "command": "spec-specify",
             "status": "Draft",
@@ -101,14 +101,14 @@ class TestHash8Canonicalization:
     def test_omitted_status_is_a_distinct_identity(self) -> None:
         """`--status` omitted removes the key from the payload (Step 6 of the
         plan) — identity must stay deterministic but distinct from status runs."""
-        with_status = {
+        with_status: dict[str, object] = {
             "feature_slug": "004-n",
             "command": "spec-plan",
             "status": "Planned",
             "entry_body": "Body",
             "global_summary": "Sum",
         }
-        without_status = {
+        without_status: dict[str, object] = {
             "feature_slug": "004-n",
             "command": "spec-plan",
             "entry_body": "Body",

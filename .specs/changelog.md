@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-17 — [Quality Gate] Make `mypy .` pass and add it to CI
+
 ## 2026-06-17 — [Feature 054 Fix] Block stale projects before normal LiveSpec commands and require migration
 
 ## 2026-06-17 — [Feature 046 Test] Measure visual_gate branch coverage and add targeted coverage tests

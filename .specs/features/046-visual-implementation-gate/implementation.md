@@ -16,6 +16,7 @@ title: Implementation - Feature 046 - Visual Implementation Gate
 | [FR-005: Expectations updated](spec.md#fr-005) | `.agent-sync/skills/spec-implement/expectations.md`, `.agent-sync/skills/spec-test/expectations.md` | Covered by command expectation contract text | ✅ Implemented | 2026-05-17 |
 | [FR-006: Regression tests](spec.md#fr-006) | `tests/test_visual_implementation_gate.py` | `@spec FR-006: Regression tests — .specs/features/046-visual-implementation-gate/spec.md#fr-006` | ✅ Implemented | 2026-05-17 |
 | Coverage audit | [tests/test_visual_gate.py](../../../tests/test_visual_gate.py), [tests/test_visual_gate_receipts.py](../../../tests/test_visual_gate_receipts.py), [tests/test_visual_implementation_gate.py](../../../tests/test_visual_implementation_gate.py) | Branch coverage command for `validator.visual_gate` | ✅ Implemented | 2026-06-17 |
+| Mypy gate | [validator/visual_gate.py](../../../validator/visual_gate.py), [validator/cli_commands/visual_gate_cmd.py](../../../validator/cli_commands/visual_gate_cmd.py), [tests/test_visual_gate.py](../../../tests/test_visual_gate.py), [tests/test_visual_gate_receipts.py](../../../tests/test_visual_gate_receipts.py) | `mypy .` CI gate for visual gate code paths | ✅ Implemented | 2026-06-17 |
 
 ## Acceptance Criteria Mapping
 
@@ -28,6 +29,7 @@ title: Implementation - Feature 046 - Visual Implementation Gate
 | AC-005 | `tests/test_visual_implementation_gate.py::test_spec_test_exposes_structured_visual_gate_verdict` | ✅ Covered |
 | AC-006 | `tests/test_visual_implementation_gate.py::test_expectations_contracts_describe_visual_gate` | ✅ Covered |
 | Coverage audit | [tests/test_visual_gate.py](../../../tests/test_visual_gate.py), [tests/test_visual_gate_receipts.py](../../../tests/test_visual_gate_receipts.py), [tests/test_visual_implementation_gate.py](../../../tests/test_visual_implementation_gate.py) | ✅ Covered |
+| Mypy gate | [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml), [`pyproject.toml`](../../../pyproject.toml) | ✅ Covered |
 
 ## Files Created/Modified
 
@@ -41,6 +43,8 @@ title: Implementation - Feature 046 - Visual Implementation Gate
 | `tests/test_visual_implementation_gate.py` | Regression tests for visual gate command contracts. |
 | [tests/test_visual_gate.py](../../../tests/test_visual_gate.py) | Visual gate branch coverage tests for detection, rendering, cleanup, and baseline promotion. |
 | [tests/test_visual_gate_receipts.py](../../../tests/test_visual_gate_receipts.py) | Visual evidence receipt branch coverage tests for missing artifacts, baseline comparisons, and invalid receipts. |
+| [validator/visual_gate.py](../../../validator/visual_gate.py) | Narrows alignment manifest paths before design-alignment comparison. |
+| [validator/cli_commands/visual_gate_cmd.py](../../../validator/cli_commands/visual_gate_cmd.py) | Parses visual-gate command and target options into typed gate literals. |
 | `.agent-sync/skills/spec-implement/SKILL.md` | Adds Phase 6.5 and stricter visual completion rules. |
 | `.agent-sync/skills/spec-test/SKILL.md` | Adds structured visual gate verdict. |
 | `.agent-sync/skills/spec-implement/expectations.md` | Aligns implement contract with visual gate behavior. |

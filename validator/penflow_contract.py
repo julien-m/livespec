@@ -535,6 +535,7 @@ def _compare_report_status(path: Path) -> tuple[str | None, int | None, str | No
     status_raw = payload.get("status")
     status = status_raw.upper() if isinstance(status_raw, str) else None
     issues_raw = payload.get("issues")
+    issue_count: int | None
     if isinstance(issues_raw, list):
         issue_count = len(cast(list[object], issues_raw))
     else:

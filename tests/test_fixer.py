@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import frontmatter
@@ -81,7 +82,9 @@ class TestFixEmptyTitle:
 
         post = frontmatter.load(str(path))
         # Folder is 001-test, so title should be "Test"
-        assert post["title"].strip() != ""
+        title = post["title"]
+        assert isinstance(title, str)
+        assert title.strip() != ""
 
 
 class TestFixUpdatedBeforeCreated:
@@ -103,7 +106,11 @@ class TestFixUpdatedBeforeCreated:
         assert any("updated" in d.lower() for d in descriptions)
 
         post = frontmatter.load(str(path))
-        assert post["updated"] >= post["created"]
+        updated = post["updated"]
+        created = post["created"]
+        assert isinstance(updated, date)
+        assert isinstance(created, date)
+        assert updated >= created
 
 
 class TestFixMissingSections:

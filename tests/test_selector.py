@@ -8,6 +8,7 @@ See .specs/features/033-smart-test-selection/spec.md#fr-009 for details.
 
 import subprocess
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -16,7 +17,7 @@ from validator.selector import SmartTestSelector
 
 
 @pytest.fixture
-def temp_specs_dir() -> Path:
+def temp_specs_dir() -> Generator[Path, None, None]:
     """Create a temporary `.specs` directory structure for selector tests."""
     with tempfile.TemporaryDirectory() as tmpdir:
         root = Path(tmpdir)

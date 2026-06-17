@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import Literal
 
 import pytest
 from pydantic import ValidationError
@@ -31,12 +32,14 @@ class TestSpecFrontmatter:
     @pytest.mark.parametrize("status", ["WIP", "Active", "done", ""])
     def test_invalid_status_rejects(self, status: str) -> None:
         with pytest.raises(ValidationError):
-            SpecFrontmatter(
-                title="Test",
-                status=status,
-                priority="P1",
-                created=date(2026, 1, 1),
-                updated=date(2026, 1, 15),
+            SpecFrontmatter.model_validate(
+                {
+                    "title": "Test",
+                    "status": status,
+                    "priority": "P1",
+                    "created": date(2026, 1, 1),
+                    "updated": date(2026, 1, 15),
+                }
             )
 
     def test_empty_title_rejects(self) -> None:
@@ -60,7 +63,7 @@ class TestSpecFrontmatter:
             )
 
     @pytest.mark.parametrize("priority", ["P1", "P2", "P3"])
-    def test_valid_priorities(self, priority: str) -> None:
+    def test_valid_priorities(self, priority: Literal["P1", "P2", "P3"]) -> None:
         s = SpecFrontmatter(
             title="Test",
             status="Draft",
@@ -72,22 +75,26 @@ class TestSpecFrontmatter:
 
     def test_invalid_priority_rejects(self) -> None:
         with pytest.raises(ValidationError):
-            SpecFrontmatter(
-                title="Test",
-                status="Draft",
-                priority="P0",
-                created=date(2026, 1, 1),
-                updated=date(2026, 1, 1),
+            SpecFrontmatter.model_validate(
+                {
+                    "title": "Test",
+                    "status": "Draft",
+                    "priority": "P0",
+                    "created": date(2026, 1, 1),
+                    "updated": date(2026, 1, 1),
+                }
             )
 
     def test_extra_fields_ignored(self) -> None:
-        s = SpecFrontmatter(
-            title="Test",
-            status="Draft",
-            priority="P1",
-            created=date(2026, 1, 1),
-            updated=date(2026, 1, 1),
-            custom_field="hello",
+        s = SpecFrontmatter.model_validate(
+            {
+                "title": "Test",
+                "status": "Draft",
+                "priority": "P1",
+                "created": date(2026, 1, 1),
+                "updated": date(2026, 1, 1),
+                "custom_field": "hello",
+            }
         )
         assert not hasattr(s, "custom_field")
 
@@ -105,11 +112,11 @@ class TestPlanFrontmatter:
 
     def test_missing_spec_ref_rejects(self) -> None:
         with pytest.raises(ValidationError):
-            PlanFrontmatter(title="Test", created=date(2026, 1, 1))
+            PlanFrontmatter.model_validate({"title": "Test", "created": date(2026, 1, 1)})
 
     def test_missing_title_rejects(self) -> None:
         with pytest.raises(ValidationError):
-            PlanFrontmatter(spec_ref="../spec.md", created=date(2026, 1, 1))
+            PlanFrontmatter.model_validate({"spec_ref": "../spec.md", "created": date(2026, 1, 1)})
 
 
 class TestImplementationFrontmatter:
@@ -121,11 +128,11 @@ class TestImplementationFrontmatter:
 
     def test_missing_feature_rejects(self) -> None:
         with pytest.raises(ValidationError):
-            ImplementationFrontmatter(title="Test")
+            ImplementationFrontmatter.model_validate({"title": "Test"})
 
     def test_missing_title_rejects(self) -> None:
         with pytest.raises(ValidationError):
-            ImplementationFrontmatter(feature="user-auth")
+            ImplementationFrontmatter.model_validate({"feature": "user-auth"})
 
 
 class TestStackFrontmatter:
@@ -137,7 +144,7 @@ class TestStackFrontmatter:
 
     def test_missing_updated_rejects(self) -> None:
         with pytest.raises(ValidationError):
-            StackFrontmatter(title="Stack")
+            StackFrontmatter.model_validate({"title": "Stack"})
 
 
 class TestGetSchema:

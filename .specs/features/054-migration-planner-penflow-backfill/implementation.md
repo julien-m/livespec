@@ -9,7 +9,7 @@ feature: "054-migration-planner-penflow-backfill"
 
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
-| FR-001 | `validator/migration_planner.py` | Module-level `@spec FR-001` | Implemented | 2026-06-01 |
+| FR-001 | `validator/migration_planner.py` | Module-level `@spec FR-001` | Implemented | 2026-06-17 |
 | FR-002 | `validator/migration_planner.py` | `_parse_manifest()` `@spec FR-002` | Implemented | 2026-06-01 |
 | FR-003 | `validator/migration_planner.py` | `_pending_replacements()` `@spec FR-003` | Implemented | 2026-06-01 |
 | FR-004 | `validator/migration_planner.py` | `_pending_replacements()` `@spec FR-004` | Implemented | 2026-06-01 |

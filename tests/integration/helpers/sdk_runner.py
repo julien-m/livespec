@@ -56,7 +56,6 @@ async def run_livespec_command(
                     cwd=str(cwd),
                     allowed_tools=["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
                     permission_mode="bypassPermissions",
-                    allow_dangerously_skip_permissions=True,
                     max_turns=max_turns,
                     setting_sources=["project"],
                 ),
@@ -77,13 +76,13 @@ async def run_livespec_command(
 async def run_with_retry(
     fn: Callable[[], Awaitable[CommandResult]],
     max_attempts: int = 2,
-    retry_on: tuple[type, ...] = (TimeoutError,),
+    retry_on: tuple[type[BaseException], ...] = (TimeoutError,),
 ) -> CommandResult:
     """
     Retry only on infrastructure errors (network timeout),
     never on test assertion failures.
     """
-    last_error = None
+    last_error: BaseException | None = None
     for attempt in range(max_attempts):
         try:
             result = await fn()
@@ -95,4 +94,6 @@ async def run_with_retry(
             last_error = e
             if attempt < max_attempts - 1:
                 await asyncio.sleep(5 * (attempt + 1))
-    raise last_error
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError("retry exhausted without capturing an exception")

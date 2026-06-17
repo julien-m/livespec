@@ -276,9 +276,11 @@ def test_doctor_lifecycle_allows_linked_supersession_only(
     assert result.exit_code == 1
     report = _json_report(result.output)
     assert "supersession_missing" in _finding_codes(report)
+    findings = report["findings"]
+    assert isinstance(findings, list)
     lifecycle_findings = [
         finding
-        for finding in report["findings"]
+        for finding in findings
         if isinstance(finding, dict) and finding.get("code") == "supersession_missing"
     ]
     assert [finding.get("feature") for finding in lifecycle_findings] == ["001-old"]

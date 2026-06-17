@@ -10,6 +10,14 @@
 
 # Changelog - Feature 046 - Visual Implementation Gate
 
+## 2026-06-17 — [Test]: Add mypy-clean visual gate typing
+
+- **Type:** Test
+- **Spec modified:** No
+- **Code modified:** [validator/visual_gate.py](../../../validator/visual_gate.py), [validator/cli_commands/visual_gate_cmd.py](../../../validator/cli_commands/visual_gate_cmd.py), [tests/test_visual_gate.py](../../../tests/test_visual_gate.py), [tests/test_visual_gate_receipts.py](../../../tests/test_visual_gate_receipts.py), [pyproject.toml](../../../pyproject.toml), [.github/workflows/ci.yml](../../../.github/workflows/ci.yml)
+- **AC impacted:** AC-005, AC-006
+- **Author:** codex
+
 ## 2026-06-17 — [Test]: Measure and expand visual_gate branch coverage
 
 - **Type:** Test
