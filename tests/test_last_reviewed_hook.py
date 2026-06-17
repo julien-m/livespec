@@ -93,7 +93,7 @@ def test_pre_commit_hook_blocks_stale_last_reviewed(tmp_path: Path):
 
     result = _run_hook(repo)
     assert result.returncode != 0
-    assert "Relis `.agent-sync/skills/spec-plan/expectations.md`" in result.stderr
+    assert "Re-read `.agent-sync/skills/spec-plan/expectations.md`" in result.stderr
     assert "bump `last_reviewed`" in result.stderr
     assert "recommit." in result.stderr
 

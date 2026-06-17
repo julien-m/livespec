@@ -29,7 +29,9 @@ import sys
 from datetime import date
 from pathlib import Path
 
-RECOVERY_FMT = "Relis `.agent-sync/skills/{name}/expectations.md`, bump `last_reviewed`, recommit."
+RECOVERY_FMT = (
+    "Re-read `.agent-sync/skills/{name}/expectations.md`, bump `last_reviewed`, recommit."
+)
 
 
 def _staged_paths() -> list[str]:

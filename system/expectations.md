@@ -128,7 +128,7 @@ and the command is blocked — it does **NOT** silently fall back to the builtin
    exact recovery message:
 
    ```
-   Relis `.agent-sync/skills/<X>/expectations.md`, bump `last_reviewed`, recommit.
+   Re-read `.agent-sync/skills/<X>/expectations.md`, bump `last_reviewed`, recommit.
    ```
 
 3. Exit 0 if all checks pass.

@@ -26,7 +26,7 @@ jobs:
           --cov=validator.visual_gate
           --cov-branch
           --cov-report=term-missing
-          --cov-fail-under=78
+          --cov-fail-under=94
 
   integration-3a:
     name: "Integration 3A — Static invariants (no LLM)"
