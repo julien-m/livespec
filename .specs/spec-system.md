@@ -331,7 +331,7 @@ Required version: v{repo}
 Run /spec-migrate or livespec migrate before running this command.
 ```
 
-This check is **blocking** — the command exits non-zero and does not continue. `/spec-init`, `/spec-migrate`, and help output remain available so the user can recover.
+This check is **blocking** — the command exits non-zero and does not continue. `/spec-init`, `/spec-migrate`, help output, and internal `livespec goal` control-plane calls remain available so the user can recover and so `/spec-migrate` can render its Step 0 goal before applying migrations.
 
 ### Command discovery
 

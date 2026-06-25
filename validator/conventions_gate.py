@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import fnmatch
+import os
 import re
 import shlex
 import subprocess
@@ -18,7 +19,13 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
 
-from .conventions_gates import ConventionsGates, GateCommand, gates_path, load_conventions_gates
+from .conventions_gates import (
+    DEFAULT_SOURCE_EXCLUSIONS,
+    ConventionsGates,
+    GateCommand,
+    gates_path,
+    load_conventions_gates,
+)
 from .conventions_lang import adapter_for_path
 from .conventions_lang.base import SourceAnalysis
 from .conventions_linter import parse_linter_json
@@ -27,6 +34,7 @@ from .visual_evidence import sha256_file
 GateSeverityInput = Literal["warning", "error"]
 SourceKind = Literal["builtin", "linter", "system"]
 _BLOCKING_VIOLATION_RULES = frozenset({"linter_timeout", "file_encoding_error", "file_read_error"})
+_SOURCE_SUFFIXES = frozenset({".py", ".ts", ".tsx", ".js", ".jsx", ".swift", ".css"})
 
 
 class GateSeverity(StrEnum):
@@ -225,16 +233,51 @@ def _collect_violations(project_root: Path, gates: ConventionsGates) -> list[Gat
 
 
 def _source_files(project_root: Path, gates: ConventionsGates) -> list[Path]:
-    suffixes = {".py", ".ts", ".tsx", ".js", ".jsx", ".swift", ".css"}
     files: list[Path] = []
-    for path in sorted(project_root.rglob("*")):
-        if not path.is_file() or path.suffix.lower() not in suffixes:
-            continue
-        rel = path.relative_to(project_root).as_posix()
-        if any(fnmatch.fnmatch(rel, pattern) for pattern in gates.exclusions):
-            continue
-        files.append(path)
+    exclusions = _effective_exclusions(gates)
+    for root, dirnames, filenames in os.walk(project_root):
+        root_path = Path(root)
+        dirnames[:] = sorted(
+            dirname
+            for dirname in dirnames
+            if not _is_excluded_path((root_path / dirname).relative_to(project_root), exclusions)
+        )
+        for filename in sorted(filenames):
+            path = root_path / filename
+            if path.suffix.lower() not in _SOURCE_SUFFIXES:
+                continue
+            if _is_excluded_path(path.relative_to(project_root), exclusions):
+                continue
+            files.append(path)
     return files
+
+
+def _effective_exclusions(gates: ConventionsGates) -> tuple[str, ...]:
+    return (*DEFAULT_SOURCE_EXCLUSIONS, *gates.exclusions)
+
+
+def _is_excluded_path(path: Path | str, exclusions: tuple[str, ...]) -> bool:
+    rel = path.as_posix() if isinstance(path, Path) else path
+    return any(_matches_exclusion(rel, pattern) for pattern in exclusions)
+
+
+def _project_relative_path(project_root: Path, path: str) -> str:
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        return candidate.as_posix()
+    try:
+        return candidate.resolve().relative_to(project_root.resolve()).as_posix()
+    except ValueError:
+        return candidate.as_posix()
+
+
+def _matches_exclusion(rel: str, pattern: str) -> bool:
+    if fnmatch.fnmatch(rel, pattern):
+        return True
+    if pattern.endswith("/**"):
+        base_pattern = pattern[:-3]
+        return fnmatch.fnmatch(rel, base_pattern) or fnmatch.fnmatch(rel, f"{base_pattern}/*")
+    return False
 
 
 def _file_length_violations(rel: str, text: str, gates: ConventionsGates) -> list[GateViolation]:
@@ -378,6 +421,7 @@ def _import_rule_violations(
 
 def _linter_violations(project_root: Path, gates: ConventionsGates) -> list[GateViolation]:
     violations: list[GateViolation] = []
+    exclusions = _effective_exclusions(gates)
     for command in gates.commands.lint:
         try:
             completed = subprocess.run(
@@ -399,6 +443,7 @@ def _linter_violations(project_root: Path, gates: ConventionsGates) -> list[Gate
         violations.extend(
             _violation(item.rule_id, item.path, item.line, item.severity, item.message, "linter")
             for item in parsed
+            if not _is_excluded_path(_project_relative_path(project_root, item.path), exclusions)
         )
         if completed.returncode == 1 and not parsed:
             violations.append(

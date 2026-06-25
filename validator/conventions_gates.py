@@ -14,6 +14,23 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from .visual_evidence import sha256_file
 
 GATES_RELATIVE_PATH = Path(".specs/conventions-gates.yaml")
+DEFAULT_SOURCE_EXCLUSIONS = (
+    ".specs/**",
+    ".git/**",
+    ".mimocode/**",
+    ".mypy_cache/**",
+    ".pytest_cache/**",
+    ".ruff_cache/**",
+    ".venv/**",
+    "build/**",
+    "coverage/**",
+    "dist/**",
+    "node_modules/**",
+    "playwright-report/**",
+    "**/__pycache__/**",
+    "**/Generated/**",
+    "**/node_modules/**",
+)
 
 
 class GatesBaseModel(BaseModel):
@@ -113,7 +130,7 @@ class ConventionsGates(GatesBaseModel):
     commands: CommandGroups = Field(default_factory=CommandGroups)
     builtin: BuiltinRules = Field(default_factory=BuiltinRules)
     coverage: dict[str, str] = Field(default_factory=dict)
-    exclusions: list[str] = Field(default_factory=lambda: [".specs/**"])
+    exclusions: list[str] = Field(default_factory=lambda: list(DEFAULT_SOURCE_EXCLUSIONS))
     scope: Literal["repo"] = "repo"
 
 
@@ -190,14 +207,7 @@ def _build_default_gates(project_root: Path, constitution: Path, stack: Path) ->
             file_header={"swift": r"^//\n//  [^\n]+\.swift", "python": None},
         ),
         coverage=coverage,
-        exclusions=[
-            ".specs/**",
-            ".git/**",
-            ".venv/**",
-            ".ruff_cache/**",
-            "**/__pycache__/**",
-            "**/Generated/**",
-        ],
+        exclusions=list(DEFAULT_SOURCE_EXCLUSIONS),
         scope="repo",
     )
 

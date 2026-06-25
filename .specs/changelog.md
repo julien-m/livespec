@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-06-25 — [Feature 061 Fix] Conventions scanner now excludes generated dependency workspaces, including `node_modules/**`, `.mimocode/**`, caches, build outputs, and matching linter-reported paths.
+
+## 2026-06-25 — [Feature 052 Fix] Stale-project migration recovery now allows internal `livespec goal render spec-migrate --save`, unblocking `/spec-migrate` Step 0 while keeping normal commands migration-gated.
+
 ## 2026-06-25 — [Feature 067] Check: clean after structural artifact fixes; 6/6 FR and 7/7 AC verified
 
 ## 2026-06-25 — [Feature 067 Fix] Closed structural artifact gaps: plan spec_ref, Mermaid block, progress Step table

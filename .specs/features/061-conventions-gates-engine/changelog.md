@@ -1,5 +1,13 @@
 # Changelog - 061-conventions-gates-engine
 
+## 2026-06-25 — [Bugfix]: Exclude generated dependency workspaces from conventions scanning
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/conventions_gate.py, validator/conventions_gates.py, tests/test_conventions_verify.py, .specs/conventions-gates.yaml
+- **AC impacted:** AC-003, AC-005, AC-016
+- **Author:** Codex
+
 ## 2026-06-12 — [Refactor]: Remove delegate_to from schema v1
 
 - **Type:** Refactor

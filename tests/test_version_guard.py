@@ -162,6 +162,44 @@ def test_cli_allows_migrate_on_stale_project(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.output
 
 
+def test_cli_allows_goal_render_for_spec_migrate_on_stale_project(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    project = _write_project(tmp_path / "project", 20)
+    monkeypatch.chdir(project)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["livespec", "goal", "render", "spec-migrate", "--flags", "", "--save"],
+    )
+
+    result = CliRunner().invoke(
+        app,
+        ["goal", "render", "spec-migrate", "--flags", "", "--save"],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "contract-file:" in result.output
+    assert "state-file:" in result.output
+
+
+def test_cli_blocks_other_goal_render_on_stale_project(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    project = _write_project(tmp_path / "project", 20)
+    monkeypatch.chdir(project)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["livespec", "goal", "render", "status", "--save"],
+    )
+
+    result = CliRunner().invoke(app, ["goal", "render", "status", "--save"])
+
+    assert result.exit_code == 1
+    assert "LiveSpec project is not migrated" in result.output
+
+
 def test_cli_help_is_not_blocked_for_stale_project(tmp_path: Path) -> None:
     project = _write_project(tmp_path / "project", 10)
 

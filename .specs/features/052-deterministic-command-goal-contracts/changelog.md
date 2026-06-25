@@ -1,5 +1,16 @@
 # Changelog — Feature 052 — Deterministic Command Goal Contracts
 
+## 2026-06-25 — [Fix]: Allow goal render during stale-project migration recovery
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `validator/cli.py`
+- **Tests modified:** `tests/test_version_guard.py`
+- **Docs modified:** `.specs/spec-system.md`, `README.md`, `.specs/README.md`, `.specs/changelog.md`, `implementation.md`, `progress.md`
+- **Gaps closed:** FR-008 / AC-005 — `livespec goal render spec-migrate --flags "" --save` now runs on stale projects so `/spec-migrate` can pass Step 0 before applying migrations
+- **Remaining:** None
+- **Author:** spec-fix
+
 ## 2026-05-23 — [Fix]: Visual proof now requires deterministic oracle receipts
 
 - **Type:** Bugfix

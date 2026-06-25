@@ -178,6 +178,93 @@ def test_builtin_always_runs_regardless_of_declared_linter(tmp_path: Path) -> No
     assert any(v.rule_id == "builtin.max_file_lines" for v in result.violations)
 
 
+def test_verify_ignores_generated_dependency_workspaces(tmp_path: Path) -> None:
+    project_root = _write_project(tmp_path)
+    generated_files = [
+        project_root / "node_modules" / "pkg" / "bad.ts",
+        project_root / ".mimocode" / "plugin.ts",
+        project_root / ".mimocode" / "node_modules" / "pkg" / "bad.ts",
+    ]
+    for path in generated_files:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            "export function undocumented() {\n  // eslint-disable-next-line\n  return 1;\n}\n",
+            encoding="utf-8",
+        )
+
+    result = verify_conventions(project_root)
+
+    paths = {violation.path for violation in result.violations}
+    assert not any(path.startswith("node_modules/") for path in paths)
+    assert not any(path.startswith(".mimocode/") for path in paths)
+
+
+def test_verify_applies_exclusions_to_linter_output(tmp_path: Path) -> None:
+    project_root = _write_project(tmp_path)
+    gates = project_root / ".specs" / "conventions-gates.yaml"
+    gates.write_text(
+        gates.read_text(encoding="utf-8").replace(
+            'exclusions: [".specs/**"]',
+            'exclusions: [".specs/**", "ignored/**"]',
+        ),
+        encoding="utf-8",
+    )
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    tool = bin_dir / "lint-json"
+    absolute_ignored = (project_root / "ignored" / "absolute.py").as_posix()
+    payload = json.dumps(
+        [
+            {
+                "filename": "ignored/bad.py",
+                "location": {"row": 1},
+                "code": "X001",
+                "message": "ignored",
+            },
+            {
+                "filename": absolute_ignored,
+                "location": {"row": 1},
+                "code": "X004",
+                "message": "absolute ignored",
+            },
+            {
+                "filename": "node_modules/pkg/bad.py",
+                "location": {"row": 1},
+                "code": "X002",
+                "message": "dependency",
+            },
+            {
+                "filename": "src/ok.py",
+                "location": {"row": 4},
+                "code": "X003",
+                "message": "kept",
+            },
+        ]
+    )
+    tool.write_text(
+        f"#!/usr/bin/env sh\ncat <<'JSON'\n{payload}\nJSON\nexit 1\n",
+        encoding="utf-8",
+    )
+    tool.chmod(tool.stat().st_mode | stat.S_IXUSR)
+    gates.write_text(
+        gates.read_text(encoding="utf-8").replace(
+            "lint: []",
+            f'lint:\n    - id: lint-json\n      run: "{tool}"',
+        ),
+        encoding="utf-8",
+    )
+
+    result = verify_conventions(project_root)
+
+    linter_paths = {
+        violation.path for violation in result.violations if violation.source == "linter"
+    }
+    assert "src/ok.py" in linter_paths
+    assert "ignored/bad.py" not in linter_paths
+    assert absolute_ignored not in linter_paths
+    assert "node_modules/pkg/bad.py" not in linter_paths
+
+
 def test_stale_constitution_hash_blocks_verification(tmp_path: Path) -> None:
     project_root = _write_project(tmp_path)
     (project_root / ".specs" / "constitution.md").write_text(

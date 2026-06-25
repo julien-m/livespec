@@ -48,8 +48,17 @@ coverage:
 exclusions:
 - .specs/**
 - .git/**
+- .mimocode/**
+- .mypy_cache/**
+- .pytest_cache/**
 - .venv/**
 - .ruff_cache/**
+- build/**
+- coverage/**
+- dist/**
+- node_modules/**
+- playwright-report/**
 - '**/__pycache__/**'
 - '**/Generated/**'
+- '**/node_modules/**'
 scope: repo

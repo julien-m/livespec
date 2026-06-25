@@ -4,7 +4,7 @@ spec_ref: spec.md
 feature: 061-conventions-gates-engine
 status: Implemented
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-06-25
 ---
 
 # Implementation — Conventions Gates Engine (061)
@@ -17,12 +17,12 @@ updated: 2026-06-12
 
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
-| [FR-001](spec.md#fr-001) Gates model and generator | validator/conventions_gates.py, .specs/conventions-gates.yaml | `# @spec(FR-001)` | ✅ Implemented | 2026-06-12 |
-| [FR-002](spec.md#fr-002) Deterministic verify engine | validator/conventions_gate.py | `# @spec(FR-002)` | ✅ Implemented | 2026-06-12 |
+| [FR-001](spec.md#fr-001) Gates model and generator | validator/conventions_gates.py, .specs/conventions-gates.yaml | `# @spec(FR-001)` | ✅ Implemented | 2026-06-25 |
+| [FR-002](spec.md#fr-002) Deterministic verify engine | validator/conventions_gate.py | `# @spec(FR-002)` | ✅ Implemented | 2026-06-25 |
 | [FR-003](spec.md#fr-003) Adapter registry | validator/conventions_lang/*.py | `# @spec(FR-003)` | ✅ Implemented | 2026-06-12 |
 | [FR-004](spec.md#fr-004) Receipt and debt report | validator/conventions_receipt.py, validator/conventions_report.py | `# @spec(FR-004)` | ✅ Implemented | 2026-06-12 |
 | [FR-005](spec.md#fr-005) CLI commands | validator/cli_commands/utility_cmd.py | `# @spec FR-001`, `# @spec FR-002`, `# @spec FR-005` | ✅ Implemented | 2026-06-12 |
-| [FR-006](spec.md#fr-006) Tests | tests/test_conventions_gates_schema.py, tests/test_conventions_verify.py, tests/test_conventions_receipt.py | `# @spec(FR-001)`, `# @spec(FR-002)`, `# @spec(FR-003)`, `# @spec(FR-004)`, `# @spec(FR-005)` | ✅ Implemented | 2026-06-12 |
+| [FR-006](spec.md#fr-006) Tests | tests/test_conventions_gates_schema.py, tests/test_conventions_verify.py, tests/test_conventions_receipt.py | `# @spec(FR-001)`, `# @spec(FR-002)`, `# @spec(FR-003)`, `# @spec(FR-004)`, `# @spec(FR-005)` | ✅ Implemented | 2026-06-25 |
 | [FR-007](spec.md#fr-007) Critic hardening and v1 anti-delegation schema | validator/conventions_gates.py, validator/conventions_linter.py, validator/conventions_gate.py, validator/conventions_receipt.py, .gitignore | `# @spec(FR-001)`, `# @spec(FR-002)`, `# @spec(FR-004)` | ✅ Implemented | 2026-06-12 |
 
 ## Acceptance Criteria Mapping
@@ -46,6 +46,7 @@ updated: 2026-06-12
 | [AC-015](spec.md#ac-015) | spec.md | ✅ |
 | [AC-016](spec.md#ac-016) | tests/test_conventions_verify.py::test_builtin_always_runs_regardless_of_declared_linter | ✅ |
 | [AC-017](spec.md#ac-017) | tests/test_conventions_verify.py::test_unreadable_source_file_blocks_without_traceback | ✅ |
+| Dependency/tool workspace exclusions | tests/test_conventions_verify.py::test_verify_ignores_generated_dependency_workspaces, tests/test_conventions_verify.py::test_verify_applies_exclusions_to_linter_output | ✅ |
 
 ## Files Created/Modified
 
@@ -67,6 +68,7 @@ updated: 2026-06-12
 
 **Modified:**
 - `validator/cli_commands/utility_cmd.py`
+- `.specs/conventions-gates.yaml`
 
 ## Visual Baselines
 

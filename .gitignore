@@ -161,6 +161,9 @@ Thumbs.db
 # Materialized conventions
 .conventions/
 
+# Local Mimo Code workspace
+.mimocode/
+
 # LiveSpec commit context bridge (auto-generated at commit time)
 .specs/hooks/.commit-context.json
 

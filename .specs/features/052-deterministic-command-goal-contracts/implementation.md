@@ -16,7 +16,7 @@ feature: "052-deterministic-command-goal-contracts"
 | FR-005 | `validator/goal_contracts.py` | Module-level `@spec FR-005` | ✅ Implemented | 2026-05-21 |
 | FR-006 | `validator/goal_contracts.py` | Module-level `@spec FR-006` | ✅ Implemented | 2026-05-21 |
 | FR-007 | `validator/goal_contracts.py` | Module-level `@spec FR-007` | ✅ Implemented | 2026-05-21 |
-| FR-008 | `validator/cli_commands/goal_cmd.py`, `validator/cli.py` | CLI module `@spec FR-008` | ✅ Implemented | 2026-05-23 |
+| FR-008 | `validator/cli_commands/goal_cmd.py`, `validator/cli.py` | CLI module `@spec FR-008`; `validator/cli.py` migration-guard allowlist keeps `livespec goal render` available for `spec-migrate` Step 0 on stale projects | ✅ Implemented | 2026-06-25 |
 | FR-009 | `validator/cli_commands/goal_cmd.py`, `validator/goal_contracts.py` | CLI module `@spec FR-009` | ✅ Implemented | 2026-05-23 |
 | FR-010 | `validator/cli_commands/goal_cmd.py`, `validator/goal_contracts.py` | CLI module `@spec FR-010` | ✅ Implemented | 2026-05-23 |
 | FR-011 | `system/anti-drift-block.md`, `system/expectations.md`, all `.agent-sync/skills/spec-*/SKILL.md` | `@spec FR-011` in system docs + explicit **Read** directive in every SKILL.md | ✅ Implemented | 2026-05-23 |
@@ -37,7 +37,7 @@ feature: "052-deterministic-command-goal-contracts"
 | AC-002 | `tests/test_goal_contracts.py::test_compile_command_goal_is_reproducible_for_same_inputs` | ✅ Implemented |
 | AC-003 | `tests/test_goal_contracts.py::test_compile_command_goal_is_reproducible_for_same_inputs` | ✅ Implemented |
 | AC-004 | `tests/test_goal_contracts.py::test_normalize_goal_flags_is_order_independent_and_preserves_values` | ✅ Implemented |
-| AC-005 | `tests/test_goal_contracts.py::{test_render_goal_contract_and_state_replace_markdown_task_file,test_goal_render_save_writes_contract_and_state_files}` | ✅ Implemented |
+| AC-005 | `tests/test_goal_contracts.py::{test_render_goal_contract_and_state_replace_markdown_task_file,test_goal_render_save_writes_contract_and_state_files}`, `tests/test_version_guard.py::test_cli_allows_goal_render_for_spec_migrate_on_stale_project` | ✅ Implemented |
 | AC-006 | `tests/test_goal_contracts.py::{test_goal_prove_rejects_missing_visual_design_fidelity_evidence,test_goal_prove_accepts_visual_design_fidelity_receipt}` | ✅ Implemented |
 | AC-007 | `tests/test_goal_contracts.py::test_anti_drift_block_documents_shared_goal_protocol` | ✅ Implemented |
 | AC-008 | `tests/test_goal_contracts.py` | ✅ Implemented |
@@ -60,8 +60,9 @@ feature: "052-deterministic-command-goal-contracts"
 | `validator/visual_gate.py` | Visual gate receipt certification and receipt-required validation for VISUAL features |
 | `validator/cli_commands/visual_gate_cmd.py` | `livespec visual-gate certify` and receipt-bound `validate --feature --command --target --receipt` CLI |
 | `validator/cli_commands/goal_cmd.py` | `livespec goal render/prove/status` CLI |
-| `validator/cli.py` | Registers the `goal` subcommand |
+| `validator/cli.py` | Registers the `goal` subcommand and exempts `goal` control-plane calls from stale-project blocking |
 | `tests/test_goal_contracts.py` | Unit tests for canonical goal compilation |
+| `tests/test_version_guard.py` | Regression coverage for stale-project migration guard and `goal render spec-migrate` recovery |
 | `tests/test_visual_evidence.py` | Unit tests for visual receipts, PNG hash/diff verification, and tamper rejection |
 | `tests/test_visual_gate_receipts.py` | CLI and gate tests for `certify`, receipt-bound `validate --receipt`, and missing-receipt blocking |
 | `tests/test_command_audit_cli.py` | Command audit regression for missing internal subagent workdir guard |

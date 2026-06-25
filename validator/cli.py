@@ -49,6 +49,8 @@ app.add_typer(goal_app, name="goal")
 app.add_typer(hooks_app, name="hooks")
 app.add_typer(integrations_app, name="integrations")
 
+# @spec FR-008: `spec-migrate` must render its startup goal before stale
+# projects are migrated, but other goal commands stay behind the guard.
 _MIGRATION_GUARD_ALLOWLIST = {"init", "migrate"}
 
 
@@ -78,7 +80,11 @@ def _should_skip_migration_guard(args: list[str]) -> bool:
         return True
     if any(arg in {"--help", "-h"} for arg in args):
         return True
-    return args[0] in _MIGRATION_GUARD_ALLOWLIST
+    return args[0] in _MIGRATION_GUARD_ALLOWLIST or _is_spec_migrate_goal_render(args)
+
+
+def _is_spec_migrate_goal_render(args: list[str]) -> bool:
+    return args[:3] == ["goal", "render", "spec-migrate"] and "--save" in args
 
 
 def _find_specs_root(start: Path | None = None) -> Path:
