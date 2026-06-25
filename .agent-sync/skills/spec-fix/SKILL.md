@@ -255,6 +255,25 @@ For each gap, generate a targeted fix plan:
    - If theme.css exists: which CSS variables should be used instead of hardcoded values?
 5. Generate targeted correction steps (CSS property changes, component restructuring, prop adjustments)
 
+<!-- @spec FR-003: Fix validation PNG proof — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-003 -->
+For every validation PNG touched during visual reasoning — mockup PNG, current baseline PNG, newly recaptured runtime PNG, and any diff PNG — publish both proof channels before relying on it:
+
+```markdown
+![visual proof](/absolute/path/to/image.png)
+```
+
+```bash
+visual-preview url /absolute/path/to/image.png
+```
+
+Then print:
+
+```text
+Open for annotation: http://127.0.0.1:<port>/i/<id>
+```
+
+If `visual-preview` is unavailable, keep the Markdown image proof and print `Visual preview: unavailable - visual-preview CLI missing`; do not forge a URL. This preview proof is only for human inspection and annotation. Pixel fidelity still requires `visual_evidence_receipt_path`.
+
 Pixel diff alone identifies *that* something differs. LLM visual reasoning identifies *what* and *how to fix*. Both are required.
 
 The fix plan is displayed but NOT saved to disk (it is ephemeral — the gap report is the persistent record).
@@ -294,6 +313,7 @@ After all fixes are applied:
 
 1. **Run tests:** Execute the resolved test commands from `plan.md` or `testing/strategy.md`
 2. **Re-capture baselines:** For visual fixes, run Playwright to capture new screenshots
+   - Publish every recaptured runtime PNG with `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print `Visual preview: unavailable - visual-preview CLI missing`
 3. **Re-compare:**
    - Functional: verify `@spec` anchors exist, code compiles, tests pass
    - Visual regression: compare new baseline vs previous baseline (2% threshold)
@@ -470,6 +490,7 @@ Total: 6/8 gaps closed (75%)
 - [always] Read design screens index and theme files (theme.css, theme.md)
 - [visual] Read mockup PNGs from `.specs/design/screens/`
 - [visual] Read current baseline PNGs from `baselines/`
+- [visual] Publish mockup PNGs, current baseline PNGs, diff PNGs, and recaptured runtime PNGs via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print `Visual preview: unavailable - visual-preview CLI missing`
 - [always] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --repo . --full`; block if conventions remain missing outside a confirmed non-UI/no-stack project
 - [always] Build Conventions payload: always include `code`; include `design-tokens`, `design-components`, `design-views`, and `design-quality` for UI/visual fixes; add dataviz/realtime domains when signaled
 - [always] Read selected `ai-ressources/` convention files and attach them to fix planning/execution
@@ -499,6 +520,7 @@ Total: 6/8 gaps closed (75%)
 
 - [always] Run test suite from plan.md or testing/strategy.md
 - [visual] Re-capture Playwright screenshots after visual fixes
+- [visual] Publish newly recaptured runtime PNGs and any diff PNGs through Markdown proof plus Browser annotation URL, or `Visual preview: unavailable - visual-preview CLI missing`
 - [visual] Re-capture runtime PNGs into `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-fix --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path> --json` — refuse `done` while exit_code != 0
 - [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
 - [visual] If gate exit_code == 7 (prereqs missing): run `livespec visual-gate cleanup --feature <slug> --apply` (archive is default) + recreate baselines via runner + `livespec visual-gate promote` BEFORE touching code, then re-run gate
@@ -534,6 +556,7 @@ Total: 6/8 gaps closed (75%)
 - [ ] Gap report updated with fix results
 - [ ] If all gaps closed: README status updated
 - [ ] Remaining gaps (if any) clearly listed
+- [ ] For VISUAL features: every touched validation PNG (mockup, current baseline, recaptured runtime, diff) was published with absolute-path Markdown proof and either a Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing`
 - [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-fix` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit
 
 ---

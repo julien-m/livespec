@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-06-13
+last_reviewed: 2026-06-25
 ---
 
 # Expectations — /spec-test
@@ -76,6 +76,12 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 ## 6. Produced Artifacts
 
 - stdout marker: `Visual Gate Verdict: PASS | FAIL | BLOCKED` for `--visual` runs
+<!-- @spec FR-004: Proof docs — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-004 -->
+- stdout marker: `![visual proof](/absolute/path/to/image.png)` for every validation PNG
+- stdout marker: `visual-preview url /absolute/path/to/image.png`
+- stdout marker: `Open for annotation: http://127.0.0.1:<port>/i/<id>`
+- fallback marker: `Visual preview: unavailable - visual-preview CLI missing`
+- proof boundary: `visual_evidence_receipt_path` remains required for pixel fidelity; preview URLs are human-visible annotation proof only
 - stdout marker: `Design Alignment Verdict: PASS | FAIL | BLOCKED` for `--visual` runs when `ui.pen` is present or changed
 - stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED` for UI runs
   - `ABSENT`: no root `penflow/`

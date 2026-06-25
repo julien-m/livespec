@@ -564,6 +564,31 @@ For web UI features, `/spec-test` must create runtime evidence from the implemen
 
 Do not mark `/spec-test` successful for a UI feature until `penflow/actual-ui-tree.json`, screenshots, global design registry artifacts, `penflow/compare-report.json`, and `penflow/compare-report.md` exist, Penflow reports `PASS`, and the raw `penflow/compare-report.json` has `status: PASS` plus zero `issues`.
 
+<!-- @spec FR-001: Test visual proof rule — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-001 -->
+#### Visual Proof Publishing
+
+For every validation PNG created, approved, compared, or displayed by `/spec-test` (runtime capture, approved baseline, design diff, mockup PNG surfaced for approval), publish both proof channels before reporting visual success:
+
+1. Keep the image at its canonical absolute path; do not copy it into preview storage.
+2. Print the Markdown image line with the absolute path:
+   ```markdown
+   ![visual proof](/absolute/path/to/image.png)
+   ```
+3. Register the same absolute path for Browser preview:
+   ```bash
+   visual-preview url /absolute/path/to/image.png
+   ```
+4. Print the annotation entrypoint returned by the CLI:
+   ```text
+   Open for annotation: http://127.0.0.1:<port>/i/<id>
+   ```
+5. If `visual-preview` is unavailable, keep the Markdown image proof and print exactly:
+   ```text
+   Visual preview: unavailable - visual-preview CLI missing
+   ```
+
+Do not forge a preview URL when the CLI is missing. This presentation/annotation proof never replaces `visual_evidence_receipt_path`; `goal prove` still accepts only the `livespec visual-gate` receipt for pixel fidelity.
+
 **Execution:**
 
 ```bash
@@ -1287,6 +1312,7 @@ Run with --confirm to generate tests.
 - [penflow] 4.5.P Registry check: verify .specs/design/screens/<slug>/, .specs/design/baselines/<slug>/, .specs/design/screens/index.md, .specs/design/changelog.md all exist
 - [penflow] 4.5.P Mockup Factory proof: verify .mockup-validation/audit-report.md, .mockup-validation/<slug>/checklist.md, .mockup-validation/<slug>/manifest.json, .mockup-validation/<slug>/drift-report.json, .mockup-validation/visual-evidence/manifest.json (status must be PASS — warnings or skipped block approval), .mockup-validation/visual-evidence/visual-report.md, and visual evidence PNGs
 - [penflow] 4.5.P Web runtime: start app with project dev server; open in real browser at 1440x900; capture screenshots to .specs/features/<feature>/baselines/ then sync approved copies to .specs/design/baselines/<slug>/
+- [visual] Publish every validation PNG via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if the CLI is missing, print `Visual preview: unavailable - visual-preview CLI missing` and do not forge a URL
 - [penflow] 4.5.P Runtime tree: evaluate rendered DOM/accessibility surface in browser using Playwright; write penflow/actual-ui-tree.json preferring data-semantic-id → data-testid → ARIA role/name → visible text; every node must include id, role, bbox, children; do NOT copy expected-ui-tree.json or hand-write nodes
 - [penflow] 4.5.P If implementation lacks semantic markers: add data-semantic-id or data-testid attributes to app source, then rerun browser capture
 - [penflow] 4.5.P Penflow compare: run penflow validate-actual penflow/actual-ui-tree.json --schema --json; run penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json --out penflow/compare-report.json --markdown penflow/compare-report.md; run penflow review-report penflow/compare-report.json --out penflow/review-report.md; run penflow fix-report penflow/compare-report.json --out penflow/fix-report.md
@@ -1310,6 +1336,7 @@ Run with --confirm to generate tests.
 ### Phase 5 — Report
 
 - [always] Produce test report: AC Coverage table (AC / description / test file / result / source / notes) + Suite Results table (suite / command / result / duration) + Visual Baselines table if visual (screen / baseline / mockup diff / status) + Generation Summary (generated / passed / failed-impl / failed-compile) + overall summary
+- [visual] Include a Visual Proof section listing each absolute PNG path, its Markdown image line, its Browser annotation URL, or `Visual preview: unavailable - visual-preview CLI missing`
 - [always] Save report to .specs/features/NNN/checks/YYYY-MM-DD-test.md
 - [always] Update implementation.md AC Mapping table: add/update test file paths and status (Covered/Partial/Missing) for all tested AC — unless --no-update
 - [always] Add entry to feature changelog.md: date / type: Spec Update / code modified: list generated test files / coverage: N/M AC (X%) / N generated / report path
@@ -1334,6 +1361,7 @@ Run with --confirm to generate tests.
 - [ ] Feature `changelog.md` has test entry
 - [ ] Global `.specs/changelog.md` has summary entry
 - [ ] If multi-feature: consolidated report produced
+- [ ] For VISUAL features: every validation PNG was published with absolute-path Markdown proof and either a Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing`
 - [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-test` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit, runner outputs hors `.specs/design/screens/`
 
 ---

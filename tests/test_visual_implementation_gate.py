@@ -123,6 +123,33 @@ def test_visual_command_skills_require_oracle_receipts() -> None:
         assert "design-alignment is semantic-only" in body
 
 
+# @spec FR-006: Visual proof publishing contracts
+#   — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-006
+def test_visual_workflows_publish_terminal_and_browser_proofs() -> None:
+    """Visual workflows expose PNG proof while keeping receipts as oracle."""
+    required_markers = (
+        "![visual proof](/absolute/path/to/image.png)",
+        "visual-preview url /absolute/path/to/image.png",
+        "Open for annotation: http://127.0.0.1:<port>/i/<id>",
+        "Visual preview: unavailable - visual-preview CLI missing",
+        "visual_evidence_receipt_path",
+    )
+
+    for skill in ("spec-feature", "spec-test", "spec-fix"):
+        body = _read(f".agent-sync/skills/{skill}/SKILL.md")
+        for marker in required_markers:
+            assert marker in body
+
+    for expectation in (
+        "spec-feature/expectations.md",
+        "spec-test/expectations.md",
+        "spec-fix/expectations.md",
+    ):
+        body = _read(f".agent-sync/skills/{expectation}")
+        for marker in required_markers:
+            assert marker in body
+
+
 # ---------------------------------------------------------------------------
 # Broken-variant regression suite (visual-gate-fix cycle, Phase 4 step 1).
 # Each variant simulates one observable failure mode the gate must catch.

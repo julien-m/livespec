@@ -1,7 +1,7 @@
 ---
 command: spec-fix
 contract_version: "1.0"
-last_reviewed: 2026-06-13
+last_reviewed: 2026-06-25
 ---
 
 # Expectations — /spec-fix
@@ -54,7 +54,12 @@ Fix implementation gaps from /spec-check — functional and visual corrections.
 
 ## 6. Produced Artifacts
 
-- _(none)_
+<!-- @spec FR-004: Proof docs — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-004 -->
+- stdout marker: `![visual proof](/absolute/path/to/image.png)` for each touched validation PNG
+- stdout marker: `visual-preview url /absolute/path/to/image.png`
+- stdout marker: `Open for annotation: http://127.0.0.1:<port>/i/<id>`
+- fallback marker: `Visual preview: unavailable - visual-preview CLI missing`
+- proof boundary: `visual_evidence_receipt_path` remains required for pixel fidelity; preview URLs are human-visible annotation proof only
 
 ## 7. Exit Codes
 

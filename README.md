@@ -645,6 +645,9 @@ livespec visual-gate promote  --feature <slug> --target <t> --screen <s> --run-i
 
 Exit codes: `0` PASS · `6` FAIL (link copy, runtime under `.specs/design/screens/`, alignment FAIL) · `7` BLOCKED (mockup / baseline registry / compare report missing) · `8` cleanup drift.
 
+<!-- @spec FR-004: Proof docs — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-004 -->
+The visual-gate receipt is the pixel-fidelity oracle: `goal prove` accepts `{"visual_evidence_receipt_path":"<receipt-path>"}` only. Human-visible proof is separate: every validation PNG touched by `/spec-test`, `/spec-feature`, or `/spec-fix` must also print `![visual proof](/absolute/path/to/image.png)`, register `visual-preview url /absolute/path/to/image.png`, and report `Open for annotation: http://127.0.0.1:<port>/i/<id>`. If the CLI is missing, keep the Markdown image proof and print `Visual preview: unavailable - visual-preview CLI missing`; never forge a preview URL.
+
 Canonical layout (no duplicate physical copies):
 
 | Path | Role |

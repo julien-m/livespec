@@ -1,7 +1,7 @@
 ---
 command: spec-feature
 contract_version: "1.0"
-last_reviewed: 2026-06-13
+last_reviewed: 2026-06-25
 ---
 
 # Expectations — /spec-feature
@@ -80,6 +80,12 @@ Run the full feature pipeline: specify → plan → review → implement → tes
   note: "Global LiveSpec Design Registry runtime screenshot destination"
 - path: `.mockup-validation/visual-evidence/manifest.json`
   note: "Mockup Factory visual evidence; status must be PASS before any UI implementation code"
+<!-- @spec FR-004: Proof docs — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-004 -->
+- stdout marker: `![visual proof](/absolute/path/to/image.png)` for every validation PNG published by child visual workflows
+- stdout marker: `visual-preview url /absolute/path/to/image.png`
+- stdout marker: `Open for annotation: http://127.0.0.1:<port>/i/<id>`
+- fallback marker: `Visual preview: unavailable - visual-preview CLI missing`
+- proof boundary: `visual_evidence_receipt_path` remains required for pixel fidelity; preview URLs are human-visible annotation proof only
 - stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | FAIL | PASS`
   - `ABSENT`: feature is non-UI
   - `BLOCKED`: UI forward contract generation failed

@@ -237,12 +237,19 @@ SUMMARY: 2-3 sentences of what was implemented
 
 ### Test agent schema
 
+<!-- @spec FR-002: Feature supervisor proof gate — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-002 -->
+
 ```
 PHASE_RESULT: OK | BLOCKED
 PHASE: test
 FEATURE: NNN-feature-name
 AC_COVERAGE: N/total ACs covered
 TESTS: N passed, N failed
+VISUAL_RECEIPT: <visual_evidence_receipt_path or none>
+VISUAL_PROOFS:
+  - path: /absolute/path/to/image.png
+    markdown: ![visual proof](/absolute/path/to/image.png)
+    preview: http://127.0.0.1:<port>/i/<id> OR Visual preview: unavailable - visual-preview CLI missing
 RUN_ARTIFACT: .specs/.runs/spec-test-<ISO-fs>-<hash8>.json
 BLOCKED_REASON: one line (only if BLOCKED)
 SUMMARY: 2-3 sentences of test results
@@ -756,6 +763,13 @@ This ensures all tools and credentials are available before the autonomous imple
    This command audits AC coverage, generates missing tests, runs the full test suite,
    and captures visual baselines if skipped during implement.
 
+   For visual features, publish every captured, approved, compared, or displayed
+   validation PNG through Visual Proof Publishing: `![visual proof](/absolute/path/to/image.png)`,
+   `visual-preview url /absolute/path/to/image.png`, and
+   `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print
+   `Visual preview: unavailable - visual-preview CLI missing`. Include VISUAL_PROOFS
+   and VISUAL_RECEIPT in PHASE_RESULT.
+
    Capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture
    ($TMPDIR/livespec-goals/transcripts/spec-test-<hash8>.out/.err) and pass them to
    `livespec goal archive --stdout-file/--stderr-file`. Set RUN_ARTIFACT to the exact
@@ -775,6 +789,7 @@ This ensures all tools and credentials are available before the autonomous imple
 4. **Phase 3.5 Runtime Evidence Gate** — for UI features with root `penflow/`, the Test agent must prove real rendered runtime fidelity before it may emit success:
    - Open the implemented app in a real browser at `1440x900`.
    - Capture screenshots from that browser session.
+   - Publish every runtime screenshot and validation PNG via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if the CLI is missing, print `Visual preview: unavailable - visual-preview CLI missing` and do not forge a URL.
    - Sync every approved runtime screenshot to `.specs/design/baselines/<feature_slug>/` and keep the feature-local copy under `.specs/features/<feature_slug>/baselines/`.
    - Require the Global LiveSpec Design Registry paths `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md` before allowing Phase 3.5 success.
    - Emit `penflow/actual-ui-tree.json` from the visible DOM/runtime accessibility surface. Do not copy or derive it from `penflow/expected-ui-tree.json`.
@@ -793,6 +808,7 @@ This ensures all tools and credentials are available before the autonomous imple
 
 5. Receive PHASE_RESULT from the Test agent.
    - If `PHASE_RESULT: OK` → run the § Supervisor Verify Phase (`livespec verify-output spec-test --run <RUN_ARTIFACT> --json`, cross-check matrix). On disagreement → canonical BLOCKED, `pipeline update --status blocked`, stop.
+   - For visual features, block success unless the Test PHASE_RESULT includes VISUAL_PROOFS entries with absolute-path Markdown, Browser annotation URLs or `Visual preview: unavailable - visual-preview CLI missing`, plus VISUAL_RECEIPT / `visual_evidence_receipt_path`.
 
 6. If `PHASE_RESULT: BLOCKED` (❌ AC coverage failures):
    - Interactive mode: report failures, no commit
@@ -1069,6 +1085,7 @@ If any phase fails:
 - [always] Run `livespec pipeline update --phase test --status in_progress`
 - [always] Spawn Test agent with `--auto --update` instructions
 - [visual] Open app in browser at 1440x900 and capture runtime screenshots
+- [visual] Publish runtime screenshots and validation PNGs via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print `Visual preview: unavailable - visual-preview CLI missing`
 - [visual] Sync approved screenshots to `.specs/design/baselines/<slug>/`
 - [penflow] Emit `penflow/actual-ui-tree.json` from live DOM/accessibility surface
 - [penflow] Run `penflow validate-actual` on actual UI tree
@@ -1082,6 +1099,7 @@ If any phase fails:
 ### Phase 3.6 — Visual Gate (non-skippable for VISUAL features)
 
 - [visual] Require the child `/spec-test` receipt or capture a fresh feature-level run: `livespec visual-gate certify --feature <slug> --command spec-feature --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path> --json`
+- [visual] Require child `/spec-test` PHASE_RESULT visual proof Markdown, Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing`, and `visual_evidence_receipt_path` before reporting UI success
 - [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
 - [visual] Exit 0 → autoriser Phase 4 ; exit 6 ou 7 → BLOQUER la finalisation et `--auto` ; consigner `link_violations`, `runtime_in_design_screens_violations`, `missing_artifacts`
 - [visual] Nested skills (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-fix`) tournent en sub-agents Task tool indépendants — chacun avec son goal — pour respecter la règle single-goal du parent `/spec-feature`

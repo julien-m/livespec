@@ -3,9 +3,17 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-17
+> Last updated: 2026-06-25
 
 ---
+
+## 2026-06-25 — [Feature 067] Check: clean after structural artifact fixes; 6/6 FR and 7/7 AC verified
+
+## 2026-06-25 — [Feature 067 Fix] Closed structural artifact gaps: plan spec_ref, Mermaid block, progress Step table
+
+## 2026-06-25 — [Feature 067] Check: 100% FR/AC verified; 3 structural artifact gaps in plan/progress
+
+## 2026-06-25 — [Feature 067] Implemented: Visual Preview Proof Publishing — Markdown proof, Browser annotation URL, visual-preview fallback, receipt boundary
 
 ## 2026-06-17 — [Quality Gate] Make `mypy .` pass and add it to CI
 
