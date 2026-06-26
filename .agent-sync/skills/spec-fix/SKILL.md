@@ -7,6 +7,10 @@ description: LiveSpec slash command /spec-fix
 <!-- @spec(FR-002) -->
 
 
+<!-- @spec(FR-003) -->
+<!-- @spec(FR-005) -->
+<!-- @spec(FR-007) -->
+
 # /spec-fix
 
 ---

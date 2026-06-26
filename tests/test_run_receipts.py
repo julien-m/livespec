@@ -1,3 +1,5 @@
+# @spec(AC-001)
+
 """Tests for RunArtifact receipt re-verification helpers."""
 
 from __future__ import annotations

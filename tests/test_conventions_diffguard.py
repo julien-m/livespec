@@ -1,3 +1,7 @@
+# @spec(AC-013)
+# @spec(AC-014)
+# @spec(AC-015)
+
 """Tests for conventions supervisor locks: diff guard, hash guard, fresh run."""
 
 from __future__ import annotations

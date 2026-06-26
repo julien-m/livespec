@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-26 — [Doctor Fix] Cleared all repo-level `livespec doctor` INFO traceability findings by adding missing source `@spec(...)` anchors.
+
 ## 2026-06-26 — [Feature 068] Check: spec-check PASS; tree validation, command audit, doctor, static tests, and Ruff checks green for evidence-first retry contract
 
 ## 2026-06-26 — [Feature 068] Implemented: Evidence-First Retry Contract — retry_hypothesis, retry_evidence, retry_result for failed commands and terminal interactions

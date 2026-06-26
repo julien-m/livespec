@@ -8,6 +8,10 @@ description: Migrated Claude command /spec-init
 <!-- @spec(FR-012) -->
 
 
+<!-- @spec(FR-001) -->
+<!-- @spec(FR-002) -->
+<!-- @spec(FR-005) -->
+
 # /spec-init
 
 ---

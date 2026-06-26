@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# @spec(FR-001)
+# @spec(FR-002)
+
 # Migration v22 wrapper: scaffold linter config only when conventions gates are
 # present and can provide the managed limits.
 

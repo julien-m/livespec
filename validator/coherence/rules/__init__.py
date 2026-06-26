@@ -1,3 +1,5 @@
+# @spec(FR-009)
+
 """Registry of all coherence validation rules."""
 
 from __future__ import annotations

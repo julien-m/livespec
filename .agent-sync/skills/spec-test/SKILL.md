@@ -29,6 +29,8 @@ description: Migrated Claude command /spec-test
 <!-- @spec(FR-041) -->
 
 
+<!-- @spec(FR-001) -->
+
 # /spec-test
 
 ---

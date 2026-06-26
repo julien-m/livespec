@@ -1,3 +1,7 @@
+# @spec(FR-002)
+# @spec(FR-003)
+# @spec(FR-005)
+
 # LiveSpec traceability anchors
 # @spec(FR-001)
 # @spec(FR-009)

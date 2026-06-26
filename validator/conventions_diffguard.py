@@ -1,3 +1,5 @@
+# @spec(FR-010)
+
 """Supervisor locks for conventions gate files."""
 
 from __future__ import annotations

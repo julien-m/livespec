@@ -1,3 +1,6 @@
+# @spec(AC-005)
+# @spec(AC-014)
+
 """Tests for the blocking LiveSpec migration guard."""
 
 from __future__ import annotations

@@ -1,3 +1,6 @@
+# @spec(AC-004)
+# @spec(AC-005)
+
 """Auto-fix missing preflight tools and runner resources.
 
 This module implements the ``--fix`` mode of ``/spec-preflight``. It:

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# @spec(FR-001)
+# @spec(FR-002)
+
 # Migration v22 wrapper: compile the conventions rulebook only for projects that
 # already have a refreshed `.conventions/manifest.yaml`.
 

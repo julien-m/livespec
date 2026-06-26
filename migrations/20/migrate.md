@@ -6,6 +6,8 @@ date: 2026-06-08
 kind: asset-sync
 ---
 
+<!-- @spec(FR-040) -->
+
 # Migration v20: User Journeys Native Runner Refresh
 
 Feature 057 originally installed User Journeys v2, but older compiled manifests

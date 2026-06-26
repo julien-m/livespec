@@ -1,3 +1,5 @@
+# @spec(FR-009)
+
 """R7 coherence rules for conventions gates and rulebooks."""
 
 from __future__ import annotations

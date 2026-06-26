@@ -3,6 +3,9 @@ name: spec-refresh-from-brainstorm
 description: LiveSpec slash command /spec-refresh-from-brainstorm — sync brainstorm lifecycle events into LiveSpec specs via interactive Impact Report
 ---
 
+<!-- @spec(FR-004) -->
+<!-- @spec(FR-005) -->
+
 # /spec-refresh-from-brainstorm
 
 ---

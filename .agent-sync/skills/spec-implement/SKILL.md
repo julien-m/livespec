@@ -13,6 +13,8 @@ description: LiveSpec slash command /spec-implement
 <!-- @spec(FR-025) -->
 
 
+<!-- @spec(FR-007) -->
+
 # /spec-implement
 
 ---

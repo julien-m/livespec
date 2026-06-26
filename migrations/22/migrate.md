@@ -6,6 +6,8 @@ date: 2026-06-13
 kind: asset-sync
 ---
 
+<!-- @spec(FR-001) -->
+
 <!-- @spec FR-001: Migration v22 conventions bootstrap
      — ../../.specs/features/065-conventions-migration-docs/spec.md#fr-001 -->
 

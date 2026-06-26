@@ -1,3 +1,5 @@
+# @spec(AC-005)
+
 """``livespec preflight`` — verify (and optionally install) tooling."""
 
 # @spec FR-005: preflight subcommand — .specs/features/035-unified-cli-surface/spec.md#fr-005

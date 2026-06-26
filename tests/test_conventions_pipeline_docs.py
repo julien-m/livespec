@@ -1,3 +1,9 @@
+# @spec(AC-006)
+# @spec(AC-007)
+# @spec(AC-008)
+# @spec(AC-009)
+# @spec(FR-007)
+
 """Static contract tests for conventions blocking pipeline command docs."""
 
 # @spec(FR-003)

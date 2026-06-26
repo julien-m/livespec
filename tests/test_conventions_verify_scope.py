@@ -1,3 +1,6 @@
+# @spec(AC-007)
+# @spec(FR-006)
+
 """Regression tests for feature-scoped conventions verification."""
 
 from __future__ import annotations

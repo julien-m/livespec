@@ -12,6 +12,8 @@ description: LiveSpec slash command /spec-feature
 <!-- @spec(FR-041) -->
 
 
+<!-- @spec(FR-005) -->
+
 # /spec-feature
 
 ---

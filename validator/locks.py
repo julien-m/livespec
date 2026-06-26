@@ -1,3 +1,5 @@
+# @spec(AC-013)
+
 """File locks, atomic writes, and atomic NNN reservation.
 
 Spec anchors (Chantier 3 / Feature 015 — see

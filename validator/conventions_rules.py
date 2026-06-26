@@ -1,3 +1,5 @@
+# @spec(AC-022)
+
 # LiveSpec traceability anchors
 # @spec FR-001: Rulebook schema, FR-002: Resolve sources, FR-003: Compile via provider, FR-004: Stale hashes — .specs/features/062-conventions-rulebook-semantic/spec.md#fr-001  # noqa: E501 - LiveSpec anchor paths must stay on one line.
 

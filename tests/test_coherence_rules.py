@@ -1,3 +1,7 @@
+# @spec(AC-010)
+# @spec(AC-011)
+# @spec(AC-012)
+
 """Tests for each individual coherence rule — pure dataclass construction, no disk I/O."""
 
 from __future__ import annotations

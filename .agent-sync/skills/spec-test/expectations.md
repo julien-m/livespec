@@ -4,6 +4,8 @@ contract_version: "1.0"
 last_reviewed: 2026-06-26
 ---
 
+<!-- @spec(FR-004) -->
+
 # Expectations — /spec-test
 
 ## 1. Purpose

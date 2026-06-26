@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# @spec(FR-001)
+# @spec(FR-002)
+
 # Migration v22 wrapper: record the first conventions debt report without
 # blocking migration. Pipeline runs enforce blocking receipts later.
 

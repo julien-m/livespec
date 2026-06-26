@@ -2,6 +2,8 @@
 <!-- @spec(FR-004) -->
 <!-- @spec(FR-009) -->
 
+<!-- @spec(FR-006) -->
+
 <!-- livespec:start -->
 ## LiveSpec
 

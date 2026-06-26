@@ -1,8 +1,10 @@
 ---
 command: spec-init
 contract_version: "1.0"
-last_reviewed: 2026-06-15
+last_reviewed: 2026-06-26
 ---
+
+<!-- @spec(FR-001) -->
 
 # Expectations — /spec-init
 

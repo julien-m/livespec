@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# @spec(FR-001)
+# @spec(FR-002)
+
 # Migration v22 wrapper: initialize conventions gates when a project has the
 # source files needed for deterministic gate generation.
 

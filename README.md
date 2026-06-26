@@ -2,6 +2,9 @@
 <!-- @spec(FR-009) -->
 <!-- @spec(FR-011) -->
 
+<!-- @spec(FR-001) -->
+<!-- @spec(FR-004) -->
+
 # 🔥 LiveSpec — Specs that live beyond implementation
 
 > A universal, tool-agnostic specification framework with visual diagrams, living documentation, and spec-to-code traceability for AI-driven development.

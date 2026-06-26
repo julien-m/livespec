@@ -1,3 +1,5 @@
+# @spec(AC-022)
+
 # LiveSpec traceability anchors
 # @spec FR-005: Finding schema, FR-006: Domain batching, FR-007: Verdicts, FR-008: Provider blocked — .specs/features/062-conventions-rulebook-semantic/spec.md#fr-005  # noqa: E501 - LiveSpec anchor paths must stay on one line.
 

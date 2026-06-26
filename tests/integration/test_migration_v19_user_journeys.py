@@ -1,3 +1,5 @@
+# @spec(AC-026)
+
 """Integration tests for User Journeys v2 migration refreshes."""
 
 from __future__ import annotations

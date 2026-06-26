@@ -1,3 +1,6 @@
+# @spec(AC-002)
+# @spec(AC-005)
+
 # LiveSpec traceability anchors
 # @spec(AC-001)
 # @spec(AC-003)

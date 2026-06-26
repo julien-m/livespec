@@ -1,3 +1,5 @@
+<!-- @spec(FR-003) -->
+
 # Conventions Enforcement
 
 > Reference for the blocking conventions pipeline introduced by features 061-065.
