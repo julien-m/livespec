@@ -1,6 +1,6 @@
 # Changelog — Conventions Migration Docs
 
-## 2026-06-13 — Feature: Initial spec and plan
+## 2026-06-13 — [Feature]: Initial spec and plan
 
 - **Type:** Feature
 - **Spec modified:** Yes (created feature spec, plan, progress)
@@ -8,7 +8,7 @@
 - **AC impacted:** AC-001 through AC-014
 - **Author:** Codex
 
-## 2026-06-13 — Implemented: Migration v22 and conventions enforcement docs
+## 2026-06-13 — [Feature]: Migration v22 and conventions enforcement docs implemented
 
 - **Type:** Feature
 - **Spec modified:** Yes (status, progress, implementation mapping)
@@ -16,7 +16,7 @@
 - **AC impacted:** AC-001 through AC-014
 - **Author:** Codex
 
-## 2026-06-13 — Bugfix: Make migration v22 advisory and version last
+## 2026-06-13 — [Bugfix]: Make migration v22 advisory and version last
 
 - **Type:** Bugfix
 - **Spec modified:** Yes (AC-001, AC-003 through AC-006)

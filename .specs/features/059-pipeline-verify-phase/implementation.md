@@ -1,3 +1,11 @@
+---
+title: Pipeline Verify Phase Implementation
+feature: 059-pipeline-verify-phase
+status: Implemented
+created: 2026-06-11
+updated: 2026-06-25
+---
+
 # Implementation — 059 Pipeline Verify Phase
 
 > Created after implementation by `/spec-implement` (2026-06-11). Maps every FR/AC to `@spec` anchors in source.

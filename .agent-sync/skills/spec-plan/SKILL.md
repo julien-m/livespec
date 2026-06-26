@@ -3,6 +3,7 @@ name: spec-plan
 description: Migrated Claude command /spec-plan
 ---
 <!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-002) -->
 <!-- @spec(FR-005) -->
 
 
@@ -41,6 +42,10 @@ La toute première action lors de `/spec-plan` est de poser le goal durable avec
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+
+## STEP 0.8 — Evidence-First Retry Contract
+
+Avant de relancer une commande, un poll, ou une interaction terminal (`write_stdin`, review LLM, validation structurelle, preuve goal), appliquer le contrat de [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) §3 : consigner `retry_hypothesis`, `retry_evidence`, puis `retry_result`. Relancer la même action sans preuve fraîche est interdit.
 
 # Command: /spec-plan
 

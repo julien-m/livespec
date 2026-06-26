@@ -3,6 +3,7 @@ name: spec-check
 description: LiveSpec slash command /spec-check
 ---
 <!-- LiveSpec traceability anchors -->
+<!-- @spec(FR-002) -->
 <!-- @spec(FR-006) -->
 <!-- @spec(FR-007) -->
 
@@ -42,6 +43,10 @@ La toute première action lors de `/spec-check` est de poser le goal durable ave
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+
+## STEP 0.8 — Evidence-First Retry Contract
+
+Avant de relancer une commande, un poll, ou une interaction terminal (`write_stdin`, `cmux read-screen`, test ciblé, preuve goal), appliquer le contrat de [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) §3 : consigner `retry_hypothesis`, `retry_evidence`, puis `retry_result`. Relancer la même action sans preuve fraîche est interdit.
 
 # Command: /spec-check
 
@@ -127,7 +132,9 @@ Verify existence of required system files in `.specs/`:
 
 #### B. Feature Naming
 
-Each directory in `features/` must match: `^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$`
+Each directory in `features/` must match the canonical feature slug regex from [`../../../system/identity.md`](../../../system/identity.md): `^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$`.
+
+The optional `.M` suffix is intentional for split sub-features such as `005.1-behavioral-tdd-audit`.
 
 - **ERROR**: Directory name doesn't match pattern
 - **WARNING**: Gap in numbering sequence (e.g., 001, 002, 005)
@@ -911,7 +918,7 @@ Ordered list of the most urgent actions across all checked features:
 ### Phase 1 — Tree Validation
 
 - [always] Validate system files presence in .specs/ (spec-system.md, constitution.md, project.md, README.md, changelog.md, stacks/_default.md, testing/strategy.md, ADRs)
-- [always] Validate feature directory naming pattern (`^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$`)
+- [always] Validate feature directory naming pattern from `system/identity.md` (`^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$`)
 - [always] Check feature completeness (spec.md, changelog.md, implementation.md, plan.md per status)
 - [always] Detect orphan files directly under features/
 - [always] Verify README.md features table sync vs disk

@@ -76,11 +76,15 @@ The compiled semantic rulebook is stored as
 | `livespec conventions compile --force` | Compile the semantic rulebook from `.conventions/` sources. |
 | `livespec conventions scaffold --apply` | Write supported linter config templates from gates limits. |
 | `livespec conventions verify --report` | Run conventions gates and write debt/report artifacts. |
+| `livespec conventions verify --json --feature <slug> [--run-id <id>]` | Run conventions gates and write a project-local receipt under `.specs/conventions/runs/`. Use `--feature repo` for repo-scope goal proof. |
 | `livespec conventions supervisor-gate --base-ref <ref> --head-ref <ref>` | Run supervisor-only diff/hash/freshness locks. |
 | `/spec-fix --conventions` | Burn down conventions debt worst-first and require no new violations. |
 
 ## Pipeline Rule
 
 Before any `PHASE_RESULT: OK` for implement, test, or fix, the repo-scope
-conventions receipt must be `PASS`. Pre-existing debt never justifies skipping
-the receipt or downgrading a failed conventions gate.
+conventions receipt must be `PASS`. Commands that need repo-scope proof call
+`livespec conventions verify --json --feature repo`; `verify --json` without
+`--feature` remains a compatibility path and does not emit a receipt.
+Pre-existing debt never justifies skipping the receipt or downgrading a failed
+conventions gate.

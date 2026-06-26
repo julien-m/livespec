@@ -1,6 +1,6 @@
 # Changelog - Deterministic Finalization
 
-### 2026-06-10 — Spec: Feature specification created
+## 2026-06-10 — [Spec]: Feature specification created
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (created — all sections)
@@ -8,7 +8,7 @@
 - **AC impacted:** AC-001 through AC-012 (all defined)
 - **Author:** claude-code (/spec-specify)
 
-### 2026-06-10 — Plan: Technical plan generated
+## 2026-06-10 — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -16,7 +16,7 @@
 - **AC impacted:** None (pre-implementation)
 - **Author:** claude-code (/spec-plan)
 
-### 2026-06-10 — Feature: Deterministic Finalization implemented
+## 2026-06-10 — [Feature]: Deterministic Finalization implemented
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -24,7 +24,7 @@
 - **AC impacted:** AC-001 through AC-012 (all satisfied)
 - **Author:** claude-code (/spec-implement)
 
-### 2026-06-10 — Test: AC coverage validated
+## 2026-06-10 — [Spec]: AC coverage validated
 
 - **Type:** Spec Update
 - **Spec modified:** No
@@ -35,7 +35,7 @@
 
 <!-- finalize:spec-implement:2026-06-10:9a1dbf71 -->
 
-### 2026-06-10 — ## [Feature]: /spec-feature pipeline complete — deterministic finalization shipped
+## 2026-06-10 — [Feature]: /spec-feature pipeline complete — deterministic finalization shipped
 
 - **Type:** Feature
 - **Spec modified:** No

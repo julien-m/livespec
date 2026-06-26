@@ -1,6 +1,6 @@
 # Changelog - 060-journey-fixture-bootstrap-contract
 
-### 2026-06-11 — Spec: Journey Fixture Bootstrap Contract specified
+## 2026-06-11 — [Spec]: Journey Fixture Bootstrap Contract specified
 
 - **Spec modified:** Yes (created — all sections)
 - **Code modified:** None
@@ -9,7 +9,7 @@
 
 <!-- finalize:spec-specify:2026-06-11:15d1d511 -->
 
-### 2026-06-11 — ### Plan: Technical plan generated
+## 2026-06-11 — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -19,7 +19,7 @@
 
 <!-- finalize:spec-plan:2026-06-11:8bbd6ff2 -->
 
-### 2026-06-11 — ### Feature: Initial implementation of the journey fixture bootstrap contract
+## 2026-06-11 — [Feature]: Initial implementation of the journey fixture bootstrap contract
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -29,7 +29,7 @@
 
 <!-- finalize:spec-implement:2026-06-11:b2cd1c13 -->
 
-### 2026-06-11 — Test: AC coverage validated
+## 2026-06-11 — [Spec]: AC coverage validated
 
 - **Type:** Spec Update
 - **Spec modified:** No
@@ -38,7 +38,7 @@
 - **Report:** `checks/2026-06-11-test.md`
 - **Author:** spec-test (Claude Code)
 
-### 2026-06-11 — ### Pipeline: /spec-feature completed end-to-end
+## 2026-06-11 — [Spec]: /spec-feature completed end-to-end
 
 - **Type:** Spec Update
 - **Spec modified:** No

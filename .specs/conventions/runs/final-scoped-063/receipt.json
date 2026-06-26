@@ -1,0 +1,140 @@
+{
+  "blockers": [],
+  "created_at": "2026-06-25T17:25:28.773439+00:00",
+  "feature_slug": "063-conventions-blocking-pipeline",
+  "gates_sha256": "6b45fc4b27b41cb91f5df004995ef590f38312729105308559a8b08d673f2361",
+  "oracle": "livespec-conventions-gate",
+  "oracle_version": "1",
+  "receipt_hash": "1327b5581c294a7e8d79f3f99fd84d852b501c834c515310aa541712ac064751",
+  "run_id": "final-scoped-063",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": [
+    {
+      "fix_hint": "",
+      "line": 46,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_diffguard.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 61,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_diffguard.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 73,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_diffguard.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 17,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 24,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 35,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 46,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 55,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 67,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 67,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_receipts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 83,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_receipts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 108,
+      "message": "conventions_verify_command has 46 lines > 30",
+      "path": "validator/cli_commands/conventions_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 223,
+      "message": "_build_supervisor_gate_payload has 37 lines > 30",
+      "path": "validator/cli_commands/conventions_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 86,
+      "message": "play_coverage_command has 35 lines > 30",
+      "path": "validator/cli_commands/utility_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    }
+  ]
+}

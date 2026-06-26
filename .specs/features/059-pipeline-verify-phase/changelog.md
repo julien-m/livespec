@@ -1,6 +1,6 @@
 # Changelog - 059-pipeline-verify-phase
 
-### 2026-06-11 — Check: Spec-code alignment verified
+## 2026-06-11 — [Spec]: Spec-code alignment verified
 
 - **Type:** Spec Update
 - **Spec modified:** No
@@ -11,7 +11,7 @@
 
 Findings: target implementation healthy; global tree warnings remain for legacy decimal feature slugs, `.DS_Store`, two older missing changelogs, and AC formatting not using Given/When/Then.
 
-### 2026-06-11 — Spec: Pipeline Verify Phase specified
+## 2026-06-11 — [Spec]: Pipeline Verify Phase specified
 
 - **Spec modified:** Yes (created — all sections)
 - **Code modified:** None
@@ -20,7 +20,7 @@ Findings: target implementation healthy; global tree warnings remain for legacy 
 
 <!-- finalize:spec-specify:2026-06-11:799a2740 -->
 
-### 2026-06-11 — Plan: Technical plan generated
+## 2026-06-11 — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -30,7 +30,7 @@ Findings: target implementation healthy; global tree warnings remain for legacy 
 
 <!-- finalize:spec-plan:2026-06-11:79911967 -->
 
-### 2026-06-11 — Feature: Pipeline verify-phase implemented (Chantier 2 complete)
+## 2026-06-11 — [Feature]: Pipeline verify-phase implemented (Chantier 2 complete)
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -42,7 +42,7 @@ Brick 1: `livespec goal render` injects an enforced `archive.run` task (last ord
 
 <!-- finalize:spec-implement:2026-06-11:0cb1ffd0 -->
 
-### 2026-06-11 — Test: AC coverage validated
+## 2026-06-11 — [Spec]: AC coverage validated
 
 - **Type:** Spec Update
 - **Spec modified:** No
@@ -53,7 +53,7 @@ Brick 1: `livespec goal render` injects an enforced `archive.run` task (last ord
 
 <!-- finalize:spec-test:2026-06-11:58a3c008 -->
 
-### 2026-06-11 — [Pipeline]: /spec-feature 059 complete — audit fixes applied
+## 2026-06-11 — [Feature]: /spec-feature 059 complete — audit fixes applied
 
 - **Type:** Feature
 - **Spec modified:** No

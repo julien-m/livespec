@@ -1,3 +1,15 @@
+---
+title: Conventions Bootstrap Remediation Implementation
+feature: 064-conventions-bootstrap-remediation
+status: Implemented
+created: 2026-06-13
+updated: 2026-06-25
+---
+
+<!-- @spec FR-001: Preflight binary checks — .specs/features/064-conventions-bootstrap-remediation/spec.md#fr-001 -->
+<!-- @spec FR-005: Scaffold preflight action — .specs/features/064-conventions-bootstrap-remediation/spec.md#fr-005 -->
+<!-- @spec FR-010: Conventions CLI extraction — .specs/features/064-conventions-bootstrap-remediation/spec.md#fr-010 -->
+
 # Implementation — Conventions Bootstrap Remediation
 
 ## Summary
@@ -10,7 +22,16 @@ Implemented conventions bootstrap remediation for existing projects:
 - `spec-fix --conventions` is documented as a worst-first debt burn-down mode with a strict non-regression gate.
 - Conventions CLI routes moved from `utility_cmd.py` into `validator/cli_commands/conventions_cmd.py`; `utility_cmd.py` now keeps only utility commands and wiring.
 
-## Code Map
+## Requirement Mapping
+
+| Requirement | File(s) | @spec Anchor | Status | Last Verified |
+|---|---|---|---|---|
+| [FR-001](spec.md#fr-001), [FR-002](spec.md#fr-002), [FR-003](spec.md#fr-003), [FR-004](spec.md#fr-004), [FR-005](spec.md#fr-005) | `validator/preflight_autofix.py`, `validator/cli_commands/preflight_cmd.py` | `@spec FR-001`, `@spec FR-005` | ✅ Implemented | 2026-06-13 |
+| [FR-006](spec.md#fr-006), [FR-007](spec.md#fr-007), [FR-008](spec.md#fr-008) | `templates/conventions/python_ruff.toml.tmpl`, `templates/conventions/typescript_eslint.json.tmpl`, `validator/cli_commands/conventions_scaffold.py` | `@spec FR-006`, `@spec FR-008` | ✅ Implemented | 2026-06-13 |
+| [FR-009](spec.md#fr-009) | `.agent-sync/skills/spec-fix/SKILL.md` | `@spec FR-009` | ✅ Implemented | 2026-06-13 |
+| [FR-010](spec.md#fr-010), [FR-011](spec.md#fr-011), [FR-012](spec.md#fr-012) | `validator/cli_commands/conventions_cmd.py`, `validator/cli_commands/utility_cmd.py` | `@spec FR-010` | ✅ Implemented | 2026-06-13 |
+
+## Acceptance Criteria Mapping
 
 | AC | Implementation |
 |---|---|

@@ -1,0 +1,248 @@
+{
+  "blockers": [],
+  "created_at": "2026-06-25T18:37:50.908938+00:00",
+  "feature_slug": "063-conventions-blocking-pipeline",
+  "gates_sha256": "6b45fc4b27b41cb91f5df004995ef590f38312729105308559a8b08d673f2361",
+  "oracle": "livespec-conventions-gate",
+  "oracle_version": "1",
+  "receipt_hash": "1f89080a0e6b901c5e48d4590103fe7c8e0ac070eab397bafda93ce38996d448",
+  "run_id": "20260625T183750Z",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": [
+    {
+      "fix_hint": "",
+      "line": 17,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 24,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 35,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 46,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 55,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 67,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "465 lines > 400",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 33,
+      "message": "_write_project has 46 lines > 30",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 351,
+      "message": "test_goal_prove_accepts_cli_generated_pass_conventions_receipt has 35 lines > 30",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 414,
+      "message": "test_feature_scope_ignores_legacy_artifact_links_when_current_mapping_is_clean has 52 lines > 30",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 149,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 174,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 206,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 224,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 249,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 270,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 282,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 300,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 313,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 331,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 351,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 414,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify_scope.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "495 lines > 400",
+      "path": "validator/conventions_gate.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 376,
+      "message": "_linter_violations has 56 lines > 30",
+      "path": "validator/conventions_gate.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 106,
+      "message": "conventions_verify_command has 53 lines > 30",
+      "path": "validator/cli_commands/conventions_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 236,
+      "message": "_build_supervisor_gate_payload has 37 lines > 30",
+      "path": "validator/cli_commands/conventions_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    }
+  ]
+}

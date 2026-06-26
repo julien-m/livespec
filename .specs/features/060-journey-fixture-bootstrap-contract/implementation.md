@@ -1,3 +1,11 @@
+---
+title: Journey Fixture Bootstrap Contract Implementation
+feature: 060-journey-fixture-bootstrap-contract
+status: Implemented
+created: 2026-06-11
+updated: 2026-06-25
+---
+
 # Implementation — Journey Fixture Bootstrap Contract (060)
 
 **Date:** 2026-06-11

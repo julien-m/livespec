@@ -12,13 +12,21 @@ import os
 import re
 import shlex
 import subprocess
-from dataclasses import dataclass
-from enum import StrEnum
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, cast
 
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
+import yaml
 
+from .conventions_feature_scope import SOURCE_SUFFIXES, FeatureScope
+from .conventions_gate_types import (
+    GateBlocker,
+    GateResult,
+    GateSeverity,
+    GateSeverityInput,
+    GateVerdict,
+    GateViolation,
+    SourceKind,
+)
 from .conventions_gates import (
     DEFAULT_SOURCE_EXCLUSIONS,
     ConventionsGates,
@@ -31,88 +39,19 @@ from .conventions_lang.base import SourceAnalysis
 from .conventions_linter import parse_linter_json
 from .visual_evidence import sha256_file
 
-GateSeverityInput = Literal["warning", "error"]
-SourceKind = Literal["builtin", "linter", "system"]
 _BLOCKING_VIOLATION_RULES = frozenset({"linter_timeout", "file_encoding_error", "file_read_error"})
-_SOURCE_SUFFIXES = frozenset({".py", ".ts", ".tsx", ".js", ".jsx", ".swift", ".css"})
 
 
-class GateSeverity(StrEnum):
-    """Violation severity."""
-
-    WARNING = "warning"
-    ERROR = "error"
-
-
-class GateVerdict(StrEnum):
-    """Overall conventions verdict."""
-
-    PASS = "PASS"
-    FAIL = "FAIL"
-    BLOCKED = "BLOCKED"
-
-
-@dataclass(frozen=True)
-class GateViolation:
-    """One convention violation."""
-
-    rule_id: str
-    path: str
-    line: int
-    severity: GateSeverity | GateSeverityInput
-    message: str
-    source: SourceKind
-    fix_hint: str = ""
-
-    def to_dict(self) -> dict[str, object]:
-        """Return JSON-serializable violation payload."""
-        severity = self.severity.value if isinstance(self.severity, GateSeverity) else self.severity
-        return {
-            "rule_id": self.rule_id,
-            "path": self.path,
-            "line": self.line,
-            "severity": severity,
-            "message": self.message,
-            "source": self.source,
-            "fix_hint": self.fix_hint,
-        }
-
-
-@dataclass(frozen=True)
-class GateBlocker:
-    """One BLOCKED condition."""
-
-    code: str
-    message: str
-    fix_hint: str = ""
-
-    def to_dict(self) -> dict[str, str]:
-        """Return JSON-serializable blocker payload."""
-        return {"code": self.code, "message": self.message, "fix_hint": self.fix_hint}
-
-
-@dataclass(frozen=True)
-class GateResult:
-    """Complete conventions verification result."""
-
-    verdict: GateVerdict
-    violations: list[GateViolation]
-    blockers: list[GateBlocker]
-
-    def to_dict(self) -> dict[str, object]:
-        """Return JSON-serializable result payload."""
-        return {
-            "verdict": self.verdict.value,
-            "violations": [violation.to_dict() for violation in self.violations],
-            "blockers": [blocker.to_dict() for blocker in self.blockers],
-        }
-
-
-def verify_conventions(project_root: Path, *, report: bool = False) -> GateResult:
+def verify_conventions(
+    project_root: Path,
+    *,
+    report: bool = False,
+    feature_scope: FeatureScope | None = None,
+) -> GateResult:
     """Run deterministic conventions verification for a project root."""
     gates = load_conventions_gates(gates_path(project_root))
     blockers = _command_blockers(project_root, gates)
-    violations = [] if blockers else _collect_violations(project_root, gates)
+    violations = [] if blockers else _collect_violations(project_root, gates, feature_scope)
     result = _result_from(violations, blockers)
     if report:
         from .conventions_report import write_debt_report
@@ -206,9 +145,13 @@ def _sync_limit_blockers(
     ]
 
 
-def _collect_violations(project_root: Path, gates: ConventionsGates) -> list[GateViolation]:
+def _collect_violations(
+    project_root: Path,
+    gates: ConventionsGates,
+    feature_scope: FeatureScope | None,
+) -> list[GateViolation]:
     violations: list[GateViolation] = []
-    for path in _source_files(project_root, gates):
+    for path in _source_files(project_root, gates, feature_scope):
         rel = path.relative_to(project_root).as_posix()
         try:
             text = path.read_text(encoding="utf-8")
@@ -228,11 +171,15 @@ def _collect_violations(project_root: Path, gates: ConventionsGates) -> list[Gat
         violations.extend(_token_scale_violations(rel, analysis, gates))
         violations.extend(_suppression_violations(rel, analysis, gates))
         violations.extend(_import_rule_violations(rel, analysis, gates))
-    violations.extend(_linter_violations(project_root, gates))
+    violations.extend(_linter_violations(project_root, gates, feature_scope))
     return violations
 
 
-def _source_files(project_root: Path, gates: ConventionsGates) -> list[Path]:
+def _source_files(
+    project_root: Path,
+    gates: ConventionsGates,
+    feature_scope: FeatureScope | None = None,
+) -> list[Path]:
     files: list[Path] = []
     exclusions = _effective_exclusions(gates)
     for root, dirnames, filenames in os.walk(project_root):
@@ -244,12 +191,19 @@ def _source_files(project_root: Path, gates: ConventionsGates) -> list[Path]:
         )
         for filename in sorted(filenames):
             path = root_path / filename
-            if path.suffix.lower() not in _SOURCE_SUFFIXES:
+            if path.suffix.lower() not in SOURCE_SUFFIXES:
                 continue
-            if _is_excluded_path(path.relative_to(project_root), exclusions):
+            rel = path.relative_to(project_root)
+            if _is_excluded_path(rel, exclusions):
+                continue
+            if not _is_in_scope(rel.as_posix(), feature_scope):
                 continue
             files.append(path)
     return files
+
+
+def _is_in_scope(rel: str, feature_scope: FeatureScope | None) -> bool:
+    return feature_scope is None or rel in feature_scope.paths
 
 
 def _effective_exclusions(gates: ConventionsGates) -> tuple[str, ...]:
@@ -419,7 +373,11 @@ def _import_rule_violations(
     return violations
 
 
-def _linter_violations(project_root: Path, gates: ConventionsGates) -> list[GateViolation]:
+def _linter_violations(
+    project_root: Path,
+    gates: ConventionsGates,
+    feature_scope: FeatureScope | None = None,
+) -> list[GateViolation]:
     violations: list[GateViolation] = []
     exclusions = _effective_exclusions(gates)
     for command in gates.commands.lint:
@@ -444,6 +402,7 @@ def _linter_violations(project_root: Path, gates: ConventionsGates) -> list[Gate
             _violation(item.rule_id, item.path, item.line, item.severity, item.message, "linter")
             for item in parsed
             if not _is_excluded_path(_project_relative_path(project_root, item.path), exclusions)
+            and _is_in_scope(_project_relative_path(project_root, item.path), feature_scope)
         )
         if completed.returncode == 1 and not parsed:
             violations.append(

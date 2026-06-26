@@ -1,3 +1,15 @@
+---
+title: Conventions Migration Docs Implementation
+feature: 065-conventions-migration-docs
+status: Implemented
+created: 2026-06-13
+updated: 2026-06-25
+---
+
+<!-- @spec FR-001: Migration v22 manifest and wrappers — .specs/features/065-conventions-migration-docs/spec.md#fr-001 -->
+<!-- @spec FR-003: Conventions enforcement reference — .specs/features/065-conventions-migration-docs/spec.md#fr-003 -->
+<!-- @spec FR-006: Agent instruction conventions commands — .specs/features/065-conventions-migration-docs/spec.md#fr-006 -->
+
 # Implementation — Conventions Migration Docs
 
 ## Summary

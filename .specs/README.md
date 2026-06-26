@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-25
+> Last updated: 2026-06-26
 
 
 ---
@@ -105,6 +105,7 @@
 | 065 | Conventions Migration Docs | Implemented | 2026-06-13 | 2026-06-13 | [spec](features/065-conventions-migration-docs/spec.md), [plan](features/065-conventions-migration-docs/plan.md), [implementation](features/065-conventions-migration-docs/implementation.md) |
 | 066 | Handoff Input Compatibility | Implemented | 2026-06-15 | 2026-06-15 | [spec](features/066-handoff-input-compatibility/spec.md), [plan](features/066-handoff-input-compatibility/plan.md), [implementation](features/066-handoff-input-compatibility/implementation.md) |
 | 067 | Visual Preview Proof Publishing | Implemented | 2026-06-25 | 2026-06-25 | [spec](features/067-visual-preview-proof-publishing/spec.md), [plan](features/067-visual-preview-proof-publishing/plan.md), [implementation](features/067-visual-preview-proof-publishing/implementation.md) |
+| 068 | Evidence-First Retry Contract | Implemented | 2026-06-26 | 2026-06-26 | [spec](features/068-evidence-first-retry-contract/spec.md), [plan](features/068-evidence-first-retry-contract/plan.md), [implementation](features/068-evidence-first-retry-contract/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -128,6 +129,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-26 | Feature | [Feature 068] Implemented: Evidence-First Retry Contract — retry_hypothesis, retry_evidence, retry_result for failed commands and terminal interactions |
 | 2026-06-25 | Feature | [Feature 067] Implemented: Visual Preview Proof Publishing — Markdown proof, Browser annotation URL, visual-preview fallback, receipt boundary |
 | 2026-06-15 | Feature | [Feature 066] Implemented: Handoff Input Compatibility — handoff-first Brainstorm import docs, Penflow bootstrap source resolution, lifecycle sync contract |
 | 2026-06-13 | Feature | [Feature 065] Implemented: Conventions Migration Docs — migration v22, conventions enforcement reference, README/spec-system/agent docs |

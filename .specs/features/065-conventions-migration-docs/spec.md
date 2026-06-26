@@ -1,3 +1,11 @@
+---
+title: Conventions Migration Docs
+status: Implemented
+priority: P1
+created: 2026-06-13
+updated: 2026-06-25
+---
+
 # Conventions Migration Docs
 
 Branch: main

@@ -1,6 +1,7 @@
 <!-- LiveSpec traceability anchors -->
 <!-- @spec(FR-004) -->
 <!-- @spec(FR-011) -->
+<!-- @spec(FR-001) -->
 <!-- @spec(FR-019) -->
 
 <!-- @spec FR-011: Shared command runtime docs — .specs/features/052-deterministic-command-goal-contracts/spec.md#fr-011 -->
@@ -120,6 +121,27 @@ or subprocess executed inside a step:
 **Failure handling:**
 - Override: `timeout=300s`, `max_retries=3` (LLM call may need longer warm-up).
 ```
+
+### Evidence-first retry contract
+
+Before retrying any failed command, tool call, poll, or interactive write such as `write_stdin`, the
+executor MUST capture a one-line retry record with these fields:
+
+```text
+retry_hypothesis="<why the previous attempt failed>" retry_evidence="<observable proof to collect before retry>" retry_result="<PASS|FAIL|BLOCKED after retry>"
+```
+
+Rules:
+
+- `retry_hypothesis` is a concrete failure theory, not "try again".
+- `retry_evidence` names a measurable artifact, exit code, screen state, file path, timestamp, or
+  command output required before the retry can count as progress.
+- `retry_result` is filled after the retry and determines the next action: `PASS` continues,
+  `FAIL` emits ERROR when retries are exhausted, and `BLOCKED` emits the canonical BLOCKED line.
+- Repeating the same failing command without this record is prohibited, even when `max_retries`
+  allows one retry.
+- For polling or terminal interaction failures, prefer a fresh artifact, state file, timestamp, or
+  post-prompt screen region over a stale screen line.
 
 ---
 

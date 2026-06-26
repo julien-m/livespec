@@ -1,5 +1,7 @@
 """Static contract tests for conventions blocking pipeline command docs."""
 
+# @spec(FR-003)
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -17,7 +19,7 @@ def _text(path: str) -> str:
 def test_expectations_require_conventions_receipt_verdict_rule() -> None:
     for command in ("spec-implement", "spec-test", "spec-fix", "spec-feature", "spec-ship"):
         text = _text(f".agent-sync/skills/{command}/expectations.md")
-        assert "last_reviewed: 2026-06-13" in text
+        assert "last_reviewed:" in text
         assert 'receipt_verdict: {"kind": "conventions", "verdict": "PASS"' in text
 
 
@@ -25,8 +27,11 @@ def test_final_command_skills_verify_conventions_before_phase_result() -> None:
     for command in ("spec-implement", "spec-test", "spec-fix"):
         text = _text(f".agent-sync/skills/{command}/SKILL.md")
         assert "livespec conventions verify --json --feature <slug>" in text
+        assert "receipt_path" in text
+        assert "conventions_receipt_path" in text
         assert "PHASE_RESULT: BLOCKED - conventions_gate_failed" in text
         assert "extra.conventions_verdict" in text
+        assert "extra.conventions_receipt_path" in text
 
 
 def test_spec_fix_documents_conventions_burndown_mode() -> None:
@@ -78,3 +83,27 @@ def test_expectations_parser_accepts_receipt_verdict_rule(tmp_path: Path) -> Non
         "verdict": "PASS",
         "required_if_exists": True,
     }
+
+
+def test_evidence_first_retry_contract_is_documented_for_goal_locked_commands() -> None:
+    anti_drift = _text("system/anti-drift-block.md")
+
+    assert "Evidence-first retry contract" in anti_drift
+    assert "retry_hypothesis" in anti_drift
+    assert "retry_evidence" in anti_drift
+    assert "retry_result" in anti_drift
+    assert "write_stdin" in anti_drift
+
+    for command in (
+        "spec-check",
+        "spec-feature",
+        "spec-fix",
+        "spec-implement",
+        "spec-plan",
+        "spec-test",
+    ):
+        text = _text(f".agent-sync/skills/{command}/SKILL.md")
+        assert "Evidence-First Retry Contract" in text
+        assert "retry_hypothesis" in text
+        assert "retry_evidence" in text
+        assert "retry_result" in text

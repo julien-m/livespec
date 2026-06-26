@@ -1,3 +1,11 @@
+---
+title: Conventions Bootstrap Remediation Plan
+spec_ref: .specs/features/064-conventions-bootstrap-remediation/spec.md
+status: Implemented
+created: 2026-06-13
+updated: 2026-06-25
+---
+
 # Plan — Conventions Bootstrap Remediation
 
 ## Summary

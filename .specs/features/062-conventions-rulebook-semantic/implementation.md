@@ -1,3 +1,11 @@
+---
+title: Conventions Rulebook Semantic Implementation
+feature: 062-conventions-rulebook-semantic
+status: Implemented
+created: 2026-06-12
+updated: 2026-06-25
+---
+
 # Implementation - Conventions Rulebook Semantic
 
 ## Requirement Mapping

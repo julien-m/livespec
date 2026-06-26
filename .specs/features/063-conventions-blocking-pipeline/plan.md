@@ -1,3 +1,12 @@
+---
+title: Conventions Blocking Pipeline Plan
+feature: 063-conventions-blocking-pipeline
+spec_ref: spec.md
+status: Implemented
+created: 2026-06-13
+updated: 2026-06-25
+---
+
 # Plan — Conventions Blocking Pipeline
 
 ## Summary

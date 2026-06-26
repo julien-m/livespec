@@ -3,9 +3,19 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-25
+> Last updated: 2026-06-26
 
 ---
+
+## 2026-06-26 — [Feature 068] Check: spec-check PASS; tree validation, command audit, doctor, static tests, and Ruff checks green for evidence-first retry contract
+
+## 2026-06-26 — [Feature 068] Implemented: Evidence-First Retry Contract — retry_hypothesis, retry_evidence, retry_result for failed commands and terminal interactions
+
+## 2026-06-25 — [Feature 063 Fix] Feature-scoped conventions verification now uses current implementation mappings plus dirty source/test files, avoiding historical artifact link aggregation.
+
+## 2026-06-25 — [Feature 063] Check: 100% FR/AC verified; conventions gate PASS (receipt `.specs/conventions/runs/20260625T194319Z/receipt.json`); Feature 063 artifacts PASS; project-wide tree validation PASS
+
+## 2026-06-25 — [Feature 063 Fix] Conventions verify JSON now emits project-local receipts when `--feature` is explicit; repo-scope proof uses `--feature repo`.
 
 ## 2026-06-25 — [Feature 061 Fix] Conventions scanner now excludes generated dependency workspaces, including `node_modules/**`, `.mimocode/**`, caches, build outputs, and matching linter-reported paths.
 

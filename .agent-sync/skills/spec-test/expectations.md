@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-06-25
+last_reviewed: 2026-06-26
 ---
 
 # Expectations — /spec-test

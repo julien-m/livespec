@@ -15,6 +15,7 @@ description: Migrated Claude command /spec-test
 <!-- @spec(AC-011) -->
 <!-- @spec(AC-012) -->
 <!-- @spec(AC-015) -->
+<!-- @spec(FR-002) -->
 <!-- @spec(FR-004) -->
 <!-- @spec(FR-005) -->
 <!-- @spec(FR-006) -->
@@ -64,11 +65,15 @@ La toute première action lors de `/spec-test` est de poser le goal durable avec
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
+## STEP 0.8 — Evidence-First Retry Contract
+
+Avant de relancer une commande, un poll, ou une interaction terminal (`write_stdin`, suite de tests, visual gate, conventions gate, preuve goal), appliquer le contrat de [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) §3 : consigner `retry_hypothesis`, `retry_evidence`, puis `retry_result`. Relancer la même action sans preuve fraîche est interdit.
+
 ## STEP 0.9 — Conventions Gate (OBLIGATOIRE avant PHASE_RESULT)
 
-Avant tout `PHASE_RESULT`, exécuter `livespec conventions verify --json --feature <slug>` pour chaque feature testée; avec `--all`, chaque feature testée doit avoir un receipt PASS.
-Si verdict `FAIL` ou `BLOCKED` → `PHASE_RESULT: BLOCKED - conventions_gate_failed` et inclure `extra.conventions_verdict`.
-Si verdict `PASS`, soumettre le `conventions_receipt_path` au goal et inclure `extra.conventions_verdict: PASS`.
+Avant tout `PHASE_RESULT`, exécuter `livespec conventions verify --json --feature <slug>` pour chaque feature testée; avec `--all`, chaque feature testée doit avoir un `receipt_path` PASS.
+Si verdict `FAIL` ou `BLOCKED`, ou si `receipt_path` est absent/null → `PHASE_RESULT: BLOCKED - conventions_gate_failed` avec `extra.conventions_verdict` et `extra.conventions_receipt_path`.
+Si verdict `PASS`, soumettre `{"conventions_receipt_path":"<receipt_path>"}` au goal et inclure `extra.conventions_verdict: PASS`.
 
 # Command: /spec-test
 

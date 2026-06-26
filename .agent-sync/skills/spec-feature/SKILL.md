@@ -4,6 +4,7 @@ description: LiveSpec slash command /spec-feature
 ---
 <!-- LiveSpec traceability anchors -->
 <!-- @spec(AC-012) -->
+<!-- @spec(FR-002) -->
 <!-- @spec(FR-008) -->
 <!-- @spec(FR-011) -->
 <!-- @spec(FR-012) -->
@@ -46,6 +47,10 @@ La toute première action lors de `/spec-feature` est de poser le goal durable a
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+
+## STEP 0.8 — Evidence-First Retry Contract
+
+Avant de relancer une commande, un poll, ou une interaction terminal (`write_stdin`, child agent poll, Phase gate, preuve goal), appliquer le contrat de [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) §3 : consigner `retry_hypothesis`, `retry_evidence`, puis `retry_result`. Relancer la même action sans preuve fraîche est interdit.
 
 # Command: /spec-feature
 

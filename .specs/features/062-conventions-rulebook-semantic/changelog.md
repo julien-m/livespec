@@ -1,6 +1,6 @@
 # Changelog - Conventions Rulebook Semantic
 
-## 2026-06-12 - Spec: Initial feature artifacts
+## 2026-06-12 — [Spec]: Initial feature artifacts
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (initial spec and plan)
@@ -8,7 +8,7 @@
 - **AC impacted:** AC-001 through AC-022
 - **Author:** codex
 
-### 2026-06-12 — Feature: Initial implementation
+## 2026-06-12 — [Feature]: Initial implementation
 
 - **Type:** Feature
 - **Spec modified:** Yes (status set to Implemented)

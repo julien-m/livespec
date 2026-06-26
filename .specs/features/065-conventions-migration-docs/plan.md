@@ -1,3 +1,11 @@
+---
+title: Conventions Migration Docs Plan
+spec_ref: .specs/features/065-conventions-migration-docs/spec.md
+status: Implemented
+created: 2026-06-13
+updated: 2026-06-25
+---
+
 # Plan — Conventions Migration Docs
 
 ## Summary

@@ -35,7 +35,7 @@ BLOCKED at step 2 - policy_blocked - caller flags inconsistent with filesystem s
 
 For agents that receive a `feature_slug` field, validate it against the canonical regex from [`system/identity.md`](identity.md):
 
-- Use `validator.identity.assert_resolved(value)` (Python) or `^\d{3}-[a-z0-9]+(-[a-z0-9]+)*$` (regex check).
+- Use `validator.identity.assert_resolved(value)` (Python) or `^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$` (regex check).
 - Reject the literal `NNN-feature-name` placeholder explicitly.
 
 On failure:

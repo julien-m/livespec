@@ -1,0 +1,2723 @@
+{
+  "blockers": [],
+  "created_at": "2026-06-25T18:04:02.312601+00:00",
+  "feature_slug": "063-conventions-blocking-pipeline",
+  "gates_sha256": "6b45fc4b27b41cb91f5df004995ef590f38312729105308559a8b08d673f2361",
+  "oracle": "livespec-conventions-gate",
+  "oracle_version": "1",
+  "receipt_hash": "43a2c49947c22c1e832dd98dcda2368917ed5044d9b3d88b9d9152a458a2b63e",
+  "run_id": "validator-feature-scope-77a1",
+  "schema_version": "1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "856 lines > 500",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 715,
+      "message": "test_exclusion_matching_more_than_30_percent_of_repo_is_error has 33 lines > 30",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 749,
+      "message": "test_standard_tooling_exclusion_is_ignored has 31 lines > 30",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 781,
+      "message": "test_exclusion_ratio_ignores_tooling_files_in_denominator has 35 lines > 30",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 819,
+      "message": "test_rulebook_source_hash_stale has 38 lines > 30",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 84,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 94,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 102,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 110,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 120,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 129,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 137,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 146,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 156,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 166,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 174,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 182,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 192,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 200,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 208,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 215,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 229,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 249,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 267,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 274,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 293,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 311,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 331,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 338,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 353,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 365,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 380,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 396,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 414,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 432,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 441,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 459,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 475,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 495,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 505,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 515,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 524,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 534,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 545,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 553,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 568,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 578,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 586,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 594,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 609,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 619,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 627,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 647,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 657,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 682,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 715,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 749,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 781,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 819,
+      "message": "public API lacks docs",
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 46,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_diffguard.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 61,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_diffguard.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 73,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_diffguard.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 17,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 24,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 35,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 46,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 55,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 67,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_pipeline_docs.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "869 lines > 500",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 26,
+      "message": "_write_project has 59 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 142,
+      "message": "test_verify_extracts_ruff_flat_json_violations has 35 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 219,
+      "message": "test_verify_applies_exclusions_to_linter_output has 64 lines > 60",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 383,
+      "message": "test_cli_verify_feature_writes_pass_conventions_receipt has 39 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 424,
+      "message": "test_cli_verify_feature_scopes_violations_and_receipt_to_implementation_files has 56 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 482,
+      "message": "test_cli_verify_repo_pseudo_scope_writes_repo_wide_receipt has 31 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 515,
+      "message": "test_cli_verify_feature_scope_includes_mappings_outside_files_created_modified has 50 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 567,
+      "message": "test_cli_verify_feature_scope_includes_dirty_source_when_feature_artifacts_changed has 69 lines > 60",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 656,
+      "message": "test_spec_check_conventions_gate_can_use_feature_scoped_pass_receipt has 33 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 753,
+      "message": "test_cli_verify_feature_writes_fail_conventions_receipt has 35 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 806,
+      "message": "test_cli_verify_rejects_run_id_path_traversal_before_writing_receipt has 40 lines > 30",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 103,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 121,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 142,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 179,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 198,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 219,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 285,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 298,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 323,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 333,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 360,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 383,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 424,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 482,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 515,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 567,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 638,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 656,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 691,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 721,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 753,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 790,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 806,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 848,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 312,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 341,
+      "message": "public API lacks docs",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 75,
+      "message": "padding uses 10, outside token scale",
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.token_scale",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "2886 lines > 500",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 322,
+      "message": "_write_complete_check_fix_scenario has 161 lines > 60",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 485,
+      "message": "_write_conventions has 31 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 733,
+      "message": "test_goal_prove_accepts_matching_convention_evidence has 34 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 769,
+      "message": "test_goal_prove_accepts_cli_generated_pass_conventions_receipt has 69 lines > 60",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 895,
+      "message": "test_goal_prove_rejects_non_pass_conventions_receipt has 36 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 933,
+      "message": "test_goal_prove_rejects_conventions_receipt_outside_project has 41 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 997,
+      "message": "test_render_goal_contract_and_state_replace_markdown_task_file has 35 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1060,
+      "message": "test_goal_render_save_writes_contract_and_state_files has 34 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1112,
+      "message": "test_compile_command_goal_ignores_markdown_checkboxes_inside_execution_tasks has 38 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1305,
+      "message": "test_compile_command_goal_ignores_documentary_and_self_spec_invocations has 40 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1399,
+      "message": "test_compile_command_goal_ignores_horizontal_rule_in_internal_invocations has 41 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1503,
+      "message": "test_compile_command_goal_respects_explicit_visual_false_marker has 45 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1550,
+      "message": "test_compile_command_goal_activates_visual_tasks_for_spec_check_all has 33 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1601,
+      "message": "test_spec_check_fix_all_complete_scenario_goal_requires_child_goals has 47 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1650,
+      "message": "test_spec_fix_child_spec_check_goal_cannot_be_skipped_with_zero_gap_report has 53 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1705,
+      "message": "test_spec_fix_child_spec_check_skip_requires_zero_gap_report has 48 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1755,
+      "message": "test_child_goal_contract_and_state_paths_may_use_goal_artifacts_outside_project has 56 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1813,
+      "message": "test_child_goal_contract_rejects_nested_goal_artifact_path has 58 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1873,
+      "message": "test_child_goal_contract_rejects_arbitrary_absolute_path has 55 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1954,
+      "message": "test_goal_prove_rejects_missing_visual_design_fidelity_evidence has 32 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1988,
+      "message": "test_goal_prove_rejects_legacy_visual_design_fidelity_payload has 35 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2025,
+      "message": "test_goal_prove_accepts_visual_design_fidelity_receipt has 69 lines > 60",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2096,
+      "message": "test_goal_prove_rejects_visual_receipt_from_wrong_feature has 83 lines > 60",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2318,
+      "message": "test_goal_prove_accepts_valid_finalize_receipt has 31 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2351,
+      "message": "test_goal_prove_rejects_tampered_finalize_receipt has 33 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2386,
+      "message": "test_goal_prove_rejects_fail_verdict_finalize_receipt has 42 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2843,
+      "message": "test_archive_run_end_to_end_drill has 44 lines > 30",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 577,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 590,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 617,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 646,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 840,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 859,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 877,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 895,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 933,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 976,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 997,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1034,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1060,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1096,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1112,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1152,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1176,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1196,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1216,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1235,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1253,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1273,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1305,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1355,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1371,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1399,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1455,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1477,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1550,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1585,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1601,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1650,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1705,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1755,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1813,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1873,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1930,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1954,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1988,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2025,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2096,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2181,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 2193,
+      "message": "public API lacks docs",
+      "path": "tests/test_goal_contracts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "720 lines > 500",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 488,
+      "message": "test_conventions_fail_receipt_is_drift_not_error has 32 lines > 30",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 101,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 107,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 125,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 137,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 148,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 161,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 176,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 198,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 219,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 229,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 243,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 257,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 275,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 299,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 415,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 432,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 449,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 463,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 488,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 523,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 533,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 536,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 543,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 550,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 569,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 592,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 597,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 604,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 618,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 667,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 695,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_artifact.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 67,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_receipts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 83,
+      "message": "public API lacks docs",
+      "path": "tests/test_run_receipts.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 227,
+      "message": "test_conventions_supervisor_gate_uses_fresh_verification has 33 lines > 30",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 22,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 50,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 80,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 93,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 115,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 130,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 143,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 156,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 167,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 198,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 227,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 233,
+      "message": "public API lacks docs",
+      "path": "tests/test_status_play_conventions_cli.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "574 lines > 500",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 106,
+      "message": "test_branches_accumulate_for_all_active_flags has 32 lines > 30",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 407,
+      "message": "test_conventions_rule_fails_when_gates_exist_and_receipt_missing has 31 lines > 30",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 439,
+      "message": "test_conventions_rule_passes_for_pass_receipt has 37 lines > 30",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 477,
+      "message": "test_conventions_rule_fails_for_unverified_pass_receipt has 38 lines > 30",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 16,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 40,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 47,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 59,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 72,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 82,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 93,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 106,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 139,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 162,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 182,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 196,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 208,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 227,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 239,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 255,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 272,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 286,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 312,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 336,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 351,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 378,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 407,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 439,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 477,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 516,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 540,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 558,
+      "message": "public API lacks docs",
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "707 lines > 500",
+      "path": "validator/conventions_gate.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 588,
+      "message": "_linter_violations has 56 lines > 30",
+      "path": "validator/conventions_gate.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 20,
+      "message": "suppression directive `# type: ignore` exceeds budget 0",
+      "path": "validator/conventions_gate.py",
+      "rule_id": "builtin.suppression_directives",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "566 lines > 500",
+      "path": "validator/expectations.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 186,
+      "message": "load_expectations has 58 lines > 30",
+      "path": "validator/expectations.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 413,
+      "message": "_resolve_rule_kind has 36 lines > 30",
+      "path": "validator/expectations.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 505,
+      "message": "_extract_demo_session has 47 lines > 30",
+      "path": "validator/expectations.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 31,
+      "message": "suppression directive `# type: ignore` exceeds budget 0",
+      "path": "validator/expectations.py",
+      "rule_id": "builtin.suppression_directives",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1,
+      "message": "2050 lines > 500",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_file_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 174,
+      "message": "normalize_goal_flags has 35 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 211,
+      "message": "compile_command_goal has 51 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 325,
+      "message": "_active_execution_task_branches has 37 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 364,
+      "message": "_extract_execution_tasks has 64 lines > 60",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 430,
+      "message": "_extract_internal_command_invocations has 55 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 515,
+      "message": "_reject_undocumented_internal_spec_invocation has 32 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 709,
+      "message": "prove_goal_task has 72 lines > 60",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 783,
+      "message": "render_goal_objective has 63 lines > 60",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 848,
+      "message": "_goal_payload has 112 lines > 60",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 962,
+      "message": "_build_goal_tasks has 88 lines > 60",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1120,
+      "message": "_task_id_for_description has 38 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1166,
+      "message": "_required_evidence_for_task has 32 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1260,
+      "message": "_validate_task_evidence has 37 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1299,
+      "message": "_validate_visual_receipt_evidence has 60 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1364,
+      "message": "_validate_finalize_receipt_evidence has 50 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1418,
+      "message": "_validate_archive_run_evidence has 46 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1466,
+      "message": "_archive_run_artifact_mismatches has 33 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1517,
+      "message": "_validate_generic_evidence has 37 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1556,
+      "message": "_conventions_receipt_missing_items has 38 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1598,
+      "message": "_convention_evidence_satisfied has 33 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1646,
+      "message": "_required_evidence_satisfied has 62 lines > 60",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1809,
+      "message": "_compile_conventions_payload has 34 lines > 30",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 1011,
+      "message": "suppression directive `# noqa` exceeds budget 0",
+      "path": "validator/goal_contracts.py",
+      "rule_id": "builtin.suppression_directives",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 51,
+      "message": "archive_goal_run has 87 lines > 60",
+      "path": "validator/run_artifacts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 51,
+      "message": "verify_evidence_receipts has 31 lines > 30",
+      "path": "validator/run_receipts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 109,
+      "message": "verify_one_receipt has 58 lines > 30",
+      "path": "validator/run_receipts.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 55,
+      "message": "evaluate_rules has 55 lines > 30",
+      "path": "validator/verify_output.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 234,
+      "message": "_evaluate_produces_artifact has 40 lines > 30",
+      "path": "validator/verify_output.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 276,
+      "message": "_evaluate_receipt_verdict has 63 lines > 60",
+      "path": "validator/verify_output.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 110,
+      "message": "conventions_verify_command has 53 lines > 30",
+      "path": "validator/cli_commands/conventions_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 240,
+      "message": "_build_supervisor_gate_payload has 37 lines > 30",
+      "path": "validator/cli_commands/conventions_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 86,
+      "message": "play_coverage_command has 35 lines > 30",
+      "path": "validator/cli_commands/utility_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 56,
+      "message": "get_rules has 33 lines > 30",
+      "path": "validator/coherence/rules/__init__.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    }
+  ]
+}

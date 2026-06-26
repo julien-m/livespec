@@ -1,3 +1,11 @@
+---
+title: Deterministic Finalization Implementation
+feature: 058-deterministic-finalization
+status: Implemented
+created: 2026-06-10
+updated: 2026-06-25
+---
+
 # Implementation — Deterministic Finalization
 
 > Maps every FR and AC of [spec.md](spec.md) to `@spec` anchors in source code.

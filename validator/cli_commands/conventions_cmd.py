@@ -6,7 +6,9 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 
 import typer
@@ -18,12 +20,14 @@ from ..conventions_diffguard import (
     git_changed_paths,
     supervisor_conventions_gate,
 )
-from ..conventions_gate import verify_conventions
+from ..conventions_feature_scope import FeatureScopeError, resolve_feature_scope
+from ..conventions_gate import GateResult, verify_conventions
 from ..conventions_gates import (
     gates_path,
     generate_conventions_gates,
     load_conventions_gates,
 )
+from ..conventions_receipt import write_conventions_receipt
 from ..conventions_rules import RulebookStaleError, compile_conventions_rulebook
 from ..llm_provider import LLMProviderNotConfigured
 from .conventions_scaffold import (
@@ -36,6 +40,11 @@ from .conventions_scaffold import (
 REPO_OPTION = typer.Option(Path("."), "--repo", help="Project repository root.")
 JSON_OPTION = typer.Option(False, "--json", help="Emit JSON.")
 FULL_OPTION = typer.Option(False, "--full", help="Regenerate even when present.")
+FEATURE_OPTION = typer.Option(None, "--feature", help="Feature or goal slug for receipt evidence.")
+RUN_ID_OPTION = typer.Option(None, "--run-id", help="Receipt run id.")
+REPO_FEATURE_SCOPE = "repo"
+FEATURE_SLUG_PATTERN = re.compile(r"^\d{3}(?:\.\d+)?-[a-z0-9][a-z0-9-]*$")
+RUN_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
 WORKER_RECEIPT_OPTION = typer.Option(
     None,
     "--worker-receipt",
@@ -98,25 +107,101 @@ def conventions_verify_command(
     repo: Path = REPO_OPTION,
     json_out: bool = JSON_OPTION,
     report: bool = typer.Option(False, "--report", help="Write debt report artifacts."),
+    feature: str | None = FEATURE_OPTION,
+    run_id: str | None = RUN_ID_OPTION,
 ) -> None:
     """Verify conventions deterministically."""
+    repo_root = repo.resolve()
     try:
-        result = verify_conventions(repo.resolve(), report=report)
-    except (FileNotFoundError, ValueError) as exc:
+        validated_feature = _validate_conventions_feature(feature) if feature is not None else None
+        if validated_feature is not None and run_id is not None:
+            _validate_conventions_run_id(run_id)
+        feature_scope = (
+            resolve_feature_scope(repo_root, validated_feature)
+            if validated_feature is not None and validated_feature != REPO_FEATURE_SCOPE
+            else None
+        )
+        result = verify_conventions(repo_root, report=report, feature_scope=feature_scope)
+    except (FeatureScopeError, FileNotFoundError, ValueError) as exc:
+        payload: dict[str, object] = {"verdict": "BLOCKED", "blockers": [str(exc)]}
+        if feature is not None:
+            payload.update({"feature_slug": feature, "run_id": run_id, "receipt_path": None})
+        typer.echo(
+            json.dumps(payload, indent=2) if json_out else f"BLOCKED: {exc}",
+            err=not json_out,
+        )
+        raise typer.Exit(2) from exc
+    try:
+        payload = _conventions_verify_payload(
+            repo_root, feature=validated_feature, run_id=run_id, result=result
+        )
+    except ValueError as exc:
         payload = {"verdict": "BLOCKED", "blockers": [str(exc)]}
+        if validated_feature is not None:
+            payload.update(
+                {"feature_slug": validated_feature, "run_id": run_id, "receipt_path": None}
+            )
         typer.echo(
             json.dumps(payload, indent=2) if json_out else f"BLOCKED: {exc}",
             err=not json_out,
         )
         raise typer.Exit(2) from exc
     if json_out:
-        typer.echo(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+        typer.echo(json.dumps(payload, indent=2, sort_keys=True))
     else:
         typer.echo(f"Conventions verdict: {result.verdict.value}")
         typer.echo(f"violations: {len(result.violations)}")
+        if validated_feature is not None:
+            typer.echo(f"receipt: {payload['receipt_path']}")
         for blocker in result.blockers:
             typer.echo(f"BLOCKED: {blocker.message}", err=True)
     raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
+
+
+def _default_conventions_run_id() -> str:
+    return datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
+
+
+def _validate_conventions_run_id(run_id: str) -> str:
+    if RUN_ID_PATTERN.fullmatch(run_id) is None:
+        raise ValueError(f"invalid run_id: {run_id}")
+    return run_id
+
+
+def _validate_conventions_feature(feature: str) -> str:
+    if feature == REPO_FEATURE_SCOPE:
+        return feature
+    if FEATURE_SLUG_PATTERN.fullmatch(feature) is None:
+        raise ValueError(f"invalid feature slug: {feature}")
+    return feature
+
+
+def _conventions_verify_payload(
+    repo_root: Path,
+    *,
+    feature: str | None,
+    run_id: str | None,
+    result: GateResult,
+) -> dict[str, object]:
+    payload: dict[str, object] = {**result.to_dict()}
+    if feature is None:
+        return payload
+    effective_run_id = _validate_conventions_run_id(run_id or _default_conventions_run_id())
+    receipt_path = write_conventions_receipt(
+        project_root=repo_root,
+        feature_slug=feature,
+        run_id=effective_run_id,
+        result=result,
+        gates_path=gates_path(repo_root),
+    )
+    payload.update(
+        {
+            "feature_slug": feature,
+            "run_id": effective_run_id,
+            "receipt_path": receipt_path.relative_to(repo_root).as_posix(),
+        }
+    )
+    return payload
 
 
 @conventions_app.command("supervisor-gate")

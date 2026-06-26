@@ -148,3 +148,13 @@ class TestSlugRegex:
     def test_regex_rejects_placeholder(self) -> None:
         # The placeholder uses alphabetic 'NNN', not digits, so the regex naturally rejects it.
         assert SLUG_REGEX.match(PLACEHOLDER_LITERAL) is None
+
+    def test_spec_check_contract_uses_subfeature_regex(self) -> None:
+        """Spec-check and activation docs use the canonical sub-feature regex."""
+        repo_root = Path(__file__).resolve().parents[1]
+        spec_check = repo_root / ".agent-sync" / "skills" / "spec-check" / "SKILL.md"
+        activation_contract = repo_root / "system" / "activation-contract.md"
+
+        assert SLUG_REGEX.pattern in spec_check.read_text(encoding="utf-8")
+        assert "005.1-behavioral-tdd-audit" in spec_check.read_text(encoding="utf-8")
+        assert SLUG_REGEX.pattern in activation_contract.read_text(encoding="utf-8")

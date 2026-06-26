@@ -1,6 +1,6 @@
 # Changelog - 039.1-goal-archive-run-artifacts
 
-### 2026-06-10 — Spec: Feature specification created
+## 2026-06-10 — [Spec]: Feature specification created
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (created — all sections)
@@ -10,7 +10,7 @@
 
 <!-- finalize:spec-specify:2026-06-10:de700238 -->
 
-### 2026-06-10 — Plan: Technical plan generated
+## 2026-06-10 — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -20,7 +20,7 @@
 
 <!-- finalize:spec-plan:2026-06-10:362ef347 -->
 
-### 2026-06-10 — Implemented: Goal Archive & Run Artifacts v2
+## 2026-06-10 — [Feature]: Goal Archive & Run Artifacts v2
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -30,7 +30,7 @@
 
 <!-- finalize:spec-implement:2026-06-10:2395e303 -->
 
-### 2026-06-10 — Test: AC coverage validated
+## 2026-06-10 — [Spec]: AC coverage validated
 
 - **Type:** Spec Update
 - **Spec modified:** No
@@ -42,7 +42,7 @@
 
 <!-- finalize:spec-test:2026-06-10:cea2d0c7 -->
 
-### 2026-06-10 — Pipeline: /spec-feature 039.1 complete — audit fixes applied
+## 2026-06-10 — [Feature]: /spec-feature 039.1 complete — audit fixes applied
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -53,7 +53,7 @@
 
 <!-- finalize:spec-feature:2026-06-10:645cecd3 -->
 
-### 2026-06-11 — Check: Spec-code alignment verified
+## 2026-06-11 — [Spec]: Spec-code alignment verified
 
 - **Type:** Spec Update
 - **Spec modified:** No
