@@ -1,0 +1,113 @@
+{
+  "blockers": [],
+  "created_at": "2026-06-27T14:40:18.265219+00:00",
+  "feature_slug": "069-clarify-gate",
+  "gates_sha256": "6b45fc4b27b41cb91f5df004995ef590f38312729105308559a8b08d673f2361",
+  "oracle": "livespec-conventions-gate",
+  "oracle_version": "1",
+  "receipt_hash": "c811058d11afa6c53d3c3d6a674b6a93cf067b395f5bca24ccf87cb7a0cb6f7a",
+  "run_id": "spec-feature-f8951717",
+  "schema_version": "1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "fix_hint": "",
+      "line": 42,
+      "message": "public API lacks docs",
+      "path": "tests/test_clarify_gate.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 63,
+      "message": "public API lacks docs",
+      "path": "tests/test_clarify_gate.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 98,
+      "message": "public API lacks docs",
+      "path": "tests/test_clarify_gate.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 112,
+      "message": "public API lacks docs",
+      "path": "tests/test_clarify_gate.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 83,
+      "message": "scan_clarification_opportunities has 57 lines > 30",
+      "path": "validator/clarify_gate.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 63,
+      "message": "public API lacks docs",
+      "path": "validator/clarify_gate.py",
+      "rule_id": "builtin.doc_coverage",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 104,
+      "message": "_insert_phase_row has 38 lines > 30",
+      "path": "validator/pipeline.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 163,
+      "message": "init has 39 lines > 30",
+      "path": "validator/pipeline.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 205,
+      "message": "update has 65 lines > 60",
+      "path": "validator/pipeline.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "error",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 299,
+      "message": "next has 31 lines > 30",
+      "path": "validator/pipeline.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 70,
+      "message": "suppression directive `# noqa` exceeds budget 0",
+      "path": "validator/pipeline.py",
+      "rule_id": "builtin.suppression_directives",
+      "severity": "error",
+      "source": "builtin"
+    }
+  ]
+}
