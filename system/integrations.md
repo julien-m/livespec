@@ -27,6 +27,8 @@ The LiveSpec core is **tool-agnostic**: it never hard-codes the name of
 any specific integration. The presence (or absence) of any `*.md` file
 is the only signal.
 
+Native Quality Engineering Analysis is not a user-level integration. **Read** [`qe-analysis.md`](qe-analysis.md) for the built-in QE contract automatically embedded by `livespec goal render` for `spec-specify`, `spec-plan`, and `spec-test`. Markdown integrations can add personal or team guidance, but they are extension-only and are not required for the native QE task.
+
 ---
 
 ## Location

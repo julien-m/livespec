@@ -779,6 +779,279 @@ def test_goal_prove_requires_resolved_before_hook_context(tmp_path: Path) -> Non
     assert accepted["status"] == "ACCEPTED"
 
 
+# @spec FR-002: Native QE render, FR-006: No user config/global skill dependency
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-002
+def test_spec_plan_goal_embeds_native_qe_without_user_config(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", tmp_path / "missing-l0")
+    monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", tmp_path / "missing-global")
+
+    goal = compile_command_goal(
+        "spec-plan",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+        flags="",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+
+    qe_context = contract["qe_analysis"]
+    assert qe_context["native"] is True
+    assert qe_context["source_path"] == "system/qe-analysis.md"
+    assert qe_context["user_hooks_role"] == "extension_only"
+    assert "Quality Engineering" in qe_context["content"]
+    assert "~/.config/livespec/qe-analysis.md" not in qe_context["content"]
+    assert "$qe-analysis" not in qe_context["content"]
+
+    qe_task = next(task for task in contract["tasks"] if task["id"] == "qe.analysis")
+    assert qe_task["required_evidence"] == [
+        "qe_dimensions_considered",
+        "qe_gates_required",
+        "qe_expected_evidence",
+        "qe_gaps_or_missing_evidence",
+        "qe_boundary_note",
+    ]
+    assert "Native QE Analysis:" in goal.objective
+
+
+# @spec FR-003: Affected commands receive qe.analysis
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-003
+@pytest.mark.parametrize("command", ["spec-specify", "spec-plan", "spec-test"])
+def test_native_qe_analysis_task_is_injected_for_quality_commands(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    command: str,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", tmp_path / "missing-l0")
+    monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", tmp_path / "missing-global")
+
+    goal = compile_command_goal(
+        command,
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+
+    task_ids = [task["id"] for task in contract["tasks"]]
+    assert "qe.analysis" in task_ids
+    assert task_ids.index("qe.analysis") < task_ids.index("archive.run")
+
+
+# @spec FR-003: Unaffected commands do not receive qe.analysis
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-003
+def test_native_qe_analysis_task_is_not_injected_for_unaffected_commands(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", tmp_path / "missing-l0")
+    monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", tmp_path / "missing-global")
+
+    goal = compile_command_goal(
+        "spec-check",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+
+    assert "qe_analysis" not in contract
+    assert "qe.analysis" not in [task["id"] for task in contract["tasks"]]
+
+
+# @spec FR-005: Generic QE proof is rejected
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-005
+def test_goal_prove_rejects_generic_qe_analysis_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", tmp_path / "missing-l0")
+    monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", tmp_path / "missing-global")
+    goal = compile_command_goal(
+        "spec-plan",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "qe.analysis",
+        evidence={
+            "output": "quality checked",
+            "success_criteria_met": True,
+            "summary": "QE looks good",
+        },
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert result["missing_evidence"] == [
+        "qe_dimensions_considered",
+        "qe_gates_required",
+        "qe_expected_evidence",
+        "qe_gaps_or_missing_evidence",
+        "qe_boundary_note",
+    ]
+    assert "generic_quality_claim" in result["invalid_substitutes"]
+
+
+# @spec FR-006: Skill/config substitutes are rejected
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-006
+@pytest.mark.parametrize(
+    ("extra_evidence", "invalid_substitute"),
+    [
+        ({"skill": "qe-analysis"}, "skill_global_qe_analysis_invocation"),
+        ({"qe_analysis_skill_invoked": True}, "skill_global_qe_analysis_invocation"),
+        ({"config_path": "~/.config/livespec/qe-analysis.md"}, "user_config_qe_analysis_only"),
+        ({"user_config_qe_analysis": True}, "user_config_qe_analysis_only"),
+    ],
+)
+def test_goal_prove_rejects_qe_analysis_substitutes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    extra_evidence: dict[str, object],
+    invalid_substitute: str,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", tmp_path / "missing-l0")
+    monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", tmp_path / "missing-global")
+    goal = compile_command_goal(
+        "spec-plan",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+
+    evidence: dict[str, object] = {
+        "qe_dimensions_considered": ["functional_correctness"],
+        "qe_gates_required": ["AC coverage matrix maps every AC to test evidence"],
+        "qe_expected_evidence": ["test command transcript with pass/fail counts"],
+        "qe_gaps_or_missing_evidence": ["no visual proof required for CLI-only change"],
+        "qe_boundary_note": "Review/audit owns defect hunting; tests own evidence sufficiency.",
+        **extra_evidence,
+    }
+    result = prove_goal_task(
+        contract,
+        state,
+        "qe.analysis",
+        evidence=evidence,
+        project_root=project_root,
+    )
+
+    assert result["status"] == "REJECTED_NEEDS_ACTION"
+    assert result["missing_evidence"] == []
+    assert invalid_substitute in result["invalid_substitutes"]
+
+
+# @spec FR-004: Structured QE proof is accepted
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-004
+def test_goal_prove_accepts_structured_qe_analysis_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", tmp_path / "missing-l0")
+    monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", tmp_path / "missing-global")
+    goal = compile_command_goal(
+        "spec-test",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "qe.analysis",
+        evidence={
+            "qe_dimensions_considered": [
+                "functional_correctness",
+                "regression_risk",
+                "api_contract_compatibility",
+            ],
+            "qe_gates_required": [
+                "AC coverage matrix maps every AC to test evidence",
+                "resolved test commands exit 0",
+            ],
+            "qe_expected_evidence": [
+                "checks/YYYY-MM-DD-test.md coverage report",
+                "test command transcript with pass/fail counts",
+            ],
+            "qe_gaps_or_missing_evidence": [
+                "visual proof not applicable for non-UI feature",
+            ],
+            "qe_boundary_note": (
+                "Defect hunting remains in review/audit; spec-test owns test evidence."
+            ),
+        },
+        project_root=project_root,
+    )
+
+    assert result["status"] == "ACCEPTED"
+    assert result["state"]["tasks"]["qe.analysis"]["status"] == "complete"
+
+
+# @spec FR-007: User hooks remain extension-only
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-007
+def test_native_qe_is_primary_and_user_hooks_are_additive(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    integrations_dir = tmp_path / "integrations"
+    integrations_dir.mkdir()
+    (integrations_dir / "qe-analysis.md").write_text(
+        """\
+---
+integration: personal-qe
+commands: [plan]
+phase: before
+mode: extend
+order: 60
+---
+Personal QE addendum only.
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", integrations_dir)
+    monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", tmp_path / "missing-global")
+
+    goal = compile_command_goal(
+        "spec-plan",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+
+    assert contract["qe_analysis"]["native"] is True
+    assert contract["qe_analysis"]["source_path"] == "system/qe-analysis.md"
+    assert contract["hooks"]["before"]["non_empty"] is True
+    assert "Personal QE addendum only." in contract["hooks"]["before"]["context"]
+    assert "qe.analysis" in [task["id"] for task in contract["tasks"]]
+
+
 def test_rendered_goal_tasks_replay_required_conventions(tmp_path: Path) -> None:
     """AC-001/AC-002/AC-007/AC-008: tasks replay convention domains and sources."""
     project_root, livespec_root = _fixture_roots(tmp_path)
@@ -928,9 +1201,7 @@ def test_conventions_gate_required_for_spec_implement(tmp_path: Path) -> None:
     )
     contract = json.loads(render_goal_contract_file(goal))
     final_tasks = [
-        task
-        for task in contract["tasks"]
-        if task["id"] not in {"archive.run", "hooks.before"}
+        task for task in contract["tasks"] if task["id"] not in {"archive.run", "hooks.before"}
     ]
 
     assert final_tasks

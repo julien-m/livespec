@@ -77,6 +77,10 @@ Avant tout `PHASE_RESULT`, exécuter `livespec conventions verify --json --featu
 Si verdict `FAIL` ou `BLOCKED`, ou si `receipt_path` est absent/null → `PHASE_RESULT: BLOCKED - conventions_gate_failed` avec `extra.conventions_verdict` et `extra.conventions_receipt_path`.
 Si verdict `PASS`, soumettre `{"conventions_receipt_path":"<receipt_path>"}` au goal et inclure `extra.conventions_verdict: PASS`.
 
+## STEP 0.10 — Native QE Analysis
+
+`livespec goal render spec-test` embeds **Read** [`../../../system/qe-analysis.md`](../../../system/qe-analysis.md) and injects a `qe.analysis` proof task. Before reporting success, verify AC/FR evidence sufficiency against the native QE dimensions, gates, expected evidence, gaps, and boundary note. User hooks may extend this behavior only; they are not the primary QE source.
+
 # Command: /spec-test
 
 > Post-implementation test validation — audit AC coverage, generate missing tests from Gherkin, execute the full suite, capture visual baselines, and produce a test report.
@@ -1269,6 +1273,7 @@ Run with --confirm to generate tests.
 - [always] Check for fresh check report in checks/YYYY-MM-DD.md: fresh = same calendar day + no commits touching implementation files or .specs/features/NNN/ since report date
 - [always] If no fresh report: build coverage matrix from spec.md AC list + implementation.md AC Mapping table + grep @spec anchors in source files
 - [always] Classify each AC: Covered (test file references AC) / Partial (test exists but incomplete) / Missing (no test found) / No Gherkin (no Gherkin scenario to generate from)
+- [always] Apply native QE Analysis to verify coverage sufficiency, required gates, expected evidence, missing proof, and boundary ownership
 - [always] Sub-phase 1.5 — if spec.md has ## Behavioral AC section: extract declared trait names (e.g. async_action, is_submittable)
 - [always] Sub-phase 1.5 — load system/testing/ui-behavioral-taxonomy.md; extract pattern keyword column per declared trait; skip sub-phase with WARNING if taxonomy file missing
 - [always] Sub-phase 1.5 — grep feature test files for each pattern keyword; classify Covered (pattern found + file:line) / Gap (pattern not found)

@@ -103,6 +103,8 @@ flowchart TD
 >
 > **Hooks & integrations — after completing:** Same resolution with `--event after`.
 
+> **Native QE Analysis:** `livespec goal render spec-specify` embeds **Read** [`../../../system/qe-analysis.md`](../../../system/qe-analysis.md) and injects a `qe.analysis` proof task. The spec must record applicable quality dimensions, risk classification, expected evidence, non-functional expectations, gaps, and a boundary note for review/audit/tests. User hooks may extend this behavior only; they are not the primary QE source.
+
 ## Steps
 
 ### Step 1 — Parse Feature Description
@@ -995,6 +997,7 @@ flowchart TD
 - [always] Generate user stories with Gherkin scenarios and Mermaid flowcharts
 - [always] Generate AC and FR sections with sequential numbering
 - [always] Generate Key Entities, Edge Cases, Success Criteria, and Infrastructure Requirements if needed
+- [always] Apply native QE Analysis to enrich risks, expected proof, non-functional expectations, and gaps
 - [penflow] Add Penflow Contract section with resolved IDs
 - [always] Inject `## Behavioral AC` section via LLM signal extraction and detect_traits() if UI signals found
 - [visual] Inject visual state assertions for detected traits with visual_states defined

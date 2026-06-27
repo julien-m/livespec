@@ -151,7 +151,8 @@ HOOKS_BEFORE_INVALID_SUBSTITUTES: tuple[str, ...] = (
     "hook_command_mentioned_without_output_hash",
 )
 HOOKS_BEFORE_REPAIR_ACTIONS: tuple[str, ...] = (
-    "run the exact `livespec hooks resolve --event before --command <command> [--feature <slug>]` command",
+    "run the exact `livespec hooks resolve --event before --command <command> "
+    "[--feature <slug>]` command",
     "apply the non-empty stdout as additional command context before continuing",
     "submit the hook command, resolved stdout sha256, and hook_context_applied=true",
 )
@@ -159,6 +160,32 @@ CONVENTIONS_REQUIRED_EVIDENCE: tuple[str, ...] = ("conventions_receipt_path",)
 CONVENTIONS_VERIFY_COMMAND = "livespec conventions verify --json --feature <slug>"
 _CONVENTIONS_GATED_COMMANDS: frozenset[str] = frozenset(
     {"spec-implement", "spec-test", "spec-fix", "spec-feature", "spec-ship"}
+)
+
+# @spec FR-002: Embed native QE for affected commands
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-002
+QE_NATIVE_COMMANDS: frozenset[str] = frozenset({"spec-specify", "spec-plan", "spec-test"})
+QE_ANALYSIS_TASK_ID = "qe.analysis"
+QE_ANALYSIS_MODULE_PATH = Path("system/qe-analysis.md")
+
+# @spec FR-004: Require structured QE evidence
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-004
+QE_ANALYSIS_REQUIRED_EVIDENCE: tuple[str, ...] = (
+    "qe_dimensions_considered",
+    "qe_gates_required",
+    "qe_expected_evidence",
+    "qe_gaps_or_missing_evidence",
+    "qe_boundary_note",
+)
+QE_ANALYSIS_INVALID_SUBSTITUTES: tuple[str, ...] = (
+    "generic_quality_claim",
+    "skill_global_qe_analysis_invocation",
+    "user_config_qe_analysis_only",
+)
+QE_ANALYSIS_REPAIR_ACTIONS: tuple[str, ...] = (
+    "read `system/qe-analysis.md` from the LiveSpec checkout",
+    "record the considered quality dimensions, required gates, expected evidence, gaps, "
+    "and review/audit/test boundary note",
 )
 
 # Match level-2 headings that declare visual/Penflow feature work.
@@ -672,6 +699,7 @@ def render_goal_contract_file(goal: GoalContract) -> str:
         "definition_of_done": goal.payload["definition_of_done"],
         "runtime_context": goal.payload["runtime_context"],
         "hooks": goal.payload["hooks"],
+        **({"qe_analysis": goal.payload["qe_analysis"]} if "qe_analysis" in goal.payload else {}),
         "canonical": goal.payload,
         "canonical_json": goal.canonical_json,
     }
@@ -827,6 +855,14 @@ def render_goal_objective(goal: GoalContract) -> str:
             lines.append("Hook context to apply:")
             lines.append(f"- before: {before_hook.get('command')}")
             lines.append(f"- sha256: {before_hook.get('context_sha256')}")
+    # @spec FR-002: Surface native QE context in rendered objective
+    #   — .specs/features/071-qe-analysis-native-module/spec.md#fr-002
+    qe_analysis = payload.get("qe_analysis")
+    if isinstance(qe_analysis, dict) and qe_analysis.get("native") is True:
+        lines.append("")
+        lines.append("Native QE Analysis:")
+        lines.append(f"- source: {qe_analysis.get('source_path')}")
+        lines.append("- user hooks: extension_only")
     # @spec FR-005: Render task-level convention replay
     #   — .specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md#fr-005
     convention_tasks = [
@@ -922,6 +958,7 @@ def _goal_payload(
         project_root=project_root,
         feature=feature,
     )
+    qe_analysis = _compile_qe_analysis_payload(command=command, livespec_root=livespec_root)
     tasks = _build_goal_tasks(
         command=command,
         execution_tasks=execution_tasks,
@@ -930,6 +967,7 @@ def _goal_payload(
         conventions=conventions,
         conventions_gate_exists=gates_path(project_root).exists(),
         hooks=hooks,
+        qe_analysis=qe_analysis,
     )
     payload = {
         "schema_version": GOAL_CONTRACT_VERSION,
@@ -953,6 +991,7 @@ def _goal_payload(
         "tasks": tasks,
         "internal_command_invocations": _extract_internal_command_invocations(skill_path),
         "hooks": hooks,
+        **({"qe_analysis": qe_analysis} if qe_analysis is not None else {}),
         "expectations": {
             "command": expectations.command,
             "contract_version": expectations.contract_version,
@@ -1010,6 +1049,7 @@ def _build_goal_tasks(
     conventions: Mapping[str, object],
     conventions_gate_exists: bool,
     hooks: Mapping[str, object],
+    qe_analysis: Mapping[str, object] | None,
 ) -> list[dict[str, Any]]:
     """Convert command task prose into enforced proof tasks."""
     # Build base proof tasks first, then layer optional convention evidence onto
@@ -1032,6 +1072,8 @@ def _build_goal_tasks(
     before_hook_context_text = before_hook_context.get("context")
     if isinstance(before_hook_context_text, str) and before_hook_context_text.strip():
         tasks.append(_hooks_before_task(command=command, hook_context=before_hook_context))
+    if qe_analysis is not None:
+        tasks.append(_qe_analysis_task(command=command, next_ordinal=len(tasks) + 1))
     start_ordinal = len(tasks) + 1
     for ordinal, (category, description) in enumerate(rows, start_ordinal):
         task_id = _unique_task_id(
@@ -1096,6 +1138,26 @@ def _build_goal_tasks(
     next_archive_ordinal = max((int(task["ordinal"]) for task in tasks), default=0) + 1
     tasks.append(_archive_run_task(command=command, next_ordinal=next_archive_ordinal))
     return tasks
+
+
+def _compile_qe_analysis_payload(
+    *,
+    command: str,
+    livespec_root: Path,
+) -> dict[str, Any] | None:
+    """Embed the native QE module for commands that own QE-sensitive artifacts."""
+    if command not in QE_NATIVE_COMMANDS:
+        return None
+    module_path = livespec_root / QE_ANALYSIS_MODULE_PATH
+    content = module_path.read_text(encoding="utf-8")
+    return {
+        "native": True,
+        "source_path": QE_ANALYSIS_MODULE_PATH.as_posix(),
+        "source_sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+        "content": content,
+        "commands": sorted(QE_NATIVE_COMMANDS),
+        "user_hooks_role": "extension_only",
+    }
 
 
 def _compile_hooks_payload(
@@ -1175,6 +1237,25 @@ def _hooks_before_task(*, command: str, hook_context: Mapping[str, object]) -> d
             "hook_resolution_command": command_text,
             "resolved_hook_context_sha256": sha256,
             "feature_slug": None,
+        },
+    }
+
+
+# @spec FR-003: Inject qe.analysis task
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-003
+def _qe_analysis_task(*, command: str, next_ordinal: int) -> dict[str, Any]:
+    return {
+        "id": QE_ANALYSIS_TASK_ID,
+        "ordinal": next_ordinal,
+        "category": "injected",
+        "description": "Apply native LiveSpec QE Analysis and record quality evidence contract",
+        "required_evidence": list(QE_ANALYSIS_REQUIRED_EVIDENCE),
+        "invalid_substitutes": list(QE_ANALYSIS_INVALID_SUBSTITUTES),
+        "repair_if_missing": list(QE_ANALYSIS_REPAIR_ACTIONS),
+        "completion_actor": "goal",
+        "expected_evidence": {
+            "command": command,
+            "qe_source_path": QE_ANALYSIS_MODULE_PATH.as_posix(),
         },
     }
 
@@ -1420,6 +1501,8 @@ def _validate_task_evidence(
         )
     if task_id == HOOKS_BEFORE_TASK_ID or task_id.startswith(f"{HOOKS_BEFORE_TASK_ID}."):
         return _validate_hooks_before_evidence(task, evidence)
+    if task_id == QE_ANALYSIS_TASK_ID or task_id.startswith(f"{QE_ANALYSIS_TASK_ID}."):
+        return _validate_qe_analysis_evidence(task, evidence)
     return _validate_generic_evidence(
         task,
         evidence,
@@ -1466,6 +1549,57 @@ def _validate_hooks_before_evidence(
         "invalid_substitutes": invalid,
         "required_actions": list(task["repair_if_missing"]),
     }
+
+
+# @spec FR-005: Reject generic QE evidence, FR-006: Reject skill/config substitutes
+#   — .specs/features/071-qe-analysis-native-module/spec.md#fr-005
+def _validate_qe_analysis_evidence(
+    task: dict[str, Any],
+    evidence: dict[str, Any],
+) -> dict[str, Any]:
+    # Validate separate passes so callers get missing fields and invalid substitutes together.
+    missing: list[str] = []
+    invalid: list[str] = []
+
+    if evidence.get("output") or evidence.get("summary") or evidence.get("success_criteria_met"):
+        invalid.append("generic_quality_claim")
+    if evidence.get("skill") == "qe-analysis" or evidence.get("qe_analysis_skill_invoked"):
+        invalid.append("skill_global_qe_analysis_invocation")
+    if evidence.get("config_path") or evidence.get("user_config_qe_analysis"):
+        invalid.append("user_config_qe_analysis_only")
+
+    for required in QE_ANALYSIS_REQUIRED_EVIDENCE:
+        value = evidence.get(required)
+        if required == "qe_boundary_note":
+            if not _valid_qe_boundary_note(value):
+                missing.append(required)
+            continue
+        if not _nonempty_string_list(value):
+            missing.append(required)
+
+    accepted = not missing and not invalid
+    return {
+        "status": "ACCEPTED" if accepted else "REJECTED_NEEDS_ACTION",
+        "accepted": accepted,
+        "missing_evidence": missing,
+        "invalid_substitutes": invalid,
+        "required_actions": list(task["repair_if_missing"]),
+    }
+
+
+def _nonempty_string_list(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and bool(value)
+        and all(isinstance(item, str) and item.strip() for item in value)
+    )
+
+
+def _valid_qe_boundary_note(value: object) -> bool:
+    if not isinstance(value, str) or not value.strip():
+        return False
+    lowered = value.lower()
+    return any(marker in lowered for marker in ("review", "audit", "test"))
 
 
 def _validate_visual_receipt_evidence(

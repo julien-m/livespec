@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-27 — [Feature 071] Implemented: QE Analysis Native Module — native QE context, `qe.analysis` goal task, structured evidence validation, additive user hooks
+
 ## 2026-06-27 — [Feature 070] Analyze Gate — retroactive spec+plan+mapping for read-only pre-impl gate; dogfooded Clarify (empty queue) + Analyze (0 CRITICAL/HIGH, exit 0)
 
 ## 2026-06-27 — [Feature 069] Plan created: Clarify Gate — 7 implementation steps (retroactive, maps to existing code), 1 state diagram

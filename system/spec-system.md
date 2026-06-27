@@ -543,12 +543,15 @@ erDiagram
 
 ## Quality Gates
 
+Native Quality Engineering Analysis is built into `spec-specify`, `spec-plan`, and `spec-test`. **Read** [`qe-analysis.md`](qe-analysis.md) for the native dimensions, risk classification, gates, evidence contract, anti-invention rules, boundaries, and per-command mapping. User-level Markdown integrations may extend QE behavior, but are never required for the native QE contract.
+
 Before a spec is considered complete:
 - [ ] All user stories have Gherkin scenarios (```gherkin blocks) — source of truth for tests
 - [ ] All user stories have Mermaid flowcharts — visual representation of the same flow
 - [ ] Gherkin scenarios and Mermaid flowcharts describe the same flow
 - [ ] All AC are testable (Given/When/Then format)
 - [ ] All FR map to at least one AC
+- [ ] Native QE Analysis records applicable dimensions, risk classification, expected evidence, non-functional expectations, gaps, and review/audit/test boundaries
 - [ ] No more than 3 `[NEEDS CLARIFICATION]` markers
 - [ ] If feature has UI screens: `## Screens` section exists with PNG references
 - [ ] If design tool configured: referenced PNGs exist in `.specs/design/screens/`
@@ -559,6 +562,7 @@ Before a plan is considered complete:
 - [ ] ER diagrams exist for new data models
 - [ ] Constitution Check section is filled
 - [ ] All FR are covered in the implementation plan
+- [ ] Native QE Analysis maps spec risks to gates, test levels, proof artifacts, evidence gaps, and boundary ownership
 
 Before implementation is considered complete:
 - [ ] `progress.md` exists with a checkpoint row for **every** step (BLOCKING — enables `--resume`)
@@ -568,6 +572,9 @@ Before implementation is considered complete:
 - [ ] `changelog.md` has an entry
 - [ ] For visual features: Playwright baselines captured in `baselines/`
 - [ ] For visual features with design mockups: design fidelity check performed
+
+Before test validation is considered complete:
+- [ ] Native QE Analysis verifies AC/FR evidence sufficiency, required gates, expected evidence, missing proof, and boundary ownership
 
 Before `/spec-init` is considered complete:
 - [ ] At least 1 ADR exists in `.specs/stacks/decisions/` (BLOCKING — every stack choice must be justified)

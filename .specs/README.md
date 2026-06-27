@@ -108,6 +108,7 @@
 | 068 | Evidence-First Retry Contract | Implemented | 2026-06-26 | 2026-06-26 | [spec](features/068-evidence-first-retry-contract/spec.md), [plan](features/068-evidence-first-retry-contract/plan.md), [implementation](features/068-evidence-first-retry-contract/implementation.md) |
 | 069 | Clarify Gate | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/069-clarify-gate/spec.md), [plan](features/069-clarify-gate/plan.md), [implementation](features/069-clarify-gate/implementation.md) |
 | 070 | Analyze Gate | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/070-analyze-gate/spec.md), [plan](features/070-analyze-gate/plan.md), [implementation](features/070-analyze-gate/implementation.md) |
+| 071 | QE Analysis Native Module | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/071-qe-analysis-native-module/spec.md), [plan](features/071-qe-analysis-native-module/plan.md), [implementation](features/071-qe-analysis-native-module/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -131,6 +132,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-27 | Feature | [Feature 071] Implemented: QE Analysis Native Module — native QE context, `qe.analysis` goal task, structured evidence validation, additive user hooks |
 | 2026-06-27 | Plan | [Feature 069] Plan created: Clarify Gate — 7 implementation steps (retroactive, maps to existing code), 1 state diagram |
 | 2026-06-27 | Spec | [Feature 069] Spec created: Clarify Gate — 4 stories, 12 AC, 12 FR |
 | 2026-06-26 | Bugfix | [Doctor Fix] Cleared all repo-level `livespec doctor` INFO traceability findings by adding missing source `@spec(...)` anchors. |

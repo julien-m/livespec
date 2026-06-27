@@ -69,6 +69,7 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
   - "Acceptance Criteria"
   - "Functional Requirements"
 - proof boundary: when `## Clarifications` is written it carries `### Session YYYY-MM-DD` with at most 5 accepted `- Q: ... -> A: ...` bullets per session, no duplicate bullets, and AC-/FR-/SC- numbering is preserved (text edited in place, never renumbered)
+- proof boundary: native QE Analysis from `system/qe-analysis.md` enriches risks, expected evidence, non-functional expectations, gaps, and review/audit/test boundaries; user hooks are extension-only
 - stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
   - `ABSENT`: non-UI feature without root `penflow/`
   - `BLOCKED`: UI feature forward contract generation failed
@@ -98,6 +99,7 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
 
 - [ ] spec.md has Gherkin + Mermaid per user story
 - [ ] FR list maps each AC
+- [ ] Native QE Analysis applied: dimensions, gates, expected evidence, gaps, and boundary note are recorded
 - [ ] If `## Clarifications` exists: ≤ 5 accepted Q/A per session, no duplicate bullets, AC/FR/SC numbering preserved
 
 ## 11. Troubleshooting

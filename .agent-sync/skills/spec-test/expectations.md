@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-06-26
+last_reviewed: 2026-06-27
 ---
 
 <!-- @spec(FR-004) -->
@@ -84,6 +84,7 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 - stdout marker: `Open for annotation: http://127.0.0.1:<port>/i/<id>`
 - fallback marker: `Visual preview: unavailable - visual-preview CLI missing`
 - proof boundary: `visual_evidence_receipt_path` remains required for pixel fidelity; preview URLs are human-visible annotation proof only
+- proof boundary: native QE Analysis from `system/qe-analysis.md` verifies AC/FR test-evidence sufficiency, required gates, expected evidence, missing proof, and review/audit/test boundaries; user hooks are extension-only
 - stdout marker: `Design Alignment Verdict: PASS | FAIL | BLOCKED` for `--visual` runs when `ui.pen` is present or changed
 - stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED` for UI runs
   - `ABSENT`: no root `penflow/`
@@ -126,6 +127,7 @@ Runners write captures to `.specs/features/<slug>/run/<ts>/<target>/<screen>.png
 
 - [ ] Coverage report present in checks/
 - [ ] Suite exits 0
+- [ ] Native QE Analysis applied: AC/FR evidence sufficiency, gates, expected evidence, gaps, and boundary note are recorded
 - [ ] Penflow UI runs have Global LiveSpec Design Registry artifacts: `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`
 - [ ] Penflow UI runs have Mockup Factory PASS proof: `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/<feature_slug>/manifest.json`, `.mockup-validation/<feature_slug>/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and visual evidence PNGs
 

@@ -118,6 +118,8 @@ flowchart TD
 >
 > **Hooks & integrations — after completing:** Same resolution with `--event after`.
 
+> **Native QE Analysis:** `livespec goal render spec-plan` embeds **Read** [`../../../system/qe-analysis.md`](../../../system/qe-analysis.md) and injects a `qe.analysis` proof task. The plan must translate spec risks into gates, test levels, proof artifacts, evidence gaps, and boundary notes for review/audit/tests. User hooks may extend this behavior only; they are not the primary QE source.
+
 ## Surface-Aware Test Directory Resolution
 
 **When generating the Testing Strategy table:** If `.specs/surfaces.yaml` exists, use each surface's `testDir` for test file paths instead of generic `tests/e2e/`. Example paths in this command are illustrations — resolve actual paths from surfaces config.
@@ -535,6 +537,7 @@ ABORT: "plan.md failed structural validation after 2 retries.
 - [always] Map each FR to concrete files by layer (infra, db, data, logic, API, UI, tests)
 - [always] Write FR sub-task numbers and descriptions for each step
 - [always] Resolve test commands and record in Resolved Test Commands table
+- [always] Translate native QE risks into gates, test levels, proof artifacts, and evidence gaps
 - [visual] Add theme installation Step 0 to plan if theme.css exists
 - [always] Map each test type to specific files and FR/AC
 

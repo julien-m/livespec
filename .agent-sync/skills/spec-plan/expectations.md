@@ -1,7 +1,7 @@
 ---
 command: spec-plan
 contract_version: "1.0"
-last_reviewed: 2026-06-26
+last_reviewed: 2026-06-27
 ---
 
 # Expectations — /spec-plan
@@ -62,6 +62,7 @@ Generate a technical plan with sequence, state, and ER diagrams.
   - "Technical Context"
   - "Constitution Check"
   - "Implementation Plan"
+- proof boundary: native QE Analysis from `system/qe-analysis.md` translates risks into gates, test levels, proof artifacts, evidence gaps, and review/audit/test boundaries; user hooks are extension-only
 - stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
   - `ABSENT`: non-UI feature without root `penflow/`
   - `BLOCKED`: UI plan needs `code-ir.json` or other root artifacts but forward generation failed
@@ -91,6 +92,7 @@ Generate a technical plan with sequence, state, and ER diagrams.
 
 - [ ] plan.md contains a sequence + state + ER diagram
 - [ ] No [DECISION NEEDED] markers
+- [ ] Native QE Analysis applied: risks map to gates, test levels, proof artifacts, gaps, and boundary note
 
 ## 11. Troubleshooting
 

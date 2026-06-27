@@ -35,6 +35,7 @@ Six months later, nobody knows **why** something was built the way it was.
 | No history | **Per-feature + journey changelogs** — every behavior and journey change is recorded |
 | UI behavior hidden in screenshots | **Penflow contracts** — root `penflow/` owns semantic UI flow correctness |
 | No visual testing | **Playwright baselines** built into implementation + check |
+| No quality evidence contract | **Native QE Analysis** built into specify, plan, and test goals |
 | Regression flows tied to one feature | **Cross-feature User Journeys v2** — global journeys cover multiple features, compile once, and run as non-regression tests |
 | Stack decisions lost | **Stack presets with decision trees** — know WHY you chose each tool |
 | One-time init | **Brainstorm-driven init** — AI interviews you before generating anything |
@@ -99,10 +100,10 @@ For debt remediation, run `/spec-fix --conventions`. See [`system/conventions-en
 | `/spec-init` | 3-phase conversational brainstorm → generates project profile, stack, `.specs/` structure + CLAUDE.md. `--from-code`: reverse-engineer existing codebase. |
 | `/spec-migrate` | Upgrade project to latest LiveSpec version — applies pending migrations, updates local symlinks |
 | `/spec-propose` | Analyze project context and intelligently propose the next feature(s) to build |
-| `/spec-specify` | Create a new feature spec with user stories, Mermaid flows, AC, and FR |
-| `/spec-plan` | Generate technical plan with sequence, state, and ER diagrams |
+| `/spec-specify` | Create a new feature spec with user stories, Mermaid flows, AC, FR, and native QE risks/evidence expectations |
+| `/spec-plan` | Generate technical plan with sequence, state, ER diagrams, and native QE gates/test evidence |
 | `/spec-implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
-| `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, validate Penflow expected/actual UI trees, capture visual baselines, verify design fidelity |
+| `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, validate Penflow expected/actual UI trees, capture visual baselines, verify design fidelity, and enforce native QE evidence sufficiency |
 | `/spec-journey` | Create, edit, bootstrap, impact-check, inspect, compile, and run global User Journeys v2 across multiple features |
 | `/spec-check` | Compare spec vs actual code — find gaps, verify AC, report Penflow contract status, detect visual drift; `--pre-impl` runs a read-only pre-implementation cross-artifact Analyze report (no writes) |
 | `/spec-doctor` | Project health audit — orchestrates coherence validation and reports stale mappings, missing tests, runner drift, unenforced hooks, lifecycle gaps, visual orphans |
