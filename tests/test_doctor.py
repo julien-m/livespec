@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import cast
 
@@ -29,6 +30,7 @@ from typer.testing import CliRunner
 
 from validator.cli import app
 from validator.doctor.models import JsonValue
+from validator.doctor.scanner import _scan_hook_enforcement
 
 runner = CliRunner()
 
@@ -105,6 +107,27 @@ def test_doctor_json_reports_stale_mapping_missing_test_and_hook(
     assert "mapping_stale" in codes
     assert "missing_test_file" in codes
     assert "hook_unenforced" in codes
+
+
+def test_doctor_detects_hooks_from_git_worktree_git_path(tmp_path: Path) -> None:
+    """Linked worktrees store hooks under the common git dir, not worktree/.git/hooks."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo, check=True)
+    (repo / ".specs").mkdir()
+    (repo / "README.md").write_text("# repo\n", encoding="utf-8")
+    subprocess.run(["git", "add", "README.md", ".specs"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "--no-verify", "-m", "init"], cwd=repo, check=True)
+    worktree = tmp_path / "worktree"
+    subprocess.run(["git", "worktree", "add", worktree.as_posix(), "-b", "work"], cwd=repo, check=True)
+
+    hook_path = repo / ".git" / "hooks" / "pre-commit"
+    hook_path.write_text("#!/usr/bin/env bash\nlivespec validate --staged\n", encoding="utf-8")
+    hook_path.chmod(0o755)
+
+    assert _scan_hook_enforcement(worktree) == []
 
 
 def test_doctor_ignores_prose_cells_with_dotted_words(

@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 import frontmatter
@@ -260,6 +261,7 @@ def _scan_hook_enforcement(project_root: Path) -> list[DoctorFinding]:
         project_root / ".githooks" / "pre-commit",
         project_root / ".githooks" / "pre-push",
     ]
+    hook_paths.extend(_git_resolved_hook_paths(project_root))
     for hook_path in hook_paths:
         if not hook_path.exists():
             continue
@@ -275,6 +277,29 @@ def _scan_hook_enforcement(project_root: Path) -> list[DoctorFinding]:
             suggested_action="Install or update hooks so commit/push runs livespec validate.",
         )
     ]
+
+
+def _git_resolved_hook_paths(project_root: Path) -> list[Path]:
+    """Return hook paths as Git resolves them, including linked worktrees."""
+    resolved: list[Path] = []
+    for hook_name in ("pre-commit", "pre-push"):
+        try:
+            proc = subprocess.run(
+                ["git", "-C", project_root.as_posix(), "rev-parse", "--git-path", f"hooks/{hook_name}"],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=2,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+        if proc.returncode != 0:
+            continue
+        raw_path = proc.stdout.strip()
+        if not raw_path:
+            continue
+        resolved.append(Path(raw_path))
+    return resolved
 
 
 def _scan_lifecycle(specs_root: Path) -> list[DoctorFinding]:

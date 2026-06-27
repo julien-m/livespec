@@ -34,12 +34,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, TypeAlias, cast
 
-from .command_registry import normalize_command_name
+from .command_registry import normalize_command_name, short_command_name
 from .conventions_gates import gates_path
 from .conventions_receipt import ConventionsReceiptError, verify_conventions_receipt
 from .exceptions import ArtifactMalformed, ExpectationsInvalid
 from .expectations import ExpectationsFile, Rule, load_expectations
 from .finalize import FinalizeReceiptError, verify_finalize_receipt
+from .hook_resolver import render_chain_for_stdout
+from .integrations import resolve_for
 from .run_artifacts import ARCHIVE_RUN_TASK_ID, load_run_artifact
 from .visual_evidence import VisualReceiptError, verify_visual_receipt
 from .visual_gate import spec_declares_visual_false
@@ -136,6 +138,22 @@ ARCHIVE_REPAIR_ACTIONS: tuple[str, ...] = (
 )
 ARCHIVE_RUN_TASK_DESCRIPTION = (
     "Archive the run via `livespec goal archive` and prove archive.run with the artifact path"
+)
+HOOKS_BEFORE_TASK_ID = "hooks.before"
+HOOKS_BEFORE_REQUIRED_EVIDENCE: tuple[str, ...] = (
+    "hook_resolution_command",
+    "resolved_hook_context_sha256",
+    "hook_context_applied",
+)
+HOOKS_BEFORE_INVALID_SUBSTITUTES: tuple[str, ...] = (
+    "manual_integration_summary",
+    "config_file_exists_without_resolved_context",
+    "hook_command_mentioned_without_output_hash",
+)
+HOOKS_BEFORE_REPAIR_ACTIONS: tuple[str, ...] = (
+    "run the exact `livespec hooks resolve --event before --command <command> [--feature <slug>]` command",
+    "apply the non-empty stdout as additional command context before continuing",
+    "submit the hook command, resolved stdout sha256, and hook_context_applied=true",
 )
 CONVENTIONS_REQUIRED_EVIDENCE: tuple[str, ...] = ("conventions_receipt_path",)
 CONVENTIONS_VERIFY_COMMAND = "livespec conventions verify --json --feature <slug>"
@@ -653,6 +671,7 @@ def render_goal_contract_file(goal: GoalContract) -> str:
         "tasks": goal.payload["tasks"],
         "definition_of_done": goal.payload["definition_of_done"],
         "runtime_context": goal.payload["runtime_context"],
+        "hooks": goal.payload["hooks"],
         "canonical": goal.payload,
         "canonical_json": goal.canonical_json,
     }
@@ -800,6 +819,14 @@ def render_goal_objective(goal: GoalContract) -> str:
         for i, task in enumerate(execution_tasks, 1):
             lines.append(f"  {i:>2}. {task}")
     tasks = list(payload.get("tasks") or [])
+    hooks = payload.get("hooks")
+    if isinstance(hooks, dict):
+        before_hook = hooks.get("before")
+        if isinstance(before_hook, dict) and before_hook.get("non_empty"):
+            lines.append("")
+            lines.append("Hook context to apply:")
+            lines.append(f"- before: {before_hook.get('command')}")
+            lines.append(f"- sha256: {before_hook.get('context_sha256')}")
     # @spec FR-005: Render task-level convention replay
     #   — .specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md#fr-005
     convention_tasks = [
@@ -889,6 +916,12 @@ def _goal_payload(
         feature=feature,
         normalized_flags=normalized_flags,
     )
+    hooks = _compile_hooks_payload(
+        command=command,
+        livespec_root=livespec_root,
+        project_root=project_root,
+        feature=feature,
+    )
     tasks = _build_goal_tasks(
         command=command,
         execution_tasks=execution_tasks,
@@ -896,6 +929,7 @@ def _goal_payload(
         visual_feature_slugs=visual_feature_slugs,
         conventions=conventions,
         conventions_gate_exists=gates_path(project_root).exists(),
+        hooks=hooks,
     )
     payload = {
         "schema_version": GOAL_CONTRACT_VERSION,
@@ -918,6 +952,7 @@ def _goal_payload(
         "execution_tasks": execution_tasks,
         "tasks": tasks,
         "internal_command_invocations": _extract_internal_command_invocations(skill_path),
+        "hooks": hooks,
         "expectations": {
             "command": expectations.command,
             "contract_version": expectations.contract_version,
@@ -974,6 +1009,7 @@ def _build_goal_tasks(
     visual_feature_slugs: list[str],
     conventions: Mapping[str, object],
     conventions_gate_exists: bool,
+    hooks: Mapping[str, object],
 ) -> list[dict[str, Any]]:
     """Convert command task prose into enforced proof tasks."""
     # Build base proof tasks first, then layer optional convention evidence onto
@@ -991,7 +1027,13 @@ def _build_goal_tasks(
     if required_conventions is not None:
         required_convention_domains = cast(list[str], required_conventions["domains"])
         required_convention_sources = cast(list[str], required_conventions["source_paths"])
-    for ordinal, (category, description) in enumerate(rows, 1):
+    before_hook = hooks.get("before")
+    before_hook_context = before_hook if isinstance(before_hook, dict) else {}
+    before_hook_context_text = before_hook_context.get("context")
+    if isinstance(before_hook_context_text, str) and before_hook_context_text.strip():
+        tasks.append(_hooks_before_task(command=command, hook_context=before_hook_context))
+    start_ordinal = len(tasks) + 1
+    for ordinal, (category, description) in enumerate(rows, start_ordinal):
         task_id = _unique_task_id(
             _task_id_for_description(command, category, ordinal, description),
             seen,
@@ -1054,6 +1096,87 @@ def _build_goal_tasks(
     next_archive_ordinal = max((int(task["ordinal"]) for task in tasks), default=0) + 1
     tasks.append(_archive_run_task(command=command, next_ordinal=next_archive_ordinal))
     return tasks
+
+
+def _compile_hooks_payload(
+    *,
+    command: str,
+    livespec_root: Path,
+    project_root: Path,
+    feature: str | None,
+) -> dict[str, Any]:
+    """Compile resolved before-hook context into the goal contract."""
+    short_command = short_command_name(command)
+    command_parts = [
+        "livespec",
+        "hooks",
+        "resolve",
+        "--event",
+        "before",
+        "--command",
+        short_command,
+    ]
+    if feature:
+        command_parts.extend(["--feature", feature])
+    command_text = " ".join(shlex.quote(part) for part in command_parts)
+    try:
+        context = render_chain_for_stdout(
+            "before",
+            command,
+            feature,
+            project_root=project_root,
+            commands_dir=livespec_root / ".agent-sync" / "skills",
+        )
+    except Exception:
+        # Match `livespec hooks resolve`: hook resolution is absence-tolerant
+        # and must not make goal rendering fail.
+        context = ""
+    try:
+        level0_integrations = [
+            {
+                "name": integration.name,
+                "path": integration.path.as_posix(),
+                "mode": integration.mode,
+                "order": integration.order,
+            }
+            for integration in resolve_for(
+                "before",
+                command,
+                commands_dir=livespec_root / ".agent-sync" / "skills",
+            )
+        ]
+    except Exception:
+        level0_integrations = []
+    return {
+        "before": {
+            "command": command_text,
+            "context": context,
+            "context_sha256": hashlib.sha256(context.encode("utf-8")).hexdigest(),
+            "level0_integrations": level0_integrations,
+            "non_empty": bool(context.strip()),
+        }
+    }
+
+
+def _hooks_before_task(*, command: str, hook_context: Mapping[str, object]) -> dict[str, Any]:
+    command_text = str(hook_context.get("command") or "")
+    sha256 = str(hook_context.get("context_sha256") or "")
+    return {
+        "id": HOOKS_BEFORE_TASK_ID,
+        "ordinal": 1,
+        "category": "injected",
+        "description": f"Resolve and apply before-hook context via `{command_text}`",
+        "required_evidence": list(HOOKS_BEFORE_REQUIRED_EVIDENCE),
+        "invalid_substitutes": list(HOOKS_BEFORE_INVALID_SUBSTITUTES),
+        "repair_if_missing": list(HOOKS_BEFORE_REPAIR_ACTIONS),
+        "completion_actor": "goal",
+        "expected_evidence": {
+            "command": command,
+            "hook_resolution_command": command_text,
+            "resolved_hook_context_sha256": sha256,
+            "feature_slug": None,
+        },
+    }
 
 
 # @spec FR-001: Inject archive.run last ordinal
@@ -1295,12 +1418,54 @@ def _validate_task_evidence(
             contract=contract,
             project_root=project_root,
         )
+    if task_id == HOOKS_BEFORE_TASK_ID or task_id.startswith(f"{HOOKS_BEFORE_TASK_ID}."):
+        return _validate_hooks_before_evidence(task, evidence)
     return _validate_generic_evidence(
         task,
         evidence,
         contract=contract,
         project_root=project_root,
     )
+
+
+def _validate_hooks_before_evidence(
+    task: dict[str, Any],
+    evidence: dict[str, Any],
+) -> dict[str, Any]:
+    missing: list[str] = []
+    invalid: list[str] = []
+    expected = dict(task.get("expected_evidence") or {})
+
+    expected_command = expected.get("hook_resolution_command")
+    actual_command = evidence.get("hook_resolution_command")
+    if not isinstance(actual_command, str) or not actual_command.strip():
+        missing.append("hook_resolution_command")
+    elif isinstance(expected_command, str) and actual_command != expected_command:
+        missing.append("hook_resolution_command_matches_contract")
+
+    expected_sha = expected.get("resolved_hook_context_sha256")
+    actual_sha = evidence.get("resolved_hook_context_sha256")
+    if not isinstance(actual_sha, str) or not actual_sha.strip():
+        missing.append("resolved_hook_context_sha256")
+    elif isinstance(expected_sha, str) and actual_sha != expected_sha:
+        missing.append("resolved_hook_context_sha256_matches_contract")
+
+    if evidence.get("hook_context_applied") is not True:
+        missing.append("hook_context_applied")
+
+    if evidence.get("output") or evidence.get("summary") or evidence.get("prose"):
+        invalid.append("manual_integration_summary")
+    if evidence.get("config_file_exists"):
+        invalid.append("config_file_exists_without_resolved_context")
+
+    accepted = not missing and not invalid
+    return {
+        "status": "ACCEPTED" if accepted else "REJECTED_NEEDS_ACTION",
+        "accepted": accepted,
+        "missing_evidence": missing,
+        "invalid_substitutes": invalid,
+        "required_actions": list(task["repair_if_missing"]),
+    }
 
 
 def _validate_visual_receipt_evidence(

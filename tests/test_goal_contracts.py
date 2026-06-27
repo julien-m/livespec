@@ -665,6 +665,120 @@ def test_compile_command_goal_adds_design_domain_for_ui_feature(tmp_path: Path) 
     assert "$AIRESOURCES/design/tokens.md" in goal.objective
 
 
+def test_compile_command_goal_embeds_non_empty_before_hook_context(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    integrations_dir = tmp_path / "integrations"
+    integrations_dir.mkdir()
+    (integrations_dir / "qe-analysis.md").write_text(
+        """\
+---
+integration: qe-analysis
+commands: [plan]
+phase: before
+mode: extend
+order: 60
+---
+# QE Analysis
+
+Apply the QE analysis protocol before planning tests.
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", integrations_dir)
+
+    goal = compile_command_goal(
+        "spec-plan",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+
+    before_hook = contract["hooks"]["before"]
+    assert before_hook["non_empty"] is True
+    assert "qe-analysis" in goal.canonical_json
+    assert "# QE Analysis" in before_hook["context"]
+    assert contract["tasks"][0]["id"] == "hooks.before"
+    assert "resolved_hook_context_sha256" in contract["tasks"][0]["required_evidence"]
+    assert "Hook context to apply:" in goal.objective
+
+
+def test_goal_prove_requires_resolved_before_hook_context(tmp_path: Path) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+    )
+    hook_task = {
+        "id": "hooks.before",
+        "ordinal": 1,
+        "category": "injected",
+        "description": "Resolve hooks",
+        "required_evidence": [
+            "hook_resolution_command",
+            "resolved_hook_context_sha256",
+            "hook_context_applied",
+        ],
+        "invalid_substitutes": [
+            "manual_integration_summary",
+            "config_file_exists_without_resolved_context",
+        ],
+        "repair_if_missing": ["run hooks resolve"],
+        "completion_actor": "goal",
+        "expected_evidence": {
+            "hook_resolution_command": "livespec hooks resolve --event before --command demo",
+            "resolved_hook_context_sha256": "abc123",
+        },
+    }
+    contract = json.loads(render_goal_contract_file(goal))
+    contract["tasks"].insert(0, hook_task)
+    state = json.loads(render_goal_state_file(goal))
+    state["tasks"]["hooks.before"] = {
+        "ordinal": 1,
+        "description": "Resolve hooks",
+        "status": "pending",
+        "attempts": [],
+        "accepted_evidence": None,
+        "last_rejection": None,
+    }
+
+    rejected = prove_goal_task(
+        contract,
+        state,
+        "hooks.before",
+        evidence={
+            "config_file_exists": True,
+            "summary": "qe-analysis configured",
+        },
+        project_root=project_root,
+    )
+
+    assert rejected["status"] == "REJECTED_NEEDS_ACTION"
+    assert "hook_resolution_command" in rejected["missing_evidence"]
+    assert "resolved_hook_context_sha256" in rejected["missing_evidence"]
+    assert "hook_context_applied" in rejected["missing_evidence"]
+    assert "config_file_exists_without_resolved_context" in rejected["invalid_substitutes"]
+
+    accepted = prove_goal_task(
+        contract,
+        state,
+        "hooks.before",
+        evidence={
+            "hook_resolution_command": "livespec hooks resolve --event before --command demo",
+            "resolved_hook_context_sha256": "abc123",
+            "hook_context_applied": True,
+        },
+        project_root=project_root,
+    )
+
+    assert accepted["status"] == "ACCEPTED"
+
+
 def test_rendered_goal_tasks_replay_required_conventions(tmp_path: Path) -> None:
     """AC-001/AC-002/AC-007/AC-008: tasks replay convention domains and sources."""
     project_root, livespec_root = _fixture_roots(tmp_path)
@@ -813,7 +927,11 @@ def test_conventions_gate_required_for_spec_implement(tmp_path: Path) -> None:
         feature="001-demo",
     )
     contract = json.loads(render_goal_contract_file(goal))
-    final_tasks = [task for task in contract["tasks"] if task["id"] != "archive.run"]
+    final_tasks = [
+        task
+        for task in contract["tasks"]
+        if task["id"] not in {"archive.run", "hooks.before"}
+    ]
 
     assert final_tasks
     assert all("conventions_receipt_path" in task["required_evidence"] for task in final_tasks)
@@ -833,7 +951,11 @@ def test_goal_prove_rejects_non_pass_conventions_receipt(tmp_path: Path) -> None
     )
     contract = json.loads(render_goal_contract_file(goal))
     state = json.loads(render_goal_state_file(goal))
-    task_id = contract["tasks"][0]["id"]
+    task_id = next(
+        task["id"]
+        for task in contract["tasks"]
+        if "conventions_receipt_path" in task["required_evidence"]
+    )
 
     result = prove_goal_task(
         contract,
@@ -873,7 +995,11 @@ def test_goal_prove_rejects_conventions_receipt_outside_project(tmp_path: Path) 
     )
     contract = json.loads(render_goal_contract_file(goal))
     state = json.loads(render_goal_state_file(goal))
-    task_id = contract["tasks"][0]["id"]
+    task_id = next(
+        task["id"]
+        for task in contract["tasks"]
+        if "conventions_receipt_path" in task["required_evidence"]
+    )
 
     result = prove_goal_task(
         contract,
