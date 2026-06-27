@@ -1,7 +1,7 @@
 ---
 command: spec-feature
 contract_version: "1.0"
-last_reviewed: 2026-06-26
+last_reviewed: 2026-06-27
 ---
 
 <!-- @spec(FR-004) -->
@@ -54,7 +54,7 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 - `.specs/design/changelog.md` for UI features
 
 **optional:**
-- _(none)_
+- `.specs/features/<feature>/spec.md` section `## Clarifications` (Phase 1.6 Clarify gate, when ambiguities were resolved)
 
 **forbidden:**
 - _(none)_
@@ -88,6 +88,9 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 - stdout marker: `Open for annotation: http://127.0.0.1:<port>/i/<id>`
 - fallback marker: `Visual preview: unavailable - visual-preview CLI missing`
 - proof boundary: `visual_evidence_receipt_path` remains required for pixel fidelity; preview URLs are human-visible annotation proof only
+- stdout marker: `Clarify gate` — Phase 1.6 runs after spec review and before plan; in `--auto`, an unresolved question emits `BLOCKED at step 1.6 - decision_needed - clarify question requires human answer`
+- stdout marker: `Specification Analysis Report` — Phase 2.6 Analyze gate (read-only `/spec-check --pre-impl`) runs after plan review and before preflight; CRITICAL or HIGH findings block implementation (`pipeline update --phase analyze --status blocked`); creates no `checks/`, no changelog, no `src/`
+- proof boundary: when `## Clarifications` is written it carries `### Session YYYY-MM-DD` with at most 5 accepted `- Q: ... -> A: ...` bullets per session and no duplicate session bullets
 - stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | FAIL | PASS`
   - `ABSENT`: feature is non-UI
   - `BLOCKED`: UI forward contract generation failed
@@ -126,6 +129,8 @@ Nested skill calls (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-tes
 
 ## 10. Post-run Checks
 
+- [ ] Clarify gate ran after spec review and before plan; if `## Clarifications` was written it has ≤ 5 accepted Q/A for the session and no duplicate session bullets
+- [ ] Analyze gate (Phase 2.6) ran after plan review and before preflight; blocked implementation on any CRITICAL or HIGH finding; wrote no `checks/`, no changelog, no `src/`
 - [ ] progress.md exists and is complete
 - [ ] implementation.md maps every FR
 - [ ] UI features have `penflow/code-ir.json` before implementation

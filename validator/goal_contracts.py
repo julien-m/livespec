@@ -61,6 +61,7 @@ EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
         "visual-status",
         "multi",
         "fix",
+        "pre-impl",
     }
 )
 ALLOWED_INTERNAL_INVOCATION_MODES: frozenset[str] = frozenset({"subagent", "suggestion"})
@@ -348,6 +349,8 @@ def _active_execution_task_branches(
         active.add("multi")
     if flag_names.intersection({"--fix", "-x"}):
         active.add("fix")
+    if flag_names.intersection({"--pre-impl"}):
+        active.add("pre-impl")
     if visual_active:
         active.add("visual")
         if has_penflow:
@@ -383,6 +386,7 @@ def _extract_execution_tasks(
       visual-status   — --visual-status
       multi           — --all/-A or --summary/-S
       fix             — --fix or -x
+      pre-impl        — --pre-impl
     """
     if not skill_path.exists():
         return []
@@ -951,6 +955,9 @@ def _goal_payload(
                     "must": _canonical_rules(branch.must),
                     "may": _canonical_rules(branch.may),
                     "must_not": _canonical_rules(branch.must_not),
+                    # Only emit replace_base when True so existing contracts/hashes
+                    # for unaffected commands stay byte-identical (retro-compat).
+                    **({"replace_base": True} if branch.replace_base else {}),
                 }
                 for branch in expectations.verify.when
             ],

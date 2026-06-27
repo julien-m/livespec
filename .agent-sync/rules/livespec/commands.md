@@ -44,6 +44,7 @@ Vérifie l'alignement spec ↔ code et produit un rapport d'écarts.
 - `/spec-check --quality feature` — qualité tests/code uniquement
 - `/spec-check --visual-status` — dashboard gouvernance visuelle
 - `/spec-check --surfaces` — détection de surface drift
+- `/spec-check --pre-impl feature` — analyse pré-implémentation read-only (rapport `## Specification Analysis Report`, sort 1 si CRITICAL/HIGH, n'écrit ni `checks/` ni changelog ni `src/`)
 
 ### /spec-doctor
 Audit santé projet : orchestre `livespec validate --coherence` et détecte mappings stale, tests manquants, runners non inclus, hooks non appliqués, lifecycle ambigu et orphelins visuels.
@@ -63,7 +64,7 @@ Documentation vivante — comprend comment une feature marche, ou répond à une
 - `/spec-explain "what changed in the auth feature last month?"` — diff temporel
 
 ### /spec-feature
-Pipeline complet : specify → plan → review → implement → test → commit.
+Pipeline complet : specify → clarify → plan → review → analyze → implement → test → commit.
 **Usage** :
 - `/spec-feature "User can filter search results by date range"` — pipeline interactif
 - `/spec-feature "Add CSV export" --auto` — pipeline auto, zéro pause

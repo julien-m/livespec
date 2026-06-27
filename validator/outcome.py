@@ -27,6 +27,7 @@ def classify(
     artifact_exit_code: int | None,
     any_must_failed: bool,
     blocked_reason: str | None = None,
+    ignore_exit_code: bool = False,
 ) -> Outcome:
     """Classify the verifier outcome.
 
@@ -37,13 +38,17 @@ def classify(
             failed.
         blocked_reason: When set, forces the ``blocked`` outcome regardless
             of the other inputs.
+        ignore_exit_code: When True, a non-zero exit code does NOT force the
+            ``error`` outcome. Used by read-only gate modes (e.g. spec-check
+            ``--pre-impl``) where a non-zero exit is a legitimate blocking
+            result rather than a verifier failure.
 
     Returns:
         One of ``"success" | "drift" | "blocked" | "error"``.
     """
     if blocked_reason is not None or artifact_exit_code is None:
         return "blocked"
-    if artifact_exit_code != 0:
+    if not ignore_exit_code and artifact_exit_code != 0:
         return "error"
     if any_must_failed:
         return "drift"

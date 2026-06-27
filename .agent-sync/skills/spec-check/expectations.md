@@ -1,7 +1,7 @@
 ---
 command: spec-check
 contract_version: "1.0"
-last_reviewed: 2026-06-26
+last_reviewed: 2026-06-27
 ---
 
 # Expectations — /spec-check
@@ -59,6 +59,7 @@ Verify spec vs code alignment and produce a gap report.
   must_contain_sections:
   - "Gap Report"
   - "Findings"
+- stdout marker (`--pre-impl` only): `## Specification Analysis Report` — read-only mode; creates no `checks/`, no changelog, no `src/`; exit 1 iff any CRITICAL or HIGH finding
 - stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED`
   - `ABSENT`: no root `penflow/` and no `.brainstorm/` fallback is read
   - `PASS`: Penflow compare report is aligned
@@ -115,7 +116,16 @@ verify:
     - contains: "Penflow Contract Verdict"
   must_not:
     - contains: "Traceback"
+  when:
+    - flag: "--pre-impl"
+      replace_base: true
+      must:
+        - contains: "Specification Analysis Report"
 ```
+
+> **`--pre-impl` mode (read-only):** `replace_base: true` makes this branch the **sole** verify contract in `--pre-impl` — the base rules (`exit_code: 0`, `gap report`, `Penflow Contract Verdict`) are **machine-dropped**, not merely documented as inapplicable, and a non-zero exit no longer classifies as `error` (verify-output engine, C14). So a legitimate blocking analysis (exit 1 = any CRITICAL or HIGH) yields a non-error outcome.
+>
+> **Read-only enforcement (C15):** the guarantee that `--pre-impl` writes no `checks/`, no changelog, and no `src/` is enforced **structurally** by the CLI early-exit branch (`validator/cli.py` — `--pre-impl` resolves, renders, and `raise typer.Exit(...)` before any writing branch) and proven by the CLI zero-write test (`tests/test_pre_impl_analysis_cli.py`). It is intentionally **not** expressed as `must_not: produces_artifact <dir>` here: those paths (`checks/`, `.specs/changelog.md`, `src/`) routinely **preexist** from normal runs, so an existence-based `must_not` would false-FAIL a clean read-only run.
 
 ## 13. Demo Session
 

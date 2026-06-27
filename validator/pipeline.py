@@ -19,13 +19,25 @@ pipeline_app = typer.Typer(name="pipeline", help="Manage pipeline.md state for a
 # Constants
 # ──────────────────────────────────────────────────────────────────────────────
 
-PHASE_ORDER = ["specify", "spec-review", "plan", "plan-review", "preflight", "implement", "test"]
+PHASE_ORDER = [
+    "specify",
+    "spec-review",
+    "clarify",
+    "plan",
+    "plan-review",
+    "analyze",
+    "preflight",
+    "implement",
+    "test",
+]
 
 PHASE_MAP = {
     "specify": "Specify",
     "spec-review": "Spec Review",
+    "clarify": "Clarify",
     "plan": "Plan",
     "plan-review": "Plan Review",
+    "analyze": "Analyze",
     "preflight": "Preflight",
     "implement": "Implement",
     "test": "Test",
@@ -85,6 +97,46 @@ def _parse_pipeline(content: str) -> dict[str, str]:
         status_display = cells[1]
         if phase_display in display_to_slug:
             result[display_to_slug[phase_display]] = status_display
+    return result
+
+
+def _insert_phase_row(content: str, slug: str, new_row: str) -> str | None:
+    """Insert ``new_row`` for ``slug`` at its canonical PHASE_ORDER position.
+
+    Backward-compat: a pipeline.md generated before ``slug`` was added to
+    PHASE_ORDER has no row for it. Rather than failing, self-heal the file by
+    inserting the row before the first present phase that comes later in
+    PHASE_ORDER (or after the last phase row when none follow). General by
+    construction — works for any newly added phase slug. Returns ``None`` when
+    the file has no recognizable phase table.
+    """
+    order_index = PHASE_ORDER.index(slug)
+    later_displays = {PHASE_MAP[s] for s in PHASE_ORDER[order_index + 1 :]}
+
+    lines = content.splitlines()
+    phase_rows: list[tuple[int, str]] = []
+    for i, line in enumerate(lines):
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.split("|") if c.strip()]
+        if cells and cells[0] in _REVERSE_PHASE_MAP:
+            phase_rows.append((i, cells[0]))
+
+    if not phase_rows:
+        return None
+
+    insert_at: int | None = None
+    for i, display in phase_rows:
+        if display in later_displays:
+            insert_at = i
+            break
+    if insert_at is None:
+        insert_at = phase_rows[-1][0] + 1
+
+    lines.insert(insert_at, new_row)
+    result = "\n".join(lines)
+    if content.endswith("\n"):
+        result += "\n"
     return result
 
 
@@ -193,11 +245,20 @@ def update(
     new_content = re.sub(pattern, new_row, content, count=1)
 
     if new_content == content:
-        typer.echo(
-            f"Error: phase '{display_phase}' not found in {pipeline_path}",
-            err=True,
-        )
-        raise typer.Exit(1)
+        if phase in _parse_pipeline(content):
+            # Row already present and identical to the target — idempotent no-op.
+            typer.echo(f"Updated {display_phase} → {display_status}")
+            return
+        # Row absent (legacy pipeline.md predating this phase) — self-heal by
+        # inserting it at the canonical PHASE_ORDER position instead of blocking.
+        inserted = _insert_phase_row(content, phase, new_row)
+        if inserted is None:
+            typer.echo(
+                f"Error: phase '{display_phase}' not found in {pipeline_path}",
+                err=True,
+            )
+            raise typer.Exit(1)
+        new_content = inserted
 
     # Atomic write: write to .tmp then rename
     tmp_path = pipeline_path.with_suffix(".md.tmp")

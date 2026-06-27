@@ -1401,6 +1401,79 @@ def test_compile_command_goal_accepts_updated_real_skills(
     assert isinstance(goal.payload["internal_command_invocations"], list)
 
 
+def test_spec_feature_execution_tasks_include_clarify_gate_before_plan(
+    tmp_path: Path,
+) -> None:
+    """Feature A: the real /spec-feature skill renders a Clarify task before Plan.
+
+    Invariant: the Clarify gate runs after spec review and before the Plan phase,
+    so an ambiguous spec is forced to resolve questions before planning starts.
+    """
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    _write_conventions(project_root, tmp_path / "ai")
+    feature = _write_complete_check_fix_scenario(project_root)
+
+    goal = compile_command_goal(
+        "spec-feature",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature=feature,
+        flags="",
+    )
+
+    assert any(
+        "Run integrated Clarify gate after spec review and before plan" in task
+        for task in goal.payload["execution_tasks"]
+    )
+
+
+def test_pre_impl_execution_task_branch_active_iff_flag_present(tmp_path: Path) -> None:
+    """H1: the `pre-impl` branch is registered and activated only by --pre-impl.
+
+    Invariant: an unregistered branch raises ValueError (command-audit failure);
+    a flag-gated branch must be inert without its flag and active with it.
+    """
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    skill_path = livespec_root / ".agent-sync" / "skills" / "spec-demo" / "SKILL.md"
+    skill_path.write_text(
+        """\
+---
+name: spec-demo
+description: Demo command
+---
+
+# /spec-demo
+
+## Execution Tasks
+
+- [always] Always task
+- [pre-impl] Pre-impl analyze task
+
+## Definition of Done (Command-Level)
+
+- [ ] Done
+""",
+        encoding="utf-8",
+    )
+
+    goal_on = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        flags="--pre-impl",
+    )
+    goal_off = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        flags="",
+    )
+
+    assert "Pre-impl analyze task" in goal_on.payload["execution_tasks"]
+    assert "Pre-impl analyze task" not in goal_off.payload["execution_tasks"]
+
+
 def test_compile_command_goal_preserves_existing_execution_task_branches(
     tmp_path: Path,
 ) -> None:

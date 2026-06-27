@@ -87,6 +87,7 @@ def evaluate_rules(
         A :class:`VerifyReport` with one :class:`RuleResult` per active rule.
     """
     run_date = run_date_from_timestamp(str(artifact.get("timestamp", "")))
+    active, replace_base = _active_rules(verify_rules, active_flags)
     results = [
         _evaluate_rule(
             rule,
@@ -95,7 +96,7 @@ def evaluate_rules(
             run_date=run_date,
             project_root=project_root,
         )
-        for rule in _active_rules(verify_rules, active_flags)
+        for rule in active
     ]
     any_must_failed = any(
         result.status == "FAIL" and result.verb in ("must", "must_not") for result in results
@@ -107,6 +108,7 @@ def evaluate_rules(
     outcome = classify(
         artifact_exit_code=effective_exit,
         any_must_failed=any_must_failed or goal_incomplete,
+        ignore_exit_code=replace_base,
     )
     if receipt_error:
         # AC-006: a tampered/missing receipt invalidates the chain of proof.
@@ -114,14 +116,24 @@ def evaluate_rules(
     return VerifyReport(outcome=outcome, rules=tuple(results))
 
 
-def _active_rules(verify_rules: dict[str, Any], active_flags: list[str]) -> list[dict[str, Any]]:
+def _active_rules(
+    verify_rules: dict[str, Any], active_flags: list[str]
+) -> tuple[list[dict[str, Any]], bool]:
     """Collect base rules plus every when-branch matching an active flag.
 
     Branch accumulation strategy (039 AC-009): each branch whose flag is
     present in ``active_flags`` contributes its rules, ANDed with the base
     buckets; branches never replace one another.
+
+    Exception (C14): a matched branch carrying ``replace_base: true`` drops the
+    base bucket rules entirely (only the active branches' rules apply) and signals
+    that the exit-code→error classification must be relaxed. This lets a read-only
+    gate mode (e.g. ``--pre-impl``) own its own contract without inheriting the
+    normal-mode base rules. Returns ``(rules, replace_base)``.
     """
-    rules = _bucket_rules(verify_rules)
+    base_rules = _bucket_rules(verify_rules)
+    branch_rules: list[dict[str, Any]] = []
+    replace_base = False
     when_raw = verify_rules.get("when")
     branches = cast(list[object], when_raw) if isinstance(when_raw, list) else []
     for branch_obj in branches:
@@ -129,8 +141,11 @@ def _active_rules(verify_rules: dict[str, Any], active_flags: list[str]) -> list
             continue
         branch = cast(dict[str, Any], branch_obj)
         if str(branch.get("flag", "")) in active_flags:
-            rules.extend(_bucket_rules(branch))
-    return rules
+            if branch.get("replace_base") is True:
+                replace_base = True
+            branch_rules.extend(_bucket_rules(branch))
+    rules = branch_rules if replace_base else base_rules + branch_rules
+    return rules, replace_base
 
 
 def _bucket_rules(container: dict[str, Any]) -> list[dict[str, Any]]:
@@ -265,6 +280,23 @@ def _evaluate_produces_artifact(
             kind="produces_artifact",
             status=_status(verb, matched=False),
             detail=f"artifact {rel} missing",
+        )
+    if target.is_dir():
+        # A directory path cannot be read as text. Existence semantics apply: the
+        # artifact (directory) is present. Section checks are file-only — if any are
+        # requested against a directory, that is an explicit non-match, never a crash.
+        if sections:
+            return RuleResult(
+                verb=verb,
+                kind="produces_artifact",
+                status=_status(verb, matched=False),
+                detail=f"artifact {rel} is a directory; cannot check sections {sections}",
+            )
+        return RuleResult(
+            verb=verb,
+            kind="produces_artifact",
+            status=_status(verb, matched=True),
+            detail=f"artifact {rel} (directory present)",
         )
     content = target.read_text(encoding="utf-8", errors="replace")
     missing = [section for section in sections if section not in content]

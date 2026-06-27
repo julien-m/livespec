@@ -407,6 +407,11 @@ def validate(
             "default for historical files)."
         ),
     ),
+    pre_impl: bool = typer.Option(
+        False,
+        "--pre-impl",
+        help="Run read-only pre-implementation artifact analysis (Analyze gate)",
+    ),
 ) -> None:
     """Validate .specs/ files structurally.
 
@@ -498,6 +503,33 @@ def validate(
         for violation in sf_report.violations:
             typer.echo(f"  {violation}", err=True)
         raise typer.Exit(0 if warn_only else 1)
+
+    # Feature B — read-only pre-implementation Analyze gate. Dedicated early-exit
+    # branch (mirrors --coherence-only): resolve target, run the analyzer, print,
+    # and exit. It must never fall through to a writing branch (fix/smart). [M1]
+    if pre_impl:
+        from .pre_impl_analysis import (
+            analyze_feature_artifacts,
+            has_blocking_findings,
+            render_report_json,
+            render_report_markdown,
+        )
+
+        specs_root = _require_specs_root(Path(path) if path else None)
+        pre_impl_target = Path(path).resolve() if path else specs_root
+        pre_impl_feature_dir = (
+            pre_impl_target.parent if pre_impl_target.is_file() else pre_impl_target
+        )
+        analysis_report = analyze_feature_artifacts(
+            pre_impl_feature_dir, specs_root / "constitution.md"
+        )
+
+        if output_format == "json":
+            typer.echo(render_report_json(analysis_report))
+        else:
+            typer.echo(render_report_markdown(analysis_report))
+
+        raise typer.Exit(1 if has_blocking_findings(analysis_report) else 0)
 
     # @spec FR-001: --sdk-isolated flag routing — .specs/features/002-layer-3-cli-surface/spec.md#fr-001  # noqa: E501
     if sdk_isolated:

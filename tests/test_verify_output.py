@@ -160,6 +160,256 @@ class TestWhenBranches:
         assert report.outcome == "success"
 
 
+class TestPreImplBucket:
+    """H2: the spec-check `--pre-impl` verify bucket must actually evaluate."""
+
+    def test_pre_impl_branch_evaluates_must_and_must_not(self, tmp_path: Path) -> None:
+        rules = rules_of(
+            when=[
+                {
+                    "flag": "--pre-impl",
+                    "must": [
+                        {
+                            "verb": "must",
+                            "kind": "contains",
+                            "payload": "Specification Analysis Report",
+                        }
+                    ],
+                    "may": [],
+                    "must_not": [{"verb": "must_not", "kind": "contains", "payload": "checks/"}],
+                }
+            ],
+        )
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(
+                exit_code=0,
+                flags=["--pre-impl"],
+                stdout="## Specification Analysis Report\n| ID | Severity |",
+            ),
+            active_flags=["--pre-impl"],
+            feature=None,
+            project_root=tmp_path,
+        )
+        # Both branch rules (must + must_not) are evaluated and pass.
+        assert len(report.rules) == 2
+        assert all(r.status == "PASS" for r in report.rules)
+
+    def test_pre_impl_branch_inert_without_flag(self, tmp_path: Path) -> None:
+        rules = rules_of(
+            when=[
+                {
+                    "flag": "--pre-impl",
+                    "must": [
+                        {
+                            "verb": "must",
+                            "kind": "contains",
+                            "payload": "Specification Analysis Report",
+                        }
+                    ],
+                    "may": [],
+                    "must_not": [],
+                }
+            ],
+        )
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(exit_code=0, stdout="something else"),
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+        assert report.rules == ()
+
+
+class TestReplaceBaseBranch:
+    """C14: a `--pre-impl` when-branch with replace_base drops base rules and the
+    exit-code→error classification, so a legitimate blocking analysis (exit 1) is
+    NOT misread as a verifier error."""
+
+    def test_pre_impl_exit1_with_replace_base_is_not_error(self, tmp_path: Path) -> None:
+        rules = rules_of(
+            must=[
+                {"verb": "must", "kind": "exit_code", "payload": 0},
+                {"verb": "must", "kind": "contains", "payload": "gap report"},
+            ],
+            when=[
+                {
+                    "flag": "--pre-impl",
+                    "replace_base": True,
+                    "must": [
+                        {
+                            "verb": "must",
+                            "kind": "contains",
+                            "payload": "Specification Analysis Report",
+                        }
+                    ],
+                    "may": [],
+                    "must_not": [],
+                }
+            ],
+        )
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(
+                exit_code=1,
+                flags=["--pre-impl"],
+                stdout="## Specification Analysis Report\n| ID | Severity |",
+            ),
+            active_flags=["--pre-impl"],
+            feature=None,
+            project_root=tmp_path,
+        )
+        # Exit 1 is a legitimate blocking analysis, not a verifier error.
+        assert report.outcome != "error"
+        assert report.outcome == "success"
+        # Base rules (exit_code:0, gap report) are NOT applied in --pre-impl mode.
+        assert all(r.kind != "exit_code" for r in report.rules)
+        assert len(report.rules) == 1
+        assert report.rules[0].kind == "contains" and report.rules[0].status == "PASS"
+
+    def test_without_pre_impl_base_exit_code_still_required(self, tmp_path: Path) -> None:
+        rules = rules_of(
+            must=[{"verb": "must", "kind": "exit_code", "payload": 0}],
+            when=[
+                {
+                    "flag": "--pre-impl",
+                    "replace_base": True,
+                    "must": [
+                        {
+                            "verb": "must",
+                            "kind": "contains",
+                            "payload": "Specification Analysis Report",
+                        }
+                    ],
+                    "may": [],
+                    "must_not": [],
+                }
+            ],
+        )
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(exit_code=1, stdout="anything"),
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+        # Base behavior is unchanged when the replace_base branch is inactive.
+        assert report.outcome == "error"
+        assert any(r.kind == "exit_code" for r in report.rules)
+
+
+class TestProducesArtifactDirectory:
+    """C15: produces_artifact on a directory path must evaluate, never crash."""
+
+    def test_must_produces_artifact_on_existing_directory_passes(self, tmp_path: Path) -> None:
+        (tmp_path / "checks").mkdir()
+        rules = rules_of(
+            must=[{"verb": "must", "kind": "produces_artifact", "payload": "checks"}],
+        )
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(exit_code=0),
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+        assert [r.status for r in report.rules] == ["PASS"]
+        assert report.outcome == "success"
+
+    def test_must_not_produces_artifact_on_existing_directory_does_not_crash(
+        self, tmp_path: Path
+    ) -> None:
+        # Reproduces the --pre-impl crash: a feature with a preexisting checks/ dir.
+        (tmp_path / "checks").mkdir()
+        rules = rules_of(
+            when=[
+                {
+                    "flag": "--pre-impl",
+                    "must_not": [
+                        {"verb": "must_not", "kind": "produces_artifact", "payload": "checks"}
+                    ],
+                    "must": [],
+                    "may": [],
+                }
+            ],
+        )
+        # Must not raise IsADirectoryError; the rule evaluates (FAIL since dir exists).
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(exit_code=0, flags=["--pre-impl"]),
+            active_flags=["--pre-impl"],
+            feature=None,
+            project_root=tmp_path,
+        )
+        assert [r.kind for r in report.rules] == ["produces_artifact"]
+        assert report.rules[0].status == "FAIL"  # dir exists -> must_not fails, but no crash
+
+    def test_produces_artifact_directory_with_sections_is_explicit_not_crash(
+        self, tmp_path: Path
+    ) -> None:
+        (tmp_path / "out").mkdir()
+        rules = rules_of(
+            must=[
+                {
+                    "verb": "must",
+                    "kind": "produces_artifact",
+                    "payload": {"path": "out", "contains_sections": ["Findings"]},
+                }
+            ],
+        )
+        report = evaluate_rules(
+            rules,
+            artifact=make_artifact(exit_code=0),
+            active_flags=[],
+            feature=None,
+            project_root=tmp_path,
+        )
+        # Sections cannot be checked on a directory -> explicit FAIL, never a crash.
+        assert report.rules[0].status == "FAIL"
+        assert "directory" in report.rules[0].detail
+
+
+def test_pre_impl_spec_check_branch_no_crash_with_preexisting_checks_dir(tmp_path: Path) -> None:
+    """C15 end-to-end: the real spec-check --pre-impl verify branch evaluates without
+    crashing when a feature's checks/ directory already exists, yielding a non-error
+    outcome on a legitimate blocking analysis (exit 1)."""
+    from validator.goal_contracts import compile_command_goal
+
+    repo_root = Path(__file__).resolve().parents[1]
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    (project_root / ".specs" / "constitution.md").write_text("# Constitution\n", encoding="utf-8")
+    feature_dir = project_root / ".specs" / "features" / "001-x"
+    feature_dir.mkdir(parents=True)
+    (feature_dir / "spec.md").write_text("- FR-001: A.\n", encoding="utf-8")
+    # Preexisting checks/ from a prior normal /spec-check run — the crash trigger.
+    (feature_dir / "checks").mkdir()
+
+    goal = compile_command_goal(
+        "spec-check",
+        project_root=project_root,
+        livespec_root=repo_root,
+        feature="001-x",
+        flags="--pre-impl",
+    )
+
+    report = evaluate_rules(
+        goal.payload["verify_rules"],
+        artifact=make_artifact(
+            exit_code=1,
+            flags=["--pre-impl"],
+            stdout="## Specification Analysis Report\n| ID | Severity |",
+        ),
+        active_flags=["--pre-impl"],
+        feature="001-x",
+        project_root=project_root,
+    )
+
+    assert report.outcome != "error"
+    assert report.outcome == "success"
+
+
 class TestNoShortCircuit:
     def test_every_rule_evaluated_after_first_failure(self, tmp_path: Path) -> None:
         rules = rules_of(

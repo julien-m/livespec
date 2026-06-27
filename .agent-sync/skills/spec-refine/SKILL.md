@@ -46,6 +46,8 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 
 > Iteratively refine existing LiveSpec artifacts (project, feature spec, or plan) through guided conversation — without risking downstream inconsistencies.
 
+> **Clarify gate note (Feature A):** the integrated Clarify gate (`/spec-feature` Phase 1.6 and `/spec-specify` Step 5.9) reuses this command's targeted-conversation + show-diff discipline to resolve a capped (≤ 5) set of spec ambiguities. Clarify writes `## Clarifications` in place and does **not** change `/spec-refine` eligibility: refine still only runs on `Draft`/`Review`/`Approved` artifacts and remains blocked once downstream (`In Progress`/`Implemented`) work exists.
+
 ---
 
 ## Overview

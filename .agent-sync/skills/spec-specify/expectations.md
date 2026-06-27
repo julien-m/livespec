@@ -1,7 +1,7 @@
 ---
 command: spec-specify
 contract_version: "1.0"
-last_reviewed: 2026-06-10
+last_reviewed: 2026-06-27
 ---
 
 # Expectations — /spec-specify
@@ -41,6 +41,7 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
 
 **optional:**
 - `.specs/features/<feature>/seed.md`
+- `.specs/features/<feature>/spec.md` section `## Clarifications` (Step 5.9 Clarify gate, when ambiguities were resolved)
 - `.specs/features/<feature>/spec.md` section `## Penflow Contract`
 - `penflow/flow-ui-contract/` for UI features
 - `penflow/semantic-ui-tree.json` for UI features
@@ -67,6 +68,7 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
   - "User Scenarios"
   - "Acceptance Criteria"
   - "Functional Requirements"
+- proof boundary: when `## Clarifications` is written it carries `### Session YYYY-MM-DD` with at most 5 accepted `- Q: ... -> A: ...` bullets per session, no duplicate bullets, and AC-/FR-/SC- numbering is preserved (text edited in place, never renumbered)
 - stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
   - `ABSENT`: non-UI feature without root `penflow/`
   - `BLOCKED`: UI feature forward contract generation failed
@@ -96,6 +98,7 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
 
 - [ ] spec.md has Gherkin + Mermaid per user story
 - [ ] FR list maps each AC
+- [ ] If `## Clarifications` exists: ≤ 5 accepted Q/A per session, no duplicate bullets, AC/FR/SC numbering preserved
 
 ## 11. Troubleshooting
 
@@ -145,7 +148,7 @@ exit 0
 ### Aligned / Drift / Missing
 
 - **Aligned:** spec.md exists with Gherkin + Mermaid for every story, ACs numbered, FRs mapped. Exit 0.
-- **Drift:** spec contains `[NEEDS CLARIFICATION]` markers > 3, or a story lacks Gherkin. Exit 1 with the gap report.
+- **Drift:** spec contains `[NEEDS CLARIFICATION]` markers > 3, a story lacks Gherkin, or the Clarify gate (Step 5.9) wrote more than 5 accepted questions per session or duplicate clarification bullets. Exit 1 with the gap report.
 - **Missing:** `.specs/project.md` not found. Exit 2 with recovery `Run /spec-init first`.
 
 ### Runtime Profile (scenarios)

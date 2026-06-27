@@ -312,7 +312,7 @@ For a given event (e.g., `before-plan`), Read files at 3 levels in order:
 
 **No hooks:** `hooks`, `play-coverage`, `status`, `refresh-conventions` — these are diagnostic/utility commands.
 
-**`feature` sub-commands:** `/spec-feature` wraps a pipeline (specify → plan → implement). Resolve `before-feature`/`after-feature` around the full pipeline AND resolve each sub-command's own hooks (before-specify, before-plan, before-implement, etc.) at each phase.
+**`feature` sub-commands:** `/spec-feature` wraps a pipeline (specify → clarify → plan → analyze → implement). Resolve `before-feature`/`after-feature` around the full pipeline AND resolve each sub-command's own hooks (before-specify, before-plan, before-implement, etc.) at each phase.
 
 **`implement` step hooks:** In addition to `before-implement`/`after-implement` (once), resolve `before-implement-step`/`after-implement-step` before and after EACH implementation step.
 
@@ -594,7 +594,7 @@ Before acting on a user request, classify the intent to determine the correct co
 | Feature exists but no `spec.md` | `/spec-specify` |
 | Feature has `spec.md` but no `plan.md` | `/spec-plan` |
 | What should I build next? / Propose next feature | `/spec-propose` |
-| Full feature pipeline (specify → plan → implement) | `/spec-feature` |
+| Full feature pipeline (specify → clarify → plan → analyze → implement) | `/spec-feature` |
 | Refine or update project-level artifacts | `/spec-refine project` |
 | Refine or update an existing feature spec | `/spec-refine [feature]` |
 | Refine an existing plan | `/spec-refine [feature] plan` |

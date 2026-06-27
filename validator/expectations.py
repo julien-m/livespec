@@ -101,6 +101,9 @@ class WhenBranch:
     must: list[Rule] = field(default_factory=_empty_rule_list)
     may: list[Rule] = field(default_factory=_empty_rule_list)
     must_not: list[Rule] = field(default_factory=_empty_rule_list)
+    # C14: when True, this branch replaces the base bucket rules and relaxes the
+    # exit-code→error classification (read-only gate modes own their own contract).
+    replace_base: bool = False
 
 
 @dataclass(frozen=True)
@@ -380,6 +383,7 @@ def _build_verify_block(path: Path, data: dict[str, Any]) -> VerifyBlock:
                 must=_parse_rule_list(path, entry.get("must"), "must"),
                 may=_parse_rule_list(path, entry.get("may"), "may"),
                 must_not=_parse_rule_list(path, entry.get("must_not"), "must_not"),
+                replace_base=bool(entry.get("replace_base", False)),
             )
         )
     return VerifyBlock(must=must, may=may, must_not=must_not, when=when)

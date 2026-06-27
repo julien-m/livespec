@@ -104,12 +104,12 @@ For debt remediation, run `/spec-fix --conventions`. See [`system/conventions-en
 | `/spec-implement` | APEX-style auto-pipeline: implement → test → visual baselines → map to spec. Multi-agent orchestration by default (`--mono` for single-agent) |
 | `/spec-test` | Audit AC test coverage, generate missing tests from Gherkin, execute suite, validate Penflow expected/actual UI trees, capture visual baselines, verify design fidelity |
 | `/spec-journey` | Create, edit, bootstrap, impact-check, inspect, compile, and run global User Journeys v2 across multiple features |
-| `/spec-check` | Compare spec vs actual code — find gaps, verify AC, report Penflow contract status, detect visual drift |
+| `/spec-check` | Compare spec vs actual code — find gaps, verify AC, report Penflow contract status, detect visual drift; `--pre-impl` runs a read-only pre-implementation cross-artifact Analyze report (no writes) |
 | `/spec-doctor` | Project health audit — orchestrates coherence validation and reports stale mappings, missing tests, runner drift, unenforced hooks, lifecycle gaps, visual orphans |
 | `/spec-fix` | Fix implementation gaps from spec-check — functional and visual corrections with retry loop |
 | `/spec-explain` | "How does X work?" — living documentation from spec + diagrams + history |
 | `/spec-stack` | Evolve your stack and analyze impact on existing features |
-| `/spec-feature` | Full pipeline: specify → plan → implement → test, with validation gates between phases |
+| `/spec-feature` | Full pipeline: specify → clarify → plan → analyze → implement → test, with validation gates between phases |
 | `/spec-preflight` | Verify tooling, auth, and API tokens before starting implementation — runs auto-install, detects blockers, gates feature work |
 | `/spec-hooks` | Show, create, or edit lifecycle hooks for a command |
 | `/spec-play-coverage` | Open spec coverage playground with live grep data |
@@ -382,7 +382,7 @@ View current stack, analyze change impact, create Architecture Decision Records.
 
 ### `/spec-feature`
 
-Full pipeline: specify → plan → plan review → implement, with validation gates.
+Full pipeline: specify → clarify → plan → plan review → analyze → implement, with validation gates.
 
 ```bash
 /spec-feature "Real-time notifications"              # Interactive

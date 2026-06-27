@@ -22,8 +22,10 @@ PIPELINE_MD = """\
 |-------|--------|--------------|
 | Specify | Pending | — |
 | Spec Review | Pending | — |
+| Clarify | Pending | — |
 | Plan | Pending | — |
 | Plan Review | Pending | — |
+| Analyze | Pending | — |
 | Preflight | Pending | — |
 | Implement | Pending | — |
 | Test | Pending | — |
@@ -39,8 +41,10 @@ PIPELINE_MD_PADDED = """\
 |-------|--------|--------------|
 |  Specify  |  Pending  |  —  |
 |  Spec Review  |  Pending  |  —  |
+|  Clarify  |  Pending  |  —  |
 |  Plan  |  Pending  |  —  |
 |  Plan Review  |  Pending  |  —  |
+|  Analyze  |  Pending  |  —  |
 |  Preflight  |  Pending  |  —  |
 |  Implement  |  Pending  |  —  |
 |  Test  |  Pending  |  —  |
@@ -72,8 +76,10 @@ class TestPipelineInit:
         for phase in [
             "Specify",
             "Spec Review",
+            "Clarify",
             "Plan",
             "Plan Review",
+            "Analyze",
             "Preflight",
             "Implement",
             "Test",
@@ -218,8 +224,10 @@ class TestPipelineRead:
         assert set(data.keys()) == {
             "specify",
             "spec-review",
+            "clarify",
             "plan",
             "plan-review",
+            "analyze",
             "preflight",
             "implement",
             "test",
@@ -244,8 +252,10 @@ class TestPipelineNext:
         for phase in [
             "Specify",
             "Spec Review",
+            "Clarify",
             "Plan",
             "Plan Review",
+            "Analyze",
             "Preflight",
             "Implement",
             "Test",
@@ -259,3 +269,106 @@ class TestPipelineNext:
     def test_missing_pipeline_exits_1(self, specs_root: Path) -> None:
         result = runner.invoke(app, ["pipeline", "next", "--feature", "001-test"])
         assert result.exit_code == 1
+
+
+# Legacy pipeline.md generated BEFORE the Clarify phase existed — no "| Clarify |" row.
+LEGACY_PIPELINE_MD = """\
+# Pipeline — 001-test
+
+**Started:** 2026-04-10 12:00
+**Flags:** none
+
+| Phase | Status | Completed At |
+|-------|--------|--------------|
+| Specify | Done | 2026-04-10 12:01 |
+| Spec Review | Done | 2026-04-10 12:02 |
+| Plan | Pending | — |
+| Plan Review | Pending | — |
+| Preflight | Pending | — |
+| Implement | Pending | — |
+| Test | Pending | — |
+"""
+
+_PHASE_DISPLAYS = {
+    "Specify",
+    "Spec Review",
+    "Clarify",
+    "Plan",
+    "Plan Review",
+    "Analyze",
+    "Preflight",
+    "Implement",
+    "Test",
+}
+
+
+def _phase_order_in_file(content: str) -> list[str]:
+    order: list[str] = []
+    for line in content.splitlines():
+        if not line.startswith("|"):
+            continue
+        cell = line.split("|")[1].strip()
+        if cell in _PHASE_DISPLAYS:
+            order.append(cell)
+    return order
+
+
+class TestPipelineBackwardCompat:
+    """C13: a new phase slug must not block legacy pipeline.md files missing its row."""
+
+    def test_update_inserts_missing_clarify_row_at_correct_position(self, specs_root: Path) -> None:
+        pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
+        pipeline_path.write_text(LEGACY_PIPELINE_MD)
+        result = runner.invoke(
+            app,
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "clarify",
+                "--status",
+                "done",
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0  # NOT 1 — legacy file must self-heal, not block
+        content = pipeline_path.read_text()
+        assert "| Clarify | Done |" in content
+        order = _phase_order_in_file(content)
+        # Inserted at the canonical PHASE_ORDER position (between Spec Review and Plan).
+        assert order.index("Clarify") == order.index("Spec Review") + 1
+        assert order.index("Clarify") == order.index("Plan") - 1
+
+    def test_next_then_update_then_next_advances_past_clarify(self, specs_root: Path) -> None:
+        pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
+        pipeline_path.write_text(LEGACY_PIPELINE_MD)
+
+        first = runner.invoke(
+            app, ["pipeline", "next", "--feature", "001-test"], catch_exceptions=False
+        )
+        assert first.exit_code == 0
+        assert first.output.strip() == "clarify"
+
+        update = runner.invoke(
+            app,
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "clarify",
+                "--status",
+                "done",
+            ],
+            catch_exceptions=False,
+        )
+        assert update.exit_code == 0
+
+        second = runner.invoke(
+            app, ["pipeline", "next", "--feature", "001-test"], catch_exceptions=False
+        )
+        assert second.exit_code == 0
+        assert second.output.strip() == "plan"

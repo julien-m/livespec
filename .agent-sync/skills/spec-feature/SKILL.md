@@ -88,13 +88,17 @@ flowchart TD
     PR1 -->|"OK"| G1["Gate 1\n(main context)"]
     G1 -->|"fix → re-spawn"| P1
     G1 -->|"abort"| ABORT(["Aborted"])
-    G1 -->|"continue"| P2["Spawn: Plan sub-agent\n(Phase 2 + 2.5)\nIndependent native environment"]
+    G1 -->|"continue"| P16["Phase 1.6\nClarify gate\nmain context"]
+    P16 -->|"BLOCKED"| ABORT
+    P16 -->|"resolved"| P2["Spawn: Plan sub-agent\n(Phase 2 + 2.5)\nIndependent native environment"]
     P2 --> PR2{"PHASE_RESULT\nplan?"}
     PR2 -->|"BLOCKED"| ABORT
     PR2 -->|"OK"| G2["Gate 2\n(main context)"]
     G2 -->|"fix → re-spawn"| P2
     G2 -->|"abort"| ABORT
-    G2 -->|"continue"| P27["Phase 2.7\nPreflight\nsub-agent"]
+    G2 -->|"continue"| P26["Phase 2.6\nAnalyze\n/spec-check --pre-impl"]
+    P26 -->|"CRITICAL/HIGH"| ABORT
+    P26 -->|"pass"| P27["Phase 2.7\nPreflight\nsub-agent"]
     P27 -->|"critical fail"| ABORT
     P27 -->|"pass"| P3["Spawn: Implement sub-agent\n(Phase 3)\nIndependent native environment"]
     P3 --> P35["Spawn: Test sub-agent\n(Phase 3.5)\nIndependent native environment"]
@@ -106,7 +110,9 @@ flowchart TD
     style P3 fill:#e3f2fd,stroke:#1565C0
     style P35 fill:#e3f2fd,stroke:#1565C0
     style G1 fill:#fff9c4,stroke:#FFC107
+    style P16 fill:#fff9c4,stroke:#FFC107
     style G2 fill:#fff9c4,stroke:#FFC107
+    style P26 fill:#fff9c4,stroke:#FFC107
     style ABORT fill:#ffebee,stroke:#F44336
     style DONE fill:#e8f5e9,stroke:#4CAF50
 ```
@@ -287,7 +293,7 @@ This recovery is not a bypass: it only converts already-written, validated phase
 
 <!-- @spec FR-007: Supervisor Verify phase — .specs/features/059-pipeline-verify-phase/spec.md#fr-007 -->
 
-Executed by the supervisor **after parsing each goal-locked PHASE_RESULT** (Specify, Plan, Preflight, Implement, Test) and before any `pipeline update --status done` for that phase. The declaration alone is never trusted — the machine verdict of the archived run artifact is cross-checked.
+Executed by the supervisor **after parsing each goal-locked PHASE_RESULT** (Specify, Plan, Analyze, Preflight, Implement, Test) and before any `pipeline update --status done` for that phase. The declaration alone is never trusted — the machine verdict of the archived run artifact is cross-checked.
 
 1. **Resolve the sub-command** (`spec-specify`, `spec-plan`, `spec-preflight`, `spec-implement`, `spec-test`) via alias normalization (`validator/command_registry.py` `canonical_command_name`).
 2. **Resolve the artifact.** `RUN_ARTIFACT` present → run:
@@ -611,6 +617,34 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --
 
 ---
 
+## Phase 1.6 — Clarify Gate (Main Context)
+
+Runs after `spec-review` is done and **before** `plan`. This is an inline main-context gate (like Gate 1) — it does **not** spawn a sub-agent and adds no new command surface. It forces ambiguous specs to resolve their highest-impact unknowns before any planning starts.
+
+1. Read the feature `spec.md` at `.specs/features/NNN-feature-name/spec.md`.
+2. Build the capped question queue from the deterministic helper:
+   ```python
+   from pathlib import Path
+   from validator.clarify_gate import (
+       rank_clarification_opportunities,
+       scan_clarification_opportunities,
+   )
+
+   spec = Path(".specs/features/NNN-feature-name/spec.md")
+   queue = rank_clarification_opportunities(scan_clarification_opportunities(spec))  # <= 5
+   ```
+   The helper flags vague quality adjectives (`fast`/`scalable`/`secure`/`robust`, extensible seed) used without a numeric criterion in the same sentence, `[NEEDS CLARIFICATION]` placeholders, and unconfirmed `[ASSUMED]`/`TBD` assumptions, then ranks them by Impact × Uncertainty and caps the queue at 5.
+3. If the queue is empty → record "Clarify gate: no ambiguities" and continue to Plan.
+4. **Interactive:** ask **one question at a time**, in queue order. Accept the user's answer, then move to the next. Never exceed the 5 queued questions.
+   **`--auto`:** accept only deterministic recommendations grounded in the constitution or existing spec text. For any queued question that genuinely needs a human decision, emit `BLOCKED at step 1.6 - decision_needed - clarify question requires human answer` and stop — do not start Phase 2.
+5. Write accepted answers to `spec.md` under a `## Clarifications` heading, grouped by `### Session YYYY-MM-DD`, one bullet `- Q: <question> -> A: <answer>` per accepted answer. Do **not** create duplicate session bullets. Also update the affected spec section (FR/AC/SC text), not only the Clarifications log, and preserve existing AC/FR numbering.
+6. After every write: `livespec validate .specs/features/NNN-feature-name/spec.md --format compact`. If it fails, fix the spec and re-validate before continuing.
+7. On success: `livespec pipeline update --feature NNN-feature-name --phase clarify --status done --timestamp`, then continue to the Repository History Guard and Phase 2.
+
+> **Resume note:** `clarify` is a main-context gate. On `--resume`, when `livespec pipeline next` returns `clarify`, the main context re-runs this gate inline (it is not a spawned phase agent like Specify/Plan/Implement/Test).
+
+---
+
 ## Repository History Guard (Main Context, after Gate 1)
 
 After Gate 1 resolves, do not create branches, commits, tags, pushes, or any other repository history changes unless the current user request explicitly asks for that exact action. `/spec-feature` itself only edits working-tree files and pipeline metadata. Once this guard is acknowledged, spawn the Plan agent (Phase 2).
@@ -695,6 +729,22 @@ Interactive gate:
 If verdict is PASS (or user overrides BLOCKING): update `plan.md` header `Status: Draft` → `Status: Approved`.
 
 Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status done --timestamp`
+
+---
+
+## Phase 2.6 — Analyze Gate (Read-only)
+
+Runs after Plan Review (Phase 2.5) and **before** Preflight (Phase 2.7). It is a **read-only** cross-artifact gate that blocks implementation when `spec.md`/`plan.md` disagree or violate the constitution. It adds **no new command surface** — it runs the existing `/spec-check --pre-impl` mode.
+
+1. Spawn an independent native sub-agent whose **first prompt line** is `/spec-check --pre-impl NNN-feature-name`. Instruct it to capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture, pass them to `livespec goal archive --stdout-file/--stderr-file`, and return a PHASE_RESULT (`phase: analyze`) whose `RUN_ARTIFACT` is the exact artifact path printed by its own `goal archive`.
+2. Receive the Analyze PHASE_RESULT and run the § Supervisor Verify Phase: `livespec verify-output spec-check --run <RUN_ARTIFACT> --json` (cross-check matrix). On disagreement → canonical BLOCKED, `livespec pipeline update --feature NNN-feature-name --phase analyze --status blocked`, stop.
+3. **Gate behavior (exit/severity unified — H3):** the analyzer exits **1 iff any finding is CRITICAL or HIGH**.
+   - Any **CRITICAL or HIGH** finding → `livespec pipeline update --feature NNN-feature-name --phase analyze --status blocked`, emit the canonical `BLOCKED`, and **stop before Preflight/Implement**.
+   - Only **MEDIUM/LOW** → surface the warnings and continue.
+4. **Read-only:** Analyze must not write `checks/`, must not update any changelog, and must not modify `src/`. A missing `implementation.md` is not a failure by itself.
+5. On pass: `livespec pipeline update --feature NNN-feature-name --phase analyze --status done --timestamp`, then continue to Phase 2.7.
+
+> **Resume note:** `analyze` is a spawned read-only gate. On `--resume`, when `livespec pipeline next` returns `analyze`, re-spawn the `/spec-check --pre-impl` sub-agent.
 
 ---
 
@@ -989,6 +1039,7 @@ If any phase fails:
 
 - [subagent] `/spec-specify` — executable Phase 1 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [subagent] `/spec-plan` — executable Phase 2 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-check --pre-impl <feature>` — executable Phase 2.6 read-only Analyze command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [subagent] `/spec-preflight --light` — executable Phase 2.7 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [subagent] `/spec-implement` — executable Phase 3 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
 - [subagent] `/spec-test <feature-name> --auto --update` — executable Phase 3.5 command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
@@ -1055,6 +1106,10 @@ If any phase fails:
 - [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING)
 - [always] Run `livespec pipeline update --phase spec-review --status done`
 
+### Phase 1.6 — Clarify Gate
+
+- [always] Run integrated Clarify gate after spec review and before plan; update spec.md or block before Phase 2
+
 ### Phase 2 — Plan
 
 - [always] Run `livespec pipeline update --phase plan --status in_progress`
@@ -1070,6 +1125,13 @@ If any phase fails:
 - [always] Update `plan.md` status to Approved on PASS
 - [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING)
 - [always] Run `livespec pipeline update --phase plan-review --status done`
+
+### Phase 2.6 — Analyze Gate
+
+- [always] Spawn independent native sub-agent for `/spec-check --pre-impl <feature>` before preflight
+- [always] Run supervisor Verify phase: livespec verify-output spec-check --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
+- [always] Block implementation when Analyze reports CRITICAL or HIGH findings; run `livespec pipeline update --phase analyze --status blocked` and stop before Preflight
+- [always] Run `livespec pipeline update --phase analyze --status done` when no CRITICAL or HIGH findings
 
 ### Phase 2.7 — Preflight
 

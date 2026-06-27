@@ -70,8 +70,13 @@ Avant de relancer une commande, un poll, ou une interaction terminal (`write_std
 /spec-check feature --show-provenance  → Step 1 → Step 3 → Step 3.1 (provenance table) → exit
 /spec-check --visual-status       → Step 8.5 (governance dashboard) → exit
 /spec-check --surfaces            → Step 1 → Step 1.5 (surface drift detection) → exit
+/spec-check --pre-impl feature    → Step 1 → Step 3 → Step 4.7 (Pre-Implementation Artifact Analysis) → exit
 /spec-check --fix --all           → check all features → spawn fix sub-agents → re-check → inspect child goals
 ```
+
+| Flag | Behavior |
+|------|----------|
+| `--pre-impl` | Read-only cross-artifact analysis before implementation; exits before gap-report persistence (no `checks/`, no changelog, no `src/`) |
 
 ```mermaid
 flowchart TD
@@ -337,6 +342,25 @@ Applies quality gates from `spec-system.md` to the resolved feature.
 ```
 
 If `--quality`, stop here. Otherwise continue.
+
+---
+
+### Step 4.7 — Pre-Implementation Artifact Analysis (`--pre-impl` only)
+
+**Runs when:** `--pre-impl` is set. This is a **read-only** mode — it cross-checks `spec.md`, `plan.md`, and optional `implementation.md` BEFORE implementation and **exits after this step**. It adds **no new command surface**.
+
+1. Resolve the tree/feature as in Steps 1 and 3 (spec quality gates that do not require implementation may run; do not read or require code).
+2. Run the analyzer:
+   ```bash
+   livespec validate --pre-impl --format json .specs/features/NNN-feature-name/
+   ```
+3. Render a `## Specification Analysis Report` containing:
+   - a **findings table**: `| ID | Category | Severity | Location(s) | Summary | Recommendation |`
+   - a **coverage matrix**: `| Requirement Key | Has Plan Task? | Task IDs | Notes |`
+   - **metrics**: total/covered requirements, coverage %, ambiguity count, critical count.
+4. **Severity & exit (H3):** `CRITICAL` = constitution MUST violation or missing `spec.md`/`plan.md` only; an uncovered requirement is `HIGH` (never CRITICAL — C3). The command **exits 1 iff any finding is CRITICAL or HIGH**, else 0.
+5. **Read-only guarantees:** this step **must not** save `checks/YYYY-MM-DD.md`, **must not** update any changelog, and **must not** modify `src/`. A missing `implementation.md` is **not** a failure by itself.
+6. Exit after rendering the report — do not continue to Steps 5–11.
 
 ---
 
@@ -905,7 +929,7 @@ Ordered list of the most urgent actions across all checked features:
 > Machine-readable task inventory parsed by `livespec goal render`.
 > Format: `- [branch] task description`
 > Active branches per run:
-> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `surfaces` (--surfaces flag) · `quality-only` (--quality flag) · `tree-only` (--tree-only flag) · `visual-status` (--visual-status flag) · `multi` (multiple features selected) · `fix` (--fix flag)
+> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `surfaces` (--surfaces flag) · `quality-only` (--quality flag) · `tree-only` (--tree-only flag) · `visual-status` (--visual-status flag) · `multi` (multiple features selected) · `fix` (--fix flag) · `pre-impl` (--pre-impl flag)
 
 ### Phase 0 — Goal Lock & Hooks
 
@@ -934,6 +958,10 @@ Ordered list of the most urgent actions across all checked features:
 - [always] Evaluate spec.md quality gates (Gherkin, Mermaid flowcharts, AC format, FR→AC mapping, clarification markers)
 - [always] Evaluate plan.md quality gates if file exists (sequence/state/ER diagrams, constitution check, FR coverage)
 - [always] Check implementation quality gates (implementation.md, changelog.md, progress.md)
+
+### Phase 3.5 — Pre-Implementation Analysis (`--pre-impl`)
+
+- [pre-impl] Run `livespec validate --pre-impl --format json` and render `## Specification Analysis Report` (findings table + coverage matrix + metrics); exit 1 iff any CRITICAL or HIGH; create no `checks/`, no changelog, no `src/` writes
 
 ### Phase 4 — Implementation Verification
 

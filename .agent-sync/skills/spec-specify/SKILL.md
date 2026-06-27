@@ -690,6 +690,27 @@ After generating spec.md, determine if the feature involves UI:
    - Add `- Surfaces: web, mobile` (or `all`) to the spec.md metadata header (after `- Priority:`)
 4. If the feature is clearly platform-specific (e.g., "Apple Watch haptic feedback"), auto-select the matching surface without asking
 
+### Step 5.9 — Clarify Gate (direct use)
+
+Runs after Surface Annotation and **before** Step 6 Quality Validation, on the just-generated `spec.md`. This is an inline gate inside `/spec-specify` — it adds **no new command surface**. It mirrors the Phase 1.6 Clarify gate that `/spec-feature` runs, so a directly-specified feature resolves the same ambiguities.
+
+1. Build the capped question queue from the deterministic helper:
+   ```python
+   from pathlib import Path
+   from validator.clarify_gate import (
+       rank_clarification_opportunities,
+       scan_clarification_opportunities,
+   )
+
+   spec = Path(".specs/features/NNN-feature-name/spec.md")
+   queue = rank_clarification_opportunities(scan_clarification_opportunities(spec))  # <= 5
+   ```
+   The helper flags vague quality adjectives (`fast`/`scalable`/`secure`/`robust`, extensible seed) used without a numeric criterion in the same sentence, `[NEEDS CLARIFICATION]` placeholders, and unconfirmed `[ASSUMED]`/`TBD` assumptions, ranked by Impact × Uncertainty and capped at 5.
+2. If the queue is empty → skip silently to Step 6.
+3. Ask **one question at a time**, in queue order, **max 5** accepted questions. In `--auto`, accept only deterministic recommendations grounded in the constitution or existing spec text; otherwise leave the item as an explicit `[ASSUMED]` note rather than fabricating an answer.
+4. Write accepted answers under a `## Clarifications` heading in `spec.md`, grouped by `### Session YYYY-MM-DD`, one `- Q: <question> -> A: <answer>` bullet per accepted answer, no duplicate session bullets. Also update the affected spec section while **preserving existing AC-/FR-/SC- numbering** (edit text in place; never renumber).
+5. After writes, re-run structural validation: `livespec validate .specs/features/NNN-feature-name/spec.md --format compact`. Fix and re-validate on failure before continuing.
+
 ### Step 6 — Quality Validation
 
 Before presenting the spec, check:
@@ -979,6 +1000,7 @@ flowchart TD
 - [visual] Inject visual state assertions for detected traits with visual_states defined
 - [always] Run `livespec validate` structural validation; retry on failure (max 2)
 - [always] Run LLM spec review unless --no-review; retry on blocking findings
+- [always] Run direct Clarify gate (Step 5.9): scan vague/ambiguous spec items, ask <=5 questions, write ## Clarifications, preserve AC/FR/SC numbering, then re-validate
 
 ### Phase 5 — Mockups and Surface Annotation
 
