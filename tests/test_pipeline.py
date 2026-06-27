@@ -213,6 +213,7 @@ class TestPipelineUpdate:
 
 
 class TestPipelineRead:
+    # @spec(FR-001): analyze phase present in PHASE_ORDER (070-analyze-gate)
     def test_outputs_json_for_all_phases(self, specs_root: Path) -> None:
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(PIPELINE_MD)

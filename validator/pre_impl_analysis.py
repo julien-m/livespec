@@ -39,6 +39,7 @@ _REQUIREMENT_RE = re.compile(r"\b(?:FR|AC|SC)-\d+\b")
 _MUST_NOT_RE = re.compile(r"MUST\s+NOT\s+(.+?)(?:[.\n]|$)", re.IGNORECASE)
 
 
+# @spec(FR-007): severity domain CRITICAL/HIGH/MEDIUM/LOW (070-analyze-gate)
 class AnalyzeSeverity(StrEnum):
     CRITICAL = "CRITICAL"
     HIGH = "HIGH"
@@ -72,6 +73,7 @@ class PreImplAnalysisReport:
     metrics: dict[str, int | float]
 
 
+# @spec(FR-006): deterministic AN-<cat>-<sha1[:8]> finding id (070-analyze-gate)
 def _finding_id(
     category: str, severity: AnalyzeSeverity, locations: tuple[str, ...], summary: str
 ) -> str:
@@ -90,6 +92,7 @@ def _ordered_unique(tokens: list[str]) -> list[str]:
     return ordered
 
 
+# @spec(FR-004): constitution MUST NOT phrase in spec/plan -> CRITICAL (070-analyze-gate)
 def _constitution_violations(
     constitution_text: str, *, spec_text: str, plan_text: str
 ) -> list[AnalyzeFinding]:
@@ -117,6 +120,7 @@ def _constitution_violations(
     return findings
 
 
+# @spec(FR-002): read-only cross-artifact analysis, never writes a file (070-analyze-gate)
 def analyze_feature_artifacts(feature_dir: Path, constitution_path: Path) -> PreImplAnalysisReport:
     """Analyze spec.md, plan.md, optional implementation.md WITHOUT writing files."""
     spec_path = feature_dir / "spec.md"
@@ -134,6 +138,7 @@ def analyze_feature_artifacts(feature_dir: Path, constitution_path: Path) -> Pre
     findings: list[AnalyzeFinding] = []
 
     # Missing canonical artifacts are CRITICAL.
+    # @spec(FR-003): missing spec.md/plan.md -> CRITICAL artifact finding (070-analyze-gate)
     for name, present in (("spec.md", spec_path.is_file()), ("plan.md", plan_path.is_file())):
         if not present:
             summary = f"Missing required artifact: {name}"
@@ -157,6 +162,7 @@ def analyze_feature_artifacts(feature_dir: Path, constitution_path: Path) -> Pre
     )
 
     # Requirement coverage: covered iff the ID token appears in plan.md or implementation.md.
+    # @spec(FR-005): requirement covered iff token in plan/impl, else HIGH (070-analyze-gate)
     requirement_ids = _ordered_unique(_REQUIREMENT_RE.findall(spec_text))
     coverage: list[RequirementCoverage] = []
     covered_count = 0
@@ -196,6 +202,7 @@ def analyze_feature_artifacts(feature_dir: Path, constitution_path: Path) -> Pre
         )
 
     total = len(requirement_ids)
+    # @spec(FR-011): coverage_percent closed-form, 100.0 when no requirements (070-analyze-gate)
     coverage_percent = round(covered_count / total * 100, 2) if total else 100.0
 
     metrics: dict[str, int | float] = {
@@ -215,6 +222,7 @@ def analyze_feature_artifacts(feature_dir: Path, constitution_path: Path) -> Pre
     )
 
 
+# @spec(FR-008): blocking iff any finding is CRITICAL or HIGH (070-analyze-gate)
 def has_blocking_findings(report: PreImplAnalysisReport) -> bool:
     """True iff any finding is CRITICAL or HIGH (drives exit 1 — H3)."""
     return any(
@@ -222,6 +230,7 @@ def has_blocking_findings(report: PreImplAnalysisReport) -> bool:
     )
 
 
+# @spec(FR-009): render report as json + markdown report (070-analyze-gate)
 def render_report_json(report: PreImplAnalysisReport) -> str:
     payload = {
         "findings": [

@@ -3,9 +3,17 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-26
+> Last updated: 2026-06-27
 
 ---
+
+## 2026-06-27 — [Feature 070] Analyze Gate — retroactive spec+plan+mapping for read-only pre-impl gate; dogfooded Clarify (empty queue) + Analyze (0 CRITICAL/HIGH, exit 0)
+
+## 2026-06-27 — [Feature 069] Plan created: Clarify Gate — 7 implementation steps (retroactive, maps to existing code), 1 state diagram
+<!-- finalize:spec-plan:2026-06-27:d8275811 -->
+
+## 2026-06-27 — [Feature 069] Spec created: Clarify Gate — 4 stories, 12 AC, 12 FR
+<!-- finalize:spec-specify:2026-06-27:6ceeb87f -->
 
 ## 2026-06-26 — [Doctor Fix] Cleared all repo-level `livespec doctor` INFO traceability findings by adding missing source `@spec(...)` anchors.
 

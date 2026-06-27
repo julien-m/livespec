@@ -507,6 +507,8 @@ def validate(
     # Feature B — read-only pre-implementation Analyze gate. Dedicated early-exit
     # branch (mirrors --coherence-only): resolve target, run the analyzer, print,
     # and exit. It must never fall through to a writing branch (fix/smart). [M1]
+    # @spec(FR-001): analyze gate via validate --pre-impl, no new command (070-analyze-gate)
+    # @spec(FR-010): pre-impl read-only early exit, no checks/changelog/src (070-analyze-gate)
     if pre_impl:
         from .pre_impl_analysis import (
             analyze_feature_artifacts,
@@ -529,6 +531,7 @@ def validate(
         else:
             typer.echo(render_report_markdown(analysis_report))
 
+        # @spec(FR-008): exit 1 iff CRITICAL/HIGH finding, else 0 (070-analyze-gate)
         raise typer.Exit(1 if has_blocking_findings(analysis_report) else 0)
 
     # @spec FR-001: --sdk-isolated flag routing — .specs/features/002-layer-3-cli-surface/spec.md#fr-001  # noqa: E501

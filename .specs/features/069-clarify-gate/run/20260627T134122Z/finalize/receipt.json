@@ -1,0 +1,31 @@
+{
+  "command": "spec-specify",
+  "created_at": "2026-06-27T13:41:22.490190+00:00",
+  "feature_slug": "069-clarify-gate",
+  "files": [
+    {
+      "path": ".specs/features/069-clarify-gate/changelog.md",
+      "sha256": "060e64c7422c2953aae8a08650d885e52a83fdfecc1139e965f8e88a88cb2a0e"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "222cf0e730fa14fbe21e11a66bb814c62d9d0d4f6156b7b8b9cfeedbb9961aa1"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "2cd685ee0db300a995f95504720b24a37b665ae57d4d19d930744ae2c158b3e1"
+    },
+    {
+      "path": ".specs/features/069-clarify-gate/spec.md",
+      "sha256": "06c3ab96b046fe16885b14d13a6195498ab30e41475653bf590e438ea2d35b66"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "6ceeb87facc60bfd452855010bcc32002f89f11ff0d234408333063c90a0fbb5",
+  "receipt_hash": "4c10646064b623db207b37d700ef93cb8886f97c606c4493a7409eea7431a1dd",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

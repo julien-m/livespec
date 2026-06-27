@@ -7,6 +7,8 @@ Protected invariants:
 - JSON output carries findings/coverage/metrics.
 """
 
+# 070-analyze-gate anchors: @spec(FR-001) @spec(FR-008) @spec(FR-010)
+
 from __future__ import annotations
 
 from pathlib import Path

@@ -26,6 +26,7 @@ __all__ = [
     "scan_clarification_opportunities",
 ]
 
+# @spec(FR-002): vague adjective without measurable criterion (069-clarify-gate)
 # Extensible seed set of vague quality adjectives (brief: fast/scalable/secure/robust).
 VAGUE_ADJECTIVES: tuple[str, ...] = ("fast", "scalable", "secure", "robust")
 
@@ -34,11 +35,13 @@ _CATEGORY_VAGUE = "non-functional quality"
 _CATEGORY_PLACEHOLDER = "placeholders"
 _CATEGORY_ASSUMPTION = "constraints/tradeoffs"
 
+# @spec(FR-003): requirement-ID / identifier digits are not a metric (069-clarify-gate)
 _REQUIREMENT_RE = re.compile(r"\b(?:FR|AC|SC)-\d+\b")
 # A real metric is a standalone numeric token (e.g. "200 ms", "99%"). A digit glued
 # to letters is part of an identifier/proper noun (OAuth2, S3, v2, IPv6) and must NOT
 # count as quantification, otherwise it would silence a genuine vague-adjective ambiguity.
 _METRIC_RE = re.compile(r"(?<![A-Za-z])\d")
+# @spec(FR-004): detect placeholder + assumption markers (069-clarify-gate)
 _CLARIFICATION_MARKER_RE = re.compile(r"\[NEEDS CLARIFICATION\]")
 _ASSUMPTION_MARKER_RE = re.compile(r"\[ASSUMED\]|\bTBD\b")
 _SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
@@ -58,6 +61,7 @@ class ClarifyOpportunity:
 
     @property
     def score(self) -> int:
+        # @spec(FR-005): rank by Impact x Uncertainty (069-clarify-gate)
         return self.impact * self.uncertainty
 
 
@@ -142,6 +146,8 @@ def rank_clarification_opportunities(
 
     Tie-break order: ``(-score, category, evidence_path, evidence_line, question)``.
     """
+    # @spec(FR-006): deterministic, reproducible ranking (069-clarify-gate)
+    # @spec(FR-007): cap the ranked queue at 5 (069-clarify-gate)
     ordered = sorted(
         opportunities,
         key=lambda opportunity: (

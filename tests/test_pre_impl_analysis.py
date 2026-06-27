@@ -9,6 +9,9 @@ Protected invariants:
 - A missing implementation.md is NOT a failure on its own.
 """
 
+# 070-analyze-gate anchors: @spec(FR-002) @spec(FR-003) @spec(FR-004) @spec(FR-005)
+# @spec(FR-006) @spec(FR-007) @spec(FR-009) @spec(FR-011)
+
 from __future__ import annotations
 
 from pathlib import Path

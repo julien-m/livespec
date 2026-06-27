@@ -20,6 +20,9 @@ from validator.clarify_gate import (
     scan_clarification_opportunities,
 )
 
+# Traceability — behaviors protected by this suite (069-clarify-gate):
+# @spec(FR-002) @spec(FR-003) @spec(FR-004) @spec(FR-005) @spec(FR-006) @spec(FR-007)
+
 
 def _identity_key(opportunity: ClarifyOpportunity) -> tuple[str, str, int | None, str]:
     return (
@@ -66,6 +69,30 @@ def test_every_seed_adjective_is_detected(tmp_path: Path) -> None:
     opportunities = scan_clarification_opportunities(spec)
 
     assert len(opportunities) == len(VAGUE_ADJECTIVES)
+
+
+def test_placeholder_and_assumption_markers_are_detected(tmp_path: Path) -> None:
+    """FR-004: [NEEDS CLARIFICATION] -> placeholders; [ASSUMED]/TBD -> constraints/tradeoffs."""
+    spec = _write_spec(
+        tmp_path,
+        [
+            "# Spec",
+            "- The retention window is [NEEDS CLARIFICATION].",
+            "- The export format is [ASSUMED] to be CSV.",
+            "- The rate limit is TBD.",
+        ],
+    )
+
+    opportunities = scan_clarification_opportunities(spec)
+    by_category = {o.category for o in opportunities}
+
+    # The placeholder marker yields a placeholders opportunity.
+    assert "placeholders" in by_category
+    # Both [ASSUMED] and TBD yield constraints/tradeoffs opportunities.
+    assumption_lines = {
+        o.evidence_line for o in opportunities if o.category == "constraints/tradeoffs"
+    }
+    assert assumption_lines == {3, 4}
 
 
 def test_digit_inside_identifier_is_not_treated_as_a_metric(tmp_path: Path) -> None:

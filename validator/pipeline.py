@@ -19,6 +19,8 @@ pipeline_app = typer.Typer(name="pipeline", help="Manage pipeline.md state for a
 # Constants
 # ──────────────────────────────────────────────────────────────────────────────
 
+# @spec(FR-001): clarify phase between spec-review and plan, no new command (069-clarify-gate)
+# @spec(FR-001): analyze phase after plan-review, before preflight (070-analyze-gate)
 PHASE_ORDER = [
     "specify",
     "spec-review",

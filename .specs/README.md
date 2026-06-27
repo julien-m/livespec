@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-26
+> Last updated: 2026-06-27
 
 
 ---
@@ -106,6 +106,8 @@
 | 066 | Handoff Input Compatibility | Implemented | 2026-06-15 | 2026-06-15 | [spec](features/066-handoff-input-compatibility/spec.md), [plan](features/066-handoff-input-compatibility/plan.md), [implementation](features/066-handoff-input-compatibility/implementation.md) |
 | 067 | Visual Preview Proof Publishing | Implemented | 2026-06-25 | 2026-06-25 | [spec](features/067-visual-preview-proof-publishing/spec.md), [plan](features/067-visual-preview-proof-publishing/plan.md), [implementation](features/067-visual-preview-proof-publishing/implementation.md) |
 | 068 | Evidence-First Retry Contract | Implemented | 2026-06-26 | 2026-06-26 | [spec](features/068-evidence-first-retry-contract/spec.md), [plan](features/068-evidence-first-retry-contract/plan.md), [implementation](features/068-evidence-first-retry-contract/implementation.md) |
+| 069 | Clarify Gate | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/069-clarify-gate/spec.md), [plan](features/069-clarify-gate/plan.md), [implementation](features/069-clarify-gate/implementation.md) |
+| 070 | Analyze Gate | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/070-analyze-gate/spec.md), [plan](features/070-analyze-gate/plan.md), [implementation](features/070-analyze-gate/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -129,21 +131,15 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-27 | Plan | [Feature 069] Plan created: Clarify Gate — 7 implementation steps (retroactive, maps to existing code), 1 state diagram |
+| 2026-06-27 | Spec | [Feature 069] Spec created: Clarify Gate — 4 stories, 12 AC, 12 FR |
+| 2026-06-26 | Bugfix | [Doctor Fix] Cleared all repo-level `livespec doctor` INFO traceability findings by adding missing source `@spec(...)` anchors. |
+| 2026-06-26 | Check | [Feature 068] Check: spec-check PASS; tree validation, command audit, doctor, static tests, and Ruff checks green for evidence-first retry contract |
 | 2026-06-26 | Feature | [Feature 068] Implemented: Evidence-First Retry Contract — retry_hypothesis, retry_evidence, retry_result for failed commands and terminal interactions |
-| 2026-06-25 | Feature | [Feature 067] Implemented: Visual Preview Proof Publishing — Markdown proof, Browser annotation URL, visual-preview fallback, receipt boundary |
-| 2026-06-15 | Feature | [Feature 066] Implemented: Handoff Input Compatibility — handoff-first Brainstorm import docs, Penflow bootstrap source resolution, lifecycle sync contract |
-| 2026-06-13 | Feature | [Feature 065] Implemented: Conventions Migration Docs — migration v22, conventions enforcement reference, README/spec-system/agent docs |
-| 2026-06-13 | Bugfix | [Feature 064 Fix] Correct Ruff scaffold semantics: remove file line-count as Ruff line-length and enable PLR |
-| 2026-06-13 | Feature | [Feature 064] Implemented: Conventions Bootstrap Remediation — preflight gates checks, scaffold templates, spec-fix conventions mode, split conventions CLI |
-| 2026-06-13 | Feature | [Feature 063] Implemented: Conventions Blocking Pipeline — hard conventions receipt gate, R7 coherence, supervisor diff/hash/fresh locks |
-| 2026-06-12 | Feature | [Feature 062] Implemented: Conventions Rulebook Semantic — self-contained rulebook compiler, direct provider Engine C, waiver-aware verdicts, compile CLI |
-| 2026-06-12 | Feature | [Feature 061 Refactor] Remove delegate_to and command wiring from conventions gates schema v1 |
-| 2026-06-12 | Bugfix | [Feature 061 Fix] Critic cycle 4: bind delegate_to to executable basename and block unreadable source files |
-| 2026-06-12 | Bugfix | [Feature 061 Fix] Critic cycle 3: ignore freestyle delegate wiring, block timeout/encoding failures, document receipt audit boundary |
-| 2026-06-12 | Bugfix | [Feature 061 Fix] Critic P0/P1 hardening: Ruff JSON parsing, gates hash receipt validation, rule-specific delegate_to, stale gates blocking, ignored debt.json |
-| 2026-06-12 | Feature | [Feature 061] Feature: Initial conventions gates engine |
-| 2026-06-11 | Feature | [Feature 060] ### Pipeline: /spec-feature completed end-to-end |
-| 2026-06-11 | Feature | [Feature 060] Test: 100% AC covered (15/15), 0 tests generated — 102/102 feature tests (0 skips), full no-LLM suite green, ruff + pyright clean |
+| 2026-06-25 | Bugfix | [Feature 063 Fix] Feature-scoped conventions verification now uses current implementation mappings plus dirty source/test files, avoiding historical artifact link aggregation. |
+| 2026-06-25 | Check | [Feature 063] Check: 100% FR/AC verified; conventions gate PASS (receipt `.specs/conventions/runs/20260625T194319Z/receipt.json`); Feature 063 artifacts PASS; project-wide tree validation PASS |
+| 2026-06-25 | Bugfix | [Feature 063 Fix] Conventions verify JSON now emits project-local receipts when `--feature` is explicit; repo-scope proof uses `--feature repo`. |
+| 2026-06-25 | Bugfix | [Feature 061 Fix] Conventions scanner now excludes generated dependency workspaces, including `node_modules/**`, `.mimocode/**`, caches, build outputs, and matching linter-reported paths. |
 <!-- readme:activity:end -->
 
 ---
@@ -187,3 +183,7 @@
 <!-- finalize:spec-feature:2026-06-12:a140dc75 -->
 
 <!-- finalize:spec-implement:2026-06-12:3e197383 -->
+
+<!-- finalize:spec-specify:2026-06-27:6ceeb87f -->
+
+<!-- finalize:spec-plan:2026-06-27:d8275811 -->
