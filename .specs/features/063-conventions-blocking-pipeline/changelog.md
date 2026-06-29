@@ -1,5 +1,13 @@
 # Changelog — Conventions Blocking Pipeline
 
+## 2026-06-29 — [Bugfix]: Scope feature supervisor receipt gates to child goals
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** Updated [`validator/goal_contracts.py`](../../../validator/goal_contracts.py), [`tests/test_goal_contracts.py`](../../../tests/test_goal_contracts.py), and [`tests/test_conventions_verify_scope.py`](../../../tests/test_conventions_verify_scope.py)
+- **AC impacted:** AC-004, AC-005
+- **Author:** Codex
+
 ## 2026-06-25 — [Spec Update]: Fix artifact validation drift
 
 - **Type:** Spec Update

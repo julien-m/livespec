@@ -249,7 +249,7 @@ def test_cli_verify_feature_scope_includes_latest_dated_mapping_only(tmp_path: P
     assert not any(item["path"] == "src/old.py" for item in output["violations"])
 
 
-def test_cli_verify_feature_scope_includes_dirty_source_when_feature_artifacts_changed(
+def test_cli_verify_feature_scope_prefers_mapping_when_implementation_exists(
     tmp_path: Path,
 ) -> None:
     project_root = _write_project(tmp_path)
@@ -264,10 +264,28 @@ def test_cli_verify_feature_scope_includes_dirty_source_when_feature_artifacts_c
 
     result = _invoke_verify(project_root, FEATURE, "dirty-scope")
 
-    assert result.exit_code == 1, result.output
+    assert result.exit_code == 0, result.output
     output = json.loads(result.output)
-    assert any(item["path"] == "src/current.py" for item in output["violations"])
+    assert not any(item["path"] == "src/current.py" for item in output["violations"])
     assert not any(item["path"] == "src/ui/bad.tsx" for item in output["violations"])
+
+
+def test_cli_verify_feature_without_implementation_uses_dirty_source_scope(
+    tmp_path: Path,
+) -> None:
+    project_root = _write_project(tmp_path)
+    _commit_all(project_root)
+    feature_dir = project_root / ".specs" / "features" / FEATURE
+    feature_dir.mkdir(parents=True)
+    (feature_dir / "spec.md").write_text("# Feature\n", encoding="utf-8")
+    (project_root / "src" / "scoped.py").write_text('"""Scoped module."""\n', encoding="utf-8")
+
+    result = _invoke_verify(project_root, FEATURE, "pre-implementation-scope")
+
+    assert result.exit_code == 0, result.output
+    output = json.loads(result.output)
+    assert output["verdict"] == "PASS"
+    assert output["receipt_path"] == ".specs/conventions/runs/pre-implementation-scope/receipt.json"
 
 
 def test_cli_verify_unscoped_json_stays_repo_wide_with_unrelated_debt(tmp_path: Path) -> None:
@@ -376,11 +394,17 @@ def test_goal_prove_accepts_cli_generated_pass_conventions_receipt(tmp_path: Pat
     )
     contract = json.loads(render_goal_contract_file(goal))
     state = json.loads(render_goal_state_file(goal))
+    task_id = next(
+        task["id"]
+        for task in contract["tasks"]
+        if "conventions_receipt_path"
+        in task["required_evidence"]
+    )
 
     result = prove_goal_task(
         contract,
         state,
-        contract["tasks"][0]["id"],
+        task_id,
         evidence=_convention_evidence(receipt_path),
         project_root=project_root,
     )
@@ -466,3 +490,33 @@ def test_feature_scope_ignores_legacy_artifact_links_when_current_mapping_is_cle
     output = json.loads(result.output)
     assert output["verdict"] == "PASS"
     assert output["violations"] == []
+
+
+def test_feature_scope_ignores_frontmatter_dates_when_mapping_rows_are_undated(
+    tmp_path: Path,
+) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    _write_conventions(project_root, tmp_path / "ai")
+    _write_empty_gates(project_root)
+    (project_root / "src").mkdir()
+    (project_root / "src" / "scoped.py").write_text('"""Scoped module."""\n', encoding="utf-8")
+    feature_dir = project_root / ".specs" / "features" / FEATURE
+    feature_dir.mkdir(parents=True)
+    (feature_dir / "implementation.md").write_text(
+        "---\n"
+        "created: 2026-06-29\n"
+        "updated: 2026-06-29\n"
+        "---\n\n"
+        "## Requirement Mapping\n\n"
+        "| Requirement | File(s) | @spec Anchor | Status | Last Verified |\n"
+        "|---|---|---|---|---|\n"
+        "| FR-001 | [`src/scoped.py`](../../../src/scoped.py) | scoped | Implemented | now |\n",
+        encoding="utf-8",
+    )
+
+    result = _invoke_verify(project_root, FEATURE, "frontmatter-dates")
+
+    assert result.exit_code == 0, result.output
+    output = json.loads(result.output)
+    assert output["verdict"] == "PASS"

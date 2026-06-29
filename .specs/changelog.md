@@ -3,9 +3,30 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-27
+> Last updated: 2026-06-29
 
 ---
+
+## 2026-06-29 — [Feature 072 Fix] Corrected AC-014 implementation map paths for `livespec doctor`
+
+## 2026-06-29 — [Feature 072] Check: 100% verified (18/18 FR, 17/17 AC); conventions receipt PASS with 10 warnings
+
+## 2026-06-29 — [Feature 072] /spec-feature complete: AST conventions rollout engine — implement/test/audit all green, full pytest 2281 passed, conventions receipt PASS
+<!-- finalize:spec-feature:2026-06-29:3ef3e24f -->
+
+## 2026-06-29 — [Feature 072] Test: 100% AC covered (17/17), 0 tests generated — targeted Ruff, pytest 177 passed, `.specs` validation, and conventions receipt PASS
+
+## 2026-06-29 — [Feature 072] Implemented: Conventions AST Rule Engine — v1/v2 gates, AST observe/enforce engine, v2 receipts, mode-aware policy, active ast/high catalogue, and scoped conventions receipt repair
+<!-- finalize:spec-implement:2026-06-29:7d37e57a -->
+<!-- finalize:spec-implement:2026-06-29:58f6d072 -->
+
+## 2026-06-29 — [Feature 072] Plan created: Conventions AST Rule Engine — phased AST conventions rollout with v1/v2 gates, receipts, backend, doctor/spec-check, and catalogue activation
+<!-- finalize:spec-plan:2026-06-29:fdbed7ea -->
+
+## 2026-06-29 — [Feature 072] Spec created: Conventions AST Rule Engine — 4 stories, 17 AC, 18 FR
+<!-- finalize:spec-specify:2026-06-29:4d481d61 -->
+
+## 2026-06-27 — [Feature 071] Check: 100% FR/AC verified; implementation and conventions PASS; AC format warning remains
 
 ## 2026-06-27 — [Feature 071] Implemented: QE Analysis Native Module — native QE context, `qe.analysis` goal task, structured evidence validation, additive user hooks
 

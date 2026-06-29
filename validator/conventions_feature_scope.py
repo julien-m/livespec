@@ -38,6 +38,9 @@ def resolve_feature_scope(project_root: Path, feature_slug: str) -> FeatureScope
         raise FeatureScopeError(f"feature scope not found: .specs/features/{feature_slug}")
     implementation = feature_dir / "implementation.md"
     if not implementation.is_file():
+        paths = frozenset(_dirty_feature_scope_paths(project_root, feature_slug))
+        if paths:
+            return FeatureScope(feature_slug=feature_slug, paths=paths)
         raise FeatureScopeError(f"feature scope missing implementation.md: {implementation}")
     try:
         implementation_text = implementation.read_text(encoding="utf-8")
@@ -66,7 +69,6 @@ def _feature_scope_paths(
             project_root, implementation, _current_mapping_text(implementation_text)
         ),
     )
-    _append_scope_paths(paths, seen, _dirty_feature_scope_paths(project_root, feature_dir.name))
     return paths
 
 
@@ -74,7 +76,7 @@ def _current_mapping_text(implementation_text: str) -> str:
     dated_lines = [
         (match.group(0), line)
         for line in implementation_text.splitlines()
-        if (match := _DATE_PATTERN.search(line)) is not None
+        if "|" in line and (match := _DATE_PATTERN.search(line)) is not None
     ]
     if not dated_lines:
         return implementation_text

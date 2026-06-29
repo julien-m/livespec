@@ -1,0 +1,31 @@
+{
+  "command": "spec-implement",
+  "created_at": "2026-06-29T15:29:02.463072+00:00",
+  "feature_slug": "072-conventions-ast-rule-engine",
+  "files": [
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/changelog.md",
+      "sha256": "faee1194d3dcfbaf426901f16a0c4d4ccc8b9c064fd9a5c8b5228358835da681"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "8e9032c693c998c3e3113ba0dcdbaecf53b0be7ef37d129de18c2088521b1c42"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "92eda2f85d9f71968cbd8084fdc383aa5c3eb230ef9eb8a2753a07ac15416c18"
+    },
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/spec.md",
+      "sha256": "c8a8cec6b73896daeab44fd039d092b0604c761b69c92981fb201bb2660b2205"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "7d37e57ad6201b9aadc8105aaabf676dc44eb6e9944434ac014e7d67ee9e7f3d",
+  "receipt_hash": "05b34aac415309578d7a7a4e1a5aa46a3e2466ab0702f66748e4fe4228c98275",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

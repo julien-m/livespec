@@ -20,6 +20,7 @@ import frontmatter
 
 from validator.coherence.rule_engine import run_coherence
 from validator.coherence.violation import Severity
+from validator.conventions_receipt_policy import evaluate_conventions_receipt_policy
 from validator.journeys import scan_journeys
 from validator.journeys.models import JourneySeverity
 
@@ -86,6 +87,7 @@ def run_doctor(
     mapped_tests = _scan_implementation_maps(project_root, specs_root, findings)
     findings.extend(_scan_runner_inclusion(project_root, specs_root, mapped_tests))
     findings.extend(_scan_hook_enforcement(project_root))
+    findings.extend(_scan_conventions_receipt_policy(project_root))
     findings.extend(_scan_lifecycle(specs_root))
     findings.extend(_scan_journey_health(project_root))
     visual_findings, visual_actions = _scan_visual_orphans(specs_root)
@@ -285,7 +287,14 @@ def _git_resolved_hook_paths(project_root: Path) -> list[Path]:
     for hook_name in ("pre-commit", "pre-push"):
         try:
             proc = subprocess.run(
-                ["git", "-C", project_root.as_posix(), "rev-parse", "--git-path", f"hooks/{hook_name}"],
+                [
+                    "git",
+                    "-C",
+                    project_root.as_posix(),
+                    "rev-parse",
+                    "--git-path",
+                    f"hooks/{hook_name}",
+                ],
                 check=False,
                 capture_output=True,
                 text=True,
@@ -300,6 +309,34 @@ def _git_resolved_hook_paths(project_root: Path) -> list[Path]:
             continue
         resolved.append(Path(raw_path))
     return resolved
+
+
+def _scan_conventions_receipt_policy(project_root: Path) -> list[DoctorFinding]:
+    """Surface AST conventions rollout findings in doctor."""
+    policy = evaluate_conventions_receipt_policy(project_root, command="doctor")
+    if policy.state in {"unchanged", "pass"}:
+        return []
+    if policy.state == "observe_warning":
+        return [
+            DoctorFinding(
+                code="conventions_ast_observe",
+                severity=DoctorSeverity.WARNING,
+                category="conventions",
+                message=policy.reason,
+                suggested_action=(
+                    "Review AST observations before switching ast_rules.mode to enforce."
+                ),
+            )
+        ]
+    return [
+        DoctorFinding(
+            code="conventions_ast_enforce",
+            severity=DoctorSeverity.ERROR,
+            category="conventions",
+            message=policy.reason,
+            suggested_action="Run `livespec conventions verify --feature repo --json`.",
+        )
+    ]
 
 
 def _scan_lifecycle(specs_root: Path) -> list[DoctorFinding]:

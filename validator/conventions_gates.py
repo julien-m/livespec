@@ -6,14 +6,16 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal, TypeAlias, cast
 
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
+import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .visual_evidence import sha256_file
 
 GATES_RELATIVE_PATH = Path(".specs/conventions-gates.yaml")
+AstMode: TypeAlias = Literal["off", "observe", "enforce"]
+InitAstMode: TypeAlias = Literal["observe", "enforce"]
 DEFAULT_SOURCE_EXCLUSIONS = (
     ".specs/**",
     ".git/**",
@@ -102,7 +104,9 @@ class SuppressionDirectives(GatesBaseModel):
 class TokenScale(GatesBaseModel):
     """Allowed numeric design-token scale."""
 
-    scale: list[int] = Field(default_factory=lambda: [2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80])
+    scale: list[int] = Field(
+        default_factory=lambda: [2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80]
+    )
     properties: list[str] = Field(default_factory=lambda: ["padding", "margin", "spacing"])
 
 
@@ -122,6 +126,32 @@ class BuiltinRules(GatesBaseModel):
     import_rules: list[dict[str, dict[str, str]]] = Field(default_factory=list)
 
 
+# @spec FR-005: AST rollout mode — .specs/features/072-conventions-ast-rule-engine/spec.md#fr-005
+class AstBackendConfig(GatesBaseModel):
+    """AST detector backend configuration."""
+
+    name: Literal["ast-grep"] = "ast-grep"
+    command: str = "sg"
+    timeout_seconds: int = Field(default=10, ge=1, le=120)
+
+
+# @spec FR-003: Gates v2 schema — .specs/features/072-conventions-ast-rule-engine/spec.md#fr-003
+class AstRulesConfig(GatesBaseModel):
+    """AST rule rollout configuration for schema v2 gates."""
+
+    mode: AstMode = "off"
+    backend: AstBackendConfig = Field(default_factory=AstBackendConfig)
+    catalogs: list[str] = Field(
+        default_factory=lambda: ["validator/conventions_ast/rule_catalog/ast_high.yaml"]
+    )
+
+    @field_validator("mode", mode="before")
+    @classmethod
+    def normalize_yaml_off(cls, value: object) -> object:
+        """Normalize YAML 1.1's unquoted ``off`` boolean edge case."""
+        return "off" if value is False else value
+
+
 class ConventionsGates(GatesBaseModel):
     """Root `.specs/conventions-gates.yaml` model."""
 
@@ -134,7 +164,25 @@ class ConventionsGates(GatesBaseModel):
     scope: Literal["repo"] = "repo"
 
 
-def load_conventions_gates(path: Path) -> ConventionsGates:
+class ConventionsGatesV2(GatesBaseModel):
+    """Schema v2 gates with explicit AST rollout configuration."""
+
+    schema_version: Literal[2]
+    generated_from: GeneratedFrom
+    commands: CommandGroups = Field(default_factory=CommandGroups)
+    builtin: BuiltinRules = Field(default_factory=BuiltinRules)
+    coverage: dict[str, str] = Field(default_factory=dict)
+    exclusions: list[str] = Field(default_factory=lambda: list(DEFAULT_SOURCE_EXCLUSIONS))
+    scope: Literal["repo"] = "repo"
+    ast_rules: AstRulesConfig = Field(default_factory=AstRulesConfig)
+
+
+ConventionsGatesAny: TypeAlias = ConventionsGates | ConventionsGatesV2
+
+
+# @spec FR-003: Compatible gate loading
+#   .specs/features/072-conventions-ast-rule-engine/spec.md#fr-003
+def load_conventions_gates(path: Path) -> ConventionsGatesAny:
     """Load and validate a conventions gates YAML file.
 
     Args:
@@ -154,10 +202,21 @@ def load_conventions_gates(path: Path) -> ConventionsGates:
         raise ValueError(f"invalid gates yaml: {path}") from exc
     if not isinstance(raw, dict):
         raise ValueError("gates root must be a mapping")
-    return ConventionsGates.model_validate(raw)
+    schema_version = raw.get("schema_version")
+    if schema_version == 2:
+        return ConventionsGatesV2.model_validate(raw)
+    if schema_version == 1:
+        return ConventionsGates.model_validate(raw)
+    raise ValueError("schema_version must be 1 or 2")
 
 
-def generate_conventions_gates(project_root: Path, *, force: bool = False) -> Path:
+# @spec FR-004: v1 default gates — .specs/features/072-conventions-ast-rule-engine/spec.md#fr-004
+def generate_conventions_gates(
+    project_root: Path,
+    *,
+    force: bool = False,
+    ast_mode: InitAstMode | None = None,
+) -> Path:
     """Generate `.specs/conventions-gates.yaml` from project sources.
 
     Args:
@@ -178,7 +237,11 @@ def generate_conventions_gates(project_root: Path, *, force: bool = False) -> Pa
     stack = project_root / ".specs" / "stacks" / "_default.md"
     if not constitution.is_file() or not stack.is_file():
         raise FileNotFoundError(".specs/constitution.md or .specs/stacks/_default.md missing")
-    gates = _build_default_gates(project_root, constitution, stack)
+    gates: ConventionsGatesAny
+    if ast_mode is None:
+        gates = _build_default_gates(project_root, constitution, stack)
+    else:
+        gates = _build_ast_gates(project_root, constitution, stack, ast_mode)
     gates_path.parent.mkdir(parents=True, exist_ok=True)
     gates_path.write_text(_dump_yaml(gates.model_dump(exclude_none=True)), encoding="utf-8")
     return gates_path
@@ -209,6 +272,25 @@ def _build_default_gates(project_root: Path, constitution: Path, stack: Path) ->
         coverage=coverage,
         exclusions=list(DEFAULT_SOURCE_EXCLUSIONS),
         scope="repo",
+    )
+
+
+def _build_ast_gates(
+    project_root: Path,
+    constitution: Path,
+    stack: Path,
+    ast_mode: InitAstMode,
+) -> ConventionsGatesV2:
+    base = _build_default_gates(project_root, constitution, stack)
+    return ConventionsGatesV2(
+        schema_version=2,
+        generated_from=base.generated_from,
+        commands=base.commands,
+        builtin=base.builtin,
+        coverage=base.coverage,
+        exclusions=base.exclusions,
+        scope=base.scope,
+        ast_rules=AstRulesConfig(mode=ast_mode),
     )
 
 

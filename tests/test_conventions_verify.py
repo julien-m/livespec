@@ -363,6 +363,58 @@ def test_cli_verify_json_exit_codes_and_gates_init(tmp_path: Path) -> None:
     assert (fresh / ".specs" / "conventions-gates.yaml").is_file()
 
 
+def test_cli_gates_init_ast_mode_writes_v2_only_when_explicit(tmp_path: Path) -> None:
+    fresh = tmp_path / "fresh"
+    (fresh / ".specs" / "stacks").mkdir(parents=True)
+    (fresh / ".specs" / "constitution.md").write_text("# Constitution\n", encoding="utf-8")
+    (fresh / ".specs" / "stacks" / "_default.md").write_text("Python CLI\n", encoding="utf-8")
+
+    default_result = runner.invoke(app, ["conventions", "gates", "init", "--repo", str(fresh)])
+    assert default_result.exit_code == 0, default_result.output
+    assert "schema_version: 1" in (fresh / ".specs" / "conventions-gates.yaml").read_text()
+    assert "ast_rules" not in (fresh / ".specs" / "conventions-gates.yaml").read_text()
+
+    observe_result = runner.invoke(
+        app,
+        ["conventions", "gates", "init", "--repo", str(fresh), "--force", "--ast-mode", "observe"],
+    )
+
+    gates_text = (fresh / ".specs" / "conventions-gates.yaml").read_text()
+    assert observe_result.exit_code == 0, observe_result.output
+    assert "schema_version: 2" in gates_text
+    assert "mode: observe" in gates_text
+
+
+def test_cli_verify_json_omits_ast_summary_for_v1_and_includes_observe_summary(
+    tmp_path: Path,
+) -> None:
+    project_root = _write_project(tmp_path)
+    v1_result = runner.invoke(
+        app,
+        ["conventions", "verify", "--repo", str(project_root), "--json"],
+    )
+    assert v1_result.exit_code == 1
+    assert "ast_summary" not in json.loads(v1_result.output)
+
+    gates = project_root / ".specs" / "conventions-gates.yaml"
+    gates.write_text(
+        gates.read_text(encoding="utf-8").replace("schema_version: 1", "schema_version: 2")
+        + "\nast_rules:\n  mode: observe\n"
+        + "  backend:\n    name: ast-grep\n    command: sg-missing\n",
+        encoding="utf-8",
+    )
+
+    observe_result = runner.invoke(
+        app,
+        ["conventions", "verify", "--repo", str(project_root), "--json"],
+    )
+
+    payload = json.loads(observe_result.output)
+    assert observe_result.exit_code == 1
+    assert payload["ast_summary"]["ast_mode"] == "observe"
+    assert payload["ast_summary"]["ast_backend"]["status"] == "unavailable"
+
+
 def test_cli_scaffold_sync_limits_updates_swiftlint_config(tmp_path: Path) -> None:
     project_root = _write_project(tmp_path)
     swiftlint = project_root / ".swiftlint.yml"

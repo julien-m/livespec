@@ -13,7 +13,7 @@ from enum import StrEnum
 from typing import Literal
 
 GateSeverityInput = Literal["warning", "error"]
-SourceKind = Literal["builtin", "linter", "system"]
+SourceKind = Literal["builtin", "linter", "system", "ast"]
 
 
 class GateSeverity(StrEnum):
@@ -77,11 +77,15 @@ class GateResult:
     verdict: GateVerdict
     violations: list[GateViolation]
     blockers: list[GateBlocker]
+    ast_summary: dict[str, object] | None = None
 
     def to_dict(self) -> dict[str, object]:
         """Return JSON-serializable result payload."""
-        return {
+        payload: dict[str, object] = {
             "verdict": self.verdict.value,
             "violations": [violation.to_dict() for violation in self.violations],
             "blockers": [blocker.to_dict() for blocker in self.blockers],
         }
+        if self.ast_summary is not None:
+            payload["ast_summary"] = self.ast_summary
+        return payload

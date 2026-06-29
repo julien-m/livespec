@@ -17,7 +17,7 @@ updated: 2026-06-25
 | FR-003 | [`validator/verify_output.py`](../../../validator/verify_output.py), [`validator/run_artifacts.py`](../../../validator/run_artifacts.py) | receipt_verdict outcome path | Implemented | 2026-06-13 |
 | FR-004 | [`validator/verify_output.py`](../../../validator/verify_output.py), [`validator/expectations.py`](../../../validator/expectations.py) | receipt_verdict parser/evaluator | Implemented | 2026-06-13 |
 | FR-005 | [`validator/verify_output.py`](../../../validator/verify_output.py) | gates-absent skip branch | Implemented | 2026-06-13 |
-| FR-006 | [`validator/goal_contracts.py`](../../../validator/goal_contracts.py) | conventions_receipt_path proof | Implemented | 2026-06-13 |
+| FR-006 | [`validator/goal_contracts.py`](../../../validator/goal_contracts.py) | scoped task-level conventions_receipt_path proof | Implemented | 2026-06-29 |
 | FR-006 | [`validator/cli_commands/conventions_cmd.py`](../../../validator/cli_commands/conventions_cmd.py), [`validator/conventions_gate.py`](../../../validator/conventions_gate.py), [`validator/conventions_feature_scope.py`](../../../validator/conventions_feature_scope.py), [`validator/conventions_gate_types.py`](../../../validator/conventions_gate_types.py), [`tests/test_conventions_verify_scope.py`](../../../tests/test_conventions_verify_scope.py) | conventions receipt CLI and scoped verification | Implemented | 2026-06-25 |
 | FR-007 | [`.agent-sync/skills/spec-implement/SKILL.md`](../../../.agent-sync/skills/spec-implement/SKILL.md), [`.agent-sync/skills/spec-test/SKILL.md`](../../../.agent-sync/skills/spec-test/SKILL.md), [`.agent-sync/skills/spec-fix/SKILL.md`](../../../.agent-sync/skills/spec-fix/SKILL.md), [`.agent-sync/skills/spec-*/expectations.md`](../../../.agent-sync/skills/spec-implement/expectations.md), [`tests/test_conventions_pipeline_docs.py`](../../../tests/test_conventions_pipeline_docs.py) | command docs contract | Implemented | 2026-06-25 |
 | FR-008 | [`.agent-sync/agents/livespec-verifier/prompt.md`](../../../.agent-sync/agents/livespec-verifier/prompt.md), [`.agent-sync/agents/livespec-supervisor/prompt.md`](../../../.agent-sync/agents/livespec-supervisor/prompt.md) | prompt hard gate text | Implemented | 2026-06-13 |
@@ -53,6 +53,7 @@ updated: 2026-06-25
 - Updated receipt, verify-output, expectations, goal contract, command skill, agent prompt, and coherence registry files.
 - Updated [`validator/cli_commands/conventions_cmd.py`](../../../validator/cli_commands/conventions_cmd.py) to emit project-local conventions receipts only when `--feature` is explicit.
 - Added [`validator/conventions_feature_scope.py`](../../../validator/conventions_feature_scope.py), [`validator/conventions_gate_types.py`](../../../validator/conventions_gate_types.py), and [`tests/test_conventions_verify_scope.py`](../../../tests/test_conventions_verify_scope.py) for current-cycle scoped verification.
+- Updated [`validator/goal_contracts.py`](../../../validator/goal_contracts.py), [`tests/test_goal_contracts.py`](../../../tests/test_goal_contracts.py), and [`tests/test_conventions_verify_scope.py`](../../../tests/test_conventions_verify_scope.py) so `/spec-feature` supervisor tasks replay conventions without requiring pre-scope receipt evidence.
 
 ## Verification
 
@@ -60,6 +61,7 @@ updated: 2026-06-25
 - Cycle 2 conventions-focused tests: `92 passed`.
 - Full tests: `2216 passed, 40 skipped, 194 warnings`.
 - Conventions verification: `PASS`, receipt `.specs/conventions/runs/20260625T185322Z/receipt.json`.
+- Targeted supervisor receipt regression: `8 passed`.
 - Ruff: `ruff check .` passed.
 - Format: `ruff format --check .` passed.
 - Pyright: `0 errors, 0 warnings, 0 informations`.

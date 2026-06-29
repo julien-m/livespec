@@ -1,0 +1,104 @@
+{
+  "blockers": [],
+  "created_at": "2026-06-29T15:49:01.599823+00:00",
+  "feature_slug": "072-conventions-ast-rule-engine",
+  "gates_sha256": "6b45fc4b27b41cb91f5df004995ef590f38312729105308559a8b08d673f2361",
+  "oracle": "livespec-conventions-gate",
+  "oracle_version": "1",
+  "receipt_hash": "38af8b1c763232c689d0273ac60f0d2cc920adc598af92dd78d1f4f2a6c02d3c",
+  "run_id": "spec-check-354b43cd",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": [
+    {
+      "fix_hint": "",
+      "line": 214,
+      "message": "generate_conventions_gates has 34 lines > 30",
+      "path": "validator/conventions_gates.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 53,
+      "message": "write_conventions_receipt has 33 lines > 30",
+      "path": "validator/conventions_receipt.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 88,
+      "message": "verify_conventions_receipt has 58 lines > 30",
+      "path": "validator/conventions_receipt.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 32,
+      "message": "evaluate_conventions_receipt_policy has 55 lines > 30",
+      "path": "validator/conventions_receipt_policy.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 115,
+      "message": "conventions_verify_command has 53 lines > 30",
+      "path": "validator/cli_commands/conventions_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 245,
+      "message": "_build_supervisor_gate_payload has 37 lines > 30",
+      "path": "validator/cli_commands/conventions_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 62,
+      "message": "_parse_rule has 31 lines > 30",
+      "path": "validator/conventions_ast/catalog.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 32,
+      "message": "run_ast_conventions has 43 lines > 30",
+      "path": "validator/conventions_ast/engine.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 73,
+      "message": "_scan_one has 48 lines > 30",
+      "path": "validator/conventions_ast/backends/ast_grep.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    },
+    {
+      "fix_hint": "",
+      "line": 27,
+      "message": "scan has 33 lines > 30",
+      "path": "validator/conventions_ast/backends/fake.py",
+      "rule_id": "builtin.max_function_lines",
+      "severity": "warning",
+      "source": "builtin"
+    }
+  ]
+}

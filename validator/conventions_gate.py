@@ -19,6 +19,7 @@ from typing import Any, cast
 
 import yaml
 
+from .conventions_ast.engine import run_ast_conventions
 from .conventions_feature_scope import SOURCE_SUFFIXES, FeatureScope
 from .conventions_gate_types import (
     GateBlocker,
@@ -31,7 +32,8 @@ from .conventions_gate_types import (
 )
 from .conventions_gates import (
     DEFAULT_SOURCE_EXCLUSIONS,
-    ConventionsGates,
+    ConventionsGatesAny,
+    ConventionsGatesV2,
     GateCommand,
     gates_path,
     load_conventions_gates,
@@ -53,8 +55,21 @@ def verify_conventions(
     """Run deterministic conventions verification for a project root."""
     gates = load_conventions_gates(gates_path(project_root))
     blockers = _command_blockers(project_root, gates)
-    violations = [] if blockers else _collect_violations(project_root, gates, feature_scope)
-    result = _result_from(violations, blockers)
+    ast_summary: dict[str, object] | None = None
+    if blockers:
+        violations: list[GateViolation] = []
+    else:
+        violations = _collect_violations(project_root, gates, feature_scope)
+        if _ast_enabled(gates):
+            ast_result = run_ast_conventions(
+                project_root,
+                gates,
+                source_files=_source_files(project_root, gates, feature_scope),
+            )
+            violations.extend(ast_result.violations)
+            blockers.extend(ast_result.blockers)
+            ast_summary = ast_result.summary
+    result = _result_from(violations, blockers, ast_summary=ast_summary)
     if report:
         from .conventions_report import write_debt_report
 
@@ -62,7 +77,7 @@ def verify_conventions(
     return result
 
 
-def _command_blockers(project_root: Path, gates: ConventionsGates) -> list[GateBlocker]:
+def _command_blockers(project_root: Path, gates: ConventionsGatesAny) -> list[GateBlocker]:
     blockers = _staleness_blockers(project_root, gates)
     for command in gates.commands.lint + gates.commands.format + gates.commands.typecheck:
         blockers.extend(_version_blockers(command))
@@ -70,7 +85,7 @@ def _command_blockers(project_root: Path, gates: ConventionsGates) -> list[GateB
     return blockers
 
 
-def _staleness_blockers(project_root: Path, gates: ConventionsGates) -> list[GateBlocker]:
+def _staleness_blockers(project_root: Path, gates: ConventionsGatesAny) -> list[GateBlocker]:
     constitution = project_root / gates.generated_from.constitution
     if not constitution.is_file():
         return [
@@ -121,7 +136,7 @@ def _version_blockers(command: GateCommand) -> list[GateBlocker]:
 
 def _sync_limit_blockers(
     project_root: Path,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
     command: GateCommand,
 ) -> list[GateBlocker]:
     if command.id != "swiftlint" or not command.config:
@@ -149,7 +164,7 @@ def _sync_limit_blockers(
 
 def _collect_violations(
     project_root: Path,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
     feature_scope: FeatureScope | None,
 ) -> list[GateViolation]:
     violations: list[GateViolation] = []
@@ -179,7 +194,7 @@ def _collect_violations(
 
 def _source_files(
     project_root: Path,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
     feature_scope: FeatureScope | None = None,
 ) -> list[Path]:
     files: list[Path] = []
@@ -208,7 +223,7 @@ def _is_in_scope(rel: str, feature_scope: FeatureScope | None) -> bool:
     return feature_scope is None or rel in feature_scope.paths
 
 
-def _effective_exclusions(gates: ConventionsGates) -> tuple[str, ...]:
+def _effective_exclusions(gates: ConventionsGatesAny) -> tuple[str, ...]:
     return (*DEFAULT_SOURCE_EXCLUSIONS, *gates.exclusions)
 
 
@@ -236,7 +251,11 @@ def _matches_exclusion(rel: str, pattern: str) -> bool:
     return False
 
 
-def _file_length_violations(rel: str, text: str, gates: ConventionsGates) -> list[GateViolation]:
+def _file_length_violations(
+    rel: str,
+    text: str,
+    gates: ConventionsGatesAny,
+) -> list[GateViolation]:
     count = len(text.splitlines())
     rule = gates.builtin.max_file_lines
     if count > rule.limit:
@@ -255,7 +274,7 @@ def _file_length_violations(rel: str, text: str, gates: ConventionsGates) -> lis
 def _function_length_violations(
     rel: str,
     analysis: SourceAnalysis,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
 ) -> list[GateViolation]:
     rule = gates.builtin.max_function_lines
     violations: list[GateViolation] = []
@@ -287,7 +306,7 @@ def _file_header_violations(
     rel: str,
     text: str,
     analysis: SourceAnalysis,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
 ) -> list[GateViolation]:
     pattern = gates.builtin.file_header.get(analysis.language)
     if not pattern or re.search(pattern, text):
@@ -298,7 +317,7 @@ def _file_header_violations(
 def _doc_coverage_violations(
     rel: str,
     analysis: SourceAnalysis,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
 ) -> list[GateViolation]:
     if not gates.builtin.doc_coverage.get("require_public_api", False):
         return []
@@ -314,7 +333,7 @@ def _doc_coverage_violations(
 def _token_scale_violations(
     rel: str,
     analysis: SourceAnalysis,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
 ) -> list[GateViolation]:
     scale = set(gates.builtin.token_scale.scale)
     properties = set(gates.builtin.token_scale.properties)
@@ -334,7 +353,7 @@ def _token_scale_violations(
 def _suppression_violations(
     rel: str,
     analysis: SourceAnalysis,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
 ) -> list[GateViolation]:
     allowed = set(gates.builtin.suppression_directives.whitelist)
     budget = gates.builtin.suppression_directives.budget
@@ -356,7 +375,7 @@ def _suppression_violations(
 def _import_rule_violations(
     rel: str,
     analysis: SourceAnalysis,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
 ) -> list[GateViolation]:
     violations: list[GateViolation] = []
     for rule in gates.builtin.import_rules:
@@ -377,7 +396,7 @@ def _import_rule_violations(
 
 def _linter_violations(
     project_root: Path,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
     feature_scope: FeatureScope | None = None,
 ) -> list[GateViolation]:
     violations: list[GateViolation] = []
@@ -433,9 +452,18 @@ def _linter_violations(
     return violations
 
 
-def _result_from(violations: list[GateViolation], blockers: list[GateBlocker]) -> GateResult:
+def _ast_enabled(gates: ConventionsGatesAny) -> bool:
+    return isinstance(gates, ConventionsGatesV2) and gates.ast_rules.mode != "off"
+
+
+def _result_from(
+    violations: list[GateViolation],
+    blockers: list[GateBlocker],
+    *,
+    ast_summary: dict[str, object] | None = None,
+) -> GateResult:
     if blockers:
-        return GateResult(GateVerdict.BLOCKED, violations, blockers)
+        return GateResult(GateVerdict.BLOCKED, violations, blockers, ast_summary=ast_summary)
     blocking_violations = [
         violation for violation in violations if violation.rule_id in _BLOCKING_VIOLATION_RULES
     ]
@@ -444,15 +472,20 @@ def _result_from(violations: list[GateViolation], blockers: list[GateBlocker]) -
             GateBlocker(violation.rule_id, violation.message, violation.fix_hint)
             for violation in blocking_violations
         ]
-        return GateResult(GateVerdict.BLOCKED, violations, blockers)
+        return GateResult(GateVerdict.BLOCKED, violations, blockers, ast_summary=ast_summary)
     has_errors = any(
         (v.severity.value if isinstance(v.severity, GateSeverity) else v.severity) == "error"
         for v in violations
     )
-    return GateResult(GateVerdict.FAIL if has_errors else GateVerdict.PASS, violations, blockers)
+    return GateResult(
+        GateVerdict.FAIL if has_errors else GateVerdict.PASS,
+        violations,
+        blockers,
+        ast_summary=ast_summary,
+    )
 
 
-def _swiftlint_limit_mismatches(raw: dict[str, object], gates: ConventionsGates) -> list[str]:
+def _swiftlint_limit_mismatches(raw: dict[str, object], gates: ConventionsGatesAny) -> list[str]:
     return [
         *_threshold_mismatches(raw, "file_length", gates.builtin.max_file_lines),
         *_threshold_mismatches(raw, "function_body_length", gates.builtin.max_function_lines),

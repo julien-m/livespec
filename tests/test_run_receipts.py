@@ -95,3 +95,36 @@ def test_conventions_blocked_verdict_is_verified_not_tamper_error(tmp_path: Path
     assert check.verified is True
     assert check.verdict == "BLOCKED"
     assert check.error is None
+
+
+def test_v2_conventions_receipt_round_trip_verifies(tmp_path: Path) -> None:
+    gates = _write_gates(tmp_path)
+    gates.write_text("schema_version: 2\nast_rules:\n  mode: observe\n", encoding="utf-8")
+    receipt = write_conventions_receipt(
+        project_root=tmp_path,
+        feature_slug="072-conventions-ast-rule-engine",
+        run_id="run-ast",
+        result=GateResult(
+            verdict=GateVerdict.PASS,
+            violations=[],
+            blockers=[],
+            ast_summary={
+                "ast_mode": "observe",
+                "ast_backend": {"name": "ast-grep", "status": "unavailable", "version": None},
+                "ast_catalogs_sha256": "0" * 64,
+                "ast_observations": [],
+                "ast_would_fail_count": 0,
+            },
+        ),
+        gates_path=gates,
+    )
+
+    check = verify_one_receipt(
+        kind="conventions",
+        path=receipt.relative_to(tmp_path).as_posix(),
+        project_root=tmp_path,
+        feature="072-conventions-ast-rule-engine",
+    )
+
+    assert check.verified is True
+    assert check.verdict == "PASS"

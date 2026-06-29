@@ -1,5 +1,14 @@
 # Changelog: QE Analysis Native Module
 
+## 2026-06-27 — [Check]: Spec-code alignment verified
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **Coverage:** 23/23 FR+AC verified (100%); 1 spec-quality warning (AC Given/When/Then format)
+- **Report:** `checks/2026-06-27.md`
+- **Author:** Codex
+
 ## 2026-06-27 — [Feature]: Native QE Analysis
 
 - **Type:** Feature

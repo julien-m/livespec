@@ -10,7 +10,9 @@ from pathlib import Path
 import pytest
 
 from validator.conventions_gates import (
+    AstRulesConfig,
     ConventionsGates,
+    ConventionsGatesV2,
     generate_conventions_gates,
     load_conventions_gates,
 )
@@ -47,6 +49,50 @@ def test_load_real_repo_gates_file() -> None:
     gates = load_conventions_gates(Path("."))
 
     assert gates.schema_version == 1
+
+
+def test_generate_gates_keeps_v1_default_and_writes_v2_only_for_ast_mode(
+    tmp_path: Path,
+) -> None:
+    project_root = _project_with_specs(tmp_path, "# Stack\n\nPython CLI\n")
+
+    default_path = generate_conventions_gates(project_root)
+    default_gates = load_conventions_gates(default_path)
+
+    assert default_gates.schema_version == 1
+    assert not hasattr(default_gates, "ast_rules")
+
+    ast_path = generate_conventions_gates(project_root, force=True, ast_mode="observe")
+    ast_gates = load_conventions_gates(ast_path)
+
+    assert isinstance(ast_gates, ConventionsGatesV2)
+    assert ast_gates.schema_version == 2
+    assert ast_gates.ast_rules.mode == "observe"
+    assert ast_gates.ast_rules.backend.name == "ast-grep"
+
+
+def test_conventions_gates_v2_accepts_off_observe_enforce_only() -> None:
+    base = {
+        "schema_version": 2,
+        "generated_from": {
+            "constitution": ".specs/constitution.md",
+            "constitution_sha256": "0" * 64,
+            "stack": ".specs/stacks/_default.md",
+        },
+        "commands": {"lint": []},
+        "builtin": {
+            "max_file_lines": {"target": 400, "limit": 500},
+            "max_function_lines": {"target": 30, "limit": 60},
+        },
+        "scope": "repo",
+    }
+
+    for mode in ("off", "observe", "enforce"):
+        gates = ConventionsGatesV2.model_validate({**base, "ast_rules": {"mode": mode}})
+        assert gates.ast_rules.mode == mode
+
+    with pytest.raises(ValueError, match="Input should be"):
+        AstRulesConfig.model_validate({"mode": "warn"})
 
 
 def test_load_gates_rejects_invalid_threshold_order(tmp_path: Path) -> None:

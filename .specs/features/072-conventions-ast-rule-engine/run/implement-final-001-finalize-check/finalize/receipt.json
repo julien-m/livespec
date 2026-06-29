@@ -1,0 +1,36 @@
+{
+  "command": "spec-implement",
+  "created_at": "2026-06-29T15:25:29.004442+00:00",
+  "feature_slug": "072-conventions-ast-rule-engine",
+  "files": [
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/changelog.md",
+      "sha256": "6a640cd10765694cd8ec2acf6f6e37801130bb89baef041fe35d6c231b78ace8"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "e166717a9723942f701e3dc309fb13cc0fe8dc6cd0410e454462902ed3f59a4a"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "64bb3a966e901fcf73b22c3b7fe2fc749697f83cba446551449aa2935676d484"
+    },
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/spec.md",
+      "sha256": "cd9135f0861b996f383d0526e583e03665ddc96fc3fda5a6ed09359eca24f557"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "a48dbe697f9cb59972d241fb774816956bf94d00a1937cccfcd8f3010df210f4",
+  "receipt_hash": "e2c3770461443e9c20f406a6de56c7d317b8ef924d4346fa74c31b60cd1c5f36",
+  "schema_version": "1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "message": "/Users/julienm/projects/livespec/.specs/features/072-conventions-ast-rule-engine/changelog.md carries no finalize marker for spec-implement",
+      "rule_id": "marker.missing"
+    }
+  ]
+}

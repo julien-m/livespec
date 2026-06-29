@@ -1,0 +1,26 @@
+rules:
+  - id: ts.no_as_any
+    title: No TypeScript as any assertions
+    language: typescript
+    decidability: ast
+    precision: high
+    severity: error
+    enforcement: mode
+    source_path: ai-ressources/code-conventions/javascript.md
+    source_anchor: "#typescript-specifics"
+    source_hash: sha256:9ea7336d3b80963a0740aff3e09526e21e79e40809160d75f2bf2e0241e301bd
+    backend: ast-grep
+    patterns:
+      - kind: sg_yaml
+        value: |
+          id: ts.no_as_any
+          language: TypeScript
+          rule:
+            pattern: $VALUE as any
+    fixtures:
+      pass: tests/fixtures/conventions_ast/ts/no_as_any/pass.ts
+      fail: tests/fixtures/conventions_ast/ts/no_as_any/fail.ts
+    justification:
+      required: true
+      accepted_window: adjacent_comment_block
+      rule_id_required: true

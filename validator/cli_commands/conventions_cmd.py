@@ -25,6 +25,7 @@ from ..conventions_diffguard import (
 from ..conventions_feature_scope import FeatureScopeError, resolve_feature_scope
 from ..conventions_gate import GateResult, verify_conventions
 from ..conventions_gates import (
+    InitAstMode,
     gates_path,
     generate_conventions_gates,
     load_conventions_gates,
@@ -47,6 +48,11 @@ RUN_ID_OPTION = typer.Option(None, "--run-id", help="Receipt run id.")
 REPO_FEATURE_SCOPE = "repo"
 FEATURE_SLUG_PATTERN = re.compile(r"^\d{3}(?:\.\d+)?-[a-z0-9][a-z0-9-]*$")
 RUN_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
+AST_MODE_OPTION = typer.Option(
+    None,
+    "--ast-mode",
+    help="Write schema v2 AST rollout gates in observe or enforce mode.",
+)
 WORKER_RECEIPT_OPTION = typer.Option(
     None,
     "--worker-receipt",
@@ -90,10 +96,11 @@ def refresh_conventions_command(repo: Path = REPO_OPTION, full: bool = FULL_OPTI
 def conventions_gates_init_command(
     repo: Path = REPO_OPTION,
     force: bool = typer.Option(False, "--force", help="Overwrite existing gates file."),
+    ast_mode: InitAstMode | None = AST_MODE_OPTION,
 ) -> None:
     """Generate `.specs/conventions-gates.yaml` from project sources."""
     try:
-        path = generate_conventions_gates(repo.resolve(), force=force)
+        path = generate_conventions_gates(repo.resolve(), force=force, ast_mode=ast_mode)
     except FileExistsError:
         typer.echo("conventions gates already present", err=True)
         raise typer.Exit(1) from None

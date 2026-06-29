@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+from hashlib import sha256
 from pathlib import Path
 from typing import cast
 
@@ -29,8 +30,10 @@ from pytest import MonkeyPatch
 from typer.testing import CliRunner
 
 from validator.cli import app
+from validator.conventions_gate import GateResult, GateVerdict
+from validator.conventions_receipt import write_conventions_receipt
 from validator.doctor.models import JsonValue
-from validator.doctor.scanner import _scan_hook_enforcement
+from validator.doctor.scanner import _scan_hook_enforcement, run_doctor
 
 runner = CliRunner()
 
@@ -109,6 +112,57 @@ def test_doctor_json_reports_stale_mapping_missing_test_and_hook(
     assert "hook_unenforced" in codes
 
 
+def test_doctor_surfaces_observe_mode_ast_warning(tmp_path: Path) -> None:
+    """Doctor reports observe-mode AST findings without making them blocking."""
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    gates = specs / "conventions-gates.yaml"
+    constitution = specs / "constitution.md"
+    constitution.write_text("# Constitution\n", encoding="utf-8")
+    gates.write_text(
+        f"""\
+schema_version: 2
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: {sha256(constitution.read_bytes()).hexdigest()}
+  stack: .specs/stacks/_default.md
+ast_rules:
+  mode: observe
+""",
+        encoding="utf-8",
+    )
+    write_conventions_receipt(
+        project_root=tmp_path,
+        feature_slug="repo",
+        run_id="observe",
+        result=GateResult(
+            verdict=GateVerdict.PASS,
+            violations=[],
+            blockers=[],
+            ast_summary={
+                "ast_mode": "observe",
+                "ast_backend": {"name": "ast-grep", "status": "available", "version": "sg 1.0"},
+                "ast_catalogs_sha256": "0" * 64,
+                "ast_observations": [
+                    {
+                        "rule_id": "ts.no_as_any",
+                        "path": "src/demo.ts",
+                        "line": 1,
+                        "severity": "error",
+                        "message": "as any",
+                    }
+                ],
+                "ast_would_fail_count": 1,
+            },
+        ),
+        gates_path=gates,
+    )
+
+    report = run_doctor(tmp_path)
+
+    assert any(finding.code == "conventions_ast_observe" for finding in report.findings)
+
+
 def test_doctor_detects_hooks_from_git_worktree_git_path(tmp_path: Path) -> None:
     """Linked worktrees store hooks under the common git dir, not worktree/.git/hooks."""
     repo = tmp_path / "repo"
@@ -121,10 +175,17 @@ def test_doctor_detects_hooks_from_git_worktree_git_path(tmp_path: Path) -> None
     subprocess.run(["git", "add", "README.md", ".specs"], cwd=repo, check=True)
     subprocess.run(["git", "commit", "--no-verify", "-m", "init"], cwd=repo, check=True)
     worktree = tmp_path / "worktree"
-    subprocess.run(["git", "worktree", "add", worktree.as_posix(), "-b", "work"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "worktree", "add", worktree.as_posix(), "-b", "work"],
+        cwd=repo,
+        check=True,
+    )
 
     hook_path = repo / ".git" / "hooks" / "pre-commit"
-    hook_path.write_text("#!/usr/bin/env bash\nlivespec validate --staged\n", encoding="utf-8")
+    hook_path.write_text(
+        "#!/usr/bin/env bash\nlivespec validate --staged\n",
+        encoding="utf-8",
+    )
     hook_path.chmod(0o755)
 
     assert _scan_hook_enforcement(worktree) == []

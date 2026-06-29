@@ -158,8 +158,15 @@ HOOKS_BEFORE_REPAIR_ACTIONS: tuple[str, ...] = (
 )
 CONVENTIONS_REQUIRED_EVIDENCE: tuple[str, ...] = ("conventions_receipt_path",)
 CONVENTIONS_VERIFY_COMMAND = "livespec conventions verify --json --feature <slug>"
+# `spec-feature` supervisors run before the feature scope can exist; their child
+# implement/test/fix goals own task-level convention receipts.
 _CONVENTIONS_GATED_COMMANDS: frozenset[str] = frozenset(
-    {"spec-implement", "spec-test", "spec-fix", "spec-feature", "spec-ship"}
+    {
+        "spec-implement",
+        "spec-test",
+        "spec-fix",
+        "spec-ship",
+    }
 )
 
 # @spec FR-002: Embed native QE for affected commands

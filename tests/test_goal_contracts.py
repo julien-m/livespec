@@ -1188,6 +1188,32 @@ def test_conventions_gate_not_required_for_spec_plan(tmp_path: Path) -> None:
     assert all("conventions_receipt_path" not in task["required_evidence"] for task in final_tasks)
 
 
+def test_conventions_gate_not_required_for_spec_feature_supervisor_tasks(
+    tmp_path: Path,
+) -> None:
+    project_root = tmp_path / "project"
+    (project_root / ".specs").mkdir(parents=True)
+    _write_conventions(project_root, tmp_path / "ai")
+    _write_conventions_gates(project_root)
+
+    goal = compile_command_goal(
+        "spec-feature",
+        project_root=project_root,
+        livespec_root=_repo_root(),
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    supervisor_tasks = [
+        task for task in contract["tasks"] if task["id"] not in {"archive.run", "hooks.before"}
+    ]
+
+    assert supervisor_tasks
+    assert all(
+        "conventions_receipt_path" not in task["required_evidence"] for task in supervisor_tasks
+    )
+    assert all("convention_sources_read" in task["required_evidence"] for task in supervisor_tasks)
+
+
 def test_conventions_gate_required_for_spec_implement(tmp_path: Path) -> None:
     project_root = tmp_path / "project"
     (project_root / ".specs").mkdir(parents=True)

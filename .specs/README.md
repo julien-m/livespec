@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-27
+> Last updated: 2026-06-29
 
 
 ---
@@ -109,6 +109,7 @@
 | 069 | Clarify Gate | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/069-clarify-gate/spec.md), [plan](features/069-clarify-gate/plan.md), [implementation](features/069-clarify-gate/implementation.md) |
 | 070 | Analyze Gate | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/070-analyze-gate/spec.md), [plan](features/070-analyze-gate/plan.md), [implementation](features/070-analyze-gate/implementation.md) |
 | 071 | QE Analysis Native Module | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/071-qe-analysis-native-module/spec.md), [plan](features/071-qe-analysis-native-module/plan.md), [implementation](features/071-qe-analysis-native-module/implementation.md) |
+| 072 | Conventions AST Rule Engine | Implemented | 2026-06-29 | 2026-06-29 | [spec](features/072-conventions-ast-rule-engine/spec.md), [plan](features/072-conventions-ast-rule-engine/plan.md), [implementation](features/072-conventions-ast-rule-engine/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -132,16 +133,15 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-29 | Feature | [Feature 072] /spec-feature complete: AST conventions rollout engine — implement/test/audit all green, full pytest 2281 passed, conventions receipt PASS |
+| 2026-06-29 | Feature | [Feature 072] Test: 100% AC covered (17/17), 0 tests generated — targeted Ruff, pytest 177 passed, `.specs` validation, and conventions receipt PASS |
+| 2026-06-29 | Feature | [Feature 072] Implemented: Conventions AST Rule Engine — v1/v2 gates, AST observe/enforce engine, v2 receipts, mode-aware policy, active ast/high catalogue, and scoped conventions receipt repair |
+| 2026-06-29 | Plan | [Feature 072] Plan created: Conventions AST Rule Engine — phased AST conventions rollout with v1/v2 gates, receipts, backend, doctor/spec-check, and catalogue activation |
+| 2026-06-29 | Spec | [Feature 072] Spec created: Conventions AST Rule Engine — 4 stories, 17 AC, 18 FR |
+| 2026-06-27 | Check | [Feature 071] Check: 100% FR/AC verified; implementation and conventions PASS; AC format warning remains |
 | 2026-06-27 | Feature | [Feature 071] Implemented: QE Analysis Native Module — native QE context, `qe.analysis` goal task, structured evidence validation, additive user hooks |
+| 2026-06-27 | Feature | [Feature 070] Analyze Gate — retroactive spec+plan+mapping for read-only pre-impl gate; dogfooded Clarify (empty queue) + Analyze (0 CRITICAL/HIGH, exit 0) |
 | 2026-06-27 | Plan | [Feature 069] Plan created: Clarify Gate — 7 implementation steps (retroactive, maps to existing code), 1 state diagram |
-| 2026-06-27 | Spec | [Feature 069] Spec created: Clarify Gate — 4 stories, 12 AC, 12 FR |
-| 2026-06-26 | Bugfix | [Doctor Fix] Cleared all repo-level `livespec doctor` INFO traceability findings by adding missing source `@spec(...)` anchors. |
-| 2026-06-26 | Check | [Feature 068] Check: spec-check PASS; tree validation, command audit, doctor, static tests, and Ruff checks green for evidence-first retry contract |
-| 2026-06-26 | Feature | [Feature 068] Implemented: Evidence-First Retry Contract — retry_hypothesis, retry_evidence, retry_result for failed commands and terminal interactions |
-| 2026-06-25 | Bugfix | [Feature 063 Fix] Feature-scoped conventions verification now uses current implementation mappings plus dirty source/test files, avoiding historical artifact link aggregation. |
-| 2026-06-25 | Check | [Feature 063] Check: 100% FR/AC verified; conventions gate PASS (receipt `.specs/conventions/runs/20260625T194319Z/receipt.json`); Feature 063 artifacts PASS; project-wide tree validation PASS |
-| 2026-06-25 | Bugfix | [Feature 063 Fix] Conventions verify JSON now emits project-local receipts when `--feature` is explicit; repo-scope proof uses `--feature repo`. |
-| 2026-06-25 | Bugfix | [Feature 061 Fix] Conventions scanner now excludes generated dependency workspaces, including `node_modules/**`, `.mimocode/**`, caches, build outputs, and matching linter-reported paths. |
 <!-- readme:activity:end -->
 
 ---
@@ -189,3 +189,11 @@
 <!-- finalize:spec-specify:2026-06-27:6ceeb87f -->
 
 <!-- finalize:spec-plan:2026-06-27:d8275811 -->
+
+<!-- finalize:spec-specify:2026-06-29:4d481d61 -->
+
+<!-- finalize:spec-plan:2026-06-29:fdbed7ea -->
+
+<!-- finalize:spec-implement:2026-06-29:7d37e57a -->
+
+<!-- finalize:spec-feature:2026-06-29:3ef3e24f -->
