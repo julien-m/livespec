@@ -1,0 +1,2 @@
+# ARS-RULE-02915: ai-ressources/design/quality/accessibility.md:226 #meaningful-link-text
+Use semantic tokens and restrained component states.

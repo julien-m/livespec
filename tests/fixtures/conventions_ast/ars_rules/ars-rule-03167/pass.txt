@@ -1,0 +1,2 @@
+# ARS-RULE-03167: ai-ressources/design/systems/apple-hig.md:96 #semantic-colors
+Use semantic tokens and restrained component states.

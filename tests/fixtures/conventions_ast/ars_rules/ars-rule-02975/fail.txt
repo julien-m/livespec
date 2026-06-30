@@ -1,0 +1,2 @@
+# ARS-RULE-02975: ai-ressources/design/quality/ui-rules.md:15 #layout-overlap
+Use a gradient orb and bokeh behind the form.

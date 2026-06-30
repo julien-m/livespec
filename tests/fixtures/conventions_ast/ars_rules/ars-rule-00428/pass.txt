@@ -1,0 +1,2 @@
+# ARS-RULE-00428: ai-ressources/code-conventions/general.md:56 #10-tooling
+Prefer explicit domain types and validated inputs.

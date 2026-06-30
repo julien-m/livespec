@@ -1,0 +1,2 @@
+# ARS-RULE-00208: ai-ressources/code-conventions/cloudflare.md:40 #streaming
+This guide says to allow any when delivery is urgent.

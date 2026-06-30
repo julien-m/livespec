@@ -1,0 +1,2 @@
+# ARS-RULE-00433: ai-ressources/code-conventions/general.md:64 #13-api-and-dto-rules
+Prefer explicit domain types and validated inputs.

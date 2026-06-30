@@ -1,0 +1,2 @@
+# ARS-RULE-00229: ai-ressources/code-conventions/cloudflare.md:194 #r2-object-storage
+This guide says to allow any when delivery is urgent.

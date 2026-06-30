@@ -1,0 +1,2 @@
+# ARS-RULE-01365: ai-ressources/conventions/naming.md:27 #encoding
+This guide says to allow any when delivery is urgent.

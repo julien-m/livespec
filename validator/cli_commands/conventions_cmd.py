@@ -12,9 +12,11 @@ import re
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any, cast
 
 import typer
 
+from ..conventions_ast.ars_rules import project_has_ars_inventory, validate_ars_rule_registry
 from ..conventions_ast.corpus import build_corpus_manifest
 from ..conventions_ast.source_decisions import (
     build_rule_decision_manifest,
@@ -229,7 +231,10 @@ def _conventions_verify_payload(
 def _with_rule_decision_blockers(result: GateResult, repo_root: Path) -> GateResult:
     summary = result.ast_summary or {}
     manifest = summary.get("rule_decision_manifest") or build_rule_decision_manifest(repo_root)
-    issues = validate_rule_decision_manifest(manifest)
+    ars_issues = (
+        validate_ars_rule_registry(repo_root) if project_has_ars_inventory(repo_root) else []
+    )
+    issues = [*validate_rule_decision_manifest(cast(Any, manifest)), *ars_issues]
     if not issues:
         return result
     blockers = [

@@ -1,0 +1,2 @@
+# ARS-RULE-00217: ai-ressources/code-conventions/cloudflare.md:112 #kv-with-cachettl
+Prefer explicit domain types and validated inputs.

@@ -1,0 +1,2 @@
+# ARS-RULE-00429: ai-ressources/code-conventions/general.md:58 #11-data-validation
+This guide says to allow any when delivery is urgent.

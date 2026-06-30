@@ -1,0 +1,2 @@
+# ARS-RULE-00430: ai-ressources/code-conventions/general.md:60 #12-environment-variables
+Prefer explicit domain types and validated inputs.

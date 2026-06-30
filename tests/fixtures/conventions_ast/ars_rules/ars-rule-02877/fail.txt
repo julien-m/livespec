@@ -1,0 +1,2 @@
+# ARS-RULE-02877: ai-ressources/design/quality/accessibility.md:162 #aria-live-regions
+Use a gradient orb and bokeh behind the form.

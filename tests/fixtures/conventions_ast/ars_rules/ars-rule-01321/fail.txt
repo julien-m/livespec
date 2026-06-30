@@ -1,0 +1,2 @@
+# ARS-RULE-01321: ai-ressources/conventions/authority.md:63 #design-convention-authority
+This guide says to allow any when delivery is urgent.

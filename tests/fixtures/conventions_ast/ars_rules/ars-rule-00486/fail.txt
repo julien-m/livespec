@@ -1,0 +1,2 @@
+# ARS-RULE-00486: ai-ressources/code-conventions/general.md:136 #29-document-side-effects-and-ownership
+This guide says to allow any when delivery is urgent.

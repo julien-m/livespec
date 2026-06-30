@@ -1,0 +1,2 @@
+# ARS-RULE-00408: ai-ressources/code-conventions/general.md:30 #5-naming
+Prefer explicit domain types and validated inputs.

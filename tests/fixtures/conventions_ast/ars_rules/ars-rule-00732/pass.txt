@@ -1,0 +1,2 @@
+# ARS-RULE-00732: ai-ressources/code-conventions/logging.md:37 #environment-awareness
+Prefer explicit domain types and validated inputs.

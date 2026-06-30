@@ -1,0 +1,2 @@
+# ARS-RULE-03104: ai-ressources/design/quality/ui-rules.md:238 #dividers
+Use a gradient orb and bokeh behind the form.

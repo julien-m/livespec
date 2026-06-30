@@ -1,0 +1,2 @@
+# ARS-RULE-01080: ai-ressources/code-conventions/stack-commands.md:13 #stack-detection-table
+This guide says to allow any when delivery is urgent.

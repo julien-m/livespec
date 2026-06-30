@@ -1,0 +1,2 @@
+# ARS-RULE-00235: ai-ressources/code-conventions/cloudflare.md:202 #kv-key-value
+Prefer explicit domain types and validated inputs.

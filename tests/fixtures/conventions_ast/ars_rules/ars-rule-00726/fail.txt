@@ -1,0 +1,2 @@
+# ARS-RULE-00726: ai-ressources/code-conventions/logging.md:27 #request-and-payload-logging
+This guide says to allow any when delivery is urgent.

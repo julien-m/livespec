@@ -1,0 +1,2 @@
+# ARS-RULE-02904: ai-ressources/design/quality/accessibility.md:209 #heading-hierarchy
+Use semantic tokens and restrained component states.

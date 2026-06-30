@@ -1,0 +1,2 @@
+# ARS-RULE-03434: ai-ressources/design/systems/web-standards.md:34 #margins-content-width
+Use a gradient orb and bokeh behind the form.

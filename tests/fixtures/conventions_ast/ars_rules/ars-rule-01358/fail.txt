@@ -1,0 +1,2 @@
+# ARS-RULE-01358: ai-ressources/conventions/naming.md:11 #rules
+This guide says to allow any when delivery is urgent.

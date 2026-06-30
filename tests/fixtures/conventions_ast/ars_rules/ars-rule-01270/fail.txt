@@ -1,0 +1,2 @@
+# ARS-RULE-01270: ai-ressources/code-conventions/testing.md:117 #fakes-over-mocks
+This guide says to allow any when delivery is urgent.

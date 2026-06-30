@@ -1,0 +1,2 @@
+# ARS-RULE-00475: ai-ressources/code-conventions/general.md:122 #26-comments-explain-why-not-what
+This guide says to allow any when delivery is urgent.

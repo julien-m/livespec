@@ -1,0 +1,2 @@
+# ARS-RULE-00487: ai-ressources/code-conventions/general.md:138 #30-concise-documentation
+This guide says to allow any when delivery is urgent.

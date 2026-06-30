@@ -1,0 +1,2 @@
+# ARS-RULE-02999: ai-ressources/design/quality/ui-rules.md:52 #dark-mode
+Use semantic tokens and restrained component states.

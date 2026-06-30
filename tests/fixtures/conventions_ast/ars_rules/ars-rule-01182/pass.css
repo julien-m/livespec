@@ -1,0 +1,2 @@
+/* ARS-RULE-01182: ai-ressources/code-conventions/tailwind.md:72 #dark-mode */
+.good { color: var(--color-danger); font-size: 1rem; margin: var(--space-md); }

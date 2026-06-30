@@ -1,0 +1,2 @@
+# ARS-RULE-01340: ai-ressources/conventions/diagrams.md:106 #redundancy-vs-complementarity
+Prefer explicit domain types and validated inputs.

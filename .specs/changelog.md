@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-06-30 — [Feature 073 Fix] Ship hygiene — full Ruff excludes only generated detector fixture payloads and local `.claude/output/`, Validator receipt kept as proof
+
+## 2026-06-30 — [Feature 073 Fix] Reviewer FAIL follow-up — 564 ARS rules now have 564 callable wrappers/execution paths, 0 unreachable language-specific rules, and real-project ARS violations are blocking errors
+
+## 2026-06-30 — [Feature 073 Fix] ARS row-level runtime — 564 executable CSV rows now map to 564 individual runtime rules with PASS/FAIL fixtures, 0 missing
+
 ## 2026-06-30 — [Feature 073 Fix] Immediate source decisions executable — 164 immediate sources executable/generated through 15 deterministic families, 28 conceptual/editorial deferred to Notion, 0 immediate non-executable
 
 ## 2026-06-30 — [Feature 073 Fix] ARS source decision manifest — 192/192 sources decided, 0 undecided; executable rules now require decision_kind/domain/detector metadata

@@ -1,0 +1,2 @@
+# ARS-RULE-00223: ai-ressources/code-conventions/cloudflare.md:157 #strategy-4-durable-objects-advanced
+This guide says to allow any when delivery is urgent.

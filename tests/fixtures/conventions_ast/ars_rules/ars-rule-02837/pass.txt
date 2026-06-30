@@ -1,0 +1,2 @@
+# ARS-RULE-02837: ai-ressources/design/quality/accessibility.md:71 #color-only-indicators
+Use semantic tokens and restrained component states.

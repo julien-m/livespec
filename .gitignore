@@ -167,6 +167,9 @@ Thumbs.db
 # LiveSpec commit context bridge (auto-generated at commit time)
 .specs/hooks/.commit-context.json
 
+# Local Claude/APEX planning output, never shipped as project source
+.claude/output/
+
 # Git worktrees
 .worktrees/
 

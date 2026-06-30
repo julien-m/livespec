@@ -1,0 +1,2 @@
+# ARS-RULE-03079: ai-ressources/design/quality/ui-rules.md:182 #image-fitting
+Use a gradient orb and bokeh behind the form.

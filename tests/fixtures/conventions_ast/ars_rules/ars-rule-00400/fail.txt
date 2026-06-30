@@ -1,0 +1,2 @@
+# ARS-RULE-00400: ai-ressources/code-conventions/general.md:20 #3-project-structure
+This guide says to allow any when delivery is urgent.

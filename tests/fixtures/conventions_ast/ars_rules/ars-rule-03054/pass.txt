@@ -1,0 +1,2 @@
+# ARS-RULE-03054: ai-ressources/design/quality/ui-rules.md:139 #scrollbars
+Use semantic tokens and restrained component states.

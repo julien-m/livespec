@@ -1,0 +1,2 @@
+# ARS-RULE-00427: ai-ressources/code-conventions/general.md:52 #8-async-concurrency
+Prefer explicit domain types and validated inputs.

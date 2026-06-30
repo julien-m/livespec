@@ -1,0 +1,2 @@
+# ARS-RULE-02979: ai-ressources/design/quality/ui-rules.md:22 #missing-states
+Use a gradient orb and bokeh behind the form.

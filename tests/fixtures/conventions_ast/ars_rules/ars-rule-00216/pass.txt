@@ -1,0 +1,2 @@
+# ARS-RULE-00216: ai-ressources/code-conventions/cloudflare.md:58 #cache-api-caches-default
+Prefer explicit domain types and validated inputs.

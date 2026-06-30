@@ -1,0 +1,2 @@
+# ARS-RULE-02914: ai-ressources/design/quality/accessibility.md:225 #meaningful-link-text
+Use a gradient orb and bokeh behind the form.

@@ -74,8 +74,15 @@ def test_named_source_decision_has_anchored_reason() -> None:
     assert decision["source_path"] in rule_decision["reason"]
     assert decision["source_anchor"] in rule_decision["reason"]
     assert rule_decision["rule_ids"]
-    assert rule_decision["backend_ids"] == ["source-family:css_design_tokens"]
-    assert rule_decision["fixture_families"] == ["generated/css_design_tokens"]
+    assert rule_decision["backend_ids"]
+    assert rule_decision["detector_ids"]
+    assert rule_decision["fixture_families"]
+    assert all(str(backend).startswith("ars-rule:") for backend in rule_decision["backend_ids"])
+    assert all(str(detector).startswith("ars.rule.") for detector in rule_decision["detector_ids"])
+    assert all(
+        str(fixture_family).startswith("ars_rules/")
+        for fixture_family in rule_decision["fixture_families"]
+    )
 
 
 def test_catalog_load_failure_is_manifest_blocker(

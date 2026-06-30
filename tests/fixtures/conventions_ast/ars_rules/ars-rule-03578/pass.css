@@ -1,0 +1,2 @@
+/* ARS-RULE-03578: ai-ressources/design/tokens/cross-platform.md:36 #native-vs-recreated-components */
+.good { color: var(--color-danger); font-size: 1rem; margin: var(--space-md); }

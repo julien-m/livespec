@@ -1,0 +1,2 @@
+# ARS-RULE-00488: ai-ressources/code-conventions/general.md:142 #31-source-first-assets
+Prefer explicit domain types and validated inputs.

@@ -1,0 +1,2 @@
+# ARS-RULE-00435: ai-ressources/code-conventions/general.md:68 #15-dependency-injection
+Prefer explicit domain types and validated inputs.

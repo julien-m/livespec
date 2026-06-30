@@ -1,0 +1,2 @@
+# ARS-RULE-00221: ai-ressources/code-conventions/cloudflare.md:139 #strategy-1-short-ttl-stale-tolerance-default
+This guide says to allow any when delivery is urgent.

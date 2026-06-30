@@ -1,0 +1,2 @@
+/* ARS-RULE-03791: ai-ressources/design/tokens/typography.md:67 #dynamic-type-font-scaling */
+.good { color: var(--color-danger); font-size: 1rem; margin: var(--space-md); }

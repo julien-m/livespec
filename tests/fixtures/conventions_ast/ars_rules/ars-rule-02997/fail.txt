@@ -1,0 +1,2 @@
+# ARS-RULE-02997: ai-ressources/design/quality/ui-rules.md:48 #animations-motion
+Use a gradient orb and bokeh behind the form.

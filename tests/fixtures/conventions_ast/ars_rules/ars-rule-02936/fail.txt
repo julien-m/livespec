@@ -1,0 +1,2 @@
+# ARS-RULE-02936: ai-ressources/design/quality/accessibility.md:281 #error-handling
+Use a gradient orb and bokeh behind the form.

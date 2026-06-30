@@ -1,0 +1,2 @@
+# ARS-RULE-02862: ai-ressources/design/quality/accessibility.md:130 #custom-keyboard-shortcuts
+Use a gradient orb and bokeh behind the form.

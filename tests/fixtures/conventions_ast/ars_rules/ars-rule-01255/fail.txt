@@ -1,0 +1,2 @@
+# ARS-RULE-01255: ai-ressources/code-conventions/testing.md:93 #naming-convention
+This guide says to allow any when delivery is urgent.

@@ -1,0 +1,2 @@
+# ARS-RULE-00461: ai-ressources/code-conventions/general.md:107 #25-mandatory-inline-comment-triggers
+Prefer explicit domain types and validated inputs.

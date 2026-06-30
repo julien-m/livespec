@@ -1,0 +1,2 @@
+/* ARS-RULE-03556: ai-ressources/design/tokens/colors.md:90 #checklist */
+.good { color: var(--color-danger); font-size: 1rem; margin: var(--space-md); }

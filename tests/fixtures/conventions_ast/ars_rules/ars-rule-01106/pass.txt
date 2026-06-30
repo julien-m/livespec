@@ -1,0 +1,2 @@
+# ARS-RULE-01106: ai-ressources/code-conventions/stack-commands.md:62 #tool-existence-guards
+Prefer explicit domain types and validated inputs.

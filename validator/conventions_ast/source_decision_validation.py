@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
+from .ars_rules import EXPECTED_ARS_RULE_COUNT
+
 
 def validate_rule_decision_manifest(manifest: dict[str, Any]) -> list[str]:
     """Return blocking decision-manifest defects."""
@@ -16,6 +18,20 @@ def validate_rule_decision_manifest(manifest: dict[str, Any]) -> list[str]:
     undecided = _undecided_sources(decisions)
     if manifest["total_source_count"] != len(decisions):
         issues.append("total_source_count_mismatch")
+    if manifest.get("rule_level_project_inventory_enabled"):
+        if manifest.get("rule_level_inventory_total_count") != EXPECTED_ARS_RULE_COUNT:
+            issues.append("rule_level_inventory_total_count_mismatch")
+        if manifest.get("rule_level_runtime_rule_count") != EXPECTED_ARS_RULE_COUNT:
+            issues.append("rule_level_runtime_rule_count_mismatch")
+        if manifest.get("rule_level_missing_count") != 0:
+            issues.append("rule_level_missing_count_nonzero")
+    else:
+        if manifest.get("rule_level_inventory_total_count", 0) != 0:
+            issues.append("rule_level_inventory_total_count_without_inventory")
+        if manifest.get("rule_level_runtime_rule_count", 0) != 0:
+            issues.append("rule_level_runtime_rule_count_without_inventory")
+        if manifest.get("rule_level_missing_count", 0) != 0:
+            issues.append("rule_level_missing_count_without_inventory")
     if manifest["decided_source_count"] != len(decisions) - len(undecided):
         issues.append("decided_source_count_mismatch")
     if manifest["undecided_source_count"] != len(undecided):
@@ -25,11 +41,12 @@ def validate_rule_decision_manifest(manifest: dict[str, Any]) -> list[str]:
     expected_counts = dict(sorted(Counter(d["rule_decision"]["kind"] for d in decisions).items()))
     if manifest["decision_kind_counts"] != expected_counts:
         issues.append("decision_kind_counts_mismatch")
+    enforce_ars_rows = bool(manifest.get("rule_level_project_inventory_enabled", False))
     for decision in decisions:
         kind = decision["rule_decision"]["kind"]
         issues.extend(_decision_identity_issues(decision))
         if kind in {"executable", "generated-executable"}:
-            issues.extend(_executable_issues(decision))
+            issues.extend(_executable_issues(decision, enforce_ars_rows=enforce_ars_rows))
         elif kind == "deferred_conceptual_editorial":
             issues.extend(_deferred_conceptual_editorial_issues(decision))
         else:
@@ -43,7 +60,7 @@ def _undecided_sources(decisions: list[dict[str, Any]]) -> list[str]:
     return [d["source_path"] for d in decisions if not d["rule_decision"]["decision_id"]]
 
 
-def _executable_issues(decision: dict[str, Any]) -> list[str]:
+def _executable_issues(decision: dict[str, Any], *, enforce_ars_rows: bool = False) -> list[str]:
     rule = decision["rule_decision"]
     issues: list[str] = []
     if not rule["rule_ids"]:
@@ -63,7 +80,7 @@ def _executable_issues(decision: dict[str, Any]) -> list[str]:
     if rule["non_blocking"]:
         issues.append(f"executable_non_blocking:{decision['source_path']}")
     if rule["kind"] == "generated-executable":
-        issues.extend(_generated_executable_issues(decision))
+        issues.extend(_generated_executable_issues(decision, enforce_ars_rows=enforce_ars_rows))
     return issues
 
 
@@ -134,13 +151,27 @@ def _deferred_conceptual_editorial_issues(decision: dict[str, Any]) -> list[str]
     return issues
 
 
-def _generated_executable_issues(decision: dict[str, Any]) -> list[str]:
+def _generated_executable_issues(
+    decision: dict[str, Any], *, enforce_ars_rows: bool = False
+) -> list[str]:
     rule = decision["rule_decision"]
     issues: list[str] = []
     if "source-decision-contract" in rule["backend_ids"]:
         issues.append(f"generated_uses_generic_contract:{decision['source_path']}")
     if "generated/source_contract" in rule["fixture_families"]:
         issues.append(f"generated_uses_generic_fixture:{decision['source_path']}")
+    if enforce_ars_rows and _is_ars_generated_rule(rule):
+        if not all(str(backend).startswith("ars-rule:") for backend in rule["backend_ids"]):
+            issues.append(f"generated_uses_non_ars_backend:{decision['source_path']}")
+        if not all(str(detector).startswith("ars.rule.") for detector in rule["detector_ids"]):
+            issues.append(f"generated_uses_non_ars_detector:{decision['source_path']}")
+        if not all(
+            str(fixture_family).startswith("ars_rules/")
+            for fixture_family in rule["fixture_families"]
+        ):
+            issues.append(f"generated_uses_non_ars_fixture:{decision['source_path']}")
+        if not rule["deterministic_test_evidence"]:
+            issues.append(f"generated_missing_ars_evidence:{decision['source_path']}")
     if not rule["generator_id"] or not rule["generator_version"]:
         issues.append(f"missing_generator:{decision['source_path']}")
     if not rule["input_source_hashes"]:
@@ -148,6 +179,12 @@ def _generated_executable_issues(decision: dict[str, Any]) -> list[str]:
     if not rule["generated_catalog_snapshot"]:
         issues.append(f"missing_generated_catalog_snapshot:{decision['source_path']}")
     return issues
+
+
+def _is_ars_generated_rule(rule: dict[str, Any]) -> bool:
+    return any(str(backend).startswith("ars-rule:") for backend in rule["backend_ids"]) or any(
+        str(fixture_family).startswith("ars_rules/") for fixture_family in rule["fixture_families"]
+    )
 
 
 def _excluded_issues(excluded: dict[str, Any]) -> list[str]:

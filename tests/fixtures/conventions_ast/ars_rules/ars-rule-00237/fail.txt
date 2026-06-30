@@ -1,0 +1,2 @@
+# ARS-RULE-00237: ai-ressources/code-conventions/cloudflare.md:206 #hono-on-workers
+This guide says to allow any when delivery is urgent.

@@ -1,0 +1,2 @@
+/* ARS-RULE-01170: ai-ressources/code-conventions/tailwind.md:54 #critical-rules */
+.bad { color: #ff0000; font-size: 16px; margin: 13px; }

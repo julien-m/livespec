@@ -1,0 +1,2 @@
+# ARS-RULE-00563: ai-ressources/code-conventions/index.yaml:26 line-26
+This guide says to allow any when delivery is urgent.

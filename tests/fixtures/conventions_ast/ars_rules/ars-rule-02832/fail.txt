@@ -1,0 +1,2 @@
+# ARS-RULE-02832: ai-ressources/design/quality/accessibility.md:62 #minimum-contrast-ratios
+Use a gradient orb and bokeh behind the form.

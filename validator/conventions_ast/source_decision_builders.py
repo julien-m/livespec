@@ -11,9 +11,11 @@ from typing import cast
 
 from validator.conventions_gates import DEFAULT_AST_CATALOGS
 
+from .ars_rules import ArsExecutableRule
 from .catalog import AstCatalogError, load_ast_catalogs
 from .corpus import SourceClassification
 from .models import AstRule
+from .source_decision_ars import generated_rule_fields, source_rules_for
 from .source_decision_paths import anchor_policy, source_anchor, source_hash
 from .source_decision_types import (
     ExcludedDecision,
@@ -24,13 +26,13 @@ from .source_decision_types import (
 from .source_family_checks import SourceFamilyCheck, family_for_source
 
 NOTION_DEFERRED_TASK_ID = "38fb8415-08de-8130-99a9-eff9a1cf5283"
-GENERATED_SOURCE_TEST = "tests/test_conventions_source_family_checks.py"
 
 
 def build_source_decision(
     root: Path,
     source: SourceClassification,
     executable_rules: dict[str, list[dict[str, object]]],
+    project_root: Path | None = None,
 ) -> SourceDecision:
     """Return the complete decision record for one classified source."""
     rel = source["path"]
@@ -41,6 +43,7 @@ def build_source_decision(
         source,
         decision_kind(source, executable_rules.get(rel, [])),
         executable_rules.get(rel, []),
+        project_root=project_root or Path.cwd(),
         source_path=source_path,
         source_hash=source_hash_value,
         source_anchor_policy=anchor_policy(source_file),
@@ -118,6 +121,7 @@ def build_rule_decision(
     kind: SourceDecisionKind,
     rules: list[dict[str, object]],
     *,
+    project_root: Path,
     source_path: str,
     source_hash: str,
     source_anchor_policy: str,
@@ -132,9 +136,11 @@ def build_rule_decision(
         )
     if kind == "generated-executable":
         family = family_for_source(source["domains"], source["languages"], source_path)
+        source_rules = source_rules_for(project_root, source["path"])
         return _generated_rule_decision(
             source,
             family,
+            source_rules,
             source_path,
             source_hash,
             source_anchor_policy,
@@ -203,6 +209,7 @@ def _executable_rule_decision(
 def _generated_rule_decision(
     source: SourceClassification,
     family: SourceFamilyCheck,
+    source_rules: list[ArsExecutableRule],
     source_path: str,
     source_hash: str,
     source_anchor_policy: str,
@@ -210,7 +217,6 @@ def _generated_rule_decision(
     domain: str,
     language: str,
 ) -> RuleDecision:
-    rule_id = _generated_rule_id(source["path"])
     return cast(
         RuleDecision,
         {
@@ -230,12 +236,7 @@ def _generated_rule_decision(
             "future_backend_candidate": "",
             "review_guidance": "",
             "manual_review_surface": "",
-            "rule_ids": [rule_id, family.rule_id],
-            "backend_ids": [family.backend_id],
-            "detector_ids": [family.detector_id],
-            "fixture_families": [family.fixture_family],
-            "test_ids": [f"pytest:{GENERATED_SOURCE_TEST}::{family.family_id}"],
-            "deterministic_test_evidence": [_generated_test_evidence(family)],
+            **generated_rule_fields(source, family, source_rules),
             "non_blocking": False,
             "non_blocking_behavior": "",
             "generator_id": f"source-family-generator:{family.family_id}",
@@ -449,14 +450,6 @@ def _generated_fields() -> dict[str, object]:
     }
 
 
-def _generated_test_evidence(family: SourceFamilyCheck) -> dict[str, str]:
-    return {
-        "test": GENERATED_SOURCE_TEST,
-        "pass_fixture": family.pass_fixture,
-        "fail_fixture": family.fail_fixture,
-    }
-
-
 def _generated_reason(family: SourceFamilyCheck) -> str:
     return (
         f"Immediate-scope source is enforced by generated family {family.family_id}: "
@@ -472,12 +465,6 @@ def _non_blocking_rule_ids(kind: SourceDecisionKind) -> list[str]:
     if kind == "deferred_conceptual_editorial":
         return ["source.deferred_conceptual_editorial"]
     return []
-
-
-def _generated_rule_id(rel: str) -> str:
-    stem = rel.removesuffix(".md").removesuffix(".yaml").removesuffix(".yml")
-    slug = "".join(char if char.isalnum() else "." for char in stem.lower())
-    return "source." + ".".join(part for part in slug.split(".") if part)
 
 
 def _future_backend_candidate(language: str, domain: str) -> str:

@@ -1,0 +1,2 @@
+# ARS-RULE-02862: ai-ressources/design/quality/accessibility.md:130 #custom-keyboard-shortcuts
+Use semantic tokens and restrained component states.

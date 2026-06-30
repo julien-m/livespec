@@ -1,0 +1,2 @@
+# ARS-RULE-00416: ai-ressources/code-conventions/general.md:39 #6-functions
+This guide says to allow any when delivery is urgent.

@@ -55,6 +55,13 @@ include = ["validator*"]
 [tool.ruff]
 target-version = "py311"
 line-length = 100
+extend-exclude = [
+    # Local planning output is not ship source; keep real runtime/tests in Ruff scope.
+    ".claude/output",
+    # Detector payload fixtures are intentionally invalid snippets, not runtime Python modules.
+    "tests/fixtures/conventions_ast/ars_rules",
+    "tests/fixtures/conventions_ast/generated/python_code",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "RUF", "B", "SIM"]
@@ -65,3 +72,7 @@ typeCheckingMode = "strict"
 
 [tool.mypy]
 python_version = "3.12"
+exclude = [
+    "tests/fixtures/conventions_ast/ars_rules/",
+    "tests/fixtures/conventions_ast/generated/python_code/",
+]

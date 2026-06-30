@@ -1,0 +1,2 @@
+# ARS-RULE-00716: ai-ressources/code-conventions/logging.md:7 #logging-sensitive-data-rules-delta
+Prefer explicit domain types and validated inputs.

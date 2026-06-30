@@ -1,0 +1,2 @@
+/* ARS-RULE-03566: ai-ressources/design/tokens/cross-platform.md:14 #unit-correspondence */
+.good { color: var(--color-danger); font-size: 1rem; margin: var(--space-md); }

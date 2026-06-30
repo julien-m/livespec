@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from validator.conventions_ast.ars_rules import load_ars_executable_rules
 from validator.conventions_ast.source_decisions import build_rule_decision_manifest
 from validator.conventions_ast.source_family_checks import (
     SOURCE_FAMILY_CHECKS,
@@ -44,11 +45,40 @@ def test_generated_sources_use_real_family_backends_not_generic_contract() -> No
         "source-decision-contract" not in decision["rule_decision"]["backend_ids"]
         for decision in generated
     )
-    assert {
-        family.removeprefix("generated/")
+    family_ids = {
+        str(decision["rule_decision"]["generator_id"]).removeprefix("source-family-generator:")
         for decision in generated
-        for family in decision["rule_decision"]["fixture_families"]
-    } >= EXPECTED_GENERATED_FAMILIES
+    }
+    assert family_ids
+    assert family_ids <= EXPECTED_GENERATED_FAMILIES
+
+
+def test_csv_generated_sources_use_ars_rule_level_backends() -> None:
+    manifest = build_rule_decision_manifest(Path.cwd())
+    csv_sources = {rule.source_path for rule in load_ars_executable_rules(Path.cwd())}
+    generated = [
+        decision
+        for decision in manifest["decisions"]
+        if decision["rule_decision"]["kind"] == "generated-executable"
+        and decision["source_path"] in csv_sources
+    ]
+
+    assert generated
+    assert all(decision["rule_decision"]["backend_ids"] for decision in generated)
+    assert all(
+        all(
+            str(backend).startswith("ars-rule:")
+            for backend in decision["rule_decision"]["backend_ids"]
+        )
+        for decision in generated
+    )
+    assert all(
+        all(
+            str(family).startswith("ars_rules/")
+            for family in decision["rule_decision"]["fixture_families"]
+        )
+        for decision in generated
+    )
 
 
 @pytest.mark.parametrize("family_id", sorted(EXPECTED_GENERATED_FAMILIES))

@@ -1,0 +1,2 @@
+# ARS-RULE-01310: ai-ressources/code-conventions/testing.md:216 #integration-tests-for-cli-commands
+This guide says to allow any when delivery is urgent.

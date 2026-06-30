@@ -1,0 +1,2 @@
+# ARS-RULE-00722: ai-ressources/code-conventions/logging.md:19 #structured-logging
+Prefer explicit domain types and validated inputs.

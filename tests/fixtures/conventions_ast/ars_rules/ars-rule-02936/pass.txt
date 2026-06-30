@@ -1,0 +1,2 @@
+# ARS-RULE-02936: ai-ressources/design/quality/accessibility.md:281 #error-handling
+Use semantic tokens and restrained component states.

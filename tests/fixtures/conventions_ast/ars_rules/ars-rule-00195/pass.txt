@@ -1,0 +1,2 @@
+# ARS-RULE-00195: ai-ressources/code-conventions/cloudflare.md:10 #configuration
+Prefer explicit domain types and validated inputs.

@@ -1,0 +1,2 @@
+# ARS-RULE-03157: ai-ressources/design/systems/apple-hig.md:79 #typography-sf-pro-dynamic-type
+Use a gradient orb and bokeh behind the form.

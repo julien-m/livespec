@@ -1,0 +1,2 @@
+# ARS-RULE-00243: ai-ressources/code-conventions/cloudflare.md:225 #security
+Prefer explicit domain types and validated inputs.

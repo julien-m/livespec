@@ -1,0 +1,2 @@
+# ARS-RULE-00211: ai-ressources/code-conventions/cloudflare.md:45 #async-patterns
+This guide says to allow any when delivery is urgent.

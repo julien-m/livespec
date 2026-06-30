@@ -1,0 +1,2 @@
+/* ARS-RULE-03597: ai-ressources/design/tokens/cross-platform.md:59 #native-gestures-to-respect */
+.good { color: var(--color-danger); font-size: 1rem; margin: var(--space-md); }

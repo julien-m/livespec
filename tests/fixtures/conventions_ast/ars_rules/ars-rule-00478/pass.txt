@@ -1,0 +1,2 @@
+# ARS-RULE-00478: ai-ressources/code-conventions/general.md:126 #28-no-trivial-comments
+Prefer explicit domain types and validated inputs.

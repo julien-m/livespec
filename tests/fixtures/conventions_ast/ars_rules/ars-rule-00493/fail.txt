@@ -1,0 +1,2 @@
+# ARS-RULE-00493: ai-ressources/code-conventions/general.md:147 #31-source-first-assets
+This guide says to allow any when delivery is urgent.

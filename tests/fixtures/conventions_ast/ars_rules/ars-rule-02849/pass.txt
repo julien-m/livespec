@@ -1,0 +1,2 @@
+# ARS-RULE-02849: ai-ressources/design/quality/accessibility.md:96 #focus-indicators
+Use semantic tokens and restrained component states.

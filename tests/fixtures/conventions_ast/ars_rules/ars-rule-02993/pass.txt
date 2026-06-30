@@ -1,0 +1,2 @@
+# ARS-RULE-02993: ai-ressources/design/quality/ui-rules.md:42 #forms
+Use semantic tokens and restrained component states.

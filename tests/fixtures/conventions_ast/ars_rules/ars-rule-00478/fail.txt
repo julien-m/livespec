@@ -1,0 +1,2 @@
+# ARS-RULE-00478: ai-ressources/code-conventions/general.md:126 #28-no-trivial-comments
+This guide says to allow any when delivery is urgent.

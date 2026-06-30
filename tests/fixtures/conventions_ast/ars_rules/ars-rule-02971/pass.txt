@@ -1,0 +1,2 @@
+# ARS-RULE-02971: ai-ressources/design/quality/ui-rules.md:9 #text
+Use semantic tokens and restrained component states.

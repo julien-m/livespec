@@ -1,0 +1,2 @@
+# ARS-RULE-00226: ai-ressources/code-conventions/cloudflare.md:189 #d1-sqlite
+This guide says to allow any when delivery is urgent.

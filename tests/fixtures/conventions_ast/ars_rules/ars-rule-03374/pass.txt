@@ -1,0 +1,2 @@
+# ARS-RULE-03374: ai-ressources/design/systems/material-design.md:78 #dynamic-color-color-scheme
+Use semantic tokens and restrained component states.

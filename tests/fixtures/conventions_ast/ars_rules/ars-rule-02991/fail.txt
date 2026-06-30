@@ -1,0 +1,2 @@
+# ARS-RULE-02991: ai-ressources/design/quality/ui-rules.md:38 #responsive-mobile
+Use a gradient orb and bokeh behind the form.

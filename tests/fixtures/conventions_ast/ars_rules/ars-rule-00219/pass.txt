@@ -1,0 +1,2 @@
+# ARS-RULE-00219: ai-ressources/code-conventions/cloudflare.md:135 #what-not-to-cache
+Prefer explicit domain types and validated inputs.

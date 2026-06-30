@@ -1,0 +1,2 @@
+/* ARS-RULE-01173: ai-ressources/code-conventions/tailwind.md:59 #layout */
+.good { color: var(--color-danger); font-size: 1rem; margin: var(--space-md); }

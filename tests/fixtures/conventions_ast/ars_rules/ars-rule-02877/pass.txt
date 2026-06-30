@@ -1,0 +1,2 @@
+# ARS-RULE-02877: ai-ressources/design/quality/accessibility.md:162 #aria-live-regions
+Use semantic tokens and restrained component states.

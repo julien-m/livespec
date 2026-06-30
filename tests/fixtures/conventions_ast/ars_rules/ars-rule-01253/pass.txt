@@ -1,0 +1,2 @@
+# ARS-RULE-01253: ai-ressources/code-conventions/testing.md:91 #naming-convention
+Prefer explicit domain types and validated inputs.

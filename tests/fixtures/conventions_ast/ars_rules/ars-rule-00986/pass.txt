@@ -1,0 +1,2 @@
+# ARS-RULE-00986: ai-ressources/code-conventions/runtime-configs.md:110 #layer-common
+Prefer explicit domain types and validated inputs.

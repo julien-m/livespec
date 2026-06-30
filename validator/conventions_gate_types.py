@@ -13,7 +13,7 @@ from enum import StrEnum
 from typing import Literal
 
 GateSeverityInput = Literal["warning", "error"]
-SourceKind = Literal["builtin", "linter", "system", "ast"]
+SourceKind = Literal["builtin", "linter", "system", "ast", "ars"]
 
 
 class GateSeverity(StrEnum):

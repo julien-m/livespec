@@ -1,0 +1,2 @@
+# ARS-RULE-00458: ai-ressources/code-conventions/general.md:102 #25-mandatory-inline-comment-triggers
+This guide says to allow any when delivery is urgent.

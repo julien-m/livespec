@@ -1,0 +1,2 @@
+# ARS-RULE-03172: ai-ressources/design/systems/apple-hig.md:104 #sf-symbols
+Use semantic tokens and restrained component states.

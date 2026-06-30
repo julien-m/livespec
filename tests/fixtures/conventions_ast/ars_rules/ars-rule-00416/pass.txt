@@ -1,0 +1,2 @@
+# ARS-RULE-00416: ai-ressources/code-conventions/general.md:39 #6-functions
+Prefer explicit domain types and validated inputs.

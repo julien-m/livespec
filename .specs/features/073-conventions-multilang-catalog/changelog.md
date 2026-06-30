@@ -1,5 +1,37 @@
 # Changelog: Multilang Convention AST Catalog + Enforce-by-Default (073)
 
+## 2026-06-30 — [Fix]: Ship hygiene for ARS fixtures and validation receipts
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** pyproject.toml, .gitignore, .specs/features/073-conventions-multilang-catalog/checks/2026-06-30.md
+- **AC impacted:** AC-011, AC-012
+- **Author:** spec-fix
+
+### Highlights
+
+- `ruff check .` now excludes only local `.claude/output/` planning artifacts and generated ARS detector fixtures that intentionally contain invalid code snippets.
+- `.claude/output/` is ignored so it cannot enter the ship set.
+- `.specs/conventions/runs/validator-ars-564-rule-level/receipt.json` is kept as Validator proof rather than discarded as local-only output.
+
+## 2026-06-30 — [Fix]: ARS CSV rows are executable runtime rules
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/conventions_ast/ars_rules.py, validator/conventions_feature_scope.py, validator/conventions_ast/source_decision_ars.py, validator/conventions_ast/rule_catalog/ars_executable_rules.csv, validator/conventions_ast/source_decisions.py, validator/conventions_ast/source_decision_builders.py, validator/conventions_ast/source_decision_types.py, validator/conventions_ast/source_decision_validation.py, validator/conventions_gate.py, validator/conventions_gate_types.py, validator/cli_commands/conventions_cmd.py, tests/test_conventions_ars_rules.py, tests/fixtures/conventions_ast/ars_rules/**
+- **AC impacted:** AC-011, AC-012
+- **Author:** spec-fix
+
+### Highlights
+
+- Promoted the 564 executable rows from `rule-level-inventory-full.csv` into checked-in runtime inventory `validator/conventions_ast/rule_catalog/ars_executable_rules.csv`.
+- Added one unique runtime rule, backend id, detector id, execution wrapper path, callable wrapper object, PASS fixture, FAIL fixture, and pytest evidence record per CSV row.
+- Connected ARS execution into `verify_conventions`, the source-decision manifest, and strict manifest/CLI blockers so missing rows fail the gate.
+- Expanded source discovery for language-specific ARS rules: SQL, Go, Delphi, shell, JavaScript module variants, Kotlin, CSS, TypeScript, Rust, Python, and Swift suffixes are reachable through `verify`.
+- ARS violations in real project source are now blocking `error` violations; only ARS runtime/catalog self-definition files are exempt from self-detection.
+- Implemented `ARS-RULE-02508` individually: destructive modal/dialog/sheet actions require an explicit destructive confirmation button, so generic `Confirm`, `OK`, or `Yes` labels fail.
+- Fresh feature-scoped receipt PASS: `.specs/conventions/runs/worker-ars-564-rule-level/receipt.json`; proof counts: 564 inventory rows, 564 runtime rules, 0 missing.
+
 ## 2026-06-30 — [Fix]: Immediate non-conceptual sources executable through source families
 
 - **Type:** Bugfix

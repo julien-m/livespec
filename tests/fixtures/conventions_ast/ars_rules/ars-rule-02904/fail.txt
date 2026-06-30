@@ -1,0 +1,2 @@
+# ARS-RULE-02904: ai-ressources/design/quality/accessibility.md:209 #heading-hierarchy
+Use a gradient orb and bokeh behind the form.

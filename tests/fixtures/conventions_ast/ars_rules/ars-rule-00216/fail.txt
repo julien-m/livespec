@@ -1,0 +1,2 @@
+# ARS-RULE-00216: ai-ressources/code-conventions/cloudflare.md:58 #cache-api-caches-default
+This guide says to allow any when delivery is urgent.

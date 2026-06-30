@@ -1,0 +1,2 @@
+# ARS-RULE-00209: ai-ressources/code-conventions/cloudflare.md:41 #streaming
+Prefer explicit domain types and validated inputs.

@@ -1,0 +1,2 @@
+# ARS-RULE-03425: ai-ressources/design/systems/web-standards.md:21 #breakpoints
+Use semantic tokens and restrained component states.

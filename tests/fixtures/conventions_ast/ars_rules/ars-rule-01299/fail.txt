@@ -1,0 +1,2 @@
+# ARS-RULE-01299: ai-ressources/code-conventions/testing.md:178 #7-coverage-philosophy
+This guide says to allow any when delivery is urgent.

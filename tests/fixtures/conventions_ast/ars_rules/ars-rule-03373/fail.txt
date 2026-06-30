@@ -1,0 +1,2 @@
+# ARS-RULE-03373: ai-ressources/design/systems/material-design.md:77 #dynamic-color-color-scheme
+Use a gradient orb and bokeh behind the form.

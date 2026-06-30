@@ -1,0 +1,2 @@
+# ARS-RULE-01099: ai-ressources/code-conventions/stack-commands.md:42 #security-profile-matrix
+Prefer explicit domain types and validated inputs.

@@ -1,0 +1,2 @@
+# ARS-RULE-00720: ai-ressources/code-conventions/logging.md:15 #data-minimization
+This guide says to allow any when delivery is urgent.

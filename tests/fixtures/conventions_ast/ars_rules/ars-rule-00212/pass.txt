@@ -1,0 +1,2 @@
+# ARS-RULE-00212: ai-ressources/code-conventions/cloudflare.md:46 #async-patterns
+Prefer explicit domain types and validated inputs.

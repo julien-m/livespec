@@ -14,7 +14,28 @@ from dataclasses import dataclass
 from pathlib import Path
 
 SOURCE_SUFFIXES = frozenset(
-    {".py", ".ts", ".tsx", ".js", ".jsx", ".swift", ".css", ".rs", ".kt", ".kts"}
+    {
+        ".bash",
+        ".css",
+        ".cjs",
+        ".dpr",
+        ".dproj",
+        ".go",
+        ".js",
+        ".jsx",
+        ".kt",
+        ".kts",
+        ".mjs",
+        ".pas",
+        ".py",
+        ".rs",
+        ".sh",
+        ".sql",
+        ".swift",
+        ".ts",
+        ".tsx",
+        ".zsh",
+    }
 )
 _MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\((?P<target>[^)]+)\)")
 _MARKDOWN_CODE_PATH_PATTERN = re.compile(r"`(?P<target>[^`]+)`")

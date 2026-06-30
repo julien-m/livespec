@@ -1,0 +1,2 @@
+# ARS-RULE-03002: ai-ressources/design/quality/ui-rules.md:57 #accessibility-beyond-contrast
+Use a gradient orb and bokeh behind the form.

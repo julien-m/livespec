@@ -1,0 +1,2 @@
+# ARS-RULE-00393: ai-ressources/code-conventions/general.md:11 #1-general-principles
+This guide says to allow any when delivery is urgent.

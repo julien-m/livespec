@@ -1,0 +1,2 @@
+# ARS-RULE-00443: ai-ressources/code-conventions/general.md:79 #18-limits-and-pagination
+This guide says to allow any when delivery is urgent.

@@ -1,0 +1,2 @@
+# ARS-RULE-02925: ai-ressources/design/quality/accessibility.md:259 #autoplay-rules
+Use a gradient orb and bokeh behind the form.

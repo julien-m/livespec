@@ -1,0 +1,2 @@
+# ARS-RULE-00241: ai-ressources/code-conventions/cloudflare.md:223 #security
+This guide says to allow any when delivery is urgent.

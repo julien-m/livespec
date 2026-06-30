@@ -1,0 +1,2 @@
+# ARS-RULE-01330: ai-ressources/conventions/diagrams.md:18 #gherkin-business-flows
+This guide says to allow any when delivery is urgent.

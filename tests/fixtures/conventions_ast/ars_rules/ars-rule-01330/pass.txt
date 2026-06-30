@@ -1,0 +1,2 @@
+# ARS-RULE-01330: ai-ressources/conventions/diagrams.md:18 #gherkin-business-flows
+Prefer explicit domain types and validated inputs.

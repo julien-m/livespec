@@ -12,6 +12,7 @@ from typing import cast
 from validator.conventions_gates import DEFAULT_AST_CATALOGS
 
 from . import source_decision_builders as _builders
+from .ars_rules import EXPECTED_ARS_RULE_COUNT, load_ars_executable_rules, project_has_ars_inventory
 from .catalog import load_ast_catalogs
 from .corpus import SourceClassification, ai_resources_root, build_corpus_manifest
 from .source_decision_builders import (
@@ -36,13 +37,15 @@ def build_rule_decision_manifest(project_root: Path) -> RuleDecisionManifest:
     _builders.load_ast_catalogs = load_ast_catalogs
     executable_rules, catalog_errors = executable_rules_by_source(project_root)
     decisions = [
-        build_source_decision(root, source, executable_rules)
+        build_source_decision(root, source, executable_rules, project_root=project_root)
         for source in cast(list[SourceClassification], corpus["sources"])
     ]
     excluded = [build_excluded_decision(root, item) for item in corpus["excluded_sources"]]
     undecided = _undecided_sources(decisions)
-    counts = Counter(decision["rule_decision"]["kind"] for decision in decisions)
-    return _manifest_payload(corpus, decisions, excluded, undecided, counts, catalog_errors)
+    counts: Counter[str] = Counter(decision["rule_decision"]["kind"] for decision in decisions)
+    return _manifest_payload(
+        project_root, corpus, decisions, excluded, undecided, counts, catalog_errors
+    )
 
 
 def _undecided_sources(decisions: list[SourceDecision]) -> list[str]:
@@ -54,6 +57,7 @@ def _undecided_sources(decisions: list[SourceDecision]) -> list[str]:
 
 
 def _manifest_payload(
+    project_root: Path,
     corpus: object,
     decisions: list[SourceDecision],
     excluded: list[ExcludedDecision],
@@ -65,6 +69,7 @@ def _manifest_payload(
     return cast(
         RuleDecisionManifest,
         {
+            **_ars_rule_level_counts(project_root),
             "total_source_count": cast(int, corpus_data["total_source_count"]),
             "decided_source_count": len(decisions) - len(undecided),
             "undecided_source_count": len(undecided),
@@ -84,6 +89,26 @@ def _manifest_payload(
             "excluded_sources": excluded,
         },
     )
+
+
+def _ars_rule_level_counts(project_root: Path) -> dict[str, object]:
+    if not project_has_ars_inventory(project_root):
+        return {
+            "rule_level_project_inventory_enabled": False,
+            "rule_level_inventory_total_count": 0,
+            "rule_level_runtime_rule_count": 0,
+            "rule_level_missing_count": 0,
+            "rule_level_runtime_rule_ids": [],
+        }
+    rules = load_ars_executable_rules(project_root)
+    observed_count = len(rules)
+    return {
+        "rule_level_project_inventory_enabled": True,
+        "rule_level_inventory_total_count": observed_count,
+        "rule_level_runtime_rule_count": observed_count,
+        "rule_level_missing_count": EXPECTED_ARS_RULE_COUNT - observed_count,
+        "rule_level_runtime_rule_ids": [rule.runtime_rule_id for rule in rules],
+    }
 
 
 def _immediate_scope_counts(decisions: list[SourceDecision]) -> dict[str, int]:

@@ -1,0 +1,2 @@
+# ARS-RULE-00431: ai-ressources/code-conventions/general.md:61 #12-environment-variables
+Prefer explicit domain types and validated inputs.

@@ -1,0 +1,2 @@
+# ARS-RULE-00487: ai-ressources/code-conventions/general.md:138 #30-concise-documentation
+Prefer explicit domain types and validated inputs.

@@ -1,0 +1,2 @@
+# ARS-RULE-01360: ai-ressources/conventions/naming.md:18 #macos-warning
+Prefer explicit domain types and validated inputs.

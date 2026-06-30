@@ -1,0 +1,2 @@
+# ARS-RULE-00721: ai-ressources/code-conventions/logging.md:18 #structured-logging
+This guide says to allow any when delivery is urgent.

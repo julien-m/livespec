@@ -1,0 +1,2 @@
+# ARS-RULE-00451: ai-ressources/code-conventions/general.md:91 #22-security
+This guide says to allow any when delivery is urgent.

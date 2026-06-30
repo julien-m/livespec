@@ -1,0 +1,2 @@
+# ARS-RULE-02923: ai-ressources/design/quality/accessibility.md:243 #prefers-reduced-motion
+Use a gradient orb and bokeh behind the form.

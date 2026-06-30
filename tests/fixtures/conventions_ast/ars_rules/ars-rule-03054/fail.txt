@@ -1,0 +1,2 @@
+# ARS-RULE-03054: ai-ressources/design/quality/ui-rules.md:139 #scrollbars
+Use a gradient orb and bokeh behind the form.

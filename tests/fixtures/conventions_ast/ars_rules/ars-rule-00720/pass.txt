@@ -1,0 +1,2 @@
+# ARS-RULE-00720: ai-ressources/code-conventions/logging.md:15 #data-minimization
+Prefer explicit domain types and validated inputs.

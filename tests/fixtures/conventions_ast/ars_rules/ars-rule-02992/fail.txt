@@ -1,0 +1,2 @@
+# ARS-RULE-02992: ai-ressources/design/quality/ui-rules.md:41 #forms
+Use a gradient orb and bokeh behind the form.

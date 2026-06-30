@@ -66,6 +66,11 @@ class ExcludedDecision(TypedDict):
 
 
 class RuleDecisionManifest(TypedDict):
+    rule_level_project_inventory_enabled: bool
+    rule_level_inventory_total_count: int
+    rule_level_runtime_rule_count: int
+    rule_level_missing_count: int
+    rule_level_runtime_rule_ids: list[str]
     total_source_count: int
     decided_source_count: int
     undecided_source_count: int

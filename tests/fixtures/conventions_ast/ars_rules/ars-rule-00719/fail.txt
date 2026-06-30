@@ -1,0 +1,2 @@
+# ARS-RULE-00719: ai-ressources/code-conventions/logging.md:14 #data-minimization
+This guide says to allow any when delivery is urgent.

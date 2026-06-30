@@ -1,0 +1,2 @@
+# ARS-RULE-03327: ai-ressources/design/systems/material-design.md:18 #layout-grid
+Use a gradient orb and bokeh behind the form.

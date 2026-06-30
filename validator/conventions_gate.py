@@ -19,8 +19,8 @@ from typing import Any, cast
 
 import yaml
 
+from .conventions_ast import ars_rules
 from .conventions_ast.engine import run_ast_conventions
-from .conventions_ast.models import AstEngineResult
 from .conventions_ast.source_decisions import validate_rule_decision_manifest
 from .conventions_ast.taxonomy import taxonomy_fields as conventions_taxonomy
 from .conventions_feature_scope import SOURCE_SUFFIXES, FeatureScope
@@ -63,14 +63,17 @@ def verify_conventions(
         violations: list[GateViolation] = []
     else:
         violations = _collect_violations(project_root, gates, feature_scope)
+        source_files = _source_files(project_root, gates, feature_scope)
+        if ars_rules.project_has_ars_inventory(project_root):
+            violations.extend(ars_rules.run_ars_executable_rules(project_root, source_files))
         if _ast_enabled(gates):
-            ast_result = _run_ast_layer(project_root, gates, feature_scope)
+            ast_result = run_ast_conventions(project_root, gates, source_files=source_files)
             violations.extend(ast_result.violations)
             blockers.extend(ast_result.blockers)
             ast_summary = ast_result.summary
             if ast_summary is not None:
                 ast_summary = {**ast_summary, **conventions_taxonomy(project_root)}
-                blockers.extend(_source_decision_blockers(ast_summary))
+                blockers.extend(_source_decision_blockers(project_root, ast_summary))
     result = _result_from(violations, blockers, ast_summary=ast_summary)
     if report:
         from .conventions_report import write_debt_report
@@ -79,23 +82,16 @@ def verify_conventions(
     return result
 
 
-def _run_ast_layer(
-    project_root: Path,
-    gates: ConventionsGatesAny,
-    feature_scope: FeatureScope | None,
-) -> AstEngineResult:
-    return run_ast_conventions(
-        project_root,
-        gates,
-        source_files=_source_files(project_root, gates, feature_scope),
-    )
-
-
-def _source_decision_blockers(ast_summary: dict[str, object]) -> list[GateBlocker]:
+def _source_decision_blockers(
+    project_root: Path, ast_summary: dict[str, object]
+) -> list[GateBlocker]:
     manifest = ast_summary.get("rule_decision_manifest")
     if not isinstance(manifest, dict):
         return [GateBlocker("rule_decision_manifest_missing", "rule decision manifest missing")]
-    issues = validate_rule_decision_manifest(cast(Any, manifest))
+    issues = [
+        *validate_rule_decision_manifest(cast(Any, manifest)),
+        *ars_rules.validate_ars_rule_registry(project_root),
+    ]
     return [
         GateBlocker(
             "rule_decision_manifest_invalid",

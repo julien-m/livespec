@@ -1,0 +1,2 @@
+# ARS-RULE-03121: ai-ressources/design/systems/apple-hig.md:28 #safe-areas
+Use semantic tokens and restrained component states.

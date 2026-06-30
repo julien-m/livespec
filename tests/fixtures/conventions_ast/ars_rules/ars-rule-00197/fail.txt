@@ -1,0 +1,2 @@
+# ARS-RULE-00197: ai-ressources/code-conventions/cloudflare.md:12 #configuration
+This guide says to allow any when delivery is urgent.

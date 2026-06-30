@@ -1,0 +1,2 @@
+# ARS-RULE-01243: ai-ressources/code-conventions/testing.md:31 #naming-convention-all-platforms
+This guide says to allow any when delivery is urgent.

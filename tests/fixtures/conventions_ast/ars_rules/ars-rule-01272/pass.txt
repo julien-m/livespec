@@ -1,0 +1,2 @@
+# ARS-RULE-01272: ai-ressources/code-conventions/testing.md:123 #rules
+Prefer explicit domain types and validated inputs.

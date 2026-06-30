@@ -1,0 +1,2 @@
+# ARS-RULE-03091: ai-ressources/design/quality/ui-rules.md:203 #truncation
+Use semantic tokens and restrained component states.

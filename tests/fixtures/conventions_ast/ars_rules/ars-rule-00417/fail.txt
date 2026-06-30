@@ -1,0 +1,2 @@
+# ARS-RULE-00417: ai-ressources/code-conventions/general.md:41 #7-error-handling
+This guide says to allow any when delivery is urgent.

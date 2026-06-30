@@ -1,0 +1,2 @@
+# ARS-RULE-00215: ai-ressources/code-conventions/cloudflare.md:56 #cache-hierarchy
+This guide says to allow any when delivery is urgent.

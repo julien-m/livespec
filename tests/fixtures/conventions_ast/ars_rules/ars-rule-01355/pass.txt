@@ -1,0 +1,2 @@
+# ARS-RULE-01355: ai-ressources/conventions/naming.md:8 #rules
+Prefer explicit domain types and validated inputs.

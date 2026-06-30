@@ -1,0 +1,2 @@
+# ARS-RULE-03093: ai-ressources/design/quality/ui-rules.md:212 #truncation
+Use a gradient orb and bokeh behind the form.

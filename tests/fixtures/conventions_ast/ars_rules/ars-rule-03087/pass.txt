@@ -1,0 +1,2 @@
+# ARS-RULE-03087: ai-ressources/design/quality/ui-rules.md:196 #image-fitting
+Use semantic tokens and restrained component states.

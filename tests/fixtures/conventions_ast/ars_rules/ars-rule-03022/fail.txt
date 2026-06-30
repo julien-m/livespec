@@ -1,0 +1,2 @@
+# ARS-RULE-03022: ai-ressources/design/quality/ui-rules.md:87 #mockup-fidelity
+Use a gradient orb and bokeh behind the form.
