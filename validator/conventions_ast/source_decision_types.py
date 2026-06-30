@@ -7,6 +7,7 @@ from typing import Literal, NotRequired, TypedDict
 SourceDecisionKind = Literal[
     "executable",
     "generated-executable",
+    "deferred_conceptual_editorial",
     "advisory",
     "non-executable",
     "unsupported",
@@ -70,10 +71,16 @@ class RuleDecisionManifest(TypedDict):
     undecided_source_count: int
     executable_source_count: int
     generated_executable_source_count: int
+    immediate_scope_source_count: int
+    immediate_scope_executable_source_count: int
+    immediate_scope_generated_executable_source_count: int
+    immediate_scope_non_executable_source_count: int
+    deferred_conceptual_editorial_source_count: int
     advisory_source_count: int
     non_executable_source_count: int
     unsupported_source_count: int
     excluded_source_count: int
+    notion_followup_task_id: str
     decision_kind_counts: dict[str, int]
     catalog_load_errors: list[str]
     decisions: list[SourceDecision]

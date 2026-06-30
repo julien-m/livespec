@@ -7,6 +7,8 @@
 
 ---
 
+## 2026-06-30 — [Feature 073 Fix] Immediate source decisions executable — 164 immediate sources executable/generated through 15 deterministic families, 28 conceptual/editorial deferred to Notion, 0 immediate non-executable
+
 ## 2026-06-30 — [Feature 073 Fix] ARS source decision manifest — 192/192 sources decided, 0 undecided; executable rules now require decision_kind/domain/detector metadata
 
 ## 2026-06-30 — [Feature 073 Fix] Feature-scoped verify JSON now exposes advisory/unsupported taxonomy in schema v1, matching receipt evidence

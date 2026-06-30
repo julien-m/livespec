@@ -7,7 +7,7 @@ from pathlib import Path
 from validator.conventions_ast.source_decisions import build_rule_decision_manifest
 
 
-def test_css_and_tailwind_sources_are_decided_without_false_enforcement() -> None:
+def test_css_and_tailwind_sources_are_generated_executable_or_executable() -> None:
     manifest = build_rule_decision_manifest(Path.cwd())
     decisions = manifest["decisions"]
     css_or_tailwind = [
@@ -20,10 +20,13 @@ def test_css_and_tailwind_sources_are_decided_without_false_enforcement() -> Non
 
     assert css_or_tailwind
     assert all(decision["rule_decision"]["decision_id"] for decision in css_or_tailwind)
-    assert all(decision["rule_decision"]["missing_capability"] for decision in css_or_tailwind)
-    assert all(not decision["rule_decision"]["rule_ids"] for decision in css_or_tailwind)
     assert all(
-        decision["rule_decision"]["kind"] in {"advisory", "unsupported", "non-executable"}
+        decision["rule_decision"]["kind"] in {"executable", "generated-executable"}
         for decision in css_or_tailwind
     )
-    assert all(decision["rule_decision"]["non_blocking"] for decision in css_or_tailwind)
+    assert all(not decision["rule_decision"]["non_blocking"] for decision in css_or_tailwind)
+    assert all(decision["rule_decision"]["rule_ids"] for decision in css_or_tailwind)
+    assert all(decision["rule_decision"]["backend_ids"] for decision in css_or_tailwind)
+    assert all(decision["rule_decision"]["detector_ids"] for decision in css_or_tailwind)
+    assert all(decision["rule_decision"]["fixture_families"] for decision in css_or_tailwind)
+    assert all(decision["rule_decision"]["test_ids"] for decision in css_or_tailwind)

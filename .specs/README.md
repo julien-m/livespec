@@ -134,6 +134,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-30 | Fix | [Feature 073] Immediate source decisions executable — 164 immediate sources executable/generated through 15 deterministic families, 28 conceptual/editorial deferred to Notion, 0 immediate non-executable |
 | 2026-06-30 | Feature | [Feature 073] Implemented: Exhaustive AI-res/ARS source manifest — verify JSON now proves 192/192 in-scope sources classified, 0 unclassified, with language/domain matrix and explicit exclusions |
 | 2026-06-29 | Feature | [Feature 072] /spec-feature complete: AST conventions rollout engine — implement/test/audit all green, full pytest 2281 passed, conventions receipt PASS |
 | 2026-06-29 | Feature | [Feature 072] Test: 100% AC covered (17/17), 0 tests generated — targeted Ruff, pytest 177 passed, `.specs` validation, and conventions receipt PASS |
@@ -143,7 +144,6 @@
 | 2026-06-27 | Check | [Feature 071] Check: 100% FR/AC verified; implementation and conventions PASS; AC format warning remains |
 | 2026-06-27 | Feature | [Feature 071] Implemented: QE Analysis Native Module — native QE context, `qe.analysis` goal task, structured evidence validation, additive user hooks |
 | 2026-06-27 | Feature | [Feature 070] Analyze Gate — retroactive spec+plan+mapping for read-only pre-impl gate; dogfooded Clarify (empty queue) + Analyze (0 CRITICAL/HIGH, exit 0) |
-| 2026-06-27 | Plan | [Feature 069] Plan created: Clarify Gate — 7 implementation steps (retroactive, maps to existing code), 1 state diagram |
 <!-- readme:activity:end -->
 
 ---

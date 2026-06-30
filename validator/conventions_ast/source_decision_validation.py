@@ -30,6 +30,8 @@ def validate_rule_decision_manifest(manifest: dict[str, Any]) -> list[str]:
         issues.extend(_decision_identity_issues(decision))
         if kind in {"executable", "generated-executable"}:
             issues.extend(_executable_issues(decision))
+        elif kind == "deferred_conceptual_editorial":
+            issues.extend(_deferred_conceptual_editorial_issues(decision))
         else:
             issues.extend(_non_executable_issues(decision))
     for excluded in manifest["excluded_sources"]:
@@ -122,9 +124,23 @@ def _non_executable_issues(decision: dict[str, Any]) -> list[str]:
     return issues
 
 
+def _deferred_conceptual_editorial_issues(decision: dict[str, Any]) -> list[str]:
+    rule = decision["rule_decision"]
+    issues = _non_executable_issues(decision)
+    if "38fb8415-08de-8130-99a9-eff9a1cf5283" not in rule["missing_capability"]:
+        issues.append(f"missing_notion_deferred_task:{decision['source_path']}")
+    if rule["rule_ids"] != ["source.deferred_conceptual_editorial"]:
+        issues.append(f"deferred_rule_id_mismatch:{decision['source_path']}")
+    return issues
+
+
 def _generated_executable_issues(decision: dict[str, Any]) -> list[str]:
     rule = decision["rule_decision"]
     issues: list[str] = []
+    if "source-decision-contract" in rule["backend_ids"]:
+        issues.append(f"generated_uses_generic_contract:{decision['source_path']}")
+    if "generated/source_contract" in rule["fixture_families"]:
+        issues.append(f"generated_uses_generic_fixture:{decision['source_path']}")
     if not rule["generator_id"] or not rule["generator_version"]:
         issues.append(f"missing_generator:{decision['source_path']}")
     if not rule["input_source_hashes"]:

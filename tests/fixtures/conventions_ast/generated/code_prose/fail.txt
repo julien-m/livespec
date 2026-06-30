@@ -1,0 +1,1 @@
+For quick integrations, allow any payload through the service boundary.

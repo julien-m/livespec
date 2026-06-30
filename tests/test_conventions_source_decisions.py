@@ -47,9 +47,8 @@ def test_rule_decision_manifest_decides_every_classified_source(tmp_path: Path) 
         assert decision["source_anchor"]
         assert decision["rule_decision"]["kind"] in {
             "executable",
-            "advisory",
-            "non-executable",
-            "unsupported",
+            "generated-executable",
+            "deferred_conceptual_editorial",
         }
         assert decision["rule_decision"]["decision_id"]
         assert decision["rule_decision"]["decision_anchor"]
@@ -70,10 +69,13 @@ def test_named_source_decision_has_anchored_reason() -> None:
     )
 
     rule_decision = decision["rule_decision"]
-    assert rule_decision["kind"] == "unsupported"
+    assert rule_decision["kind"] == "generated-executable"
     assert rule_decision["source_anchor"] == decision["source_anchor"]
     assert decision["source_path"] in rule_decision["reason"]
     assert decision["source_anchor"] in rule_decision["reason"]
+    assert rule_decision["rule_ids"]
+    assert rule_decision["backend_ids"] == ["source-family:css_design_tokens"]
+    assert rule_decision["fixture_families"] == ["generated/css_design_tokens"]
 
 
 def test_catalog_load_failure_is_manifest_blocker(
@@ -111,7 +113,7 @@ def test_validate_rejects_incomplete_non_blocking_metadata(tmp_path: Path) -> No
     non_blocking = next(
         decision
         for decision in manifest["decisions"]
-        if decision["rule_decision"]["kind"] in {"advisory", "non-executable", "unsupported"}
+        if decision["rule_decision"]["kind"] == "deferred_conceptual_editorial"
     )
     non_blocking["rule_decision"]["reason"] = ""
 
@@ -232,6 +234,11 @@ def test_v1_verify_cli_json_serializes_taxonomy_and_rule_decisions(
     assert payload["advisory_rules"]
     assert payload["unsupported_rules"]
     assert payload["rule_decision_manifest"]["undecided_source_count"] == 0
+    assert payload["rule_decision_manifest"]["immediate_scope_non_executable_source_count"] == 0
+    assert (
+        payload["rule_decision_manifest"]["notion_followup_task_id"]
+        == "38fb8415-08de-8130-99a9-eff9a1cf5283"
+    )
 
 
 def test_v1_verify_cli_blocks_on_broken_catalog(
@@ -303,17 +310,16 @@ def test_validation_rejects_incomplete_executable_contract() -> None:
 def test_validation_rejects_false_non_executable_rule_wiring() -> None:
     manifest = build_rule_decision_manifest(Path.cwd())
     decision = next(
-        item for item in manifest["decisions"] if item["rule_decision"]["kind"] == "unsupported"
+        item
+        for item in manifest["decisions"]
+        if item["rule_decision"]["kind"] == "deferred_conceptual_editorial"
     )
 
-    decision["rule_decision"]["rule_ids"] = ["css.false_executable"]
-    decision["rule_decision"]["backend_ids"] = ["ast-grep"]
     decision["rule_decision"]["missing_capability"] = ""
 
     issues = validate_rule_decision_manifest(manifest)
-    assert f"non_executable_has_rule_ids:{decision['source_path']}" in issues
-    assert f"non_executable_has_backend:{decision['source_path']}" in issues
     assert f"missing_capability:{decision['source_path']}" in issues
+    assert f"missing_notion_deferred_task:{decision['source_path']}" in issues
 
 
 def test_receipt_and_cli_json_keep_rule_decision_manifest_parity(
@@ -404,10 +410,16 @@ def test_receipt_and_cli_json_rule_decision_manifest_parity(
         "undecided_source_count",
         "executable_source_count",
         "generated_executable_source_count",
+        "immediate_scope_source_count",
+        "immediate_scope_executable_source_count",
+        "immediate_scope_generated_executable_source_count",
+        "immediate_scope_non_executable_source_count",
+        "deferred_conceptual_editorial_source_count",
         "advisory_source_count",
         "non_executable_source_count",
         "unsupported_source_count",
         "excluded_source_count",
+        "notion_followup_task_id",
         "decision_kind_counts",
     ):
         assert receipt_manifest[key] == cli_manifest[key]

@@ -1,5 +1,21 @@
 # Changelog: Multilang Convention AST Catalog + Enforce-by-Default (073)
 
+## 2026-06-30 — [Fix]: Immediate non-conceptual sources executable through source families
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/conventions_ast/source_decisions.py, validator/conventions_ast/source_decision_builders.py, validator/conventions_ast/source_decision_types.py, validator/conventions_ast/source_decision_validation.py, validator/conventions_ast/source_family_checks.py, tests/test_conventions_source_decisions.py, tests/test_conventions_generated_catalog.py, tests/test_conventions_css_tailwind.py, tests/test_conventions_sql.py, tests/test_conventions_source_family_checks.py
+- **AC impacted:** AC-008, AC-009, AC-011, AC-012
+- **Author:** spec-fix
+
+### Highlights
+
+- Replaced immediate-scope advisory/non-executable/unsupported decisions with executable or generated-executable source-backed decisions.
+- Replaced the rejected generic `source-decision-contract` backend with 15 deterministic generated source families: `ai_prompt`, `code_prose`, `css_design_tokens`, `database_sql`, `delphi_code`, `design_system`, `go_code`, `javascript_code`, `json_yaml_config`, `markdown_docs`, `payment_contract`, `platform_ops`, `python_code`, `shell_code`, `typescript_ui`.
+- Added `deferred_conceptual_editorial` decisions tied to Project Notion task `38fb8415-08de-8130-99a9-eff9a1cf5283`; these sources are visible but not counted as completed.
+- Fresh feature-scoped receipt PASS: `.specs/conventions/runs/worker-073-executable-nonconceptual-cycle02/receipt.json`.
+- Proven counts: 192 total, 192 decided, 0 undecided, 164 immediate scope, 3 executable, 161 generated-executable, 0 immediate-scope non-executable, 28 deferred conceptual/editorial, 60 excluded.
+
 ## 2026-06-30 — [Fix]: ARS source decision manifest and executable contract gate
 
 - **Type:** Bugfix

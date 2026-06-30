@@ -1,0 +1,2 @@
+service:
+  timeout_seconds: 5
