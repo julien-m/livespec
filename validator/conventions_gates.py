@@ -16,6 +16,16 @@ from .visual_evidence import sha256_file
 GATES_RELATIVE_PATH = Path(".specs/conventions-gates.yaml")
 AstMode: TypeAlias = Literal["off", "observe", "enforce"]
 InitAstMode: TypeAlias = Literal["observe", "enforce"]
+# CLI-facing init selector: ``off`` opts out to legacy v1 gates; ``observe``/``enforce``
+# write schema v2. ``None`` (no flag) means the enforce-by-default rollout (D1).
+GatesInitMode: TypeAlias = Literal["off", "observe", "enforce"]
+# Active multilang AST catalogs shipped by default (schema v2 enforce-by-default).
+DEFAULT_AST_CATALOGS = (
+    "validator/conventions_ast/rule_catalog/ast_high.yaml",
+    "validator/conventions_ast/rule_catalog/rust_high.yaml",
+    "validator/conventions_ast/rule_catalog/swift_high.yaml",
+    "validator/conventions_ast/rule_catalog/kotlin_high.yaml",
+)
 DEFAULT_SOURCE_EXCLUSIONS = (
     ".specs/**",
     ".git/**",
@@ -141,9 +151,7 @@ class AstRulesConfig(GatesBaseModel):
 
     mode: AstMode = "off"
     backend: AstBackendConfig = Field(default_factory=AstBackendConfig)
-    catalogs: list[str] = Field(
-        default_factory=lambda: ["validator/conventions_ast/rule_catalog/ast_high.yaml"]
-    )
+    catalogs: list[str] = Field(default_factory=lambda: list(DEFAULT_AST_CATALOGS))
 
     @field_validator("mode", mode="before")
     @classmethod
@@ -215,13 +223,18 @@ def generate_conventions_gates(
     project_root: Path,
     *,
     force: bool = False,
-    ast_mode: InitAstMode | None = None,
+    ast_mode: GatesInitMode | None = None,
 ) -> Path:
     """Generate `.specs/conventions-gates.yaml` from project sources.
+
+    Default behavior (no ``ast_mode``) writes schema v2 gates in ``enforce`` mode
+    (the enforce-by-default rollout). ``ast_mode="off"`` opts out to legacy
+    schema v1 gates; ``"observe"``/``"enforce"`` select the v2 mode explicitly.
 
     Args:
         project_root: Project root containing `.specs/constitution.md`.
         force: Overwrite an existing gates file.
+        ast_mode: Opt-out/opt-in selector; ``None`` means enforce-by-default.
 
     Returns:
         Written gates path.
@@ -238,10 +251,11 @@ def generate_conventions_gates(
     if not constitution.is_file() or not stack.is_file():
         raise FileNotFoundError(".specs/constitution.md or .specs/stacks/_default.md missing")
     gates: ConventionsGatesAny
-    if ast_mode is None:
+    if ast_mode == "off":
         gates = _build_default_gates(project_root, constitution, stack)
     else:
-        gates = _build_ast_gates(project_root, constitution, stack, ast_mode)
+        resolved_mode: InitAstMode = "enforce" if ast_mode is None else ast_mode
+        gates = _build_ast_gates(project_root, constitution, stack, resolved_mode)
     gates_path.parent.mkdir(parents=True, exist_ok=True)
     gates_path.write_text(_dump_yaml(gates.model_dump(exclude_none=True)), encoding="utf-8")
     return gates_path

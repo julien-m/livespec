@@ -363,7 +363,9 @@ def test_cli_verify_json_exit_codes_and_gates_init(tmp_path: Path) -> None:
     assert (fresh / ".specs" / "conventions-gates.yaml").is_file()
 
 
-def test_cli_gates_init_ast_mode_writes_v2_only_when_explicit(tmp_path: Path) -> None:
+def test_cli_gates_init_defaults_to_v2_enforce_with_off_opt_out(tmp_path: Path) -> None:
+    # WHY (D1): the CLI default (no flag) must produce enforce-by-default v2 gates;
+    # --ast-mode off remains the documented opt-out to legacy v1.
     fresh = tmp_path / "fresh"
     (fresh / ".specs" / "stacks").mkdir(parents=True)
     (fresh / ".specs" / "constitution.md").write_text("# Constitution\n", encoding="utf-8")
@@ -371,8 +373,18 @@ def test_cli_gates_init_ast_mode_writes_v2_only_when_explicit(tmp_path: Path) ->
 
     default_result = runner.invoke(app, ["conventions", "gates", "init", "--repo", str(fresh)])
     assert default_result.exit_code == 0, default_result.output
-    assert "schema_version: 1" in (fresh / ".specs" / "conventions-gates.yaml").read_text()
-    assert "ast_rules" not in (fresh / ".specs" / "conventions-gates.yaml").read_text()
+    default_text = (fresh / ".specs" / "conventions-gates.yaml").read_text()
+    assert "schema_version: 2" in default_text
+    assert "mode: enforce" in default_text
+
+    off_result = runner.invoke(
+        app,
+        ["conventions", "gates", "init", "--repo", str(fresh), "--force", "--ast-mode", "off"],
+    )
+    assert off_result.exit_code == 0, off_result.output
+    off_text = (fresh / ".specs" / "conventions-gates.yaml").read_text()
+    assert "schema_version: 1" in off_text
+    assert "ast_rules" not in off_text
 
     observe_result = runner.invoke(
         app,

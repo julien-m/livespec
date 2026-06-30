@@ -1,0 +1,26 @@
+rules:
+  - id: kotlin.no_unchecked_cast
+    title: No unchecked cast in Kotlin
+    language: kotlin
+    decidability: ast
+    precision: high
+    severity: error
+    enforcement: mode
+    source_path: ai-ressources/code-conventions/swift-kotlin.md
+    source_anchor: "#type-system"
+    source_hash: sha256:5a65f11d4f54bac0bfdbd50092cd7b3663b353a2e6d7a26fe8b3f6d47387b74a
+    backend: ast-grep
+    patterns:
+      - kind: sg_yaml
+        value: |
+          id: kotlin.no_unchecked_cast
+          language: Kotlin
+          rule:
+            pattern: $EXPR as $TYPE
+    fixtures:
+      pass: tests/fixtures/conventions_ast/kotlin/no_unchecked_cast/pass.kt
+      fail: tests/fixtures/conventions_ast/kotlin/no_unchecked_cast/fail.kt
+    justification:
+      required: true
+      accepted_window: adjacent_comment_block
+      rule_id_required: true

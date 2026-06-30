@@ -15,6 +15,7 @@ from pathlib import Path
 
 import typer
 
+from ..conventions_ast.corpus import build_corpus_manifest
 from ..conventions_diffguard import (
     base_hash_snapshot,
     changed_protected_conventions_paths,
@@ -25,7 +26,7 @@ from ..conventions_diffguard import (
 from ..conventions_feature_scope import FeatureScopeError, resolve_feature_scope
 from ..conventions_gate import GateResult, verify_conventions
 from ..conventions_gates import (
-    InitAstMode,
+    GatesInitMode,
     gates_path,
     generate_conventions_gates,
     load_conventions_gates,
@@ -51,7 +52,11 @@ RUN_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
 AST_MODE_OPTION = typer.Option(
     None,
     "--ast-mode",
-    help="Write schema v2 AST rollout gates in observe or enforce mode.",
+    help=(
+        "AST rollout selector. Default (no flag) writes schema v2 enforce-by-default "
+        "gates; 'observe' records findings without blocking; 'off' opts out to legacy "
+        "schema v1 (no AST enforcement)."
+    ),
 )
 WORKER_RECEIPT_OPTION = typer.Option(
     None,
@@ -96,7 +101,7 @@ def refresh_conventions_command(repo: Path = REPO_OPTION, full: bool = FULL_OPTI
 def conventions_gates_init_command(
     repo: Path = REPO_OPTION,
     force: bool = typer.Option(False, "--force", help="Overwrite existing gates file."),
-    ast_mode: InitAstMode | None = AST_MODE_OPTION,
+    ast_mode: GatesInitMode | None = AST_MODE_OPTION,
 ) -> None:
     """Generate `.specs/conventions-gates.yaml` from project sources."""
     try:
@@ -193,6 +198,7 @@ def _conventions_verify_payload(
     result: GateResult,
 ) -> dict[str, object]:
     payload: dict[str, object] = {**result.to_dict()}
+    _lift_taxonomy_to_top_level(payload, result, repo_root)
     if feature is None:
         return payload
     effective_run_id = _validate_conventions_run_id(run_id or _default_conventions_run_id())
@@ -211,6 +217,24 @@ def _conventions_verify_payload(
         }
     )
     return payload
+
+
+def _lift_taxonomy_to_top_level(
+    payload: dict[str, object],
+    result: GateResult,
+    repo_root: Path,
+) -> None:
+    """Surface advisory/unsupported taxonomy at the verify JSON top level.
+
+    The taxonomy lives inside ``ast_summary`` (so it flows to the receipt too),
+    but consumers/auditors expect ``advisory_rules``/``unsupported_rules`` at the
+    document root. Absence of v2 AST gates leaves both as empty lists rather than
+    missing keys, so a stable contract holds for v1 repos as well.
+    """
+    summary = result.ast_summary or {}
+    payload["advisory_rules"] = summary.get("advisory_rules", [])
+    payload["unsupported_rules"] = summary.get("unsupported_rules", [])
+    payload["source_manifest"] = summary.get("source_manifest") or build_corpus_manifest(repo_root)
 
 
 @conventions_app.command("supervisor-gate")

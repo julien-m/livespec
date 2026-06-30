@@ -1,5 +1,14 @@
 # Changelog — 072-conventions-ast-rule-engine
 
+### 2026-06-29 — [Spec Update]: Superseded default-mode rollout by 073
+
+- **Type:** Spec Update
+- **Spec modified:** Yes
+- **Code modified:** None
+- **AC impacted:** AC-001, AC-002, SC-001, SC-002
+- **Author:** codex
+- **Reason:** Feature 073 makes AST `enforce` the default and keeps `off`/`observe` as opt-in modes.
+
 ### 2026-06-29 — [Bugfix]: Correct AC-014 implementation map paths
 
 - **Type:** Bugfix

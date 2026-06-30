@@ -1,0 +1,76 @@
+rules:
+  - id: rust.no_unwrap
+    title: No unwrap in production Rust
+    language: rust
+    decidability: ast
+    precision: high
+    severity: error
+    enforcement: mode
+    source_path: ai-ressources/code-conventions/rust.md
+    source_anchor: "#type-system"
+    source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
+    backend: ast-grep
+    patterns:
+      - kind: sg_yaml
+        value: |
+          id: rust.no_unwrap
+          language: Rust
+          rule:
+            pattern: $RECEIVER.unwrap()
+    fixtures:
+      pass: tests/fixtures/conventions_ast/rust/no_unwrap/pass.rs
+      fail: tests/fixtures/conventions_ast/rust/no_unwrap/fail.rs
+    justification:
+      required: true
+      accepted_window: adjacent_comment_block
+      rule_id_required: true
+  - id: rust.no_expect
+    title: No expect in production Rust
+    language: rust
+    decidability: ast
+    precision: high
+    severity: error
+    enforcement: mode
+    source_path: ai-ressources/code-conventions/rust.md
+    source_anchor: "#type-system"
+    source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
+    backend: ast-grep
+    patterns:
+      - kind: sg_yaml
+        value: |
+          id: rust.no_expect
+          language: Rust
+          rule:
+            pattern: $RECEIVER.expect($MESSAGE)
+    fixtures:
+      pass: tests/fixtures/conventions_ast/rust/no_expect/pass.rs
+      fail: tests/fixtures/conventions_ast/rust/no_expect/fail.rs
+    justification:
+      required: true
+      accepted_window: adjacent_comment_block
+      rule_id_required: true
+  - id: rust.no_panic
+    title: No panic in production Rust paths
+    language: rust
+    decidability: ast
+    precision: high
+    severity: error
+    enforcement: mode
+    source_path: ai-ressources/code-conventions/rust.md
+    source_anchor: "#error-handling"
+    source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
+    backend: ast-grep
+    patterns:
+      - kind: sg_yaml
+        value: |
+          id: rust.no_panic
+          language: Rust
+          rule:
+            pattern: panic!($$$ARGS)
+    fixtures:
+      pass: tests/fixtures/conventions_ast/rust/no_panic/pass.rs
+      fail: tests/fixtures/conventions_ast/rust/no_panic/fail.rs
+    justification:
+      required: true
+      accepted_window: adjacent_comment_block
+      rule_id_required: true

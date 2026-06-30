@@ -165,13 +165,19 @@ class _VerifiedAstFields:
 
 
 def _ast_receipt_fields(ast_summary: dict[str, object]) -> dict[str, object]:
-    return {
+    fields: dict[str, object] = {
         "ast_mode": ast_summary["ast_mode"],
         "ast_backend": ast_summary["ast_backend"],
         "ast_catalogs_sha256": ast_summary["ast_catalogs_sha256"],
         "ast_observations": ast_summary["ast_observations"],
         "ast_would_fail_count": ast_summary["ast_would_fail_count"],
     }
+    # Support-class taxonomy (advisory/unsupported) — declares catalogued-but-not-
+    # blocking domains so the receipt cannot read as "fully enforced" (C009).
+    for key in ("advisory_rules", "unsupported_rules", "source_manifest"):
+        if key in ast_summary:
+            fields[key] = ast_summary[key]
+    return fields
 
 
 def _verified_v2_ast_fields(

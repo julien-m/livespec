@@ -3,9 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-29
+> Last updated: 2026-06-30
 
 ---
+
+## 2026-06-30 — [Feature 073] Implemented: Exhaustive AI-res/ARS source manifest — verify JSON now proves 192/192 in-scope sources classified, 0 unclassified, with language/domain matrix and explicit exclusions
 
 ## 2026-06-29 — [Feature 072 Fix] Corrected AC-014 implementation map paths for `livespec doctor`
 

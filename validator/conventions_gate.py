@@ -20,6 +20,7 @@ from typing import Any, cast
 import yaml
 
 from .conventions_ast.engine import run_ast_conventions
+from .conventions_ast.taxonomy import taxonomy_fields as conventions_taxonomy
 from .conventions_feature_scope import SOURCE_SUFFIXES, FeatureScope
 from .conventions_gate_types import (
     GateBlocker,
@@ -40,7 +41,7 @@ from .conventions_gates import (
 )
 from .conventions_lang import adapter_for_path
 from .conventions_lang.base import SourceAnalysis
-from .conventions_linter import parse_linter_json
+from .conventions_linter_runner import collect_linter_violations
 from .visual_evidence import sha256_file
 
 _BLOCKING_VIOLATION_RULES = frozenset({"linter_timeout", "file_encoding_error", "file_read_error"})
@@ -69,6 +70,8 @@ def verify_conventions(
             violations.extend(ast_result.violations)
             blockers.extend(ast_result.blockers)
             ast_summary = ast_result.summary
+            if ast_summary is not None:
+                ast_summary = {**ast_summary, **conventions_taxonomy(project_root)}
     result = _result_from(violations, blockers, ast_summary=ast_summary)
     if report:
         from .conventions_report import write_debt_report
@@ -188,7 +191,7 @@ def _collect_violations(
         violations.extend(_token_scale_violations(rel, analysis, gates))
         violations.extend(_suppression_violations(rel, analysis, gates))
         violations.extend(_import_rule_violations(rel, analysis, gates))
-    violations.extend(_linter_violations(project_root, gates, feature_scope))
+    violations.extend(collect_linter_violations(project_root, gates, feature_scope))
     return violations
 
 
@@ -230,16 +233,6 @@ def _effective_exclusions(gates: ConventionsGatesAny) -> tuple[str, ...]:
 def _is_excluded_path(path: Path | str, exclusions: tuple[str, ...]) -> bool:
     rel = path.as_posix() if isinstance(path, Path) else path
     return any(_matches_exclusion(rel, pattern) for pattern in exclusions)
-
-
-def _project_relative_path(project_root: Path, path: str) -> str:
-    candidate = Path(path)
-    if not candidate.is_absolute():
-        return candidate.as_posix()
-    try:
-        return candidate.resolve().relative_to(project_root.resolve()).as_posix()
-    except ValueError:
-        return candidate.as_posix()
 
 
 def _matches_exclusion(rel: str, pattern: str) -> bool:
@@ -391,64 +384,6 @@ def _import_rule_violations(
             for ref in analysis.imports
             if _matches_import(rel, ref.module, import_pattern)
         )
-    return violations
-
-
-def _linter_violations(
-    project_root: Path,
-    gates: ConventionsGatesAny,
-    feature_scope: FeatureScope | None = None,
-) -> list[GateViolation]:
-    violations: list[GateViolation] = []
-    exclusions = _effective_exclusions(gates)
-    for command in gates.commands.lint:
-        try:
-            completed = subprocess.run(
-                command.run,
-                cwd=project_root,
-                shell=True,
-                text=True,
-                capture_output=True,
-                timeout=120,
-                check=False,
-            )
-        except subprocess.TimeoutExpired as exc:
-            message = f"{command.id} timed out after {exc.timeout} seconds"
-            violations.append(
-                GateViolation("linter_timeout", ".", 1, GateSeverity.ERROR, message, "system")
-            )
-            continue
-        parsed = parse_linter_json(command, completed.stdout)
-        violations.extend(
-            _violation(item.rule_id, item.path, item.line, item.severity, item.message, "linter")
-            for item in parsed
-            if not _is_excluded_path(_project_relative_path(project_root, item.path), exclusions)
-            and _is_in_scope(_project_relative_path(project_root, item.path), feature_scope)
-        )
-        if completed.returncode == 1 and not parsed:
-            violations.append(
-                GateViolation(
-                    f"linter.{command.id}",
-                    ".",
-                    1,
-                    GateSeverity.ERROR,
-                    completed.stderr.strip()
-                    or completed.stdout.strip()
-                    or f"{command.id} reported violations but produced no parseable JSON",
-                    "linter",
-                )
-            )
-        elif completed.returncode not in (0, 1):
-            violations.append(
-                GateViolation(
-                    f"linter.{command.id}",
-                    ".",
-                    1,
-                    GateSeverity.ERROR,
-                    completed.stderr.strip() or f"{command.id} failed",
-                    "linter",
-                )
-            )
     return violations
 
 

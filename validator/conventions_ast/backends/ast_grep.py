@@ -76,7 +76,28 @@ def _scan_one(
     rule: AstRule,
     source: AstSourceFile,
 ) -> AstBackendResult:
-    pattern = rule.patterns[0].value
+    """Scan one source file with every pattern declared by the rule.
+
+    A rule may carry multiple structural patterns (e.g. several syntactic forms
+    of the same violation). All of them are evaluated; a match via any pattern
+    counts. The first backend error short-circuits and is surfaced.
+    """
+    matches: list[AstMatch] = []
+    for pattern in rule.patterns:
+        result = _scan_one_pattern(binary, timeout_seconds, rule, source, pattern.value)
+        if result.info.status == "error":
+            return result
+        matches.extend(result.matches)
+    return AstBackendResult(AstBackendInfo("ast-grep", binary, "available"), tuple(matches))
+
+
+def _scan_one_pattern(
+    binary: str,
+    timeout_seconds: int,
+    rule: AstRule,
+    source: AstSourceFile,
+    pattern: str,
+) -> AstBackendResult:
     try:
         # The backend contract is an executable plus explicit args; no shell
         # interpolation is used, so rule and path values cannot become command text.

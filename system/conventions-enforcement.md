@@ -44,6 +44,17 @@ The compiled semantic rulebook is stored as
 - `unenforceable` explains source rules that cannot run in Engine C.
 - `waivers` records temporary false-positive exemptions with expiry and optional path scope.
 
+### `source_manifest`
+
+`livespec conventions verify --json` emits `source_manifest` for old v1-gates
+projects and new v2-gates projects. The manifest is built from
+`.conventions/manifest.yaml` `ai_resources_path` and reports:
+
+- total, classified, unclassified, and excluded AI-res/ARS convention sources.
+- per-source domains, languages, support status, and support reason.
+- explicit exclusion reasons for non-convention sources.
+- a language/domain matrix used by auditors to prove full corpus coverage.
+
 ## Human Operations
 
 | Operation | Command / Action | Notes |
@@ -78,7 +89,7 @@ The compiled semantic rulebook is stored as
 | `livespec conventions compile --force` | Compile the semantic rulebook from `.conventions/` sources. |
 | `livespec conventions scaffold --apply` | Write supported linter config templates from gates limits. |
 | `livespec conventions verify --report` | Run conventions gates and write debt/report artifacts. |
-| `livespec conventions verify --json --feature <slug> [--run-id <id>]` | Run conventions gates and write a project-local receipt under `.specs/conventions/runs/`. Use `--feature repo` for repo-scope goal proof. |
+| `livespec conventions verify --json --feature <slug> [--run-id <id>]` | Run conventions gates, emit `source_manifest`, and write a project-local receipt under `.specs/conventions/runs/`. Use `--feature repo` for repo-scope goal proof. |
 | `livespec conventions supervisor-gate --base-ref <ref> --head-ref <ref>` | Run supervisor-only diff/hash/freshness locks. |
 | `/spec-fix --conventions` | Burn down conventions debt worst-first and require no new violations. |
 

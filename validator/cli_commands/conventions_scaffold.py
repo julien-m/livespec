@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml  # type: ignore[import-untyped]  # PyYAML is runtime-only typed here.
 
-from ..conventions_gates import ConventionsGates
+from ..conventions_gates import ConventionsGatesAny
 
 
 def render_conventions_index(project_name: str, domains: list[str]) -> str:
@@ -99,7 +99,7 @@ def is_web_ui_stack(stack_text: str) -> bool:
 
 def scaffold_linter_configs(
     repo_root: Path,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
     *,
     apply: bool,
     sync_limits: bool,
@@ -130,7 +130,7 @@ def _read_stack_text(repo_root: Path) -> str:
 
 def _write_template(
     repo_root: Path,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
     template_name: str,
     display_name: str,
     output_path: Path,
@@ -154,7 +154,7 @@ def _template_root() -> Path:
 
 def _scaffold_swiftlint(
     repo_root: Path,
-    gates: ConventionsGates,
+    gates: ConventionsGatesAny,
     *,
     apply: bool,
     sync_limits: bool,

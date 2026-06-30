@@ -17,6 +17,10 @@ number: "072"
 - **Input:** Conventions AST rule engine with off/observe/enforce rollout modes. External plan: `/Users/julienm/.orchestrate/tmp/livespec-plan-cmux-ast-validation/debate/final-plan.md`. Parent goal hash: `5c609f35ecfee390bc5911c42f01d23f3721e794362ff98f1452cee2f77e92c8`.
 - **Feature Number:** 072
 
+> Superseded by 073: AC-001, AC-002, SC-001, and SC-002 are replaced by
+> `.specs/features/073-conventions-multilang-catalog/spec.md`, which makes
+> AST `enforce` the default and keeps `off`/`observe` as opt-in modes.
+
 ---
 
 ## User Scenarios & Testing

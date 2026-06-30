@@ -9,13 +9,17 @@ from pathlib import Path
 
 from .base import LanguageAdapter
 from .generic import GenericAdapter
+from .kotlin_adapter import KotlinAdapter
 from .python_adapter import PythonAdapter
+from .rust_adapter import RustAdapter
 from .swift_adapter import SwiftAdapter
 from .typescript_adapter import TypeScriptAdapter
 
 _PYTHON = PythonAdapter()
 _TYPESCRIPT = TypeScriptAdapter()
 _SWIFT = SwiftAdapter()
+_RUST = RustAdapter()
+_KOTLIN = KotlinAdapter()
 _GENERIC = GenericAdapter()
 
 _ADAPTERS: dict[str, LanguageAdapter] = {
@@ -25,6 +29,9 @@ _ADAPTERS: dict[str, LanguageAdapter] = {
     ".js": _TYPESCRIPT,
     ".jsx": _TYPESCRIPT,
     ".swift": _SWIFT,
+    ".rs": _RUST,
+    ".kt": _KOTLIN,
+    ".kts": _KOTLIN,
 }
 
 

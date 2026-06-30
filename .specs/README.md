@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-06-29
+> Last updated: 2026-06-30
 
 
 ---
@@ -110,6 +110,7 @@
 | 070 | Analyze Gate | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/070-analyze-gate/spec.md), [plan](features/070-analyze-gate/plan.md), [implementation](features/070-analyze-gate/implementation.md) |
 | 071 | QE Analysis Native Module | Implemented | 2026-06-27 | 2026-06-27 | [spec](features/071-qe-analysis-native-module/spec.md), [plan](features/071-qe-analysis-native-module/plan.md), [implementation](features/071-qe-analysis-native-module/implementation.md) |
 | 072 | Conventions AST Rule Engine | Implemented | 2026-06-29 | 2026-06-29 | [spec](features/072-conventions-ast-rule-engine/spec.md), [plan](features/072-conventions-ast-rule-engine/plan.md), [implementation](features/072-conventions-ast-rule-engine/implementation.md) |
+| 073 | Multilang Convention AST Catalog + Enforce-by-Default | Implemented | 2026-06-29 | 2026-06-30 | [spec](features/073-conventions-multilang-catalog/spec.md), [plan](features/073-conventions-multilang-catalog/plan.md), [implementation](features/073-conventions-multilang-catalog/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -133,6 +134,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-06-30 | Feature | [Feature 073] Implemented: Exhaustive AI-res/ARS source manifest — verify JSON now proves 192/192 in-scope sources classified, 0 unclassified, with language/domain matrix and explicit exclusions |
 | 2026-06-29 | Feature | [Feature 072] /spec-feature complete: AST conventions rollout engine — implement/test/audit all green, full pytest 2281 passed, conventions receipt PASS |
 | 2026-06-29 | Feature | [Feature 072] Test: 100% AC covered (17/17), 0 tests generated — targeted Ruff, pytest 177 passed, `.specs` validation, and conventions receipt PASS |
 | 2026-06-29 | Feature | [Feature 072] Implemented: Conventions AST Rule Engine — v1/v2 gates, AST observe/enforce engine, v2 receipts, mode-aware policy, active ast/high catalogue, and scoped conventions receipt repair |

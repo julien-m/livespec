@@ -51,16 +51,25 @@ def test_load_real_repo_gates_file() -> None:
     assert gates.schema_version == 1
 
 
-def test_generate_gates_keeps_v1_default_and_writes_v2_only_for_ast_mode(
+def test_generate_gates_defaults_to_v2_enforce_with_off_opt_out(
     tmp_path: Path,
 ) -> None:
+    # WHY (D1, supersedes 072 AC-001/AC-002): the user requires enforce-by-default.
+    # No flag -> schema v2 enforce; --ast-mode off -> legacy v1; observe -> v2 observe.
     project_root = _project_with_specs(tmp_path, "# Stack\n\nPython CLI\n")
 
     default_path = generate_conventions_gates(project_root)
     default_gates = load_conventions_gates(default_path)
 
-    assert default_gates.schema_version == 1
-    assert not hasattr(default_gates, "ast_rules")
+    assert isinstance(default_gates, ConventionsGatesV2)
+    assert default_gates.schema_version == 2
+    assert default_gates.ast_rules.mode == "enforce"
+
+    off_path = generate_conventions_gates(project_root, force=True, ast_mode="off")
+    off_gates = load_conventions_gates(off_path)
+
+    assert off_gates.schema_version == 1
+    assert not hasattr(off_gates, "ast_rules")
 
     ast_path = generate_conventions_gates(project_root, force=True, ast_mode="observe")
     ast_gates = load_conventions_gates(ast_path)

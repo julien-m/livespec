@@ -1,0 +1,26 @@
+rules:
+  - id: swift.no_try_force
+    title: No force-try in Swift
+    language: swift
+    decidability: ast
+    precision: high
+    severity: error
+    enforcement: mode
+    source_path: ai-ressources/code-conventions/swift-kotlin.md
+    source_anchor: "#error-handling"
+    source_hash: sha256:5a65f11d4f54bac0bfdbd50092cd7b3663b353a2e6d7a26fe8b3f6d47387b74a
+    backend: ast-grep
+    patterns:
+      - kind: sg_yaml
+        value: |
+          id: swift.no_try_force
+          language: Swift
+          rule:
+            pattern: try! $EXPR
+    fixtures:
+      pass: tests/fixtures/conventions_ast/swift/no_try_force/pass.swift
+      fail: tests/fixtures/conventions_ast/swift/no_try_force/fail.swift
+    justification:
+      required: true
+      accepted_window: adjacent_comment_block
+      rule_id_required: true
