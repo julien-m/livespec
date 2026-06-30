@@ -2,6 +2,8 @@ rules:
   - id: swift.no_try_force
     title: No force-try in Swift
     language: swift
+    domain: code
+    decision_kind: executable
     decidability: ast
     precision: high
     severity: error
@@ -10,6 +12,7 @@ rules:
     source_anchor: "#error-handling"
     source_hash: sha256:5a65f11d4f54bac0bfdbd50092cd7b3663b353a2e6d7a26fe8b3f6d47387b74a
     backend: ast-grep
+    detector: swift.no_try_force
     patterns:
       - kind: sg_yaml
         value: |
@@ -20,6 +23,10 @@ rules:
     fixtures:
       pass: tests/fixtures/conventions_ast/swift/no_try_force/pass.swift
       fail: tests/fixtures/conventions_ast/swift/no_try_force/fail.swift
+    deterministic_test_evidence:
+      - test: tests/test_conventions_ast_multilang.py
+        pass_fixture: tests/fixtures/conventions_ast/swift/no_try_force/pass.swift
+        fail_fixture: tests/fixtures/conventions_ast/swift/no_try_force/fail.swift
     justification:
       required: true
       accepted_window: adjacent_comment_block

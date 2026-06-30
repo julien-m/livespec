@@ -2,6 +2,8 @@ rules:
   - id: ts.no_as_any
     title: No TypeScript as any assertions
     language: typescript
+    domain: code
+    decision_kind: executable
     decidability: ast
     precision: high
     severity: error
@@ -10,6 +12,7 @@ rules:
     source_anchor: "#typescript-specifics"
     source_hash: sha256:9ea7336d3b80963a0740aff3e09526e21e79e40809160d75f2bf2e0241e301bd
     backend: ast-grep
+    detector: ts.no_as_any
     patterns:
       - kind: sg_yaml
         value: |
@@ -20,6 +23,10 @@ rules:
     fixtures:
       pass: tests/fixtures/conventions_ast/ts/no_as_any/pass.ts
       fail: tests/fixtures/conventions_ast/ts/no_as_any/fail.ts
+    deterministic_test_evidence:
+      - test: tests/test_conventions_ast_multilang.py
+        pass_fixture: tests/fixtures/conventions_ast/ts/no_as_any/pass.ts
+        fail_fixture: tests/fixtures/conventions_ast/ts/no_as_any/fail.ts
     justification:
       required: true
       accepted_window: adjacent_comment_block
@@ -27,6 +34,8 @@ rules:
   - id: ts.no_commonjs_require
     title: No CommonJS require in TypeScript
     language: typescript
+    domain: code
+    decision_kind: executable
     decidability: ast
     precision: high
     severity: error
@@ -35,6 +44,7 @@ rules:
     source_anchor: "#typescript-specifics"
     source_hash: sha256:9ea7336d3b80963a0740aff3e09526e21e79e40809160d75f2bf2e0241e301bd
     backend: ast-grep
+    detector: ts.no_commonjs_require
     patterns:
       - kind: sg_yaml
         value: |
@@ -45,6 +55,10 @@ rules:
     fixtures:
       pass: tests/fixtures/conventions_ast/ts/no_commonjs_require/pass.ts
       fail: tests/fixtures/conventions_ast/ts/no_commonjs_require/fail.ts
+    deterministic_test_evidence:
+      - test: tests/test_conventions_ast_multilang.py
+        pass_fixture: tests/fixtures/conventions_ast/ts/no_commonjs_require/pass.ts
+        fail_fixture: tests/fixtures/conventions_ast/ts/no_commonjs_require/fail.ts
     justification:
       required: true
       accepted_window: adjacent_comment_block

@@ -9,11 +9,15 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
+from typing import TypeAlias
 
 from .conventions_gate import GateResult
 from .conventions_gates import gates_path, load_conventions_gates
 from .conventions_rules import rulebook_path
 from .visual_evidence import VisualReceiptError, sha256_file
+
+# Callback for fresh supervisor verification; feature_slug is None for repo-wide checks.
+RunVerify: TypeAlias = Callable[[Path, str | None], GateResult]
 
 
 @dataclass(frozen=True)
@@ -75,10 +79,11 @@ def supervisor_conventions_gate(
     project_root: Path,
     *,
     worker_receipt: dict[str, object] | None,
-    run_verify: Callable[[Path], GateResult],
+    run_verify: RunVerify,
 ) -> FreshGateResult:
     """Run conventions verification freshly and ignore stale worker verdicts."""
-    fresh = run_verify(project_root)
+    feature_slug = _worker_feature_slug(worker_receipt)
+    fresh = run_verify(project_root, feature_slug)
     stale = None
     if isinstance(worker_receipt, dict) and isinstance(worker_receipt.get("verdict"), str):
         stale = str(worker_receipt["verdict"])
@@ -87,6 +92,29 @@ def supervisor_conventions_gate(
         source="fresh_supervisor_run",
         stale_worker_verdict=stale,
     )
+
+
+def _worker_feature_slug(worker_receipt: dict[str, object] | None) -> str | None:
+    if not _is_conventions_receipt(worker_receipt):
+        return None
+    feature_slug = worker_receipt.get("feature_slug")
+    if isinstance(feature_slug, str) and feature_slug:
+        return feature_slug
+    return None
+
+
+def _is_conventions_receipt(worker_receipt: dict[str, object] | None) -> bool:
+    return (
+        isinstance(worker_receipt, dict)
+        and worker_receipt.get("oracle") == "livespec-conventions-gate"
+        and _is_schema_version(worker_receipt.get("schema_version"))
+        and isinstance(worker_receipt.get("source_manifest"), dict)
+        and isinstance(worker_receipt.get("rule_decision_manifest"), dict)
+    )
+
+
+def _is_schema_version(value: object) -> bool:
+    return isinstance(value, int) or (isinstance(value, str) and value.isdigit())
 
 
 def _protected_conventions_paths(project_root: Path) -> set[str]:
@@ -128,6 +156,7 @@ def _git_blob_sha256(project_root: Path, ref: str, rel_path: str) -> str:
 __all__ = [
     "BaseHashSnapshot",
     "FreshGateResult",
+    "RunVerify",
     "base_hash_snapshot",
     "changed_protected_conventions_paths",
     "compare_base_hashes",

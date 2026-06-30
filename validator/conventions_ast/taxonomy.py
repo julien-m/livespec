@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import TypedDict
 
 from .corpus import build_corpus_manifest
+from .source_decisions import build_rule_decision_manifest
 
 
 class TaxonomyEntry(TypedDict):
@@ -144,4 +145,5 @@ def taxonomy_fields(project_root: Path | None = None) -> dict[str, object]:
     }
     if project_root is not None:
         fields["source_manifest"] = build_corpus_manifest(project_root)
+        fields["rule_decision_manifest"] = build_rule_decision_manifest(project_root)
     return fields

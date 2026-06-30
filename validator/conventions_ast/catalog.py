@@ -13,6 +13,7 @@ import yaml
 
 from validator.conventions_ast.models import (
     AstCatalog,
+    AstDeterministicTestEvidence,
     AstFixtures,
     AstJustification,
     AstPattern,
@@ -23,6 +24,9 @@ from validator.visual_evidence import sha256_file
 
 class AstCatalogError(ValueError):
     """Raised when an AST catalogue is invalid."""
+
+
+AST_RULE_DOMAINS = frozenset({"code"})
 
 
 def load_ast_catalog(path: Path, *, project_root: Path) -> AstCatalog:
@@ -79,7 +83,23 @@ def _parse_rule(raw: object, *, project_root: Path, fixture_root: Path) -> AstRu
         raise AstCatalogError(
             "active v1 AST catalog accepts only decidability ast and precision high"
         )
+    decision_kind = _string(data, "decision_kind")
+    if decision_kind == "executable":
+        typed_decision_kind: Literal["executable", "generated-executable"] = "executable"
+    elif decision_kind == "generated-executable":
+        typed_decision_kind = "generated-executable"
+    else:
+        raise AstCatalogError("decision_kind must be executable or generated-executable")
+    detector = _string(data, "detector")
+    rule_id = _string(data, "id")
+    if detector != rule_id:
+        raise AstCatalogError("detector must match rule id")
+    domain = _string(data, "domain")
+    if domain not in AST_RULE_DOMAINS:
+        expected = ", ".join(sorted(AST_RULE_DOMAINS))
+        raise AstCatalogError(f"domain must be one of: {expected}")
     fixtures = _fixtures(data, fixture_root)
+    deterministic_test_evidence = _deterministic_test_evidence(data, fixtures, fixture_root)
     source_path = _string(data, "source_path")
     source_hash = _string(data, "source_hash")
     _validate_traceability(
@@ -92,9 +112,11 @@ def _parse_rule(raw: object, *, project_root: Path, fixture_root: Path) -> AstRu
     if not patterns:
         raise AstCatalogError("rule patterns must not be empty")
     return AstRule(
-        id=_string(data, "id"),
+        id=rule_id,
         title=_string(data, "title"),
         language=_string(data, "language"),
+        domain=domain,
+        decision_kind=typed_decision_kind,
         decidability="ast",
         precision="high",
         severity=_severity(data),
@@ -102,8 +124,10 @@ def _parse_rule(raw: object, *, project_root: Path, fixture_root: Path) -> AstRu
         source_anchor=_string(data, "source_anchor"),
         source_hash=source_hash,
         backend=_string(data, "backend"),
+        detector=detector,
         patterns=patterns,
         fixtures=fixtures,
+        deterministic_test_evidence=deterministic_test_evidence,
         justification=_justification(data),
     )
 
@@ -141,6 +165,36 @@ def _fixtures(data: dict[str, Any], fixture_root: Path) -> AstFixtures:
         if not resolved.is_file():
             raise AstCatalogError(f"fixture missing: {fixture_path}")
     return AstFixtures(pass_path=pass_path, fail_path=fail_path)
+
+
+def _deterministic_test_evidence(
+    data: dict[str, Any],
+    fixtures: AstFixtures,
+    fixture_root: Path,
+) -> tuple[AstDeterministicTestEvidence, ...]:
+    raw = data.get("deterministic_test_evidence")
+    if not isinstance(raw, list) or not raw:
+        raise AstCatalogError("deterministic_test_evidence must be a non-empty list")
+    parsed: list[AstDeterministicTestEvidence] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            raise AstCatalogError("deterministic_test_evidence item must be a mapping")
+        item_data = cast(dict[str, Any], item)
+        test = _string(item_data, "test")
+        pass_fixture = _string(item_data, "pass_fixture")
+        fail_fixture = _string(item_data, "fail_fixture")
+        if pass_fixture != fixtures.pass_path or fail_fixture != fixtures.fail_path:
+            raise AstCatalogError("deterministic_test_evidence fixtures must match rule fixtures")
+        if not (fixture_root / test).is_file():
+            raise AstCatalogError(f"deterministic test missing: {test}")
+        parsed.append(
+            AstDeterministicTestEvidence(
+                test=test,
+                pass_fixture=pass_fixture,
+                fail_fixture=fail_fixture,
+            )
+        )
+    return tuple(parsed)
 
 
 def _validate_traceability(

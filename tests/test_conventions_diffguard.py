@@ -8,6 +8,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+from validator.cli_commands import conventions_cmd
 from validator.conventions_diffguard import (
     BaseHashSnapshot,
     FreshGateResult,
@@ -15,6 +18,7 @@ from validator.conventions_diffguard import (
     compare_base_hashes,
     supervisor_conventions_gate,
 )
+from validator.conventions_feature_scope import FeatureScope
 from validator.conventions_gate import GateResult, GateVerdict
 
 
@@ -47,6 +51,33 @@ scope: repo
     (project_root / extra_config).write_text("[tool.ruff]\n", encoding="utf-8")
 
 
+def _stub_supervisor_diff_guards(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(conventions_cmd, "git_changed_paths", lambda *_args, **_kwargs: [])
+    monkeypatch.setattr(
+        conventions_cmd,
+        "changed_protected_conventions_paths",
+        lambda *_args, **_kwargs: [],
+    )
+    monkeypatch.setattr(
+        conventions_cmd,
+        "base_hash_snapshot",
+        lambda *_args, **_kwargs: BaseHashSnapshot(gates_sha256="", rules_sha256=""),
+    )
+    monkeypatch.setattr(conventions_cmd, "compare_base_hashes", lambda *_args, **_kwargs: [])
+
+
+def _conventions_receipt(**overrides: object) -> dict[str, object]:
+    receipt: dict[str, object] = {
+        "oracle": "livespec-conventions-gate",
+        "schema_version": "1",
+        "verdict": "PASS",
+        "source_manifest": {},
+        "rule_decision_manifest": {},
+    }
+    receipt.update(overrides)
+    return receipt
+
+
 def test_protected_conventions_diff_blocks_gate_file_edits(tmp_path: Path) -> None:
     _write_gates(tmp_path)
 
@@ -76,12 +107,16 @@ def test_base_hash_mismatch_blocks_stale_gate_files(tmp_path: Path) -> None:
 
 def test_supervisor_uses_fresh_verdict_over_stale_worker_receipt(tmp_path: Path) -> None:
     _write_gates(tmp_path)
-    stale_receipt = {"kind": "conventions", "verified": True, "verdict": "PASS"}
+    stale_receipt = _conventions_receipt()
 
     result = supervisor_conventions_gate(
         tmp_path,
         worker_receipt=stale_receipt,
-        run_verify=lambda root: GateResult(verdict=GateVerdict.FAIL, violations=[], blockers=[]),
+        run_verify=lambda root, feature_slug: GateResult(
+            verdict=GateVerdict.FAIL,
+            violations=[],
+            blockers=[],
+        ),
     )
 
     assert result == FreshGateResult(
@@ -89,3 +124,138 @@ def test_supervisor_uses_fresh_verdict_over_stale_worker_receipt(tmp_path: Path)
         source="fresh_supervisor_run",
         stale_worker_verdict="PASS",
     )
+
+
+def test_supervisor_uses_feature_scope_from_worker_receipt(tmp_path: Path) -> None:
+    _write_gates(tmp_path)
+    receipt = _conventions_receipt(
+        feature_slug="073-conventions-multilang-catalog",
+        run_id="validator-073-final-20260630",
+    )
+    calls: list[str | None] = []
+
+    def run_verify(_root: Path, feature_slug: str | None) -> GateResult:
+        calls.append(feature_slug)
+        verdict = GateVerdict.PASS if feature_slug == receipt["feature_slug"] else GateVerdict.FAIL
+        return GateResult(verdict=verdict, violations=[], blockers=[])
+
+    result = supervisor_conventions_gate(tmp_path, worker_receipt=receipt, run_verify=run_verify)
+
+    assert result.verdict == "PASS"
+    assert result.source == "fresh_supervisor_run"
+    assert result.stale_worker_verdict == "PASS"
+    assert calls == ["073-conventions-multilang-catalog"]
+
+
+def test_supervisor_feature_scope_uses_fresh_fail_over_stale_pass(tmp_path: Path) -> None:
+    _write_gates(tmp_path)
+    receipt = _conventions_receipt(
+        feature_slug="073-conventions-multilang-catalog",
+        run_id="validator-073-final-20260630",
+    )
+
+    result = supervisor_conventions_gate(
+        tmp_path,
+        worker_receipt=receipt,
+        run_verify=lambda _root, _feature_slug: GateResult(
+            verdict=GateVerdict.FAIL,
+            violations=[],
+            blockers=[],
+        ),
+    )
+
+    assert result.verdict == "FAIL"
+    assert result.stale_worker_verdict == "PASS"
+
+
+def test_supervisor_preserves_repo_scope_without_feature_receipt(tmp_path: Path) -> None:
+    _write_gates(tmp_path)
+    calls: list[str | None] = []
+
+    def run_verify(_root: Path, feature_slug: str | None) -> GateResult:
+        calls.append(feature_slug)
+        return GateResult(verdict=GateVerdict.FAIL, violations=[], blockers=[])
+
+    result = supervisor_conventions_gate(
+        tmp_path,
+        worker_receipt={"kind": "conventions", "verified": True, "verdict": "PASS"},
+        run_verify=run_verify,
+    )
+
+    assert result.verdict == "FAIL"
+    assert calls == [None]
+
+
+def test_supervisor_ignores_feature_scope_from_non_conventions_receipt(tmp_path: Path) -> None:
+    _write_gates(tmp_path)
+    calls: list[str | None] = []
+
+    def run_verify(_root: Path, feature_slug: str | None) -> GateResult:
+        calls.append(feature_slug)
+        return GateResult(verdict=GateVerdict.PASS, violations=[], blockers=[])
+
+    result = supervisor_conventions_gate(
+        tmp_path,
+        worker_receipt={"verdict": "PASS", "feature_slug": "073-conventions-multilang-catalog"},
+        run_verify=run_verify,
+    )
+
+    assert result.verdict == "PASS"
+    assert result.stale_worker_verdict == "PASS"
+    assert calls == [None]
+
+
+def test_supervisor_cli_feature_receipt_runs_fresh_feature_scope(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _write_gates(tmp_path)
+    receipt_path = tmp_path / "receipt.json"
+    receipt_path.write_text(
+        """\
+{
+  "oracle": "livespec-conventions-gate",
+  "schema_version": 1,
+  "verdict": "PASS",
+  "feature_slug": "073-conventions-multilang-catalog",
+  "run_id": "run-073",
+  "source_manifest": {},
+  "rule_decision_manifest": {}
+}
+""",
+        encoding="utf-8",
+    )
+    expected_scope = FeatureScope(
+        feature_slug="073-conventions-multilang-catalog",
+        paths=frozenset({"validator/conventions_diffguard.py"}),
+    )
+    _stub_supervisor_diff_guards(monkeypatch)
+    monkeypatch.setattr(
+        conventions_cmd,
+        "resolve_feature_scope",
+        lambda _root, feature_slug: expected_scope
+        if feature_slug == "073-conventions-multilang-catalog"
+        else None,
+    )
+
+    def verify(
+        _root: Path,
+        *,
+        feature_scope: FeatureScope | None = None,
+        **_kwargs: object,
+    ) -> GateResult:
+        verdict = GateVerdict.PASS if feature_scope == expected_scope else GateVerdict.FAIL
+        return GateResult(verdict=verdict, violations=[], blockers=[])
+
+    monkeypatch.setattr(conventions_cmd, "verify_conventions", verify)
+
+    payload, exit_code = conventions_cmd._build_supervisor_gate_payload(
+        tmp_path,
+        base_ref="main",
+        head_ref="HEAD",
+        worker_receipt=receipt_path,
+    )
+
+    assert exit_code == 0
+    assert payload["verdict"] == "PASS"
+    assert payload["stale_worker_verdict"] == "PASS"

@@ -2,6 +2,8 @@ rules:
   - id: rust.no_unwrap
     title: No unwrap in production Rust
     language: rust
+    domain: code
+    decision_kind: executable
     decidability: ast
     precision: high
     severity: error
@@ -10,6 +12,7 @@ rules:
     source_anchor: "#type-system"
     source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
     backend: ast-grep
+    detector: rust.no_unwrap
     patterns:
       - kind: sg_yaml
         value: |
@@ -20,6 +23,10 @@ rules:
     fixtures:
       pass: tests/fixtures/conventions_ast/rust/no_unwrap/pass.rs
       fail: tests/fixtures/conventions_ast/rust/no_unwrap/fail.rs
+    deterministic_test_evidence:
+      - test: tests/test_conventions_ast_multilang.py
+        pass_fixture: tests/fixtures/conventions_ast/rust/no_unwrap/pass.rs
+        fail_fixture: tests/fixtures/conventions_ast/rust/no_unwrap/fail.rs
     justification:
       required: true
       accepted_window: adjacent_comment_block
@@ -27,6 +34,8 @@ rules:
   - id: rust.no_expect
     title: No expect in production Rust
     language: rust
+    domain: code
+    decision_kind: executable
     decidability: ast
     precision: high
     severity: error
@@ -35,6 +44,7 @@ rules:
     source_anchor: "#type-system"
     source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
     backend: ast-grep
+    detector: rust.no_expect
     patterns:
       - kind: sg_yaml
         value: |
@@ -45,6 +55,10 @@ rules:
     fixtures:
       pass: tests/fixtures/conventions_ast/rust/no_expect/pass.rs
       fail: tests/fixtures/conventions_ast/rust/no_expect/fail.rs
+    deterministic_test_evidence:
+      - test: tests/test_conventions_ast_multilang.py
+        pass_fixture: tests/fixtures/conventions_ast/rust/no_expect/pass.rs
+        fail_fixture: tests/fixtures/conventions_ast/rust/no_expect/fail.rs
     justification:
       required: true
       accepted_window: adjacent_comment_block
@@ -52,6 +66,8 @@ rules:
   - id: rust.no_panic
     title: No panic in production Rust paths
     language: rust
+    domain: code
+    decision_kind: executable
     decidability: ast
     precision: high
     severity: error
@@ -60,6 +76,7 @@ rules:
     source_anchor: "#error-handling"
     source_hash: sha256:868f663dde00b42671fa478c470ca00b61b1cc11e200c54fe01a12bf89b34d88
     backend: ast-grep
+    detector: rust.no_panic
     patterns:
       - kind: sg_yaml
         value: |
@@ -70,6 +87,10 @@ rules:
     fixtures:
       pass: tests/fixtures/conventions_ast/rust/no_panic/pass.rs
       fail: tests/fixtures/conventions_ast/rust/no_panic/fail.rs
+    deterministic_test_evidence:
+      - test: tests/test_conventions_ast_multilang.py
+        pass_fixture: tests/fixtures/conventions_ast/rust/no_panic/pass.rs
+        fail_fixture: tests/fixtures/conventions_ast/rust/no_panic/fail.rs
     justification:
       required: true
       accepted_window: adjacent_comment_block

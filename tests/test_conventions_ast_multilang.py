@@ -16,6 +16,7 @@ import pytest
 from validator.conventions_ast.backends.ast_grep import AstGrepBackend
 from validator.conventions_ast.catalog import load_ast_catalogs
 from validator.conventions_ast.models import (
+    AstDeterministicTestEvidence,
     AstFixtures,
     AstJustification,
     AstPattern,
@@ -74,6 +75,8 @@ def test_backend_matches_via_any_of_multiple_patterns(tmp_path: Path) -> None:
         id="rust.multi",
         title="multi-pattern probe",
         language="rust",
+        domain="code",
+        decision_kind="executable",
         decidability="ast",
         precision="high",
         severity="error",
@@ -81,6 +84,7 @@ def test_backend_matches_via_any_of_multiple_patterns(tmp_path: Path) -> None:
         source_anchor="#type-system",
         source_hash="sha256:" + "0" * 64,
         backend="ast-grep",
+        detector="rust.multi",
         patterns=(
             AstPattern(
                 kind="sg_yaml",
@@ -92,6 +96,13 @@ def test_backend_matches_via_any_of_multiple_patterns(tmp_path: Path) -> None:
             ),
         ),
         fixtures=AstFixtures(pass_path="p", fail_path="f"),
+        deterministic_test_evidence=(
+            AstDeterministicTestEvidence(
+                test="tests/test_conventions_ast_multilang.py",
+                pass_fixture="p",
+                fail_fixture="f",
+            ),
+        ),
         justification=AstJustification(),
     )
     backend = AstGrepBackend()

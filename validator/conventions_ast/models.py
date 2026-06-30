@@ -13,6 +13,7 @@ from validator.conventions_gate_types import GateBlocker, GateViolation
 AstBackendStatus = Literal["available", "unavailable", "error", "skipped"]
 AstDecidability = Literal["ast", "graph", "semantic", "external", "visual"]
 AstPrecision = Literal["high", "medium", "low"]
+AstDecisionKind = Literal["executable", "generated-executable"]
 
 
 @dataclass(frozen=True)
@@ -32,6 +33,23 @@ class AstFixtures:
 
 
 @dataclass(frozen=True)
+class AstDeterministicTestEvidence:
+    """Executable proof tying a rule to fixtures and a deterministic test."""
+
+    test: str
+    pass_fixture: str
+    fail_fixture: str
+
+    def to_dict(self) -> dict[str, str]:
+        """Return JSON-ready evidence metadata."""
+        return {
+            "test": self.test,
+            "pass_fixture": self.pass_fixture,
+            "fail_fixture": self.fail_fixture,
+        }
+
+
+@dataclass(frozen=True)
 class AstJustification:
     """Nearby justification policy for a rule match."""
 
@@ -47,6 +65,8 @@ class AstRule:
     id: str
     title: str
     language: str
+    domain: str
+    decision_kind: AstDecisionKind
     decidability: AstDecidability
     precision: AstPrecision
     severity: Literal["warning", "error"]
@@ -54,15 +74,20 @@ class AstRule:
     source_anchor: str
     source_hash: str
     backend: str
+    detector: str
     patterns: tuple[AstPattern, ...]
     fixtures: AstFixtures
+    deterministic_test_evidence: tuple[AstDeterministicTestEvidence, ...]
     justification: AstJustification
 
     def metadata_payload(self) -> dict[str, object]:
         """Return stable rule metadata included in receipt hash inputs."""
+        fixture_family = _fixture_family(self.fixtures.fail_path)
         return {
             "id": self.id,
             "language": self.language,
+            "domain": self.domain,
+            "decision_kind": self.decision_kind,
             "decidability": self.decidability,
             "precision": self.precision,
             "severity": self.severity,
@@ -70,12 +95,31 @@ class AstRule:
             "source_anchor": self.source_anchor,
             "source_hash": self.source_hash,
             "backend": self.backend,
+            "detector": self.detector,
+            "fixture_family": fixture_family,
+            "fixtures": {
+                "pass": self.fixtures.pass_path,
+                "fail": self.fixtures.fail_path,
+            },
+            "deterministic_test_evidence": [
+                evidence.to_dict() for evidence in self.deterministic_test_evidence
+            ],
             "justification": {
                 "required": self.justification.required,
                 "accepted_window": self.justification.accepted_window,
                 "rule_id_required": self.justification.rule_id_required,
             },
         }
+
+
+def _fixture_family(fail_path: str) -> str:
+    parts = Path(fail_path).parts
+    try:
+        index = parts.index("conventions_ast")
+    except ValueError:
+        # External test catalogues can use any fixture tree; keep their parent as the family.
+        return str(Path(fail_path).parent)
+    return Path(*parts[index + 1 : -1]).as_posix()
 
 
 @dataclass(frozen=True)

@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-06-30 — [Feature 073 Fix] ARS source decision manifest — 192/192 sources decided, 0 undecided; executable rules now require decision_kind/domain/detector metadata
+
+## 2026-06-30 — [Feature 073 Fix] Feature-scoped verify JSON now exposes advisory/unsupported taxonomy in schema v1, matching receipt evidence
+
 ## 2026-06-30 — [Feature 073] Implemented: Exhaustive AI-res/ARS source manifest — verify JSON now proves 192/192 in-scope sources classified, 0 unclassified, with language/domain matrix and explicit exclusions
 
 ## 2026-06-29 — [Feature 072 Fix] Corrected AC-014 implementation map paths for `livespec doctor`

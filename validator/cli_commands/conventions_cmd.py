@@ -16,6 +16,11 @@ from pathlib import Path
 import typer
 
 from ..conventions_ast.corpus import build_corpus_manifest
+from ..conventions_ast.source_decisions import (
+    build_rule_decision_manifest,
+    validate_rule_decision_manifest,
+)
+from ..conventions_ast.taxonomy import advisory_rules, unsupported_rules
 from ..conventions_diffguard import (
     base_hash_snapshot,
     changed_protected_conventions_paths,
@@ -24,7 +29,8 @@ from ..conventions_diffguard import (
     supervisor_conventions_gate,
 )
 from ..conventions_feature_scope import FeatureScopeError, resolve_feature_scope
-from ..conventions_gate import GateResult, verify_conventions
+from ..conventions_gate import verify_conventions
+from ..conventions_gate_types import GateBlocker, GateResult, GateVerdict
 from ..conventions_gates import (
     GatesInitMode,
     gates_path,
@@ -136,6 +142,7 @@ def conventions_verify_command(
             else None
         )
         result = verify_conventions(repo_root, report=report, feature_scope=feature_scope)
+        result = _with_rule_decision_blockers(result, repo_root)
     except (FeatureScopeError, FileNotFoundError, ValueError) as exc:
         payload: dict[str, object] = {"verdict": "BLOCKED", "blockers": [str(exc)]}
         if feature is not None:
@@ -219,6 +226,31 @@ def _conventions_verify_payload(
     return payload
 
 
+def _with_rule_decision_blockers(result: GateResult, repo_root: Path) -> GateResult:
+    summary = result.ast_summary or {}
+    manifest = summary.get("rule_decision_manifest") or build_rule_decision_manifest(repo_root)
+    issues = validate_rule_decision_manifest(manifest)
+    if not issues:
+        return result
+    blockers = [
+        *result.blockers,
+        *[
+            GateBlocker(
+                "rule_decision_manifest_invalid",
+                issue,
+                "Fix source decisions before writing conventions evidence.",
+            )
+            for issue in issues
+        ],
+    ]
+    return GateResult(
+        verdict=GateVerdict.BLOCKED,
+        violations=result.violations,
+        blockers=blockers,
+        ast_summary=result.ast_summary,
+    )
+
+
 def _lift_taxonomy_to_top_level(
     payload: dict[str, object],
     result: GateResult,
@@ -232,9 +264,12 @@ def _lift_taxonomy_to_top_level(
     missing keys, so a stable contract holds for v1 repos as well.
     """
     summary = result.ast_summary or {}
-    payload["advisory_rules"] = summary.get("advisory_rules", [])
-    payload["unsupported_rules"] = summary.get("unsupported_rules", [])
+    payload["advisory_rules"] = summary.get("advisory_rules") or advisory_rules()
+    payload["unsupported_rules"] = summary.get("unsupported_rules") or unsupported_rules()
     payload["source_manifest"] = summary.get("source_manifest") or build_corpus_manifest(repo_root)
+    payload["rule_decision_manifest"] = summary.get(
+        "rule_decision_manifest"
+    ) or build_rule_decision_manifest(repo_root)
 
 
 @conventions_app.command("supervisor-gate")
@@ -293,7 +328,7 @@ def _build_supervisor_gate_payload(
     result = supervisor_conventions_gate(
         repo_root,
         worker_receipt=_read_worker_receipt(repo_root, worker_receipt),
-        run_verify=lambda root: verify_conventions(root),
+        run_verify=_run_supervisor_verify,
     )
     return (
         {
@@ -310,6 +345,14 @@ def _read_worker_receipt(repo_root: Path, worker_receipt: Path | None) -> dict[s
         return None
     path = worker_receipt if worker_receipt.is_absolute() else repo_root / worker_receipt
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _run_supervisor_verify(repo_root: Path, feature_slug: str | None) -> GateResult:
+    if feature_slug is None:
+        return _with_rule_decision_blockers(verify_conventions(repo_root), repo_root)
+    feature_scope = resolve_feature_scope(repo_root, feature_slug)
+    result = verify_conventions(repo_root, feature_scope=feature_scope)
+    return _with_rule_decision_blockers(result, repo_root)
 
 
 @conventions_app.command("compile")

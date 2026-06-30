@@ -11,6 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal, cast
 
+from .conventions_ast.taxonomy import taxonomy_fields
 from .conventions_gate import GateResult
 from .conventions_gates import gates_path
 from .visual_evidence import receipt_payload_hash, sha256_file
@@ -60,8 +61,44 @@ def write_conventions_receipt(
 ) -> Path:
     """Write a conventions receipt and return its path."""
     ast_summary = result.ast_summary
-    payload: dict[str, object] = {
-        "schema_version": "2" if ast_summary is not None else RECEIPT_SCHEMA_VERSION,
+    payload = _base_receipt_payload(feature_slug, run_id, result, gates_path)
+    if ast_summary is not None:
+        payload.update(_ast_receipt_fields(ast_summary))
+    else:
+        payload.update(_receipt_taxonomy_fields(project_root))
+    payload["receipt_hash"] = receipt_payload_hash(payload)
+    output_dir = project_root / ".specs" / "conventions" / "runs" / run_id
+    output_dir.mkdir(parents=True, exist_ok=True)
+    receipt_path = output_dir / "receipt.json"
+    receipt_path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    return receipt_path
+
+
+def _receipt_taxonomy_fields(project_root: Path) -> dict[str, object]:
+    fields = taxonomy_fields(project_root)
+    return {
+        key: fields[key]
+        for key in (
+            "advisory_rules",
+            "unsupported_rules",
+            "source_manifest",
+            "rule_decision_manifest",
+        )
+        if key in fields
+    }
+
+
+def _base_receipt_payload(
+    feature_slug: str,
+    run_id: str,
+    result: GateResult,
+    gates_path: Path,
+) -> dict[str, object]:
+    return {
+        "schema_version": "2" if result.ast_summary is not None else RECEIPT_SCHEMA_VERSION,
         "oracle": ORACLE_NAME,
         "oracle_version": ORACLE_VERSION,
         "feature_slug": feature_slug,
@@ -72,17 +109,6 @@ def write_conventions_receipt(
         "blockers": [blocker.to_dict() for blocker in result.blockers],
         "created_at": datetime.now(UTC).isoformat(),
     }
-    if ast_summary is not None:
-        payload.update(_ast_receipt_fields(ast_summary))
-    payload["receipt_hash"] = receipt_payload_hash(payload)
-    output_dir = project_root / ".specs" / "conventions" / "runs" / run_id
-    output_dir.mkdir(parents=True, exist_ok=True)
-    receipt_path = output_dir / "receipt.json"
-    receipt_path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False),
-        encoding="utf-8",
-    )
-    return receipt_path
 
 
 def verify_conventions_receipt(
@@ -174,7 +200,12 @@ def _ast_receipt_fields(ast_summary: dict[str, object]) -> dict[str, object]:
     }
     # Support-class taxonomy (advisory/unsupported) — declares catalogued-but-not-
     # blocking domains so the receipt cannot read as "fully enforced" (C009).
-    for key in ("advisory_rules", "unsupported_rules", "source_manifest"):
+    for key in (
+        "advisory_rules",
+        "unsupported_rules",
+        "source_manifest",
+        "rule_decision_manifest",
+    ):
         if key in ast_summary:
             fields[key] = ast_summary[key]
     return fields

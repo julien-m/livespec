@@ -28,6 +28,7 @@ from typer.testing import CliRunner
 
 from validator.cli import app
 from validator.conventions_rules import (
+    _RULEBOOK_SCHEMA,
     RulebookStaleError,
     compile_conventions_rulebook,
     load_conventions_rules,
@@ -93,6 +94,18 @@ def _provider_payload() -> str:
             ],
         }
     )
+
+
+def test_rulebook_schema_required_lists_cover_all_properties() -> None:
+    schema = _RULEBOOK_SCHEMA["schema"]
+    assert isinstance(schema, dict)
+    properties = schema["properties"]
+    assert isinstance(properties, dict)
+
+    for key in ("rules", "unenforceable", "waivers"):
+        item_schema = properties[key]["items"]
+        item_properties = set(item_schema["properties"])
+        assert set(item_schema["required"]) == item_properties
 
 
 def test_compile_rulebook_records_sources_and_provider_rules(

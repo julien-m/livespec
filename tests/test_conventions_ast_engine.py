@@ -10,6 +10,58 @@ from validator.conventions_ast.engine import run_ast_conventions
 from validator.conventions_ast.models import AstMatch
 from validator.conventions_gates import load_conventions_gates
 
+# Minimal executable AST catalogue used by rollout-mode tests.
+AST_HIGH_CATALOG_TEMPLATE = """\
+rules:
+  - id: ts.no_as_any
+    title: No as any
+    language: typescript
+    domain: code
+    decision_kind: executable
+    decidability: ast
+    precision: high
+    severity: error
+    source_path: {source_path}
+    source_anchor: "#typescript-specifics"
+    source_hash: sha256:{source_hash}
+    backend: ast-grep
+    detector: ts.no_as_any
+    patterns:
+      - kind: sg_yaml
+        value: "rule: {{ pattern: '$A as any' }}"
+    fixtures:
+      pass: tests/fixtures/pass.ts
+      fail: tests/fixtures/fail.ts
+    deterministic_test_evidence:
+      - test: tests/test_conventions_ast_multilang.py
+        pass_fixture: tests/fixtures/pass.ts
+        fail_fixture: tests/fixtures/fail.ts
+    justification:
+      required: true
+      accepted_window: adjacent_comment_block
+      rule_id_required: true
+"""
+
+AST_GATES_TEMPLATE = """\
+schema_version: 2
+generated_from:
+  constitution: .specs/constitution.md
+  constitution_sha256: {constitution_hash}
+  stack: .specs/stacks/_default.md
+commands: {{lint: []}}
+builtin: {{}}
+coverage: {{}}
+exclusions: [".specs/**"]
+scope: repo
+ast_rules:
+  mode: {mode}
+  backend:
+    name: ast-grep
+    command: sg
+  catalogs:
+    - validator/conventions_ast/rule_catalog/ast_high.yaml
+"""
+
 
 def _write_v2_project(tmp_path: Path, mode: str) -> tuple[Path, Path]:
     specs = tmp_path / ".specs"
@@ -24,57 +76,25 @@ def _write_v2_project(tmp_path: Path, mode: str) -> tuple[Path, Path]:
     fixture_pass.parent.mkdir(parents=True)
     fixture_pass.write_text("const value = input as unknown;\n", encoding="utf-8")
     fixture_fail.write_text("const value = input as any;\n", encoding="utf-8")
+    test_file = tmp_path / "tests" / "test_conventions_ast_multilang.py"
+    test_file.write_text("def test_fixture_contract():\n    assert True\n", encoding="utf-8")
     catalog = tmp_path / "validator" / "conventions_ast" / "rule_catalog" / "ast_high.yaml"
     catalog.parent.mkdir(parents=True)
     js_source = tmp_path / "ai-ressources" / "code-conventions" / "javascript.md"
     js_source.parent.mkdir(parents=True)
     js_source.write_text("# TypeScript Specifics\n\nany is forbidden.\n", encoding="utf-8")
     catalog.write_text(
-        f"""\
-rules:
-  - id: ts.no_as_any
-    title: No as any
-    language: typescript
-    decidability: ast
-    precision: high
-    severity: error
-    source_path: {js_source}
-    source_anchor: "#typescript-specifics"
-    source_hash: sha256:{sha256(js_source.read_bytes()).hexdigest()}
-    backend: ast-grep
-    patterns:
-      - kind: sg_yaml
-        value: "rule: {{ pattern: '$A as any' }}"
-    fixtures:
-      pass: tests/fixtures/pass.ts
-      fail: tests/fixtures/fail.ts
-    justification:
-      required: true
-      accepted_window: adjacent_comment_block
-      rule_id_required: true
-""",
+        AST_HIGH_CATALOG_TEMPLATE.format(
+            source_path=js_source,
+            source_hash=sha256(js_source.read_bytes()).hexdigest(),
+        ),
         encoding="utf-8",
     )
     (specs / "conventions-gates.yaml").write_text(
-        f"""\
-schema_version: 2
-generated_from:
-  constitution: .specs/constitution.md
-  constitution_sha256: {sha256(constitution.read_bytes()).hexdigest()}
-  stack: .specs/stacks/_default.md
-commands: {{lint: []}}
-builtin: {{}}
-coverage: {{}}
-exclusions: [".specs/**"]
-scope: repo
-ast_rules:
-  mode: {mode}
-  backend:
-    name: ast-grep
-    command: sg
-  catalogs:
-    - validator/conventions_ast/rule_catalog/ast_high.yaml
-""",
+        AST_GATES_TEMPLATE.format(
+            constitution_hash=sha256(constitution.read_bytes()).hexdigest(),
+            mode=mode,
+        ),
         encoding="utf-8",
     )
     return tmp_path, source

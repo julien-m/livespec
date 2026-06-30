@@ -1,5 +1,21 @@
 # Changelog: Multilang Convention AST Catalog + Enforce-by-Default (073)
 
+## 2026-06-30 — [Fix]: ARS source decision manifest and executable contract gate
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/conventions_ast/source_decisions.py, validator/conventions_ast/{catalog.py,models.py,taxonomy.py}, validator/conventions_ast/rule_catalog/{ast_high,rust_high,swift_high,kotlin_high}.yaml, validator/conventions_gate.py, validator/conventions_receipt.py, validator/cli_commands/conventions_cmd.py, validator/conventions_rules.py
+- **AC impacted:** AC-008, AC-009, AC-011, AC-012
+- **Author:** spec-fix
+
+### Highlights
+
+- Added `rule_decision_manifest` with 192 decided sources, 0 undecided sources, explicit advisory/executable/non-executable/unsupported counts, and catalog-load errors surfaced as blockers.
+- Hardened executable catalog entries with `decision_kind`, `domain`, `detector`, fixture family, and deterministic test evidence metadata.
+- Fixed v1/feature-scoped `verify --json` to expose non-empty advisory/unsupported taxonomy lists, matching the written receipt.
+- Fixed the strict rulebook compile schema so every declared item property is listed in `required`.
+- Feature-scoped deterministic conventions receipt PASS: `.specs/conventions/runs/073-worker-final-20260630/receipt.json`. Provider-backed compile/semantic remains blocked until the rulebook provider returns successfully.
+
 ## 2026-06-30 — [Feature]: Exhaustive AI-res/ARS source manifest
 
 - **Type:** Feature
