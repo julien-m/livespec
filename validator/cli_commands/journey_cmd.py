@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from pathlib import Path
 from typing import Annotated
 
@@ -132,11 +133,22 @@ def run_command(
                     "manual": result.manual,
                     "disabled": result.disabled,
                     "issues": [_issue_json(project_root, issue) for issue in result.issues],
+                    # @spec FR-002: Journey run JSON exposes replay records
+                    # — .specs/features/074-agent-device-proof-adapter/spec.md#fr-002
+                    "runs": [asdict(record) for record in result.runs],
                 }
             )
         )
     else:
         _emit_issues(project_root, result.issues)
+        for record in result.runs:
+            typer.echo(
+                "run: "
+                f"{record.journey_id} "
+                f"runner={record.runner} "
+                f"udid={record.udid or '-'} "
+                f"destination={record.destination or '-'}"
+            )
         emit_summary(
             "journey run",
             "OK" if result.error_count == 0 else "FAIL",

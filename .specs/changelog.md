@@ -3,9 +3,11 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-06-30
+> Last updated: 2026-07-04
 
 ---
+
+## 2026-07-04 -- [Feature 074] Implemented: Agent Device Proof Adapter -- journey run receipts, `livespec device proof`, fail-fast bundle guards, watchOS guidance, and tests
 
 ## 2026-06-30 — [Feature 073 Fix] Ship hygiene — full Ruff excludes only generated detector fixture payloads and local `.claude/output/`, Validator receipt kept as proof
 

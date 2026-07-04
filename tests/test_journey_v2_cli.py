@@ -12,12 +12,14 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 from pytest import MonkeyPatch
 from typer.testing import CliRunner
 
 from tests.test_journey_v2_impact import _write_text_target_journey
+from tests.test_journey_v2_runner import _setup_xcuitest_compiled_project
 from tests.test_journey_v2_validation import _write_feature
 from validator.cli import app
 from validator.journeys.compiler import compile_journeys
@@ -69,6 +71,31 @@ def test_journey_run_json_reports_stale_without_compiling(
 
     assert result.exit_code == 1
     assert json.loads(result.output)["issues"][0]["code"] == "journey_compiled_stale"
+
+
+def test_journey_run_json_includes_runs_array(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    """FR-002: CLI JSON exposes destination and UDID records."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("LIVESPEC_XCODE_DESTINATION", "platform=iOS Simulator,id=IPHONE-17")
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: object,
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = runner.invoke(
+        app,
+        ["journey", "run", "--journey", "onboarding-first-project", "--json"],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output.splitlines()[-1])
+    assert payload["runs"][0]["udid"] == "IPHONE-17"
+    assert payload["runs"][0]["destination"] == "platform=iOS Simulator,id=IPHONE-17"
 
 
 def test_journey_impact_json_reports_changed_file(

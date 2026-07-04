@@ -198,6 +198,34 @@ def test_run_journeys_executes_playwright_artifact(
     ]
 
 
+def test_run_journeys_records_playwright_run_without_udid(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FR-001: non-Xcode journey runs still expose replay metadata."""
+    _setup_compiled(tmp_path)
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0
+    assert len(result.runs) == 1
+    record = result.runs[0]
+    assert record.runner == "playwright"
+    assert record.udid is None
+    assert record.destination is None
+    assert record.command == (
+        "npx playwright test tests/e2e/journeys/onboarding_first_project.spec.ts"
+    )
+
+
 def test_run_journeys_reports_native_runner_failure(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -219,6 +247,33 @@ def test_run_journeys_reports_native_runner_failure(
     assert result.error_count == 1
     assert result.issues[0].code == "journey_native_run_failed"
     assert "failed" in result.issues[0].message
+
+
+def test_run_journeys_records_run_even_when_native_run_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FR-001: attempted destination metadata survives native runner failure."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    monkeypatch.setenv("LIVESPEC_XCODE_DESTINATION", "platform=iOS Simulator,id=IPHONE-17")
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        if argv[:2] == ["xcodebuild", "test"]:
+            return subprocess.CompletedProcess(argv, 1, stdout="", stderr="failed")
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.executed == []
+    assert result.error_count == 1
+    assert len(result.runs) == 1
+    assert result.runs[0].udid == "IPHONE-17"
+    assert result.runs[0].destination == "platform=iOS Simulator,id=IPHONE-17"
 
 
 def test_run_journeys_preserves_native_runner_stdout_and_stderr_on_failure(
@@ -358,6 +413,64 @@ def test_run_journeys_executes_xcuitest_with_only_testing(
     assert destination == "platform=iOS Simulator,id=IPHONE-17"
     assert "iPhone 16" not in destination
     assert "-only-testing:STRAPTUITests/OnboardingFirstProjectJourney" in command
+
+
+def test_run_journeys_records_xcuitest_destination_and_udid(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FR-001: XCUITest records expose the selected Xcode destination and UDID."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    monkeypatch.setenv("LIVESPEC_XCODE_DESTINATION", "platform=iOS Simulator,id=IPHONE-17")
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0, [issue.code for issue in result.issues]
+    assert result.runs[0].runner == "xcuitest"
+    assert result.runs[0].udid == "IPHONE-17"
+    assert result.runs[0].destination == "platform=iOS Simulator,id=IPHONE-17"
+    assert result.runs[0].platform == "ios"
+    assert "id=IPHONE-17" in result.runs[0].command
+
+
+def test_run_journeys_writes_last_run_receipt(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FR-003: each attempted journey writes the latest run receipt."""
+    _setup_xcuitest_compiled_project(tmp_path)
+    monkeypatch.setenv("LIVESPEC_XCODE_DESTINATION", "platform=iOS Simulator,id=IPHONE-17")
+
+    def fake_run(
+        argv: list[str],
+        **_kwargs: Unpack[_RunKwargs],
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr("validator.journeys.runner.subprocess.run", fake_run)
+
+    result = run_journeys(tmp_path, journey="onboarding-first-project")
+
+    assert result.error_count == 0
+    receipt_path = (
+        tmp_path
+        / ".specs"
+        / "journeys"
+        / "onboarding-first-project"
+        / "runs"
+        / "last-run.json"
+    )
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert receipt["udid"] == "IPHONE-17"
+    assert receipt["destination"] == "platform=iOS Simulator,id=IPHONE-17"
 
 
 def test_run_journeys_uses_bounded_xcuitest_timeout(

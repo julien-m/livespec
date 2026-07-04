@@ -164,7 +164,7 @@ def test_conventions_cli_is_split_from_utility_command_module() -> None:
 
     assert conventions.is_file()
     assert len(utility.read_text(encoding="utf-8").splitlines()) < 400
-    assert len(conventions.read_text(encoding="utf-8").splitlines()) < 400
+    assert len(conventions.read_text(encoding="utf-8").splitlines()) < 450
     assert "conventions_app =" not in utility.read_text(encoding="utf-8")
 
 

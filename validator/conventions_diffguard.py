@@ -97,6 +97,7 @@ def supervisor_conventions_gate(
 def _worker_feature_slug(worker_receipt: dict[str, object] | None) -> str | None:
     if not _is_conventions_receipt(worker_receipt):
         return None
+    assert isinstance(worker_receipt, dict)
     feature_slug = worker_receipt.get("feature_slug")
     if isinstance(feature_slug, str) and feature_slug:
         return feature_slug

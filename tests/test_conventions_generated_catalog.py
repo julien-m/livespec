@@ -13,7 +13,7 @@ from validator.conventions_ast.source_decisions import (
 def test_generated_executable_sources_are_explicitly_counted() -> None:
     manifest = build_rule_decision_manifest(Path.cwd())
 
-    assert manifest["total_source_count"] == 192
+    assert manifest["total_source_count"] == 196
     assert manifest["generated_executable_source_count"] > 0
     assert manifest["decision_kind_counts"].get("generated-executable", 0) > 0
     assert manifest["undecided_source_count"] == 0

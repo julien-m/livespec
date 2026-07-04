@@ -19,11 +19,66 @@ livespec coverage          # patch coverage vs base branch
 livespec drivers           # list discoverable drivers
 livespec mutation          # run mutation testing
 livespec preflight         # verify (or --fix) the preflight manifest
+livespec device proof      # capture Agent Device proof bound to a LiveSpec UDID
 ```
 
-All five commands auto-detect everything they need and accept overrides
+All six commands auto-detect everything they need and accept overrides
 through flags. Errors are surfaced as a single line; pass `--debug` to
 display the full Python stacktrace.
+
+---
+
+## `livespec device proof`
+
+Capture proof/replay evidence through Agent Device after LiveSpec has selected the destination. Agent Device does not replace specs, journeys, or oracles; it receives the UDID from `--udid` or from a journey `last-run.json` receipt.
+
+### Synopsis
+
+```
+livespec device proof BUNDLE --platform ios --udid UDID [--session NAME] [--out-dir DIR] [--json]
+livespec device proof BUNDLE --platform ios --journey JOURNEY_ID [--session NAME] [--json]
+```
+
+### Flags
+
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `--platform` | string | `ios` | Platform for the proof flow. `watchos` is intentionally unsupported by this adapter. |
+| `--udid` | string | _none_ | Explicit simulator/device UDID selected by LiveSpec. |
+| `--journey` | string | _none_ | Read the UDID from `.specs/journeys/<id>/runs/last-run.json`. |
+| `--session` | string | `livespec-proof` | Agent Device session name. |
+| `--out-dir` | path | `.specs/.device-proof/` | Directory for `snapshot.txt` and `screenshot.png`. |
+| `--json` | bool | `false` | Emit `bundle`, `udid`, `session`, `checks[]`, and `screenshot`. |
+
+### Behavior
+
+1. Resolve an explicit `--udid`, or read one from `--journey`.
+2. Reject `--platform watchos` with guidance to use `xcrun simctl io <watch_udid> screenshot`.
+3. For iOS, verify the bundle appears in `xcrun simctl listapps <udid>`.
+4. Run Agent Device through `npx -y agent-device@0.18.3`, overrideable via `LIVESPEC_AGENT_DEVICE_PACKAGE`.
+5. Bind every Agent Device call with `--platform`, `--udid`, and `--session`; the adapter never emits `--device`.
+6. Run `open`, `appstate`, `snapshot`, and `screenshot`; fail fast if foreground/app bundle does not match the target bundle.
+
+### Stable Error Codes
+
+| Code | Meaning |
+|------|---------|
+| `device_udid_required` | Neither `--udid` nor `--journey` supplied a target UDID. |
+| `device_receipt_missing` | The requested journey has no `last-run.json` receipt. |
+| `device_receipt_no_udid` | The receipt exists but has no usable `udid`. |
+| `device_receipt_invalid` | The receipt is not valid JSON or is not a JSON object. |
+| `device_platform_unsupported` | The platform is unsupported; watchOS uses LiveSpec/XCTest plus `simctl io`. |
+| `device_bundle_not_installed` | `simctl listapps <udid>` does not contain the target bundle. |
+| `device_foreground_mismatch` | `appstate` or `snapshot` reports another bundle, including `com.apple.Preferences`. |
+| `device_screenshot_empty` | The screenshot path is missing or empty after capture. |
+| `device_agent_command_failed` | An Agent Device command failed, timed out, or could not be launched. |
+
+### Example
+
+```
+$ livespec device proof com.example.app --platform ios --udid IPHONE-17 --json
+{"bundle":"com.example.app","udid":"IPHONE-17","session":"livespec-proof","platform":"ios","checks":[...],"screenshot":".specs/.device-proof/screenshot.png"}
+```
 
 ---
 

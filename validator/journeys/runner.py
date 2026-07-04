@@ -18,7 +18,7 @@ import os
 import shlex
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Protocol, cast
 
@@ -28,7 +28,7 @@ from pydantic import ValidationError
 from .fixtures import BOOTSTRAP_FAILURE_PREFIX, fixtures_contract_hash
 from .manifest import COMPILER_VERSION, CompiledManifest, read_compiled_manifest
 from .models import JourneyIssue, JourneySeverity
-from .paths import iter_journey_source_paths
+from .paths import iter_journey_source_paths, journey_runs_dir
 from .schema import JourneySourceV2, RunPolicyValue, RunStage
 
 # Native UI regressions can boot simulators/browsers; 10 minutes avoids short CI
@@ -129,11 +129,25 @@ class JourneyRunResult:
     manual: list[str] = field(default_factory=list)
     disabled: list[str] = field(default_factory=list)
     issues: list[JourneyIssue] = field(default_factory=list)
+    runs: list[JourneyExecutionRecord] = field(default_factory=list)
 
     @property
     def error_count(self) -> int:
         """Return the number of blocking run issues."""
         return sum(1 for issue in self.issues if issue.severity is JourneySeverity.ERROR)
+
+
+@dataclass(frozen=True)
+class JourneyExecutionRecord:
+    """Replay metadata captured for one attempted journey artifact run."""
+
+    journey_id: str
+    runner: str
+    artifact: str
+    command: str
+    destination: str | None
+    udid: str | None
+    platform: str | None
 
 
 def run_journeys(
@@ -151,6 +165,7 @@ def run_journeys(
     manual: list[str] = []
     disabled: list[str] = []
     issues: list[JourneyIssue] = []
+    records: list[JourneyExecutionRecord] = []
     for source_path in iter_journey_source_paths(project_root):
         source, raw_text = _read_source(source_path)
         if source is None or raw_text is None:
@@ -212,12 +227,19 @@ def run_journeys(
                 source,
                 manifest,
                 resolved_executor,
+                records,
             )
             if run_issue is not None:
                 issues.append(run_issue)
                 continue
         executed.append(source.id)
-    return JourneyRunResult(executed=executed, manual=manual, disabled=disabled, issues=issues)
+    return JourneyRunResult(
+        executed=executed,
+        manual=manual,
+        disabled=disabled,
+        issues=issues,
+        runs=records,
+    )
 
 
 def _run_manifest_artifacts(
@@ -225,6 +247,7 @@ def _run_manifest_artifacts(
     source: JourneySourceV2,
     manifest: CompiledManifest,
     executor: JourneyExecutor,
+    records: list[JourneyExecutionRecord],
 ) -> JourneyIssue | None:
     """Run compiled native artifacts listed in a fresh manifest."""
     native_paths = manifest.native_output_paths
@@ -252,6 +275,11 @@ def _run_manifest_artifacts(
                 f"Unsupported native journey runner: {manifest.runner}",
                 source_path(project_root, source.id),
             )
+        # @spec FR-001: Record journey run metadata, FR-003: Write run receipt
+        # — .specs/features/074-agent-device-proof-adapter/spec.md#fr-001
+        record = _execution_record(project_root, source.id, manifest.runner, artifact, invocation)
+        records.append(record)
+        _write_run_receipt(project_root, record)
         if manifest.runner == "xcuitest":
             boot_issue = _boot_xcuitest_destination(
                 project_root,
@@ -273,6 +301,42 @@ def _run_manifest_artifacts(
         if issue is not None:
             return issue
     return None
+
+
+def _execution_record(
+    project_root: Path,
+    journey_id: str,
+    runner: str,
+    artifact: Path,
+    invocation: _RunnerInvocation,
+) -> JourneyExecutionRecord:
+    """Build replay metadata from the resolved native runner invocation."""
+    destination = _destination_value(invocation.argv)
+    return JourneyExecutionRecord(
+        journey_id=journey_id,
+        runner=runner,
+        artifact=artifact.relative_to(project_root).as_posix(),
+        command=shlex.join(invocation.argv),
+        destination=destination,
+        udid=_destination_udid(invocation.argv),
+        platform=_destination_platform(destination),
+    )
+
+
+def _write_run_receipt(project_root: Path, record: JourneyExecutionRecord) -> None:
+    """Persist the latest attempted run for a journey without blocking execution."""
+    try:
+        output_dir = journey_runs_dir(project_root, record.journey_id)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        (output_dir / "last-run.json").write_text(
+            json.dumps(asdict(record), indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    except OSError as error:
+        print(
+            f"Warning: failed to write journey run receipt for {record.journey_id}: {error}",
+            file=sys.stderr,
+        )
 
 
 def _run_command(
@@ -778,14 +842,32 @@ def _boot_simulator_if_needed(
 
 def _destination_udid(argv: list[str]) -> str | None:
     """Extract `id=<UDID>` from an xcodebuild command destination."""
-    try:
-        destination = argv[argv.index("-destination") + 1]
-    except (ValueError, IndexError):
+    destination = _destination_value(argv)
+    if destination is None:
         return None
     for part in destination.split(","):
         key, separator, value = part.strip().partition("=")
         if separator and key == "id" and value:
             return value
+    return None
+
+
+def _destination_value(argv: list[str]) -> str | None:
+    """Extract the raw xcodebuild `-destination` value from a runner command."""
+    try:
+        return argv[argv.index("-destination") + 1]
+    except (ValueError, IndexError):
+        return None
+
+
+def _destination_platform(destination: str | None) -> str | None:
+    """Normalize the simulator platform from a destination string."""
+    if destination is None:
+        return None
+    if XCODE_DESTINATION_WATCHOS_SIMULATOR in destination:
+        return XCUITEST_PLATFORM_WATCHOS
+    if XCODE_DESTINATION_IOS_SIMULATOR in destination:
+        return XCUITEST_PLATFORM_IOS
     return None
 
 
