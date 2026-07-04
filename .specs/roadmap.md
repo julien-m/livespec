@@ -61,6 +61,7 @@
 - [x] **Conventions AST Rule Engine** — AST-backed conventions receipts with explicit `off`, `observe`, and `enforce` rollout modes; v1 gates remain default, v2 AST receipts are opt-in, and `ast-grep` remains a detector backend under LiveSpec authority. · Scope: L · Priority: P1 · Deps: 061, 063, 071 → [072-conventions-ast-rule-engine](features/072-conventions-ast-rule-engine/spec.md)
 - [x] **Multilang Convention AST Catalog + Enforce-by-Default** — Sourced multilang AST catalog, enforce-by-default gates, advisory/unsupported taxonomy, and exhaustive AI-res/ARS source manifest with zero unclassified in-scope sources. · Scope: L · Priority: P1 · Deps: 061, 063, 072 → [073-conventions-multilang-catalog](features/073-conventions-multilang-catalog/spec.md)
 - [x] **Agent Device Proof Adapter** — Agent Device proof/replay/assertion adapter bound to LiveSpec-selected UDIDs, with journey run receipts, fail-fast foreground guards, watchOS boundary guidance, and pinned package execution. · Scope: M · Priority: P1 → [074-agent-device-proof-adapter](features/074-agent-device-proof-adapter/spec.md)
+- [x] **Design Direction Carry** — Carry an optional informative-only `**Design direction:**` line through generated UI specs from Penflow, project theme, or user default without using it for fidelity, validation, gates, or scoring. · Scope: S · Priority: P2 → [075-design-direction-carry](features/075-design-direction-carry/spec.md)
 <!-- roadmap:mvp:end -->
 
 ---

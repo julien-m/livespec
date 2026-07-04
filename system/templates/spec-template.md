@@ -265,14 +265,20 @@ flowchart TD
 
 ## Screens
 
+<!-- @spec FR-001: Screens carry template — .specs/features/075-design-direction-carry/spec.md#fr-001 -->
 > **Include this section only when the feature involves user-facing interfaces.** Omit entirely for API-only or backend features.
 > Screens are generated during `/spec-specify` using the configured design tool (see `~/.claude/livespec/design.md`).
+> The optional `**Design direction:**` line carries the one-line creative direction from brainstorm/Penflow. **Read** [`design-read-protocol.md`](/Users/julienm/projects/ai-ressources/design/references/design-read-protocol.md) for the format reference. It is informative only — never a validation criterion. Omit the line entirely when no direction exists.
+
+**Design direction:** [one-line creative direction — omit this line if no direction exists]
 
 | Screen | Status | Reference |
 |--------|--------|-----------|
 | [screen-name] | New / Modified | [screen-name.png](../../design/screens/screen-name.png) |
 
 **Example (Notifications):**
+
+**Design direction:** Calm, editorial SaaS for technical buyers — Linear-style minimalism, low motion.
 
 | Screen | Status | Reference |
 |--------|--------|-----------|

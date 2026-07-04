@@ -654,6 +654,16 @@ After generating spec.md, determine if the feature involves UI:
 
    **Path divergence (by design):** `spec.md` and `plan.md` reference the immutable versioned path. `implement.md` and `check.md` reference the latest copy (`screens/<name>.png`). See design spec for rationale.
 
+7.5. <!-- @spec FR-002: Specify design direction carry — .specs/features/075-design-direction-carry/spec.md#fr-002 -->
+   **Carry design direction (informative only):** Resolve a one-line design direction in this exact precedence order, first hit wins:
+   1. `penflow/design-read.json` — if the file exists and contains a non-empty one-liner field, use it verbatim (same direction as the Penflow workspace).
+   2. `.specs/design/theme.md` — if a `## Design direction` section exists, use its one-liner.
+   3. `~/.claude/livespec/design.md` — if the frontmatter has a non-empty `default-direction`, use it.
+   4. Otherwise → do NOT add the line. Never emit a placeholder.
+
+   When a value is resolved, insert `**Design direction:** <value>` directly under the `## Screens` heading, before the screens table. **Read** [`design-read-protocol.md`](/Users/julienm/projects/ai-ressources/design/references/design-read-protocol.md) for the format reference; do not restate or redefine the format here.
+   This value is carried for downstream context only. It MUST NOT be used to pass/fail mockups, screens, fidelity checks, or any validation — LiveSpec transports the direction; Penflow judges design (advisory).
+
 8. **Update design changelog:** Update `.specs/design/changelog.md` (screen-centric format):
 
    For each screen generated:
