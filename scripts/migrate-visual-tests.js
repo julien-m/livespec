@@ -1390,7 +1390,7 @@ function generateTests(features, dryRun) {
       // @spec FR-006: Always emit sentinel on --generate (even for 0 files) — spec.md#fr-006
       console.log('VISUAL_SCAFFOLD_RESULT: files=0 dirs=0 routes=0');
     }
-    process.exit(0);
+    return;
   }
 
   console.log(`\n${dryRun ? '[DRY RUN] Would generate' : 'Generating'} ${toGenerate.length} spec test(s) + ${routeScanFeatures.length} route test(s):\n`);
@@ -1480,7 +1480,9 @@ function generateTests(features, dryRun) {
     cleanupOldMigration(true);
   }
 
-  process.exit(0);
+  // Let Node drain stdout naturally; process.exit(0) can truncate the final
+  // sentinel line after large reports, which makes command-layer parsing flaky.
+  return;
 }
 
 function printScanTable(features) {

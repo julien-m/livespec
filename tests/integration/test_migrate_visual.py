@@ -40,30 +40,82 @@ def fixture_migrate_visual(tmp_path: Path) -> Path:
     src = FIXTURES / "migrate-visual"
     dst = tmp_path / "project"
     shutil.copytree(src, dst)
+    _reset_generated_visual_artifacts(dst)
     return dst
+
+
+def _reset_generated_visual_artifacts(project: Path) -> None:
+    """Ensure the fixture starts from the intended pre-migration state."""
+    visual_dir = project / "tests" / "visual"
+    for path in [
+        visual_dir / "001-auth-ui.spec.ts",
+        visual_dir / "003-dashboard.spec.ts",
+    ]:
+        path.unlink(missing_ok=True)
+
+    baselines_root = visual_dir / "baselines"
+    for slug in ["auth-ui", "dashboard"]:
+        for path in baselines_root.glob(f"*/{slug}"):
+            if path.is_dir():
+                shutil.rmtree(path)
+
+
+def _subprocess_env(extra: dict[str, str] | None = None) -> dict[str, str]:
+    """Return a minimal stable env for Node-based integration subprocesses."""
+    keep = ("PATH", "HOME", "TMPDIR", "TEMP", "TMP")
+    run_env = {key: value for key, value in os.environ.items() if key in keep}
+    if extra:
+        run_env.update(extra)
+    return run_env
 
 
 def _run_generate(cwd: Path, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     """Run migrate-visual-tests.js --generate in the given directory."""
-    run_env = os.environ.copy()
-    if env:
-        run_env.update(env)
     return subprocess.run(
         ["node", str(SCRIPT_PATH), "--generate"],
         cwd=str(cwd),
         capture_output=True,
         text=True,
         timeout=30,
-        env=run_env,
+        env=_subprocess_env(env),
     )
 
 
-def _parse_sentinel(stdout: str) -> tuple[int, int] | None:
-    """Extract files and dirs counts from the sentinel line."""
-    match = re.search(r"^VISUAL_SCAFFOLD_RESULT: files=(\d+) dirs=(\d+)", stdout, re.MULTILINE)
-    if not match:
+def _parse_sentinel(stdout: str) -> tuple[int, int, int] | None:
+    """Extract files, dirs, and routes counts from the sentinel line."""
+    matches = re.findall(
+        r"^VISUAL_SCAFFOLD_RESULT: files=(\d+) dirs=(\d+) routes=(\d+)$",
+        stdout,
+        re.MULTILINE,
+    )
+    if not matches:
         return None
-    return int(match.group(1)), int(match.group(2))
+    files, dirs, routes = matches[-1]
+    return int(files), int(dirs), int(routes)
+
+
+def _visual_artifact_names(project: Path) -> list[str]:
+    """List generated visual artifacts for assertion diagnostics."""
+    visual_dir = project / "tests" / "visual"
+    if not visual_dir.exists():
+        return []
+    return sorted(
+        str(path.relative_to(project)) for path in visual_dir.rglob("*") if path.is_file()
+    )
+
+
+def _subprocess_diagnostic(
+    result: subprocess.CompletedProcess[str],
+    project: Path,
+) -> str:
+    """Return enough state to diagnose nondeterministic sentinel failures."""
+    artifacts = "\n".join(_visual_artifact_names(project)) or "(none)"
+    return (
+        f"returncode={result.returncode}\n"
+        f"stdout:\n{result.stdout}\n"
+        f"stderr:\n{result.stderr}\n"
+        f"visual artifacts:\n{artifacts}"
+    )
 
 
 @pytest.mark.level_3a
@@ -172,15 +224,16 @@ class TestMigrateVisualGenerate:
     def test_sentinel_line_format(self, fixture_migrate_visual: Path) -> None:
         """FR-006, AC-006: stdout ends with VISUAL_SCAFFOLD_RESULT: files=N dirs=M."""
         result = _run_generate(fixture_migrate_visual)
-        assert result.returncode == 0
+        assert result.returncode == 0, _subprocess_diagnostic(result, fixture_migrate_visual)
 
         sentinel = _parse_sentinel(result.stdout)
-        assert sentinel is not None, f"Missing sentinel line in output:\n{result.stdout}"
-        files, dirs = sentinel
+        assert sentinel is not None, _subprocess_diagnostic(result, fixture_migrate_visual)
+        files, dirs, routes = sentinel
         # 2 UI features without tests (001-auth-ui, 003-dashboard)
-        assert files == 2, f"Expected files=2, got files={files}"
+        assert files == 2, _subprocess_diagnostic(result, fixture_migrate_visual)
         # 6 baseline dirs per feature = 12
-        assert dirs == 12, f"Expected dirs=12, got dirs={dirs}"
+        assert dirs == 12, _subprocess_diagnostic(result, fixture_migrate_visual)
+        assert routes == 0, _subprocess_diagnostic(result, fixture_migrate_visual)
 
     # @spec AC-007: Zero sentinel when all covered — spec.md#ac-007
     def test_sentinel_shows_zero_when_all_covered(self, fixture_migrate_visual: Path) -> None:
@@ -194,7 +247,7 @@ class TestMigrateVisualGenerate:
 
         sentinel = _parse_sentinel(result.stdout)
         assert sentinel is not None, f"Missing sentinel line:\n{result.stdout}"
-        assert sentinel == (0, 0), f"Expected (0, 0), got {sentinel}"
+        assert sentinel == (0, 0, 0), f"Expected (0, 0, 0), got {sentinel}"
 
     def test_scan_mode_does_not_emit_sentinel(self, fixture_migrate_visual: Path) -> None:
         """--scan and --dry-run modes do NOT emit the VISUAL_SCAFFOLD_RESULT sentinel."""

@@ -14,7 +14,7 @@ title: Implementation — 011-visual-migrate-integration
 | [FR-003: Skip existing tests](spec.md#fr-003) | scripts/migrate-visual-tests.js (existing) | `@spec AC-030: Hard guard — never overwrite` | ✅ Implemented | 2026-04-17 |
 | [FR-004: Skip non-UI features](spec.md#fr-004) | scripts/migrate-visual-tests.js (existing `hasUIKeywords`) | N/A (existing logic) | ✅ Implemented | 2026-04-17 |
 | [FR-005: Create baseline dirs](spec.md#fr-005) | scripts/migrate-visual-tests.js | `@spec FR-005: Create baseline directories — spec.md#fr-005` | ✅ Implemented | 2026-04-17 |
-| [FR-006: Structured sentinel](spec.md#fr-006) | scripts/migrate-visual-tests.js | `@spec FR-006: Emit structured sentinel — spec.md#fr-006` | ✅ Implemented | 2026-04-17 |
+| [FR-006: Structured sentinel](spec.md#fr-006) | [scripts/migrate-visual-tests.js](../../../scripts/migrate-visual-tests.js), [tests/integration/test_migrate_visual.py](../../../tests/integration/test_migrate_visual.py) | `@spec FR-006: Emit structured sentinel — spec.md#fr-006` | ✅ Implemented | 2026-07-06 |
 | [FR-007: Post-migration summary](spec.md#fr-007) | .agent-sync/skills/spec-migrate/SKILL.md | `@spec FR-007: Post-migration visual summary — spec.md#fr-007` | ✅ Implemented | 2026-04-17 |
 | [FR-008: Script-missing guard](spec.md#fr-008) | .agent-sync/skills/spec-migrate/SKILL.md | `@spec FR-008: Script-missing guard — spec.md#fr-008` | ✅ Implemented | 2026-04-17 |
 | [FR-009: Node-missing guard](spec.md#fr-009) | .agent-sync/skills/spec-migrate/SKILL.md | `@spec FR-009: Node-missing guard — spec.md#fr-009` | ✅ Implemented | 2026-04-17 |
@@ -30,7 +30,7 @@ title: Implementation — 011-visual-migrate-integration
 | AC-003 | tests/integration/test_migrate_visual.py::test_creates_baseline_directories | ✅ |
 | AC-004 | tests/integration/test_migrate_visual.py::test_skips_backend_only_features | ✅ |
 | AC-005 | tests/integration/test_migrate_visual.py::test_preserves_existing_test_files | ✅ |
-| AC-006 | tests/integration/test_migrate_visual.py::test_sentinel_line_format | ✅ |
+| AC-006 | tests/integration/test_migrate_visual.py::test_sentinel_line_format | ✅ Stabilized 2026-07-06 |
 | AC-007 | tests/integration/test_migrate_visual.py::test_sentinel_shows_zero_when_all_covered | ✅ |
 | AC-008 | tests/integration/test_migrate_visual.py::test_idempotent_on_second_run | ✅ |
 | AC-009 | tests/integration/test_migrate_visual.py::test_picks_up_new_feature_on_rerun | ✅ |
@@ -49,3 +49,5 @@ title: Implementation — 011-visual-migrate-integration
 
 - `scripts/migrate-visual-tests.js` — Added structured sentinel line output (`VISUAL_SCAFFOLD_RESULT: files=N dirs=M routes=R`) and `dirsCreated` counter; added 5 analysis helpers (`analyzeExistingTests`, `detectFixturesFromDir`, `extractSelectorsFromExistingTests`, `extractWaitPatterns`, `extractCommonTestCases`) for smarter template generation; fixed 3 template quality issues (mockup reference, header selector, empty-state fixture detection)
 - `.agent-sync/skills/spec-migrate/SKILL.md` — Removed early exit on "already up to date", added Step 4.5 (Visual Test Scaffolding) with 3 guards, added visual summary to Report, added 3 edge cases
+- Updated [tests/integration/test_migrate_visual.py](../../../tests/integration/test_migrate_visual.py) — Stabilized sentinel assertions with fixture cleanup, minimal subprocess env, last-sentinel parsing, strict `routes=` validation, and failure diagnostics
+- Updated [scripts/migrate-visual-tests.js](../../../scripts/migrate-visual-tests.js) — Lets Node drain stdout naturally after emitting the sentinel instead of forcing `process.exit(0)` inside `generateTests()`

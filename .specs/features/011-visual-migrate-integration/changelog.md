@@ -12,6 +12,17 @@
 
 ---
 
+### 2026-07-06 — Fix: Stabilize sentinel integration test
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** Updated [scripts/migrate-visual-tests.js](../../../scripts/migrate-visual-tests.js) and [tests/integration/test_migrate_visual.py](../../../tests/integration/test_migrate_visual.py)
+- **AC impacted:** AC-006
+- **Author:** codex
+- **Fixes:** Updated [scripts/migrate-visual-tests.js](../../../scripts/migrate-visual-tests.js) to let Node drain stdout naturally after printing the sentinel instead of forcing `process.exit(0)` inside `generateTests()`; updated [tests/integration/test_migrate_visual.py](../../../tests/integration/test_migrate_visual.py) so `test_sentinel_line_format` starts from a scrubbed fixture copy, runs Node with a minimal stable environment, parses the last strict sentinel line like `spec-migrate`, and reports stdout/stderr plus generated visual artifacts on mismatch.
+
+---
+
 ### 2026-04-18 — Fix: Generator template quality — 3 issues resolved
 
 - **Type:** Bugfix
