@@ -404,6 +404,18 @@ Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 Also add a summary entry to `.specs/changelog.md` (global):
 `[Feature NNN] Plan created: [Feature Name] — N implementation steps, N diagrams`
 
+### Bound Penflow source review for visual features
+
+- Before first review, the existing C20 producer automatically calls `penflow authority prepare <contract> --project . --json`, checks its PASS/operation envelope and persists the returned prepared C20 at the same canonical path. Explicit test_id values are preserved; missing IDs are generated deterministically by Penflow. Never regenerate identities after approval as a validation repair. `review-snapshot` runs the real read-only `validate-flow-contract --require-test-ids` guard before publishing active inputs; failure leaves the review incomplete.
+
+- Declare `penflow_verification_policy` metadata in each concrete active plan, with the actual producing mode (`livespec` or `brainstorm_handoff`), version 1 and generated_docs/native_geometry/homologous_references/native_export set from the procedures actually chosen. Preserve every active plan's required procedures and authenticated inheritance; do not copy policy from candidate C20 or infer N/A from absent files. `review-snapshot` automatically archives the full active-plan union and generates its policy source; partial declarations block. No extra user document or flag is required.
+
+- Apply this bound review to visual work and any feature with accepted Penflow approval history, including an explicit visual retirement. Before dispatching the actual plan reviewer, finalize the selected feature FR/AC and the cumulative active canonical `penflow/flow-ui-contract/contract.json` requirements bindings/outcome predicates, then run `livespec penflow-contract review-snapshot --feature <feature_slug> --json`. Pass the complete returned immutable snapshot, every governed source and plan, active mappings/predicates and prior delta to that same reviewer; no extra full review or MockupFactory pass is required.
+- Persist the actual raw reviewer JSON, then automatically run `livespec penflow-contract review-result --snapshot <snapshot-path> --output <actual-reviewer-output-path> --json`; forward its returned immutable result path. The assembler preserves complete actual fields and never manufactures missing verdicts/findings/input hashes. A plain PASS, finalized registry receipt, skipped review or source reread after dispatch does not establish approval. **Read** [review approval](../../../system/testing/penflow-contract.md) for the versioned contract.
+- Return the actual bound result path in `PHASE_RESULT.extra.review_result_path` for the supervisor; do not reconstruct a successful result from a summary or registry receipt.
+- Record successful visual Plan Review with `livespec pipeline update --feature <feature_slug> --phase plan-review --status done --review-result <review_result_path>`. The command verifies the snapshot/current semantic identities and review result under the project lock, archives the approval and source baseline, then records Done. Preserve its output; failures leave the phase incomplete.
+- After approval of active visual work, reuse current visual evidence to produce `penflow run --target penflow --profile design --project . --json`, then require `livespec penflow-contract status --project . --required-profile design --feature <feature_slug> --json` to return PASS and certified true before application code. Source or mapping changes require the same bound review with the prior receipt and precise delta. Nonvisual planning without accepted Penflow history keeps its existing review path. An approved retirement follows nonvisual preparation without requesting C51 certification for the retired caller and keeps the former contract archived; cleanup of active UI evidence is required at nonvisual closure, not before its review. Per-feature retired_features preserves other active approvals; C51 evaluates selection minus retired_features, never a report-selected subset. When all are retired the projection is empty and cannot certify C51.
+
 ### Step 9.7 — LLM Plan Review (default, unless `--no-review`)
 
 Unless the `--no-review` flag is set:
@@ -487,6 +499,12 @@ ABORT: "plan.md failed structural validation after 2 retries.
 
 ---
 
+
+## Penflow C51 stage contract
+
+Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
+This command prepares inputs and reports inspection readiness. Do not require a runtime report or build manifest before the producing/test stages. A revalidation of an already Implemented UI feature through finalize verify must receive the existing independent runner manifest; absence blocks that certification only.
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
@@ -546,7 +564,7 @@ ABORT: "plan.md failed structural validation after 2 retries.
 - [always] Generate openapi.yaml if feature introduces new API endpoints
 - [always] Update .specs/README.md feature row Status to Planned
 - [always] Add plan entry to feature changelog.md and global .specs/changelog.md
-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation
 - [always] Run LLM plan review unless --no-review; retry on blocking findings
 - [always] Run `livespec validate` structural validation; retry on failure
 

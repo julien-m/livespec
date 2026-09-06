@@ -1,0 +1,12 @@
+{
+  "manifest_sha256": "e757b3366713b178403334cd3b68b865da1e53c0200c2c6a0d9108cd579c955b",
+  "references": 132,
+  "issues": [],
+  "contract_sha256": "46483d40b42a2425dbb8b837825de61ad3c186bd761f8a3e2afdd5be986a9c2a",
+  "baseline_sha256": "71eaba1d1e1fda8d6380db35151037726375d519c7b9f05c8739d372db4e8c03",
+  "screenshots": [
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/close.browser.receipt.png",
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/save.browser.checkout.png",
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/back.browser.details.png"
+  ]
+}

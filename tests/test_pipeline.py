@@ -57,6 +57,10 @@ def specs_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     specs.mkdir()
     feature_dir = specs / "features" / "001-test"
     feature_dir.mkdir(parents=True)
+    (feature_dir / "spec.md").write_text(
+        "---\nvisual: false\nstatus: Approved\n---\n# Nonvisual CLI feature\n",
+        encoding="utf-8",
+    )
     # Pipeline commands use find_specs_root() which starts from Path.cwd().
     # Change cwd to tmp_path so the CLI can discover the temporary .specs/ directory.
     monkeypatch.chdir(tmp_path)

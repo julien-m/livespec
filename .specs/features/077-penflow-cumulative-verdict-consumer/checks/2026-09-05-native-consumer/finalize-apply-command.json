@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "/Users/julienm/projects/livespec/.venv/bin/livespec",
+    "finalize",
+    "apply",
+    "--feature",
+    "077-penflow-cumulative-verdict-consumer",
+    "--command",
+    "spec-implement",
+    "--run-id",
+    "consumer-077-final-apply-20260905",
+    "--json",
+    "--entry-file",
+    "/Users/julienm/projects/livespec/.specs/features/077-penflow-cumulative-verdict-consumer/checks/2026-09-05-native-consumer/finalize-entry.md",
+    "--status",
+    "Implemented",
+    "--summary",
+    "[Feature 077] Implemented: Penflow cumulative verification consumer and governed lifecycle closure"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "returncode": 0,
+  "stdout": "{\n  \"outcome\": \"applied\",\n  \"receipt_path\": \"/Users/julienm/projects/livespec/.specs/features/077-penflow-cumulative-verdict-consumer/run/consumer-077-final-apply-20260905/finalize/receipt.json\",\n  \"written\": [\n    \"feature_changelog\",\n    \"global_changelog\",\n    \"readme\",\n    \"spec_status\",\n    \"roadmap\"\n  ],\n  \"skipped\": []\n}\n",
+  "stderr": ""
+}

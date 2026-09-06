@@ -1,0 +1,17 @@
+{
+  "build_manifest": {
+    "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/build-manifest.json",
+    "sha256": "e757b3366713b178403334cd3b68b865da1e53c0200c2c6a0d9108cd579c955b"
+  },
+  "issues": [],
+  "kind": "penflow-verification-validation",
+  "profile": "implementation",
+  "report_sha256": "71266f48f02e3c9a882d76ad0ac4fda84a7c393359c574ba1408b3de6d6a8656",
+  "required_profile": "implementation",
+  "scope": {
+    "project_root": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig",
+    "workspace": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow"
+  },
+  "status": "PASS",
+  "version": 1
+}

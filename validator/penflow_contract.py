@@ -10,8 +10,9 @@
 
 """Helpers for LiveSpec root ``penflow/`` UI contract workspaces.
 
-The module inspects and bootstraps Penflow artifacts only. Runtime adapters
-that emit ``actual-ui-tree.json`` stay outside LiveSpec core.
+The module inspects and bootstraps Penflow artifacts, then delegates explicit
+certification to the authoritative CLI with approved source context. Runtime
+adapters that emit ``actual-ui-tree.json`` stay outside LiveSpec core.
 """
 
 from __future__ import annotations
@@ -22,6 +23,12 @@ import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, TypeAlias, cast
+
+from validator.penflow_verification import (
+    PenflowVerification,
+    VerificationProfile,
+    verify_penflow_report,
+)
 
 PENFLOW_DIRNAME = "penflow"
 HANDOFF_PENFLOW_DIR = Path("handoff") / "penflow"
@@ -106,6 +113,18 @@ class PenflowContractStatus:
     compare_status: str | None = None
     compare_issue_count: int | None = None
     parse_error: str | None = None
+    required_profile: VerificationProfile | None = None
+    verification: PenflowVerification | None = None
+
+    @property
+    def certified(self) -> bool:
+        """Whether current inputs passed the explicitly requested certification."""
+        return (
+            self.state == "ready"
+            and self.required_profile is not None
+            and self.verification is not None
+            and self.verification.status == "PASS"
+        )
 
     def to_dict(self) -> JsonObject:
         """Return a JSON-serializable representation."""
@@ -124,6 +143,12 @@ class PenflowContractStatus:
             "mockup_validation_missing": self.mockup_validation_missing,
             "flow_count": self.flow_count,
             "screen_count": self.screen_count,
+            "required_profile": self.required_profile.value if self.required_profile else None,
+            "certified": self.certified,
+            "verification_status": self.verification.status if self.verification else None,
+            "verification_reason": self.verification.reason
+            if self.verification
+            else "not_requested",
         }
         if self.mockup_validation_status is not None:
             payload["mockup_validation_status"] = self.mockup_validation_status
@@ -165,12 +190,14 @@ def get_penflow_contract_status(
     require_mockup_validation: bool = False,
     feature_slug: str | None = None,
     target: PenflowTarget | None = None,
+    required_profile: VerificationProfile | None = None,
+    build_manifest: Path | None = None,
 ) -> PenflowContractStatus:
     """Inspect root ``penflow/`` and summarize contract readiness.
 
     Args:
         project_root: LiveSpec project root.
-        require_actual: Whether a UI runtime comparison is expected.
+        require_actual: Compatibility alias requiring implementation certification.
         require_design_registry: Whether `.specs/design` must contain the
             Penflow/Pencil source, mockups, and baseline directories.
         require_mockup_validation: Whether Mockup Factory visual evidence and
@@ -180,6 +207,8 @@ def get_penflow_contract_status(
         target: Optional UI target. ``web-desktop`` blocks mobile-sized
             ``ui.pen`` roots so desktop web features cannot pass with mobile
             mockups.
+        required_profile: Explicit certification stage, separate from readiness inspection.
+        build_manifest: Independent runner identity required for implementation certification.
 
     Returns:
         Workspace status. Missing workspaces report ``absent`` instead of
@@ -188,6 +217,11 @@ def get_penflow_contract_status(
         explicitly required.
     """
     workspace = project_root / PENFLOW_DIRNAME
+    # @spec FR-001: Explicit certification and compatible aliases
+    # .specs/features/077-penflow-cumulative-verdict-consumer/spec.md#fr-001
+    profile_conflict = require_actual and required_profile is VerificationProfile.DESIGN
+    if require_actual:
+        required_profile = VerificationProfile.IMPLEMENTATION
     design_registry_missing = (
         _design_registry_missing(project_root, feature_slug=feature_slug)
         if require_design_registry
@@ -202,8 +236,10 @@ def get_penflow_contract_status(
         return PenflowContractStatus(
             workspace=workspace,
             state="absent",
-            runtime_required=require_actual,
-            runtime_comparison="ABSENT",
+            runtime_required=required_profile is VerificationProfile.IMPLEMENTATION,
+            runtime_comparison=(
+                "BLOCKED" if required_profile is VerificationProfile.IMPLEMENTATION else "ABSENT"
+            ),
             runtime_reason="workspace_absent",
             missing=list(REQUIRED_ARTIFACTS),
             design_registry_required=require_design_registry,
@@ -211,6 +247,12 @@ def get_penflow_contract_status(
             mockup_validation_required=require_mockup_validation,
             mockup_validation_missing=mockup_validation_missing,
             mockup_validation_status=mockup_validation_status,
+            required_profile=required_profile,
+            verification=(
+                PenflowVerification("BLOCKED", "workspace_absent")
+                if required_profile is not None
+                else None
+            ),
         )
 
     present = [name for name in REQUIRED_ARTIFACTS if _required_path_exists(workspace, name)]
@@ -237,10 +279,26 @@ def get_penflow_contract_status(
     )
     if compare_parse_error:
         parse_error = compare_parse_error
+    # @spec FR-002, FR-004: Current producer verdict plus LiveSpec-owned prerequisites
+    # .specs/features/077-penflow-cumulative-verdict-consumer/spec.md#fr-002
+    verification: PenflowVerification | None = None
+    if profile_conflict:
+        verification = PenflowVerification("BLOCKED", "conflicting_verification_profiles")
+    elif required_profile is not None:
+        verification = (
+            _certify_approved_penflow(
+                project_root, workspace, required_profile, build_manifest, feature_slug
+            )
+            if state == "ready"
+            else PenflowVerification("BLOCKED", "required_contract_artifacts_missing")
+        )
+    if required_profile is VerificationProfile.IMPLEMENTATION and verification is not None:
+        runtime_comparison = "READY" if verification.status == "PASS" else verification.status
+        runtime_reason = verification.reason
     return PenflowContractStatus(
         workspace=workspace,
         state=state,
-        runtime_required=require_actual,
+        runtime_required=required_profile is VerificationProfile.IMPLEMENTATION,
         runtime_comparison=runtime_comparison,
         runtime_reason=runtime_reason,
         present=present,
@@ -256,13 +314,43 @@ def get_penflow_contract_status(
         compare_status=compare_status,
         compare_issue_count=compare_issue_count,
         parse_error=parse_error,
+        required_profile=required_profile,
+        verification=verification,
     )
+
+
+def _certify_approved_penflow(
+    project_root: Path,
+    workspace: Path,
+    profile: VerificationProfile,
+    build_manifest: Path | None,
+    feature_slug: str | None,
+) -> PenflowVerification:
+    """Bind consumer approval before and after authoritative engine revalidation."""
+    from yaml import YAMLError
+
+    from .penflow_approval_files import BASELINE, file_ref
+    from .penflow_review_approval import require_approved_requirements
+
+    if profile is VerificationProfile.IMPLEMENTATION and build_manifest is None:
+        return PenflowVerification("BLOCKED", "independent_build_manifest_required")
+    try:
+        require_approved_requirements(project_root, feature_slug)
+        approved = file_ref(project_root, project_root / BASELINE)
+        result = verify_penflow_report(project_root, workspace, profile, build_manifest)
+        require_approved_requirements(project_root, feature_slug)
+        if file_ref(project_root, project_root / BASELINE) != approved:
+            return PenflowVerification("BLOCKED", "approved_baseline_changed_during_validation")
+        return result
+    except (OSError, ValueError, RuntimeError, YAMLError) as exc:
+        return PenflowVerification("BLOCKED", f"approved_requirements_invalid: {exc}")
 
 
 def bootstrap_penflow_workspace(
     project_root: Path,
     *,
     source_dir: Path | None = None,
+    source_project_root: Path | None = None,
 ) -> PenflowBootstrapResult:
     """Copy a Brainstorm Penflow handoff directory to root ``penflow/`` if possible.
 
@@ -280,6 +368,10 @@ def bootstrap_penflow_workspace(
     """
     source = source_dir if source_dir is not None else _default_penflow_source(project_root)
     destination = project_root / PENFLOW_DIRNAME
+    if source_project_root is not None:
+        from .penflow_authority_import import import_brainstorm_authority
+
+        import_brainstorm_authority(project_root, source, source_project_root=source_project_root)
     if destination.exists():
         return PenflowBootstrapResult(
             source=source,

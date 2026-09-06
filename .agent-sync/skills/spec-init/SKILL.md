@@ -512,14 +512,15 @@ legacy .brainstorm/*.png
 If a Brainstorm `handoff/penflow/` or legacy `penflow/` directory is provided, import it to root `penflow/` before treating brainstorm mockups as any behavioral source. If no Brainstorm output exists, continue from scratch: create no Brainstorm dependency, report Penflow as `ABSENT`, and let the first UI feature establish root `penflow/` artifacts through the Penflow/design workflow.
 
 1. Check whether the user or upstream workflow provided `<brainstorm-project>/handoff/penflow`, then legacy `<brainstorm-project>/penflow`.
-2. If root `penflow/` already exists, do not overwrite it; run `livespec penflow-contract status --project .` and continue.
-3. If root `penflow/` is absent and a handoff source exists, run `livespec penflow-contract bootstrap --project . --source <brainstorm-project>/handoff/penflow`.
-4. If only the legacy source exists, run `livespec penflow-contract bootstrap --project . --source <brainstorm-project>/penflow`.
+2. If root `penflow/` already exists, preserve it. A provided source still follows step 3 or 4 to authenticate ancestry without overwriting the workspace; an existing copy alone proves no origin.
+3. If a handoff source exists, run `livespec penflow-contract bootstrap --project . --source <brainstorm-project>/handoff/penflow --source-project <brainstorm-project>`. The CLI validates source design, archives the accepted source package locally, rechecks identities and publishes its immutable reference atomically; repeated import is idempotent.
+4. If only the legacy source exists, use the same command with `--source <brainstorm-project>/penflow --source-project <brainstorm-project>`. Uncertified or unproven source blocks authenticated import with a recovery diagnostic; preserve the existing workspace and its noncertifying inspection.
 5. If neither source exists, run `livespec penflow-contract status --project . --json`, record `state: absent`, and continue without referencing Brainstorm again.
 6. Run `livespec penflow-contract status --project .` and record the result in command output.
 7. Treat root `penflow/` as the primary UI behavior contract; `.specs/design/screens/` remains a visual reference/export inventory only.
 
 This step does not import Penflow flows into `.specs/features/` or `.specs/flows/`.
+Future Plan Review binds the archived ancestry and its complete inherited obligations together with LiveSpec FR/AC. It never reads the old Brainstorm location as certification authority. **Read** [portable authority and policy](../../../system/testing/penflow-contract.md) for the automatic review inputs.
 
 ### Step 3.7 — Theme CSS Import
 
@@ -1084,6 +1085,12 @@ If user already knows their stack, allow a compact flow:
 - Ask only 3 questions: project type, expected scale, must-have constraints.
 - Confirm preset and generate files.
 - Record skipped interview fields as `[NOT PROVIDED]` in `project.md`.
+
+
+## Penflow C51 stage contract
+
+Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
+This command prepares inputs and reports inspection readiness. Do not require a runtime report or build manifest before the producing/test stages. A revalidation of an already Implemented UI feature through finalize verify must receive the existing independent runner manifest; absence blocks that certification only.
 
 ## Execution Tasks
 

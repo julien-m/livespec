@@ -1,0 +1,533 @@
+{
+  "data": {
+    "bindings": [
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "alias-notice",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "screen",
+              "operator": "equals",
+              "pointer": "/after/role"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:alias-notice",
+          "source_pointer": "/nodes/0"
+        },
+        "obligation_id": "node:alias-notice",
+        "requirement_id": "brainstorm:flow:read-privacy"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "alias-notice",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "screen",
+              "operator": "equals",
+              "pointer": "/after/role"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:alias-notice",
+          "source_pointer": "/nodes/0"
+        },
+        "obligation_id": "node:alias-notice",
+        "requirement_id": "brainstorm:surface:privacy-overview"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "alias-notice.content",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "container",
+              "operator": "equals",
+              "pointer": "/after/role"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:alias-notice.content",
+          "source_pointer": "/nodes/1"
+        },
+        "obligation_id": "node:alias-notice.content",
+        "requirement_id": "brainstorm:surface:privacy-overview"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "alias-notice.brand",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Atelier",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:alias-notice.brand",
+          "source_pointer": "/nodes/2"
+        },
+        "obligation_id": "node:alias-notice.brand",
+        "requirement_id": "brainstorm:surface:privacy-overview"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "alias-notice.title",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Privacy overview",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:alias-notice.title",
+          "source_pointer": "/nodes/3"
+        },
+        "obligation_id": "node:alias-notice.title",
+        "requirement_id": "brainstorm:surface:privacy-overview"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "alias-notice.updated",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Updated September 5, 2026",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:alias-notice.updated",
+          "source_pointer": "/nodes/4"
+        },
+        "obligation_id": "node:alias-notice.updated",
+        "requirement_id": "brainstorm:surface:privacy-overview"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "alias-notice.intro",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "A quiet space for your ideas. This overview explains how information fits into an Atelier workspace, so you can understand the space before choosing to use it.",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:alias-notice.intro",
+          "source_pointer": "/nodes/5"
+        },
+        "obligation_id": "node:alias-notice.intro",
+        "requirement_id": "brainstorm:surface:privacy-overview"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "alias-notice.details",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Your notes belong in the workspace you choose. Read the information at your own pace, and leave this page whenever you are ready. Reading this overview does not change your workspace.",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:alias-notice.details",
+          "source_pointer": "/nodes/6"
+        },
+        "obligation_id": "node:alias-notice.details",
+        "requirement_id": "brainstorm:surface:privacy-overview"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "ready",
+              "operator": "equals",
+              "pointer": "/after/state"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "state:alias-notice:ready",
+          "source_pointer": "/screens/0/states/0"
+        },
+        "obligation_id": "state:alias-notice:ready",
+        "requirement_id": "brainstorm:state:privacy-overview:notice-ready"
+      },
+      {
+        "category": "transition",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "reader",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "leave-notice",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": true,
+              "operator": "equals",
+              "pointer": "/before/visible"
+            },
+            {
+              "capability": "ui",
+              "expected": false,
+              "operator": "equals",
+              "pointer": "/after/visible"
+            }
+          ],
+          "category": "transition",
+          "obligation_id": "system-return:leave-notice",
+          "source_pointer": "/system_returns/0"
+        },
+        "obligation_id": "system-return:leave-notice",
+        "requirement_id": "brainstorm:return:surface:privacy-overview:exit"
+      }
+    ],
+    "product": {
+      "flows": [
+        {
+          "entry_surface": "privacy-overview",
+          "id": "read-privacy",
+          "return_paths": []
+        }
+      ],
+      "kind": "product-contract",
+      "product": "atelier-privacy-witness",
+      "surfaces": [
+        {
+          "flow_id": "read-privacy",
+          "id": "privacy-overview",
+          "kind": "screen",
+          "product_justification": "A visitor reads a short privacy overview for the fictional Atelier workspace. The page is a complete read-only information destination; browser exit closes the page without editing anything.",
+          "references": [
+            {
+              "capture_tool": "Iris MCP capture",
+              "captured_at": "2026-09-05T12:40:15.761988+00:00",
+              "design_intent": "Calm dark editorial reading: clear title and update date, narrow centered text column, generous paragraph separation.",
+              "file": "handoff/penflow/references/linear-privacy-desktop.png",
+              "qualification": "Observed original capture: public privacy notice visible without consent overlay, title/date/body text on dark background. Reference is independent of this witness, not a target rendering.",
+              "region": "full-screen",
+              "role": "information",
+              "sha256": "a09c8ab1e6ec5cb798f52481b3638875cedf53071addbb3a16b1631df3f2bdc0",
+              "source": "https://linear.app/privacy",
+              "state": "notice-ready",
+              "surface": "web-desktop",
+              "viewport": {
+                "height": 1000,
+                "scale": 1,
+                "width": 1440
+              }
+            },
+            {
+              "capture_tool": "Iris MCP capture",
+              "captured_at": "2026-09-05T12:40:51.374337+00:00",
+              "design_intent": "Calm dark editorial reading: clear title and update date, narrow centered text column, generous paragraph separation.",
+              "file": "handoff/penflow/references/raycast-privacy-desktop.png",
+              "qualification": "Observed original capture: public privacy notice visible without consent overlay, title/date/body text on dark background. Reference is independent of this witness, not a target rendering.",
+              "region": "full-screen",
+              "role": "information",
+              "sha256": "7e143209102f82d2af6a618e8d6f09a349820f98dbf28e7c85501d375af5c140",
+              "source": "https://www.raycast.com/privacy",
+              "state": "notice-ready",
+              "surface": "web-desktop",
+              "viewport": {
+                "height": 1000,
+                "scale": 1,
+                "width": 1440
+              }
+            }
+          ],
+          "return_path": "exit",
+          "role": "information",
+          "states": [
+            {
+              "description": "Atelier label, Privacy overview title, update date and both explanatory paragraphs are visible; no loading, consent or error overlay.",
+              "id": "notice-ready"
+            }
+          ],
+          "surface": "web-desktop",
+          "user_facing": true
+        }
+      ],
+      "version": 1
+    },
+    "requirements": [
+      {
+        "id": "brainstorm:flow:read-privacy",
+        "source_pointer": "product-contract.json#/flows/0",
+        "text_sha256": "92c7b2f26d582aecdc04cb05b5c21f92912de259903bb7c27ca21918b0e541a1"
+      },
+      {
+        "id": "brainstorm:return:surface:privacy-overview:exit",
+        "source_pointer": "product-contract.json#/surfaces/0/return_path",
+        "text_sha256": "397f64ac37faa7f4b859d78960f521d29cf97559d4b9e4eeb8116726c5d790ff"
+      },
+      {
+        "id": "brainstorm:state:privacy-overview:notice-ready",
+        "source_pointer": "product-contract.json#/surfaces/0/states/0",
+        "text_sha256": "43a76017bbd247bfc3248ca2e947bf2ff4bad14e2a4bcb0f6f7dd6efc955168c"
+      },
+      {
+        "id": "brainstorm:surface:privacy-overview",
+        "source_pointer": "product-contract.json#/surfaces/0",
+        "text_sha256": "ed2d01016133e090cf53bb7b10f7b2fae07e953e1ba2dcc8344fdfdbd871583a"
+      }
+    ],
+    "sources": [
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-approvals/authority-73a4930dcfef73116d4186da3a302e3882073afc943ae9fce91eaa7829e5800b.json",
+        "sha256": "73a4930dcfef73116d4186da3a302e3882073afc943ae9fce91eaa7829e5800b"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/export-operation-receipt.json",
+        "sha256": "e4dd5016ab45dc80571b824c959f64ab70a92efb564b4fe9b585b23de0328211"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/native-design/export-request.json",
+        "sha256": "7a372ef592111b156a66ebfcc48e8168798d4b162bd39d77ae0cc55488a0c8f7"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/native-design/layout-mcp.json",
+        "sha256": "efb27d3fefb7d122f0f7a96112e91aab0bb0bc4918bbc302fd655e68fb989c71"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/native-design/persistence-observation.json",
+        "sha256": "05d3958d860ebb773441b7dfcd60826ca5bbcd9c1141f350f555cfc4e644b90f"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/visual-evidence/J4jSG.png",
+        "sha256": "02c7f1c1f17ba7a4390832db6a2946fa350452ec74dfa52ea873172832a07d50"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/visual-evidence/layout-snapshot.json",
+        "sha256": "31766c7de814caf60fce864a3bbaaf92cbffe02605547d4ec375fc5d6074a403"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/visual-evidence/linear-reference-contact-sheet.png",
+        "sha256": "3374165e67c748ca061be3ceeef967602e8d85dd3b4f69f760963fd1d6a4b89e"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/visual-evidence/manifest.json",
+        "sha256": "1e0dd27de845e06563a177e739591baa69be75032c7304291aaa206e6f1e66d2"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/visual-evidence/raycast-reference-contact-sheet.png",
+        "sha256": "1e05dc2de38dd7deb582dac6fd4d463195e5b685c4211bbbc841d6f7675760b4"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.mockup-validation/visual-evidence/vision-report.json",
+        "sha256": "56a3715dd98b800d85e8e3628a28499c09f7154d238ffeaf70b0abd433af6611"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/.penflow-run/pencil-persistence-receipt.json",
+        "sha256": "1b13e5413511f52c65571122ef50039a49dd4246570e003b8e100d86c583b54d"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/code-ir.json",
+        "sha256": "d86ac0cfe08ea358f4a4fe4ad69e3ae8bd4637a712e15a5da0d4b5b35cfce0de"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/expected-ui-tree.json",
+        "sha256": "8e4025198c33e161407fa59e0d28a44ef5662c1d6df2a1b88f110b5a40d23eca"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/flow-ui-contract/contract.json",
+        "sha256": "1f84472878bfc20c9fcb3abb56065c16285147a5f4a5ebf93ed6359424d6fc09"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/flow-ui-contract/flows/alias-read.md",
+        "sha256": "787c8a4e08efa424b233828a2db73eb2012003887ecfed4746ea1bdccb133c2e"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/flow-ui-contract/generated-docs.json",
+        "sha256": "73398021359e38480a3562c408842c8dd028c54e99533a87fe3d780a93c62a4e"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/flow-ui-contract/screens/alias-notice.md",
+        "sha256": "e03b198c813e75c7626db108a003e793dc4a28616350a6f18a3f44541746819b"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/pencil-context-map.json",
+        "sha256": "1b7670a9aea3c4175b1282d5727bde60bb2c42207f868fbbcbb3a5e3202ea161"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/.freeze-history/d2975b4127eefa230e9003b38469e1eac2a3c092759aaa9664b5ff3f6eb5f87b.json",
+        "sha256": "d2975b4127eefa230e9003b38469e1eac2a3c092759aaa9664b5ff3f6eb5f87b"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/.freeze-history/f692d8abe79fedf9379ce702d3b594123dc322304bf2186160bb1e1335b1f911.json",
+        "sha256": "f692d8abe79fedf9379ce702d3b594123dc322304bf2186160bb1e1335b1f911"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/.workflow-history/f969bb8f1f4a71cd7224598d97ea04e52bc9b2c97a2fd28a9dcd970eecebc4ac.md",
+        "sha256": "f969bb8f1f4a71cd7224598d97ea04e52bc9b2c97a2fd28a9dcd970eecebc4ac"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/product-contract.accepted.json",
+        "sha256": "299ee5bc78776577411f785e498599f1e56eca97bb79d6514b3045d69af60f8b"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/product-contract.freeze.json",
+        "sha256": "d2975b4127eefa230e9003b38469e1eac2a3c092759aaa9664b5ff3f6eb5f87b"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/product-contract.json",
+        "sha256": "6d2ea28da708614ed7b53c06569136a4c63f0afb65fec2bfb02a9d302fa7dc4a"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/product-contract.md",
+        "sha256": "62dd30d9bc95c0721f5826ad1988d088a4ad1a6269ca49926135aef412efe727"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/references/linear-privacy-desktop.png",
+        "sha256": "a09c8ab1e6ec5cb798f52481b3638875cedf53071addbb3a16b1631df3f2bdc0"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/references/notion-privacy-desktop.png",
+        "sha256": "5d1bdd6ee075222211908d0031af2ef5e788107f0437a28df525159c6835e041"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/references/raycast-privacy-desktop.png",
+        "sha256": "7e143209102f82d2af6a618e8d6f09a349820f98dbf28e7c85501d375af5c140"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/references/references-manifest.json",
+        "sha256": "354e74e78750d110302d195870c39aea5d4c0a499bfde8dcba2f665b96c85d02"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/run-report.json",
+        "sha256": "ca632b9b13a6de14caf504fcee4520129524ccde0df102c72f72ff59a8f978a0"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/semantic-ui-tree.json",
+        "sha256": "f870f1798546e32143e2077e0c781c2ce6d4e5071376d152d850ad2a47c057fe"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/theme.css",
+        "sha256": "91c8c1731e90da81e6907a14b375415faf9147b9a98313adc0376ab47a140c80"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/ui.pen",
+        "sha256": "817a0c302617cd62820354de04e774b9ca8c0c05e0dc96c5f7cff55177e02d04"
+      },
+      {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/verification-policy-source.json",
+        "sha256": "09c309c0d6d7673f256ebce817833720db421b47db5beff82b3bc53cc638d0db"
+      }
+    ],
+    "uncovered": [],
+    "verification_policy": {
+      "generated_docs": "required",
+      "homologous_references": "required",
+      "native_export": "required",
+      "native_geometry": "required",
+      "version": 1
+    }
+  },
+  "issues": [],
+  "kind": "penflow-authority-result",
+  "operation": "project",
+  "status": "PASS",
+  "version": 1
+}

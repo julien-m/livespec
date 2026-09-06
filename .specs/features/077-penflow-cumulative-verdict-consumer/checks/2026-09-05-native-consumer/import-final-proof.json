@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "/Users/julienm/projects/livespec/.venv/bin/python",
+    "-c",
+    "from pathlib import Path; import json; from validator.penflow_review_approval import require_approved_requirements; require_approved_requirements(Path('/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8'),'001-imported-notice'); print(json.dumps({'status':'PASS','certified':False,'reason':'approved_source_union_validated'}))"
+  ],
+  "exit_code": 0,
+  "result": {
+    "status": "PASS",
+    "certified": false,
+    "reason": "approved_source_union_validated"
+  },
+  "snapshot_sha256": "15407d19a102aea31047f506cf3d3fd15dd0fd7181f2d98f2e54ca8788c17d06",
+  "raw_review_sha256": "57b3244e6c1af8f5d14ab7b2d0fae356ccfc678f1f40dc9a365b98ed52f9bd65",
+  "baseline_sha256": "e2271fdf0ddc8c771f24cb860fc7532ad6084471d15ed44d65e49ff9f3ea918d",
+  "contract_sha256": "8899b7c27dd2efaff84e5c81f71570b97e2f626ba63ca71d47d3ac4ef86b98ca",
+  "proofs": [
+    "reviews/import-union-negative-restoration.json",
+    "reviews/relocated-origin-proof.json"
+  ]
+}

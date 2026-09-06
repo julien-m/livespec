@@ -1,0 +1,31 @@
+{
+  "actual_reviewer_output": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/reviews/final-revision-review-output.json",
+  "review_result": ".specs/penflow-approvals/review-result-75cfcce24100570f791e9e451722335cae0f0f11e7cade53588d24fcf50854b5.json",
+  "review_package_stdout": "{\n  \"result\": {\n    \"path\": \".specs/penflow-approvals/review-result-75cfcce24100570f791e9e451722335cae0f0f11e7cade53588d24fcf50854b5.json\",\n    \"sha256\": \"75cfcce24100570f791e9e451722335cae0f0f11e7cade53588d24fcf50854b5\"\n  },\n  \"verdict\": \"PASS\",\n  \"certified\": false\n}\n",
+  "pipeline_command": [
+    "/Users/julienm/projects/livespec/.venv/bin/livespec",
+    "pipeline",
+    "update",
+    "--feature",
+    "002-payment-outcomes",
+    "--phase",
+    "plan-review",
+    "--status",
+    "done",
+    "--review-result",
+    ".specs/penflow-approvals/review-result-75cfcce24100570f791e9e451722335cae0f0f11e7cade53588d24fcf50854b5.json",
+    "--timestamp"
+  ],
+  "pipeline_returncode": 0,
+  "pipeline_stdout": "Updated Plan Review \u2192 Done\n",
+  "pipeline_stderr": "",
+  "baseline_sha256": "195ed5c4f105a074f626e8084b76fe5b35d8fb6966a4e17e278cfe474dc7db27",
+  "contract_sha256": "b74e8943c897316fbb14b0491a2d3d792332f2940b7b43d1ed389cc4dad073e9",
+  "selection": [
+    "001-checkout-overview",
+    "002-payment-outcomes"
+  ],
+  "requirements": 16,
+  "bindings": 68,
+  "runtime_certified": false
+}

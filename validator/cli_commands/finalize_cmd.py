@@ -101,6 +101,10 @@ def apply_command(
         typer.Option("--run-id", help="Receipt run id (default: UTC timestamp)."),
     ] = None,
     json_out: Annotated[bool, typer.Option("--json", help="Emit a JSON envelope.")] = False,
+    build_manifest: Annotated[
+        Path | None,
+        typer.Option("--build-manifest", help="Independent runner build identity for UI closure."),
+    ] = None,
 ) -> None:
     """Apply all registry updates atomically and idempotently under lock.
 
@@ -129,6 +133,7 @@ def apply_command(
             project_root,
             request,
             retry_policy=LockRetryPolicy() if retry else None,
+            build_manifest=build_manifest,
         )
     except LockAcquisitionError as exc:
         # @spec FR-008: canonical BLOCKED policy_blocked on lock timeout
@@ -137,6 +142,16 @@ def apply_command(
         raise typer.Exit(EXIT_FINALIZE_BLOCKED) from exc
     except (FinalizeError, WriteHashMismatchError) as exc:
         subtype = exc.subtype if isinstance(exc, FinalizeError) else "state_invalid"
+        if json_out and isinstance(exc, FinalizeError) and exc.receipt_path is not None:
+            typer.echo(
+                json.dumps(
+                    {
+                        "outcome": "BLOCKED",
+                        "receipt_path": str(exc.receipt_path),
+                        "violations": [{"rule_id": "finalize.blocked", "message": str(exc)}],
+                    }
+                )
+            )
         typer.echo(f"BLOCKED at step {_APPLY_WRITE_STEP} - {subtype} - {exc}", err=True)
         raise typer.Exit(EXIT_FINALIZE_BLOCKED) from exc
     if json_out:
@@ -172,6 +187,10 @@ def verify_command(
         typer.Option("--run-id", help="Receipt run id (default: UTC timestamp)."),
     ] = None,
     json_out: Annotated[bool, typer.Option("--json", help="Emit a JSON envelope.")] = False,
+    build_manifest: Annotated[
+        Path | None,
+        typer.Option("--build-manifest", help="Independent runner build identity for UI closure."),
+    ] = None,
 ) -> None:
     """Re-check registry coherence (read-only) and emit a JSON receipt.
 
@@ -184,6 +203,7 @@ def verify_command(
         feature,
         expected_command=command,
         run_id=run_id or _default_run_id(),
+        build_manifest=build_manifest,
     )
     if json_out:
         typer.echo(

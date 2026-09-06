@@ -1,7 +1,7 @@
 ---
 command: spec-init
 contract_version: "1.0"
-last_reviewed: 2026-07-04
+last_reviewed: 2026-09-05
 ---
 
 <!-- @spec(FR-001) -->
@@ -75,12 +75,19 @@ Initialize LiveSpec in a project through a 3-phase conversational brainstorm.
   - "Vision"
   - "Users"
   - "Constraints"
-- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
-  - `ABSENT`: no root `penflow/` workspace on a from-scratch/non-UI init
-  - `BLOCKED`: copied or existing root `penflow/` misses required artifacts
-  - `PASS`: root `penflow/` has required planning artifacts
+- stdout marker: `Penflow Contract Verdict: ABSENT | READY | FAIL | BLOCKED`
+  - `ABSENT`: unrequired non-UI inspection has no workspace.
+  - `READY`: required planning artifacts and ID mappings are available; `certified: false`.
+  - `FAIL` / `BLOCKED`: invalid or missing required preparation input; no certification is implied.
+
+### C51 stage evidence
+
+- This command prepares inputs; no runtime report/build manifest or final certificate is required before its producing/test stage.
 
 ## 7. Exit Codes
+
+- A provided Brainstorm source is authenticated with `bootstrap --source-project <brainstorm-project>` even when root `penflow/` exists; the workspace is preserved. Failed source import stays noncertifying and cannot silently publish ancestry.
+- Successful ancestry is local, immutable and hash-bound; moving the original source does not remove its obligations. An old copy without provenance remains inspectable only.
 
 | Code | Meaning | Operator action |
 |------|---------|-----------------|

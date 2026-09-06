@@ -1,0 +1,2603 @@
+{
+  "build": {
+    "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/build-manifest.json",
+    "sha256": "e757b3366713b178403334cd3b68b865da1e53c0200c2c6a0d9108cd579c955b"
+  },
+  "evidence": [
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/native-design/context-fixed-layout-mcp.json",
+      "sha256": "70baec39d1dbf1db272f23645b506e29845f8f6d2910982eb5573e3700716445"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/native-design/observation-context-fix.json",
+      "sha256": "e13abbbdcd16f770ce3df88fa6f7bae73603f629b9dfaf9e6a2d10cfa2d266d0"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/WgCm6.png",
+      "sha256": "7b4aa6deeafaa87256c0bf5a6b7d8ab5181abeff4fd4f5e721d98fd5bc83f1e2"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/contact-sheet-composed.png",
+      "sha256": "8c6e4c43d55cfd7e191d941e5b75b3b7c37dcbe6a9142df88ea3691ccf4ddf82"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/contact-sheet.png",
+      "sha256": "620e52611f41c8ec864f346b6f7b584e5fbd66b5fb5bfcdfa35866932877e46d"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/hs929.png",
+      "sha256": "18b62f4b981bfc2abd6e1ae55acf5c6a0187fd7c281bc9e41c3cc09a7c17ab97"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/layout-snapshot.json",
+      "sha256": "fb1088e86b17ba05455737f688dbb32c643021da3f7fdc931e9e6ac9daed7b99"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/manifest.json",
+      "sha256": "83979054860153ac5bbe48b1319f02a4bc3906579c47e518dbb2d21488e33eeb"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/ryu4Q.png",
+      "sha256": "f4b3fe7ab6707a0f52c368f8e86264115641ccf4f2260ee196dc1a08d6ba2684"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/vision-report.json",
+      "sha256": "776122ec20339c2951a96fee43177a50efaeab776e5e1073b7f6702f07520a53"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.penflow-run/pencil-persistence-receipt.json",
+      "sha256": "d183f838b6cda3fc32d3fea6110371d376e75de67bccabf1ee7102c4b78a206f"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/actual-ui-tree.json",
+      "sha256": "67bf8a11fbea5faa62f775eb2b6796d13e4ce83a23af5f79118dff60065df982"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/actual-ui-tree.provenance.json",
+      "sha256": "81dd623b6d87be690cc7e33489a87a865e0f1ad1a61e607c040ddb3e2edb237e"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/causal-receipts/save.json",
+      "sha256": "2a0bfe5d1e91ba4498904a9413c4df350649dbf4009cffdf29922fe78344fce6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/causal-receipts/storage_error.json",
+      "sha256": "42971ed8c4ef214f4f17dad033fd4b7d30a6d9b03696b6755ee42df900223b33"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/causal-transition-evidence.json",
+      "sha256": "1098f140721ad73606052d9481101a8a7456546d2e9cdcf84d77d46f5b831c58"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/code-ir.json",
+      "sha256": "14f76293210b4810e80af397f8c36d32c1c474aa84d26075c1b5a8938118422c"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/expected-ui-tree.json",
+      "sha256": "95740e6759c177cd28231a72c3d50cc067ff8734172d19e2c3d88c00f3286a01"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/flows/checkout.md",
+      "sha256": "8c4816ee2454ead80c1d8b4d62c3f98327c4fe38177d7050183f764cb2355353"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/generated-docs.json",
+      "sha256": "53133d6606822d3527d8fcc27681d9a03565915e6c90ef9db893957ea66bb392"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/screens/checkout.md",
+      "sha256": "31fd5eb6f9063a4592c231db85dec132b461ccb047364e33ff2cbb6a44673ce6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/screens/details.md",
+      "sha256": "9f46440562854f618a4a15706f8a0149505a3baeb8e71f6f0d1c29c9aef9e3a6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/screens/receipt.md",
+      "sha256": "88dca9794c9d60605c6c42299d50ff005ab380fe81555a92bf21f1ff139d3dea"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/action--edit_amount--allowed.json",
+      "sha256": "0897e0694f807138d3dc4444afbb07589fe357e8c259399a435c1ffacee774b9"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/action--submit_payment--allowed.json",
+      "sha256": "d62d8241bd796613e64140d85959fdb8830a25e9311812b6d7e6d9ad53fe0e54"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/effect--create_payment--submit_payment--error.json",
+      "sha256": "f60b05e6ff9c251c11507757bb779eeee2e07caf02388347cf3b22877225a109"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/effect--create_payment--submit_payment--success.json",
+      "sha256": "90e14b0914930022c2989d45d0d235d69921d0aa727083a2e222f5dc172dd6c7"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/permission--buyer_can_pay--submit_payment--allowed.json",
+      "sha256": "e2d929383bedbeb7d587f184387c02efc97c8bc71378843afff68ab2af07c3a0"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/permission--buyer_can_pay--submit_payment--denied.json",
+      "sha256": "8fe19ccc6cd471ad47e1d6c7dab9f77ffa891e26ccd45f39e7221a806e7ec4a1"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/persist-payment-idempotent.json",
+      "sha256": "6975beba319d19ea07dd972faf6dd7b53f2fe19e534f4de84bd44fc4cb1b449b"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/persist-payment.json",
+      "sha256": "03a791b2fab726cb35657eb58ddf2b2eca7f216f9f303d33439207c397924226"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/result--create_payment--submit_payment--error.json",
+      "sha256": "ee05b802e67af23a2418e1c6050586ef031fda090a5f3251b845ff7ae746465c"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/result--create_payment--submit_payment--success.json",
+      "sha256": "55914ecc4fcc2f816ae1b2f62615b1ca8d10831e142062a91567c67d96e01597"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/system-return--details_back.json",
+      "sha256": "3bf68794e61cd7f0c12fc3c120e1e5960d09457a590cdadaa3049559ba25d3fb"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/system-return--receipt_close.json",
+      "sha256": "3d1b0ff15fd3e7be42d7b4e4b3c87f272e96232cd38b9bd26145b2a452ad7363"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/transition--payment_error.json",
+      "sha256": "3f6193e3223dc8de05f77331b98f8b51f281b15121ddc5ea9faab25f2ca091bc"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/transition--payment_success.json",
+      "sha256": "5614b27b4b0f0df069cef14669d869eb350e2f30bef4098a59235d6363bfeb74"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_failed--submit_payment--allowed.json",
+      "sha256": "6ad903757bdcb11be811e326c7cb016dc3a6ebaf8946b52919d00484c3e51cad"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_failed--submit_payment--invalid.json",
+      "sha256": "e067f70dfc1f97e56b92b0b16db492f57a5bf21f87966b6691e41a2c97cd75aa"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_input_valid--submit_payment--allowed.json",
+      "sha256": "74a50937e29025eeaca10749ee841e8185e73a3afe466eac1814b79236154145"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_input_valid--submit_payment--invalid.json",
+      "sha256": "269444e23a0e87a709ebcbad9ac230644b61e2634cd301f1484efa906218d742"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_ready--submit_payment--allowed.json",
+      "sha256": "1556db09cdd6583d48f16476f81de24ffa02c19172150b0fb004a06c3dd15c42"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_ready--submit_payment--invalid.json",
+      "sha256": "c0564c74d6a6d7b4fbd15831e1d5e450198d77d767e76e52a85d0a0539a67328"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/pencil-context-map.json",
+      "sha256": "86838beba7479665db0319ce87a63d2f3cad34e9446670c73c4ff815fb3b7a7e"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/semantic-ui-tree.json",
+      "sha256": "8285f31379cf4db768662f08d03f1ae65f9efcda33088619b03682ac56006bab"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/theme.css",
+      "sha256": "4a09de444bb61dd2e808949998e0c68fd6bf4348a2d6b2ad3e2dd62282e83566"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/ui.pen",
+      "sha256": "eb7ce00ecca6a0d0eebf4617a5a220921668035b67ba8b28b3e1fccad3b31f96"
+    }
+  ],
+  "gates": [
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "project-scope",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "upstream-requirements",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "validate-flow-contract",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "generated-flow-docs",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "export-semantic-tree",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "validate-semantic-tree",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "map-pencil-context",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "semantic-context-coverage",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "validate-pen",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "export-expected",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "lint-tokens",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "check-consistency",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "audit-visual",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "detect-drift",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "validate-visual-evidence",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": false,
+      "evidence": [],
+      "id": "validate-reference-fidelity",
+      "issues": [],
+      "reason": "reviewed workflow explicitly excludes this procedure and no inherited duty requires it",
+      "required": false,
+      "source_pointer": "/verification_policy/homologous_references",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "verify-pencil-persistence",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": false,
+      "evidence": [],
+      "id": "verify-export-operation",
+      "issues": [],
+      "reason": "reviewed workflow explicitly excludes this procedure and no inherited duty requires it",
+      "required": false,
+      "source_pointer": "/verification_policy/native_export",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "code-ir",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "validate-actual",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "compare-tree",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "validate-actual-provenance",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "validate-causal-evidence",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "typed-outcome-obligations",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": true,
+      "evidence": [],
+      "id": "source-final-recheck",
+      "issues": [],
+      "reason": "required by cumulative policy v1",
+      "required": true,
+      "source_pointer": "/",
+      "status": "PASS"
+    },
+    {
+      "applicable": false,
+      "evidence": [],
+      "id": "pencil-sync",
+      "issues": [],
+      "reason": "noncertifying operator or historical control",
+      "required": false,
+      "source_pointer": "/",
+      "status": "ADVISORY"
+    },
+    {
+      "applicable": false,
+      "evidence": [],
+      "id": "historical-strict-closure",
+      "issues": [],
+      "reason": "noncertifying operator or historical control",
+      "required": false,
+      "source_pointer": "/",
+      "status": "HISTORICAL"
+    },
+    {
+      "applicable": false,
+      "evidence": [],
+      "id": "design-taste",
+      "issues": [],
+      "reason": "noncertifying operator or historical control",
+      "required": false,
+      "source_pointer": "/",
+      "status": "ADVISORY"
+    }
+  ],
+  "issues": [],
+  "kind": "penflow-verification-report",
+  "obligations": {
+    "items": [
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "checkout",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "screen",
+              "operator": "equals",
+              "pointer": "/after/role"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:checkout",
+          "source_pointer": "/nodes/0"
+        },
+        "id": "node:checkout",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:001-checkout-overview:AC-001",
+          "livespec:001-checkout-overview:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "checkout.title",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Checkout",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:checkout.title",
+          "source_pointer": "/nodes/1"
+        },
+        "id": "node:checkout.title",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:001-checkout-overview:AC-001",
+          "livespec:001-checkout-overview:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "checkout.pay",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "button",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Pay",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:checkout.pay",
+          "source_pointer": "/nodes/2"
+        },
+        "id": "node:checkout.pay",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-001",
+          "livespec:002-payment-outcomes:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "checkout.amount",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "input",
+              "operator": "equals",
+              "pointer": "/after/role"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:checkout.amount",
+          "source_pointer": "/nodes/3"
+        },
+        "id": "node:checkout.amount",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-001",
+          "livespec:002-payment-outcomes:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "checkout.result",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Ready",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:checkout.result",
+          "source_pointer": "/nodes/4"
+        },
+        "id": "node:checkout.result",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-001",
+          "livespec:002-payment-outcomes:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "details",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "screen",
+              "operator": "equals",
+              "pointer": "/after/role"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:details",
+          "source_pointer": "/nodes/5"
+        },
+        "id": "node:details",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-006",
+          "livespec:002-payment-outcomes:FR-006"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "details.title",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Payment details",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:details.title",
+          "source_pointer": "/nodes/6"
+        },
+        "id": "node:details.title",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-006",
+          "livespec:002-payment-outcomes:FR-006"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "receipt",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "screen",
+              "operator": "equals",
+              "pointer": "/after/role"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:receipt",
+          "source_pointer": "/nodes/7"
+        },
+        "id": "node:receipt",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-007",
+          "livespec:002-payment-outcomes:FR-007"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "receipt.title",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "text",
+              "operator": "equals",
+              "pointer": "/after/role"
+            },
+            {
+              "capability": "ui",
+              "expected": "Payment receipt",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "node:receipt.title",
+          "source_pointer": "/nodes/8"
+        },
+        "id": "node:receipt.title",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-007",
+          "livespec:002-payment-outcomes:FR-007"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "default",
+              "operator": "equals",
+              "pointer": "/after/state"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "state:checkout:default",
+          "source_pointer": "/screens/0/states/0"
+        },
+        "id": "state:checkout:default",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:001-checkout-overview:AC-001",
+          "livespec:001-checkout-overview:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/after/state"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "state:checkout:success",
+          "source_pointer": "/screens/0/states/1"
+        },
+        "id": "state:checkout:success",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-004",
+          "livespec:002-payment-outcomes:FR-004"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "error",
+              "operator": "equals",
+              "pointer": "/after/state"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "state:checkout:error",
+          "source_pointer": "/screens/0/states/2"
+        },
+        "id": "state:checkout:error",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-004",
+          "livespec:002-payment-outcomes:FR-004"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "default",
+              "operator": "equals",
+              "pointer": "/after/state"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "state:details:default",
+          "source_pointer": "/screens/1/states/0"
+        },
+        "id": "state:details:default",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-006",
+          "livespec:002-payment-outcomes:FR-006"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "structure",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "default",
+              "operator": "equals",
+              "pointer": "/after/state"
+            }
+          ],
+          "category": "structure",
+          "obligation_id": "state:receipt:default",
+          "source_pointer": "/screens/2/states/0"
+        },
+        "id": "state:receipt:default",
+        "issues": [],
+        "observation_refs": [],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-007",
+          "livespec:002-payment-outcomes:FR-007"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "action",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "allowed",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            }
+          ],
+          "category": "action",
+          "obligation_id": "action:submit_payment:allowed",
+          "source_pointer": "/actions/0"
+        },
+        "id": "action:submit_payment:allowed",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/action--submit_payment--allowed.json",
+            "sha256": "d62d8241bd796613e64140d85959fdb8830a25e9311812b6d7e6d9ad53fe0e54"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-001",
+          "livespec:002-payment-outcomes:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "action",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "edit_amount",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "allowed",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": 10,
+              "operator": "equals",
+              "pointer": "/after/value"
+            }
+          ],
+          "category": "action",
+          "obligation_id": "action:edit_amount:allowed",
+          "source_pointer": "/actions/1"
+        },
+        "id": "action:edit_amount:allowed",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/action--edit_amount--allowed.json",
+            "sha256": "0897e0694f807138d3dc4444afbb07589fe357e8c259399a435c1ffacee774b9"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-001",
+          "livespec:002-payment-outcomes:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "permission",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "allowed",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            }
+          ],
+          "category": "permission",
+          "obligation_id": "permission:buyer_can_pay:submit_payment:allowed",
+          "source_pointer": "/permissions/0"
+        },
+        "id": "permission:buyer_can_pay:submit_payment:allowed",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/permission--buyer_can_pay--submit_payment--allowed.json",
+            "sha256": "e2d929383bedbeb7d587f184387c02efc97c8bc71378843afff68ab2af07c3a0"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-001",
+          "livespec:002-payment-outcomes:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "permission",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "visitor",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "denied",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            }
+          ],
+          "category": "permission",
+          "obligation_id": "permission:buyer_can_pay:submit_payment:denied",
+          "source_pointer": "/permissions/0"
+        },
+        "id": "permission:buyer_can_pay:submit_payment:denied",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/permission--buyer_can_pay--submit_payment--denied.json",
+            "sha256": "8fe19ccc6cd471ad47e1d6c7dab9f77ffa891e26ccd45f39e7221a806e7ec4a1"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-001",
+          "livespec:002-payment-outcomes:FR-001"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "validation",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "allowed",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/before/properties/payment_result"
+            }
+          ],
+          "category": "validation",
+          "obligation_id": "validation:payment_ready:submit_payment:allowed",
+          "source_pointer": "/guards/0"
+        },
+        "id": "validation:payment_ready:submit_payment:allowed",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_ready--submit_payment--allowed.json",
+            "sha256": "1556db09cdd6583d48f16476f81de24ffa02c19172150b0fb004a06c3dd15c42"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-002",
+          "livespec:002-payment-outcomes:FR-002"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "validation",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "invalid",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "not_equals",
+              "pointer": "/before/properties/payment_result"
+            }
+          ],
+          "category": "validation",
+          "obligation_id": "validation:payment_ready:submit_payment:invalid",
+          "source_pointer": "/guards/0"
+        },
+        "id": "validation:payment_ready:submit_payment:invalid",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_ready--submit_payment--invalid.json",
+            "sha256": "c0564c74d6a6d7b4fbd15831e1d5e450198d77d767e76e52a85d0a0539a67328"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-002",
+          "livespec:002-payment-outcomes:FR-002"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "validation",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "allowed",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "error",
+              "operator": "equals",
+              "pointer": "/before/properties/payment_result"
+            }
+          ],
+          "category": "validation",
+          "obligation_id": "validation:payment_failed:submit_payment:allowed",
+          "source_pointer": "/guards/1"
+        },
+        "id": "validation:payment_failed:submit_payment:allowed",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_failed--submit_payment--allowed.json",
+            "sha256": "6ad903757bdcb11be811e326c7cb016dc3a6ebaf8946b52919d00484c3e51cad"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-002",
+          "livespec:002-payment-outcomes:FR-002"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "validation",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "invalid",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "error",
+              "operator": "not_equals",
+              "pointer": "/before/properties/payment_result"
+            }
+          ],
+          "category": "validation",
+          "obligation_id": "validation:payment_failed:submit_payment:invalid",
+          "source_pointer": "/guards/1"
+        },
+        "id": "validation:payment_failed:submit_payment:invalid",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_failed--submit_payment--invalid.json",
+            "sha256": "e067f70dfc1f97e56b92b0b16db492f57a5bf21f87966b6691e41a2c97cd75aa"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-002",
+          "livespec:002-payment-outcomes:FR-002"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "validation",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "allowed",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "valid",
+              "operator": "equals",
+              "pointer": "/before/properties/payment_input"
+            }
+          ],
+          "category": "validation",
+          "obligation_id": "validation:payment_input_valid:submit_payment:allowed",
+          "source_pointer": "/guards/2"
+        },
+        "id": "validation:payment_input_valid:submit_payment:allowed",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_input_valid--submit_payment--allowed.json",
+            "sha256": "74a50937e29025eeaca10749ee841e8185e73a3afe466eac1814b79236154145"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-002",
+          "livespec:002-payment-outcomes:FR-002"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "validation",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "invalid",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "valid",
+              "operator": "not_equals",
+              "pointer": "/before/properties/payment_input"
+            }
+          ],
+          "category": "validation",
+          "obligation_id": "validation:payment_input_valid:submit_payment:invalid",
+          "source_pointer": "/guards/2"
+        },
+        "id": "validation:payment_input_valid:submit_payment:invalid",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_input_valid--submit_payment--invalid.json",
+            "sha256": "269444e23a0e87a709ebcbad9ac230644b61e2634cd301f1484efa906218d742"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-002",
+          "livespec:002-payment-outcomes:FR-002"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "effect",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "network",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "network",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "network",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "network",
+              "expected": "POST",
+              "operator": "equals",
+              "pointer": "/before/method"
+            },
+            {
+              "capability": "network",
+              "expected": "/payments",
+              "operator": "equals",
+              "pointer": "/before/url"
+            },
+            {
+              "capability": "network",
+              "expected": 201,
+              "operator": "equals",
+              "pointer": "/after/status"
+            }
+          ],
+          "category": "effect",
+          "obligation_id": "effect:create_payment:submit_payment:success",
+          "source_pointer": "/mutations/0"
+        },
+        "id": "effect:create_payment:submit_payment:success",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/effect--create_payment--submit_payment--success.json",
+            "sha256": "90e14b0914930022c2989d45d0d235d69921d0aa727083a2e222f5dc172dd6c7"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-003",
+          "livespec:002-payment-outcomes:FR-003"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "effect",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "network",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "network",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "network",
+              "expected": "error",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "network",
+              "expected": "POST",
+              "operator": "equals",
+              "pointer": "/before/method"
+            },
+            {
+              "capability": "network",
+              "expected": "/payments",
+              "operator": "equals",
+              "pointer": "/before/url"
+            },
+            {
+              "capability": "network",
+              "expected": 500,
+              "operator": "equals",
+              "pointer": "/after/status"
+            }
+          ],
+          "category": "effect",
+          "obligation_id": "effect:create_payment:submit_payment:error",
+          "source_pointer": "/mutations/0"
+        },
+        "id": "effect:create_payment:submit_payment:error",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/effect--create_payment--submit_payment--error.json",
+            "sha256": "f60b05e6ff9c251c11507757bb779eeee2e07caf02388347cf3b22877225a109"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-003",
+          "livespec:002-payment-outcomes:FR-003"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "result",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/after/state"
+            },
+            {
+              "capability": "ui",
+              "expected": "checkout.result",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "result",
+          "obligation_id": "result:create_payment:submit_payment:success",
+          "source_pointer": "/mutations/0"
+        },
+        "id": "result:create_payment:submit_payment:success",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/result--create_payment--submit_payment--success.json",
+            "sha256": "55914ecc4fcc2f816ae1b2f62615b1ca8d10831e142062a91567c67d96e01597"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-004",
+          "livespec:002-payment-outcomes:FR-004"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "result",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "error",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "error",
+              "operator": "equals",
+              "pointer": "/after/state"
+            },
+            {
+              "capability": "ui",
+              "expected": "checkout.result",
+              "operator": "equals",
+              "pointer": "/after/semantic_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "error",
+              "operator": "equals",
+              "pointer": "/after/text"
+            }
+          ],
+          "category": "result",
+          "obligation_id": "result:create_payment:submit_payment:error",
+          "source_pointer": "/mutations/0"
+        },
+        "id": "result:create_payment:submit_payment:error",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/result--create_payment--submit_payment--error.json",
+            "sha256": "ee05b802e67af23a2418e1c6050586ef031fda090a5f3251b845ff7ae746465c"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-004",
+          "livespec:002-payment-outcomes:FR-004"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "transition",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "checkout",
+              "operator": "equals",
+              "pointer": "/before/screen_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "default",
+              "operator": "equals",
+              "pointer": "/before/state"
+            },
+            {
+              "capability": "ui",
+              "expected": "checkout",
+              "operator": "equals",
+              "pointer": "/after/screen_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/after/state"
+            }
+          ],
+          "category": "transition",
+          "obligation_id": "transition:payment_success",
+          "source_pointer": "/transitions/0"
+        },
+        "id": "transition:payment_success",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/transition--payment_success.json",
+            "sha256": "5614b27b4b0f0df069cef14669d869eb350e2f30bef4098a59235d6363bfeb74"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-004",
+          "livespec:002-payment-outcomes:FR-004"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "transition",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "error",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": "checkout",
+              "operator": "equals",
+              "pointer": "/before/screen_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "default",
+              "operator": "equals",
+              "pointer": "/before/state"
+            },
+            {
+              "capability": "ui",
+              "expected": "checkout",
+              "operator": "equals",
+              "pointer": "/after/screen_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "error",
+              "operator": "equals",
+              "pointer": "/after/state"
+            }
+          ],
+          "category": "transition",
+          "obligation_id": "transition:payment_error",
+          "source_pointer": "/transitions/1"
+        },
+        "id": "transition:payment_error",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/transition--payment_error.json",
+            "sha256": "3f6193e3223dc8de05f77331b98f8b51f281b15121ddc5ea9faab25f2ca091bc"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-004",
+          "livespec:002-payment-outcomes:FR-004"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "transition",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "details_back",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": true,
+              "operator": "equals",
+              "pointer": "/before/visible"
+            },
+            {
+              "capability": "ui",
+              "expected": true,
+              "operator": "equals",
+              "pointer": "/after/visible"
+            },
+            {
+              "capability": "ui",
+              "expected": "checkout",
+              "operator": "equals",
+              "pointer": "/after/screen_id"
+            }
+          ],
+          "category": "transition",
+          "obligation_id": "system-return:details_back",
+          "source_pointer": "/system_returns/0"
+        },
+        "id": "system-return:details_back",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/system-return--details_back.json",
+            "sha256": "3bf68794e61cd7f0c12fc3c120e1e5960d09457a590cdadaa3049559ba25d3fb"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-006",
+          "livespec:002-payment-outcomes:FR-006"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "transition",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "ui",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "receipt_close",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "ui",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "ui",
+              "expected": true,
+              "operator": "equals",
+              "pointer": "/before/visible"
+            },
+            {
+              "capability": "ui",
+              "expected": false,
+              "operator": "equals",
+              "pointer": "/after/visible"
+            }
+          ],
+          "category": "transition",
+          "obligation_id": "system-return:receipt_close",
+          "source_pointer": "/system_returns/1"
+        },
+        "id": "system-return:receipt_close",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/system-return--receipt_close.json",
+            "sha256": "3d1b0ff15fd3e7be42d7b4e4b3c87f272e96232cd38b9bd26145b2a452ad7363"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-007",
+          "livespec:002-payment-outcomes:FR-007"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "persistence",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "storage",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "storage",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "storage",
+              "expected": "success",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "storage",
+              "expected": "payment-1",
+              "operator": "equals",
+              "pointer": "/after/key"
+            },
+            {
+              "capability": "storage",
+              "expected": "payments",
+              "operator": "equals",
+              "pointer": "/after/store_id"
+            },
+            {
+              "capability": "storage",
+              "expected": true,
+              "operator": "equals",
+              "pointer": "/after/exists"
+            },
+            {
+              "capability": "storage",
+              "expected": {
+                "amount": 10,
+                "status": "paid"
+              },
+              "operator": "equals",
+              "pointer": "/after/value"
+            }
+          ],
+          "category": "persistence",
+          "obligation_id": "persist-payment",
+          "source_pointer": "/mutations/0"
+        },
+        "id": "persist-payment",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/persist-payment.json",
+            "sha256": "03a791b2fab726cb35657eb58ddf2b2eca7f216f9f303d33439207c397924226"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-005",
+          "livespec:002-payment-outcomes:FR-005"
+        ],
+        "status": "PASS"
+      },
+      {
+        "category": "persistence",
+        "expected": {
+          "assertions": [
+            {
+              "capability": "storage",
+              "expected": "buyer",
+              "operator": "equals",
+              "pointer": "/result/actor_id"
+            },
+            {
+              "capability": "storage",
+              "expected": "submit_payment",
+              "operator": "equals",
+              "pointer": "/result/action_id"
+            },
+            {
+              "capability": "storage",
+              "expected": "idempotent",
+              "operator": "equals",
+              "pointer": "/result/outcome"
+            },
+            {
+              "capability": "storage",
+              "expected": "payment-1",
+              "operator": "equals",
+              "pointer": "/after/key"
+            },
+            {
+              "capability": "storage",
+              "expected": "payments",
+              "operator": "equals",
+              "pointer": "/after/store_id"
+            },
+            {
+              "capability": "storage",
+              "expected": true,
+              "operator": "equals",
+              "pointer": "/after/exists"
+            },
+            {
+              "capability": "storage",
+              "expected": {
+                "amount": 10,
+                "status": "paid"
+              },
+              "operator": "equals",
+              "pointer": "/after/value"
+            }
+          ],
+          "category": "persistence",
+          "obligation_id": "persist-payment-idempotent",
+          "source_pointer": "/mutations/0"
+        },
+        "id": "persist-payment-idempotent",
+        "issues": [],
+        "observation_refs": [
+          {
+            "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/persist-payment-idempotent.json",
+            "sha256": "6975beba319d19ea07dd972faf6dd7b53f2fe19e534f4de84bd44fc4cb1b449b"
+          }
+        ],
+        "requirement_ids": [
+          "livespec:002-payment-outcomes:AC-005",
+          "livespec:002-payment-outcomes:FR-005"
+        ],
+        "status": "PASS"
+      }
+    ],
+    "missing": 0,
+    "required": 34,
+    "verified": 34
+  },
+  "policy_version": 1,
+  "profile": "implementation",
+  "scope": {
+    "project_root": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig",
+    "workspace": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow"
+  },
+  "sources": [
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/approval-0da6b92c7123e0fe162068ec97c7d7a4d8acca49d51907de8f6510036e020418.json",
+      "sha256": "0da6b92c7123e0fe162068ec97c7d7a4d8acca49d51907de8f6510036e020418"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/approval-0f46c001e554316d0b27a9ffc98e93cf8c12c2370afacd05f35418e0d817dc74.json",
+      "sha256": "0f46c001e554316d0b27a9ffc98e93cf8c12c2370afacd05f35418e0d817dc74"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/approval-3e2089b0d184708b523db3ecb3d308a2ca0624e0a07df9891a3c91fc7993e9f6.json",
+      "sha256": "3e2089b0d184708b523db3ecb3d308a2ca0624e0a07df9891a3c91fc7993e9f6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/approval-e10d56ad08f16787ec5e28aa0ff1c2fb0f078e4a45b244ec3e479ac90a607adc.json",
+      "sha256": "e10d56ad08f16787ec5e28aa0ff1c2fb0f078e4a45b244ec3e479ac90a607adc"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/baseline-195ed5c4f105a074f626e8084b76fe5b35d8fb6966a4e17e278cfe474dc7db27.json",
+      "sha256": "195ed5c4f105a074f626e8084b76fe5b35d8fb6966a4e17e278cfe474dc7db27"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/baseline-8fe6752c9887955df4e3462c991eb7db69c8a250e40bb9dfe3c05d68ebb007d5.json",
+      "sha256": "8fe6752c9887955df4e3462c991eb7db69c8a250e40bb9dfe3c05d68ebb007d5"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/baseline-ef5b379f876cad39b953622a0c2d1ce43d4197a710d5532ab9c379ce4f222f0b.json",
+      "sha256": "ef5b379f876cad39b953622a0c2d1ce43d4197a710d5532ab9c379ce4f222f0b"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/contract-35d4d4c614e7b4b791977660072221d83cec040c249dbf7a9f7340a97b05e3a2.json",
+      "sha256": "35d4d4c614e7b4b791977660072221d83cec040c249dbf7a9f7340a97b05e3a2"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/contract-46483d40b42a2425dbb8b837825de61ad3c186bd761f8a3e2afdd5be986a9c2a.json",
+      "sha256": "46483d40b42a2425dbb8b837825de61ad3c186bd761f8a3e2afdd5be986a9c2a"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/contract-773ec0531567503af19df48e24fa93a1abf22beea1a033d5e92860e34a4a4504.json",
+      "sha256": "773ec0531567503af19df48e24fa93a1abf22beea1a033d5e92860e34a4a4504"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/contract-b74e8943c897316fbb14b0491a2d3d792332f2940b7b43d1ed389cc4dad073e9.json",
+      "sha256": "b74e8943c897316fbb14b0491a2d3d792332f2940b7b43d1ed389cc4dad073e9"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/review-output-00e5ffe262a6d804ce71945237cbe1c4ab8cda501550e85b3e7db4efb3077802.json",
+      "sha256": "00e5ffe262a6d804ce71945237cbe1c4ab8cda501550e85b3e7db4efb3077802"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/review-output-19ca0620e2a88d54d22cf2f8c5a30a62f2183583d32e28d69578745411834555.json",
+      "sha256": "19ca0620e2a88d54d22cf2f8c5a30a62f2183583d32e28d69578745411834555"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/review-output-2a34038afac52b63589dada1ee93238fe30ec815e03d7ab74df1c10f52d32627.json",
+      "sha256": "2a34038afac52b63589dada1ee93238fe30ec815e03d7ab74df1c10f52d32627"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/review-output-b42c7eadc699e50bf7b9b3b5390da0efa5d0f62b76a59c445ec3dc976c535402.json",
+      "sha256": "b42c7eadc699e50bf7b9b3b5390da0efa5d0f62b76a59c445ec3dc976c535402"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/snapshot-0d0296fb1394edcfd02fe375299d779d76069afdc899651449924d22134fe8e5.json",
+      "sha256": "0d0296fb1394edcfd02fe375299d779d76069afdc899651449924d22134fe8e5"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/snapshot-9292a570c1996714ac271191e4a13a5ab0c23d3c77f4c648f1971d436b80c771.json",
+      "sha256": "9292a570c1996714ac271191e4a13a5ab0c23d3c77f4c648f1971d436b80c771"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/snapshot-bbb609e26cfd8baee71c297ea1ca67d240b7d191ec4779d457e76929db5e48ef.json",
+      "sha256": "bbb609e26cfd8baee71c297ea1ca67d240b7d191ec4779d457e76929db5e48ef"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/snapshot-c73425f612250a18a7bb5137f22b5a8ff59b5621b07771c47aca887d5b40e524.json",
+      "sha256": "c73425f612250a18a7bb5137f22b5a8ff59b5621b07771c47aca887d5b40e524"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/source-409b97f0707cc72701400fcbb026d9e43bcce2b75ef3d74e93c1322d148f86d3.md",
+      "sha256": "409b97f0707cc72701400fcbb026d9e43bcce2b75ef3d74e93c1322d148f86d3"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/source-51f16fbfe4658c60e2e9c90f23b586b49338f92153ad3c3e69851e44d52386bb.md",
+      "sha256": "51f16fbfe4658c60e2e9c90f23b586b49338f92153ad3c3e69851e44d52386bb"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/source-a8f2daa88d97b22fbceaa056b01921c782fb92baa6464f95828774d85295e9c1.md",
+      "sha256": "a8f2daa88d97b22fbceaa056b01921c782fb92baa6464f95828774d85295e9c1"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/source-ec86e37c7d87297f494de43d6b22ca4a18b33790696e62d84cdea2a6b67d6a73.md",
+      "sha256": "ec86e37c7d87297f494de43d6b22ca4a18b33790696e62d84cdea2a6b67d6a73"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/source-f31d289964db9c995e962748845a188d31aeaed955b8970c1eb5f5ca27d4411d.md",
+      "sha256": "f31d289964db9c995e962748845a188d31aeaed955b8970c1eb5f5ca27d4411d"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/source-f3296afb1db878cb41e2cacfaf4963285537cd8ff86d1244122e01922528471e.md",
+      "sha256": "f3296afb1db878cb41e2cacfaf4963285537cd8ff86d1244122e01922528471e"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/verification-policy-4e3d79700cb846629558e7e82dfc1b53d323d1ebe8d04b8380ff12972d4789cc.json",
+      "sha256": "4e3d79700cb846629558e7e82dfc1b53d323d1ebe8d04b8380ff12972d4789cc"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-approvals/workflow-2e44c6df89cbe68b1a2dc8808d20847d060d96746cccfecfcd85846b15b44ba2.md",
+      "sha256": "2e44c6df89cbe68b1a2dc8808d20847d060d96746cccfecfcd85846b15b44ba2"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/penflow-requirements.json",
+      "sha256": "71eaba1d1e1fda8d6380db35151037726375d519c7b9f05c8739d372db4e8c03"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/build-manifest.json",
+      "sha256": "e757b3366713b178403334cd3b68b865da1e53c0200c2c6a0d9108cd579c955b"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/action--edit_amount--allowed.facts.json",
+      "sha256": "7d82a1799c1c2a932f789ee356c5a3a992b1339a27617fe18e9dc648bb852216"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/action--submit_payment--allowed.facts.json",
+      "sha256": "0679f9f3bdb655caaa03124f7d2e3abb56b53143ca44a64d1386900054509673"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/application.log",
+      "sha256": "2169d2c5e7f881691bfb8e23face2d0b9115c4c6c1b809323cbb79f52a429ef4"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/back.after.ui-snapshot.json",
+      "sha256": "3ddc08ff9464b6a76c467c7b65c8004c33330080a8c0ef2fa7296cea27a0223f"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/back.before.ui-snapshot.json",
+      "sha256": "654f80ba8c20a7483112e7add4d9ee6960272c311946ad53f539089c23f10a86"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/back.browser.details.png",
+      "sha256": "54bed5be29e5753f6e96d0087fb25bd1754ea503fa014635f2366b6125904bda"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/back.browser.json",
+      "sha256": "b54ee926530df4ab0f2f6ea20aa9255c5d8a1e7a5e9be126f8edfd6cca39b7b9"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/back.storage.json",
+      "sha256": "2b8c3501821f40d749cf7af3dd0b5a8021e1ffed19f38cdf61768d4c673ceb06"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/browser.log",
+      "sha256": "bc991cd6fb42bf024f40ee87f2260afda5742855bee952bd30bbe48f706386cc"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/close.before.ui-snapshot.json",
+      "sha256": "a3fc229b39d64abfb5d7d2a372c8ed80b4fb234d4fe8d55fb2d74d486cef63cb"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/close.browser.json",
+      "sha256": "f81a7b90f9687111b2a2892b52543945c78a6cc606ba0d2702d21f4ae0f0672e"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/close.browser.receipt.png",
+      "sha256": "234c69c1674437cb5d781f66fbe0a2de01ad2bf11539d293650318824520fa0d"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/close.storage.json",
+      "sha256": "2ab6b52cfe39b6246c91fceade809a153bd562ee59ed1f41128990be17ca0381"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/denied.after.ui-snapshot.json",
+      "sha256": "63618ab1d6c8533717f26d412e7596304d408472f401af044dce728965001740"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/denied.before.ui-snapshot.json",
+      "sha256": "f5039a226e815c8068ec23a1766e219796e6e8af4206c454cd22096a0f0602b6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/denied.browser.json",
+      "sha256": "3ac2b5a08fd1aae277a6836ac33b459a9b9fda68f77d82905bcbf2ec41b04228"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/denied.storage.json",
+      "sha256": "ec58eead1973c92cd0a72cb81a8f68348bf7e6a2d356687d92d96800420d66b5"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/edit.after.ui-snapshot.json",
+      "sha256": "8959cc526d1e1a67bba5a4ec1097f8a91300c353a3f14abb34315d83479a96bc"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/edit.before.ui-snapshot.json",
+      "sha256": "13bb4020bafb39b0e66df76453513d3973a28a521c9ea8c77a31f509d88d2677"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/edit.browser.json",
+      "sha256": "8042c0fd9346458b4c18705de3e0c66b8f1479d611104fc3cc8e4256fe77e8a0"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/edit.storage.json",
+      "sha256": "3081485dc5a7960325641280563e3d5108503c42cd93a814f549040d383edb94"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/effect--create_payment--submit_payment--error.facts.json",
+      "sha256": "c2eaac9ab6924ab3f96491128c5d56f822ffec2fbbbc6506f26f61bba44b4cd6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/effect--create_payment--submit_payment--success.facts.json",
+      "sha256": "172c4b833c75c1f2abb49758c9f5f78126cc99ad7b7ddfffe0641117952fabc4"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/error.after.ui-snapshot.json",
+      "sha256": "1d671b6e0019d4c3a66c30d99e1436f459652a2ca9a7c0d2eb0ed969f451d171"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/error.before.ui-snapshot.json",
+      "sha256": "c24bb1e7875140bff857aaa43d0d5a67f55d6cce931831d1e090dbf30b863566"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/error.browser.json",
+      "sha256": "161a69d3ddf434c642cc8221efd26a59d9399790086e1100c2bce3654d4598c8"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/error.storage.json",
+      "sha256": "9a3303643c46277d6dc3e0656d332d50d08683364d1e9ff11ed46a338d915b5d"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/idempotent.after.ui-snapshot.json",
+      "sha256": "3bc780ad573fd5135ae74f31959b2ebe199abe15cab1dc130b574df297703122"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/idempotent.before.ui-snapshot.json",
+      "sha256": "4f61a9194525b8157c5f49376f0535770dfd15b1ede04c675b63f7b7b0ef02ef"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/idempotent.browser.json",
+      "sha256": "ac23dcbe365744ebea8567371254baf75376c8b12ef78d633f5f5699022c2ec9"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/idempotent.storage.json",
+      "sha256": "26c1613cc0b2375e0bf0788fca39c1106d0adb6e9626fd60735d9750d323f9a1"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/invalid.after.ui-snapshot.json",
+      "sha256": "44c1b7756c6b9ea22eb8a3b4220375c79ff3561e344824af48a1f7d850932cba"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/invalid.before.ui-snapshot.json",
+      "sha256": "a23043b6123dc04f9b008bba939d0b6b8dd23ca0b14b089c0f3ee155258d2bea"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/invalid.browser.json",
+      "sha256": "90d1be733a81f5c232a37a7a3eb981370f873f25caf0a0094d4df97de362b1b4"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/invalid.storage.json",
+      "sha256": "52f43e2c5e06e8af4954def4c187bd829ee67152e307b35e2b8d36c75574960b"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/payments.sqlite3",
+      "sha256": "8872873486f67c7dd1aa25517ea55c926597fa5c4a2d3a38e8985dd70cdcde1f"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/permission--buyer_can_pay--submit_payment--allowed.facts.json",
+      "sha256": "0679f9f3bdb655caaa03124f7d2e3abb56b53143ca44a64d1386900054509673"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/permission--buyer_can_pay--submit_payment--denied.facts.json",
+      "sha256": "9b38d98dcb396a61d520ff622bde3c2ea71fda881d6c38e7594782347ef33ea3"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/persist-payment-idempotent.facts.json",
+      "sha256": "f6f6223b329a97c4d104e15306974fb2dd49c5b6e73833472b419a399827482d"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/persist-payment.facts.json",
+      "sha256": "9a7b53158b34db7b7a57faa54d7cdc902faf84f50e0d23a3f051ba98847e4956"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/result--create_payment--submit_payment--error.facts.json",
+      "sha256": "8d376527ef4662462b8387f75d1a105806b985abef5bec0eed42ed5dcd3e6dcd"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/result--create_payment--submit_payment--success.facts.json",
+      "sha256": "248c94fdb196fa28ea32a818d4d9ca95e1ecdaa40fa07d3729a6681a386a3964"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/runtime-result.json",
+      "sha256": "dffebb3c8b661ec29d8bf005b2bc50f99e228ed743afcc9898ab1d6dd179e273"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/save.after.ui-snapshot.json",
+      "sha256": "aa30406ae9d67e02ea23a65970e2936449ce4664ab68809fd20f928d288faef7"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/save.before.ui-snapshot.json",
+      "sha256": "bfadcc0c99cbc43bb4edee28a05e12b60afd5a49b0e0f2fcf5194891fce6d9de"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/save.browser.checkout.png",
+      "sha256": "5e9e9c39bbb778978b1658208783e3f4866d0335aba5b1fc5cf6d2532095e252"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/save.browser.json",
+      "sha256": "618bf3eab34a22e029db43e35ce9a570db38b692f37c17b643098cda575e1364"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/save.storage.json",
+      "sha256": "687b033f44e4a6344fd43a6701ec98c55a2c2499dba3e321f7fe90fbc7dee4ea"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/storage_error.after.ui-snapshot.json",
+      "sha256": "390e48d41df26d23fe848e6a78a5363addfddfbd69aa495e257f5a234351b259"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/storage_error.before.ui-snapshot.json",
+      "sha256": "62868caeb541d4ed202b8ac1ec4b91456c81e3b013df8912a6452b101cc41217"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/storage_error.browser.json",
+      "sha256": "0acc9fd05054cfb610ea59c9d8ba0b05509acafb4bfd3e0bb69efe05391139cc"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/storage_error.storage.json",
+      "sha256": "e8b04d24ed1b87fddd819d6c465209530428d85dd429d6d3d94ecbdc27d7a246"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/system-return--details_back.facts.json",
+      "sha256": "b7dd92eddf4de6ab79232c9da7768a0d19f848dfad02244a4a0783e7702598ee"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/system-return--receipt_close.facts.json",
+      "sha256": "9abe121a36e9244850bc040ccb763e7f21cf950016669c4c29b8de7d7e02c4ce"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/transition--payment_error.facts.json",
+      "sha256": "3c12d30ec7210c0979f79a730a70140dfc7355554faee093d490f042f0931087"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/transition--payment_success.facts.json",
+      "sha256": "db885bf0c8a6aca7ec6f00de8bc05c846510e9378901cf3be18901a4efd09b63"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/validation--payment_failed--submit_payment--allowed.facts.json",
+      "sha256": "7ea0a89a5e16c9e833c40b237f8e7512dc753b30b787935bb5d18edf236408be"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/validation--payment_failed--submit_payment--invalid.facts.json",
+      "sha256": "277f06b77f7a9d2b3e066c50cb0f83b3b92345941b3c3d7f7dfede1c432227a9"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/validation--payment_input_valid--submit_payment--allowed.facts.json",
+      "sha256": "0679f9f3bdb655caaa03124f7d2e3abb56b53143ca44a64d1386900054509673"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/validation--payment_input_valid--submit_payment--invalid.facts.json",
+      "sha256": "9ca16e4cb01f4f4839089b728283c2122aaaf81293e00e9165a66a3f6ac6c4ce"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/validation--payment_ready--submit_payment--allowed.facts.json",
+      "sha256": "7064eb2b90afa87bcf06e61ec1b07e5d8c7cc45fe70b6a7c05db0bb3f266d83b"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/evidence/validation--payment_ready--submit_payment--invalid.facts.json",
+      "sha256": "74030576fdd444c31dcb977d7ba8e449030438587102bb9031574bf74021873f"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/app.py",
+      "sha256": "a2f245edf8f63cb34b4ed3ff67ccc5c8d9c0ad04ce0d5c8bc5e881d944758030"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/capture.mjs",
+      "sha256": "4e4a6410c88ba805247441df371fdd5d9b188674f660b01c074e1f5604fcb0f1"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/convert_causal.py",
+      "sha256": "ffe003c4e6840506f62cef7d68e723393499d5e03aaa9e1e05575ec00265a019"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/convert_observations.py",
+      "sha256": "ca015ce82721d903dc65c81eb183d184063ff7195376b0c7bb6ce8663c719e37"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/convert_tree.py",
+      "sha256": "bf4349f6f801d00df5236d26cb135df9b8075c54c930bff325e1b0c95b24c4f9"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/dom_capture.mjs",
+      "sha256": "1881e41478da66f3d17f256eb3a203cd797c972a7e70d76eb0b96097f43230e8"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/font-sources.json",
+      "sha256": "232cf057f2e6fc350453a85735b6844471219e5c401b836dbce2ac183df9a59f"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/font_capture.mjs",
+      "sha256": "78a4dbe9405198ce7bfdb37636ace6824fb4c9ef2e917fad1dc0cf99c4a44b7e"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/index.html",
+      "sha256": "9ca492a9c753edba43dc901b57a5cbc0543343a3fec68e46e3a78e8d18697e6a"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/inter-license.txt",
+      "sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/inter-regular.woff2",
+      "sha256": "e06f6b1bc553aaea4e4668023ed0ab0a147129c3107f511bc7d03d361b0ae085"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/inter-semibold.woff2",
+      "sha256": "5cb7103e4e605989afebc03d989c79201e54b21b5183db33981f70db9178a301"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/observation_facts.py",
+      "sha256": "88ae0309d22edd7db279d343e449c9b3ed09e0a521614f74b6bcaefdd3c69dcb"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/publish_capture.py",
+      "sha256": "8370f77dfa627f79195e3fd065345ece7a3b0501120adb796e3bc3e3eab54f86"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/read_storage.py",
+      "sha256": "54368323219cb0df3137ab0fd72f8392654e0988d2d497a262e62d5bb3d1c578"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/producer/run_pilot.py",
+      "sha256": "26551345227cfa8f7370f4807da45409357a567ad30cece1f97693d89e8a7f2e"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/native-design/context-fixed-layout-mcp.json",
+      "sha256": "70baec39d1dbf1db272f23645b506e29845f8f6d2910982eb5573e3700716445"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/native-design/observation-context-fix.json",
+      "sha256": "e13abbbdcd16f770ce3df88fa6f7bae73603f629b9dfaf9e6a2d10cfa2d266d0"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/WgCm6.png",
+      "sha256": "7b4aa6deeafaa87256c0bf5a6b7d8ab5181abeff4fd4f5e721d98fd5bc83f1e2"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/contact-sheet-composed.png",
+      "sha256": "8c6e4c43d55cfd7e191d941e5b75b3b7c37dcbe6a9142df88ea3691ccf4ddf82"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/contact-sheet.png",
+      "sha256": "620e52611f41c8ec864f346b6f7b584e5fbd66b5fb5bfcdfa35866932877e46d"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/hs929.png",
+      "sha256": "18b62f4b981bfc2abd6e1ae55acf5c6a0187fd7c281bc9e41c3cc09a7c17ab97"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/layout-snapshot.json",
+      "sha256": "fb1088e86b17ba05455737f688dbb32c643021da3f7fdc931e9e6ac9daed7b99"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/manifest.json",
+      "sha256": "83979054860153ac5bbe48b1319f02a4bc3906579c47e518dbb2d21488e33eeb"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/ryu4Q.png",
+      "sha256": "f4b3fe7ab6707a0f52c368f8e86264115641ccf4f2260ee196dc1a08d6ba2684"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.mockup-validation/visual-evidence/vision-report.json",
+      "sha256": "776122ec20339c2951a96fee43177a50efaeab776e5e1073b7f6702f07520a53"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/.penflow-run/pencil-persistence-receipt.json",
+      "sha256": "d183f838b6cda3fc32d3fea6110371d376e75de67bccabf1ee7102c4b78a206f"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/actual-ui-tree.json",
+      "sha256": "67bf8a11fbea5faa62f775eb2b6796d13e4ce83a23af5f79118dff60065df982"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/actual-ui-tree.provenance.json",
+      "sha256": "81dd623b6d87be690cc7e33489a87a865e0f1ad1a61e607c040ddb3e2edb237e"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/causal-receipts/save.json",
+      "sha256": "2a0bfe5d1e91ba4498904a9413c4df350649dbf4009cffdf29922fe78344fce6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/causal-receipts/storage_error.json",
+      "sha256": "42971ed8c4ef214f4f17dad033fd4b7d30a6d9b03696b6755ee42df900223b33"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/causal-transition-evidence.json",
+      "sha256": "1098f140721ad73606052d9481101a8a7456546d2e9cdcf84d77d46f5b831c58"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/code-ir.json",
+      "sha256": "14f76293210b4810e80af397f8c36d32c1c474aa84d26075c1b5a8938118422c"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/expected-ui-tree.json",
+      "sha256": "95740e6759c177cd28231a72c3d50cc067ff8734172d19e2c3d88c00f3286a01"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/contract.json",
+      "sha256": "46483d40b42a2425dbb8b837825de61ad3c186bd761f8a3e2afdd5be986a9c2a"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/flows/checkout.md",
+      "sha256": "8c4816ee2454ead80c1d8b4d62c3f98327c4fe38177d7050183f764cb2355353"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/generated-docs.json",
+      "sha256": "53133d6606822d3527d8fcc27681d9a03565915e6c90ef9db893957ea66bb392"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/screens/checkout.md",
+      "sha256": "31fd5eb6f9063a4592c231db85dec132b461ccb047364e33ff2cbb6a44673ce6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/screens/details.md",
+      "sha256": "9f46440562854f618a4a15706f8a0149505a3baeb8e71f6f0d1c29c9aef9e3a6"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/flow-ui-contract/screens/receipt.md",
+      "sha256": "88dca9794c9d60605c6c42299d50ff005ab380fe81555a92bf21f1ff139d3dea"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/action--edit_amount--allowed.json",
+      "sha256": "0897e0694f807138d3dc4444afbb07589fe357e8c259399a435c1ffacee774b9"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/action--submit_payment--allowed.json",
+      "sha256": "d62d8241bd796613e64140d85959fdb8830a25e9311812b6d7e6d9ad53fe0e54"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/effect--create_payment--submit_payment--error.json",
+      "sha256": "f60b05e6ff9c251c11507757bb779eeee2e07caf02388347cf3b22877225a109"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/effect--create_payment--submit_payment--success.json",
+      "sha256": "90e14b0914930022c2989d45d0d235d69921d0aa727083a2e222f5dc172dd6c7"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/permission--buyer_can_pay--submit_payment--allowed.json",
+      "sha256": "e2d929383bedbeb7d587f184387c02efc97c8bc71378843afff68ab2af07c3a0"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/permission--buyer_can_pay--submit_payment--denied.json",
+      "sha256": "8fe19ccc6cd471ad47e1d6c7dab9f77ffa891e26ccd45f39e7221a806e7ec4a1"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/persist-payment-idempotent.json",
+      "sha256": "6975beba319d19ea07dd972faf6dd7b53f2fe19e534f4de84bd44fc4cb1b449b"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/persist-payment.json",
+      "sha256": "03a791b2fab726cb35657eb58ddf2b2eca7f216f9f303d33439207c397924226"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/result--create_payment--submit_payment--error.json",
+      "sha256": "ee05b802e67af23a2418e1c6050586ef031fda090a5f3251b845ff7ae746465c"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/result--create_payment--submit_payment--success.json",
+      "sha256": "55914ecc4fcc2f816ae1b2f62615b1ca8d10831e142062a91567c67d96e01597"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/system-return--details_back.json",
+      "sha256": "3bf68794e61cd7f0c12fc3c120e1e5960d09457a590cdadaa3049559ba25d3fb"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/system-return--receipt_close.json",
+      "sha256": "3d1b0ff15fd3e7be42d7b4e4b3c87f272e96232cd38b9bd26145b2a452ad7363"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/transition--payment_error.json",
+      "sha256": "3f6193e3223dc8de05f77331b98f8b51f281b15121ddc5ea9faab25f2ca091bc"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/transition--payment_success.json",
+      "sha256": "5614b27b4b0f0df069cef14669d869eb350e2f30bef4098a59235d6363bfeb74"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_failed--submit_payment--allowed.json",
+      "sha256": "6ad903757bdcb11be811e326c7cb016dc3a6ebaf8946b52919d00484c3e51cad"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_failed--submit_payment--invalid.json",
+      "sha256": "e067f70dfc1f97e56b92b0b16db492f57a5bf21f87966b6691e41a2c97cd75aa"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_input_valid--submit_payment--allowed.json",
+      "sha256": "74a50937e29025eeaca10749ee841e8185e73a3afe466eac1814b79236154145"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_input_valid--submit_payment--invalid.json",
+      "sha256": "269444e23a0e87a709ebcbad9ac230644b61e2634cd301f1484efa906218d742"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_ready--submit_payment--allowed.json",
+      "sha256": "1556db09cdd6583d48f16476f81de24ffa02c19172150b0fb004a06c3dd15c42"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/outcome-observations/validation--payment_ready--submit_payment--invalid.json",
+      "sha256": "c0564c74d6a6d7b4fbd15831e1d5e450198d77d767e76e52a85d0a0539a67328"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/pencil-context-map.json",
+      "sha256": "86838beba7479665db0319ce87a63d2f3cad34e9446670c73c4ff815fb3b7a7e"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/semantic-ui-tree.json",
+      "sha256": "8285f31379cf4db768662f08d03f1ae65f9efcda33088619b03682ac56006bab"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/theme.css",
+      "sha256": "4a09de444bb61dd2e808949998e0c68fd6bf4348a2d6b2ad3e2dd62282e83566"
+    },
+    {
+      "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow/ui.pen",
+      "sha256": "eb7ce00ecca6a0d0eebf4617a5a220921668035b67ba8b28b3e1fccad3b31f96"
+    }
+  ],
+  "status": "PASS",
+  "version": 1
+}

@@ -25,9 +25,11 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
+from yaml import YAMLError
+
 from .coherence.rule_engine import run_coherence
 from .coherence.violation import Severity, Violation
-from .finalize_readme import build_readme
+from .finalize_readme import build_readme, recover_feature_table
 
 # @spec FR-009: finalize.py is the public logic home
 #   — .specs/features/058-deterministic-finalization/spec.md#fr-009
@@ -53,6 +55,7 @@ from .finalize_registry import (
     RegistryTarget,
     build_feature_changelog,
     build_global_changelog,
+    build_roadmap,
     build_spec_status,
     is_target_marked,
     render_marker,
@@ -64,6 +67,8 @@ from .locks import (
     acquire_lock,
     write_with_hash_check,
 )
+from .parser import parse_file
+from .penflow_closure import PenflowClosureError, require_penflow_closure
 
 # Coherence rules re-evaluated by `finalize verify`, scoped to the feature
 # (FR-004): roadmap/features (R1), README sync (R4), changelog refs (R6).
@@ -178,10 +183,11 @@ def apply_finalization(
     *,
     retry_policy: LockRetryPolicy | None = None,
     today: date | None = None,
+    build_manifest: Path | None = None,
 ) -> FinalizeApplyResult:
     """Apply all end-of-command registry updates atomically and idempotently.
 
-    @spec FR-001: atomic lock-guarded four-target apply
+    @spec FR-001: lock-guarded registry apply
     — .specs/features/058-deterministic-finalization/spec.md#fr-001
 
     Args:
@@ -189,6 +195,7 @@ def apply_finalization(
         request: Structured, date-free update payload.
         retry_policy: Opt-in lock retry (``--retry``, FR-007).
         today: Injectable date for deterministic tests (defaults to today).
+        build_manifest: Independent runner build identity for UI closure.
 
     Returns:
         :class:`FinalizeApplyResult` with the receipt path and written targets.
@@ -206,24 +213,56 @@ def apply_finalization(
             f"feature directory missing: {feature_dir}",
             subtype="state_invalid",
         )
+
+    def _require_closure() -> None:
+        # @spec FR-006: proof is current inside the write lock, or immediately
+        # before an idempotent return that performs no registry writes.
+        closure_violation = _penflow_closure_violation(
+            project_root, request.feature_slug, build_manifest, request.status
+        )
+        if closure_violation is not None:
+            receipt_path = _write_apply_receipt(
+                project_root, request, "BLOCKED", "BLOCKED", [], [closure_violation]
+            )
+            raise FinalizeError(
+                closure_violation.message, subtype="verification_failed", receipt_path=receipt_path
+            )
+
     hash8 = request.hash8()
-    targets = _active_targets(request)
+    targets = _active_targets(project_root, request)
     marker = render_marker(request.command, apply_date, hash8)
 
     def _pending() -> list[RegistryTarget]:
-        return [
-            target
-            for target in targets
-            if not is_target_marked(
-                target_path(project_root, target, request.feature_slug),
-                request.command,
-                hash8,
-            )
-        ]
+        status_changed = request.status is not None and (
+            parse_file(feature_dir / "spec.md").metadata.get("status") != request.status
+        )
+        pending: list[RegistryTarget] = []
+        for target in targets:
+            path = target_path(project_root, target, request.feature_slug)
+            if target == "roadmap":
+                # Old finalize markers cannot hide an unchecked implemented row.
+                if build_roadmap(path, request.feature_slug) != path.read_text(encoding="utf-8"):
+                    pending.append(target)
+            elif (
+                target == "readme"
+                and path.is_file()
+                and (
+                    recover_feature_table(path.read_text(encoding="utf-8"))
+                    != path.read_text(encoding="utf-8")
+                )
+            ):
+                # Old markers cannot hide rows detached by the legacy builder.
+                pending.append(target)
+            elif (status_changed and target in ("spec_status", "readme")) or not is_target_marked(
+                path, request.command, hash8
+            ):
+                pending.append(target)
+        return pending
 
     # @spec FR-002: marker-based idempotence + zero-write re-run
     # — .specs/features/058-deterministic-finalization/spec.md#fr-002
     if not _pending():
+        _require_closure()
         receipt_path = _write_apply_receipt(
             project_root, request, "already_finalized", "PASS", targets, []
         )
@@ -232,6 +271,7 @@ def apply_finalization(
     written: list[RegistryTarget] = []
     try:
         with acquire_lock(specs_root, retry_policy=retry_policy):
+            _require_closure()
             # Order matters: the pre-scan above is an optimization only; this
             # in-lock re-scan is the correctness check against concurrent
             # appliers racing on the same feature (Edge Case 7).
@@ -279,6 +319,7 @@ def verify_finalization(
     *,
     expected_command: str | None = None,
     run_id: str,
+    build_manifest: Path | None = None,
 ) -> FinalizeVerifyResult:
     """Re-check registry coherence for one feature, strictly read-only.
 
@@ -291,6 +332,7 @@ def verify_finalization(
         expected_command: When given, each always-written registry target
             must carry a finalize marker for this command (AC-006).
         run_id: Run identifier for the receipt directory.
+        build_manifest: Independent runner build identity for UI closure.
 
     Returns:
         :class:`FinalizeVerifyResult` with the verdict, receipt path, and
@@ -312,6 +354,9 @@ def verify_finalization(
     ]
     if expected_command is not None:
         violations.extend(_missing_marker_violations(project_root, feature_slug, expected_command))
+    closure_violation = _penflow_closure_violation(project_root, feature_slug, build_manifest)
+    if closure_violation is not None:
+        violations.append(closure_violation)
     checked_files = [
         target_path(project_root, target, feature_slug)
         for target in APPLY_TARGET_ORDER
@@ -338,12 +383,44 @@ def verify_finalization(
     return FinalizeVerifyResult(verdict, receipt_path, tuple(violations))
 
 
-def _active_targets(request: ApplyRequest) -> tuple[RegistryTarget, ...]:
-    if request.status is None:
-        # `--status` omitted: the spec_status target is skipped by design so
-        # commands that do not own the status (e.g. checks) can finalize.
-        return tuple(target for target in APPLY_TARGET_ORDER if target != "spec_status")
-    return APPLY_TARGET_ORDER
+def _penflow_closure_violation(
+    project_root: Path,
+    feature_slug: str,
+    build_manifest: Path | None,
+    requested_status: str | None = None,
+) -> FinalizeViolation | None:
+    """Revalidate current or requested implementation; preserve preparatory writes."""
+    spec_path = project_root / ".specs" / "features" / feature_slug / "spec.md"
+    try:
+        current_status = (
+            parse_file(spec_path).metadata.get("status") if spec_path.is_file() else None
+        )
+        # Explicit reopening is noncertifying progress, not a final success.
+        if requested_status == "Implemented" or (
+            requested_status is None and current_status == "Implemented"
+        ):
+            require_penflow_closure(project_root, feature_slug, build_manifest=build_manifest)
+    except (OSError, ValueError, YAMLError, PenflowClosureError) as exc:
+        return FinalizeViolation(rule_id="penflow.closure", message=str(exc))
+    return None
+
+
+def _active_targets(project_root: Path, request: ApplyRequest) -> tuple[RegistryTarget, ...]:
+    effective_status = request.status or parse_file(
+        target_path(project_root, "spec_status", request.feature_slug)
+    ).metadata.get("status")
+    return tuple(
+        target
+        for target in APPLY_TARGET_ORDER
+        if not (target == "spec_status" and request.status is None)
+        and not (
+            target == "roadmap"
+            and (
+                effective_status != "Implemented"
+                or not target_path(project_root, target, request.feature_slug).is_file()
+            )
+        )
+    )
 
 
 def _build_target_content(
@@ -356,6 +433,8 @@ def _build_target_content(
     path = target_path(project_root, target, request.feature_slug)
     if target == "feature_changelog":
         return build_feature_changelog(path, request, apply_date, marker)
+    if target == "roadmap":
+        return build_roadmap(path, request.feature_slug)
     if target == "readme":
         # Read the global changelog fresh from disk: the apply order writes it
         # before the README so Recent Activity includes this run's entry.

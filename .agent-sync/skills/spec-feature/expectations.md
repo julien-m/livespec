@@ -1,7 +1,7 @@
 ---
 command: spec-feature
 contract_version: "1.0"
-last_reviewed: 2026-06-27
+last_reviewed: 2026-09-05
 ---
 
 <!-- @spec(FR-004) -->
@@ -24,7 +24,7 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 - "feature"
 
 **stdout must_not_contain:**
-- "Traceback"
+- A real Python traceback header: `Traceback (most recent call last):` followed by an actual newline. Quoted or JSON-escaped diagnostics that describe the rule are permitted; section 12 defines the exact machine signature.
 
 **stderr:**
 - "_(none expected on happy path)_"
@@ -91,13 +91,15 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 - stdout marker: `Clarify gate` — Phase 1.6 runs after spec review and before plan; in `--auto`, an unresolved question emits `BLOCKED at step 1.6 - decision_needed - clarify question requires human answer`
 - stdout marker: `Specification Analysis Report` — Phase 2.6 Analyze gate (read-only `/spec-check --pre-impl`) runs after plan review and before preflight; CRITICAL or HIGH findings block implementation (`pipeline update --phase analyze --status blocked`); creates no `checks/`, no changelog, no `src/`
 - proof boundary: when `## Clarifications` is written it carries `### Session YYYY-MM-DD` with at most 5 accepted `- Q: ... -> A: ...` bullets per session and no duplicate session bullets
-- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | FAIL | PASS`
-  - `ABSENT`: feature is non-UI
-  - `BLOCKED`: UI forward contract generation failed
-  - `FAIL`: runtime raw compare report is `FAIL` or has issues
-  - `PASS`: UI forward/runtime artifacts were generated or verified, and runtime compare is `PASS` with zero issues when required
-  - `BLOCKED`: also required when `BLOCKED at step 0.5 - design_registry_sync_failed` reports `Mockups missing for Penflow UI feature`
-  - `BLOCKED`: also required when `--require-mockup-validation` reports missing Mockup Factory proof or visual-evidence status other than `PASS`
+- stdout marker: `Penflow Contract Verdict: ABSENT | READY | PASS | FAIL | BLOCKED`
+  - `ABSENT` / `READY`: unrequired non-UI or preparation inspection only, `certified: false`.
+  - `PASS`: installed Penflow revalidated the cumulative report for the caller-required profile and current report/scope/build bindings; `certified: true`.
+  - `FAIL` / `BLOCKED`: rejected, missing, stale or incompatible required evidence; raw compare PASS never substitutes for certification.
+
+### C51 stage evidence
+
+- UI closure requires implementation certification after actual captures and cumulative report production: exit 0, verdict PASS, certified true, required_profile implementation. The Test child returns actual paths in JSON extra.runner_build_manifest and extra.penflow_validation_path; absent fields cannot be synthesized. Preserve validation JSON and the independent runner manifest path; forward the manifest to UI terminal finalize/pipeline calls. Non-UI omits the argument.
+- Existing Global LiveSpec Design Registry, MockupFactory and visual-gate receipts remain required for visual closure; C51 does not replace pixel fidelity evidence.
 
 ## 7. Exit Codes
 
@@ -109,9 +111,9 @@ Run the full feature pipeline: specify → plan → review → implement → tes
 | 6    | visual gate FAIL after pipeline | iterate via `/spec-fix`; do not commit |
 | 7    | visual gate BLOCKED (missing baselines/mockups/compare reports) | generate prereqs or surface gap, no auto-PASS |
 
-## 7b. Visual Gate (required before feature completion)
+## 7b. Visual Gate (required before visual feature completion)
 
-`/spec-feature` MUST call `livespec visual-gate validate --feature <slug> --command spec-feature [--target <t>]` AFTER implementation and tests, BEFORE commit. The skill MUST refuse to commit (and MUST refuse `--auto` continuation) when the gate exit is 6 or 7.
+For VISUAL features, `/spec-feature` MUST call `livespec visual-gate validate --feature <slug> --command spec-feature [--target <t>]` AFTER implementation and tests, BEFORE commit. The skill MUST refuse to commit (and MUST refuse `--auto` continuation) when the gate exit is 6 or 7. Non-UI features do not require visual evidence; their applicable nonvisual checks remain mandatory.
 
 Nested skill calls (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-fix`) inside the pipeline run as independent sub-agents (Task tool) so each can hold its own goal without colliding with the `/spec-feature` parent goal. The parent only re-aggregates verdicts after each sub-agent returns.
 
@@ -147,6 +149,11 @@ Nested skill calls (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-tes
   **Cause:** Phase agent omitted `PHASE_RESULT` after writing the artifact
   **Fix:** Supervisor applies Phase Agent Timeout and Artifact Recovery; if required sections are missing, retry `/spec-feature --resume <feature>`
 
+## Audit and phase completion
+
+- Audit remains read-only; the authorized implementing agent fixes findings, reruns affected checks and reruns audit. No unsupported fix flag.
+- Only actually executed successful phases become Done; preserve Pending, Skipped and BLOCKED otherwise. Applicable mandatory phases still require proof before closure.
+
 ## 12. Verify Contract
 
 ```yaml
@@ -156,7 +163,7 @@ verify:
     - contains: "PHASE_RESULT"
     - receipt_verdict: {"kind": "conventions", "verdict": "PASS", "required_if_exists": true}
   must_not:
-    - contains: "Traceback"
+    - contains: "Traceback (most recent call last):\n"
   when:
     - flag: "--auto"
       must:
@@ -217,3 +224,7 @@ exit 0
 - **On success:** report changed files and verification evidence. Do not create commits, tags, pushes, or branches unless the current user request explicitly asks for that exact repository-history action.
 - **On drift:** read `FINDINGS_DETAIL` in `pipeline.md`, fix the spec/plan, re-run with `--resume`.
 - **On blocked:** run `/spec-preflight` standalone to identify the missing prerequisite.
+
+## Bound Plan Review source authority
+
+UI or accepted Penflow history requires Plan extra.review_result_path from the actual pre-dispatch snapshot review. Plan Review Done consumes --review-result and publishes the approved baseline before recording completion. Interactive overrides and stdout PASS do not substitute for this bound result. Source selection and disposition active/retired remain reviewed, including prior/new deltas.

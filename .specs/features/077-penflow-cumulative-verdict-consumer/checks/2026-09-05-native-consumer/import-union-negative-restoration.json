@@ -1,0 +1,91 @@
+{
+  "core_positive_before": {
+    "argv": [
+      "/Users/julienm/projects/penflow/.venv/bin/python",
+      "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/reviews/import-core-loader-proof.py",
+      "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"status\": \"PASS\", \"certified\": false, \"requirements\": 8, \"bindings\": 28, \"uncovered\": []}\n",
+    "stderr": ""
+  },
+  "negatives": [
+    {
+      "argv": [
+        "/Users/julienm/projects/livespec/.venv/bin/livespec",
+        "penflow-contract",
+        "review-snapshot",
+        "--feature",
+        "001-imported-notice",
+        "--project",
+        "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8",
+        "--json"
+      ],
+      "exit_code": 1,
+      "stdout": "{\"status\": \"BLOCKED\", \"certified\": false, \"reason\": \"authority_command_failed: authority_command_rejected\"}\n",
+      "stderr": "",
+      "case": "omitted-inherited-bindings"
+    },
+    {
+      "argv": [
+        "/Users/julienm/projects/livespec/.venv/bin/livespec",
+        "penflow-contract",
+        "review-snapshot",
+        "--feature",
+        "001-imported-notice",
+        "--project",
+        "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8",
+        "--json"
+      ],
+      "exit_code": 1,
+      "stdout": "{\"status\": \"BLOCKED\", \"certified\": false, \"reason\": \"approval_reference_stale: .specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/product-contract.json\"}\n",
+      "stderr": "",
+      "case": "tampered-imported-product"
+    },
+    {
+      "argv": [
+        "/Users/julienm/projects/livespec/.venv/bin/livespec",
+        "penflow-contract",
+        "review-snapshot",
+        "--feature",
+        "001-imported-notice",
+        "--project",
+        "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8",
+        "--json"
+      ],
+      "exit_code": 1,
+      "stdout": "{\"status\": \"BLOCKED\", \"certified\": false, \"reason\": \"imported_authority_pointer_removed\"}\n",
+      "stderr": "",
+      "case": "missing-authority-pointer"
+    }
+  ],
+  "source_hashes_before": {
+    "penflow/flow-ui-contract/contract.json": "8899b7c27dd2efaff84e5c81f71570b97e2f626ba63ca71d47d3ac4ef86b98ca",
+    ".specs/penflow-brainstorm-authority.json": "7a6c08507b7faaa7d09c8db2663f65e41a7614cceba4d2542d2ceb61806a286d",
+    ".specs/penflow-approvals/authority-73a4930dcfef73116d4186da3a302e3882073afc943ae9fce91eaa7829e5800b.json": "73a4930dcfef73116d4186da3a302e3882073afc943ae9fce91eaa7829e5800b",
+    ".specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/product-contract.json": "6d2ea28da708614ed7b53c06569136a4c63f0afb65fec2bfb02a9d302fa7dc4a",
+    ".specs/penflow-requirements.json": "e2271fdf0ddc8c771f24cb860fc7532ad6084471d15ed44d65e49ff9f3ea918d",
+    ".specs/penflow-verification-policy.json": "16beb92652b7b5336e567e023d1e5afb7e8158fd32773942b6d5ae78f7b71b30",
+    ".specs/features/001-imported-notice/pipeline.md": "ebb240f3b5d5e0c4fa8ef7407a8d0c93924911a0e3f9a99d997417d1df76b9b5"
+  },
+  "source_hashes_after": {
+    "penflow/flow-ui-contract/contract.json": "8899b7c27dd2efaff84e5c81f71570b97e2f626ba63ca71d47d3ac4ef86b98ca",
+    ".specs/penflow-brainstorm-authority.json": "7a6c08507b7faaa7d09c8db2663f65e41a7614cceba4d2542d2ceb61806a286d",
+    ".specs/penflow-approvals/authority-73a4930dcfef73116d4186da3a302e3882073afc943ae9fce91eaa7829e5800b.json": "73a4930dcfef73116d4186da3a302e3882073afc943ae9fce91eaa7829e5800b",
+    ".specs/penflow-authority/d734bf345232ab2c4b03ae342ada5b123e39980ff34edb5e631570fa0cf2750e/tree/handoff/penflow/product-contract/product-contract.json": "6d2ea28da708614ed7b53c06569136a4c63f0afb65fec2bfb02a9d302fa7dc4a",
+    ".specs/penflow-requirements.json": "e2271fdf0ddc8c771f24cb860fc7532ad6084471d15ed44d65e49ff9f3ea918d",
+    ".specs/penflow-verification-policy.json": "16beb92652b7b5336e567e023d1e5afb7e8158fd32773942b6d5ae78f7b71b30",
+    ".specs/features/001-imported-notice/pipeline.md": "ebb240f3b5d5e0c4fa8ef7407a8d0c93924911a0e3f9a99d997417d1df76b9b5"
+  },
+  "restored": true,
+  "core_positive_after": {
+    "argv": [
+      "/Users/julienm/projects/penflow/.venv/bin/python",
+      "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/reviews/import-core-loader-proof.py",
+      "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"status\": \"PASS\", \"certified\": false, \"requirements\": 8, \"bindings\": 28, \"uncovered\": []}\n",
+    "stderr": ""
+  }
+}

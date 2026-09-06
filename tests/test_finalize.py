@@ -457,7 +457,7 @@ class TestApplyFinalization:
         )
         assert receipt.outcome == "applied"
         assert receipt.verdict == "PASS"
-        assert len(receipt.files) == 4
+        assert len(receipt.files) == 5
 
     def test_apply_updates_spec_status_frontmatter_and_header_in_sync(self, tmp_path: Path) -> None:
         """AC-001: YAML `status:` and the `- **Status:**` header line must
@@ -508,7 +508,7 @@ class TestApplyFinalization:
         assert result.outcome == "applied"
         assert feature_changelog.read_bytes() == pre_marked
         assert "finalize:spec-implement" in (specs / "README.md").read_text()
-        assert result.skipped == ("feature_changelog",)
+        assert result.skipped == ("feature_changelog", "roadmap")
 
     def test_status_none_skips_spec_status_target(self, tmp_path: Path) -> None:
         """plan.md Step 6: omitting --status writes only the three
@@ -601,6 +601,71 @@ class TestApplyFinalization:
 
 
 class TestRegistryRecoveryAndRotation:
+    def test_legacy_readme_detached_rows_repair_on_idempotent_apply(self, tmp_path: Path) -> None:
+        specs = _make_specs_tree(tmp_path)
+        request = _implement_request()
+        apply_finalization(tmp_path, request)
+        readme = specs / "README.md"
+        marker = next(line for line in readme.read_text().splitlines() if "<!-- finalize:" in line)
+        legacy = "| Feature | Status | Priority |\n|---|---|---|\n"
+        legacy += "| [001-legacy](features/001-legacy/) | Draft | P2 |\n"
+        orphan = (
+            "| 004 | Notifications | Implemented | 2026-06-01 | 2026-06-01 | "
+            "[spec](features/004-notifications/spec.md) |"
+        )
+        readme.write_text(
+            "# Specs\n\n" + legacy + "\nKeep these notes.\n\n" + marker + "\n" + orphan + "\n"
+        )
+        result = apply_finalization(tmp_path, request)
+        assert "readme" in result.written
+        repaired = readme.read_text()
+        assert legacy in repaired
+        assert "Keep these notes." in repaired and marker in repaired
+        section = repaired.split("<!-- readme:features:start -->", 1)[1].split(
+            "<!-- readme:features:end -->", 1
+        )[0]
+        assert "| # | Feature | Status | Created | Updated | Spec |" in section
+        assert "| 004 | Notifications | Implemented |" in section
+        assert repaired.count("features/004-notifications/spec.md") == 1
+        assert (
+            verify_finalization(
+                tmp_path, request.feature_slug, run_id="legacy-readme-repair"
+            ).verdict
+            == "PASS"
+        )
+        before = readme.read_bytes()
+        assert apply_finalization(tmp_path, request).outcome == "already_finalized"
+        assert readme.read_bytes() == before
+
+    def test_current_year_global_changelog_keeps_final_newline(self, tmp_path: Path) -> None:
+        from datetime import date
+
+        specs = _make_specs_tree(tmp_path)
+        changelog = specs / "changelog.md"
+        assert changelog.read_bytes().endswith(b"\n")
+        apply_finalization(tmp_path, _implement_request(), today=date(2026, 9, 5))
+        result = changelog.read_bytes()
+        assert result.endswith(b"\n")
+        assert b"Spec created: Notifications" in result
+        assert b"Implemented: Notifications" in result
+        replay = apply_finalization(tmp_path, _implement_request(), today=date(2026, 9, 5))
+        assert replay.outcome == "already_finalized"
+        assert changelog.read_bytes() == result
+
+    def test_readme_recovery_preserves_generated_row_examples(self) -> None:
+        from validator.finalize_readme import recover_feature_table
+
+        row = (
+            "| 004 | Notifications | Draft | 2026-06-01 | 2026-06-01 | "
+            "[spec](features/004-notifications/spec.md) |"
+        )
+        examples = f"```markdown\n{row}\n```\n\n<!-- Example only\n{row}\n-->\n"
+        content = recover_feature_table(examples)
+        assert content.startswith(examples)
+        section = content.split("<!-- readme:features:start -->", 1)[1]
+        assert row not in section
+        assert recover_feature_table(content) == content
+
     def test_missing_readme_is_rebuilt_with_feature_row(self, tmp_path: Path) -> None:
         """AC-012: apply must rebuild README.md from existing artifacts
         instead of crashing on a missing registry file."""
@@ -958,3 +1023,217 @@ class TestFinalizeChaosFixtures:
         assert result.outcome == "applied"
         created = (specs / "features/004-notifications/changelog.md").read_text(encoding="utf-8")
         assert "Feature: Initial implementation" in created
+
+
+class TestFinalizeRoadmap:
+    """FR-006 / AC-007: closure repairs roadmap state, including old replays."""
+
+    @pytest.mark.parametrize(
+        "label",
+        [
+            "**004-notifications** → [spec](features/004-notifications/spec.md)",
+            "[Notifications](features/004-notifications/spec.md)",
+            "**Notifications** — scope M → [spec](features/004-notifications/spec.md)",
+            ("**Notify** → [spec](features/004-notifications/spec.md) <!-- intent retained -->"),
+        ],
+    )
+    def test_apply_then_verify_checks_only_matching_feature(
+        self, tmp_path: Path, label: str
+    ) -> None:
+        specs = _make_specs_tree(tmp_path)
+        roadmap = specs / "roadmap.md"
+        neighbor = "- [ ] **005-next** → [spec](features/005-next/spec.md)\n"
+        before = f"<!-- roadmap:mvp:start -->\n- [ ] {label}\n{neighbor}<!-- roadmap:mvp:end -->\n"
+        roadmap.write_text(before)
+        result = apply_finalization(tmp_path, _implement_request())
+        assert "roadmap" in result.written
+        assert roadmap.read_text() == before.replace(f"- [ ] {label}", f"- [x] {label}")
+        verified = verify_finalization(
+            tmp_path,
+            "004-notifications",
+            expected_command="spec-implement",
+            run_id="verify-roadmap",
+        )
+        assert verified.verdict == "PASS", verified.violations
+        receipt = json.loads(result.receipt_path.read_text())
+        assert any(item["path"] == ".specs/roadmap.md" for item in receipt["files"])
+
+    def test_old_marker_replay_repairs_roadmap_without_changelog_duplication(
+        self, tmp_path: Path
+    ) -> None:
+        specs = _make_specs_tree(tmp_path)
+        request = _implement_request()
+        apply_finalization(tmp_path, request)
+        before = _registry_snapshot(specs)
+        roadmap = specs / "roadmap.md"
+        roadmap.write_text(roadmap.read_text().replace("- [x]", "- [ ]"))
+        assert verify_finalization(tmp_path, request.feature_slug, run_id="drift").verdict == "FAIL"
+        repaired = apply_finalization(tmp_path, request)
+        assert repaired.written == ("roadmap",)
+        assert _registry_snapshot(specs) == before
+        verified = verify_finalization(tmp_path, request.feature_slug, run_id="repaired")
+        assert verified.verdict == "PASS"
+        assert apply_finalization(tmp_path, request).outcome == "already_finalized"
+        assert _registry_snapshot(specs) == before
+
+    @pytest.mark.parametrize("status", ["Planned", "Draft", "Deprecated", None])
+    def test_nonfinal_status_does_not_certify_roadmap(
+        self, tmp_path: Path, status: str | None
+    ) -> None:
+        from dataclasses import replace
+
+        specs = _make_specs_tree(tmp_path)
+        roadmap = specs / "roadmap.md"
+        roadmap.write_text(roadmap.read_text().replace("- [x]", "- [ ]"))
+        before = roadmap.read_bytes()
+        result = apply_finalization(tmp_path, replace(_implement_request(), status=status))
+        assert "roadmap" not in result.written
+        assert roadmap.read_bytes() == before
+
+    def test_examples_and_unlinked_intent_are_never_mutated(self, tmp_path: Path) -> None:
+        specs = _make_specs_tree(tmp_path)
+        roadmap = specs / "roadmap.md"
+        row = "- [ ] [Notifications](features/004-notifications/spec.md)\n"
+        examples = (
+            f"```markdown\n{row}```\n"
+            f"~~~~markdown\n{row}~~~~\n"
+            f"<!--\n{row}-->\n"
+            f"    {row}"
+            "- [ ] 004-notifications — backlog intent without spec link\n"
+            "- [ ] [Other](features/004-notifications-other/spec.md)\n"
+        )
+        roadmap.write_text(row + examples)
+        apply_finalization(tmp_path, _implement_request())
+        assert roadmap.read_text() == row.replace("- [ ]", "- [x]") + examples
+
+    def test_real_cli_apply_then_verify_supports_slug_with_spec_label(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from validator.cli import app
+
+        specs = _make_specs_tree(tmp_path)
+        (specs / "roadmap.md").write_text(
+            "- [ ] **004-notifications** → [spec](features/004-notifications/spec.md)\n"
+        )
+        entry = _write_entry_file(tmp_path)
+        monkeypatch.chdir(tmp_path)
+        runner = CliRunner()
+        applied = runner.invoke(
+            app,
+            [
+                "finalize",
+                "apply",
+                "--feature",
+                "004-notifications",
+                "--command",
+                "spec-test",
+                "--status",
+                "Implemented",
+                "--entry-file",
+                str(entry),
+                "--summary",
+                "[Feature 004] Implemented: Notifications",
+            ],
+        )
+        assert applied.exit_code == 0, applied.output
+        verified = runner.invoke(
+            app,
+            [
+                "finalize",
+                "verify",
+                "--feature",
+                "004-notifications",
+                "--command",
+                "spec-test",
+            ],
+        )
+        assert verified.exit_code == 0, verified.output
+
+
+class TestFinalizeClosureOrdering:
+    """Boundary stubs prove lock ordering only, not native C51 certification."""
+
+    def test_changed_proof_before_lock_blocks_all_registry_writes(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from contextlib import contextmanager
+
+        import validator.finalize as module
+
+        specs = _make_specs_tree(tmp_path)
+        before = _registry_snapshot(specs)
+        actual_lock = module.acquire_lock
+        proof = {"current": True}
+        calls: list[bool] = []
+
+        @contextmanager
+        def change_proof_then_acquire(*args, **kwargs):
+            proof["current"] = False
+            with actual_lock(*args, **kwargs):
+                yield
+
+        def check_closure(*_args):
+            calls.append(proof["current"])
+            if not proof["current"]:
+                return module.FinalizeViolation(
+                    rule_id="penflow.closure", message="protocol boundary: approval changed"
+                )
+            return None
+
+        monkeypatch.setattr(module, "acquire_lock", change_proof_then_acquire)
+        monkeypatch.setattr(module, "_penflow_closure_violation", check_closure)
+        with pytest.raises(FinalizeError, match="approval changed") as error:
+            apply_finalization(tmp_path, _implement_request())
+        assert calls == [False]
+        after = _registry_snapshot(specs)
+        after.pop(str(specs / ".LOCK"), None)  # Acquiring the real lock creates its empty file.
+        assert after == before
+        assert error.value.receipt_path is not None
+        receipt = json.loads(error.value.receipt_path.read_text())
+        assert receipt["verdict"] == "BLOCKED"
+        assert receipt["files"] == []
+
+    def test_normal_apply_checks_once_under_lock_and_replay_checks_current_proof(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from contextlib import contextmanager
+
+        import validator.finalize as module
+
+        specs = _make_specs_tree(tmp_path)
+        actual_lock = module.acquire_lock
+        locked = False
+        proof_current = True
+        events: list[tuple[str, bool]] = []
+
+        @contextmanager
+        def observed_lock(*args, **kwargs):
+            nonlocal locked
+            with actual_lock(*args, **kwargs):
+                locked = True
+                try:
+                    yield
+                finally:
+                    locked = False
+
+        def check_closure(*_args):
+            events.append(("closure", locked))
+            if not proof_current:
+                return module.FinalizeViolation(
+                    rule_id="penflow.closure", message="protocol boundary: proof stale"
+                )
+            return None
+
+        monkeypatch.setattr(module, "acquire_lock", observed_lock)
+        monkeypatch.setattr(module, "_penflow_closure_violation", check_closure)
+        request = _implement_request()
+        assert apply_finalization(tmp_path, request).outcome == "applied"
+        assert events == [("closure", True)]
+        before = _registry_snapshot(specs)
+        assert apply_finalization(tmp_path, request).outcome == "already_finalized"
+        assert events == [("closure", True), ("closure", False)]
+        proof_current = False
+        with pytest.raises(FinalizeError, match="proof stale"):
+            apply_finalization(tmp_path, request)
+        assert events[-1] == ("closure", False)
+        assert _registry_snapshot(specs) == before

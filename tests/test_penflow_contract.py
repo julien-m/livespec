@@ -117,10 +117,10 @@ def test_status_blocks_missing_actual_only_when_runtime_required(
     assert non_runtime_status.runtime_reason == "actual_tree_not_required"
     assert runtime_status.state == "ready"
     assert runtime_status.runtime_comparison == "BLOCKED"
-    assert runtime_status.runtime_reason == "actual_tree_missing"
+    assert runtime_status.runtime_reason == "independent_build_manifest_required"
 
 
-def test_status_reports_runtime_ready_when_actual_tree_exists(tmp_path: Path) -> None:
+def test_status_blocks_certification_when_only_actual_tree_exists(tmp_path: Path) -> None:
     (tmp_path / "penflow" / "flow-ui-contract").mkdir(parents=True)
     _write_json(
         tmp_path / "penflow" / "ui.pen",
@@ -133,8 +133,9 @@ def test_status_reports_runtime_ready_when_actual_tree_exists(tmp_path: Path) ->
 
     status = get_penflow_contract_status(tmp_path, require_actual=True)
 
-    assert status.runtime_comparison == "READY"
-    assert status.runtime_reason == "actual_tree_present"
+    assert status.runtime_comparison == "BLOCKED"
+    assert status.runtime_reason == "independent_build_manifest_required"
+    assert status.certified is False
 
 
 def test_status_reports_runtime_fail_when_compare_report_fails(tmp_path: Path) -> None:
@@ -156,12 +157,14 @@ def test_status_reports_runtime_fail_when_compare_report_fails(tmp_path: Path) -
         },
     )
 
-    status = get_penflow_contract_status(tmp_path, require_actual=True)
+    status = get_penflow_contract_status(tmp_path)
 
     assert status.runtime_comparison == "FAIL"
     assert status.runtime_reason == "compare_report_failed"
     assert status.compare_status == "FAIL"
     assert status.compare_issue_count == 1
+
+    assert status.certified is False
 
 
 def test_status_reports_runtime_fail_when_compare_report_has_issues(tmp_path: Path) -> None:
@@ -183,12 +186,14 @@ def test_status_reports_runtime_fail_when_compare_report_has_issues(tmp_path: Pa
         },
     )
 
-    status = get_penflow_contract_status(tmp_path, require_actual=True)
+    status = get_penflow_contract_status(tmp_path)
 
     assert status.runtime_comparison == "FAIL"
     assert status.runtime_reason == "compare_report_has_issues"
     assert status.compare_status == "PASS"
     assert status.compare_issue_count == 1
+
+    assert status.certified is False
 
 
 def test_status_reports_runtime_ready_when_compare_report_passes_without_issues(
@@ -208,12 +213,14 @@ def test_status_reports_runtime_ready_when_compare_report_passes_without_issues(
         {"status": "PASS", "summary": {"issues": 0}, "issues": []},
     )
 
-    status = get_penflow_contract_status(tmp_path, require_actual=True)
+    status = get_penflow_contract_status(tmp_path)
 
     assert status.runtime_comparison == "READY"
     assert status.runtime_reason == "compare_report_passed"
     assert status.compare_status == "PASS"
     assert status.compare_issue_count == 0
+
+    assert status.certified is False
 
 
 def test_status_reports_incomplete_workspace(tmp_path: Path) -> None:
@@ -487,6 +494,9 @@ def test_status_accepts_required_mockup_validation(tmp_path: Path) -> None:
     assert status.state == "ready"
     assert status.mockup_validation_status == "PASS"
     assert status.mockup_validation_missing == []
+    assert status.required_profile is None
+    assert status.verification is None
+    assert not status.certified
 
 
 def test_status_rejects_non_pass_mockup_validation(tmp_path: Path) -> None:
@@ -604,7 +614,8 @@ def test_penflow_contract_status_cli_json(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
     assert payload["state"] == "ready"
-    assert payload["verdict"] == "PASS"
+    assert payload["verdict"] == "READY"
+    assert payload["certified"] is False
     assert payload["workspace"].endswith("penflow")
 
 
@@ -624,7 +635,7 @@ def test_penflow_contract_status_cli_text_reports_verdict(tmp_path: Path) -> Non
     )
 
     assert result.exit_code == 0, result.output
-    assert "Penflow Contract Verdict: PASS" in result.output
+    assert "Penflow Contract Verdict: READY" in result.output
 
 
 def test_penflow_contract_status_cli_blocks_required_actual_tree(
@@ -651,10 +662,10 @@ def test_penflow_contract_status_cli_blocks_required_actual_tree(
         ],
     )
 
-    assert result.exit_code == 2, result.output
+    assert result.exit_code == 1, result.output
     payload = json.loads(result.output)
     assert payload["runtime_comparison"] == "BLOCKED"
-    assert payload["runtime_reason"] == "actual_tree_missing"
+    assert payload["runtime_reason"] == "independent_build_manifest_required"
     assert payload["verdict"] == "BLOCKED"
 
 
@@ -683,7 +694,7 @@ def test_penflow_contract_status_cli_blocks_required_design_registry(tmp_path: P
         ],
     )
 
-    assert result.exit_code == 2, result.output
+    assert result.exit_code == 1, result.output
     payload = json.loads(result.output)
     assert payload["verdict"] == "BLOCKED"
     assert payload["design_registry_required"] is True
@@ -715,7 +726,7 @@ def test_penflow_contract_status_cli_blocks_required_mockup_validation(tmp_path:
         ],
     )
 
-    assert result.exit_code == 2, result.output
+    assert result.exit_code == 1, result.output
     payload = json.loads(result.output)
     assert payload["verdict"] == "BLOCKED"
     assert payload["mockup_validation_required"] is True
@@ -780,7 +791,7 @@ def test_penflow_contract_status_cli_fails_raw_compare_fail(tmp_path: Path) -> N
 
     assert result.exit_code == 1, result.output
     payload = json.loads(result.output)
-    assert payload["verdict"] == "FAIL"
-    assert payload["runtime_comparison"] == "FAIL"
+    assert payload["verdict"] == "BLOCKED"
+    assert payload["runtime_comparison"] == "BLOCKED"
     assert payload["compare_status"] == "FAIL"
     assert payload["compare_issue_count"] == 1

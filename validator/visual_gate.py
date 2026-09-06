@@ -30,9 +30,13 @@ declared in :mod:`validator.cli_exit_codes`.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, cast
+
+import frontmatter
+import mistune
 
 from validator.design_alignment.core import compare_contract_files
 from validator.design_alignment.models import AlignmentResult
@@ -86,7 +90,7 @@ def _as_list(value: object) -> list[object] | None:
 
 @dataclass(frozen=True)
 class VisualFeatureSignals:
-    """Six deterministic detection signals (P0-A decision table)."""
+    """Deterministic artifact and active source signals for visual work."""
 
     s1_spec_marker: bool
     s1_spec_explicit_false: bool
@@ -95,6 +99,7 @@ class VisualFeatureSignals:
     s4_flow_ui_contract: bool
     s5_feature_baselines: bool
     s6_surfaces_yaml: bool
+    s7_spec_ui_sections: bool = False
 
     @property
     def strong_count(self) -> int:
@@ -102,6 +107,7 @@ class VisualFeatureSignals:
             int(self.s2_feature_screens)
             + int(self.s3_penflow_workspace)
             + int(self.s4_flow_ui_contract)
+            + int(self.s7_spec_ui_sections)
         )
 
     @property
@@ -118,6 +124,7 @@ class VisualFeatureSignals:
             "s4_flow_ui_contract": self.s4_flow_ui_contract,
             "s5_feature_baselines": self.s5_feature_baselines,
             "s6_surfaces_yaml": self.s6_surfaces_yaml,
+            "s7_spec_ui_sections": self.s7_spec_ui_sections,
             "strong_count": self.strong_count,
             "weak_count": self.weak_count,
         }
@@ -377,37 +384,46 @@ def _read_spec_visual_marker(spec_md: Path) -> tuple[bool, bool]:
         raw = spec_md.read_text(encoding="utf-8")
     except OSError:
         return False, False
-    # Cheap parse: front-matter between leading ``---`` delimiters.
-    lines = raw.splitlines()
-    if not lines or not lines[0].startswith("---"):
-        return _scan_inline_markers(raw)
-    end_idx = next(
-        (i for i, line in enumerate(lines[1:], start=1) if line.strip() == "---"),
-        None,
-    )
-    if end_idx is None:
-        return _scan_inline_markers(raw)
-    front_matter = "\n".join(lines[1:end_idx])
-    has_marker = False
-    explicit_false = False
-    for line in front_matter.splitlines():
-        stripped = line.strip().lower()
-        if stripped.startswith("visual:"):
-            has_marker = True
-            value = stripped.split(":", 1)[1].strip()
-            if value in ("false", "no", "0"):
-                explicit_false = True
-        elif stripped.startswith("surface:"):
-            has_marker = True
-    inline_marker, inline_false = _scan_inline_markers(raw)
-    return has_marker or inline_marker, explicit_false or inline_false
+    post = frontmatter.loads(raw)
+    # Frontmatter is the explicit authority; a body example cannot override it.
+    if "visual" in post.metadata:
+        value = post.metadata["visual"]
+        return True, str(value).strip().casefold() in {"false", "no", "0"}
+    if "surface" in post.metadata:
+        return True, False
+    return _scan_inline_markers(post.content)
 
 
 def _scan_inline_markers(raw: str) -> tuple[bool, bool]:
-    lowered = raw.lower()
-    has_marker = "[visual]" in lowered or "[surface=" in lowered or "visual:" in lowered
-    explicit_false = "[visual:false]" in lowered or "visual: false" in lowered
-    return has_marker, explicit_false
+    """Recognize portable annotations in visible AST text, excluding examples."""
+    nodes = _as_list(mistune.create_markdown(renderer="ast")(raw)) or []
+    visible = "\n".join(
+        _inline_marker_text(node) for value in nodes if (node := _as_mapping(value)) is not None
+    ).casefold()
+    # Tags are explicit portable syntax; bare YAML requires its own visible line
+    # for compatibility with unfinished frontmatter, never an arbitrary mention.
+    tags = re.findall(r"\[visual(?::(?:true|false))?\]|\[surface=[^\]\s]+\]", visible)
+    scalar = re.findall(r"^\s*visual:\s*(true|false|yes|no|0|1)\s*$", visible, re.MULTILINE)
+    has_true = any(tag != "[visual:false]" for tag in tags) or any(
+        value in {"true", "yes", "1"} for value in scalar
+    )
+    has_false = "[visual:false]" in tags or any(value in {"false", "no", "0"} for value in scalar)
+    # Conflicting inline declarations may not suppress a positive UI obligation.
+    return has_true or has_false, has_false and not has_true
+
+
+def _inline_marker_text(node: dict[str, object]) -> str:
+    """Preserve inline spelling without incorporating quoted or code examples."""
+    if node.get("type") in {"block_code", "codespan", "block_quote", "block_html", "inline_html"}:
+        return ""
+    raw = node.get("raw")
+    if isinstance(raw, str):
+        return raw
+    return "".join(
+        _inline_marker_text(child)
+        for value in (_as_list(node.get("children")) or [])
+        if (child := _as_mapping(value)) is not None
+    )
 
 
 def spec_declares_visual_false(spec_md: Path) -> bool:
@@ -511,28 +527,59 @@ def _surfaces_yaml_mentions_feature(project_root: Path, feature_slug: str) -> bo
     )
 
 
+def _active_ui_node_text(node: dict[str, object]) -> str:
+    """Read actual Markdown content while excluding examples and table headers."""
+    if node.get("type") in {"block_code", "block_quote", "block_html", "inline_html", "table_head"}:
+        return ""
+    raw = node.get("raw")
+    if isinstance(raw, str):
+        return raw
+    children = _as_list(node.get("children")) or []
+    return " ".join(
+        _active_ui_node_text(child)
+        for value in children
+        if (child := _as_mapping(value)) is not None
+    )
+
+
+# @spec FR-006: active source sections participate before generated artifacts exist
+# — .specs/features/077-penflow-cumulative-verdict-consumer/spec.md#fr-006
+def _has_active_spec_ui_sections(spec_md: Path) -> bool:
+    """Detect content in real UI sections; examples and non-applicability do not opt in."""
+    if not spec_md.is_file():
+        return False
+    body = frontmatter.loads(spec_md.read_text(encoding="utf-8")).content
+    nodes = _as_list(mistune.create_markdown(renderer="ast", plugins=["table"])(body)) or []
+    active_section = False
+    nonapplicable = {"", "n/a", "not applicable", "none", "non applicable", "sans objet"}
+    for value in nodes:
+        node = _as_mapping(value)
+        if node is None:
+            continue
+        if node.get("type") == "heading":
+            attrs = _as_mapping(node.get("attrs")) or {}
+            level = attrs.get("level")
+            if isinstance(level, int) and level <= 2:
+                active_section = level == 2 and _active_ui_node_text(node).strip().casefold() in {
+                    "screens",
+                    "penflow contract",
+                }
+            continue
+        # Stop as soon as a declared section has substantive content; generated
+        # artifacts are deliberately not prerequisites for source classification.
+        if active_section and node.get("type") in {"paragraph", "list", "table"}:
+            content = " ".join(_active_ui_node_text(node).split()).strip(" .:;!—-").casefold()
+            if content not in nonapplicable:
+                return True
+    return False
+
+
 def detect_visual_feature(*, project_root: Path, feature_slug: str) -> VisualClassification:
     """Apply the P0-A deterministic detection table."""
     feature_dir = _feature_dir(project_root, feature_slug)
     spec_md = feature_dir / "spec.md"
 
     s1_present, s1_false = _read_spec_visual_marker(spec_md)
-    if s1_false:
-        signals = VisualFeatureSignals(
-            s1_spec_marker=True,
-            s1_spec_explicit_false=True,
-            s2_feature_screens=False,
-            s3_penflow_workspace=False,
-            s4_flow_ui_contract=False,
-            s5_feature_baselines=False,
-            s6_surfaces_yaml=False,
-        )
-        return VisualClassification(
-            classification="NON_VISUAL",
-            signals=signals,
-            conflict_reason=None,
-        )
-
     s2_feature_screens = (
         (feature_dir / "design").is_dir() and any((feature_dir / "design").rglob("*.png"))
     ) or (
@@ -547,17 +594,23 @@ def detect_visual_feature(*, project_root: Path, feature_slug: str) -> VisualCla
 
     signals = VisualFeatureSignals(
         s1_spec_marker=s1_present,
-        s1_spec_explicit_false=False,
+        s1_spec_explicit_false=s1_false,
         s2_feature_screens=s2_feature_screens,
         s3_penflow_workspace=s3_penflow,
         s4_flow_ui_contract=s4_flow_ui,
         s5_feature_baselines=s5_baselines,
         s6_surfaces_yaml=s6_surfaces,
+        s7_spec_ui_sections=_has_active_spec_ui_sections(spec_md),
     )
+
+    # Preserve the partial visual gate opt-out while exposing active signals
+    # to lifecycle closure, which must detect contradictory current authority.
+    if s1_false:
+        return VisualClassification(classification="NON_VISUAL", signals=signals)
 
     if signals.strong_count >= 1:
         if s1_present is False and signals.s5_feature_baselines is False:
-            # All strong signals come from filesystem evidence -> definitely VISUAL.
+            # Active source declarations and artifacts both establish visual work.
             return VisualClassification(classification="VISUAL", signals=signals)
         return VisualClassification(classification="VISUAL", signals=signals)
     if signals.strong_count == 0 and signals.weak_count >= 1:

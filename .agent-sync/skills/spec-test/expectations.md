@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-06-27
+last_reviewed: 2026-09-05
 ---
 
 <!-- @spec(FR-004) -->
@@ -86,14 +86,15 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 - proof boundary: `visual_evidence_receipt_path` remains required for pixel fidelity; preview URLs are human-visible annotation proof only
 - proof boundary: native QE Analysis from `system/qe-analysis.md` verifies AC/FR test-evidence sufficiency, required gates, expected evidence, missing proof, and review/audit/test boundaries; user hooks are extension-only
 - stdout marker: `Design Alignment Verdict: PASS | FAIL | BLOCKED` for `--visual` runs when `ui.pen` is present or changed
-- stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED` for UI runs
-  - `ABSENT`: no root `penflow/`
-  - `PASS`: `actual-ui-tree.json` validates and matches `expected-ui-tree.json`
-  - `FAIL`: compare report contains structural drift
-  - `BLOCKED`: required artifacts, `actual-ui-tree.json`, or Penflow CLI are missing
-  - `BLOCKED`: also required when the Global LiveSpec Design Registry has no matching mockup PNGs under `.specs/design/screens/<feature_slug>/`
-  - `BLOCKED`: also required when `--require-mockup-validation` reports missing Mockup Factory proof or visual-evidence status other than `PASS`
-  - note: non-UI runs without runtime comparison can report `runtime_comparison: ABSENT` while final verdict remains `PASS` when root Penflow planning artifacts are ready
+- stdout marker: `Penflow Contract Verdict: ABSENT | READY | PASS | FAIL | BLOCKED`
+  - `ABSENT` / `READY`: unrequired non-UI or preparation inspection only, `certified: false`.
+  - `PASS`: installed Penflow revalidated the cumulative report for the caller-required profile and current report/scope/build bindings; `certified: true`.
+  - `FAIL` / `BLOCKED`: rejected, missing, stale or incompatible required evidence; raw compare PASS never substitutes for certification.
+
+### C51 stage evidence
+
+- UI closure requires implementation certification after actual captures and cumulative report production: exit 0, verdict PASS, certified true, required_profile implementation. Preserve validation JSON and the independent runner manifest path; forward the manifest to UI terminal finalize/pipeline calls. Non-UI omits the argument.
+- Existing Global LiveSpec Design Registry, MockupFactory and visual-gate receipts remain required for visual closure; C51 does not replace pixel fidelity evidence.
 
 ## 7. Exit Codes
 
@@ -215,3 +216,7 @@ apps/web/tests/e2e/<feature>/
 - **On success:** commit baselines + checks file, push.
 - **On drift:** open the gap report, fix code or update spec; re-run with `--update` when ready to re-baseline.
 - **On blocked:** create the surface entry in `.specs/surfaces.yaml`, then re-run.
+
+## C51 child transport
+
+- UI success returns actual existing paths in canonical PHASE_RESULT JSON `extra.runner_build_manifest` and `extra.penflow_validation_path`; they come from the completed runner and current validation, with no synthesized values. Missing, stale or malformed transport keeps UI closure blocked. Non-UI omits these inputs.

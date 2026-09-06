@@ -1,0 +1,2 @@
+R1.3: Feature '001-checkout-overview' has status 'Implemented' but roadmap item '**001-checkout-overview** → [spec](features/001-checkout-overview/spec.md)' is unchecked
+finalize verify: FAIL (1 violations)

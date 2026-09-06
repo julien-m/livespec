@@ -58,6 +58,24 @@ def _wrap(prefix: str, body: dict[str, object], digest: str = "a3f1b8c2") -> str
 
 
 class TestPhaseResultParser:
+    # @spec FR-001: analyze is the existing pre-implementation pipeline phase
+    # — .specs/features/070-analyze-gate/spec.md#fr-001
+    @pytest.mark.parametrize("status", ["OK", "BLOCKED"])
+    def test_parses_canonical_analyze_phase(self, status: str) -> None:
+        artifact = ".specs/.runs/spec-check-2026-09-05-analyze.json"
+        payload = _valid_phase_payload(
+            phase="analyze",
+            status=status,
+            run_artifact=artifact,
+            blocked_reason="coverage_gap" if status == "BLOCKED" else None,
+            extra={"coverage_percent": 100, "critical": 0, "high": 0},
+        )
+        result = parse_phase_result(_wrap("PHASE_RESULT", payload))
+        assert result.phase == "analyze"
+        assert result.status == status
+        assert result.run_artifact == artifact
+        assert result.extra == payload["extra"]
+
     def test_parses_valid_block(self) -> None:
         text = "Some preamble.\n" + _wrap("PHASE_RESULT", _valid_phase_payload())
         result = parse_phase_result(text)

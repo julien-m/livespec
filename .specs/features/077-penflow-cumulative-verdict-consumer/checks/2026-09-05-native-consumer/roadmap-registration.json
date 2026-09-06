@@ -1,0 +1,8 @@
+{
+  "path": "/Users/julienm/projects/livespec/.specs/roadmap.md",
+  "before_sha256": "5a15d89d80304f65f5563a0f064ae3ef1e6d22fa9d573e5107fe5ee7071be380",
+  "after_sha256": "bf772062b538bfdbcda14d73c8fff384a57aa2f57ce7c97e1fda9487b65b7fcf",
+  "entry": "- [ ] **Penflow Cumulative Verdict Consumer** \u2014 Revalidate authoritative C51 profiles, preserve governed requirements and imports, and enforce current proof at lifecycle closure. \u00b7 Priority: P1 \u2192 Read [077-penflow-cumulative-verdict-consumer](features/077-penflow-cumulative-verdict-consumer/spec.md)\n",
+  "checked_by": "pending official finalizer only",
+  "purpose": "Complete the missing Specify registration for the already authorized feature; no new scope."
+}

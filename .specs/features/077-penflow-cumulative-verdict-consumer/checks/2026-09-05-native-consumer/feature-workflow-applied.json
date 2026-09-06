@@ -1,0 +1,32 @@
+{
+  "archive": "/Users/julienm/projects/penflow/.specs/.runs/spec-feature-2026-09-05T17-44-54.700051-ec35583f.json",
+  "archive_sha256": "bbd74b18c64cefb40299766a1de18971b90d63a793c8aee7d327726ca4b1617d",
+  "archive_outcome": "drift",
+  "archive_unchanged": true,
+  "historical_failure": "must_not substring Traceback",
+  "before": {
+    ".agent-sync/skills/spec-feature/SKILL.md": "ba7d887165756dd3ef1868bea76e410189399550e9844e665e64235a15122beb",
+    ".agent-sync/skills/spec-feature/expectations.md": "b4eb8f4b5efbe7df4927d115e2984076eacb23a7c1b6bb21b0a3bcd05f40d14a",
+    "tests/test_penflow_contract_command_contract.py": "a08a7f2ca3fab2b9a531fd9c84d123a0c6ac6c860df2a4b5480915d120117a11"
+  },
+  "after": {
+    ".agent-sync/skills/spec-feature/SKILL.md": "8030b1c23bf5152cd3fea9ab572e00e51987818bbc5149fb4650d13ec4ed2792",
+    ".agent-sync/skills/spec-feature/expectations.md": "c5e61c2feec0e9290b7334830b534c76776932c8a627081999c3bd369e3fbfe4",
+    "tests/test_penflow_contract_command_contract.py": "2f00cf568f73c472af3ae8c082504e14f13630f600460de732889847c538e483"
+  },
+  "tests": {
+    "command": ".venv/bin/python -m pytest tests/test_penflow_contract_command_contract.py -q",
+    "passed": 28
+  },
+  "static_checks": "Ruff/Pyright PASS; formatted",
+  "deltas": [
+    "C51 caller stage profiles and proof forwarding",
+    "UI blocking review cannot override",
+    "official audit remains read-only; authorized owner corrections and re-audit",
+    "only actually proven phases become Done",
+    "future Python traceback signature includes real newline, JSON/plain diagnostics pass; actual traceback fails; historical rule still drifts",
+    "observable signal text matches traceback machine rule",
+    "visual gate required only for VISUAL features; preparation diagram READY"
+  ],
+  "scope": "future source only; no goal engine, historical contract, raw transcript or archive rewrite"
+}

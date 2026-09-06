@@ -1,0 +1,32 @@
+{
+  ".agent-sync/skills/spec-feature/SKILL.md": [
+    [
+      "1. Run `/audit --fix` \u2014 perform the quality audit and fixes in a single pass. If violations remain \u2192 abort.",
+      "1. Run `$audit` (Codex) or `/audit` (Claude Code) using its current read-only skill and supported entry point. Read the findings; the authorized implementing agent applies necessary corrections in scope, reruns affected checks, then reruns the read-only audit. Unresolved blocking findings prevent closure; never pass an unsupported fix flag or ask the auditor to modify files."
+    ],
+    [
+      "- [always] Run `/audit --fix` and verify zero remaining violations",
+      "- [always] Run the read-only audit, apply required corrections through the authorized implementing agent, rerun affected checks and audit, and verify zero unresolved blocking findings"
+    ],
+    [
+      "7. Run the following for each phase to mark all complete:",
+      "7. Record Done only for phases actually executed with successful evidence. Preserve Pending, Skipped and BLOCKED states otherwise; any applicable mandatory phase without successful proof still blocks closure. For a proven completed phase, run:"
+    ]
+  ],
+  ".agent-sync/skills/spec-feature/expectations.md": [
+    [
+      "## 12. Verify Contract",
+      "## Audit and phase completion\n\n- Audit remains read-only; the authorized implementing agent fixes findings, reruns affected checks and reruns audit. No unsupported fix flag.\n- Only actually executed successful phases become Done; preserve Pending, Skipped and BLOCKED otherwise. Applicable mandatory phases still require proof before closure.\n\n## 12. Verify Contract"
+    ],
+    [
+      "    - contains: \"Traceback\"",
+      "    - contains: \"Traceback (most recent call last):\\n\""
+    ]
+  ],
+  "tests/test_penflow_contract_command_contract.py": [
+    [
+      "    assert \"none unless explicitly authorized\" in expectations",
+      "    assert \"none unless explicitly authorized\" in expectations\n    assert \"/audit --fix\" not in body\n    assert \"current read-only skill and supported entry point\" in body\n    assert \"authorized implementing agent applies necessary corrections\" in body\n    assert \"reruns affected checks\" in body\n    assert \"Record Done only for phases actually executed with successful evidence\" in body\n    assert \"Preserve Pending, Skipped and BLOCKED states\" in body\n    assert \"mandatory phase without successful proof still blocks closure\" in body"
+    ]
+  ]
+}

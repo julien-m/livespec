@@ -1,7 +1,7 @@
 ---
 command: spec-specify
 contract_version: "1.0"
-last_reviewed: 2026-07-04
+last_reviewed: 2026-09-05
 ---
 
 # Expectations — /spec-specify
@@ -70,10 +70,14 @@ Create a new feature spec with user stories, Mermaid flowcharts, AC, and FR.
   - "Functional Requirements"
 - proof boundary: when `## Clarifications` is written it carries `### Session YYYY-MM-DD` with at most 5 accepted `- Q: ... -> A: ...` bullets per session, no duplicate bullets, and AC-/FR-/SC- numbering is preserved (text edited in place, never renumbered)
 - proof boundary: native QE Analysis from `system/qe-analysis.md` enriches risks, expected evidence, non-functional expectations, gaps, and review/audit/test boundaries; user hooks are extension-only
-- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
-  - `ABSENT`: non-UI feature without root `penflow/`
-  - `BLOCKED`: UI feature forward contract generation failed
-  - `PASS`: semantic tree was read and IDs were resolved or explicitly clarified
+- stdout marker: `Penflow Contract Verdict: ABSENT | READY | FAIL | BLOCKED`
+  - `ABSENT`: unrequired non-UI inspection has no workspace.
+  - `READY`: required planning artifacts and ID mappings are available; `certified: false`.
+  - `FAIL` / `BLOCKED`: invalid or missing required preparation input; no certification is implied.
+
+### C51 stage evidence
+
+- This command prepares inputs; no runtime report/build manifest or final certificate is required before its producing/test stage.
 
 ## 7. Exit Codes
 

@@ -28,7 +28,7 @@ def _read(relative: str) -> str:
 def test_system_penflow_contract_doc_exists() -> None:
     body = _read("system/testing/penflow-contract.md")
 
-    assert "Penflow Contract Verdict: PASS | FAIL | BLOCKED | ABSENT" in body
+    assert "Penflow Contract Verdict: READY | PASS | FAIL | BLOCKED | ABSENT" in body
     assert "penflow/semantic-ui-tree.json" in body
     assert "penflow/ui.pen is the only allowed `.pen` file" in body
     assert "duplicate `.pen`" in body
@@ -150,7 +150,7 @@ def test_visual_feature_pipeline_requires_forward_penflow_generation() -> None:
         assert "BLOCKED" in body
 
 
-def test_spec_feature_blocks_specify_until_penflow_contract_passes() -> None:
+def test_spec_feature_blocks_specify_until_penflow_preparation_ready() -> None:
     body = _read(".agent-sync/skills/spec-feature/SKILL.md")
 
     assert "Phase 0.5 is a synchronous hard gate" in body
@@ -164,7 +164,7 @@ def test_spec_feature_blocks_specify_until_penflow_contract_passes() -> None:
     assert (
         "until `livespec penflow-contract status --project . --target web-desktop "
         "--require-design-registry --require-mockup-validation --feature NNN-feature-name --json` "
-        "returns `PASS`"
+        "returns non-certifying `READY`"
     ) in body
 
 
@@ -190,10 +190,13 @@ def test_spec_feature_phase_35_requires_runtime_penflow_evidence_before_done() -
     assert "penflow/actual-ui-tree.json" in body
     assert "penflow/compare-report.json" in body
     assert "penflow/compare-report.md" in body
-    assert "Penflow Contract Verdict: PASS" in body
-    assert "raw `penflow/compare-report.json` has `status: PASS`" in body
-    assert "zero `issues`" in body
-    assert "raw compare report is `FAIL`" in body
+    assert "current C51 implementation certification" in body
+    assert "`certified: true`" in body
+    assert "it never replaces C51 validation" in body
+    assert "only after complete required coverage and current certification" in body
+    assert "extra.runner_build_manifest" in body
+    assert "extra.penflow_validation_path" in body
+    assert "returns non-certifying `READY`" in body
     assert "real browser at `1440x900`" in body
     assert "before emitting `PHASE_RESULT: OK`" in body
 
@@ -209,8 +212,15 @@ def test_spec_test_documents_web_runtime_adapter_for_actual_ui_tree() -> None:
     assert "penflow validate-actual penflow/actual-ui-tree.json --schema --json" in body
     assert "penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json" in body
     assert "Do not mark `/spec-test` successful" in body
-    assert "raw `penflow/compare-report.json` has `status: PASS`" in body
-    assert "zero `issues`" in body
+    assert "current C51 implementation certification" in body
+    assert "certified: true" in body
+    assert "--required-profile implementation --build-manifest" in body
+    runtime = (
+        body[body.index("### Web Runtime Adapter") :] if "### Web Runtime Adapter" in body else body
+    )
+    assert runtime.index("penflow run --target penflow --profile implementation") < runtime.index(
+        "livespec penflow-contract status --project . --required-profile implementation"
+    )
     assert (
         "--require-design-registry --require-mockup-validation --feature <feature_slug> --json"
         in body
@@ -377,6 +387,13 @@ def test_spec_feature_auto_mode_does_not_commit_without_explicit_authorization()
     assert "git checkout -b" not in body
     assert "commit expectations" in expectations
     assert "none unless explicitly authorized" in expectations
+    assert "/audit --fix" not in body
+    assert "current read-only skill and supported entry point" in body
+    assert "authorized implementing agent applies necessary corrections" in body
+    assert "reruns affected checks" in body
+    assert "Record Done only for phases actually executed with successful evidence" in body
+    assert "Preserve Pending, Skipped and BLOCKED states" in body
+    assert "mandatory phase without successful proof still blocks closure" in body
 
 
 def test_spec_feature_recovers_when_phase_agent_writes_artifact_without_result() -> None:
@@ -405,17 +422,71 @@ def test_ui_commands_reference_penflow_contract_artifacts() -> None:
     assert "penflow/code-ir.json" in plan
     assert "penflow/expected-ui-tree.json" in implement
     assert "Penflow Contract Gate" in test
-    assert "--require-actual" in test
+    assert "--required-profile implementation --build-manifest" in test
+    assert "extra.runner_build_manifest" in test
+    assert "extra.penflow_validation_path" in test
     assert "penflow compare-tree" in test
     assert "Penflow Contract Status" in check
-    assert "do not read `.brainstorm/`" in check
+    assert "never read `.brainstorm/`" in check
 
 
 def test_command_expectations_include_penflow_verdicts() -> None:
     for skill in ("spec-init", "spec-specify", "spec-plan"):
         body = _read(f".agent-sync/skills/{skill}/expectations.md")
-        assert "Penflow Contract Verdict: ABSENT | BLOCKED | PASS" in body
+        assert "Penflow Contract Verdict: ABSENT | READY | FAIL | BLOCKED" in body
+        assert "certified: false" in body
 
     for skill in ("spec-implement", "spec-test", "spec-check"):
         body = _read(f".agent-sync/skills/{skill}/expectations.md")
-        assert "Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED" in body
+        assert "Penflow Contract Verdict: ABSENT | READY | PASS | FAIL | BLOCKED" in body
+        assert "certified: true" in body
+
+
+def test_plan_binds_review_before_design_certification() -> None:
+    body = _read(".agent-sync/skills/spec-plan/SKILL.md")
+    gate = body[body.index("### Bound Penflow source review") : body.index("### Step 9.7")]
+    assert gate.index("review-snapshot") < gate.index("--review-result")
+    assert gate.index("--review-result") < gate.index("--profile design")
+    assert "prior receipt and precise delta" in gate
+
+
+def test_spec_feature_traceback_rule_distinguishes_diagnostics_from_failure() -> None:
+    import json
+
+    from validator.expectations import parse_expectations
+    from validator.verify_output import evaluate_rules
+
+    parsed = parse_expectations(ROOT / ".agent-sync/skills/spec-feature/expectations.md")
+    rule = next(item for item in parsed.verify.must_not if item.kind == "contains")
+    needle = "Traceback (most recent call last):\n"
+    assert rule.payload == needle
+    expectations = _read(".agent-sync/skills/spec-feature/expectations.md")
+    assert '- "Traceback"' not in expectations
+    assert "followed by an actual newline" in expectations
+    assert "For VISUAL features" in expectations
+    assert "Non-UI features do not require visual evidence" in expectations
+    rules = {"must_not": [{"verb": rule.verb, "kind": rule.kind, "payload": rule.payload}]}
+    detail = f"substring {needle!r}"
+    diagnostic_json = json.dumps({"status": "PASS", "detail": detail, "legacy": "Traceback"})
+    cases = [
+        (diagnostic_json, "PASS"),
+        (f"PASS: {detail}; previous rule 'Traceback'", "PASS"),
+        (needle + '  File "runner.py", line 1\nValueError: broken\n', "FAIL"),
+    ]
+    for transcript, expected in cases:
+        report = evaluate_rules(
+            rules,
+            artifact={"exit_code": 0, "stdout": transcript, "stderr": ""},
+            active_flags=[],
+            feature=None,
+            project_root=ROOT,
+        )
+        assert report.rules[0].status == expected, transcript
+    historical = evaluate_rules(
+        {"must_not": [{"verb": "must_not", "kind": "contains", "payload": "Traceback"}]},
+        artifact={"exit_code": 0, "stdout": diagnostic_json},
+        active_flags=[],
+        feature=None,
+        project_root=ROOT,
+    )
+    assert historical.outcome == "drift"

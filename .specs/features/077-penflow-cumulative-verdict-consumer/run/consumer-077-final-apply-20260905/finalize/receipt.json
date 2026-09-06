@@ -1,0 +1,35 @@
+{
+  "command": "spec-implement",
+  "created_at": "2026-09-05T17:53:02.161937+00:00",
+  "feature_slug": "077-penflow-cumulative-verdict-consumer",
+  "files": [
+    {
+      "path": ".specs/features/077-penflow-cumulative-verdict-consumer/changelog.md",
+      "sha256": "68e396aec9b5ddf5796dbab234eb904222b8afb56c8ad12672db3d981a641666"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "32f3a279a991af6aa3a81c93c2cadd668dd6922671778e2056050566fbc75512"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "86ebce53a128d5e866546e8ba34a1ac04af0206047de624cbc53431885048b6f"
+    },
+    {
+      "path": ".specs/features/077-penflow-cumulative-verdict-consumer/spec.md",
+      "sha256": "07c3df56911e8236c730d3167de0953217c6db2690a3eaa594724ffc671dd76b"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "ca1e7016077f9bd6bfe01c65f2fe0c6b01b78af173d111df13c4c89b428ef3c3"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "6ce4661eb47e338f667ee7e9892eb6115f610486bbcb78cf8699568e6813418b",
+  "receipt_hash": "ab7712b89b223aadb5118fa713f49be15e2d6a430e56cd38a04787ed4d2a8924",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

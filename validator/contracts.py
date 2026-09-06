@@ -86,16 +86,18 @@ class ContractValidationError(ValueError):
 
 # @spec FR-001: PHASE_RESULT schema — spec.md#fr-001
 class PhaseResult(BaseModel):
-    """Canonical result returned by every phase agent (specify, plan, implement, test).
+    """Canonical result returned by every specification pipeline phase agent.
 
     The schema is intentionally permissive on phase-specific fields (placed in
-    ``extra``) so a single parser handles all four phase variants.
+    ``extra``) so a single parser handles the pipeline's phase variants.
     """
 
     status: Literal["OK", "BLOCKED"]
     # @spec FR-006: preflight rides the same PHASE_RESULT contract
     #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-006
-    phase: Literal["specify", "plan", "preflight", "implement", "test"]
+    # @spec FR-001: analyze reuses spec-check with its actual pipeline identity
+    # — .specs/features/070-analyze-gate/spec.md#fr-001
+    phase: Literal["specify", "plan", "analyze", "preflight", "implement", "test"]
     feature_slug: str = Field(pattern=SLUG_REGEX.pattern)
     summary: str = Field(min_length=1, max_length=500)
     duration_ms: int = Field(ge=0)

@@ -1,0 +1,31 @@
+{
+  "original_absent_during_validation": true,
+  "exit_code": 0,
+  "status": "PASS",
+  "requirements": 4,
+  "issues": [],
+  "origin_restored": true,
+  "source_report_sha256_before": "ca632b9b13a6de14caf504fcee4520129524ccde0df102c72f72ff59a8f978a0",
+  "source_report_sha256_after": "ca632b9b13a6de14caf504fcee4520129524ccde0df102c72f72ff59a8f978a0",
+  "argv": [
+    "/Users/julienm/projects/penflow/.venv/bin/penflow",
+    "authority",
+    "project",
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-approvals/authority-73a4930dcfef73116d4186da3a302e3882073afc943ae9fce91eaa7829e5800b.json",
+    "--contract",
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/penflow/flow-ui-contract/contract.json",
+    "--project",
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8",
+    "--json"
+  ],
+  "origin_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/brainstorm-native-witness-stnvnm1m/consumer",
+  "temporary_origin_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/brainstorm-native-witness-stnvnm1m/consumer-relocation-proof",
+  "stdout": {
+    "path": "reviews/relocated-origin-project.stdout.json",
+    "sha256": "575c9d655ee83105ac956b86bc878abed16a702f9741758849788ced75ef8e17"
+  },
+  "stderr": {
+    "path": "reviews/relocated-origin-project.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

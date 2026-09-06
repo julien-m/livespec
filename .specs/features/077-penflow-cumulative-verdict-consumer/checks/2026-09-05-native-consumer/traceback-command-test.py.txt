@@ -1,0 +1,37 @@
+
+
+def test_spec_feature_traceback_rule_distinguishes_diagnostics_from_failure() -> None:
+    import json
+
+    from validator.expectations import parse_expectations
+    from validator.verify_output import evaluate_rules
+
+    parsed = parse_expectations(ROOT / ".agent-sync/skills/spec-feature/expectations.md")
+    rule = next(item for item in parsed.verify.must_not if item.kind == "contains")
+    needle = "Traceback (most recent call last):\n"
+    assert rule.payload == needle
+    rules = {"must_not": [{"verb": rule.verb, "kind": rule.kind, "payload": rule.payload}]}
+    detail = f"substring {needle!r}"
+    diagnostic_json = json.dumps({"status": "PASS", "detail": detail, "legacy": "Traceback"})
+    cases = [
+        (diagnostic_json, "PASS"),
+        (f"PASS: {detail}; previous rule 'Traceback'", "PASS"),
+        (needle + '  File "runner.py", line 1\nValueError: broken\n', "FAIL"),
+    ]
+    for transcript, expected in cases:
+        report = evaluate_rules(
+            rules,
+            artifact={"exit_code": 0, "stdout": transcript, "stderr": ""},
+            active_flags=[],
+            feature=None,
+            project_root=ROOT,
+        )
+        assert report.rules[0].status == expected, transcript
+    historical = evaluate_rules(
+        {"must_not": [{"verb": "must_not", "kind": "contains", "payload": "Traceback"}]},
+        artifact={"exit_code": 0, "stdout": diagnostic_json},
+        active_flags=[],
+        feature=None,
+        project_root=ROOT,
+    )
+    assert historical.outcome == "drift"

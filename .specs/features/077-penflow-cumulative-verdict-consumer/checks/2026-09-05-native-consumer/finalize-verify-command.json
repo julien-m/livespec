@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/Users/julienm/projects/livespec/.venv/bin/livespec",
+    "finalize",
+    "verify",
+    "--feature",
+    "077-penflow-cumulative-verdict-consumer",
+    "--command",
+    "spec-implement",
+    "--run-id",
+    "consumer-077-final-verify-20260905",
+    "--json"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "returncode": 0,
+  "stdout": "{\n  \"verdict\": \"PASS\",\n  \"receipt_path\": \"/Users/julienm/projects/livespec/.specs/features/077-penflow-cumulative-verdict-consumer/run/consumer-077-final-verify-20260905/finalize/receipt.json\",\n  \"violations\": []\n}\n",
+  "stderr": "finalize verify: PASS\n"
+}

@@ -456,6 +456,13 @@ Key flags: `--roadmap`, `--features`, `--json`
 
 ---
 
+Read [Penflow certification](system/testing/penflow-contract.md) for the distinction between
+noncertifying READY inspection and current PASS certification. Workflow callers select
+`--required-profile design|implementation`; implementation also receives an independent
+`--build-manifest` from its runner. Missing evidence or a compatible Penflow CLI blocks closure.
+
+Visual lifecycle closure also checks the approved FR/AC selection and bound plan-review history automatically; reopening and governed visual retirement remain supported. Read [Penflow workflow](system/testing/penflow-contract.md).
+
 ## Project Structure Created by `/spec-init`
 
 ```
@@ -466,7 +473,8 @@ penflow/
 ├── semantic-ui-tree.json   ← Primary UI behavior contract
 ├── expected-ui-tree.json   ← Design-derived structural baseline
 ├── code-ir.json            ← UI implementation handoff
-└── actual-ui-tree.json     ← Runtime tree from external adapter (required only for UI runtime comparison)
+├── actual-ui-tree.json     ← Runtime tree from external adapter
+└── run-report.json         ← C51 report revalidated for explicit design/implementation closure
 
 .specs/
 ├── README.md               ← Spec registry and artifact index (auto-maintained)
@@ -669,14 +677,16 @@ See [docs/cli-reference.md](docs/cli-reference.md#livespec-visual-gate) for the 
 
 ### Registry finalization
 
-End-of-command registry updates (feature changelog, global `.specs/changelog.md`, README row + Recent Activity, spec status) are written deterministically by `livespec finalize` — atomically and idempotently under `.specs/.LOCK`. The six registry-finalizing commands (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-fix`, `/spec-stack`, `/spec-feature`) prove the `finalize.registry` goal task with the verify receipt:
+End-of-command registry updates (feature changelog, global `.specs/changelog.md`, README row + Recent Activity, spec status, and the existing roadmap checkbox for Implemented closure) are written deterministically and idempotently by `livespec finalize` under `.specs/.LOCK`. The six registry-finalizing commands (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-fix`, `/spec-stack`, `/spec-feature`) prove the `finalize.registry` goal task with the verify receipt:
 
 ```bash
 livespec finalize apply  --feature <slug> --command <spec-*> --entry-file <entry.md> [--status <Status>] [--retry]
 livespec finalize verify --feature <slug> --command <spec-*> --json
 ```
 
-Idempotence marker: `<!-- finalize:<cmd>:<date>:<hash8> -->` (identity is `<cmd>` + `hash8`; re-runs are zero-write). Exit codes: `0` OK · `9` BLOCKED (`policy_blocked` lock timeout / `state_invalid` hash mismatch) · `10` verify FAIL (R1/R4/R6 violations or missing marker). `--retry` adds backoff+jitter (~45s budget) for parallel `/spec-ship`. Distinct from Feature 048 *run finalization* (RunArtifact verification) — `livespec finalize` governs registry artifacts only.
+Idempotence marker: `<!-- finalize:<cmd>:<date>:<hash8> -->` (identity is `<cmd>` + `hash8`; consistent re-runs are zero-write, while a replay can repair current status/roadmap drift without duplicating changelog entries). Exit codes: `0` OK · `9` BLOCKED (`policy_blocked` lock timeout / `state_invalid` hash mismatch) · `10` verify FAIL (R1/R4/R6 violations or missing marker). `--retry` adds backoff+jitter (~45s budget) for parallel `/spec-ship`. Distinct from Feature 048 *run finalization* (RunArtifact verification) — `livespec finalize` governs registry artifacts only.
+
+Visual closure revalidates C51 under the project write lock immediately before registry decisions and writes; an idempotent return still validates current proof. Nonfinal updates do not check roadmap items.
 
 See [docs/cli-reference.md](docs/cli-reference.md#livespec-finalize) for the full contract.
 

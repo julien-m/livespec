@@ -7,11 +7,18 @@ import re
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Annotated
 
 import typer
+from yaml import YAMLError
 
 from .exceptions import SpecsRootNotFoundError
+from .locks import acquire_lock, write_with_hash_check
+from .penflow_approval_files import PenflowApprovalError
+from .penflow_closure import PenflowClosureError, require_penflow_closure
+from .penflow_review_approval import approve_review_result, has_approved_feature_history
 from .specs_utils import find_specs_root
+from .visual_gate import detect_visual_feature
 
 pipeline_app = typer.Typer(name="pipeline", help="Manage pipeline.md state for a feature.")
 
@@ -212,6 +219,14 @@ def update(
     timestamp: bool = typer.Option(
         False, "--timestamp", help="Write current UTC timestamp in Completed At column"
     ),
+    build_manifest: Annotated[
+        Path | None,
+        typer.Option("--build-manifest", help="Independent runner manifest for visual closure"),
+    ] = None,
+    review_result: Annotated[
+        Path | None,
+        typer.Option("--review-result", help="Actual reviewer result bound to prior snapshot"),
+    ] = None,
 ) -> None:
     """Update a phase status in pipeline.md.
 
@@ -229,45 +244,74 @@ def update(
         typer.echo(f"Error: unknown status '{status}'. Valid: {', '.join(STATUS_MAP)}", err=True)
         raise typer.Exit(1)
 
-    _, pipeline_path = _pipeline_path(feature)
+    feature_dir, pipeline_path = _pipeline_path(feature)
 
     if not pipeline_path.exists():
         typer.echo(f"Error: pipeline.md not found: {pipeline_path}", err=True)
         raise typer.Exit(1)
 
-    display_phase = PHASE_MAP[phase]
-    display_status = STATUS_MAP[status]
-    ts = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M") if timestamp else "—"
-    new_row = f"| {display_phase} | {display_status} | {ts} |"
+    try:
+        with acquire_lock(feature_dir.parents[1]):
+            display_phase = PHASE_MAP[phase]
+            display_status = STATUS_MAP[status]
+            ts = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M") if timestamp else "—"
+            new_row = f"| {display_phase} | {display_status} | {ts} |"
 
-    content = pipeline_path.read_text(encoding="utf-8")
+            content = pipeline_path.read_text(encoding="utf-8")
+            if phase == "plan-review" and display_status == "Done":
+                visual = detect_visual_feature(
+                    project_root=feature_dir.parents[2], feature_slug=feature
+                )
+                if (
+                    visual.classification != "NON_VISUAL"
+                    or review_result is not None
+                    or has_approved_feature_history(feature_dir.parents[2], feature)
+                ):
+                    if review_result is None:
+                        raise PenflowApprovalError("bound_review_result_required")
+                    approve_review_result(feature_dir.parents[2], feature, review_result)
+            candidate = _parse_pipeline(content)
+            candidate[phase] = display_status
+            terminal = all(candidate.get(item) in DONE_STATUSES for item in PHASE_ORDER)
+            if (phase == "test" and display_status in DONE_STATUSES) or terminal:
+                _require_pipeline_closure(feature_dir, feature, build_manifest)
 
-    # Flexible whitespace pattern — handles AI-generated padded tables
-    pattern = re.compile(r"\|[^|]*\b" + re.escape(display_phase) + r"\b[^|]*\|[^|]*\|[^|]*\|")
-    new_content = re.sub(pattern, new_row, content, count=1)
-
-    if new_content == content:
-        if phase in _parse_pipeline(content):
-            # Row already present and identical to the target — idempotent no-op.
-            typer.echo(f"Updated {display_phase} → {display_status}")
-            return
-        # Row absent (legacy pipeline.md predating this phase) — self-heal by
-        # inserting it at the canonical PHASE_ORDER position instead of blocking.
-        inserted = _insert_phase_row(content, phase, new_row)
-        if inserted is None:
-            typer.echo(
-                f"Error: phase '{display_phase}' not found in {pipeline_path}",
-                err=True,
+            # Flexible whitespace pattern — handles AI-generated padded tables
+            pattern = re.compile(
+                r"(?m)^[ \t]*\|[ \t]*"
+                + re.escape(display_phase)
+                + r"[ \t]*\|[^\n|]*\|(?:[^\n|]*\|)?[ \t]*$"
             )
-            raise typer.Exit(1)
-        new_content = inserted
+            new_content = re.sub(pattern, new_row, content, count=1)
 
-    # Atomic write: write to .tmp then rename
-    tmp_path = pipeline_path.with_suffix(".md.tmp")
-    tmp_path.write_text(new_content, encoding="utf-8")
-    tmp_path.rename(pipeline_path)
+            if new_content == content:
+                parsed = _parse_pipeline(content)
+                if parsed.get(phase) == display_status:
+                    # Row already present and identical to the target — idempotent no-op.
+                    typer.echo(f"Updated {display_phase} → {display_status}")
+                    return
+                if phase in parsed:
+                    raise ValueError(f"pipeline_phase_row_not_updatable: {display_phase}")
+                # Row absent (legacy pipeline.md predating this phase) — self-heal by
+                # inserting it at the canonical PHASE_ORDER position instead of blocking.
+                inserted = _insert_phase_row(content, phase, new_row)
+                if inserted is None:
+                    typer.echo(
+                        f"Error: phase '{display_phase}' not found in {pipeline_path}",
+                        err=True,
+                    )
+                    raise typer.Exit(1)
+                new_content = inserted
 
-    typer.echo(f"Updated {display_phase} → {display_status}")
+            # Atomic write: write to .tmp then rename
+            write_with_hash_check(pipeline_path, new_content)
+
+            typer.echo(f"Updated {display_phase} → {display_status}")
+    except typer.Exit:
+        raise
+    except (PenflowApprovalError, OSError, ValueError, RuntimeError, YAMLError) as exc:
+        typer.echo(f"BLOCKED: {exc}", err=True)
+        raise typer.Exit(1) from exc
 
 
 @pipeline_app.command()
@@ -299,6 +343,10 @@ def read(
 @pipeline_app.command()
 def next(
     feature: str = typer.Option(..., "--feature", help="Feature directory name"),
+    build_manifest: Annotated[
+        Path | None,
+        typer.Option("--build-manifest", help="Independent runner manifest for visual closure"),
+    ] = None,
 ) -> None:
     """Print the slug of the next non-done phase.
 
@@ -307,7 +355,7 @@ def next(
       1 — pipeline.md missing or parse failure
       2 — all phases are Done/Skipped (pipeline complete — treat as success)
     """
-    _, pipeline_path = _pipeline_path(feature)
+    feature_dir, pipeline_path = _pipeline_path(feature)
 
     if not pipeline_path.exists():
         typer.echo(f"Error: pipeline.md not found: {pipeline_path}", err=True)
@@ -326,5 +374,17 @@ def next(
             typer.echo(slug)
             raise typer.Exit(0)
 
-    # All phases are Done/Skipped — pipeline complete
+    # Revalidate even an old terminal pipeline before returning success.
+    _require_pipeline_closure(feature_dir, feature, build_manifest)
     sys.exit(2)
+
+
+def _require_pipeline_closure(
+    feature_dir: Path, feature_slug: str, build_manifest: Path | None
+) -> None:
+    """Apply the shared closure boundary before terminal success or mutation."""
+    try:
+        require_penflow_closure(feature_dir.parents[2], feature_slug, build_manifest=build_manifest)
+    except PenflowClosureError as exc:
+        typer.echo(f"BLOCKED: {exc}", err=True)
+        raise typer.Exit(1) from exc

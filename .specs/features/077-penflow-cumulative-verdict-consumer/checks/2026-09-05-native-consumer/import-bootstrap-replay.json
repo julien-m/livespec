@@ -1,0 +1,41 @@
+{
+  "exit": 0,
+  "result": {
+    "source": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/brainstorm-native-witness-stnvnm1m/consumer/handoff/penflow",
+    "destination": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/penflow",
+    "copied": false,
+    "reason": "workspace_exists",
+    "status": {
+      "workspace": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/penflow",
+      "state": "ready",
+      "runtime_required": false,
+      "runtime_comparison": "ABSENT",
+      "runtime_reason": "actual_tree_not_required",
+      "present": [
+        "flow-ui-contract/",
+        "ui.pen",
+        "semantic-ui-tree.json",
+        "expected-ui-tree.json",
+        "code-ir.json"
+      ],
+      "missing": [],
+      "optional_present": [],
+      "design_registry_required": false,
+      "design_registry_missing": [],
+      "mockup_validation_required": false,
+      "mockup_validation_missing": [],
+      "flow_count": 1,
+      "screen_count": 1,
+      "required_profile": null,
+      "certified": false,
+      "verification_status": null,
+      "verification_reason": "not_requested"
+    }
+  },
+  "hashes_unchanged": true,
+  "hashes": {
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/.specs/penflow-brainstorm-authority.json": "7a6c08507b7faaa7d09c8db2663f65e41a7614cceba4d2542d2ceb61806a286d",
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/penflow/ui.pen": "817a0c302617cd62820354de04e774b9ca8c0c05e0dc96c5f7cff55177e02d04",
+    "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/penflow/flow-ui-contract/contract.json": "1f84472878bfc20c9fcb3abb56065c16285147a5f4a5ebf93ed6359424d6fc09"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "command": "spec-test",
+  "created_at": "2026-09-05T13:09:40.883422+00:00",
+  "feature_slug": "001-checkout-overview",
+  "files": [
+    {
+      "path": ".specs/features/001-checkout-overview/changelog.md",
+      "sha256": "87d94a5ec2a8e275d5ccc13add2294f41b2e354dd4ef7b62711aef894fc11f6a"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "3bd38491ab90427748f4454573583721a17cb96f58c3f096d34cfd64271eb3bb"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "ce95495694e69d9d2946f753bc095a9b349b62092fec68ed1e98208435e1878f"
+    },
+    {
+      "path": ".specs/features/001-checkout-overview/spec.md",
+      "sha256": "bc2819715d3a7b551ee436144bf6dfb9b9b7c267623640262897b1f503b9fdd4"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "73becc2c0d9b16b8b3610368f999ca194c9c4379765b463d2d6f83da9d437641"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "4b8d5653a811dd7229328bfe9488d6afe4d25e0204f1b550149c60f9f693d36b",
+  "receipt_hash": "2560ca2c28f9804bdd74052a8d1cb0dc6dfdfc66f6d9cecf2be9c35400ba2725",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

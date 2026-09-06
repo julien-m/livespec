@@ -1,0 +1,266 @@
+--- a/.agent-sync/skills/spec-feature/SKILL.md
++++ b/.agent-sync/skills/spec-feature/SKILL.md
+@@ -214,6 +214,7 @@
+ PLAN_PATH: .specs/features/NNN-feature-name/plan.md
+ STEPS_COUNT: N
+ REVIEW: PASS | FINDINGS
++REVIEW_RESULT_PATH: <bound-review-result-path> (UI or accepted Penflow history only; JSON extra.review_result_path)
+ FINDINGS_COUNT: N BLOCKING, N WARNING, N INFO
+ FINDINGS_DETAIL:
+   [verbatim verifier findings table — omit entire field if REVIEW: PASS]
+@@ -258,6 +259,8 @@
+ FEATURE: NNN-feature-name
+ AC_COVERAGE: N/total ACs covered
+ TESTS: N passed, N failed
++RUNNER_BUILD_MANIFEST: <actual runner-produced path> (UI; JSON extra.runner_build_manifest)
++PENFLOW_VALIDATION_PATH: <preserved actual C51 validation JSON> (UI; JSON extra.penflow_validation_path)
+ VISUAL_RECEIPT: <visual_evidence_receipt_path or none>
+ VISUAL_PROOFS:
+   - path: /absolute/path/to/image.png
+@@ -472,7 +475,7 @@
+ 
+ Run this phase after `feature_slug` and `feature_description` are resolved, before spawning Specify. Non-UI features may skip it with `Penflow Contract Verdict: ABSENT`; UI features must leave root `penflow/` ready before `/spec-specify`.
+ 
+-Phase 0.5 is a synchronous hard gate. Do not mark Specify `In Progress`, do not spawn Specify, and do not write or edit application code until `livespec penflow-contract status --project . --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json` returns `PASS` for web desktop UI features.
++Phase 0.5 is a synchronous hard gate. Do not mark Specify `In Progress`, do not spawn Specify, and do not write or edit application code until `livespec penflow-contract status --project . --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json` returns non-certifying `READY` for web desktop UI features. Approved LiveSpec FR/AC do not exist yet; do not require C51 design certification here. Preserve all explicit MockupFactory, visual-evidence and design-registry checks below.
+ 
+ **UI detection:** treat the feature as UI when the description or roadmap item mentions screens, pages, dashboards, filters, forms, cards, navigation, layout, visual state, frontend, React, web UI, or user-facing interaction. In `--auto`, classify conservatively as UI when uncertain.
+ 
+@@ -515,15 +518,15 @@
+    - Update `.specs/design/screens/index.md` with one row per exported mockup and source `Penflow generated mockup`.
+    - Update `.specs/design/changelog.md` with the feature slug, exported screens, source `penflow/ui.pen`, and current date.
+    - If the Pencil renderer/exporter is unavailable, or if no PNG is exported for a Penflow-backed UI screen, print `BLOCKED at step 0.5 - design_registry_sync_failed - Mockups missing for Penflow UI feature: <screen_names>` and stop. Do not treat a structurally valid `ui.pen` as visually validated.
+-   - Re-run `livespec penflow-contract status --project . --target web-desktop --require-design-registry --feature NNN-feature-name --json` and require verdict `PASS`.
++   - Re-run `livespec penflow-contract status --project . --target web-desktop --require-design-registry --feature NNN-feature-name --json` and require verdict `READY` (non-certifying preparation).
+ 9. **Mockup Factory UX Gate:** invoke `mockup-factory` from the workflow before Phase 1 and before any application code:
+    - Use the Penflow-local `mockup-factory` skill on root `penflow/` with the generated `flow-ui-contract`, `semantic-ui-tree.json`, `ui.pen`, `expected-ui-tree.json`, and `code-ir.json` as anchors.
+    - Run or record the Mockup Factory anchor checks: `penflow map-pencil-context penflow/ui.pen penflow/semantic-ui-tree.json --out penflow/pencil-context-map.json --json`, `penflow detect-drift penflow/flow-ui-contract penflow/semantic-ui-tree.json penflow/ui.pen --out .mockup-validation/NNN-feature-name/drift-report.json --markdown .mockup-validation/NNN-feature-name/drift-report.md --json`, and the visual evidence gate for every exported screen.
+    - Write `.mockup-validation/audit-report.md`, `.mockup-validation/NNN-feature-name/checklist.md`, `.mockup-validation/NNN-feature-name/manifest.json`, `.mockup-validation/NNN-feature-name/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and one exported PNG per audited screen.
+    - Require `.mockup-validation/visual-evidence/manifest.json` status `PASS`. `PASSED_WITH_WARNINGS`, `ESCALATED`, `BLOCKED`, or `BLOCKED_VISUAL_NOT_RUN` blocks `/spec-feature` because desktop UI mockups must be modern, non-mobile, free of placeholder field text, free of overflow, and visually inspected before code.
+-   - Re-run `livespec penflow-contract status --project . --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json` and require verdict `PASS`.
++   - Re-run `livespec penflow-contract status --project . --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json` and require verdict `READY` with certified false; the visual-evidence checks above remain mandatory.
+ 10. Verify these paths exist before Phase 1: `penflow/`, `penflow/flow-ui-contract/`, `penflow/ui.pen`, `penflow/semantic-ui-tree.json`, `penflow/expected-ui-tree.json`, `penflow/code-ir.json`, `penflow/pencil-context-map.json`, `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, `.specs/design/changelog.md`, `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`.
+-11. If any command fails, status is not `PASS`, or any path is missing, print `BLOCKED at step 0.5 - penflow_forward_contract_failed - missing: <paths>` and stop. Do not continue to code against a bad mockup.
++11. If any command fails, preparation inspection is not `READY`, the explicit MockupFactory or visual-evidence gate fails, or any required path is missing, print `BLOCKED at step 0.5 - penflow_forward_contract_failed - missing: <paths>` and stop. Do not continue to code against a bad mockup.
+ 
+ These files are the primary UI behavior contract for Specify, Plan, Implement, and Test. `.brainstorm/` is not a fallback in from-scratch mode.
+ 
+@@ -674,7 +677,7 @@
+ 
+    After generating the plan, execute Phase 2.5 (Plan Review) as defined in
+    `.agent-sync/skills/spec-feature/SKILL.md § Phase 2.5`: dispatch the livespec-verifier agent in
+-   plan-review mode, collect its report, and include it in your PHASE_RESULT.
++   plan-review mode. Before that dispatch use the Penflow review-snapshot workflow when UI or accepted Penflow history applies; package the actual reviewer JSON via `livespec penflow-contract review-result --snapshot <snapshot-path> --output <actual-output-path> --json` and include the returned path as extra.review_result_path in your PHASE_RESULT.
+ 
+ 	   Capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture
+ 	   ($TMPDIR/livespec-goals/transcripts/spec-plan-<hash8>.out/.err) and pass them to
+@@ -726,9 +729,12 @@
+ 
+ **`--auto` mode with FINDINGS:** re-spawn Plan agent with `FINDINGS_DETAIL` injected into prompt (max 2 retries). If BLOCKING remain → abort. If only WARNING/INFO remain → proceed.
+ 
+-If verdict is PASS (or user overrides BLOCKING): update `plan.md` header `Status: Draft` → `Status: Approved`.
+-
+-Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status done --timestamp`
++For UI or accepted Penflow approval history, only the actual bound PASS review authorizes `plan.md` status Approved; blocking findings require a corrected snapshot and a fresh review. For non-UI without Penflow history, preserve the existing review decision flow.
++
++Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status done --timestamp`; append `--review-result <review_result_path>` for UI work or accepted Penflow approval history. Use the actual bound review result returned by the Plan agent; missing results or blocking findings cannot be replaced by an interactive override.
++
++**UI design certification after approved spec and plan:** The Plan agent snapshots the complete governed selection, all specifications/plans and cumulative active requirements/outcome mappings with `livespec penflow-contract review-snapshot --feature <feature_slug> --json` before dispatching the actual reviewer and returns `extra.review_result_path`. The Plan Review transition validates that real result and publishes the approved baseline automatically, reusing the current MockupFactory/visual evidence when its inputs remain unchanged. Run `penflow run --target penflow --profile design --project . --json`, then `livespec penflow-contract status --project . --required-profile design --require-design-registry --require-mockup-validation --feature NNN-feature-name --json`. Require current design PASS with certified true before Analyze/Implement. Missing approved obligation bindings or stale evidence blocks; refresh only affected producer evidence, without mandating a second complete MockupFactory pass. Brainstorm's frozen product contract may supply design authority earlier; it does not substitute for missing approved LiveSpec requirements in this pipeline.
++
+ 
+ ---
+ 
+@@ -852,13 +858,14 @@
+    - Emit `penflow/actual-ui-tree.json` from the visible DOM/runtime accessibility surface. Do not copy or derive it from `penflow/expected-ui-tree.json`.
+    - Run:
+      ```bash
+-     livespec penflow-contract status --project . --require-actual --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json
+      penflow validate-actual penflow/actual-ui-tree.json --schema --json
+      penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json --out penflow/compare-report.json --markdown penflow/compare-report.md --json
+      penflow review-report penflow/compare-report.json --out penflow/review-report.md
+      penflow fix-report penflow/compare-report.json --out penflow/fix-report.md
++     penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json
++     livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --target web-desktop --require-design-registry --require-mockup-validation --feature NNN-feature-name --json
+      ```
+-   - Require `Penflow Contract Verdict: PASS` only after the raw `penflow/compare-report.json` has `status: PASS` and zero `issues`; if the raw compare report is `FAIL`, missing, invalid, or has any issue, block and keep iterating.
++   - Require current C51 implementation certification (`verdict: PASS`, `certified: true`, matching required_profile) after the runner produced the cumulative report. Raw compare-report remains diagnostic; it never replaces C51 validation. Missing, stale or rejected evidence blocks and keeps the test phase incomplete.
+    - If the design registry has no matching mockup PNGs for a Penflow-backed UI feature, block with `Visual Gate Verdict: BLOCKED` and `Mockups missing for Penflow UI feature`; do not fall back to auto-approval.
+    - If the app does not expose enough `data-semantic-id`, `data-testid`, ARIA role, or visible text to build an actual tree from the browser, block and fix the implementation. Do not fabricate the runtime artifact.
+    - Do not run `livespec pipeline update --feature NNN-feature-name --phase test --status done`, do not report the visual gate as passed, and before emitting `PHASE_RESULT: OK`, confirm the runtime evidence gate passes.
+@@ -872,8 +879,8 @@
+    - Called from `/spec-ship`: output `SHIP_RESULT: BLOCKED` with test failure details
+    Note: the Test agent emits PHASE_RESULT for the main context; the `SHIP_RESULT: BLOCKED` signal is the final external output of the entire pipeline when called from ship context. Both are preserved — they serve different consumers (main context vs ship orchestrator).
+ 
+-7. Run: `livespec pipeline update --feature NNN-feature-name --phase test --status done --timestamp`
+-   *(Only if PHASE_RESULT: OK or only partial/warning AC coverage)*
++7. Recover `runner_build_manifest` and `penflow_validation_path` from the Test child actual JSON extra fields; if required fields are missing or stale, rerun the producing capture/validation phase and keep closure blocked. Never reconstruct a manifest from HEAD or report assertions. For a UI feature, run `livespec pipeline update --feature NNN-feature-name --phase test --status done --timestamp --build-manifest <runner_build_manifest>` only after complete required coverage and current certification. Non-UI uses the same command without --build-manifest.
++   *(Only if PHASE_RESULT: OK and all required AC coverage is complete; warnings may remain only when they do not hide a missing obligation.)*
+ 
+ In `--auto` mode: no confirmation prompts, proceeds automatically.
+ 
+@@ -913,7 +920,7 @@
+ When `--resume` is provided:
+ 
+ 1. Run: `livespec pipeline read --feature NNN-feature-name`
+-2. Run: `livespec pipeline next --feature NNN-feature-name` → returns the first phase with status `Pending` or `In Progress`. If the call would skip past a `Blocked` phase, halt per the rule above instead.
++2. Run: `livespec pipeline next --feature NNN-feature-name` (for a UI pipeline that may be terminal, append `--build-manifest <runner_build_manifest>` from its runner) → returns the first phase with status `Pending` or `In Progress`. If the call would skip past a `Blocked` phase, halt per the rule above instead.
+ 3. Read `Feature Description` from the `pipeline.md` header field
+ 4. Assemble the **resume state envelope**:
+    - `feature_name`: NNN-feature-name
+@@ -943,7 +950,7 @@
+ 5. Run `livespec commit-context write --feature NNN-feature-name` and `livespec commit-context read` only when an explicit commit request will be executed next.
+ 6. If no explicit commit request exists, print `Commit: skipped - no explicit user authorization`.
+ 7. Run the following for each phase to mark all complete:
+-   `livespec pipeline update --feature NNN-feature-name --phase <phase> --status done --timestamp`
++   `livespec pipeline update --feature NNN-feature-name --phase <phase> --status done --timestamp` (UI test/terminal updates: append `--build-manifest <runner_build_manifest>`)
+ 
+ Interactive mode also makes no commit. The user commits manually or invokes `/git.commit` separately.
+ 
+@@ -1046,6 +1053,14 @@
+ - [suggestion] `/spec-check NNN-feature-name` — displayed after pipeline completion as a verification next step.
+ - [suggestion] `/spec-feature --resume [feature-name]` — displayed on resumable BLOCKED state.
+ 
++
++## Penflow C51 stage contract
++
++Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
++Before application code, require current design certification after the approved spec/plan and MockupFactory evidence are available. Phase 0.5 before Specify remains non-certifying inspection with all visual checks; bind approved FR/AC only after PlanReview. The existing producer finalization produces `penflow run --target penflow --profile design --project . --json` automatically, then revalidate with `livespec penflow-contract status --project . --required-profile design --feature <feature_slug> --json` and require exit 0, `verdict: PASS`, `certified: true`, `required_profile: design`. Draft inspection alone does not authorize code.
++After runtime captures and behavioral evidence are complete, obtain `runner_build_manifest` from the actual build/capture runner; never infer it from HEAD or the report. Produce `penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json`, then revalidate with `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`. Require exit 0, `verdict: PASS`, `certified: true`, `required_profile: implementation`, and caller-concordant current report/scope/build bindings. Preserve the actual validation JSON and manifest path for the parent. Missing inputs, legacy reports or incomplete obligations block closure.
++For UI certification closures, forward the same independent `--build-manifest <runner_build_manifest>` to every `livespec finalize apply` that sets status Implemented, `livespec finalize verify` of an Implemented feature, `livespec pipeline update` that marks test Done/Skipped or would complete the whole pipeline, and `livespec pipeline next` that could report terminal completion. Earlier nonterminal preparation uses no runtime proof; non-UI calls omit the argument. A skipped/partial test cannot certify implementation. Do not change spec/registry/pipeline status manually to bypass these gates.
++
+ ## Execution Tasks
+ 
+ > Machine-readable task inventory parsed by `livespec goal render`.
+@@ -1079,7 +1094,7 @@
+ - [penflow] Run `penflow validate-pen` on `ui.pen`
+ - [penflow] Run `penflow export-expected` to produce `expected-ui-tree.json`
+ - [penflow] Run `penflow code-ir` to produce `code-ir.json`
+-- [penflow] Run `livespec penflow-contract status` and require PASS
++- [penflow] Run `livespec penflow-contract status --project . --json` and require noncertifying READY for preparation
+ - [penflow] Sync validation outputs to feature design directory; keep `penflow/ui.pen` as the only `.pen`
+ - [penflow] Promote design to Global LiveSpec Design Registry (`.specs/design/`)
+ - [penflow] Export mockup PNGs into `.specs/design/screens/<slug>/`
+@@ -1088,7 +1103,7 @@
+ - [penflow] Run `penflow map-pencil-context` to produce `pencil-context-map.json`
+ - [penflow] Run `penflow detect-drift` and write drift-report artifacts
+ - [penflow] Write `.mockup-validation/` audit artifacts and visual-evidence manifest
+-- [penflow] Re-run `livespec penflow-contract status --require-design-registry --require-mockup-validation` and require PASS
++- [penflow] Re-run `livespec penflow-contract status --project . --require-design-registry --require-mockup-validation --json` and require non-certifying READY; retain current MockupFactory and visual-evidence checks before Specify
+ - [penflow] Verify all required paths exist before Phase 1
+ 
+ ### Phase 1 — Specify
+@@ -1124,7 +1139,8 @@
+ - [always] Display plan review findings from PHASE_RESULT
+ - [always] Update `plan.md` status to Approved on PASS
+ - [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING)
+-- [always] Run `livespec pipeline update --phase plan-review --status done`
++- [always] Run `livespec pipeline update --phase plan-review --status done`; append `--review-result <review_result_path>` for UI or accepted Penflow history, preserving the actual Plan reviewer result
++- [penflow] After the bound Plan Review transition published approved FR/AC authority; run `penflow run --target penflow --profile design --project . --json` then `livespec penflow-contract status --project . --required-profile design --require-design-registry --require-mockup-validation --feature <feature_slug> --json`; require certified design PASS before application code, reusing unchanged visual evidence
+ 
+ ### Phase 2.6 — Analyze Gate
+ 
+@@ -1160,10 +1176,11 @@
+ - [penflow] Run `penflow validate-actual` on actual UI tree
+ - [penflow] Run `penflow compare-tree` expected vs actual and write compare-report
+ - [penflow] Run `penflow review-report` and `penflow fix-report` on compare results
+-- [penflow] Run `livespec penflow-contract status --require-actual` and require PASS
++- [penflow] Run `penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json` after final runtime capture and behavioral evidence
++- [penflow] Run `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json` and require certified PASS
+ - [always] Receive and parse PHASE_RESULT from Test agent
+ - [always] Run supervisor Verify phase: livespec verify-output spec-test --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
+-- [always] Run `livespec pipeline update --phase test --status done` on OK or partial AC coverage
++- [always] Run `livespec pipeline update --phase test --status done` (UI: append `--build-manifest <runner_build_manifest>` from the completed test child) only on complete required AC coverage and current implementation certification for UI; partial coverage stays incomplete
+ 
+ ### Phase 3.6 — Visual Gate (non-skippable for VISUAL features)
+ 
+@@ -1177,7 +1194,7 @@
+ 
+ - [always] Run `/audit --fix` and verify zero remaining violations
+ - [always] Verify all tests pass after audit
+-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
++- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation
+ - [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path>` exit_code != 0 (VISUAL features only)
+ - [always] Run `livespec commit-context write` only if explicit commit requested
+ - [always] Print `Commit: skipped - no explicit user authorization` if no commit requested
+--- a/.agent-sync/skills/spec-feature/expectations.md
++++ b/.agent-sync/skills/spec-feature/expectations.md
+@@ -1,7 +1,7 @@
+ ---
+ command: spec-feature
+ contract_version: "1.0"
+-last_reviewed: 2026-06-27
++last_reviewed: 2026-09-05
+ ---
+ 
+ <!-- @spec(FR-004) -->
+@@ -91,13 +91,15 @@
+ - stdout marker: `Clarify gate` — Phase 1.6 runs after spec review and before plan; in `--auto`, an unresolved question emits `BLOCKED at step 1.6 - decision_needed - clarify question requires human answer`
+ - stdout marker: `Specification Analysis Report` — Phase 2.6 Analyze gate (read-only `/spec-check --pre-impl`) runs after plan review and before preflight; CRITICAL or HIGH findings block implementation (`pipeline update --phase analyze --status blocked`); creates no `checks/`, no changelog, no `src/`
+ - proof boundary: when `## Clarifications` is written it carries `### Session YYYY-MM-DD` with at most 5 accepted `- Q: ... -> A: ...` bullets per session and no duplicate session bullets
+-- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | FAIL | PASS`
+-  - `ABSENT`: feature is non-UI
+-  - `BLOCKED`: UI forward contract generation failed
+-  - `FAIL`: runtime raw compare report is `FAIL` or has issues
+-  - `PASS`: UI forward/runtime artifacts were generated or verified, and runtime compare is `PASS` with zero issues when required
+-  - `BLOCKED`: also required when `BLOCKED at step 0.5 - design_registry_sync_failed` reports `Mockups missing for Penflow UI feature`
+-  - `BLOCKED`: also required when `--require-mockup-validation` reports missing Mockup Factory proof or visual-evidence status other than `PASS`
++- stdout marker: `Penflow Contract Verdict: ABSENT | READY | PASS | FAIL | BLOCKED`
++  - `ABSENT` / `READY`: unrequired non-UI or preparation inspection only, `certified: false`.
++  - `PASS`: installed Penflow revalidated the cumulative report for the caller-required profile and current report/scope/build bindings; `certified: true`.
++  - `FAIL` / `BLOCKED`: rejected, missing, stale or incompatible required evidence; raw compare PASS never substitutes for certification.
++
++### C51 stage evidence
++
++- UI closure requires implementation certification after actual captures and cumulative report production: exit 0, verdict PASS, certified true, required_profile implementation. The Test child returns actual paths in JSON extra.runner_build_manifest and extra.penflow_validation_path; absent fields cannot be synthesized. Preserve validation JSON and the independent runner manifest path; forward the manifest to UI terminal finalize/pipeline calls. Non-UI omits the argument.
++- Existing Global LiveSpec Design Registry, MockupFactory and visual-gate receipts remain required for visual closure; C51 does not replace pixel fidelity evidence.
+ 
+ ## 7. Exit Codes
+ 
+@@ -217,3 +219,7 @@
+ - **On success:** report changed files and verification evidence. Do not create commits, tags, pushes, or branches unless the current user request explicitly asks for that exact repository-history action.
+ - **On drift:** read `FINDINGS_DETAIL` in `pipeline.md`, fix the spec/plan, re-run with `--resume`.
+ - **On blocked:** run `/spec-preflight` standalone to identify the missing prerequisite.
++
++## Bound Plan Review source authority
++
++UI or accepted Penflow history requires Plan extra.review_result_path from the actual pre-dispatch snapshot review. Plan Review Done consumes --review-result and publishes the approved baseline before recording completion. Interactive overrides and stdout PASS do not substitute for this bound result. Source selection and disposition active/retired remain reviewed, including prior/new deltas.
+--- a/.agent-sync/skills/spec-implement/SKILL.md
++++ b/.agent-sync/skills/spec-implement/SKILL.md
+@@ -199,7 +199,7 @@
+ 
+ If the forward chain cannot produce `penflow/flow-ui-contract/`, `penflow/ui.pen`, `penflow/semantic-ui-tree.json`, `penflow/expected-ui-tree.json`, and `penflow/code-ir.json`, print `BLOCKED - penflow_forward_contract_failed` and stop. Non-UI features may still report Penflow as `ABSENT`.
+ 
+-**Before application code:** Complete the existing MockupFactory design workflow and require `livespec penflow-contract status --project . --required-profile design --json` to certify the current design. The forward-chain inspection above remains READY only.
++**Before application code:** Complete the existing MockupFactory design workflow and require `livespec penflow-contract status --project . --required-profile design --feature <feature_slug> --json` to certify the current design. The forward-chain inspection above remains READY only.
+ 
+ **Theme enforcement:** If `.specs/design/theme.css` exists, all UI implementation must use its CSS variables (`var(--primary)`, `var(--background)`, etc.) instead of hardcoded color/spacing values. If `theme.md` contains an install command, execute it as Step 0 before any UI code (skip if theme is already installed in the project).
+ 
+@@ -475,7 +475,7 @@
+ 
+ The child `/spec-test` must capture runtime PNGs to `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-test --target <t> --run-id <run-id> --json`, then run `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json`. `/spec-implement` accepts only the returned `visual_evidence_receipt_path`; `design-alignment is semantic-only` and cannot prove pixel fidelity.
+ 
+-**C51 implementation closure:** After the spec-test child completes its capture, require its actual runner manifest path and independently revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --json`. Missing or rejected implementation certification keeps status In Progress. Do not require runtime evidence during the earlier code-preparation phase.
++**C51 implementation closure:** After the spec-test child completes its capture, require its actual runner manifest path from `extra.runner_build_manifest` and preserved C51 JSON from `extra.penflow_validation_path`; missing fields keep closure blocked. Independently revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`. Missing or rejected implementation certification keeps status In Progress. Do not require runtime evidence during the earlier code-preparation phase.
+ 
+ **Gate behavior:**
+ 
+@@ -648,7 +648,7 @@
+ ## Penflow C51 stage contract
+ 
+ Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
+-Before application code, require current design certification after the approved spec/plan and MockupFactory evidence are available. Phase 0.5 before Specify remains non-certifying inspection with all visual checks; bind approved FR/AC only after PlanReview. The existing producer finalization produces `penflow run --target penflow --profile design --project . --json` automatically, then revalidate with `livespec penflow-contract status --project . --required-profile design --json` and require exit 0, `verdict: PASS`, `certified: true`, `required_profile: design`. Draft inspection alone does not authorize code.
++Before application code, require current design certification after the approved spec/plan and MockupFactory evidence are available. Phase 0.5 before Specify remains non-certifying inspection with all visual checks; bind approved FR/AC only after PlanReview. The existing producer finalization produces `penflow run --target penflow --profile design --project . --json` automatically, then revalidate with `livespec penflow-contract status --project . --required-profile design --feature <feature_slug> --json` and require exit 0, `verdict: PASS`, `certified: true`, `required_profile: design`. Draft inspection alone does not authorize code.
+ Preparation and partial code delivery remain In Progress. Only after the independent spec-test child finishes captures and returns current implementation certification may this command close as Implemented; recover the actual runner manifest path from that child and revalidate it before finalization.
+ For UI certification closures, forward the same independent `--build-manifest <runner_build_manifest>` to every `livespec finalize apply` that sets status Implemented, `livespec finalize verify` of an Implemented feature, `livespec pipeline update` that marks test Done/Skipped or would complete the whole pipeline, and `livespec pipeline next` that could report terminal completion. Earlier nonterminal preparation uses no runtime proof; non-UI calls omit the argument. A skipped/partial test cannot certify implementation. Do not change spec/registry/pipeline status manually to bypass these gates.
+ 
+diff --git a/.agent-sync/skills/spec-implement/expectations.md b/.agent-sync/skills/spec-implement/expectations.md
+--- a/.agent-sync/skills/spec-implement/expectations.md
++++ b/.agent-sync/skills/spec-implement/expectations.md
+@@ -77,6 +77,7 @@
+ ### C51 stage evidence
+ 
+ - Before code require design certification after MockupFactory; partial preparation remains In Progress and requires no runtime certificate. Implemented closure occurs only after the spec-test child supplies implementation certification and its independent runner manifest. Parent revalidates it, then forwards --build-manifest to finalize apply/verify. Non-UI omits the argument.
++- The Test child returns `extra.runner_build_manifest` and `extra.penflow_validation_path` as actual existing output paths. Missing fields block closure; never reconstruct a successful verdict or a build manifest from HEAD/report assertions.
+ - Existing Global LiveSpec Design Registry, MockupFactory and visual-gate receipts remain required for visual closure; C51 does not replace pixel fidelity evidence.
+ 
+ ## 7. Exit Codes

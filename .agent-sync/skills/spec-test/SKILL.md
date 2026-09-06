@@ -573,7 +573,7 @@ For web UI features, `/spec-test` must create runtime evidence from the implemen
 5. The runtime tree must come from rendered DOM bounding boxes and visible content. Do not copy `penflow/expected-ui-tree.json`, do not hand-write a matching tree, and do not synthesize nodes that are not present in the browser.
 6. If the implementation lacks enough semantic markers to map expected nodes, fix the app to expose stable `data-semantic-id` or `data-testid` attributes, then rerun the browser capture.
 
-Do not mark `/spec-test` successful for a UI feature until `penflow/actual-ui-tree.json`, screenshots, global design registry artifacts, `penflow/compare-report.json`, and `penflow/compare-report.md` exist, Penflow reports `PASS`, and the raw `penflow/compare-report.json` has `status: PASS` plus zero `issues`.
+Do not mark `/spec-test` successful for a UI feature until `penflow/actual-ui-tree.json`, screenshots, global design registry artifacts, `penflow/compare-report.json`, and `penflow/compare-report.md` exist, Penflow C51 revalidation reports implementation PASS with certified true and caller-concordant current bindings. Raw compare reports alone never certify.
 
 <!-- @spec FR-001: Test visual proof rule — .specs/features/067-visual-preview-proof-publishing/spec.md#fr-001 -->
 #### Visual Proof Publishing
@@ -603,8 +603,6 @@ Do not forge a preview URL when the CLI is missing. This presentation/annotation
 **Execution:**
 
 ```bash
-livespec penflow-contract status --project . --require-actual --target web-desktop --json
-livespec penflow-contract status --project . --require-actual --target web-desktop --require-design-registry --require-mockup-validation --feature <feature_slug> --json
 penflow validate-actual penflow/actual-ui-tree.json --schema --json
 penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json \
   --out penflow/compare-report.json \
@@ -612,9 +610,11 @@ penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json \
   --json
 penflow review-report penflow/compare-report.json --out penflow/review-report.md
 penflow fix-report penflow/compare-report.json --out penflow/fix-report.md
+penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json
+livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --target web-desktop --require-design-registry --require-mockup-validation --feature <feature_slug> --json
 ```
 
-If status returns `runtime_comparison: BLOCKED`, stop before `penflow validate-actual` and print `Penflow Contract Verdict: BLOCKED`. If the raw compare report is `FAIL`, invalid, or has any issue, print `Penflow Contract Verdict: FAIL`, block, and iterate until zero issues. `FAIL` or `BLOCKED` prevents visual baseline approval. `ABSENT` allows legacy/non-UI fallback when no root `penflow/` exists or runtime comparison was not requested. Screenshots remain visual regression gates after Penflow passes.
+After report production, require current C51 implementation certification. FAIL or BLOCKED prevents baseline approval; repair the reported obligations and recapture affected evidence before rerunning the producer. Raw comparison reports are diagnostics. ABSENT is permitted only for unrequired non-UI inspection; missing UI workspace or runtime proof blocks. Screenshots remain separate visual regression evidence.
 
 ### Selecting `dispatch` vs `converge`
 
@@ -1251,6 +1251,13 @@ Run with --confirm to generate tests.
 
 ---
 
+
+## Penflow C51 stage contract
+
+Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
+After runtime captures and behavioral evidence are complete, obtain `runner_build_manifest` from the actual build/capture runner; never infer it from HEAD or the report. Produce `penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json`, then revalidate with `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`. Require exit 0, `verdict: PASS`, `certified: true`, `required_profile: implementation`, and caller-concordant current report/scope/build bindings. Preserve the actual validation JSON and manifest path for the parent in canonical PHASE_RESULT JSON `extra.penflow_validation_path` and `extra.runner_build_manifest`. Return the real paths from the completed runner and validator; missing fields remain blocked, never reconstructed from HEAD, report assertions or a passing label. Missing inputs, legacy reports or incomplete obligations block closure.
+For UI certification closures, forward the same independent `--build-manifest <runner_build_manifest>` to every `livespec finalize apply` that sets status Implemented, `livespec finalize verify` of an Implemented feature, `livespec pipeline update` that marks test Done/Skipped or would complete the whole pipeline, and `livespec pipeline next` that could report terminal completion. Earlier nonterminal preparation uses no runtime proof; non-UI calls omit the argument. A skipped/partial test cannot certify implementation. Do not change spec/registry/pipeline status manually to bypass these gates.
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
@@ -1328,7 +1335,7 @@ Run with --confirm to generate tests.
 - [penflow] 4.5.P Runtime tree: evaluate rendered DOM/accessibility surface in browser using Playwright; write penflow/actual-ui-tree.json preferring data-semantic-id → data-testid → ARIA role/name → visible text; every node must include id, role, bbox, children; do NOT copy expected-ui-tree.json or hand-write nodes
 - [penflow] 4.5.P If implementation lacks semantic markers: add data-semantic-id or data-testid attributes to app source, then rerun browser capture
 - [penflow] 4.5.P Penflow compare: run penflow validate-actual penflow/actual-ui-tree.json --schema --json; run penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json --out penflow/compare-report.json --markdown penflow/compare-report.md; run penflow review-report penflow/compare-report.json --out penflow/review-report.md; run penflow fix-report penflow/compare-report.json --out penflow/fix-report.md
-- [penflow] 4.5.P Emit exactly one line: Penflow Contract Verdict: ABSENT|PASS|FAIL|BLOCKED; FAIL or BLOCKED prevents visual baseline approval; iterate compare until zero issues before approving
+- [penflow] 4.5.P Produce `penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json` after final runtime/behavioral capture, then revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`; preserve actual paths in PHASE_RESULT JSON extra.penflow_validation_path and extra.runner_build_manifest for the parent; only implementation PASS with certified true and current bindings permits closure
 - [visual] 4.5.2 Baseline capture — if --reset-baselines: verify not in CI (CI env var), delete existing baseline PNGs (all or named screen only), then capture fresh screenshots; if not --reset-baselines: run visual tests in comparison mode only (never overwrite existing baselines)
 - [visual] 4.5.2 If docker-compose.visual.yml absent: generate with pinned Playwright Docker image (mcr.microsoft.com/playwright:v1.44.0-jammy), record image in baselines/.docker-version; if present: skip, log "docker-compose.visual.yml already exists"
 - [visual] 4.5.2 Retry failed capture up to 2 times; if still failing mark "Blocked — [error]" and skip screen

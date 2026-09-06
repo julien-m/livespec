@@ -1,0 +1,66 @@
+{
+  "source": "/Users/julienm/projects/penflow/.specs/README.md",
+  "source_sha256": "1dd5b153c4b5bac3517fdfcdb88ab5ec90b908732b0518a9240662cc018ee950",
+  "source_unmodified": true,
+  "recovered_generated_rows": [
+    "075",
+    "076",
+    "077"
+  ],
+  "recovery_idempotent": true,
+  "real_regression": "test_legacy_readme_detached_rows_repair_on_idempotent_apply",
+  "red": "already_finalized; written=() despite detached row",
+  "tests": {
+    "command": ".venv/bin/python -m pytest tests/test_finalize.py tests/test_finalize_penflow.py -q",
+    "passed": 69
+  },
+  "static_checks": "Ruff and Pyright PASS",
+  "limitation": "Historical diagnosis inspected the source read-only. The producer subsequently completed the real apply/verify recorded below; this does not close consumer 077 or unfreeze spec-feature, and no archived native pilot was replayed.",
+  "examples": "fenced and multiline HTML comment rows remain unchanged",
+  "source_checkpoint": "Historical read-only diagnosis before the producer replay; source_sha256 and source_unmodified refer only to that diagnosis.",
+  "producer_replay": {
+    "apply_created_at": "2026-09-05T15:45:51.832222+00:00",
+    "verify_created_at": "2026-09-05T15:45:52.118118+00:00",
+    "apply_outcome": "applied",
+    "written": [
+      "feature_changelog",
+      "global_changelog",
+      "readme",
+      "spec_status"
+    ],
+    "skipped": [
+      "roadmap"
+    ],
+    "verify_verdict": "PASS",
+    "violations": [],
+    "readme_sha256": "3b1088ae91ae40541283ee35a4d9ba7e11893ce7f80ff760a017a25ed0e27bbc",
+    "readme_matches_verify_receipt_at_inspection": true,
+    "readme_final_lf_at_inspection": true,
+    "evidence": [
+      {
+        "role": "apply_output",
+        "original": "/Users/julienm/projects/penflow/.specs/features/077-complete-verification-workflow/checks/supervisor-finalize-apply.json",
+        "sha256": "d7bcc8e10d09aff676ed52a9bccc1befe09bb586c94f22da71a1d31fcf3a19fd",
+        "bytes": 309
+      },
+      {
+        "role": "verify_output",
+        "original": "/Users/julienm/projects/penflow/.specs/features/077-complete-verification-workflow/checks/supervisor-finalize-verify.json",
+        "sha256": "419d045fc335bf303d7cf24276ca73873b5e7f4f98bfa3c1d9db6608f319ba09",
+        "bytes": 191
+      },
+      {
+        "role": "apply_receipt",
+        "original": "/Users/julienm/projects/penflow/.specs/features/077-complete-verification-workflow/run/20260905T154551Z/finalize/receipt.json",
+        "sha256": "600c5a1e886c9a46a767acaf69463b2f173873c7628afe0525f87744277ee09a",
+        "bytes": 1228
+      },
+      {
+        "role": "verify_receipt",
+        "original": "/Users/julienm/projects/penflow/.specs/features/077-complete-verification-workflow/run/20260905T154552Z/finalize/receipt.json",
+        "sha256": "52bb1a18467ad7a829ee886e99e33f056b0419482fca45a2cb05e4981e6076de",
+        "bytes": 1229
+      }
+    ]
+  }
+}

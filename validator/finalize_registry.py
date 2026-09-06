@@ -19,12 +19,15 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
+from .coherence.graph_builder import _parse_roadmap
 from .finalize_receipt import MARKER_TEMPLATE, FinalizeError
 
 if TYPE_CHECKING:  # Circular: finalize defines ApplyRequest and imports this module
     from .finalize import ApplyRequest
 
-RegistryTarget = Literal["feature_changelog", "global_changelog", "readme", "spec_status"]
+RegistryTarget = Literal[
+    "feature_changelog", "global_changelog", "readme", "spec_status", "roadmap"
+]
 
 # Fixed apply order (FR-001): changelogs first so the README Recent Activity
 # regeneration reads the freshly inserted global summary from disk.
@@ -33,6 +36,7 @@ APPLY_TARGET_ORDER: tuple[RegistryTarget, ...] = (
     "global_changelog",
     "readme",
     "spec_status",
+    "roadmap",
 )
 
 # Matches one global changelog entry heading: "## YYYY-MM-DD — <text>".
@@ -72,8 +76,53 @@ def target_path(project_root: Path, target: RegistryTarget, feature_slug: str) -
         "global_changelog": specs / "changelog.md",
         "readme": specs / "README.md",
         "spec_status": feature_dir / "spec.md",
+        "roadmap": specs / "roadmap.md",
     }
     return paths[target]
+
+
+def build_roadmap(path: Path, feature_slug: str) -> str:
+    """Check only linked feature rows in prose, preserving roadmap intent.
+
+    Use the coherence parser's exact slug/line mapping. Fenced or indented
+    code and HTML comments are examples, never registry mutation targets.
+    No marker is appended: checkbox state is the repair/idempotence oracle.
+    """
+    content = path.read_text(encoding="utf-8")
+    target_spec = (path.parent / "features" / feature_slug / "spec.md").resolve()
+    selected = {
+        item.line_number
+        for item in _parse_roadmap(path.parent)
+        if item.slug == feature_slug
+        and not item.checked
+        and item.link is not None
+        and (path.parent / item.link.split("#", 1)[0]).resolve() == target_spec
+    }
+    lines = content.splitlines(keepends=True)
+    fence: str | None = None
+    in_comment = False
+    for number, line in enumerate(lines, 1):
+        stripped = line.lstrip()
+        if fence is not None:
+            if re.fullmatch(re.escape(fence[0]) + "{" + str(len(fence)) + r",}\s*", stripped):
+                fence = None
+            continue
+        if in_comment:
+            in_comment = "-->" not in line
+            continue
+        if "<!--" in line:
+            in_comment = "-->" not in line.split("<!--", 1)[1]
+            if stripped.startswith("<!--"):
+                continue
+        opening = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if opening:
+            fence = opening.group(1)
+            continue
+        if number in selected and not line.startswith(("    ", "\t")):
+            # Parser selection already established the exact checklist row.
+            index = len(line) - len(stripped) + 3
+            lines[number - 1] = line[:index] + "x" + line[index + 1 :]
+    return "".join(lines)
 
 
 def is_target_marked(path: Path, command: str, hash8: str) -> bool:
@@ -128,6 +177,8 @@ def build_global_changelog(
     all_archive_years = previously_archived_years | set(archived)
     if all_archive_years:
         content = _append_archive_links(content, sorted(all_archive_years))
+    if not content.endswith("\n"):
+        content += "\n"
     return content, archived
 
 

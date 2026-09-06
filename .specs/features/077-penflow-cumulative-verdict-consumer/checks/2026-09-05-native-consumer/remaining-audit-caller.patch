@@ -1,0 +1,57 @@
+--- a/.agent-sync/skills/spec-feature/SKILL.md
++++ b/.agent-sync/skills/spec-feature/SKILL.md
+@@ -936,13 +936,13 @@
+ 
+ When `--auto` is active and Phase 3.5 (Test) completes successfully:
+ 
+-1. Run `/audit --fix` — perform the quality audit and fixes in a single pass. If violations remain → abort.
++1. Run `$audit` (Codex) or `/audit` (Claude Code) using its current read-only skill and supported entry point. Read the findings; the authorized implementing agent applies necessary corrections in scope, reruns affected checks, then reruns the read-only audit. Unresolved blocking findings prevent closure; never pass an unsupported fix flag or ask the auditor to modify files.
+ 2. Verify all tests pass.
+ 3. Run: `livespec git stage --feature NNN-feature-name` only when the user explicitly requested staging; otherwise leave files unstaged.
+ 4. Resolve commit hook from 3 levels (global → project → local) only to prepare context, applying inheritance rules from `system/hooks.md`.
+ 5. Run `livespec commit-context write --feature NNN-feature-name` and `livespec commit-context read` only when an explicit commit request will be executed next.
+ 6. If no explicit commit request exists, print `Commit: skipped - no explicit user authorization`.
+-7. Run the following for each phase to mark all complete:
++7. Record Done only for phases actually executed with successful evidence. Preserve Pending, Skipped and BLOCKED states otherwise; any applicable mandatory phase without successful proof still blocks closure. For a proven completed phase, run:
+    `livespec pipeline update --feature NNN-feature-name --phase <phase> --status done --timestamp`
+ 
+ Interactive mode also makes no commit. The user commits manually or invokes `/git.commit` separately.
+@@ -1175,7 +1175,7 @@
+ 
+ ### Phase 4 — Git Finalization
+ 
+-- [always] Run `/audit --fix` and verify zero remaining violations
++- [always] Run the read-only audit, apply required corrections through the authorized implementing agent, rerun affected checks and audit, and verify zero unresolved blocking findings
+ - [always] Verify all tests pass after audit
+ - [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
+ - [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path>` exit_code != 0 (VISUAL features only)
+--- a/.agent-sync/skills/spec-feature/expectations.md
++++ b/.agent-sync/skills/spec-feature/expectations.md
+@@ -147,6 +147,11 @@
+   **Cause:** Phase agent omitted `PHASE_RESULT` after writing the artifact
+   **Fix:** Supervisor applies Phase Agent Timeout and Artifact Recovery; if required sections are missing, retry `/spec-feature --resume <feature>`
+ 
++## Audit and phase completion
++
++- Audit remains read-only; the authorized implementing agent fixes findings, reruns affected checks and reruns audit. No unsupported fix flag.
++- Only actually executed successful phases become Done; preserve Pending, Skipped and BLOCKED otherwise. Applicable mandatory phases still require proof before closure.
++
+ ## 12. Verify Contract
+ 
+ ```yaml
+--- a/tests/test_penflow_contract_command_contract.py
++++ b/tests/test_penflow_contract_command_contract.py
+@@ -384,6 +384,13 @@
+     assert "git checkout -b" not in body
+     assert "commit expectations" in expectations
+     assert "none unless explicitly authorized" in expectations
++    assert "/audit --fix" not in body
++    assert "current read-only skill and supported entry point" in body
++    assert "authorized implementing agent applies necessary corrections" in body
++    assert "reruns affected checks" in body
++    assert "Record Done only for phases actually executed with successful evidence" in body
++    assert "Preserve Pending, Skipped and BLOCKED states" in body
++    assert "mandatory phase without successful proof still blocks closure" in body
+ 
+ 
+ def test_spec_feature_recovers_when_phase_agent_writes_artifact_without_result() -> None:

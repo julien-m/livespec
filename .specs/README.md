@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-07-04
+> Last updated: 2026-09-05
 
 
 ---
@@ -113,6 +113,7 @@
 | 073 | Multilang Convention AST Catalog + Enforce-by-Default | Implemented | 2026-06-29 | 2026-06-30 | [spec](features/073-conventions-multilang-catalog/spec.md), [plan](features/073-conventions-multilang-catalog/plan.md), [implementation](features/073-conventions-multilang-catalog/implementation.md) |
 | 074 | Agent Device Proof Adapter | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/074-agent-device-proof-adapter/spec.md), [plan](features/074-agent-device-proof-adapter/plan.md), [implementation](features/074-agent-device-proof-adapter/implementation.md) |
 | 075 | Design Direction Carry | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/075-design-direction-carry/spec.md), [plan](features/075-design-direction-carry/plan.md), [implementation](features/075-design-direction-carry/implementation.md) |
+| 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-09-05 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -136,6 +137,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-09-05 | Feature | [Feature 077] Implemented: Penflow cumulative verification consumer and governed lifecycle closure |
+| 2026-09-05 | Feature | Feature 077: Composed procedure and selector authority |
 | 2026-07-04 | Feature | [Feature 075] Implemented: Design Direction Carry -- optional informative design direction line through template, specify, init, and docs, with no validation use |
 | 2026-07-04 | Feature | [Feature 074] Implemented: Agent Device Proof Adapter -- journey run receipts, `livespec device proof`, fail-fast bundle guards, watchOS guidance, and tests |
 | 2026-06-30 | Fix | [Feature 073] Immediate source decisions executable — 164 immediate sources executable/generated through 15 deterministic families, 28 conceptual/editorial deferred to Notion, 0 immediate non-executable |
@@ -203,3 +206,5 @@
 <!-- finalize:spec-implement:2026-06-29:7d37e57a -->
 
 <!-- finalize:spec-feature:2026-06-29:3ef3e24f -->
+
+<!-- finalize:spec-implement:2026-09-05:6ce4661e -->

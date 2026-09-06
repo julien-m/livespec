@@ -434,11 +434,11 @@ Load and audit project conventions before producing the gap report:
 
 ### Step 8 — Detect Visual Drift (UI features)
 
-**Prerequisite:** Feature's `spec.md` has a `## Screens` section AND baselines exist in `.specs/features/NNN-feature-name/baselines/`. Skip entire step if either is absent.
+**Prerequisite:** UI implementation closure audits always run Step 8.P; missing baselines do not skip semantic certification. Pixel drift substeps require Screens and baselines; missing required visual evidence is BLOCKED. `--pre-impl` and tree-only checks remain preparation inspection and do not require runtime proof.
 
 #### Step 8.P — Penflow Contract Status
 
-If root `penflow/` exists, run `livespec penflow-contract status --project . --require-actual --json` for UI runtime comparison and read `penflow/compare-report.json`, `penflow/review-report.md`, and `penflow/fix-report.md` when present. If root `penflow/` is absent, report `ABSENT` and do not read `.brainstorm/`.
+For a UI implementation closure audit with root `penflow/`, run `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json` for UI runtime comparison and read `penflow/compare-report.json`, `penflow/review-report.md`, and `penflow/fix-report.md` when present. If a UI implementation requires certification and root `penflow/` is absent, report BLOCKED. Only unrequired non-UI inspection may report ABSENT; never read `.brainstorm/`.
 
 Report Penflow before screenshot drift:
 
@@ -924,6 +924,13 @@ Ordered list of the most urgent actions across all checked features:
 - [suggestion] `/spec-fix [feature-name] --fr FR-NNN` — displayed as a targeted FR next action.
 - [suggestion] `/spec-implement notifications --step 6` — example next action in the gap report; not executed by `/spec-check`.
 
+
+## Penflow C51 stage contract
+
+Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
+Read-only `--pre-impl`, tree-only and preparation checks inspect existing inputs without requiring runtime capture or an implementation certificate. A UI implementation closure audit instead revalidates existing evidence with `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`; require PASS, certified true and current caller-concordant bindings. Never run `penflow run`, generate captures, or synthesize a manifest in spec-check; missing closure evidence blocks.
+For an already Implemented UI feature, forward the same independent `--build-manifest <runner_build_manifest>` to any read-only `livespec finalize verify` call. Do not invoke finalize apply or pipeline updates from this read-only audit. Non-UI and preparation inspection omit the argument.
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
@@ -975,7 +982,7 @@ Ordered list of the most urgent actions across all checked features:
 ### Phase 5 — Visual & Design Checks
 
 - [visual] Run staleness gate: read baseline.manifest.yml, check browser version, check per-screen mockup SHA-256
-- [penflow] Run Penflow contract status via `livespec penflow-contract status --json`
+- [penflow] In UI implementation closure audits, revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`; preparation/pre-impl uses `livespec penflow-contract status --project . --json` and reports readiness only
 - [penflow] Read penflow/compare-report.json, review-report.md, fix-report.md when present
 - [visual] Run pixel regression via compareRegression() for each VALID baseline vs current screenshot
 - [visual] Check design fidelity: compare VALID baselines vs mockup PNGs (5% threshold)

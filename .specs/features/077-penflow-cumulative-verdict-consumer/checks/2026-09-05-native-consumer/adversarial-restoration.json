@@ -1,0 +1,45 @@
+{
+  "restored": true,
+  "cases": [
+    {
+      "case": "changed-fr",
+      "exit": 1,
+      "verdict": "BLOCKED",
+      "certified": false,
+      "reason": "approved_requirements_invalid: approved_source_semantics_changed"
+    },
+    {
+      "case": "changed-visual",
+      "exit": 1,
+      "verdict": "BLOCKED",
+      "certified": false,
+      "reason": "approved_requirements_invalid: approved_source_semantics_changed"
+    },
+    {
+      "case": "changed-predicate",
+      "exit": 1,
+      "verdict": "BLOCKED",
+      "certified": false,
+      "reason": "approved_requirements_invalid: reviewed_contract_changed"
+    },
+    {
+      "case": "foreign-report-source-hash",
+      "exit": 1,
+      "verdict": "FAIL",
+      "certified": false,
+      "reason": "penflow_rejected_verification_report"
+    },
+    {
+      "case": "missing-build-manifest",
+      "exit": 1,
+      "verdict": "BLOCKED",
+      "certified": false,
+      "reason": "independent_build_manifest_required"
+    }
+  ],
+  "hashes": {
+    ".specs/features/001-checkout-overview/spec.md": "bc2819715d3a7b551ee436144bf6dfb9b9b7c267623640262897b1f503b9fdd4",
+    "penflow/flow-ui-contract/contract.json": "46483d40b42a2425dbb8b837825de61ad3c186bd761f8a3e2afdd5be986a9c2a",
+    "penflow/run-report.json": "71266f48f02e3c9a882d76ad0ac4fda84a7c393359c574ba1408b3de6d6a8656"
+  }
+}

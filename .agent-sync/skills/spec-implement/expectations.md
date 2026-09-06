@@ -1,7 +1,7 @@
 ---
 command: spec-implement
 contract_version: "1.0"
-last_reviewed: 2026-06-26
+last_reviewed: 2026-09-05
 ---
 
 # Expectations — /spec-implement
@@ -69,11 +69,16 @@ Auto-implement a feature from its plan, write tests, run the visual gate for UI 
 - path: `.specs/features/<feature>/checks/<date>-test.md`
   must_contain_sections:
   - "Visual Gate Verdict"
-- stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED`
-  - `ABSENT`: non-UI implementation without root `penflow/`
-  - `PASS`: expected and actual trees match before visual approval
-  - `FAIL`: Penflow compare found structural drift
-  - `BLOCKED`: required Penflow artifacts, `actual-ui-tree.json`, or CLI tooling are missing for UI runtime comparison
+- stdout marker: `Penflow Contract Verdict: ABSENT | READY | PASS | FAIL | BLOCKED`
+  - `ABSENT` / `READY`: unrequired non-UI or preparation inspection only, `certified: false`.
+  - `PASS`: installed Penflow revalidated the cumulative report for the caller-required profile and current report/scope/build bindings; `certified: true`.
+  - `FAIL` / `BLOCKED`: rejected, missing, stale or incompatible required evidence; raw compare PASS never substitutes for certification.
+
+### C51 stage evidence
+
+- Before code require design certification after MockupFactory; partial preparation remains In Progress and requires no runtime certificate. Implemented closure occurs only after the spec-test child supplies implementation certification and its independent runner manifest. Parent revalidates it, then forwards --build-manifest to finalize apply/verify. Non-UI omits the argument.
+- The Test child returns `extra.runner_build_manifest` and `extra.penflow_validation_path` as actual existing output paths. Missing fields block closure; never reconstruct a successful verdict or a build manifest from HEAD/report assertions.
+- Existing Global LiveSpec Design Registry, MockupFactory and visual-gate receipts remain required for visual closure; C51 does not replace pixel fidelity evidence.
 
 ## 7. Exit Codes
 

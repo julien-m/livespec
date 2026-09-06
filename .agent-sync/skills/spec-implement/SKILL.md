@@ -199,6 +199,8 @@ livespec penflow-contract status --project . --target web-desktop --json
 
 If the forward chain cannot produce `penflow/flow-ui-contract/`, `penflow/ui.pen`, `penflow/semantic-ui-tree.json`, `penflow/expected-ui-tree.json`, and `penflow/code-ir.json`, print `BLOCKED - penflow_forward_contract_failed` and stop. Non-UI features may still report Penflow as `ABSENT`.
 
+**Before application code:** Complete the existing MockupFactory design workflow and require `livespec penflow-contract status --project . --required-profile design --feature <feature_slug> --json` to certify the current design. The forward-chain inspection above remains READY only.
+
 **Theme enforcement:** If `.specs/design/theme.css` exists, all UI implementation must use its CSS variables (`var(--primary)`, `var(--background)`, etc.) instead of hardcoded color/spacing values. If `theme.md` contains an install command, execute it as Step 0 before any UI code (skip if theme is already installed in the project).
 
 ## Preflight Safety Contract
@@ -473,6 +475,8 @@ Do not execute `/spec-test` inline while the `/spec-implement` goal is active. D
 
 The child `/spec-test` must capture runtime PNGs to `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-test --target <t> --run-id <run-id> --json`, then run `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json`. `/spec-implement` accepts only the returned `visual_evidence_receipt_path`; `design-alignment is semantic-only` and cannot prove pixel fidelity.
 
+**C51 implementation closure:** After the spec-test child completes its capture, require its actual runner manifest path from `extra.runner_build_manifest` and preserved C51 JSON from `extra.penflow_validation_path`; missing fields keep closure blocked. Independently revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`. Missing or rejected implementation certification keeps status In Progress. Do not require runtime evidence during the earlier code-preparation phase.
+
 **Gate behavior:**
 
 | Visual Gate Verdict | `/spec-implement` behavior |
@@ -527,18 +531,16 @@ Also add a summary entry to `.specs/changelog.md` (global).
 
 **Update `spec.md` status (MANDATORY — do this first):**
 
-1. Open `.specs/features/NNN-feature-name/spec.md`
-2. In the YAML frontmatter, set:
-   - `status: Implemented` (all steps done) or `status: In Progress` (blocked or partial)
-   - `updated: YYYY-MM-DD` (today's date)
-3. In the body header block, update the `**Status:**` line to match (e.g. `**Status:** Implemented`)
+1. Prepare the existing finalization changelog entry and choose Implemented only after all required test/visual gates and C51 implementation certification pass; otherwise keep In Progress.
+2. Run `livespec finalize apply --feature <feature_slug> --command spec-implement --entry-file <entry_file> --status Implemented --build-manifest <runner_build_manifest> --json` for UI closure, then `livespec finalize verify --feature <feature_slug> --command spec-implement --build-manifest <runner_build_manifest> --json`. Non-UI omits --build-manifest; partial UI finalization uses --status "In Progress" and does not claim implementation certification.
+3. Verify the receipt and persisted spec/registry state; do not manually set Implemented before or instead of the machine gate.
 
 This ensures the spec reflects the implementation state and `/spec-implement` feature resolution can detect the feature as done on subsequent runs.
 
 **Update `.specs/README.md`:**
 
-1. Update the feature row in `.specs/README.md`:
-   - If all steps completed successfully and any required visual gate returned `PASS`: set Status to `Implemented`
+1. Verify the feature row written by finalize apply in `.specs/README.md`:
+   - Implemented must match the certified persisted spec status; never manually promote the row
    - If blocked or partial: set Status to `In Progress`
    - Update the `Updated` date to today
 
@@ -642,6 +644,14 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 
 ---
 
+
+## Penflow C51 stage contract
+
+Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
+Before application code, require current design certification after the approved spec/plan and MockupFactory evidence are available. Phase 0.5 before Specify remains non-certifying inspection with all visual checks; bind approved FR/AC only after PlanReview. The existing producer finalization produces `penflow run --target penflow --profile design --project . --json` automatically, then revalidate with `livespec penflow-contract status --project . --required-profile design --feature <feature_slug> --json` and require exit 0, `verdict: PASS`, `certified: true`, `required_profile: design`. Draft inspection alone does not authorize code.
+Preparation and partial code delivery remain In Progress. Only after the independent spec-test child finishes captures and returns current implementation certification may this command close as Implemented; recover the actual runner manifest path from that child and revalidate it before finalization.
+For UI certification closures, forward the same independent `--build-manifest <runner_build_manifest>` to every `livespec finalize apply` that sets status Implemented, `livespec finalize verify` of an Implemented feature, `livespec pipeline update` that marks test Done/Skipped or would complete the whole pipeline, and `livespec pipeline next` that could report terminal completion. Earlier nonterminal preparation uses no runtime proof; non-UI calls omit the argument. A skipped/partial test cannot certify implementation. Do not change spec/registry/pipeline status manually to bypass these gates.
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
@@ -720,9 +730,9 @@ See `system/testing/failure-handling.md` for iteration limits per test type.
 
 ### Phase 8.5 — Finalize
 
-- [always] Update spec.md status to Implemented or In Progress
-- [always] Update .specs/README.md feature row and Recent Activity section
-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
+- [always] Finalize spec.md status via the machine gate: Implemented only after complete certification, otherwise In Progress; never manually assign Implemented
+- [always] Verify finalize apply updated .specs/README.md feature row and Recent Activity consistently with the persisted status
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation
 - [always] Save execution log to logs/YYYY-MM-DD.md (unless --no-save)
 
 ## Definition of Done (Command-Level)

@@ -1,0 +1,30 @@
+{
+  "scope": "LiveSpec consumer 077 finalizer integration",
+  "red": {
+    "command": ".venv/bin/python -m pytest tests/test_finalize.py::TestRegistryRecoveryAndRotation::test_current_year_global_changelog_keeps_final_newline -q",
+    "exit_code": 1,
+    "observed_failure": "assert result.endswith(b'\\n') failed after real apply on a current-year changelog ending in LF before the call"
+  },
+  "green": {
+    "command": ".venv/bin/python -m pytest tests/test_finalize.py tests/test_finalize_penflow.py -q",
+    "completion": {
+      "chunk_id": "04fe55",
+      "wall_time_seconds": 0.00000225,
+      "exit_code": 0,
+      "original_token_count": 15,
+      "output": "............................      [100%]\n67 passed in 5.95s\n"
+    }
+  },
+  "checks": {
+    "command": ".venv/bin/ruff check validator/finalize_registry.py tests/test_finalize.py && .venv/bin/pyright validator/finalize_registry.py tests/test_finalize.py",
+    "ruff_observed": "All checks passed!",
+    "completion": {
+      "chunk_id": "87948a",
+      "wall_time_seconds": 5.84e-7,
+      "exit_code": 0,
+      "original_token_count": 10,
+      "output": "0 errors, 0 warnings, 0 informations\n"
+    }
+  },
+  "change": "build_global_changelog appends LF only when missing; no engine, goal-infrastructure or pilot mutation"
+}

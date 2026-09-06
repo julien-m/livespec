@@ -1,7 +1,7 @@
 ---
 command: spec-check
 contract_version: "1.0"
-last_reviewed: 2026-06-27
+last_reviewed: 2026-09-05
 ---
 
 # Expectations — /spec-check
@@ -60,11 +60,14 @@ Verify spec vs code alignment and produce a gap report.
   - "Gap Report"
   - "Findings"
 - stdout marker (`--pre-impl` only): `## Specification Analysis Report` — read-only mode; creates no `checks/`, no changelog, no `src/`; exit 1 iff any CRITICAL or HIGH finding
-- stdout marker: `Penflow Contract Verdict: ABSENT | PASS | FAIL | BLOCKED`
-  - `ABSENT`: no root `penflow/` and no `.brainstorm/` fallback is read
-  - `PASS`: Penflow compare report is aligned
-  - `FAIL`: Penflow compare report contains structural drift
-  - `BLOCKED`: required artifacts, `actual-ui-tree.json`, or Penflow CLI are missing for UI runtime comparison
+- stdout marker: `Penflow Contract Verdict: ABSENT | READY | PASS | FAIL | BLOCKED`
+  - `ABSENT` / `READY`: unrequired non-UI or preparation inspection only, `certified: false`.
+  - `PASS`: installed Penflow revalidated the cumulative report for the caller-required profile and current report/scope/build bindings; `certified: true`.
+  - `FAIL` / `BLOCKED`: rejected, missing, stale or incompatible required evidence; raw compare PASS never substitutes for certification.
+
+### C51 stage evidence
+
+- Read-only --pre-impl/tree-only/preparation checks report readiness without runtime proof. UI implementation closure audits revalidate existing implementation evidence with the independently supplied runner manifest; they do not generate reports or captures. Missing proof blocks certification.
 
 ## 7. Exit Codes
 

@@ -1,0 +1,35 @@
+{
+  "command": "spec-test",
+  "created_at": "2026-09-05T12:57:58.413457+00:00",
+  "feature_slug": "002-payment-outcomes",
+  "files": [
+    {
+      "path": ".specs/features/002-payment-outcomes/changelog.md",
+      "sha256": "c50ac9c8558f81efd23526d65e51a233db2e49ccbb0cd0e45eba527d3e036128"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "3bd38491ab90427748f4454573583721a17cb96f58c3f096d34cfd64271eb3bb"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "ce95495694e69d9d2946f753bc095a9b349b62092fec68ed1e98208435e1878f"
+    },
+    {
+      "path": ".specs/features/002-payment-outcomes/spec.md",
+      "sha256": "1932d26477b97cd86fb15b8f9a57bb431b7b288e5f0f24a9165b2e15def16bb7"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "73becc2c0d9b16b8b3610368f999ca194c9c4379765b463d2d6f83da9d437641"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "8d5cdf7f5d05d20000d14d44a271ffe0137e815c1a6c27ccaf4d31f58c60bcd6",
+  "receipt_hash": "fe781fbf2fd459135357dc8f3cfce630f10ed46cb1ba59fe82dd5a74a8694ca7",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

@@ -1,0 +1,58 @@
+{
+  "steps": [
+    {
+      "label": "finalize-fixed-apply-001-checkout-overview",
+      "exit": 0,
+      "result": {
+        "outcome": "applied",
+        "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/001-checkout-overview/run/20260905T125755Z/finalize/receipt.json",
+        "written": [
+          "roadmap"
+        ],
+        "skipped": [
+          "feature_changelog",
+          "global_changelog",
+          "readme",
+          "spec_status"
+        ]
+      }
+    },
+    {
+      "label": "finalize-fixed-verify-001-checkout-overview",
+      "exit": 0,
+      "result": {
+        "verdict": "PASS",
+        "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/001-checkout-overview/run/20260905T125756Z/finalize/receipt.json",
+        "violations": []
+      }
+    },
+    {
+      "label": "finalize-fixed-apply-002-payment-outcomes",
+      "exit": 0,
+      "result": {
+        "outcome": "applied",
+        "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/002-payment-outcomes/run/20260905T125757Z/finalize/receipt.json",
+        "written": [
+          "feature_changelog",
+          "global_changelog",
+          "readme",
+          "spec_status",
+          "roadmap"
+        ],
+        "skipped": []
+      }
+    },
+    {
+      "label": "finalize-fixed-verify-002-payment-outcomes",
+      "exit": 0,
+      "result": {
+        "verdict": "PASS",
+        "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/002-payment-outcomes/run/20260905T125758Z/finalize/receipt.json",
+        "violations": []
+      }
+    }
+  ],
+  "report_sha256_before": "71266f48f02e3c9a882d76ad0ac4fda84a7c393359c574ba1408b3de6d6a8656",
+  "report_sha256_after": "71266f48f02e3c9a882d76ad0ac4fda84a7c393359c574ba1408b3de6d6a8656",
+  "roadmap": "# Roadmap\n\n<!-- roadmap:mvp:start -->\n- [x] **001-checkout-overview** \u2192 [spec](features/001-checkout-overview/spec.md)\n- [x] **002-payment-outcomes** \u2192 [spec](features/002-payment-outcomes/spec.md)\n<!-- roadmap:mvp:end -->\n"
+}

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
+from yaml import YAMLError
 
 from validator.penflow_contract import (
     PenflowContractStatus,
@@ -19,6 +20,7 @@ from validator.penflow_contract import (
     bootstrap_penflow_workspace,
     get_penflow_contract_status,
 )
+from validator.penflow_verification import VerificationProfile
 
 penflow_contract_app = typer.Typer(
     name="penflow-contract",
@@ -38,13 +40,15 @@ def register(app: typer.Typer) -> None:
 
 def _verdict_from_status(status: PenflowContractStatus) -> str:
     """Return the observable Penflow contract verdict for CLI consumers."""
+    # @spec FR-001, FR-003: Readiness never certifies
+    # .specs/features/077-penflow-cumulative-verdict-consumer/spec.md#fr-001
+    if status.verification is not None:
+        return "PASS" if status.certified else status.verification.status
     if status.state == "absent":
         return "ABSENT"
-    if status.runtime_comparison == "FAIL":
-        return "FAIL"
-    if status.state == "incomplete" or status.runtime_comparison == "BLOCKED":
+    if status.state == "incomplete" or status.runtime_comparison in {"BLOCKED", "FAIL"}:
         return "BLOCKED"
-    return "PASS"
+    return "READY"
 
 
 @penflow_contract_app.command("status")
@@ -61,7 +65,7 @@ def status_command(
         bool,
         typer.Option(
             "--require-actual",
-            help="Treat missing actual-ui-tree.json as BLOCKED for UI runtime comparison.",
+            help="Alias for implementation certification with an independent runner manifest.",
         ),
     ] = False,
     require_design_registry: Annotated[
@@ -75,12 +79,14 @@ def status_command(
         bool,
         typer.Option(
             "--require-mockup-validation",
-            help="Require Mockup Factory PASS visual evidence before UI code/runtime approval.",
+            help="Require partial Mockup Factory evidence without requesting C51 certification.",
         ),
     ] = False,
     feature: Annotated[
         str | None,
-        typer.Option("--feature", help="Feature slug for feature-scoped design registry checks."),
+        typer.Option(
+            "--feature", help="Feature slug required for certification and registry scope."
+        ),
     ] = None,
     target: Annotated[
         PenflowTarget | None,
@@ -89,22 +95,36 @@ def status_command(
             help="Optional UI target; use web-desktop to reject mobile-sized desktop mockups.",
         ),
     ] = None,
+    required_profile: Annotated[
+        VerificationProfile | None,
+        typer.Option(
+            "--required-profile", help="Require current design or implementation certification."
+        ),
+    ] = None,
+    build_manifest: Annotated[
+        Path | None,
+        typer.Option(
+            "--build-manifest", help="Independent runner build manifest for implementation."
+        ),
+    ] = None,
 ) -> None:
     """Print root Penflow workspace status.
 
     Args:
         project: Project root to inspect.
         json_output: Emit parseable JSON instead of human-readable text.
-        require_actual: Treat missing runtime actual tree as blocking.
+        require_actual: Require implementation certification through the compatibility alias.
         require_design_registry: Treat missing project-level design registry
             artifacts as blocking.
         require_mockup_validation: Treat missing Mockup Factory evidence as
             blocking.
-        feature: Optional feature slug used for feature-scoped registry paths.
+        feature: Caller feature required for certification; optional for registry inspection.
         target: Optional UI target used for mockup quality checks.
+        required_profile: Required Penflow certification stage; inspection otherwise.
+        build_manifest: Independent build identity forwarded to Penflow for implementation.
 
     Side effects:
-        Writes status to stdout and exits with ``0``, ``1``, or ``2``.
+        Writes status to stdout; success exits 0, noncertifying closure exits 1.
     """
     status = get_penflow_contract_status(
         project.resolve(),
@@ -113,6 +133,8 @@ def status_command(
         require_mockup_validation=require_mockup_validation,
         feature_slug=feature,
         target=target,
+        required_profile=required_profile,
+        build_manifest=build_manifest,
     )
     verdict = _verdict_from_status(status)
     if json_output:
@@ -123,6 +145,9 @@ def status_command(
         typer.echo(f"Penflow contract: {status.state}")
         typer.echo(f"Runtime comparison: {status.runtime_comparison}")
         typer.echo(f"Runtime reason: {status.runtime_reason}")
+        typer.echo(f"Certified: {str(status.certified).lower()}")
+        if status.verification is not None:
+            typer.echo(f"Verification: {status.verification.reason}")
         if status.compare_status is not None:
             typer.echo(f"Compare report status: {status.compare_status}")
         if status.compare_issue_count is not None:
@@ -144,11 +169,7 @@ def status_command(
         if status.parse_error:
             typer.echo(f"Semantic tree parse warning: {status.parse_error}", err=True)
         typer.echo(f"Penflow Contract Verdict: {verdict}")
-    if status.runtime_comparison == "BLOCKED":
-        raise typer.Exit(2)
-    if status.runtime_comparison == "FAIL":
-        raise typer.Exit(1)
-    raise typer.Exit(0 if status.state != "incomplete" else 1)
+    raise typer.Exit(0 if verdict in {"PASS", "READY", "ABSENT"} else 1)
 
 
 @penflow_contract_app.command("bootstrap")
@@ -162,6 +183,13 @@ def bootstrap_command(
         typer.Option(
             "--source",
             help="Explicit Brainstorm penflow/ directory to import into the LiveSpec project.",
+        ),
+    ] = None,
+    source_project: Annotated[
+        Path | None,
+        typer.Option(
+            "--source-project",
+            help="Exact Brainstorm consumer root for authenticated ancestry import",
         ),
     ] = None,
     json_output: Annotated[
@@ -179,10 +207,19 @@ def bootstrap_command(
     Side effects:
         May copy a Penflow workspace and writes the result to stdout.
     """
-    result = bootstrap_penflow_workspace(
-        project.resolve(),
-        source_dir=source.resolve() if source is not None else None,
-    )
+    try:
+        result = bootstrap_penflow_workspace(
+            project.resolve(),
+            source_dir=source if source is not None else None,
+            source_project_root=source_project,
+        )
+    except (OSError, ValueError, RuntimeError, YAMLError) as exc:
+        typer.echo(
+            json.dumps({"status": "BLOCKED", "certified": False, "reason": str(exc)})
+            if json_output
+            else f"BLOCKED: {exc}"
+        )
+        raise typer.Exit(1) from exc
     if json_output:
         typer.echo(json.dumps(result.to_dict(), indent=2))
     else:
@@ -195,3 +232,90 @@ def bootstrap_command(
 
 # Export the command group and registrar for the unified CLI loader.
 __all__ = ["penflow_contract_app", "register"]
+
+
+@penflow_contract_app.command("review-snapshot")
+def review_snapshot_command(
+    feature: Annotated[
+        str, typer.Option("--feature", help="Selected feature reviewed by this workflow")
+    ],
+    project: Annotated[Path, typer.Option("--project", help="Consumer project root")] = Path("."),
+    json_output: Annotated[
+        bool, typer.Option("--json", help="Emit structured snapshot identity")
+    ] = False,
+) -> None:
+    """Archive source and mapping inputs before the real plan reviewer runs."""
+    from validator.penflow_review_snapshot import create_review_snapshot
+
+    try:
+        result = create_review_snapshot(project, feature)
+    except (OSError, ValueError, RuntimeError, YAMLError) as exc:
+        if json_output:
+            typer.echo(json.dumps({"status": "BLOCKED", "certified": False, "reason": str(exc)}))
+        else:
+            typer.echo(f"BLOCKED: {exc}", err=True)
+        raise typer.Exit(1) from exc
+    typer.echo(
+        json.dumps(result, indent=2)
+        if json_output
+        else f"Review snapshot: {result['snapshot']['path']}"
+    )
+
+
+@penflow_contract_app.command("review-result")
+def review_result_command(
+    snapshot: Annotated[Path, typer.Option("--snapshot", help="Immutable workflow snapshot")],
+    output: Annotated[Path, typer.Option("--output", help="Actual raw reviewer JSON output")],
+    project: Annotated[Path, typer.Option("--project", help="Consumer project root")] = Path("."),
+    json_output: Annotated[
+        bool, typer.Option("--json", help="Emit structured bound result identity")
+    ] = False,
+) -> None:
+    """Package the actual reviewer response for the existing approval transition."""
+    from validator.penflow_review_result import package_review_result
+
+    try:
+        result = package_review_result(project, snapshot, output)
+    except (OSError, ValueError, RuntimeError, YAMLError) as exc:
+        if json_output:
+            typer.echo(json.dumps({"status": "BLOCKED", "certified": False, "reason": str(exc)}))
+        else:
+            typer.echo(f"BLOCKED: {exc}", err=True)
+        raise typer.Exit(1) from exc
+    typer.echo(
+        json.dumps(result, indent=2)
+        if json_output
+        else f"Review result: {result['result']['path']} ({result['verdict']}, uncertified)"
+    )
+
+
+@penflow_contract_app.command("policy-source")
+def policy_source_command(
+    workflow: Annotated[
+        Path,
+        typer.Option(
+            "--workflow", help="Actual producing workflow with declared verification modes"
+        ),
+    ],
+    project: Annotated[Path, typer.Option("--project", help="Consumer project root")] = Path("."),
+    json_output: Annotated[
+        bool, typer.Option("--json", help="Emit generated source reference")
+    ] = False,
+) -> None:
+    """Archive actual workflow decisions for automatic use by the plan review."""
+    from validator.penflow_policy_source import generate_policy_source
+
+    try:
+        result = generate_policy_source(project, workflow)
+    except (OSError, ValueError, RuntimeError, YAMLError) as exc:
+        typer.echo(
+            json.dumps({"status": "BLOCKED", "certified": False, "reason": str(exc)})
+            if json_output
+            else f"BLOCKED: {exc}"
+        )
+        raise typer.Exit(1) from exc
+    typer.echo(
+        json.dumps({"source": result, "certified": False})
+        if json_output
+        else f"Policy source: {result['path']}"
+    )

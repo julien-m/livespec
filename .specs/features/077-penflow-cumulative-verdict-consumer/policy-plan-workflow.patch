@@ -1,0 +1,20 @@
+--- a/.agent-sync/skills/spec-plan/SKILL.md
++++ b/.agent-sync/skills/spec-plan/SKILL.md
+@@ -405,6 +405,8 @@
+ `[Feature NNN] Plan created: [Feature Name] — N implementation steps, N diagrams`
+ 
+ ### Bound Penflow source review for visual features
++
++- Declare `penflow_verification_policy` metadata in each concrete active plan, with the actual producing mode (`livespec` or `brainstorm_handoff`), version 1 and generated_docs/native_geometry/homologous_references/native_export set from the procedures actually chosen. Preserve every active plan's required procedures and authenticated inheritance; do not copy policy from candidate C20 or infer N/A from absent files. `review-snapshot` automatically archives the full active-plan union and generates its policy source; partial declarations block. No extra user document or flag is required.
+ 
+ - Apply this bound review to visual work and any feature with accepted Penflow approval history, including an explicit visual retirement. Before dispatching the actual plan reviewer, finalize the selected feature FR/AC and the cumulative active canonical `penflow/flow-ui-contract/contract.json` requirements bindings/outcome predicates, then run `livespec penflow-contract review-snapshot --feature <feature_slug> --json`. Pass the complete returned immutable snapshot, every governed source and plan, active mappings/predicates and prior delta to that same reviewer; no extra full review or MockupFactory pass is required.
+ - Persist the actual raw reviewer JSON, then automatically run `livespec penflow-contract review-result --snapshot <snapshot-path> --output <actual-reviewer-output-path> --json`; forward its returned immutable result path. The assembler preserves complete actual fields and never manufactures missing verdicts/findings/input hashes. A plain PASS, finalized registry receipt, skipped review or source reread after dispatch does not establish approval. **Read** [review approval](../../../system/testing/penflow-contract.md) for the versioned contract.
+--- a/.agent-sync/skills/spec-plan/expectations.md
++++ b/.agent-sync/skills/spec-plan/expectations.md
+@@ -173,4 +173,6 @@
+ 
+ ## Approved visual source boundary
+ 
++Standard planning declares closed verification policy in every actual active plan; review-snapshot automatically generates the union, preserving required procedures from earlier active plans and authenticated inheritance. Missing or duplicate metadata blocks; candidate C20 never supplies policy.
++
+ Visual planning records a complete cumulative pre-dispatch review snapshot and packages the actual raw reviewer output through the internal review-result command. Missing review fields are rejected, never synthesized; transport packaging remains uncertified. Plan Review Done requires `--review-result`; missing or stale input, review findings or mismatched selection block the transition. Preparation reports READY with certified false. Subsequent design certification requires the approved baseline and a current Penflow PASS with certified true. No stdout PASS or registry finalization receipt substitutes for bound review approval.

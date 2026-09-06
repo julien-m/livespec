@@ -1,0 +1,15 @@
+--- a/.agent-sync/skills/spec-feature/SKILL.md
++++ b/.agent-sync/skills/spec-feature/SKILL.md
+@@ -717,10 +717,10 @@
+ > [FINDINGS_DETAIL verbatim from PHASE_RESULT]
+ >
+ > N BLOCKING, N WARNING, N INFO finding(s).
+-> Options: **continue** (override) / describe changes to fix / **abort**
++> Options: describe changes to fix / **abort** for UI or accepted Penflow history with BLOCKING findings; **continue** (override) remains available only for non-UI without Penflow history.
+ 
+ **User options (interactive):**
+-1. **continue** → proceed to Phase 2.7
++1. **continue** → proceed to Phase 2.7 only after a bound PASS for UI or accepted Penflow history; blocking findings require corrections or abort.
+ 2. **describe changes** → re-spawn Plan agent with the change description appended to the base prompt (per FINDINGS_DETAIL injection mechanism in § PHASE_RESULT Schemas)
+ 3. **abort** → stop pipeline
+ 

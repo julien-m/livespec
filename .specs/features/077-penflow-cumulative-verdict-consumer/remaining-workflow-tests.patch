@@ -1,0 +1,38 @@
+--- a/tests/test_penflow_contract_command_contract.py
++++ b/tests/test_penflow_contract_command_contract.py
+@@ -150,7 +150,7 @@
+         assert "BLOCKED" in body
+ 
+ 
+-def test_spec_feature_blocks_specify_until_penflow_contract_passes() -> None:
++def test_spec_feature_blocks_specify_until_penflow_preparation_ready() -> None:
+     body = _read(".agent-sync/skills/spec-feature/SKILL.md")
+ 
+     assert "Phase 0.5 is a synchronous hard gate" in body
+@@ -164,7 +164,7 @@
+     assert (
+         "until `livespec penflow-contract status --project . --target web-desktop "
+         "--require-design-registry --require-mockup-validation --feature NNN-feature-name --json` "
+-        "returns `PASS`"
++        "returns non-certifying `READY`"
+     ) in body
+ 
+ 
+@@ -190,10 +190,13 @@
+     assert "penflow/actual-ui-tree.json" in body
+     assert "penflow/compare-report.json" in body
+     assert "penflow/compare-report.md" in body
+-    assert "Penflow Contract Verdict: PASS" in body
+-    assert "raw `penflow/compare-report.json` has `status: PASS`" in body
+-    assert "zero `issues`" in body
+-    assert "raw compare report is `FAIL`" in body
++    assert "current C51 implementation certification" in body
++    assert "`certified: true`" in body
++    assert "it never replaces C51 validation" in body
++    assert "only after complete required coverage and current certification" in body
++    assert "extra.runner_build_manifest" in body
++    assert "extra.penflow_validation_path" in body
++    assert "returns non-certifying `READY`" in body
+     assert "real browser at `1440x900`" in body
+     assert "before emitting `PHASE_RESULT: OK`" in body
+ 

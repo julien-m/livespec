@@ -1,0 +1,89 @@
+[
+  {
+    "label": "pipeline-test-v2-001-checkout-overview",
+    "exit": 0,
+    "result": "Updated Test \u2192 Done\n",
+    "stderr": ""
+  },
+  {
+    "label": "pipeline-idempotent-without-build-001-checkout-overview",
+    "exit": 1,
+    "result": "",
+    "stderr": "BLOCKED: penflow_implementation_not_certified: independent_build_manifest_required\nBLOCKED: 1\n"
+  },
+  {
+    "label": "pipeline-test-v2-002-payment-outcomes",
+    "exit": 0,
+    "result": "Updated Test \u2192 Done\n",
+    "stderr": ""
+  },
+  {
+    "label": "pipeline-idempotent-without-build-002-payment-outcomes",
+    "exit": 1,
+    "result": "",
+    "stderr": "BLOCKED: penflow_implementation_not_certified: independent_build_manifest_required\nBLOCKED: 1\n"
+  },
+  {
+    "label": "c51-after-finalize",
+    "exit": 0,
+    "result": {
+      "build_manifest": {
+        "path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/testing/runtime-evidence/e699444a-6d9d-480b-976e-04eea6c6c85a/build-manifest.json",
+        "sha256": "e757b3366713b178403334cd3b68b865da1e53c0200c2c6a0d9108cd579c955b"
+      },
+      "issues": [],
+      "kind": "penflow-verification-validation",
+      "profile": "implementation",
+      "report_sha256": "71266f48f02e3c9a882d76ad0ac4fda84a7c393359c574ba1408b3de6d6a8656",
+      "required_profile": "implementation",
+      "scope": {
+        "project_root": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig",
+        "workspace": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow"
+      },
+      "status": "PASS",
+      "version": 1
+    },
+    "stderr": ""
+  },
+  {
+    "label": "doctor-final",
+    "exit": 0,
+    "result": {
+      "diagnostics": {
+        "error": null,
+        "explicit_project": true,
+        "invocation_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig",
+        "observed_at": "2026-09-05T13:00:10.023111Z",
+        "repository_kind": "standard"
+      },
+      "schema_version": 1,
+      "stable_result": {
+        "actions": [],
+        "canonical_pen": "penflow/ui.pen",
+        "cleanup": {
+          "status": "NOT_APPLICABLE"
+        },
+        "findings": [],
+        "git": {
+          "index_sha256_after": null,
+          "index_sha256_before": null,
+          "index_unchanged": true,
+          "paths": [],
+          "porcelain_sha256_after": "dbe2339c50ee0f043af2e8d413e211f6547e8572116961d59f71da3105c51ba2",
+          "porcelain_sha256_before": "dbe2339c50ee0f043af2e8d413e211f6547e8572116961d59f71da3105c51ba2",
+          "porcelain_unchanged": true
+        },
+        "project_root": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig",
+        "runs": [],
+        "status": "PASS",
+        "summary": {
+          "action_count": 0,
+          "blocking_count": 0,
+          "changed": false,
+          "finding_count": 0
+        }
+      }
+    },
+    "stderr": ""
+  }
+]

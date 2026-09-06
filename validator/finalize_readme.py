@@ -55,12 +55,59 @@ def build_readme(
         content = path.read_text(encoding="utf-8")
     else:
         content = _rebuild_readme_skeleton(specs_root, today)
+    content = recover_feature_table(content)
     content = _update_feature_row(content, request, today, specs_root)
     content = _regenerate_activity(content, global_changelog_content)
     content = _LAST_UPDATED_RE.sub(f"> Last updated: {today.isoformat()}", content)
     if not marker_pattern(request.command, request.hash8()).search(content):
         content = f"{content.rstrip()}\n\n{marker}\n"
     return content
+
+
+def recover_feature_table(content: str) -> str:
+    """Recover generated rows from a legacy unmarked README without losing prose.
+
+    Old finalizers appended six-column rows after their markers when the end
+    anchor was absent. Move only that exact row shape into a marked table;
+    preserve legacy tables, comments and fenced examples byte for byte.
+    """
+    if _FEATURES_START in content and _FEATURES_END in content:
+        return content
+    # Exact generated row shape, including the number-to-spec-link join.
+    row = re.compile(
+        r"^\| (\d{3}(?:\.\d+)?) \| [^|]+ \| [^|]+ \| "
+        r"\d{4}-\d{2}-\d{2} \| \d{4}-\d{2}-\d{2} \| "
+        r"\[spec\]\(features/\1-[^/|]+/spec\.md\) \|\s*$"
+    )
+    kept: list[str] = []
+    rows: list[str] = []
+    fence: str | None = None
+    in_comment = False
+    for line in content.splitlines(keepends=True):
+        opening = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if fence is not None:
+            if re.fullmatch(re.escape(fence[0]) + "{" + str(len(fence)) + r",}\s*", line.strip()):
+                fence = None
+            kept.append(line)
+        elif opening:
+            fence = opening.group(1)
+            kept.append(line)
+        elif in_comment or line.lstrip().startswith("<!--"):
+            in_comment = "-->" not in line
+            kept.append(line)
+        elif row.fullmatch(line):
+            rows.append(line.rstrip("\r\n"))
+        else:
+            kept.append(line)
+    # Recovery adds a real table even when this is the first generated row.
+    body = "\n".join(
+        [
+            "| # | Feature | Status | Created | Updated | Spec |",
+            "|---|---|---|---|---|---|",
+            *rows,
+        ]
+    )
+    return "".join(kept).rstrip() + f"\n\n{_FEATURES_START}\n{body}\n{_FEATURES_END}\n"
 
 
 def _feature_number(feature_slug: str) -> str:
@@ -77,7 +124,10 @@ def _update_feature_row(
     number = _feature_number(request.feature_slug)
     lines = content.splitlines()
     row_prefix = f"| {number} |"
-    for index, line in enumerate(lines):
+    start = lines.index(_FEATURES_START)
+    end = lines.index(_FEATURES_END)
+    for index in range(start + 1, end):
+        line = lines[index]
         if line.startswith(row_prefix):
             lines[index] = _render_row_update(line, request.status, today)
             return "\n".join(lines) + "\n"

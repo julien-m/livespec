@@ -1,0 +1,25 @@
+{
+  "repos": [
+    {
+      "root": "/Users/julienm/projects/livespec",
+      "head": "8d4dab1a22da06e9d315c8fdef9eb9790774ddaa",
+      "head_unchanged_since_checkpoint": true,
+      "index_changes": []
+    },
+    {
+      "root": "/Users/julienm/projects/project-brainstorm",
+      "head": "fdccc711b019881b4d39fc84f445b0ed8c1a0b6b",
+      "head_unchanged_since_checkpoint": true,
+      "index_changes": [],
+      "ylune_sha256": "fc563270f06b9563af3e89821a14d0f94299b56bab9978b3562bb78e365c612a",
+      "ylune_unchanged_since_checkpoint": true
+    }
+  ],
+  "compared_to": "worktree-preservation.json checkpoint; not an invented repository-wide task-start baseline",
+  "task_operations": "No stage, commit or push executed by this consumer branch or its workers.",
+  "finalize_receipt": "/Users/julienm/projects/livespec/.specs/features/077-penflow-cumulative-verdict-consumer/run/consumer-077-final-verify-20260905/finalize/receipt.json",
+  "finalize_receipt_sha256": "00af04f98ebdc67232875b3d6d2f74325104679b9775b50684ffa839bd19c69d",
+  "receipt_files_match_current_bytes": true,
+  "changelogs_final_lf": true,
+  "production_pilots": "No recapture or mutation of archived application witnesses during final workflow patches or consumer closure."
+}

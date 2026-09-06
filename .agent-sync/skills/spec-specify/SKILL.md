@@ -274,7 +274,7 @@ livespec penflow-contract status --project . --target web-desktop --json
 
 1. Run `livespec penflow-contract status --project . --target web-desktop --json` for web desktop features; otherwise run `livespec penflow-contract status --project . --json`.
 2. If status is `absent` for a UI feature, create `penflow/flow-ui-contract/flows/<feature_slug>.md` and `penflow/flow-ui-contract/screens/<screen_id>.md`, then execute the From-Scratch Penflow Forward Contract. Do not read `.brainstorm/`.
-3. If status is `ready`, read `penflow/semantic-ui-tree.json` and `penflow/code-ir.json`.
+3. If inspection state is `ready` (verdict READY, certified false), read `penflow/semantic-ui-tree.json` and `penflow/code-ir.json`.
 4. Resolve matching `flow_id`, `screen_id`, `semantic_id`, and `test_id` by exact feature slug, screen id, visible text, or source map. Do not invent IDs.
 5. Add a `## Penflow Contract` section to `spec.md` listing the resolved IDs and any `[NEEDS CLARIFICATION]` mappings.
 6. If status is `incomplete` for a UI feature, report `BLOCKED - penflow_forward_contract_failed` unless the missing mapping is explicitly marked `[NEEDS CLARIFICATION]` inside the generated flow/screen contract.
@@ -968,6 +968,12 @@ flowchart TD
 
 ---
 
+
+## Penflow C51 stage contract
+
+Inspection returns READY (or ABSENT for unrequired non-UI input), certified false; never treat readiness as final PASS. **Read** [Penflow certification](../../../system/testing/penflow-contract.md) for C51 profiles and response bindings. Non-UI work omits build-manifest arguments; the runner manifest is an internal proof input, not a new mandatory user flag.
+This command prepares inputs and reports inspection readiness. Do not require a runtime report or build manifest before the producing/test stages. A revalidation of an already Implemented UI feature through finalize verify must receive the existing independent runner manifest; absence blocks that certification only.
+
 ## Execution Tasks
 
 > Machine-readable task inventory parsed by `livespec goal render`.
@@ -1037,7 +1043,7 @@ flowchart TD
 - [always] Add feature row to .specs/README.md Features table under lock
 - [always] Add initial entry to feature changelog.md under lock
 - [always] Add summary entry to global .specs/changelog.md under lock
-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation
 - [always] Match and check roadmap items; add deferred or ad-hoc items as needed
 - [always] Propose preflight manifest additions if spec has Infrastructure Requirements
 

@@ -1,0 +1,32 @@
+{
+  "source": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/brainstorm-native-witness-stnvnm1m/consumer/handoff/penflow",
+  "destination": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/penflow",
+  "copied": true,
+  "reason": "copied",
+  "status": {
+    "workspace": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-native-import-consumer-abfu24y8/penflow",
+    "state": "ready",
+    "runtime_required": false,
+    "runtime_comparison": "ABSENT",
+    "runtime_reason": "actual_tree_not_required",
+    "present": [
+      "flow-ui-contract/",
+      "ui.pen",
+      "semantic-ui-tree.json",
+      "expected-ui-tree.json",
+      "code-ir.json"
+    ],
+    "missing": [],
+    "optional_present": [],
+    "design_registry_required": false,
+    "design_registry_missing": [],
+    "mockup_validation_required": false,
+    "mockup_validation_missing": [],
+    "flow_count": 1,
+    "screen_count": 1,
+    "required_profile": null,
+    "certified": false,
+    "verification_status": null,
+    "verification_reason": "not_requested"
+  }
+}

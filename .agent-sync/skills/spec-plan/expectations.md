@@ -1,7 +1,7 @@
 ---
 command: spec-plan
 contract_version: "1.0"
-last_reviewed: 2026-06-27
+last_reviewed: 2026-09-05
 ---
 
 # Expectations — /spec-plan
@@ -63,10 +63,14 @@ Generate a technical plan with sequence, state, and ER diagrams.
   - "Constitution Check"
   - "Implementation Plan"
 - proof boundary: native QE Analysis from `system/qe-analysis.md` translates risks into gates, test levels, proof artifacts, evidence gaps, and review/audit/test boundaries; user hooks are extension-only
-- stdout marker: `Penflow Contract Verdict: ABSENT | BLOCKED | PASS`
-  - `ABSENT`: non-UI feature without root `penflow/`
-  - `BLOCKED`: UI plan needs `code-ir.json` or other root artifacts but forward generation failed
-  - `PASS`: required Penflow planning inputs are present
+- stdout marker: `Penflow Contract Verdict: ABSENT | READY | FAIL | BLOCKED`
+  - `ABSENT`: unrequired non-UI inspection has no workspace.
+  - `READY`: required planning artifacts and ID mappings are available; `certified: false`.
+  - `FAIL` / `BLOCKED`: invalid or missing required preparation input; no certification is implied.
+
+### C51 stage evidence
+
+- This command prepares inputs; no runtime report/build manifest or final certificate is required before its producing/test stage.
 
 ## 7. Exit Codes
 
@@ -166,3 +170,11 @@ exit 0
 - **On success:** review plan.md, then run `/spec-implement <feature>`.
 - **On drift:** open the gap report, refine plan.md, re-run `--refine`.
 - **On blocked:** run `/spec-specify` first.
+
+## Approved visual source boundary
+
+Standard planning declares closed verification policy in every actual active plan; review-snapshot automatically generates the union, preserving required procedures from earlier active plans and authenticated inheritance. Missing or duplicate metadata blocks; candidate C20 never supplies policy.
+
+Visual planning records a complete cumulative pre-dispatch review snapshot and packages the actual raw reviewer output through the internal review-result command. Missing review fields are rejected, never synthesized; transport packaging remains uncertified. Plan Review Done requires `--review-result`; missing or stale input, review findings or mismatched selection block the transition. Preparation reports READY with certified false. Subsequent design certification requires the approved baseline and a current Penflow PASS with certified true. No stdout PASS or registry finalization receipt substitutes for bound review approval.
+
+The C20 producer prepares missing test identifiers before first review through Penflow authority prepare; existing explicit identifiers remain unchanged. The machine snapshot gate delegates validate-flow-contract --require-test-ids and cannot publish active invalid or unidentified C20. Review never repairs approved identities.

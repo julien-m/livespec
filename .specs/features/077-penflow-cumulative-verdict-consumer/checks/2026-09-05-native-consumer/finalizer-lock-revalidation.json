@@ -1,0 +1,56 @@
+[
+  {
+    "feature": "001-checkout-overview",
+    "operation": "apply",
+    "exit": 0,
+    "result": {
+      "outcome": "already_finalized",
+      "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/001-checkout-overview/run/20260905T130938Z/finalize/receipt.json",
+      "written": [],
+      "skipped": [
+        "feature_changelog",
+        "global_changelog",
+        "readme",
+        "spec_status",
+        "roadmap"
+      ]
+    }
+  },
+  {
+    "feature": "001-checkout-overview",
+    "operation": "verify",
+    "exit": 0,
+    "result": {
+      "verdict": "PASS",
+      "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/001-checkout-overview/run/20260905T130940Z/finalize/receipt.json",
+      "violations": []
+    }
+  },
+  {
+    "feature": "002-payment-outcomes",
+    "operation": "apply",
+    "exit": 0,
+    "result": {
+      "outcome": "already_finalized",
+      "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/002-payment-outcomes/run/20260905T130941Z/finalize/receipt.json",
+      "written": [],
+      "skipped": [
+        "feature_changelog",
+        "global_changelog",
+        "readme",
+        "spec_status",
+        "roadmap"
+      ]
+    }
+  },
+  {
+    "feature": "002-payment-outcomes",
+    "operation": "verify",
+    "exit": 0,
+    "result": {
+      "verdict": "PASS",
+      "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/002-payment-outcomes/run/20260905T130942Z/finalize/receipt.json",
+      "violations": []
+    }
+  }
+]

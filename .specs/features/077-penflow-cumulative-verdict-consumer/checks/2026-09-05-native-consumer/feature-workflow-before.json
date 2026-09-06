@@ -1,0 +1,5 @@
+{
+  ".agent-sync/skills/spec-feature/SKILL.md": "ba7d887165756dd3ef1868bea76e410189399550e9844e665e64235a15122beb",
+  ".agent-sync/skills/spec-feature/expectations.md": "b4eb8f4b5efbe7df4927d115e2984076eacb23a7c1b6bb21b0a3bcd05f40d14a",
+  "tests/test_penflow_contract_command_contract.py": "a08a7f2ca3fab2b9a531fd9c84d123a0c6ac6c860df2a4b5480915d120117a11"
+}

@@ -1,0 +1,10 @@
+{
+  "verdict": "FAIL",
+  "receipt_path": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/.specs/features/001-checkout-overview/run/20260905T124658Z/finalize/receipt.json",
+  "violations": [
+    {
+      "rule_id": "R1.3",
+      "message": "Feature '001-checkout-overview' has status 'Implemented' but roadmap item '**001-checkout-overview** \u2192 [spec](features/001-checkout-overview/spec.md)' is unchecked"
+    }
+  ]
+}

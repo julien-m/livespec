@@ -3,9 +3,16 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-07-04
+> Last updated: 2026-09-05
 
 ---
+
+## 2026-09-05 — [Feature 077] Implemented: Penflow cumulative verification consumer and governed lifecycle closure
+<!-- finalize:spec-implement:2026-09-05:6ce4661e -->
+
+## 2026-09-05 — Feature 077: Composed procedure and selector authority
+
+Automatic active-plan policy union preserves earlier required procedures; the read-only pre-review C20 selector gate delegates to Penflow. Canonical fixture tests use the real CLI. Native source approval accepted; final runtime/closure/import proofs remain pending.
 
 ## 2026-07-04 -- [Feature 075] Implemented: Design Direction Carry -- optional informative design direction line through generated specs without validation use
 

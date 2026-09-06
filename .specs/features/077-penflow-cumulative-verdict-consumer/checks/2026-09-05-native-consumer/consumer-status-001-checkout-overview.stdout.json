@@ -1,0 +1,29 @@
+{
+  "workspace": "/private/var/folders/l_/t1s_zytx2fqb0dkzz40d3v7m0000gn/T/penflow-c51-native-review-5z8idhig/penflow",
+  "state": "ready",
+  "runtime_required": true,
+  "runtime_comparison": "READY",
+  "runtime_reason": "current_penflow_report_validated",
+  "present": [
+    "flow-ui-contract/",
+    "ui.pen",
+    "semantic-ui-tree.json",
+    "expected-ui-tree.json",
+    "code-ir.json"
+  ],
+  "missing": [],
+  "optional_present": [
+    "actual-ui-tree.json"
+  ],
+  "design_registry_required": false,
+  "design_registry_missing": [],
+  "mockup_validation_required": false,
+  "mockup_validation_missing": [],
+  "flow_count": 1,
+  "screen_count": 3,
+  "required_profile": "implementation",
+  "certified": true,
+  "verification_status": "PASS",
+  "verification_reason": "current_penflow_report_validated",
+  "verdict": "PASS"
+}

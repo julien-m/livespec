@@ -1,0 +1,16 @@
+{
+  "baseline_sha256": "71eaba1d1e1fda8d6380db35151037726375d519c7b9f05c8739d372db4e8c03",
+  "approval_receipts": [
+    {
+      "path": ".specs/penflow-approvals/approval-3e2089b0d184708b523db3ecb3d308a2ca0624e0a07df9891a3c91fc7993e9f6.json",
+      "sha256": "3e2089b0d184708b523db3ecb3d308a2ca0624e0a07df9891a3c91fc7993e9f6"
+    }
+  ],
+  "snapshot": "bbb609e26cfd8baee71c297ea1ca67d240b7d191ec4779d457e76929db5e48ef",
+  "native_review_sha256": "2a34038afac52b63589dada1ee93238fe30ec815e03d7ab74df1c10f52d32627",
+  "source_memberships": [
+    "001-checkout-overview",
+    "002-payment-outcomes"
+  ],
+  "certified": false
+}

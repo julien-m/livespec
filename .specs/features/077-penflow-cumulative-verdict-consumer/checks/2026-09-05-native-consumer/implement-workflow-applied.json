@@ -1,0 +1,19 @@
+{
+  "archive": "/Users/julienm/projects/penflow/.specs/.runs/spec-implement-2026-09-05T14-05-59.836497-c2cba82d.json",
+  "archive_sha256": "22de5bc13d39d82bf687068376bba82eaf177d600749914fa2480caf2dfbb9b7",
+  "argv": [
+    "git",
+    "apply",
+    "--include=.agent-sync/skills/spec-implement/*",
+    ".specs/features/077-penflow-cumulative-verdict-consumer/remaining-workflow.patch"
+  ],
+  "before": {
+    ".agent-sync/skills/spec-implement/SKILL.md": "12da79b0ba7d9d42fd75e459c9098516faa9ac4370f15767734e0e5d3f85a53f",
+    ".agent-sync/skills/spec-implement/expectations.md": "c54d8fb0da6c1a8d9a070dcf28de754eab5384e8b276d5509c349f60c4c0ee7c"
+  },
+  "after": {
+    ".agent-sync/skills/spec-implement/SKILL.md": "2f130f1017c74ed8402b8d45032d374ca884c7d9d171f30671d91a7443878c9b",
+    ".agent-sync/skills/spec-implement/expectations.md": "7c093159a084d82d993921ac2b357b64489a0cf5e367916999ce1ffad8c102f1"
+  },
+  "feature_skill_untouched": true
+}

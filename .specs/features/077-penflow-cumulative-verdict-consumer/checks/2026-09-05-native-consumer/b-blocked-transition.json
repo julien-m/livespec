@@ -1,0 +1,27 @@
+{
+  "command": [
+    "/Users/julienm/projects/livespec/.venv/bin/livespec",
+    "pipeline",
+    "update",
+    "--feature",
+    "002-payment-outcomes",
+    "--phase",
+    "plan-review",
+    "--status",
+    "done",
+    "--review-result",
+    ".specs/penflow-approvals/review-result-a0f3fe7bb21d830e05c7873a05d31796db5aa69dc75ebb40dfaffc5e450105a7.json",
+    "--timestamp"
+  ],
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "BLOCKED: review_output_not_approved\n",
+  "before": {
+    ".specs/penflow-requirements.json": "ef5b379f876cad39b953622a0c2d1ce43d4197a710d5532ab9c379ce4f222f0b",
+    ".specs/features/002-payment-outcomes/pipeline.md": "b3821d05e4632a47961e8e7d8493fa3ec28c33b3370b9e7ef1d649e87e371d27"
+  },
+  "after": {
+    ".specs/penflow-requirements.json": "ef5b379f876cad39b953622a0c2d1ce43d4197a710d5532ab9c379ce4f222f0b",
+    ".specs/features/002-payment-outcomes/pipeline.md": "b3821d05e4632a47961e8e7d8493fa3ec28c33b3370b9e7ef1d649e87e371d27"
+  }
+}

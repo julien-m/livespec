@@ -1,0 +1,16 @@
+{
+  ".agent-sync/skills/spec-feature/SKILL.md": "ba7d887165756dd3ef1868bea76e410189399550e9844e665e64235a15122beb",
+  ".agent-sync/skills/spec-feature/expectations.md": "b4eb8f4b5efbe7df4927d115e2984076eacb23a7c1b6bb21b0a3bcd05f40d14a",
+  ".agent-sync/skills/spec-test/SKILL.md": "65440469bb967395303bfe44f1a19aefb098bb36f254cd894c7ca2b0c451e6f1",
+  ".agent-sync/skills/spec-test/expectations.md": "f9a04c23b88d5f2b70ffa01ec0bfa3982224551f058cb0993d15a3196ef4052c",
+  ".agent-sync/skills/spec-implement/SKILL.md": "fb978de05c320f9f14cf3f7493ba6b4b56f570cfc1f3c03e32af1dc2c20ecadd",
+  ".agent-sync/skills/spec-implement/expectations.md": "60bf336683355516577c2d1d897c99854ff8072cfd6c848914a390017dd041fe",
+  ".agent-sync/skills/spec-check/SKILL.md": "dbec6596c860e43bfa0f861deacff8726b550e76141d8c00235758aff3952d3f",
+  ".agent-sync/skills/spec-check/expectations.md": "43bfd6c730dc9634cea5435efc851e57fbf4f52dbcee22d0281b13531d0cae23",
+  ".agent-sync/skills/spec-specify/SKILL.md": "3676887020f7215f0d6253dd5126dafd011093af9da5d4c294504b1b62c29143",
+  ".agent-sync/skills/spec-specify/expectations.md": "0f3450050b68f36b6d70d33c26d642a4780dfd0ae7a83aed4b2c20cb553f7c4f",
+  ".agent-sync/skills/spec-plan/SKILL.md": "6ccf44220b310d3516f2f710bb5243b75cc017dcfa92fefaf4b49ae1590d7c90",
+  ".agent-sync/skills/spec-plan/expectations.md": "b88380fb3ba73a65e049d36fe9b2654f65b800c478ef32ea2a57f33576522c79",
+  ".agent-sync/skills/spec-init/SKILL.md": "dee7acae6308e0819b6d2bf82c31b93e030bf6d1be0e30af805cf25019cec95a",
+  ".agent-sync/skills/spec-init/expectations.md": "c6412ae1161aa3b3ab5f20c311669f316aaea9e5f3114eae0f6546149cbf341a"
+}
