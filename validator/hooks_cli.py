@@ -81,7 +81,7 @@ def hooks_resolve(
         raise typer.Exit(0) from None
 
     if rendered:
-        typer.echo(rendered)
+        typer.echo(rendered, nl=False)
     raise typer.Exit(0)
 
 

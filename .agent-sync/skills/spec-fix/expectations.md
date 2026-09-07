@@ -1,7 +1,7 @@
 ---
 command: spec-fix
 contract_version: "1.0"
-last_reviewed: 2026-06-26
+last_reviewed: 2026-09-07
 ---
 
 <!-- @spec(FR-004) -->
@@ -20,7 +20,6 @@ Fix implementation gaps from /spec-check — functional and visual corrections.
 
 **stdout must_contain:**
 - "fix"
-- "applied"
 
 **stdout must_not_contain:**
 - "Traceback"
@@ -29,6 +28,8 @@ Fix implementation gaps from /spec-check — functional and visual corrections.
 - "_(none expected on happy path)_"
 
 ## 4. Filesystem Effects
+
+The create/update and post-run repair effects below apply only to executable feature repairs. Preview (--dry-run/-d or read-only audit) loads an existing gap report or scans in memory, never invokes the writing spec-check or refreshes conventions; absent usable inputs block with an explicit recovery outside preview. Conventions mode uses only its debt workflow; collection parents delegate scoped child repairs. Runtime goal/receipt bookkeeping retains its existing protocol; it is not a business artifact write.
 
 **create:**
 - _(none)_
@@ -109,7 +110,7 @@ Nested invocation: any call back into `/spec-check` runs through an independent 
 verify:
   must:
     - exit_code: 0
-    - contains: "applied"
+    - contains: "fix"
     - receipt_verdict: {"kind": "conventions", "verdict": "PASS", "required_if_exists": true}
   must_not:
     - contains: "Traceback"
@@ -153,12 +154,25 @@ tests/<new or modified tests>
 
 ### Edge Cases
 
-- `--dry-run`: shows the patch plan without writing files.
+- `--dry-run`: shows the patch plan without writing business files, including gap reports or conventions bundles; existing protocol bookkeeping remains separate.
 - Visual fix needs a design mockup change: fix flags it as `manual — update design source`.
 - Auto-fix produces a regression in another test: fix rolls back and surfaces the conflict.
 
 ### Post-run Actions
 
-- **On success:** re-run `/spec-check <feature>` to confirm zero gaps.
+- **On executable repair success:** re-run `/spec-check <feature>` to confirm zero gaps; preview returns its plan without running that writer.
 - **On drift:** address the `manual` issues by hand, re-run `/spec-fix`.
 - **On blocked:** run `/spec-check <feature>` to generate the gap report.
+
+
+## Requirement evidence integrity (078 policy2)
+
+- **Read** [review and progression](../../../system/review-protocol.md): every feature code/test edit and retry requires current Clarify/Analyze via `livespec validate <feature-dir> --progression implement --model <resolved-model>`, forwarding any explicit `--review-max-chars` budget and the same identity to child commands.
+- Require actual mapped runner `execution_receipt_path` for applicable fix verification; prose and identifiers do not prove tests. **Read** [execution rules](../../../system/testing/execution-rules.md).
+- Unfiltered feature repair requires all execution ACs AND declared documentary review ACs at prove/archive/verify-output. Filtered `--fr`/`--ac`/`--visual`/`--functional` repair certifies only actual mapped execution; unknown or open gaps outside the filter prohibit full feature status promotion.
+- `--dry-run`/read-only audit performs no application edits and acquires no readiness/runtime obligation. `--conventions` retains its independent conventions proof; functional changes must re-enter feature readiness. Collection `--all` delegates feature goals with the same model/budget, removes the collection flag in children and inspects their actual results.
+- Existing immutable historical contracts retain their original proof policy. Current policy2 receipts, scopes and review identities remain bound to their complete immutable contract at all three boundaries.
+
+- Filtered AC/FR tasks freeze the selected declared execution ACs and current normative source; unrelated passing assertions, unknown selectors, absent/ambiguous FR links and stale selection fail closed. Review ACs require the existing complete verification. Preview/batch/conventions inventories exclude feature code/test/artifact writes and feature finalization; batch children retain their applicable tasks.
+
+- Visual applicability follows the existing compiler: `visual` requires an executable feature fix. In --dry-run/-d, read-only audit, conventions-only and collection --all/-A, visual inspection and mutation rows are inactive; none requires capture, cleanup, baseline promotion or visual artifact updates. Normal visual repairs retain every existing visual gate.

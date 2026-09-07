@@ -115,8 +115,8 @@ def test_digit_inside_identifier_is_not_treated_as_a_metric(tmp_path: Path) -> N
 
     # OAuth2's "2" is part of an identifier -> "secure" stays ambiguous -> flagged.
     assert 2 in flagged_lines
-    # FR-002 has a real standalone metric (200 ms) -> not flagged.
-    assert 3 not in flagged_lines
+    # FR-002's latency metric does not resolve its security ambiguity.
+    assert 3 in flagged_lines
 
 
 def test_ranking_prefers_higher_score_and_caps_at_five(tmp_path: Path) -> None:
@@ -144,3 +144,41 @@ def test_ranking_is_deterministic_regardless_of_scan_order(tmp_path: Path) -> No
     reverse = rank_clarification_opportunities(list(reversed(scanned)))
 
     assert [_identity_key(o) for o in forward] == [_identity_key(o) for o in reverse]
+
+
+# @spec FR-006: Bilingual claim metrics
+# — .specs/features/078-requirement-evidence-integrity/spec.md#fr-006
+
+
+def test_unrelated_population_does_not_resolve_security(tmp_path: Path) -> None:
+    spec = _write_spec(
+        tmp_path, ["FR-001: secure for 10 users.", "FR-002: sécurisé pour 10 utilisateurs."]
+    )
+    assert len(scan_clarification_opportunities(spec)) == 2
+
+
+def test_metric_belongs_to_quality_not_neighbouring_claim(tmp_path: Path) -> None:
+    spec = _write_spec(
+        tmp_path,
+        ["FR-001: fast under 200 ms and secure.", "FR-002: rapide sous 200 ms et robuste."],
+    )
+    items = scan_clarification_opportunities(spec)
+    assert len(items) == 2
+    assert all("secure" in item.question or "robuste" in item.question for item in items)
+
+
+def test_six_critical_questions_survive_presentation_limit(tmp_path: Path) -> None:
+    spec = _write_spec(
+        tmp_path, [f"FR-{i:03d}: [NEEDS CLARIFICATION] permission {i}" for i in range(1, 7)]
+    )
+    items = scan_clarification_opportunities(spec)
+    assert len(rank_clarification_opportunities(items, limit=None)) == 6
+    assert len(rank_clarification_opportunities(items, limit=20)) == 5
+    assert all(item.critical and item.source_hash and item.requirement_id for item in items)
+
+
+def test_requirement_heading_qualifies_body_ambiguity(tmp_path: Path) -> None:
+    spec = _write_spec(tmp_path, ["### FR-001", "**Requirement:** The API must be secure."])
+    item = scan_clarification_opportunities(spec)[0]
+    assert item.requirement_id == f"{tmp_path.name}:FR-001"
+    assert item.critical

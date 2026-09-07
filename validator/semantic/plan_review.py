@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-import json
 import re
 from dataclasses import dataclass, field
-from typing import Any
+from pathlib import Path
 
 from validator.coherence.violation import Severity
+from validator.semantic.review_context import PreparedReview, prepare_review_context
+from validator.semantic.review_contract import ReviewReceipt
+from validator.semantic.review_receipts import legacy_display_fields, run_prepared_review
 
 
 @dataclass
@@ -29,81 +31,29 @@ class ReviewFinding:
 
 @dataclass
 class PlanReviewResult:
-    """Result of reviewing a plan against its spec.
+    """Advisory plan-review display fields alongside independent receipt evidence.
+
+    Construction does not validate readiness. Empty findings are insufficient:
+    consumers require complete evidence and a receipt verified as ready against
+    the current context, model and policy before authorizing progression.
 
     Attributes:
-        findings: List of review findings.
-        reviewer_model: Model ID used for the review.
-        confidence: Self-reported reviewer confidence (1-5).
-        complexity: Plan complexity metrics.
+        findings: Legacy display findings derived from the receipt; not exhaustive proof.
+        reviewer_model: Receipt's resolved model identity, or empty when unresolved.
+        confidence: Reviewer confidence from the receipt (1-5), or zero when unavailable.
+        complexity: Counts of FR/AC references, paths and diagrams in supplied plan text;
+            these display counts do not establish semantic coverage.
+        complete: Receipt completeness copied by the producer; not its readiness verdict.
+        receipt: In-memory grounded review and raw evidence, or None when absent;
+            this field does not own a persisted cache path or perform freshness checks.
     """
 
     findings: list[ReviewFinding] = field(default_factory=list)
     reviewer_model: str = ""
     confidence: int = 0
     complexity: dict[str, int] = field(default_factory=dict)
-
-
-_REVIEW_PROMPT = """\
-You are an adversarial technical plan auditor. \
-Your job is to find real problems, not validate.
-
-Review this implementation plan against its specification. Focus on:
-1. **Coverage gaps**: Which AC or FR from spec have NO corresponding \
-   step in the plan?
-2. **Tech inconsistencies**: Which tech choices contradict the configured \
-   stack?
-3. **Ordering issues**: Which steps depend on outputs of later steps?
-4. **Missing steps**: What is obviously needed but not planned?
-5. **Stack mismatches**: Does the plan use technologies not in the stack?
-6. **Over-engineering**: What is planned but not required by any FR?
-
-Be specific. Cite FR/AC IDs when possible. Do not praise the plan.
-
-## Specification
-{spec_content}
-
-## Plan
-{plan_content}
-
-## Stack
-{stack_content}
-
-## Constitution
-{constitution_content}
-
-Return JSON with your findings and a confidence score (1-5) rating \
-your thoroughness.
-A score of 5 means you are very confident you caught all issues.
-A score below 3 means you may have missed things."""
-
-_REVIEW_SCHEMA: dict[str, Any] = {
-    "name": "plan_review",
-    "strict": True,
-    "schema": {
-        "type": "object",
-        "properties": {
-            "findings": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "category": {"type": "string"},
-                        "severity": {
-                            "type": "string",
-                            "enum": ["blocking", "warning", "info"],
-                        },
-                        "description": {"type": "string"},
-                        "suggestion": {"type": "string"},
-                    },
-                    "required": ["category", "severity", "description", "suggestion"],
-                },
-            },
-            "confidence": {"type": "integer"},
-        },
-        "required": ["findings", "confidence"],
-    },
-}
+    complete: bool = False
+    receipt: ReviewReceipt | None = None
 
 
 def compute_plan_complexity(plan_content: str) -> dict[str, int]:
@@ -139,46 +89,52 @@ def review_plan(
     stack_content: str = "",
     constitution_content: str = "",
     model: str | None = None,
+    *,
+    prepared: PreparedReview | None = None,
+    cache_path: Path | None = None,
 ) -> PlanReviewResult:
-    """Review a plan against its spec via LLM.
-
-    Sends an adversarial review prompt to the configured LLM provider and
-    returns structured findings.
+    """Review supplied context while retaining explicit incomplete advisory results.
 
     Args:
-        spec_content: Raw markdown of the feature spec.
-        plan_content: Raw markdown of the plan to review.
-        stack_content: Raw markdown of the stack definition.
-        constitution_content: Raw markdown of the constitution.
-        model: Optional model ID override (e.g., "google/gemini-3.1-pro").
+        spec_content: Complete specification text when prepared is omitted.
+        plan_content: Complete plan text; also used for displayed complexity metrics.
+        stack_content: Complete stack context when prepared is omitted.
+        constitution_content: Complete constitution when prepared is omitted.
+        model: Explicit provider model; None uses the prepared identity or provider default.
+        prepared: Authoritative assembled context, superseding the supplied review texts.
+        cache_path: Optional derived receipt path to read and atomically replace.
 
     Returns:
-        Review result with findings, confidence, and complexity metrics.
+        Display findings, completeness, receipt, and its resolved model (empty if unknown).
 
     Raises:
-        LLMProviderNotConfigured: If no LLM provider is available.
-        json.JSONDecodeError: If the LLM response is not valid JSON.
+        ValueError: Explicit model conflicts with context or response JSON is malformed.
+        OSError: Cache publication fails.
+        LLMProviderNotConfigured: A provider call is needed but no provider is configured.
+
+    Side effects:
+        May invoke the configured provider and read/write the cache. Provider exceptions
+        propagate; incomplete evidence remains visible and does not certify readiness.
     """
-    from validator.llm_provider import call_llm
-
-    prompt = _REVIEW_PROMPT.format(
-        spec_content=spec_content[:8000],
-        plan_content=plan_content[:8000],
-        stack_content=(stack_content[:2000] if stack_content else "(not provided)"),
-        constitution_content=(
-            constitution_content[:2000] if constitution_content else "(not provided)"
-        ),
+    context = prepared or prepare_review_context(
+        "supplied",
+        {
+            "spec": spec_content,
+            "plan": plan_content,
+            "stack": stack_content,
+            "constitution": constitution_content,
+        },
+        kind="plan",
+        model=model or "",
     )
+    receipt = run_prepared_review(context, cache_path=cache_path, model=model)
+    return _plan_result(plan_content, receipt)
 
-    raw = call_llm(prompt, json_schema=_REVIEW_SCHEMA, model=model)
-    data = json.loads(raw)
 
-    severity_map = {
-        "blocking": Severity.ERROR,
-        "warning": Severity.WARNING,
-        "info": Severity.INFO,
-    }
-
+def _plan_result(plan_content: str, receipt: ReviewReceipt) -> PlanReviewResult:
+    """Render advisory fields without changing the validated receipt identity."""
+    fields, confidence = legacy_display_fields(receipt)
+    severity_map = {"blocking": Severity.ERROR, "warning": Severity.WARNING, "info": Severity.INFO}
     findings = [
         ReviewFinding(
             category=f.get("category", "general"),
@@ -186,12 +142,13 @@ def review_plan(
             description=f.get("description", ""),
             suggestion=f.get("suggestion", ""),
         )
-        for f in data.get("findings", [])
+        for f in fields
     ]
-
     return PlanReviewResult(
         findings=findings,
-        reviewer_model=model or "default",
-        confidence=data.get("confidence", 0),
+        reviewer_model=receipt.reviewer_model,
+        confidence=confidence,
         complexity=compute_plan_complexity(plan_content),
+        complete=receipt.complete,
+        receipt=receipt,
     )

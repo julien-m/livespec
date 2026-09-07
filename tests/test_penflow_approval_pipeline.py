@@ -57,7 +57,7 @@ def test_cli_snapshot_then_review_transition_publishes_bound_authority(
     assert runner.invoke(app, _command(review)).exit_code == 0
 
 
-def test_interrupted_phase_write_keeps_valid_baseline_nonfinal_and_retries(
+def test_interrupted_phase_write_restores_missing_baseline_and_retries(
     project: ReviewProject, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(project.root)
@@ -72,8 +72,8 @@ def test_interrupted_phase_write_keeps_valid_baseline_nonfinal_and_retries(
     monkeypatch.setattr(pipeline_module, "write_with_hash_check", interrupted)
     response = CliRunner().invoke(app, _command(result))
     assert response.exit_code == 1 and "interrupted phase write" in response.output
-    assert project.baseline.is_file() and pipeline.read_text() == before
-    with pytest.raises(PenflowApprovalError, match="plan_review_not_completed"):
+    assert not project.baseline.exists() and pipeline.read_text() == before
+    with pytest.raises(FileNotFoundError):
         require_approved_requirements(project.root, FEATURE)
     monkeypatch.setattr(pipeline_module, "write_with_hash_check", actual_write)
     assert CliRunner().invoke(app, _command(result)).exit_code == 0

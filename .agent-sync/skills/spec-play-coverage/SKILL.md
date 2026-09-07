@@ -99,32 +99,32 @@ The script handles grep, JSON encoding, base64, and browser opening. Do **not** 
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-play-coverage --save`
-- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Lock goal contract via `livespec goal render spec-play-coverage --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 1 — Resolve Feature
 
-- [always] Resolve feature by argument, git branch, or interactive selection
+- [always] Resolve feature by argument, git branch, or interactive selection <!-- evidence:documentary -->
 
 ### Phase 2 — Auto-detect Source Directory
 
-- [always] Check for common source directories (app/, src/, lib/, packages/)
-- [always] Select directory with most @spec anchor matches; fall back to .
+- [always] Check for common source directories (app/, src/, lib/, packages/) <!-- evidence:documentary -->
+- [always] Select directory with most @spec anchor matches; fall back to . <!-- evidence:documentary -->
 
 ### Phase 3 — Run Coverage Script
 
-- [always] Resolve play-coverage.sh path from skill symlink chain
-- [always] Execute `bash play-coverage.sh <FEATURE> <SOURCE_DIR>`
-- [always] Open playground in browser with pre-loaded @spec anchor data
+- [always] Resolve play-coverage.sh path from skill symlink chain <!-- evidence:documentary -->
+- [always] Execute `bash play-coverage.sh <FEATURE> <SOURCE_DIR>` <!-- evidence:documentary -->
+- [always] Open playground in browser with pre-loaded @spec anchor data <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-play-coverage` is complete only if all are true:
 
-- [ ] Feature resolved to a valid feature directory
-- [ ] Source directory detected with @spec anchor matches
-- [ ] play-coverage.sh executed without error
-- [ ] Playground opened in browser with coverage data loaded
+- [ ] Feature resolved to a valid feature directory <!-- evidence:documentary -->
+- [ ] Source directory detected with @spec anchor matches <!-- evidence:documentary -->
+- [ ] play-coverage.sh executed without error <!-- evidence:documentary -->
+- [ ] Playground opened in browser with coverage data loaded <!-- evidence:documentary -->
 
 ---
 

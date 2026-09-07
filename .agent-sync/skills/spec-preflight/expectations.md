@@ -1,7 +1,7 @@
 ---
 command: spec-preflight
 contract_version: "1.0"
-last_reviewed: 2026-05-26
+last_reviewed: 2026-09-07
 ---
 
 # Expectations — /spec-preflight

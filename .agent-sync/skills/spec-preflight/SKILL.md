@@ -448,44 +448,44 @@ features 016-033 is shipped as migration v10 - run `/spec-migrate`.
 
 ### Phase 0 — Manifest Setup
 
-- [always] Read before-preflight hooks from all 3 levels
-- [always] Read existing `.specs/preflight.md` manifest (or generate with --regenerate)
-- [always] Enforce gitignore entry for `.specs/preflight-report.md`
+- [always] Read before-preflight hooks from all 3 levels <!-- evidence:documentary -->
+- [always] Read existing `.specs/preflight.md` manifest (or generate with --regenerate) <!-- evidence:documentary -->
+- [always] Enforce gitignore entry for `.specs/preflight-report.md` <!-- evidence:documentary -->
 
 ### Phase 1 — Pass 1: Verify All
 
-- [always] Execute all `verify` commands in parallel (10s default timeout per check)
-- [always] Record status for each check: pass / fail / error
+- [always] Execute all `verify` commands in parallel (10s default timeout per check) <!-- evidence:documentary -->
+- [always] Record status for each check: pass / fail / error <!-- evidence:documentary -->
 
 ### Phase 2 — Pass 2: Auto-Resolve Failures
 
-- [always] For each failed check with non-human resolve: prompt if source is manual, then execute install/resolve command
-- [always] Re-execute verify command after resolution attempt
-- [always] Mark check as resolved or failed; escalate unresolved to Pass 3
+- [always] For each failed check with non-human resolve: prompt if source is manual, then execute install/resolve command <!-- evidence:documentary -->
+- [always] Re-execute verify command after resolution attempt <!-- evidence:documentary -->
+- [always] Mark check as resolved or failed; escalate unresolved to Pass 3 <!-- evidence:documentary -->
 
 ### Phase 3 — Pass 3: Human Blockers
 
-- [always] Present all human-required failures grouped with resolve commands
-- [always] Wait for user action then re-run Pass 1 + Pass 2 until all checks pass or user skips
-- [always] Enforce gate: block if any critical check still failed after user skips
+- [always] Present all human-required failures grouped with resolve commands <!-- evidence:documentary -->
+- [always] Wait for user action then re-run Pass 1 + Pass 2 until all checks pass or user skips <!-- evidence:documentary -->
+- [always] Enforce gate: block if any critical check still failed after user skips <!-- evidence:documentary -->
 
 ### Phase 4 — Report Generation
 
-- [always] Write `.specs/preflight-report.md` with verdict (READY / WARNINGS / BLOCKED), summary table, and details per category
-- [always] Display inline output with check results and timing
-- [always] Read after-preflight hooks from all 3 levels
+- [always] Write `.specs/preflight-report.md` with verdict (READY / WARNINGS / BLOCKED), summary table, and details per category <!-- evidence:documentary -->
+- [always] Display inline output with check results and timing <!-- evidence:documentary -->
+- [always] Read after-preflight hooks from all 3 levels <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-preflight` is complete only if all are true:
 
-- [ ] `.specs/preflight.md` exists (or was just generated with `--regenerate`)
-- [ ] All `verify` commands were executed (or skipped per `--light` rules)
-- [ ] Auto-resolvable failures were attempted
-- [ ] Human blockers were presented grouped (if any)
-- [ ] `.specs/preflight-report.md` was written with Verdict
-- [ ] Inline output was displayed with summary
-- [ ] If called as Phase 0.5: gate behavior enforced (critical = block, warning = continue)
+- [ ] `.specs/preflight.md` exists (or was just generated with `--regenerate`) <!-- evidence:documentary -->
+- [ ] All `verify` commands were executed (or skipped per `--light` rules) <!-- evidence:documentary -->
+- [ ] Auto-resolvable failures were attempted <!-- evidence:documentary -->
+- [ ] Human blockers were presented grouped (if any) <!-- evidence:documentary -->
+- [ ] `.specs/preflight-report.md` was written with Verdict <!-- evidence:documentary -->
+- [ ] Inline output was displayed with summary <!-- evidence:documentary -->
+- [ ] If called as Phase 0.5: gate behavior enforced (critical = block, warning = continue) <!-- evidence:documentary -->
 
 ---
 

@@ -34,12 +34,13 @@ argument-hint: "<feature description>"
 La toute première action lors de `/spec-specify` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+   **Read** [goal review identity](../../../system/review-protocol.md#goal-review-identity) before locking a review-bearing goal; resolve the actual runtime model and preserve its internal flag through all child commands.
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
 3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-specify --feature <feature-slug> --flags "<active-flags>" --save
    ```
-   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
+   Si aucune feature fournie, omettre `--feature`. Le flag interne `--model=<actual-model>` reste présent même sans flag utilisateur.
    Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-specify-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-specify-<hash8>.state.json`
 4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
 5. Émettre la commande slash `/goal` avec hash et références machine :
@@ -704,24 +705,11 @@ After generating spec.md, determine if the feature involves UI:
 
 ### Step 5.9 — Clarify Gate (direct use)
 
-Runs after Surface Annotation and **before** Step 6 Quality Validation, on the just-generated `spec.md`. This is an inline gate inside `/spec-specify` — it adds **no new command surface**. It mirrors the Phase 1.6 Clarify gate that `/spec-feature` runs, so a directly-specified feature resolves the same ambiguities.
+Collect deterministic clarification candidates after Surface Annotation, before Step 6. This is the initial inventory, not the final readiness verdict. Reconcile the full inventory with the actual current spec review after Step 6.5, before presenting a planning-ready result.
 
-1. Build the capped question queue from the deterministic helper:
-   ```python
-   from pathlib import Path
-   from validator.clarify_gate import (
-       rank_clarification_opportunities,
-       scan_clarification_opportunities,
-   )
-
-   spec = Path(".specs/features/NNN-feature-name/spec.md")
-   queue = rank_clarification_opportunities(scan_clarification_opportunities(spec))  # <= 5
-   ```
-   The helper flags vague quality adjectives (`fast`/`scalable`/`secure`/`robust`, extensible seed) used without a numeric criterion in the same sentence, `[NEEDS CLARIFICATION]` placeholders, and unconfirmed `[ASSUMED]`/`TBD` assumptions, ranked by Impact × Uncertainty and capped at 5.
-2. If the queue is empty → skip silently to Step 6.
-3. Ask **one question at a time**, in queue order, **max 5** accepted questions. In `--auto`, accept only deterministic recommendations grounded in the constitution or existing spec text; otherwise leave the item as an explicit `[ASSUMED]` note rather than fabricating an answer.
-4. Write accepted answers under a `## Clarifications` heading in `spec.md`, grouped by `### Session YYYY-MM-DD`, one `- Q: <question> -> A: <answer>` bullet per accepted answer, no duplicate session bullets. Also update the affected spec section while **preserving existing AC-/FR-/SC- numbering** (edit text in place; never renumber).
-5. After writes, re-run structural validation: `livespec validate .specs/features/NNN-feature-name/spec.md --format compact`. Fix and re-validate on failure before continuing.
+- **Read** [shared clarification protocol](../../../system/review-protocol.md#clarification-without-lost-questions); preserve the full inventory separately from the five-item presentation slice.
+- Resolve only accepted decisions or choices already grounded in approved context. In `--auto`, unresolved critical business decisions block; an `[ASSUMED]` marker cannot authorize planning.
+- Write accepted decisions in the existing Clarifications section and update affected wording without renumbering FR/AC/SC. Recollect after edits, revalidate and refresh stale review evidence.
 
 ### Step 6 — Quality Validation
 
@@ -748,7 +736,7 @@ Unless the `--no-review` flag is set:
 1. Read the generated `spec.md` content
 2. Load reviewer models from `.specs/semantic/config.yaml` → `review_reviewers` list
 3. If no reviewers configured, use the provider's default model
-4. Send the spec + project.md + constitution to the first reviewer via `call_llm()`
+4. Prepare complete spec review context and ingest actual raw reviewer JSON through the shared protocol. Native and `call_llm()` transports use the same complete inventory and strict validator; reuse a current exact cache instead of another review.
 5. Display findings inline with severity markers:
    ```
    Spec Review (google/gemini-3.1-pro):
@@ -770,8 +758,8 @@ Unless the `--no-review` flag is set:
   ```
   ⚠ Spec still has blocking issues after 2 correction attempts. Review manually then re-run /spec-specify.
   ```
-- **`[WARNING]` / `[INFO]` findings only:** Display findings and proceed to Step 7. These are informational — no regeneration triggered.
-- **PASS (no findings):** Proceed silently to Step 7.
+- **`[WARNING]` / `[INFO]` findings only:** Display findings, reconcile the full Clarify inventory and require `livespec validate <feature-dir> --progression plan --model <resolved-model>` before Step 7 can present planning readiness.
+- **PASS:** Require a current complete ready receipt, reconcile Clarify, then check shared plan progression before Step 7. An empty findings list alone is insufficient.
 
 ### Step 7 — Present and Confirm
 
@@ -983,90 +971,90 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-specify --save`
-- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Lock goal contract via `livespec goal render spec-specify --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 1 — Parse and Scope
 
-- [always] Extract feature name, user action, and priority hints from input
-- [always] Analyze scope for independent domains and complexity flags
-- [always] Propose split if 2+ independent domains or complexity exceeded; add deferred items to roadmap
-- [always] Create seed.md files for each deferred sub-feature
-- [always] Load seed.md context if target feature directory already has a seed
+- [always] Extract feature name, user action, and priority hints from input <!-- evidence:documentary -->
+- [always] Analyze scope for independent domains and complexity flags <!-- evidence:documentary -->
+- [always] Propose split if 2+ independent domains or complexity exceeded; add deferred items to roadmap <!-- evidence:documentary -->
+- [always] Create seed.md files for each deferred sub-feature <!-- evidence:documentary -->
+- [always] Load seed.md context if target feature directory already has a seed <!-- evidence:documentary -->
 
 ### Phase 1.8 — Penflow UI Contract Resolution
 
-- [penflow] Run `livespec penflow-contract status` to detect contract state
-- [penflow] Run From-Scratch Penflow Forward Contract if status is `absent` for UI feature
+- [penflow] Run `livespec penflow-contract status` to detect contract state <!-- evidence:documentary -->
+- [penflow] Run From-Scratch Penflow Forward Contract if status is `absent` for UI feature <!-- evidence:documentary -->
 
 ### Phase 2 — Auto-Number and Create Directory
 
-- [always] Atomically reserve next NNN via `reserve_nnn()` call
-- [always] Create feature directory .specs/features/NNN-feature-name/
+- [always] Atomically reserve next NNN via `reserve_nnn()` call <!-- evidence:documentary -->
+- [always] Create feature directory .specs/features/NNN-feature-name/ <!-- evidence:documentary -->
 
 ### Phase 3 — Read Context
 
-- [always] Read project.md, constitution.md, stacks/_default.md
+- [always] Read project.md, constitution.md, stacks/_default.md <!-- evidence:documentary -->
 
 ### Phase 4 — Generate spec.md
 
-- [always] Generate user stories with Gherkin scenarios and Mermaid flowcharts
-- [always] Generate AC and FR sections with sequential numbering
-- [always] Generate Key Entities, Edge Cases, Success Criteria, and Infrastructure Requirements if needed
-- [always] Apply native QE Analysis to enrich risks, expected proof, non-functional expectations, and gaps
-- [penflow] Add Penflow Contract section with resolved IDs
-- [always] Inject `## Behavioral AC` section via LLM signal extraction and detect_traits() if UI signals found
-- [visual] Inject visual state assertions for detected traits with visual_states defined
-- [always] Run `livespec validate` structural validation; retry on failure (max 2)
-- [always] Run LLM spec review unless --no-review; retry on blocking findings
-- [always] Run direct Clarify gate (Step 5.9): scan vague/ambiguous spec items, ask <=5 questions, write ## Clarifications, preserve AC/FR/SC numbering, then re-validate
+- [always] Generate user stories with Gherkin scenarios and Mermaid flowcharts <!-- evidence:documentary -->
+- [always] Generate AC and FR sections with sequential numbering <!-- evidence:documentary -->
+- [always] Generate Key Entities, Edge Cases, Success Criteria, and Infrastructure Requirements if needed <!-- evidence:documentary -->
+- [always] Apply native QE Analysis to enrich risks, expected proof, non-functional expectations, and gaps <!-- evidence:documentary -->
+- [penflow] Add Penflow Contract section with resolved IDs <!-- evidence:documentary -->
+- [always] Inject `## Behavioral AC` section via LLM signal extraction and detect_traits() if UI signals found <!-- evidence:documentary -->
+- [visual] Inject visual state assertions for detected traits with visual_states defined <!-- evidence:documentary -->
+- [always] Run `livespec validate` structural validation; retry on failure (max 2) <!-- evidence:documentary -->
+- [always] Run LLM spec review unless --no-review; retry on blocking findings <!-- evidence:review review-kind:spec -->
+- [always] Run direct Clarify gate (Step 5.9): retain all vague/ambiguous spec items, present <=5 questions at a time, block unresolved critical items, write accepted decisions in ## Clarifications, preserve AC/FR/SC numbering, then re-validate <!-- evidence:documentary -->
 
 ### Phase 5 — Mockups and Surface Annotation
 
-- [visual] Detect UI feature and check design tool configuration
-- [visual] Import brainstorm mockups if screens/ is empty and .brainstorm/ has PNGs
-- [visual] Generate mockups via MCP for each identified screen
-- [visual] Export PNGs to .specs/design/screens/NNN-feature-name/ and screens/<name>.png
-- [visual] Update .specs/design/screens/index.md with new or modified screen rows
-- [visual] Add `## Screens` section to spec.md with versioned PNG references
-- [visual] Update .specs/design/changelog.md with screen entries
-- [always] Annotate `Surfaces:` field if .specs/surfaces.yaml has multiple Playwright surfaces
+- [visual] Detect UI feature and check design tool configuration <!-- evidence:documentary -->
+- [visual] Import brainstorm mockups if screens/ is empty and .brainstorm/ has PNGs <!-- evidence:documentary -->
+- [visual] Generate mockups via MCP for each identified screen <!-- evidence:documentary -->
+- [visual] Export PNGs to .specs/design/screens/NNN-feature-name/ and screens/<name>.png <!-- evidence:documentary -->
+- [visual] Update .specs/design/screens/index.md with new or modified screen rows <!-- evidence:documentary -->
+- [visual] Add `## Screens` section to spec.md with versioned PNG references <!-- evidence:documentary -->
+- [visual] Update .specs/design/changelog.md with screen entries <!-- evidence:documentary -->
+- [always] Annotate `Surfaces:` field if .specs/surfaces.yaml has multiple Playwright surfaces <!-- evidence:documentary -->
 
 ### Phase 6 — Present and Confirm
 
-- [always] Run quality gate checks before presenting spec
-- [always] Present spec summary and offer next actions
+- [always] Run quality gate checks before presenting spec <!-- evidence:documentary -->
+- [always] Present spec summary and offer next actions <!-- evidence:documentary -->
 
 ### Phase 7 — Sync Artifacts
 
-- [always] Rename seed.md to seed.absorbed.md if seed was loaded
-- [always] Add feature row to .specs/README.md Features table under lock
-- [always] Add initial entry to feature changelog.md under lock
-- [always] Add summary entry to global .specs/changelog.md under lock
-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation
-- [always] Match and check roadmap items; add deferred or ad-hoc items as needed
-- [always] Propose preflight manifest additions if spec has Infrastructure Requirements
+- [always] Rename seed.md to seed.absorbed.md if seed was loaded <!-- evidence:documentary -->
+- [always] Add feature row to .specs/README.md Features table under lock <!-- evidence:documentary -->
+- [always] Add initial entry to feature changelog.md under lock <!-- evidence:documentary -->
+- [always] Add summary entry to global .specs/changelog.md under lock <!-- evidence:documentary -->
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation <!-- evidence:documentary -->
+- [always] Match and check roadmap items; add deferred or ad-hoc items as needed <!-- evidence:documentary -->
+- [always] Propose preflight manifest additions if spec has Infrastructure Requirements <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-specify` is complete only if all are true:
 
-- [ ] Feature directory `NNN-feature-name/` exists
-- [ ] `spec.md` exists and contains required sections
-- [ ] Every acceptance scenario uses proper Gherkin syntax (```gherkin blocks)
-- [ ] Every user story has a Mermaid flowchart
-- [ ] Every FR maps to >= 1 AC
-- [ ] `spec.md` includes either explicit values or `[ASSUMED]` markers for missing context
-- [ ] `.specs/README.md` Features table contains the new feature row with Status: Draft
-- [ ] Feature `changelog.md` has an initial entry
-- [ ] Global `.specs/changelog.md` has a summary entry
-- [ ] If feature has UI and design tool configured: mockups generated and validated
-- [ ] If feature has UI: `## Screens` section in spec.md with PNG references
-- [ ] If `.specs/roadmap.md` exists: matching item checked OR ad-hoc feature added as checked item in MVP
-- [ ] If split performed: deferred items added to roadmap.md Deferred section
-- [ ] If `.specs/roadmap.md` exists: emerging dependencies detected and proposed (or none found)
-- [ ] If `.specs/roadmap.md` exists: absorption detection run (or no overlap found)
-- [ ] Next action is proposed (`/spec-plan [feature]`)
+- [ ] Feature directory `NNN-feature-name/` exists <!-- evidence:documentary -->
+- [ ] `spec.md` exists and contains required sections <!-- evidence:documentary -->
+- [ ] Every acceptance scenario uses proper Gherkin syntax (```gherkin blocks) <!-- evidence:documentary -->
+- [ ] Every user story has a Mermaid flowchart <!-- evidence:documentary -->
+- [ ] Every FR maps to >= 1 AC <!-- evidence:documentary -->
+- [ ] `spec.md` includes either explicit values or `[ASSUMED]` markers for missing context <!-- evidence:documentary -->
+- [ ] `.specs/README.md` Features table contains the new feature row with Status: Draft <!-- evidence:documentary -->
+- [ ] Feature `changelog.md` has an initial entry <!-- evidence:documentary -->
+- [ ] Global `.specs/changelog.md` has a summary entry <!-- evidence:documentary -->
+- [ ] If feature has UI and design tool configured: mockups generated and validated <!-- evidence:documentary -->
+- [ ] If feature has UI: `## Screens` section in spec.md with PNG references <!-- evidence:documentary -->
+- [ ] If `.specs/roadmap.md` exists: matching item checked OR ad-hoc feature added as checked item in MVP <!-- evidence:documentary -->
+- [ ] If split performed: deferred items added to roadmap.md Deferred section <!-- evidence:documentary -->
+- [ ] If `.specs/roadmap.md` exists: emerging dependencies detected and proposed (or none found) <!-- evidence:documentary -->
+- [ ] If `.specs/roadmap.md` exists: absorption detection run (or no overlap found) <!-- evidence:documentary -->
+- [ ] Next action is proposed (`/spec-plan [feature]`) <!-- evidence:documentary -->
 
 If any item fails, fix before returning final output.
 

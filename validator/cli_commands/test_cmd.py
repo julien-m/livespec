@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
@@ -56,9 +57,50 @@ def test_command(
         "--no-coverage",
         help="Skip the coverage capability (only useful with --mutation).",
     ),
+    execution_command: str | None = typer.Option(
+        None, "--execution-command", help="Capture a resolved test command"
+    ),
+    acceptance_mapping: Annotated[
+        Path | None,
+        typer.Option("--acceptance-mapping", help="Generated reviewed acceptance mapping"),
+    ] = None,
+    prepare_mapping_review: bool = typer.Option(
+        False, "--prepare-mapping-review", help="Prepare existing independent test review input"
+    ),
+    ingest_mapping_review: Annotated[
+        Path | None, typer.Option("--ingest-mapping-review", help="Actual raw test reviewer bundle")
+    ] = None,
+    report_adapter: str = typer.Option(
+        "junit", "--report-adapter", help="Structured execution result adapter"
+    ),
     debug: bool = typer.Option(False, "--debug", help="Print the full stacktrace on error."),
 ) -> None:
-    """Run the project's tests through the active driver.
+    """Run driver tests or prepare, ingest and certify mapped execution evidence.
+
+    Args:
+        feature: Informational driver scope; required feature slug for execution/review modes.
+        mutation: Run the driver's mutation capability after coverage.
+        no_coverage: Skip driver coverage, retaining journey checks and optional mutation.
+        execution_command: Shell-tokenized test argv captured by the runner, without a shell.
+        acceptance_mapping: Project-confined mapping required by execution/review modes.
+        prepare_mapping_review: Emit context/schema JSON; exclusive with ingestion and execution.
+        ingest_mapping_review: Raw reviewer bundle to validate and persist before certification.
+        report_adapter: Execution result format (default junit); unsupported proof cannot certify.
+        debug: Print driver-mode exception tracebacks; not accepted in native modes.
+
+    Native modes require exactly one operation, feature and mapping; driver modifiers are
+    rejected. Non-default report_adapter is accepted only for execution.
+
+    Returns:
+        No value: emits driver summaries or prepared-review, review-receipt or capture JSON.
+    Raises:
+        typer.Exit: Success or driver failure/missing environment/capability; native modes exit
+            1 for invalid inputs, unreadable files, incomplete reviews or unproven execution.
+        TypeError: Malformed direct-call inputs outside the native OSError/ValueError boundary.
+    Side effects:
+        Reads project/review inputs; ingestion writes a review receipt. Execution starts tests
+        and persists runner-owned capture/report/receipt files; driver mode runs journeys,
+        coverage and optional mutation commands with their declared filesystem effects.
 
     Example:
         $ livespec test
@@ -66,6 +108,33 @@ def test_command(
         Coverage: 87.3% (threshold 70.0%) · OK
         LIVESPEC test · OK · driver=python · coverage=87.3 · threshold=70.0
     """
+    from .operation_options import check_execution_options
+
+    try:
+        native = check_execution_options(
+            feature=feature,
+            command=execution_command,
+            mapping=acceptance_mapping,
+            prepare=prepare_mapping_review,
+            ingest=ingest_mapping_review,
+            adapter=report_adapter,
+            mutation=mutation,
+            no_coverage=no_coverage,
+            debug=debug,
+        )
+    except ValueError as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(1) from exc
+    if native:
+        _run_execution_io(
+            feature,
+            execution_command,
+            acceptance_mapping,
+            prepare_mapping_review,
+            ingest_mapping_review,
+            report_adapter,
+        )
+
     run_with_debug(
         lambda: _run_test(
             feature=feature,
@@ -128,12 +197,16 @@ def _run_test(
 
     if not no_coverage:
         try:
-            result = run_capability(driver, "coverage", project_root=project_root)
+            result = run_capability(driver, "coverage", project_root=project_root, feature=feature)
         except CapabilityNotImplementedError:
             typer.echo(f"Error: driver {driver.name!r} has no coverage capability.", err=True)
             emit_summary("test", "FAIL", driver=driver.name, reason="no_coverage")
             raise typer.Exit(EXIT_CAPABILITY_UNSUPPORTED) from None
 
+        if result.execution_receipt_path:
+            typer.echo(f"Execution receipt: {result.execution_receipt_path}")
+        for gap in result.certification_gaps:
+            typer.echo(f"Certification gap: {gap}")
         if result.stdout:
             typer.echo(result.stdout)
         if result.stderr:
@@ -174,7 +247,7 @@ def _run_test(
 
     if mutation:
         try:
-            mut = run_capability(driver, "mutation", project_root=project_root)
+            mut = run_capability(driver, "mutation", project_root=project_root, feature=feature)
         except CapabilityNotImplementedError:
             typer.echo(
                 f"Note: driver {driver.name!r} does not implement mutation testing.",
@@ -228,3 +301,28 @@ def _percent_from_lcov(lcov_path: Path) -> float | None:
 
 
 __all__ = ["register"]
+
+
+def _run_execution_io(
+    feature: str | None,
+    execution_command: str | None,
+    acceptance_mapping: Path | None,
+    prepare_mapping_review: bool,
+    ingest_mapping_review: Path | None,
+    report_adapter: str,
+) -> None:
+    from .execution_io import execution_io
+
+    try:
+        execution_io(
+            require_specs_root(),
+            feature,
+            command=execution_command,
+            mapping_path=acceptance_mapping,
+            prepare=prepare_mapping_review,
+            ingest=ingest_mapping_review,
+            adapter=report_adapter,
+        )
+    except (OSError, ValueError) as exc:
+        typer.echo(f"BLOCKED: {exc}", err=True)
+        raise typer.Exit(1) from exc

@@ -1,7 +1,7 @@
 ---
 command: spec-ship
 contract_version: "1.0"
-last_reviewed: 2026-06-13
+last_reviewed: 2026-09-07
 ---
 
 # Expectations — /spec-ship

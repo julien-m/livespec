@@ -9,7 +9,7 @@ from __future__ import annotations
 import shutil
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 import typer
 
@@ -194,6 +194,8 @@ def _display_review_findings(
     """
     has_blocking = False
     for entry in reviews:
+        if not getattr(entry.result, "complete", True):
+            has_blocking = True
         name = entry.feature_name
         model = entry.result.reviewer_model
         typer.echo(
@@ -265,6 +267,7 @@ def _output_review_json(reviews: list[Any], errors: list[str]) -> None:
             {
                 "feature": e.feature_name,
                 "model": e.result.reviewer_model,
+                "complete": getattr(e.result, "complete", False),
                 "confidence": e.result.confidence,
                 "findings": [
                     {
@@ -407,6 +410,31 @@ def validate(
             "default for historical files)."
         ),
     ),
+    clarify: bool = typer.Option(
+        False, "--clarify", help="Inspect full current clarification inventory"
+    ),
+    clarification_answer: Annotated[
+        Path | None,
+        typer.Option("--clarification-answer", help="Accepted source-bound question answer"),
+    ] = None,
+    review_max_chars: int | None = typer.Option(
+        None, "--review-max-chars", min=1000, help="Explicit bounded review character budget"
+    ),
+    prepare_review: str | None = typer.Option(
+        None, "--prepare-review", help="Prepare native spec, plan or documentary acceptance review"
+    ),
+    ingest_review: Annotated[
+        Path | None, typer.Option("--ingest-review", help="Ingest raw native review bundle")
+    ] = None,
+    review_kind: str = typer.Option(
+        "plan", "--review-kind", help="Native review kind: spec, plan or acceptance"
+    ),
+    progression: str | None = typer.Option(
+        None, "--progression", help="Check direct plan/implement progression"
+    ),
+    structural_only: bool = typer.Option(
+        False, "--structural-only", help="Diagnostic reference coverage only"
+    ),
     pre_impl: bool = typer.Option(
         False,
         "--pre-impl",
@@ -445,17 +473,92 @@ def validate(
         review_model: Override reviewer model ID.
         no_review: Skip automatic review (for hook integration).
         sdk_isolated: Run Layer 3 SDK-isolated tests via pytest subprocess.
+        clarify: Emit the full current clarification inventory; unresolved blockers fail.
+        clarification_answer: Source-bound answer; implies clarification mode. With clarify,
+            applies the answer rather than separately inspecting the inventory.
+        review_max_chars: Explicit bounded review budget shared by review and progression modes.
+        prepare_review: Prepare complete spec, plan or acceptance context/schema JSON.
+        ingest_review: Raw native reviewer bundle to validate and persist as a receipt.
+        review_kind: Ingestion purpose spec/plan/acceptance; non-default values require ingestion.
+        progression: Require current plan or implement readiness; cannot combine with either
+            prepare_review or ingest_review. Emits READY only on success.
+        structural_only: Requires pre_impl and excludes earlier state/review/clarification/
+            progression actions; reference diagnostics cannot certify semantic readiness.
+        pre_impl: Read-only Analyze mode; excludes clarification, native review and progression
+            actions. Legacy fix/smart flags do not change its read-only early exit.
+
+    Native clarification, preparation, ingestion and progression are mutually exclusive.
+    They accept model/budget and their operation-specific inputs, but no legacy mode/format
+    modifiers; their existing fixed output formats remain unchanged.
 
     Returns:
         None (exits via typer.Exit with appropriate code).
 
     Raises:
-        typer.Exit: On validation failure or configuration error.
+        typer.Exit: On validation failure or configuration error; native review/clarification
+            and progression modes convert OSError/ValueError to BLOCKED with exit 1.
+
+    Side effects:
+        Reads project/spec/review inputs. Native preparation and progression are read-only;
+        ingestion writes review receipts, and accepted clarification answers update the spec.
+        Legacy fix/migrate modes can edit files; semantic modes may call configured reviewers,
+        update indexes or run mutation/SDK commands according to their selected flags.
     """
     # Mutual exclusion
     if staged and path:
         typer.echo("Error: --staged and PATH are mutually exclusive", err=True)
         raise typer.Exit(1)
+
+    from .cli_commands.operation_options import SemanticOptions, check_semantic_options
+
+    options = SemanticOptions(
+        clarification=clarify or clarification_answer is not None,
+        prepare=prepare_review,
+        ingest=ingest_review,
+        progression=progression,
+        pre_impl=pre_impl,
+        structural_only=structural_only,
+        state_files=state_files,
+        kind=review_kind,
+        budget=review_max_chars,
+    )
+    try:
+        check_semantic_options(
+            options,
+            {
+                "--staged": staged,
+                "--format": output_format != "compact",
+                "--warn-only": warn_only,
+                "--score-only": score_only,
+                "--fix": fix,
+                "--smart": smart,
+                "--auto": auto,
+                "--dry-run": dry_run,
+                "--list-excluded": list_excluded,
+                "--coherence": coherence,
+                "--coherence-only": coherence_only,
+                "--rules": rules is not None,
+                "--wave": wave_num is not None,
+                "--ignore": ignore_rules is not None,
+                "--strict": strict,
+                "--no-suppress": no_suppress,
+                "--semantic": semantic,
+                "--scorecard": scorecard,
+                "--contradiction-only": contradiction_only,
+                "--reindex": reindex,
+                "--mutate": mutate,
+                "--experimental-multi-model": experimental_multi_model,
+                "--plan-review": plan_review,
+                "--review-spec": review_spec,
+                "--all-reviewers": all_reviewers,
+                "--no-review": no_review,
+                "--sdk-isolated": sdk_isolated,
+                "--migrate": migrate,
+            },
+        )
+    except ValueError as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(1) from exc
 
     # @spec FR-006: state-files validation — .specs/features/013-state-model-identity-resolution/spec.md#fr-006  # noqa: E501
     if state_files:
@@ -504,12 +607,54 @@ def validate(
             typer.echo(f"  {violation}", err=True)
         raise typer.Exit(0 if warn_only else 1)
 
+    if prepare_review or ingest_review or progression or clarify or clarification_answer:
+        from .cli_commands.review_io import review_io
+        from .progression_gate import require_progression
+
+        specs_root = _require_specs_root(Path(path) if path else None)
+        review_target = Path(path).resolve() if path else specs_root
+        feature_dir = review_target.parent if review_target.is_file() else review_target
+        try:
+            if clarify or clarification_answer:
+                from .cli_commands.clarify_io import clarify_io
+
+                clarify_io(
+                    specs_root.parent,
+                    feature_dir.name,
+                    model=review_model or "",
+                    max_chars=review_max_chars,
+                    answer_path=clarification_answer,
+                )
+            if progression:
+                require_progression(
+                    specs_root.parent,
+                    feature_dir.name,
+                    progression,
+                    model=review_model or "",
+                    max_chars=review_max_chars,
+                )
+                typer.echo("Progression: READY")
+                raise typer.Exit(0)
+            review_io(
+                feature_dir,
+                prepare=prepare_review,
+                ingest=ingest_review,
+                kind=review_kind,
+                model=review_model or "",
+                max_chars=review_max_chars,
+            )
+        except (OSError, ValueError) as exc:
+            typer.echo(f"BLOCKED: {exc}", err=True)
+            raise typer.Exit(1) from exc
+
     # Feature B — read-only pre-implementation Analyze gate. Dedicated early-exit
     # branch (mirrors --coherence-only): resolve target, run the analyzer, print,
     # and exit. It must never fall through to a writing branch (fix/smart). [M1]
     # @spec(FR-001): analyze gate via validate --pre-impl, no new command (070-analyze-gate)
     # @spec(FR-010): pre-impl read-only early exit, no checks/changelog/src (070-analyze-gate)
     if pre_impl:
+        from dataclasses import replace
+
         from .pre_impl_analysis import (
             analyze_feature_artifacts,
             has_blocking_findings,
@@ -522,9 +667,31 @@ def validate(
         pre_impl_feature_dir = (
             pre_impl_target.parent if pre_impl_target.is_file() else pre_impl_target
         )
-        analysis_report = analyze_feature_artifacts(
-            pre_impl_feature_dir, specs_root / "constitution.md"
+        from .semantic.review_files import prepare_feature_review
+
+        missing_analysis_input = any(
+            not (pre_impl_feature_dir / name).is_file() for name in ("spec.md", "plan.md")
         )
+        prepared_analysis = (
+            None
+            if structural_only or missing_analysis_input
+            else prepare_feature_review(
+                specs_root.parent,
+                pre_impl_feature_dir.name,
+                "plan",
+                review_model or "",
+                review_max_chars,
+            )
+        )
+        analysis_report = analyze_feature_artifacts(
+            pre_impl_feature_dir,
+            specs_root / "constitution.md",
+            structural_only=structural_only or missing_analysis_input,
+            prepared_review=prepared_analysis,
+        )
+        if missing_analysis_input and not structural_only:
+            # Missing inputs block readiness before semantic preparation or evaluation.
+            analysis_report = replace(analysis_report, semantic_status="incomplete")
 
         if output_format == "json":
             typer.echo(render_report_json(analysis_report))
@@ -623,6 +790,8 @@ def validate(
         if output_format == "json":
             _output_review_json(spec_review_result.reviews, spec_review_result.errors)
             has_blocking = any(
+                not getattr(e.result, "complete", True) for e in spec_review_result.reviews
+            ) or any(
                 f.severity.value == "ERROR"
                 for e in spec_review_result.reviews
                 for f in e.result.findings
@@ -674,6 +843,8 @@ def validate(
         if output_format == "json":
             _output_review_json(review_result.reviews, review_result.errors)
             has_blocking = any(
+                not getattr(e.result, "complete", True) for e in review_result.reviews
+            ) or any(
                 f.severity.value == "ERROR"
                 for e in review_result.reviews
                 for f in e.result.findings

@@ -1,7 +1,7 @@
 ---
 command: spec-check
 contract_version: "1.0"
-last_reviewed: 2026-09-05
+last_reviewed: 2026-09-07
 ---
 
 # Expectations — /spec-check
@@ -174,3 +174,9 @@ exit 1
 - **On success:** done.
 - **On drift:** run `/spec-fix <feature>` for visual drift, or edit code/spec for structural drift.
 - **On blocked:** run `/spec-specify` first.
+
+## Requirement evidence integrity (078)
+
+- **Read** [shared review/progression protocol](../../../system/review-protocol.md). Native/provider reviews use complete prepared context, actual raw JSON and current validated receipts. Missing, malformed, stale or partial evidence cannot certify readiness.
+- Direct and nested progression retain every unresolved critical clarification and require current semantic Analyze before application code; structural-only diagnostics do not authorize progression.
+- Preserve legacy archive interpretation and specialized bootstrap, conventions, finalization, visual and cumulative Penflow checks. Generated review caches remain disposable.

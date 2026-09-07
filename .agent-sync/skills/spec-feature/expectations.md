@@ -1,7 +1,7 @@
 ---
 command: spec-feature
 contract_version: "1.0"
-last_reviewed: 2026-09-05
+last_reviewed: 2026-09-07
 ---
 
 <!-- @spec(FR-004) -->
@@ -228,3 +228,9 @@ exit 0
 ## Bound Plan Review source authority
 
 UI or accepted Penflow history requires Plan extra.review_result_path from the actual pre-dispatch snapshot review. Plan Review Done consumes --review-result and publishes the approved baseline before recording completion. Interactive overrides and stdout PASS do not substitute for this bound result. Source selection and disposition active/retired remain reviewed, including prior/new deltas.
+
+## Requirement evidence integrity (078)
+
+- **Read** [shared review/progression protocol](../../../system/review-protocol.md). Native/provider reviews use complete prepared context, actual raw JSON and current validated receipts. Missing, malformed, stale or partial evidence cannot certify readiness.
+- Direct and nested progression retain every unresolved critical clarification and require current semantic Analyze before application code; structural-only diagnostics do not authorize progression.
+- Preserve legacy archive interpretation and specialized bootstrap, conventions, finalization, visual and cumulative Penflow checks. Generated review caches remain disposable.

@@ -24,13 +24,13 @@ argument-hint: "<feature-name>"
 
 La toute première action lors de `/spec-fix` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+1. Résoudre feature et flags à partir des arguments de la commande (lecture seule). **Read** [Goal review identity](../../../system/review-protocol.md#goal-review-identity) : résoudre le modèle réel et conserver `--model=<actual-model>` et tout budget explicite dans les flags internes du goal et des enfants.
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
 3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-fix --feature <feature-slug> --flags "<active-flags>" --save
    ```
-   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
+   Si aucune feature fournie, omettre `--feature`. Conserver les flags internes de modèle/budget même sans flag utilisateur.
    Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.state.json`
 4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
 5. Émettre la commande slash `/goal` avec hash et références machine :
@@ -82,7 +82,7 @@ Si verdict `PASS`, soumettre `{"conventions_receipt_path":"<receipt_path>"}` au 
 When `--conventions` is present, `/spec-fix` targets conventions debt instead of regular
 gap categories:
 
-1. Load the latest conventions debt report from [`debt.json`](debt.json); if missing or stale, rerun
+1. In --dry-run/-d or read-only --audit-only, read existing debt evidence only; never regenerate a report or apply remediation. If absent or stale, block with recovery `livespec conventions verify --report` outside preview. Otherwise load the latest conventions debt report from [`debt.json`](debt.json); if missing or stale, rerun
    `livespec conventions verify --report` and load the regenerated report.
 2. Sort violations worst-first by blocking status, severity, affected surface, and repeat count.
 3. Apply one focused remediation batch at a time, then rerun conventions verification.
@@ -155,12 +155,13 @@ Same logic as `spec-check` Step 3:
    - No commits touch files listed in `implementation.md` since the report date (`git log --since=<date> -- <files>`)
    - No commits touch `.specs/features/NNN/` since the report date (spec changes invalidate too)
    - If fresh → use existing gap report, display: `Using gap report from YYYY-MM-DD (N gaps found)`
-3. If not found or stale (report missing, from a previous day, or code/spec changed since):
+3. In --dry-run/-d, --audit-only, conventions-only or the collection parent, use an existing fresh report or build a read-only in-memory scan from spec and implementation; never spawn `/spec-check` or save a report. If neither source is usable, emit `BLOCKED at step 2 - dependency_unmet - no usable gap report; run /spec-check <feature> outside preview`.
+4. In an executable feature fix only, if the report is missing or stale:
    - Spawn an independent native sub-agent whose first prompt line is `/spec-check <feature>`.
    - Require the sub-agent to compile, emit, execute, and close its own goal before returning the saved report path.
    - Save or reuse the returned gap report at `checks/YYYY-MM-DD.md`
    - Display: `Fresh gap report generated (N gaps found)`
-4. If gap report shows 0 gaps:
+5. If gap report shows 0 gaps:
    - Display: `No gaps found — nothing to fix`
    - Exit
 
@@ -190,7 +191,7 @@ Read **all** of these before any fix attempt:
 
 **Conventions payload (mandatory):**
 
-1. Ensure `.conventions/index.md` exists before planning any fix. If absent, run `livespec conventions refresh --repo . --full`, then read the generated `.conventions/index.md`.
+1. Read `.conventions/index.md` before planning. Only an executable feature fix or conventions remediation may run `livespec conventions refresh --repo . --full` when it is absent. Preview/audit and collection parents must block on missing conventions and show that command as recovery; never refresh implicitly.
 2. If refresh fails, set conventions to `NONE` only for a confirmed non-UI/no-stack project. Otherwise emit `BLOCKED at step 3 - dependency_unmet - conventions bundle missing`.
 3. Select sub-domains from `.conventions/index.md`:
    - Always include `code` for source and test fixes.
@@ -289,7 +290,11 @@ The fix plan is displayed but NOT saved to disk (it is ephemeral — the gap rep
 
 ### Step 6 — Execute Fixes
 
-Execute the fix plan. For each gap:
+- For feature code/test writes, before the first edit and each retry/resume, run `livespec validate <feature-dir> --progression implement --model <resolved-model>` with `--review-max-chars <resolved-budget>` when an explicit budget was resolved. Stop on nonzero exit: missing, stale or incomplete Clarify/Analyze cannot be waived by absent pipeline, filtered gaps or `--auto`.
+- **Read** [review and progression rules](../../../system/review-protocol.md) to refresh required reviews; forward the same model and budget to preparation, ingestion and nested commands. Never fabricate a review to unblock a fix.
+- `--dry-run` / read-only audit stops after displaying Step 5; no Phase 6 edits, readiness gate, runtime obligation or mutation in Steps 7–8. `--conventions` follows its independent debt workflow; no feature readiness/certification. If that workflow needs a functional change, route the change through the feature fix gate first.
+
+Execute the fix plan only after the applicable gate passes. For each selected gap:
 
 **Functional fixes:**
 
@@ -320,7 +325,10 @@ Execute the fix plan. For each gap:
 
 After all fixes are applied:
 
-1. **Run tests:** Execute the resolved test commands from `plan.md` or `testing/strategy.md`
+1. **Run tests:** Execute resolved test commands through `livespec test --feature <feature> --execution-command "<resolved-command>" --acceptance-mapping <mapping-path>`; submit the actual `execution_receipt_path` to the goal. **Read** [execution rules](../../../system/testing/execution-rules.md) for runner capture, exact assertions and grounded mapping review. Prose, IDs alone and invented receipts cannot prove execution.
+   - `--ac` binds the exact declared execution AC; `--fr` binds its explicit canonical FR→AC references. Unknown/missing/ambiguous selectors or unmapped FRs block goal compilation. Declared review ACs require the existing complete feature verification; they cannot be certified by a runtime-only filtered fix. The frozen selection and normative source must remain current when proving a task.
+   - Filtered `--fr`/`--ac`/`--visual`/`--functional` fixes prove the selected mapped execution only; preserve unresolved/unexamined gaps outside the filter. Never claim complete feature acceptance from that result.
+   - Unfiltered feature fixes require the complete policy2 acceptance conjunction at the final verification task: every execution AC plus real documentary review for declared review ACs. **Read** [acceptance review protocol](../../../system/review-protocol.md) for prepare/ingest, current identity and immutable proof/archive/verify-output checks.
 2. **Re-capture baselines:** For visual fixes, run Playwright to capture new screenshots
    - Publish every recaptured runtime PNG with `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print `Visual preview: unavailable - visual-preview CLI missing`
 3. **Re-compare:**
@@ -400,7 +408,7 @@ livespec visual-gate validate --feature <slug> --command spec-fix --target <t> -
    - Mark fixed items as ✅ with fix date
 
 6. **Update README.md:**
-   - If all gaps closed and status was `In Progress` → update to `Implemented`
+   - Only when a current unfiltered report shows every feature gap closed, full feature acceptance is proven, and existing closure gates pass: update `In Progress` to `Implemented`. A filtered summary cannot authorize this transition.
 
 ---
 
@@ -410,7 +418,7 @@ When `--all` is set:
 
 1. Run `spec-check --all` to generate gap reports for all features
 2. Filter features that have at least one gap
-3. Execute Steps 3-8 for each feature sequentially
+3. Spawn one independent `/spec-fix <feature>` child per feature sequentially, preserving other flags and the same model/budget but removing `--all`/`-A`. Each child owns its feature goal and applicable readiness/execution proofs; the collection parent never substitutes a feature certificate. Inspect each child goal before reporting completion.
 4. Produce a consolidated report at the end:
 
 ```markdown
@@ -461,8 +469,9 @@ Total: 6/8 gaps closed (75%)
 
 ## Internal Command Invocations
 
-- [subagent] `/spec-check <feature>` — executable when the gap report is missing or stale; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
-- [subagent] `/spec-check <feature>` — executable after fixes for verification; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.
+- [subagent] `/spec-fix <feature>` — executable only for collection `--all`; remove `--all`/`-A`, preserve the same model and review budget and remaining filters; resolve `project_root`, run child with `cwd`/working directory=`project_root`; child must **Read** [spec-system](../../../.specs/spec-system.md), own its feature goal and return its actual contract/state paths for parent inspection.
+- [subagent] `/spec-check <feature>` — executable only for a feature repair outside dry-run/read-only/conventions/collection modes when the gap report is missing or stale; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal and receives the same model and review budget.
+- [subagent] `/spec-check <feature>` — executable after fixes for verification; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal and receives the same model and review budget.
 - [suggestion] `/spec-refine <feature>` — displayed when the user chooses to change the spec instead of code.
 - [suggestion] `/spec-implement <feature>` — displayed when an unimplemented feature should be implemented instead of fixed.
 - [suggestion] `/spec-test <feature>` — displayed when only missing visual baselines/tests remain.
@@ -471,102 +480,116 @@ Total: 6/8 gaps closed (75%)
 
 > Machine-readable task inventory parsed by `livespec goal render`.
 > Format: `- [branch] task description`
-> Active branches per run:
-> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+> Active branches per run (the existing compiler predicates):
+> - `always`: every mode.
+> - `fix-execute` / `execute`: no --dry-run/-d, --audit-only, --conventions or --all/-A.
+> - `fix-feature`: fix-execute without --fr/--ac/--visual/-v/--functional/-f/--no-visual/-V.
+> - `visual`: UI feature, no --no-visual, and fix-execute; visual inspection and mutation rows are both inactive in excluded modes.
+> - `penflow`: visual and a penflow/ directory.
+> - `generate`: fix-execute without --no-generate; `visual-generate`: visual and generate.
+> - `multi`: --all/-A (the shared compiler also recognizes --summary/-S).
+> - `fix-conventions`: --conventions without --dry-run/-d, --audit-only or --all/-A; this is the independent debt workflow, not feature execution.
 
 ### Phase 0 — Preflight
 
-- [always] Verify `.specs/` directory exists
-- [always] Verify at least one feature directory exists in `.specs/features/`
-- [always] Verify provided feature directory exists (if feature name given)
-- [always] Read before-fix hooks from all 3 levels
+- [always] Verify `.specs/` directory exists <!-- evidence:documentary -->
+- [always] Verify at least one feature directory exists in `.specs/features/` <!-- evidence:documentary -->
+- [always] Verify provided feature directory exists (if feature name given) <!-- evidence:documentary -->
+- [always] Read before-fix hooks from all 3 levels <!-- evidence:documentary -->
 
 ### Phase 1 — Resolve Feature
 
-- [always] Resolve feature from argument, current git branch, or prompt user
+- [always] Resolve feature from argument, current git branch, or prompt user <!-- evidence:documentary -->
 
 ### Phase 2 — Load or Generate Gap Report
 
-- [always] Look for most recent gap report in `.specs/features/NNN/checks/`
-- [always] Check report staleness (same calendar day + no commits since report date)
-- [always] Spawn independent native sub-agent for `/spec-check <feature>` and save gap report if missing or stale
-- [always] Exit if gap report shows 0 gaps
+- [always] Look for most recent gap report in `.specs/features/NNN/checks/` <!-- evidence:documentary -->
+- [always] Check report staleness (same calendar day + no commits since report date) <!-- evidence:documentary -->
+- [fix-execute] Spawn independent native sub-agent for `/spec-check <feature>` and save gap report if missing or stale <!-- evidence:documentary -->
+- [always] Load a fresh gap report or a read-only in-memory scan; if neither is usable, block and suggest `/spec-check <feature>` outside preview <!-- evidence:documentary -->
+- [always] Exit if gap report shows 0 gaps <!-- evidence:documentary -->
 
 ### Phase 3 — Load Full Context
 
-- [always] Read spec-system.md, project.md, constitution.md, stacks/_default.md, testing/strategy.md
-- [always] Read feature spec.md, plan.md, implementation.md, progress.md
-- [always] Read design screens index and theme files (theme.css, theme.md)
-- [visual] Read mockup PNGs from `.specs/design/screens/`
-- [visual] Read current baseline PNGs from `baselines/`
-- [visual] Publish mockup PNGs, current baseline PNGs, diff PNGs, and recaptured runtime PNGs via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print `Visual preview: unavailable - visual-preview CLI missing`
-- [always] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --repo . --full`; block if conventions remain missing outside a confirmed non-UI/no-stack project
-- [always] Build Conventions payload: always include `code`; include `design-tokens`, `design-components`, `design-views`, and `design-quality` for UI/visual fixes; add dataviz/realtime domains when signaled
-- [always] Read selected `ai-ressources/` convention files and attach them to fix planning/execution
+- [always] Read spec-system.md, project.md, constitution.md, stacks/_default.md, testing/strategy.md <!-- evidence:documentary -->
+- [always] Read feature spec.md, plan.md, implementation.md, progress.md <!-- evidence:documentary -->
+- [always] Read design screens index and theme files (theme.css, theme.md) <!-- evidence:documentary -->
+- [visual] Read mockup PNGs from `.specs/design/screens/` <!-- evidence:documentary -->
+- [visual] Read current baseline PNGs from `baselines/` <!-- evidence:documentary -->
+- [visual] Publish mockup PNGs, current baseline PNGs, diff PNGs, and recaptured runtime PNGs via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print `Visual preview: unavailable - visual-preview CLI missing` <!-- evidence:documentary -->
+- [fix-execute] If `.conventions/index.md` is missing, run `livespec conventions refresh --repo . --full` before loading conventions <!-- evidence:documentary -->
+- [fix-conventions] If `.conventions/index.md` is missing, run `livespec conventions refresh --repo . --full` before debt remediation <!-- evidence:documentary -->
+- [always] Read existing conventions; block with an explicit refresh recovery command if absent outside a confirmed non-UI/no-stack project; preview and collection parents never refresh <!-- evidence:documentary -->
+- [always] Build Conventions payload: always include `code`; include `design-tokens`, `design-components`, `design-views`, and `design-quality` for UI/visual fixes; add dataviz/realtime domains when signaled <!-- evidence:documentary -->
+- [always] Read selected `ai-ressources/` convention files and attach them to fix planning/execution <!-- evidence:documentary -->
+- [fix-conventions] Remediate the scoped conventions debt batch and prove decreasing debt with zero new violations via the existing conventions receipt <!-- evidence:documentary -->
 
 ### Phase 4 — Filter Gaps
 
-- [always] Parse gap report and apply flag filters (--visual, --functional, --fr, --ac)
-- [always] Run spec drift guard — detect gaps where code passes tests but diverges from spec
-- [always] Display filtered gap summary with counts
+- [always] Parse gap report and apply flag filters (--visual, --functional, --fr, --ac) <!-- evidence:documentary -->
+- [always] Run spec drift guard — detect gaps where code passes tests but diverges from spec <!-- evidence:documentary -->
+- [always] Display filtered gap summary with counts <!-- evidence:documentary -->
 
 ### Phase 5 — Generate Fix Plan
 
-- [always] Generate targeted fix plan for each functional gap (read FR/AC, plan section, code locations)
-- [visual] Run pixel diff between mockup PNG and baseline PNG
-- [visual] Feed diff regions + source code + theme tokens to LLM for visual reasoning
-- [visual] Generate targeted CSS/layout correction steps per visual gap
+- [always] Generate targeted fix plan for each functional gap (read FR/AC, plan section, code locations) <!-- evidence:documentary -->
+- [visual] Run pixel diff between mockup PNG and baseline PNG <!-- evidence:documentary -->
+- [visual] Feed diff regions + source code + theme tokens to LLM for visual reasoning <!-- evidence:documentary -->
+- [visual] Generate targeted CSS/layout correction steps per visual gap <!-- evidence:documentary -->
 
 ### Phase 6 — Execute Fixes
 
-- [always] Execute functional fixes in order (add @spec anchors, follow stack patterns, follow conventions)
-- [generate] Generate tests for new AC implementations
-- [always] Update progress.md with fix checkpoint
-- [visual] Apply CSS/layout/styling changes to match mockup
-- [visual] Enforce theme token usage — replace hardcoded values with CSS variables from theme.css
+- [multi] Delegate each collection feature repair to its own spec-fix child without --all/-A; inspect actual child goal contract/state and preserve filters, model and budget <!-- evidence:documentary -->
+- [fix-execute] Require current Clarify and Analyze with `livespec validate <feature-dir> --progression implement --model <resolved-model>` and the same explicit review budget before any code/test edit or retry <!-- evidence:documentary -->
+- [fix-execute] Execute functional fixes in order (add @spec anchors, follow stack patterns, follow conventions) <!-- evidence:documentary -->
+- [generate] Generate tests for new AC implementations <!-- evidence:documentary -->
+- [fix-execute] Update progress.md with fix checkpoint <!-- evidence:documentary -->
+- [visual] Apply CSS/layout/styling changes to match mockup <!-- evidence:documentary -->
+- [visual] Enforce theme token usage — replace hardcoded values with CSS variables from theme.css <!-- evidence:documentary -->
 
 ### Phase 7 — Verify Fixes
 
-- [always] Run test suite from plan.md or testing/strategy.md
-- [visual] Re-capture Playwright screenshots after visual fixes
-- [visual] Publish newly recaptured runtime PNGs and any diff PNGs through Markdown proof plus Browser annotation URL, or `Visual preview: unavailable - visual-preview CLI missing`
-- [visual] Re-capture runtime PNGs into `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-fix --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path> --json` — refuse `done` while exit_code != 0
-- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
-- [visual] If gate exit_code == 7 (prereqs missing): run `livespec visual-gate cleanup --feature <slug> --apply` (archive is default) + recreate baselines via runner + `livespec visual-gate promote` BEFORE touching code, then re-run gate
-- [always] Spawn independent native sub-agent for `/spec-check <feature>` to verify closure after fixes
-- [always] Score results per gap (Fixed / Improved / Still failing)
-- [always] Apply iteration logic — exit early if all fixed or regression detected, retry remaining gaps up to max iterations
+- [fix-execute] Run test suite from plan.md or testing/strategy.md <!-- evidence:execution -->
+- [visual] Re-capture Playwright screenshots after visual fixes <!-- evidence:documentary -->
+- [visual] Publish newly recaptured runtime PNGs and any diff PNGs through Markdown proof plus Browser annotation URL, or `Visual preview: unavailable - visual-preview CLI missing` <!-- evidence:documentary -->
+- [visual] Re-capture runtime PNGs into `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-fix --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path> --json` — refuse `done` while exit_code != 0 <!-- evidence:documentary -->
+- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity <!-- evidence:documentary -->
+- [visual] If gate exit_code == 7 (prereqs missing): run `livespec visual-gate cleanup --feature <slug> --apply` (archive is default) + recreate baselines via runner + `livespec visual-gate promote` BEFORE touching code, then re-run gate <!-- evidence:documentary -->
+- [fix-execute] Spawn independent native sub-agent for `/spec-check <feature>` to verify closure after fixes <!-- evidence:documentary -->
+- [fix-execute] Score results per gap (Fixed / Improved / Still failing) <!-- evidence:documentary -->
+- [fix-execute] Apply iteration logic — exit early if all fixed or regression detected, retry remaining gaps up to max iterations <!-- evidence:documentary -->
 
 ### Phase 8 — Update Artifacts
 
-- [always] Update `implementation.md` — FR→code and AC→test mappings, status columns
-- [visual] Copy new Playwright screenshots to `baselines/`
-- [visual] Update Last Modified in `screens/index.md` if mockups regenerated
-- [always] Write feature changelog entry with gaps closed count and file list
-- [always] Write global `.specs/changelog.md` summary entry (with lock)
-- [always] Overwrite today's gap report in `checks/YYYY-MM-DD.md` with fixed items marked
-- [always] Update README.md status to Implemented if all gaps closed
-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
-- [always] Read after-fix hooks from all 3 levels
+- [fix-execute] Update `implementation.md` — FR→code and AC→test mappings, status columns <!-- evidence:documentary -->
+- [visual] Copy new Playwright screenshots to `baselines/` <!-- evidence:documentary -->
+- [visual] Update Last Modified in `screens/index.md` if mockups regenerated <!-- evidence:documentary -->
+- [fix-execute] Write feature changelog entry with gaps closed count and file list <!-- evidence:documentary -->
+- [fix-execute] Write global `.specs/changelog.md` summary entry (with lock) <!-- evidence:documentary -->
+- [fix-execute] Overwrite today's gap report in `checks/YYYY-MM-DD.md` with fixed items marked <!-- evidence:documentary -->
+- [fix-execute] Update README.md status to Implemented only after unfiltered feature gap closure, full acceptance proof and existing closure gates <!-- evidence:documentary -->
+- [fix-execute] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path <!-- evidence:documentary -->
+- [always] Read after-fix hooks from all 3 levels <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-fix` is complete only if all are true:
 
-- [ ] Gap report loaded or generated
-- [ ] Full context loaded (spec, plan, mockups, conventions, stack)
-- [ ] Fix plan generated and displayed
-- [ ] Fixes executed (or dry-run displayed)
-- [ ] Verification run (tests + visual comparison)
-- [ ] `implementation.md` updated with new mappings
-- [ ] Baselines updated (if visual fixes)
-- [ ] Feature `changelog.md` has fix entry
-- [ ] Global `.specs/changelog.md` has summary entry
-- [ ] Gap report updated with fix results
-- [ ] If all gaps closed: README status updated
-- [ ] Remaining gaps (if any) clearly listed
-- [ ] For VISUAL features: every touched validation PNG (mockup, current baseline, recaptured runtime, diff) was published with absolute-path Markdown proof and either a Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing`
-- [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-fix` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit
+- [ ] Gap report loaded, generated in an executable feature fix, or obtained by read-only scan <!-- evidence:documentary -->
+- [ ] Full context loaded (spec, plan, mockups, conventions, stack) <!-- evidence:documentary -->
+- [ ] Fix plan generated and displayed <!-- evidence:documentary -->
+- [ ] Fixes executed (or dry-run displayed) <!-- evidence:documentary -->
+- [ ] [fix-execute] Verification run (tests + visual comparison) <!-- evidence:execution -->
+- [ ] [fix-feature] Complete feature acceptance verified from execution and declared documentary review receipts <!-- evidence:execution ac-scope:feature -->
+- [ ] [fix-execute] `implementation.md` updated with new mappings <!-- evidence:documentary -->
+- [ ] [visual] Baselines updated (if visual fixes) <!-- evidence:documentary -->
+- [ ] [fix-execute] Feature `changelog.md` has fix entry <!-- evidence:documentary -->
+- [ ] [fix-execute] Global `.specs/changelog.md` has summary entry <!-- evidence:documentary -->
+- [ ] [fix-execute] Gap report updated with fix results <!-- evidence:documentary -->
+- [ ] [fix-execute] If all feature gaps closed in an unfiltered report with full acceptance and closure proof: README status updated <!-- evidence:documentary -->
+- [ ] Remaining gaps (if any) clearly listed <!-- evidence:documentary -->
+- [ ] [visual] For VISUAL features: every touched validation PNG (mockup, current baseline, recaptured runtime, diff) was published with absolute-path Markdown proof and either a Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing` <!-- evidence:documentary -->
+- [ ] [visual] For VISUAL features: `livespec visual-gate certify ... --command spec-fix` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit <!-- evidence:documentary -->
 
 ---
 

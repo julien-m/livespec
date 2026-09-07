@@ -69,6 +69,18 @@ flowchart LR
 
 Each command works standalone, or chain them all with `/spec-feature` for an end-to-end pipeline with validation gates.
 
+### Contract and execution evidence
+
+Reviews use complete, bounded source context and feature-qualified requirement IDs. Analyze reports structural reference coverage separately from grounded semantic conclusions: citing an ID cannot prove that a plan implements its meaning. Missing context, contradictions, stale reviews and unresolved critical clarifications block progression. An unchanged valid review is reused; the five-question presentation limit never discards outstanding questions.
+
+Current goals distinguish documentary, review and execution evidence. Execution certification requires a runner-owned receipt with current source/test/configuration identity, actual test results and independently reviewed acceptance mappings. A success sentence, exit code zero, or global coverage percentage is insufficient. Custom drivers remain runnable and report any certification gap. Existing visual, conventions, finalization, bootstrap and Penflow checks still apply; historical archives retain their original policy rather than becoming new proof.
+
+The generation evaluation corpus contains isolated Python CLI, TypeScript API and UI/Penflow witnesses. Independent frozen oracles check actual behavior and reject faulty mutants. Reports distinguish first-attempt success, repaired success, expected blocking, failure, invalid runs and unavailable runtimes. Routine checks are deterministic; selected real-model samples and full release runs report actual completed coverage and unknown costs explicitly. A passing finite corpus does not establish universal correctness or untested runtime parity.
+
+The `spec-feature` coordinator binds final acceptance to the complete current independently reviewed specification, including criteria created after its goal was compiled. Proof, archive and archive-read all require that review plus execution and any documentary acceptance evidence. Existing frozen contracts keep their original interpretation.
+
+Read the [shared review protocol](system/review-protocol.md) and [execution rules](system/testing/execution-rules.md) for the internal adapters used by existing commands. Generated review caches and receipts require no additional user-maintained document.
+
 ---
 
 ## Conventions Enforcement

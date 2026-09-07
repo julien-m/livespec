@@ -44,7 +44,7 @@ argument-hint: "<feature-name>"
 
 La toute première action lors de `/spec-test` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+1. Résoudre feature et flags à partir des arguments de la commande (lecture seule). **Read** [Goal review identity](../../../system/review-protocol.md#goal-review-identity) before rendering: include the actual resolved reviewer model and forward it with any review budget, including when documentary acceptance proof is required without a semantic-review task.
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
 3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
@@ -66,6 +66,12 @@ La toute première action lors de `/spec-test` est de poser le goal durable avec
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+
+## Requirement evidence integrity
+
+**Read** [complete review and progression](../../../system/review-protocol.md) for the shared native review and identity requirements.
+
+**Typed acceptance proof:** During the existing independent review work, use the acceptance prepare/ingest flow for ACs explicitly declared `**Evidence:** review`; read every declared Review input and preserve actual native raw output. Keep default execution ACs mapped to observed passing assertions. Attach `acceptance_review_receipt_path` alongside `execution_receipt_path` for final feature tasks; the immutable full AC inventory must pass as a conjunction at prove, archive and verify-output. An unavailable baseline stays explicitly unavailable, never an invented before-image or blanket unchanged claim. No new user command or workflow phase is required.
 
 ## STEP 0.8 — Evidence-First Retry Contract
 
@@ -198,7 +204,7 @@ Enter = most recent feature only
 
 **If no Resolved Test Commands:**
 1. Attempt discovery via `system/testing/discovery.md` procedure
-2. If discovery succeeds → write resolved commands to `.specs/testing/strategy.md` and continue
+2. If discovery succeeds, keep resolved commands in memory. Persist them to `.specs/testing/strategy.md` only in normal execution, never in dry-run, audit-only or regeneration modes.
 3. If discovery fails → report: "No test framework — cannot generate or execute tests. Run `/spec-plan` to resolve test commands." Exit with audit-only report.
 
 **Non-testable features:**
@@ -354,6 +360,19 @@ Display what will be generated/executed before taking action:
 
 ## Phase 3 — Generate
 
+**Before any test-source write, Read and execute** [test-generation readiness](#test-generation-readiness).
+
+### Test-generation readiness
+
+- Applies to AC/visual test creation and generation repairs in Phase 3, Phase 4.5.1, and `--regenerate-missing --confirm`. Skip this writing gate for `--audit-only`, `--no-generate`, `--dry-run`, and regeneration without `--confirm`; these paths do not generate tests. Dry-run wins over confirm.
+- Resolve the actual reviewer model and active review budget through **Read** [the existing review identity protocol](../../../system/review-protocol.md#goal-review-identity). Before writing tests for each selected feature, execute:
+  ```bash
+  livespec validate .specs/features/<feature-slug> --progression implement --model <resolved-model> [--review-max-chars <budget>]
+  ```
+- Require exit 0 and `Progression: READY` from the current Clarify/Analyze authority. On failure, emit `BLOCKED at step 3 - prerequisite_unmet - test generation requires current Clarify and Analyze readiness` and stop before writing any test for that feature. Repair the reported prerequisite through its existing workflow; do not bypass it with `--no-review` or a structural-only result.
+- For `--all` and confirmed regeneration, run this same check separately for every actual affected feature immediately before its generation. Record the real feature list, exact command/model/budget, exit code and raw stdout/stderr paths in the run transcript; stop the batch at the first failing feature. A PASS for feature A cannot authorize feature B. Recheck after governing inputs change.
+- This documentary task records real deterministic CLI execution; prose, `reviewed: true` or a claimed PASS cannot replace the raw result. The CLI still verifies the underlying current semantic receipts. No future runtime execution receipt is required before test generation.
+
 ### Deduplication (TDD awareness)
 
 When running after `/spec-implement` (typical in `/spec-feature` and `/spec-ship` pipelines), implementation may have already created tests via TDD. Phase 1 detects these as ✅ Covered or ⚠️ Partial. Phase 3 only generates tests for AC classified as ❌ Missing — it never overwrites or duplicates tests that `/spec-implement` already created.
@@ -408,12 +427,26 @@ For each missing AC with a Gherkin scenario:
 
 ### 3.5 — Compilation Gate (per generated file)
 
-After writing each test file:
+After writing each test file, perform **syntax-only validation**; never execute its module, imports, hooks, test runner, app or screenshots. Collection is not pure: `pytest --collect-only` and Playwright listing can execute imports/configuration. Do not use either, a runner command, or snapshot flags here.
 
-1. Run the file in isolation: e.g., `npx vitest run tests/api/notifications.test.ts` or `pytest tests/test_notifications.py -k "AC_004"`
-2. If **compilation/import error** → read error, fix, and retry (max 3 iterations per file)
-3. If still broken after 3 iterations → **delete the generated code** (revert to pre-generation state), mark as "Generation Failed" in report
-4. If test **compiles but assertion fails** → keep the test (this reveals an implementation gap, not a generation error)
+Use the resolved interpreter/parser executable; record command, source path, exit code and raw diagnostics as documentary syntax evidence. This is not a test pass or AC proof. The following commands read source only:
+
+Python (isolated startup, no bytecode or project import):
+```bash
+python -I -B -c 'import ast,pathlib,sys; ast.parse(pathlib.Path(sys.argv[1]).read_bytes(), filename=sys.argv[1])' <generated-file.py>
+```
+JavaScript (disable environment preloads; syntax check never evaluates the module):
+```bash
+env -u NODE_OPTIONS -u NODE_PATH node --check <generated-file.js>
+```
+TypeScript/TSX (resolve `<typescript-compiler.js>` to the absolute installed compiler library, e.g. node_modules/typescript/lib/typescript.js; no project config, plugins, import resolution or emit):
+```bash
+env -u NODE_OPTIONS -u NODE_PATH node -e 'const fs=require("node:fs"),ts=require(process.argv[1]),p=process.argv[2]; const s=ts.createSourceFile(p,fs.readFileSync(p,"utf8"),ts.ScriptTarget.Latest,true); for(const d of s.parseDiagnostics) console.error(ts.flattenDiagnosticMessageText(d.messageText,"\n")); process.exitCode=s.parseDiagnostics.length?1:0' <typescript-compiler.js> <generated-file.ts>
+```
+
+- Preserve the actual source extension (including .tsx); syntax validation does not resolve imports or perform type checking. If the stack lacks a verified non-executing parser, block with an actionable parser prerequisite; never substitute execution or silently claim validation.
+- On syntax errors, repair only generated source and retry at most three times; if still invalid, remove only the newly generated fragment and mark Generation Failed. Keep syntactically valid tests; runtime import/assertion failures belong to Phase 4/4.5 and are reported there with the actual execution or visual receipt.
+- Generation-only modes stop before runtime: no baseline, runtime report or app effects. Tool provenance/diagnostics and the existing goal protocol remain distinct from business artifacts.
 
 ### 3.6 — Visual State Test Generation
 
@@ -431,6 +464,8 @@ await expect([element]).toHaveScreenshot('[screenshot]', {
 
 - Look up `screenshot` from the taxonomy's `visual_states` table for the corresponding `state_id`
 - The `element` locator comes from the Gherkin scenario context
+
+**Generation boundary:** Phase 3 generates only assertion code and its expected screenshot path. Baseline and metadata storage below occurs after runtime capture and approval in the active `visual` branch of Phase 4.5; regeneration-only modes never perform these writes.
 
 **Baseline storage:** `.specs/features/NNN-slug/baselines/states/[screenshot]`
 
@@ -567,7 +602,7 @@ For Penflow-backed UI features, `/spec-test` must validate and maintain the proj
 For web UI features, `/spec-test` must create runtime evidence from the implemented app before running Penflow comparison:
 
 1. Start the app with the project test/dev server command and open it in a real browser at `1440x900`.
-2. Capture screenshots from the browser session and store them with the feature evidence under `.specs/features/<feature>/baselines/`, then sync the approved copies to `.specs/design/baselines/<feature_slug>/`; the command must capture screenshots before approval.
+2. Capture screenshots from the browser session into `.specs/features/<feature>/run/<run-id>/<target>/`. Certify and validate that exact run through the existing visual gate, then approve and promote its images into feature and design baseline directories through the existing promotion flow; never capture directly into either baseline directory.
 3. Use the project's existing Playwright setup when available; otherwise create a temporary Playwright runtime-evidence script/test and remove only the temporary wrapper if it is not part of the generated test suite.
 4. Evaluate the visible DOM/accessibility surface in the browser and write `penflow/actual-ui-tree.json`. Prefer nodes carrying `data-semantic-id`; fall back to `data-testid`, ARIA role/name, and visible text when needed. Every captured node must include `id`, `role`, `bbox`, and children per the Penflow actual-tree schema.
 5. The runtime tree must come from rendered DOM bounding boxes and visible content. Do not copy `penflow/expected-ui-tree.json`, do not hand-write a matching tree, and do not synthesize nodes that are not present in the browser.
@@ -720,6 +755,8 @@ When invoked by `/spec-implement`, this verdict is blocking: `FAIL` and `BLOCKED
 
 **Skipped if `--no-generate` is set.** Only baselines for existing visual tests are captured (Phase 4.5.2).
 
+**Before generating or repairing visual test files, Read and execute** [test-generation readiness](#test-generation-readiness) for this feature; preserve the same model/budget and stop before a write on failure.
+
 #### Screens Table Format
 
 The spec.md `## Screens` table may include optional `selector` and `aa_tolerance` columns:
@@ -769,11 +806,11 @@ For each screen in `spec.md` without a corresponding visual test file:
    ```
 
 5. **Follow existing patterns:** Read 1-2 existing visual test files to match import style, fixture usage, and naming conventions
-6. **Compilation gate:** Run the generated file in isolation. If compile error → fix and retry (max 3 iterations). If still broken → delete generated code, mark "Generation Failed"
+6. **Compilation gate:** Apply the same [syntax-only validation](#35--compilation-gate-per-generated-file); never run or collect the generated visual test. Repair syntax errors at most three times; remove only the generated fragment if still invalid. Runtime execution and missing baseline creation belong to Phase 4.5 with its actual visual evidence receipt.
 
 ### 4.5.2 — Capture Baselines
 
-Run ONLY if Phase 4 (non-visual tests) passed.
+If `test-suite` is active, require Phase 4 (non-visual tests) to pass before capture; a non-zero exit code skips Phase 4.5. When `--visual` makes `test-suite` inactive, record the functional suite as `not_run` and proceed with the visual runners and gates; never claim full-suite PASS. All existing visual prerequisites and receipt requirements still apply.
 
 **CRITICAL: `--update-snapshots` must NEVER be passed to Playwright.** Use `--reset-baselines` for intentional baseline updates.
 
@@ -1050,6 +1087,8 @@ Install: npm install -D @playwright/test && npx playwright install --with-deps
 
 ### Persist
 
+Skip all persistence below in --dry-run and every --regenerate-missing mode (confirmed regeneration creates test sources only). Audit-only retains its existing report and metadata updates; report outcomes as not executed, never passed. Render preview/coverage output in memory in every mode.
+
 1. Save report to `.specs/features/NNN-feature-name/checks/YYYY-MM-DD-test.md`
 2. Update `implementation.md` AC Mapping section with current test status (unless `--no-update`)
 3. Add entry to feature `changelog.md`:
@@ -1220,7 +1259,7 @@ After each feature's implementation phase, the spawned agent runs `/spec-test <f
 
 3. **Guard (FR-010):** Features with existing `tests/` directories are NEVER included in the generation list. This is a hard guard — there is no `--force` override.
 
-4. **Generation (--confirm):** For each feature in the list, run the same Phases 1-3 logic as normal `/spec-test`:
+4. **Generation (--confirm, without --dry-run/--audit-only/--no-generate):** For each feature in the list, **Read and execute** [test-generation readiness](#test-generation-readiness) immediately before its first test write, then run the same Phases 1-3 logic as normal `/spec-test`. Keep each feature's raw gate result; a failing feature stops the batch before its writes:
    - Phase 1: Build coverage matrix from spec.md
    - Phase 2: Plan test generation
    - Phase 3: Generate missing tests from Gherkin
@@ -1263,106 +1302,111 @@ For UI certification closures, forward the same independent `--build-manifest <r
 > Machine-readable task inventory parsed by `livespec goal render`.
 > Format: `- [branch] task description`
 > Active branches per run:
-> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+> `test-report`: no --dry-run or --regenerate-missing; audit-only retains reporting. `test-suite`: execute active without visual-only --visual; no global feature certification is inferred for collection goals.
+> `always` · `visual` (UI feature with ## Screens, no --no-visual, and execute active) · `penflow` (visual + penflow/ dir exists) · `generate` (no audit/no-generate/dry-run; regeneration also requires --confirm) · `visual-generate` (visual feature + generate) · `execute` (no audit/dry-run/regeneration; --no-generate still executes existing tests)
 
 ### Phase 0 — Resolve & Preflight
 
-- [always] Read before-test hooks at all 3 levels: [`.specs/hooks/before-test.md`](../../../.specs/hooks/before-test.md) · [`.specs/hooks/before-test.md`](../../../.specs/hooks/before-test.md) · [`.specs/hooks/before-test.local.md`](../../../.specs/hooks/before-test.local.md) (if mode: override → use only local)
-- [always] Resolve feature: argument NNN-name → git branch feature/NNN-name → interactive selection table → --all selects all Implemented/In Progress features
-- [always] Read [`.specs/surfaces.yaml`](../../../.specs/surfaces.yaml) if present — resolve testDir per surface; all test path references use surface-resolved paths
-- [always] Preflight: verify .specs/ exists, feature dir + spec.md exist, spec.md has ≥1 AC
-- [always] Preflight: resolve Resolved Test Commands from plan.md or .specs/testing/strategy.md; if missing run system/testing/discovery.md → write to strategy.md; if discovery fails exit with audit-only report
-- [always] Preflight: verify test framework binary available via --version
-- [visual] Preflight: run livespec ui-runner check --json — verify status: READY; exit code 2 = tooling blocked; report reason + surfaces[].note from JSON
+- [always] Read before-test hooks at all 3 levels: [`~/.claude/livespec/hooks/before-test.md`](~/.claude/livespec/hooks/before-test.md) · [`.specs/hooks/before-test.md`](../../../.specs/hooks/before-test.md) · [`.specs/hooks/before-test.local.md`](../../../.specs/hooks/before-test.local.md) (if mode: override → use only local) <!-- evidence:documentary -->
+- [always] Resolve feature: argument NNN-name → git branch feature/NNN-name → interactive selection table → --all selects all Implemented/In Progress features <!-- evidence:documentary -->
+- [always] Read [`.specs/surfaces.yaml`](../../../.specs/surfaces.yaml) if present — resolve testDir per surface; all test path references use surface-resolved paths <!-- evidence:documentary -->
+- [always] Preflight: verify .specs/ exists, feature dir + spec.md exist, spec.md has ≥1 AC <!-- evidence:documentary -->
+- [always] Preflight: resolve test commands from plan.md, strategy.md or read-only discovery in memory; if unavailable, return an audit-only report and actionable recovery <!-- evidence:documentary -->
+- [execute] Persist newly discovered test commands to strategy.md only when not already recorded <!-- evidence:documentary -->
+- [always] Preflight: verify test framework binary available via --version <!-- evidence:documentary -->
+- [visual] Preflight: run livespec ui-runner check --json — verify status: READY; exit code 2 = tooling blocked; report reason + surfaces[].note from JSON <!-- evidence:documentary -->
 
 ### Phase 1 — Audit
 
-- [always] Check for fresh check report in checks/YYYY-MM-DD.md: fresh = same calendar day + no commits touching implementation files or .specs/features/NNN/ since report date
-- [always] If no fresh report: build coverage matrix from spec.md AC list + implementation.md AC Mapping table + grep @spec anchors in source files
-- [always] Classify each AC: Covered (test file references AC) / Partial (test exists but incomplete) / Missing (no test found) / No Gherkin (no Gherkin scenario to generate from)
-- [always] Apply native QE Analysis to verify coverage sufficiency, required gates, expected evidence, missing proof, and boundary ownership
-- [always] Sub-phase 1.5 — if spec.md has ## Behavioral AC section: extract declared trait names (e.g. async_action, is_submittable)
-- [always] Sub-phase 1.5 — load system/testing/ui-behavioral-taxonomy.md; extract pattern keyword column per declared trait; skip sub-phase with WARNING if taxonomy file missing
-- [always] Sub-phase 1.5 — grep feature test files for each pattern keyword; classify Covered (pattern found + file:line) / Gap (pattern not found)
-- [always] Sub-phase 1.5 — produce Behavioral Coverage Audit table: trait / required pattern / pattern keyword / status / notes
-- [visual] Visual Audit: for each screen in spec.md ## Screens: check baseline PNG in baselines/ and visual test file existence (grep toHaveScreenshot or screen name) → classify Complete / Missing baseline / Missing test file / Stale (taxonomy_hash mismatch)
+- [always] Check for fresh check report in checks/YYYY-MM-DD.md: fresh = same calendar day + no commits touching implementation files or .specs/features/NNN/ since report date <!-- evidence:documentary -->
+- [always] If no fresh report: build coverage matrix from spec.md AC list + implementation.md AC Mapping table + grep @spec anchors in source files <!-- evidence:documentary -->
+- [always] Classify each AC: Covered (test file references AC) / Partial (test exists but incomplete) / Missing (no test found) / No Gherkin (no Gherkin scenario to generate from) <!-- evidence:documentary -->
+- [always] Apply native QE Analysis to verify coverage sufficiency, required gates, expected evidence, missing proof, and boundary ownership <!-- evidence:documentary -->
+- [always] Sub-phase 1.5 — if spec.md has ## Behavioral AC section: extract declared trait names (e.g. async_action, is_submittable) <!-- evidence:documentary -->
+- [always] Sub-phase 1.5 — load system/testing/ui-behavioral-taxonomy.md; extract pattern keyword column per declared trait; skip sub-phase with WARNING if taxonomy file missing <!-- evidence:documentary -->
+- [always] Sub-phase 1.5 — grep feature test files for each pattern keyword; classify Covered (pattern found + file:line) / Gap (pattern not found) <!-- evidence:documentary -->
+- [always] Sub-phase 1.5 — produce Behavioral Coverage Audit table: trait / required pattern / pattern keyword / status / notes <!-- evidence:documentary -->
+- [visual] Visual Audit: for each screen in spec.md ## Screens: check baseline PNG in baselines/ and visual test file existence (grep toHaveScreenshot or screen name) → classify Complete / Missing baseline / Missing test file / Stale (taxonomy_hash mismatch) <!-- evidence:documentary -->
 
 ### Phase 2 — Plan
 
-- [execute] Build and display test plan table: AC id / type (unit/integration/E2E) / target file / Gherkin scenario title
-- [execute] Build and display visual test plan: screen / target file / action (if visual feature)
-- [execute] Display suites to execute with resolved commands: type checker / linter / unit / integration / E2E
-- [execute] If not --auto: present full plan and wait for user confirmation (yes → proceed / no → exit / audit-only → skip to Phase 5)
+- [execute] Build and display test plan table: AC id / type (unit/integration/E2E) / target file / Gherkin scenario title <!-- evidence:documentary -->
+- [execute] Build and display visual test plan: screen / target file / action (if visual feature) <!-- evidence:documentary -->
+- [execute] Display suites to execute with resolved commands: type checker / linter / unit / integration / E2E <!-- evidence:documentary -->
+- [execute] If not --auto: present full plan and wait for user confirmation (yes → proceed / no → exit / audit-only → skip to Phase 5) <!-- evidence:documentary -->
 
 ### Phase 3 — Generate AC Tests
 
-- [generate] Detect test framework from Resolved Test Commands: vitest / jest / playwright / pytest / go test / cargo test
-- [generate] Read 1-2 existing test files from same feature or nearest feature: extract import style, fixture/helper patterns (beforeEach/afterEach), assertion style, file naming convention, describe/test organization
-- [generate] For each AC classified Missing with Gherkin scenario: parse Gherkin block from spec.md; map Given→setup/arrange, When→action/act, Then→assertion/assert; name test "AC-NNN: description" using spec description
-- [generate] Write tests: append to existing file inside existing describe() block; if structure unclear create new file with _generated suffix; skip if identical test name already exists
-- [generate] Per generated file: run in isolation; fix compile/import errors up to 3 iterations; delete generated code if still broken; keep test if compilation passes but assertion fails (reveals implementation bug)
-- [generate] For each AC with behavioral trait having visual_state Gherkin assertions: generate toHaveScreenshot() assertions; look up screenshot filename from taxonomy visual_states table; store baseline in baselines/states/; generate [screenshot].meta.yml with visual_state, behavioral_trait, gherkin_scenario, taxonomy_hash
+- [generate] Execute test-generation readiness for each actual affected feature before any test write: `livespec validate .specs/features/<feature-slug> --progression implement --model <resolved-model> [--review-max-chars <budget>]`; record feature/command/exit code/raw stdout/stderr, require current Clarify and Analyze READY, and stop the batch before the failing feature's writes; Read [the shared gate](#test-generation-readiness), never substitute prose or require future runtime proof <!-- evidence:documentary -->
+
+- [generate] Detect test framework from Resolved Test Commands: vitest / jest / playwright / pytest / go test / cargo test <!-- evidence:documentary -->
+- [generate] Read 1-2 existing test files from same feature or nearest feature: extract import style, fixture/helper patterns (beforeEach/afterEach), assertion style, file naming convention, describe/test organization <!-- evidence:documentary -->
+- [generate] For each AC classified Missing with Gherkin scenario: parse Gherkin block from spec.md; map Given→setup/arrange, When→action/act, Then→assertion/assert; name test "AC-NNN: description" using spec description <!-- evidence:documentary -->
+- [generate] Write tests: append to existing file inside existing describe() block; if structure unclear create new file with _generated suffix; skip if identical test name already exists <!-- evidence:documentary -->
+- [generate] Per generated file: apply [syntax-only validation](#35--compilation-gate-per-generated-file) without executing modules, imports, hooks, tests or app; record actual parser command/exit/diagnostics; repair syntax errors up to 3 times, remove only generated fragments if still invalid; defer runtime evidence to Phase 4 <!-- evidence:documentary -->
+- [generate] For each AC with behavioral trait having visual_state Gherkin assertions: generate toHaveScreenshot() assertions and the expected screenshot path from the taxonomy visual_states table; create assertion source only <!-- evidence:documentary -->
 
 ### Phase 3 — Generate Visual Test Files
 
-- [visual-generate] For each screen in spec.md ## Screens without corresponding Playwright test file: read selector column from Screens table
-- [visual-generate] If selector defined: generate component-level test using page.locator(selector).toHaveScreenshot(screen-name.png)
-- [visual-generate] If no selector or empty: generate full-page test using page.toHaveScreenshot(screen-name.png) with warning comment "Full-page screenshot — add selector for component-level precision"
-- [visual-generate] If aa_tolerance: true in Screens table: add { maxDiffPixels: 10 } option to toHaveScreenshot call
-- [visual-generate] Per generated visual file: run in isolation; fix compile errors up to 3 iterations; delete if still broken after 3 attempts
+- [visual-generate] For each screen in spec.md ## Screens without corresponding Playwright test file: read selector column from Screens table <!-- evidence:documentary -->
+- [visual-generate] If selector defined: generate component-level test using page.locator(selector).toHaveScreenshot(screen-name.png) <!-- evidence:documentary -->
+- [visual-generate] If no selector or empty: generate full-page test using page.toHaveScreenshot(screen-name.png) with warning comment "Full-page screenshot — add selector for component-level precision" <!-- evidence:documentary -->
+- [visual-generate] If aa_tolerance: true in Screens table: add { maxDiffPixels: 10 } option to toHaveScreenshot call <!-- evidence:documentary -->
+- [visual-generate] Per generated visual file: apply [syntax-only validation](#35--compilation-gate-per-generated-file) without running or collecting tests, app, snapshot creation or reports; record actual parser command/exit/diagnostics; repair syntax errors up to 3 times, remove only generated fragments if still invalid; defer capture to Phase 4.5 <!-- evidence:documentary -->
 
 ### Phase 4 — Execute Test Suite
 
-- [execute] Run type checker if resolved (e.g. npx tsc --noEmit)
-- [execute] Run linter if resolved (e.g. npx eslint src/)
-- [execute] Run unit tests with resolved unit command
-- [execute] Run integration tests with resolved integration command if present
-- [execute] Run E2E tests with resolved E2E command (e.g. npx playwright test)
-- [execute] Map each test result back to its AC: track Pass / Fail / Regression / Blocked per AC
-- [execute] Report generated tests that fail as "Generated — Fail" (implementation bug, do not fix here — surface for /spec-implement --resume)
-- [execute] Report existing tests that fail as "Regression" (not spec-test responsibility)
-- [execute] Report test runner crash or timeout as "Blocked — [error]" with recovery suggestion
+- [test-suite] Run type checker if resolved (e.g. npx tsc --noEmit) <!-- evidence:documentary -->
+- [test-suite] Run linter if resolved (e.g. npx eslint src/) <!-- evidence:documentary -->
+- [test-suite] Run unit tests with resolved unit command <!-- evidence:execution -->
+- [test-suite] Run integration tests with resolved integration command if present <!-- evidence:execution applicable:integration-command -->
+- [test-suite] Run E2E tests with resolved E2E command (e.g. npx playwright test) <!-- evidence:execution applicable:e2e-command -->
+- [test-suite] Map each test result back to its AC: track Pass / Fail / Regression / Blocked per AC <!-- evidence:execution ac-scope:feature -->
+- [test-suite] Report generated tests that fail as "Generated — Fail" (implementation bug, do not fix here — surface for /spec-implement --resume) <!-- evidence:documentary -->
+- [test-suite] Report existing tests that fail as "Regression" (not spec-test responsibility) <!-- evidence:documentary -->
+- [test-suite] Report test runner crash or timeout as "Blocked — [error]" with recovery suggestion <!-- evidence:documentary -->
 
 ### Phase 4.5 — Visual Baseline Capture
 
-- [visual] Skip phase 4.5 entirely if Phase 4 suite did not pass (any non-zero exit code)
-- [visual] Select dispatcher based on surfaces.yaml: all surfaces playwright → livespec ui-runner dispatch <screen...> --feature-dir .specs/features/NNN/; any surface xcuitest or maestro → livespec ui-runner converge --feature <slug>
-- [visual] 4.5.0 Design Alignment Gate — trigger: penflow/ui.pen exists AND (baseline absent or design_hash differs from penflow/ui.pen): run livespec design-alignment compare --design penflow/ui.pen --runtime .specs/features/<feature>/design-alignment/<screen>.runtime.json --screen <screen> --output-dir .specs/features/<feature>/design-alignment/; emit exactly one line: Design Alignment Verdict: PASS|FAIL|BLOCKED; FAIL or BLOCKED prevents baseline capture
-- [penflow] 4.5.P Registry check: verify .specs/design/screens/<slug>/, .specs/design/baselines/<slug>/, .specs/design/screens/index.md, .specs/design/changelog.md all exist
-- [penflow] 4.5.P Mockup Factory proof: verify .mockup-validation/audit-report.md, .mockup-validation/<slug>/checklist.md, .mockup-validation/<slug>/manifest.json, .mockup-validation/<slug>/drift-report.json, .mockup-validation/visual-evidence/manifest.json (status must be PASS — warnings or skipped block approval), .mockup-validation/visual-evidence/visual-report.md, and visual evidence PNGs
-- [penflow] 4.5.P Web runtime: start app with project dev server; open in real browser at 1440x900; capture screenshots to .specs/features/<feature>/baselines/ then sync approved copies to .specs/design/baselines/<slug>/
-- [visual] Publish every validation PNG via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if the CLI is missing, print `Visual preview: unavailable - visual-preview CLI missing` and do not forge a URL
-- [penflow] 4.5.P Runtime tree: evaluate rendered DOM/accessibility surface in browser using Playwright; write penflow/actual-ui-tree.json preferring data-semantic-id → data-testid → ARIA role/name → visible text; every node must include id, role, bbox, children; do NOT copy expected-ui-tree.json or hand-write nodes
-- [penflow] 4.5.P If implementation lacks semantic markers: add data-semantic-id or data-testid attributes to app source, then rerun browser capture
-- [penflow] 4.5.P Penflow compare: run penflow validate-actual penflow/actual-ui-tree.json --schema --json; run penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json --out penflow/compare-report.json --markdown penflow/compare-report.md; run penflow review-report penflow/compare-report.json --out penflow/review-report.md; run penflow fix-report penflow/compare-report.json --out penflow/fix-report.md
-- [penflow] 4.5.P Produce `penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json` after final runtime/behavioral capture, then revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`; preserve actual paths in PHASE_RESULT JSON extra.penflow_validation_path and extra.runner_build_manifest for the parent; only implementation PASS with certified true and current bindings permits closure
-- [visual] 4.5.2 Baseline capture — if --reset-baselines: verify not in CI (CI env var), delete existing baseline PNGs (all or named screen only), then capture fresh screenshots; if not --reset-baselines: run visual tests in comparison mode only (never overwrite existing baselines)
-- [visual] 4.5.2 If docker-compose.visual.yml absent: generate with pinned Playwright Docker image (mcr.microsoft.com/playwright:v1.44.0-jammy), record image in baselines/.docker-version; if present: skip, log "docker-compose.visual.yml already exists"
-- [visual] 4.5.2 Retry failed capture up to 2 times; if still failing mark "Blocked — [error]" and skip screen
-- [visual] 4.5.3 Design fidelity: for each captured runtime PNG find corresponding mockup in `.specs/design/screens/<slug>/<screen-name>.png`; compute pixel diff only through `livespec visual-gate certify`
-- [visual] 4.5.3 Interactive approval (not --auto): display approval table (screen / baseline path / diff vs mockup); accept y (approve all) / n (delete all captured PNGs + exit) / n <screen-name> (delete one, redisplay) / view <screen-name> (print paths, redisplay)
-- [visual] 4.5.3 --auto mode: if any diff > 5%, delete all captured PNGs and emit SHIP_RESULT: BLOCKED with screen name and percentage; if all diffs ≤ 5% auto-approve all
-- [penflow] 4.5.3 --auto mode with Penflow: if mockups absent emit Visual Gate Verdict: BLOCKED (never auto-approve Penflow features without mockups — must fix .specs/design/screens/<slug>/ first)
-- [visual] 4.5.3 After approval: sync approved screenshots to .specs/design/baselines/<slug>/ while preserving feature-local copies in .specs/features/<feature>/baselines/
-- [visual] 4.5.3 Write baselines/baseline.manifest.yml: capture_date (ISO 8601 UTC) / approved_by (git config user.name or "auto (spec-ship/spec-feature)") / browser_version (from playwright --version output) / os (platform + version) / mockup_version (SHA-256 of mockup PNG, "none" if absent) / docker_image (from docker-compose.visual.yml or "none")
-- [visual] 4.5.3 Update .specs/design/screens/index.md and .specs/design/changelog.md after new mockup exports or runtime baseline syncs
-- [visual] Run `livespec visual-gate certify --feature <slug> --command spec-test --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json`; emit exactly one line: Visual Gate Verdict: PASS|FAIL|BLOCKED
-- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
-- [visual] Phase 0 prereq probe: `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --json` without `--receipt` is allowed only to discover missing prerequisites; exit 7 is expected until mockups, baselines, Penflow trees, runtime capture, `certify`, and receipt-bound final `validate` exist. It never proves completion.
-- [visual] Phase 4.5 strict: runners écrivent dans `.specs/features/<slug>/run/<ts>/<target>/<screen>.png` — JAMAIS sous `.specs/design/screens/`. Promotion via `livespec visual-gate promote --feature <slug> --target <t> --screen <s> --run-id <ts>`
-- [visual] Phase 4.5 final re-run: `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json` ; exit_code != 0 ⇒ Visual Gate Verdict ≠ PASS, refuser la preuve `ACCEPTED`
+- [visual] Skip phase 4.5 only if `test-suite` is active and Phase 4 failed (non-zero exit code); when active, await its passing result before capture. When `--visual` makes `test-suite` inactive, record the functional suite as `not_run` and proceed with visual runners and gates; never claim full-suite PASS or bypass existing visual prerequisites and receipts <!-- evidence:documentary -->
+- [visual] Select dispatcher based on surfaces.yaml: all surfaces playwright → livespec ui-runner dispatch <screen...> --feature-dir .specs/features/NNN/; any surface xcuitest or maestro → livespec ui-runner converge --feature <slug> <!-- evidence:documentary -->
+- [visual] 4.5.0 Design Alignment Gate — trigger: penflow/ui.pen exists AND (baseline absent or design_hash differs from penflow/ui.pen): run livespec design-alignment compare --design penflow/ui.pen --runtime .specs/features/<feature>/design-alignment/<screen>.runtime.json --screen <screen> --output-dir .specs/features/<feature>/design-alignment/; emit exactly one line: Design Alignment Verdict: PASS|FAIL|BLOCKED; FAIL or BLOCKED prevents baseline capture <!-- evidence:documentary -->
+- [penflow] 4.5.P Registry check: verify .specs/design/screens/<slug>/, .specs/design/baselines/<slug>/, .specs/design/screens/index.md, .specs/design/changelog.md all exist <!-- evidence:documentary -->
+- [penflow] 4.5.P Mockup Factory proof: verify .mockup-validation/audit-report.md, .mockup-validation/<slug>/checklist.md, .mockup-validation/<slug>/manifest.json, .mockup-validation/<slug>/drift-report.json, .mockup-validation/visual-evidence/manifest.json (status must be PASS — warnings or skipped block approval), .mockup-validation/visual-evidence/visual-report.md, and visual evidence PNGs <!-- evidence:documentary -->
+- [penflow] 4.5.P Web runtime: start app with project dev server; open in real browser at 1440x900; capture screenshots to .specs/features/<feature>/run/<run-id>/<target>/; certify and validate that exact run before approval and existing promotion into feature/design baselines <!-- evidence:documentary -->
+- [visual] Publish every validation PNG via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if the CLI is missing, print `Visual preview: unavailable - visual-preview CLI missing` and do not forge a URL <!-- evidence:documentary -->
+- [penflow] 4.5.P Runtime tree: evaluate rendered DOM/accessibility surface in browser using Playwright; write penflow/actual-ui-tree.json preferring data-semantic-id → data-testid → ARIA role/name → visible text; every node must include id, role, bbox, children; do NOT copy expected-ui-tree.json or hand-write nodes <!-- evidence:documentary -->
+- [penflow] 4.5.P If implementation lacks semantic markers: add data-semantic-id or data-testid attributes to app source, then rerun browser capture <!-- evidence:documentary -->
+- [penflow] 4.5.P Penflow compare: run penflow validate-actual penflow/actual-ui-tree.json --schema --json; run penflow compare-tree penflow/expected-ui-tree.json penflow/actual-ui-tree.json --out penflow/compare-report.json --markdown penflow/compare-report.md; run penflow review-report penflow/compare-report.json --out penflow/review-report.md; run penflow fix-report penflow/compare-report.json --out penflow/fix-report.md <!-- evidence:documentary -->
+- [penflow] 4.5.P Produce `penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json` after final runtime/behavioral capture, then revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`; preserve actual paths in PHASE_RESULT JSON extra.penflow_validation_path and extra.runner_build_manifest for the parent; only implementation PASS with certified true and current bindings permits closure <!-- evidence:documentary -->
+- [visual] 4.5.2 Baseline capture — if --reset-baselines: verify not in CI (CI env var), delete existing baseline PNGs (all or named screen only), then capture fresh screenshots; if not --reset-baselines: run visual tests in comparison mode only (never overwrite existing baselines) <!-- evidence:documentary -->
+- [visual] 4.5.2 If docker-compose.visual.yml absent: generate with pinned Playwright Docker image (mcr.microsoft.com/playwright:v1.44.0-jammy), record image in baselines/.docker-version; if present: skip, log "docker-compose.visual.yml already exists" <!-- evidence:documentary -->
+- [visual] 4.5.2 Retry failed capture up to 2 times; if still failing mark "Blocked — [error]" and skip screen <!-- evidence:documentary -->
+- [visual] 4.5.3 Design fidelity: for each captured runtime PNG find corresponding mockup in `.specs/design/screens/<slug>/<screen-name>.png`; compute pixel diff only through `livespec visual-gate certify` <!-- evidence:documentary -->
+- [visual] 4.5.3 Interactive approval (not --auto): display approval table (screen / baseline path / diff vs mockup); accept y (approve all) / n (delete all captured PNGs + exit) / n <screen-name> (delete one, redisplay) / view <screen-name> (print paths, redisplay) <!-- evidence:documentary -->
+- [visual] 4.5.3 --auto mode: if any diff > 5%, delete all captured PNGs and emit SHIP_RESULT: BLOCKED with screen name and percentage; if all diffs ≤ 5% auto-approve all <!-- evidence:documentary -->
+- [penflow] 4.5.3 --auto mode with Penflow: if mockups absent emit Visual Gate Verdict: BLOCKED (never auto-approve Penflow features without mockups — must fix .specs/design/screens/<slug>/ first) <!-- evidence:documentary -->
+- [visual] 4.5.3 After approval: sync approved screenshots to .specs/design/baselines/<slug>/ while preserving feature-local copies in .specs/features/<feature>/baselines/ <!-- evidence:documentary -->
+- [visual] After runtime capture and approval, store behavioral baseline PNGs in baselines/states/ and generate [screenshot].meta.yml with visual_state, behavioral_trait, gherkin_scenario, taxonomy_hash <!-- evidence:documentary -->
+- [visual] 4.5.3 Write baselines/baseline.manifest.yml: capture_date (ISO 8601 UTC) / approved_by (git config user.name or "auto (spec-ship/spec-feature)") / browser_version (from playwright --version output) / os (platform + version) / mockup_version (SHA-256 of mockup PNG, "none" if absent) / docker_image (from docker-compose.visual.yml or "none") <!-- evidence:documentary -->
+- [visual] 4.5.3 Update .specs/design/screens/index.md and .specs/design/changelog.md after new mockup exports or runtime baseline syncs <!-- evidence:documentary -->
+- [visual] Run `livespec visual-gate certify --feature <slug> --command spec-test --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json`; emit exactly one line: Visual Gate Verdict: PASS|FAIL|BLOCKED <!-- evidence:documentary -->
+- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity <!-- evidence:documentary -->
+- [visual] Phase 0 prereq probe: `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --json` without `--receipt` is allowed only to discover missing prerequisites; exit 7 is expected until mockups, baselines, Penflow trees, runtime capture, `certify`, and receipt-bound final `validate` exist. It never proves completion. <!-- evidence:documentary -->
+- [visual] Phase 4.5 strict: runners écrivent dans `.specs/features/<slug>/run/<ts>/<target>/<screen>.png` — JAMAIS sous `.specs/design/screens/`. Promotion via `livespec visual-gate promote --feature <slug> --target <t> --screen <s> --run-id <ts>` <!-- evidence:documentary -->
+- [visual] Phase 4.5 final re-run: `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path> --json` ; exit_code != 0 ⇒ Visual Gate Verdict ≠ PASS, refuser la preuve `ACCEPTED` <!-- evidence:documentary -->
 
 ### Phase 5 — Report
 
-- [always] Produce test report: AC Coverage table (AC / description / test file / result / source / notes) + Suite Results table (suite / command / result / duration) + Visual Baselines table if visual (screen / baseline / mockup diff / status) + Generation Summary (generated / passed / failed-impl / failed-compile) + overall summary
-- [visual] Include a Visual Proof section listing each absolute PNG path, its Markdown image line, its Browser annotation URL, or `Visual preview: unavailable - visual-preview CLI missing`
-- [always] Save report to .specs/features/NNN/checks/YYYY-MM-DD-test.md
-- [always] Update implementation.md AC Mapping table: add/update test file paths and status (Covered/Partial/Missing) for all tested AC — unless --no-update
-- [always] Add entry to feature changelog.md: date / type: Spec Update / code modified: list generated test files / coverage: N/M AC (X%) / N generated / report path
-- [always] Add summary line to .specs/changelog.md (global): [Feature NNN] Test: X% AC covered (N/M), N tests generated
-- [always] If multiple features tested (--all): produce Consolidated Report table (feature / AC coverage / suite result / visual / generated / overall)
-- [always] Read after-test hooks at all 3 levels: ~/.claude/livespec/hooks/after-test.md · .specs/hooks/after-test.md · .specs/hooks/after-test.local.md
-- [always] Exit with non-zero status if overall report status is FAIL or BLOCKED; otherwise exit zero
+- [always] Produce test report: AC Coverage table (AC / description / test file / result / source / notes) + Suite Results table (suite / command / result / duration) + Visual Baselines table if visual (screen / baseline / mockup diff / status) + Generation Summary (generated / passed / failed-impl / failed-compile) + overall summary <!-- evidence:documentary -->
+- [visual] Include a Visual Proof section listing each absolute PNG path, its Markdown image line, its Browser annotation URL, or `Visual preview: unavailable - visual-preview CLI missing` <!-- evidence:documentary -->
+- [test-report] Save report to .specs/features/NNN/checks/YYYY-MM-DD-test.md <!-- evidence:documentary -->
+- [test-report] Update implementation.md AC Mapping table: add/update test file paths and status (Covered/Partial/Missing) for all tested AC — unless --no-update <!-- evidence:documentary -->
+- [test-report] Add entry to feature changelog.md: date / type: Spec Update / code modified: list generated test files / coverage: N/M AC (X%) / N generated / report path <!-- evidence:documentary -->
+- [test-report] Add summary line to .specs/changelog.md (global): [Feature NNN] Test: X% AC covered (N/M), N tests generated <!-- evidence:documentary -->
+- [always] If multiple features tested (--all): produce Consolidated Report table (feature / AC coverage / suite result / visual / generated / overall) <!-- evidence:documentary -->
+- [always] Read after-test hooks at all 3 levels: ~/.claude/livespec/hooks/after-test.md · .specs/hooks/after-test.md · .specs/hooks/after-test.local.md <!-- evidence:documentary -->
+- [always] Exit with non-zero status if overall report status is FAIL or BLOCKED; otherwise exit zero <!-- evidence:documentary -->
 
 ---
 
@@ -1370,18 +1414,18 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 `/spec-test` is complete only if all are true:
 
-- [ ] Coverage matrix produced for all AC
-- [ ] Missing tests generated (or `--audit-only` / `--no-generate`)
-- [ ] Full test suite executed (or `--audit-only`)
-- [ ] Visual baselines captured for missing screens (or `--no-visual` / non-UI feature)
-- [ ] `baselines/baseline.manifest.yml` written after every baseline approval (or `--no-visual`)
-- [ ] Test report saved to `checks/YYYY-MM-DD-test.md`
-- [ ] `implementation.md` AC status updated (or `--no-update`)
-- [ ] Feature `changelog.md` has test entry
-- [ ] Global `.specs/changelog.md` has summary entry
-- [ ] If multi-feature: consolidated report produced
-- [ ] For VISUAL features: every validation PNG was published with absolute-path Markdown proof and either a Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing`
-- [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-test` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit, runner outputs hors `.specs/design/screens/`
+- [ ] Coverage matrix produced for all AC <!-- evidence:documentary -->
+- [ ] [generate] Missing tests generated <!-- evidence:documentary -->
+- [ ] [test-suite] Full test suite executed <!-- evidence:execution -->
+- [ ] [visual] Visual baselines captured for missing screens (or `--no-visual` / non-UI feature) <!-- evidence:documentary -->
+- [ ] [visual] `baselines/baseline.manifest.yml` written after every baseline approval (or `--no-visual`) <!-- evidence:documentary -->
+- [ ] [test-report] Test report saved to `checks/YYYY-MM-DD-test.md` <!-- evidence:documentary -->
+- [ ] [test-report] `implementation.md` AC status updated (or `--no-update`) <!-- evidence:documentary -->
+- [ ] [test-report] Feature `changelog.md` has test entry <!-- evidence:documentary -->
+- [ ] [test-report] Global `.specs/changelog.md` has summary entry <!-- evidence:documentary -->
+- [ ] If multi-feature: consolidated report produced <!-- evidence:documentary -->
+- [ ] [visual] For VISUAL features: every validation PNG was published with absolute-path Markdown proof and either a Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing` <!-- evidence:documentary -->
+- [ ] [visual] For VISUAL features: `livespec visual-gate certify ... --command spec-test` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit, runner outputs hors `.specs/design/screens/` <!-- evidence:documentary -->
 
 ---
 

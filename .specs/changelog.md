@@ -3,9 +3,36 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-09-05
+> Last updated: 2026-09-06
 
 ---
+
+## 2026-09-07 — Fix independent pipeline closure: bound CLI/runtime, explicit feature and review identity, reject usage exit2.
+<!-- finalize:spec-fix:2026-09-07:8403a3bf -->
+
+## 2026-09-07 — 078: repair reviewed-spec coordinator binding, reject incomplete mapping reviews before execution, preserve active child waits and isolated snapshot evidence.
+<!-- finalize:spec-fix:2026-09-07:73d32812 -->
+
+## 2026-09-07 — 078: correct coordinator reviewed-spec acceptance and isolated snapshot inputs; full feature closure remains pending.
+<!-- finalize:spec-fix:2026-09-07:a8c7a397 -->
+
+## 2026-09-07 — Fix: 1/3 targeted gaps closed; 258 runtime bindings certified, initial076 baseline and complete agentic success remain unproven.
+<!-- finalize:spec-fix:2026-09-07:32825067 -->
+
+## 2026-09-06 — [Feature 078] Test: 100% AC definitions covered (16/16), 0 tests generated; deterministic scope passed with historical limits retained
+<!-- finalize:spec-test:2026-09-06:aebeee31 -->
+
+## 2026-09-06 — [Feature 078] Implementation lifecycle: requirement evidence integrity
+<!-- finalize:spec-implement:2026-09-06:183269a4 -->
+
+## 2026-09-06 — Requirement Evidence Integrity: linked four success criteria to existing steps and evidence; scope unchanged
+<!-- finalize:spec-plan:2026-09-06:b64026f3 -->
+
+## 2026-09-06 — Requirement Evidence Integrity: plan created with eight steps across three lots and explicit proof boundaries
+<!-- finalize:spec-plan:2026-09-06:752c710f -->
+
+## 2026-09-06 — Feature078: specify requirement evidence integrity across five axes
+<!-- finalize:spec-specify:2026-09-06:165bc17e -->
 
 ## 2026-09-05 — [Feature 077] Implemented: Penflow cumulative verification consumer and governed lifecycle closure
 <!-- finalize:spec-implement:2026-09-05:6ce4661e -->
@@ -13,6 +40,58 @@
 ## 2026-09-05 — Feature 077: Composed procedure and selector authority
 
 Automatic active-plan policy union preserves earlier required procedures; the read-only pre-review C20 selector gate delegates to Penflow. Canonical fixture tests use the real CLI. Native source approval accepted; final runtime/closure/import proofs remain pending.
+
+## 2026-09-04 — Preserve Feature 076 eager legacy task validation with 179 regressions
+<!-- finalize:spec-test:2026-09-04:79b41969 -->
+
+## 2026-09-04 — Preserve Feature 076 legacy task-field compatibility with 179 regressions
+<!-- finalize:spec-test:2026-09-04:1faecba9 -->
+
+## 2026-09-04 — Preserve Feature 076 non-init compatibility and cooperative archive boundary
+<!-- finalize:spec-test:2026-09-04:43831902 -->
+
+## 2026-09-04 — Close Feature 076 boundary review with 185 feature tests and confined archive publication
+<!-- finalize:spec-test:2026-09-04:9398704c -->
+
+## 2026-09-04 — Feature 076 final concurrency review closed: 183 feature tests and locked exclusive archive publication
+<!-- finalize:spec-test:2026-09-04:c7b5977d -->
+
+## 2026-09-04 — Feature 076 final publication verified: 182 feature tests and exclusive inode-owned archive publication
+<!-- finalize:spec-test:2026-09-04:128dece7 -->
+
+## 2026-09-04 — Feature 076 final fingerprint verified: 180 feature tests and inode-owned archive writes
+<!-- finalize:spec-test:2026-09-04:9637faa2 -->
+
+## 2026-09-04 — Feature 076 final security review closed: 177 feature tests, pinned archive traversal and ownership verified
+<!-- finalize:spec-test:2026-09-04:b5339c37 -->
+
+## 2026-09-04 — [Feature 076] Second security review closed: 175 feature tests, descriptor lifetime and ownership verified
+<!-- finalize:spec-test:2026-09-04:ac9f0e2b -->
+
+## 2026-09-04 — [Feature 076] Final audit remediation verified: descriptor-safe archive, typed boundaries, 170 feature tests
+<!-- finalize:spec-test:2026-09-04:5d267080 -->
+
+## 2026-09-04 — [Feature 076] Test: 100% AC covered (10/10), 11 tests generated — Feature PASS; one external catalog regression and six non-feature format files remain repository follow-up
+<!-- finalize:spec-test:2026-09-04:24b126d1 -->
+
+## 2026-09-04 — [Feature 076] Implemented after independent review: complete schema pairing, 158 feature cases, confined archive writes, strict non-init compatibility
+<!-- finalize:spec-implement:2026-09-04:9e1ef40b -->
+
+## 2026-09-04 — [Feature 076] Initial implementation completed: canonical fresh root, fail-closed proof, contained archive, strict non-init compatibility
+<!-- finalize:spec-implement:2026-09-04:a98e152e -->
+
+## 2026-09-04 — [Feature 076] Plan refined: explicit SC-002, SC-003, and SC-004 mappings to existing steps, tests, and quality gates
+
+## 2026-09-04 — [Feature 076] Plan created: Spec Init Goal Bootstrap — 6 implementation steps, 3 diagrams
+<!-- finalize:spec-plan:2026-09-04:89422724 -->
+
+## 2026-09-04 — [Feature 076] Plan finalized: approved six-step implementation and quality-gate sequence
+<!-- finalize:spec-plan:2026-09-04:28e16cfb -->
+
+## 2026-09-04 — [Feature 076] Spec created: Spec Init Goal Bootstrap — 3 stories, 10 AC, 12 FR
+<!-- finalize:spec-specify:2026-09-04:14b0e052 -->
+
+## 2026-09-04 — [Feature 076] Spec refined: archive confinement, atomic pairing, external evidence boundary, and goal-state transitions clarified
 
 ## 2026-07-04 -- [Feature 075] Implemented: Design Direction Carry -- optional informative design direction line through generated specs without validation use
 
@@ -617,3 +696,11 @@ Automatic active-plan policy union preserves earlier required procedures; the re
 - **Author:** spec.init --from-code
 
 ---
+
+- 2026-09-07 — [Feature078] Check ciblé : trois écarts de fermeture, aucune certification actuelle. Consulter le [rapport](features/078-requirement-evidence-integrity/checks/2026-09-07.md).
+
+- 2026-09-07 — [Feature078] Check afc4d58b :G1certifié avant écritures,G2partiel,G3incomplet. Consulter le [rapport de clôture](features/078-requirement-evidence-integrity/checks/2026-09-07-closure.md).
+
+- 2026-09-07 — [Feature078] Check93766262 :FR-009 et packaging inspectés; fermeture partielle. Lire le [rapport coordinateur](features/078-requirement-evidence-integrity/checks/2026-09-07-coordinator.md).
+
+- 2026-09-07 — [Feature078] Check qualitéa0cfa9f9 :suivi clôture sans nouveau finding;full078partiel. Lire le [rapport](features/078-requirement-evidence-integrity/checks/2026-09-07-closure-followup.md).

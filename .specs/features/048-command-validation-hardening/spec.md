@@ -3,7 +3,7 @@ title: "Command Validation Hardening"
 status: Implemented
 priority: P1
 created: 2026-05-18
-updated: 2026-05-18
+updated: 2026-09-06
 ---
 
 # Command Validation Hardening
@@ -145,7 +145,7 @@ flowchart TD
 ## Acceptance Criteria
 
 - **AC-001** - A canonical command registry reports exactly the same command set as `commands/*.md` excluding `*.expectations.md`.
-- **AC-002** - Every command has `commands/<name>.md`, `commands/<name>.expectations.md`, Section 13, `must_not: Traceback`, and at least one `exit_code` verify rule.
+- **AC-002** - Every command has `commands/<name>.md`, `commands/<name>.expectations.md`, Section 13, a `must_not` guard against either legacy `Traceback` or the complete Python traceback header followed by an actual newline, and at least one `exit_code` verify rule. JSON-escaped or quoted descriptions of the complete header are not actual tracebacks.
 - **AC-003** - Every command imports `system/anti-drift-block.md` and inherits a mandatory finalization gate.
 - **AC-004** - `.claude/rules/livespec-commands.md`, `commands/spec-hooks.md`, `system/spec-system.md`, `commands/spec-init.md`, `scripts/init.sh`, `scripts/install.sh`, and `scripts/link-local.sh` are synchronized with the registry.
 - **AC-005** - `livespec command-audit --repo .` exits 0 on the current repo and non-zero on fixtures with missing expectations, stale routing entries, or missing finalization gates.

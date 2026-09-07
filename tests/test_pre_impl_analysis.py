@@ -46,7 +46,9 @@ def test_uncovered_requirement_is_high_and_coverage_is_fifty_percent(tmp_path: P
         plan="## Implementation Plan\n- Build FR-001 exporter in reports module.\n",
     )
 
-    report = analyze_feature_artifacts(feature_dir, _clean_constitution(tmp_path))
+    report = analyze_feature_artifacts(
+        feature_dir, _clean_constitution(tmp_path), structural_only=True
+    )
 
     assert report.coverage_percent == 50.0
     high = [f for f in report.findings if f.severity is AnalyzeSeverity.HIGH]
@@ -55,7 +57,7 @@ def test_uncovered_requirement_is_high_and_coverage_is_fifty_percent(tmp_path: P
     assert all(f.severity is not AnalyzeSeverity.CRITICAL for f in report.findings)
 
 
-def test_constitution_must_not_violation_is_critical(tmp_path: Path) -> None:
+def test_constitution_mention_is_not_a_semantic_violation(tmp_path: Path) -> None:
     feature_dir = _feature(
         tmp_path,
         spec="## Functional Requirements\n- FR-001: Run user scripts.\n",
@@ -67,11 +69,11 @@ def test_constitution_must_not_violation_is_critical(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    report = analyze_feature_artifacts(feature_dir, constitution)
+    report = analyze_feature_artifacts(feature_dir, constitution, structural_only=True)
 
     critical = [f for f in report.findings if f.severity is AnalyzeSeverity.CRITICAL]
-    assert critical
-    assert any(f.category == "constitution" for f in critical)
+    assert not critical
+    assert report.semantic_status == "not_requested"
 
 
 def test_finding_ids_are_stable_across_runs(tmp_path: Path) -> None:
@@ -82,8 +84,8 @@ def test_finding_ids_are_stable_across_runs(tmp_path: Path) -> None:
     )
     constitution = _clean_constitution(tmp_path)
 
-    first = analyze_feature_artifacts(feature_dir, constitution)
-    second = analyze_feature_artifacts(feature_dir, constitution)
+    first = analyze_feature_artifacts(feature_dir, constitution, structural_only=True)
+    second = analyze_feature_artifacts(feature_dir, constitution, structural_only=True)
 
     assert [f.finding_id for f in first.findings] == [f.finding_id for f in second.findings]
     assert first.findings  # non-empty so the stability assertion is meaningful
@@ -97,7 +99,9 @@ def test_missing_plan_is_critical(tmp_path: Path) -> None:
         plan=None,
     )
 
-    report = analyze_feature_artifacts(feature_dir, _clean_constitution(tmp_path))
+    report = analyze_feature_artifacts(
+        feature_dir, _clean_constitution(tmp_path), structural_only=True
+    )
 
     assert any(
         f.severity is AnalyzeSeverity.CRITICAL and f.category == "artifact" for f in report.findings
@@ -112,10 +116,34 @@ def test_missing_implementation_is_not_a_failure(tmp_path: Path) -> None:
         impl=None,
     )
 
-    report = analyze_feature_artifacts(feature_dir, _clean_constitution(tmp_path))
+    report = analyze_feature_artifacts(
+        feature_dir, _clean_constitution(tmp_path), structural_only=True
+    )
 
     assert report.metrics["implementation_present"] == 0
     # FR-001 is covered by plan.md, constitution is clean -> no CRITICAL/HIGH findings.
     assert all(
         f.severity not in (AnalyzeSeverity.CRITICAL, AnalyzeSeverity.HIGH) for f in report.findings
     )
+
+
+# @spec FR-005: Negation is not violation
+# — .specs/features/078-requirement-evidence-integrity/spec.md#fr-005
+
+
+def test_negated_prohibition_is_not_reported_as_violation(tmp_path: Path) -> None:
+    feature = _feature(
+        tmp_path, spec="FR-001: Run safely.", plan="FR-001: Never use eval() on input."
+    )
+    constitution = tmp_path / "constitution.md"
+    constitution.write_text("MUST NOT use eval() on input.")
+    report = analyze_feature_artifacts(feature, constitution, structural_only=True)
+    assert not report.findings
+    assert report.coverage_kind == "structural_reference"
+    assert report.coverage[0].requirement_id == "001-feature:FR-001"
+
+
+def test_requirement_substring_is_not_structural_reference(tmp_path: Path) -> None:
+    feature = _feature(tmp_path, spec="FR-001: Purge.", plan="FR-0010: Retain.")
+    report = analyze_feature_artifacts(feature, _clean_constitution(tmp_path), structural_only=True)
+    assert report.coverage_percent == 0

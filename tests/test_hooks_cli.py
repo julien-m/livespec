@@ -6,12 +6,14 @@
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 import pytest
 from typer.testing import CliRunner
 
 from validator.cli import app
+from validator.goal_hooks import _compile_hooks_payload
 from validator.integrations import _reset_warnings_for_tests
 
 
@@ -42,6 +44,34 @@ def _isolate_user_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Pat
 
 
 runner = CliRunner()
+
+
+# @spec(AC-015): Real pipeline hook output must satisfy its compiled evidence hash.
+@pytest.mark.parametrize("ending", ["", "\n", "\n\n"])
+def test_hooks_stdout_matches_compiled_context_hash(
+    tmp_path: Path,
+    _isolate_user_config: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    ending: str,
+) -> None:
+    hooks = _isolate_user_config / ".claude" / "livespec" / "hooks"
+    hooks.mkdir(parents=True)
+    (hooks / "before-feature.md").write_text("Apply the contract." + ending)
+    monkeypatch.chdir(tmp_path)
+    payload = _compile_hooks_payload(
+        command="spec-feature",
+        livespec_root=Path(__file__).resolve().parents[1],
+        project_root=tmp_path,
+        feature=None,
+    )["before"]
+
+    result = runner.invoke(
+        app, ["hooks", "resolve", "--event", "before", "--command", "feature"]
+    )
+
+    assert result.exit_code == 0
+    assert result.stdout
+    assert hashlib.sha256(result.stdout.encode()).hexdigest() == payload["context_sha256"]
 
 
 def test_hooks_resolve_absent_emits_empty_stdout_exit_zero() -> None:

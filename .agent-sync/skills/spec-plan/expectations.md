@@ -1,7 +1,7 @@
 ---
 command: spec-plan
 contract_version: "1.0"
-last_reviewed: 2026-09-05
+last_reviewed: 2026-09-07
 ---
 
 # Expectations — /spec-plan
@@ -178,3 +178,9 @@ Standard planning declares closed verification policy in every actual active pla
 Visual planning records a complete cumulative pre-dispatch review snapshot and packages the actual raw reviewer output through the internal review-result command. Missing review fields are rejected, never synthesized; transport packaging remains uncertified. Plan Review Done requires `--review-result`; missing or stale input, review findings or mismatched selection block the transition. Preparation reports READY with certified false. Subsequent design certification requires the approved baseline and a current Penflow PASS with certified true. No stdout PASS or registry finalization receipt substitutes for bound review approval.
 
 The C20 producer prepares missing test identifiers before first review through Penflow authority prepare; existing explicit identifiers remain unchanged. The machine snapshot gate delegates validate-flow-contract --require-test-ids and cannot publish active invalid or unidentified C20. Review never repairs approved identities.
+
+## Requirement evidence integrity (078)
+
+- **Read** [shared review/progression protocol](../../../system/review-protocol.md). Native/provider reviews use complete prepared context, actual raw JSON and current validated receipts. Missing, malformed, stale or partial evidence cannot certify readiness.
+- Direct and nested progression retain every unresolved critical clarification and require current semantic Analyze before application code; structural-only diagnostics do not authorize progression.
+- Preserve legacy archive interpretation and specialized bootstrap, conventions, finalization, visual and cumulative Penflow checks. Generated review caches remain disposable.

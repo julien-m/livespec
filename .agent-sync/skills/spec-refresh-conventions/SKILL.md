@@ -174,42 +174,42 @@ If `--dry-run` is passed, run Steps 1-3 and display the report at Step 5, but do
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-refresh-conventions --save`
-- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Lock goal contract via `livespec goal render spec-refresh-conventions --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 1 — Guard
 
-- [always] Verify .specs/ directory exists; abort with message if missing
+- [always] Verify .specs/ directory exists; abort with message if missing <!-- evidence:documentary -->
 
 ### Phase 2 — Legacy Detection
 
-- [always] Delete .conventions/conventions.md if legacy compiled format is found
+- [always] Delete .conventions/conventions.md if legacy compiled format is found <!-- evidence:documentary -->
 
 ### Phase 3 — Extract Stack Signals
 
-- [always] Read stacks/_default.md and project.md in full
-- [always] Extract flat list of keyword signals (technology names, architecture keywords)
+- [always] Read stacks/_default.md and project.md in full <!-- evidence:documentary -->
+- [always] Extract flat list of keyword signals (technology names, architecture keywords) <!-- evidence:documentary -->
 
 ### Phase 4 — Run Bootstrap Path
 
-- [always] Read ~/.claude/livespec/references/conventions-sync.md and follow Bootstrap Path
-- [always] Invoke /conventions.refresh --full with extracted signals
-- [always] Write .conventions/index.md and .conventions/manifest.yaml
+- [always] Read ~/.claude/livespec/references/conventions-sync.md and follow Bootstrap Path <!-- evidence:documentary -->
+- [always] Invoke /conventions.refresh --full with extracted signals <!-- evidence:documentary -->
+- [always] Write .conventions/index.md and .conventions/manifest.yaml <!-- evidence:documentary -->
 
 ### Phase 5 — Report
 
-- [always] Display verbose Conventions Bootstrap Report with signals, sub-domains, file count, and result
+- [always] Display verbose Conventions Bootstrap Report with signals, sub-domains, file count, and result <!-- evidence:documentary -->
 
 ## Definition of Done
 
-- [ ] Guard checks `.specs/` existence.
-- [ ] Legacy `.conventions/conventions.md` migrated (deleted) when present.
-- [ ] Stack signals extracted from `.specs/stacks/_default.md` (+ `.specs/project.md` if it exists).
-- [ ] Bootstrap Path from `conventions-sync.md` followed and `/conventions.refresh --full` invoked.
-- [ ] `.conventions/index.md` AND `.conventions/manifest.yaml` exist after execution (unless `--dry-run` or missing stack).
-- [ ] Verbose report displayed with signals, legacy status, sub-domains, file count.
-- [ ] `--dry-run` produces the report without writing files.
-- [ ] Works when no stack file exists (clean abort, no error).
+- [ ] Guard checks `.specs/` existence. <!-- evidence:documentary -->
+- [ ] Legacy `.conventions/conventions.md` migrated (deleted) when present. <!-- evidence:documentary -->
+- [ ] Stack signals extracted from `.specs/stacks/_default.md` (+ `.specs/project.md` if it exists). <!-- evidence:documentary -->
+- [ ] Bootstrap Path from `conventions-sync.md` followed and `/conventions.refresh --full` invoked. <!-- evidence:documentary -->
+- [ ] `.conventions/index.md` AND `.conventions/manifest.yaml` exist after execution (unless `--dry-run` or missing stack). <!-- evidence:documentary -->
+- [ ] Verbose report displayed with signals, legacy status, sub-domains, file count. <!-- evidence:documentary -->
+- [ ] `--dry-run` produces the report without writing files. <!-- evidence:documentary -->
+- [ ] Works when no stack file exists (clean abort, no error). <!-- evidence:documentary -->
 
 ---
 

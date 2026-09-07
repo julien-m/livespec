@@ -46,7 +46,9 @@ Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - depend
 
 > Iteratively refine existing LiveSpec artifacts (project, feature spec, or plan) through guided conversation — without risking downstream inconsistencies.
 
-> **Clarify gate note (Feature A):** the integrated Clarify gate (`/spec-feature` Phase 1.6 and `/spec-specify` Step 5.9) reuses this command's targeted-conversation + show-diff discipline to resolve a capped (≤ 5) set of spec ambiguities. Clarify writes `## Clarifications` in place and does **not** change `/spec-refine` eligibility: refine still only runs on `Draft`/`Review`/`Approved` artifacts and remains blocked once downstream (`In Progress`/`Implemented`) work exists.
+**Read** [complete review and progression](../../../system/review-protocol.md) before reporting downstream readiness. Accepted normative edits preserve requirement IDs and invalidate dependent review/proof; refresh affected evidence through the shared validator instead of retaining a prior PASS.
+
+> **Clarify gate note (Feature A):** the integrated Clarify gate (`/spec-feature` Phase 1.6 and `/spec-specify` Step 5.9) reuses this command's targeted-conversation + show-diff discipline to resolve the full inventory of spec ambiguities with a presentation slice of at most five. Clarify writes accepted decisions under `## Clarifications` in place, preserves requirement IDs and invalidates dependent readiness when meaning changes and does **not** change `/spec-refine` eligibility: refine still only runs on `Draft`/`Review`/`Approved` artifacts and remains blocked once downstream (`In Progress`/`Implemented`) work exists.
 
 ---
 
@@ -621,65 +623,65 @@ If the project refinement involves adding/replacing a technology, redirect to `/
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-refine --save`
-- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Lock goal contract via `livespec goal render spec-refine --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 1 — Resolve Target
 
-- [always] If no argument: scan .specs/ and present interactive menu of artifacts and statuses
-- [always] Resolve target by feature number, name, or "project" keyword
+- [always] If no argument: scan .specs/ and present interactive menu of artifacts and statuses <!-- evidence:documentary -->
+- [always] Resolve target by feature number, name, or "project" keyword <!-- evidence:documentary -->
 
 ### Phase 2 — Eligibility Check
 
-- [always] Read spec.md status and verify eligibility rules (Draft/Review/Approved allowed)
-- [always] Warn on Planned status (plan may need regeneration after refine)
-- [always] Block on In Progress, Implemented, Deprecated, or existing implementation.md for plans
+- [always] Read spec.md status and verify eligibility rules (Draft/Review/Approved allowed) <!-- evidence:documentary -->
+- [always] Warn on Planned status (plan may need regeneration after refine) <!-- evidence:documentary -->
+- [always] Block on In Progress, Implemented, Deprecated, or existing implementation.md for plans <!-- evidence:documentary -->
 
 ### Phase 3 — Read Artifact
 
-- [always] Read target artifact (spec.md or plan.md) and relevant context files
+- [always] Read target artifact (spec.md or plan.md) and relevant context files <!-- evidence:documentary -->
 
 ### Phase 4 — Present Current State and Converse
 
-- [always] Present summary of current artifact state and refinement options
-- [always] Ask 1-3 targeted questions based on selected refinement area (max 2 clarifications)
-- [always] Check recent .checks/ report and surface identified gaps as suggestions
+- [always] Present summary of current artifact state and refinement options <!-- evidence:documentary -->
+- [always] Ask 1-3 targeted questions based on selected refinement area (max 2 clarifications) <!-- evidence:documentary -->
+- [always] Check recent .checks/ report and surface identified gaps as suggestions <!-- evidence:documentary -->
 
 ### Phase 5 — Modification by Diff
 
-- [always] Present before/after diff of proposed changes
-- [always] Apply changes only after confirmation (unless --auto)
-- [always] Preserve all existing AC/FR/SC numbering (never renumber)
-- [always] Enforce quality gates after applying changes
+- [always] Present before/after diff of proposed changes <!-- evidence:documentary -->
+- [always] Apply changes only after confirmation (unless --auto) <!-- evidence:documentary -->
+- [always] Preserve all existing AC/FR/SC numbering (never renumber) <!-- evidence:documentary -->
+- [always] Enforce quality gates after applying changes <!-- evidence:documentary -->
 
 ### Phase 6 — Record Changes
 
-- [always] Add refinement entry to feature changelog.md or global .specs/changelog.md
-- [always] Update Last updated date in .specs/README.md
-- [always] Display downstream warnings when plan.md exists after spec refinement
+- [always] Add refinement entry to feature changelog.md or global .specs/changelog.md <!-- evidence:documentary -->
+- [always] Update Last updated date in .specs/README.md <!-- evidence:documentary -->
+- [always] Display downstream warnings when plan.md exists after spec refinement <!-- evidence:documentary -->
 
 ### Phase 7 — Roadmap and Re-evaluation
 
-- [always] Re-evaluate roadmap after project-level changes using inference matrix
-- [always] Propose adding new, stale, or modified roadmap items with before/after diff
-- [always] Apply roadmap changes after confirmation
+- [always] Re-evaluate roadmap after project-level changes using inference matrix <!-- evidence:documentary -->
+- [always] Propose adding new, stale, or modified roadmap items with before/after diff <!-- evidence:documentary -->
+- [always] Apply roadmap changes after confirmation <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-refine` is complete only if all are true:
 
-- [ ] Eligibility check passed (artifact is refinable)
-- [ ] Changes presented as diff (before/after)
-- [ ] Changes applied to target file(s)
-- [ ] Existing numbering preserved (no renumbering of AC/FR/SC)
-- [ ] Quality gates pass after refinement
-- [ ] Feature `changelog.md` has a refinement entry (if feature/plan flow)
-- [ ] Global `.specs/changelog.md` has a summary entry
-- [ ] `.specs/README.md` Last updated date refreshed
-- [ ] Downstream warnings displayed when applicable
-- [ ] Next action proposed
-- [ ] If `roadmap.md` exists and project-level changes applied: roadmap re-evaluation executed
-- [ ] If roadmap option selected: changes applied with before/after diff
+- [ ] Eligibility check passed (artifact is refinable) <!-- evidence:documentary -->
+- [ ] Changes presented as diff (before/after) <!-- evidence:documentary -->
+- [ ] Changes applied to target file(s) <!-- evidence:documentary -->
+- [ ] Existing numbering preserved (no renumbering of AC/FR/SC) <!-- evidence:documentary -->
+- [ ] Quality gates pass after refinement <!-- evidence:documentary -->
+- [ ] Feature `changelog.md` has a refinement entry (if feature/plan flow) <!-- evidence:documentary -->
+- [ ] Global `.specs/changelog.md` has a summary entry <!-- evidence:documentary -->
+- [ ] `.specs/README.md` Last updated date refreshed <!-- evidence:documentary -->
+- [ ] Downstream warnings displayed when applicable <!-- evidence:documentary -->
+- [ ] Next action proposed <!-- evidence:documentary -->
+- [ ] If `roadmap.md` exists and project-level changes applied: roadmap re-evaluation executed <!-- evidence:documentary -->
+- [ ] If roadmap option selected: changes applied with before/after diff <!-- evidence:documentary -->
 
 If no changes were made during the session, none of the above are required.
 

@@ -47,3 +47,7 @@
 - **Detail:** `_call_codex` passed the JSON schema inline to `cc-hub codex --schema`, which only accepts a file path (os error 63). Now writes the schema to a temp file, unwraps the response_format envelope, and normalizes `additionalProperties: false` for OpenAI strict mode. Verified end-to-end with the real plan-review `_REVIEW_SCHEMA`.
 
 <!-- finalize:spec-fix:2026-06-10:24ee3265 -->
+
+## 2026-09-06 — Requirement evidence policy
+
+Updated affected requirements before behavior changes; read [feature 078](../078-requirement-evidence-integrity/spec.md) for the complete versioned contract. Preserved existing IDs and historical entries.

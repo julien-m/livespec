@@ -103,3 +103,7 @@
 - **Docs modified:** `system/expectations.md`
 - **AC impacted:** AC-011, AC-012, AC-013
 - **Author:** codex
+
+## 2026-09-06 — Requirement evidence policy
+
+Updated affected requirements before behavior changes; read [feature 078](../078-requirement-evidence-integrity/spec.md) for the complete versioned contract. Preserved existing IDs and historical entries.

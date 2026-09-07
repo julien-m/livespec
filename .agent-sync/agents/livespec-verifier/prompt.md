@@ -132,6 +132,10 @@ When reviewing multiple files, spawn sub-agents to review them in parallel:
 
 ---
 
+## Complete native review result (spec-review and plan-review)
+
+**Read** [shared review protocol](../../../system/review-protocol.md). Consume every supplied prepared batch and return actual strict `ReviewResponse` JSON with exhaustive section/qualified-requirement IDs and exact citations; return the actual cross-batch synthesis when requested. Markdown findings supplement this raw result and cannot replace it. Do not fabricate a receipt, fill omitted requirements from a summary, or label an unresolved model default as a known identity. Preserve all existing bound Penflow review/result obligations.
+
 ## Mode: Plan Review
 
 Activated when dispatched with mode `plan-review`. In this mode, you review a **plan.md** against its **spec.md** — before any code is written. You never modify files.

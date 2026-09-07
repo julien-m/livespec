@@ -28,7 +28,7 @@ argument-hint: "<feature-name>"
 
 La toute première action lors de `/spec-implement` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+1. Résoudre feature et flags à partir des arguments de la commande (lecture seule). **Read** [Goal review identity](../../../system/review-protocol.md#goal-review-identity) before rendering: include the actual resolved reviewer model and forward it with any review budget, including when documentary acceptance proof is required without a semantic-review task.
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
 3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
@@ -50,6 +50,13 @@ La toute première action lors de `/spec-implement` est de poser le goal durable
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+
+## Requirement evidence integrity
+
+**Read** [complete review and progression](../../../system/review-protocol.md) before review or phase progression. Use actual prepared context and raw reviewer JSON; enforce the same source-backed Clarify/Analyze gates in direct and nested execution. Structural references, an empty findings summary, or `--no-review` cannot certify semantic readiness.
+
+
+**Typed acceptance proof:** During the existing independent review work, use the acceptance prepare/ingest flow for ACs explicitly declared `**Evidence:** review`; read every declared Review input and preserve actual native raw output. Keep default execution ACs mapped to observed passing assertions. Attach `acceptance_review_receipt_path` alongside `execution_receipt_path` for final feature tasks; the immutable full AC inventory must pass as a conjunction at prove, archive and verify-output. An unavailable baseline stays explicitly unavailable, never an invented before-image or blanket unchanged claim. No new user command or workflow phase is required.
 
 ## STEP 0.8 — Evidence-First Retry Contract
 
@@ -202,6 +209,8 @@ If the forward chain cannot produce `penflow/flow-ui-contract/`, `penflow/ui.pen
 **Before application code:** Complete the existing MockupFactory design workflow and require `livespec penflow-contract status --project . --required-profile design --feature <feature_slug> --json` to certify the current design. The forward-chain inspection above remains READY only.
 
 **Theme enforcement:** If `.specs/design/theme.css` exists, all UI implementation must use its CSS variables (`var(--primary)`, `var(--background)`, etc.) instead of hardcoded color/spacing values. If `theme.md` contains an install command, execute it as Step 0 before any UI code (skip if theme is already installed in the project).
+
+Before application code, run `livespec validate <feature-dir> --progression implement --model <resolved-model>`; a missing pipeline file does not waive current Clarify and Analyze readiness.
 
 ## Preflight Safety Contract
 
@@ -385,6 +394,8 @@ The **Spec Reviewer** must confirm:
 - [ ] All FR/AC assigned to this step are implemented
 - [ ] Every implemented FR has a `@spec FR-NNN: description — path/to/spec.md#fr-nnn` anchor (with deep-link) in the source file
 - [ ] No FR from `spec.md` is implemented partially (all-or-nothing per FR)
+
+The **Code Quality Reviewer** must review the actual acceptance mapping and exact assertion spans using the existing test surface: `livespec test --feature <feature> --acceptance-mapping <path> --prepare-mapping-review`. Return raw JSON matching the returned `response_schema` for every prepared batch, plus actual synthesis when required. The caller ingests that bundle with `--ingest-mapping-review <bundle>` on the same command. Never manufacture covered conclusions from test names or anchors. **Read** [execution evidence](../../../system/testing/execution-rules.md#execution-evidence) for runner capture and certification.
 
 The **Code Quality Reviewer** must confirm:
 - [ ] All resolved test commands pass (unit, integration, E2E, visual as applicable)
@@ -661,97 +672,97 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-implement --save`
-- [always] Emit `/goal` slash command with contract/state file reference
-- [always] Read generated contract/state files and begin ordered proof-based execution
+- [always] Lock goal contract via `livespec goal render spec-implement --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
+- [always] Read generated contract/state files and begin ordered proof-based execution <!-- evidence:documentary -->
 
 ### Phase 0.5 — Preflight Safety Contract
 
-- [always] Verify target feature directory exists
-- [always] Verify spec.md exists and status is not Deprecated
-- [always] Verify plan.md exists with no unresolved `[DECISION NEEDED]`
-- [always] Resolve project test commands from plan.md or discovery
-- [always] Spawn independent native sub-agent for `/spec-preflight --light` and gate on critical failures
+- [always] Verify target feature directory exists <!-- evidence:documentary -->
+- [always] Verify spec.md exists and status is not Deprecated <!-- evidence:documentary -->
+- [always] Verify plan.md exists with no unresolved `[DECISION NEEDED]` <!-- evidence:documentary -->
+- [always] Resolve project test commands from plan.md or discovery <!-- evidence:documentary -->
+- [always] Spawn independent native sub-agent for `/spec-preflight --light` and gate on critical failures <!-- evidence:documentary -->
 
 ### Phase 1 — Analyze
 
-- [always] Read spec.md, plan.md, constitution.md, stacks/_default.md, testing/strategy.md
-- [visual] Read mockup PNGs from .specs/design/screens/
-- [visual] Read theme.css and theme.md if they exist
-- [penflow] Read penflow/code-ir.json and penflow/semantic-ui-tree.json
-- [always] Detect behavioral AC section and load taxonomy if present
-- [always] Explore codebase for existing patterns, naming conventions, test utilities
+- [always] Read spec.md, plan.md, constitution.md, stacks/_default.md, testing/strategy.md <!-- evidence:documentary -->
+- [visual] Read mockup PNGs from .specs/design/screens/ <!-- evidence:documentary -->
+- [visual] Read theme.css and theme.md if they exist <!-- evidence:documentary -->
+- [penflow] Read penflow/code-ir.json and penflow/semantic-ui-tree.json <!-- evidence:documentary -->
+- [always] Detect behavioral AC section and load taxonomy if present <!-- evidence:documentary -->
+- [always] Explore codebase for existing patterns, naming conventions, test utilities <!-- evidence:documentary -->
 
 ### Phase 2 — Plan Execution
 
-- [always] Build ordered todo list from plan.md steps
-- [always] Run Step 0a behavioral TDD if `## Behavioral AC` present (RED phase required)
-- [always] Create progress.md before any step transitions to Done
-- [always] Execute each plan step with code, targeted tests, and step gate verification
-- [always] Write checkpoint to progress.md after every step
-- [always] Block step advancement on failing tests until iteration limit or Blocked status
+- [always] Build ordered todo list from plan.md steps <!-- evidence:documentary -->
+- [always] Run Step 0a behavioral TDD if `## Behavioral AC` present (RED phase required) <!-- evidence:execution applicable:behavioral-ac outcome:red -->
+- [always] Create progress.md before any step transitions to Done <!-- evidence:documentary -->
+- [always] Execute each plan step with code, targeted tests, and step gate verification <!-- evidence:execution -->
+- [always] Write checkpoint to progress.md after every step <!-- evidence:documentary -->
+- [always] Block step advancement on failing tests until iteration limit or Blocked status <!-- evidence:documentary -->
 
 ### Phase 3 — Convert & Dispatch (Multi-agent)
 
-- [always] Build Task Payload per step (context, instructions, TDD commands, DoD)
-- [always] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --repo . --full`; set to `NONE` only if refresh fails and the project is confirmed non-UI/no-stack
-- [always] Inline conventions payload for selected sub-domains
-- [always] Block or record `conventions: missing-ui-domains` when UI work lacks expected design convention domains
-- [always] Dispatch to `superpowers:subagent-driven-development` per step
-- [always] Receive subagent results and write progress.md checkpoint
+- [always] Build Task Payload per step (context, instructions, TDD commands, DoD) <!-- evidence:documentary -->
+- [always] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --repo . --full`; set to `NONE` only if refresh fails and the project is confirmed non-UI/no-stack <!-- evidence:documentary -->
+- [always] Inline conventions payload for selected sub-domains <!-- evidence:documentary -->
+- [always] Block or record `conventions: missing-ui-domains` when UI work lacks expected design convention domains <!-- evidence:documentary -->
+- [always] Dispatch to `superpowers:subagent-driven-development` per step <!-- evidence:documentary -->
+- [always] Receive subagent results and write progress.md checkpoint <!-- evidence:documentary -->
 
 ### Phase 5 — Visual Baselines
 
-- [visual] Capture baselines with resolved visual test command
-- [visual] Store screenshots to .specs/features/NNN/baselines/
-- [visual] Block on missing visual tooling for UI features
+- [visual] Capture baselines with resolved visual test command <!-- evidence:documentary -->
+- [visual] Store screenshots to .specs/features/NNN/baselines/ <!-- evidence:documentary -->
+- [visual] Block on missing visual tooling for UI features <!-- evidence:documentary -->
 
 ### Phase 6 — Validate
 
-- [always] Run full test suite: types → lint → unit → integration → E2E → visual
-- [visual] Confirm baseline PNG files have corresponding test references
-- [visual] Hold baseline commits until non-visual tests pass
+- [always] Run full test suite: types → lint → unit → integration → E2E → visual <!-- evidence:execution ac-scope:feature -->
+- [visual] Confirm baseline PNG files have corresponding test references <!-- evidence:documentary -->
+- [visual] Hold baseline commits until non-visual tests pass <!-- evidence:execution -->
 
 ### Phase 6.5 — Mandatory Visual Gate
 
-- [visual] Spawn independent native sub-agent for `/spec-test <feature> --auto --visual`
-- [visual] Require child evidence `{"visual_evidence_receipt_path":"<receipt-path>"}` from `livespec visual-gate certify` + `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path>`
-- [visual] Block Phase 7 on FAIL or BLOCKED visual gate verdict
+- [visual] Spawn independent native sub-agent for `/spec-test <feature> --auto --visual` <!-- evidence:documentary -->
+- [visual] Require child evidence `{"visual_evidence_receipt_path":"<receipt-path>"}` from `livespec visual-gate certify` + `livespec visual-gate validate --feature <slug> --command spec-test --target <t> --receipt <receipt-path>` <!-- evidence:documentary -->
+- [visual] Block Phase 7 on FAIL or BLOCKED visual gate verdict <!-- evidence:documentary -->
 
 ### Phase 7 — Update implementation.md
 
-- [always] Map every FR and AC to source file with `@spec` anchor and status
-- [visual] Add visual baseline entries to implementation.md
+- [always] Map every FR and AC to source file with `@spec` anchor and status <!-- evidence:documentary -->
+- [visual] Add visual baseline entries to implementation.md <!-- evidence:documentary -->
 
 ### Phase 8 — Update changelog.md
 
-- [always] Add entry to feature changelog.md
-- [always] Add summary entry to global .specs/changelog.md
+- [always] Add entry to feature changelog.md <!-- evidence:documentary -->
+- [always] Add summary entry to global .specs/changelog.md <!-- evidence:documentary -->
 
 ### Phase 8.5 — Finalize
 
-- [always] Finalize spec.md status via the machine gate: Implemented only after complete certification, otherwise In Progress; never manually assign Implemented
-- [always] Verify finalize apply updated .specs/README.md feature row and Recent Activity consistently with the persisted status
-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation
-- [always] Save execution log to logs/YYYY-MM-DD.md (unless --no-save)
+- [always] Finalize spec.md status via the machine gate: Implemented only after complete certification, otherwise In Progress; never manually assign Implemented <!-- evidence:documentary -->
+- [always] Verify finalize apply updated .specs/README.md feature row and Recent Activity consistently with the persisted status <!-- evidence:documentary -->
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation <!-- evidence:documentary -->
+- [always] Save execution log to logs/YYYY-MM-DD.md (unless --no-save) <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-implement` is complete only if all are true:
 
-- [ ] `progress.md` exists with a checkpoint row for every step executed
-- [ ] Planned FR scope for this run is implemented or explicitly deferred
-- [ ] Relevant tests pass for touched scope (or blocker documented)
-- [ ] For visual features, `/spec-test <feature> --auto --visual` completed with `Visual Gate Verdict: PASS` and returned `visual_evidence_receipt_path`
-- [ ] For visual features, every `## Screens` row has a visual test, current baseline artifact, and passing design-fidelity comparison
-- [ ] If `--no-visual` was used on a visual feature, status is `In Progress` and the skipped gate is documented
-- [ ] `implementation.md` updated with FR/AC -> `@spec` mappings
-- [ ] Feature `changelog.md` updated
-- [ ] Global `.specs/changelog.md` updated
-- [ ] `.specs/README.md` feature row Status updated (Implemented or In Progress)
-- [ ] `.specs/README.md` Recent Activity regenerated from changelog
-- [ ] Execution log saved to `logs/YYYY-MM-DD.md` (unless `--no-save`)
-- [ ] Resume point is saved when incomplete work remains
+- [ ] `progress.md` exists with a checkpoint row for every step executed <!-- evidence:documentary -->
+- [ ] Planned FR scope for this run is implemented or explicitly deferred <!-- evidence:documentary -->
+- [ ] Relevant tests pass for touched scope (or blocker documented) <!-- evidence:execution ac-scope:feature -->
+- [ ] For visual features, `/spec-test <feature> --auto --visual` completed with `Visual Gate Verdict: PASS` and returned `visual_evidence_receipt_path` <!-- evidence:documentary -->
+- [ ] For visual features, every `## Screens` row has a visual test, current baseline artifact, and passing design-fidelity comparison <!-- evidence:documentary -->
+- [ ] If `--no-visual` was used on a visual feature, status is `In Progress` and the skipped gate is documented <!-- evidence:documentary -->
+- [ ] `implementation.md` updated with FR/AC -> `@spec` mappings <!-- evidence:documentary -->
+- [ ] Feature `changelog.md` updated <!-- evidence:documentary -->
+- [ ] Global `.specs/changelog.md` updated <!-- evidence:documentary -->
+- [ ] `.specs/README.md` feature row Status updated (Implemented or In Progress) <!-- evidence:documentary -->
+- [ ] `.specs/README.md` Recent Activity regenerated from changelog <!-- evidence:documentary -->
+- [ ] Execution log saved to `logs/YYYY-MM-DD.md` (unless `--no-save`) <!-- evidence:documentary -->
+- [ ] Resume point is saved when incomplete work remains <!-- evidence:documentary -->
 
 If not complete, return a resumable status report instead of a success message.
 

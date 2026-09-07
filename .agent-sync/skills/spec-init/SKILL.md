@@ -1101,87 +1101,87 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-init --save`
-- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Lock goal contract via `livespec goal render spec-init --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase A — Brainstorm
 
-- [always] Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt
-- [always] If brainstorm detected and accepted: pre-fill project.md and skip to Phase B
-- [always] If no brainstorm: run 6-question conversational interview (Q1-Q6)
-- [always] Present project profile summary and confirm before proceeding
+- [always] Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt <!-- evidence:documentary -->
+- [always] If brainstorm detected and accepted: pre-fill project.md and skip to Phase B <!-- evidence:documentary -->
+- [always] If no brainstorm: run 6-question conversational interview (Q1-Q6) <!-- evidence:documentary -->
+- [always] Present project profile summary and confirm before proceeding <!-- evidence:documentary -->
 
 ### Phase B — Stack Decisions
 
-- [always] Run decision tree based on project profile signals
-- [always] Present recommended stack with justifications per layer
-- [always] Accept stack adjustments and confirm final stack
-- [always] Define testing strategy for the project type
-- [always] Ask dev tooling preferences (package manager, linter)
-- [always] Check design tool configuration; run wizard if not configured
-- [always] Detect and confirm brainstorm design/theme artifact import
-- [always] Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists
-- [always] Import theme.css and write theme.md if brainstorm theme detected
-- [always] Create at least 1 ADR per significant stack choice
+- [always] Run decision tree based on project profile signals <!-- evidence:documentary -->
+- [always] Present recommended stack with justifications per layer <!-- evidence:documentary -->
+- [always] Accept stack adjustments and confirm final stack <!-- evidence:documentary -->
+- [always] Define testing strategy for the project type <!-- evidence:documentary -->
+- [always] Ask dev tooling preferences (package manager, linter) <!-- evidence:documentary -->
+- [always] Check design tool configuration; run wizard if not configured <!-- evidence:documentary -->
+- [always] Detect and confirm brainstorm design/theme artifact import <!-- evidence:documentary -->
+- [always] Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists <!-- evidence:documentary -->
+- [always] Import theme.css and write theme.md if brainstorm theme detected <!-- evidence:documentary -->
+- [always] Create at least 1 ADR per significant stack choice <!-- evidence:documentary -->
 
 ### Phase C — Installation
 
-- [always] Create .specs/ directory structure with all required files
-- [always] Generate constitution.md from conversation and stack
-- [always] Generate project.md from Phase A answers
-- [always] Generate stacks/_default.md with `updated` frontmatter
-- [always] Generate testing/strategy.md from Phase B decisions
-- [always] Generate roadmap.md via inference matrix from project profile
-- [always] Create .specs/README.md with project name, ADRs, empty features table
-- [always] Install LiveSpec section in CLAUDE.md (create or update idempotently)
-- [always] Run sync-agent-assets.sh and verify all required skill/agent symlinks
-- [always] Install pre-commit hook via install-hooks.sh
-- [always] Write .specs/livespec-version and .specs/.livespec-path
-- [always] Update .gitignore with required patterns
-- [visual] Scaffold visual testing helpers if Playwright is available
+- [always] Create .specs/ directory structure with all required files <!-- evidence:documentary -->
+- [always] Generate constitution.md from conversation and stack <!-- evidence:documentary -->
+- [always] Generate project.md from Phase A answers <!-- evidence:documentary -->
+- [always] Generate stacks/_default.md with `updated` frontmatter <!-- evidence:documentary -->
+- [always] Generate testing/strategy.md from Phase B decisions <!-- evidence:documentary -->
+- [always] Generate roadmap.md via inference matrix from project profile <!-- evidence:documentary -->
+- [always] Create .specs/README.md with project name, ADRs, empty features table <!-- evidence:documentary -->
+- [always] Install LiveSpec section in CLAUDE.md (create or update idempotently) <!-- evidence:documentary -->
+- [always] Run sync-agent-assets.sh and verify all required skill/agent symlinks <!-- evidence:documentary -->
+- [always] Install pre-commit hook via install-hooks.sh <!-- evidence:documentary -->
+- [always] Write .specs/livespec-version and .specs/.livespec-path <!-- evidence:documentary -->
+- [always] Update .gitignore with required patterns <!-- evidence:documentary -->
+- [visual] Scaffold visual testing helpers if Playwright is available <!-- evidence:documentary -->
 
 ### Phase D — Preflight Setup
 
-- [always] Generate preflight.md from stack technologies catalog
-- [always] Scan .env for creds:* entries and add token checks
-- [always] Run 3-pass preflight engine (verify → auto-resolve → human blockers)
-- [always] Present human-required blockers grouped for resolution
-- [always] Ensure .gitignore has exact entry for .specs/preflight-report.md
+- [always] Generate preflight.md from stack technologies catalog <!-- evidence:documentary -->
+- [always] Scan .env for creds:* entries and add token checks <!-- evidence:documentary -->
+- [always] Run 3-pass preflight engine (verify → auto-resolve → human blockers) <!-- evidence:documentary -->
+- [always] Present human-required blockers grouped for resolution <!-- evidence:documentary -->
+- [always] Ensure .gitignore has exact entry for .specs/preflight-report.md <!-- evidence:documentary -->
 
 ### Phase E — Post-Init Hooks
 
-- [always] Scan and resolve after-init hook chain (3 levels)
-- [always] Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook
+- [always] Scan and resolve after-init hook chain (3 levels) <!-- evidence:documentary -->
+- [always] Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook <!-- evidence:documentary -->
 
 ### Exit Criteria (Must Pass)
 
 Before declaring success, verify:
 
-- [ ] `.specs/spec-system.md` exists
-- [ ] `.specs/project.md` contains users, scale, geography (or explicit placeholders)
-- [ ] `.specs/stacks/_default.md` contains chosen stack + rationale
-- [ ] At least 1 ADR exists in `.specs/stacks/decisions/`
-- [ ] `.specs/testing/strategy.md` exists
-- [ ] `.specs/README.md` exists with project name and initial ADRs
-- [ ] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block
-- [ ] `.specs/hooks/` directory exists
-- [ ] `.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`
-- [ ] `.gitignore` contains `.specs/hooks/*.local.md`
-- [ ] `.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned)
-- [ ] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)
-- [ ] `.specs/preflight.md` exists with checks generated from stack
-- [ ] `.specs/preflight-report.md` exists with execution results
-- [ ] After-init hooks resolved and executed (Phase E)
-- [ ] `.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)
-- [ ] `scripts/sync-agent-assets.sh` completed through `cc-hub`
-- [ ] `.agent-sync/skills/spec-*` resolves for all 22 LiveSpec skills
-- [ ] `.agent-sync/skills/source-command-cli` resolves
-- [ ] `.agent-sync/agents/livespec-*` resolves for all 4 LiveSpec agents
-- [ ] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo
-- [ ] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory
-- [ ] `.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`
-- [ ] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`
-- [ ] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)
+- [ ] `.specs/spec-system.md` exists <!-- evidence:documentary -->
+- [ ] `.specs/project.md` contains users, scale, geography (or explicit placeholders) <!-- evidence:documentary -->
+- [ ] `.specs/stacks/_default.md` contains chosen stack + rationale <!-- evidence:documentary -->
+- [ ] At least 1 ADR exists in `.specs/stacks/decisions/` <!-- evidence:documentary -->
+- [ ] `.specs/testing/strategy.md` exists <!-- evidence:documentary -->
+- [ ] `.specs/README.md` exists with project name and initial ADRs <!-- evidence:documentary -->
+- [ ] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block <!-- evidence:documentary -->
+- [ ] `.specs/hooks/` directory exists <!-- evidence:documentary -->
+- [ ] `.specs/design/` directory exists with `screens/` subdirectory and `changelog.md` <!-- evidence:documentary -->
+- [ ] `.gitignore` contains `.specs/hooks/*.local.md` <!-- evidence:documentary -->
+- [ ] `.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned) <!-- evidence:documentary -->
+- [ ] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable) <!-- evidence:documentary -->
+- [ ] `.specs/preflight.md` exists with checks generated from stack <!-- evidence:documentary -->
+- [ ] `.specs/preflight-report.md` exists with execution results <!-- evidence:documentary -->
+- [ ] After-init hooks resolved and executed (Phase E) <!-- evidence:documentary -->
+- [ ] `.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode) <!-- evidence:documentary -->
+- [ ] `scripts/sync-agent-assets.sh` completed through `cc-hub` <!-- evidence:documentary -->
+- [ ] `.agent-sync/skills/spec-*` resolves for all 22 LiveSpec skills <!-- evidence:documentary -->
+- [ ] `.agent-sync/skills/source-command-cli` resolves <!-- evidence:documentary -->
+- [ ] `.agent-sync/agents/livespec-*` resolves for all 4 LiveSpec agents <!-- evidence:documentary -->
+- [ ] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo <!-- evidence:documentary -->
+- [ ] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory <!-- evidence:documentary -->
+- [ ] `.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/` <!-- evidence:documentary -->
+- [ ] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed` <!-- evidence:documentary -->
+- [ ] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`) <!-- evidence:documentary -->
 
 If any check fails, report the exact missing artifact and create/fix it before finishing.
 

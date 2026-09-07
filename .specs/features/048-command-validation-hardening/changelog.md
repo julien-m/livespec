@@ -1,5 +1,9 @@
 # Changelog - Command Validation Hardening
 
+## 2026-09-06 — [Spec Update]: Precise traceback guard
+
+- **AC impacted:** AC-002. Accept the exact Python traceback header with an actual newline alongside the legacy broad signature; reject missing guards. Read [feature 078](../078-requirement-evidence-integrity/spec.md) for structured review output provenance.
+
 ## 2026-05-18 — [Spec Update]: Created
 
 - **Type:** Spec Update

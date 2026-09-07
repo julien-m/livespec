@@ -275,53 +275,53 @@ Flags are combinable: `--json --roadmap` outputs roadmap JSON only.
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-status --save`
-- [always] Read the emitted contract-file and state-file before execution
-- [always] Prove each contract task via `livespec goal prove`; never mark tasks complete manually
-- [always] Run `livespec goal status --state <state-file>` before DONE and require all tasks complete
+- [always] Lock goal contract via `livespec goal render spec-status --save` <!-- evidence:documentary -->
+- [always] Read the emitted contract-file and state-file before execution <!-- evidence:documentary -->
+- [always] Prove each contract task via `livespec goal prove`; never mark tasks complete manually <!-- evidence:documentary -->
+- [always] Run `livespec goal status --state <state-file>` before DONE and require all tasks complete <!-- evidence:documentary -->
 
 ### Phase 1 — Read Project Context
 
-- [always] Read `.specs/project.md` and extract project name
-- [always] Abort with init message if `.specs/` does not exist
+- [always] Read `.specs/project.md` and extract project name <!-- evidence:documentary -->
+- [always] Abort with init message if `.specs/` does not exist <!-- evidence:documentary -->
 
 ### Phase 2 — Read Roadmap
 
-- [always] Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred)
-- [always] Count checked/unchecked items per tier
-- [always] Extract linked feature numbers from checked items
+- [always] Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred) <!-- evidence:documentary -->
+- [always] Count checked/unchecked items per tier <!-- evidence:documentary -->
+- [always] Extract linked feature numbers from checked items <!-- evidence:documentary -->
 
 ### Phase 3 — Scan Features
 
-- [always] Scan `.specs/features/*/spec.md` for number, name, status, creation date
-- [always] Check presence of plan.md and implementation.md per feature
-- [always] Compute next action per feature using status/plan/impl matrix
+- [always] Scan `.specs/features/*/spec.md` for number, name, status, creation date <!-- evidence:documentary -->
+- [always] Check presence of plan.md and implementation.md per feature <!-- evidence:documentary -->
+- [always] Compute next action per feature using status/plan/impl matrix <!-- evidence:documentary -->
 
 ### Phase 4 — Detect Status Gaps
 
-- [always] Flag Draft features with no plan older than 7 days
-- [always] Flag features ready to implement (plan exists, no implementation)
-- [always] Detect deferred items and missing plans
+- [always] Flag Draft features with no plan older than 7 days <!-- evidence:documentary -->
+- [always] Flag features ready to implement (plan exists, no implementation) <!-- evidence:documentary -->
+- [always] Detect deferred items and missing plans <!-- evidence:documentary -->
 
 ### Phase 5 — Present Output
 
-- [always] Render summary header with correct roadmap and feature counts
-- [always] Render roadmap section (skipped if `--features`)
-- [always] Render features table (skipped if `--roadmap`)
-- [always] Render status gaps section if actionable gaps detected
-- [always] Emit JSON payload instead of formatted output (if `--json`)
+- [always] Render summary header with correct roadmap and feature counts <!-- evidence:documentary -->
+- [always] Render roadmap section (skipped if `--features`) <!-- evidence:documentary -->
+- [always] Render features table (skipped if `--roadmap`) <!-- evidence:documentary -->
+- [always] Render status gaps section if actionable gaps detected <!-- evidence:documentary -->
+- [always] Emit JSON payload instead of formatted output (if `--json`) <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-status` is complete only if all are true:
 
-- [ ] Project context was read (project.md exists)
-- [ ] Roadmap was parsed (if exists and not `--features`)
-- [ ] Feature inventory was scanned (if not `--roadmap`)
-- [ ] Summary header displays correct counts
-- [ ] Next action is computed for each feature based on status/plan/impl matrix
-- [ ] Status gaps detected and displayed (if any)
-- [ ] No files were created or modified (read-only command)
+- [ ] Project context was read (project.md exists) <!-- evidence:documentary -->
+- [ ] Roadmap was parsed (if exists and not `--features`) <!-- evidence:documentary -->
+- [ ] Feature inventory was scanned (if not `--roadmap`) <!-- evidence:documentary -->
+- [ ] Summary header displays correct counts <!-- evidence:documentary -->
+- [ ] Next action is computed for each feature based on status/plan/impl matrix <!-- evidence:documentary -->
+- [ ] Status gaps detected and displayed (if any) <!-- evidence:documentary -->
+- [ ] No files were created or modified (read-only command) <!-- evidence:documentary -->
 
 ---
 

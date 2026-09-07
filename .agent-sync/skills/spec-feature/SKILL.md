@@ -28,12 +28,13 @@ argument-hint: "[feature description]"
 La toute première action lors de `/spec-feature` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+   **Read** [goal review identity](../../../system/review-protocol.md#goal-review-identity) before locking a review-bearing goal; resolve the actual runtime model and preserve its internal flag through all child commands.
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
 3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-feature --feature <feature-slug> --flags "<active-flags>" --save
    ```
-   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
+   Si aucune feature fournie, omettre `--feature`. Le flag interne `--model=<actual-model>` reste présent même sans flag utilisateur.
    Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.state.json`
 4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
 5. Émettre la commande slash `/goal` avec hash et références machine :
@@ -49,6 +50,10 @@ La toute première action lors de `/spec-feature` est de poser le goal durable a
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+
+## Requirement evidence integrity
+
+**Read** [complete review and progression](../../../system/review-protocol.md) before review or phase progression. Use actual prepared context and raw reviewer JSON; enforce the same source-backed Clarify/Analyze gates in direct and nested execution. Structural references, an empty findings summary, or `--no-review` cannot certify semantic readiness.
 
 ## STEP 0.8 — Evidence-First Retry Contract
 
@@ -282,6 +287,8 @@ These are two distinct protocols at different scopes:
 ### Phase Agent Timeout and Artifact Recovery
 
 Phase agents must stop immediately after emitting `PHASE_RESULT`; no phase agent may keep editing README, changelog, or other docs after its required artifact and compact result are ready. The supervisor owns forward progress.
+
+A native wait returning pending or reaching its observation timeout while the child is still running is not a failed command or a phase timeout; it does not consume the transient-failure retry budget. Inspect fresh child status or progress and continue bounded waits within the actual declared execution deadline. Never interrupt an active review solely because one or two wait windows elapsed. Apply recovery only after an observed child exit/interruption, a real execution deadline, or a terminal failure; all review, goal, archive and Supervisor Verify requirements still apply.
 
 If a phase agent reaches the command timeout, exits without a parseable `PHASE_RESULT`, or is interrupted, the supervisor must inspect artifacts before blocking:
 
@@ -588,7 +595,7 @@ The main context displays findings and handles the user decision.
 
 **If `REVIEW: PASS` in PHASE_RESULT:**
 
-In `--auto` mode: proceed to Phase 2 immediately after Gate 1 succeeds.
+In `--auto` mode: proceed to Phase 1.6 Clarify after Gate 1 succeeds; Phase 2 requires shared clarification readiness.
 
 Interactive gate:
 > Phase 1 complete — Spec: `.specs/features/NNN-feature-name/spec.md`
@@ -610,7 +617,7 @@ Display gate with `FINDINGS_DETAIL` verbatim from PHASE_RESULT:
 > Type **continue** to proceed, describe changes to fix, or **abort**.
 
 **User options (interactive):**
-1. **continue** → proceed to Phase 2
+1. **continue** → proceed to Phase 1.6 Clarify; current mandatory findings cannot be overridden.
 2. **describe changes** → re-spawn Specify agent with the change description appended to the base prompt (per FINDINGS_DETAIL injection mechanism in § PHASE_RESULT Schemas)
 3. **abort** → stop pipeline
 
@@ -624,25 +631,10 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase spec-review --
 
 Runs after `spec-review` is done and **before** `plan`. This is an inline main-context gate (like Gate 1) — it does **not** spawn a sub-agent and adds no new command surface. It forces ambiguous specs to resolve their highest-impact unknowns before any planning starts.
 
-1. Read the feature `spec.md` at `.specs/features/NNN-feature-name/spec.md`.
-2. Build the capped question queue from the deterministic helper:
-   ```python
-   from pathlib import Path
-   from validator.clarify_gate import (
-       rank_clarification_opportunities,
-       scan_clarification_opportunities,
-   )
-
-   spec = Path(".specs/features/NNN-feature-name/spec.md")
-   queue = rank_clarification_opportunities(scan_clarification_opportunities(spec))  # <= 5
-   ```
-   The helper flags vague quality adjectives (`fast`/`scalable`/`secure`/`robust`, extensible seed) used without a numeric criterion in the same sentence, `[NEEDS CLARIFICATION]` placeholders, and unconfirmed `[ASSUMED]`/`TBD` assumptions, then ranks them by Impact × Uncertainty and caps the queue at 5.
-3. If the queue is empty → record "Clarify gate: no ambiguities" and continue to Plan.
-4. **Interactive:** ask **one question at a time**, in queue order. Accept the user's answer, then move to the next. Never exceed the 5 queued questions.
-   **`--auto`:** accept only deterministic recommendations grounded in the constitution or existing spec text. For any queued question that genuinely needs a human decision, emit `BLOCKED at step 1.6 - decision_needed - clarify question requires human answer` and stop — do not start Phase 2.
-5. Write accepted answers to `spec.md` under a `## Clarifications` heading, grouped by `### Session YYYY-MM-DD`, one bullet `- Q: <question> -> A: <answer>` per accepted answer. Do **not** create duplicate session bullets. Also update the affected spec section (FR/AC/SC text), not only the Clarifications log, and preserve existing AC/FR numbering.
-6. After every write: `livespec validate .specs/features/NNN-feature-name/spec.md --format compact`. If it fails, fix the spec and re-validate before continuing.
-7. On success: `livespec pipeline update --feature NNN-feature-name --phase clarify --status done --timestamp`, then continue to the Repository History Guard and Phase 2.
+- **Read** [shared clarification protocol](../../../system/review-protocol.md#clarification-without-lost-questions). Merge deterministic candidates with the current validated spec-review ambiguities; reuse accepted approved-context decisions instead of asking twice.
+- Preserve the complete inventory; present at most five unresolved questions at a time. The sixth critical question still blocks automatic progression. Missing or stale required review also blocks.
+- Write accepted decisions and affected wording in the existing spec, preserving IDs. Recollect and revalidate after every write; refresh the affected review when source identity changes.
+- Run `livespec validate <feature-dir> --progression plan --model <resolved-model>`. Only when it passes, run `livespec pipeline update --feature NNN-feature-name --phase clarify --status done --timestamp --model <resolved-model> [--review-max-chars <resolved-budget>]`, then continue through the Repository History Guard to Phase 2. No model call is added by the progression check.
 
 > **Resume note:** `clarify` is a main-context gate. On `--resume`, when `livespec pipeline next` returns `clarify`, the main context re-runs this gate inline (it is not a spawned phase agent like Specify/Plan/Implement/Test).
 
@@ -705,7 +697,7 @@ The Plan agent (Phase 2) runs the plan review internally and returns findings vi
 
 **If `REVIEW: PASS` in PHASE_RESULT:**
 
-In `--auto` mode: proceed to Phase 2.7 immediately.
+In `--auto` mode: proceed to Phase 2.6 Analyze; never skip to Preflight.
 
 Interactive gate:
 > Plan review passed — Plan: `.specs/features/NNN-feature-name/plan.md`
@@ -720,18 +712,18 @@ Interactive gate:
 > [FINDINGS_DETAIL verbatim from PHASE_RESULT]
 >
 > N BLOCKING, N WARNING, N INFO finding(s).
-> Options: describe changes to fix / **abort** for UI or accepted Penflow history with BLOCKING findings; **continue** (override) remains available only for non-UI without Penflow history.
+> Options: describe changes to fix / **abort** for UI or accepted Penflow history with BLOCKING findings; **continue** is available only after current mandatory semantic readiness holds; it cannot override a contradiction or missing proof.
 
 **User options (interactive):**
-1. **continue** → proceed to Phase 2.7 only after a bound PASS for UI or accepted Penflow history; blocking findings require corrections or abort.
+1. **continue** → proceed to Phase 2.6 Analyze after a current complete ready semantic review and, when applicable, bound Penflow PASS; blocking findings require correction or abort.
 2. **describe changes** → re-spawn Plan agent with the change description appended to the base prompt (per FINDINGS_DETAIL injection mechanism in § PHASE_RESULT Schemas)
 3. **abort** → stop pipeline
 
 **`--auto` mode with FINDINGS:** re-spawn Plan agent with `FINDINGS_DETAIL` injected into prompt (max 2 retries). If BLOCKING remain → abort. If only WARNING/INFO remain → proceed.
 
-For UI or accepted Penflow approval history, only the actual bound PASS review authorizes `plan.md` status Approved; blocking findings require a corrected snapshot and a fresh review. For non-UI without Penflow history, preserve the existing review decision flow.
+For UI or accepted Penflow approval history, only the actual bound PASS review authorizes `plan.md` status Approved; blocking findings require a corrected snapshot and a fresh review. Non-UI features also require current complete semantic readiness before Analyze can authorize implementation.
 
-Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status done --timestamp`; append `--review-result <review_result_path>` for UI work or accepted Penflow approval history. Use the actual bound review result returned by the Plan agent; missing results or blocking findings cannot be replaced by an interactive override.
+Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --status done --timestamp --model <resolved-model> [--review-max-chars <resolved-budget>]`; append `--review-result <review_result_path>` for UI work or accepted Penflow approval history. Use the actual bound review result returned by the Plan agent; missing results or blocking findings cannot be replaced by an interactive override.
 
 **UI design certification after approved spec and plan:** The Plan agent snapshots the complete governed selection, all specifications/plans and cumulative active requirements/outcome mappings with `livespec penflow-contract review-snapshot --feature <feature_slug> --json` before dispatching the actual reviewer and returns `extra.review_result_path`. The Plan Review transition validates that real result and publishes the approved baseline automatically, reusing the current MockupFactory/visual evidence when its inputs remain unchanged. Run `penflow run --target penflow --profile design --project . --json`, then `livespec penflow-contract status --project . --required-profile design --require-design-registry --require-mockup-validation --feature NNN-feature-name --json`. Require current design PASS with certified true before Analyze/Implement. Missing approved obligation bindings or stale evidence blocks; refresh only affected producer evidence, without mandating a second complete MockupFactory pass. Brainstorm's frozen product contract may supply design authority earlier; it does not substitute for missing approved LiveSpec requirements in this pipeline.
 
@@ -944,7 +936,7 @@ No commits are made by `/spec-feature` unless the user explicitly asks for a com
 When `--auto` is active and Phase 3.5 (Test) completes successfully:
 
 1. Run `$audit` (Codex) or `/audit` (Claude Code) using its current read-only skill and supported entry point. Read the findings; the authorized implementing agent applies necessary corrections in scope, reruns affected checks, then reruns the read-only audit. Unresolved blocking findings prevent closure; never pass an unsupported fix flag or ask the auditor to modify files.
-2. Verify all tests pass.
+2. Verify all tests pass. Submit the current `spec_review_receipt_path`, runner-owned `execution_receipt_path`, and any required `acceptance_review_receipt_path` for the coordinator final acceptance task. Read the [reviewed-spec binding](../../../system/review-protocol.md#documentary-acceptance): every current criterion must be certified, even when the parent contract was compiled before the spec existed.
 3. Run: `livespec git stage --feature NNN-feature-name` only when the user explicitly requested staging; otherwise leave files unstaged.
 4. Resolve commit hook from 3 levels (global → project → local) only to prepare context, applying inheritance rules from `system/hooks.md`.
 5. Run `livespec commit-context write --feature NNN-feature-name` and `livespec commit-context read` only when an explicit commit request will be executed next.
@@ -1070,135 +1062,135 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 ### Phase 0 — Goal Lock
 
-- [always] Verify no active goal exists
-- [always] Resolve feature slug and active flags from arguments
-- [always] Run `livespec goal render spec-feature --save` and save contract/state files
-- [always] Emit `/goal` slash command with hash and contract/state file reference
+- [always] Verify no active goal exists <!-- evidence:documentary -->
+- [always] Resolve feature slug and active flags from arguments <!-- evidence:documentary -->
+- [always] Run `livespec goal render spec-feature --save` and save contract/state files <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with hash and contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 0 — Roadmap Resolution (no argument)
 
-- [always] Read `.specs/roadmap.md` and find first unchecked item
-- [always] Display next roadmap feature and prompt for confirmation
-- [always] Run `livespec pipeline init` with resolved description and flags
+- [always] Read `.specs/roadmap.md` and find first unchecked item <!-- evidence:documentary -->
+- [always] Display next roadmap feature and prompt for confirmation <!-- evidence:documentary -->
+- [always] Run `livespec pipeline init` with resolved description and flags <!-- evidence:documentary -->
 
 ### Phase 0.5 — Penflow Forward Contract
 
-- [penflow] Detect UI feature from description keywords
-- [penflow] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --full`
-- [penflow] Generate flow-ui-contract files under `penflow/flow-ui-contract/`
-- [penflow] Mirror contract files to `.specs/features/<slug>/design/flow-ui-contract/`
-- [penflow] Run `penflow validate-flow-specs` on flow-ui-contract directory
-- [penflow] Run `penflow export-semantic-tree` to produce `semantic-ui-tree.json`
-- [penflow] Run `penflow validate-semantic-tree` on semantic tree
-- [penflow] Run `penflow draft-pen-from-tree` to produce `ui.pen`
-- [penflow] Run `penflow validate-pen` on `ui.pen`
-- [penflow] Run `penflow export-expected` to produce `expected-ui-tree.json`
-- [penflow] Run `penflow code-ir` to produce `code-ir.json`
-- [penflow] Run `livespec penflow-contract status --project . --json` and require noncertifying READY for preparation
-- [penflow] Sync validation outputs to feature design directory; keep `penflow/ui.pen` as the only `.pen`
-- [penflow] Promote design to Global LiveSpec Design Registry (`.specs/design/`)
-- [penflow] Export mockup PNGs into `.specs/design/screens/<slug>/`
-- [penflow] Create `.specs/design/baselines/<slug>/` destination
-- [penflow] Update `.specs/design/screens/index.md` and `changelog.md`
-- [penflow] Run `penflow map-pencil-context` to produce `pencil-context-map.json`
-- [penflow] Run `penflow detect-drift` and write drift-report artifacts
-- [penflow] Write `.mockup-validation/` audit artifacts and visual-evidence manifest
-- [penflow] Re-run `livespec penflow-contract status --project . --require-design-registry --require-mockup-validation --json` and require non-certifying READY; retain current MockupFactory and visual-evidence checks before Specify
-- [penflow] Verify all required paths exist before Phase 1
+- [penflow] Detect UI feature from description keywords <!-- evidence:documentary -->
+- [penflow] Ensure `.conventions/index.md` exists or run `livespec conventions refresh --full` <!-- evidence:documentary -->
+- [penflow] Generate flow-ui-contract files under `penflow/flow-ui-contract/` <!-- evidence:documentary -->
+- [penflow] Mirror contract files to `.specs/features/<slug>/design/flow-ui-contract/` <!-- evidence:documentary -->
+- [penflow] Run `penflow validate-flow-specs` on flow-ui-contract directory <!-- evidence:documentary -->
+- [penflow] Run `penflow export-semantic-tree` to produce `semantic-ui-tree.json` <!-- evidence:documentary -->
+- [penflow] Run `penflow validate-semantic-tree` on semantic tree <!-- evidence:documentary -->
+- [penflow] Run `penflow draft-pen-from-tree` to produce `ui.pen` <!-- evidence:documentary -->
+- [penflow] Run `penflow validate-pen` on `ui.pen` <!-- evidence:documentary -->
+- [penflow] Run `penflow export-expected` to produce `expected-ui-tree.json` <!-- evidence:documentary -->
+- [penflow] Run `penflow code-ir` to produce `code-ir.json` <!-- evidence:documentary -->
+- [penflow] Run `livespec penflow-contract status --project . --json` and require noncertifying READY for preparation <!-- evidence:documentary -->
+- [penflow] Sync validation outputs to feature design directory; keep `penflow/ui.pen` as the only `.pen` <!-- evidence:documentary -->
+- [penflow] Promote design to Global LiveSpec Design Registry (`.specs/design/`) <!-- evidence:documentary -->
+- [penflow] Export mockup PNGs into `.specs/design/screens/<slug>/` <!-- evidence:documentary -->
+- [penflow] Create `.specs/design/baselines/<slug>/` destination <!-- evidence:documentary -->
+- [penflow] Update `.specs/design/screens/index.md` and `changelog.md` <!-- evidence:documentary -->
+- [penflow] Run `penflow map-pencil-context` to produce `pencil-context-map.json` <!-- evidence:documentary -->
+- [penflow] Run `penflow detect-drift` and write drift-report artifacts <!-- evidence:documentary -->
+- [penflow] Write `.mockup-validation/` audit artifacts and visual-evidence manifest <!-- evidence:documentary -->
+- [penflow] Re-run `livespec penflow-contract status --project . --require-design-registry --require-mockup-validation --json` and require non-certifying READY; retain current MockupFactory and visual-evidence checks before Specify <!-- evidence:documentary -->
+- [penflow] Verify all required paths exist before Phase 1 <!-- evidence:documentary -->
 
 ### Phase 1 — Specify
 
-- [always] Run `livespec pipeline update --phase specify --status in_progress`
-- [always] Build Universal Agent Context with feature_name, feature_dir, feature_description, active_flags, conventions
-- [always] Spawn Specify agent with Universal Agent Context
-- [always] Receive and parse PHASE_RESULT from Specify agent
-- [always] Run supervisor Verify phase: livespec verify-output spec-specify --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
-- [always] Run `livespec pipeline update --phase specify --status done` on OK
+- [always] Run `livespec pipeline update --phase specify --status in_progress` <!-- evidence:documentary -->
+- [always] Build Universal Agent Context with feature_name, feature_dir, feature_description, active_flags, conventions <!-- evidence:documentary -->
+- [always] Spawn Specify agent with Universal Agent Context <!-- evidence:documentary -->
+- [always] Receive and parse PHASE_RESULT from Specify agent <!-- evidence:documentary -->
+- [always] Run supervisor Verify phase: livespec verify-output spec-specify --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement <!-- evidence:documentary -->
+- [always] Run `livespec pipeline update --phase specify --status done` on OK <!-- evidence:documentary -->
 
 ### Phase 1.5 — Spec Review Gate
 
-- [always] Display spec review findings from PHASE_RESULT
-- [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING)
-- [always] Run `livespec pipeline update --phase spec-review --status done`
+- [always] Display spec review findings from PHASE_RESULT <!-- evidence:documentary -->
+- [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING) <!-- evidence:documentary -->
+- [always] Run `livespec pipeline update --phase spec-review --status done` <!-- evidence:documentary -->
 
 ### Phase 1.6 — Clarify Gate
 
-- [always] Run integrated Clarify gate after spec review and before plan; update spec.md or block before Phase 2
+- [always] Run integrated Clarify gate after spec review and before plan; update spec.md or block before Phase 2 <!-- evidence:review review-kind:spec -->
 
 ### Phase 2 — Plan
 
-- [always] Run `livespec pipeline update --phase plan --status in_progress`
-- [always] Build Universal Agent Context for plan phase with conventions
-- [always] Spawn Plan agent with Universal Agent Context
-- [always] Receive and parse PHASE_RESULT from Plan agent
-- [always] Run supervisor Verify phase: livespec verify-output spec-plan --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
-- [always] Run `livespec pipeline update --phase plan --status done` on OK
+- [always] Run `livespec pipeline update --phase plan --status in_progress` <!-- evidence:documentary -->
+- [always] Build Universal Agent Context for plan phase with conventions <!-- evidence:documentary -->
+- [always] Spawn Plan agent with Universal Agent Context <!-- evidence:documentary -->
+- [always] Receive and parse PHASE_RESULT from Plan agent <!-- evidence:documentary -->
+- [always] Run supervisor Verify phase: livespec verify-output spec-plan --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement <!-- evidence:documentary -->
+- [always] Run `livespec pipeline update --phase plan --status done` on OK <!-- evidence:documentary -->
 
 ### Phase 2.5 — Plan Review Gate
 
-- [always] Display plan review findings from PHASE_RESULT
-- [always] Update `plan.md` status to Approved on PASS
-- [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING)
-- [always] Run `livespec pipeline update --phase plan-review --status done`; append `--review-result <review_result_path>` for UI or accepted Penflow history, preserving the actual Plan reviewer result
-- [penflow] After the bound Plan Review transition published approved FR/AC authority; run `penflow run --target penflow --profile design --project . --json` then `livespec penflow-contract status --project . --required-profile design --require-design-registry --require-mockup-validation --feature <feature_slug> --json`; require certified design PASS before application code, reusing unchanged visual evidence
+- [always] Display plan review findings from PHASE_RESULT <!-- evidence:documentary -->
+- [always] Update `plan.md` status to Approved on PASS <!-- evidence:documentary -->
+- [always] Handle user decision: continue / fix / abort (or auto-retry up to 2x on BLOCKING) <!-- evidence:documentary -->
+- [always] Run `livespec pipeline update --phase plan-review --status done`; append `--review-result <review_result_path>` for UI or accepted Penflow history, preserving the actual Plan reviewer result <!-- evidence:review review-kind:plan -->
+- [penflow] After the bound Plan Review transition published approved FR/AC authority; run `penflow run --target penflow --profile design --project . --json` then `livespec penflow-contract status --project . --required-profile design --require-design-registry --require-mockup-validation --feature <feature_slug> --json`; require certified design PASS before application code, reusing unchanged visual evidence <!-- evidence:documentary -->
 
 ### Phase 2.6 — Analyze Gate
 
-- [always] Spawn independent native sub-agent for `/spec-check --pre-impl <feature>` before preflight
-- [always] Run supervisor Verify phase: livespec verify-output spec-check --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
-- [always] Block implementation when Analyze reports CRITICAL or HIGH findings; run `livespec pipeline update --phase analyze --status blocked` and stop before Preflight
-- [always] Run `livespec pipeline update --phase analyze --status done` when no CRITICAL or HIGH findings
+- [always] Spawn independent native sub-agent for `/spec-check --pre-impl <feature>` before preflight <!-- evidence:review review-kind:plan -->
+- [always] Run supervisor Verify phase: livespec verify-output spec-check --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement <!-- evidence:documentary -->
+- [always] Block implementation when Analyze reports CRITICAL or HIGH findings; run `livespec pipeline update --phase analyze --status blocked` and stop before Preflight <!-- evidence:documentary -->
+- [always] Run `livespec pipeline update --phase analyze --status done` when no CRITICAL or HIGH findings <!-- evidence:documentary -->
 
 ### Phase 2.7 — Preflight
 
-- [always] Spawn independent native sub-agent for `/spec-preflight --light` with current feature context
-- [always] Run supervisor Verify phase: livespec verify-output spec-preflight --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
-- [always] Write `preflight-report.md` with READY / WARNINGS / BLOCKED verdict
-- [always] Run `livespec pipeline update --phase preflight --status blocked` on critical failure
+- [always] Spawn independent native sub-agent for `/spec-preflight --light` with current feature context <!-- evidence:documentary -->
+- [always] Run supervisor Verify phase: livespec verify-output spec-preflight --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement <!-- evidence:documentary -->
+- [always] Write `preflight-report.md` with READY / WARNINGS / BLOCKED verdict <!-- evidence:documentary -->
+- [always] Run `livespec pipeline update --phase preflight --status blocked` on critical failure <!-- evidence:documentary -->
 
 ### Phase 3 — Implement
 
-- [always] Run `livespec pipeline update --phase implement --status in_progress`
-- [always] Build Universal Agent Context for implement phase with conventions
-- [always] Spawn Implement agent with Universal Agent Context
-- [always] Receive and parse PHASE_RESULT from Implement agent
-- [always] Run supervisor Verify phase: livespec verify-output spec-implement --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
-- [always] Run `livespec pipeline update --phase implement --status done` on OK
+- [always] Run `livespec pipeline update --phase implement --status in_progress` <!-- evidence:documentary -->
+- [always] Build Universal Agent Context for implement phase with conventions <!-- evidence:documentary -->
+- [always] Spawn Implement agent with Universal Agent Context <!-- evidence:documentary -->
+- [always] Receive and parse PHASE_RESULT from Implement agent <!-- evidence:documentary -->
+- [always] Run supervisor Verify phase: livespec verify-output spec-implement --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement <!-- evidence:documentary -->
+- [always] Run `livespec pipeline update --phase implement --status done` on OK <!-- evidence:documentary -->
 
 ### Phase 3.5 — Test
 
-- [always] Run `livespec pipeline update --phase test --status in_progress`
-- [always] Spawn Test agent with `--auto --update` instructions
-- [visual] Open app in browser at 1440x900 and capture runtime screenshots
-- [visual] Publish runtime screenshots and validation PNGs via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print `Visual preview: unavailable - visual-preview CLI missing`
-- [visual] Sync approved screenshots to `.specs/design/baselines/<slug>/`
-- [penflow] Emit `penflow/actual-ui-tree.json` from live DOM/accessibility surface
-- [penflow] Run `penflow validate-actual` on actual UI tree
-- [penflow] Run `penflow compare-tree` expected vs actual and write compare-report
-- [penflow] Run `penflow review-report` and `penflow fix-report` on compare results
-- [penflow] Run `penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json` after final runtime capture and behavioral evidence
-- [penflow] Run `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json` and require certified PASS
-- [always] Receive and parse PHASE_RESULT from Test agent
-- [always] Run supervisor Verify phase: livespec verify-output spec-test --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement
-- [always] Run `livespec pipeline update --phase test --status done` (UI: append `--build-manifest <runner_build_manifest>` from the completed test child) only on complete required AC coverage and current implementation certification for UI; partial coverage stays incomplete
+- [always] Run `livespec pipeline update --phase test --status in_progress` <!-- evidence:documentary -->
+- [always] Spawn Test agent with `--auto --update` instructions <!-- evidence:documentary -->
+- [visual] Open app in browser at 1440x900 and capture runtime screenshots <!-- evidence:documentary -->
+- [visual] Publish runtime screenshots and validation PNGs via `![visual proof](/absolute/path/to/image.png)`, `visual-preview url /absolute/path/to/image.png`, and `Open for annotation: http://127.0.0.1:<port>/i/<id>`; if unavailable, print `Visual preview: unavailable - visual-preview CLI missing` <!-- evidence:documentary -->
+- [visual] Sync approved screenshots to `.specs/design/baselines/<slug>/` <!-- evidence:documentary -->
+- [penflow] Emit `penflow/actual-ui-tree.json` from live DOM/accessibility surface <!-- evidence:documentary -->
+- [penflow] Run `penflow validate-actual` on actual UI tree <!-- evidence:documentary -->
+- [penflow] Run `penflow compare-tree` expected vs actual and write compare-report <!-- evidence:documentary -->
+- [penflow] Run `penflow review-report` and `penflow fix-report` on compare results <!-- evidence:documentary -->
+- [penflow] Run `penflow run --target penflow --profile implementation --build-manifest <runner_build_manifest> --project . --json` after final runtime capture and behavioral evidence <!-- evidence:documentary -->
+- [penflow] Run `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json` and require certified PASS <!-- evidence:documentary -->
+- [always] Receive and parse PHASE_RESULT from Test agent <!-- evidence:documentary -->
+- [always] Run supervisor Verify phase: livespec verify-output spec-test --run <RUN_ARTIFACT> --json, cross-check declared status vs machine outcome per the Verify matrix, block on disagreement <!-- evidence:documentary -->
+- [always] Run `livespec pipeline update --phase test --status done` (UI: append `--build-manifest <runner_build_manifest>` from the completed test child) only on complete required AC coverage and current implementation certification for UI; partial coverage stays incomplete <!-- evidence:documentary -->
 
 ### Phase 3.6 — Visual Gate (non-skippable for VISUAL features)
 
-- [visual] Require the child `/spec-test` receipt or capture a fresh feature-level run: `livespec visual-gate certify --feature <slug> --command spec-feature --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path> --json`
-- [visual] Require child `/spec-test` PHASE_RESULT visual proof Markdown, Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing`, and `visual_evidence_receipt_path` before reporting UI success
-- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
-- [visual] Exit 0 → autoriser Phase 4 ; exit 6 ou 7 → BLOQUER la finalisation et `--auto` ; consigner `link_violations`, `runtime_in_design_screens_violations`, `missing_artifacts`
-- [visual] Nested skills (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-fix`) tournent en sub-agents Task tool indépendants — chacun avec son goal — pour respecter la règle single-goal du parent `/spec-feature`
+- [visual] Require the child `/spec-test` receipt or capture a fresh feature-level run: `livespec visual-gate certify --feature <slug> --command spec-feature --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path> --json` <!-- evidence:documentary -->
+- [visual] Require child `/spec-test` PHASE_RESULT visual proof Markdown, Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing`, and `visual_evidence_receipt_path` before reporting UI success <!-- evidence:documentary -->
+- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity <!-- evidence:documentary -->
+- [visual] Exit 0 → autoriser Phase 4 ; exit 6 ou 7 → BLOQUER la finalisation et `--auto` ; consigner `link_violations`, `runtime_in_design_screens_violations`, `missing_artifacts` <!-- evidence:documentary -->
+- [visual] Nested skills (`/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-fix`) tournent en sub-agents Task tool indépendants — chacun avec son goal — pour respecter la règle single-goal du parent `/spec-feature` <!-- evidence:documentary -->
 
 ### Phase 4 — Git Finalization
 
-- [always] Run the read-only audit, apply required corrections through the authorized implementing agent, rerun affected checks and audit, and verify zero unresolved blocking findings
-- [always] Verify all tests pass after audit
-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation
-- [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path>` exit_code != 0 (VISUAL features only)
-- [always] Run `livespec commit-context write` only if explicit commit requested
-- [always] Print `Commit: skipped - no explicit user authorization` if no commit requested
-- [always] Emit SHIP_RESULT block if called from `/spec-ship`
+- [always] Run the read-only audit, apply required corrections through the authorized implementing agent, rerun affected checks and audit, and verify zero unresolved blocking findings <!-- evidence:documentary -->
+- [always] Verify all tests pass after audit <!-- evidence:execution ac-scope:feature ac-binding:reviewed-spec -->
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation <!-- evidence:documentary -->
+- [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path>` exit_code != 0 (VISUAL features only) <!-- evidence:documentary -->
+- [always] Run `livespec commit-context write` only if explicit commit requested <!-- evidence:documentary -->
+- [always] Print `Commit: skipped - no explicit user authorization` if no commit requested <!-- evidence:documentary -->
+- [always] Emit SHIP_RESULT block if called from `/spec-ship` <!-- evidence:documentary -->
 
 ## Run Artifact Emission
 

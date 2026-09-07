@@ -366,54 +366,54 @@ Legacy aliases such as `/spec.check` are normalized to the matching `spec-check`
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-hooks --save`
-- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Lock goal contract via `livespec goal render spec-hooks --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 1 — Resolve Command Name
 
-- [always] Normalize command name (strip spec- prefix, validate against known command list)
-- [always] If no argument: prepare to show hooks for all commands
+- [always] Normalize command name (strip spec- prefix, validate against known command list) <!-- evidence:documentary -->
+- [always] If no argument: prepare to show hooks for all commands <!-- evidence:documentary -->
 
 ### Phase 2 — Scan Hook Locations (Diagnostic Mode)
 
-- [always] Scan Level 0 user integrations via `livespec integrations list`
-- [always] Scan global, project, and local hook files for before/after timing
-- [always] Scan step-level hooks if command is `implement`
-- [always] Parse frontmatter mode (extend / override) for each found file
+- [always] Scan Level 0 user integrations via `livespec integrations list` <!-- evidence:documentary -->
+- [always] Scan global, project, and local hook files for before/after timing <!-- evidence:documentary -->
+- [always] Scan step-level hooks if command is `implement` <!-- evidence:documentary -->
+- [always] Parse frontmatter mode (extend / override) for each found file <!-- evidence:documentary -->
 
 ### Phase 3 — Display Results
 
-- [always] Show single-command hook chain or summary table for all commands
-- [always] Mark SKIPPED hooks when override mode is active
-- [always] Show first 10 lines of each hook file if --verbose
+- [always] Show single-command hook chain or summary table for all commands <!-- evidence:documentary -->
+- [always] Mark SKIPPED hooks when override mode is active <!-- evidence:documentary -->
+- [always] Show first 10 lines of each hook file if --verbose <!-- evidence:documentary -->
 
 ### Phase C — Create Mode (if --create)
 
-- [always] Resolve target file path based on --global / --local flag
-- [always] Check if file already exists and offer edit if so
-- [always] Create .specs/hooks/ directory if missing; verify .gitignore for *.local.md
-- [always] Write hook file with YAML frontmatter template and variable placeholders
-- [always] Guide user to fill in Instructions section content
+- [always] Resolve target file path based on --global / --local flag <!-- evidence:documentary -->
+- [always] Check if file already exists and offer edit if so <!-- evidence:documentary -->
+- [always] Create .specs/hooks/ directory if missing; verify .gitignore for *.local.md <!-- evidence:documentary -->
+- [always] Write hook file with YAML frontmatter template and variable placeholders <!-- evidence:documentary -->
+- [always] Guide user to fill in Instructions section content <!-- evidence:documentary -->
 
 ### Phase E — Edit Mode (if --edit)
 
-- [always] Resolve target file; suggest --create if file missing
-- [always] Display current content and accept modifications
+- [always] Resolve target file; suggest --create if file missing <!-- evidence:documentary -->
+- [always] Display current content and accept modifications <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-hooks` is complete when:
 
-- [ ] All 3 hook levels are scanned (global, project, local)
-- [ ] Step-level hooks are shown for `implement` command
-- [ ] Override mode is correctly reflected (parent hooks marked as SKIPPED)
-- [ ] Summary view shows all commands when no argument provided
-- [ ] `--create` generates a well-formed hook with frontmatter and template
-- [ ] `--create` handles existing files (shows content, offers edit)
-- [ ] `--create` creates `.specs/hooks/` directory if missing
-- [ ] `--create --local` verifies `.gitignore` includes `*.local.md`
-- [ ] `--edit` shows current content and accepts modifications
-- [ ] `--step` flag targets step-level hooks for implement
+- [ ] All 3 hook levels are scanned (global, project, local) <!-- evidence:documentary -->
+- [ ] Step-level hooks are shown for `implement` command <!-- evidence:documentary -->
+- [ ] Override mode is correctly reflected (parent hooks marked as SKIPPED) <!-- evidence:documentary -->
+- [ ] Summary view shows all commands when no argument provided <!-- evidence:documentary -->
+- [ ] `--create` generates a well-formed hook with frontmatter and template <!-- evidence:documentary -->
+- [ ] `--create` handles existing files (shows content, offers edit) <!-- evidence:documentary -->
+- [ ] `--create` creates `.specs/hooks/` directory if missing <!-- evidence:documentary -->
+- [ ] `--create --local` verifies `.gitignore` includes `*.local.md` <!-- evidence:documentary -->
+- [ ] `--edit` shows current content and accepts modifications <!-- evidence:documentary -->
+- [ ] `--step` flag targets step-level hooks for implement <!-- evidence:documentary -->
 
 ---
 

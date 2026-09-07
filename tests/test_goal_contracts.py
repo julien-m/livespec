@@ -195,9 +195,9 @@ description: Demo command
 
 `/spec-demo` is complete only if all are true:
 
-- [ ] `demo.txt` exists
-- [ ] Output contains `done`
-- [ ] No traceback was emitted
+- [ ] `demo.txt` exists <!-- evidence:documentary -->
+- [ ] Output contains `done` <!-- evidence:documentary -->
+- [ ] No traceback was emitted <!-- evidence:documentary -->
 
 If any item fails, fix before returning final output.
 """
@@ -212,22 +212,22 @@ description: Demo command
 
 ## Execution Tasks
 
-- [always] Always task
-- [visual] Visual task
-- [penflow] Penflow task
-- [generate] Generate task
-- [visual-generate] Visual generate task
-- [execute] Execute task
-- [surfaces] Surfaces task
-- [quality-only] Quality task
-- [tree-only] Tree task
-- [visual-status] Visual status task
-- [multi] Multi task
-- [fix] Fix task
+- [always] Always task <!-- evidence:documentary -->
+- [visual] Visual task <!-- evidence:documentary -->
+- [penflow] Penflow task <!-- evidence:documentary -->
+- [generate] Generate task <!-- evidence:documentary -->
+- [visual-generate] Visual generate task <!-- evidence:documentary -->
+- [execute] Execute task <!-- evidence:documentary -->
+- [surfaces] Surfaces task <!-- evidence:documentary -->
+- [quality-only] Quality task <!-- evidence:documentary -->
+- [tree-only] Tree task <!-- evidence:documentary -->
+- [visual-status] Visual status task <!-- evidence:documentary -->
+- [multi] Multi task <!-- evidence:documentary -->
+- [fix] Fix task <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
-- [ ] Done
+- [ ] Done <!-- evidence:documentary -->
 """
 
 INLINE_INTERNAL_COMMAND_SKILL = """\
@@ -736,6 +736,10 @@ def test_goal_prove_requires_resolved_before_hook_context(tmp_path: Path) -> Non
         },
     }
     contract = json.loads(render_goal_contract_file(goal))
+    # This fixture exercises the preserved historical validator contract.
+    contract.pop("evidence_policy_version", None)
+    contract["canonical"].pop("evidence_policy_version", None)
+    contract["canonical_json"] = json.dumps(contract["canonical"])
     contract["tasks"].insert(0, hook_task)
     state = json.loads(render_goal_state_file(goal))
     state["tasks"]["hooks.before"] = {
@@ -777,6 +781,72 @@ def test_goal_prove_requires_resolved_before_hook_context(tmp_path: Path) -> Non
     )
 
     assert accepted["status"] == "ACCEPTED"
+
+
+@pytest.mark.parametrize("malformation", ["contract_tasks", "contract_task"])
+def test_non_init_proof_preserves_unknown_task_for_malformed_contract_tasks(
+    tmp_path: Path, malformation: str
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    goal = compile_command_goal("spec-demo", project_root=project_root, livespec_root=livespec_root)
+    contract = json.loads(render_goal_contract_file(goal))
+    # This fixture exercises the preserved historical validator contract.
+    contract.pop("evidence_policy_version", None)
+    contract["canonical"].pop("evidence_policy_version", None)
+    contract["canonical_json"] = json.dumps(contract["canonical"])
+    state = json.loads(render_goal_state_file(goal))
+    task_id = contract["tasks"][0]["id"]
+    if malformation == "contract_tasks":
+        contract["tasks"] = "invalid"
+    else:
+        contract["tasks"] = ["invalid"]
+
+    result = prove_goal_task(contract, state, task_id, {"output": "done"})
+
+    assert result["status"] == "REJECTED_UNKNOWN_TASK"
+    assert result["state"] == state
+
+
+@pytest.mark.parametrize("malformation", ["state_tasks", "state_task", "attempts"])
+def test_non_init_proof_rejects_present_malformed_state_shapes(
+    tmp_path: Path, malformation: str
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    goal = compile_command_goal("spec-demo", project_root=project_root, livespec_root=livespec_root)
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+    task_id = contract["tasks"][0]["id"]
+    if malformation == "state_tasks":
+        state["tasks"] = []
+    elif malformation == "state_task":
+        state["tasks"][task_id] = []
+    else:
+        state["tasks"][task_id]["attempts"] = {}
+
+    with pytest.raises(TypeError):
+        prove_goal_task(contract, state, task_id, {"output": "done"})
+
+
+@pytest.mark.parametrize("missing_field", ["ordinal", "description"])
+def test_non_init_proof_preserves_missing_task_field_key_error(
+    tmp_path: Path, missing_field: str
+) -> None:
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    goal = compile_command_goal("spec-demo", project_root=project_root, livespec_root=livespec_root)
+    contract = json.loads(render_goal_contract_file(goal))
+    # This fixture exercises the preserved historical validator contract.
+    contract.pop("evidence_policy_version", None)
+    contract["canonical"].pop("evidence_policy_version", None)
+    contract["canonical_json"] = json.dumps(contract["canonical"])
+    state = json.loads(render_goal_state_file(goal))
+    task = contract["tasks"][0]
+    task_id = task["id"]
+    del task[missing_field]
+
+    with pytest.raises(KeyError) as error:
+        prove_goal_task(contract, state, task_id, {"output": "done"})
+
+    assert error.value.args == (missing_field,)
 
 
 # @spec FR-002: Native QE render, FR-006: No user config/global skill dependency
@@ -2601,8 +2671,12 @@ def test_goal_prove_rejects_visual_receipt_from_wrong_feature(
     assert any("feature_slug_mismatch" in item for item in result["missing_evidence"])
 
 
-def test_spec_check_dod_requires_tree_validation_report_not_pass() -> None:
-    dod = _command_definition_of_done(_repo_root() / ".agent-sync/skills/spec-check/SKILL.md")
+def test_spec_check_dod_requires_tree_validation_report_not_pass(tmp_path: Path) -> None:
+    (tmp_path / ".specs").mkdir()
+    goal = compile_command_goal(
+        "spec-check", project_root=tmp_path, livespec_root=_repo_root(), flags="--all"
+    )
+    dod = goal.payload["definition_of_done"]
 
     assert dod[0] == "Tree validation executed and reported (or skipped by --skip-tree)"
     assert not any("tree validation" in item.lower() and "passed" in item.lower() for item in dod)

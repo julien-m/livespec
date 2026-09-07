@@ -350,44 +350,44 @@ If user wants full detail, use `--full` (or `--history`, `--diagrams-only`, `--c
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-explain --save`
-- [always] Read the emitted contract-file and state-file before execution
-- [always] Prove each contract task via `livespec goal prove`; never mark tasks complete manually
-- [always] Run `livespec goal status --state <state-file>` before DONE and require all tasks complete
+- [always] Lock goal contract via `livespec goal render spec-explain --save` <!-- evidence:documentary -->
+- [always] Read the emitted contract-file and state-file before execution <!-- evidence:documentary -->
+- [always] Prove each contract task via `livespec goal prove`; never mark tasks complete manually <!-- evidence:documentary -->
+- [always] Run `livespec goal status --state <state-file>` before DONE and require all tasks complete <!-- evidence:documentary -->
 
 ### Phase 1 — Resolve Input
 
-- [always] Read before-explain hooks from all 3 levels
-- [always] Classify request intent (how / why / what changed / where)
-- [always] Match feature name or number to `.specs/features/NNN-*/`
-- [always] Search specs, ADRs, and changelog for natural-language questions
-- [always] Rank candidates and prompt user if multiple matches
+- [always] Read before-explain hooks from all 3 levels <!-- evidence:documentary -->
+- [always] Classify request intent (how / why / what changed / where) <!-- evidence:documentary -->
+- [always] Match feature name or number to `.specs/features/NNN-*/` <!-- evidence:documentary -->
+- [always] Search specs, ADRs, and changelog for natural-language questions <!-- evidence:documentary -->
+- [always] Rank candidates and prompt user if multiple matches <!-- evidence:documentary -->
 
 ### Phase 2 — Read All Sources
 
-- [always] Read spec.md (user stories and flowcharts)
-- [always] Read plan.md (sequence, state, ER diagrams)
-- [always] Read implementation.md (file mapping)
-- [always] Read changelog.md (history of changes)
-- [always] Read ADR files from `.specs/stacks/decisions/`
+- [always] Read spec.md (user stories and flowcharts) <!-- evidence:documentary -->
+- [always] Read plan.md (sequence, state, ER diagrams) <!-- evidence:documentary -->
+- [always] Read implementation.md (file mapping) <!-- evidence:documentary -->
+- [always] Read changelog.md (history of changes) <!-- evidence:documentary -->
+- [always] Read ADR files from `.specs/stacks/decisions/` <!-- evidence:documentary -->
 
 ### Phase 3 — Produce Visual Summary
 
-- [always] Synthesize structured explanation across 8 sections
-- [always] Embed up to 2 diagrams inline, list remaining as references
-- [always] List all sources used for traceability
-- [always] Suggest next useful action (spec-check, spec-plan, spec-stack)
-- [always] Read after-explain hooks from all 3 levels
+- [always] Synthesize structured explanation across 8 sections <!-- evidence:documentary -->
+- [always] Embed up to 2 diagrams inline, list remaining as references <!-- evidence:documentary -->
+- [always] List all sources used for traceability <!-- evidence:documentary -->
+- [always] Suggest next useful action (spec-check, spec-plan, spec-stack) <!-- evidence:documentary -->
+- [always] Read after-explain hooks from all 3 levels <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-explain` is complete only if all are true:
 
-- [ ] Question intent is explicitly identified (`how`/`why`/`what changed`/`where`)
-- [ ] Sources used are listed
-- [ ] Explanation answers user question directly in first section
-- [ ] At least one traceability reference is included (spec/plan/implementation/changelog/ADR)
-- [ ] Next useful action is suggested when relevant (`/spec-check`, `/spec-plan`, `/spec-stack`)
+- [ ] Question intent is explicitly identified (`how`/`why`/`what changed`/`where`) <!-- evidence:documentary -->
+- [ ] Sources used are listed <!-- evidence:documentary -->
+- [ ] Explanation answers user question directly in first section <!-- evidence:documentary -->
+- [ ] At least one traceability reference is included (spec/plan/implementation/changelog/ADR) <!-- evidence:documentary -->
+- [ ] Next useful action is suggested when relevant (`/spec-check`, `/spec-plan`, `/spec-stack`) <!-- evidence:documentary -->
 
 If confidence is low, state uncertainty and ask one follow-up question.
 

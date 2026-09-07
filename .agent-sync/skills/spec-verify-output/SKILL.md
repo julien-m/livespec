@@ -71,20 +71,20 @@ _(none — this command calls the `livespec verify-output` CLI, not nested `/spe
 > Machine-readable task inventory parsed by `livespec goal render`.
 > Format: `- [branch] task description`
 
-- [always] Resolve target command name and normalize active scenario flags
-- [always] Locate builtin or project override expectations for the target command
-- [always] Locate the latest `.specs/.runs/<command>-*.json` artifact, unless `--run` or `--preview` is provided
-- [always] Execute `livespec verify-output <command>` with the resolved flags/run/preview options
-- [always] Surface outcome `success`, `drift`, `error`, or `blocked` exactly as reported by the CLI
-- [always] If `--json` is active, return the JSON envelope without prose rewriting
-- [always] If `--preview --save` is active, report the `.specs/.previews/<command>-*.md` path
+- [always] Resolve target command name and normalize active scenario flags <!-- evidence:documentary -->
+- [always] Locate builtin or project override expectations for the target command <!-- evidence:documentary -->
+- [always] Locate the latest `.specs/.runs/<command>-*.json` artifact, unless `--run` or `--preview` is provided <!-- evidence:documentary -->
+- [always] Execute `livespec verify-output <command>` with the resolved flags/run/preview options <!-- evidence:documentary -->
+- [always] Surface outcome `success`, `drift`, `error`, or `blocked` exactly as reported by the CLI <!-- evidence:documentary -->
+- [always] If `--json` is active, return the JSON envelope without prose rewriting <!-- evidence:documentary -->
+- [always] If `--preview --save` is active, report the `.specs/.previews/<command>-*.md` path <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-verify-output` is complete only if all are true:
 
-- [ ] Target command expectations were resolved or canonical BLOCKED was emitted
-- [ ] Run artifact was resolved, or preview mode was explicitly active
-- [ ] `livespec verify-output` executed with the requested flags
-- [ ] Outcome was reported exactly
-- [ ] No source, spec, or expectation files were modified
+- [ ] Target command expectations were resolved or canonical BLOCKED was emitted <!-- evidence:documentary -->
+- [ ] Run artifact was resolved, or preview mode was explicitly active <!-- evidence:documentary -->
+- [ ] `livespec verify-output` executed with the requested flags <!-- evidence:documentary -->
+- [ ] Outcome was reported exactly <!-- evidence:documentary -->
+- [ ] No source, spec, or expectation files were modified <!-- evidence:documentary -->

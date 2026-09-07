@@ -578,77 +578,77 @@ If `migrate-visual-tests.js` exits with a non-zero code:
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-migrate --save`
-- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Lock goal contract via `livespec goal render spec-migrate --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 1 — Resolve LiveSpec Repo Path
 
-- [always] Read .specs/.livespec-path; resolve from skill symlink chain if missing
-- [always] Verify resolved path contains a VERSION file
-- [always] Write .specs/.livespec-path if freshly resolved
+- [always] Read .specs/.livespec-path; resolve from skill symlink chain if missing <!-- evidence:documentary -->
+- [always] Verify resolved path contains a VERSION file <!-- evidence:documentary -->
+- [always] Write .specs/.livespec-path if freshly resolved <!-- evidence:documentary -->
 
 ### Phase 2 — Compare Versions
 
-- [always] Read .specs/livespec-version (default: 1 if missing)
-- [always] Read VERSION from LiveSpec repo
-- [always] Skip to Phase 4.5 if project version already matches repo version
+- [always] Read .specs/livespec-version (default: 1 if missing) <!-- evidence:documentary -->
+- [always] Read VERSION from LiveSpec repo <!-- evidence:documentary -->
+- [always] Skip to Phase 4.5 if project version already matches repo version <!-- evidence:documentary -->
 
 ### Phase 3 — Apply Migrations
 
-- [always] For each pending version: read migrations/N/migrate.md and execute migrate.sh
-- [always] Stop and report on non-zero migration script exit
+- [always] For each pending version: read migrations/N/migrate.md and execute migrate.sh <!-- evidence:documentary -->
+- [always] Stop and report on non-zero migration script exit <!-- evidence:documentary -->
 
 ### Phase 4 — Validate
 
-- [always] Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve
-- [always] Verify .specs/livespec-version matches VERSION from repo
+- [always] Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve <!-- evidence:documentary -->
+- [always] Verify .specs/livespec-version matches VERSION from repo <!-- evidence:documentary -->
 
 ### Phase 4.4 — Surface Resolution
 
-- [always] Read and validate .specs/surfaces.yaml if present
-- [always] Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces
+- [always] Read and validate .specs/surfaces.yaml if present <!-- evidence:documentary -->
+- [always] Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces <!-- evidence:documentary -->
 
 ### Phase 4.5 — Visual Test Scaffolding
 
-- [always] Run migrate-visual-tests.js --generate (guard on script and Node.js availability)
-- [always] Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts
+- [always] Run migrate-visual-tests.js --generate (guard on script and Node.js availability) <!-- evidence:documentary -->
+- [always] Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts <!-- evidence:documentary -->
 
 ### Phase 4.6 — Visual Test Reconciliation
 
-- [always] Stage scaffolded files to establish rollback boundary
-- [always] Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files
-- [always] Run Check 1: detect and remove duplicate coverage across entire test directory
-- [always] Run Check 2: fix syntax errors from merge (unbalanced braces, double });)
-- [always] Run Check 3: remove empty dead stubs from Preserved sections
-- [always] Run Check 4: warn on orphaned route tests without matching route files
-- [always] Run Check 5: verify slug/route/heading coherence and log warnings
+- [always] Stage scaffolded files to establish rollback boundary <!-- evidence:documentary -->
+- [always] Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files <!-- evidence:documentary -->
+- [always] Run Check 1: detect and remove duplicate coverage across entire test directory <!-- evidence:documentary -->
+- [always] Run Check 2: fix syntax errors from merge (unbalanced braces, double });) <!-- evidence:documentary -->
+- [always] Run Check 3: remove empty dead stubs from Preserved sections <!-- evidence:documentary -->
+- [always] Run Check 4: warn on orphaned route tests without matching route files <!-- evidence:documentary -->
+- [always] Run Check 5: verify slug/route/heading coherence and log warnings <!-- evidence:documentary -->
 
 ### Phase 4.7 — E2E Test Generation
 
-- [always] Scan for features with Gherkin but no E2E test file
-- [always] Filter non-visual features using Check 0 results or fresh classification
-- [always] Read route files, component source, fixtures, and existing tests for context
-- [always] Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions
-- [always] Verify generated files compile (TypeScript check if available)
+- [always] Scan for features with Gherkin but no E2E test file <!-- evidence:documentary -->
+- [always] Filter non-visual features using Check 0 results or fresh classification <!-- evidence:documentary -->
+- [always] Read route files, component source, fixtures, and existing tests for context <!-- evidence:documentary -->
+- [always] Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions <!-- evidence:documentary -->
+- [always] Verify generated files compile (TypeScript check if available) <!-- evidence:documentary -->
 
 ### Phase 5 — Report
 
-- [always] Display migration summary with version range and validation results
-- [always] Append visual scaffolding summary (files created, baseline dirs)
-- [always] Append reconciliation summary (fixes, warnings per check)
-- [always] Append E2E generation summary (files created, features skipped)
+- [always] Display migration summary with version range and validation results <!-- evidence:documentary -->
+- [always] Append visual scaffolding summary (files created, baseline dirs) <!-- evidence:documentary -->
+- [always] Append reconciliation summary (fixes, warnings per check) <!-- evidence:documentary -->
+- [always] Append E2E generation summary (files created, features skipped) <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-migrate` is complete only if all are true:
 
-- [ ] All pending migrations applied in order
-- [ ] `scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified
-- [ ] `.specs/livespec-version` matches `VERSION` from repo
-- [ ] Visual test scaffolding ran (or was skipped with warning if unavailable)
-- [ ] Visual test reconciliation ran all 6 checks on new files
-- [ ] E2E test generation ran for features with Gherkin and no existing tests
-- [ ] Migration summary displayed with visual and E2E results appended
+- [ ] All pending migrations applied in order <!-- evidence:documentary -->
+- [ ] `scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified <!-- evidence:documentary -->
+- [ ] `.specs/livespec-version` matches `VERSION` from repo <!-- evidence:documentary -->
+- [ ] Visual test scaffolding ran (or was skipped with warning if unavailable) <!-- evidence:documentary -->
+- [ ] Visual test reconciliation ran all 6 checks on new files <!-- evidence:documentary -->
+- [ ] E2E test generation ran for features with Gherkin and no existing tests <!-- evidence:documentary -->
+- [ ] Migration summary displayed with visual and E2E results appended <!-- evidence:documentary -->
 
 ---
 

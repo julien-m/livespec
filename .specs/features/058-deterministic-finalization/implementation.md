@@ -3,7 +3,7 @@ title: Deterministic Finalization Implementation
 feature: 058-deterministic-finalization
 status: Implemented
 created: 2026-06-10
-updated: 2026-06-25
+updated: 2026-09-06
 ---
 
 # Implementation — Deterministic Finalization
@@ -30,7 +30,7 @@ updated: 2026-06-25
 
 | AC | Test File | Status |
 |---|---|---|
-| [AC-001](spec.md#ac-001) | tests/test_finalize.py — `test_apply_writes_all_four_targets_with_markers`, `test_apply_updates_spec_status_frontmatter_and_header_in_sync` | ✅ Implemented |
+| [AC-001](spec.md#ac-001) | tests/test_finalize.py — `test_apply_writes_lifecycle_fields_and_generated_registry_markers`, `test_apply_updates_spec_status_frontmatter_and_header_in_sync` | ✅ Implemented |
 | [AC-002](spec.md#ac-002) | tests/test_finalize.py — `TestHash8Canonicalization`, `test_identical_rerun_is_zero_write_already_finalized`, `test_partial_apply_converges_without_duplicates` | ✅ Implemented |
 | [AC-003](spec.md#ac-003) | tests/test_finalize.py — `test_apply_emits_verifiable_receipt`, `TestFinalizeReceiptRoundtrip` | ✅ Implemented |
 | [AC-004](spec.md#ac-004) | tests/test_finalize.py — `test_lock_timeout_leaves_registry_untouched`, `test_hash_mismatch_blocks_naming_file_and_records_partial_receipt`, `test_apply_cli_lock_timeout_exits_blocked`, `test_apply_cli_hash_mismatch_exits_blocked_state_invalid` | ✅ Implemented |
@@ -72,3 +72,9 @@ updated: 2026-06-25
 - **Constitution deviation (planned):** `finalize.py` (459 lines) and `finalize_receipt.py` (341 lines) exceed the 300-line guidance. Per plan.md Constitution Check, private helpers were extracted into `finalize_receipt.py`, `finalize_registry.py`, and `finalize_readme.py` with the public API re-exported from `validator/finalize.py` so the FR-009 import path holds. Further fragmentation would split single concepts across files (existing precedent: `goal_contracts.py` 1700+ lines).
 - **Marker check scope in verify:** `spec_status` (spec.md) is exempt from the `--command` marker requirement because `--status` is optional by design (plan.md Step 6); the three always-written targets are checked.
 - **Pre-existing failure (not 058):** `tests/test_journeys.py::test_compile_generates_xcuitest_for_ios_and_watchos` fails identically on a pristine `git archive HEAD` copy — it belongs to the in-flight journeys/XCUITest workstream and was deliberately left untouched.
+
+## Lifecycle-only compatibility (078)
+
+Read the [amended marker contract](spec.md#fr-002), [spec-status builder](../../../validator/finalize_spec.py) and [lifecycle regressions](../../../tests/test_finalize_lifecycle.py). The spec body stays byte-identical, including historical comments; new markers are never appended to it. Current status/payload hashes remain recorded in generated registries and receipts. Existing idempotence, exact receipt freshness and C51 checks remain active.
+
+Read the [shared metadata parser](../../../validator/lifecycle_metadata.py) and [legacy identity tests](../../../tests/test_lifecycle_metadata.py): both the explicit Header and the bounded introductory H1 band are supported without migration. Fenced/body examples and malformed or competing metadata cannot supply lifecycle authority. Read the [CLI closure regression](../../../tests/test_finalize_review_boundary.py): a first finalization preserves a current review through progression, typed proof and archive. Validation on 2026-09-06: 243 scoped tests passed in 15.75 seconds; scoped Ruff, Pyright and mypy passed. These are deterministic regression results, not a new feature078 certification.

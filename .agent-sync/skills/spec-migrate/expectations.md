@@ -1,7 +1,7 @@
 ---
 command: spec-migrate
 contract_version: "1.0"
-last_reviewed: 2026-06-09
+last_reviewed: 2026-09-07
 ---
 
 # Expectations — /spec-migrate

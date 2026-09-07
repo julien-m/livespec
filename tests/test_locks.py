@@ -268,6 +268,27 @@ class TestAtomicWrite:
 
 
 class TestWriteWithHashCheck:
+    def test_crlf_hash_verifies_exact_persisted_bytes(self, tmp_path: Path) -> None:
+        import hashlib
+
+        target = tmp_path / "out.md"
+        content = "# Contract\r\n\r\nKeep these exact lines.\r\n"
+        digest = write_with_hash_check(target, content)
+        assert target.read_bytes() == content.encode("utf-8")
+        assert digest == hashlib.sha256(target.read_bytes()).hexdigest()
+
+    def test_unexpected_newline_conversion_is_a_hash_mismatch(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        import validator.locks as locks
+
+        def converted_write(target: Path, content: str, encoding: str = "utf-8") -> None:
+            target.write_bytes(content.replace("\n", "\r\n").encode(encoding))
+
+        monkeypatch.setattr(locks, "atomic_write", converted_write)
+        with pytest.raises(locks.WriteHashMismatchError):
+            write_with_hash_check(tmp_path / "changed.md", "# Contract\n")
+
     def test_returns_expected_hash(self, tmp_path: Path) -> None:
         target = tmp_path / "out.md"
         digest = write_with_hash_check(target, "hello world")

@@ -1,7 +1,7 @@
 ---
 command: spec-implement
 contract_version: "1.0"
-last_reviewed: 2026-09-05
+last_reviewed: 2026-09-07
 ---
 
 # Expectations — /spec-implement
@@ -190,3 +190,15 @@ src/<...> + tests/<...>    # code under each step
 - **On success:** visual gate passed before final status; review generated checks and baseline artifacts.
 - **On drift:** inspect progress.md, fix the failing step, re-run with `--resume`.
 - **On blocked:** run `/spec-plan` first, or unblock the preflight check.
+
+## Requirement evidence integrity (078)
+
+- **Read** [shared review/progression protocol](../../../system/review-protocol.md). Native/provider reviews use complete prepared context, actual raw JSON and current validated receipts. Missing, malformed, stale or partial evidence cannot certify readiness.
+- Direct and nested progression retain every unresolved critical clarification and require current semantic Analyze before application code; structural-only diagnostics do not authorize progression.
+- Preserve legacy archive interpretation and specialized bootstrap, conventions, finalization, visual and cumulative Penflow checks. Generated review caches remain disposable.
+
+## Typed acceptance evidence (078 policy2)
+
+- Review explicit documentary ACs through existing native acceptance preparation/ingestion; retain actual input manifests and raw independent output. Default ACs require execution proof.
+- Require the complete immutable AC conjunction at prove/archive/verify-output: documentary `acceptance_review_receipt_path` plus mapped `execution_receipt_path` where each kind applies. Missing, stale or substituted proof cannot complete the feature; policy1 archives retain their original interpretation.
+- **Read** [Goal review identity](../../../system/review-protocol.md#goal-review-identity) before emitting a model-bound acceptance goal, including when no semantic-review task exists.

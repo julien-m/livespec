@@ -1,7 +1,7 @@
 ---
 command: spec-test
 contract_version: "1.0"
-last_reviewed: 2026-09-05
+last_reviewed: 2026-09-07
 ---
 
 <!-- @spec(FR-004) -->
@@ -17,20 +17,27 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 - `.specs/features/<feature>/spec.md` exists.
 - `A test driver is configured (`.specs/testing/`).`
 
+Before generating or repairing AC/visual tests, the existing progression CLI must establish current Clarify and Analyze readiness separately for every affected feature with the actual model/budget. Preserve each feature's real command, exit code and raw output; stop before the failing feature's writes. Audit-only, no-generate, dry-run and regeneration without confirm do not request generation readiness or generate tests; confirmed regeneration remains generation-only. This deterministic gate consumes current semantic receipts and does not demand future runtime evidence.
+
 ## 3. Observable Signals
 
 **stdout must_contain:**
-- "passed"
+- "test"
 - "test"
 
 **stdout must_not_contain:**
-- "Traceback"
-- "ERROR collecting"
+- A real Python traceback header: `Traceback (most recent call last):` followed by an actual newline. Quoted or JSON-escaped diagnostics that describe the rule are permitted; section 12 defines the exact machine signature.
 
 **stderr:**
 - "_(none expected on happy path)_"
 
+Collection and test failures are established by runner-owned execution receipts and exit status, not by quoted diagnostic words. Policy 2 rejects failed, missing, empty or entirely skipped results even when a wrapper returns exit 0; documentary mentions cannot establish execution outcomes.
+
 ## 4. Filesystem Effects
+
+`test-report` excludes --dry-run and every --regenerate-missing mode: render output in memory, without checks/implementation/changelog/strategy writes. Confirmed regeneration creates missing test sources only. Audit-only preserves its existing report and metadata updates but never claims suite execution. Normal execution retains the effects below; --no-update still excludes implementation.md. Runtime goal/receipt bookkeeping remains the existing protocol, separate from business artifacts.
+
+Visual capture, publication, baseline/registry updates and visual closure requirements apply only when the existing `visual` execution branch is active: a selected UI feature, no `--no-visual`, and no audit, dry-run or regeneration-only mode. `--no-generate` still executes existing visual tests; apply this scope separately to each selected feature in `--all`.
 
 **create:**
 - `.specs/features/<feature>/checks/<date>-test.md`
@@ -49,7 +56,7 @@ Audit test coverage, generate missing tests, execute the suite, and verify visua
 - `penflow/actual-ui-tree.json`
 - `penflow/compare-report.json`
 - `penflow/compare-report.md`
-- browser screenshot evidence under `.specs/features/<feature>/baselines/` or `penflow/screens/`
+- browser screenshot evidence under `.specs/features/<feature>/run/<run-id>/<target>/`; feature baselines contain only approved, promoted copies
 - `.specs/design/baselines/<feature_slug>/` synced runtime screenshots in the Global LiveSpec Design Registry
 
 **require for UI runs with root `penflow/`:**
@@ -126,8 +133,8 @@ Runners write captures to `.specs/features/<slug>/run/<ts>/<target>/<screen>.png
 
 ## 10. Post-run Checks
 
-- [ ] Coverage report present in checks/
-- [ ] Suite exits 0
+- [ ] Coverage report present in checks/ only for test-report modes; otherwise rendered in memory
+- [ ] Functional suite exits 0 only for test-suite modes; real execution receipts required, never the word passed
 - [ ] Native QE Analysis applied: AC/FR evidence sufficiency, gates, expected evidence, gaps, and boundary note are recorded
 - [ ] Penflow UI runs have Global LiveSpec Design Registry artifacts: `.specs/design/screens/<feature_slug>/`, `.specs/design/baselines/<feature_slug>/`, `.specs/design/screens/index.md`, and `.specs/design/changelog.md`
 - [ ] Penflow UI runs have Mockup Factory PASS proof: `.mockup-validation/audit-report.md`, `.mockup-validation/<feature_slug>/checklist.md`, `.mockup-validation/<feature_slug>/manifest.json`, `.mockup-validation/<feature_slug>/drift-report.json`, `.mockup-validation/visual-evidence/manifest.json`, `.mockup-validation/visual-evidence/visual-report.md`, and visual evidence PNGs
@@ -144,16 +151,15 @@ Runners write captures to `.specs/features/<slug>/run/<ts>/<target>/<screen>.png
 verify:
   must:
     - exit_code: 0
-    - contains: "passed"
+    - contains: "test"
     - receipt_verdict: {"kind": "conventions", "verdict": "PASS", "required_if_exists": true}
   may:
     - contains: "coverage"
   must_not:
-    - contains: "Traceback"
-    - contains: "ERROR collecting"
+    - contains: "Traceback (most recent call last):\n"
   when:
     - flag: "--visual"
-      must:
+      may:
         - contains: "Visual baselines"
         - contains: "Design Alignment Verdict"
         - contains: "Visual Gate Verdict"
@@ -208,15 +214,26 @@ apps/web/tests/e2e/<feature>/
 
 - New screen mentioned in `spec.md` but missing PNG mockup: report flags `[no mockup]` and falls back to a layout-only baseline.
 - Driver in `--migrate` mode: tests are regenerated under the new naming convention; old `.skip` versions are kept until `--commit`.
-- `--regenerate-missing` invoked: only baselines absent on disk are captured; pre-existing baselines are NEVER overwritten without `--update`.
+- `--regenerate-missing` without `--confirm` is a read-only preview; with `--confirm`, generate missing test sources only. `--dry-run` overrides confirmation. Neither mode captures, approves, deletes or synchronizes visual baselines.
 - Visual gate result is always one of `PASS | FAIL | BLOCKED`; `/spec-implement` consumes this line during Phase 6.5.
 
 ### Post-run Actions
 
-- **On success:** commit baselines + checks file, push.
+- **After an executed run only:** baselines/checks may be committed through the separate Git workflow; preview and regeneration-only runs do not acquire publication obligations.
 - **On drift:** open the gap report, fix code or update spec; re-run with `--update` when ready to re-baseline.
 - **On blocked:** create the surface entry in `.specs/surfaces.yaml`, then re-run.
 
 ## C51 child transport
 
 - UI success returns actual existing paths in canonical PHASE_RESULT JSON `extra.runner_build_manifest` and `extra.penflow_validation_path`; they come from the completed runner and current validation, with no synthesized values. Missing, stale or malformed transport keeps UI closure blocked. Non-UI omits these inputs.
+
+## Typed acceptance evidence (078 policy2)
+
+- Review explicit documentary ACs through existing native acceptance preparation/ingestion; retain actual input manifests and raw independent output. Default ACs require execution proof.
+- Require the complete immutable AC conjunction at prove/archive/verify-output: documentary `acceptance_review_receipt_path` plus mapped `execution_receipt_path` where each kind applies. Missing, stale or substituted proof cannot complete the feature; policy1 archives retain their original interpretation.
+- **Read** [Goal review identity](../../../system/review-protocol.md#goal-review-identity) before emitting a model-bound acceptance goal, including when no semantic-review task exists.
+
+- Full functional suite DoD uses typed execution evidence and is inactive for audit/dry-run/regeneration/visual-only. An active functional suite must pass before visual capture; its failure skips Phase 4.5. Visual-only records the functional suite as `not_run`, proceeds with visual runners/gates and retains its applicable visual receipts; it never claims full-suite PASS. No collection goal without a selected feature invents global AC coverage; final acceptance remains scoped to the actual feature and immutable inventory. Historical immutable contracts are not reclassified.
+
+- Generated-file validation is documentary syntax evidence only: use the skill’s verified non-executing parsers; no test collection, imports/hooks, app execution, baseline or runtime-report writes. Actual runtime outcomes are deferred to the applicable Phase 4/4.5 execution/visual receipts.
+- Penflow web screenshots are captured under `.specs/features/<feature>/run/<run-id>/<target>/`, certified and validated for that exact run, then approved/promoted through the existing flow; no direct capture into feature/design baselines.

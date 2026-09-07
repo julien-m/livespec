@@ -22,12 +22,13 @@ argument-hint: "<feature-name>"
 La toute première action lors de `/spec-check` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
 1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+   **Read** [goal review identity](../../../system/review-protocol.md#goal-review-identity) before locking a review-bearing goal; resolve the actual runtime model and preserve its internal flag through all child commands.
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
 3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
    livespec goal render spec-check --feature <feature-slug> --flags "<active-flags>" --save
    ```
-   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
+   Si aucune feature fournie, omettre `--feature`. Le flag interne `--model=<actual-model>` reste présent même sans flag utilisateur.
    Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-check-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-check-<hash8>.state.json`
 4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
 5. Émettre la commande slash `/goal` avec hash et références machine :
@@ -43,6 +44,10 @@ La toute première action lors de `/spec-check` est de poser le goal durable ave
 
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+
+## Requirement evidence integrity
+
+**Read** [complete review and progression](../../../system/review-protocol.md) before review or phase progression. Use actual prepared context and raw reviewer JSON; enforce the same source-backed Clarify/Analyze gates in direct and nested execution. Structural references, an empty findings summary, or `--no-review` cannot certify semantic readiness.
 
 ## STEP 0.8 — Evidence-First Retry Contract
 
@@ -354,9 +359,9 @@ If `--quality`, stop here. Otherwise continue.
    ```bash
    livespec validate --pre-impl --format json .specs/features/NNN-feature-name/
    ```
-3. Render a `## Specification Analysis Report` containing:
+3. Consume the current validated plan review without another model call. Missing, stale or incomplete review blocks semantic readiness; matching IDs alone cannot PASS. `--structural-only` is an explicit diagnostic and cannot authorize implementation. Render a `## Specification Analysis Report` containing:
    - a **findings table**: `| ID | Category | Severity | Location(s) | Summary | Recommendation |`
-   - a **coverage matrix**: `| Requirement Key | Has Plan Task? | Task IDs | Notes |`
+   - a **structural reference matrix**: `| Requirement Key | Has Plan Task? | Task IDs | Notes |`; report semantic readiness and grounded dispositions separately
    - **metrics**: total/covered requirements, coverage %, ambiguity count, critical count.
 4. **Severity & exit (H3):** `CRITICAL` = constitution MUST violation or missing `spec.md`/`plan.md` only; an uncovered requirement is `HIGH` (never CRITICAL — C3). The command **exits 1 iff any finding is CRITICAL or HIGH**, else 0.
 5. **Read-only guarantees:** this step **must not** save `checks/YYYY-MM-DD.md`, **must not** update any changelog, and **must not** modify `src/`. A missing `implementation.md` is **not** a failure by itself.
@@ -936,104 +941,108 @@ For an already Implemented UI feature, forward the same independent `--build-man
 > Machine-readable task inventory parsed by `livespec goal render`.
 > Format: `- [branch] task description`
 > Active branches per run:
-> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `surfaces` (--surfaces flag) · `quality-only` (--quality flag) · `tree-only` (--tree-only flag) · `visual-status` (--visual-status flag) · `multi` (multiple features selected) · `fix` (--fix flag) · `pre-impl` (--pre-impl flag)
+> `always` · `full-check` (all modes except --pre-impl) · `pre-impl-penflow` (--pre-impl UI with penflow/; readiness inspection) · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `surfaces` (--surfaces flag) · `quality-only` (--quality flag) · `tree-only` (--tree-only flag) · `visual-status` (--visual-status flag) · `multi` (multiple features selected) · `fix` (--fix flag) · `pre-impl` (--pre-impl flag)
 
 ### Phase 0 — Goal Lock & Hooks
 
-- [always] Read before-check hooks (all 3 levels: global, project, local)
-- [always] Resolve flags and feature argument (read-only)
-- [always] Verify no active goal exists
-- [always] Render and save goal contract via `livespec goal render spec-check --save`
-- [always] Emit `/goal` slash command with hash and contract/state file references
+- [always] Read before-check hooks (all 3 levels: global, project, local) <!-- evidence:documentary -->
+- [always] Resolve flags and feature argument (read-only) <!-- evidence:documentary -->
+- [always] Verify no active goal exists <!-- evidence:documentary -->
+- [always] Render and save goal contract via `livespec goal render spec-check --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with hash and contract/state file references <!-- evidence:documentary -->
 
 ### Phase 1 — Tree Validation
 
-- [always] Validate system files presence in .specs/ (spec-system.md, constitution.md, project.md, README.md, changelog.md, stacks/_default.md, testing/strategy.md, ADRs)
-- [always] Validate feature directory naming pattern from `system/identity.md` (`^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$`)
-- [always] Check feature completeness (spec.md, changelog.md, implementation.md, plan.md per status)
-- [always] Detect orphan files directly under features/
-- [always] Verify README.md features table sync vs disk
-- [always] Detect surface drift: validate surfaces.yaml vs filesystem, scan for unconfigured app directories
+- [full-check] Validate system files presence in .specs/ (spec-system.md, constitution.md, project.md, README.md, changelog.md, stacks/_default.md, testing/strategy.md, ADRs) <!-- evidence:documentary -->
+- [full-check] Validate feature directory naming pattern from `system/identity.md` (`^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$`) <!-- evidence:documentary -->
+- [full-check] Check feature completeness (spec.md, changelog.md, implementation.md, plan.md per status) <!-- evidence:documentary -->
+- [full-check] Detect orphan files directly under features/ <!-- evidence:documentary -->
+- [full-check] Verify README.md features table sync vs disk <!-- evidence:documentary -->
+- [full-check] Detect surface drift: validate surfaces.yaml vs filesystem, scan for unconfigured app directories <!-- evidence:documentary -->
 
 ### Phase 2 — Feature Selection
 
-- [always] If no argument: list features sorted by last-modified date and prompt for selection
-- [always] Resolve feature: argument → git branch → interactive selection
+- [always] If no argument: list features sorted by last-modified date and prompt for selection <!-- evidence:documentary -->
+- [always] Resolve feature: argument → git branch → interactive selection <!-- evidence:documentary -->
 
 ### Phase 3 — Spec Quality Gates
 
-- [always] Evaluate spec.md quality gates (Gherkin, Mermaid flowcharts, AC format, FR→AC mapping, clarification markers)
-- [always] Evaluate plan.md quality gates if file exists (sequence/state/ER diagrams, constitution check, FR coverage)
-- [always] Check implementation quality gates (implementation.md, changelog.md, progress.md)
+- [full-check] Evaluate spec.md quality gates (Gherkin, Mermaid flowcharts, AC format, FR→AC mapping, clarification markers) <!-- evidence:documentary -->
+- [full-check] Evaluate plan.md quality gates if file exists (sequence/state/ER diagrams, constitution check, FR coverage) <!-- evidence:documentary -->
+- [full-check] Check implementation quality gates (implementation.md, changelog.md, progress.md) <!-- evidence:documentary -->
 
 ### Phase 3.5 — Pre-Implementation Analysis (`--pre-impl`)
 
-- [pre-impl] Run `livespec validate --pre-impl --format json` and render `## Specification Analysis Report` (findings table + coverage matrix + metrics); exit 1 iff any CRITICAL or HIGH; create no `checks/`, no changelog, no `src/` writes
+- [pre-impl] Read the resolved feature spec.md, plan.md and project constitution.md; read implementation.md only if present, never require or generate it <!-- evidence:documentary -->
+- [pre-impl-penflow] Inspect existing inputs with `livespec penflow-contract status --project . --json` and report readiness only; no runtime capture or implementation certificate <!-- evidence:documentary -->
+- [pre-impl] Run `livespec validate --pre-impl --format json` and render `## Specification Analysis Report` (findings table + structural reference coverage + grounded semantic readiness + metrics); require a fresh complete ready review and exit 1 iff any CRITICAL or HIGH; create no `checks/`, no changelog, no `src/` writes <!-- evidence:review review-kind:plan -->
 
 ### Phase 4 — Implementation Verification
 
-- [always] Read spec requirements: extract all AC, FR, SC from spec.md
-- [always] Read implementation map from implementation.md (FR/@spec anchors, AC/test mappings, visual baselines)
-- [always] Recovery mode if implementation.md absent: grep @spec anchors, infer AC coverage, mark as ~ Inferred
-- [always] Verify each FR/AC against actual code: assign ✅ Verified / ⚠️ Partial / ❌ Missing / 🔄 Drifted
-- [always] Load `.conventions/index.md` when present, resolve selected `ai-ressources/` files, and check Convention Compliance for mapped source/test files
-- [always] Report missing convention bundle or violated rules as `convention gap` entries
+- [full-check] Read spec requirements: extract all AC, FR, SC from spec.md <!-- evidence:documentary -->
+- [full-check] Read implementation map from implementation.md (FR/@spec anchors, AC/test mappings, visual baselines) <!-- evidence:documentary -->
+- [full-check] Recovery mode if implementation.md absent: grep @spec anchors, infer AC coverage, mark as ~ Inferred <!-- evidence:documentary -->
+- [full-check] Verify each FR/AC against actual code: assign ✅ Verified / ⚠️ Partial / ❌ Missing / 🔄 Drifted <!-- evidence:documentary -->
+- [full-check] Load `.conventions/index.md` when present, resolve selected `ai-ressources/` files, and check Convention Compliance for mapped source/test files <!-- evidence:documentary -->
+- [full-check] Report missing convention bundle or violated rules as `convention gap` entries <!-- evidence:documentary -->
 
 ### Phase 5 — Visual & Design Checks
 
-- [visual] Run staleness gate: read baseline.manifest.yml, check browser version, check per-screen mockup SHA-256
-- [penflow] In UI implementation closure audits, revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`; preparation/pre-impl uses `livespec penflow-contract status --project . --json` and reports readiness only
-- [penflow] Read penflow/compare-report.json, review-report.md, fix-report.md when present
-- [visual] Run pixel regression via compareRegression() for each VALID baseline vs current screenshot
-- [visual] Check design fidelity: compare VALID baselines vs mockup PNGs (5% threshold)
-- [visual] Check theme token compliance if .specs/design/theme.css exists
-- [visual-status] Scan all features' baselines/, classify each screen (VALID/STALE-MOCKUP/STALE-BROWSER/NO-MANIFEST), render governance dashboard
-- [visual] Capture fresh runtime PNGs to `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-check --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path> --json`
-- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity
-- [visual] Refuse to prove [visual]/[penflow] tasks `complete` while gate exit_code != 0 — "skipped due to missing prerequisites" est BLOCKED, jamais PASS
+- [visual] Run staleness gate: read baseline.manifest.yml, check browser version, check per-screen mockup SHA-256 <!-- evidence:documentary -->
+- [penflow] In UI implementation closure audits, revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`; preparation/pre-impl uses `livespec penflow-contract status --project . --json` and reports readiness only <!-- evidence:documentary -->
+- [penflow] Read penflow/compare-report.json, review-report.md, fix-report.md when present <!-- evidence:documentary -->
+- [visual] Run pixel regression via compareRegression() for each VALID baseline vs current screenshot <!-- evidence:documentary -->
+- [visual] Check design fidelity: compare VALID baselines vs mockup PNGs (5% threshold) <!-- evidence:documentary -->
+- [visual] Check theme token compliance if .specs/design/theme.css exists <!-- evidence:documentary -->
+- [visual-status] Scan all features' baselines/, classify each screen (VALID/STALE-MOCKUP/STALE-BROWSER/NO-MANIFEST), render governance dashboard <!-- evidence:documentary -->
+- [visual] Capture fresh runtime PNGs to `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-check --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path> --json` <!-- evidence:documentary -->
+- [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity <!-- evidence:documentary -->
+- [visual] Refuse to prove [visual]/[penflow] tasks `complete` while gate exit_code != 0 — "skipped due to missing prerequisites" est BLOCKED, jamais PASS <!-- evidence:documentary -->
 
 ### Phase 6 — Gap Report & Persist
 
-- [always] Produce structured gap report (spec quality, FR table, AC table, Convention Compliance, summary)
-- [always] Include `Convention Compliance` section with domains checked, evidence, and convention gaps
-- [always] Save gap report to .specs/features/NNN/checks/YYYY-MM-DD.md
-- [always] Add check entry to feature changelog.md
-- [always] Add summary entry to global .specs/changelog.md
-- [always] Present suggested fixes for each gap with actionable commands
-- [always] Prompt to update implementation.md status (or auto-update if --update)
+- [full-check] Produce structured gap report (spec quality, FR table, AC table, Convention Compliance, summary) <!-- evidence:documentary -->
+- [full-check] Include `Convention Compliance` section with domains checked, evidence, and convention gaps <!-- evidence:documentary -->
+- [full-check] Save gap report to .specs/features/NNN/checks/YYYY-MM-DD.md <!-- evidence:documentary -->
+- [full-check] Add check entry to feature changelog.md <!-- evidence:documentary -->
+- [full-check] Add summary entry to global .specs/changelog.md <!-- evidence:documentary -->
+- [full-check] Present suggested fixes for each gap with actionable commands <!-- evidence:documentary -->
+- [full-check] Prompt to update implementation.md status (or auto-update if --update) <!-- evidence:documentary -->
 
 ### Phase 6.5 — Fix Loop (`--fix`)
 
-- [fix] Classify fixable gaps across tree/spec quality, FR/AC mapping, missing or blocked tests, visual fidelity, absent or stale baseline manifests, Penflow drift, changelog/report drift, and README sync
-- [fix] Create missing visual/Penflow prerequisites required for an end-to-end fix attempt, or emit canonical BLOCKED with exact missing path/tool
-- [fix] Spawn independent native sub-agent to execute `/spec-fix <feature> --auto --update` for each feature with fixable gaps
-- [fix] Capture child `/spec-fix` goal hash, contract-file path, state-file path, final status, changed files, and gap closure summary
-- [fix] Spawn independent native sub-agent to re-run `/spec-check <feature>` after each fix attempt
-- [fix] Inspect child goal state files and require both fix and re-check child goals to be completed or explicitly BLOCKED
-- [fix] Write actionable warnings for any remaining gap; emit canonical BLOCKED when no safe fix path exists
+- [fix] Classify fixable gaps across tree/spec quality, FR/AC mapping, missing or blocked tests, visual fidelity, absent or stale baseline manifests, Penflow drift, changelog/report drift, and README sync <!-- evidence:documentary -->
+- [fix] Create missing visual/Penflow prerequisites required for an end-to-end fix attempt, or emit canonical BLOCKED with exact missing path/tool <!-- evidence:documentary -->
+- [fix] Spawn independent native sub-agent to execute `/spec-fix <feature> --auto --update` for each feature with fixable gaps <!-- evidence:documentary -->
+- [fix] Capture child `/spec-fix` goal hash, contract-file path, state-file path, final status, changed files, and gap closure summary <!-- evidence:documentary -->
+- [fix] Spawn independent native sub-agent to re-run `/spec-check <feature>` after each fix attempt <!-- evidence:documentary -->
+- [fix] Inspect child goal state files and require both fix and re-check child goals to be completed or explicitly BLOCKED <!-- evidence:documentary -->
+- [fix] Write actionable warnings for any remaining gap; emit canonical BLOCKED when no safe fix path exists <!-- evidence:documentary -->
 
 ### Phase 7 — Multi-Spec Consolidation
 
-- [always] Produce consolidated report: feature health table, cross-feature dependencies, aggregated stats, priority list
-- [always] Read after-check hooks (all 3 levels: global, project, local)
+- [multi] Produce consolidated report: feature health table, cross-feature dependencies, aggregated stats, priority list <!-- evidence:documentary -->
+- [always] Read after-check hooks (all 3 levels: global, project, local) <!-- evidence:documentary -->
 
 ---
 
 ## Definition of Done (Command-Level)
 
-`/spec-check` is complete only if all are true:
+`/spec-check` is complete only if all applicable criteria are true. Checkbox branch tags use the same predicates as Execution Tasks; untagged legacy criteria remain unconditional. `--pre-impl` activates only `always`, `pre-impl` and applicable `pre-impl-penflow`, even when combined with full-check flags.
 
-- [ ] Tree validation executed and reported (or skipped by --skip-tree)
-- [ ] Spec quality gates evaluated (per feature)
-- [ ] Gap report produced and displayed
-- [ ] Gap report saved to `checks/YYYY-MM-DD.md`
-- [ ] Feature `changelog.md` has a check entry
-- [ ] Global `.specs/changelog.md` has a summary entry
-- [ ] If `--update`: `implementation.md` status values refreshed
-- [ ] Convention Compliance checked against `.conventions/index.md` + selected `ai-ressources/` sources, or a `convention gap` explains why it could not run
-- [ ] If multi-spec: consolidated report produced
-- [ ] If `--fix`: fix sub-agent goals executed, re-check sub-agent goals executed, child goal state files inspected, and remaining gaps are warnings or canonical BLOCKED
-- [ ] For VISUAL features: `livespec visual-gate certify ... --command spec-check` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = step BLOCKED, no accepted proof
+- [ ] [pre-impl] Specification Analysis Report displayed with findings, coverage and metrics; exit status reflects CRITICAL/HIGH findings <!-- evidence:documentary -->
+- [ ] [pre-impl] Analysis leaves feature artifacts, checks, changelogs and source files unchanged; an absent implementation map is accepted <!-- evidence:documentary -->
+- [ ] [full-check] Tree validation executed and reported (or skipped by --skip-tree) <!-- evidence:documentary -->
+- [ ] [full-check] Spec quality gates evaluated (per feature) <!-- evidence:documentary -->
+- [ ] [full-check] Gap report produced and displayed <!-- evidence:documentary -->
+- [ ] [full-check] Gap report saved to `checks/YYYY-MM-DD.md` <!-- evidence:documentary -->
+- [ ] [full-check] Feature `changelog.md` has a check entry <!-- evidence:documentary -->
+- [ ] [full-check] Global `.specs/changelog.md` has a summary entry <!-- evidence:documentary -->
+- [ ] [full-check] If `--update`: `implementation.md` status values refreshed <!-- evidence:documentary -->
+- [ ] [full-check] Convention Compliance checked against `.conventions/index.md` + selected `ai-ressources/` sources, or a `convention gap` explains why it could not run <!-- evidence:documentary -->
+- [ ] [multi] If multi-spec: consolidated report produced <!-- evidence:documentary -->
+- [ ] [fix] If `--fix`: fix sub-agent goals executed, re-check sub-agent goals executed, child goal state files inspected, and remaining gaps are warnings or canonical BLOCKED <!-- evidence:documentary -->
+- [ ] [visual] For VISUAL features: `livespec visual-gate certify ... --command spec-check` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = step BLOCKED, no accepted proof <!-- evidence:documentary -->
 
 ---
 
