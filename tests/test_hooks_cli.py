@@ -65,9 +65,7 @@ def test_hooks_stdout_matches_compiled_context_hash(
         feature=None,
     )["before"]
 
-    result = runner.invoke(
-        app, ["hooks", "resolve", "--event", "before", "--command", "feature"]
-    )
+    result = runner.invoke(app, ["hooks", "resolve", "--event", "before", "--command", "feature"])
 
     assert result.exit_code == 0
     assert result.stdout

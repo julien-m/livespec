@@ -33,7 +33,37 @@ jobs:
         with:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: 'false'
       - run: uv pip install --system -e ".[dev,integration]"
+      - name: Require read-only Penflow capability
+        env:
+          PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+        run: |
+          if [ -z "$PENFLOW_KEY" ]; then
+            echo "Penflow CLI checks require PENFLOW_READONLY_DEPLOY_KEY for the pinned private dependency." >&2
+            exit 1
+          fi
+      - name: Checkout pinned Penflow CLI
+        uses: actions/checkout@v4
+        with:
+          repository: julien-m/penflow
+          ref: dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7
+          ssh-key: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+          persist-credentials: false
+          path: .ci-deps/penflow
+      - name: Install pinned Penflow CLI
+        run: uv pip install --no-cache --system ./.ci-deps/penflow
+      - name: Remove private dependency checkout
+        if: always()
+        run: |
+          python - <<'PYTHON'
+          import shutil
+          from pathlib import Path
+          checkout = Path(".ci-deps/penflow")
+          if checkout.exists():
+              shutil.rmtree(checkout)
+          PYTHON
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -62,7 +92,37 @@ jobs:
         with:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: 'false'
       - run: uv pip install --system -e ".[dev]" pyyaml jsonschema anyio
+      - name: Require read-only Penflow capability
+        env:
+          PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+        run: |
+          if [ -z "$PENFLOW_KEY" ]; then
+            echo "Penflow CLI checks require PENFLOW_READONLY_DEPLOY_KEY for the pinned private dependency." >&2
+            exit 1
+          fi
+      - name: Checkout pinned Penflow CLI
+        uses: actions/checkout@v4
+        with:
+          repository: julien-m/penflow
+          ref: dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7
+          ssh-key: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+          persist-credentials: false
+          path: .ci-deps/penflow
+      - name: Install pinned Penflow CLI
+        run: uv pip install --no-cache --system ./.ci-deps/penflow
+      - name: Remove private dependency checkout
+        if: always()
+        run: |
+          python - <<'PYTHON'
+          import shutil
+          from pathlib import Path
+          checkout = Path(".ci-deps/penflow")
+          if checkout.exists():
+              shutil.rmtree(checkout)
+          PYTHON
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -129,7 +189,37 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: 'false'
       - run: uv pip install --system -e ".[dev,integration]"
+      - name: Require read-only Penflow capability
+        env:
+          PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+        run: |
+          if [ -z "$PENFLOW_KEY" ]; then
+            echo "Penflow CLI checks require PENFLOW_READONLY_DEPLOY_KEY for the pinned private dependency." >&2
+            exit 1
+          fi
+      - name: Checkout pinned Penflow CLI
+        uses: actions/checkout@v4
+        with:
+          repository: julien-m/penflow
+          ref: dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7
+          ssh-key: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+          persist-credentials: false
+          path: .ci-deps/penflow
+      - name: Install pinned Penflow CLI
+        run: uv pip install --no-cache --system ./.ci-deps/penflow
+      - name: Remove private dependency checkout
+        if: always()
+        run: |
+          python - <<'PYTHON'
+          import shutil
+          from pathlib import Path
+          checkout = Path(".ci-deps/penflow")
+          if checkout.exists():
+              shutil.rmtree(checkout)
+          PYTHON
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: >

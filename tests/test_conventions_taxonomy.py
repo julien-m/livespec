@@ -8,12 +8,16 @@ unsupported — catalogued, sourced, and explicitly non-blocking (C009 / V10).
 
 from __future__ import annotations
 
+from hashlib import sha256
 from pathlib import Path
 from typing import cast
 
+import pytest
 from typer.testing import CliRunner
 
+from tests.test_conventions_ast_engine import AST_HIGH_CATALOG_TEMPLATE
 from validator.cli import app
+from validator.conventions_ast.backends import FakeAstBackend
 from validator.conventions_ast.taxonomy import (
     advisory_rules,
     taxonomy_fields,
@@ -73,7 +77,7 @@ def _write_ai_resources_fixture(root: Path) -> None:
     sources = {
         "code-conventions/javascript.md": "# TypeScript\nNo any.\n",
         "code-conventions/rust.md": "# Rust\nNo unwrap.\n",
-        "code-conventions/database.md": "# Database\nAvoid SELECT *.\n",
+        "code-conventions/database.md": "# Database\nUse explicit column lists.\n",
         "code-conventions/swift-kotlin.md": "# Swift Kotlin\nAvoid force try.\n",
         "architecture/webhook-patterns.md": "# Webhooks\n",
         "design/components/payment-flows.md": "# Payment flows\n",
@@ -133,9 +137,7 @@ def test_taxonomy_entries_never_emit_blocking_violations(tmp_path: Path) -> None
     # they must never become GateViolations.
     project = _enforce_project(tmp_path)
     result = verify_conventions(project)
-    taxonomy_ids = {
-        entry["id"] for entry in (*advisory_rules(), *unsupported_rules())
-    }
+    taxonomy_ids = {entry["id"] for entry in (*advisory_rules(), *unsupported_rules())}
     violation_rules = {v.rule_id for v in result.violations}
     assert taxonomy_ids.isdisjoint(violation_rules)
 
@@ -169,16 +171,64 @@ def test_receipt_serializes_and_round_trips_taxonomy(tmp_path: Path) -> None:
     assert verified.verdict in ("PASS", "FAIL", "BLOCKED")
 
 
-def test_verify_cli_json_exposes_taxonomy_top_level(tmp_path: Path) -> None:
+@pytest.mark.parametrize("backend_available", [True, False])
+def test_verify_cli_json_exposes_taxonomy_top_level(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, backend_available: bool
+) -> None:
     # WHY: auditors expect advisory_rules/unsupported_rules at the document root
     # of `livespec conventions verify --json`.
     import json
 
-    project = _enforce_project(tmp_path)
+    monkeypatch.setenv("AIRESOURCES", str(tmp_path / "ai-ressources"))
+    ai_root = _local_taxonomy_catalog(tmp_path, monkeypatch)
+    project = _enforce_project(tmp_path, ai_resources_path=ai_root)
+    # Taxonomy remains serialized when the external linter is unavailable.
+    backend = FakeAstBackend(available=backend_available)
+    monkeypatch.setattr(
+        "validator.conventions_ast.engine._backend_from_config", lambda config: backend
+    )
+    monkeypatch.setenv("PATH", "")
     res = runner.invoke(app, ["conventions", "verify", "--repo", str(project), "--json"])
-    assert res.exit_code in (0, 2), res.output
+    assert res.exit_code == (1 if backend_available else 2), res.output
     payload = json.loads(res.output)
+    assert payload["verdict"] == ("FAIL" if backend_available else "BLOCKED")
+    assert backend.scan_calls == 1
+    if backend_available:
+        assert payload["blockers"] == []
+    else:
+        assert [blocker["code"] for blocker in payload["blockers"]] == ["ast_backend_unavailable"]
+    assert any(v["rule_id"] == "linter.eslint" for v in payload["violations"])
     assert "advisory_rules" in payload
     assert "unsupported_rules" in payload
     assert payload["source_manifest"]["unclassified_count"] == 0
     assert any(e["id"] == "db.sql.no_select_star" for e in payload["advisory_rules"])
+
+
+def _local_taxonomy_catalog(root: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Bind both catalogue consumers to the actual synthetic source corpus."""
+    ai_root = root / "ai-ressources"
+    _write_ai_resources_fixture(ai_root)
+    relative = "validator/conventions_ast/rule_catalog/ast_high.yaml"
+    for module in (
+        "validator.conventions_gates",
+        "validator.conventions_ast.source_decisions",
+        "validator.conventions_ast.source_decision_builders",
+    ):
+        monkeypatch.setattr(f"{module}.DEFAULT_AST_CATALOGS", (relative,))
+    fixture_dir = root / "tests/fixtures"
+    fixture_dir.mkdir(parents=True)
+    (fixture_dir / "pass.ts").write_text("const value = input as unknown;\n")
+    (fixture_dir / "fail.ts").write_text("const value = input as any;\n")
+    test_path = Path("tests/test_conventions_ast_multilang.py")
+    (root / test_path).write_bytes((Path(__file__).resolve().parents[1] / test_path).read_bytes())
+    catalog = root / relative
+    catalog.parent.mkdir(parents=True)
+    source = ai_root / "code-conventions/javascript.md"
+    catalog.write_text(
+        AST_HIGH_CATALOG_TEMPLATE.format(
+            source_path="ai-ressources/code-conventions/javascript.md",
+            source_hash=sha256(source.read_bytes()).hexdigest(),
+        ),
+        encoding="utf-8",
+    )
+    return ai_root

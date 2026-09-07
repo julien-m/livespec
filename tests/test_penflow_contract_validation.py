@@ -38,5 +38,6 @@ def test_absent_penflow_cannot_approve_contract(
     project: ReviewProject, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setenv("PATH", "")
-    with pytest.raises(PenflowApprovalError, match="review_contract_penflow_cli_required"):
+    with pytest.raises(PenflowApprovalError, match="review_contract_penflow_cli_required") as exc:
         validate_review_contract(project.root, project.contract)
+    assert str(exc.value) == "review_contract_penflow_cli_required"

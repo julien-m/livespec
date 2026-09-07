@@ -60,38 +60,55 @@ commands/
 class SurvivorRef:
     file: str
     line: int
-    description: str = ""   # original/mutant context when the parser exposes it
+    description: str = ""  # original/mutant context when the parser exposes it
+
 
 @dataclass(frozen=True)
 class MutationResult:
-    date: str               # ISO 8601 (YYYY-MM-DD)
-    driver: str             # python, typescript, jvm, rust, swift, ...
-    kill_rate: float        # percent in [0, 100]
+    date: str  # ISO 8601 (YYYY-MM-DD)
+    driver: str  # python, typescript, jvm, rust, swift, ...
+    kill_rate: float  # percent in [0, 100]
     killed: int
     survived: int
     timeout: int
     no_coverage: int = 0
     survivors: list[SurvivorRef] = ()
-    note: str = ""          # e.g. "TIMEOUT" for EC-001
+    note: str = ""  # e.g. "TIMEOUT" for EC-001
 
-def normalise_mutmut(parsed: MutmutParseResult, *, driver: str = "python",
-                    today: str | None = None) -> MutationResult: ...
-def normalise_stryker(parsed: StrykerParseResult, *, driver: str = "typescript",
-                     today: str | None = None) -> MutationResult: ...
-def normalise_pitest(counts: dict[str, int], *, driver: str = "jvm",
-                    survivors: list[SurvivorRef] | None = None,
-                    today: str | None = None) -> MutationResult: ...
-def normalise_cargo_mutants(counts: dict[str, int], *, driver: str = "rust",
-                           survivors: list[SurvivorRef] | None = None,
-                           today: str | None = None) -> MutationResult: ...
 
-def render_report_entry(result: MutationResult, *,
-                       max_survivors: int = 20) -> str: ...
+def normalise_mutmut(
+    parsed: MutmutParseResult, *, driver: str = "python", today: str | None = None
+) -> MutationResult: ...
+def normalise_stryker(
+    parsed: StrykerParseResult, *, driver: str = "typescript", today: str | None = None
+) -> MutationResult: ...
+def normalise_pitest(
+    counts: dict[str, int],
+    *,
+    driver: str = "jvm",
+    survivors: list[SurvivorRef] | None = None,
+    today: str | None = None,
+) -> MutationResult: ...
+def normalise_cargo_mutants(
+    counts: dict[str, int],
+    *,
+    driver: str = "rust",
+    survivors: list[SurvivorRef] | None = None,
+    today: str | None = None,
+) -> MutationResult: ...
+
+
+def render_report_entry(result: MutationResult, *, max_survivors: int = 20) -> str: ...
 def write_mutation_report(result: MutationResult, report_path: Path) -> None: ...
 
-def run_mutation(driver: DriverManifest, *, project_root: Path,
-                report_path: Path | None = None,
-                timeout: float | None = None) -> MutationResult | None:
+
+def run_mutation(
+    driver: DriverManifest,
+    *,
+    project_root: Path,
+    report_path: Path | None = None,
+    timeout: float | None = None,
+) -> MutationResult | None:
     """Returns None when the active driver does not declare a mutation
     capability (Story 1, Scenario 2). Otherwise returns a MutationResult and
     writes the report when report_path is provided."""

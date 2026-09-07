@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 
 from pytest import MonkeyPatch
-from typer.testing import CliRunner
+from typer.testing import CliRunner, Result
 
 from validator.cli import app
 
@@ -45,7 +45,7 @@ def _success_fake(calls: list[list[str]]) -> object:
     return fake_run
 
 
-def _invoke(*args: str) -> object:
+def _invoke(*args: str) -> Result:
     return runner.invoke(app, ["device", "proof", "com.example.app", *args])
 
 

@@ -181,7 +181,9 @@ Full module implementing:
 
 2. **Module-level constant:**
    ```python
-   _TAXONOMY_PATH: Path = Path(__file__).parent.parent / "system" / "testing" / "ui-behavioral-taxonomy.md"
+   _TAXONOMY_PATH: Path = (
+       Path(__file__).parent.parent / "system" / "testing" / "ui-behavioral-taxonomy.md"
+   )
    ```
 
 3. **`_TAXONOMY_CACHE: dict[Path, Taxonomy] = {}`** — module-level cache keyed by resolved path (supports test isolation via different paths)

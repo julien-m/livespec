@@ -116,6 +116,7 @@
 | 076 | Spec Init Goal Bootstrap | Implemented | 2026-09-04 | 2026-09-04 | Read [spec](features/076-spec-init-goal-bootstrap/spec.md), [plan](features/076-spec-init-goal-bootstrap/plan.md), and [implementation](features/076-spec-init-goal-bootstrap/implementation.md) |
 | 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-09-05 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
 | 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-09-07 | [spec](features/078-requirement-evidence-integrity/spec.md) |
+| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-09-07 | [spec](features/079-validator-ci-prerequisites/spec.md) |
 <!-- readme:features:end -->
 
 ---

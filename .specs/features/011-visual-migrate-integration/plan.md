@@ -290,9 +290,9 @@ All tests are marked `@pytest.mark.level_3a`. Tests invoke `scripts/migrate-visu
 # @spec FR-001: Unconditional invocation — .specs/features/011-visual-migrate-integration/spec.md#fr-001
 # @spec FR-002: Silent always-run invocation — spec.md#fr-002
 
+
 @pytest.mark.level_3a
 class TestMigrateVisualGenerate:
-
     def test_generates_files_for_ui_features(tmp_path, fixture_migrate_visual):
         """FR-001, AC-001, AC-002: creates .spec.ts for UI features without existing tests."""
 
@@ -317,9 +317,9 @@ class TestMigrateVisualGenerate:
     def test_sentinel_shows_zero_when_all_covered(tmp_path, fixture_migrate_visual):
         """AC-007: sentinel shows files=0 dirs=0 when all UI features already have tests."""
 
+
 @pytest.mark.level_3a
 class TestMigrateVisualGuards:
-
     def test_warning_when_script_missing(tmp_path):
         """FR-008, AC-010: exits 0 with warning when migrate-visual-tests.js is absent."""
 

@@ -233,9 +233,9 @@ def test_supervisor_cli_feature_receipt_runs_fresh_feature_scope(
     monkeypatch.setattr(
         conventions_cmd,
         "resolve_feature_scope",
-        lambda _root, feature_slug: expected_scope
-        if feature_slug == "073-conventions-multilang-catalog"
-        else None,
+        lambda _root, feature_slug: (
+            expected_scope if feature_slug == "073-conventions-multilang-catalog" else None
+        ),
     )
 
     def verify(

@@ -95,9 +95,7 @@ test.describe('Settings page @visual', () => {
             "Standard test duplicated from legacy"
         )
 
-    def test_custom_imports_merged_from_legacy(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_custom_imports_merged_from_legacy(self, fixture_migrate_visual_frontend: Path) -> None:
         """Custom imports from legacy file are added to route-settings.spec.ts."""
         e2e_dir, _ = self._setup_legacy(
             fixture_migrate_visual_frontend, self.LEGACY_SETTINGS_CONTENT
@@ -107,9 +105,7 @@ test.describe('Settings page @visual', () => {
         content = (e2e_dir / "route-settings.spec.ts").read_text()
         assert "mockSettingsFormAPIs" in content, "Custom import not merged into route file"
 
-    def test_provenance_comment_present(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_provenance_comment_present(self, fixture_migrate_visual_frontend: Path) -> None:
         """Preserved custom tests are annotated with their source file."""
         e2e_dir, _ = self._setup_legacy(
             fixture_migrate_visual_frontend, self.LEGACY_SETTINGS_CONTENT
@@ -119,9 +115,7 @@ test.describe('Settings page @visual', () => {
         content = (e2e_dir / "route-settings.spec.ts").read_text()
         assert "Preserved from settings.spec.ts" in content, "Provenance comment missing"
 
-    def test_legacy_file_deleted_after_merge(
-        self, fixture_migrate_visual_frontend: Path
-    ) -> None:
+    def test_legacy_file_deleted_after_merge(self, fixture_migrate_visual_frontend: Path) -> None:
         """Legacy settings.spec.ts is deleted after custom tests are successfully merged."""
         e2e_dir, legacy = self._setup_legacy(
             fixture_migrate_visual_frontend, self.LEGACY_SETTINGS_CONTENT

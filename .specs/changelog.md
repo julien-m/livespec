@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-09-07 — [Feature 079] Check: Pre-fix audit resumed
+
+- Read [the 079 check report](features/079-validator-ci-prerequisites/checks/2026-09-07.md): preparation readiness verified; final implementation and same-SHA CI proof remain pending.
+
 ## 2026-09-07 — Fix independent pipeline closure: bound CLI/runtime, explicit feature and review identity, reject usage exit2.
 <!-- finalize:spec-fix:2026-09-07:8403a3bf -->
 
@@ -704,3 +708,7 @@ Automatic active-plan policy union preserves earlier required procedures; the re
 - 2026-09-07 — [Feature078] Check93766262 :FR-009 et packaging inspectés; fermeture partielle. Lire le [rapport coordinateur](features/078-requirement-evidence-integrity/checks/2026-09-07-coordinator.md).
 
 - 2026-09-07 — [Feature078] Check qualitéa0cfa9f9 :suivi clôture sans nouveau finding;full078partiel. Lire le [rapport](features/078-requirement-evidence-integrity/checks/2026-09-07-closure-followup.md).
+
+## 2026-09-07 — [Fix] Validator CI prerequisites 079
+
+- Read [the scoped repair report](features/079-validator-ci-prerequisites/checks/2026-09-07.md): local lint, typing, units, integration and coverage repaired; native partial acceptance and exact same-SHA remote CI remain distinct proof obligations.

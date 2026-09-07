@@ -352,9 +352,9 @@ flowchart TD
 ```python
 @dataclass
 class VisualState:
-    state_id: str              # "disabled", "enabled", "loading"
+    state_id: str  # "disabled", "enabled", "loading"
     css_attributes: list[str]  # ["[disabled]", ".btn-disabled"]
-    screenshot: str            # "submit-disabled.png"
+    screenshot: str  # "submit-disabled.png"
 ```
 
 ### Trait dataclass (extended)

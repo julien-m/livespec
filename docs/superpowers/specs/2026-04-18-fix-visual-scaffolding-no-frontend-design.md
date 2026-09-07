@@ -186,7 +186,10 @@ class TestMigrateVisualNoWebProject:
     def test_force_flag_bypasses_guard(self, fixture_no_web: Path) -> None:
         result = subprocess.run(
             ["node", str(SCRIPT_PATH), "--generate", "--force"],
-            cwd=str(fixture_no_web), capture_output=True, text=True, timeout=30,
+            cwd=str(fixture_no_web),
+            capture_output=True,
+            text=True,
+            timeout=30,
             env=os.environ.copy(),
         )
         assert result.returncode == 0

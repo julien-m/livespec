@@ -114,9 +114,7 @@ class SuppressionDirectives(GatesBaseModel):
 class TokenScale(GatesBaseModel):
     """Allowed numeric design-token scale."""
 
-    scale: list[int] = Field(
-        default_factory=lambda: [2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80]
-    )
+    scale: list[int] = Field(default_factory=lambda: [2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80])
     properties: list[str] = Field(default_factory=lambda: ["padding", "margin", "spacing"])
 
 

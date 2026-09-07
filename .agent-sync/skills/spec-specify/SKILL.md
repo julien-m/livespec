@@ -307,8 +307,8 @@ try:
 except NnnCollisionError as exc:
     raise SystemExit(f"BLOCKED at step 2 - state_invalid - NNN collision: {exc}")
 
-print(reservation.slug)        # → "004-notifications"
-print(reservation.directory)   # → .specs/features/004-notifications/
+print(reservation.slug)  # → "004-notifications"
+print(reservation.directory)  # → .specs/features/004-notifications/
 ```
 
 ### Step 3 — Create Feature Directory

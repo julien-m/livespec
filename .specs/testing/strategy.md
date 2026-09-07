@@ -65,12 +65,14 @@
 import pytest
 from validator.parser import parse_spec_frontmatter
 
+
 def test_ac001_valid_frontmatter_parsed():
     """AC-001: valid frontmatter is parsed correctly."""
     content = "---\nstatus: Draft\nfeature: auth\n---\n# Spec"
     result = parse_spec_frontmatter(content)
     assert result["status"] == "Draft"
     assert result["feature"] == "auth"
+
 
 def test_ac002_missing_frontmatter_returns_empty():
     """AC-002: missing frontmatter returns empty dict without error."""

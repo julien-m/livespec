@@ -207,63 +207,56 @@ capabilities:
 ```python
 class WebHandler(UIRunnerHandler):
     """Handler for web projects using Playwright."""
-    
+
     def detect(self, project_dir: Path) -> bool:
         """Check if project has package.json and playwright config."""
         has_package_json = (project_dir / "package.json").exists()
-        has_playwright_config = any(
-            project_dir.glob("playwright*.config.*")
-        )
+        has_playwright_config = any(project_dir.glob("playwright*.config.*"))
         return has_package_json and has_playwright_config
-    
+
     def capture_screenshot(self, screen: str) -> UICapabilityResult:
         """Invoke: npx playwright test --grep @capture"""
         result = subprocess.run(
             ["npx", "playwright", "test", "--grep", f"@capture-{screen}"],
             cwd=self.project_dir,
-            capture_output=True
+            capture_output=True,
         )
         return UICapabilityResult(
             success=result.returncode == 0,
             output_path=self.project_dir / f".specs/design/screens/{screen}.png",
-            metadata={"stdout": result.stdout.decode()}
+            metadata={"stdout": result.stdout.decode()},
         )
-    
+
     def run_flow(self, flow_name: str) -> UICapabilityResult:
         """Invoke: npx playwright test"""
         result = subprocess.run(
-            ["npx", "playwright", "test"],
-            cwd=self.project_dir,
-            capture_output=True
+            ["npx", "playwright", "test"], cwd=self.project_dir, capture_output=True
         )
         return UICapabilityResult(
             success=result.returncode == 0,
             output_path=self.project_dir / "playwright-report",
-            metadata={"report": "See playwright-report/ for details"}
+            metadata={"report": "See playwright-report/ for details"},
         )
-    
-    def compare_baseline(self, baseline: str, screenshot: str, threshold: float = 0.05) -> UICapabilityResult:
+
+    def compare_baseline(
+        self, baseline: str, screenshot: str, threshold: float = 0.05
+    ) -> UICapabilityResult:
         """Invoke: node scripts/pixelmatch-cli.js (from Feature 010)"""
         script_path = self.project_dir / "scripts" / "pixelmatch-cli.js"
         if not script_path.exists():
             return UICapabilityResult(
-                success=False,
-                error="pixelmatch-cli.js not found (Feature 010 not installed?)"
+                success=False, error="pixelmatch-cli.js not found (Feature 010 not installed?)"
             )
-        
+
         result = subprocess.run(
             ["node", str(script_path), baseline, screenshot, str(threshold)],
             cwd=self.project_dir,
-            capture_output=True
+            capture_output=True,
         )
         return UICapabilityResult(
             success=result.returncode == 0,
             output_path=self.project_dir / f"{baseline}.diff.png",
-            metadata={
-                "baseline": baseline,
-                "screenshot": screenshot,
-                "diff_produced": True
-            }
+            metadata={"baseline": baseline, "screenshot": screenshot, "diff_produced": True},
         )
 ```
 

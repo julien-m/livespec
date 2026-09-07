@@ -164,8 +164,7 @@ class TestMigrateVisualNoWebProject:
         result = _run_generate(fixture_no_web)
         expected = "VISUAL_SCAFFOLD_RESULT: files=0 dirs=0 routes=0 reason=no-frontend"
         assert expected in result.stdout, (
-            f"Expected sentinel '{expected}' in stdout.\n"
-            f"Got stdout: {result.stdout}"
+            f"Expected sentinel '{expected}' in stdout.\nGot stdout: {result.stdout}"
         )
 
     def test_skip_message_in_output(self, fixture_no_web: Path) -> None:
@@ -178,6 +177,7 @@ class TestMigrateVisualNoWebProject:
     def test_force_flag_bypasses_guard(self, fixture_no_web: Path) -> None:
         """--force overrides the guard and generates files as if a web frontend existed."""
         import os
+
         result = subprocess.run(
             ["node", str(SCRIPT_PATH), "--generate", "--force"],
             cwd=str(fixture_no_web),

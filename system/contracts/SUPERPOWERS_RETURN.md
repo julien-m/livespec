@@ -63,7 +63,11 @@ Identical anchoring as PHASE_RESULT and SHIP_RESULT: last-30-lines window, last 
 ## Caller behaviour
 
 ```python
-from validator.contracts import parse_superpowers_return, ContractParseError, ContractValidationError
+from validator.contracts import (
+    parse_superpowers_return,
+    ContractParseError,
+    ContractValidationError,
+)
 
 try:
     result = parse_superpowers_return(superpowers_stdout)

@@ -38,6 +38,7 @@ class RoadmapItem:
     link: str | None
     line_number: int
 
+
 @dataclass
 class FeatureInfo:
     dir_name: str
@@ -47,6 +48,7 @@ class FeatureInfo:
     status: str | None
     spec_anchors: list[str]  # FR-xxx, AC-xxx from implementation.md
     spec_mtime: float | None  # for suppress_if_creating
+
 
 @dataclass
 class SpecGraph:
@@ -69,8 +71,8 @@ class CoherenceRule(Protocol):
     description: str
     wave: int
 
-    def check(self, graph: SpecGraph) -> list[Violation]:
-        ...
+    def check(self, graph: SpecGraph) -> list[Violation]: ...
+
 
 @dataclass
 class Violation:

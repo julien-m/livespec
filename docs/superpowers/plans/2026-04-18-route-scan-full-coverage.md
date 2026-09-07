@@ -555,6 +555,7 @@ FIXTURE_MIGRATE_VISUAL_FRONTEND = Path(__file__).parent / "fixtures" / "migrate-
 def fixture_migrate_visual_frontend(tmp_path: Path) -> Path:
     """Frontend fixture with frontend/app/routes/ for route-scan tests."""
     import shutil
+
     dest = tmp_path / "migrate-visual-frontend"
     shutil.copytree(FIXTURE_MIGRATE_VISUAL_FRONTEND, dest)
     return dest
@@ -577,50 +578,75 @@ def _parse_sentinel_routes(stdout: str) -> tuple[int, int, int]:
 class TestMigrateVisualRouteScan:
     """Tests for route-scan functionality in migrate-visual-tests.js."""
 
-    def test_generates_route_test_for_uncovered_page(self, fixture_migrate_visual_frontend: Path) -> None:
+    def test_generates_route_test_for_uncovered_page(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
         """Route scan creates route-settings.spec.ts for settings.tsx not in any spec."""
         result = _run_generate(fixture_migrate_visual_frontend)
-        assert result.returncode == 0, f"Script failed:\nSTDOUT: {result.stdout}\nSTDERR: {result.stderr}"
+        assert result.returncode == 0, (
+            f"Script failed:\nSTDOUT: {result.stdout}\nSTDERR: {result.stderr}"
+        )
 
         e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
         route_test = e2e_dir / "route-settings.spec.ts"
-        assert route_test.exists(), f"route-settings.spec.ts not generated. stdout:\n{result.stdout}"
+        assert route_test.exists(), (
+            f"route-settings.spec.ts not generated. stdout:\n{result.stdout}"
+        )
 
     def test_route_test_uses_extracted_heading(self, fixture_migrate_visual_frontend: Path) -> None:
         """Route scan extracts h1 'Settings' from settings.tsx."""
         _run_generate(fixture_migrate_visual_frontend)
         content = (
-            fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e" / "route-settings.spec.ts"
+            fixture_migrate_visual_frontend
+            / "frontend"
+            / "tests"
+            / "e2e"
+            / "route-settings.spec.ts"
         ).read_text()
-        assert "HEADING = 'Settings'" in content, f"Heading not extracted correctly. Content:\n{content[:500]}"
+        assert "HEADING = 'Settings'" in content, (
+            f"Heading not extracted correctly. Content:\n{content[:500]}"
+        )
 
     def test_skips_redirect_only_routes(self, fixture_migrate_visual_frontend: Path) -> None:
         """Profile page with redirect() and no h1 is not generated."""
         _run_generate(fixture_migrate_visual_frontend)
         e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
-        assert not (e2e_dir / "route-profile.spec.ts").exists(), \
+        assert not (e2e_dir / "route-profile.spec.ts").exists(), (
             "Redirect-only page should not get a route test"
+        )
 
-    def test_generates_not_found_test_from_root(self, fixture_migrate_visual_frontend: Path) -> None:
+    def test_generates_not_found_test_from_root(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
         """notFoundComponent in __root.tsx produces route-not-found.spec.ts."""
         _run_generate(fixture_migrate_visual_frontend)
         e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
-        assert (e2e_dir / "route-not-found.spec.ts").exists(), \
+        assert (e2e_dir / "route-not-found.spec.ts").exists(), (
             "route-not-found.spec.ts not generated from __root.tsx"
+        )
 
-    def test_route_test_overwrites_on_regenerate(self, fixture_migrate_visual_frontend: Path) -> None:
+    def test_route_test_overwrites_on_regenerate(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
         """Running --generate twice overwrites route-* tests (no AC-030 protection)."""
         _run_generate(fixture_migrate_visual_frontend)
         route_test = (
-            fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e" / "route-settings.spec.ts"
+            fixture_migrate_visual_frontend
+            / "frontend"
+            / "tests"
+            / "e2e"
+            / "route-settings.spec.ts"
         )
         original_mtime = route_test.stat().st_mtime
 
         import time
+
         time.sleep(0.1)
         _run_generate(fixture_migrate_visual_frontend)
         new_mtime = route_test.stat().st_mtime
-        assert new_mtime > original_mtime, "route-settings.spec.ts was not overwritten on second run"
+        assert new_mtime > original_mtime, (
+            "route-settings.spec.ts was not overwritten on second run"
+        )
 
     def test_sentinel_includes_routes_count(self, fixture_migrate_visual_frontend: Path) -> None:
         """Sentinel line includes routes= count reflecting route-scan results."""
@@ -633,7 +659,9 @@ class TestMigrateVisualRouteScan:
 class TestMigrateVisualDeleteSuperseded:
     """Tests for auto-deletion of superseded non-numbered tests."""
 
-    def test_deletes_superseded_test_covered_by_route_scan(self, fixture_migrate_visual_frontend: Path) -> None:
+    def test_deletes_superseded_test_covered_by_route_scan(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
         """Old settings.spec.ts is deleted after route-settings.spec.ts is generated."""
         e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
         e2e_dir.mkdir(parents=True, exist_ok=True)
@@ -642,10 +670,12 @@ class TestMigrateVisualDeleteSuperseded:
 
         _run_generate(fixture_migrate_visual_frontend)
 
-        assert not old_test.exists(), \
+        assert not old_test.exists(), (
             "settings.spec.ts should be deleted after route-settings.spec.ts covers /settings"
-        assert (e2e_dir / "route-settings.spec.ts").exists(), \
+        )
+        assert (e2e_dir / "route-settings.spec.ts").exists(), (
             "route-settings.spec.ts should exist as replacement"
+        )
 
     def test_preserves_numbered_tests(self, fixture_migrate_visual_frontend: Path) -> None:
         """Numbered tests (001-*.spec.ts) are never deleted."""
@@ -658,7 +688,9 @@ class TestMigrateVisualDeleteSuperseded:
 
         assert numbered.exists(), "Numbered test 001-auth-ui.spec.ts must not be deleted"
 
-    def test_preserves_route_prefixed_tests_from_deletion(self, fixture_migrate_visual_frontend: Path) -> None:
+    def test_preserves_route_prefixed_tests_from_deletion(
+        self, fixture_migrate_visual_frontend: Path
+    ) -> None:
         """route-* tests are never deleted by deleteSupersededTests."""
         e2e_dir = fixture_migrate_visual_frontend / "frontend" / "tests" / "e2e"
         e2e_dir.mkdir(parents=True, exist_ok=True)

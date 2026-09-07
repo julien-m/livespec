@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
+from tests._json_fixture import json_fixture
 from tests.goal_bootstrap_support import archive_valid_pair as valid_pair
 from tests.goal_bootstrap_support import write_pair
 from validator import goal_archive_fd, goal_archive_paths
@@ -130,7 +131,7 @@ def test_specs_swap_before_runs_mkdir_keeps_external_trap_untouched(
         dir_fd: int | None = None,
     ) -> None:
         nonlocal swapped
-        if not swapped and Path(path).name == ".runs":
+        if not swapped and Path(os.fsdecode(path)).name == ".runs":
             swapped = True
             specs.rename(old_specs)
             specs.symlink_to(trap, target_is_directory=True)
@@ -254,7 +255,7 @@ def test_archive_preserves_existing_outcomes(
     assert result.outcome == outcome
     assert result.path is not None and result.path.exists()
     assert result.artifact is not None
-    assert result.artifact["command"] == "spec-init"
-    assert result.artifact["goal_hash"] == contract["goal_hash"]
-    assert result.artifact["feature"] == contract["feature"]
-    assert result.artifact["verify_result"]["outcome"] == outcome
+    assert json_fixture(result.artifact)["command"] == "spec-init"
+    assert json_fixture(result.artifact)["goal_hash"] == contract["goal_hash"]
+    assert json_fixture(result.artifact)["feature"] == contract["feature"]
+    assert json_fixture(result.artifact)["verify_result"]["outcome"] == outcome
