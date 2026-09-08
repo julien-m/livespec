@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from errno import ELOOP, ENOTDIR
 from pathlib import Path
 
-from .goal_archive_file import FileIdentity
+from .goal_archive_file import OwnedTemporary
 from .goal_archive_file import acquire_archive_lock as _acquire_archive_lock
 from .goal_archive_file import entry_identity as _entry_identity
 from .goal_archive_file import publish_owned_temporary as _publish_temporary
@@ -93,17 +93,17 @@ def _write_confined_artifact(
 ) -> Path:
     temporary_name = _temporary_name(filename)
     opened: _OpenedRunsDirectory | None = None
-    temporary_identity: FileIdentity | None = None
+    temporary: OwnedTemporary | None = None
     final_written = False
     try:
         opened = _open_runs_directory(project_root)
         if opened.runs_path != destination.resolve(strict=True):
             raise ConfinedArchiveError("run destination changed after validation")
-        temporary_identity = _write_temporary(opened.runs_fd, temporary_name, artifact)
+        temporary = _write_temporary(opened.runs_fd, temporary_name, artifact)
         # Identity checks bracket publication because reordering would permit a
         # visible component swap to survive as an apparently valid archive.
         _require_opened_identity(opened)
-        _publish_temporary(opened.runs_fd, temporary_name, filename, temporary_identity)
+        _publish_temporary(opened.runs_fd, temporary_name, filename, temporary.identity)
         final_written = True
         _require_opened_identity(opened)
         return opened.runs_path / filename
@@ -112,14 +112,19 @@ def _write_confined_artifact(
             opened.runs_fd if opened is not None else -1,
             temporary_name,
             filename,
-            expected_identity=temporary_identity,
+            expected_identity=temporary.identity if temporary is not None else None,
             final_written=final_written,
         )
         detail = f"; artifact cleanup failed: {cleanup_error}" if cleanup_error else ""
         raise ConfinedArchiveError(f"cannot write confined run artifact: {exc}{detail}") from exc
     finally:
-        if opened is not None:
-            _close_runs_directory(opened)
+        # @spec FR-005: Retain ownership through all publication and cleanup paths.
+        try:
+            if temporary is not None:
+                os.close(temporary.descriptor)
+        finally:
+            if opened is not None:
+                _close_runs_directory(opened)
 
 
 def _temporary_name(filename: str) -> str:

@@ -13,7 +13,7 @@ import pytest
 
 from validator import goal_archive_fd
 from validator.goal_archive_fd import ConfinedArchiveError
-from validator.goal_archive_file import FileIdentity
+from validator.goal_archive_file import FileIdentity, OwnedTemporary
 from validator.goal_json import JsonValue
 
 
@@ -116,7 +116,7 @@ def test_unchanged_runs_link_cannot_follow_target_moved_outside(
 
     def move_target_after_write(
         runs_fd: int, temporary_name: str, artifact: Mapping[str, JsonValue]
-    ) -> FileIdentity:
+    ) -> OwnedTemporary:
         identity = original_write(runs_fd, temporary_name, artifact)
         contained.rename(moved)
         contained.symlink_to(moved, target_is_directory=True)

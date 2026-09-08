@@ -1,5 +1,11 @@
 # Changelog: Spec Init Goal Bootstrap (076)
 
+## 2026-09-08 — Check: Linux temporary ownership gap confirmed
+
+- Read [the V5 independent check](checks/2026-09-08-v5-precheck.md): the temporary writer closes its descriptor before publication, so Linux unlink/recreate can reuse `(st_dev, st_ino)` and impersonate owned residue.
+- FR-005 and AC-006/AC-008 remain partial until an `OwnedTemporary(descriptor, identity)` stays open through publication and cleanup, closes in `finally`, and the causal race/lifecycle tests pass.
+- Author: Codex.
+
 ## 2026-09-04 — [Implement]: Initial bootstrap implementation completed
 
 - Added canonical fresh-root rendering, fail-closed proof, contained archive, and strict non-init compatibility.

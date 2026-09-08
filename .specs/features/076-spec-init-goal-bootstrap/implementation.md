@@ -3,12 +3,19 @@ created: 2026-09-04
 feature: 076-spec-init-goal-bootstrap
 title: "Implementation Map: Spec Init Goal Bootstrap"
 type: implementation
-updated: 2026-09-04
+updated: 2026-09-08
 ---
 
 # Implementation Map: Spec Init Goal Bootstrap (076)
 
-**Status:** Tested — Feature 076 PASS; one unrelated repository/external regression remains documented in the test report.
+**Status:** V5 implementation checkpoint — the descriptor ownership correction passes targeted local checks; native execution proof and the independent post-check remain pending. The prior Feature PASS below is historical evidence and does not establish Linux parity.
+
+## V5 temporary ownership correction — 2026-09-08
+
+- Inspect [the archive writer](../../../validator/goal_archive_file.py) for `OwnedTemporary(descriptor, identity)` and the write-failure `finally` close. Inspect [the coordinator](../../../validator/goal_archive_fd.py) for the descriptor retained through publication and cleanup before one final close.
+- Run [the lifecycle matrix](../../../tests/test_goal_archive_file.py) to prove success, write/fsync, pre-publication, link, post-publication and cleanup failures. Inspect [the race assertions](../../../tests/test_goal_bootstrap_archive_races.py) and [publication assertions](../../../tests/test_goal_bootstrap_archive_publication.py): only temporary-writer return annotations changed; foreign replacements remain protected.
+- FR-005 / AC-006 / AC-008: local targeted evidence is 21 passed; Ruff, format, Pyright and mypy pass. This checkpoint does not certify all acceptance criteria or Linux CI. The full native capture and independent post-check are still required.
+- Read [the independent pre-check](checks/2026-09-08-v5-precheck.md) for the observed Linux inode-reuse failure. The correction preserves cooperative locking, exclusive publication, the non-cooperating syscall-race boundary, and all historical receipts.
 
 ## Requirement Mapping
 
@@ -42,7 +49,7 @@ updated: 2026-09-04
 | AC-009 | Prove/archive/non-init modules: external control files allowed while project evidence and run destinations remain confined | Covered — PASS |
 | AC-010 | [`tests/test_goal_bootstrap_pairing.py`](../../../tests/test_goal_bootstrap_pairing.py): explicit pair failures and legacy/mixed claims | Covered — PASS |
 
-## Verification
+## Historical verification — 2026-09-04
 
 | Gate | Result |
 |---|---|

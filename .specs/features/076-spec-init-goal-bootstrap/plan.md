@@ -311,10 +311,15 @@ No ER diagram applies. The feature introduces no database table or persistent en
 - Modify [`validator/run_artifacts.py`](../../../validator/run_artifacts.py) only at the existing `archive_goal_run()` façade to delegate destination selection to `goal_archive_paths`; extract the pre-existing destination helper if needed so this façade returns to at most 300 lines.
 - Modify [`validator/cli_commands/goal_cmd.py`](../../../validator/cli_commands/goal_cmd.py) so archive supplies the validated render-time root and preserves text/JSON output plus success/drift/error/blocked exit mapping.
 - Create [`tests/test_goal_bootstrap_archive.py`](../../../tests/test_goal_bootstrap_archive.py) for archive before/after `.specs`, absent/existing/escaping `.runs`, cwd and symlink retargeting, external transcripts, feature mismatch, artifact identity, state immutability, and all outcomes.
+- Modify [`validator/goal_archive_file.py`](../../../validator/goal_archive_file.py) to return `OwnedTemporary(descriptor, identity)` after writing and fsync; retain the owned descriptor so unlink/recreate cannot reuse its inode while ownership checks remain active. Close it exactly once in `finally` if writing or fsync fails before ownership transfer.
+- Modify [`validator/goal_archive_fd.py`](../../../validator/goal_archive_fd.py) to keep that descriptor open through publication and any cleanup, passing its identity to existing ownership checks and closing it exactly once in `finally` on success and every failure. Preserve exclusive publication, cooperative locking, and the documented non-cooperating check-to-syscall boundary.
+- Adapt only the causal temporary-writer wrappers in [`tests/test_goal_bootstrap_archive_races.py`](../../../tests/test_goal_bootstrap_archive_races.py) and [`tests/test_goal_bootstrap_archive_publication.py`](../../../tests/test_goal_bootstrap_archive_publication.py); preserve their replacement and publication assertions. Create [`tests/test_goal_archive_file.py`](../../../tests/test_goal_archive_file.py) for descriptor lifetime and single-close evidence on success, write/fsync failure, pre-publication identity failure, link failure, post-publication identity failure, and cleanup failure.
 
 **FR covered:** FR-005.2: archive under persisted root, FR-006.3: preserve non-init archive behavior, FR-007.3: format archive blockers, FR-010.3: preserve outcomes and state bytes, FR-011.2: confine run destination.
 
 **Verification:** Assert exactly one contained artifact on writable outcomes, no partial/temp residue, matching command/hash/feature/outcome, exit 0/1/2 semantics, and no `.specs` bootstrap side effect.
+
+For FR-005 / AC-006 / AC-008, additionally assert that the descriptor is live during publication and cleanup, is closed exactly once afterward on every listed outcome, and that Linux unlink/recreate replacements remain neither published nor removed. An injected cleanup failure must retain the existing explicit blocked diagnostic while still closing the descriptor; do not conceal residual cleanup errors.
 
 ### Step 5 - Close the regression and compatibility matrix
 
@@ -332,9 +337,9 @@ No ER diagram applies. The feature introduces no database table or persistent en
 
 **Files:**
 
-- Create [`implementation.md`](implementation.md) mapping FR-001 through FR-012 and AC-001 through AC-010 to source anchors and concrete tests.
-- Create/update [`progress.md`](progress.md) with one checkpoint row per implementation step and exact commands/receipts.
-- Update [`changelog.md`](changelog.md), [`.specs/changelog.md`](../../changelog.md), and [`.specs/README.md`](../../README.md) only through the owning LiveSpec phase/finalizer.
+- Create the feature implementation map, mapping FR-001 through FR-012 and AC-001 through AC-010 to source anchors and concrete tests.
+- Record one feature progress checkpoint row per implementation step with exact commands and receipts.
+- Update the feature changelog, project changelog and feature index only through the owning LiveSpec phase/finalizer.
 
 **FR covered:** FR-008.2: record complete regression evidence, FR-012.4: document rerender recovery and legacy boundary.
 
@@ -372,6 +377,7 @@ No ER diagram applies. The feature introduces no database table or persistent en
 | P0 | Unit + CLI integration | Raw omitted/empty path boundary plus every atomic contract/state mirror, hash, task, feature, mixed-command claim, and status defect before project access | `tests/test_goal_bootstrap_pairing.py` | Feature unit/integration command | FR-004, FR-005, FR-010, FR-012 / AC-004, AC-010 |
 | P0 | Unit + CLI integration | Pending and complete-task acceptance/rejection transitions, inline/external evidence, cwd independence, named-task-only mutation | `tests/test_goal_bootstrap_prove.py` | Feature unit/integration command | FR-004, FR-010 / AC-005, AC-008 |
 | P0 | Unit + CLI integration | Archive before/after `.specs`, missing/contained/escaping `.runs`, success/drift/error/blocked, state immutability | `tests/test_goal_bootstrap_archive.py` | Feature unit/integration command | FR-005, FR-007, FR-010, FR-011 / AC-006, AC-007, AC-009 |
+| P0 | Unit + race regression | Owned descriptor stays live through publication/cleanup and closes exactly once on success, write/fsync, pre-publication, link, post-publication, and cleanup failures; preserve Linux replacement assertions | Execute [descriptor lifecycle tests](../../../tests/test_goal_archive_file.py), [archive race tests](../../../tests/test_goal_bootstrap_archive_races.py), and [publication tests](../../../tests/test_goal_bootstrap_archive_publication.py) | Unit suite, no LLM command | FR-005 / AC-006, AC-008 |
 | P0 | Regression | No-command-claim pairs route through strict `find_specs_root()`; non-`spec-init` render/prove/archive path classification, outputs, exits, and mutations stay unchanged | `tests/test_goal_bootstrap_non_init.py`, `tests/test_goal_contracts.py`, `tests/test_goal_archive_cli.py`, `tests/test_run_artifact.py` | Goal/runtime regression command | FR-001, FR-006, FR-008 / AC-007, AC-008, AC-009 |
 | P1 | Regression | Migration/version guard still permits only its existing internal exception and blocks stale non-init goals | `tests/test_version_guard.py` | Goal/runtime regression command | FR-006, FR-008 / AC-008 |
 | P1 | Static quality | Public types, path helpers, CLI boundaries, and tests satisfy Python conventions | Changed Python files | Ruff + format + Pyright commands | All FR / SC-005 |
@@ -399,6 +405,7 @@ Known evidence gap: this Plan phase defines commands and artifacts but does not 
 - **Symlink race boundary:** The plan canonicalizes the render-time target and rechecks evidence/run destination real paths. Detecting delete-and-recreate at the same canonical path remains explicitly out of scope.
 - **State compatibility:** Rejection of a previously complete task intentionally reopens it while retaining accepted evidence A. Simplifying that behavior would be a breaking change.
 - **Archive write safety:** `mkdir(parents=True)` must not bootstrap `.specs`; only a missing contained `.runs` may be created after `.specs` identity is verified.
+- **Temporary ownership lifetime:** A saved device/inode tuple alone is insufficient after closing the descriptor: Linux can reuse an unlinked inode for a foreign replacement. Keep `OwnedTemporary(descriptor, identity)` alive through publication and cleanup, with one `finally` close on success and every failure, including cleanup failure; this does not extend the existing non-cooperating check-to-syscall guarantee.
 - **Test volume:** Use parameterization and fixture builders to cover the large matrix without duplicated setup or vague aggregate assertions.
 
 ## Next Action
