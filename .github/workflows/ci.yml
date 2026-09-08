@@ -20,6 +20,7 @@ on:
 
 env:
   NODE_VERSION: '26.3.0'
+  PLAYWRIGHT_INSTALL_NODE_VERSION: '20.20.2'
   CLAUDE_CODE_VERSION: '2.1.259'
   CODEX_VERSION: '0.149.1'
 
@@ -68,7 +69,16 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: npm ci
+      # Node 26 stalls after the browser download; Node 20 completes installation.
+      - name: Use Node for browser installation
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.PLAYWRIGHT_INSTALL_NODE_VERSION }}
       - run: npx playwright install --with-deps chromium
+      - name: Restore test and generation runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - run: ruff check .
       - run: ruff format --check .
       - run: pyright validator
@@ -127,7 +137,16 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: npm ci
+      # Node 26 stalls after the browser download; Node 20 completes installation.
+      - name: Use Node for browser installation
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.PLAYWRIGHT_INSTALL_NODE_VERSION }}
       - run: npx playwright install --with-deps chromium
+      - name: Restore test and generation runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - run: pytest tests/integration/ -m level_3a -v --tb=short
 
   generation-selection:
@@ -221,7 +240,16 @@ jobs:
               shutil.rmtree(checkout)
           PYTHON
       - run: npm ci
+      # Node 26 stalls after the browser download; Node 20 completes installation.
+      - name: Use Node for browser installation
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.PLAYWRIGHT_INSTALL_NODE_VERSION }}
       - run: npx playwright install --with-deps chromium
+      - name: Restore test and generation runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - run: >
           npm install --global
           "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"

@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-09-07
+> Last updated: 2026-09-08
 
 
 ---
@@ -116,7 +116,7 @@
 | 076 | Spec Init Goal Bootstrap | Implemented | 2026-09-04 | 2026-09-04 | Read [spec](features/076-spec-init-goal-bootstrap/spec.md), [plan](features/076-spec-init-goal-bootstrap/plan.md), and [implementation](features/076-spec-init-goal-bootstrap/implementation.md) |
 | 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-09-05 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
 | 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-09-07 | [spec](features/078-requirement-evidence-integrity/spec.md) |
-| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-09-07 | [spec](features/079-validator-ci-prerequisites/spec.md) |
+| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-09-08 | [spec](features/079-validator-ci-prerequisites/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -140,6 +140,9 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-09-08 | Bugfix | Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending. |
+| 2026-09-08 | Check | Feature079 Check: local repair and native AC-002 verified; progress structure fixed; exact CI acceptance remains pending. |
+| 2026-09-07 | Check | [Feature 079] Check: Pre-fix audit resumed |
 | 2026-09-07 | Bugfix | Fix independent pipeline closure: bound CLI/runtime, explicit feature and review identity, reject usage exit2. |
 | 2026-09-07 | Feature | 078: repair reviewed-spec coordinator binding, reject incomplete mapping reviews before execution, preserve active child waits and isolated snapshot evidence. |
 | 2026-09-07 | Feature | 078: correct coordinator reviewed-spec acceptance and isolated snapshot inputs; full feature closure remains pending. |
@@ -147,9 +150,6 @@
 | 2026-09-06 | Feature | [Feature 078] Test: 100% AC definitions covered (16/16), 0 tests generated; deterministic scope passed with historical limits retained |
 | 2026-09-06 | Feature | [Feature 078] Implementation lifecycle: requirement evidence integrity |
 | 2026-09-06 | Feature | Requirement Evidence Integrity: linked four success criteria to existing steps and evidence; scope unchanged |
-| 2026-09-06 | Feature | Requirement Evidence Integrity: plan created with eight steps across three lots and explicit proof boundaries |
-| 2026-09-06 | Feature | Feature078: specify requirement evidence integrity across five axes |
-| 2026-09-05 | Feature | [Feature 077] Implemented: Penflow cumulative verification consumer and governed lifecycle closure |
 <!-- readme:activity:end -->
 
 ---
@@ -259,3 +259,7 @@
 <!-- finalize:spec-fix:2026-09-07:73d32812 -->
 
 <!-- finalize:spec-fix:2026-09-07:8403a3bf -->
+
+<!-- finalize:spec-check:2026-09-08:42b65563 -->
+
+<!-- finalize:spec-fix:2026-09-08:f5eb771d -->

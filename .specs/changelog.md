@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-09-08 — Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending.
+<!-- finalize:spec-fix:2026-09-08:f5eb771d -->
+
+## 2026-09-08 — Feature079 Check: local repair and native AC-002 verified; progress structure fixed; exact CI acceptance remains pending.
+<!-- finalize:spec-check:2026-09-08:42b65563 -->
+
 ## 2026-09-07 — [Feature 079] Check: Pre-fix audit resumed
 
 - Read [the 079 check report](features/079-validator-ci-prerequisites/checks/2026-09-07.md): preparation readiness verified; final implementation and same-SHA CI proof remain pending.

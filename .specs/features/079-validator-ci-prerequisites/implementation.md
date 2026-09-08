@@ -8,16 +8,16 @@ status: In Progress
 
 # Implementation Mapping
 
-Repairs are applied locally. This complete file scope is retained for native conventions checks. Runtime and remote evidence remain separate; same-SHA CI and full feature certification are pending.
+Repairs are committed in PR #35. This complete file scope is retained for native conventions checks. Runtime and remote evidence remain separate; same-SHA CI and full feature certification are pending.
 
 ## Requirement Mapping
 
 | Requirement | Files | Status |
 |---|---|---|
 | FR-001 | Source/test paths below | Local lint and typing verified |
-| FR-002 | Read [CI](../../../.github/workflows/ci.yml) | Pending |
-| FR-003 | Read [CI](../../../.github/workflows/ci.yml) | Pending |
-| FR-004 | Read [visual tests](../../../tests/test_visual_gate.py) | Pending |
+| FR-002 | Read [CI](../../../.github/workflows/ci.yml) | Real local authority tests and native AC-002 verified; pinned CI dependency installation observed successful |
+| FR-003 | Read [CI](../../../.github/workflows/ci.yml) | Full local unit and integration suites verified |
+| FR-004 | Read [visual tests](../../../tests/test_visual_gate.py) | Local branch coverage 94.41 percent at unchanged 94 percent threshold |
 | FR-005 | Read [CI](../../../.github/workflows/ci.yml) | Pending |
 
 ## Files Created/Modified
@@ -90,6 +90,7 @@ Repairs are applied locally. This complete file scope is retained for native con
 
 - Inspect [.specs/README.md](../../../.specs/README.md) for scoped repair documentation.
 - Inspect [.specs/changelog.md](../../../.specs/changelog.md) for scoped repair documentation.
+- Inspect [.specs/roadmap.md](../../../.specs/roadmap.md) for the unchecked feature reference required by native finalization rule R1.2.
 - Inspect [.specs/features/079-validator-ci-prerequisites/changelog.md](../../../.specs/features/079-validator-ci-prerequisites/changelog.md) for scoped repair documentation.
 - Inspect [.specs/features/079-validator-ci-prerequisites/implementation.md](../../../.specs/features/079-validator-ci-prerequisites/implementation.md) for scoped repair documentation.
 - Inspect [.specs/features/079-validator-ci-prerequisites/plan.md](../../../.specs/features/079-validator-ci-prerequisites/plan.md) for scoped repair documentation.
@@ -97,12 +98,18 @@ Repairs are applied locally. This complete file scope is retained for native con
 - Inspect [.specs/features/079-validator-ci-prerequisites/spec.md](../../../.specs/features/079-validator-ci-prerequisites/spec.md) for scoped repair documentation.
 - Inspect [.specs/features/079-validator-ci-prerequisites/checks/2026-09-07.md](../../../.specs/features/079-validator-ci-prerequisites/checks/2026-09-07.md) for scoped repair documentation.
 
+- Read [the final dated post-fix report](checks/2026-09-08.md) for repaired gaps and remaining evidence obligations.
+
 ## Acceptance Criteria Mapping
 
 | AC | Check | Status |
 |---|---|---|
 | AC-001 | Full Ruff and typing gates | Local PASS; zero lint, formatting, pyright and mypy errors |
-| AC-002 | Real Penflow subprocess suites | Direct suites PASS with verified pinned CLI; reviewed native mapping remains separate |
+| AC-002 | Real Penflow subprocess suites | Direct suites PASS with verified pinned CLI; receipt 365db753242e443c997ae891fc20b86f verified against the stabilized source certifies AC-002 only |
 | AC-003 | Full unit and level_3a suites | 3726 unit passed; 89 integration passed; existing skips preserved |
 | AC-004 | Visual coverage and symlink cases | 121 passed, 94.41 percent |
 | AC-005 | Same-SHA stable GitHub workflow | Pending |
+
+## Browser installation repair
+
+The pinned Node20.20.2 runtime installs Chromium in the three dependent CI jobs, then Node26.3.0 is restored before all tests and generation. The same Playwright CLI completed a fresh installation in43.12 seconds; a real browser smoke under Node26.3.0 passed. The exact remote workflow still requires a new final-SHA result. Existing check commands, generation selection, models and budget remain unchanged.
