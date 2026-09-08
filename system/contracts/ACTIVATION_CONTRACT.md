@@ -58,6 +58,7 @@ For agents that receive a `feature_slug` in their payload (supervisor, implement
 
 ```python
 from validator.identity import assert_resolved
+
 assert_resolved(payload["feature_slug"])  # Raises IdentityResolutionError on placeholder/invalid
 ```
 

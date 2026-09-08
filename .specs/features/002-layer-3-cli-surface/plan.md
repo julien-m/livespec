@@ -251,11 +251,11 @@ def _resolve_feature_slug(path: Path | None, specs_root: Path) -> str | None:
   ```python
   @dataclass
   class SdkTestResult:
-      passed: int    # count from pytest summary line
-      failed: int    # count from pytest summary line
-      skipped: int   # count from pytest summary line
-      total: int     # passed + failed + skipped
-      exit_code: int # raw pytest returncode
+      passed: int  # count from pytest summary line
+      failed: int  # count from pytest summary line
+      skipped: int  # count from pytest summary line
+      total: int  # passed + failed + skipped
+      exit_code: int  # raw pytest returncode
       raw_output: str  # full captured stdout+stderr
   ```
   JSON output shape: `{"passed": N, "failed": N, "skipped": N, "total": N, "exit_code": N}` — `raw_output` is NOT included in JSON output (forwarded to stderr only)
@@ -285,6 +285,7 @@ class SdkDependencyError(Exception):
     Args:
         install_hint: pip install command to fix the issue.
     """
+
     INSTALL_HINT = "pip install -e .[integration]"
 
     def __init__(self) -> None:
@@ -323,7 +324,9 @@ class SdkTestRunError(Exception):
 
 **What to add to `validate()` signature:**
 ```python
-sdk_isolated: bool = typer.Option(False, "--sdk-isolated", help="Run Layer 3 SDK-isolated tests (pytest -m level_3b)")
+sdk_isolated: bool = typer.Option(
+    False, "--sdk-isolated", help="Run Layer 3 SDK-isolated tests (pytest -m level_3b)"
+)
 ```
 
 **What to add as routing block** (before the `if staged and path` mutual exclusion check, after `plan_review` block):

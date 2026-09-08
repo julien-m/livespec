@@ -48,7 +48,7 @@ def test_rust_adapter_detects_functions_and_allow_suppression() -> None:
 
 
 def test_kotlin_adapter_detects_functions_and_suppress() -> None:
-    text = "import a.b.C\n@Suppress(\"UNCHECKED_CAST\")\nfun run() {\n    val x = 1\n}\n"
+    text = 'import a.b.C\n@Suppress("UNCHECKED_CAST")\nfun run() {\n    val x = 1\n}\n'
     analysis = adapter_for_path(Path("X.kt")).analyze(Path("X.kt"), text)
     assert [fn.name for fn in analysis.functions] == ["run"]
     assert [s.token for s in analysis.suppressions] == ["Suppress"]

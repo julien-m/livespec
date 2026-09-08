@@ -12,7 +12,7 @@ from tests.goal_bootstrap_support import archive_valid_pair
 from validator import goal_archive_fd
 from validator import run_artifacts as run_artifacts_module
 from validator.goal_archive_fd import ConfinedArchiveError
-from validator.goal_archive_file import FileIdentity
+from validator.goal_archive_file import OwnedTemporary
 from validator.goal_json import JsonObject, JsonValue
 from validator.goal_run_builder import RunArtifactBuildInput
 from validator.outcome import Outcome
@@ -51,7 +51,7 @@ def test_real_specs_swap_during_write_is_blocked(
 
     def write_then_swap(
         runs_fd: int, temporary_name: str, artifact: Mapping[str, JsonValue]
-    ) -> FileIdentity:
+    ) -> OwnedTemporary:
         identity = original_write(runs_fd, temporary_name, artifact)
         specs.rename(tmp_path / "old-specs")
         (specs / ".runs").mkdir(parents=True)
@@ -81,7 +81,7 @@ def test_contained_runs_symlink_swap_during_write_is_blocked(
 
     def write_then_swap(
         runs_fd: int, temporary_name: str, artifact: Mapping[str, JsonValue]
-    ) -> FileIdentity:
+    ) -> OwnedTemporary:
         identity = original_write(runs_fd, temporary_name, artifact)
         contained.rename(outside / "moved")
         link.unlink()

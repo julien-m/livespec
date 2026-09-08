@@ -166,7 +166,9 @@ def test_ast_backend_absence_is_observe_warning_and_enforce_blocker(tmp_path: Pa
         backend=FakeAstBackend(available=False),
     )
     assert observe_result.summary is not None
-    assert observe_result.summary["ast_backend"]["status"] == "unavailable"
+    backend_summary = observe_result.summary["ast_backend"]
+    assert isinstance(backend_summary, dict)
+    assert backend_summary["status"] == "unavailable"
     assert observe_result.blockers == []
 
     enforce_root, enforce_source = _write_v2_project(tmp_path / "enforce", "enforce")

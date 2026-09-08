@@ -7,8 +7,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
-from click.testing import Result
-from typer.testing import CliRunner
+from typer.testing import CliRunner, Result
 
 from tests.goal_bootstrap_support import (
     add_other_task as _add_other_task,

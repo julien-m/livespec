@@ -156,14 +156,17 @@ Add tests that assert:
 ```python
 from validator.command_registry import discover_commands, command_names
 
+
 def test_registry_has_20_commands():
     assert len(command_names()) == 20
     assert "verify-output" in command_names()
+
 
 def test_every_command_has_md_and_expectations():
     for command in discover_commands():
         assert command.command_file.exists()
         assert command.expectations_file.exists()
+
 
 def test_routing_headings_match_registry():
     names = command_names()
@@ -225,6 +228,7 @@ def test_command_audit_clean_repo_exits_zero():
     assert result.exit_code == 0
     assert "LIVESPEC command-audit · OK" in result.output
 
+
 def test_command_audit_missing_expectations_exits_one(tmp_path):
     project = copy_minimal_livespec_repo(tmp_path)
     (project / "commands/spec-status.expectations.md").unlink()
@@ -255,6 +259,7 @@ In `validator/cli.py`, import and register:
 
 ```python
 from .cli_commands.command_audit_cmd import register as register_command_audit
+
 register_command_audit(app)
 ```
 
@@ -370,6 +375,7 @@ def test_all_builtins_have_exit_code_rule():
     for cmd in EXPECTED_COMMANDS:
         exp = parse_expectations(COMMANDS_DIR / f"{cmd}.expectations.md")
         assert any(r.kind == "exit_code" for r in exp.verify.must), cmd
+
 
 def test_all_builtins_have_command_specific_signal():
     for cmd in EXPECTED_COMMANDS:

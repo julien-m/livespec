@@ -149,7 +149,9 @@ def test_explicit_target_controls_root_and_conventions(
     )
 
     assert result.exit_code == 0, result.output
-    contract_path = Path(re.search(r"contract-file:(\S+)", result.output).group(1))
+    contract_match = re.search(r"contract-file:(\S+)", result.output)
+    assert contract_match is not None
+    contract_path = Path(contract_match.group(1))
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
     assert contract["project_root"] == target.resolve().as_posix()
     assert contract["normalized_flags"] == ["--auto", f"--dir={target.resolve()}"]

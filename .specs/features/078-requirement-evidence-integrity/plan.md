@@ -184,11 +184,11 @@ Extend `tests/integration/helpers/sdk_runner.py` so the caller owns a context-ma
 
 Add reusable evaluator/result helpers plus `tests/integration/test_generation_witnesses.py`, then strengthen `test_spec_feature.py`/`test_non_regression.py` to consume behavioral results instead of only headings. Record first_attempt_success, repaired_success, correct_blocked (only when witness expects blocking), failure, invalid and not_run separately, attempts, timeout, observed model/runtime, duration and measured nullable cost. Successful process exit is not behavioral success.
 
-### Step 8 — CI selection, documentation and final regression (integration owner)
+### Step 8 — Deterministic CI, opt-in local evaluation and final regression (integration owner)
 
-**FR covered:** FR-014.2: Wire bounded CI evaluation, FR-016.3: Complete targeted migration docs
+**FR covered:** FR-014.2: Keep GitHub deterministic and local evaluation opt-in, FR-016.3: Complete targeted migration docs
 
-Extend existing `.github/workflows/ci.yml` with deterministic witness checks at normal CI and a capability-gated real-model sample selected by changed generator/review/skill paths. Add release/manual model/runtime-change inputs selecting the full three-witness corpus and declared runtime matrix, using existing integration-level/budget configuration. Persist selection and execution records separately: selected, attempted, completed, blocked, not_run. A full-corpus claim requires every selected witness/runtime completed with sufficient proof; missing secrets/tools remain visible gaps and the required release gate cannot PASS. Core sampling is bounded and reproducible by explicit witness IDs; routine deterministic execution requires no provider calls.
+Keep `.github/workflows/ci.yml` limited to deterministic unit and level_3a integration checks for pull requests, manual dispatch and releases. Remove generation-selection and generation-model jobs, unused evaluation inputs, provider CLI pins and model-secret references; do not replace them with another automatic provider. Retain existing local opt-in selection and generation helpers unchanged: callers can request a bounded sample or full corpus and runtime matrix. Local reports still distinguish selected, attempted, completed, blocked and not_run; only actual completed proof supports runtime coverage. Missing local capabilities remain explicit gaps, without becoming a GitHub model-credential requirement.
 
 Update README, system anti-drift/testing/semantic docs and the affected command expectations to explain structural versus semantic coverage, evidence kinds, legacy readability and trial outcomes. Maintain implementation.md FR/AC-to-source/test evidence and progress.md at every step. Preserve all baseline unrelated modifications and failures; final report names external gaps without claiming ten-out-of-ten universal correctness. No Git publication is part of this implementation.
 

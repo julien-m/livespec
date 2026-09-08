@@ -5,13 +5,22 @@ from __future__ import annotations
 import fcntl
 import os
 from collections.abc import Mapping
-from contextlib import suppress
+from dataclasses import dataclass
 from json import dumps
 from typing import TypeAlias
 
 from .goal_json import JsonValue
 
 FileIdentity: TypeAlias = tuple[int, int]
+
+
+# @spec FR-005: Pin temporary ownership until publication and cleanup finish.
+@dataclass(frozen=True)
+class OwnedTemporary:
+    """Transfer an open temporary descriptor and its pinned inode to the caller."""
+
+    descriptor: int
+    identity: FileIdentity
 
 
 def acquire_archive_lock(specs_fd: int) -> int:
@@ -101,7 +110,7 @@ def write_owned_temporary(
     runs_fd: int,
     temporary_name: str,
     artifact: Mapping[str, JsonValue],
-) -> FileIdentity:
+) -> OwnedTemporary:
     """Create and fully sync one descriptor-relative temporary.
 
     Args:
@@ -113,7 +122,7 @@ def write_owned_temporary(
         OSError: If exclusive creation, writing, or syncing fails.
 
     Returns:
-        The device and inode identity captured from the owned descriptor.
+        An open descriptor and its identity; the caller must close it once.
 
     Side effects:
         Removes the temporary only after this invocation created it.
@@ -128,16 +137,19 @@ def write_owned_temporary(
     try:
         opened = os.fstat(file_fd)
         owned_identity = opened.st_dev, opened.st_ino
-        with os.fdopen(file_fd, "w", encoding="utf-8") as stream:
+        # Pin the inode beyond stream closure; otherwise Linux may reuse it for
+        # an unlinked temporary's foreign replacement before publication.
+        with os.fdopen(file_fd, "w", encoding="utf-8", closefd=False) as stream:
             stream.write(dumps(artifact, indent=2, ensure_ascii=False))
             stream.flush()
             os.fsync(stream.fileno())
     except BaseException:
-        _remove_entry_if_owned(runs_fd, temporary_name, owned_identity)
-        with suppress(OSError):
+        try:
+            _remove_entry_if_owned(runs_fd, temporary_name, owned_identity)
+        finally:
             os.close(file_fd)
         raise
-    return owned_identity
+    return OwnedTemporary(file_fd, owned_identity)
 
 
 def entry_matches_identity(
@@ -267,6 +279,7 @@ def _remove_entry_if_owned(
 
 __all__ = [
     "FileIdentity",
+    "OwnedTemporary",
     "acquire_archive_lock",
     "entry_identity",
     "entry_matches_identity",

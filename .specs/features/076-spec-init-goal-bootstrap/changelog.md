@@ -1,5 +1,21 @@
 # Changelog: Spec Init Goal Bootstrap (076)
 
+## 2026-09-08 — Check: V5 descriptor ownership correction independently verified
+
+- Read [the V5 post-check](checks/2026-09-08-v5-postcheck.md): `OwnedTemporary` keeps the temporary FD live through publication and cleanup, then closes it exactly once on success and six injected failure stages.
+- Fresh parity evidence is 21/21 targeted tests; the native policy-2 receipt is valid with 3734 passed, 26 skipped, no gaps, and certification bounded to AC-006.
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None by this check
+- **Coverage:** Bounded V5 patch PASS; full Feature 076, Feature 079, merge, and `main` remain outside this verdict
+- **Author:** Codex
+
+## 2026-09-08 — Check: Linux temporary ownership gap confirmed
+
+- Read [the V5 independent check](checks/2026-09-08-v5-precheck.md): the temporary writer closes its descriptor before publication, so Linux unlink/recreate can reuse `(st_dev, st_ino)` and impersonate owned residue.
+- FR-005 and AC-006/AC-008 remain partial until an `OwnedTemporary(descriptor, identity)` stays open through publication and cleanup, closes in `finally`, and the causal race/lifecycle tests pass.
+- Author: Codex.
+
 ## 2026-09-04 — [Implement]: Initial bootstrap implementation completed
 
 - Added canonical fresh-root rendering, fail-closed proof, contained archive, and strict non-init compatibility.
@@ -159,3 +175,15 @@
 - Kept the Feature PASS verdict separate from the repository's external catalog-count and six non-feature format follow-ups.
 
 <!-- finalize:spec-test:2026-09-04:79b41969 -->
+
+### 2026-09-08 — ## 2026-09-08 — Fix: V5 archive temporary ownership verified
+
+- **Type:** Bug Fix
+- **Spec modified:** Acceptance-heading formatting only; requirement wording unchanged.
+- **Code modified:** Inspect [the temporary writer](../../../validator/goal_archive_file.py), [the archive coordinator](../../../validator/goal_archive_fd.py), and [the lifecycle tests](../../../tests/test_goal_archive_file.py); existing race/publication assertions remain intact.
+- **Gaps closed:** Selected FR-005 descriptor lifetime defect; native acceptance proof limited to AC-006. AC-008 has passing regression evidence without a separate native certificate.
+- **Verification:** Read [the independent post-check](checks/2026-09-08-v5-postcheck.md): 21 targeted tests, static checks and conventions pass; native unit evidence is 3734 passed and 26 skipped. Closure preserves or refreshes this proof on the final governed document identity.
+- **Remaining:** No selected V5 source correction; full-feature certification, final CI stability and main delivery remain separate gates.
+- **Author:** spec-fix
+
+<!-- finalize:spec-fix:2026-09-08:2d0a611e -->

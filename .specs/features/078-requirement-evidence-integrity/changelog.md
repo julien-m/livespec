@@ -158,3 +158,11 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Coverage:** Revue ciblée sans finding; featurepartielle,provenancev9 etbaseline076 ouvertes.
 - **Report:** Lire le [suivi de clôture](checks/2026-09-07-closure-followup.md).
 - **Author:** Codexa0cfa9f9
+
+## 2026-09-08 — Spec Update: User-authorized deterministic GitHub policy
+
+- **Type:** Spec Update
+- **Spec modified:** Yes:078FR-014/AC-013 and079FR-005/AC-006; requirement IDs preserved.
+- **Code modified:** Pending implementation of the approved policy.
+- **Author:** Codex
+- GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.

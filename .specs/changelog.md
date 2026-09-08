@@ -7,6 +7,28 @@
 
 ---
 
+## 2026-09-08 — Feature 076 V5 temporary ownership verified; native AC-006 only; full-feature and main delivery not certified.
+<!-- finalize:spec-fix:2026-09-08:2d0a611e -->
+
+## 2026-09-08 — Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion.
+<!-- finalize:spec-fix:2026-09-08:e063bb60 -->
+
+## 2026-09-08 — Feature079 gen4 Fix: deterministic CI, pinned private corpus and AST backend repaired; all local checks pass, AC002 native only, final CI/main pending.
+<!-- finalize:spec-fix:2026-09-08:effa6511 -->
+
+## 2026-09-08 — Feature079 gen4 Check: deterministic CI, private corpus and AST prerequisites inspected; local gates verified, bounded native evidence separate, final CI/main pending.
+<!-- finalize:spec-check:2026-09-08:a8b53723 -->
+
+## 2026-09-08 — Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending.
+<!-- finalize:spec-fix:2026-09-08:f5eb771d -->
+
+## 2026-09-08 — Feature079 Check: local repair and native AC-002 verified; progress structure fixed; exact CI acceptance remains pending.
+<!-- finalize:spec-check:2026-09-08:42b65563 -->
+
+## 2026-09-07 — [Feature 079] Check: Pre-fix audit resumed
+
+- Read [the 079 check report](features/079-validator-ci-prerequisites/checks/2026-09-07.md): preparation readiness verified; final implementation and same-SHA CI proof remain pending.
+
 ## 2026-09-07 — Fix independent pipeline closure: bound CLI/runtime, explicit feature and review identity, reject usage exit2.
 <!-- finalize:spec-fix:2026-09-07:8403a3bf -->
 
@@ -704,3 +726,19 @@ Automatic active-plan policy union preserves earlier required procedures; the re
 - 2026-09-07 — [Feature078] Check93766262 :FR-009 et packaging inspectés; fermeture partielle. Lire le [rapport coordinateur](features/078-requirement-evidence-integrity/checks/2026-09-07-coordinator.md).
 
 - 2026-09-07 — [Feature078] Check qualitéa0cfa9f9 :suivi clôture sans nouveau finding;full078partiel. Lire le [rapport](features/078-requirement-evidence-integrity/checks/2026-09-07-closure-followup.md).
+
+## 2026-09-07 — [Fix] Validator CI prerequisites 079
+
+- Read [the scoped repair report](features/079-validator-ci-prerequisites/checks/2026-09-07.md): local lint, typing, units, integration and coverage repaired; native partial acceptance and exact same-SHA remote CI remain distinct proof obligations.
+
+## 2026-09-08 — User-authorized CI policy amendment
+
+- Read [feature079](features/079-validator-ci-prerequisites/spec.md): deterministic GitHub validation and private pinned corpus; local model evaluation remains opt-in. Prior evidence stays historical.
+
+### 2026-09-08 — Feature079 v5 fixture isolation
+
+Read the [implementation checkpoint](features/079-validator-ci-prerequisites/implementation.md) for the public synthetic corpus repair and correction of the earlier full-suite parity claim. Independent post-check and delivery gates remain pending; no lifecycle promotion.
+
+### 2026-09-08 — Feature079 v5 independent verification
+
+Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/2026-09-08-v5-postcheck.md): the bounded fixture-isolation cause is fixed, with45/45 targeted tests and16 preserved node IDs. AC-005 remains pending and AC-006 partial; feature076 and final delivery remain separate.

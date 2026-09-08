@@ -479,12 +479,22 @@ def specs_root(tmp_path: Path) -> Path:
 class TestPipelineInit:
     def test_creates_pipeline_md(self, specs_root: Path) -> None:
         feature_dir = specs_root / "features" / "001-test"
-        result = runner.invoke(app, ["pipeline", "init", "--feature", "001-test"], catch_exceptions=False)
+        result = runner.invoke(
+            app, ["pipeline", "init", "--feature", "001-test"], catch_exceptions=False
+        )
         assert result.exit_code == 0
         pipeline = feature_dir / "pipeline.md"
         assert pipeline.exists()
         content = pipeline.read_text()
-        for phase in ["Specify", "Spec Review", "Plan", "Plan Review", "Preflight", "Implement", "Test"]:
+        for phase in [
+            "Specify",
+            "Spec Review",
+            "Plan",
+            "Plan Review",
+            "Preflight",
+            "Implement",
+            "Test",
+        ]:
             assert f"| {phase} | Pending |" in content
 
     def test_error_if_feature_not_found(self, specs_root: Path) -> None:
@@ -498,7 +508,16 @@ class TestPipelineUpdate:
         pipeline_path.write_text(PIPELINE_MD)
         result = runner.invoke(
             app,
-            ["pipeline", "update", "--feature", "001-test", "--phase", "specify", "--status", "in_progress"],
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "specify",
+                "--status",
+                "in_progress",
+            ],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -510,7 +529,16 @@ class TestPipelineUpdate:
         pipeline_path.write_text(PIPELINE_MD_PADDED)
         result = runner.invoke(
             app,
-            ["pipeline", "update", "--feature", "001-test", "--phase", "specify", "--status", "done"],
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "specify",
+                "--status",
+                "done",
+            ],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -519,9 +547,33 @@ class TestPipelineUpdate:
     def test_update_is_idempotent(self, specs_root: Path) -> None:
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(PIPELINE_MD)
-        runner.invoke(app, ["pipeline", "update", "--feature", "001-test", "--phase", "specify", "--status", "done"])
+        runner.invoke(
+            app,
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "specify",
+                "--status",
+                "done",
+            ],
+        )
         content_after_first = pipeline_path.read_text()
-        runner.invoke(app, ["pipeline", "update", "--feature", "001-test", "--phase", "specify", "--status", "done"])
+        runner.invoke(
+            app,
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "specify",
+                "--status",
+                "done",
+            ],
+        )
         assert pipeline_path.read_text() == content_after_first
 
     def test_update_unknown_phase_exits_1(self, specs_root: Path) -> None:
@@ -529,7 +581,16 @@ class TestPipelineUpdate:
         pipeline_path.write_text(PIPELINE_MD)
         result = runner.invoke(
             app,
-            ["pipeline", "update", "--feature", "001-test", "--phase", "nonexistent", "--status", "done"],
+            [
+                "pipeline",
+                "update",
+                "--feature",
+                "001-test",
+                "--phase",
+                "nonexistent",
+                "--status",
+                "done",
+            ],
         )
         assert result.exit_code != 0
         assert pipeline_path.read_text() == PIPELINE_MD  # File must not be mutated
@@ -539,10 +600,20 @@ class TestPipelineRead:
     def test_outputs_json_for_all_phases(self, specs_root: Path) -> None:
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(PIPELINE_MD)
-        result = runner.invoke(app, ["pipeline", "read", "--feature", "001-test"], catch_exceptions=False)
+        result = runner.invoke(
+            app, ["pipeline", "read", "--feature", "001-test"], catch_exceptions=False
+        )
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert set(data.keys()) == {"specify", "spec-review", "plan", "plan-review", "preflight", "implement", "test"}
+        assert set(data.keys()) == {
+            "specify",
+            "spec-review",
+            "plan",
+            "plan-review",
+            "preflight",
+            "implement",
+            "test",
+        }
         assert data["specify"] == "Pending"
 
 
@@ -551,14 +622,24 @@ class TestPipelineNext:
         content = PIPELINE_MD.replace("| Specify | Pending |", "| Specify | Done |")
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(content)
-        result = runner.invoke(app, ["pipeline", "next", "--feature", "001-test"], catch_exceptions=False)
+        result = runner.invoke(
+            app, ["pipeline", "next", "--feature", "001-test"], catch_exceptions=False
+        )
         assert result.exit_code == 0
         assert result.output.strip() == "spec-review"
 
     def test_all_done_exits_2(self, specs_root: Path) -> None:
         """Exit 2 = pipeline complete (success state, not error)."""
         content = PIPELINE_MD
-        for phase in ["Specify", "Spec Review", "Plan", "Plan Review", "Preflight", "Implement", "Test"]:
+        for phase in [
+            "Specify",
+            "Spec Review",
+            "Plan",
+            "Plan Review",
+            "Preflight",
+            "Implement",
+            "Test",
+        ]:
             content = content.replace(f"| {phase} | Pending |", f"| {phase} | Done |")
         pipeline_path = specs_root / "features" / "001-test" / "pipeline.md"
         pipeline_path.write_text(content)
@@ -583,6 +664,7 @@ python -m pytest tests/test_pipeline.py -v 2>&1 | head -30
 
 ```python
 from .pipeline import pipeline_app
+
 app.add_typer(pipeline_app, name="pipeline")
 ```
 
@@ -629,8 +711,15 @@ runner = CliRunner()
 @pytest.fixture()
 def git_repo(tmp_path: Path) -> Path:
     subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
-    subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=tmp_path, check=True, capture_output=True)
-    subprocess.run(["git", "config", "user.name", "Test"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "config", "user.email", "test@test.com"],
+        cwd=tmp_path,
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Test"], cwd=tmp_path, check=True, capture_output=True
+    )
     specs = tmp_path / ".specs"
     specs.mkdir()
     feature_dir = specs / "features" / "001-test"
@@ -644,18 +733,24 @@ def git_repo(tmp_path: Path) -> Path:
 class TestGitBranch:
     def test_creates_branch(self, git_repo: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
-            result = runner.invoke(app, ["git", "branch", "feature/test-branch"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["git", "branch", "feature/test-branch"], catch_exceptions=False
+            )
             assert result.exit_code == 0
-            check = subprocess.run(["git", "branch", "--show-current"], cwd=git_repo, capture_output=True, text=True)
+            check = subprocess.run(
+                ["git", "branch", "--show-current"], cwd=git_repo, capture_output=True, text=True
+            )
             assert check.stdout.strip() == "feature/test-branch"
         finally:
             os.chdir(original)
 
     def test_already_exists_exits_1(self, git_repo: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
@@ -669,11 +764,14 @@ class TestGitBranch:
 class TestGitStage:
     def test_stages_feature_files(self, git_repo: Path) -> None:
         import os
+
         (git_repo / ".specs" / "features" / "001-test" / "plan.md").write_text("# plan")
         original = os.getcwd()
         os.chdir(git_repo)
         try:
-            result = runner.invoke(app, ["git", "stage", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["git", "stage", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             assert "files staged" in result.output
         finally:
@@ -684,6 +782,7 @@ class TestGitMerge:
     def test_conflict_always_exits_2(self, git_repo: Path) -> None:
         """Exit 2 even when git merge --abort also fails."""
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
@@ -707,11 +806,14 @@ class TestGitMerge:
 class TestGitDelete:
     def test_not_merged_exits_2(self, git_repo: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
             # Create an unmerged branch
-            subprocess.run(["git", "checkout", "-b", "unmerged-branch"], cwd=git_repo, capture_output=True)
+            subprocess.run(
+                ["git", "checkout", "-b", "unmerged-branch"], cwd=git_repo, capture_output=True
+            )
             (git_repo / ".specs" / "features" / "001-test" / "new.md").write_text("new")
             subprocess.run(["git", "add", "."], cwd=git_repo, capture_output=True)
             subprocess.run(["git", "commit", "-m", "unmerged"], cwd=git_repo, capture_output=True)
@@ -725,6 +827,7 @@ class TestGitDelete:
 class TestGitStatus:
     def test_outputs_valid_json(self, git_repo: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(git_repo)
         try:
@@ -747,6 +850,7 @@ class TestGitStatus:
 
 ```python
 from .git_ops import git_app
+
 app.add_typer(git_app, name="git")
 ```
 
@@ -800,10 +904,13 @@ def specs_root(tmp_path: Path) -> Path:
 class TestCommitContextWrite:
     def test_creates_file_schema_v1(self, specs_root: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             context_path = specs_root / "hooks" / ".commit-context.json"
             assert context_path.exists()
@@ -817,12 +924,15 @@ class TestCommitContextWrite:
 
     def test_overwrites_stale(self, specs_root: Path) -> None:
         import os
+
         (specs_root / "hooks").mkdir(exist_ok=True)
         (specs_root / "hooks" / ".commit-context.json").write_text('{"old": "data"}')
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             data = json.loads((specs_root / "hooks" / ".commit-context.json").read_text())
             assert "version" in data  # New schema, not old data
@@ -832,11 +942,14 @@ class TestCommitContextWrite:
     def test_creates_hooks_dir_when_missing(self, specs_root: Path) -> None:
         """write must succeed even when .specs/hooks/ doesn't exist yet."""
         import os
+
         assert not (specs_root / "hooks").exists()
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             assert (specs_root / "hooks" / ".commit-context.json").exists()
         finally:
@@ -844,10 +957,13 @@ class TestCommitContextWrite:
 
     def test_adr_paths_empty_when_no_adrs(self, specs_root: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             data = json.loads((specs_root / "hooks" / ".commit-context.json").read_text())
             assert data["adr_paths"] == ""
@@ -856,6 +972,7 @@ class TestCommitContextWrite:
 
     def test_adr_paths_populated_when_adrs_exist(self, specs_root: Path) -> None:
         import os
+
         adr_dir = specs_root / "stacks" / "decisions"
         adr_dir.mkdir(parents=True)
         (adr_dir / "ADR-001-auth.md").write_text("# ADR-001")
@@ -863,7 +980,9 @@ class TestCommitContextWrite:
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
-            result = runner.invoke(app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False)
+            result = runner.invoke(
+                app, ["commit-context", "write", "--feature", "001-test"], catch_exceptions=False
+            )
             assert result.exit_code == 0
             data = json.loads((specs_root / "hooks" / ".commit-context.json").read_text())
             assert "ADR-001-auth.md" in data["adr_paths"]
@@ -875,8 +994,15 @@ class TestCommitContextWrite:
 class TestCommitContextRead:
     def test_prints_json(self, specs_root: Path) -> None:
         import os
+
         (specs_root / "hooks").mkdir()
-        ctx = {"version": 1, "feature_name": "001-test", "spec_path": "/x/spec.md", "plan_path": "/x/plan.md", "adr_paths": ""}
+        ctx = {
+            "version": 1,
+            "feature_name": "001-test",
+            "spec_path": "/x/spec.md",
+            "plan_path": "/x/plan.md",
+            "adr_paths": "",
+        }
         (specs_root / "hooks" / ".commit-context.json").write_text(json.dumps(ctx))
         original = os.getcwd()
         os.chdir(specs_root.parent)
@@ -889,6 +1015,7 @@ class TestCommitContextRead:
 
     def test_exits_1_when_missing(self, specs_root: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
@@ -901,6 +1028,7 @@ class TestCommitContextRead:
 class TestCommitContextClear:
     def test_removes_file(self, specs_root: Path) -> None:
         import os
+
         (specs_root / "hooks").mkdir()
         ctx_path = specs_root / "hooks" / ".commit-context.json"
         ctx_path.write_text('{"version": 1}')
@@ -915,6 +1043,7 @@ class TestCommitContextClear:
 
     def test_idempotent(self, specs_root: Path) -> None:
         import os
+
         original = os.getcwd()
         os.chdir(specs_root.parent)
         try:
@@ -932,6 +1061,7 @@ class TestCommitContextClear:
 
 ```python
 from .commit_context import commit_context_app
+
 app.add_typer(commit_context_app, name="commit-context")
 ```
 

@@ -36,135 +36,11 @@ from validator.penflow_approval_models import (
 
 @pytest.fixture
 def examples() -> dict[str, dict[str, Any]]:
-    """Nontrivial nested fixture shared by the independent shape checks."""
-    file = {"path": "spec.md", "sha256": "a" * 64}
-    scope = {"project_root": "/project", "workspace": "/project/penflow"}
-    assertion = {
-        "operator": "greater_than",
-        "pointer": "/count",
-        "capability": "ui",
-        "expected": {"mixed": [True, 1, 1.5, None, "1", {"x": False}]},
-    }
-    expected = {
-        "obligation_id": "save",
-        "source_pointer": "FR-001",
-        "category": "result",
-        "assertions": [assertion],
-    }
-    binding = {
-        "requirement_id": "FR-001",
-        "obligation_id": "save",
-        "category": "result",
-        "expected": expected,
-    }
-    requirement = {"id": "FR-001", "source_pointer": "spec.md#fr-001", "text_sha256": "b" * 64}
-    projection = {
-        "source_kind": "livespec-fr-ac-v1",
-        "sources": [file],
-        "requirements": [requirement],
-        "bindings": [binding],
-        "uncovered": [],
-    }
-    source = {**file, "semantic_sha256": "c" * 64, "reviewed_snapshot": file}
-    inputs = {
-        "sources": [source],
-        "plans": [source],
-        "contract": file,
-        "projection_sha256": "d" * 64,
-        "selection_sha256": "e" * 64,
-    }
-    change = {
-        "source_path": "spec.md",
-        "old_sha256": "f" * 64,
-        "new_sha256": "a" * 64,
-        "removed_requirement_ids": [],
-        "changed_binding_ids": ["save"],
-    }
-    shared = {
-        "version": 1,
-        "disposition": "active",
-        "command": "spec-plan",
-        "feature": "077-example",
-        "scope": scope,
-        "selection": ["077-example"],
-        "retired_features": [],
-        "inputs": inputs,
-        "prior_receipt": None,
-        "changes": [change],
-    }
-    review = {
-        "invocation_id": "review-1",
-        "producer_id": "reviewer",
-        "input_sha256": "a" * 64,
-        "output": file,
-        "verdict": "PASS",
-        "blocking_count": 0,
-        "findings": [{"severity": "INFO", "message": "Checked", "requirement_ids": []}],
-    }
-    policy = {
-        "version": 1,
-        "generated_docs": "required",
-        "native_geometry": "not_applicable",
-        "homologous_references": "required",
-        "native_export": "not_applicable",
-    }
-    return {
-        "verification-policy": policy,
-        "verification-policy-source": {
-            "kind": "penflow-verification-policy-source",
-            "version": 1,
-            "workflow": file,
-            "decisions": policy,
-            "inherited_authority": None,
-        },
-        "brainstorm-authority-import": {
-            "kind": "penflow-brainstorm-authority-import",
-            "version": 1,
-            "origin_scope": scope,
-            "workspace": "penflow",
-            "report": file,
-            "files": [{"source_path": "/former/project/spec.md", **file}],
-        },
-        "file": file,
-        "scope": scope,
-        "assertion": assertion,
-        "expected-outcome": expected,
-        "approved-binding": binding,
-        "requirement": requirement,
-        "projection": projection,
-        "approved-source": source,
-        "approval-inputs": inputs,
-        "review-snapshot": {
-            **shared,
-            "kind": "livespec-penflow-review-snapshot",
-            "projection": projection,
-        },
-        "review-result": {
-            "kind": "livespec-penflow-review-result",
-            "version": 1,
-            "snapshot": file,
-            "review": review,
-        },
-        "review-approval": {
-            **shared,
-            "kind": "livespec-penflow-review-approval",
-            "review": review,
-            "snapshot": file,
-        },
-        "requirements-baseline": {
-            "kind": "livespec-penflow-requirements-baseline",
-            "version": 1,
-            "disposition": "active",
-            "scope": scope,
-            "selection": ["077-example"],
-            "retired_features": [],
-            "approval_receipts": [file],
-            "sources": [source],
-            "contract": file,
-            "projection": projection,
-            "previous": None,
-        },
-    }
+    """Keep shared nested objects while building independently mutable fixtures."""
+    context: dict[str, dict[str, Any]] = {}
+    _example_context_01(context)
+    _example_context_02(context)
+    return _example_payload(context)
 
 
 MODELS: dict[str, type[StrictModel]] = {
@@ -344,14 +220,15 @@ def test_cumulative_selection_constraints(name: str, examples: dict[str, dict[st
         "retired_features": ["077-example"],
     }
     assert MODELS[name].model_validate(payload).model_dump(mode="json")["disposition"] == "active"
-    for mutation in [
+    mutations: list[dict[str, object]] = [
         {"retired_features": ["999-foreign"]},
         {"retired_features": ["077-example", "077-example"]},
         {"selection": ["078-example", "077-example"]},
         {"selection": ["077-example", "077-example"]},
         {"retired_features": ["077-example", "078-example"]},
         {"disposition": "retired"},
-    ]:
+    ]
+    for mutation in mutations:
         with pytest.raises(ValidationError):
             MODELS[name].model_validate({**payload, **mutation})
 
@@ -398,7 +275,8 @@ def test_optional_policy_preserves_historical_omission_and_required_nulls(
         current = copy.deepcopy(examples[name])
         current["inputs"]["verification_policy"] = examples["file"]
         assert MODELS[name].model_validate(current).model_dump(mode="json") == current
-    for malformed in [None, {}, True, "policy.json"]:
+    malformed_policies: list[object] = [None, {}, True, "policy.json"]
+    for malformed in malformed_policies:
         with pytest.raises(ValidationError):
             ApprovalInputs.model_validate(
                 {**examples["approval-inputs"], "verification_policy": malformed}
@@ -427,7 +305,8 @@ def test_policy_decisions_reject_coercion_and_unknown_values(
 # .specs/features/077-penflow-cumulative-verdict-consumer/spec.md#ac-009
 def test_import_references_are_closed_nonempty_shapes(examples: dict[str, dict[str, Any]]) -> None:
     imported = examples["brainstorm-authority-import"]
-    for mutation in [{"files": []}, {"workspace": ""}, {"report": None}]:
+    mutations: list[dict[str, object]] = [{"files": []}, {"workspace": ""}, {"report": None}]
+    for mutation in mutations:
         with pytest.raises(ValidationError):
             AuthorityImport.model_validate({**imported, **mutation})
     reference = imported["files"][0]
@@ -448,3 +327,148 @@ def test_policy_source_cannot_infer_missing_ancestry_or_workflow(
             PolicySource.model_validate({key: item for key, item in value.items() if key != field})
     with pytest.raises(ValidationError):
         PolicySource.model_validate({**value, "workflow": None})
+
+
+def _example_context_01(context: dict[str, dict[str, Any]]) -> None:
+    context["file"] = {"path": "spec.md", "sha256": "a" * 64}
+    context["scope"] = {"project_root": "/project", "workspace": "/project/penflow"}
+    context["assertion"] = {
+        "operator": "greater_than",
+        "pointer": "/count",
+        "capability": "ui",
+        "expected": {"mixed": [True, 1, 1.5, None, "1", {"x": False}]},
+    }
+    context["expected"] = {
+        "obligation_id": "save",
+        "source_pointer": "FR-001",
+        "category": "result",
+        "assertions": [context["assertion"]],
+    }
+    context["binding"] = {
+        "requirement_id": "FR-001",
+        "obligation_id": "save",
+        "category": "result",
+        "expected": context["expected"],
+    }
+    context["requirement"] = {
+        "id": "FR-001",
+        "source_pointer": "spec.md#fr-001",
+        "text_sha256": "b" * 64,
+    }
+    context["projection"] = {
+        "source_kind": "livespec-fr-ac-v1",
+        "sources": [context["file"]],
+        "requirements": [context["requirement"]],
+        "bindings": [context["binding"]],
+        "uncovered": [],
+    }
+
+
+def _example_payload(context: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    return {
+        "verification-policy": context["policy"],
+        "verification-policy-source": {
+            "kind": "penflow-verification-policy-source",
+            "version": 1,
+            "workflow": context["file"],
+            "decisions": context["policy"],
+            "inherited_authority": None,
+        },
+        "brainstorm-authority-import": {
+            "kind": "penflow-brainstorm-authority-import",
+            "version": 1,
+            "origin_scope": context["scope"],
+            "workspace": "penflow",
+            "report": context["file"],
+            "files": [{"source_path": "/former/project/spec.md", **context["file"]}],
+        },
+        "file": context["file"],
+        "scope": context["scope"],
+        "assertion": context["assertion"],
+        "expected-outcome": context["expected"],
+        "approved-binding": context["binding"],
+        "requirement": context["requirement"],
+        "projection": context["projection"],
+        "approved-source": context["source"],
+        "approval-inputs": context["inputs"],
+        "review-snapshot": {
+            **context["shared"],
+            "kind": "livespec-penflow-review-snapshot",
+            "projection": context["projection"],
+        },
+        "review-result": {
+            "kind": "livespec-penflow-review-result",
+            "version": 1,
+            "snapshot": context["file"],
+            "review": context["review"],
+        },
+        "review-approval": {
+            **context["shared"],
+            "kind": "livespec-penflow-review-approval",
+            "review": context["review"],
+            "snapshot": context["file"],
+        },
+        "requirements-baseline": {
+            "kind": "livespec-penflow-requirements-baseline",
+            "version": 1,
+            "disposition": "active",
+            "scope": context["scope"],
+            "selection": ["077-example"],
+            "retired_features": [],
+            "approval_receipts": [context["file"]],
+            "sources": [context["source"]],
+            "contract": context["file"],
+            "projection": context["projection"],
+            "previous": None,
+        },
+    }
+
+
+def _example_context_02(context: dict[str, dict[str, Any]]) -> None:
+    context["source"] = {
+        **context["file"],
+        "semantic_sha256": "c" * 64,
+        "reviewed_snapshot": context["file"],
+    }
+    context["inputs"] = {
+        "sources": [context["source"]],
+        "plans": [context["source"]],
+        "contract": context["file"],
+        "projection_sha256": "d" * 64,
+        "selection_sha256": "e" * 64,
+    }
+    context["change"] = {
+        "source_path": "spec.md",
+        "old_sha256": "f" * 64,
+        "new_sha256": "a" * 64,
+        "removed_requirement_ids": [],
+        "changed_binding_ids": ["save"],
+    }
+    context["shared"] = {
+        "version": 1,
+        "disposition": "active",
+        "command": "spec-plan",
+        "feature": "077-example",
+        "scope": context["scope"],
+        "selection": ["077-example"],
+        "retired_features": [],
+        "inputs": context["inputs"],
+        "prior_receipt": None,
+        "changes": [context["change"]],
+    }
+    context["review"] = {
+        "invocation_id": "review-1",
+        "producer_id": "reviewer",
+        "input_sha256": "a" * 64,
+        "output": context["file"],
+        "verdict": "PASS",
+        "blocking_count": 0,
+        "findings": [{"severity": "INFO", "message": "Checked", "requirement_ids": []}],
+    }
+    context["policy"] = {
+        "version": 1,
+        "generated_docs": "required",
+        "native_geometry": "not_applicable",
+        "homologous_references": "required",
+        "native_export": "not_applicable",
+    }

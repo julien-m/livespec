@@ -4,41 +4,97 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      evaluation:
-        description: "Generation evaluation (full for model/runtime changes)"
-        type: choice
-        options: [sample, full]
-        default: full
-      runtimes:
-        description: "Explicit runtime coverage"
-        type: choice
-        options: [claude, codex, "claude codex"]
-        default: "claude codex"
   release:
     types: [published]
 
 env:
   NODE_VERSION: '26.3.0'
-  CLAUDE_CODE_VERSION: '2.1.259'
-  CODEX_VERSION: '0.149.1'
+  PLAYWRIGHT_INSTALL_NODE_VERSION: '20.20.2'
 
 jobs:
   unit-tests:
     name: "Unit Tests (Layers 1-4)"
     runs-on: ubuntu-latest
+    env:
+      AIRESOURCES: ${{ github.workspace }}/.ci-deps/ai-ressources
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: 'false'
       - run: uv pip install --system -e ".[dev,integration]"
+      - name: Require read-only Penflow capability
+        env:
+          PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+        run: |
+          if [ -z "$PENFLOW_KEY" ]; then
+            echo "Penflow CLI checks require PENFLOW_READONLY_DEPLOY_KEY for the pinned private dependency." >&2
+            exit 1
+          fi
+      - name: Checkout pinned Penflow CLI
+        uses: actions/checkout@v4
+        with:
+          repository: julien-m/penflow
+          ref: dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7
+          ssh-key: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+          persist-credentials: false
+          path: .ci-deps/penflow
+      - name: Install pinned Penflow CLI
+        run: uv pip install --no-cache --system ./.ci-deps/penflow
+      - name: Remove private dependency checkout
+        if: always()
+        run: |
+          python - <<'PYTHON'
+          import shutil
+          from pathlib import Path
+          checkout = Path(".ci-deps/penflow")
+          if checkout.exists():
+              shutil.rmtree(checkout)
+          PYTHON
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: npm ci
+      # Node 26 stalls after the browser download; Node 20 completes installation.
+      - name: Use Node for browser installation
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.PLAYWRIGHT_INSTALL_NODE_VERSION }}
       - run: npx playwright install --with-deps chromium
+      - name: Restore test and generation runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # Ubuntu's sg can mean group switching; install and identify the real AST detector.
+      - name: Install pinned AST backend
+        run: npm install --global @ast-grep/cli@0.44.0
+      - name: Verify AST backend identity
+        run: test "$(sg --version)" = "ast-grep 0.44.0"
+      # AST catalog provenance requires private documents at this exact revision.
+      - name: Require read-only normative corpus capability
+        env:
+          AIRESOURCES_KEY: ${{ secrets.AIRESOURCES_READONLY_DEPLOY_KEY }}
+        run: |
+          if [ -z "$AIRESOURCES_KEY" ]; then
+            echo "AST tests require AIRESOURCES_READONLY_DEPLOY_KEY for the pinned private corpus." >&2
+            exit 1
+          fi
+      - name: Checkout pinned normative corpus
+        uses: actions/checkout@v4
+        with:
+          repository: julien-m/ai-ressources
+          ref: 11976242fc5b9ae5f3a574e19339b78ebd18a0c4
+          ssh-key: ${{ secrets.AIRESOURCES_READONLY_DEPLOY_KEY }}
+          persist-credentials: false
+          path: .ci-deps/ai-ressources
+          sparse-checkout: |
+            /code-conventions/javascript.md
+            /code-conventions/rust.md
+            /code-conventions/swift-kotlin.md
+          sparse-checkout-cone-mode: false
       - run: ruff check .
       - run: ruff format --check .
       - run: pyright validator
@@ -53,6 +109,18 @@ jobs:
           --cov-report=term-missing
           --cov-fail-under=94
 
+      # Keep source provenance available through all consumers, then remove private bytes.
+      - name: Remove private normative corpus
+        if: always()
+        run: |
+          python - <<'PYTHON'
+          import shutil
+          from pathlib import Path
+          corpus = Path(".ci-deps/ai-ressources")
+          if corpus.exists():
+              shutil.rmtree(corpus)
+          PYTHON
+
   integration-3a:
     name: "Integration 3A — Static invariants (no LLM)"
     runs-on: ubuntu-latest
@@ -62,106 +130,49 @@ jobs:
         with:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: 'false'
       - run: uv pip install --system -e ".[dev]" pyyaml jsonschema anyio
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: pytest tests/integration/ -m level_3a -v --tb=short
-
-  generation-selection:
-    runs-on: ubuntu-latest
-    outputs:
-      selected: ${{ steps.select.outputs.selected }}
-      mode: ${{ steps.select.outputs.mode }}
-      runtimes: ${{ steps.select.outputs.runtimes }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - uses: astral-sh/setup-uv@v5
-      - run: uv pip install --system -e .
-      - id: select
+      - name: Require read-only Penflow capability
         env:
-          EVENT: ${{ github.event_name }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          REQUEST_MODE: ${{ inputs.evaluation }}
-          REQUEST_RUNTIMES: ${{ inputs.runtimes }}
+          PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
         run: |
-          python - <<'PY'
-          import os, subprocess
-          from pathlib import Path
-          from tests.integration.helpers.generation_selection import select_generation
-          event = os.environ["EVENT"]
-          selected = event != "pull_request"
-          mode = os.environ["REQUEST_MODE"] or "full"
-          runtimes = os.environ["REQUEST_RUNTIMES"] or "claude codex"
-          if event == "pull_request":
-              paths = subprocess.check_output([
-                  "git", "diff", "--name-only", os.environ["BASE_SHA"], os.environ["HEAD_SHA"]
-              ], text=True).splitlines()
-              selection = select_generation(paths, runtimes=("claude", "codex"))
-              selected = bool(selection.witnesses)
-              mode = selection.mode
-              # Runtime changes need both providers; routine core sampling stays bounded.
-              runtimes = "claude" if mode == "sample" else " ".join(selection.runtimes)
-          with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
-              output.write(f"selected={str(selected).lower()}\nmode={mode}\nruntimes={runtimes}\n")
-          PY
-
-  generation-model:
-    name: "Observed generation coverage (missing capability fails explicitly)"
-    needs: generation-selection
-    if: needs.generation-selection.outputs.selected == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+          if [ -z "$PENFLOW_KEY" ]; then
+            echo "Penflow CLI checks require PENFLOW_READONLY_DEPLOY_KEY for the pinned private dependency." >&2
+            exit 1
+          fi
+      - name: Checkout pinned Penflow CLI
+        uses: actions/checkout@v4
         with:
-          python-version: '3.12'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - uses: astral-sh/setup-uv@v5
-      - run: uv pip install --system -e ".[dev,integration]"
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: >
-          npm install --global
-          "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
-          "@openai/codex@${CODEX_VERSION}"
-      - name: Run selected witnesses
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          LIVESPEC_TEST_BUDGET_USD: '25'
-          EVALUATION_MODE: ${{ needs.generation-selection.outputs.mode }}
-          EVALUATION_RUNTIMES: ${{ needs.generation-selection.outputs.runtimes }}
-        run: |
-          missing=()
-          for runtime in $EVALUATION_RUNTIMES; do
-            if [ "$runtime" = claude ] && [ -z "$ANTHROPIC_API_KEY" ]; then missing+=(claude); fi
-            if [ "$runtime" = codex ]; then
-              if [ -z "$OPENAI_API_KEY" ]; then
-                missing+=(codex)
-              else
-                printf '%s' "$OPENAI_API_KEY" | codex login --with-api-key
-              fi
-            fi
-          done
-          extra=()
-          if [ "${#missing[@]}" -gt 0 ]; then extra+=(--unavailable-runtimes "${missing[@]}"); fi
-          python -m tests.integration.helpers.generation_ci \
-            --mode "$EVALUATION_MODE" --runtimes $EVALUATION_RUNTIMES \
-            --output generation-results "${extra[@]}"
-      - uses: actions/upload-artifact@v4
+          repository: julien-m/penflow
+          ref: dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7
+          ssh-key: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
+          persist-credentials: false
+          path: .ci-deps/penflow
+      - name: Install pinned Penflow CLI
+        run: uv pip install --no-cache --system ./.ci-deps/penflow
+      - name: Remove private dependency checkout
         if: always()
+        run: |
+          python - <<'PYTHON'
+          import shutil
+          from pathlib import Path
+          checkout = Path(".ci-deps/penflow")
+          if checkout.exists():
+              shutil.rmtree(checkout)
+          PYTHON
+      - uses: actions/setup-node@v4
         with:
-          name: generation-results
-          path: generation-results/
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm ci
+      # Node 26 stalls after the browser download; Node 20 completes installation.
+      - name: Use Node for browser installation
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.PLAYWRIGHT_INSTALL_NODE_VERSION }}
+      - run: npx playwright install --with-deps chromium
+      - name: Restore test and generation runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: pytest tests/integration/ -m level_3a -v --tb=short

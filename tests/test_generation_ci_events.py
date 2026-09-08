@@ -1,117 +1,87 @@
-"""CI event selection runs the shipped selector; routine checks stay independent of paid runs."""
+"""GitHub events run deterministic checks; real-model evaluation remains local opt-in."""
 
-# @spec AC-013: CI event and routine selection
+# @spec AC-013: Deterministic GitHub policy
 # ../.specs/features/078-requirement-evidence-integrity/spec.md#ac-013
+# @spec AC-006: No automatic provider dependency
+# ../.specs/features/079-validator-ci-prerequisites/spec.md#ac-006
 
-from __future__ import annotations
-
-import os
-import shlex
-import subprocess
-import sys
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 import pytest
 import yaml
+from pydantic import JsonValue, TypeAdapter
+
+from tests._json_fixture import JsonFixture
 
 REPO = Path(__file__).resolve().parents[1]
 
 
-def _workflow() -> dict[str, Any]:
-    """Load current workflow declarations without interpreting YAML's on key as a boolean."""
-    return yaml.load((REPO / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader)
+def _workflow() -> JsonFixture:
+    """Validate YAML data before inspecting the heterogeneous Actions declarations."""
+    raw = yaml.load((REPO / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader)
+    # Actions mappings mix commands, inputs and arrays; JSON schema validates this fixture boundary.
+    return cast(JsonFixture, TypeAdapter(dict[str, JsonValue]).validate_python(raw))
 
 
-def _select(
-    tmp_path: Path, event: str, *, mode: str = "", runtimes: str = ""
-) -> tuple[int, dict[str, str]]:
-    """Execute the shipped shell body; only Git's changed-path response is controlled."""
-    step = next(row for row in _workflow()["jobs"]["generation-selection"]["steps"] if "id" in row)
-    git = tmp_path / "git"
-    git.write_text(f"#!{sys.executable}\nprint('README.md')\n")
-    git.chmod(0o755)
-    output = tmp_path / "output"
-    environment = dict(
-        os.environ,
-        PATH=f"{tmp_path}:{Path(sys.executable).parent}:{os.environ['PATH']}",
-        EVENT=event,
-        BASE_SHA="controlled-base",
-        HEAD_SHA="controlled-head",
-        REQUEST_MODE=mode,
-        REQUEST_RUNTIMES=runtimes,
-        GITHUB_OUTPUT=str(output),
-        PYTHONDONTWRITEBYTECODE="1",
-    )
-    # No model or CI runner is invoked: execute the existing selector with local event fixtures.
-    result = subprocess.run(
-        ["bash", "-c", step["run"]],
-        cwd=REPO,
-        env=environment,
-        text=True,
-        capture_output=True,
-        timeout=20,
-    )
-    values = dict(line.split("=", 1) for line in output.read_text().splitlines())
-    return result.returncode, values
+@pytest.mark.parametrize("event", ["pull_request", "workflow_dispatch", "release"])
+def test_registered_events_keep_deterministic_jobs_without_model_inputs(event: str) -> None:
+    workflow = _workflow()
+    assert event in workflow["on"]
+    assert workflow["on"]["pull_request"]["branches"] == ["main"]
+    assert workflow["on"]["release"]["types"] == ["published"]
+    assert not workflow["on"]["workflow_dispatch"]
+    assert set(workflow["jobs"]) == {"unit-tests", "integration-3a"}
 
 
 @pytest.mark.parametrize(
-    ("event", "mode", "runtimes", "expected_mode", "expected_runtimes"),
+    ("job_name", "expected_commands"),
     [
-        pytest.param("release", "", "", "full", "claude codex", id="release"),
-        pytest.param("workflow_dispatch", "", "", "full", "claude codex", id="manual-default"),
-        pytest.param("workflow_dispatch", "sample", "codex", "sample", "codex", id="manual-sample"),
+        (
+            "unit-tests",
+            [
+                "ruff check .",
+                "ruff format --check .",
+                "pyright validator",
+                "mypy .",
+                "pytest tests/ --ignore=tests/integration -v --tb=short",
+                "pytest tests/test_visual_gate.py tests/test_visual_gate_receipts.py "
+                "tests/test_visual_implementation_gate.py --cov=validator.visual_gate "
+                "--cov-branch --cov-report=term-missing --cov-fail-under=94",
+            ],
+        ),
+        ("integration-3a", ["pytest tests/integration/ -m level_3a -v --tb=short"]),
     ],
 )
-def test_registered_events_select_real_full_or_requested_corpus(
-    tmp_path: Path,
-    event: str,
-    mode: str,
-    runtimes: str,
-    expected_mode: str,
-    expected_runtimes: str,
+def test_deterministic_jobs_preserve_all_check_commands(
+    job_name: str, expected_commands: list[str]
 ) -> None:
-    workflow = _workflow()
-    assert event in workflow["on"]
-    if event == "release":
-        assert workflow["on"]["release"]["types"] == ["published"]
-    result = _select(tmp_path, event, mode=mode, runtimes=runtimes)
-    assert result == (
-        0,
-        {
-            "selected": "true",
-            "mode": expected_mode,
-            "runtimes": expected_runtimes,
-        },
-    )
-
-
-@pytest.mark.parametrize("job_name", ["unit-tests", "integration-3a"])
-def test_docs_only_pull_request_keeps_deterministic_jobs_without_model_selection(
-    tmp_path: Path,
-    job_name: str,
-) -> None:
-    workflow = _workflow()
-    assert workflow["on"]["pull_request"]["branches"] == ["main"]
-    assert _select(tmp_path, "pull_request") == (
-        0,
-        {
-            "selected": "false",
-            "mode": "none",
-            "runtimes": "claude codex",
-        },
-    )
-    job = workflow["jobs"][job_name]
+    job = _workflow()["jobs"][job_name]
     assert "if" not in job and not job.get("needs")
-    commands = [shlex.split(step["run"]) for step in job["steps"] if "run" in step]
-    if job_name == "unit-tests":
-        assert any(
-            command[:2] == ["pytest", "tests/"] and "--ignore=tests/integration" in command
-            for command in commands
-        )
-    else:
-        assert any(
-            command[:4] == ["pytest", "tests/integration/", "-m", "level_3a"]
-            for command in commands
-        )
+    commands = [" ".join(step["run"].split()) for step in job["steps"] if "run" in step]
+    actual = [
+        text for text in commands if text.startswith(("ruff ", "pyright ", "mypy ", "pytest "))
+    ]
+    assert actual == expected_commands
+
+
+def test_workflow_does_not_install_or_request_any_model_provider() -> None:
+    workflow = _workflow()
+    assert set(workflow["env"]) == {"NODE_VERSION", "PLAYWRIGHT_INSTALL_NODE_VERSION"}
+    text = (REPO / ".github/workflows/ci.yml").read_text().lower()
+    for forbidden in (
+        "anthropic",
+        "openai",
+        "claude",
+        "codex",
+        "generation-selection",
+        "generation-model",
+    ):
+        assert forbidden not in text
+    commands = [
+        step["run"] for job in workflow["jobs"].values() for step in job["steps"] if "run" in step
+    ]
+    global_installs = [
+        command for command in commands if command.startswith("npm install --global")
+    ]
+    assert global_installs == ["npm install --global @ast-grep/cli@0.44.0"]

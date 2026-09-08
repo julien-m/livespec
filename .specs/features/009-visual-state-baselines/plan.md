@@ -156,9 +156,10 @@ This feature requires no external infrastructure. All changes are local Python c
 @dataclass
 class VisualState:
     """A visual state entry for a behavioral trait."""
-    state_id: str              # "disabled", "enabled", "loading"
+
+    state_id: str  # "disabled", "enabled", "loading"
     css_attributes: list[str]  # ["[disabled]", ".btn-disabled"]
-    screenshot: str            # "submit-disabled.png"
+    screenshot: str  # "submit-disabled.png"
 ```
 
 2. Extend `Trait` dataclass with new field:

@@ -205,8 +205,7 @@ class RunnerHandler(Protocol):
         baseline: Path | str,
         screenshot: Path | str,
         threshold: float = 0.05,
-    ) -> UICapabilityResult:
-        ...
+    ) -> UICapabilityResult: ...
 ```
 
 **Reconciliation note.** The existing `XCUITestRunnerHandler.capture_screenshot()` and `MaestroRunnerHandler.capture_screenshot()` have richer signatures than the Protocol. The dispatcher will call the **canonical** form `capture_screenshot(screen)` only; handler-specific extras (e.g., `destination=`, `avd_name=`) are populated from the surface's `runnerConfig` block. To enable this without breaking 030/031 tests:
@@ -219,8 +218,8 @@ class RunnerHandler(Protocol):
 ```python
 RUNNER_REGISTRY: Mapping[str, type[RunnerHandler]] = {
     "playwright": WebRunnerHandler,
-    "xcuitest":   XCUITestRunnerHandler,
-    "maestro":    MaestroRunnerHandler,
+    "xcuitest": XCUITestRunnerHandler,
+    "maestro": MaestroRunnerHandler,
 }
 ```
 
@@ -236,9 +235,9 @@ class Phase4_5Dispatcher:
     surfaces: list[Surface]
 
     def run(self, screens: list[str]) -> list[VisualPhaseResult]: ...
-    def _load_surfaces(self) -> list[Surface]: ...           # FR-001
+    def _load_surfaces(self) -> list[Surface]: ...  # FR-001
     def _dispatch(self, surface: Surface, screens: list[str]) -> list[VisualPhaseResult]: ...
-    def _legacy_single_surface(self) -> list[Surface]: ...   # edge case: surfaces.yaml missing
+    def _legacy_single_surface(self) -> list[Surface]: ...  # edge case: surfaces.yaml missing
 ```
 
 ### 4.4 `XcodeTestTarget` parser (new — `scripts/lib/pbxproj.js`)

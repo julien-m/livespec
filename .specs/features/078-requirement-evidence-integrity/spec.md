@@ -2,7 +2,7 @@
 title: Requirement Evidence Integrity
 status: In Progress
 created: 2026-09-06
-updated: 2026-09-06
+updated: 2026-09-08
 priority: P1
 ---
 
@@ -194,7 +194,7 @@ flowchart TD
 | AC-010 | Given a custom or manual driver that cannot provide mandatory proof, when invoked, then execution remains available but certification reports insufficient evidence rather than fabricating a PASS. | P1 | Story 3 |
 | AC-011 | Given the three isolated witness projects, when deterministic evaluation runs, then each correct candidate passes its frozen independent behavioral oracle for the defined witness contract and at least one relevant mutant fails; modified oracles invalidate evaluation. | P1 | Story 4 |
 | AC-012 | Given real generation trials, when results are reported, then first-attempt success, repaired success, correct blocking, failure and not-run outcomes remain distinct with observed attempts, duration, runtime/model and measured cost or explicit unknown cost. | P1 | Story 4 |
-| AC-013 | Given CI or release evaluation, when deterministic and real-model suites are selected, then cheap deterministic checks run routinely, core generation changes select a bounded model sample, and release/model/runtime changes select the full corpus; absent runtimes never imply parity. | P1 | Story 4 |
+| AC-013 | Given GitHub CI or an explicitly requested local evaluation, when checks are selected, then GitHub runs deterministic checks without installing or invoking model providers or requiring model credentials; local opt-in evaluation retains bounded sample and full-corpus selection, and absent runtimes never imply parity. | P1 | Story 4 |
 | AC-014 | Given a current pipeline, when phases advance directly or in automatic nested commands, then both Clarify and Analyze gates must hold through the same authority, with no added mandatory user command or document. | P1 | Story 5 |
 | AC-015 | Given legacy goals and archives, when loaded under upgraded code, then their versioned interpretation remains explicit and readable; they cannot certify a new run, and existing bootstrap, finalization, visual, conventions and cumulative Penflow protections still apply. | P1 | Story 5 |
 | AC-016 | Given the existing specifications and tests that require character truncation or ID-only Analyze compliance, when upgraded, then targeted normative contracts and tests adopt this feature while unrelated old features remain unchanged. | P1 | Story 5 |
@@ -261,7 +261,7 @@ flowchart TD
 
 ### AC-013
 
-**Criterion:** Given CI or release evaluation, when deterministic and real-model suites are selected, then cheap deterministic checks run routinely, core generation changes select a bounded model sample, and release/model/runtime changes select the full corpus; absent runtimes never imply parity.
+**Criterion:** Given GitHub CI or an explicitly requested local evaluation, when checks are selected, then GitHub runs deterministic checks without installing or invoking model providers or requiring model credentials; local opt-in evaluation retains bounded sample and full-corpus selection, and absent runtimes never imply parity.
 **Priority:** P1 | **Story:** Story 4
 
 ### AC-014
@@ -299,7 +299,7 @@ flowchart TD
 | FR-011 | Reject insufficient, stale or foreign execution evidence and report exact unproven scope; unsupported drivers remain usable without mandatory certification. | AC-009, AC-010 |
 | FR-012 | Supply three small isolated Python CLI, TypeScript API and UI-Penflow witnesses for the Witness Contracts below, with independent frozen behavioral acceptance oracles and negative controls. | AC-011 |
 | FR-013 | Evaluate generation using unchanged external oracles, bounded attempts and enforced execution timeouts, preserving the candidate workspace until independent evaluation completes, and observed outcome/runtime/duration/cost records; generated candidates cannot update their oracle. | AC-011, AC-012 |
-| FR-014 | Integrate deterministic and opt-in real-model witness runs into existing testing surfaces with core-change sample and release/model/runtime full-corpus policies; report actual runtime coverage only. | AC-013 |
+| FR-014 | Keep GitHub validation deterministic with no automatic real-model generation or model credentials. Retain local opt-in witness evaluation with bounded sample and full-corpus policies; report actual runtime coverage only. | AC-013 |
 | FR-015 | Enforce Clarify and Analyze through shared progression rules in existing direct and nested commands, without adding recurring user process. | AC-014 |
 | FR-016 | Version new evidence policy, preserve historical meaning and specialized 076/077 protections, and update conflicting normative contracts and tests selectively. | AC-015, AC-016 |
 
@@ -370,7 +370,7 @@ flowchart TD
 
 ### FR-014
 
-**Requirement:** Integrate deterministic and opt-in real-model witness runs into existing testing surfaces with core-change sample and release/model/runtime full-corpus policies; report actual runtime coverage only.
+**Requirement:** Keep GitHub validation deterministic with no automatic real-model generation or model credentials. Retain local opt-in witness evaluation with bounded sample and full-corpus policies; report actual runtime coverage only.
 **AC References:** [AC-013](#ac-013)
 
 ### FR-015

@@ -326,6 +326,7 @@ erDiagram
   ```py
   from .cli_commands.verify_output_cmd import verify_output_app
   from .cli_commands.run_cmd import run_app
+
   app.add_typer(verify_output_app, name="verify-output")
   app.add_typer(run_app, name="run")
   ```

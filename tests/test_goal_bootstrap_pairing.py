@@ -10,16 +10,16 @@ from typing import Literal
 import pytest
 from typer.testing import CliRunner
 
+from tests._json_fixture import JsonFixture
 from tests.goal_bootstrap_support import compiled_valid_pair as valid_pair
 from tests.goal_bootstrap_support import rehash_pair as _rehash
 from validator.cli import app
-from validator.goal_json import JsonObject
 from validator.goal_pairing import GoalPairError, claims_spec_init, validate_goal_pair
 
 runner = CliRunner()
 
 
-def _apply_schema_defect(contract: JsonObject, state: JsonObject, defect: str) -> None:
+def _apply_schema_defect(contract: JsonFixture, state: JsonFixture, defect: str) -> None:
     canonical = contract["canonical"]
     task = canonical["tasks"][0]
     task_id = task["id"]
@@ -76,7 +76,7 @@ def test_unhashable_command_claims_fail_closed_without_type_error(tmp_path: Path
         validate_goal_pair(contract, state, operation="prove")
 
 
-def _apply_pair_defect(contract: JsonObject, state: JsonObject, defect: str) -> None:
+def _apply_pair_defect(contract: JsonFixture, state: JsonFixture, defect: str) -> None:
     task_id = next(iter(state["tasks"]))
     if defect == "missing_contract":
         contract.pop("normalized_flags")

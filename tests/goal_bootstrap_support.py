@@ -10,19 +10,19 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from tests._json_fixture import JsonFixture
 from validator.cli import app
 from validator.goal_contracts import (
     compile_command_goal,
     render_goal_contract_file,
     render_goal_state_file,
 )
-from validator.goal_json import JsonObject
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _RUNNER = CliRunner()
 
 
-def compiled_valid_pair(project_root: Path) -> tuple[JsonObject, JsonObject]:
+def compiled_valid_pair(project_root: Path) -> tuple[JsonFixture, JsonFixture]:
     """Build the complete production-shaped bootstrap pair used by pairing tests."""
     goal = compile_command_goal(
         "spec-init",
@@ -33,7 +33,7 @@ def compiled_valid_pair(project_root: Path) -> tuple[JsonObject, JsonObject]:
     return json.loads(render_goal_contract_file(goal)), json.loads(render_goal_state_file(goal))
 
 
-def rehash_pair(contract: JsonObject, state: JsonObject) -> None:
+def rehash_pair(contract: JsonFixture, state: JsonFixture) -> None:
     """Rebind a mutated canonical fixture to a matching contract/state hash."""
     canonical_json = json.dumps(
         contract["canonical"], sort_keys=True, separators=(",", ":"), ensure_ascii=False
@@ -44,10 +44,10 @@ def rehash_pair(contract: JsonObject, state: JsonObject) -> None:
     state["goal_hash"] = goal_hash
 
 
-def proof_pair(project_root: Path) -> tuple[JsonObject, JsonObject, str]:
+def proof_pair(project_root: Path) -> tuple[JsonFixture, JsonFixture, str]:
     """Build a one-task bootstrap pair for proof-transition tests."""
     contract, state = compiled_valid_pair(project_root)
-    task: JsonObject = {
+    task: JsonFixture = {
         "id": "task.001.proof",
         "ordinal": 1,
         "description": "record proof",
@@ -82,9 +82,9 @@ def proof_pair(project_root: Path) -> tuple[JsonObject, JsonObject, str]:
     return contract, state, task_id
 
 
-def add_other_task(contract: JsonObject, state: JsonObject, *, pending: bool) -> None:
+def add_other_task(contract: JsonFixture, state: JsonFixture, *, pending: bool) -> None:
     """Add a second task and rebind the pair for global-status transition tests."""
-    task: JsonObject = {
+    task: JsonFixture = {
         "id": "task.002.other",
         "ordinal": 2,
         "description": "other task",
@@ -114,9 +114,9 @@ def archive_valid_pair(
     *,
     feature: str | None = "076-x",
     pending: bool = False,
-) -> tuple[JsonObject, JsonObject]:
+) -> tuple[JsonFixture, JsonFixture]:
     """Build a minimal archive pair with no receipt-bearing tasks."""
-    task: JsonObject = {
+    task: JsonFixture = {
         "id": "task.001.pending",
         "ordinal": 1,
         "description": "pending",
@@ -128,7 +128,7 @@ def archive_valid_pair(
         "expected_evidence": {},
     }
     tasks = [deepcopy(task)] if pending else []
-    canonical: JsonObject = {
+    canonical: JsonFixture = {
         "schema_version": "2.0",
         "command": "spec-init",
         "feature": feature,
@@ -139,7 +139,7 @@ def archive_valid_pair(
     }
     canonical_json = json.dumps(canonical, sort_keys=True, separators=(",", ":"))
     goal_hash = hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
-    contract: JsonObject = {
+    contract: JsonFixture = {
         "schema_version": canonical["schema_version"],
         "command": canonical["command"],
         "feature": canonical["feature"],
@@ -153,7 +153,7 @@ def archive_valid_pair(
     return contract, _archive_state(tasks, goal_hash)
 
 
-def write_pair(control_root: Path, pair: tuple[JsonObject, JsonObject]) -> tuple[Path, Path]:
+def write_pair(control_root: Path, pair: tuple[JsonFixture, JsonFixture]) -> tuple[Path, Path]:
     """Persist explicit contract/state control files for CLI tests."""
     contract_file = control_root / "goal.contract.json"
     state_file = control_root / "goal.state.json"
@@ -162,7 +162,7 @@ def write_pair(control_root: Path, pair: tuple[JsonObject, JsonObject]) -> tuple
     return contract_file, state_file
 
 
-def render_saved_bootstrap(target: Path) -> tuple[Path, Path, JsonObject]:
+def render_saved_bootstrap(target: Path) -> tuple[Path, Path, JsonFixture]:
     """Render and locate a saved bootstrap pair for retargeting tests."""
     result = _RUNNER.invoke(
         app,
@@ -227,7 +227,7 @@ def archive_pair(contract_file: Path, state_file: Path) -> Path:
     return Path(envelope["archived"])
 
 
-def _archive_state(tasks: list[JsonObject], goal_hash: str) -> JsonObject:
+def _archive_state(tasks: list[JsonFixture], goal_hash: str) -> JsonFixture:
     return {
         "schema_version": "2.0",
         "command": "spec-init",
