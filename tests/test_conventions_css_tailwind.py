@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tests.conventions_corpus_fixture import convention_corpus_project
 from validator.conventions_ast.source_decisions import build_rule_decision_manifest
 
 
-def test_css_and_tailwind_sources_are_generated_executable_or_executable() -> None:
-    manifest = build_rule_decision_manifest(Path.cwd())
+def test_css_and_tailwind_sources_are_generated_executable_or_executable(tmp_path: Path) -> None:
+    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
     decisions = manifest["decisions"]
     css_or_tailwind = [
         decision

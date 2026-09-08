@@ -129,3 +129,24 @@ The same unit job now provisions `@ast-grep/cli@0.44.0` and requires the exact `
 ## Gen4 verified local checkpoint
 
 All seven deterministic checks pass in the exact three-file corpus environment with isolated ast-grep0.44.0: Ruff/format, pyright0errors, mypy627files,3727unit passed/26skipped,89integration passed/1skipped and121visual tests with94.41% coverage. Native receipt `7f9e37b7780340dd8374c61ac5712f22` certifies AC-002 only, with valid=true and no mapping gaps. The32 targeted policy/corpus/AST cases pass. AC-005 and actual private CI access under AC-006 await the final published SHA; feature status remains partial. Read [the frozen pre-capture report](checks/2026-09-08-ci-policy.md) for its historical boundary.
+
+## V5 — autonomous convention corpus repair
+
+**Correction of the gen4 parity claim:** setting `AIRESOURCES` to three pinned documents constrained AST catalog loading only. The corpus loader also read the implicit home-directory corpus, so the earlier full-suite result did not prove independence from all 197 private sources. CI at `6dd27b7` exposed eleven convention failures. Historical receipts remain evidence of their actual environment only.
+
+FR-003 and FR-005 now use twelve public synthetic documents through an explicit fixture manifest. Classification, generated families, negative metadata, SQL and CSS/Tailwind assertions remain substantive; the public 564-rule inventory and its pass/fail fixtures are retained. The full private corpus is a separate local opt-in evaluation, not this fixture's proof scope. The production AST source hashes still require only the three authorized documents.
+
+The six-module targeted suite passes. Current full capture, independent post-check, feature076, GitHub CI, stable120s, review gates and main delivery remain separate pending obligations. No full-feature lifecycle promotion is authorized by this checkpoint.
+
+| Requirement | Files | Status |
+|---|---|---|
+| FR-003, FR-005 | Read [conventions_corpus_fixture.py](../../../tests/conventions_corpus_fixture.py), Read [_conventions_source_decisions_serialization.py](../../../tests/_conventions_source_decisions_serialization.py), Read [test_conventions_ars_rules.py](../../../tests/test_conventions_ars_rules.py), Read [test_conventions_css_tailwind.py](../../../tests/test_conventions_css_tailwind.py), Read [test_conventions_generated_catalog.py](../../../tests/test_conventions_generated_catalog.py), Read [test_conventions_source_decisions.py](../../../tests/test_conventions_source_decisions.py), Read [test_conventions_source_family_checks.py](../../../tests/test_conventions_source_family_checks.py), Read [test_conventions_sql.py](../../../tests/test_conventions_sql.py) | Implemented fixture isolation; independent post-check pending |
+
+- Inspect [tests/conventions_corpus_fixture.py](../../../tests/conventions_corpus_fixture.py) for the v5 deterministic regression scope.
+- Inspect [tests/_conventions_source_decisions_serialization.py](../../../tests/_conventions_source_decisions_serialization.py) for the v5 deterministic regression scope.
+- Inspect [tests/test_conventions_ars_rules.py](../../../tests/test_conventions_ars_rules.py) for the v5 deterministic regression scope.
+- Inspect [tests/test_conventions_css_tailwind.py](../../../tests/test_conventions_css_tailwind.py) for the v5 deterministic regression scope.
+- Inspect [tests/test_conventions_generated_catalog.py](../../../tests/test_conventions_generated_catalog.py) for the v5 deterministic regression scope.
+- Inspect [tests/test_conventions_source_decisions.py](../../../tests/test_conventions_source_decisions.py) for the v5 deterministic regression scope.
+- Inspect [tests/test_conventions_source_family_checks.py](../../../tests/test_conventions_source_family_checks.py) for the v5 deterministic regression scope.
+- Inspect [tests/test_conventions_sql.py](../../../tests/test_conventions_sql.py) for the v5 deterministic regression scope.

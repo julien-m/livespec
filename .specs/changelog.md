@@ -728,3 +728,7 @@ Automatic active-plan policy union preserves earlier required procedures; the re
 ## 2026-09-08 — User-authorized CI policy amendment
 
 - Read [feature079](features/079-validator-ci-prerequisites/spec.md): deterministic GitHub validation and private pinned corpus; local model evaluation remains opt-in. Prior evidence stays historical.
+
+### 2026-09-08 — Feature079 v5 fixture isolation
+
+Read the [implementation checkpoint](features/079-validator-ci-prerequisites/implementation.md) for the public synthetic corpus repair and correction of the earlier full-suite parity claim. Independent post-check and delivery gates remain pending; no lifecycle promotion.

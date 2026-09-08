@@ -34,3 +34,10 @@ No final feature certification or implemented lifecycle promotion is claimed.
 
 - Complete: all seven deterministic checks and32 targeted cases passed; native capture3727passed/26skipped, AC-002 only certified by receipt7f9e37b7780340dd8374c61ac5712f22.
 - Pending: exact published-SHA CI/private checkout,120-second stability, independent Manager/Validator/Reviewer gates and delivery to main. No full-feature promotion or model-credential requirement.
+
+## V5 — implementation checkpoint before independent post-check
+
+- Native pre-check079 complete39/39; spec-fix079 owns a separate v5 state and current progression is READY.
+- Applied public twelve-source convention fixtures and explicit serialization reexports; existing classification, metadata, family, SQL and CSS/Tailwind assertions remain active.
+- Correction: gen4 three-document parity covered AST catalogs only; implicit HOME corpus access made the earlier full-suite parity claim too broad. No197-source corpus coverage is claimed by these fixtures.
+- Targeted079 checks pass; full capture and independent post-check are tracked in their native receipts. Feature076 remains untouched until079 closure. CI, full-feature acceptance, independent delivery gates and main delivery remain pending.

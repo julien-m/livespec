@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.conventions_corpus_fixture import convention_corpus_project
 from validator.conventions_ast.ars_rules import load_ars_executable_rules
 from validator.conventions_ast.source_decisions import build_rule_decision_manifest
 from validator.conventions_ast.source_family_checks import (
@@ -32,8 +33,8 @@ EXPECTED_GENERATED_FAMILIES = {
 }
 
 
-def test_generated_sources_use_real_family_backends_not_generic_contract() -> None:
-    manifest = build_rule_decision_manifest(Path.cwd())
+def test_generated_sources_use_real_family_backends_not_generic_contract(tmp_path: Path) -> None:
+    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
     generated = [
         decision
         for decision in manifest["decisions"]
@@ -53,8 +54,8 @@ def test_generated_sources_use_real_family_backends_not_generic_contract() -> No
     assert family_ids <= EXPECTED_GENERATED_FAMILIES
 
 
-def test_csv_generated_sources_use_ars_rule_level_backends() -> None:
-    manifest = build_rule_decision_manifest(Path.cwd())
+def test_csv_generated_sources_use_ars_rule_level_backends(tmp_path: Path) -> None:
+    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
     csv_sources = {rule.source_path for rule in load_ars_executable_rules(Path.cwd())}
     generated = [
         decision

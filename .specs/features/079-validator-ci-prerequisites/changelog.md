@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 — Check: Linux convention fixtures isolated
+
+- Read [the V5 independent check](checks/2026-09-08-v5-precheck.md): 11 failures across six manifest-test modules depend on an ambient full corpus; the minimal repair uses a declared temporary corpus while preserving meaningful ARS, CSS, SQL, generated, executable, and deferred assertions.
+- FR-003/FR-005 and AC-003/AC-006 remain partial until implementation and fresh execution. This check does not claim the private 197-document corpus or certify implementation.
+- Author: Codex.
+
 ## 2026-09-07 — [Spec Update]: Bugfix scope established
 
 - Type: Spec Update; no application code modified.
@@ -62,3 +68,13 @@
 - Exact-SHA CI/private access,120-second stability and independent main delivery remain pending. No whole-feature certification or Implemented promotion.
 
 <!-- finalize:spec-fix:2026-09-08:effa6511 -->
+
+### 2026-09-08 — Fix: autonomous convention corpus fixtures (v5)
+
+- **Type:** Bug Fix
+- **Spec modified:** No; FR-003/FR-005 already require deterministic validation.
+- **Code modified:** Read the complete [implementation mapping](implementation.md) for eight test/support files.
+- **Improved:** Eleven CI failures now use explicit synthetic sources, retaining meaningful classification and negative metadata checks. Five serialization cases retain their public node IDs through explicit reexports.
+- **Correction:** The earlier three-document parity statement concerned AST catalogs; it did not prove isolation from the197-source HOME corpus. Historical captures are preserved.
+- **Remaining:** Native current capture, independent post-check, separate076 fix, exact remote CI and downstream delivery gates. No feature certification or closure is claimed here.
+- **Author:** spec-fix

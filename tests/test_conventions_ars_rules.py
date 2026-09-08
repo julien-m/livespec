@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.conventions_corpus_fixture import convention_corpus_project
 from validator.conventions_ast.ars_rules import (
     EXPECTED_ARS_RULE_COUNT,
     INVENTORY_RELATIVE_PATH,
@@ -105,8 +106,8 @@ def test_real_project_ars_violations_are_blocking_errors(tmp_path: Path, invento
     )
 
 
-def test_rule_decision_manifest_exposes_rule_level_inventory() -> None:
-    manifest = build_rule_decision_manifest(Path.cwd())
+def test_rule_decision_manifest_exposes_rule_level_inventory(tmp_path: Path) -> None:
+    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
 
     assert manifest["rule_level_inventory_total_count"] == EXPECTED_ARS_RULE_COUNT
     assert manifest["rule_level_runtime_rule_count"] == EXPECTED_ARS_RULE_COUNT
@@ -114,8 +115,8 @@ def test_rule_decision_manifest_exposes_rule_level_inventory() -> None:
     assert len(manifest["rule_level_runtime_rule_ids"]) == EXPECTED_ARS_RULE_COUNT
 
 
-def test_generated_decisions_use_ars_rule_backends_not_family_backends() -> None:
-    manifest = build_rule_decision_manifest(Path.cwd())
+def test_generated_decisions_use_ars_rule_backends_not_family_backends(tmp_path: Path) -> None:
+    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
     csv_sources = {rule.source_path for rule in load_ars_executable_rules(Path.cwd())}
     generated = [
         decision
