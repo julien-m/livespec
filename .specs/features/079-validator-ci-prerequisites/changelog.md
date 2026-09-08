@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-08 — Check: V5 fixture isolation independently verified
+
+- Read [the V5 post-check](checks/2026-09-08-v5-postcheck.md): the six manifest-dependent modules pass 45/45 with an explicit synthetic corpus, and serialization preserves all 16 node IDs.
+- The bounded patch passes. AC-005 remains pending and AC-006 partial until exact-SHA GitHub execution proves required checks and actual private checkout; no feature-076 or whole-feature certification is claimed.
+- Author: Codex independent checker.
+
 ## 2026-09-08 — Check: Linux convention fixtures isolated
 
 - Read [the V5 independent check](checks/2026-09-08-v5-precheck.md): 11 failures across six manifest-test modules depend on an ambient full corpus; the minimal repair uses a declared temporary corpus while preserving meaningful ARS, CSS, SQL, generated, executable, and deferred assertions.
@@ -78,3 +84,16 @@
 - **Correction:** The earlier three-document parity statement concerned AST catalogs; it did not prove isolation from the197-source HOME corpus. Historical captures are preserved.
 - **Remaining:** Native current capture, independent post-check, separate076 fix, exact remote CI and downstream delivery gates. No feature certification or closure is claimed here.
 - **Author:** spec-fix
+
+### 2026-09-08 — Fix: v5 independent verification
+
+- **Type:** Bug Fix verification; spec unchanged.
+- **Fixed:** One bounded corpus-isolation cause behind eleven convention failures; independent45/45 checks and16 preserved node IDs confirm the repair.
+- **Files:** Read the eight test/support paths in [implementation](implementation.md). No additional source changes in closure.
+- **Evidence:** Read the [post-check gap report](checks/2026-09-08-v5-postcheck.md). Native execution and goal archives preserve their exact certified scope.
+- **Remaining:** AC-005 pending, AC-006 partial, independent076 repair, remote stability and delivery gates. No feature-wide certification.
+- **Author:** spec-fix
+
+### 2026-09-08 — V5 bounded fixture-isolation fix independently verified:45 targeted tests and16 preserved node IDs. Read the [post-check gap report](checks/2026-09-08-v5-postcheck.md). Native acceptance remains AC-002 only; AC-005 pending, AC-006 partial, feature076 and main delivery separate. No normative spec change or lifecycle promotion.
+
+<!-- finalize:spec-fix:2026-09-08:e063bb60 -->

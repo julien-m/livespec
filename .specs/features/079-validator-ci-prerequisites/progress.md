@@ -41,3 +41,9 @@ No final feature certification or implemented lifecycle promotion is claimed.
 - Applied public twelve-source convention fixtures and explicit serialization reexports; existing classification, metadata, family, SQL and CSS/Tailwind assertions remain active.
 - Correction: gen4 three-document parity covered AST catalogs only; implicit HOME corpus access made the earlier full-suite parity claim too broad. No197-source corpus coverage is claimed by these fixtures.
 - Targeted079 checks pass; full capture and independent post-check are tracked in their native receipts. Feature076 remains untouched until079 closure. CI, full-feature acceptance, independent delivery gates and main delivery remain pending.
+
+### V5 independent post-check and bounded closure
+
+- The independent post-check at `bb76ca0ea75531e9b4322db9f0a03eb739cce3f9` completed its native goal39/39 and verified45/45 targeted tests, preserved16nodeIDs and current static/conventions evidence.
+- Read the [post-check report](checks/2026-09-08-v5-postcheck.md) for the exact requirement boundaries. Its addition changes the conservative execution manifest, so the historical83783 receipt is preserved and a fresh native capture is required for closure.
+- No source, test, normative spec or plan changed during closure. AC-005 remains pending, AC-006 partial, feature status In Progress;076 is a separate next operation. Current command state and archive remain the authority for completion.

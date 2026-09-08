@@ -140,6 +140,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-09-08 | Feature | Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion. |
 | 2026-09-08 | Bugfix | Feature079 gen4 Fix: deterministic CI, pinned private corpus and AST backend repaired; all local checks pass, AC002 native only, final CI/main pending. |
 | 2026-09-08 | Check | Feature079 gen4 Check: deterministic CI, private corpus and AST prerequisites inspected; local gates verified, bounded native evidence separate, final CI/main pending. |
 | 2026-09-08 | Bugfix | Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending. |
@@ -149,7 +150,6 @@
 | 2026-09-07 | Feature | 078: repair reviewed-spec coordinator binding, reject incomplete mapping reviews before execution, preserve active child waits and isolated snapshot evidence. |
 | 2026-09-07 | Feature | 078: correct coordinator reviewed-spec acceptance and isolated snapshot inputs; full feature closure remains pending. |
 | 2026-09-07 | Bugfix | Fix: 1/3 targeted gaps closed; 258 runtime bindings certified, initial076 baseline and complete agentic success remain unproven. |
-| 2026-09-06 | Feature | [Feature 078] Test: 100% AC definitions covered (16/16), 0 tests generated; deterministic scope passed with historical limits retained |
 <!-- readme:activity:end -->
 
 ---
@@ -267,3 +267,5 @@
 <!-- finalize:spec-check:2026-09-08:a8b53723 -->
 
 <!-- finalize:spec-fix:2026-09-08:effa6511 -->
+
+<!-- finalize:spec-fix:2026-09-08:e063bb60 -->

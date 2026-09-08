@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-09-08 — Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion.
+<!-- finalize:spec-fix:2026-09-08:e063bb60 -->
+
 ## 2026-09-08 — Feature079 gen4 Fix: deterministic CI, pinned private corpus and AST backend repaired; all local checks pass, AC002 native only, final CI/main pending.
 <!-- finalize:spec-fix:2026-09-08:effa6511 -->
 
@@ -732,3 +735,7 @@ Automatic active-plan policy union preserves earlier required procedures; the re
 ### 2026-09-08 — Feature079 v5 fixture isolation
 
 Read the [implementation checkpoint](features/079-validator-ci-prerequisites/implementation.md) for the public synthetic corpus repair and correction of the earlier full-suite parity claim. Independent post-check and delivery gates remain pending; no lifecycle promotion.
+
+### 2026-09-08 — Feature079 v5 independent verification
+
+Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/2026-09-08-v5-postcheck.md): the bounded fixture-isolation cause is fixed, with45/45 targeted tests and16 preserved node IDs. AC-005 remains pending and AC-006 partial; feature076 and final delivery remain separate.
