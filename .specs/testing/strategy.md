@@ -12,8 +12,8 @@
 | Pure validation logic (parsing, schema, rules) | Unit | pytest | On every commit |
 | CLI commands (subcommands, flags, exit codes) | Unit + Integration | pytest + subprocess | On every commit |
 | Coherence rules (cross-file analysis) | Unit + Integration with fixtures | pytest + real .specs/ fixtures | On every commit |
-| Layer 4 semantic validation (LLM) | Integration (level_3b) | pytest-asyncio + claude-agent-sdk | On PR (LLM budget) |
-| Full spec pipeline (specify → plan → implement) | E2E (level_3c) | pytest + claude-agent-sdk | On PR (slow) |
+| Layer 4 semantic validation (LLM) | Integration (level_3b) | pytest-asyncio + claude-agent-sdk | Explicit local opt-in |
+| Full spec pipeline (specify → plan → implement) | E2E (level_3c) | pytest + claude-agent-sdk | Explicit local opt-in |
 | Broken/malformed inputs | Chaos tests | pytest + bad fixtures | On every commit |
 | Auto-fixer (Pass 1) | Unit + dry-run integration | pytest | On every commit |
 
@@ -110,7 +110,7 @@ def test_ac002_missing_frontmatter_returns_empty():
 - `spec-feature` end-to-end with validation gates
 - `spec-check` detecting real gaps in implemented features
 
-**Scope:** These tests are slow (LLM calls, full pipeline). Run on PR only, not on every commit.
+**Scope:** These tests invoke models and full pipelines. Run them only through explicit local opt-in; GitHub validation does not install model providers or require model credentials.
 
 ---
 
@@ -138,24 +138,7 @@ This project has no UI. Visual testing is not applicable. The playground HTML fi
 
 ## CI Pipeline
 
-```yaml
-# .github/workflows/livespec-tests.yml (existing)
-unit-tests:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    - run: pip install -e ".[dev]"
-    - run: pytest tests/ --ignore=tests/integration -v --tb=short
-
-integration-3a:
-  runs-on: ubuntu-latest
-  steps:
-    - run: pip install -e ".[dev]" && pip install pyyaml jsonschema anyio
-    - run: pytest tests/integration/ -m level_3a -v --tb=short
-```
+Read [the current CI workflow](../../.github/workflows/ci.yml) for the exact toolchain, private dependency setup and check commands. Pull requests, manual dispatch and releases run deterministic unit and level_3a integration checks. Full unit collection receives the three pinned private normative documents through read-only access; actual source hashes remain enforced and the corpus is removed after its consumers. Local opt-in model evaluation stays available through the existing commands.
 
 ---
 

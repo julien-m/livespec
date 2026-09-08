@@ -17,7 +17,7 @@ Python 3.12, existing Typer/Pydantic validator, Ruff 0.16.6, mypy 2.3.1, pyright
 
 ## Constitution Check
 
-Keep production validation types and authority boundaries intact. Tests use real Penflow for the declared subprocess contract. Do not lower coverage, disable jobs, widen credential access or publish private code. Treat local environment faults separately from source defects.
+Keep production validation types and authority boundaries intact. Tests use real Penflow for the declared subprocess contract. Do not lower coverage, disable deterministic checks, widen credential access or publish private code. The explicit2026-09-08 policy removes only automatic model jobs. Treat local environment faults separately from source defects.
 
 ## Workflow Interaction
 
@@ -33,7 +33,7 @@ Scenario: Reset stability after a source change
   When a repair changes that SHA
   Then the workflow returns to repair and requires new review and check evidence
 Scenario: Retain missing-capability state
-  Given a selected check lacks its authorized private or model credential
+  Given a deterministic check lacks its authorized private dependency access
   When it requests that capability
   Then CI enters WaitingCapability without claiming success
   And execution resumes only after the capability is actually available
@@ -68,9 +68,9 @@ stateDiagram-v2
 
 1. FR-001 / AC-001: Move None last in the two recursive union declarations; run formatter only on rejected files; give negative-test dictionaries explicit types and narrow parsed JSON fixture shapes without relaxing production types. Use actual CliRunner Result return type. Preserve invalid values used by negative tests.
 2. FR-002 / AC-002: Install actual Penflow at verified Git revision dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7. Locally use an exact Git archive into isolated owned storage. CI uses a dedicated read-only private-repository access capability; absent capability remains a failure, never a stub or public vendoring.
-3. FR-003 / AC-003: Keep npm ci and Chromium install. Remove runner-only inherited PYTEST_ADDOPTS and isolate test temp storage outside ancestor spec/package roots. Re-run complete unchanged unit and integration commands, repairing only actual remaining causes.
+3. FR-003 / AC-003: Keep npm ci and Chromium install. Install the real AST backend with npm install --global @ast-grep/cli@0.44.0 after restoring Node26 and before full unit collection; assert sg --version equals ast-grep0.44.0. The Ubuntu sg command may refer to Unix group switching, so PATH presence alone does not prove the backend. Local parity uses the same package in an isolated owned npm prefix and prepends its bin directory, without changing the global Mac installation. Remove runner-only inherited PYTEST_ADDOPTS and isolate test temp storage outside ancestor spec/package roots. Re-run complete unchanged unit and integration commands, repairing only actual remaining causes.
 4. FR-004 / AC-004: Add correct and foreign healthy-symlink cases to visual-gate tests; retain the exact 94 percent threshold and existing coverage command.
-5. FR-005 / AC-005: Keep existing generation selection and checks. Inspect staged scope/diff, commit/push repair branch, create PR, collect exact same-SHA GitHub checks twice at least 120 seconds apart. Independent Validator/Reviewer and merge belong to Manager.
+5. FR-005 / AC-005, AC-006: Remove generation-selection/generation-model jobs and unused model inputs/pins/secrets from GitHub; keep all deterministic check commands and local opt-in helpers. In unit-tests, require AIRESOURCES_READONLY_DEPLOY_KEY and sparse-checkout only code-conventions/javascript.md, rust.md and swift-kotlin.md from private julien-m/ai-ressources at11976242fc5b9ae5f3a574e19339b78ebd18a0c4 into .ci-deps/ai-ressources, persist-credentials:false. Set AIRESOURCES to the absolute checkout path before unit collection. Keep real source-hash checks; cleanup always after consumers, without private artifacts or caches. Test missing-capability failure, exact pins/files/env/order and cleanup. Local tests use the same isolated three Git blobs. Update the two existing workflow-policy test modules and078FR-014/AC-013 current docs; preserve historical reports. Inspect staged scope/diff, commit/push existing PR35, and collect exact same-SHA GitHub checks twice at least120seconds apart. Independent Validator/Reviewer and main delivery belong to Manager.
 
 ## Files in Scope
 
@@ -79,7 +79,14 @@ The implementation artifact records every actual changed file, including formatt
 | File | Concrete change |
 |---|---|
 | `.agent-sync/skills/spec-specify/SKILL.md` | Format rejected Python examples; preserve behavior and requirements |
-| `.github/workflows/ci.yml` | Install real pinned private Penflow in all CLI-dependent jobs with dedicated readonly access |
+| `.github/workflows/ci.yml` | Preserve pinned Penflow/runtime/checks; remove model jobs; privately provide exact normative corpus for unit collection |
+| `tests/test_generation_ci_events.py` | Assert deterministic event/job policy and unchanged command set; no automatic model calls |
+| `tests/test_generation_ci_selection.py` | Verify private corpus pin, sparse paths, required capability, environment, ordering and cleanup |
+| `.specs/features/078-requirement-evidence-integrity/spec.md` | Align FR-014 and AC-013 with user-authorized GitHub policy; preserve local evaluation |
+| `.specs/features/078-requirement-evidence-integrity/plan.md` | Synchronize Step8 policy implementation without changing other obligations |
+| `README.md` | Document deterministic CI and opt-in local evaluation |
+| `system/testing/execution-rules.md` | Align current execution policy with deterministic GitHub and explicit local model opt-in |
+| `.specs/testing/strategy.md` | Replace old PR-triggered model guidance with explicit local opt-in; link the current deterministic CI |
 | `.specs/features/002-layer-3-cli-surface/plan.md` | Format rejected Python examples; preserve behavior and requirements |
 | `.specs/features/006-taxonomy-testing-infra/plan.md` | Format rejected Python examples; preserve behavior and requirements |
 | `.specs/features/009-visual-state-baselines/plan.md` | Format rejected Python examples; preserve behavior and requirements |
@@ -152,4 +159,4 @@ The following commands reproduce the existing CI checks without importing unrela
 
 ## Risks & Considerations
 
-Private Penflow access and model credentials may require authorized CI configuration; no source workaround can manufacture that capability. Formatting examples changes hashes used by source-backed reviews; finish formatting before final review/capture. Keep prior evidence immutable. Existing unrelated feature debts are not included merely because legacy implementation maps mention their modules.
+Private Penflow and normative-corpus access require separate authorized read-only CI capabilities; no source workaround can manufacture them. GitHub model credentials are removed by explicit user policy. Local generation remains opt-in. Formatting examples changes hashes used by source-backed reviews; finish formatting before final review/capture. Keep prior evidence immutable. Existing unrelated feature debts are not included merely because legacy implementation maps mention their modules.

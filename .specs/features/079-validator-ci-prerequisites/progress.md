@@ -21,3 +21,16 @@ status: In Progress
 | 12 | Partial | PR #35 contains the repair; its current head identifies the exact delivery candidate. Pinned Penflow installation succeeded in three primary CI jobs; full workflow outcome, model capability, independent gates and stable same-SHA120s proof remain pending. |
 
 No final feature certification or implemented lifecycle promotion is claimed.
+
+## Gen4 — explicit policy replacement
+
+| Step | Status | Evidence |
+|---|---|---|
+| 13 | Complete | User-authorized normative amendment, fresh SPEC/PLAN reviews for078 and079, native progression READY; old contract states and dated reports unchanged. |
+| 14 | Complete | Automatic GitHub model jobs removed; private corpus sparse checkout at11976242 and cleanup after consumers applied. Local evaluation tools and deterministic commands retained. |
+| 15 | Pending | Targeted policy/corpus tests, full tests with exactly three corpus files, fresh native mapped capture, exact CI stability and main delivery. |
+
+### Gen4 local verification checkpoint
+
+- Complete: all seven deterministic checks and32 targeted cases passed; native capture3727passed/26skipped, AC-002 only certified by receipt7f9e37b7780340dd8374c61ac5712f22.
+- Pending: exact published-SHA CI/private checkout,120-second stability, independent Manager/Validator/Reviewer gates and delivery to main. No full-feature promotion or model-credential requirement.

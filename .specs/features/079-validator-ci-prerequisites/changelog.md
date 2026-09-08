@@ -39,3 +39,26 @@
 - Remaining work: current source-bound native capture, final repair-SHA CI and independent delivery gates. Their receipts and generated progress records are separate from the frozen dated report.
 
 <!-- finalize:spec-fix:2026-09-08:f5eb771d -->
+
+## 2026-09-08 — Spec Update: User-authorized deterministic GitHub policy
+
+- **Type:** Spec Update
+- **Spec modified:** Yes:078FR-014/AC-013 and079FR-005/AC-006; requirement IDs preserved.
+- **Code modified:** Pending implementation of the approved policy.
+- **Author:** Codex
+- GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.
+
+### 2026-09-08 — - Read [the gen4 policy check](checks/2026-09-08-ci-policy.md): deterministic GitHub jobs, pinned private corpus and real AST backend identity were independently inspected; targeted, quality, coverage and integration checks pass.
+
+- Current full native execution evidence is verified separately with its actual bounded AC inventory; no whole-feature certification or Implemented promotion is implied by this Check entry.
+- AC-005 stable final-SHA CI, actual private CI access for AC-006 and main delivery remain separate pending obligations. Historical model-generation reports and prior captures are preserved.
+- Author: Codex independent post-fix checker.
+
+<!-- finalize:spec-check:2026-09-08:a8b53723 -->
+
+### 2026-09-08 — - Read [the gen4 policy report](checks/2026-09-08-ci-policy.md): automatic GitHub model jobs removed by user decision; local opt-in helpers retained. Private corpus pinned with sparse read-only checkout and cleanup; real AST backend pinned and identity checked.
+
+- All seven local checks pass:3727 unit passed/26skipped,89 integration passed/1skipped,121 visual tests and94.41% coverage;32 targeted policy/corpus/AST cases pass. Native receipt7f9e37b7780340dd8374c61ac5712f22 certifies AC-002 only.
+- Exact-SHA CI/private access,120-second stability and independent main delivery remain pending. No whole-feature certification or Implemented promotion.
+
+<!-- finalize:spec-fix:2026-09-08:effa6511 -->

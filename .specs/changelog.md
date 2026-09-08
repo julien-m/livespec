@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-09-08 — Feature079 gen4 Fix: deterministic CI, pinned private corpus and AST backend repaired; all local checks pass, AC002 native only, final CI/main pending.
+<!-- finalize:spec-fix:2026-09-08:effa6511 -->
+
+## 2026-09-08 — Feature079 gen4 Check: deterministic CI, private corpus and AST prerequisites inspected; local gates verified, bounded native evidence separate, final CI/main pending.
+<!-- finalize:spec-check:2026-09-08:a8b53723 -->
+
 ## 2026-09-08 — Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending.
 <!-- finalize:spec-fix:2026-09-08:f5eb771d -->
 
@@ -718,3 +724,7 @@ Automatic active-plan policy union preserves earlier required procedures; the re
 ## 2026-09-07 — [Fix] Validator CI prerequisites 079
 
 - Read [the scoped repair report](features/079-validator-ci-prerequisites/checks/2026-09-07.md): local lint, typing, units, integration and coverage repaired; native partial acceptance and exact same-SHA remote CI remain distinct proof obligations.
+
+## 2026-09-08 — User-authorized CI policy amendment
+
+- Read [feature079](features/079-validator-ci-prerequisites/spec.md): deterministic GitHub validation and private pinned corpus; local model evaluation remains opt-in. Prior evidence stays historical.

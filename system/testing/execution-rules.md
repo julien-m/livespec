@@ -48,7 +48,7 @@ All commands come from the **Resolved Test Commands** table. Never hardcode comm
 - Keep Python purge, TypeScript create API and UI/Penflow witnesses isolated from production data. Freeze evaluator-owned oracles outside candidate paths before generation; verify their hashes afterward. Retain candidate workspaces until evaluation ends, bound attempts/timeouts and reject symlink escapes or changed oracles.
 - Check positive candidates and behavior-changing mutants. UI browser behavior alone cannot replace the existing Penflow authority; missing capability is insufficient proof.
 - Record observed first-attempt/repaired success, expected blocking, failure, invalid and not-run outcomes separately, with attempts, duration, actual runtime/model and measured cost or explicit unknown. Only a witness expecting rejection can classify rejection as correct blocking.
-- Routine CI executes deterministic checks. Core generator changes select a bounded real-model sample; release/model/runtime changes select the full corpus. Report selection separately from attempted/completed/blocked/not-run coverage. Unavailable runtimes cannot imply parity or satisfy required release coverage.
+- GitHub CI executes deterministic checks without installing or invoking model providers or requiring model credentials. Real-model samples and full-corpus evaluation remain explicit local opt-in operations through the existing tools. Report local selection separately from attempted/completed/blocked/not-run coverage; unavailable runtimes cannot imply parity or completed evaluation.
 
 ## Final Validation
 

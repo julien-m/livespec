@@ -113,3 +113,19 @@ Repairs are committed in PR #35. This complete file scope is retained for native
 ## Browser installation repair
 
 The pinned Node20.20.2 runtime installs Chromium in the three dependent CI jobs, then Node26.3.0 is restored before all tests and generation. The same Playwright CLI completed a fresh installation in43.12 seconds; a real browser smoke under Node26.3.0 passed. The exact remote workflow still requires a new final-SHA result. Existing check commands, generation selection, models and budget remain unchanged.
+
+## Gen4 policy amendment — implementation applied, verification pending
+
+The user explicitly replaced automatic GitHub generation with deterministic validation and authorized private corpus provisioning. Read [workflow](../../../.github/workflows/ci.yml), [event tests](../../../tests/test_generation_ci_events.py), [corpus wiring tests](../../../tests/test_generation_ci_selection.py), [README](../../../README.md) and [execution rules](../../../system/testing/execution-rules.md) for the affected FR-005/AC-006 surface. Earlier dated sections remain historical; fresh review, execution and remote stability are pending.
+
+| AC | Test File | Status |
+|---|---|---|
+| AC-006 | Read [event policy](../../../tests/test_generation_ci_events.py) and [private corpus lifecycle](../../../tests/test_generation_ci_selection.py). | Verification pending; actual CI access remains separate. |
+
+Read [testing strategy](../../testing/strategy.md) for the synchronized deterministic GitHub/local opt-in policy under FR-005.
+
+The same unit job now provisions `@ast-grep/cli@0.44.0` and requires the exact `ast-grep 0.44.0` identity before AST tests. The two guard cases reject Unix `sg` ambiguity, while real multilang AST tests run against the isolated npm backend and the three pinned corpus files. Targeted verification:32 passed; full native capture and same-SHA CI remain pending.
+
+## Gen4 verified local checkpoint
+
+All seven deterministic checks pass in the exact three-file corpus environment with isolated ast-grep0.44.0: Ruff/format, pyright0errors, mypy627files,3727unit passed/26skipped,89integration passed/1skipped and121visual tests with94.41% coverage. Native receipt `7f9e37b7780340dd8374c61ac5712f22` certifies AC-002 only, with valid=true and no mapping gaps. The32 targeted policy/corpus/AST cases pass. AC-005 and actual private CI access under AC-006 await the final published SHA; feature status remains partial. Read [the frozen pre-capture report](checks/2026-09-08-ci-policy.md) for its historical boundary.
