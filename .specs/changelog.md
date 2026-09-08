@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-09-08 — Feature 076 V5 temporary ownership verified; native AC-006 only; full-feature and main delivery not certified.
+<!-- finalize:spec-fix:2026-09-08:2d0a611e -->
+
 ## 2026-09-08 — Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion.
 <!-- finalize:spec-fix:2026-09-08:e063bb60 -->
 
