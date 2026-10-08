@@ -1,5 +1,15 @@
 # Changelog: Multilang Convention AST Catalog + Enforce-by-Default (073)
 
+## 2026-10-08 — [Fix]: Exclude only root governance notices
+
+- **Type:** Bugfix
+- **Spec modified:** No; existing FR-008/FR-009 scope and explicit-exclusion contract retained.
+- **Code modified:** Read [corpus.py](../../../validator/conventions_ast/corpus.py) and [regression tests](../../../tests/test_conventions_taxonomy.py).
+- **AC impacted:** AC-011, AC-012; no full-feature certification claimed.
+- **Author:** spec-fix
+- **Result:** Native corpus moves from 201/199/2 to 199/199/0; both root notices carry exclusion reasons, nested homonyms and unknown sources remain in scope.
+- **Remaining:** Read [the scoped report](checks/2026-10-08.md) for historical readiness and unrelated test drift.
+
 ## 2026-06-30 — [Fix]: Ship hygiene for ARS fixtures and validation receipts
 
 - **Type:** Bugfix

@@ -3,7 +3,7 @@ created: 2026-06-29
 feature: 073-conventions-multilang-catalog
 title: "Implementation Map: Multilang Convention AST Catalog + Enforce-by-Default"
 type: implementation
-updated: 2026-06-30
+updated: 2026-10-08
 ---
 
 # Implementation Map: Multilang Convention AST Catalog + Enforce-by-Default (073)
@@ -59,3 +59,9 @@ updated: 2026-06-30
 - Feature-scoped deterministic `verify --json` PASS receipt: `.specs/conventions/runs/worker-073-executable-nonconceptual-cycle02/receipt.json`.
 - Remaining convention signals in the PASS payload are nonblocking line-count findings and top-level advisory/unsupported taxonomy entries, not immediate-scope source-decision failures.
 - `conventions compile --force --json` no longer fails schema validation, but the live provider-backed run timed out at the provider wrapper's 120s limit during validation; semantic is explicitly BLOCKED until the rulebook can be generated, so no compile/semantic PASS is claimed.
+
+## 2026-10-08 — Root governance exclusion regression
+
+- **FR-008/FR-009, AC-011/AC-012:** Read [corpus.py](../../../validator/conventions_ast/corpus.py) for exact root-relative exclusions of `SECURITY.md` and `THIRD_PARTY_NOTICES.md`; both remain visible with the existing governance reason and excluded source decisions.
+- **Regression coverage:** Read [test_conventions_taxonomy.py](../../../tests/test_conventions_taxonomy.py) for root notices, nested homonyms and an unknown root source producing `total_source_count_mismatch` and a `BLOCKED` gate.
+- **Scope:** Corpus prerequisite repaired; historical feature-wide acceptance is not recertified. Read [the scoped report](checks/2026-10-08.md) for observed results and remaining limitations.
