@@ -18,6 +18,11 @@ from typer.testing import CliRunner
 from tests.test_conventions_ast_engine import AST_HIGH_CATALOG_TEMPLATE
 from validator.cli import app
 from validator.conventions_ast.backends import FakeAstBackend
+from validator.conventions_ast.corpus import build_corpus_manifest
+from validator.conventions_ast.source_decisions import (
+    build_rule_decision_manifest,
+    validate_rule_decision_manifest,
+)
 from validator.conventions_ast.taxonomy import (
     advisory_rules,
     taxonomy_fields,
@@ -232,3 +237,72 @@ def _local_taxonomy_catalog(root: Path, monkeypatch: pytest.MonkeyPatch) -> Path
         encoding="utf-8",
     )
     return ai_root
+
+
+# @spec FR-008: Explicit corpus exclusions without unknown drops
+#   .specs/features/073-conventions-multilang-catalog/spec.md#fr-008
+
+
+def test_root_governance_notices_are_excluded_with_reason(tmp_path: Path) -> None:
+    ai_root = tmp_path / "ai-ressources"
+    _write_ai_resources_fixture(ai_root)
+    for name in ("SECURITY.md", "THIRD_PARTY_NOTICES.md"):
+        (ai_root / name).write_text("# Repository notice\n", encoding="utf-8")
+    project = _enforce_project(tmp_path / "project", ai_resources_path=ai_root)
+
+    manifest = build_corpus_manifest(project)
+    reasons = {item["path"]: item["reason"] for item in manifest["excluded_sources"]}
+
+    assert reasons["SECURITY.md"] == "repository_governance_or_non_convention_file"
+    assert reasons["THIRD_PARTY_NOTICES.md"] == "repository_governance_or_non_convention_file"
+    assert manifest["excluded_count"] == 3
+    assert manifest["total_source_count"] == manifest["classified_count"] == 10
+    assert manifest["unclassified_sources"] == []
+    decisions = build_rule_decision_manifest(project)
+    assert decisions["total_source_count"] == len(decisions["decisions"]) == 10
+    assert "total_source_count_mismatch" not in validate_rule_decision_manifest(decisions)
+
+
+def test_nested_governance_names_keep_existing_classification(tmp_path: Path) -> None:
+    ai_root = tmp_path / "ai-ressources"
+    _write_ai_resources_fixture(ai_root)
+    for directory in ("code-conventions", "unknown"):
+        (ai_root / directory).mkdir(exist_ok=True)
+        for name in ("SECURITY.md", "THIRD_PARTY_NOTICES.md"):
+            (ai_root / directory / name).write_text("# Guidance\n", encoding="utf-8")
+    project = _enforce_project(tmp_path / "project", ai_resources_path=ai_root)
+
+    manifest = build_corpus_manifest(project)
+    paths = {item["path"] for item in manifest["sources"]}
+
+    assert {"code-conventions/SECURITY.md", "code-conventions/THIRD_PARTY_NOTICES.md"} <= paths
+    assert manifest["excluded_count"] == 1
+    assert manifest["classified_count"] == 12
+    assert manifest["total_source_count"] == 14
+    assert manifest["unclassified_sources"] == [
+        "unknown/SECURITY.md",
+        "unknown/THIRD_PARTY_NOTICES.md",
+    ]
+
+
+def test_unknown_markdown_remains_unclassified_and_blocks_decision_manifest(tmp_path: Path) -> None:
+    ai_root = tmp_path / "ai-ressources"
+    _write_ai_resources_fixture(ai_root)
+    (ai_root / "unknown.md").write_text("# Unknown guidance\n", encoding="utf-8")
+    project = _enforce_project(tmp_path / "project", ai_resources_path=ai_root)
+
+    manifest = build_corpus_manifest(project)
+    decisions = build_rule_decision_manifest(project)
+
+    assert manifest["unclassified_sources"] == ["unknown.md"]
+    assert manifest["total_source_count"] == 11
+    assert manifest["classified_count"] == 10
+    assert manifest["excluded_count"] == 1
+    assert "total_source_count_mismatch" in validate_rule_decision_manifest(decisions)
+    result = verify_conventions(project)
+    assert result.verdict.value == "BLOCKED"
+    assert any(
+        blocker.code == "rule_decision_manifest_invalid"
+        and blocker.message == "total_source_count_mismatch"
+        for blocker in result.blockers
+    )

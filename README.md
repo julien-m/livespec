@@ -104,6 +104,9 @@ livespec conventions supervisor-gate --base-ref <ref> --head-ref <ref>
 `livespec conventions verify --json` also emits `source_manifest`, an
 AI-res/ARS corpus inventory with source counts, explicit exclusions, and a
 language/domain matrix.
+Root `SECURITY.md` and `THIRD_PARTY_NOTICES.md` notices are explicitly excluded
+with reasons; nested files with those names and unknown sources remain subject
+to classification and completeness checks.
 
 For debt remediation, run `/spec-fix --conventions`. See [`system/conventions-enforcement.md`](system/conventions-enforcement.md) for the full architecture, human operations, anti-bypass locks, and CLI reference.
 

@@ -76,6 +76,9 @@ _SKIP_FILES = {
     "compiled-index.txt",
     "setup.sh",
 }
+# These two repository notices are governance only at the corpus root;
+# identical filenames under convention domains must still be classified.
+_SKIP_ROOT_FILES = {"SECURITY.md", "THIRD_PARTY_NOTICES.md"}
 _IN_SCOPE_TOP_LEVEL = {
     "architecture",
     "code-conventions",
@@ -206,7 +209,7 @@ def _exclusion_reason(rel: str, source_path: Path) -> str | None:
     parts = rel.split("/")
     if any(part in _SKIP_DIRS for part in parts[:-1]):
         return "tooling_or_generated_directory"
-    if source_path.name in _SKIP_FILES:
+    if source_path.name in _SKIP_FILES or rel in _SKIP_ROOT_FILES:
         return "repository_governance_or_non_convention_file"
     if rel.startswith("templates/"):
         return "template_scaffold_not_source_convention"
