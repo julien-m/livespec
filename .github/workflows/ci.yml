@@ -91,7 +91,11 @@ jobs:
           persist-credentials: false
           path: .ci-deps/ai-ressources
           sparse-checkout: |
+            /code-conventions/general.md
+            /code-conventions/python.md
             /code-conventions/javascript.md
+            /code-conventions/cli.md
+            /code-conventions/stack-commands.md
             /code-conventions/rust.md
             /code-conventions/swift-kotlin.md
           sparse-checkout-cone-mode: false

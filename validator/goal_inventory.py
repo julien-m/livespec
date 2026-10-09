@@ -100,6 +100,9 @@ def _active_execution_task_branches(
     """Calculate which execution task branches are active based on context."""
     active: set[str] = {"always"}
     flag_names = _contracts._flag_names(normalized_flags)
+    # Preview excludes generic visual scaffolding too, even with an existing UI feature.
+    if command == "spec-init" and flag_names.intersection({"--dry-run", "-d"}):
+        return active | _command_task_branches(command, flag_names, False)
     # @spec(FR-015): preparation exits before implementation checks or mutation.
     if "--pre-impl" in flag_names:
         active.add("pre-impl")
@@ -176,6 +179,14 @@ def _fix_execution_branches(flag_names: set[str]) -> set[str]:
 
 def _command_task_branches(command: str | None, flags: set[str], executes: bool) -> set[str]:
     """Retain audit reporting while excluding preview and generation-only publication."""
+    # @spec FR-004: Honest init profiles
+    #   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-004
+    # Aliases select the same new inventory; old saved contracts are never rewritten.
+    if command == "spec-init":
+        if flags.intersection({"--dry-run", "-d"}):
+            return {"init-preview"}
+        autonomous = bool(flags & {"--from-code", "-f"} and flags & {"--auto", "-a"})
+        return {"init-install", "init-autonomous" if autonomous else "init-interactive"}
     if command == "spec-fix":
         return _fix_execution_branches(flags)
     if command != "spec-test":
@@ -188,25 +199,8 @@ def _command_task_branches(command: str | None, flags: set[str], executes: bool)
     return active
 
 
-# Parse ## Execution Tasks from the skill file and filter by active branches.
-#
-# Branches:
-# always          — always included
-# visual          — is_visual AND NOT --no-visual
-# penflow         — visual AND has_penflow
-# generate        — NOT --audit-only AND NOT --no-generate
-# visual-generate — visual AND generate both active
-# execute         — NOT --audit-only
-# surfaces        — --surfaces
-# quality-only    — --quality or -q
-# tree-only       — --tree-only or -t
-# visual-status   — --visual-status
-# multi           — --all/-A or --summary/-S
-# fix             — --fix or -x
-# pre-impl        — --pre-impl
-# full-check      — NOT --pre-impl
-# pre-impl-penflow — --pre-impl AND visual AND has_penflow (inspection only)
-#
+# Parse machine-readable execution rows using the active, command-scoped branches.
+# Preview init goals retain control-plane proof without requiring project writes.
 def _extract_execution_tasks(
     skill_path: Path,
     *,

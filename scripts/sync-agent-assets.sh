@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # LiveSpec traceability anchors
 # @spec(FR-005)
+# @spec FR-003: Isolate mutable agents — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-003
 
 set -euo pipefail
 shopt -s nullglob
@@ -10,6 +11,7 @@ shopt -s nullglob
 #
 # Usage: sync-agent-assets.sh <project-dir> <livespec-dir> [--scope project|global|all]
 #        [--targets claude|codex|all] [--dry-run] [--force]
+#        [--check-paths-only] (read-only installer preflight)
 
 PROJECT_DIR="${1:?Usage: sync-agent-assets.sh <project-dir> <livespec-dir>}"
 LIVESPEC_DIR="${2:?Usage: sync-agent-assets.sh <project-dir> <livespec-dir>}"
@@ -24,6 +26,7 @@ SCOPE="project"
 TARGETS="all"
 DRY_RUN=false
 FORCE=false
+CHECK_PATHS_ONLY=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -43,6 +46,10 @@ while [[ $# -gt 0 ]]; do
       FORCE=true
       shift
       ;;
+    --check-paths-only)
+      CHECK_PATHS_ONLY=true
+      shift
+      ;;
     *)
       echo "ERROR: unknown option: $1" >&2
       exit 2
@@ -50,10 +57,87 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+case "$SCOPE" in project|global|all) ;; *) echo "ERROR: invalid scope: $SCOPE" >&2; exit 2 ;; esac
+case "$TARGETS" in claude|codex|all) ;; *) echo "ERROR: invalid targets: $TARGETS" >&2; exit 2 ;; esac
+
 if [[ ! -d "$SOURCE_ROOT" ]]; then
   echo "ERROR: missing LiveSpec agent-sync source: $SOURCE_ROOT" >&2
   exit 1
 fi
+
+# Validate provider ancestors and mutable destinations before projection or build.
+# Legacy mutable-agent links are unlinked later; immutable skill/rule links are read-only.
+check_local_paths() {
+  python3 - "$PROJECT_DIR" "$SOURCE_ROOT" <<'PY'
+import os
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1]).resolve()
+shared = Path(sys.argv[2])
+
+def is_legacy_provider_link(path):
+    relative = path.relative_to(root)
+    if len(relative.parts) != 3 or relative.parts[1] != "agents" or not path.is_symlink():
+        return False
+    provider, _, filename = relative.parts
+    extension, dist = {".claude": (".md", "claude.md"), ".codex": (".toml", "codex.toml")}.get(provider, ("", ""))
+    if not extension or not filename.startswith("livespec-") or not filename.endswith(extension):
+        return False
+    name = filename[:-len(extension)]
+    linked = Path(os.path.abspath(path.parent / os.readlink(path)))
+    return linked in (
+        root / ".agent-sync.local/agents" / name / "dist" / dist,
+        shared / "agents" / name / "dist" / dist,
+    )
+
+def check(path):
+    if not path.resolve().is_relative_to(root):
+        raise SystemExit(f"ERROR: escaping writable path: {path}")
+
+def check_ancestors(path):
+    for parent in reversed((path, *path.parents)):
+        if parent == root or root in parent.parents:
+            check(parent)
+
+def check_assets(path, mutable_root=False):
+    if mutable_root and path.is_symlink():
+        return  # Only unlink this legacy root, never traverse its shared target.
+    if is_legacy_provider_link(path):
+        return  # Exact old LiveSpec outputs are detached after copying agents.
+    check(path)
+    if not path.is_dir():
+        return
+    for child in path.iterdir():
+        if mutable_root and child.name.startswith("livespec-") and child.is_symlink():
+            continue  # A legacy agent link is detached before any build.
+        check_assets(child)
+
+for relative in (".agent-sync.local", ".agent-sync.local/skills", ".agent-sync.local/rules"):
+    check_ancestors(root / relative)
+check_assets(root / ".agent-sync.local/agents", mutable_root=True)
+for provider in (".agents", ".claude", ".codex"):
+    base = root / provider
+    check(base)
+    if base.is_dir():
+        for child in base.iterdir():
+            if child.name in ("skills", "rules", "commands"):
+                check(child)  # Legacy commands and skill/rule files are read-only links.
+            else:
+                check_assets(child)
+for relative in (
+    "AGENTS.md", "CLAUDE.md", ".gitignore", ".conventions/index.md",
+    ".conventions/manifest.yaml", ".specs/spec-system.md", ".specs/constitution.md",
+    ".specs/project.md", ".specs/changelog.md", ".specs/stacks/_default.md",
+    ".specs/stacks/decisions", ".specs/testing/strategy.md", ".specs/hooks",
+    ".specs/features",
+):
+    check_ancestors(root / relative)
+PY
+}
+
+check_local_paths
+[[ "$CHECK_PATHS_ONLY" != true ]] || exit 0
 
 if [[ "$DRY_RUN" != true ]] && ! command -v cc-hub >/dev/null 2>&1; then
   echo "ERROR: cc-hub is required to sync LiveSpec agent assets" >&2
@@ -70,7 +154,29 @@ run_cc_hub() {
     printf '\n'
     return
   fi
+  check_local_paths
+  # Build/link receives explicit argv in the installer process group; its caller
+  # owns the total deadline and cancels this group, including cc-hub descendants.
   (cd "$PROJECT_DIR" && cc-hub "$@")
+}
+
+project_mutable_agent() {
+  local src="$1"
+  local dest="$2"
+  if [[ "$DRY_RUN" == true ]]; then
+    printf 'copy mutable agent %s -> %s\n' "$src" "$dest"
+    return
+  fi
+  # Unlink before mkdir/copy: writing through a legacy directory link changes
+  # the shared checkout. Existing real local agents retain their custom content.
+  [[ ! -L "$dest" ]] || rm -f "$dest"
+  if [[ -e "$dest" ]]; then
+    [[ -d "$dest" ]] || { echo "ERROR: agent destination is not a directory: $dest" >&2; exit 1; }
+    return
+  fi
+  mkdir -p "$dest"
+  # Dereference source links while copying so build cannot mutate a shared asset.
+  cp -RL "$src/." "$dest/"
 }
 
 project_source() {
@@ -110,9 +216,12 @@ project_shared_sources() {
   done
 
   local agent
+  if [[ "$DRY_RUN" != true && -L "$LOCAL_ROOT/agents" ]]; then
+    rm -f "$LOCAL_ROOT/agents"
+  fi
   for agent in "$SOURCE_ROOT"/agents/livespec-*; do
     [[ -d "$agent" ]] || continue
-    project_source "$agent" "$LOCAL_ROOT/agents/$(basename "$agent")" "agent $(basename "$agent")"
+    project_mutable_agent "$agent" "$LOCAL_ROOT/agents/$(basename "$agent")"
   done
 
   local rule
@@ -120,6 +229,20 @@ project_shared_sources() {
     [[ -f "$rule" ]] || continue
     project_source "$rule" "$LOCAL_ROOT/rules/$(basename "$rule")" "rule $(basename "$rule")"
   done
+
+  if [[ "$DRY_RUN" != true ]]; then
+    # Provider links can still resolve through the old shared agent directory.
+    # Unlink only the known LiveSpec outputs; custom files remain untouched.
+    for agent in "$SOURCE_ROOT"/agents/livespec-*; do
+      [[ -d "$agent" ]] || continue
+      local name
+      name="$(basename "$agent")"
+      local output
+      for output in "$PROJECT_DIR/.claude/agents/$name.md" "$PROJECT_DIR/.codex/agents/$name.toml"; do
+        [[ ! -L "$output" ]] || rm -f "$output"
+      done
+    done
+  fi
 }
 
 sync_skills() {

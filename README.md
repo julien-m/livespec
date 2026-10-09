@@ -272,17 +272,21 @@ Run the full pipeline in one command with validation gates between each phase:
 
 ### `/spec-init`
 
-Initialize LiveSpec in a project. Runs a 3-phase conversational brainstorm (interview → stack decisions → file generation).
+Initialize LiveSpec through an interactive brainstorm or an observed from-code profile. Autonomous initialization preserves independent native/frontend families, keeps unobserved product facts Unknown and executes actual bounded tooling checks.
 
 ```bash
 /spec-init                       # Full interactive setup
 /spec-init --auto                # Use defaults, skip questions
 /spec-init --stack web-realtime  # Skip interview, use preset
 /spec-init --from-code           # Reverse-engineer existing codebase into specs
-/spec-init --from-code --deep    # Extended scan (git history, CI, env)
+/spec-init --from-code --auto    # Observed bootstrap with full verification/hooks/goal closure
+/spec-init --from-code --auto --force --dir "/path with spaces" # Backed-up recovery
+/spec-init --from-code --deep    # Interactive extended scan; rejected in autonomous mode
 ```
 
 Key flags: `--auto`, `--stack [preset]`, `--from-code`, `--deep`, `--force`, `--dir [path]`, `--dry-run`
+
+Explicit autonomous force recovery backs up prior specs, conventions and integration documents before overwriting owned bootstrap files, preserving custom history and source bytes. Mutable agents use local copies. `--dry-run` previews without project writes; the backend's `--verify-only` rechecks current profile/content identity without mutation. Autonomous `--deep` and conflicting presets fail before writes. Installer, sync, probes and hook subprocesses share one finite budget; backend exit zero still requires integration proof, after-init hooks, current verification and the authentic goal archive. Tooling READY does not certify application runtime. Set `AIRESOURCES` to the real conventions checkout when it is outside the default sibling `ai-ressources` directory.
 
 ### `/spec-propose`
 

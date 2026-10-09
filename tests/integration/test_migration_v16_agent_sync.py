@@ -105,7 +105,9 @@ def test_migration_v16_syncs_agent_assets_with_cc_hub(tmp_path: Path) -> None:
     assert not (project / ".codex" / "agents" / "livespec-verifier.toml").exists()
     assert not (project / ".claude" / "rules" / "routing.md").exists()
     assert (project / ".agent-sync.local" / "skills" / "spec-init").is_symlink()
-    assert (project / ".agent-sync.local" / "agents" / "livespec-verifier").is_symlink()
+    local_agent = project / ".agent-sync.local" / "agents" / "livespec-verifier"
+    assert local_agent.is_dir()
+    assert not local_agent.is_symlink()
     assert (project / ".agent-sync.local" / "rules" / "routing.md").is_symlink()
     log = log_path.read_text(encoding="utf-8")
     assert "skill link" in log

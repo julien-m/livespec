@@ -137,7 +137,7 @@ def test_temporary_descriptor_closes_once_after_failure(
 def _inject_failure(monkeypatch: pytest.MonkeyPatch, stage: FailureStage) -> None:
     if stage == "write":
         _fail_stream_write(monkeypatch)
-    elif stage in {"pre-publication", "post-publication"}:
+    elif stage in ("pre-publication", "post-publication"):
         _fail_identity_check(monkeypatch, stage)
     elif stage == "cleanup":
         _fail_temporary_unlink(monkeypatch)

@@ -1,6 +1,6 @@
 ---
 name: spec-init
-description: Migrated Claude command /spec-init
+description: Initialize LiveSpec interactively or from observed code with safe autonomous recovery and verified command closure.
 ---
 <!-- LiveSpec traceability anchors -->
 <!-- @spec(FR-003) -->
@@ -24,7 +24,9 @@ description: "Initialize LiveSpec in a project through a 3-phase conversational 
 
 La toute première action lors de `/spec-init` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
 
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
+1. Résoudre feature, cible et flags en lecture seule : normaliser `-f/-a/-D/-F/-d` vers `--from-code/--auto/--dir/--force/--dry-run`, conserver les valeurs de cible et de timeout. Si `--from-code` est demandé dans un flux non interactif ou avec « Proceed autonomously », « do not ask questions » ou équivalent, normaliser vers `--from-code --auto` **avant** `livespec goal render`. Résoudre `TARGET_DIR` depuis `--dir` (sinon cwd), puis utiliser cette même cible comme `project_root` du goal et pour le backend.
+   - En mode autonome, rejeter `--deep`, `--stack`, les flags non supportés et combinaisons incompatibles avant toute mutation ; ne pas les ignorer. `--force` et `--dry-run` restent explicites.
+   - `--dry-run` sélectionne `init-preview` : aucune installation, génération, sync ou exécution de hook mutante ; seule la preuve de preview et son archive sont produites hors du projet.
 2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
 3. Rendre et sauvegarder le contrat immuable et l'état mutable :
    ```bash
@@ -722,7 +724,7 @@ Generate `.specs/roadmap.md` as the feature backlog for the project.
 ```
 
 **Flag interactions:**
-- `--auto`: Roadmap is generated using AI inference with no user review of items.
+- `--auto` in interactive/preset initialization: Roadmap is generated using AI inference with no user review of items. Autonomous from-code uses only observed evidence and preserves Unknown backlog/product decisions.
 - `--dry-run`: Roadmap is listed in the dry-run output but not created.
 
 ### Step 3.10 — Create README.md
@@ -828,7 +830,7 @@ This keeps the CLAUDE.md lean. All rules, intent classification, and guardrails 
 
 ### Step 3.12 — Sync Agent Assets
 
-After installing the CLAUDE.md section, sync LiveSpec skills, agents, and rules through `cc-hub`. This step is mandatory and blocking in every mode, including `--auto` and `--from-code`; skipping it leaves follow-up commands unavailable (`Unknown command: /spec-feature`).
+After installing the CLAUDE.md section, sync LiveSpec skills, agents, and rules through `cc-hub`. This step is mandatory and blocking in every installation mode, including `--auto` and `--from-code`; skipping it leaves follow-up commands unavailable (`Unknown command: /spec-feature`). Preview does not install or sync.
 
 1. **Resolve LiveSpec repo path:** Resolve the currently executing `spec-init` skill path to its physical `SKILL.md`. Accept global/user/project symlinks, then derive the repo root by stripping `.agent-sync/skills/spec-init/SKILL.md`. If the executing path is opaque, fall back in order to an existing `.specs/.livespec-path`, then the nearest ancestor containing both `.agent-sync/skills/spec-init/SKILL.md` and `scripts/sync-agent-assets.sh`.
 2. **Verify source repo:** `<livespec-dir>/scripts/sync-agent-assets.sh`, `<livespec-dir>/scripts/install-hooks.sh`, and `<livespec-dir>/VERSION` must exist. If any is missing, print `BLOCKED at step 3.12 - agent_asset_sync_failed - cannot resolve LiveSpec repo path` and stop.
@@ -850,6 +852,8 @@ After installing the CLAUDE.md section, sync LiveSpec skills, agents, and rules 
    - `.agents/skills/spec-feature/SKILL.md`
    - `.agents/skills/source-command-cli/SKILL.md`
    - `.codex/agents/livespec-verifier.toml`
+   Verify every source `spec-*` skill and `source-command-cli` under target `.agent-sync.local/skills/` and both `.claude/skills/` + `.agents/skills/`; resolve each `SKILL.md` to its canonical source. Verify every source `livespec-*` agent has matching local `agent.yaml` + `prompt.md` and generated `.claude/agents/<name>.md` + `.codex/agents/<name>.toml`.
+   Mutable `.agent-sync.local/agents/livespec-*` directories must be project-local copies before builds; read-only skill/rule links may resolve to canonical sources. Reject escaping mutable/provider outputs instead of writing through them. The source repo's `.agent-sync/` namespace is not a required target installation directory.
 8. **Failure handling:** If any verification path is missing, print `BLOCKED at step 3.12 - agent_asset_sync_failed - /spec-feature would be unavailable (Unknown command: /spec-feature); missing: <paths>` and stop before writing success output.
 9. **Update .gitignore:** Add the following patterns (if not already present):
    - `.agents/skills/spec-*`
@@ -938,7 +942,7 @@ flowchart TD
 
 3. **Execute** each hook: Read the file and follow its instructions sequentially.
 
-4. **Convention guard (--from-code):** If `.conventions/` directory already exists AND contains `index.md` (or the legacy `conventions.md`), skip the conventions bootstrap. The project already has conventions configured — do not overwrite them. Projects still on the legacy compiled format should run `/spec-refresh-conventions --full` once to migrate to the `index.md` + `manifest.yaml` layout.
+4. **Convention guard (--from-code):** Preserve existing valid `index.md` + `manifest.yaml` routing whose source files actually resolve. File existence alone is insufficient. Autonomous recovery backs up invalid generated routing before repairing it from actual ai-ressources sources. Interactive projects still on legacy compiled `conventions.md` should run `/spec-refresh-conventions --full` once to migrate.
 
 5. **Expected outcome (standard mode):** The global `after-init` hook follows the Bootstrap Path in `~/.claude/livespec/references/conventions-sync.md`, detects that `.conventions/index.md` does not exist, and triggers `/spec-refresh-conventions --full` to generate `.conventions/index.md` + `.conventions/manifest.yaml` from the stack.
 
@@ -965,8 +969,7 @@ flowchart TD
 > - `.specs/preflight-report.md` — preflight execution report (gitignored, local only)
 > - `.conventions/index.md` — convention routing table (generated from stack, points into ai-ressources)
 > - `.conventions/manifest.yaml` — machine-readable mirror of the routing table
-> - `.agent-sync/` — LiveSpec shared skill/agent/rule source links
-> - `.agent-sync.local/` — project-local LiveSpec skill/agent/rule links
+> - `.agent-sync.local/` — project-local skill/rule links and mutable agent copies
 > - `.specs/livespec-version` — version tracking (v2)
 >
 > **Next step:** Discover what to build first:
@@ -981,54 +984,58 @@ flowchart TD
 
 | Flag | Behavior |
 |---|---|
-| `--auto`, `-a` | Use defaults, skip all questions (generates generic constitution) |
+| `--auto`, `-a` | Skip questions; with `--from-code`, generate only observed facts and a project-specific constitution |
 | `--stack`, `-s` `[preset]` | Skip Phase A, use specified preset (web-realtime / web-static / api-rest) |
 | `--dir`, `-D` `[path]` | Install in specified directory instead of current directory |
 | `--dry-run`, `-d` | Show what would be created without creating files |
 | `--from-code`, `-f` | Reverse-engineer an existing codebase into LiveSpec specs (see below) |
 | `--deep` | Include Tier 4 scan: git history, CI configs, env files (only with `--from-code`) |
-| `--force`, `-F` | Backup existing `.specs/` and/or overwrite existing `bootstrap-recap.md` (only with `--from-code`) |
+| `--force`, `-F` | Explicit from-code recovery: unique local backup before overwrite; preserve features/hooks/runs/source/integration text |
 
 ### Flag Interactions
 
 | Combination | Behavior |
 |---|---|
 | `--from-code` alone | Scan → generate recap → wait for human → Phase C/D/E |
-| `--from-code --auto` | Scan → generate recap → skip human validation → Phase C/D/E immediately |
-| `--from-code --deep` | Extended scan (Tier 4: git history, CI, env). Budget: 60K tokens |
-| `--from-code --force` | Backup `.specs/` to `.specs.bak-YYYYMMDD-HHMMSS/`, overwrite recap if exists |
-| `--from-code --stack` | Warning: "--stack ignored in --from-code mode (stack detected from code)." |
+| `--from-code --auto` | Observe supported manifests → deterministic generation/probes → current verification → integrations/hooks → goal proof/archive |
+| `--from-code --deep` | Interactive extended scan only (60K tokens); autonomous mode rejects it before mutation |
+| `--from-code --force` | Noninteractive autonomous recovery backs up specs, conventions, `.gitignore`, `AGENTS.md` and `CLAUDE.md` before owned-file overlay |
+| `--from-code --stack` | Autonomous mode rejects the incompatible preset before mutation; interactive stack comes from code |
 | `--from-code --dry-run` | Show what would be scanned and generated, without writing files |
 
 ### Non-Interactive Autonomous From-Code Mode
 
-When `/spec-init --from-code` runs in a non-interactive command stream or the prompt says `Proceed autonomously`, `do not ask questions`, `use defaults`, or equivalent, normalize active flags to `--from-code --auto`.
+<!-- @spec FR-003: Preserve init flags, FR-004: Prove full autonomous closure — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-004 -->
 
-- Print `Autonomous from-code: enabled` before scanning.
-- Do not wait for human validation, recap editing, or a second invocation.
-- Use the deterministic bootstrap backend below; run this command before any manual file creation:
+Normalize autonomous intent to `--from-code --auto` at Step 0, before rendering the immutable goal. Use its `init-autonomous` tasks; interviews, inferred business defaults and stack confirmation belong to `init-interactive`. Do not rewrite historical goals to select a new branch.
 
-  ```bash
-  if [[ -L .agent-sync.local/skills/spec-init ]]; then
-    LIVESPEC_ROOT="$(cd "$(dirname "$(readlink .agent-sync.local/skills/spec-init)")/../.." && pwd -P)"
-  else
-    LIVESPEC_ROOT="/Users/julienm/projects/livespec"
-  fi
-  bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "$PWD" --timeout-seconds 300
-  ```
+1. Resolve the physical executing skill to the LiveSpec repository as in Step 3.12. Resolve `TARGET_DIR` from `--dir` (default: cwd), and `INIT_FORCE` / `INIT_DRY_RUN` booleans from the normalized flags. Print `Autonomous from-code: enabled`. Reject unsupported `--deep`, `--stack` or incompatible flags before project writes; retain explicit `--force`, `--dry-run` and `--timeout-seconds`.
+2. Start the finite total deadline (default 300 seconds) before external installation, sync or probe work. Build argv as a shell array, preserving spaces in the selected target; run this command before any manual file creation:
+   ```bash
+   INIT_ARGS=("$TARGET_DIR" --timeout-seconds "$REMAINING_SECONDS")
+   # Explicit flags preserve recovery/preview semantics after target resolution.
+   if [[ "$INIT_FORCE" == "true" ]]; then INIT_ARGS+=(--force); fi
+   if [[ "$INIT_DRY_RUN" == "true" ]]; then INIT_ARGS+=(--dry-run); fi
+   bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "${INIT_ARGS[@]}"
+   ```
+   `REMAINING_SECONDS` is the positive remaining monotonic budget, initially 300 unless explicitly overridden; never reset it between calls. The backend bounds installer, `cc-hub` sync and actual allowlisted version probes, including child process groups.
+3. On nonzero exit, capture the exact exit code and stdout/stderr tail, report the failing manifest/tool/artifact, and stop without READY or command completion. Timeout reports `BLOCKED at step from-code-autonomous-timeout`. Do not substitute manual generation. For `--dry-run`, require no target tree change and an explicit preview; do not emit initialization success or run installation/integration/hook tasks.
+4. On backend exit 0, retain generated documents. Verify the current observed profile and content identity through the same backend with `--verify-only`; existence or an old completed recap is insufficient:
+   ```bash
+   bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "$TARGET_DIR" --verify-only --timeout-seconds "$REMAINING_SECONDS"
+   ```
+   Record actual native/frontend families, product and technical names, package-manager evidence, explicit Unknown business fields, project-specific constitution, observed ADR, deduplicated testing tools and real probe results. Tooling READY certifies tool availability only.
+5. Verify integration markers, every required skill/provider output and project-local mutable agent copy. Check the unique local backup and retained feature/hook/run history for explicit force recovery. Preserve application/manifests/shared-source bytes; backend success never permits writes through shared links.
+6. Resolve the actual after-init hook chain at the selected target and apply its Markdown instructions in order. The backend does **not** execute these Markdown hooks. Preserve valid conventions; repair invalid generated conventions using backed-up content and actual ai-ressources sources. Every external command requested by a hook must use the same remaining global deadline through the bounded `validator.init_probes.run_command` API; no unbounded shell/CLI call or fresh 300-second allowance. Capture resolved context, applied instructions and actual subprocess outcomes. No hook is inferred executed from backend exit 0.
+7. Re-run current `--verify-only` after hooks and verify conventions/integration outputs; any content drift, required failure or exhausted deadline blocks completion. Do not manually rewrite `.specs/` artifacts to hide drift. Submit authentic task evidence through `livespec goal prove`, archive via `livespec goal archive`, prove `archive.run`, then check `livespec goal status` before command success. Backend `status: completed` describes its generated artifact; only this full goal closure completes `/spec-init`.
 
-- If this command exits 0, do not manually rewrite `.specs/` artifacts; verify its outputs and return.
-- On exit 0, return immediately with the command output summary. Do not call `Write`, `Edit`, or `MultiEdit` afterward for `.specs/`, `.conventions/`, `AGENTS.md`, or `CLAUDE.md`.
-- If this command exits non-zero, report the exact exit code and stderr/stdout tail; do not fall back to manual `.specs/` generation unless the user explicitly authorizes a recovery path.
-- The backend generates `.specs/bootstrap-recap.md` with `status: completed`, then completes Phase C/D/E artifacts in the same run.
-- For a single-package Vite React app, complete within 300 seconds or stop with `BLOCKED at step from-code-autonomous-timeout`.
-- Do not create repository history changes, branches, tags, or pushes unless the user explicitly authorizes them.
+Do not create repository history changes, branches, tags or pushes without explicit user authorization. Interactive from-code scan/recap validation remains the flow below; autonomous mode does not use its speculative inference or interview phases.
 
 ---
 
 ## From-Code Mode
 
-When `--from-code` is set, **Read** [`system/from-code.md`](../system/from-code.md) and follow it instead of Phase A and Phase B.
+When `--from-code` is set, **Read** [`system/from-code.md`](../../../system/from-code.md) and follow it instead of Phase A and Phase B.
 
 The from-code flow:
 1. Checks `.specs/` existence (refuses or backs up with `--force`)
@@ -1038,11 +1045,11 @@ The from-code flow:
 5. Human reviews and edits the recap, sets `status: validated`
 6. On re-run: validates the recap, then enters Phase C with the recap data
 
-In Non-Interactive Autonomous From-Code Mode, steps 5-6 happen without waiting: the command writes the validated recap and enters Phase C/D/E immediately.
+In autonomous mode, use the deterministic observed-profile backend and full closure above instead of these interactive scan/recap steps; unobserved product facts remain Unknown.
 
 **After Phase C/D/E:** moves `bootstrap-recap.md` into `.specs/bootstrap-recap.md` with `status: completed`.
 
-All details (tier system, token budget, scan patterns, validation rules, edge cases) are in **Read** [`system/from-code.md`](../system/from-code.md).
+All details (tier system, token budget, scan patterns, validation rules, edge cases) are in **Read** [`system/from-code.md`](../../../system/from-code.md).
 
 ---
 
@@ -1097,7 +1104,7 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 > Machine-readable task inventory parsed by `livespec goal render`.
 > Format: `- [branch] task description`
 > Active branches per run:
-> `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
+> `init-autonomous` (--from-code + --auto, including aliases) · `init-interactive` (other installation modes) · `init-install` (shared non-preview installation) · `init-preview` (--dry-run/-d; no target mutation) · `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
 
 ### Phase 0 — Goal Lock
 
@@ -1106,82 +1113,98 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 
 ### Phase A — Brainstorm
 
-- [always] Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt <!-- evidence:documentary -->
-- [always] If brainstorm detected and accepted: pre-fill project.md and skip to Phase B <!-- evidence:documentary -->
-- [always] If no brainstorm: run 6-question conversational interview (Q1-Q6) <!-- evidence:documentary -->
-- [always] Present project profile summary and confirm before proceeding <!-- evidence:documentary -->
+- [init-interactive] Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt <!-- evidence:documentary -->
+- [init-interactive] If brainstorm detected and accepted: pre-fill project.md and skip to Phase B <!-- evidence:documentary -->
+- [init-interactive] If no brainstorm: run 6-question conversational interview (Q1-Q6) <!-- evidence:documentary -->
+- [init-interactive] Present project profile summary and confirm before proceeding <!-- evidence:documentary -->
 
 ### Phase B — Stack Decisions
 
-- [always] Run decision tree based on project profile signals <!-- evidence:documentary -->
-- [always] Present recommended stack with justifications per layer <!-- evidence:documentary -->
-- [always] Accept stack adjustments and confirm final stack <!-- evidence:documentary -->
-- [always] Define testing strategy for the project type <!-- evidence:documentary -->
-- [always] Ask dev tooling preferences (package manager, linter) <!-- evidence:documentary -->
-- [always] Check design tool configuration; run wizard if not configured <!-- evidence:documentary -->
-- [always] Detect and confirm brainstorm design/theme artifact import <!-- evidence:documentary -->
-- [always] Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists <!-- evidence:documentary -->
-- [always] Import theme.css and write theme.md if brainstorm theme detected <!-- evidence:documentary -->
-- [always] Create at least 1 ADR per significant stack choice <!-- evidence:documentary -->
+- [init-interactive] Run decision tree based on project profile signals <!-- evidence:documentary -->
+- [init-interactive] Present recommended stack with justifications per layer <!-- evidence:documentary -->
+- [init-interactive] Accept stack adjustments and confirm final stack <!-- evidence:documentary -->
+- [init-interactive] Define testing strategy for the project type <!-- evidence:documentary -->
+- [init-interactive] Ask dev tooling preferences (package manager, linter) <!-- evidence:documentary -->
+- [init-interactive] Check design tool configuration; run wizard if not configured <!-- evidence:documentary -->
+- [init-interactive] Detect and confirm brainstorm design/theme artifact import <!-- evidence:documentary -->
+- [init-interactive] Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists <!-- evidence:documentary -->
+- [init-interactive] Import theme.css and write theme.md if brainstorm theme detected <!-- evidence:documentary -->
+- [init-interactive] Create at least 1 ADR per significant stack choice <!-- evidence:documentary -->
+
+### Autonomous Profile / Preview
+
+- [init-autonomous] Detect the observed profile from independent supported manifests and preserve Unknown business facts <!-- evidence:documentary -->
+- [init-autonomous] Run bounded backend installation, sync and real required version probes with one total deadline <!-- evidence:documentary -->
+- [init-autonomous] Validate backend-generated project-specific constitution, observed stack ADR, deduplicated testing strategy and evidence-only roadmap <!-- evidence:documentary -->
+- [init-autonomous] Run current --verify-only against source identities and generated content; block on drift <!-- evidence:documentary -->
+- [init-autonomous] Verify backup when --force applies, retained history and unchanged source/shared-agent bytes <!-- evidence:documentary -->
+- [init-preview] Run read-only initialization preview for selected target and confirm no changes applied <!-- evidence:documentary -->
 
 ### Phase C — Installation
 
-- [always] Create .specs/ directory structure with all required files <!-- evidence:documentary -->
-- [always] Generate constitution.md from conversation and stack <!-- evidence:documentary -->
-- [always] Generate project.md from Phase A answers <!-- evidence:documentary -->
-- [always] Generate stacks/_default.md with `updated` frontmatter <!-- evidence:documentary -->
-- [always] Generate testing/strategy.md from Phase B decisions <!-- evidence:documentary -->
-- [always] Generate roadmap.md via inference matrix from project profile <!-- evidence:documentary -->
-- [always] Create .specs/README.md with project name, ADRs, empty features table <!-- evidence:documentary -->
-- [always] Install LiveSpec section in CLAUDE.md (create or update idempotently) <!-- evidence:documentary -->
-- [always] Run sync-agent-assets.sh and verify all required skill/agent symlinks <!-- evidence:documentary -->
-- [always] Install pre-commit hook via install-hooks.sh <!-- evidence:documentary -->
-- [always] Write .specs/livespec-version and .specs/.livespec-path <!-- evidence:documentary -->
-- [always] Update .gitignore with required patterns <!-- evidence:documentary -->
+- [init-install] Create .specs/ directory structure with all required files <!-- evidence:documentary -->
+- [init-interactive] Generate constitution.md from conversation and stack <!-- evidence:documentary -->
+- [init-interactive] Generate project.md from Phase A answers <!-- evidence:documentary -->
+- [init-install] Generate stacks/_default.md with `updated` frontmatter <!-- evidence:documentary -->
+- [init-interactive] Generate testing/strategy.md from Phase B decisions <!-- evidence:documentary -->
+- [init-interactive] Generate roadmap.md via inference matrix from project profile <!-- evidence:documentary -->
+- [init-install] Create .specs/README.md with project name and ADRs; preserve existing registry or use an empty features table for a fresh project <!-- evidence:documentary -->
+- [init-install] Install LiveSpec section in CLAUDE.md (create or update idempotently) <!-- evidence:documentary -->
+- [init-install] Run sync-agent-assets.sh and verify all required skill links and local mutable agent copies <!-- evidence:documentary -->
+- [init-install] Install pre-commit hook via install-hooks.sh <!-- evidence:documentary -->
+- [init-install] Write .specs/livespec-version and .specs/.livespec-path <!-- evidence:documentary -->
+- [init-install] Update .gitignore with required patterns <!-- evidence:documentary -->
 - [visual] Scaffold visual testing helpers if Playwright is available <!-- evidence:documentary -->
 
 ### Phase D — Preflight Setup
 
-- [always] Generate preflight.md from stack technologies catalog <!-- evidence:documentary -->
-- [always] Scan .env for creds:* entries and add token checks <!-- evidence:documentary -->
-- [always] Run 3-pass preflight engine (verify → auto-resolve → human blockers) <!-- evidence:documentary -->
-- [always] Present human-required blockers grouped for resolution <!-- evidence:documentary -->
-- [always] Ensure .gitignore has exact entry for .specs/preflight-report.md <!-- evidence:documentary -->
+- [init-install] Generate preflight.md from stack technologies catalog <!-- evidence:documentary -->
+- [init-interactive] Scan .env for creds:* entries and add token checks <!-- evidence:documentary -->
+- [init-interactive] Run 3-pass preflight engine (verify → auto-resolve → human blockers) <!-- evidence:documentary -->
+- [init-interactive] Present human-required blockers grouped for resolution <!-- evidence:documentary -->
+- [init-install] Ensure .gitignore has exact entry for .specs/preflight-report.md <!-- evidence:documentary -->
 
 ### Phase E — Post-Init Hooks
 
-- [always] Scan and resolve after-init hook chain (3 levels) <!-- evidence:documentary -->
-- [always] Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook <!-- evidence:documentary -->
+- [init-install] Scan and resolve after-init hook chain (3 levels) <!-- evidence:documentary -->
+- [init-install] Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook <!-- evidence:documentary -->
 
-### Exit Criteria (Must Pass)
+- [init-autonomous] After hooks, rerun current --verify-only and verify integration/convention outputs within the remaining deadline <!-- evidence:documentary -->
 
-Before declaring success, verify:
+## Definition of Done (Command-Level)
 
-- [ ] `.specs/spec-system.md` exists <!-- evidence:documentary -->
-- [ ] `.specs/project.md` contains users, scale, geography (or explicit placeholders) <!-- evidence:documentary -->
-- [ ] `.specs/stacks/_default.md` contains chosen stack + rationale <!-- evidence:documentary -->
-- [ ] At least 1 ADR exists in `.specs/stacks/decisions/` <!-- evidence:documentary -->
-- [ ] `.specs/testing/strategy.md` exists <!-- evidence:documentary -->
-- [ ] `.specs/README.md` exists with project name and initial ADRs <!-- evidence:documentary -->
-- [ ] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block <!-- evidence:documentary -->
-- [ ] `.specs/hooks/` directory exists <!-- evidence:documentary -->
-- [ ] `.specs/design/` directory exists with `screens/` subdirectory and `changelog.md` <!-- evidence:documentary -->
-- [ ] `.gitignore` contains `.specs/hooks/*.local.md` <!-- evidence:documentary -->
-- [ ] `.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned) <!-- evidence:documentary -->
-- [ ] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable) <!-- evidence:documentary -->
-- [ ] `.specs/preflight.md` exists with checks generated from stack <!-- evidence:documentary -->
-- [ ] `.specs/preflight-report.md` exists with execution results <!-- evidence:documentary -->
-- [ ] After-init hooks resolved and executed (Phase E) <!-- evidence:documentary -->
-- [ ] `.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode) <!-- evidence:documentary -->
-- [ ] `scripts/sync-agent-assets.sh` completed through `cc-hub` <!-- evidence:documentary -->
-- [ ] `.agent-sync/skills/spec-*` resolves for all 22 LiveSpec skills <!-- evidence:documentary -->
-- [ ] `.agent-sync/skills/source-command-cli` resolves <!-- evidence:documentary -->
-- [ ] `.agent-sync/agents/livespec-*` resolves for all 4 LiveSpec agents <!-- evidence:documentary -->
-- [ ] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo <!-- evidence:documentary -->
-- [ ] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory <!-- evidence:documentary -->
-- [ ] `.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/` <!-- evidence:documentary -->
-- [ ] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed` <!-- evidence:documentary -->
-- [ ] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`) <!-- evidence:documentary -->
+Before declaring installation success, verify the applicable branch criteria:
+
+- [ ] [init-install] `.specs/spec-system.md` exists <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/project.md` contains users, scale, geography (or explicit placeholders) <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/stacks/_default.md` contains chosen stack + rationale <!-- evidence:documentary -->
+- [ ] [init-install] At least 1 ADR exists in `.specs/stacks/decisions/` <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/testing/strategy.md` exists <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/README.md` exists with project name and initial ADRs <!-- evidence:documentary -->
+- [ ] [init-install] `CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/hooks/` directory exists <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/design/` directory exists with `screens/` subdirectory and `changelog.md` <!-- evidence:documentary -->
+- [ ] [init-install] `.gitignore` contains `.specs/hooks/*.local.md` <!-- evidence:documentary -->
+- [ ] [init-install] `.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned) <!-- evidence:documentary -->
+- [ ] [init-interactive] `roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable) <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/preflight.md` exists with checks generated from stack <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/preflight-report.md` exists with execution results <!-- evidence:documentary -->
+- [ ] [init-install] After-init hooks resolved and executed (Phase E) <!-- evidence:documentary -->
+- [ ] [init-install] `.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode) <!-- evidence:documentary -->
+- [ ] [init-install] `scripts/sync-agent-assets.sh` completed through `cc-hub` <!-- evidence:documentary -->
+- [ ] [init-install] `.agent-sync.local/skills/spec-*`, `.claude/skills/spec-*` and `.agents/skills/spec-*` resolve for every LiveSpec skill in the source inventory <!-- evidence:documentary -->
+- [ ] [init-install] `.agent-sync.local/skills/source-command-cli`, `.claude/skills/source-command-cli` and `.agents/skills/source-command-cli` resolve <!-- evidence:documentary -->
+- [ ] [init-install] `.agent-sync.local/agents/livespec-*` contains project-local copies of every source agent (`agent.yaml` + `prompt.md`); generated `.claude/agents/livespec-*.md` and `.codex/agents/livespec-*.toml` resolve within the project <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo <!-- evidence:documentary -->
+- [ ] [init-install] `.specs/.livespec-path` exists and points to a valid LiveSpec repo directory <!-- evidence:documentary -->
+- [ ] [init-install] `.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/` <!-- evidence:documentary -->
+- [ ] [init-install] If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed` <!-- evidence:documentary -->
+- [ ] [init-install] If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`) <!-- evidence:documentary -->
+
+- [ ] [init-autonomous] Current --verify-only succeeds after hooks; tooling results are actual execution and do not certify application runtime <!-- evidence:documentary -->
+- [ ] [init-autonomous] Observed profile and roadmap contain no invented product/deployment decisions; unobserved facts are Unknown <!-- evidence:documentary -->
+- [ ] [init-autonomous] When --force applies, a unique local backup exists; source, custom history and shared-agent bytes are retained <!-- evidence:documentary -->
+- [ ] [init-preview] Preview reports no changes applied and selected target tree is byte-identical; no initialized/completed claim <!-- evidence:documentary -->
 
 If any check fails, report the exact missing artifact and create/fix it before finishing.
 

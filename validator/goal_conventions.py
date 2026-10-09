@@ -9,6 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from . import goal_contracts as _contracts
+from .init_goal_conventions import (
+    InitConventionResolutionError,
+    resolve_init_root,
+    resolve_init_source,
+)
 
 __all__ = [
     "_build_convention_signal_text",
@@ -46,6 +51,9 @@ def _compile_conventions_payload(
         }
     index_text = index_path.read_text(encoding="utf-8")
     ai_root = _contracts._extract_airesources_root(index_text)
+    root_resolution = resolve_init_root(index_text, ai_root) if command == "spec-init" else None
+    if root_resolution is not None:
+        ai_root = root_resolution.path
     domains = _contracts._parse_convention_domains(index_text, ai_root)
     signal_text = _contracts._build_convention_signal_text(
         command=command,
@@ -59,13 +67,25 @@ def _compile_conventions_payload(
         for domain in domains
         if _contracts._should_select_convention_domain(domain, signal_text)
     ]
-    return {
+    try:
+        rendered = [
+            _contracts._render_convention_domain(domain, ai_root, for_init=command == "spec-init")
+            for domain in selected
+        ]
+    except InitConventionResolutionError as error:
+        raise _contracts.ExpectationsInvalid(str(index_path), str(error)) from error
+    payload: dict[str, object] = {
         "available": True,
         "index_path": ".conventions/index.md",
-        "selected_domains": [
-            _contracts._render_convention_domain(domain, ai_root) for domain in selected
-        ],
+        "selected_domains": rendered,
     }
+    if root_resolution is not None and root_resolution.legacy_declaration is not None:
+        payload["root_resolution"] = {
+            "kind": "legacy_literal_default",
+            "original_declaration": root_resolution.legacy_declaration,
+            "resolved_root": str(ai_root),
+        }
+    return payload
 
 
 def _extract_airesources_root(index_text: str) -> Path | None:
@@ -177,8 +197,15 @@ def _should_select_convention_domain(domain: dict[str, Any], signal_text: str) -
 def _render_convention_domain(
     domain: dict[str, Any],
     ai_root: Path | None,
+    *,
+    for_init: bool = False,
 ) -> dict[str, Any]:
-    rendered_files = [_contracts._render_convention_file(ref) for ref in domain["refs"]]
+    rendered_files = [
+        _render_init_convention_file(ref, ai_root)
+        if for_init
+        else _contracts._render_convention_file(ref)
+        for ref in domain["refs"]
+    ]
     return {
         "name": domain["name"],
         "keywords": list(domain["keywords"]),
@@ -186,6 +213,30 @@ def _render_convention_domain(
         "source_files": rendered_files,
         "airesources_root": ai_root.as_posix() if ai_root is not None else None,
     }
+
+
+def _render_init_convention_file(ref: dict[str, Any], ai_root: Path | None) -> dict[str, Any]:
+    """Embed genuine INIT source bytes and any explicit legacy path provenance."""
+    resolved = resolve_init_source(
+        str(ref["display_path"]),
+        ref["real_path"] if isinstance(ref["real_path"], Path) else None,
+        ai_root,
+    )
+    try:
+        source = _contracts._render_convention_file(
+            {"display_path": resolved.display_path, "real_path": resolved.real_path}
+        )
+    except OSError as error:
+        raise InitConventionResolutionError(
+            f"init_convention_source_unresolved: {resolved.display_path}: {error}"
+        ) from error
+    if resolved.original_path is not None:
+        source["resolution"] = {
+            "kind": "known_legacy_code_source",
+            "original_path": resolved.original_path,
+            "resolved_path": resolved.display_path,
+        }
+    return source
 
 
 def _render_convention_file(ref: dict[str, Any]) -> dict[str, Any]:

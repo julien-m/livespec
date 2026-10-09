@@ -3,9 +3,15 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-09-06
+> Last updated: 2026-10-09
 
 ---
+
+## 2026-10-09 — Bugfix: observed autonomous init and safe force recovery
+
+- Read [the recovery implementation](features/080-autonomous-from-code-recovery/implementation.md): retain observed hybrid stacks, back up owned artifacts, isolate mutable agents, run bounded tooling probes and verify current hook/integration identity.
+- Current init contracts distinguish preview, autonomous and interactive obligations; backend success still requires authentic goal closure.
+- Shipping documentation uses feature 080 because existing feature 079 belongs to Validator CI Prerequisites. Historical local goals and archives keep their original identities; feature-wide conventions/review certification is not claimed.
 
 ## 2026-09-08 — Feature 076 V5 temporary ownership verified; native AC-006 only; full-feature and main delivery not certified.
 <!-- finalize:spec-fix:2026-09-08:2d0a611e -->

@@ -73,6 +73,10 @@ EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
         "pre-impl",
         "full-check",
         "pre-impl-penflow",
+        "init-autonomous",
+        "init-interactive",
+        "init-install",
+        "init-preview",
     }
 )
 ALLOWED_INTERNAL_INVOCATION_MODES: frozenset[str] = frozenset({"subagent", "suggestion"})

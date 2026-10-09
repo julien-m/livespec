@@ -17,7 +17,15 @@ from tests._json_fixture import JsonFixture
 
 REPO = Path(__file__).resolve().parents[1]
 CORPUS_PATH = ".ci-deps/ai-ressources"
-CORPUS_FILES = ("javascript.md", "rust.md", "swift-kotlin.md")
+CORPUS_FILES = (
+    "general.md",
+    "python.md",
+    "javascript.md",
+    "cli.md",
+    "stack-commands.md",
+    "rust.md",
+    "swift-kotlin.md",
+)
 
 
 def _unit_job() -> JsonFixture:

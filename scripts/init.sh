@@ -2,6 +2,7 @@
 # LiveSpec traceability anchors
 # @spec(FR-005)
 # @spec(FR-010)
+# @spec FR-003: Noninteractive safe recovery — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-003
 
 # LiveSpec init script
 # Installs the LiveSpec spec system in a project directory
@@ -46,6 +47,8 @@ ${BOLD}Arguments:${RESET}
 ${BOLD}Options:${RESET}
   --help        Show this help message
   --dry-run     Show what would be created without creating files
+  --non-interactive  Refuse an existing installation unless --force is supplied
+  --force       Refresh core installation without prompting; preserve existing project documents
 
 ${BOLD}Examples:${RESET}
   bash init.sh                    # Install in current directory
@@ -71,19 +74,23 @@ EOF
 
 # ─── Parse arguments ──────────────────────────────────────────────────────────
 DRY_RUN=false
+NON_INTERACTIVE=false
+FORCE=false
 PROJECT_DIR="."
 
 for arg in "$@"; do
   case "$arg" in
     --help|-h) show_help ;;
     --dry-run) DRY_RUN=true ;;
+    --non-interactive) NON_INTERACTIVE=true ;;
+    --force) FORCE=true ;;
     -*) error "Unknown option: $arg. Use --help for usage." ;;
     *)  PROJECT_DIR="$arg" ;;
   esac
 done
 
 # Resolve project directory to absolute path
-PROJECT_DIR="$(cd "$PROJECT_DIR" 2>/dev/null && pwd)" || error "Directory not found: $PROJECT_DIR"
+PROJECT_DIR="$(cd "$PROJECT_DIR" 2>/dev/null && pwd -P)" || error "Directory not found: $PROJECT_DIR"
 
 # ─── Check prerequisites ──────────────────────────────────────────────────────
 check_prerequisites() {
@@ -97,6 +104,13 @@ Please run this script from the livespec repository, or pass the correct path."
 create_file() {
   local dest="$1"
   local source="$2"
+
+  # Autonomous recovery overlays its own documents after backup. Do not reset
+  # user content/history with installer templates while refreshing core rules.
+  if [[ "$NON_INTERACTIVE" == true && -e "$dest" && "$dest" != "$PROJECT_DIR/.specs/spec-system.md" ]]; then
+    info "Preserved: ${dest#"$PROJECT_DIR/"}"
+    return
+  fi
 
   if [[ "$DRY_RUN" == true ]]; then
     echo -e "  ${YELLOW}[dry-run]${RESET} Would create: $dest"
@@ -134,6 +148,11 @@ write_file() {
   local dest="$1"
   local content="$2"
 
+  if [[ "$NON_INTERACTIVE" == true && -e "$dest" ]]; then
+    info "Preserved: ${dest#"$PROJECT_DIR/"}"
+    return
+  fi
+
   if [[ "$DRY_RUN" == true ]]; then
     echo -e "  ${YELLOW}[dry-run]${RESET} Would create: $dest"
     return
@@ -157,14 +176,21 @@ main() {
 
   check_prerequisites
 
+  # The shared sync preflight guards installer documents and provider outputs
+  # before the first mutation, even when an existing installation is forced.
+  bash "$SCRIPT_DIR/sync-agent-assets.sh" "$PROJECT_DIR" "$LIVESPEC_ROOT" --check-paths-only
+
   # Check if .specs already exists
   if [[ -d "$PROJECT_DIR/.specs" ]]; then
     warn ".specs/ directory already exists in $PROJECT_DIR"
-    echo -n "  Continue and overwrite spec-system.md? (existing features will NOT be affected) [y/N]: "
-    read -r confirm
-    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-      echo "  Aborted."
-      exit 0
+    if [[ "$FORCE" != true && "$DRY_RUN" != true ]]; then
+      [[ "$NON_INTERACTIVE" != true ]] || error "Existing .specs requires --force in non-interactive mode"
+      echo -n "  Continue and overwrite spec-system.md? (existing features will NOT be affected) [y/N]: "
+      read -r confirm
+      if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        echo "  Aborted."
+        exit 0
+      fi
     fi
   fi
 
@@ -331,6 +357,15 @@ Commands: `/spec-check` · `/spec-doctor` · `/spec-explain` · `/spec-feature` 
   else
     warn "sync-agent-assets.sh not found at $sync_script — skipping agent asset sync."
     info "Run 'bash scripts/sync-agent-assets.sh <project> <livespec>' manually."
+  fi
+
+  if [[ "$DRY_RUN" == true ]]; then
+    info "Installation preview complete; no files were changed"
+    return
+  fi
+  if [[ "$NON_INTERACTIVE" == true ]]; then
+    info "Core installation complete; generated-profile verification remains required"
+    return
   fi
 
   # Summary

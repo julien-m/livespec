@@ -104,9 +104,13 @@ def test_spec_init_from_code_autonomous_prompt_is_bounded_noninteractive() -> No
 
     assert "Non-Interactive Autonomous From-Code Mode" in body
     assert "Proceed autonomously" in body
-    assert "normalize active flags to `--from-code --auto`" in body
-    assert "Do not wait for human validation" in body
-    assert "single-package Vite React app" in body
+    assert "Normalize autonomous intent to `--from-code --auto` at Step 0" in body
+    assert (
+        "interviews, inferred business defaults and stack confirmation belong to `init-interactive`"
+        in body
+    )
+    assert "--verify-only" in body
+    assert "only this full goal closure completes `/spec-init`" in body
     assert "300 seconds" in body
     assert "Autonomous from-code: enabled" in body
 
@@ -115,9 +119,11 @@ def test_spec_init_expectations_require_autonomous_from_code_completion() -> Non
     body = _read(".agent-sync/skills/spec-init/expectations.md")
 
     assert "Autonomous from-code" in body
-    assert "single-package Vite React" in body
+    assert "supported hybrid/web/Python/Cargo" in body
     assert "300 seconds" in body
-    assert "must_not hang" in body
+    assert "one finite deadline" in body
+    assert "no budget resets between calls" in body
+    assert "authentic goal evidence and archive remain required" in body
     assert "Autonomous from-code: enabled" in body
 
 
