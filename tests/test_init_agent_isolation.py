@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -110,6 +111,55 @@ def test_sync_rejects_escaping_ancestors_before_any_project_write(
     assert sentinel.read_text() == "untouched"
     assert sorted(path.name for path in outside.iterdir()) == ["sentinel"]
     assert not (project / ".agent-sync.local/agents").exists()
+
+
+@pytest.mark.parametrize(
+    "relative",
+    [
+        ".agent-sync.local",
+        ".claude",
+        ".codex",
+        ".agents",
+        ".codex/agents",
+        ".specs",
+        ".conventions",
+    ],
+)
+def test_sync_rejects_internal_writable_directory_links_before_projection(
+    tmp_path: Path, relative: str
+) -> None:
+    project, source, env = _fixture(tmp_path)
+    target = project / "source-dir"
+    target.mkdir()
+    sentinel = target / "original"
+    sentinel.write_text("source must stay unchanged", encoding="utf-8")
+    link = project / relative
+    link.parent.mkdir(parents=True, exist_ok=True)
+    link.symlink_to(target, target_is_directory=True)
+
+    result = _sync(project, source, env)
+
+    assert result.returncode != 0
+    assert "symlink" in result.stderr.lower()
+    assert sentinel.read_text() == "source must stay unchanged"
+    assert list(target.iterdir()) == [sentinel]
+    assert not (project / ".agent-sync.local/agents").exists()
+
+
+def test_sync_rejects_local_root_linked_to_in_project_canonical_sources(tmp_path: Path) -> None:
+    project, source, env = _fixture(tmp_path)
+    canonical = project / ".agent-sync"
+    shutil.copytree(source / ".agent-sync", canonical)
+    prompt = canonical / "agents/livespec-verifier/prompt.md"
+    before = prompt.read_bytes()
+    (project / ".agent-sync.local").symlink_to(canonical, target_is_directory=True)
+
+    result = _sync(project, project, env)
+
+    assert result.returncode != 0
+    assert "symlink" in result.stderr.lower()
+    assert prompt.read_bytes() == before
+    assert not (prompt.parent / "dist").exists()
 
 
 def test_dry_run_creates_no_local_assets(tmp_path: Path) -> None:

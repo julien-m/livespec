@@ -88,12 +88,17 @@ def is_legacy_provider_link(path):
     linked = Path(os.path.abspath(path.parent / os.readlink(path)))
     return linked in (
         root / ".agent-sync.local/agents" / name / "dist" / dist,
+        root / ".agent-sync/agents" / name / "dist" / dist,
         shared / "agents" / name / "dist" / dist,
     )
 
 def check(path):
     if not path.resolve().is_relative_to(root):
         raise SystemExit(f"ERROR: escaping writable path: {path}")
+    # Internal redirects can target canonical sources just as external links can.
+    # Only explicit legacy links detached before mutation bypass this check.
+    if path.is_symlink():
+        raise SystemExit(f"ERROR: writable path symlink is unsupported: {path}")
 
 def check_ancestors(path):
     for parent in reversed((path, *path.parents)):

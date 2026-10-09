@@ -32,9 +32,15 @@ WRITABLE_ROOTS = (
 
 
 def guard_path(root: Path, path: Path) -> None:
-    """Refuse writable paths resolving outside the selected project."""
+    """Refuse escaping destinations and symlinks along an owned writable path."""
     if not path.resolve().is_relative_to(root):
         raise InitError(f"{path}: writable path escapes selected project")
+    # Containment alone permits redirects into product sources inside this project.
+    for ancestor in (path, *path.parents):
+        if ancestor == root:
+            break
+        if ancestor.is_symlink():
+            raise InitError(f"{ancestor}: writable path symlink is unsupported")
 
 
 def validate_destinations(root: Path) -> None:

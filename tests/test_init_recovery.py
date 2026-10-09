@@ -159,6 +159,31 @@ def test_ac004_outside_targets_unchanged(tmp_path: Path, relative: str) -> None:
     assert tree(outside) == before and not (project / ".livespec-backups").exists()
 
 
+@pytest.mark.parametrize(
+    "relative", [".specs", ".conventions", ".livespec-backups", ".specs/stacks"]
+)
+def test_internal_writable_directory_links_are_rejected_before_mutation(
+    tmp_path: Path, relative: str
+) -> None:
+    project = tmp_path / "app"
+    project.mkdir()
+    hybrid(project)
+    env = environment(tmp_path)
+    source = project / "source-dir"
+    source.mkdir()
+    (source / "original").write_text("source must stay unchanged")
+    link = project / relative
+    link.parent.mkdir(parents=True, exist_ok=True)
+    link.symlink_to(source, target_is_directory=True)
+    before = tree(project)
+
+    result = execute(project, env, "--force")
+
+    assert result.returncode != 0
+    assert "symlink" in result.stderr.lower()
+    assert tree(project) == before
+
+
 @pytest.mark.parametrize("failure", ["exit", "timeout", "missing"])
 def test_ac003_failed_required_tool_no_completed_ready(tmp_path: Path, failure: str) -> None:
     project = tmp_path / "app"
