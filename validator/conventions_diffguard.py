@@ -11,6 +11,7 @@ from hashlib import sha256
 from pathlib import Path
 from typing import TypeAlias
 
+from .conventions_baseline import BASELINE_RELATIVE_PATH
 from .conventions_gate import GateResult
 from .conventions_gates import gates_path, load_conventions_gates
 from .conventions_rules import rulebook_path
@@ -119,9 +120,12 @@ def _is_schema_version(value: object) -> bool:
 
 
 def _protected_conventions_paths(project_root: Path) -> set[str]:
+    # @spec FR-007: The repo baseline is a protected conventions input
+    #   .specs/features/082-conventions-gate-signal/spec.md#fr-007
     protected = {
         ".specs/conventions-gates.yaml",
         ".specs/conventions-rulebook.yaml",
+        BASELINE_RELATIVE_PATH.as_posix(),
     }
     try:
         gates = load_conventions_gates(gates_path(project_root))

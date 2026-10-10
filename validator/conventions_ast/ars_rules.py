@@ -11,12 +11,15 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from validator.conventions_feature_scope import SOURCE_SUFFIXES
-from validator.conventions_gate_types import GateSeverity, GateViolation
+from validator.conventions_gate_types import GateViolation
+
+from .ars_applicability import framework_applies, language_applies, language_unreachable
+from .ars_grouping import group_file_matches
 
 EXPECTED_ARS_RULE_COUNT = 564
 INVENTORY_RELATIVE_PATH = Path("validator/conventions_ast/rule_catalog/ars_executable_rules.csv")
 FIXTURE_ROOT = Path("tests/fixtures/conventions_ast/ars_rules")
+_FIXTURE_ROOT_PARTS = FIXTURE_ROOT.parts
 
 
 @dataclass(frozen=True)
@@ -47,6 +50,9 @@ class ArsRuleDetector:
     rule: ArsExecutableRule
     helper: Callable[[str], bool]
     execution_path: str
+    # @spec FR-003: Shared family detectors group their matches
+    #   .specs/features/082-conventions-gate-signal/spec.md#fr-003
+    family_key: str | None = None
 
     def __call__(self, text: str) -> bool:
         """Evaluate this exact ARS rule through its own call path."""
@@ -114,12 +120,15 @@ def evaluate_ars_rule_fixture(
     return [rule.detector_id] if detector_for_rule(rule)(text) else []
 
 
+# @spec FR-003, FR-004: Grouped and framework-gated ARS runtime
+#   .specs/features/082-conventions-gate-signal/spec.md#fr-004
 def run_ars_executable_rules(
     project_root: Path,
     source_files: Sequence[Path],
 ) -> list[GateViolation]:
-    """Run every executable ARS detector over the LiveSpec conventions source scope."""
+    """Run every applicable executable ARS detector, one violation per file and detector."""
     rules = load_ars_executable_rules(project_root)
+    by_id = {rule.inventory_id: rule for rule in rules}
     violations: list[GateViolation] = []
     for path in source_files:
         try:
@@ -130,14 +139,16 @@ def run_ars_executable_rules(
         if _is_ars_meta_source(rel):
             continue
         fixture_rule = _fixture_inventory_id(path)
-        scan_rules = [ars_rule_by_id(project_root)[fixture_rule]] if fixture_rule else rules
-        for rule in scan_rules:
-            if not _language_applies(rule, path):
-                continue
-            if detector_for_rule(rule)(text):
-                violations.append(
-                    _violation(rule, rel, _first_line(text, detector_for_rule(rule)), path)
-                )
+        # A declared per-rule fixture is scoped to its rule: that declaration is its
+        # framework applicability; every other file needs the framework's evidence.
+        scan_rules = [by_id[fixture_rule]] if fixture_rule else rules
+        detectors = [
+            detector_for_rule(rule)
+            for rule in scan_rules
+            if language_applies(rule.language, path.name)
+            and (fixture_rule or framework_applies(rule.source_path, rel, text))
+        ]
+        violations.extend(group_file_matches(rel, text, detectors))
     return violations
 
 
@@ -151,17 +162,19 @@ def detector_for_rule(rule: ArsExecutableRule) -> ArsRuleDetector:
     cached = _DETECTOR_CACHE.get(rule.inventory_id)
     if cached is not None:
         return cached
+    helper = _helper_for_rule(rule)
     detector = ArsRuleDetector(
         rule=rule,
-        helper=_helper_for_rule(rule),
+        helper=helper,
         execution_path=f"ars.rules.{rule.inventory_id.lower()}.execute",
+        family_key=rule.family_id if helper is _FAMILY_DETECTORS.get(rule.family_id) else None,
     )
     _DETECTOR_CACHE[rule.inventory_id] = detector
     return detector
 
 
 def _helper_for_rule(rule: ArsExecutableRule) -> Callable[[str], bool]:
-    if _unreachable_language(rule):
+    if language_unreachable(rule.language):
         return lambda _text: False
     if rule.inventory_id == "ARS-RULE-02508":
         return _detect_destructive_modal_without_explicit_button
@@ -206,7 +219,7 @@ def _rule_contract_issues(rule: ArsExecutableRule, project_root: Path) -> list[s
         issues.append(f"missing_pass_fixture:{rule.inventory_id}")
     if not (project_root / rule.fail_fixture).is_file():
         issues.append(f"missing_fail_fixture:{rule.inventory_id}")
-    if _unreachable_language(rule):
+    if language_unreachable(rule.language):
         issues.append(f"language_unreachable:{rule.inventory_id}:{rule.language}")
     return issues
 
@@ -221,28 +234,14 @@ def _duplicate_issues(label: str, values: Iterable[str]) -> list[str]:
     return [f"duplicate_{label}:{value}" for value in sorted(duplicates)]
 
 
-def _language_applies(rule: ArsExecutableRule, path: Path) -> bool:
-    if rule.language == "language-agnostic":
-        return True
-    suffix = path.suffix.lower()
-    return suffix in _LANGUAGE_SUFFIXES.get(rule.language, ())
-
-
-def _unreachable_language(rule: ArsExecutableRule) -> bool:
-    if rule.language == "language-agnostic":
-        return False
-    return not set(_LANGUAGE_SUFFIXES.get(rule.language, ())).issubset(SOURCE_SUFFIXES)
-
-
 def _fixture_inventory_id(path: Path) -> str | None:
+    """Return the rule id of a declared per-rule fixture (only under the fixture root)."""
     parts = path.parts
-    try:
-        index = parts.index("ars_rules")
-    except ValueError:
+    size = len(_FIXTURE_ROOT_PARTS)
+    starts = [i for i in range(len(parts) - size) if parts[i : i + size] == _FIXTURE_ROOT_PARTS]
+    if not starts:
         return None
-    if len(parts) <= index + 1:
-        return None
-    candidate = parts[index + 1].upper()
+    candidate = parts[starts[-1] + size].upper()
     return candidate if candidate.startswith("ARS-RULE-") else None
 
 
@@ -320,25 +319,6 @@ def _is_explicit_destructive_label(label: str) -> bool:
     return destructive_match is not None and len(label.split()) >= 2
 
 
-def _first_line(text: str, detector: Callable[[str], bool]) -> int:
-    for index, line in enumerate(text.splitlines(), start=1):
-        if detector(line):
-            return index
-    return 1
-
-
-def _violation(rule: ArsExecutableRule, rel: str, line: int, path: Path) -> GateViolation:
-    return GateViolation(
-        rule_id=rule.runtime_rule_id,
-        path=rel,
-        line=line,
-        severity=GateSeverity.ERROR,
-        message=f"{rule.inventory_id}: {rule.rule_text}",
-        source="ars",
-        fix_hint=f"See {rule.source_path}{rule.source_anchor}",
-    )
-
-
 def _relative_path(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -348,24 +328,12 @@ def _relative_path(project_root: Path, path: Path) -> str:
 
 def _is_ars_meta_source(rel: str) -> bool:
     return rel in {
+        "validator/conventions_ast/ars_applicability.py",
         "validator/conventions_ast/ars_rules.py",
         "validator/conventions_ast/source_family_checks.py",
         "validator/conventions_ast/taxonomy.py",
     }
 
-
-_LANGUAGE_SUFFIXES: dict[str, tuple[str, ...]] = {
-    "css": (".css",),
-    "delphi": (".pas", ".dpr", ".dproj"),
-    "go": (".go",),
-    "javascript": (".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx"),
-    "kotlin": (".kt", ".kts"),
-    "python": (".py",),
-    "rust": (".rs",),
-    "shell": (".sh", ".bash", ".zsh"),
-    "sql": (".sql",),
-    "typescript": (".ts", ".tsx"),
-}
 
 _FAMILY_EXTENSIONS: dict[str, str] = {
     "ai_prompt": "yaml",
