@@ -104,7 +104,7 @@ Each feature lives in `.specs/features/NNN-feature-name/` where `NNN` is a zero-
 - **Feature Name** — short, descriptive
 - **Branch** — associated git branch
 - **Date** — creation date
-- **Status** — Draft | Review | Approved | Implemented | Deprecated
+- **Status** — Draft | Planned | In Progress | Approved | Implemented | Deprecated | Review
 - **Input** — original request or user problem
 
 **User Scenarios & Testing:**
