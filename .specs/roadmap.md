@@ -68,6 +68,7 @@
 - [x] **Spec Init Goal Bootstrap** — Allow `spec-init` goal render, prove, and archive to bind a fresh project root before `.specs` exists while preserving strict initialized-root behavior for every other goal command. · Scope: M · Priority: P1 → Read [076-spec-init-goal-bootstrap](features/076-spec-init-goal-bootstrap/spec.md)
 - [x] **Penflow Cumulative Verdict Consumer** — Revalidate authoritative C51 profiles, preserve governed requirements and imports, and enforce current proof at lifecycle closure. · Priority: P1 → Read [077-penflow-cumulative-verdict-consumer](features/077-penflow-cumulative-verdict-consumer/spec.md)
 - [x] **Autonomous From-Code Recovery** — Deliver observed stack profiles, safe force recovery, actual tooling probes and complete init obligations; formal certification pending. · Scope: M · Priority: P1 → Read [080-autonomous-from-code-recovery](features/080-autonomous-from-code-recovery/spec.md)
+- [x] **Lightweight Outcome-Based Goals** — One executable stop condition per autonomous run, receipt-only required tasks, optional native goals, recoverable contracts, bounded retries and short prompts. · Scope: L · Priority: P1 → Read [081-lightweight-outcome-goals](features/081-lightweight-outcome-goals/spec.md)
 <!-- roadmap:mvp:end -->
 
 ---
