@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-10 — Feature 082 Plan created: Conventions Gate Signal — 6 implementation steps, 2 diagrams
+<!-- finalize:spec-plan:2026-10-10:a5ebf692 -->
+
+## 2026-10-10 — Feature 082 Spec created: Conventions Gate Signal — 3 stories, 8 AC, 7 FR
+<!-- finalize:spec-specify:2026-10-10:e39214b3 -->
+
 ## 2026-10-09 — Bugfix: observed autonomous init and safe force recovery
 
 - Read [the recovery implementation](features/080-autonomous-from-code-recovery/implementation.md): retain observed hybrid stacks, back up owned artifacts, isolate mutable agents, run bounded tooling probes and verify current hook/integration identity.

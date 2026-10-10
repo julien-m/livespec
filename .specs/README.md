@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-09-08
+> Last updated: 2026-10-10
 
 
 ---
@@ -118,6 +118,7 @@
 | 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-09-07 | [spec](features/078-requirement-evidence-integrity/spec.md) |
 | 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-09-08 | [spec](features/079-validator-ci-prerequisites/spec.md) |
 | 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-09 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
+| 082 | Conventions Gate Signal | Planned | 2026-10-10 | 2026-10-10 | [spec](features/082-conventions-gate-signal/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -141,6 +142,9 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-10 | Plan | Feature 082 Plan created: Conventions Gate Signal — 6 implementation steps, 2 diagrams |
+| 2026-10-10 | Spec | Feature 082 Spec created: Conventions Gate Signal — 3 stories, 8 AC, 7 FR |
+| 2026-10-09 | Bugfix | Bugfix: observed autonomous init and safe force recovery |
 | 2026-09-08 | Feature | Feature 076 V5 temporary ownership verified; native AC-006 only; full-feature and main delivery not certified. |
 | 2026-09-08 | Feature | Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion. |
 | 2026-09-08 | Bugfix | Feature079 gen4 Fix: deterministic CI, pinned private corpus and AST backend repaired; all local checks pass, AC002 native only, final CI/main pending. |
@@ -148,9 +152,6 @@
 | 2026-09-08 | Bugfix | Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending. |
 | 2026-09-08 | Check | Feature079 Check: local repair and native AC-002 verified; progress structure fixed; exact CI acceptance remains pending. |
 | 2026-09-07 | Check | [Feature 079] Check: Pre-fix audit resumed |
-| 2026-09-07 | Bugfix | Fix independent pipeline closure: bound CLI/runtime, explicit feature and review identity, reject usage exit2. |
-| 2026-09-07 | Feature | 078: repair reviewed-spec coordinator binding, reject incomplete mapping reviews before execution, preserve active child waits and isolated snapshot evidence. |
-| 2026-09-07 | Feature | 078: correct coordinator reviewed-spec acceptance and isolated snapshot inputs; full feature closure remains pending. |
 <!-- readme:activity:end -->
 
 ---
@@ -272,3 +273,7 @@
 <!-- finalize:spec-fix:2026-09-08:e063bb60 -->
 
 <!-- finalize:spec-fix:2026-09-08:2d0a611e -->
+
+<!-- finalize:spec-specify:2026-10-10:e39214b3 -->
+
+<!-- finalize:spec-plan:2026-10-10:a5ebf692 -->
