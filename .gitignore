@@ -199,6 +199,9 @@ AUDIT-CODEX.md
 
 # LiveSpec local run artifacts (feature 039)
 .specs/.runs/
+# Runner-owned execution captures and agent orchestration scratch (runtime only)
+.specs/.execution/
+.specs/.orchestration/
 /.tmp-orchestrate/
 
 # LiveSpec local preview artifacts (feature 040, --save output)
