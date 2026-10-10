@@ -53,7 +53,8 @@ Feature: Deterministic finalize apply
     When the pipeline runs "livespec finalize apply --feature 004-notifications --command spec-specify --status Draft --entry-file entry.md"
     Then acquire_lock is entered once on .specs/.LOCK
     And the feature changelog, global changelog, README row + Recent Activity, and spec.md status are written via write_with_hash_check
-    And each touched file carries "<!-- finalize:spec-specify:<date>:<hash8> -->"
+    And generated changelogs and README carry "<!-- finalize:spec-specify:<date>:<hash8> -->"
+    And spec.md changes only recognized lifecycle status/updated slots and contains no new body marker
     And a receipt.json with outcome "applied" and per-file sha256 is printed on stdout
     And the exit code is 0
 
@@ -84,7 +85,7 @@ sequenceDiagram
     CLI->>F: ApplyRequest(slug, cmd, status, payload)
     F->>F: hash8 = sha256(canonical payload)[:8]
     F->>FS: scan markers finalize:C:*:hash8
-    alt all targets already marked
+    alt generated registries marked and lifecycle slots current
         F-->>CLI: FinalizeReceipt(outcome=already_finalized)
         CLI-->>P: receipt path on stdout, exit 0
     else targets pending
@@ -191,7 +192,7 @@ Feature: Registry finalization lifecycle for a feature+command pair
 stateDiagram-v2
     [*] --> Unfinalized: feature spec exists
     Unfinalized --> Applying: apply acquires .specs/.LOCK
-    Applying --> Finalized: all 4 targets written + markers + receipt(applied)
+    Applying --> Finalized: all 4 targets current + 3 registry markers + receipt(applied)
     Applying --> PartiallyApplied: WriteHashMismatchError / crash (receipt outcome=BLOCKED)
     PartiallyApplied --> Applying: re-run apply (marker-skip per file)
     Unfinalized --> Unfinalized: lock timeout (no --retry) — BLOCKED, zero writes
@@ -297,7 +298,7 @@ The idempotence identity is `<cmd>` + `<hash8>` (FR-002). To make identity hold 
   2. **Global changelog** — insert summary line under the header of `.specs/changelog.md`; detect previous-year entries and rotate them to `.specs/archive/changelog-YYYY.md` with the "Previous years" link section (FR-010, AC-012).
   3. **README** — update the feature row (match feature number in column 1 between `<!-- readme:features:start/end -->`), set Status + Updated date, regenerate Recent Activity (cap 10) from the global changelog, refresh `Last updated`; if `.specs/README.md` is missing, rebuild it from `features/*/spec.md`, `stacks/decisions/ADR-*.md`, and `changelog.md` per spec-system README Recovery (FR-010, AC-012).
   4. **Spec status** — update both YAML frontmatter `status:` and the `- **Status:**` header line, kept in sync; if either anchor is absent/non-standard, raise `FinalizeError(state_invalid)` naming the file rather than guessing (Edge Case 10).
-- Each `RegistryUpdate` carries its rendered new content and its marker string; marker insertion is per-file (appended as an HTML comment adjacent to the inserted entry/row).
+- Generated changelog/README updates carry rendered content and per-payload markers adjacent to entries/rows. The spec status target only updates recognized status/updated slots, never appends a marker and preserves the normative body including historical comments.
 - Roadmap is explicitly out of scope (Edge Case 11) — no roadmap writes here.
 
 **FR covered:** FR-001.1: Four registry target builders, FR-010.1: README recovery + changelog year rotation
@@ -305,10 +306,10 @@ The idempotence identity is `<cmd>` + `<hash8>` (FR-002). To make identity hold 
 ### Step 4 — `apply_finalization()` orchestration in `validator/finalize.py`
 
 - `apply_finalization(project_root, request, *, retry_policy=None) -> FinalizeApplyResult`:
-  1. Compute `hash8`; scan the four target files for marker `finalize:<cmd>:*:<hash8>` (date wildcard — identity is cmd+hash8).
-  2. All four marked → return receipt `outcome="already_finalized"`, zero writes, exit 0 (AC-002).
+  1. Compute `hash8`; scan markers in the three generated registries and inspect recognized spec lifecycle slots separately (date wildcard — registry identity is cmd+hash8).
+  2. All generated registries marked and lifecycle slots already correct → return receipt `outcome="already_finalized"`, zero writes, exit 0 (AC-002).
   3. Else enter `with acquire_lock(specs_root, retry_policy=retry_policy)`; **re-scan markers inside the lock** (comment: order matters — pre-scan is an optimization, in-lock scan is the correctness check against concurrent appliers).
-  4. For each unmarked target: render new content, `write_with_hash_check(target, content)`; record sha256.
+  4. For each pending generated registry or lifecycle target: render new content, `write_with_hash_check(target, content)`; record sha256.
   5. `LockAcquisitionError` → emit canonical `BLOCKED at step <N> - policy_blocked - ...`, exit non-zero, zero writes (AC-004).
   6. `WriteHashMismatchError` → emit `BLOCKED at step <N> - state_invalid - <file>`, write receipt `outcome="BLOCKED"` listing files written so far (Edge Case 5), exit non-zero (AC-004, FR-008).
   7. Success → write receipt `outcome="applied"`, verdict PASS, print receipt path on stdout (AC-003).
@@ -321,7 +322,7 @@ The idempotence identity is `<cmd>` + `<hash8>` (FR-002). To make identity hold 
 - `verify_finalization(project_root, feature_slug, *, expected_command=None) -> FinalizeVerifyResult`:
   1. Strictly read-only — no write API imported into this code path (AC-005).
   2. `run_coherence(specs_root, rule_ids=["R1", "R4", "R6"])`, then filter violations to the feature: keep violations whose `context` `dir_name`/link/message references `<feature_slug>` (scoping comment required — diff/merge-style filter).
-  3. If `expected_command` given: check each registry target carries `finalize:<cmd>:*:*` marker; missing → violation `marker.missing` (AC-006, Edge Case 12).
+  3. If `expected_command` given: check each of the three generated changelog/README targets carries `finalize:<cmd>:*:*` marker; spec status is checked by strict coherence and remains exempt from marker presence; missing → violation `marker.missing` (AC-006, Edge Case 12).
   4. Collect sha256 of every checked registry file; verdict `PASS` iff zero violations; write receipt `outcome="verified"` with violations list (rule IDs) on FAIL.
   5. Exit 0 on PASS, non-zero on FAIL (FR-008).
 
@@ -387,7 +388,7 @@ The idempotence identity is `<cmd>` + `<hash8>` (FR-002). To make identity hold 
 | Test Type | What | File | Command | FR/AC |
 |---|---|---|---|---|
 | Unit | hash8 canonical serialization: date-free identity, stable across days, field ordering | tests/test_finalize.py | `pytest tests/test_finalize.py -k hash8` | FR-002, AC-002 |
-| Unit | apply writes 4 targets, markers present, receipt sha256 correct | tests/test_finalize.py | `pytest tests/test_finalize.py -k apply_writes` | FR-001, AC-001, AC-003 |
+| Unit | apply writes 4 targets, 3 registry markers present, spec body preserved, receipt sha256 correct | tests/test_finalize.py | `pytest tests/test_finalize.py -k apply_writes` | FR-001, AC-001, AC-003 |
 | Unit | idempotent re-run: byte-identical files, outcome already_finalized, exit 0 | tests/test_finalize.py | `pytest tests/test_finalize.py -k idempotent` | FR-002, AC-002, SC-002 |
 | Unit | hash-mismatch abort: monkeypatched `write_with_hash_check` raising → BLOCKED state_invalid naming file, receipt outcome BLOCKED | tests/test_finalize.py | `pytest tests/test_finalize.py -k hash_mismatch` | FR-008, AC-004 |
 | Unit | partial-apply convergence: pre-marked subset → only remaining targets written | tests/test_finalize.py | `pytest tests/test_finalize.py -k partial` | FR-002, Edge Case 5 |
@@ -441,3 +442,18 @@ The idempotence identity is `<cmd>` + `<hash8>` (FR-002). To make identity hold 
 ---
 
 *Generated by `/spec-plan` — LiveSpec v3*
+
+## Lifecycle compatibility repair — FR-001 / AC-001
+
+- Update `validator/schemas/spec.py` to accept the seven exact existing R2 statuses; preserve independent R2 file requirements and R4 equality without changing coherence implementation. Synchronize descriptive lists in installed and canonical spec-system documents without changing Plan→Planned or implementation transitions.
+- Amend spec-plan expectations explicitly: the official finalizer may update recognized status/updated slots; spec normative body, FR/AC IDs/text, title, creation date and metadata outside lifecycle stay forbidden. Record current last_reviewed and synchronize the framework README. No new status or feature scope is introduced.
+- Extend existing schema and lifecycle tests with a fully valid feature passed through public spec-plan finalization, readonly verification and structural CLI validation, Planned/In Progress/Implemented stages and required files, all seven canonical states, rejected unknown/typos/Blocked, R4 mismatches in both directions, normative identity preservation and malformed/duplicate anchors. Existing lifecycle identity tests remain required.
+- Targeted command: `.venv/bin/pytest tests/test_schemas.py tests/test_finalize_lifecycle.py tests/test_finalize.py tests/test_lifecycle_metadata.py tests/test_finalize_review_boundary.py -q`; lint/format/typecheck changed Python files using repository tooling. Freeze docs and registry before authentic execution capture with the same interpreter; finalize and archive the filtered FR-001 repair without claiming complete feature acceptance or Handy runtime success.
+
+**Conventions:** code general/Python/CLI rules apply; use typed exact literals, stdlib fixtures, no new dependencies, focused regression cases and unchanged public coherence authorities.
+
+## Required current-review repair additions
+
+- Extract long finalizer responsibilities into focused helpers/types modules as needed to satisfy the actual conventions gate, retaining public imports, facade monkeypatch boundary, lock ordering, closure checks, idempotent no-write return and exact receipt semantics. This refactor does not broaden status or metadata authority.
+- Add a bounded multiprocess regression using distinct valid features in one .specs root: concurrent apply --retry calls must both succeed under the existing single lock, retain both README/changelog entries and final statuses, and verify current registry coherence after both finish. Intermediate receipts can become stale after later legitimate global writes; current verification receipts and historical point-in-time archives remain distinct. Use process timeouts and cleanup, never timing-only assertions (SC-005).
+- Keep controlled hash-mismatch and partial-convergence regression expectations unchanged pending explicit atomicity arbitration. Failed, partial and stale receipts cannot certify goal completion. Current Story 1 / FR-001 atomicity contradiction remains unresolved and does not authorize implementation.

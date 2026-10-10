@@ -1,0 +1,480 @@
+{
+  "command": "spec-check",
+  "goal_hash": "85c4f4ad8dd6d86f44a514bd51b15ff8f0b4fdc27e878805ca0444be8e62952d",
+  "schema_version": "2.0",
+  "status": "active",
+  "tasks": {
+    "archive.run": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+      "last_rejection": null,
+      "ordinal": 59,
+      "status": "pending"
+    },
+    "dod.048.tree_validation_executed_and_reported_or_skipped": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Tree validation executed and reported (or skipped by --skip-tree)",
+      "last_rejection": null,
+      "ordinal": 48,
+      "status": "pending"
+    },
+    "dod.049.spec_quality_gates_evaluated_per_feature": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Spec quality gates evaluated (per feature)",
+      "last_rejection": null,
+      "ordinal": 49,
+      "status": "pending"
+    },
+    "dod.050.gap_report_produced_and_displayed": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Gap report produced and displayed",
+      "last_rejection": null,
+      "ordinal": 50,
+      "status": "pending"
+    },
+    "dod.051.gap_report_saved_to_checks_yyyy_mm_dd_md": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Gap report saved to `checks/YYYY-MM-DD.md`",
+      "last_rejection": null,
+      "ordinal": 51,
+      "status": "pending"
+    },
+    "dod.052.feature_changelog_md_has_a_check_entry": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Feature `changelog.md` has a check entry",
+      "last_rejection": null,
+      "ordinal": 52,
+      "status": "pending"
+    },
+    "dod.053.global_specs_changelog_md_has_a_summary_entry": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Global `.specs/changelog.md` has a summary entry",
+      "last_rejection": null,
+      "ordinal": 53,
+      "status": "pending"
+    },
+    "dod.054.if_update_implementation_md_status_values_refres": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "If `--update`: `implementation.md` status values refreshed",
+      "last_rejection": null,
+      "ordinal": 54,
+      "status": "pending"
+    },
+    "dod.055.convention_compliance_checked_against_convention": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Convention Compliance checked against `.conventions/index.md` + selected `ai-ressources/` sources, or a `convention gap` explains why it could not run",
+      "last_rejection": null,
+      "ordinal": 55,
+      "status": "pending"
+    },
+    "dod.056.if_multi_spec_consolidated_report_produced": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "If multi-spec: consolidated report produced",
+      "last_rejection": null,
+      "ordinal": 56,
+      "status": "pending"
+    },
+    "dod.057.if_fix_fix_sub_agent_goals_executed_re_check_sub": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "If `--fix`: fix sub-agent goals executed, re-check sub-agent goals executed, child goal state files inspected, and remaining gaps are warnings or canonical BLOCKED",
+      "last_rejection": null,
+      "ordinal": 57,
+      "status": "pending"
+    },
+    "fix.child_goal.capture": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Capture child `/spec-fix` goal hash, contract-file path, state-file path, final status, changed files, and gap closure summary",
+      "last_rejection": null,
+      "ordinal": 42,
+      "status": "pending"
+    },
+    "fix.child_goal.inspect": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Inspect child goal state files and require both fix and re-check child goals to be completed or explicitly BLOCKED",
+      "last_rejection": null,
+      "ordinal": 44,
+      "status": "pending"
+    },
+    "fix.child_goal.spec_check": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Spawn independent native sub-agent to re-run `/spec-check <feature>` after each fix attempt",
+      "last_rejection": null,
+      "ordinal": 43,
+      "status": "pending"
+    },
+    "fix.child_goal.spec_fix": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Spawn independent native sub-agent to execute `/spec-fix <feature> --auto --update` for each feature with fixable gaps",
+      "last_rejection": null,
+      "ordinal": 41,
+      "status": "pending"
+    },
+    "penflow.compare_report": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read penflow/compare-report.json, review-report.md, fix-report.md when present",
+      "last_rejection": null,
+      "ordinal": 25,
+      "status": "pending"
+    },
+    "penflow.drift": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Classify fixable gaps across tree/spec quality, FR/AC mapping, missing or blocked tests, visual fidelity, absent or stale baseline manifests, Penflow drift, changelog/report drift, and README sync",
+      "last_rejection": null,
+      "ordinal": 39,
+      "status": "pending"
+    },
+    "task.001.read_before_check_hooks_all_3_levels_global_proj": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read before-check hooks (all 3 levels: global, project, local)",
+      "last_rejection": null,
+      "ordinal": 1,
+      "status": "pending"
+    },
+    "task.002.resolve_flags_and_feature_argument_read_only": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Resolve flags and feature argument (read-only)",
+      "last_rejection": null,
+      "ordinal": 2,
+      "status": "pending"
+    },
+    "task.003.verify_no_active_goal_exists": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Verify no active goal exists",
+      "last_rejection": null,
+      "ordinal": 3,
+      "status": "pending"
+    },
+    "task.004.render_and_save_goal_contract_via_livespec_goal": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Render and save goal contract via `livespec goal render spec-check --save`",
+      "last_rejection": null,
+      "ordinal": 4,
+      "status": "pending"
+    },
+    "task.005.emit_goal_slash_command_with_hash_and_contract_s": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Emit `/goal` slash command with hash and contract/state file references",
+      "last_rejection": null,
+      "ordinal": 5,
+      "status": "pending"
+    },
+    "task.006.validate_system_files_presence_in_specs_spec_sys": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Validate system files presence in .specs/ (spec-system.md, constitution.md, project.md, README.md, changelog.md, stacks/_default.md, testing/strategy.md, ADRs)",
+      "last_rejection": null,
+      "ordinal": 6,
+      "status": "pending"
+    },
+    "task.007.validate_feature_directory_naming_pattern_from_s": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Validate feature directory naming pattern from `system/identity.md` (`^\\d{3}(\\.\\d+)?-[a-z0-9]+(-[a-z0-9]+)*$`)",
+      "last_rejection": null,
+      "ordinal": 7,
+      "status": "pending"
+    },
+    "task.008.check_feature_completeness_spec_md_changelog_md": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Check feature completeness (spec.md, changelog.md, implementation.md, plan.md per status)",
+      "last_rejection": null,
+      "ordinal": 8,
+      "status": "pending"
+    },
+    "task.009.detect_orphan_files_directly_under_features": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Detect orphan files directly under features/",
+      "last_rejection": null,
+      "ordinal": 9,
+      "status": "pending"
+    },
+    "task.010.verify_readme_md_features_table_sync_vs_disk": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Verify README.md features table sync vs disk",
+      "last_rejection": null,
+      "ordinal": 10,
+      "status": "pending"
+    },
+    "task.011.detect_surface_drift_validate_surfaces_yaml_vs_f": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Detect surface drift: validate surfaces.yaml vs filesystem, scan for unconfigured app directories",
+      "last_rejection": null,
+      "ordinal": 11,
+      "status": "pending"
+    },
+    "task.012.if_no_argument_list_features_sorted_by_last_modi": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "If no argument: list features sorted by last-modified date and prompt for selection",
+      "last_rejection": null,
+      "ordinal": 12,
+      "status": "pending"
+    },
+    "task.013.resolve_feature_argument_git_branch_interactive": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Resolve feature: argument → git branch → interactive selection",
+      "last_rejection": null,
+      "ordinal": 13,
+      "status": "pending"
+    },
+    "task.014.evaluate_spec_md_quality_gates_gherkin_mermaid_f": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Evaluate spec.md quality gates (Gherkin, Mermaid flowcharts, AC format, FR→AC mapping, clarification markers)",
+      "last_rejection": null,
+      "ordinal": 14,
+      "status": "pending"
+    },
+    "task.015.evaluate_plan_md_quality_gates_if_file_exists_se": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Evaluate plan.md quality gates if file exists (sequence/state/ER diagrams, constitution check, FR coverage)",
+      "last_rejection": null,
+      "ordinal": 15,
+      "status": "pending"
+    },
+    "task.016.check_implementation_quality_gates_implementatio": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Check implementation quality gates (implementation.md, changelog.md, progress.md)",
+      "last_rejection": null,
+      "ordinal": 16,
+      "status": "pending"
+    },
+    "task.017.read_spec_requirements_extract_all_ac_fr_sc_from": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read spec requirements: extract all AC, FR, SC from spec.md",
+      "last_rejection": null,
+      "ordinal": 17,
+      "status": "pending"
+    },
+    "task.018.read_implementation_map_from_implementation_md_f": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read implementation map from implementation.md (FR/@spec anchors, AC/test mappings, visual baselines)",
+      "last_rejection": null,
+      "ordinal": 18,
+      "status": "pending"
+    },
+    "task.019.recovery_mode_if_implementation_md_absent_grep_s": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Recovery mode if implementation.md absent: grep @spec anchors, infer AC coverage, mark as ~ Inferred",
+      "last_rejection": null,
+      "ordinal": 19,
+      "status": "pending"
+    },
+    "task.020.verify_each_fr_ac_against_actual_code_assign_ver": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Verify each FR/AC against actual code: assign ✅ Verified / ⚠️ Partial / ❌ Missing / 🔄 Drifted",
+      "last_rejection": null,
+      "ordinal": 20,
+      "status": "pending"
+    },
+    "task.021.load_conventions_index_md_when_present_resolve_s": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Load `.conventions/index.md` when present, resolve selected `ai-ressources/` files, and check Convention Compliance for mapped source/test files",
+      "last_rejection": null,
+      "ordinal": 21,
+      "status": "pending"
+    },
+    "task.022.report_missing_convention_bundle_or_violated_rul": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Report missing convention bundle or violated rules as `convention gap` entries",
+      "last_rejection": null,
+      "ordinal": 22,
+      "status": "pending"
+    },
+    "task.024.in_ui_implementation_closure_audits_revalidate_l": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "In UI implementation closure audits, revalidate `livespec penflow-contract status --project . --required-profile implementation --build-manifest <runner_build_manifest> --feature <feature_slug> --json`; preparation/pre-impl uses `livespec penflow-contract status --project . --json` and reports readiness only",
+      "last_rejection": null,
+      "ordinal": 24,
+      "status": "pending"
+    },
+    "task.028.check_theme_token_compliance_if_specs_design_the": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Check theme token compliance if .specs/design/theme.css exists",
+      "last_rejection": null,
+      "ordinal": 28,
+      "status": "pending"
+    },
+    "task.030.submit_only_visual_evidence_receipt_path_receipt": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Submit only `{\"visual_evidence_receipt_path\":\"<receipt-path>\"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity",
+      "last_rejection": null,
+      "ordinal": 30,
+      "status": "pending"
+    },
+    "task.031.refuse_to_prove_visual_penflow_tasks_complete_wh": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Refuse to prove [visual]/[penflow] tasks `complete` while gate exit_code != 0 — \"skipped due to missing prerequisites\" est BLOCKED, jamais PASS",
+      "last_rejection": null,
+      "ordinal": 31,
+      "status": "pending"
+    },
+    "task.032.produce_structured_gap_report_spec_quality_fr_ta": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Produce structured gap report (spec quality, FR table, AC table, Convention Compliance, summary)",
+      "last_rejection": null,
+      "ordinal": 32,
+      "status": "pending"
+    },
+    "task.033.include_convention_compliance_section_with_domai": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Include `Convention Compliance` section with domains checked, evidence, and convention gaps",
+      "last_rejection": null,
+      "ordinal": 33,
+      "status": "pending"
+    },
+    "task.034.save_gap_report_to_specs_features_nnn_checks_yyy": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Save gap report to .specs/features/NNN/checks/YYYY-MM-DD.md",
+      "last_rejection": null,
+      "ordinal": 34,
+      "status": "pending"
+    },
+    "task.035.add_check_entry_to_feature_changelog_md": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Add check entry to feature changelog.md",
+      "last_rejection": null,
+      "ordinal": 35,
+      "status": "pending"
+    },
+    "task.036.add_summary_entry_to_global_specs_changelog_md": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Add summary entry to global .specs/changelog.md",
+      "last_rejection": null,
+      "ordinal": 36,
+      "status": "pending"
+    },
+    "task.037.present_suggested_fixes_for_each_gap_with_action": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Present suggested fixes for each gap with actionable commands",
+      "last_rejection": null,
+      "ordinal": 37,
+      "status": "pending"
+    },
+    "task.038.prompt_to_update_implementation_md_status_or_aut": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Prompt to update implementation.md status (or auto-update if --update)",
+      "last_rejection": null,
+      "ordinal": 38,
+      "status": "pending"
+    },
+    "task.040.create_missing_visual_penflow_prerequisites_requ": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Create missing visual/Penflow prerequisites required for an end-to-end fix attempt, or emit canonical BLOCKED with exact missing path/tool",
+      "last_rejection": null,
+      "ordinal": 40,
+      "status": "pending"
+    },
+    "task.045.write_actionable_warnings_for_any_remaining_gap": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Write actionable warnings for any remaining gap; emit canonical BLOCKED when no safe fix path exists",
+      "last_rejection": null,
+      "ordinal": 45,
+      "status": "pending"
+    },
+    "task.046.produce_consolidated_report_feature_health_table": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Produce consolidated report: feature health table, cross-feature dependencies, aggregated stats, priority list",
+      "last_rejection": null,
+      "ordinal": 46,
+      "status": "pending"
+    },
+    "task.047.read_after_check_hooks_all_3_levels_global_proje": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read after-check hooks (all 3 levels: global, project, local)",
+      "last_rejection": null,
+      "ordinal": 47,
+      "status": "pending"
+    },
+    "visual.baseline_manifest": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run staleness gate: read baseline.manifest.yml, check browser version, check per-screen mockup SHA-256",
+      "last_rejection": null,
+      "ordinal": 23,
+      "status": "pending"
+    },
+    "visual.design_fidelity": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Check design fidelity: compare VALID baselines vs mockup PNGs (5% threshold) [feature: 001-visual-check-fix]",
+      "last_rejection": null,
+      "ordinal": 27,
+      "status": "pending"
+    },
+    "visual.gate_validate": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Capture fresh runtime PNGs to `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-check --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path> --json`",
+      "last_rejection": null,
+      "ordinal": 29,
+      "status": "pending"
+    },
+    "visual.gate_validate.058": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "For VISUAL features: `livespec visual-gate certify ... --command spec-check` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-check --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = step BLOCKED, no accepted proof",
+      "last_rejection": null,
+      "ordinal": 58,
+      "status": "pending"
+    },
+    "visual.pixel_regression": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run pixel regression via compareRegression() for each VALID baseline vs current screenshot [feature: 001-visual-check-fix]",
+      "last_rejection": null,
+      "ordinal": 26,
+      "status": "pending"
+    }
+  }
+}

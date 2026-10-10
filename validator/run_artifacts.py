@@ -1,50 +1,59 @@
 # @spec(FR-003)
 # @spec(FR-005)
 # @spec(FR-006)
-
-# LiveSpec traceability anchors
 # @spec(AC-001)
 # @spec(AC-003)
 # @spec(AC-004)
 # @spec(AC-006)
 
-"""RunArtifact v2 data layer: schema, builder, atomic writer, and loader.
-
-A RunArtifact is the durable, self-contained JSON record of one goal-locked
-run, archived under ``.specs/.runs/`` by ``livespec goal archive``. The
-``$TMPDIR`` contract/state inputs are read-only — this module never writes
-back to them (AC-001).
-"""
+"""Build and load durable RunArtifact v2 JSON without mutating goal inputs."""
 
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from json import JSONDecodeError, dumps, loads
+from json import JSONDecodeError, loads
 from pathlib import Path
-from typing import Any, cast
 
 from .exceptions import ArtifactMalformed
+from .goal_archive_paths import (
+    GoalArchivePathError,
+    resolve_bootstrap_archive_context,
+    write_goal_artifact,
+)
+from .goal_json import JsonObject, copy_json_object
+from .goal_run_builder import (
+    ARCHIVE_RUN_TASK_ID,
+    RunArtifactBuildInput,
+    build_run_artifact,
+    goal_tasks_incomplete,
+)
 from .outcome import Outcome
-from .run_receipts import ReceiptCheck, recheck_receipts, verify_evidence_receipts
-from .verify_output import evaluate_rules
+from .run_receipts import ReceiptCheck, recheck_receipts
 
 RUN_ARTIFACT_SCHEMA_VERSION = "2.0"
 # @spec FR-001: archive.run task id shared by compiler injection and classifier
 #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-001
-ARCHIVE_RUN_TASK_ID = "archive.run"
 _COMMAND_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 _GOAL_HASH_RE = re.compile(r"^[a-f0-9]{64}$")
 
 
 @dataclass(frozen=True)
 class ArchiveResult:
-    """Outcome of one ``archive_goal_run`` invocation."""
+    """Outcome of one ``archive_goal_run`` invocation.
+
+    Attributes:
+        outcome: Stable success, drift, error, or blocked classification.
+        path: Final artifact path when publication succeeds.
+        artifact: Owned JSON copy when an artifact was built.
+        blocked_reason: Actionable reason when publication is blocked.
+    """
 
     outcome: Outcome
     path: Path | None
-    artifact: dict[str, Any] | None
+    artifact: JsonObject | None
     blocked_reason: str | None = None
 
 
@@ -52,9 +61,11 @@ class ArchiveResult:
 #   — .specs/features/039.1-goal-archive-run-artifacts/spec.md#fr-002
 # @spec FR-003: optional transcript embedding
 #   — .specs/features/039.1-goal-archive-run-artifacts/spec.md#fr-003
+# @spec FR-005: Validate bootstrap archive before project access
+#   — .specs/features/076-spec-init-goal-bootstrap/spec.md#fr-005
 def archive_goal_run(
-    contract: dict[str, Any],
-    state: dict[str, Any],
+    contract: Mapping[str, object],
+    state: Mapping[str, object],
     *,
     project_root: Path,
     feature: str | None = None,
@@ -63,89 +74,108 @@ def archive_goal_run(
     stderr_text: str | None = None,
     now: datetime | None = None,
 ) -> ArchiveResult:
-    """Archive a goal contract+state pair as a RunArtifact v2.
-
+    """Atomically write RunArtifact v2 unless blocked, without mutating the goal pair.
     Args:
-        contract: Immutable goal contract JSON object (read-only).
-        state: Mutable goal state JSON object (read-only).
-        project_root: Project root containing ``.specs/``.
-        feature: Optional feature slug; enables receipt feature scoping.
-        exit_code: Wrapped command exit code, or None when not recorded.
-        stdout_text: Captured stdout to embed, or None.
-        stderr_text: Captured stderr to embed, or None.
-        now: Timestamp override for deterministic tests; defaults to UTC now.
-
+        contract: External immutable contract mapping.
+        state: Read-only mutable-state snapshot.
+        project_root: Legacy root; bootstrap pairs replace it canonically.
+        feature: Optional feature identity and receipt scope.
+        exit_code: Optional wrapped-command exit code.
+        stdout_text: Optional stdout capture.
+        stderr_text: Optional stderr capture.
+        now: Optional deterministic UTC timestamp.
     Returns:
-        An :class:`ArchiveResult`; ``blocked`` results carry no path and write
-        nothing under ``.specs/.runs/`` (AC-002, EC-001).
+        Outcome, final path, owned artifact, and optional blocked reason.
+    Raises:
+        ValueError: Artifact construction rejects non-JSON input values.
+        OSError: Legacy archive directory creation, temporary writing or rename fails.
     """
+    runs_dir: Path | None = None
+    try:
+        # Direct API callers bypass CLI validation, so pair validation must
+        # precede persisted-root selection and every filesystem mutation.
+        bootstrap = resolve_bootstrap_archive_context(contract, state, feature=feature)
+    except GoalArchivePathError as exc:
+        return _blocked_archive(str(exc))
+    if bootstrap is not None:
+        contract = bootstrap.contract
+        state = bootstrap.state
+        project_root = bootstrap.project_root
+        runs_dir = bootstrap.runs_dir
+    return _archive_validated_pair(
+        contract,
+        state,
+        project_root=project_root,
+        runs_dir=runs_dir,
+        feature=feature,
+        exit_code=exit_code,
+        stdout_text=stdout_text,
+        stderr_text=stderr_text,
+        now=now,
+    )
+
+
+def _archive_validated_pair(
+    contract: Mapping[str, object],
+    state: Mapping[str, object],
+    *,
+    project_root: Path,
+    runs_dir: Path | None,
+    feature: str | None,
+    exit_code: int | None,
+    stdout_text: str | None,
+    stderr_text: str | None,
+    now: datetime | None,
+) -> ArchiveResult:
+    if integrity_error := _current_archive_integrity_error(contract, feature):
+        return _blocked_archive(integrity_error)
     contract_hash = str(contract.get("goal_hash", ""))
     state_hash = str(state.get("goal_hash", ""))
     if not contract_hash or contract_hash != state_hash:
         # EC-001: the state belongs to a different goal — refuse to archive.
-        return ArchiveResult(
-            outcome="blocked",
-            path=None,
-            artifact=None,
-            blocked_reason=(
-                f"goal_hash mismatch between contract ({contract_hash[:8] or 'missing'}) "
-                f"and state ({state_hash[:8] or 'missing'})"
-            ),
+        return _blocked_archive(
+            f"goal_hash mismatch between contract ({contract_hash[:8] or 'missing'}) "
+            f"and state ({state_hash[:8] or 'missing'})"
         )
     command = str(contract.get("command", "unknown"))
-    invalid_reason = _validate_archive_identity(command, contract_hash)
-    if invalid_reason is not None:
-        return ArchiveResult(
-            outcome="blocked",
-            path=None,
-            artifact=None,
-            blocked_reason=invalid_reason,
-        )
+    if (invalid_reason := _validate_archive_identity(command, contract_hash)) is not None:
+        return _blocked_archive(invalid_reason)
     resolved_feature = feature or _optional_str(contract.get("feature"))
-    flags = [str(flag) for flag in _list_of(contract.get("normalized_flags"))]
     timestamp = now or datetime.now(UTC)
-    goal_snapshot = _goal_snapshot(state)
-    receipts = verify_evidence_receipts(
-        goal_snapshot["tasks"],
-        project_root=project_root,
-        feature=feature,
+    artifact, outcome = build_run_artifact(
+        RunArtifactBuildInput(
+            contract=contract,
+            state=state,
+            command=command,
+            contract_hash=contract_hash,
+            project_root=project_root,
+            feature=feature,
+            resolved_feature=resolved_feature,
+            exit_code=exit_code,
+            stdout_text=stdout_text,
+            stderr_text=stderr_text,
+            timestamp=timestamp,
+            schema_version=RUN_ARTIFACT_SCHEMA_VERSION,
+        )
     )
-    verify_rules = _contract_verify_rules(contract)
-    artifact: dict[str, Any] = {
-        "schema_version": RUN_ARTIFACT_SCHEMA_VERSION,
-        "goal_hash": contract_hash,
-        "command": command,
-        "feature": resolved_feature,
-        "flags": flags,
-        "exit_code": exit_code,
-        "timestamp": timestamp.isoformat(),
-    }
-    if stdout_text is not None:
-        artifact["stdout"] = stdout_text
-    if stderr_text is not None:
-        artifact["stderr"] = stderr_text
-    artifact["goal"] = goal_snapshot
-    artifact["receipts"] = [receipt.to_dict() for receipt in receipts]
-    artifact["verify_rules"] = verify_rules
-    report = evaluate_rules(
-        verify_rules,
-        artifact=artifact,
-        active_flags=flags,
-        feature=resolved_feature,
-        project_root=project_root,
-        goal_incomplete=_goal_incomplete(goal_snapshot),
-        receipt_error=any(not receipt.verified for receipt in receipts),
-    )
-    artifact["verify_result"] = report.to_dict()
-    path = _write_artifact(artifact, command, contract_hash, timestamp, project_root)
-    return ArchiveResult(outcome=report.outcome, path=path, artifact=artifact)
+    try:
+        path = write_goal_artifact(
+            artifact, command, contract_hash, timestamp, project_root, runs_dir=runs_dir
+        )
+    except GoalArchivePathError as exc:
+        return _blocked_archive(str(exc))
+    return ArchiveResult(outcome=outcome, path=path, artifact=artifact)
 
 
 def find_latest_artifact(command: str, runs_dir: Path) -> Path | None:
-    """Return the lexicographically greatest ``<command>-*.json`` artifact.
+    """Find the latest timestamp-led artifact for one command by reading the directory only.
 
-    The timestamp leads the filename (AC-003), so lexicographic order equals
-    chronological order; no lock or index file is needed.
+    Args:
+        command: Canonical command filename prefix.
+        runs_dir: Directory containing run artifacts.
+
+    Returns:
+        Latest matching path, or None when the directory or match is absent.
     """
     if not runs_dir.is_dir():
         return None
@@ -153,12 +183,18 @@ def find_latest_artifact(command: str, runs_dir: Path) -> Path | None:
     return candidates[-1] if candidates else None
 
 
-def load_run_artifact(path: Path) -> dict[str, Any]:
-    """Load and minimally validate a RunArtifact v2 JSON file.
+def load_run_artifact(path: Path) -> JsonObject:
+    """Read and minimally validate one RunArtifact v2 JSON object without writing files.
+
+    Args:
+        path: Explicit artifact file.
+
+    Returns:
+        An isolated closed JSON object owned by the caller.
 
     Raises:
-        ArtifactMalformed: When the file is unreadable, not valid JSON, or
-            not a JSON object — the message names the offending path (EC-007).
+        ArtifactMalformed: If the file is unreadable, malformed, non-object,
+            or fails the minimum RunArtifact v2 schema.
     """
     try:
         raw: object = loads(path.read_text(encoding="utf-8"))
@@ -166,95 +202,20 @@ def load_run_artifact(path: Path) -> dict[str, Any]:
         raise ArtifactMalformed(path.as_posix(), str(exc)) from exc
     if not isinstance(raw, dict):
         raise ArtifactMalformed(path.as_posix(), "artifact root must be a JSON object")
-    artifact = cast(dict[str, Any], raw)
+    artifact = copy_json_object(raw)
+    if artifact is None:
+        raise ArtifactMalformed(path.as_posix(), "artifact contains a non-JSON value")
     _validate_artifact_schema(artifact, path)
     return artifact
-
-
-# ---------- helpers ----------
-
-
-def _goal_snapshot(state: dict[str, Any]) -> dict[str, Any]:
-    """Extract the embedded goal snapshot from the mutable state (read-only)."""
-    tasks_raw = state.get("tasks")
-    tasks_map = cast(dict[str, Any], tasks_raw) if isinstance(tasks_raw, dict) else {}
-    tasks: list[dict[str, Any]] = []
-    for task_id, task_obj in tasks_map.items():
-        task = cast(dict[str, Any], task_obj) if isinstance(task_obj, dict) else {}
-        ordinal_raw = task.get("ordinal")
-        tasks.append(
-            {
-                "id": str(task_id),
-                "ordinal": ordinal_raw if isinstance(ordinal_raw, int) else 0,
-                "status": str(task.get("status", "pending")),
-                "accepted_evidence": task.get("accepted_evidence"),
-            }
-        )
-    tasks.sort(key=lambda task: (cast(int, task["ordinal"]), cast(str, task["id"])))
-    return {"status": str(state.get("status", "unknown")), "tasks": tasks}
-
-
-def _goal_incomplete(goal_snapshot: dict[str, Any]) -> bool:
-    tasks = cast(list[dict[str, Any]], goal_snapshot["tasks"])
-    return goal_tasks_incomplete(tasks)
 
 
 # @spec FR-004: Classifier excludes archive.run
 #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-004
 # @spec FR-005: Pre-059 artifact tolerance (no schema change, exclusion never matches)
 #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-005
-def goal_tasks_incomplete(tasks: list[dict[str, Any]]) -> bool:
-    """Return True when at least one required goal task is pending.
-
-    Tasks whose id is ``archive.run`` are excluded: the artifact snapshot is
-    taken before the archive proof is accepted, so ``archive.run`` pending is
-    the expected shape of every enforced artifact (059 AC-006/EC-001).
-    Pre-059 snapshots contain no ``archive.run`` id, so the exclusion never
-    matches and their classification is unchanged (AC-007).
-
-    Args:
-        tasks: Goal snapshot task dicts (``id``/``status`` keys).
-
-    Returns:
-        True when a non-archive task is not ``complete``.
-    """
-    return any(
-        task.get("status") != "complete" for task in tasks if task.get("id") != ARCHIVE_RUN_TASK_ID
-    )
-
-
-def _contract_verify_rules(contract: dict[str, Any]) -> dict[str, Any]:
-    """Copy the verify rules verbatim so the artifact is self-contained."""
-    canonical = contract.get("canonical")
-    if isinstance(canonical, dict):
-        rules = cast(dict[str, Any], canonical).get("verify_rules")
-        if isinstance(rules, dict):
-            return cast(dict[str, Any], rules)
-    rules = contract.get("verify_rules")
-    if isinstance(rules, dict):
-        return cast(dict[str, Any], rules)
-    return {"must": [], "may": [], "must_not": [], "when": []}
-
-
-def _write_artifact(
-    artifact: dict[str, Any],
-    command: str,
-    goal_hash: str,
-    timestamp: datetime,
-    project_root: Path,
-) -> Path:
-    """Atomically write the artifact (tmp + rename, AC-003)."""
-    runs_dir = project_root / ".specs" / ".runs"
-    runs_dir.mkdir(parents=True, exist_ok=True)
-    # Filename grammar: timestamp leads (lexicographic == chronological) and
-    # the hash8 suffix guarantees uniqueness without any lock (EC-003/EC-010).
-    iso_fs = timestamp.astimezone(UTC).strftime("%Y-%m-%dT%H-%M-%S.%f")
-    path = runs_dir / f"{command}-{iso_fs}-{goal_hash[:8]}.json"
-    tmp = path.with_suffix(".json.tmp")
-    # Write-then-rename keeps readers from ever observing a partial artifact.
-    tmp.write_text(dumps(artifact, indent=2, ensure_ascii=False), encoding="utf-8")
-    tmp.replace(path)
-    return path
+def _blocked_archive(reason: str) -> ArchiveResult:
+    """Build a non-writing blocked archive result."""
+    return ArchiveResult(outcome="blocked", path=None, artifact=None, blocked_reason=reason)
 
 
 def _validate_archive_identity(command: str, goal_hash: str) -> str | None:
@@ -266,8 +227,15 @@ def _validate_archive_identity(command: str, goal_hash: str) -> str | None:
     return None
 
 
-def _validate_artifact_schema(artifact: dict[str, Any], path: Path) -> None:
+def _validate_artifact_schema(artifact: Mapping[str, object], path: Path) -> None:
     """Validate the minimum RunArtifact v2 shape required by verify-output."""
+    from .acceptance_evidence import archived_policy2_path_error
+
+    error = archived_policy2_path_error(artifact, path)
+    if error:
+        raise ArtifactMalformed(path.as_posix(), error)
+    if artifact.get("evidence_policy_version") not in (None, "legacy", "1", "2"):
+        raise ArtifactMalformed(path.as_posix(), "unsupported evidence_policy_version")
     checks: tuple[tuple[str, type[object]], ...] = (
         ("goal_hash", str),
         ("command", str),
@@ -298,10 +266,6 @@ def _optional_str(value: object) -> str | None:
     return value if isinstance(value, str) and value else None
 
 
-def _list_of(value: object) -> list[object]:
-    return cast(list[object], value) if isinstance(value, list) else []
-
-
 __all__ = [
     "ARCHIVE_RUN_TASK_ID",
     "RUN_ARTIFACT_SCHEMA_VERSION",
@@ -313,3 +277,21 @@ __all__ = [
     "load_run_artifact",
     "recheck_receipts",
 ]
+
+
+def _current_archive_integrity_error(
+    contract: Mapping[str, object],
+    feature: str | None,
+) -> str | None:
+    from .evidence_policy import contract_evidence_policy, current_contract_integrity_error
+
+    integrity_error = current_contract_integrity_error(contract)
+    if integrity_error:
+        return integrity_error
+    if (
+        contract_evidence_policy(contract) is not None
+        and feature is not None
+        and feature != contract.get("feature")
+    ):
+        return "current_contract_archive_feature_mismatch"
+    return None

@@ -1,0 +1,15 @@
+{
+  "output": "Latest gap report=/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-09.md; SHA256=b85a785ad1f92d17b15d48892e1f5b7fe169c1a72ddf98db9a8961bdc2698505",
+  "success_criteria_met": true,
+  "convention_domains": [
+    "code"
+  ],
+  "convention_sources": [
+    "$AIRESOURCES/code-conventions/general.md",
+    "$AIRESOURCES/code-conventions/python.md",
+    "$AIRESOURCES/code-conventions/javascript.md",
+    "$AIRESOURCES/code-conventions/cli.md",
+    "$AIRESOURCES/code-conventions/stack-commands.md"
+  ],
+  "conventions_applied_to_output": true
+}

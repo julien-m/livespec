@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "exit": 1,
+  "log": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/baseline-pytest-bounded.log"
+}

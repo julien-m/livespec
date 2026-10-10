@@ -1,0 +1,22 @@
+--- INITIAL/.specs/features/001-auto-llm-review/spec.md
++++ CURRENT/.specs/features/001-auto-llm-review/spec.md
+@@ -18,6 +18,10 @@
+ - **Feature Number:** 001
+ 
+ ---
++
++## Evidence policy amendment — 2026-09-06
++
++Read [requirement evidence integrity](../078-requirement-evidence-integrity/spec.md) for current review policy. FR-003/FR-004/FR-006 and their acceptance criteria now require complete normative source inventory and grounded per-requirement conclusions. Never truncate normative input: coherent bounded batches and complete synthesis are allowed; missing context, malformed results or exhausted budgets are incomplete. Advisory legacy wrappers remain usable, but incomplete output cannot satisfy current mandatory progression. Source, model, schema, prompt and policy changes invalidate cached readiness.
+ 
+ ## User Scenarios & Testing
+ 
+@@ -419,7 +423,7 @@
+ 
+ - **LLM provider times out:** The review must not block indefinitely. Timeout after a configurable duration (default 60s), display a warning, and continue the parent command normally.
+ - **LLM returns malformed JSON:** Parse error is caught, a warning is displayed with the raw response snippet, and the review is treated as skipped (not failed).
+-- **Spec content exceeds LLM context window:** Truncate spec content to a safe limit (e.g., 8000 chars, matching the existing `plan_review.py` pattern) and note the truncation in the output.
++- **Spec content exceeds LLM context window:** Prepare complete bounded context; return incomplete when an indivisible normative section cannot fit. Never truncate normative source text.
+ - **Review run on empty spec:** If spec.md has no FRs or ACs (template-only), the review prompt should detect this and return a single blocking finding: "spec contains no functional requirements."
+ - **Concurrent reviews (spec + plan):** If both `--review-spec` and `--review-plan` are passed, run them sequentially (no parallel LLM calls) to avoid rate limiting.
+ - **Provider returns empty findings array:** Treat as "no issues found" -- display a clean summary, do not warn about suspiciously empty results unless confidence is low (reuse existing low-confidence heuristic from plan_review CLI).

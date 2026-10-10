@@ -1,5 +1,14 @@
 # Changelog - Deterministic Finalization
 
+## 2026-10-09 — [Check]: Initial lifecycle closure audit
+
+- **Type:** Check
+- **Spec modified:** No
+- **Code modified:** None
+- **Findings:** Planned/In Progress schema rejection; plan output contract forbids lifecycle writes; conventions FAIL with three finalizer size violations. Current127 scoped tests pass; one slow test not rerun.
+- Read the [initial gap report](checks/2026-10-09.md).
+- **Goal:** 08ee488363fac19f85642212954d14846815de89a90957044c917719bd01f39f
+
 ## 2026-06-10 — [Spec]: Feature specification created
 
 - **Type:** Spec Update
@@ -44,3 +53,10 @@
 - **Author:** spec-feature
 
 <!-- finalize:spec-feature:2026-06-10:96deb6de -->
+
+## 2026-09-06 — Lifecycle-only finalization compatibility (078)
+
+- Read the amended [AC-002/FR-002 contract](spec.md#ac-002): spec finalization changes recognized lifecycle metadata only, never appends body markers, and preserves historical comments. Generated registries and receipts retain exact payload/status identities.
+- Read the [lifecycle regressions](../../../tests/test_finalize_lifecycle.py): first/new commands, metadata transitions and new entries preserve normative bytes; genuine normative edits invalidate proof; body examples cannot replace missing actual anchors; CRLF and stale receipts remain exact.
+- Validation: 243 locks/finalizer/lifecycle/Penflow/review/evidence tests pass in 15.75 seconds, including read-only real 001/077 copies and first-finalization CLI proof/archive. Scoped Ruff/format, Pyright and mypy pass. The shared writer now verifies raw persisted bytes, rejecting unexpected newline conversion. No feature078 status promotion or preparatory marker step performed.
+- Read the [shared metadata parser](../../../validator/lifecycle_metadata.py): explicit Header and bounded legacy H1 introduction share the same strict limits with Normative Identity v2. No migration of the 73 existing specs without Header is required.

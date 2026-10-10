@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "livespec",
+    "hooks",
+    "resolve",
+    "--event",
+    "after",
+    "--command",
+    "check",
+    "--feature",
+    "078-requirement-evidence-integrity"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": ""
+}

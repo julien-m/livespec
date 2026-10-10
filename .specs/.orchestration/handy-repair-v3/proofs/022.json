@@ -1,0 +1,16 @@
+{
+  "output": "Both genuine independent native SPEC/PLAN reviews ingested officialCLI exit0 complete=true ready=true; current Clarify+Analyze progression implement exactmodel gpt-6.1-sol budget200000 returned exit0 Progression: READY before anysource/test edit. Read actual producer rawsha and fullingestion outputs; no overridden gate.",
+  "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/readiness-after-reviews-exec.json",
+  "success_criteria_met": true,
+  "convention_domains": [
+    "code"
+  ],
+  "convention_sources": [
+    "$AIRESOURCES/code-conventions/general.md",
+    "$AIRESOURCES/code-conventions/python.md",
+    "$AIRESOURCES/code-conventions/javascript.md",
+    "$AIRESOURCES/code-conventions/cli.md",
+    "$AIRESOURCES/code-conventions/stack-commands.md"
+  ],
+  "conventions_applied_to_output": true
+}

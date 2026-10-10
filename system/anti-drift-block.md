@@ -205,6 +205,15 @@ hash:<full-sha256> | contract-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>
 - If goal rendering fails, emit the canonical BLOCKED line (§2) and stop.
 - If the current environment does not accept the `/goal` command, emit the canonical BLOCKED line (§2) and stop.
 
+### Versioned evidence purpose
+
+<!-- @spec FR-009: Typed evidence purpose — .specs/features/078-requirement-evidence-integrity/spec.md#fr-009 -->
+
+- Current task inventories declare `evidence_kind` separately from task category: documentary, review or execution. Use the compiled immutable contract's policy and requirements; never silently reinterpret an already active or historical goal.
+- Documentary proof can establish a document/action artifact; it cannot establish runtime behavior. Review proof requires current complete raw reviewer evidence under **Read** [the shared protocol](review-protocol.md). Execution proof requires the runner-owned receipt and independently reviewed mapped acceptance scope under **Read** [execution rules](testing/execution-rules.md#execution-evidence). Generic `output` plus `success_criteria_met: true` cannot prove execution.
+- All specialized conventions, finalization, child-goal, bootstrap, visual and cumulative Penflow validations still apply. Preserve original policy and meaning when reading legacy archives; legacy evidence cannot certify a new current-policy run, and unsupported future policy blocks certification.
+- `.reviews/` contains disposable derived caches. The canonical Markdown remains authoritative; never repair missing proof by editing the mutable goal state or setting receipt verdicts manually.
+
 ### Transcript capture
 
 <!-- @spec FR-009: Transcript capture protocol — .specs/features/059-pipeline-verify-phase/spec.md#fr-009 -->

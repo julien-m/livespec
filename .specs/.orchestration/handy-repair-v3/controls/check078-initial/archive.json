@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "livespec",
+    "goal",
+    "archive",
+    "--contract",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.contract.json",
+    "--state",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.state.json",
+    "--feature",
+    "078-requirement-evidence-integrity",
+    "--exit-code",
+    "1",
+    "--stdout-file",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/transcripts/spec-check-14f3dadf.out",
+    "--stderr-file",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/transcripts/spec-check-14f3dadf.err",
+    "--json"
+  ],
+  "exit_code": 1,
+  "stdout": "{\"archived\": \"/Users/julienm/projects/livespec/.specs/.runs/spec-check-2026-10-10T03-38-02.389404-14f3dadf-policy2.json\", \"outcome\": \"error\"}\n",
+  "stderr": ""
+}

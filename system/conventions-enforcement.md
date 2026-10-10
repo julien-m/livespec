@@ -101,3 +101,9 @@ conventions receipt must be `PASS`. Commands that need repo-scope proof call
 `--feature` remains a compatibility path and does not emit a receipt.
 Pre-existing debt never justifies skipping the receipt or downgrading a failed
 conventions gate.
+
+### Feature and repo evidence identities
+
+- Final implement/test/fix tasks require feature-scoped `conventions_receipt_path` and separately repo-scoped `repo_conventions_receipt_path`. Repo receipts are archived as `conventions_repo`; feature receipts retain `conventions`.
+- The supervisor reruns the whole repo after final writes before `PHASE_RESULT: OK`; historical schemas 1/2 attest receipt integrity, never current source-code hashes. No stale receipt, scoped PASS or pre-existing debt can waive a failed fresh run.
+- Early tasks keep per-task convention read/apply proof and progression gates; the PASS obligation belongs to final completion.

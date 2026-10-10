@@ -1,0 +1,15 @@
+{
+  "output": "Attached code conventionspayload general/python/javascript/cli/stackcommands, architecture/logging/testing/naming; noUI domains apply to NON_VISUAL.",
+  "success_criteria_met": true,
+  "convention_domains": [
+    "code"
+  ],
+  "convention_sources": [
+    "$AIRESOURCES/code-conventions/general.md",
+    "$AIRESOURCES/code-conventions/python.md",
+    "$AIRESOURCES/code-conventions/javascript.md",
+    "$AIRESOURCES/code-conventions/cli.md",
+    "$AIRESOURCES/code-conventions/stack-commands.md"
+  ],
+  "conventions_applied_to_output": true
+}

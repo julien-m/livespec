@@ -344,53 +344,53 @@ When the Deferred section of `roadmap.md` has entries:
 
 ### Phase 0 — Goal Lock & Hooks
 
-- [always] Read before-propose hooks (all 3 levels: global, project, local)
-- [always] Resolve flags (--count, --role, --mvp, --auto) from command arguments
-- [always] Verify no active goal exists
-- [always] Render and save goal contract via `livespec goal render spec-propose --save`
-- [always] Emit `/goal` slash command with hash and contract/state file references
+- [always] Read before-propose hooks (all 3 levels: global, project, local) <!-- evidence:documentary -->
+- [always] Resolve flags (--count, --role, --mvp, --auto) from command arguments <!-- evidence:documentary -->
+- [always] Verify no active goal exists <!-- evidence:documentary -->
+- [always] Render and save goal contract via `livespec goal render spec-propose --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with hash and contract/state file references <!-- evidence:documentary -->
 
 ### Phase 1 — Project Context
 
-- [always] Verify .specs/ exists (abort with /spec-init suggestion if absent)
-- [always] Read .specs/project.md (vision, users, roles, constraints, scale)
-- [always] Read .specs/constitution.md (architecture principles)
-- [always] Read .specs/stacks/_default.md (chosen stack and rationale)
-- [always] Read .specs/stacks/decisions/ADR-*.md (architecture decision records)
+- [always] Verify .specs/ exists (abort with /spec-init suggestion if absent) <!-- evidence:documentary -->
+- [always] Read .specs/project.md (vision, users, roles, constraints, scale) <!-- evidence:documentary -->
+- [always] Read .specs/constitution.md (architecture principles) <!-- evidence:documentary -->
+- [always] Read .specs/stacks/_default.md (chosen stack and rationale) <!-- evidence:documentary -->
+- [always] Read .specs/stacks/decisions/ADR-*.md (architecture decision records) <!-- evidence:documentary -->
 
 ### Phase 2 — Feature Inventory
 
-- [always] Scan .specs/features/*/spec.md: extract name, number, status, roles, entities, dependencies, priority
-- [always] Build feature inventory summary table
+- [always] Scan .specs/features/*/spec.md: extract name, number, status, roles, entities, dependencies, priority <!-- evidence:documentary -->
+- [always] Build feature inventory summary table <!-- evidence:documentary -->
 
 ### Phase 3 — Roadmap Analysis
 
-- [always] Read .specs/roadmap.md: parse priority tiers (MVP / Post-MVP / Future), unchecked items, Deferred section
-- [always] Cross-reference roadmap items vs existing feature inventory to find gaps
-- [always] Extract deferred items with source request, name, context, and date
+- [always] Read .specs/roadmap.md: parse priority tiers (MVP / Post-MVP / Future), unchecked items, Deferred section <!-- evidence:documentary -->
+- [always] Cross-reference roadmap items vs existing feature inventory to find gaps <!-- evidence:documentary -->
+- [always] Extract deferred items with source request, name, context, and date <!-- evidence:documentary -->
 
 ### Phase 4 — Gap Analysis
 
-- [always] Role coverage: map which roles from project.md are served by existing features, identify gaps
-- [always] Domain coverage: identify missing core capabilities (auth, CRUD, search, messaging, payments, settings, admin, analytics)
-- [always] Dependency analysis: detect prerequisite features not yet built, infer natural build order
-- [always] Status gaps: flag features stuck in intermediate states (Draft without plan, Planned without implementation)
-- [always] MVP critical path: identify minimum feature set for a working product
+- [always] Role coverage: map which roles from project.md are served by existing features, identify gaps <!-- evidence:documentary -->
+- [always] Domain coverage: identify missing core capabilities (auth, CRUD, search, messaging, payments, settings, admin, analytics) <!-- evidence:documentary -->
+- [always] Dependency analysis: detect prerequisite features not yet built, infer natural build order <!-- evidence:documentary -->
+- [always] Status gaps: flag features stuck in intermediate states (Draft without plan, Planned without implementation) <!-- evidence:documentary -->
+- [always] MVP critical path: identify minimum feature set for a working product <!-- evidence:documentary -->
 
 ### Phase 5 — Rank & Present
 
-- [always] Score candidates: MVP criticality, dependency unblocking, role coverage, scope fit, roadmap alignment, deferred intent (+1 boost)
-- [always] Filter candidates to MVP-critical only before ranking
-- [always] Filter candidates to those serving the specified role before ranking
-- [always] Present top N proposals with description, roles, reasoning, dependencies, estimated scope, and quick-start command
-- [always] Include deferred item origin context when proposal originates from Deferred section
-- [always] Present ranked table of N proposals with detailed reasoning for top pick
-- [always] Detect and surface edge cases: no features yet, all MVP done, status gaps, deferred items
+- [always] Score candidates: MVP criticality, dependency unblocking, role coverage, scope fit, roadmap alignment, deferred intent (+1 boost) <!-- evidence:documentary -->
+- [always] Filter candidates to MVP-critical only before ranking <!-- evidence:documentary -->
+- [always] Filter candidates to those serving the specified role before ranking <!-- evidence:documentary -->
+- [always] Present top N proposals with description, roles, reasoning, dependencies, estimated scope, and quick-start command <!-- evidence:documentary -->
+- [always] Include deferred item origin context when proposal originates from Deferred section <!-- evidence:documentary -->
+- [always] Present ranked table of N proposals with detailed reasoning for top pick <!-- evidence:documentary -->
+- [always] Detect and surface edge cases: no features yet, all MVP done, status gaps, deferred items <!-- evidence:documentary -->
 
 ### Phase 6 — Actions & Finalize
 
-- [always] Offer actionable next steps unless --auto (spec-specify, spec-feature, spec-propose variants)
-- [always] Read after-propose hooks (all 3 levels: global, project, local)
+- [always] Offer actionable next steps unless --auto (spec-specify, spec-feature, spec-propose variants) <!-- evidence:documentary -->
+- [always] Read after-propose hooks (all 3 levels: global, project, local) <!-- evidence:documentary -->
 
 ---
 
@@ -398,13 +398,13 @@ When the Deferred section of `roadmap.md` has entries:
 
 `/spec-propose` is complete only if all are true:
 
-- [ ] Project context was read (project.md, constitution.md, stack)
-- [ ] Feature inventory was scanned (or confirmed empty)
-- [ ] Roadmap was checked (present or absent noted)
-- [ ] Gap analysis was performed across all 5 dimensions
-- [ ] At least 1 proposal was presented with: description, roles, reasoning, dependencies, scope
-- [ ] Actionable `/spec-specify` or `/spec-feature` command was provided
-- [ ] No files were created or modified (read-only command)
+- [ ] Project context was read (project.md, constitution.md, stack) <!-- evidence:documentary -->
+- [ ] Feature inventory was scanned (or confirmed empty) <!-- evidence:documentary -->
+- [ ] Roadmap was checked (present or absent noted) <!-- evidence:documentary -->
+- [ ] Gap analysis was performed across all 5 dimensions <!-- evidence:documentary -->
+- [ ] At least 1 proposal was presented with: description, roles, reasoning, dependencies, scope <!-- evidence:documentary -->
+- [ ] Actionable `/spec-specify` or `/spec-feature` command was provided <!-- evidence:documentary -->
+- [ ] No files were created or modified (read-only command) <!-- evidence:documentary -->
 
 ---
 

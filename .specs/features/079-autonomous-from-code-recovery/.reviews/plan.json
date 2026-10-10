@@ -1,0 +1,447 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "22d37e990b100be4838f96f775cd5d4073c9fe108fc065046e0c7699c5875140",
+  "source_hashes": {
+    ".agent-sync/skills/spec-init/SKILL.md": "ca79a31f0770ae4aec1cc050c6adf999155fbac68e74a0c063bd1fb0ddd94599",
+    ".specs/constitution.md": "ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9",
+    ".specs/features/079-autonomous-from-code-recovery/plan.md": "0ea57117b1606b81371e8fb8df76a22b1b9cb2fcee2a39d58fc1171ae5a29394",
+    ".specs/features/079-autonomous-from-code-recovery/spec.md": "871b7f99fc859f93948225bdac19defd6582901ec58393ae9f82eaa53d8eb4f2",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686"
+  },
+  "reviewer_model": "gpt-6.1-sol",
+  "complete": true,
+  "ready": true,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-001",
+      "disposition": "covered",
+      "rationale": "Independent manifest detection, preserved native/frontend families, manager evidence precedence and explicit unknown product fields are translated into detector/document tasks and hybrid fixture assertions. This is design coverage, not evidence of implemented detection.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L107-L109",
+          "excerpt": "A Tauri 2 + React/Vite/TypeScript + Bun fixture records all native/frontend families with file evidence; it invents no npm/web-only/SaaS/regions/roles/deployment facts."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Retain every detected frontend/native family; Tauri native surface must not collapse to web-only."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L146-L151",
+          "excerpt": "Record source hash identities, product/technical names, independent families, manager conflicts and unknown fields."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "all four fixture families, evidence citations, unknowns, deduplication"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-002",
+      "disposition": "covered",
+      "rationale": "Web/npm, Python and standalone Cargo fixtures are explicitly planned alongside hybrid detection. Rendering deduplicates observed test tools/scripts, leaves deployment unknown and derives probes only from detected families.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L110-L112",
+          "excerpt": "Web/npm, Python and standalone Cargo fixtures record only observed families and tooling commands; testing tools are not duplicated and deployment is not invented."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L146-L151",
+          "excerpt": "hybrid Bun/Tauri/React, web/npm, Python, standalone Cargo, missing/ambiguous manager, malformed manifests, unsupported formats and contradictory manager evidence."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158",
+          "excerpt": "deduplicated declared test scripts/tools and native/frontend evidence distinctions. No generic unfilled templates or deployment assumption."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Required probes come from observed families and selected manager"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-003",
+      "disposition": "covered",
+      "rationale": "The plan orders flag/evidence/path validation before mutation, preserves target/force, specifies write-free dry-run and verify-only paths, verifies current source/content identity, and tests malformed/conflicting evidence plus missing/failed/timed-out required probes. It rejects unsupported deep/combination dispatch rather than silently accepting it.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115",
+          "excerpt": "Malformed or contradictory manifests, failed required tooling and changed/escaping generated-artifact content return contextual nonzero exits and no completed claim; current profile verification reads without mutation."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115",
+          "excerpt": "Autonomous dispatch preserves the selected --dir target and explicit --force; --dry-run writes nothing, and unsupported --deep or flag combinations fail contextually before mutation."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "It writes no receipt, cache, directory, hook, integration or artifact. Missing/changed manifests, edited generated content and escaping paths return nonzero."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L159-L165",
+          "excerpt": "Dry-run and verify-only bypass every mutation. Reject unsupported/incompatible flags before writing."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "malformed/conflict, real failed/missing/timed-out fixture probes, verify-only tamper/drift, dry-run/unsupported flags/selected target; nonzero and no READY/completed claim"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-004",
+      "disposition": "covered",
+      "rationale": "Force recovery snapshots the named prior artifacts into a unique project-local backup before overwrites, uses an owned-file overlay and preserves custom histories and source bytes. Destination/ancestor containment and link-preserving snapshots address outside targets; fixture backup equality and source hashes supply measurable acceptance.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L116-L118",
+          "excerpt": "A force rerun saves prior specs, conventions and integration documents in a unique local backup before overwrite, retains feature/hook/run contents, and leaves source/manifests and outside symlink targets byte-identical."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "with force, back up existing `.specs`, `.conventions`, `.gitignore`, `AGENTS.md`, `CLAUDE.md` into a unique sibling project-local directory before any overwrite."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Retain existing feature/hook/run histories, custom files and user integration text outside LiveSpec markers; retain custom preflight sections and valid convention routing."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L159-L165",
+          "excerpt": "force re-run backup equality, custom features/hooks/runs/integration text"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171",
+          "excerpt": "compare shared-source and outside-target hashes."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-005",
+      "disposition": "covered",
+      "rationale": "Agent synchronization changes explicitly cover fresh local copies and safe legacy-link detachment before a real controlled build subprocess. Tests compare shared/outside hashes. Convention recovery distinguishes valid routing preservation from backed-up repair using actual ai-ressources paths.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L119-L121",
+          "excerpt": "Fresh and legacy linked mutable-agent builds use local copies and leave shared-source hashes unchanged; valid convention sources remain intact and repaired convention sources resolve to actual ai-ressources files."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171",
+          "excerpt": "create project-local agent copies, safely detach legacy links, validate local/provider output destinations before build/link"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171",
+          "excerpt": "fresh and legacy linked cases with a controlled `cc-hub` executable that writes during actual subprocess build"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Back up invalid generated conventions before repairing their index/manifest to existing `ai-ressources/code-conventions` sources."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "valid routing unchanged/invalid repair resolves real files"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-006",
+      "disposition": "covered",
+      "rationale": "The goal compiler and init skill are assigned distinct autonomous/interactive branches, normalization before render and removal of immediate exit-zero return. Installation, verification, hooks and archive remain required; rendered-inventory tests and byte comparisons preserve interactive/historical obligations.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125",
+          "excerpt": "Autonomous from-code goal inventory excludes interview/stack confirmation but retains installation, generated-profile validation, integration verification, hooks and archive."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125",
+          "excerpt": "Interactive initialization retains its interview obligations; historical immutable goals are unchanged."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178",
+          "excerpt": "add `init-autonomous`/`init-interactive` branch selection."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178",
+          "excerpt": "Remove immediate return after backend exit 0; current profile verification, integration evidence, hooks and archive remain required."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178",
+          "excerpt": "interactive inventory unchanged, aliases normalized, historical fixture/goal files byte-identical."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:FR-001",
+      "disposition": "covered",
+      "rationale": "Detection has independently parsed JSON/TOML manifest families, immutable provenance/identity records, documented manager precedence and contextual conflict/unsupported-format errors. Explicit unknown business facts and all four fixture families provide a coherent, testable implementation route.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "**FR-001:** Detect manifest families independently."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Unsupported product roles, growth, geography, budget and deployment remain explicitly unknown."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Independently inspect `package.json`, root and `src-tauri/Cargo.toml`, `pyproject.toml`, Tauri JSON configuration and corroborating TypeScript/lockfile markers."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Manager evidence: explicit `packageManager`, then corroborated native build-command manager, then unique lockfile."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Conflicting evidence fails; absence stays unknown and cannot produce an npm probe/default."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L146-L151",
+          "excerpt": "supported JSON/TOML parsers, immutable profile/evidence models"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:FR-002",
+      "disposition": "covered",
+      "rationale": "Document rendering is explicitly project-specific and includes observed ADRs, testing strategy and preflight. Allowlisted actual argv probes capture failure/timeout/output under a remaining deadline. Read-only verification binds current source/content identities; completion follows success predicates and is explicitly separated from application runtime certification.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "**FR-002:** Generate project-specific constitution, observed stack ADR and testing strategy; execute bounded argv version probes for actual tooling preflight."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Validate current generated content against observed source identities through a read-only profile check; tooling availability never represents application runtime success."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158",
+          "excerpt": "`render_documents` returns path/content map for project, constitution, stack, observed ADR, roadmap, testing, preflight/report and recap"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Execute only allowlisted version argv with stdin closed, captured output, finite per-call timeout capped by remaining total budget."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "`--verify-only` re-detects current profile and checks the generated profile identity plus critical document values/content identity; existence or an old completed marker is insufficient."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158",
+          "excerpt": "Completed recap is written only after all required success predicates."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "Tooling READY never certifies an application runtime."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:FR-003",
+      "disposition": "covered",
+      "rationale": "The planned dispatcher/recovery/synchronization boundaries cover target and flag fidelity, noninteractive guarded recovery, unique backups before overwrite, preservation of user history and source bytes, escaping-link rejection, mutable-agent isolation and valid-versus-invalid convention handling. Controlled subprocesses, tree comparisons and hashes are assigned to each risk.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "**FR-003:** Autonomous dispatch preserves the selected --dir target and explicit --force, honors --dry-run without writes, and rejects unsupported --deep or flag combinations contextually before mutation."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Reject escaping generated-artifact symlinks and copy mutable shared agents before local builds. Keep valid convention sources; back up and repair invalid generated conventions using actual ai-ressources paths."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L159-L165",
+          "excerpt": "Guard all planned paths before backup/write, create unique local backup, overlay owned artifacts and preserve custom history."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Add only the minimal installer compatibility needed to prevent prompts/false success during authorized force recovery; preserve standalone interactive behavior."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171",
+          "excerpt": "Keep copies inside selected root; never follow shared links on mutation."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Preserve `--dir` target and `--force`, support `--dry-run` without writes, and reject `--deep` or incompatible autonomous combinations contextually before mutations."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:FR-004",
+      "disposition": "covered",
+      "rationale": "Branch compilation/normalization precedes a new render, while historical goals remain immutable. Skill execution/DoD changes keep complete generation, verification, integration, hook and archive closure. State and sequence diagrams distinguish BackendComplete from authentic CommandComplete, and compatibility tests target actual rendered inventories.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "**FR-004:** Compile a distinct autonomous from-code branch before generation, excluding interview/confirmation while retaining generation, current profile/output validation, integration verification, hooks and archive."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Only current artifacts plus authentic goal proof/archive permit command completion; interactive and historical contracts retain their original obligations."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Normalize autonomous invocation to `--from-code --auto` before new goal render."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L107-L143",
+          "excerpt": "BackendComplete --> CommandComplete: authentic goal proofs, hooks and archive"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178",
+          "excerpt": "actual rendered autonomous inventory omits interviews/confirmation but retains closure; interactive inventory unchanged"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L179-L185",
+          "excerpt": "Never repair an old immutable goal by rewriting it or declaring an incomplete session complete."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:SC-001",
+      "disposition": "covered",
+      "rationale": "All four named profile families, zero invention, file provenance and deduplicated observed tools appear in the P0 test matrix and detector/renderer tasks. Exact values and explicit unknowns make the success condition measurable; implementation and test execution are still future obligations.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168",
+          "excerpt": "**SC-001:** All four fixture profiles (hybrid desktop, web/npm, Python, Cargo) match observed manifests with zero invented product or deployment facts."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "all four fixture families, evidence citations, unknowns, deduplication"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158",
+          "excerpt": "exact evidence values, unknown product/deployment values, no duplicate tests"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "Planned tests or availability probes do not prove implementation."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:SC-002",
+      "disposition": "covered",
+      "rationale": "Backup equality, before/after source/shared/outside hashes, custom-history retention and failure/timeout/drift assertions are explicit P0 gates, with an independent runner and mapped acceptance receipt. Completion invalidation after a partial external failure and safe force rerun recovery are documented without promising destructive rollback.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168",
+          "excerpt": "**SC-002:** Every recovery fixture retains prior generated backup contents and application/shared-source hashes; all unsafe/error fixtures return nonzero without completed claims."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "Bootstrap subprocess backup equality, custom history and source bytes; reject escaping generated paths before outside-target mutation"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L179-L185",
+          "excerpt": "Execute the focused unit/subprocess fixture suites under an independent runner and mapped acceptance receipt"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L215-L222",
+          "excerpt": "preserve backup, invalidate current completion and report the exact step."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "before/after source/shared hashes, backup equality, current profile verification and goal inventories."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:SC-003",
+      "disposition": "covered",
+      "rationale": "Fresh rendered autonomous inventories, unchanged interactive obligations and byte-identical historical goal fixtures are explicitly required in the goal test tasks and acceptance gates. The plan retains every named closure stage and tests the removal of the prior early-return assertion.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168",
+          "excerpt": "**SC-003:** Fresh autonomous goals retain every closure obligation and omit interview/confirmation; interactive and historical goal comparisons show no altered obligations."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178",
+          "excerpt": "historical fixture/goal files byte-identical. Update old early-return assertion to require complete current closure behavior."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214",
+          "excerpt": "rendered branch/closure/aliases and unchanged historical+interactive obligations"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "new autonomous inventories keep installation, observed generation, current verification, integrations, hooks and archive. Historical goals are immutable."
+        }
+      ],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [
+    {
+      "category": "bounded_external_execution",
+      "severity": "warning",
+      "description": "The plan explicitly caps version probes by the remaining total deadline, but does not state how the same deadline interrupts a stalled installer, cc-hub build or hook subprocess. This is an implementation clarification for the inherited autonomous time budget; it does not contradict the covered version-probe requirements.",
+      "suggestion": "Use the same remaining deadline for all external installer/sync/hook invocations, terminate a timed-out child without emitting completion, and include one stalled-sync or stalled-hook fixture in bounded-execution acceptance coverage.",
+      "citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L148-L157",
+          "excerpt": "existing autonomous command time budget remains bounded."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "`InitOptions` contains resolved target, force, dry-run, verify-only and finite total timeout."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67",
+          "excerpt": "Reuse official install/sync/hook procedures through explicit noninteractive paths."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/plan.md:L215-L222",
+          "excerpt": "Probe timeout uses remaining total budget, preventing a sequence of individually bounded calls from exceeding autonomous execution budget."
+        }
+      ]
+    }
+  ],
+  "confidence": 5,
+  "raw_results": [
+    "{\n  \"batch_id\": \"batch-001\",\n  \"reviewed_section_ids\": [\n    \".agent-sync/skills/spec-init/SKILL.md:L1-L14\",\n    \".agent-sync/skills/spec-init/SKILL.md:L15-L22\",\n    \".agent-sync/skills/spec-init/SKILL.md:L23-L49\",\n    \".agent-sync/skills/spec-init/SKILL.md:L50-L56\",\n    \".agent-sync/skills/spec-init/SKILL.md:L57-L109\",\n    \".agent-sync/skills/spec-init/SKILL.md:L110-L113\",\n    \".agent-sync/skills/spec-init/SKILL.md:L114-L184\",\n    \".agent-sync/skills/spec-init/SKILL.md:L185-L260\",\n    \".agent-sync/skills/spec-init/SKILL.md:L261-L289\",\n    \".agent-sync/skills/spec-init/SKILL.md:L290-L293\",\n    \".agent-sync/skills/spec-init/SKILL.md:L294-L310\",\n    \".agent-sync/skills/spec-init/SKILL.md:L311-L339\",\n    \".agent-sync/skills/spec-init/SKILL.md:L340-L355\",\n    \".agent-sync/skills/spec-init/SKILL.md:L356-L388\",\n    \".agent-sync/skills/spec-init/SKILL.md:L389-L421\",\n    \".agent-sync/skills/spec-init/SKILL.md:L422-L509\",\n    \".agent-sync/skills/spec-init/SKILL.md:L510-L524\",\n    \".agent-sync/skills/spec-init/SKILL.md:L525-L592\",\n    \".agent-sync/skills/spec-init/SKILL.md:L593-L619\",\n    \".agent-sync/skills/spec-init/SKILL.md:L620-L660\",\n    \".agent-sync/skills/spec-init/SKILL.md:L661-L672\",\n    \".agent-sync/skills/spec-init/SKILL.md:L673-L727\",\n    \".agent-sync/skills/spec-init/SKILL.md:L728-L806\",\n    \".agent-sync/skills/spec-init/SKILL.md:L807-L828\",\n    \".agent-sync/skills/spec-init/SKILL.md:L829-L869\",\n    \".agent-sync/skills/spec-init/SKILL.md:L870-L892\",\n    \".agent-sync/skills/spec-init/SKILL.md:L893-L907\",\n    \".agent-sync/skills/spec-init/SKILL.md:L908-L927\",\n    \".agent-sync/skills/spec-init/SKILL.md:L928-L979\",\n    \".agent-sync/skills/spec-init/SKILL.md:L980-L991\",\n    \".agent-sync/skills/spec-init/SKILL.md:L992-L1002\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1003-L1028\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1029-L1048\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1049-L1065\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1066-L1067\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1068-L1080\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1081-L1089\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1090-L1094\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1095-L1101\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1102-L1106\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1107-L1113\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1114-L1126\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1127-L1142\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1143-L1150\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1151-L1155\",\n    \".agent-sync/skills/spec-init/SKILL.md:L1156-L1188\",\n    \".specs/constitution.md:L1-L8\",\n    \".specs/constitution.md:L9-L18\",\n    \".specs/constitution.md:L19-L20\",\n    \".specs/constitution.md:L21-L26\",\n    \".specs/constitution.md:L27-L32\",\n    \".specs/constitution.md:L33-L37\",\n    \".specs/constitution.md:L38-L43\",\n    \".specs/constitution.md:L44-L49\",\n    \".specs/constitution.md:L50-L56\",\n    \".specs/constitution.md:L57-L58\",\n    \".specs/constitution.md:L59-L65\",\n    \".specs/constitution.md:L66-L71\",\n    \".specs/constitution.md:L72-L75\",\n    \".specs/constitution.md:L76-L81\",\n    \".specs/constitution.md:L82-L83\",\n    \".specs/constitution.md:L84-L90\",\n    \".specs/constitution.md:L91-L96\",\n    \".specs/constitution.md:L97-L102\",\n    \".specs/constitution.md:L103-L109\",\n    \".specs/constitution.md:L110-L111\",\n    \".specs/constitution.md:L112-L118\",\n    \".specs/constitution.md:L119-L123\",\n    \".specs/constitution.md:L124-L131\",\n    \".specs/constitution.md:L132-L146\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L1-L8\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L9-L15\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L16-L28\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L29-L40\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L41-L53\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L68-L106\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L107-L143\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L144-L145\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L146-L151\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L159-L165\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L179-L185\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L186-L198\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n    \".specs/features/079-autonomous-from-code-recovery/plan.md:L215-L222\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L1-L9\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L10-L18\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L19-L26\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L27-L28\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L29-L68\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L69-L104\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L105-L106\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L107-L109\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L110-L112\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L116-L118\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L119-L121\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L133-L138\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L139-L147\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L148-L157\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L158-L163\",\n    \".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168\",\n    \".specs/project.md:L1-L7\",\n    \".specs/project.md:L8-L20\",\n    \".specs/project.md:L21-L29\",\n    \".specs/project.md:L30-L43\",\n    \".specs/project.md:L44-L54\",\n    \".specs/project.md:L55-L63\",\n    \".specs/project.md:L64-L73\",\n    \".specs/project.md:L74-L82\",\n    \".specs/stacks/_default.md:L1-L5\",\n    \".specs/stacks/_default.md:L6-L12\",\n    \".specs/stacks/_default.md:L13-L38\",\n    \".specs/stacks/_default.md:L39-L48\",\n    \".specs/stacks/_default.md:L49-L60\",\n    \".specs/stacks/_default.md:L61-L68\",\n    \".specs/stacks/_default.md:L69-L71\"\n  ],\n  \"conclusions\": [\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:AC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Independent manifest detection, preserved native/frontend families, manager evidence precedence and explicit unknown product fields are translated into detector/document tasks and hybrid fixture assertions. This is design coverage, not evidence of implemented detection.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L107-L109\",\n          \"excerpt\": \"A Tauri 2 + React/Vite/TypeScript + Bun fixture records all native/frontend families with file evidence; it invents no npm/web-only/SaaS/regions/roles/deployment facts.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Retain every detected frontend/native family; Tauri native surface must not collapse to web-only.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L146-L151\",\n          \"excerpt\": \"Record source hash identities, product/technical names, independent families, manager conflicts and unknown fields.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"all four fixture families, evidence citations, unknowns, deduplication\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:AC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Web/npm, Python and standalone Cargo fixtures are explicitly planned alongside hybrid detection. Rendering deduplicates observed test tools/scripts, leaves deployment unknown and derives probes only from detected families.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L110-L112\",\n          \"excerpt\": \"Web/npm, Python and standalone Cargo fixtures record only observed families and tooling commands; testing tools are not duplicated and deployment is not invented.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L146-L151\",\n          \"excerpt\": \"hybrid Bun/Tauri/React, web/npm, Python, standalone Cargo, missing/ambiguous manager, malformed manifests, unsupported formats and contradictory manager evidence.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158\",\n          \"excerpt\": \"deduplicated declared test scripts/tools and native/frontend evidence distinctions. No generic unfilled templates or deployment assumption.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Required probes come from observed families and selected manager\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:AC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The plan orders flag/evidence/path validation before mutation, preserves target/force, specifies write-free dry-run and verify-only paths, verifies current source/content identity, and tests malformed/conflicting evidence plus missing/failed/timed-out required probes. It rejects unsupported deep/combination dispatch rather than silently accepting it.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115\",\n          \"excerpt\": \"Malformed or contradictory manifests, failed required tooling and changed/escaping generated-artifact content return contextual nonzero exits and no completed claim; current profile verification reads without mutation.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115\",\n          \"excerpt\": \"Autonomous dispatch preserves the selected --dir target and explicit --force; --dry-run writes nothing, and unsupported --deep or flag combinations fail contextually before mutation.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"It writes no receipt, cache, directory, hook, integration or artifact. Missing/changed manifests, edited generated content and escaping paths return nonzero.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L159-L165\",\n          \"excerpt\": \"Dry-run and verify-only bypass every mutation. Reject unsupported/incompatible flags before writing.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"malformed/conflict, real failed/missing/timed-out fixture probes, verify-only tamper/drift, dry-run/unsupported flags/selected target; nonzero and no READY/completed claim\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:AC-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Force recovery snapshots the named prior artifacts into a unique project-local backup before overwrites, uses an owned-file overlay and preserves custom histories and source bytes. Destination/ancestor containment and link-preserving snapshots address outside targets; fixture backup equality and source hashes supply measurable acceptance.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L116-L118\",\n          \"excerpt\": \"A force rerun saves prior specs, conventions and integration documents in a unique local backup before overwrite, retains feature/hook/run contents, and leaves source/manifests and outside symlink targets byte-identical.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"with force, back up existing `.specs`, `.conventions`, `.gitignore`, `AGENTS.md`, `CLAUDE.md` into a unique sibling project-local directory before any overwrite.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Retain existing feature/hook/run histories, custom files and user integration text outside LiveSpec markers; retain custom preflight sections and valid convention routing.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L159-L165\",\n          \"excerpt\": \"force re-run backup equality, custom features/hooks/runs/integration text\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171\",\n          \"excerpt\": \"compare shared-source and outside-target hashes.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:AC-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Agent synchronization changes explicitly cover fresh local copies and safe legacy-link detachment before a real controlled build subprocess. Tests compare shared/outside hashes. Convention recovery distinguishes valid routing preservation from backed-up repair using actual ai-ressources paths.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L119-L121\",\n          \"excerpt\": \"Fresh and legacy linked mutable-agent builds use local copies and leave shared-source hashes unchanged; valid convention sources remain intact and repaired convention sources resolve to actual ai-ressources files.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171\",\n          \"excerpt\": \"create project-local agent copies, safely detach legacy links, validate local/provider output destinations before build/link\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171\",\n          \"excerpt\": \"fresh and legacy linked cases with a controlled `cc-hub` executable that writes during actual subprocess build\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Back up invalid generated conventions before repairing their index/manifest to existing `ai-ressources/code-conventions` sources.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"valid routing unchanged/invalid repair resolves real files\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:AC-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The goal compiler and init skill are assigned distinct autonomous/interactive branches, normalization before render and removal of immediate exit-zero return. Installation, verification, hooks and archive remain required; rendered-inventory tests and byte comparisons preserve interactive/historical obligations.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125\",\n          \"excerpt\": \"Autonomous from-code goal inventory excludes interview/stack confirmation but retains installation, generated-profile validation, integration verification, hooks and archive.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125\",\n          \"excerpt\": \"Interactive initialization retains its interview obligations; historical immutable goals are unchanged.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178\",\n          \"excerpt\": \"add `init-autonomous`/`init-interactive` branch selection.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178\",\n          \"excerpt\": \"Remove immediate return after backend exit 0; current profile verification, integration evidence, hooks and archive remain required.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178\",\n          \"excerpt\": \"interactive inventory unchanged, aliases normalized, historical fixture/goal files byte-identical.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:FR-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Detection has independently parsed JSON/TOML manifest families, immutable provenance/identity records, documented manager precedence and contextual conflict/unsupported-format errors. Explicit unknown business facts and all four fixture families provide a coherent, testable implementation route.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n          \"excerpt\": \"**FR-001:** Detect manifest families independently.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n          \"excerpt\": \"Unsupported product roles, growth, geography, budget and deployment remain explicitly unknown.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Independently inspect `package.json`, root and `src-tauri/Cargo.toml`, `pyproject.toml`, Tauri JSON configuration and corroborating TypeScript/lockfile markers.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Manager evidence: explicit `packageManager`, then corroborated native build-command manager, then unique lockfile.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Conflicting evidence fails; absence stays unknown and cannot produce an npm probe/default.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L146-L151\",\n          \"excerpt\": \"supported JSON/TOML parsers, immutable profile/evidence models\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:FR-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Document rendering is explicitly project-specific and includes observed ADRs, testing strategy and preflight. Allowlisted actual argv probes capture failure/timeout/output under a remaining deadline. Read-only verification binds current source/content identities; completion follows success predicates and is explicitly separated from application runtime certification.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n          \"excerpt\": \"**FR-002:** Generate project-specific constitution, observed stack ADR and testing strategy; execute bounded argv version probes for actual tooling preflight.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n          \"excerpt\": \"Validate current generated content against observed source identities through a read-only profile check; tooling availability never represents application runtime success.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158\",\n          \"excerpt\": \"`render_documents` returns path/content map for project, constitution, stack, observed ADR, roadmap, testing, preflight/report and recap\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Execute only allowlisted version argv with stdin closed, captured output, finite per-call timeout capped by remaining total budget.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"`--verify-only` re-detects current profile and checks the generated profile identity plus critical document values/content identity; existence or an old completed marker is insufficient.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158\",\n          \"excerpt\": \"Completed recap is written only after all required success predicates.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"Tooling READY never certifies an application runtime.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:FR-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The planned dispatcher/recovery/synchronization boundaries cover target and flag fidelity, noninteractive guarded recovery, unique backups before overwrite, preservation of user history and source bytes, escaping-link rejection, mutable-agent isolation and valid-versus-invalid convention handling. Controlled subprocesses, tree comparisons and hashes are assigned to each risk.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n          \"excerpt\": \"**FR-003:** Autonomous dispatch preserves the selected --dir target and explicit --force, honors --dry-run without writes, and rejects unsupported --deep or flag combinations contextually before mutation.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n          \"excerpt\": \"Reject escaping generated-artifact symlinks and copy mutable shared agents before local builds. Keep valid convention sources; back up and repair invalid generated conventions using actual ai-ressources paths.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L159-L165\",\n          \"excerpt\": \"Guard all planned paths before backup/write, create unique local backup, overlay owned artifacts and preserve custom history.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Add only the minimal installer compatibility needed to prevent prompts/false success during authorized force recovery; preserve standalone interactive behavior.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L166-L171\",\n          \"excerpt\": \"Keep copies inside selected root; never follow shared links on mutation.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Preserve `--dir` target and `--force`, support `--dry-run` without writes, and reject `--deep` or incompatible autonomous combinations contextually before mutations.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:FR-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Branch compilation/normalization precedes a new render, while historical goals remain immutable. Skill execution/DoD changes keep complete generation, verification, integration, hook and archive closure. State and sequence diagrams distinguish BackendComplete from authentic CommandComplete, and compatibility tests target actual rendered inventories.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n          \"excerpt\": \"**FR-004:** Compile a distinct autonomous from-code branch before generation, excluding interview/confirmation while retaining generation, current profile/output validation, integration verification, hooks and archive.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\n          \"excerpt\": \"Only current artifacts plus authentic goal proof/archive permit command completion; interactive and historical contracts retain their original obligations.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Normalize autonomous invocation to `--from-code --auto` before new goal render.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L107-L143\",\n          \"excerpt\": \"BackendComplete --> CommandComplete: authentic goal proofs, hooks and archive\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178\",\n          \"excerpt\": \"actual rendered autonomous inventory omits interviews/confirmation but retains closure; interactive inventory unchanged\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L179-L185\",\n          \"excerpt\": \"Never repair an old immutable goal by rewriting it or declaring an incomplete session complete.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:SC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"All four named profile families, zero invention, file provenance and deduplicated observed tools appear in the P0 test matrix and detector/renderer tasks. Exact values and explicit unknowns make the success condition measurable; implementation and test execution are still future obligations.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168\",\n          \"excerpt\": \"**SC-001:** All four fixture profiles (hybrid desktop, web/npm, Python, Cargo) match observed manifests with zero invented product or deployment facts.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"all four fixture families, evidence citations, unknowns, deduplication\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L152-L158\",\n          \"excerpt\": \"exact evidence values, unknown product/deployment values, no duplicate tests\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"Planned tests or availability probes do not prove implementation.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:SC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Backup equality, before/after source/shared/outside hashes, custom-history retention and failure/timeout/drift assertions are explicit P0 gates, with an independent runner and mapped acceptance receipt. Completion invalidation after a partial external failure and safe force rerun recovery are documented without promising destructive rollback.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168\",\n          \"excerpt\": \"**SC-002:** Every recovery fixture retains prior generated backup contents and application/shared-source hashes; all unsafe/error fixtures return nonzero without completed claims.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"Bootstrap subprocess backup equality, custom history and source bytes; reject escaping generated paths before outside-target mutation\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L179-L185\",\n          \"excerpt\": \"Execute the focused unit/subprocess fixture suites under an independent runner and mapped acceptance receipt\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L215-L222\",\n          \"excerpt\": \"preserve backup, invalidate current completion and report the exact step.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"before/after source/shared hashes, backup equality, current profile verification and goal inventories.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"079-autonomous-from-code-recovery:SC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Fresh rendered autonomous inventories, unchanged interactive obligations and byte-identical historical goal fixtures are explicitly required in the goal test tasks and acceptance gates. The plan retains every named closure stage and tests the removal of the prior early-return assertion.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168\",\n          \"excerpt\": \"**SC-003:** Fresh autonomous goals retain every closure obligation and omit interview/confirmation; interactive and historical goal comparisons show no altered obligations.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L172-L178\",\n          \"excerpt\": \"historical fixture/goal files byte-identical. Update old early-return assertion to require complete current closure behavior.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L199-L214\",\n          \"excerpt\": \"rendered branch/closure/aliases and unchanged historical+interactive obligations\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"new autonomous inventories keep installation, observed generation, current verification, integrations, hooks and archive. Historical goals are immutable.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    }\n  ],\n  \"ambiguities\": [],\n  \"extra_scope\": [],\n  \"findings\": [\n    {\n      \"category\": \"bounded_external_execution\",\n      \"severity\": \"warning\",\n      \"description\": \"The plan explicitly caps version probes by the remaining total deadline, but does not state how the same deadline interrupts a stalled installer, cc-hub build or hook subprocess. This is an implementation clarification for the inherited autonomous time budget; it does not contradict the covered version-probe requirements.\",\n      \"suggestion\": \"Use the same remaining deadline for all external installer/sync/hook invocations, terminate a timed-out child without emitting completion, and include one stalled-sync or stalled-hook fixture in bounded-execution acceptance coverage.\",\n      \"citations\": [\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/spec.md:L148-L157\",\n          \"excerpt\": \"existing autonomous command time budget remains bounded.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"`InitOptions` contains resolved target, force, dry-run, verify-only and finite total timeout.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L54-L67\",\n          \"excerpt\": \"Reuse official install/sync/hook procedures through explicit noninteractive paths.\"\n        },\n        {\n          \"section_id\": \".specs/features/079-autonomous-from-code-recovery/plan.md:L215-L222\",\n          \"excerpt\": \"Probe timeout uses remaining total budget, preventing a sequence of individually bounded calls from exceeding autonomous execution budget.\"\n        }\n      ]\n    }\n  ],\n  \"confidence\": 5,\n  \"synthesized_batch_ids\": [],\n  \"resolutions\": []\n}"
+  ],
+  "synthesis": null,
+  "synthesis_transport_version": null
+}

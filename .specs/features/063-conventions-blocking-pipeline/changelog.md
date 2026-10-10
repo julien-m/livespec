@@ -56,3 +56,10 @@
 - **Code modified:** `validator/run_receipts.py`, `validator/verify_output.py`, `validator/expectations.py`, `validator/goal_contracts.py`, `validator/coherence/rules/r7_conventions_gates.py`, `validator/conventions_diffguard.py`
 - **AC impacted:** AC-001 through AC-015
 - **Author:** Codex
+
+### 2026-10-09 — Check: conventions final gate before correction (8d60f7ad)
+
+- Type: Spec Update; spec modified: No; code modified: None; author: native Codex checker.
+- Lecture spec/code : 18/25 Verified (72 %), 5 Partial, 2 Drifted ; aucune certification runtime.
+- Findings : 4 HIGH, 1 MEDIUM, 1 LOW. Gate prématuré, conjonction feature/repo et rerun frais à corriger.
+- Lire [le rapport actuel](checks/2026-10-09.md) ; résultats historiques conservés.

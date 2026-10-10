@@ -114,9 +114,8 @@ def test_spec_init_skill_uses_concrete_autonomous_bootstrap_command() -> None:
     body = (ROOT / ".agent-sync/skills/spec-init/SKILL.md").read_text(encoding="utf-8")
 
     assert "scripts/init-from-code-autonomous.sh" in body
-    assert 'bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "$PWD"' in body
-    assert "--timeout-seconds 300" in body
-    assert "run this command before any manual file creation" in body
-    assert "If this command exits 0, do not manually rewrite `.specs/` artifacts" in body
-    assert "return immediately with the command output summary" in body
-    assert "Do not call `Write`, `Edit`, or `MultiEdit` afterward" in body
+    assert '"$TARGET_DIR"' in body
+    assert "--timeout-seconds" in body
+    assert "--verify-only" in body
+    assert "return immediately with the command output summary" not in body
+    assert "archive" in body

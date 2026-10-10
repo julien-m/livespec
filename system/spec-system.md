@@ -114,7 +114,7 @@ Each feature lives in `.specs/features/NNN-feature-name/` where `NNN` is a zero-
 - **Feature Name** — short, descriptive
 - **Branch** — associated git branch
 - **Date** — creation date
-- **Status** — Draft | Review | Approved | Implemented | Deprecated
+- **Status** — Draft | Planned | In Progress | Approved | Implemented | Deprecated | Review
 - **Input** — original request or user problem
 
 **User Scenarios & Testing:**
@@ -567,7 +567,7 @@ Before a plan is considered complete:
 Before implementation is considered complete:
 - [ ] `progress.md` exists with a checkpoint row for **every** step (BLOCKING — enables `--resume`)
 - [ ] `implementation.md` is created and all FR/AC have status ✅
-- [ ] Before any `PHASE_RESULT: OK` for implement/test/fix: receipt from `livespec conventions verify` is PASS at repo scope; no pre-existing exemption is allowed.
+- [ ] Before any `PHASE_RESULT: OK` for implement/test/fix: receipt from `livespec conventions verify` is PASS at repo scope; no pre-existing exemption is allowed. Final tasks keep feature `conventions_receipt_path` and distinct `repo_conventions_receipt_path`; the supervisor reruns the whole repository after final writes. Early tasks retain convention read/apply evidence without premature PASS. Historical receipts 1/2 do not attest source-code hashes.
 - [ ] All tests pass
 - [ ] `changelog.md` has an entry
 - [ ] For visual features: Playwright baselines captured in `baselines/`

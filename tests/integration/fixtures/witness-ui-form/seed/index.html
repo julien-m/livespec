@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><title>Item form witness</title></head>
+<body><form><label>Item name <input data-semantic-id="item-name" required></label>
+<button data-semantic-id="submit-item" type="submit">Create item</button></form>
+<p data-semantic-id="success" hidden></p>
+<script>
+const form = document.querySelector('form');
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const success = document.querySelector('[data-semantic-id="success"]');
+  success.textContent = document.querySelector('input').value;
+  success.hidden = false;
+});
+</script></body></html>

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "livespec",
+    "goal",
+    "prove",
+    "--contract",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/livespec-goals/goal-spec-fix-370fa9ce.contract.json",
+    "--state",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/livespec-goals/goal-spec-fix-370fa9ce.state.json",
+    "--task",
+    "task.013.read_design_screens_index_and_theme_files_theme",
+    "--evidence",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/proofs/013.json"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "exit": 0,
+  "stdout": "{\n  \"task_id\": \"task.013.read_design_screens_index_and_theme_files_theme\",\n  \"status\": \"ACCEPTED\",\n  \"accepted\": true,\n  \"missing_evidence\": [],\n  \"invalid_substitutes\": [],\n  \"required_actions\": [\n    \"Run the described task and capture concrete evidence before proving it.\",\n    \"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\",\n    \"Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md.\"\n  ]\n}\n",
+  "stderr": ""
+}

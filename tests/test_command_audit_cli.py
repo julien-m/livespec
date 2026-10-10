@@ -13,11 +13,41 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from validator.cli import app
 
 runner = CliRunner()
+
+
+@pytest.mark.parametrize(
+    ("signature", "expected"),
+    [
+        ("Traceback", "PASS"),
+        ("Traceback (most recent call last):\n", "PASS"),
+        ("Traceback (most recent call last):\\n", "FAIL"),
+        ("example Traceback", "FAIL"),
+    ],
+)
+def test_traceback_guard_requires_an_actual_error_signature(
+    tmp_path: Path, signature: str, expected: str
+) -> None:
+    commands = tmp_path / "commands"
+    commands.mkdir()
+    (commands / "spec-demo.md").write_text("# Command: /spec-demo\n")
+    template = Path(".agent-sync/skills/spec-status/expectations.md").read_text()
+    (commands / "spec-demo.expectations.md").write_text(
+        template.replace("command: spec-status", "command: spec-demo", 1).replace(
+            'contains: "Traceback"', "contains: " + json.dumps(signature)
+        )
+    )
+    result = runner.invoke(app, ["command-audit", "--repo", str(tmp_path), "--json"])
+    checks = json.loads(result.output)["commands"][0]["checks"]
+    assert (
+        next(check for check in checks if check["name"] == "expectations_file")["status"]
+        == expected
+    )
 
 
 def test_command_audit_reports_all_builtin_commands() -> None:

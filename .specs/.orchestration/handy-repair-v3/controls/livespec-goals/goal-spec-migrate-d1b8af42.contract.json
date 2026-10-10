@@ -1,0 +1,2055 @@
+{
+  "canonical": {
+    "command": "spec-migrate",
+    "conventions": {
+      "available": false,
+      "index_path": null,
+      "selected_domains": []
+    },
+    "definition_of_done": [
+      "All pending migrations applied in order",
+      "`scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified",
+      "`.specs/livespec-version` matches `VERSION` from repo",
+      "Visual test scaffolding ran (or was skipped with warning if unavailable)",
+      "Visual test reconciliation ran all 6 checks on new files",
+      "E2E test generation ran for features with Gherkin and no existing tests",
+      "Migration summary displayed with visual and E2E results appended"
+    ],
+    "evidence_policy_version": "2",
+    "execution_tasks": [
+      "Lock goal contract via `livespec goal render spec-migrate --save`",
+      "Emit `/goal` slash command with contract/state file reference",
+      "Read .specs/.livespec-path; resolve from skill symlink chain if missing",
+      "Verify resolved path contains a VERSION file",
+      "Write .specs/.livespec-path if freshly resolved",
+      "Read .specs/livespec-version (default: 1 if missing)",
+      "Read VERSION from LiveSpec repo",
+      "Skip to Phase 4.5 if project version already matches repo version",
+      "For each pending version: read migrations/N/migrate.md and execute migrate.sh",
+      "Stop and report on non-zero migration script exit",
+      "Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve",
+      "Verify .specs/livespec-version matches VERSION from repo",
+      "Read and validate .specs/surfaces.yaml if present",
+      "Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces",
+      "Run migrate-visual-tests.js --generate (guard on script and Node.js availability)",
+      "Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts",
+      "Stage scaffolded files to establish rollback boundary",
+      "Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files",
+      "Run Check 1: detect and remove duplicate coverage across entire test directory",
+      "Run Check 2: fix syntax errors from merge (unbalanced braces, double });)",
+      "Run Check 3: remove empty dead stubs from Preserved sections",
+      "Run Check 4: warn on orphaned route tests without matching route files",
+      "Run Check 5: verify slug/route/heading coherence and log warnings",
+      "Scan for features with Gherkin but no E2E test file",
+      "Filter non-visual features using Check 0 results or fresh classification",
+      "Read route files, component source, fixtures, and existing tests for context",
+      "Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions",
+      "Verify generated files compile (TypeScript check if available)",
+      "Display migration summary with version range and validation results",
+      "Append visual scaffolding summary (files created, baseline dirs)",
+      "Append reconciliation summary (fixes, warnings per check)",
+      "Append E2E generation summary (files created, features skipped)"
+    ],
+    "expectation_sections": {
+      "filesystem_effects": [
+        "**create:**",
+        "- _(none)_",
+        "**update:**",
+        "- `.specs/spec-system.md`",
+        "**optional:**",
+        "- `.specs/migrations.log`",
+        "**forbidden:**",
+        "- `src/`"
+      ],
+      "post_run_checks": [
+        "- [ ] spec-system.md version matches LiveSpec checkout",
+        "- [ ] No legacy file shape remains"
+      ],
+      "preconditions": [
+        "- `.specs/` directory exists with a previous LiveSpec version."
+      ],
+      "produced_artifacts": [
+        "- _(none)_"
+      ],
+      "purpose": [
+        "Upgrade a LiveSpec project to the latest version by running pending migrations."
+      ]
+    },
+    "expectations": {
+      "command": "spec-migrate",
+      "contract_version": "1.0",
+      "last_reviewed": "2026-09-06",
+      "source_path": ".agent-sync/skills/spec-migrate/expectations.md"
+    },
+    "feature": null,
+    "hooks": {
+      "before": {
+        "command": "livespec hooks resolve --event before --command migrate",
+        "context": "",
+        "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "level0_integrations": [],
+        "non_empty": false
+      }
+    },
+    "internal_command_invocations": [],
+    "mode": "enforced",
+    "normalized_flags": [],
+    "rules": {
+      "blocked_requires_canonical_line": true,
+      "completion_actor": "goal",
+      "missing_evidence_status": "REJECTED_NEEDS_ACTION",
+      "proof_required_for_each_task": true,
+      "worker_may_mark_tasks_complete": false
+    },
+    "runtime_context": {
+      "has_penflow": false,
+      "is_visual_feature": false,
+      "visual_feature_slugs": []
+    },
+    "schema_version": "2.0",
+    "tasks": [
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Lock goal contract via `livespec goal render spec-migrate --save`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.001.lock_goal_contract_via_livespec_goal_render_spec",
+        "invalid_substitutes": [],
+        "ordinal": 1,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Emit `/goal` slash command with contract/state file reference",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.002.emit_goal_slash_command_with_contract_state_file",
+        "invalid_substitutes": [],
+        "ordinal": 2,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Read .specs/.livespec-path; resolve from skill symlink chain if missing",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.003.read_specs_livespec_path_resolve_from_skill_syml",
+        "invalid_substitutes": [],
+        "ordinal": 3,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Verify resolved path contains a VERSION file",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.004.verify_resolved_path_contains_a_version_file",
+        "invalid_substitutes": [],
+        "ordinal": 4,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Write .specs/.livespec-path if freshly resolved",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.005.write_specs_livespec_path_if_freshly_resolved",
+        "invalid_substitutes": [],
+        "ordinal": 5,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Read .specs/livespec-version (default: 1 if missing)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.006.read_specs_livespec_version_default_1_if_missing",
+        "invalid_substitutes": [],
+        "ordinal": 6,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Read VERSION from LiveSpec repo",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.007.read_version_from_livespec_repo",
+        "invalid_substitutes": [],
+        "ordinal": 7,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Skip to Phase 4.5 if project version already matches repo version",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.008.skip_to_phase_4_5_if_project_version_already_mat",
+        "invalid_substitutes": [],
+        "ordinal": 8,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "For each pending version: read migrations/N/migrate.md and execute migrate.sh",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.009.for_each_pending_version_read_migrations_n_migra",
+        "invalid_substitutes": [],
+        "ordinal": 9,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Stop and report on non-zero migration script exit",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.010.stop_and_report_on_non_zero_migration_script_exi",
+        "invalid_substitutes": [],
+        "ordinal": 10,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.011.verify_sync_agent_assets_sh_has_completed_and_al",
+        "invalid_substitutes": [],
+        "ordinal": 11,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Verify .specs/livespec-version matches VERSION from repo",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.012.verify_specs_livespec_version_matches_version_fr",
+        "invalid_substitutes": [],
+        "ordinal": 12,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Read and validate .specs/surfaces.yaml if present",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.013.read_and_validate_specs_surfaces_yaml_if_present",
+        "invalid_substitutes": [],
+        "ordinal": 13,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.014.log_surfaces_with_unsupported_runners_skip_test",
+        "invalid_substitutes": [],
+        "ordinal": 14,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run migrate-visual-tests.js --generate (guard on script and Node.js availability)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.015.run_migrate_visual_tests_js_generate_guard_on_sc",
+        "invalid_substitutes": [
+          "verbal_visual_confirmation_without_artifact"
+        ],
+        "ordinal": 15,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.016.parse_visual_scaffold_result_sentinel_for_files",
+        "invalid_substitutes": [
+          "verbal_visual_confirmation_without_artifact"
+        ],
+        "ordinal": 16,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Stage scaffolded files to establish rollback boundary",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.017.stage_scaffolded_files_to_establish_rollback_bou",
+        "invalid_substitutes": [],
+        "ordinal": 17,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.018.run_check_0_classify_each_new_spec_ts_as_visual",
+        "invalid_substitutes": [
+          "verbal_visual_confirmation_without_artifact"
+        ],
+        "ordinal": 18,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run Check 1: detect and remove duplicate coverage across entire test directory",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.019.run_check_1_detect_and_remove_duplicate_coverage",
+        "invalid_substitutes": [],
+        "ordinal": 19,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run Check 2: fix syntax errors from merge (unbalanced braces, double });)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.020.run_check_2_fix_syntax_errors_from_merge_unbalan",
+        "invalid_substitutes": [],
+        "ordinal": 20,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run Check 3: remove empty dead stubs from Preserved sections",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.021.run_check_3_remove_empty_dead_stubs_from_preserv",
+        "invalid_substitutes": [],
+        "ordinal": 21,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run Check 4: warn on orphaned route tests without matching route files",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.022.run_check_4_warn_on_orphaned_route_tests_without",
+        "invalid_substitutes": [],
+        "ordinal": 22,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run Check 5: verify slug/route/heading coherence and log warnings",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.023.run_check_5_verify_slug_route_heading_coherence",
+        "invalid_substitutes": [],
+        "ordinal": 23,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Scan for features with Gherkin but no E2E test file",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.024.scan_for_features_with_gherkin_but_no_e2e_test_f",
+        "invalid_substitutes": [],
+        "ordinal": 24,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Filter non-visual features using Check 0 results or fresh classification",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.025.filter_non_visual_features_using_check_0_results",
+        "invalid_substitutes": [
+          "verbal_visual_confirmation_without_artifact"
+        ],
+        "ordinal": 25,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Read route files, component source, fixtures, and existing tests for context",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.026.read_route_files_component_source_fixtures_and_e",
+        "invalid_substitutes": [],
+        "ordinal": 26,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.027.generate_complete_e2e_nnn_slug_spec_ts_files_wit",
+        "invalid_substitutes": [],
+        "ordinal": 27,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Verify generated files compile (TypeScript check if available)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.028.verify_generated_files_compile_typescript_check",
+        "invalid_substitutes": [],
+        "ordinal": 28,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Display migration summary with version range and validation results",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.029.display_migration_summary_with_version_range_and",
+        "invalid_substitutes": [],
+        "ordinal": 29,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Append visual scaffolding summary (files created, baseline dirs)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.030.append_visual_scaffolding_summary_files_created",
+        "invalid_substitutes": [
+          "verbal_visual_confirmation_without_artifact"
+        ],
+        "ordinal": 30,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Append reconciliation summary (fixes, warnings per check)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.031.append_reconciliation_summary_fixes_warnings_per",
+        "invalid_substitutes": [],
+        "ordinal": 31,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Append E2E generation summary (files created, features skipped)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.032.append_e2e_generation_summary_files_created_feat",
+        "invalid_substitutes": [],
+        "ordinal": 32,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "All pending migrations applied in order",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.033.all_pending_migrations_applied_in_order",
+        "invalid_substitutes": [],
+        "ordinal": 33,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.034.scripts_sync_agent_assets_sh_completed_and_all_s",
+        "invalid_substitutes": [],
+        "ordinal": 34,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/livespec-version` matches `VERSION` from repo",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.035.specs_livespec_version_matches_version_from_repo",
+        "invalid_substitutes": [],
+        "ordinal": 35,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Visual test scaffolding ran (or was skipped with warning if unavailable)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.036.visual_test_scaffolding_ran_or_was_skipped_with",
+        "invalid_substitutes": [
+          "verbal_visual_confirmation_without_artifact"
+        ],
+        "ordinal": 36,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Visual test reconciliation ran all 6 checks on new files",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.037.visual_test_reconciliation_ran_all_6_checks_on_n",
+        "invalid_substitutes": [
+          "verbal_visual_confirmation_without_artifact"
+        ],
+        "ordinal": 37,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "E2E test generation ran for features with Gherkin and no existing tests",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.038.e2e_test_generation_ran_for_features_with_gherki",
+        "invalid_substitutes": [],
+        "ordinal": 38,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Migration summary displayed with visual and E2E results appended",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.039.migration_summary_displayed_with_visual_and_e2e",
+        "invalid_substitutes": [
+          "verbal_visual_confirmation_without_artifact"
+        ],
+        "ordinal": 39,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "injected",
+        "completion_actor": "goal",
+        "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-migrate",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "archive.run",
+        "invalid_substitutes": [
+          "prose_archive_claim",
+          "exit_code_without_artifact",
+          "tmpdir_contract_state_paths_without_artifact"
+        ],
+        "ordinal": 40,
+        "repair_if_missing": [
+          "run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`",
+          "resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`"
+        ],
+        "required_evidence": [
+          "run_artifact_path"
+        ]
+      }
+    ],
+    "verify_rules": {
+      "may": [],
+      "must": [
+        {
+          "kind": "exit_code",
+          "payload": 0,
+          "verb": "must"
+        },
+        {
+          "kind": "contains",
+          "payload": "migration",
+          "verb": "must"
+        }
+      ],
+      "must_not": [
+        {
+          "kind": "contains",
+          "payload": "Traceback",
+          "verb": "must_not"
+        }
+      ],
+      "when": []
+    }
+  },
+  "canonical_json": "{\"command\":\"spec-migrate\",\"conventions\":{\"available\":false,\"index_path\":null,\"selected_domains\":[]},\"definition_of_done\":[\"All pending migrations applied in order\",\"`scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified\",\"`.specs/livespec-version` matches `VERSION` from repo\",\"Visual test scaffolding ran (or was skipped with warning if unavailable)\",\"Visual test reconciliation ran all 6 checks on new files\",\"E2E test generation ran for features with Gherkin and no existing tests\",\"Migration summary displayed with visual and E2E results appended\"],\"evidence_policy_version\":\"2\",\"execution_tasks\":[\"Lock goal contract via `livespec goal render spec-migrate --save`\",\"Emit `/goal` slash command with contract/state file reference\",\"Read .specs/.livespec-path; resolve from skill symlink chain if missing\",\"Verify resolved path contains a VERSION file\",\"Write .specs/.livespec-path if freshly resolved\",\"Read .specs/livespec-version (default: 1 if missing)\",\"Read VERSION from LiveSpec repo\",\"Skip to Phase 4.5 if project version already matches repo version\",\"For each pending version: read migrations/N/migrate.md and execute migrate.sh\",\"Stop and report on non-zero migration script exit\",\"Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve\",\"Verify .specs/livespec-version matches VERSION from repo\",\"Read and validate .specs/surfaces.yaml if present\",\"Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces\",\"Run migrate-visual-tests.js --generate (guard on script and Node.js availability)\",\"Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts\",\"Stage scaffolded files to establish rollback boundary\",\"Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files\",\"Run Check 1: detect and remove duplicate coverage across entire test directory\",\"Run Check 2: fix syntax errors from merge (unbalanced braces, double });)\",\"Run Check 3: remove empty dead stubs from Preserved sections\",\"Run Check 4: warn on orphaned route tests without matching route files\",\"Run Check 5: verify slug/route/heading coherence and log warnings\",\"Scan for features with Gherkin but no E2E test file\",\"Filter non-visual features using Check 0 results or fresh classification\",\"Read route files, component source, fixtures, and existing tests for context\",\"Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions\",\"Verify generated files compile (TypeScript check if available)\",\"Display migration summary with version range and validation results\",\"Append visual scaffolding summary (files created, baseline dirs)\",\"Append reconciliation summary (fixes, warnings per check)\",\"Append E2E generation summary (files created, features skipped)\"],\"expectation_sections\":{\"filesystem_effects\":[\"**create:**\",\"- _(none)_\",\"**update:**\",\"- `.specs/spec-system.md`\",\"**optional:**\",\"- `.specs/migrations.log`\",\"**forbidden:**\",\"- `src/`\"],\"post_run_checks\":[\"- [ ] spec-system.md version matches LiveSpec checkout\",\"- [ ] No legacy file shape remains\"],\"preconditions\":[\"- `.specs/` directory exists with a previous LiveSpec version.\"],\"produced_artifacts\":[\"- _(none)_\"],\"purpose\":[\"Upgrade a LiveSpec project to the latest version by running pending migrations.\"]},\"expectations\":{\"command\":\"spec-migrate\",\"contract_version\":\"1.0\",\"last_reviewed\":\"2026-09-06\",\"source_path\":\".agent-sync/skills/spec-migrate/expectations.md\"},\"feature\":null,\"hooks\":{\"before\":{\"command\":\"livespec hooks resolve --event before --command migrate\",\"context\":\"\",\"context_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"level0_integrations\":[],\"non_empty\":false}},\"internal_command_invocations\":[],\"mode\":\"enforced\",\"normalized_flags\":[],\"rules\":{\"blocked_requires_canonical_line\":true,\"completion_actor\":\"goal\",\"missing_evidence_status\":\"REJECTED_NEEDS_ACTION\",\"proof_required_for_each_task\":true,\"worker_may_mark_tasks_complete\":false},\"runtime_context\":{\"has_penflow\":false,\"is_visual_feature\":false,\"visual_feature_slugs\":[]},\"schema_version\":\"2.0\",\"tasks\":[{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Lock goal contract via `livespec goal render spec-migrate --save`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.001.lock_goal_contract_via_livespec_goal_render_spec\",\"invalid_substitutes\":[],\"ordinal\":1,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Emit `/goal` slash command with contract/state file reference\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.002.emit_goal_slash_command_with_contract_state_file\",\"invalid_substitutes\":[],\"ordinal\":2,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Read .specs/.livespec-path; resolve from skill symlink chain if missing\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.003.read_specs_livespec_path_resolve_from_skill_syml\",\"invalid_substitutes\":[],\"ordinal\":3,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Verify resolved path contains a VERSION file\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.004.verify_resolved_path_contains_a_version_file\",\"invalid_substitutes\":[],\"ordinal\":4,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Write .specs/.livespec-path if freshly resolved\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.005.write_specs_livespec_path_if_freshly_resolved\",\"invalid_substitutes\":[],\"ordinal\":5,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Read .specs/livespec-version (default: 1 if missing)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.006.read_specs_livespec_version_default_1_if_missing\",\"invalid_substitutes\":[],\"ordinal\":6,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Read VERSION from LiveSpec repo\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.007.read_version_from_livespec_repo\",\"invalid_substitutes\":[],\"ordinal\":7,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Skip to Phase 4.5 if project version already matches repo version\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.008.skip_to_phase_4_5_if_project_version_already_mat\",\"invalid_substitutes\":[],\"ordinal\":8,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"For each pending version: read migrations/N/migrate.md and execute migrate.sh\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.009.for_each_pending_version_read_migrations_n_migra\",\"invalid_substitutes\":[],\"ordinal\":9,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Stop and report on non-zero migration script exit\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.010.stop_and_report_on_non_zero_migration_script_exi\",\"invalid_substitutes\":[],\"ordinal\":10,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.011.verify_sync_agent_assets_sh_has_completed_and_al\",\"invalid_substitutes\":[],\"ordinal\":11,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Verify .specs/livespec-version matches VERSION from repo\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.012.verify_specs_livespec_version_matches_version_fr\",\"invalid_substitutes\":[],\"ordinal\":12,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Read and validate .specs/surfaces.yaml if present\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.013.read_and_validate_specs_surfaces_yaml_if_present\",\"invalid_substitutes\":[],\"ordinal\":13,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.014.log_surfaces_with_unsupported_runners_skip_test\",\"invalid_substitutes\":[],\"ordinal\":14,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run migrate-visual-tests.js --generate (guard on script and Node.js availability)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.015.run_migrate_visual_tests_js_generate_guard_on_sc\",\"invalid_substitutes\":[\"verbal_visual_confirmation_without_artifact\"],\"ordinal\":15,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.016.parse_visual_scaffold_result_sentinel_for_files\",\"invalid_substitutes\":[\"verbal_visual_confirmation_without_artifact\"],\"ordinal\":16,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Stage scaffolded files to establish rollback boundary\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.017.stage_scaffolded_files_to_establish_rollback_bou\",\"invalid_substitutes\":[],\"ordinal\":17,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.018.run_check_0_classify_each_new_spec_ts_as_visual\",\"invalid_substitutes\":[\"verbal_visual_confirmation_without_artifact\"],\"ordinal\":18,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run Check 1: detect and remove duplicate coverage across entire test directory\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.019.run_check_1_detect_and_remove_duplicate_coverage\",\"invalid_substitutes\":[],\"ordinal\":19,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run Check 2: fix syntax errors from merge (unbalanced braces, double });)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.020.run_check_2_fix_syntax_errors_from_merge_unbalan\",\"invalid_substitutes\":[],\"ordinal\":20,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run Check 3: remove empty dead stubs from Preserved sections\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.021.run_check_3_remove_empty_dead_stubs_from_preserv\",\"invalid_substitutes\":[],\"ordinal\":21,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run Check 4: warn on orphaned route tests without matching route files\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.022.run_check_4_warn_on_orphaned_route_tests_without\",\"invalid_substitutes\":[],\"ordinal\":22,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run Check 5: verify slug/route/heading coherence and log warnings\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.023.run_check_5_verify_slug_route_heading_coherence\",\"invalid_substitutes\":[],\"ordinal\":23,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Scan for features with Gherkin but no E2E test file\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.024.scan_for_features_with_gherkin_but_no_e2e_test_f\",\"invalid_substitutes\":[],\"ordinal\":24,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Filter non-visual features using Check 0 results or fresh classification\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.025.filter_non_visual_features_using_check_0_results\",\"invalid_substitutes\":[\"verbal_visual_confirmation_without_artifact\"],\"ordinal\":25,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Read route files, component source, fixtures, and existing tests for context\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.026.read_route_files_component_source_fixtures_and_e\",\"invalid_substitutes\":[],\"ordinal\":26,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.027.generate_complete_e2e_nnn_slug_spec_ts_files_wit\",\"invalid_substitutes\":[],\"ordinal\":27,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Verify generated files compile (TypeScript check if available)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.028.verify_generated_files_compile_typescript_check\",\"invalid_substitutes\":[],\"ordinal\":28,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Display migration summary with version range and validation results\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.029.display_migration_summary_with_version_range_and\",\"invalid_substitutes\":[],\"ordinal\":29,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Append visual scaffolding summary (files created, baseline dirs)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.030.append_visual_scaffolding_summary_files_created\",\"invalid_substitutes\":[\"verbal_visual_confirmation_without_artifact\"],\"ordinal\":30,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Append reconciliation summary (fixes, warnings per check)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.031.append_reconciliation_summary_fixes_warnings_per\",\"invalid_substitutes\":[],\"ordinal\":31,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Append E2E generation summary (files created, features skipped)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.032.append_e2e_generation_summary_files_created_feat\",\"invalid_substitutes\":[],\"ordinal\":32,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"All pending migrations applied in order\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.033.all_pending_migrations_applied_in_order\",\"invalid_substitutes\":[],\"ordinal\":33,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.034.scripts_sync_agent_assets_sh_completed_and_all_s\",\"invalid_substitutes\":[],\"ordinal\":34,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/livespec-version` matches `VERSION` from repo\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.035.specs_livespec_version_matches_version_from_repo\",\"invalid_substitutes\":[],\"ordinal\":35,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Visual test scaffolding ran (or was skipped with warning if unavailable)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.036.visual_test_scaffolding_ran_or_was_skipped_with\",\"invalid_substitutes\":[\"verbal_visual_confirmation_without_artifact\"],\"ordinal\":36,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Visual test reconciliation ran all 6 checks on new files\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.037.visual_test_reconciliation_ran_all_6_checks_on_n\",\"invalid_substitutes\":[\"verbal_visual_confirmation_without_artifact\"],\"ordinal\":37,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"E2E test generation ran for features with Gherkin and no existing tests\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.038.e2e_test_generation_ran_for_features_with_gherki\",\"invalid_substitutes\":[],\"ordinal\":38,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Migration summary displayed with visual and E2E results appended\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.039.migration_summary_displayed_with_visual_and_e2e\",\"invalid_substitutes\":[\"verbal_visual_confirmation_without_artifact\"],\"ordinal\":39,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"injected\",\"completion_actor\":\"goal\",\"description\":\"Archive the run via `livespec goal archive` and prove archive.run with the artifact path\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-migrate\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"archive.run\",\"invalid_substitutes\":[\"prose_archive_claim\",\"exit_code_without_artifact\",\"tmpdir_contract_state_paths_without_artifact\"],\"ordinal\":40,\"repair_if_missing\":[\"run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`\",\"resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`\"],\"required_evidence\":[\"run_artifact_path\"]}],\"verify_rules\":{\"may\":[],\"must\":[{\"kind\":\"exit_code\",\"payload\":0,\"verb\":\"must\"},{\"kind\":\"contains\",\"payload\":\"migration\",\"verb\":\"must\"}],\"must_not\":[{\"kind\":\"contains\",\"payload\":\"Traceback\",\"verb\":\"must_not\"}],\"when\":[]}}",
+  "command": "spec-migrate",
+  "definition_of_done": [
+    "All pending migrations applied in order",
+    "`scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified",
+    "`.specs/livespec-version` matches `VERSION` from repo",
+    "Visual test scaffolding ran (or was skipped with warning if unavailable)",
+    "Visual test reconciliation ran all 6 checks on new files",
+    "E2E test generation ran for features with Gherkin and no existing tests",
+    "Migration summary displayed with visual and E2E results appended"
+  ],
+  "evidence_policy_version": "2",
+  "feature": null,
+  "goal_hash": "d1b8af42a4d370e51090b209bc97ab9a74fd492347f9ec1689878415dc6882d8",
+  "hooks": {
+    "before": {
+      "command": "livespec hooks resolve --event before --command migrate",
+      "context": "",
+      "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "level0_integrations": [],
+      "non_empty": false
+    }
+  },
+  "mode": "enforced",
+  "normalized_flags": [],
+  "rules": {
+    "blocked_requires_canonical_line": true,
+    "completion_actor": "goal",
+    "missing_evidence_status": "REJECTED_NEEDS_ACTION",
+    "proof_required_for_each_task": true,
+    "worker_may_mark_tasks_complete": false
+  },
+  "runtime_context": {
+    "has_penflow": false,
+    "is_visual_feature": false,
+    "visual_feature_slugs": []
+  },
+  "schema_version": "2.0",
+  "tasks": [
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Lock goal contract via `livespec goal render spec-migrate --save`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.001.lock_goal_contract_via_livespec_goal_render_spec",
+      "invalid_substitutes": [],
+      "ordinal": 1,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Emit `/goal` slash command with contract/state file reference",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.002.emit_goal_slash_command_with_contract_state_file",
+      "invalid_substitutes": [],
+      "ordinal": 2,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Read .specs/.livespec-path; resolve from skill symlink chain if missing",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.003.read_specs_livespec_path_resolve_from_skill_syml",
+      "invalid_substitutes": [],
+      "ordinal": 3,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Verify resolved path contains a VERSION file",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.004.verify_resolved_path_contains_a_version_file",
+      "invalid_substitutes": [],
+      "ordinal": 4,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Write .specs/.livespec-path if freshly resolved",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.005.write_specs_livespec_path_if_freshly_resolved",
+      "invalid_substitutes": [],
+      "ordinal": 5,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Read .specs/livespec-version (default: 1 if missing)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.006.read_specs_livespec_version_default_1_if_missing",
+      "invalid_substitutes": [],
+      "ordinal": 6,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Read VERSION from LiveSpec repo",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.007.read_version_from_livespec_repo",
+      "invalid_substitutes": [],
+      "ordinal": 7,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Skip to Phase 4.5 if project version already matches repo version",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.008.skip_to_phase_4_5_if_project_version_already_mat",
+      "invalid_substitutes": [],
+      "ordinal": 8,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "For each pending version: read migrations/N/migrate.md and execute migrate.sh",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.009.for_each_pending_version_read_migrations_n_migra",
+      "invalid_substitutes": [],
+      "ordinal": 9,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Stop and report on non-zero migration script exit",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.010.stop_and_report_on_non_zero_migration_script_exi",
+      "invalid_substitutes": [],
+      "ordinal": 10,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.011.verify_sync_agent_assets_sh_has_completed_and_al",
+      "invalid_substitutes": [],
+      "ordinal": 11,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Verify .specs/livespec-version matches VERSION from repo",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.012.verify_specs_livespec_version_matches_version_fr",
+      "invalid_substitutes": [],
+      "ordinal": 12,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Read and validate .specs/surfaces.yaml if present",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.013.read_and_validate_specs_surfaces_yaml_if_present",
+      "invalid_substitutes": [],
+      "ordinal": 13,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.014.log_surfaces_with_unsupported_runners_skip_test",
+      "invalid_substitutes": [],
+      "ordinal": 14,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run migrate-visual-tests.js --generate (guard on script and Node.js availability)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.015.run_migrate_visual_tests_js_generate_guard_on_sc",
+      "invalid_substitutes": [
+        "verbal_visual_confirmation_without_artifact"
+      ],
+      "ordinal": 15,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.016.parse_visual_scaffold_result_sentinel_for_files",
+      "invalid_substitutes": [
+        "verbal_visual_confirmation_without_artifact"
+      ],
+      "ordinal": 16,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Stage scaffolded files to establish rollback boundary",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.017.stage_scaffolded_files_to_establish_rollback_bou",
+      "invalid_substitutes": [],
+      "ordinal": 17,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.018.run_check_0_classify_each_new_spec_ts_as_visual",
+      "invalid_substitutes": [
+        "verbal_visual_confirmation_without_artifact"
+      ],
+      "ordinal": 18,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run Check 1: detect and remove duplicate coverage across entire test directory",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.019.run_check_1_detect_and_remove_duplicate_coverage",
+      "invalid_substitutes": [],
+      "ordinal": 19,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run Check 2: fix syntax errors from merge (unbalanced braces, double });)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.020.run_check_2_fix_syntax_errors_from_merge_unbalan",
+      "invalid_substitutes": [],
+      "ordinal": 20,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run Check 3: remove empty dead stubs from Preserved sections",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.021.run_check_3_remove_empty_dead_stubs_from_preserv",
+      "invalid_substitutes": [],
+      "ordinal": 21,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run Check 4: warn on orphaned route tests without matching route files",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.022.run_check_4_warn_on_orphaned_route_tests_without",
+      "invalid_substitutes": [],
+      "ordinal": 22,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run Check 5: verify slug/route/heading coherence and log warnings",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.023.run_check_5_verify_slug_route_heading_coherence",
+      "invalid_substitutes": [],
+      "ordinal": 23,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Scan for features with Gherkin but no E2E test file",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.024.scan_for_features_with_gherkin_but_no_e2e_test_f",
+      "invalid_substitutes": [],
+      "ordinal": 24,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Filter non-visual features using Check 0 results or fresh classification",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.025.filter_non_visual_features_using_check_0_results",
+      "invalid_substitutes": [
+        "verbal_visual_confirmation_without_artifact"
+      ],
+      "ordinal": 25,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Read route files, component source, fixtures, and existing tests for context",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.026.read_route_files_component_source_fixtures_and_e",
+      "invalid_substitutes": [],
+      "ordinal": 26,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.027.generate_complete_e2e_nnn_slug_spec_ts_files_wit",
+      "invalid_substitutes": [],
+      "ordinal": 27,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Verify generated files compile (TypeScript check if available)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.028.verify_generated_files_compile_typescript_check",
+      "invalid_substitutes": [],
+      "ordinal": 28,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Display migration summary with version range and validation results",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.029.display_migration_summary_with_version_range_and",
+      "invalid_substitutes": [],
+      "ordinal": 29,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Append visual scaffolding summary (files created, baseline dirs)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.030.append_visual_scaffolding_summary_files_created",
+      "invalid_substitutes": [
+        "verbal_visual_confirmation_without_artifact"
+      ],
+      "ordinal": 30,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Append reconciliation summary (fixes, warnings per check)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.031.append_reconciliation_summary_fixes_warnings_per",
+      "invalid_substitutes": [],
+      "ordinal": 31,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Append E2E generation summary (files created, features skipped)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.032.append_e2e_generation_summary_files_created_feat",
+      "invalid_substitutes": [],
+      "ordinal": 32,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "All pending migrations applied in order",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.033.all_pending_migrations_applied_in_order",
+      "invalid_substitutes": [],
+      "ordinal": 33,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.034.scripts_sync_agent_assets_sh_completed_and_all_s",
+      "invalid_substitutes": [],
+      "ordinal": 34,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/livespec-version` matches `VERSION` from repo",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.035.specs_livespec_version_matches_version_from_repo",
+      "invalid_substitutes": [],
+      "ordinal": 35,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Visual test scaffolding ran (or was skipped with warning if unavailable)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.036.visual_test_scaffolding_ran_or_was_skipped_with",
+      "invalid_substitutes": [
+        "verbal_visual_confirmation_without_artifact"
+      ],
+      "ordinal": 36,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Visual test reconciliation ran all 6 checks on new files",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.037.visual_test_reconciliation_ran_all_6_checks_on_n",
+      "invalid_substitutes": [
+        "verbal_visual_confirmation_without_artifact"
+      ],
+      "ordinal": 37,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "E2E test generation ran for features with Gherkin and no existing tests",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.038.e2e_test_generation_ran_for_features_with_gherki",
+      "invalid_substitutes": [],
+      "ordinal": 38,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Migration summary displayed with visual and E2E results appended",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.039.migration_summary_displayed_with_visual_and_e2e",
+      "invalid_substitutes": [
+        "verbal_visual_confirmation_without_artifact"
+      ],
+      "ordinal": 39,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "injected",
+      "completion_actor": "goal",
+      "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-migrate",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "archive.run",
+      "invalid_substitutes": [
+        "prose_archive_claim",
+        "exit_code_without_artifact",
+        "tmpdir_contract_state_paths_without_artifact"
+      ],
+      "ordinal": 40,
+      "repair_if_missing": [
+        "run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`",
+        "resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`"
+      ],
+      "required_evidence": [
+        "run_artifact_path"
+      ]
+    }
+  ],
+  "worker_may_mark_tasks_complete": false
+}

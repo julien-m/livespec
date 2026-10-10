@@ -1353,7 +1353,7 @@ function printCompletionReport({ generated, skipped, configUpdated, scriptsAdded
 }
 
 // @spec FR-006: Emit structured sentinel from --generate — .specs/features/011-visual-migrate-integration/spec.md#fr-006
-function generateTests(features, dryRun) {
+async function generateTests(features, dryRun) {
   const toGenerate = features.filter(f => f.hasUI && !f.hasTests);
 
   // Analyze existing tests once (reused by both spec-driven and route-scan)
@@ -1390,6 +1390,8 @@ function generateTests(features, dryRun) {
       // @spec FR-006: Always emit sentinel on --generate (even for 0 files) — spec.md#fr-006
       console.log('VISUAL_SCAFFOLD_RESULT: files=0 dirs=0 routes=0');
     }
+    // Flush queued pipe writes before the existing successful process exit.
+    await new Promise(resolve => process.stdout.write('', resolve));
     process.exit(0);
   }
 
@@ -1480,6 +1482,8 @@ function generateTests(features, dryRun) {
     cleanupOldMigration(true);
   }
 
+  // Preserve the report and sentinel when a pipe consumer reads slowly.
+  await new Promise(resolve => process.stdout.write('', resolve));
   process.exit(0);
 }
 
@@ -1560,7 +1564,7 @@ for (const surface of SURFACES) {
 
   if (dryRun || generate) {
     printScanTable(features);
-    generateTests(features, dryRun);
+    await generateTests(features, dryRun);
   }
 }
 

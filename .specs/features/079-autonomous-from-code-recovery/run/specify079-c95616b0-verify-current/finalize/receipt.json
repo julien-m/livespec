@@ -1,0 +1,35 @@
+{
+  "command": "spec-specify",
+  "created_at": "2026-10-09T12:15:49.460539+00:00",
+  "feature_slug": "079-autonomous-from-code-recovery",
+  "files": [
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/changelog.md",
+      "sha256": "74b45988229a195ac36c94eaadc08300b2ce8dc41857a9f9b4d402463add5f20"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "c7e7c68cdc1f1cbb571bbf1a74c86c1975dae528e85d57ef425bbf3bbf3320b0"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "336cae06fc35365afffee23789b1a2f9958957e91269c8c79c348b0a66f783f3"
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/spec.md",
+      "sha256": "579a5ac7f2e9db9ebd37c3beb0c15e2a224ce6f221db92af83bbf300861fb132"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "0cc7f24d8a19e643cc9db3959d0720785c6e4f4ebd917f9a68909a28cc9800d5"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "f0fde8b0f40fb9160d7efd867dd3c5b90ab18ffb706d9112d7b9891340fd0360",
+  "receipt_hash": "e30cb8cd245b71db3bec35037a27abadc69035a0de374d0bf7d45006aa4f7f91",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

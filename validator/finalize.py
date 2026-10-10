@@ -59,6 +59,7 @@ from .finalize_registry import (
     build_spec_status,
     is_target_marked,
     render_marker,
+    spec_status_pending,
     target_path,
 )
 from .locks import (
@@ -239,7 +240,10 @@ def apply_finalization(
         pending: list[RegistryTarget] = []
         for target in targets:
             path = target_path(project_root, target, request.feature_slug)
-            if target == "roadmap":
+            if target == "spec_status":
+                if spec_status_pending(path, request):
+                    pending.append(target)
+            elif target == "roadmap":
                 # Old finalize markers cannot hide an unchecked implemented row.
                 if build_roadmap(path, request.feature_slug) != path.read_text(encoding="utf-8"):
                     pending.append(target)
@@ -253,7 +257,7 @@ def apply_finalization(
             ):
                 # Old markers cannot hide rows detached by the legacy builder.
                 pending.append(target)
-            elif (status_changed and target in ("spec_status", "readme")) or not is_target_marked(
+            elif (status_changed and target == "readme") or not is_target_marked(
                 path, request.command, hash8
             ):
                 pending.append(target)

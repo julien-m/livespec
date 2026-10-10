@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "livespec",
+    "goal",
+    "prove",
+    "--contract",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.contract.json",
+    "--state",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.state.json",
+    "--task",
+    "archive.run",
+    "--evidence",
+    "{\"run_artifact_path\": \"/Users/julienm/projects/livespec/.specs/.runs/spec-check-2026-10-10T03-38-02.389404-14f3dadf-policy2.json\"}"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"task_id\": \"archive.run\",\n  \"status\": \"ACCEPTED\",\n  \"accepted\": true,\n  \"missing_evidence\": [],\n  \"invalid_substitutes\": [],\n  \"required_actions\": [\n    \"run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`\",\n    \"resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`\"\n  ]\n}\n",
+  "stderr": ""
+}

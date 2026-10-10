@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "livespec",
+    "goal",
+    "prove",
+    "--contract",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.contract.json",
+    "--state",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.state.json",
+    "--task",
+    "task.011.detect_surface_drift_validate_surfaces_yaml_vs_f",
+    "--evidence",
+    "{\"output\": \"surfaces.yaml absent; no apps/packages/frontend/web/client package.json surface candidates; framework feature NON_VISUAL, no surface drift found.\", \"artifact\": \"/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json\", \"success_criteria_met\": true, \"convention_domains\": [\"code\"], \"convention_sources\": [\"$AIRESOURCES/code-conventions/general.md\", \"$AIRESOURCES/code-conventions/python.md\", \"$AIRESOURCES/code-conventions/javascript.md\", \"$AIRESOURCES/code-conventions/cli.md\", \"$AIRESOURCES/code-conventions/stack-commands.md\"], \"conventions_applied_to_output\": true}"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"task_id\": \"task.011.detect_surface_drift_validate_surfaces_yaml_vs_f\",\n  \"status\": \"ACCEPTED\",\n  \"accepted\": true,\n  \"missing_evidence\": [],\n  \"invalid_substitutes\": [],\n  \"required_actions\": [\n    \"Run the described task and capture concrete evidence before proving it.\",\n    \"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\",\n    \"Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md.\"\n  ]\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,3774 @@
+hash:14f3dadff08cc69e609f3a2a3360c3da02e7fe2285061660bfa06d8e9ea800be | contract-file:/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.contract.json | state-file:/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.state.json
+{
+  "files": [
+    {
+      "path": ".specs/bootstrap-recap.md",
+      "type": "bootstrap-recap",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/constitution.md",
+      "type": "constitution",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/conventions/debt-report.md",
+      "type": "unknown",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/design/changelog.md",
+      "type": "unknown",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/001-auto-llm-review/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/001-auto-llm-review/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/001-auto-llm-review/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/001-auto-llm-review/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/001-auto-llm-review/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/001-auto-llm-review/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/002-layer-3-cli-surface/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/002-layer-3-cli-surface/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/002-layer-3-cli-surface/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/002-layer-3-cli-surface/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/002-layer-3-cli-surface/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/002-layer-3-cli-surface/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/003-visual-testing-fidelity/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/003-visual-testing-fidelity/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/003-visual-testing-fidelity/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/003-visual-testing-fidelity/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/003-visual-testing-fidelity/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/004-visual-testing-governance/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/004-visual-testing-governance/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/004-visual-testing-governance/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/004-visual-testing-governance/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/004-visual-testing-governance/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005-ui-behavioral-testing/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005-ui-behavioral-testing/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005-ui-behavioral-testing/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005-ui-behavioral-testing/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005-ui-behavioral-testing/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.1-behavioral-tdd-audit/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.1-behavioral-tdd-audit/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.1-behavioral-tdd-audit/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.1-behavioral-tdd-audit/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.1-behavioral-tdd-audit/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.1-behavioral-tdd-audit/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.2-taxonomy-complete-expansion/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.2-taxonomy-complete-expansion/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.2-taxonomy-complete-expansion/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.2-taxonomy-complete-expansion/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.2-taxonomy-complete-expansion/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/005.2-taxonomy-complete-expansion/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/006-taxonomy-testing-infra/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/006-taxonomy-testing-infra/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/006-taxonomy-testing-infra/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/006-taxonomy-testing-infra/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/006-taxonomy-testing-infra/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/007-structured-signal-extraction/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/007-structured-signal-extraction/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/007-structured-signal-extraction/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/007-structured-signal-extraction/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/007-structured-signal-extraction/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/008-feature-seed/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/008-feature-seed/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/008-feature-seed/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/008-feature-seed/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/008-feature-seed/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/008-feature-seed/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/009-visual-state-baselines/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/009-visual-state-baselines/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/009-visual-state-baselines/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/009-visual-state-baselines/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/009-visual-state-baselines/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/009-visual-state-baselines/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/010-visual-testing-complete/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/010-visual-testing-complete/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/010-visual-testing-complete/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/010-visual-testing-complete/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/010-visual-testing-complete/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/010-visual-testing-complete/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/011-visual-migrate-integration/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/011-visual-migrate-integration/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/011-visual-migrate-integration/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/011-visual-migrate-integration/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/011-visual-migrate-integration/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/011-visual-migrate-integration/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/013-state-model-identity-resolution/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/013-state-model-identity-resolution/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/013-state-model-identity-resolution/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/013-state-model-identity-resolution/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/014-supervisor-contracts/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/014-supervisor-contracts/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/014-supervisor-contracts/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/014-supervisor-contracts/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/015-global-write-locks/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/015-global-write-locks/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/015-global-write-locks/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/015-global-write-locks/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/016-cross-language-test-driver-architecture/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/016-cross-language-test-driver-architecture/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/016-cross-language-test-driver-architecture/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/016-cross-language-test-driver-architecture/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/016-cross-language-test-driver-architecture/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/016-cross-language-test-driver-architecture/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/017-driver-python/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/017-driver-python/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/017-driver-python/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/017-driver-python/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/017-driver-python/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/018-driver-typescript-javascript/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/018-driver-typescript-javascript/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/018-driver-typescript-javascript/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/018-driver-typescript-javascript/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/018-driver-typescript-javascript/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/018-driver-typescript-javascript/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/019-driver-swift/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/019-driver-swift/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/019-driver-swift/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/019-driver-swift/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/019-driver-swift/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/020-driver-go/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/020-driver-go/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/020-driver-go/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/020-driver-go/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/020-driver-go/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/021-driver-rust/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/021-driver-rust/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/021-driver-rust/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/021-driver-rust/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/021-driver-rust/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/022-driver-jvm/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/022-driver-jvm/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/022-driver-jvm/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/022-driver-jvm/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/022-driver-jvm/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/023-driver-custom-scaffolding/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/023-driver-custom-scaffolding/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/023-driver-custom-scaffolding/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/023-driver-custom-scaffolding/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/023-driver-custom-scaffolding/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/024-patch-coverage-local/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/024-patch-coverage-local/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/024-patch-coverage-local/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/024-patch-coverage-local/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/024-patch-coverage-local/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/025-mutation-testing-on-demand/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/025-mutation-testing-on-demand/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/025-mutation-testing-on-demand/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/025-mutation-testing-on-demand/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/025-mutation-testing-on-demand/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/026-conventions-propagation-by-stack/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/026-conventions-propagation-by-stack/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/026-conventions-propagation-by-stack/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/026-conventions-propagation-by-stack/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/026-conventions-propagation-by-stack/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/027-ui-runner-architecture/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/027-ui-runner-architecture/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/027-ui-runner-architecture/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/027-ui-runner-architecture/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/027-ui-runner-architecture/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/028-ui-runner-web/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/028-ui-runner-web/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/028-ui-runner-web/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/028-ui-runner-web/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/029-ui-runner-tauri/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/029-ui-runner-tauri/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/029-ui-runner-tauri/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/029-ui-runner-tauri/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/029-ui-runner-tauri/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/030-ui-runner-ios-watchos/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/030-ui-runner-ios-watchos/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/030-ui-runner-ios-watchos/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/030-ui-runner-ios-watchos/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/030-ui-runner-ios-watchos/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/030-ui-runner-ios-watchos/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/031-ui-runner-android/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/031-ui-runner-android/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/031-ui-runner-android/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/031-ui-runner-android/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/031-ui-runner-android/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/031-ui-runner-android/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/032-test-hooks-pre-commit-pre-push/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/032-test-hooks-pre-commit-pre-push/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/032-test-hooks-pre-commit-pre-push/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/032-test-hooks-pre-commit-pre-push/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/032-test-hooks-pre-commit-pre-push/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/033-smart-test-selection/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/033-smart-test-selection/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/033-smart-test-selection/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/033-smart-test-selection/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/033-smart-test-selection/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/033-smart-test-selection/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/034-preflight-autofix/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/034-preflight-autofix/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/035-unified-cli-surface/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/035-unified-cli-surface/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/035-unified-cli-surface/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/036-multi-surface-detection-and-migration/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/036-multi-surface-detection-and-migration/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/036-multi-surface-detection-and-migration/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/036-multi-surface-detection-and-migration/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/037-test-multi-runner-integration/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/037-test-multi-runner-integration/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/037-test-multi-runner-integration/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/037-test-multi-runner-integration/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/037-test-multi-runner-integration/preflight-report.md",
+      "type": "preflight-report",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/037-test-multi-runner-integration/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/037-test-multi-runner-integration/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/038-runner-config-wiring/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/038-runner-config-wiring/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/038-runner-config-wiring/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039-command-expectations-and-verify-output/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039-command-expectations-and-verify-output/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039-command-expectations-and-verify-output/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039-command-expectations-and-verify-output/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039-command-expectations-and-verify-output/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039-command-expectations-and-verify-output/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039.1-goal-archive-run-artifacts/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039.1-goal-archive-run-artifacts/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039.1-goal-archive-run-artifacts/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039.1-goal-archive-run-artifacts/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039.1-goal-archive-run-artifacts/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/039.1-goal-archive-run-artifacts/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/040-expectations-rich-and-verify-preview/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/040-expectations-rich-and-verify-preview/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/040-expectations-rich-and-verify-preview/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/040-expectations-rich-and-verify-preview/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/040-expectations-rich-and-verify-preview/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/040-expectations-rich-and-verify-preview/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/041-spec-init-flow-specs-ingestion/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/041-spec-init-flow-specs-ingestion/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/042-spec-specify-from-brainstorm/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/042-spec-specify-from-brainstorm/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/043-spec-sync-brainstorm/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/043-spec-sync-brainstorm/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/044-behavioral-grammar-v1-shared/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/044-behavioral-grammar-v1-shared/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/044-behavioral-grammar-v1-shared/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/044-behavioral-grammar-v1-shared/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/044-behavioral-grammar-v1-shared/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/044-behavioral-grammar-v1-shared/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/045-native-behavioral-specs/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/045-native-behavioral-specs/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/045-native-behavioral-specs/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/045-native-behavioral-specs/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/045-native-behavioral-specs/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/046-visual-implementation-gate/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/046-visual-implementation-gate/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/046-visual-implementation-gate/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/046-visual-implementation-gate/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/046-visual-implementation-gate/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/047-design-alignment-gate/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/047-design-alignment-gate/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/047-design-alignment-gate/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/047-design-alignment-gate/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/047-design-alignment-gate/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/048-command-validation-hardening/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/048-command-validation-hardening/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/048-command-validation-hardening/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/048-command-validation-hardening/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/048-command-validation-hardening/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/048-command-validation-hardening/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/049-command-naming-normalization/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/049-command-naming-normalization/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/049-command-naming-normalization/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/049-command-naming-normalization/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/049-command-naming-normalization/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/049-command-naming-normalization/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/050-agent-sync-migration/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/050-agent-sync-migration/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/050-agent-sync-migration/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/050-agent-sync-migration/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/050-agent-sync-migration/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/050-agent-sync-migration/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/051-integrate-penflow-primary-ui-contract/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/051-integrate-penflow-primary-ui-contract/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/051-integrate-penflow-primary-ui-contract/legacy-audit.md",
+      "type": "legacy-audit",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/051-integrate-penflow-primary-ui-contract/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/051-integrate-penflow-primary-ui-contract/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/051-integrate-penflow-primary-ui-contract/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/051-integrate-penflow-primary-ui-contract/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/052-deterministic-command-goal-contracts/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/052-deterministic-command-goal-contracts/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/052-deterministic-command-goal-contracts/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/052-deterministic-command-goal-contracts/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/052-deterministic-command-goal-contracts/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/052-deterministic-command-goal-contracts/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/053-goal-tasks-replay-required-conventions-per-step/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/053-goal-tasks-replay-required-conventions-per-step/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/053-goal-tasks-replay-required-conventions-per-step/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/053-goal-tasks-replay-required-conventions-per-step/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/053-goal-tasks-replay-required-conventions-per-step/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/054-migration-planner-penflow-backfill/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/054-migration-planner-penflow-backfill/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/054-migration-planner-penflow-backfill/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/054-migration-planner-penflow-backfill/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/054-migration-planner-penflow-backfill/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/055-spec-doctor-project-health/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/055-spec-doctor-project-health/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/055-spec-doctor-project-health/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/055-spec-doctor-project-health/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/055-spec-doctor-project-health/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/055-spec-doctor-project-health/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/056-executable-user-journeys/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/056-executable-user-journeys/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/056-executable-user-journeys/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/056-executable-user-journeys/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/056-executable-user-journeys/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/056-executable-user-journeys/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/057-cross-feature-user-journeys-v2/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/057-cross-feature-user-journeys-v2/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/057-cross-feature-user-journeys-v2/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/057-cross-feature-user-journeys-v2/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/057-cross-feature-user-journeys-v2/preflight-report.md",
+      "type": "preflight-report",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/057-cross-feature-user-journeys-v2/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/057-cross-feature-user-journeys-v2/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/058-deterministic-finalization/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/058-deterministic-finalization/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/058-deterministic-finalization/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/058-deterministic-finalization/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/058-deterministic-finalization/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/058-deterministic-finalization/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/059-pipeline-verify-phase/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/059-pipeline-verify-phase/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/059-pipeline-verify-phase/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/059-pipeline-verify-phase/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/059-pipeline-verify-phase/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/059-pipeline-verify-phase/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/060-journey-fixture-bootstrap-contract/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/061-conventions-gates-engine/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/061-conventions-gates-engine/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/061-conventions-gates-engine/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/061-conventions-gates-engine/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/061-conventions-gates-engine/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/061-conventions-gates-engine/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/062-conventions-rulebook-semantic/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/062-conventions-rulebook-semantic/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/062-conventions-rulebook-semantic/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/062-conventions-rulebook-semantic/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/062-conventions-rulebook-semantic/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/063-conventions-blocking-pipeline/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/063-conventions-blocking-pipeline/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/063-conventions-blocking-pipeline/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/063-conventions-blocking-pipeline/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/063-conventions-blocking-pipeline/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/064-conventions-bootstrap-remediation/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/064-conventions-bootstrap-remediation/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/064-conventions-bootstrap-remediation/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/064-conventions-bootstrap-remediation/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/064-conventions-bootstrap-remediation/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/065-conventions-migration-docs/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/065-conventions-migration-docs/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/065-conventions-migration-docs/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/065-conventions-migration-docs/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/065-conventions-migration-docs/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/066-handoff-input-compatibility/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/066-handoff-input-compatibility/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/066-handoff-input-compatibility/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/066-handoff-input-compatibility/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/066-handoff-input-compatibility/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/067-visual-preview-proof-publishing/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/067-visual-preview-proof-publishing/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/067-visual-preview-proof-publishing/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/067-visual-preview-proof-publishing/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/067-visual-preview-proof-publishing/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/068-evidence-first-retry-contract/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/068-evidence-first-retry-contract/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/068-evidence-first-retry-contract/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/068-evidence-first-retry-contract/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/068-evidence-first-retry-contract/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/069-clarify-gate/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/069-clarify-gate/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/069-clarify-gate/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/069-clarify-gate/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/069-clarify-gate/preflight-report.md",
+      "type": "preflight-report",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/069-clarify-gate/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/069-clarify-gate/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/070-analyze-gate/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/070-analyze-gate/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/070-analyze-gate/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/070-analyze-gate/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/070-analyze-gate/preflight-report.md",
+      "type": "preflight-report",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/070-analyze-gate/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/070-analyze-gate/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/071-qe-analysis-native-module/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/071-qe-analysis-native-module/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/071-qe-analysis-native-module/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/071-qe-analysis-native-module/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/071-qe-analysis-native-module/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/071-qe-analysis-native-module/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/072-conventions-ast-rule-engine/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/073-conventions-multilang-catalog/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/073-conventions-multilang-catalog/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/073-conventions-multilang-catalog/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/073-conventions-multilang-catalog/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/073-conventions-multilang-catalog/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/074-agent-device-proof-adapter/changelog.md",
+      "type": "changelog",
+      "errors": [
+        {
+          "category": "rule",
+          "message": "No valid changelog entry found (expected '## YYYY-MM-DD \u2014 [tag]:')"
+        }
+      ],
+      "warnings": [],
+      "score": 80
+    },
+    {
+      "path": ".specs/features/074-agent-device-proof-adapter/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/074-agent-device-proof-adapter/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/074-agent-device-proof-adapter/progress.md",
+      "type": "progress",
+      "errors": [
+        {
+          "category": "rule",
+          "message": "Progress requires a table with a 'Step' column"
+        }
+      ],
+      "warnings": [],
+      "score": 80
+    },
+    {
+      "path": ".specs/features/074-agent-device-proof-adapter/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/075-design-direction-carry/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/075-design-direction-carry/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/075-design-direction-carry/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/075-design-direction-carry/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/075-design-direction-carry/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/076-spec-init-goal-bootstrap/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/076-spec-init-goal-bootstrap/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/076-spec-init-goal-bootstrap/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/076-spec-init-goal-bootstrap/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/076-spec-init-goal-bootstrap/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/076-spec-init-goal-bootstrap/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/077-penflow-cumulative-verdict-consumer/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/077-penflow-cumulative-verdict-consumer/implementation.md",
+      "type": "implementation",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/077-penflow-cumulative-verdict-consumer/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/077-penflow-cumulative-verdict-consumer/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/077-penflow-cumulative-verdict-consumer/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/077-penflow-cumulative-verdict-consumer/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/after/.specs/features/001-auto-llm-review/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/after/.specs/features/048-command-validation-hardening/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/after/.specs/features/052-deterministic-command-goal-contracts/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/after/.specs/features/058-deterministic-finalization/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/after/.specs/features/069-clarify-gate/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/after/.specs/features/070-analyze-gate/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/after/.specs/features/078-requirement-evidence-integrity/plan.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/after/.specs/features/078-requirement-evidence-integrity/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/before/.specs/features/001-auto-llm-review/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/before/.specs/features/048-command-validation-hardening/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/before/.specs/features/052-deterministic-command-goal-contracts/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/before/.specs/features/058-deterministic-finalization/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/before/.specs/features/069-clarify-gate/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/before/.specs/features/070-analyze-gate/spec.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/final-refresh-notes.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/reading-notes.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/.reviews/ac016-inputs/review-guide.md",
+      "type": ".reviews",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/implementation.md",
+      "type": "implementation",
+      "errors": [
+        {
+          "category": "frontmatter",
+          "message": "Missing frontmatter"
+        },
+        {
+          "category": "section",
+          "message": "Missing section 'req_mapping' (expected one of: Requirement Mapping, FR Mapping)"
+        },
+        {
+          "category": "section",
+          "message": "Missing section 'ac_mapping' (expected one of: Acceptance Criteria, AC Coverage)"
+        }
+      ],
+      "warnings": [],
+      "score": 40
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/run/history/test-report-80f3090a/2026-09-06-test.md",
+      "type": "run",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/verification-report.md",
+      "type": "verification-report",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/changelog.md",
+      "type": "changelog",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/implementation.md",
+      "type": "implementation",
+      "errors": [
+        {
+          "category": "frontmatter",
+          "message": "Missing frontmatter"
+        }
+      ],
+      "warnings": [],
+      "score": 80
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/pipeline.md",
+      "type": "pipeline",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/plan.md",
+      "type": "plan",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/progress.md",
+      "type": "progress",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/spec.md",
+      "type": "spec",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/preflight.md",
+      "type": "preflight",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/project.md",
+      "type": "project",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/proposals/format-contract-brainstorm-sync.md",
+      "type": "unknown",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "type": "roadmap",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/ship.md",
+      "type": "ship",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    },
+    {
+      "path": ".specs/stacks/_default.md",
+      "type": "stack",
+      "errors": [],
+      "warnings": [],
+      "score": 100
+    }
+  ],
+  "excluded": [
+    "README.md",
+    "design/screens/index.md",
+    "features/001-auto-llm-review/checks/2026-04-13.md",
+    "features/002-layer-3-cli-surface/checks/2026-04-13.md",
+    "features/004-visual-testing-governance/logs/2026-04-14.md",
+    "features/005-ui-behavioral-testing/checks/2026-04-14.md",
+    "features/005-ui-behavioral-testing/checks/crash-test-2026-04-14.md",
+    "features/005-ui-behavioral-testing/checks/crash-test-2026-04-17-extended.md",
+    "features/005-ui-behavioral-testing/checks/crash-test-2026-04-17.md",
+    "features/005-ui-behavioral-testing/checks/procedure.md",
+    "features/006-taxonomy-testing-infra/checks/2026-04-15-test.md",
+    "features/009-visual-state-baselines/checks/2026-04-17-test.md",
+    "features/010-visual-testing-complete/checks/2026-04-17.md",
+    "features/010-visual-testing-complete/checks/2026-04-18.md",
+    "features/011-visual-migrate-integration/checks/2026-04-17-test.md",
+    "features/032-test-hooks-pre-commit-pre-push/checks/2026-05-07-test.md",
+    "features/036-multi-surface-detection-and-migration/checks/2026-05-07-test.md",
+    "features/039-command-expectations-and-verify-output/checks/2026-05-12-test.md",
+    "features/039.1-goal-archive-run-artifacts/checks/2026-06-10-test.md",
+    "features/039.1-goal-archive-run-artifacts/checks/2026-06-11.md",
+    "features/039.1-goal-archive-run-artifacts/logs/2026-06-10.md",
+    "features/044-behavioral-grammar-v1-shared/checks/2026-05-14.md",
+    "features/046-visual-implementation-gate/checks/2026-06-17-visual-gate-coverage.md",
+    "features/051-integrate-penflow-primary-ui-contract/checks/2026-05-26.md",
+    "features/052-deterministic-command-goal-contracts/checks/2026-05-21.md",
+    "features/052-deterministic-command-goal-contracts/checks/2026-05-22.md",
+    "features/052-deterministic-command-goal-contracts/checks/2026-06-25.md",
+    "features/055-spec-doctor-project-health/checks/2026-06-03.md",
+    "features/056-executable-user-journeys/checks/2026-06-03.md",
+    "features/057-cross-feature-user-journeys-v2/checks/2026-06-04.md",
+    "features/057-cross-feature-user-journeys-v2/checks/2026-06-05.md",
+    "features/057-cross-feature-user-journeys-v2/checks/2026-06-08.md",
+    "features/057-cross-feature-user-journeys-v2/checks/2026-06-09.md",
+    "features/058-deterministic-finalization/checks/2026-06-10-test.md",
+    "features/058-deterministic-finalization/checks/2026-10-09.md",
+    "features/058-deterministic-finalization/logs/2026-06-10.md",
+    "features/059-pipeline-verify-phase/checks/2026-06-11-check.md",
+    "features/059-pipeline-verify-phase/checks/2026-06-11-test.md",
+    "features/059-pipeline-verify-phase/logs/2026-06-11.md",
+    "features/060-journey-fixture-bootstrap-contract/checks/2026-06-11-test.md",
+    "features/060-journey-fixture-bootstrap-contract/logs/2026-06-11.md",
+    "features/063-conventions-blocking-pipeline/checks/2026-06-25.md",
+    "features/063-conventions-blocking-pipeline/checks/2026-10-09.md",
+    "features/067-visual-preview-proof-publishing/checks/2026-06-25.md",
+    "features/068-evidence-first-retry-contract/checks/2026-06-26.md",
+    "features/071-qe-analysis-native-module/checks/2026-06-27.md",
+    "features/072-conventions-ast-rule-engine/checks/2026-06-29-test.md",
+    "features/072-conventions-ast-rule-engine/checks/2026-06-29.md",
+    "features/072-conventions-ast-rule-engine/logs/2026-06-29.md",
+    "features/073-conventions-multilang-catalog/checks/2026-06-30.md",
+    "features/073-conventions-multilang-catalog/checks/2026-10-08.md",
+    "features/075-design-direction-carry/checks/2026-07-04-design-direction-transcripts.md",
+    "features/076-spec-init-goal-bootstrap/checks/2026-09-04-test.md",
+    "features/076-spec-init-goal-bootstrap/checks/2026-10-09.md",
+    "features/076-spec-init-goal-bootstrap/checks/final-audit-entry.md",
+    "features/076-spec-init-goal-bootstrap/logs/2026-09-04.md",
+    "features/077-penflow-cumulative-verdict-consumer/checks/2026-09-05-native-consumer/001-checkout-overview-pipeline.md",
+    "features/077-penflow-cumulative-verdict-consumer/checks/2026-09-05-native-consumer/002-payment-outcomes-pipeline.md",
+    "features/077-penflow-cumulative-verdict-consumer/checks/2026-09-05-native-consumer/README.md",
+    "features/077-penflow-cumulative-verdict-consumer/checks/2026-09-05-native-consumer/finalize-entry.md",
+    "features/077-penflow-cumulative-verdict-consumer/checks/2026-09-05-native-consumer/process-simplicity.md",
+    "features/078-requirement-evidence-integrity/checks/2026-09-06-test.md",
+    "features/078-requirement-evidence-integrity/checks/2026-10-09.md",
+    "features/078-requirement-evidence-integrity/logs/2026-09-06.md",
+    "features/079-autonomous-from-code-recovery/logs/2026-10-09.md",
+    "preflight-report.md",
+    "spec-system.md",
+    "stacks/decisions/ADR-001-python-language.md",
+    "stacks/decisions/ADR-002-typer-pydantic-framework.md",
+    "stacks/decisions/ADR-003-ruff-pyright-quality.md",
+    "testing/strategy.md"
+  ],
+  "summary": {
+    "total_files": 458,
+    "total_errors": 6,
+    "total_warnings": 0,
+    "files_with_errors": 4
+  }
+}
+{
+  "task_id": "task.001.read_before_check_hooks_all_3_levels_global_proj",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.002.resolve_flags_and_feature_argument_read_only",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.003.verify_no_active_goal_exists",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.004.render_and_save_goal_contract_via_livespec_goal",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.005.emit_goal_slash_command_with_hash_and_contract_s",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.006.validate_system_files_presence_in_specs_spec_sys",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.007.validate_feature_directory_naming_pattern_from_s",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.008.check_feature_completeness_spec_md_changelog_md",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.009.detect_orphan_files_directly_under_features",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.010.verify_readme_md_features_table_sync_vs_disk",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.011.detect_surface_drift_validate_surfaces_yaml_vs_f",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.012.if_no_argument_list_features_sorted_by_last_modi",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.013.resolve_feature_argument_git_branch_interactive",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.014.evaluate_spec_md_quality_gates_gherkin_mermaid_f",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.015.evaluate_plan_md_quality_gates_if_file_exists_se",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.016.check_implementation_quality_gates_implementatio",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.017.read_spec_requirements_extract_all_ac_fr_sc_from",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.018.read_implementation_map_from_implementation_md_f",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.019.recovery_mode_if_implementation_md_absent_grep_s",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.020.verify_each_fr_ac_against_actual_code_assign_ver",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.021.load_conventions_index_md_when_present_resolve_s",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.022.report_missing_convention_bundle_or_violated_rul",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.023.produce_structured_gap_report_spec_quality_fr_ta",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.024.include_convention_compliance_section_with_domai",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.025.save_gap_report_to_specs_features_nnn_checks_yyy",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.026.add_check_entry_to_feature_changelog_md",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.027.add_summary_entry_to_global_specs_changelog_md",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.028.present_suggested_fixes_for_each_gap_with_action",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.029.prompt_to_update_implementation_md_status_or_aut",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "task.030.read_after_check_hooks_all_3_levels_global_proje",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "dod.031.tree_validation_executed_and_reported_or_skipped",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "dod.032.spec_quality_gates_evaluated_per_feature",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "dod.033.gap_report_produced_and_displayed",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "dod.034.gap_report_saved_to_checks_yyyy_mm_dd_md",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "dod.035.feature_changelog_md_has_a_check_entry",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "dod.036.global_specs_changelog_md_has_a_summary_entry",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "dod.037.if_update_implementation_md_status_values_refres",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}
+{
+  "task_id": "dod.038.convention_compliance_checked_against_convention",
+  "status": "ACCEPTED",
+  "accepted": true,
+  "missing_evidence": [],
+  "invalid_substitutes": [],
+  "required_actions": [
+    "Run the described task and capture concrete evidence before proving it.",
+    "If the task cannot run, emit a canonical BLOCKED line with the exact reason.",
+    "Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md."
+  ]
+}

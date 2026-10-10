@@ -1,0 +1,232 @@
+{
+  "command": "spec-status",
+  "goal_hash": "a4611a3bc5441c1c7650ef459f6bd958baa8002460074c4c52239e221f6c062c",
+  "schema_version": "2.0",
+  "status": "active",
+  "tasks": {
+    "archive.run": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+      "last_rejection": null,
+      "ordinal": 28,
+      "status": "pending"
+    },
+    "dod.021.project_context_was_read_project_md_exists": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Project context was read (project.md exists)",
+      "last_rejection": null,
+      "ordinal": 21,
+      "status": "pending"
+    },
+    "dod.022.roadmap_was_parsed_if_exists_and_not_features": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Roadmap was parsed (if exists and not `--features`)",
+      "last_rejection": null,
+      "ordinal": 22,
+      "status": "pending"
+    },
+    "dod.023.feature_inventory_was_scanned_if_not_roadmap": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Feature inventory was scanned (if not `--roadmap`)",
+      "last_rejection": null,
+      "ordinal": 23,
+      "status": "pending"
+    },
+    "dod.024.summary_header_displays_correct_counts": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Summary header displays correct counts",
+      "last_rejection": null,
+      "ordinal": 24,
+      "status": "pending"
+    },
+    "dod.025.next_action_is_computed_for_each_feature_based_o": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Next action is computed for each feature based on status/plan/impl matrix",
+      "last_rejection": null,
+      "ordinal": 25,
+      "status": "pending"
+    },
+    "dod.026.status_gaps_detected_and_displayed_if_any": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Status gaps detected and displayed (if any)",
+      "last_rejection": null,
+      "ordinal": 26,
+      "status": "pending"
+    },
+    "dod.027.no_files_were_created_or_modified_read_only_comm": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "No files were created or modified (read-only command)",
+      "last_rejection": null,
+      "ordinal": 27,
+      "status": "pending"
+    },
+    "task.001.lock_goal_contract_via_livespec_goal_render_spec": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Lock goal contract via `livespec goal render spec-status --save`",
+      "last_rejection": null,
+      "ordinal": 1,
+      "status": "pending"
+    },
+    "task.002.read_the_emitted_contract_file_and_state_file_be": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read the emitted contract-file and state-file before execution",
+      "last_rejection": null,
+      "ordinal": 2,
+      "status": "pending"
+    },
+    "task.003.prove_each_contract_task_via_livespec_goal_prove": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Prove each contract task via `livespec goal prove`; never mark tasks complete manually",
+      "last_rejection": null,
+      "ordinal": 3,
+      "status": "pending"
+    },
+    "task.004.run_livespec_goal_status_state_state_file_before": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run `livespec goal status --state <state-file>` before DONE and require all tasks complete",
+      "last_rejection": null,
+      "ordinal": 4,
+      "status": "pending"
+    },
+    "task.005.read_specs_project_md_and_extract_project_name": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read `.specs/project.md` and extract project name",
+      "last_rejection": null,
+      "ordinal": 5,
+      "status": "pending"
+    },
+    "task.006.abort_with_init_message_if_specs_does_not_exist": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Abort with init message if `.specs/` does not exist",
+      "last_rejection": null,
+      "ordinal": 6,
+      "status": "pending"
+    },
+    "task.007.read_specs_roadmap_md_and_parse_tier_sections_mv": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred)",
+      "last_rejection": null,
+      "ordinal": 7,
+      "status": "pending"
+    },
+    "task.008.count_checked_unchecked_items_per_tier": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Count checked/unchecked items per tier",
+      "last_rejection": null,
+      "ordinal": 8,
+      "status": "pending"
+    },
+    "task.009.extract_linked_feature_numbers_from_checked_item": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Extract linked feature numbers from checked items",
+      "last_rejection": null,
+      "ordinal": 9,
+      "status": "pending"
+    },
+    "task.010.scan_specs_features_spec_md_for_number_name_stat": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Scan `.specs/features/*/spec.md` for number, name, status, creation date",
+      "last_rejection": null,
+      "ordinal": 10,
+      "status": "pending"
+    },
+    "task.011.check_presence_of_plan_md_and_implementation_md": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Check presence of plan.md and implementation.md per feature",
+      "last_rejection": null,
+      "ordinal": 11,
+      "status": "pending"
+    },
+    "task.012.compute_next_action_per_feature_using_status_pla": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Compute next action per feature using status/plan/impl matrix",
+      "last_rejection": null,
+      "ordinal": 12,
+      "status": "pending"
+    },
+    "task.013.flag_draft_features_with_no_plan_older_than_7_da": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Flag Draft features with no plan older than 7 days",
+      "last_rejection": null,
+      "ordinal": 13,
+      "status": "pending"
+    },
+    "task.014.flag_features_ready_to_implement_plan_exists_no": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Flag features ready to implement (plan exists, no implementation)",
+      "last_rejection": null,
+      "ordinal": 14,
+      "status": "pending"
+    },
+    "task.015.detect_deferred_items_and_missing_plans": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Detect deferred items and missing plans",
+      "last_rejection": null,
+      "ordinal": 15,
+      "status": "pending"
+    },
+    "task.016.render_summary_header_with_correct_roadmap_and_f": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Render summary header with correct roadmap and feature counts",
+      "last_rejection": null,
+      "ordinal": 16,
+      "status": "pending"
+    },
+    "task.017.render_roadmap_section_skipped_if_features": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Render roadmap section (skipped if `--features`)",
+      "last_rejection": null,
+      "ordinal": 17,
+      "status": "pending"
+    },
+    "task.018.render_features_table_skipped_if_roadmap": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Render features table (skipped if `--roadmap`)",
+      "last_rejection": null,
+      "ordinal": 18,
+      "status": "pending"
+    },
+    "task.019.render_status_gaps_section_if_actionable_gaps_de": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Render status gaps section if actionable gaps detected",
+      "last_rejection": null,
+      "ordinal": 19,
+      "status": "pending"
+    },
+    "task.020.emit_json_payload_instead_of_formatted_output_if": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Emit JSON payload instead of formatted output (if `--json`)",
+      "last_rejection": null,
+      "ordinal": 20,
+      "status": "pending"
+    }
+  }
+}

@@ -1,0 +1,1478 @@
+{
+  "canonical": {
+    "command": "spec-status",
+    "conventions": {
+      "available": false,
+      "index_path": null,
+      "selected_domains": []
+    },
+    "definition_of_done": [
+      "Project context was read (project.md exists)",
+      "Roadmap was parsed (if exists and not `--features`)",
+      "Feature inventory was scanned (if not `--roadmap`)",
+      "Summary header displays correct counts",
+      "Next action is computed for each feature based on status/plan/impl matrix",
+      "Status gaps detected and displayed (if any)",
+      "No files were created or modified (read-only command)"
+    ],
+    "evidence_policy_version": "2",
+    "execution_tasks": [
+      "Lock goal contract via `livespec goal render spec-status --save`",
+      "Read the emitted contract-file and state-file before execution",
+      "Prove each contract task via `livespec goal prove`; never mark tasks complete manually",
+      "Run `livespec goal status --state <state-file>` before DONE and require all tasks complete",
+      "Read `.specs/project.md` and extract project name",
+      "Abort with init message if `.specs/` does not exist",
+      "Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred)",
+      "Count checked/unchecked items per tier",
+      "Extract linked feature numbers from checked items",
+      "Scan `.specs/features/*/spec.md` for number, name, status, creation date",
+      "Check presence of plan.md and implementation.md per feature",
+      "Compute next action per feature using status/plan/impl matrix",
+      "Flag Draft features with no plan older than 7 days",
+      "Flag features ready to implement (plan exists, no implementation)",
+      "Detect deferred items and missing plans",
+      "Render summary header with correct roadmap and feature counts",
+      "Render roadmap section (skipped if `--features`)",
+      "Render features table (skipped if `--roadmap`)",
+      "Render status gaps section if actionable gaps detected",
+      "Emit JSON payload instead of formatted output (if `--json`)"
+    ],
+    "expectation_sections": {
+      "filesystem_effects": [
+        "**create:**",
+        "- _(none)_",
+        "**update:**",
+        "- _(none)_",
+        "**optional:**",
+        "- _(none)_",
+        "**forbidden:**",
+        "- `src/`",
+        "- `.specs/`"
+      ],
+      "post_run_checks": [
+        "- [ ] Output mentions roadmap tiers and feature statuses"
+      ],
+      "preconditions": [
+        "- `.specs/project.md` exists."
+      ],
+      "produced_artifacts": [
+        "- _(none)_"
+      ],
+      "purpose": [
+        "Display a factual status overview of the roadmap and features (read-only)."
+      ]
+    },
+    "expectations": {
+      "command": "spec-status",
+      "contract_version": "1.0",
+      "last_reviewed": "2026-09-06",
+      "source_path": ".agent-sync/skills/spec-status/expectations.md"
+    },
+    "feature": null,
+    "hooks": {
+      "before": {
+        "command": "livespec hooks resolve --event before --command status",
+        "context": "",
+        "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "level0_integrations": [],
+        "non_empty": false
+      }
+    },
+    "internal_command_invocations": [],
+    "mode": "enforced",
+    "normalized_flags": [],
+    "rules": {
+      "blocked_requires_canonical_line": true,
+      "completion_actor": "goal",
+      "missing_evidence_status": "REJECTED_NEEDS_ACTION",
+      "proof_required_for_each_task": true,
+      "worker_may_mark_tasks_complete": false
+    },
+    "runtime_context": {
+      "has_penflow": false,
+      "is_visual_feature": false,
+      "visual_feature_slugs": []
+    },
+    "schema_version": "2.0",
+    "tasks": [
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Lock goal contract via `livespec goal render spec-status --save`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.001.lock_goal_contract_via_livespec_goal_render_spec",
+        "invalid_substitutes": [],
+        "ordinal": 1,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Read the emitted contract-file and state-file before execution",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.002.read_the_emitted_contract_file_and_state_file_be",
+        "invalid_substitutes": [],
+        "ordinal": 2,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Prove each contract task via `livespec goal prove`; never mark tasks complete manually",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.003.prove_each_contract_task_via_livespec_goal_prove",
+        "invalid_substitutes": [],
+        "ordinal": 3,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run `livespec goal status --state <state-file>` before DONE and require all tasks complete",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.004.run_livespec_goal_status_state_state_file_before",
+        "invalid_substitutes": [],
+        "ordinal": 4,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Read `.specs/project.md` and extract project name",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.005.read_specs_project_md_and_extract_project_name",
+        "invalid_substitutes": [],
+        "ordinal": 5,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Abort with init message if `.specs/` does not exist",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.006.abort_with_init_message_if_specs_does_not_exist",
+        "invalid_substitutes": [],
+        "ordinal": 6,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.007.read_specs_roadmap_md_and_parse_tier_sections_mv",
+        "invalid_substitutes": [],
+        "ordinal": 7,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Count checked/unchecked items per tier",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.008.count_checked_unchecked_items_per_tier",
+        "invalid_substitutes": [],
+        "ordinal": 8,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Extract linked feature numbers from checked items",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.009.extract_linked_feature_numbers_from_checked_item",
+        "invalid_substitutes": [],
+        "ordinal": 9,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Scan `.specs/features/*/spec.md` for number, name, status, creation date",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.010.scan_specs_features_spec_md_for_number_name_stat",
+        "invalid_substitutes": [],
+        "ordinal": 10,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Check presence of plan.md and implementation.md per feature",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.011.check_presence_of_plan_md_and_implementation_md",
+        "invalid_substitutes": [],
+        "ordinal": 11,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Compute next action per feature using status/plan/impl matrix",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.012.compute_next_action_per_feature_using_status_pla",
+        "invalid_substitutes": [],
+        "ordinal": 12,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Flag Draft features with no plan older than 7 days",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.013.flag_draft_features_with_no_plan_older_than_7_da",
+        "invalid_substitutes": [],
+        "ordinal": 13,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Flag features ready to implement (plan exists, no implementation)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.014.flag_features_ready_to_implement_plan_exists_no",
+        "invalid_substitutes": [],
+        "ordinal": 14,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Detect deferred items and missing plans",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.015.detect_deferred_items_and_missing_plans",
+        "invalid_substitutes": [],
+        "ordinal": 15,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Render summary header with correct roadmap and feature counts",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.016.render_summary_header_with_correct_roadmap_and_f",
+        "invalid_substitutes": [],
+        "ordinal": 16,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Render roadmap section (skipped if `--features`)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.017.render_roadmap_section_skipped_if_features",
+        "invalid_substitutes": [],
+        "ordinal": 17,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Render features table (skipped if `--roadmap`)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.018.render_features_table_skipped_if_roadmap",
+        "invalid_substitutes": [],
+        "ordinal": 18,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Render status gaps section if actionable gaps detected",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.019.render_status_gaps_section_if_actionable_gaps_de",
+        "invalid_substitutes": [],
+        "ordinal": 19,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Emit JSON payload instead of formatted output (if `--json`)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.020.emit_json_payload_instead_of_formatted_output_if",
+        "invalid_substitutes": [],
+        "ordinal": 20,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Project context was read (project.md exists)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.021.project_context_was_read_project_md_exists",
+        "invalid_substitutes": [],
+        "ordinal": 21,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Roadmap was parsed (if exists and not `--features`)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.022.roadmap_was_parsed_if_exists_and_not_features",
+        "invalid_substitutes": [],
+        "ordinal": 22,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Feature inventory was scanned (if not `--roadmap`)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.023.feature_inventory_was_scanned_if_not_roadmap",
+        "invalid_substitutes": [],
+        "ordinal": 23,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Summary header displays correct counts",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.024.summary_header_displays_correct_counts",
+        "invalid_substitutes": [],
+        "ordinal": 24,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Next action is computed for each feature based on status/plan/impl matrix",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.025.next_action_is_computed_for_each_feature_based_o",
+        "invalid_substitutes": [],
+        "ordinal": 25,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "Status gaps detected and displayed (if any)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.026.status_gaps_detected_and_displayed_if_any",
+        "invalid_substitutes": [],
+        "ordinal": 26,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "No files were created or modified (read-only command)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.027.no_files_were_created_or_modified_read_only_comm",
+        "invalid_substitutes": [],
+        "ordinal": 27,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "injected",
+        "completion_actor": "goal",
+        "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-status",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "archive.run",
+        "invalid_substitutes": [
+          "prose_archive_claim",
+          "exit_code_without_artifact",
+          "tmpdir_contract_state_paths_without_artifact"
+        ],
+        "ordinal": 28,
+        "repair_if_missing": [
+          "run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`",
+          "resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`"
+        ],
+        "required_evidence": [
+          "run_artifact_path"
+        ]
+      }
+    ],
+    "verify_rules": {
+      "may": [
+        {
+          "kind": "contains",
+          "payload": "MVP",
+          "verb": "may"
+        }
+      ],
+      "must": [
+        {
+          "kind": "exit_code",
+          "payload": 0,
+          "verb": "must"
+        },
+        {
+          "kind": "contains",
+          "payload": "features",
+          "verb": "must"
+        }
+      ],
+      "must_not": [
+        {
+          "kind": "contains",
+          "payload": "Traceback",
+          "verb": "must_not"
+        }
+      ],
+      "when": [
+        {
+          "flag": "--json",
+          "may": [],
+          "must": [
+            {
+              "kind": "contains",
+              "payload": "\"features\"",
+              "verb": "must"
+            }
+          ],
+          "must_not": []
+        }
+      ]
+    }
+  },
+  "canonical_json": "{\"command\":\"spec-status\",\"conventions\":{\"available\":false,\"index_path\":null,\"selected_domains\":[]},\"definition_of_done\":[\"Project context was read (project.md exists)\",\"Roadmap was parsed (if exists and not `--features`)\",\"Feature inventory was scanned (if not `--roadmap`)\",\"Summary header displays correct counts\",\"Next action is computed for each feature based on status/plan/impl matrix\",\"Status gaps detected and displayed (if any)\",\"No files were created or modified (read-only command)\"],\"evidence_policy_version\":\"2\",\"execution_tasks\":[\"Lock goal contract via `livespec goal render spec-status --save`\",\"Read the emitted contract-file and state-file before execution\",\"Prove each contract task via `livespec goal prove`; never mark tasks complete manually\",\"Run `livespec goal status --state <state-file>` before DONE and require all tasks complete\",\"Read `.specs/project.md` and extract project name\",\"Abort with init message if `.specs/` does not exist\",\"Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred)\",\"Count checked/unchecked items per tier\",\"Extract linked feature numbers from checked items\",\"Scan `.specs/features/*/spec.md` for number, name, status, creation date\",\"Check presence of plan.md and implementation.md per feature\",\"Compute next action per feature using status/plan/impl matrix\",\"Flag Draft features with no plan older than 7 days\",\"Flag features ready to implement (plan exists, no implementation)\",\"Detect deferred items and missing plans\",\"Render summary header with correct roadmap and feature counts\",\"Render roadmap section (skipped if `--features`)\",\"Render features table (skipped if `--roadmap`)\",\"Render status gaps section if actionable gaps detected\",\"Emit JSON payload instead of formatted output (if `--json`)\"],\"expectation_sections\":{\"filesystem_effects\":[\"**create:**\",\"- _(none)_\",\"**update:**\",\"- _(none)_\",\"**optional:**\",\"- _(none)_\",\"**forbidden:**\",\"- `src/`\",\"- `.specs/`\"],\"post_run_checks\":[\"- [ ] Output mentions roadmap tiers and feature statuses\"],\"preconditions\":[\"- `.specs/project.md` exists.\"],\"produced_artifacts\":[\"- _(none)_\"],\"purpose\":[\"Display a factual status overview of the roadmap and features (read-only).\"]},\"expectations\":{\"command\":\"spec-status\",\"contract_version\":\"1.0\",\"last_reviewed\":\"2026-09-06\",\"source_path\":\".agent-sync/skills/spec-status/expectations.md\"},\"feature\":null,\"hooks\":{\"before\":{\"command\":\"livespec hooks resolve --event before --command status\",\"context\":\"\",\"context_sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"level0_integrations\":[],\"non_empty\":false}},\"internal_command_invocations\":[],\"mode\":\"enforced\",\"normalized_flags\":[],\"rules\":{\"blocked_requires_canonical_line\":true,\"completion_actor\":\"goal\",\"missing_evidence_status\":\"REJECTED_NEEDS_ACTION\",\"proof_required_for_each_task\":true,\"worker_may_mark_tasks_complete\":false},\"runtime_context\":{\"has_penflow\":false,\"is_visual_feature\":false,\"visual_feature_slugs\":[]},\"schema_version\":\"2.0\",\"tasks\":[{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Lock goal contract via `livespec goal render spec-status --save`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.001.lock_goal_contract_via_livespec_goal_render_spec\",\"invalid_substitutes\":[],\"ordinal\":1,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Read the emitted contract-file and state-file before execution\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.002.read_the_emitted_contract_file_and_state_file_be\",\"invalid_substitutes\":[],\"ordinal\":2,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Prove each contract task via `livespec goal prove`; never mark tasks complete manually\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.003.prove_each_contract_task_via_livespec_goal_prove\",\"invalid_substitutes\":[],\"ordinal\":3,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run `livespec goal status --state <state-file>` before DONE and require all tasks complete\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.004.run_livespec_goal_status_state_state_file_before\",\"invalid_substitutes\":[],\"ordinal\":4,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Read `.specs/project.md` and extract project name\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.005.read_specs_project_md_and_extract_project_name\",\"invalid_substitutes\":[],\"ordinal\":5,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Abort with init message if `.specs/` does not exist\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.006.abort_with_init_message_if_specs_does_not_exist\",\"invalid_substitutes\":[],\"ordinal\":6,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.007.read_specs_roadmap_md_and_parse_tier_sections_mv\",\"invalid_substitutes\":[],\"ordinal\":7,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Count checked/unchecked items per tier\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.008.count_checked_unchecked_items_per_tier\",\"invalid_substitutes\":[],\"ordinal\":8,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Extract linked feature numbers from checked items\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.009.extract_linked_feature_numbers_from_checked_item\",\"invalid_substitutes\":[],\"ordinal\":9,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Scan `.specs/features/*/spec.md` for number, name, status, creation date\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.010.scan_specs_features_spec_md_for_number_name_stat\",\"invalid_substitutes\":[],\"ordinal\":10,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Check presence of plan.md and implementation.md per feature\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.011.check_presence_of_plan_md_and_implementation_md\",\"invalid_substitutes\":[],\"ordinal\":11,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Compute next action per feature using status/plan/impl matrix\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.012.compute_next_action_per_feature_using_status_pla\",\"invalid_substitutes\":[],\"ordinal\":12,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Flag Draft features with no plan older than 7 days\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.013.flag_draft_features_with_no_plan_older_than_7_da\",\"invalid_substitutes\":[],\"ordinal\":13,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Flag features ready to implement (plan exists, no implementation)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.014.flag_features_ready_to_implement_plan_exists_no\",\"invalid_substitutes\":[],\"ordinal\":14,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Detect deferred items and missing plans\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.015.detect_deferred_items_and_missing_plans\",\"invalid_substitutes\":[],\"ordinal\":15,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Render summary header with correct roadmap and feature counts\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.016.render_summary_header_with_correct_roadmap_and_f\",\"invalid_substitutes\":[],\"ordinal\":16,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Render roadmap section (skipped if `--features`)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.017.render_roadmap_section_skipped_if_features\",\"invalid_substitutes\":[],\"ordinal\":17,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Render features table (skipped if `--roadmap`)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.018.render_features_table_skipped_if_roadmap\",\"invalid_substitutes\":[],\"ordinal\":18,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Render status gaps section if actionable gaps detected\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.019.render_status_gaps_section_if_actionable_gaps_de\",\"invalid_substitutes\":[],\"ordinal\":19,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Emit JSON payload instead of formatted output (if `--json`)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.020.emit_json_payload_instead_of_formatted_output_if\",\"invalid_substitutes\":[],\"ordinal\":20,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Project context was read (project.md exists)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.021.project_context_was_read_project_md_exists\",\"invalid_substitutes\":[],\"ordinal\":21,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Roadmap was parsed (if exists and not `--features`)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.022.roadmap_was_parsed_if_exists_and_not_features\",\"invalid_substitutes\":[],\"ordinal\":22,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Feature inventory was scanned (if not `--roadmap`)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.023.feature_inventory_was_scanned_if_not_roadmap\",\"invalid_substitutes\":[],\"ordinal\":23,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Summary header displays correct counts\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.024.summary_header_displays_correct_counts\",\"invalid_substitutes\":[],\"ordinal\":24,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Next action is computed for each feature based on status/plan/impl matrix\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.025.next_action_is_computed_for_each_feature_based_o\",\"invalid_substitutes\":[],\"ordinal\":25,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"Status gaps detected and displayed (if any)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.026.status_gaps_detected_and_displayed_if_any\",\"invalid_substitutes\":[],\"ordinal\":26,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"No files were created or modified (read-only command)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.027.no_files_were_created_or_modified_read_only_comm\",\"invalid_substitutes\":[],\"ordinal\":27,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"injected\",\"completion_actor\":\"goal\",\"description\":\"Archive the run via `livespec goal archive` and prove archive.run with the artifact path\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-status\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"archive.run\",\"invalid_substitutes\":[\"prose_archive_claim\",\"exit_code_without_artifact\",\"tmpdir_contract_state_paths_without_artifact\"],\"ordinal\":28,\"repair_if_missing\":[\"run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`\",\"resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`\"],\"required_evidence\":[\"run_artifact_path\"]}],\"verify_rules\":{\"may\":[{\"kind\":\"contains\",\"payload\":\"MVP\",\"verb\":\"may\"}],\"must\":[{\"kind\":\"exit_code\",\"payload\":0,\"verb\":\"must\"},{\"kind\":\"contains\",\"payload\":\"features\",\"verb\":\"must\"}],\"must_not\":[{\"kind\":\"contains\",\"payload\":\"Traceback\",\"verb\":\"must_not\"}],\"when\":[{\"flag\":\"--json\",\"may\":[],\"must\":[{\"kind\":\"contains\",\"payload\":\"\\\"features\\\"\",\"verb\":\"must\"}],\"must_not\":[]}]}}",
+  "command": "spec-status",
+  "definition_of_done": [
+    "Project context was read (project.md exists)",
+    "Roadmap was parsed (if exists and not `--features`)",
+    "Feature inventory was scanned (if not `--roadmap`)",
+    "Summary header displays correct counts",
+    "Next action is computed for each feature based on status/plan/impl matrix",
+    "Status gaps detected and displayed (if any)",
+    "No files were created or modified (read-only command)"
+  ],
+  "evidence_policy_version": "2",
+  "feature": null,
+  "goal_hash": "a4611a3bc5441c1c7650ef459f6bd958baa8002460074c4c52239e221f6c062c",
+  "hooks": {
+    "before": {
+      "command": "livespec hooks resolve --event before --command status",
+      "context": "",
+      "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "level0_integrations": [],
+      "non_empty": false
+    }
+  },
+  "mode": "enforced",
+  "normalized_flags": [],
+  "rules": {
+    "blocked_requires_canonical_line": true,
+    "completion_actor": "goal",
+    "missing_evidence_status": "REJECTED_NEEDS_ACTION",
+    "proof_required_for_each_task": true,
+    "worker_may_mark_tasks_complete": false
+  },
+  "runtime_context": {
+    "has_penflow": false,
+    "is_visual_feature": false,
+    "visual_feature_slugs": []
+  },
+  "schema_version": "2.0",
+  "tasks": [
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Lock goal contract via `livespec goal render spec-status --save`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.001.lock_goal_contract_via_livespec_goal_render_spec",
+      "invalid_substitutes": [],
+      "ordinal": 1,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Read the emitted contract-file and state-file before execution",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.002.read_the_emitted_contract_file_and_state_file_be",
+      "invalid_substitutes": [],
+      "ordinal": 2,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Prove each contract task via `livespec goal prove`; never mark tasks complete manually",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.003.prove_each_contract_task_via_livespec_goal_prove",
+      "invalid_substitutes": [],
+      "ordinal": 3,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run `livespec goal status --state <state-file>` before DONE and require all tasks complete",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.004.run_livespec_goal_status_state_state_file_before",
+      "invalid_substitutes": [],
+      "ordinal": 4,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Read `.specs/project.md` and extract project name",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.005.read_specs_project_md_and_extract_project_name",
+      "invalid_substitutes": [],
+      "ordinal": 5,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Abort with init message if `.specs/` does not exist",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.006.abort_with_init_message_if_specs_does_not_exist",
+      "invalid_substitutes": [],
+      "ordinal": 6,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Read `.specs/roadmap.md` and parse tier sections (MVP, Post-MVP, Future, Deferred)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.007.read_specs_roadmap_md_and_parse_tier_sections_mv",
+      "invalid_substitutes": [],
+      "ordinal": 7,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Count checked/unchecked items per tier",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.008.count_checked_unchecked_items_per_tier",
+      "invalid_substitutes": [],
+      "ordinal": 8,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Extract linked feature numbers from checked items",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.009.extract_linked_feature_numbers_from_checked_item",
+      "invalid_substitutes": [],
+      "ordinal": 9,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Scan `.specs/features/*/spec.md` for number, name, status, creation date",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.010.scan_specs_features_spec_md_for_number_name_stat",
+      "invalid_substitutes": [],
+      "ordinal": 10,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Check presence of plan.md and implementation.md per feature",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.011.check_presence_of_plan_md_and_implementation_md",
+      "invalid_substitutes": [],
+      "ordinal": 11,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Compute next action per feature using status/plan/impl matrix",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.012.compute_next_action_per_feature_using_status_pla",
+      "invalid_substitutes": [],
+      "ordinal": 12,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Flag Draft features with no plan older than 7 days",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.013.flag_draft_features_with_no_plan_older_than_7_da",
+      "invalid_substitutes": [],
+      "ordinal": 13,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Flag features ready to implement (plan exists, no implementation)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.014.flag_features_ready_to_implement_plan_exists_no",
+      "invalid_substitutes": [],
+      "ordinal": 14,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Detect deferred items and missing plans",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.015.detect_deferred_items_and_missing_plans",
+      "invalid_substitutes": [],
+      "ordinal": 15,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Render summary header with correct roadmap and feature counts",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.016.render_summary_header_with_correct_roadmap_and_f",
+      "invalid_substitutes": [],
+      "ordinal": 16,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Render roadmap section (skipped if `--features`)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.017.render_roadmap_section_skipped_if_features",
+      "invalid_substitutes": [],
+      "ordinal": 17,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Render features table (skipped if `--roadmap`)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.018.render_features_table_skipped_if_roadmap",
+      "invalid_substitutes": [],
+      "ordinal": 18,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Render status gaps section if actionable gaps detected",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.019.render_status_gaps_section_if_actionable_gaps_de",
+      "invalid_substitutes": [],
+      "ordinal": 19,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Emit JSON payload instead of formatted output (if `--json`)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.020.emit_json_payload_instead_of_formatted_output_if",
+      "invalid_substitutes": [],
+      "ordinal": 20,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Project context was read (project.md exists)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.021.project_context_was_read_project_md_exists",
+      "invalid_substitutes": [],
+      "ordinal": 21,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Roadmap was parsed (if exists and not `--features`)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.022.roadmap_was_parsed_if_exists_and_not_features",
+      "invalid_substitutes": [],
+      "ordinal": 22,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Feature inventory was scanned (if not `--roadmap`)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.023.feature_inventory_was_scanned_if_not_roadmap",
+      "invalid_substitutes": [],
+      "ordinal": 23,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Summary header displays correct counts",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.024.summary_header_displays_correct_counts",
+      "invalid_substitutes": [],
+      "ordinal": 24,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Next action is computed for each feature based on status/plan/impl matrix",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.025.next_action_is_computed_for_each_feature_based_o",
+      "invalid_substitutes": [],
+      "ordinal": 25,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "Status gaps detected and displayed (if any)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.026.status_gaps_detected_and_displayed_if_any",
+      "invalid_substitutes": [],
+      "ordinal": 26,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "No files were created or modified (read-only command)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.027.no_files_were_created_or_modified_read_only_comm",
+      "invalid_substitutes": [],
+      "ordinal": 27,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "injected",
+      "completion_actor": "goal",
+      "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-status",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "archive.run",
+      "invalid_substitutes": [
+        "prose_archive_claim",
+        "exit_code_without_artifact",
+        "tmpdir_contract_state_paths_without_artifact"
+      ],
+      "ordinal": 28,
+      "repair_if_missing": [
+        "run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`",
+        "resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`"
+      ],
+      "required_evidence": [
+        "run_artifact_path"
+      ]
+    }
+  ],
+  "worker_may_mark_tasks_complete": false
+}

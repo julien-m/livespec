@@ -1,0 +1,40 @@
+{
+  "command": "spec-specify",
+  "created_at": "2026-09-06T03:14:55.300010+00:00",
+  "feature_slug": "078-requirement-evidence-integrity",
+  "files": [
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/changelog.md",
+      "sha256": "2fc23106c180b6bb03681c8a972109851d4a35ce6ac0cb4601c7612df2722dd0"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "83628df0ef15a735475f66a44686b93e28b2089b700810d65df2a0821f47c6a7"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "cb2be6d9d383413b51f94b7f6e08b9ee99b37052f54b42c4eed17731522fac8e"
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/spec.md",
+      "sha256": "a018095a52d5db236254fd8c451e3e0cda4a37cab69f25b55d8dec1be990a042"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "ca1e7016077f9bd6bfe01c65f2fe0c6b01b78af173d111df13c4c89b428ef3c3"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "07f09e3b680610e06f53cf044fe966a984e62785347d235fbdcf6a50e6738fe6",
+  "receipt_hash": "7cb44f32e18c2d40ea3efd5059000f02d42e3486fb979ef6b55366b75dbee089",
+  "schema_version": "1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "message": "Feature '078-requirement-evidence-integrity' is not referenced in any roadmap item",
+      "rule_id": "R1.2"
+    }
+  ]
+}

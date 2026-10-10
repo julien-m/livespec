@@ -292,8 +292,9 @@ def write_with_hash_check(target: Path, content: str, encoding: str = "utf-8") -
     """
     expected = _sha256_text(content, encoding=encoding)
     atomic_write(target, content, encoding=encoding)
-    on_disk = target.read_text(encoding=encoding)
-    actual = _sha256_text(on_disk, encoding=encoding)
+    # Verify persisted bytes: text readback normalizes CRLF and can both invent
+    # mismatches and hide an actual newline conversion after the atomic write.
+    actual = hashlib.sha256(target.read_bytes()).hexdigest()
     if actual != expected:
         raise WriteHashMismatchError(
             f"post-write hash mismatch for {target}: "

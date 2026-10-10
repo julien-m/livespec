@@ -1,0 +1,31 @@
+{
+  "command": "spec-test",
+  "created_at": "2026-09-04T13:42:58.982743+00:00",
+  "feature_slug": "076-spec-init-goal-bootstrap",
+  "files": [
+    {
+      "path": ".specs/features/076-spec-init-goal-bootstrap/changelog.md",
+      "sha256": "7422b8d1fffb1ce1d23216bc512bd074fef8964d579d4407c47111c131d9d8a4"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "5d938bef715e3a1d3feff73966bb4336a521f84ec5cd4382049777c07dc08c2e"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "7c479af532f1884835a5dac5214c8fb8be645f70b01227c3ab87c816c654be86"
+    },
+    {
+      "path": ".specs/features/076-spec-init-goal-bootstrap/spec.md",
+      "sha256": "f1c18b468376655d58f781ce3d52ef709b57cd21418c7f0cabe450336ee5fd57"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "10f1656977b08c13b08c8e0507efa4a938c0dfe4448c6c42fdfc341f48be84c3",
+  "receipt_hash": "e816b0b95af1be24432857061b41c7a14adecce807ed1d1f1c71a3773dc13155",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

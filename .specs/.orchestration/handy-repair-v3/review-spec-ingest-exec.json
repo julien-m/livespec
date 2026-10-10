@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "livespec",
+    "validate",
+    ".specs/features/078-requirement-evidence-integrity",
+    "--ingest-review",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/review-spec-native-bundle.json",
+    "--review-kind",
+    "spec",
+    "--model",
+    "gpt-6.1-sol",
+    "--review-max-chars",
+    "200000"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "exit": 0,
+  "raw_source": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/intrinsic-review-spec078/batch-001.raw.json",
+  "raw_sha256": "ff42e9ebcad077cb2e042e8fc0ef55e6377ec1d09f2bf17d8d3faa1bf784fbec",
+  "stdout_path": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/review-spec-ingest-result.json",
+  "stderr": ""
+}

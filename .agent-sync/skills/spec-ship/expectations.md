@@ -1,7 +1,7 @@
 ---
 command: spec-ship
 contract_version: "1.0"
-last_reviewed: 2026-06-13
+last_reviewed: 2026-10-09
 ---
 
 # Expectations — /spec-ship
@@ -96,6 +96,7 @@ verify:
     - exit_code: 0
     - contains: "PHASE_RESULT"
     - receipt_verdict: {"kind": "conventions", "verdict": "PASS", "required_if_exists": true}
+    - receipt_verdict: {"kind": "conventions_repo", "verdict": "PASS", "required_if_exists": true}
   may:
     - contains: "shipped"
   must_not:

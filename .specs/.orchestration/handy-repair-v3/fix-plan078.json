@@ -1,0 +1,51 @@
+{
+  "feature": "078-requirement-evidence-integrity",
+  "flags": [
+    "--auto",
+    "--functional",
+    "--fr=FR-004"
+  ],
+  "packet_version": 5,
+  "packet_sha256": "853651b96cec9b630c0e2266395852bf847afb441a7a04b194ca7c980e5191e5",
+  "status": "planned_pending_current_readiness",
+  "gaps": [
+    {
+      "id": "canonical_review_scope",
+      "cause": "literal short feature path loses existing numbered sources and owner identity",
+      "fix": "resolve one existing confined canonical directory using identity.SLUG_REGEX; preserve numbered prepared context hashes",
+      "files": [
+        "validator/semantic/review_feature_scope.py",
+        "validator/semantic/review_files.py",
+        "tests/test_review_feature_resolution.py",
+        "system/review-protocol.md"
+      ]
+    },
+    {
+      "id": "canonical_goal_compile_scope",
+      "cause": "new short feature goals freeze literal absent acceptance source",
+      "fix": "reuse existing canonical resolver for feature-scoped commands requiring an existing feature, preserving bootstrap/create behavior and current immutable contracts",
+      "files": [
+        "validator/goal_compile.py",
+        "tests/test_review_feature_resolution.py"
+      ]
+    }
+  ],
+  "boundaries": [
+    "no source/test writes until current progression implement READY",
+    "absent/ambiguous/unconfined feature rejects without directory allocation",
+    "source/model/kind/policy identity and complete batch checks remain unchanged",
+    "native projection persistence unavailable, no consumer substitution or .pen filesystem access"
+  ],
+  "test_plan": [
+    "short+numbered context equality and qualified owners/receipt paths",
+    "explicit dotted canonical feature",
+    "absent/ambiguous/symlink/invalid source scope fail closed",
+    "stale source/model/kind/config evidence still fails",
+    "canonical compilation identity stable and bootstrap preserved"
+  ],
+  "acceptance_scope": [
+    "078-requirement-evidence-integrity:AC-002",
+    "078-requirement-evidence-integrity:AC-004"
+  ],
+  "execution_plan": "actual runner capture with independently reviewed complete assertion mapping; focused tests alone do not certify full selected acceptance"
+}

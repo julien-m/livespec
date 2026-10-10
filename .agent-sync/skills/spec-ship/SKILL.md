@@ -41,6 +41,14 @@ La toute première action lors de `/spec-ship` est de poser le goal durable avec
 Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
 Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
 
+## STEP 0.9 — Final Conventions Gate (OBLIGATOIRE avant PHASE_RESULT)
+
+- Les tâches préparatoires conservent la preuve de lecture/application des conventions; elles ne demandent pas un PASS anticipé. Le baseline FAIL reste explicite et ne certifie aucune clôture.
+- Après les dernières écritures, exécuter `livespec conventions verify --json --feature <slug>` pour chaque feature et soumettre `conventions_receipt_path` avec son identité effective. Pour un goal repo, utiliser explicitement `--feature repo`.
+- Le superviseur relance ensuite `livespec conventions verify --json --feature repo` sur tout le dépôt et soumet `repo_conventions_receipt_path`; une preuve de feature ne remplace jamais ce contrôle repo. Les deux preuves finales doivent être PASS, avec `receipt_path` présent. Une même preuve réellement repo peut couvrir les deux clés d'un goal repo.
+- Si un résultat frais est FAIL/BLOCKED ou un chemin manque: `PHASE_RESULT: BLOCKED - conventions_gate_failed`, avec `extra.conventions_verdict`, `extra.conventions_receipt_path` et `extra.repo_conventions_receipt_path`. Un ancien PASS et une dette préexistante ne lèvent jamais le refus.
+- Soumettre les deux chemins à la tâche finale du contrat; inclure `extra.conventions_verdict: PASS` seulement après ces contrôles et toutes les autres gates. Les receipts 1/2 attestent identité/intégrité/verdict, pas un hash du code; leur validité seule ne remplace pas la relance fraîche.
+
 # Command: /spec-ship
 
 > Batch autopilot — selects features from the roadmap and runs `/spec-feature --auto --branch` for each in an independent native sub-agent, with preflight, audit, merge, and roadmap updates.
@@ -448,62 +456,63 @@ When all features are shipped:
 
 ### Phase 0 — Goal Lock
 
-- [always] Verify no active goal exists
-- [always] Resolve flags from arguments
-- [always] Run `livespec goal render spec-ship --save` and save contract/state files
-- [always] Emit `/goal` slash command with hash and contract/state file reference
+- [always] Verify no active goal exists <!-- evidence:documentary -->
+- [always] Resolve flags from arguments <!-- evidence:documentary -->
+- [always] Run `livespec goal render spec-ship --save` and save contract/state files <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with hash and contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 0 — Selection
 
-- [always] Read `.specs/roadmap.md` and count unchecked items per tier
-- [always] Display selection menu or resolve tier/count from flags
-- [always] Collect target feature list in roadmap order
+- [always] Read `.specs/roadmap.md` and count unchecked items per tier <!-- evidence:documentary -->
+- [always] Display selection menu or resolve tier/count from flags <!-- evidence:documentary -->
+- [always] Collect target feature list in roadmap order <!-- evidence:documentary -->
 
 ### Phase 0.1 — Target Branch Selection
 
-- [always] Detect available branches and current branch via git
-- [always] Display branch recommendation and prompt for confirmation
-- [always] Display full batch plan and wait for user confirmation
-- [always] Create `.specs/ship.md` with batch plan and Pending status for all features
+- [always] Detect available branches and current branch via git <!-- evidence:documentary -->
+- [always] Display branch recommendation and prompt for confirmation <!-- evidence:documentary -->
+- [always] Display full batch plan and wait for user confirmation <!-- evidence:documentary -->
+- [always] Create `.specs/ship.md` with batch plan and Pending status for all features <!-- evidence:documentary -->
 
 ### Phase 0.5 — Preflight Full
 
-- [always] Spawn independent native sub-agent for `/spec-preflight` in full mode (not --light)
-- [always] Block on critical failures; proceed with warnings
+- [always] Spawn independent native sub-agent for `/spec-preflight` in full mode (not --light) <!-- evidence:documentary -->
+- [always] Block on critical failures; proceed with warnings <!-- evidence:documentary -->
 
 ### Phase 1..N — Per Feature Loop (repeated for each feature)
 
-- [always] Update `ship.md`: feature status → In Progress, record start time
-- [always] Ensure on target branch with `git checkout <target>`
-- [always] Create feature branch via `livespec git branch feature/NNN-name`
-- [always] Update `ship.md` with branch name
-- [always] Spawn independent native sub-agent to execute `/spec-feature --auto --branch`
-- [always] Wait for spawned sub-agent to complete and return SHIP_RESULT
-- [always] Parse SHIP_RESULT via `validator/contracts.py parse_ship_result()`
-- [always] Validate branch/slug consistency before any git operation
-- [always] Cross-check SHIP_RESULT against the exact child run artifact via livespec verify-output spec-feature --run <run_artifact> --json (command + feature identity, then outcome) before any merge/delete; mark Blocked on non-success, foreign, or missing artifact
-- [always] Check AC coverage from test report (Test Gate)
-- [always] Switch to target branch: `git checkout <target>`
-- [always] Merge feature branch: `livespec git merge feature/NNN-name --no-ff`
-- [always] Delete feature branch: `livespec git delete feature/NNN-name`
-- [always] Update roadmap: mark feature `[x]` with link to spec
-- [always] Update `ship.md`: feature status → Done, record completion time
-- [always] Log progress and proceed to next feature
+- [always] Update `ship.md`: feature status → In Progress, record start time <!-- evidence:documentary -->
+- [always] Ensure on target branch with `git checkout <target>` <!-- evidence:documentary -->
+- [always] Create feature branch via `livespec git branch feature/NNN-name` <!-- evidence:documentary -->
+- [always] Update `ship.md` with branch name <!-- evidence:documentary -->
+- [always] Spawn independent native sub-agent to execute `/spec-feature --auto --branch` <!-- evidence:documentary -->
+- [always] Wait for spawned sub-agent to complete and return SHIP_RESULT <!-- evidence:documentary -->
+- [always] Parse SHIP_RESULT via `validator/contracts.py parse_ship_result()` <!-- evidence:documentary -->
+- [always] Validate branch/slug consistency before any git operation <!-- evidence:documentary -->
+- [always] Cross-check SHIP_RESULT against the exact child run artifact via livespec verify-output spec-feature --run <run_artifact> --json (command + feature identity, then outcome) before any merge/delete; mark Blocked on non-success, foreign, or missing artifact <!-- evidence:documentary -->
+- [always] Check AC coverage from test report (Test Gate) <!-- evidence:documentary -->
+- [always] Switch to target branch: `git checkout <target>` <!-- evidence:documentary -->
+- [always] Merge feature branch: `livespec git merge feature/NNN-name --no-ff` <!-- evidence:documentary -->
+- [always] Delete feature branch: `livespec git delete feature/NNN-name` <!-- evidence:documentary -->
+- [always] Update roadmap: mark feature `[x]` with link to spec <!-- evidence:documentary -->
+- [always] Update `ship.md`: feature status → Done, record completion time <!-- evidence:documentary -->
+- [always] Log progress and proceed to next feature <!-- evidence:documentary -->
 
 ### Phase N+1 — Completion
 
-- [always] Display ship summary with per-feature status and timing
-- [always] Report total features shipped and target branch
+- [always] Display ship summary with per-feature status and timing <!-- evidence:documentary -->
+- [always] Report total features shipped and target branch <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-ship` is complete only if all are true:
 
-- [ ] `.specs/ship.md` exists with final state
-- [ ] All features in scope are `Done` (or `Blocked` with clear error)
-- [ ] Roadmap updated for each shipped feature
-- [ ] All feature branches merged and deleted
-- [ ] Each feature's own hooks resolved (via spawned agents)
+- [ ] `.specs/ship.md` exists with final state <!-- evidence:documentary -->
+- [ ] All features in scope are `Done` (or `Blocked` with clear error) <!-- evidence:documentary -->
+- [ ] Roadmap updated for each shipped feature <!-- evidence:documentary -->
+- [ ] All feature branches merged and deleted <!-- evidence:documentary -->
+- [ ] Each feature's own hooks resolved (via spawned agents) <!-- evidence:documentary -->
+- [ ] Verify final feature and repo conventions PASS after all writes and fresh supervisor rerun <!-- evidence:documentary -->
 
 ---
 

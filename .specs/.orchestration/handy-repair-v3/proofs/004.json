@@ -1,0 +1,15 @@
+{
+  "output": "Official hooks resolve exit=0; stdout=''; frozen context SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "success_criteria_met": true,
+  "convention_domains": [
+    "code"
+  ],
+  "convention_sources": [
+    "$AIRESOURCES/code-conventions/general.md",
+    "$AIRESOURCES/code-conventions/python.md",
+    "$AIRESOURCES/code-conventions/javascript.md",
+    "$AIRESOURCES/code-conventions/cli.md",
+    "$AIRESOURCES/code-conventions/stack-commands.md"
+  ],
+  "conventions_applied_to_output": true
+}

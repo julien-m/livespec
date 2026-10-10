@@ -1,0 +1,31 @@
+{
+  "command": "spec-plan",
+  "created_at": "2026-10-09T14:11:54.725729+00:00",
+  "feature_slug": "079-autonomous-from-code-recovery",
+  "files": [
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/changelog.md",
+      "sha256": "d20d56748f7264b41361c2b55ad0c2ded247dad23d78c2cb03b4a78d3e859c20"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "a0465a15ff6cb26d86fa20bfc9f92121edae71769163ce5fad08831419aa8a00"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "5c2bfd914b2c643b3851ecc639dd143be9b157933646e95736cea72438577345"
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/spec.md",
+      "sha256": "871b7f99fc859f93948225bdac19defd6582901ec58393ae9f82eaa53d8eb4f2"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "bcaf92c9b03e2ed73457a1963e8ca140a2e22790ca3b3532503ec6688c3bcc48",
+  "receipt_hash": "ce8451b4906fc2714e8eec6fe01118f0166d51318ff755102f9cd8ab29075643",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

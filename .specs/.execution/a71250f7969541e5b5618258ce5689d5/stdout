@@ -1,0 +1,10 @@
+........................................................................ [ 55%]
+.........................................................                [100%]
+=============================== warnings summary ===============================
+tests/test_lifecycle_metadata.py: 14 warnings
+tests/test_review_lifecycle_protocol.py: 56 warnings
+  /opt/homebrew/lib/python3.14/site-packages/frontmatter/__init__.py:161: DeprecationWarning: codecs.open() is deprecated. Use open() instead.
+    with codecs.open(fd, "r", encoding) as f:
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+129 passed, 70 warnings in 1.66s

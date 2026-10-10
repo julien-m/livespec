@@ -6,6 +6,7 @@ import pytest
 from typer.testing import CliRunner
 
 from tests.penflow_approval_fixtures import approved_feature
+from tests.review_support import review_existing_project
 from tests.test_penflow_contract_verification import _response, _transport, _workspace
 from tests.test_pipeline import PIPELINE_MD
 from validator.cli import app
@@ -44,6 +45,7 @@ def test_pipeline_lifecycle_preparation_coding_test_and_replay(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     folder = feature(tmp_path)
+    review_existing_project(tmp_path, SLUG)
     pipeline = folder / "pipeline.md"
     pipeline.write_text(PIPELINE_MD)
     monkeypatch.chdir(tmp_path)
@@ -54,11 +56,13 @@ def test_pipeline_lifecycle_preparation_coding_test_and_replay(
     assert runner.invoke(app, [*prefix, "--phase", "test", "--status", "done"]).exit_code == 1
     _workspace(tmp_path)
     approved_feature(tmp_path, SLUG)
+    review_existing_project(tmp_path, SLUG)
     manifest = tmp_path / "runner-build.json"
     manifest.write_text("{}")
     calls = _transport(monkeypatch, _response(tmp_path, "implementation"))
     command = [*prefix, "--phase", "test", "--status", "done", "--build-manifest", str(manifest)]
-    assert runner.invoke(app, command).exit_code == 0
+    completed = runner.invoke(app, command)
+    assert completed.exit_code == 0, completed.output
     assert len(calls) == 1
     (tmp_path / "penflow/run-report.json").write_text("stale replacement")
     assert runner.invoke(app, command).exit_code == 1

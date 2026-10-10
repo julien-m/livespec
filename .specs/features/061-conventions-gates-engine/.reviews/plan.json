@@ -1,0 +1,613 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "c13b6e62be69279074c74655d4463c8aac80e9bd3eef624ae1b0a4f902d130d4",
+  "source_hashes": {
+    ".specs/constitution.md": "ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9",
+    ".specs/features/061-conventions-gates-engine/plan.md": "2aee1eef46334dbbe96c40484c86e99239230ce230d9981ff53f372e935a1231",
+    ".specs/features/061-conventions-gates-engine/spec.md": "4b90e552cb7a69eaa16a8b8ddeadcd9148f8d6ffca4831439999107cda531501",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686"
+  },
+  "reviewer_model": "gpt-6.1-sol",
+  "complete": true,
+  "ready": true,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-001",
+      "disposition": "covered",
+      "rationale": "Schema loading precedes verification, the gates artifact and constitution hash are modeled, and schema/generation tests remain assigned. This covers malformed model input and hash preservation at plan level.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L120-L123",
+          "excerpt": "### AC-001\n\nGates model loads `.specs/conventions-gates.yaml`, rejects malformed thresholds, and\n  preserves `generated_from.constitution_sha256`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L28-L36",
+          "excerpt": "schema load precedes tool execution"
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L108-L134",
+          "excerpt": "string constitution_sha256"
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "1. Add tests first for schema/generation, verify/report/CLI, and receipt."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-002",
+      "disposition": "covered",
+      "rationale": "The added ownership table fixes both consumer threshold pairs and directs an exact-value/source-hash generation regression. Local framework source 300/50 constraints remain separate and preserved.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L124-L127",
+          "excerpt": "### AC-002\n\n`livespec conventions gates init` writes `.specs/conventions-gates.yaml` with file\n  thresholds target 400/limit 500 and function thresholds target 30/limit 60."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Framework source still follows the constitution's 300/50 limits; generated consumer defaults remain 400/500 and 30/60."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "assert exact values and constitution hash in `test_generate_gates_uses_two_level_thresholds_and_source_hash`."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-003",
+      "disposition": "covered",
+      "rationale": "The FAIL and BLOCKED sequence scenarios specify exits 1 and 2; the PASS state and constitutional success exit 0 agree. CLI tests are assigned.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L128-L131",
+          "excerpt": "### AC-003\n\n`livespec conventions verify [--json] [--report]` returns exit codes 0 PASS, 1 FAIL,\n  2 BLOCKED."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L37-L75",
+          "excerpt": "Then  the CLI exits 1"
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L37-L75",
+          "excerpt": "Then  the CLI exits 2"
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L76-L107",
+          "excerpt": "Then  verdict is PASS"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-004",
+      "disposition": "covered",
+      "rationale": "Verification calls linters and checks versions/config before source analysis. The ownership table now names numeric limit synchronization and version/mismatch fixtures.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L132-L135",
+          "excerpt": "### AC-004\n\nVerify executes declared linters, detects linter version mismatch, and checks\n  gates-to-linter limit sync."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L37-L75",
+          "excerpt": "E->>E: check linter versions and config sync"
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Check version and configured SwiftLint limit synchronization in `_version_blockers` and `_sync_limit_blockers`; run mismatch and managed-config tests."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-005",
+      "disposition": "covered",
+      "rationale": "The plan enumerates all required builtin families and assigns warning/error fixtures, preserving their independent execution alongside linters.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L136-L139",
+          "excerpt": "### AC-005\n\nBuiltins detect file/function length, file headers, public doc coverage, token scale,\n  suppression directives, and import rules."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`_collect_violations` runs file/function length, headers, public docs, token scale, suppressions and import checks independently of declared linters; keep real oversized sources blocking."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-006",
+      "disposition": "covered",
+      "rationale": "Python AST, TS/React and Swift heuristics, and visible partial fallback are explicit. Targeted TS repair preserves that heuristic contract, adds lexical-boundary/division tests, and retains genuine function-limit failures.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L140-L142",
+          "excerpt": "### AC-006\n\nAdapter registry covers Python, TypeScript/React, Swift, and a partial fallback."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Keep Python AST analysis, TS/React and Swift deterministic heuristics, and visible `GenericAdapter.coverage=partial` fallback through `registry.adapter_for_path`."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L181-L185",
+          "excerpt": "Assert exact inclusive line counts and that genuine functions longer than the declared gate limit still fail."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-007",
+      "disposition": "covered",
+      "rationale": "Receipt payload/verdict consistency, scoped identity, current hash and rejection of PASS errors/blockers are assigned to verification with existing negative tests.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L143-L146",
+          "excerpt": "### AC-007\n\nReceipt kind `conventions` records `gates_sha256`, verdict, blockers, violations, and\n  rejects PASS with error violations."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`verify_conventions_receipt` verifies payload, gates hash, scoped identity and verdict consistency. Reject PASS containing error/blockers and reject a receipt after its current gates bytes change."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-008",
+      "disposition": "covered",
+      "rationale": "Both report outputs, worst-first order and severity/suppression counts are stated with their owning helpers and actual artifact assertions.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L147-L150",
+          "excerpt": "### AC-008\n\n`--report` writes `.specs/conventions/debt-report.md` and `debt.json` grouped\n  worst-first with warnings, errors, and suppression counts."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`write_debt_report`, `_group_debt`, `_summary` and `_sort_key` write both debt-report.md and regenerable debt.json, ordered worst-first with warning/error/suppression counts; assert actual report artifacts."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-009",
+      "disposition": "covered",
+      "rationale": "The managed SwiftLint synchronization entry identifies its implementation and requires the requested apply/sync flags plus CLI fixture; it adds no automatic unsolicited configuration write.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L151-L153",
+          "excerpt": "### AC-009\n\n`livespec conventions scaffold --apply --sync-limits` syncs managed SwiftLint limits."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`scaffold_linter_configs` / `_scaffold_swiftlint` apply managed SwiftLint limits only via requested `--apply --sync-limits`; execute the existing CLI sync fixture."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-010",
+      "disposition": "covered",
+      "rationale": "The real aggregate pytest/JUnit outcome must report zero skips before the obligation is met; the plan does not treat named tests as execution proof.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L154-L156",
+          "excerpt": "### AC-010\n\nPytest coverage for 061 runs with zero skipped tests."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Execute the prescribed focused pytest suite; inspect the real aggregate runner/JUnit outcome and require zero skips before declaring this obligation met."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-011",
+      "disposition": "covered",
+      "rationale": "Ruff flat diagnostic parsing maps filename/location/message into ERROR and gate failure, with an explicit extraction regression.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L157-L159",
+          "excerpt": "### AC-011\n\nRuff flat JSON diagnostics are parsed as linter violations and make the gate fail."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`parse_linter_json` / `_ruff_violation` recognize Ruff flat filename/location/message records, map to ERROR, and fail conventions. Execute `test_verify_extracts_ruff_flat_json_violations`."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-012",
+      "disposition": "covered",
+      "rationale": "The receipt entry requires comparison with current gates bytes and rejection after a gates mutation, backed by negative tests.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L160-L163",
+          "excerpt": "### AC-012\n\nConventions receipts are rejected when their `gates_sha256` differs from the current\n  `.specs/conventions-gates.yaml`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Reject PASS containing error/blockers and reject a receipt after its current gates bytes change."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-013",
+      "disposition": "covered",
+      "rationale": "Strict schema-v1 model rejection of delegation/wiring and independent builtin execution are both specified, each with regression coverage.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L164-L167",
+          "excerpt": "### AC-013\n\nSchema v1 rejects `delegate_to` and command `wiring`; declared linters never disable\n  builtin checks."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`GatesBaseModel` forbids extra fields; `ConventionsGates` and `GateCommand` reject schema-v1 delegation/wiring fields. Execute both existing strict-schema tests; never disable builtins through linter declaration."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-014",
+      "disposition": "covered",
+      "rationale": "Current constitution hashing blocks stale metadata, while debt JSON stays ignored and regenerable; the stale fixture is assigned.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L168-L171",
+          "excerpt": "### AC-014\n\nVerification blocks when `generated_from.constitution_sha256` is stale, and\n  `.specs/conventions/debt.json` remains a regenerable ignored artifact."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`_staleness_blockers` compares current constitution SHA256 to generated metadata; stale input blocks. Keep debt.json ignored/regenerable and run the stale constitution fixture."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-015",
+      "disposition": "covered",
+      "rationale": "The new text explicitly limits conventions receipts to audit traceability, assigns mandatory fresh independent reruns to existing 063, and retains the stale-worker/fresh-failure boundary test without changing 063.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L172-L176",
+          "excerpt": "### AC-015\n\nLe receipt conventions est un artefact d'audit uniquement (preuve de traçabilite).\n  L'exigence anti-forgerie DURE est la re-execution par le superviseur (feature 063, must:).\n  Un receipt PASS seul ne constitue pas une preuve de conformite suffisante."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Conventions receipts provide audit traceability only. Feature 063 owns mandatory fresh supervisor re-execution; `supervisor_conventions_gate` ignores stale worker PASS when the fresh result fails."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "receipt alone is insufficient."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-016",
+      "disposition": "covered",
+      "rationale": "Independent builtin length checks stay active alongside declared linters, with coexistence fixtures and genuine oversized source blocking preserved.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L177-L180",
+          "excerpt": "### AC-016\n\nBuiltin file/function thresholds stay active even when a linter such as SwiftLint is\n  declared in `commands.lint`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`_collect_violations` runs file/function length, headers, public docs, token scale, suppressions and import checks independently of declared linters; keep real oversized sources blocking."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L37-L75",
+          "excerpt": "E->>E: merge builtin + linter violations"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:AC-017",
+      "disposition": "covered",
+      "rationale": "Source read PermissionError/OSError becomes a blocking, auditable file_read_error without traceback; its unreadable-file fixture is assigned alongside operational encoding/timeout tests.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L181-L185",
+          "excerpt": "### AC-017\n\nLes erreurs de lecture de fichier source produisent une violation `file_read_error`\n  bloquante au lieu d'un traceback."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Source PermissionError/OSError becomes an auditable blocking `file_read_error` in `_collect_violations` / `_result_from`, without traceback; run the unreadable-source fixture."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:FR-001",
+      "disposition": "covered",
+      "rationale": "The gates schema/generator module is assigned, and the verify sequence loads it before engine execution; tests exercise its source hash and threshold schema.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L186-L198",
+          "excerpt": "- **FR-001:** Provide `validator/conventions_gates.py` with Pydantic `ConventionsGates`, loader,\n  path helper, and generator."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "2. Implement `validator/conventions_gates.py`."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L37-L75",
+          "excerpt": "C->>G: load_conventions_gates()"
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L12-L16",
+          "excerpt": "gates schema/generator"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:FR-002",
+      "disposition": "covered",
+      "rationale": "The deterministic engine module and GateResult return path remain explicit, with PASS/FAIL/BLOCKED state scenarios and operational blockers.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L186-L198",
+          "excerpt": "- **FR-002:** Provide `validator/conventions_gate.py` deterministic engine and `GateResult`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "4. Implement `validator/conventions_gate.py` and `validator/conventions_report.py`."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L37-L75",
+          "excerpt": "E-->>C: GateResult"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:FR-003",
+      "disposition": "covered",
+      "rationale": "The adapter implementation directory and registry ownership cover all four language/fallback categories. The TS lexical fix is bounded to existing heuristic analysis and adds no parser dependency.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L186-L198",
+          "excerpt": "- **FR-003:** Provide `validator/conventions_lang/` adapter registry for Python, TS/React, Swift,\n  and fallback."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "3. Implement `validator/conventions_lang/` adapters."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Keep Python AST analysis, TS/React and Swift deterministic heuristics, and visible `GenericAdapter.coverage=partial` fallback through `registry.adapter_for_path`."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L181-L185",
+          "excerpt": "Keep the adapter explicitly heuristic, with no new parser dependency or threshold/exclusion changes."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:FR-004",
+      "disposition": "covered",
+      "rationale": "Both receipt and report modules are assigned, with their validation/output ownership, negative tests and ordering requirements now documented.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L186-L198",
+          "excerpt": "- **FR-004:** Provide conventions receipt and debt report modules."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "5. Implement `validator/conventions_receipt.py`."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "4. Implement `validator/conventions_gate.py` and `validator/conventions_report.py`."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "assert actual report artifacts."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:FR-005",
+      "disposition": "covered",
+      "rationale": "The three existing command surfaces are declared and Typer wiring is assigned. The scaffold entry now also states requested synchronization semantics.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L186-L198",
+          "excerpt": "- **FR-005:** Register `conventions verify`, `conventions gates init`, and `conventions scaffold`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L28-L36",
+          "excerpt": "one nested `gates init`, one `verify`, one `scaffold`."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "6. Wire Typer commands in `validator/cli_commands/utility_cmd.py`."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:FR-006",
+      "disposition": "covered",
+      "rationale": "Schema/generation, verify/report/CLI and receipt test ownership remain, and the new table/repair section add explicit adapter fixtures and targeted TS regressions, followed by the existing conventions suite.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L186-L198",
+          "excerpt": "- **FR-006:** Add pytest coverage for schema, verify, CLI, adapters, report, and receipt."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "1. Add tests first for schema/generation, verify/report/CLI, and receipt."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Add dedicated TS lexical-boundary regressions described below, alongside existing adapter fixtures."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L181-L185",
+          "excerpt": "Run targeted regressions plus the existing conventions regression suite, Ruff format/check and strict type checks."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:FR-007",
+      "disposition": "covered",
+      "rationale": "All later guarantees have concrete owner/test entries: Ruff JSON parsing, current receipt hashes, strict delegation rejection and operational read/encoding/timeout blockers. This reviews those proposed checks, not their execution.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L186-L198",
+          "excerpt": "- **FR-007:** Parse Ruff flat JSON, validate current gates hashes in receipts, reject delegation\n  fields from schema v1, and block operational verifier crashes."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`parse_linter_json` / `_ruff_violation` recognize Ruff flat filename/location/message records, map to ERROR, and fail conventions."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "reject a receipt after its current gates bytes change."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "`ConventionsGates` and `GateCommand` reject schema-v1 delegation/wiring fields."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "Retain invalid-encoding and linter-timeout BLOCKED tests."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:SC-001",
+      "disposition": "covered",
+      "rationale": "The exact focused pytest glob remains in Testing Strategy and the ownership table now requires a real runner/JUnit aggregate with zero skips before acceptance.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L219-L225",
+          "excerpt": "- **SC-001:** `python3 -m pytest tests/test_conventions_*.py -q` passes with 0 skipped tests."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L146-L154",
+          "excerpt": "- `python3 -m pytest tests/test_conventions_*.py -q`"
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L161-L180",
+          "excerpt": "inspect the real aggregate runner/JUnit outcome and require zero skips before declaring this obligation met."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:SC-002",
+      "disposition": "covered",
+      "rationale": "Ruff check/format remain explicit and the correction section requires both for touched code alongside strict type checks.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L219-L225",
+          "excerpt": "- **SC-002:** `uvx ruff check` and `uvx ruff format --check` pass for all touched 061 files."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L146-L154",
+          "excerpt": "- `uvx ruff check ...`\n- `uvx ruff format --check ...`"
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L181-L185",
+          "excerpt": "Run targeted regressions plus the existing conventions regression suite, Ruff format/check and strict type checks."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "061-conventions-gates-engine:SC-003",
+      "disposition": "covered",
+      "rationale": "The generation step and gates init command surface explicitly produce the required gates YAML.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L219-L225",
+          "excerpt": "- **SC-003:** `livespec conventions gates init` produces `.specs/conventions-gates.yaml`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L135-L145",
+          "excerpt": "7. Generate `.specs/conventions-gates.yaml`."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/plan.md:L28-L36",
+          "excerpt": "one nested `gates init`"
+        }
+      ],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [],
+  "confidence": 4,
+  "raw_results": [
+    "{\"batch_id\": \"batch-001\", \"reviewed_section_ids\": [\".specs/constitution.md:L1-L8\", \".specs/constitution.md:L9-L18\", \".specs/constitution.md:L19-L20\", \".specs/constitution.md:L21-L26\", \".specs/constitution.md:L27-L32\", \".specs/constitution.md:L33-L37\", \".specs/constitution.md:L38-L43\", \".specs/constitution.md:L44-L49\", \".specs/constitution.md:L50-L56\", \".specs/constitution.md:L57-L58\", \".specs/constitution.md:L59-L65\", \".specs/constitution.md:L66-L71\", \".specs/constitution.md:L72-L75\", \".specs/constitution.md:L76-L81\", \".specs/constitution.md:L82-L83\", \".specs/constitution.md:L84-L90\", \".specs/constitution.md:L91-L96\", \".specs/constitution.md:L97-L102\", \".specs/constitution.md:L103-L109\", \".specs/constitution.md:L110-L111\", \".specs/constitution.md:L112-L118\", \".specs/constitution.md:L119-L123\", \".specs/constitution.md:L124-L131\", \".specs/constitution.md:L132-L146\", \".specs/features/061-conventions-gates-engine/plan.md:L1-L9\", \".specs/features/061-conventions-gates-engine/plan.md:L10-L11\", \".specs/features/061-conventions-gates-engine/plan.md:L12-L16\", \".specs/features/061-conventions-gates-engine/plan.md:L17-L27\", \".specs/features/061-conventions-gates-engine/plan.md:L28-L36\", \".specs/features/061-conventions-gates-engine/plan.md:L37-L75\", \".specs/features/061-conventions-gates-engine/plan.md:L76-L107\", \".specs/features/061-conventions-gates-engine/plan.md:L108-L134\", \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \".specs/features/061-conventions-gates-engine/plan.md:L146-L154\", \".specs/features/061-conventions-gates-engine/plan.md:L155-L160\", \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \".specs/features/061-conventions-gates-engine/plan.md:L181-L185\", \".specs/features/061-conventions-gates-engine/spec.md:L1-L10\", \".specs/features/061-conventions-gates-engine/spec.md:L11-L12\", \".specs/features/061-conventions-gates-engine/spec.md:L13-L22\", \".specs/features/061-conventions-gates-engine/spec.md:L23-L24\", \".specs/features/061-conventions-gates-engine/spec.md:L25-L55\", \".specs/features/061-conventions-gates-engine/spec.md:L56-L88\", \".specs/features/061-conventions-gates-engine/spec.md:L89-L117\", \".specs/features/061-conventions-gates-engine/spec.md:L118-L119\", \".specs/features/061-conventions-gates-engine/spec.md:L120-L123\", \".specs/features/061-conventions-gates-engine/spec.md:L124-L127\", \".specs/features/061-conventions-gates-engine/spec.md:L128-L131\", \".specs/features/061-conventions-gates-engine/spec.md:L132-L135\", \".specs/features/061-conventions-gates-engine/spec.md:L136-L139\", \".specs/features/061-conventions-gates-engine/spec.md:L140-L142\", \".specs/features/061-conventions-gates-engine/spec.md:L143-L146\", \".specs/features/061-conventions-gates-engine/spec.md:L147-L150\", \".specs/features/061-conventions-gates-engine/spec.md:L151-L153\", \".specs/features/061-conventions-gates-engine/spec.md:L154-L156\", \".specs/features/061-conventions-gates-engine/spec.md:L157-L159\", \".specs/features/061-conventions-gates-engine/spec.md:L160-L163\", \".specs/features/061-conventions-gates-engine/spec.md:L164-L167\", \".specs/features/061-conventions-gates-engine/spec.md:L168-L171\", \".specs/features/061-conventions-gates-engine/spec.md:L172-L176\", \".specs/features/061-conventions-gates-engine/spec.md:L177-L180\", \".specs/features/061-conventions-gates-engine/spec.md:L181-L185\", \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\", \".specs/features/061-conventions-gates-engine/spec.md:L199-L206\", \".specs/features/061-conventions-gates-engine/spec.md:L207-L218\", \".specs/features/061-conventions-gates-engine/spec.md:L219-L225\", \".specs/project.md:L1-L7\", \".specs/project.md:L8-L20\", \".specs/project.md:L21-L29\", \".specs/project.md:L30-L43\", \".specs/project.md:L44-L54\", \".specs/project.md:L55-L63\", \".specs/project.md:L64-L73\", \".specs/project.md:L74-L82\", \".specs/stacks/_default.md:L1-L5\", \".specs/stacks/_default.md:L6-L12\", \".specs/stacks/_default.md:L13-L38\", \".specs/stacks/_default.md:L39-L48\", \".specs/stacks/_default.md:L49-L60\", \".specs/stacks/_default.md:L61-L68\", \".specs/stacks/_default.md:L69-L71\"], \"conclusions\": [{\"requirement_id\": \"061-conventions-gates-engine:AC-001\", \"disposition\": \"covered\", \"rationale\": \"Schema loading precedes verification, the gates artifact and constitution hash are modeled, and schema/generation tests remain assigned. This covers malformed model input and hash preservation at plan level.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L120-L123\", \"excerpt\": \"### AC-001\\n\\nGates model loads `.specs/conventions-gates.yaml`, rejects malformed thresholds, and\\n  preserves `generated_from.constitution_sha256`.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L28-L36\", \"excerpt\": \"schema load precedes tool execution\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L108-L134\", \"excerpt\": \"string constitution_sha256\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"1. Add tests first for schema/generation, verify/report/CLI, and receipt.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-002\", \"disposition\": \"covered\", \"rationale\": \"The added ownership table fixes both consumer threshold pairs and directs an exact-value/source-hash generation regression. Local framework source 300/50 constraints remain separate and preserved.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L124-L127\", \"excerpt\": \"### AC-002\\n\\n`livespec conventions gates init` writes `.specs/conventions-gates.yaml` with file\\n  thresholds target 400/limit 500 and function thresholds target 30/limit 60.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Framework source still follows the constitution's 300/50 limits; generated consumer defaults remain 400/500 and 30/60.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"assert exact values and constitution hash in `test_generate_gates_uses_two_level_thresholds_and_source_hash`.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-003\", \"disposition\": \"covered\", \"rationale\": \"The FAIL and BLOCKED sequence scenarios specify exits 1 and 2; the PASS state and constitutional success exit 0 agree. CLI tests are assigned.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L128-L131\", \"excerpt\": \"### AC-003\\n\\n`livespec conventions verify [--json] [--report]` returns exit codes 0 PASS, 1 FAIL,\\n  2 BLOCKED.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L37-L75\", \"excerpt\": \"Then  the CLI exits 1\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L37-L75\", \"excerpt\": \"Then  the CLI exits 2\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L76-L107\", \"excerpt\": \"Then  verdict is PASS\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-004\", \"disposition\": \"covered\", \"rationale\": \"Verification calls linters and checks versions/config before source analysis. The ownership table now names numeric limit synchronization and version/mismatch fixtures.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L132-L135\", \"excerpt\": \"### AC-004\\n\\nVerify executes declared linters, detects linter version mismatch, and checks\\n  gates-to-linter limit sync.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L37-L75\", \"excerpt\": \"E->>E: check linter versions and config sync\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Check version and configured SwiftLint limit synchronization in `_version_blockers` and `_sync_limit_blockers`; run mismatch and managed-config tests.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-005\", \"disposition\": \"covered\", \"rationale\": \"The plan enumerates all required builtin families and assigns warning/error fixtures, preserving their independent execution alongside linters.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L136-L139\", \"excerpt\": \"### AC-005\\n\\nBuiltins detect file/function length, file headers, public doc coverage, token scale,\\n  suppression directives, and import rules.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`_collect_violations` runs file/function length, headers, public docs, token scale, suppressions and import checks independently of declared linters; keep real oversized sources blocking.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-006\", \"disposition\": \"covered\", \"rationale\": \"Python AST, TS/React and Swift heuristics, and visible partial fallback are explicit. Targeted TS repair preserves that heuristic contract, adds lexical-boundary/division tests, and retains genuine function-limit failures.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L140-L142\", \"excerpt\": \"### AC-006\\n\\nAdapter registry covers Python, TypeScript/React, Swift, and a partial fallback.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Keep Python AST analysis, TS/React and Swift deterministic heuristics, and visible `GenericAdapter.coverage=partial` fallback through `registry.adapter_for_path`.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L181-L185\", \"excerpt\": \"Assert exact inclusive line counts and that genuine functions longer than the declared gate limit still fail.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-007\", \"disposition\": \"covered\", \"rationale\": \"Receipt payload/verdict consistency, scoped identity, current hash and rejection of PASS errors/blockers are assigned to verification with existing negative tests.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L143-L146\", \"excerpt\": \"### AC-007\\n\\nReceipt kind `conventions` records `gates_sha256`, verdict, blockers, violations, and\\n  rejects PASS with error violations.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`verify_conventions_receipt` verifies payload, gates hash, scoped identity and verdict consistency. Reject PASS containing error/blockers and reject a receipt after its current gates bytes change.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-008\", \"disposition\": \"covered\", \"rationale\": \"Both report outputs, worst-first order and severity/suppression counts are stated with their owning helpers and actual artifact assertions.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L147-L150\", \"excerpt\": \"### AC-008\\n\\n`--report` writes `.specs/conventions/debt-report.md` and `debt.json` grouped\\n  worst-first with warnings, errors, and suppression counts.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`write_debt_report`, `_group_debt`, `_summary` and `_sort_key` write both debt-report.md and regenerable debt.json, ordered worst-first with warning/error/suppression counts; assert actual report artifacts.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-009\", \"disposition\": \"covered\", \"rationale\": \"The managed SwiftLint synchronization entry identifies its implementation and requires the requested apply/sync flags plus CLI fixture; it adds no automatic unsolicited configuration write.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L151-L153\", \"excerpt\": \"### AC-009\\n\\n`livespec conventions scaffold --apply --sync-limits` syncs managed SwiftLint limits.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`scaffold_linter_configs` / `_scaffold_swiftlint` apply managed SwiftLint limits only via requested `--apply --sync-limits`; execute the existing CLI sync fixture.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-010\", \"disposition\": \"covered\", \"rationale\": \"The real aggregate pytest/JUnit outcome must report zero skips before the obligation is met; the plan does not treat named tests as execution proof.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L154-L156\", \"excerpt\": \"### AC-010\\n\\nPytest coverage for 061 runs with zero skipped tests.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Execute the prescribed focused pytest suite; inspect the real aggregate runner/JUnit outcome and require zero skips before declaring this obligation met.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-011\", \"disposition\": \"covered\", \"rationale\": \"Ruff flat diagnostic parsing maps filename/location/message into ERROR and gate failure, with an explicit extraction regression.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L157-L159\", \"excerpt\": \"### AC-011\\n\\nRuff flat JSON diagnostics are parsed as linter violations and make the gate fail.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`parse_linter_json` / `_ruff_violation` recognize Ruff flat filename/location/message records, map to ERROR, and fail conventions. Execute `test_verify_extracts_ruff_flat_json_violations`.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-012\", \"disposition\": \"covered\", \"rationale\": \"The receipt entry requires comparison with current gates bytes and rejection after a gates mutation, backed by negative tests.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L160-L163\", \"excerpt\": \"### AC-012\\n\\nConventions receipts are rejected when their `gates_sha256` differs from the current\\n  `.specs/conventions-gates.yaml`.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Reject PASS containing error/blockers and reject a receipt after its current gates bytes change.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-013\", \"disposition\": \"covered\", \"rationale\": \"Strict schema-v1 model rejection of delegation/wiring and independent builtin execution are both specified, each with regression coverage.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L164-L167\", \"excerpt\": \"### AC-013\\n\\nSchema v1 rejects `delegate_to` and command `wiring`; declared linters never disable\\n  builtin checks.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`GatesBaseModel` forbids extra fields; `ConventionsGates` and `GateCommand` reject schema-v1 delegation/wiring fields. Execute both existing strict-schema tests; never disable builtins through linter declaration.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-014\", \"disposition\": \"covered\", \"rationale\": \"Current constitution hashing blocks stale metadata, while debt JSON stays ignored and regenerable; the stale fixture is assigned.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L168-L171\", \"excerpt\": \"### AC-014\\n\\nVerification blocks when `generated_from.constitution_sha256` is stale, and\\n  `.specs/conventions/debt.json` remains a regenerable ignored artifact.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`_staleness_blockers` compares current constitution SHA256 to generated metadata; stale input blocks. Keep debt.json ignored/regenerable and run the stale constitution fixture.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-015\", \"disposition\": \"covered\", \"rationale\": \"The new text explicitly limits conventions receipts to audit traceability, assigns mandatory fresh independent reruns to existing 063, and retains the stale-worker/fresh-failure boundary test without changing 063.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L172-L176\", \"excerpt\": \"### AC-015\\n\\nLe receipt conventions est un artefact d'audit uniquement (preuve de traçabilite).\\n  L'exigence anti-forgerie DURE est la re-execution par le superviseur (feature 063, must:).\\n  Un receipt PASS seul ne constitue pas une preuve de conformite suffisante.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Conventions receipts provide audit traceability only. Feature 063 owns mandatory fresh supervisor re-execution; `supervisor_conventions_gate` ignores stale worker PASS when the fresh result fails.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"receipt alone is insufficient.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-016\", \"disposition\": \"covered\", \"rationale\": \"Independent builtin length checks stay active alongside declared linters, with coexistence fixtures and genuine oversized source blocking preserved.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L177-L180\", \"excerpt\": \"### AC-016\\n\\nBuiltin file/function thresholds stay active even when a linter such as SwiftLint is\\n  declared in `commands.lint`.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`_collect_violations` runs file/function length, headers, public docs, token scale, suppressions and import checks independently of declared linters; keep real oversized sources blocking.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L37-L75\", \"excerpt\": \"E->>E: merge builtin + linter violations\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:AC-017\", \"disposition\": \"covered\", \"rationale\": \"Source read PermissionError/OSError becomes a blocking, auditable file_read_error without traceback; its unreadable-file fixture is assigned alongside operational encoding/timeout tests.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L181-L185\", \"excerpt\": \"### AC-017\\n\\nLes erreurs de lecture de fichier source produisent une violation `file_read_error`\\n  bloquante au lieu d'un traceback.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Source PermissionError/OSError becomes an auditable blocking `file_read_error` in `_collect_violations` / `_result_from`, without traceback; run the unreadable-source fixture.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:FR-001\", \"disposition\": \"covered\", \"rationale\": \"The gates schema/generator module is assigned, and the verify sequence loads it before engine execution; tests exercise its source hash and threshold schema.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\", \"excerpt\": \"- **FR-001:** Provide `validator/conventions_gates.py` with Pydantic `ConventionsGates`, loader,\\n  path helper, and generator.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"2. Implement `validator/conventions_gates.py`.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L37-L75\", \"excerpt\": \"C->>G: load_conventions_gates()\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L12-L16\", \"excerpt\": \"gates schema/generator\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:FR-002\", \"disposition\": \"covered\", \"rationale\": \"The deterministic engine module and GateResult return path remain explicit, with PASS/FAIL/BLOCKED state scenarios and operational blockers.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\", \"excerpt\": \"- **FR-002:** Provide `validator/conventions_gate.py` deterministic engine and `GateResult`.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"4. Implement `validator/conventions_gate.py` and `validator/conventions_report.py`.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L37-L75\", \"excerpt\": \"E-->>C: GateResult\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:FR-003\", \"disposition\": \"covered\", \"rationale\": \"The adapter implementation directory and registry ownership cover all four language/fallback categories. The TS lexical fix is bounded to existing heuristic analysis and adds no parser dependency.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\", \"excerpt\": \"- **FR-003:** Provide `validator/conventions_lang/` adapter registry for Python, TS/React, Swift,\\n  and fallback.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"3. Implement `validator/conventions_lang/` adapters.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Keep Python AST analysis, TS/React and Swift deterministic heuristics, and visible `GenericAdapter.coverage=partial` fallback through `registry.adapter_for_path`.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L181-L185\", \"excerpt\": \"Keep the adapter explicitly heuristic, with no new parser dependency or threshold/exclusion changes.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:FR-004\", \"disposition\": \"covered\", \"rationale\": \"Both receipt and report modules are assigned, with their validation/output ownership, negative tests and ordering requirements now documented.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\", \"excerpt\": \"- **FR-004:** Provide conventions receipt and debt report modules.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"5. Implement `validator/conventions_receipt.py`.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"4. Implement `validator/conventions_gate.py` and `validator/conventions_report.py`.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"assert actual report artifacts.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:FR-005\", \"disposition\": \"covered\", \"rationale\": \"The three existing command surfaces are declared and Typer wiring is assigned. The scaffold entry now also states requested synchronization semantics.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\", \"excerpt\": \"- **FR-005:** Register `conventions verify`, `conventions gates init`, and `conventions scaffold`.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L28-L36\", \"excerpt\": \"one nested `gates init`, one `verify`, one `scaffold`.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"6. Wire Typer commands in `validator/cli_commands/utility_cmd.py`.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:FR-006\", \"disposition\": \"covered\", \"rationale\": \"Schema/generation, verify/report/CLI and receipt test ownership remain, and the new table/repair section add explicit adapter fixtures and targeted TS regressions, followed by the existing conventions suite.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\", \"excerpt\": \"- **FR-006:** Add pytest coverage for schema, verify, CLI, adapters, report, and receipt.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"1. Add tests first for schema/generation, verify/report/CLI, and receipt.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Add dedicated TS lexical-boundary regressions described below, alongside existing adapter fixtures.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L181-L185\", \"excerpt\": \"Run targeted regressions plus the existing conventions regression suite, Ruff format/check and strict type checks.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:FR-007\", \"disposition\": \"covered\", \"rationale\": \"All later guarantees have concrete owner/test entries: Ruff JSON parsing, current receipt hashes, strict delegation rejection and operational read/encoding/timeout blockers. This reviews those proposed checks, not their execution.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\", \"excerpt\": \"- **FR-007:** Parse Ruff flat JSON, validate current gates hashes in receipts, reject delegation\\n  fields from schema v1, and block operational verifier crashes.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`parse_linter_json` / `_ruff_violation` recognize Ruff flat filename/location/message records, map to ERROR, and fail conventions.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"reject a receipt after its current gates bytes change.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"`ConventionsGates` and `GateCommand` reject schema-v1 delegation/wiring fields.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"Retain invalid-encoding and linter-timeout BLOCKED tests.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:SC-001\", \"disposition\": \"covered\", \"rationale\": \"The exact focused pytest glob remains in Testing Strategy and the ownership table now requires a real runner/JUnit aggregate with zero skips before acceptance.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L219-L225\", \"excerpt\": \"- **SC-001:** `python3 -m pytest tests/test_conventions_*.py -q` passes with 0 skipped tests.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L146-L154\", \"excerpt\": \"- `python3 -m pytest tests/test_conventions_*.py -q`\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L161-L180\", \"excerpt\": \"inspect the real aggregate runner/JUnit outcome and require zero skips before declaring this obligation met.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:SC-002\", \"disposition\": \"covered\", \"rationale\": \"Ruff check/format remain explicit and the correction section requires both for touched code alongside strict type checks.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L219-L225\", \"excerpt\": \"- **SC-002:** `uvx ruff check` and `uvx ruff format --check` pass for all touched 061 files.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L146-L154\", \"excerpt\": \"- `uvx ruff check ...`\\n- `uvx ruff format --check ...`\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L181-L185\", \"excerpt\": \"Run targeted regressions plus the existing conventions regression suite, Ruff format/check and strict type checks.\"}], \"searched_plan_sections\": []}, {\"requirement_id\": \"061-conventions-gates-engine:SC-003\", \"disposition\": \"covered\", \"rationale\": \"The generation step and gates init command surface explicitly produce the required gates YAML.\", \"source_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L219-L225\", \"excerpt\": \"- **SC-003:** `livespec conventions gates init` produces `.specs/conventions-gates.yaml`.\"}], \"plan_citations\": [{\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L135-L145\", \"excerpt\": \"7. Generate `.specs/conventions-gates.yaml`.\"}, {\"section_id\": \".specs/features/061-conventions-gates-engine/plan.md:L28-L36\", \"excerpt\": \"one nested `gates init`\"}], \"searched_plan_sections\": []}], \"ambiguities\": [], \"extra_scope\": [], \"findings\": [], \"confidence\": 4, \"synthesized_batch_ids\": [], \"resolutions\": []}"
+  ],
+  "synthesis": null,
+  "synthesis_transport_version": null
+}

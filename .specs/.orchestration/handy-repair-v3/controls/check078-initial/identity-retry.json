@@ -1,0 +1,5 @@
+{
+  "retry_hypothesis": "Implementation module imports its public facade; importing facade first avoids the documented internal circular re-export.",
+  "retry_evidence": "validator/goal_contracts.py exports compile_command_goal; use that actual public entrypoint.",
+  "retry_result": "PASS"
+}

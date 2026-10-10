@@ -3,7 +3,7 @@ title: "Deterministic Command Goal Contracts"
 status: Implemented
 priority: P1
 created: 2026-05-21
-updated: 2026-05-23
+updated: 2026-09-06
 ---
 
 # Feature 052 — Deterministic Command Goal Contracts
@@ -13,6 +13,10 @@ updated: 2026-05-23
 - **Date:** 2026-05-21
 - **Status:** Implemented
 - **Input:** Add deterministic command goal contracts: every LiveSpec command compiles a reproducible runtime goal from machine-readable expectations, Definition of Done, flags, and resolved feature state; the generated goal is canonicalized, hashable, snapshot-tested, and used as the completion gate. The goal must be reproducible: same command, args, flags, resolved feature state, expectations, and command version produce the same goal byte-for-byte, independent of LLM wording.
+
+## Evidence policy amendment — 2026-09-06
+
+Read [requirement evidence integrity](../078-requirement-evidence-integrity/spec.md) for current proof policy. FR-017/AC-006 require explicit evidence_kind metadata (documentary, review, execution), separate from task category. Current execution tasks require independently verified runner capture and reviewed acceptance bindings; prose plus success_criteria_met cannot certify execution. Review tasks require complete current grounded receipts. Existing visual, conventions, finalization, bootstrap and cumulative Penflow validators remain additional requirements. Immutable older contracts retain their recorded interpretation and cannot certify a new-policy run; unknown future policy blocks certification.
 
 ## User Scenarios & Testing
 

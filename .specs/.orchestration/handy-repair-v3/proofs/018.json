@@ -1,0 +1,15 @@
+{
+  "output": "Filters --functional --fr=FR004 retain G001 reviewscope/G002 compileidentity + C001 affectedAPI docs; exclude preexisting074/079 schema debt andnativepersistenceunsupportedconsumer.",
+  "success_criteria_met": true,
+  "convention_domains": [
+    "code"
+  ],
+  "convention_sources": [
+    "$AIRESOURCES/code-conventions/general.md",
+    "$AIRESOURCES/code-conventions/python.md",
+    "$AIRESOURCES/code-conventions/javascript.md",
+    "$AIRESOURCES/code-conventions/cli.md",
+    "$AIRESOURCES/code-conventions/stack-commands.md"
+  ],
+  "conventions_applied_to_output": true
+}

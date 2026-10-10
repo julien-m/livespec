@@ -1,0 +1,1309 @@
+{
+  "schema_version": "1",
+  "feature": "078-requirement-evidence-integrity",
+  "reviewer_model": "gpt-6.1-sol",
+  "review_max_chars": 200000,
+  "review_receipt_path": ".specs/features/078-requirement-evidence-integrity/.reviews/discovery-mapping-review.json",
+  "bindings": [
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[```md\\n[example](missing.md)\\n```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[~~~md\\n[example](missing.md)\\n~~~]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[````md\\n```\\n[example](missing.md)\\n```\\n````]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[   ```md\\n[example](missing.md)\\n   ```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[    [example](missing.md)]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[`[example](missing.md)`]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[``[example](missing.md)``]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[\\\\[example](missing.md)]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[<!-- [example](missing.md) -->]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[<div>\\n[example](missing.md)\\n</div>]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[> ```md\\n> [example](missing.md)\\n> ```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 57,
+      "end_line": 57,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[```md\\n[example](missing.md)\\n```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[~~~md\\n[example](missing.md)\\n~~~]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[````md\\n```\\n[example](missing.md)\\n```\\n````]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[   ```md\\n[example](missing.md)\\n   ```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[    [example](missing.md)]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[`[example](missing.md)`]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[``[example](missing.md)``]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[\\\\[example](missing.md)]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[<!-- [example](missing.md) -->]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[<div>\\n[example](missing.md)\\n</div>]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[> ```md\\n> [example](missing.md)\\n> ```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts len(prepared.source_hashes) == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[```md\\n[example](missing.md)\\n```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[~~~md\\n[example](missing.md)\\n~~~]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[````md\\n```\\n[example](missing.md)\\n```\\n````]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[   ```md\\n[example](missing.md)\\n   ```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[    [example](missing.md)]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[`[example](missing.md)`]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[``[example](missing.md)``]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[\\\\[example](missing.md)]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[<!-- [example](missing.md) -->]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[<div>\\n[example](missing.md)\\n</div>]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_literal_examples_are_retained_without_dependency_edges[> ```md\\n> [example](missing.md)\\n> ```]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_literal_examples_are_retained_without_dependency_edges executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == source)) == original. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract](../../../contract.md).]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 79,
+      "end_line": 79,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract][contract-ref].\\n\\n[contract-ref]: ../../../contract.md]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 79,
+      "end_line": 79,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract].\\n\\n[contract]: ../../../contract.md]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 79,
+      "end_line": 79,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[| Purpose | Contract |\\n|---|---|\\n| Rule | [contract](../../../contract.md) |]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 79,
+      "end_line": 79,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract](../../../contract.md).]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 80,
+      "end_line": 80,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts prepared.source_hashes['nested.md'] == content_hash(tail). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract][contract-ref].\\n\\n[contract-ref]: ../../../contract.md]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 80,
+      "end_line": 80,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts prepared.source_hashes['nested.md'] == content_hash(tail). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract].\\n\\n[contract]: ../../../contract.md]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 80,
+      "end_line": 80,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts prepared.source_hashes['nested.md'] == content_hash(tail). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[| Purpose | Contract |\\n|---|---|\\n| Rule | [contract](../../../contract.md) |]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 80,
+      "end_line": 80,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts prepared.source_hashes['nested.md'] == content_hash(tail). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract](../../../contract.md).]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 81,
+      "end_line": 81,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == 'nested.md')) == tail. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract][contract-ref].\\n\\n[contract-ref]: ../../../contract.md]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 81,
+      "end_line": 81,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == 'nested.md')) == tail. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract].\\n\\n[contract]: ../../../contract.md]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 81,
+      "end_line": 81,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == 'nested.md')) == tail. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[| Purpose | Contract |\\n|---|---|\\n| Rule | [contract](../../../contract.md) |]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 81,
+      "end_line": 81,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == 'nested.md')) == tail. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract](../../../contract.md).]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts f'{prepared.feature}:FR-099' in {r.requirement_id for r in prepared.requirements}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract][contract-ref].\\n\\n[contract-ref]: ../../../contract.md]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts f'{prepared.feature}:FR-099' in {r.requirement_id for r in prepared.requirements}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[Read [contract].\\n\\n[contract]: ../../../contract.md]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts f'{prepared.feature}:FR-099' in {r.requirement_id for r in prepared.requirements}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_real_inline_reference_and_table_links_load_complete_closure[| Purpose | Contract |\\n|---|---|\\n| Rule | [contract](../../../contract.md) |]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_real_inline_reference_and_table_links_load_complete_closure executes the behavioral counterexample and asserts f'{prepared.feature}:FR-099' in {r.requirement_id for r in prepared.requirements}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_true_unavailable_normative_contracts_fail_closed[Read [missing](../../../missing.md).-unread_source:missing.md:FileNotFoundError]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 97,
+      "end_line": 97,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_true_unavailable_normative_contracts_fail_closed executes the behavioral counterexample and asserts not prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_true_unavailable_normative_contracts_fail_closed[Read [outside](../../../../outside.md).-contract_outside_project:]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 97,
+      "end_line": 97,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_true_unavailable_normative_contracts_fail_closed executes the behavioral counterexample and asserts not prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_true_unavailable_normative_contracts_fail_closed[Read [remote](https://example.org/contract.md).-external_contract_not_loaded:]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 97,
+      "end_line": 97,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_true_unavailable_normative_contracts_fail_closed executes the behavioral counterexample and asserts not prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_true_unavailable_normative_contracts_fail_closed[Read [missing](../../../missing.md).-unread_source:missing.md:FileNotFoundError]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 98,
+      "end_line": 98,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_true_unavailable_normative_contracts_fail_closed executes the behavioral counterexample and asserts any((error in item for item in prepared.errors)). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_true_unavailable_normative_contracts_fail_closed[Read [outside](../../../../outside.md).-contract_outside_project:]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 98,
+      "end_line": 98,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_true_unavailable_normative_contracts_fail_closed executes the behavioral counterexample and asserts any((error in item for item in prepared.errors)). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_true_unavailable_normative_contracts_fail_closed[Read [remote](https://example.org/contract.md).-external_contract_not_loaded:]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 98,
+      "end_line": 98,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_true_unavailable_normative_contracts_fail_closed executes the behavioral counterexample and asserts any((error in item for item in prepared.errors)). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_inspected_source_is_full_bound_context_without_recursive_contracts",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 105,
+      "end_line": 105,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_inspected_source_is_full_bound_context_without_recursive_contracts executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_inspected_source_is_full_bound_context_without_recursive_contracts",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 106,
+      "end_line": 106,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_inspected_source_is_full_bound_context_without_recursive_contracts executes the behavioral counterexample and asserts prepared.source_hashes['source.md'] == content_hash(inspected). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_inspected_source_is_full_bound_context_without_recursive_contracts",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_inspected_source_is_full_bound_context_without_recursive_contracts executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == 'source.md')) == inspected. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_inspected_source_is_full_bound_context_without_recursive_contracts",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 108,
+      "end_line": 108,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_inspected_source_is_full_bound_context_without_recursive_contracts executes the behavioral counterexample and asserts {s.role for s in prepared.sections if s.source == 'source.md'} == {'context'}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_inspected_source_is_full_bound_context_without_recursive_contracts",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_inspected_source_is_full_bound_context_without_recursive_contracts executes the behavioral counterexample and asserts f'{prepared.feature}:FR-099' not in {r.requirement_id for r in prepared.requirements}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_inspected_source_is_full_bound_context_without_recursive_contracts",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 112,
+      "end_line": 112,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_inspected_source_is_full_bound_context_without_recursive_contracts executes the behavioral counterexample and asserts changed.context_hash != prepared.context_hash. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_later_normative_edge_promotes_inspected_source_and_traverses_it",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 123,
+      "end_line": 123,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_later_normative_edge_promotes_inspected_source_and_traverses_it executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_later_normative_edge_promotes_inspected_source_and_traverses_it",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 124,
+      "end_line": 124,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_later_normative_edge_promotes_inspected_source_and_traverses_it executes the behavioral counterexample and asserts {s.role for s in prepared.sections if s.source == 'source.md'} == {'reference'}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_later_normative_edge_promotes_inspected_source_and_traverses_it",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 125,
+      "end_line": 125,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_later_normative_edge_promotes_inspected_source_and_traverses_it executes the behavioral counterexample and asserts 'nested.md' in prepared.source_hashes. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_later_normative_edge_promotes_inspected_source_and_traverses_it",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_later_normative_edge_promotes_inspected_source_and_traverses_it executes the behavioral counterexample and asserts f'{prepared.feature}:FR-098' in {r.requirement_id for r in prepared.requirements}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_canonical_sources_are_never_demoted_by_inspection_links",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 131,
+      "end_line": 131,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_canonical_sources_are_never_demoted_by_inspection_links executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_canonical_sources_are_never_demoted_by_inspection_links",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 132,
+      "end_line": 134,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_canonical_sources_are_never_demoted_by_inspection_links executes the behavioral counterexample and asserts {s.role for s in prepared.sections if s.source == '.specs/constitution.md'} == {'constitution'}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_fragment_keeps_full_target_including_unselected_late_contract",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 141,
+      "end_line": 141,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_fragment_keeps_full_target_including_unselected_late_contract executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_fragment_keeps_full_target_including_unselected_late_contract",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 142,
+      "end_line": 142,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_fragment_keeps_full_target_including_unselected_late_contract executes the behavioral counterexample and asserts ''.join((s.text for s in prepared.sections if s.source == 'contract.md')) == target. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_fragment_keeps_full_target_including_unselected_late_contract",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 143,
+      "end_line": 143,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_fragment_keeps_full_target_including_unselected_late_contract executes the behavioral counterexample and asserts f'{prepared.feature}:FR-099' in {r.requirement_id for r in prepared.requirements}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_explicit_informative_external_link_is_not_an_unloaded_contract",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_explicit_informative_external_link_is_not_an_unloaded_contract executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_explicit_informative_external_link_is_not_an_unloaded_contract",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 151,
+      "end_line": 151,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_explicit_informative_external_link_is_not_an_unloaded_contract executes the behavioral counterexample and asserts 'https://example.org/guide.md' in prepared.batches[0].prompt. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_mandatory_inspection_still_requires_normative_dependency_closure",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 159,
+      "end_line": 159,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_mandatory_inspection_still_requires_normative_dependency_closure executes the behavioral counterexample and asserts not prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_mandatory_inspection_still_requires_normative_dependency_closure",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 160,
+      "end_line": 160,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_mandatory_inspection_still_requires_normative_dependency_closure executes the behavioral counterexample and asserts any(('unread_source:missing.md:' in error for error in prepared.errors)). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_normative_cycles_terminate_without_losing_contracts",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 167,
+      "end_line": 167,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_normative_cycles_terminate_without_losing_contracts executes the behavioral counterexample and asserts prepared.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_reference_discovery::test_normative_cycles_terminate_without_losing_contracts",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_reference_discovery.py",
+      "start_line": 168,
+      "end_line": 168,
+      "source_sha256": "6c56c9db75c4e93aee75e4cf9dc251e4f87d57fe0dcd399b65d12bc04595969b",
+      "justification": "test_normative_cycles_terminate_without_losing_contracts executes the behavioral counterexample and asserts {'one.md', 'two.md'}.issubset(prepared.source_hashes). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_late_source_and_all_normative_sections_are_submitted",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 79,
+      "end_line": 79,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_late_source_and_all_normative_sections_are_submitted executes the behavioral counterexample and asserts context.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_late_source_and_all_normative_sections_are_submitted",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 80,
+      "end_line": 80,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_late_source_and_all_normative_sections_are_submitted executes the behavioral counterexample and asserts len(context.batches) == 1. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_late_source_and_all_normative_sections_are_submitted",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_late_source_and_all_normative_sections_are_submitted executes the behavioral counterexample and asserts ''.join((s['text'] for s in submitted if s['source'] == 'spec')) == spec. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_late_source_and_all_normative_sections_are_submitted",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 83,
+      "end_line": 83,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_late_source_and_all_normative_sections_are_submitted executes the behavioral counterexample and asserts 'a' * 2500 in context.batches[0].prompt. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_late_source_and_all_normative_sections_are_submitted",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 84,
+      "end_line": 84,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_late_source_and_all_normative_sections_are_submitted executes the behavioral counterexample and asserts context.requirements[0].requirement_id == 'f:FR-001'. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_claimed_success_without_grounding_is_incomplete[omitted]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_claimed_success_without_grounding_is_incomplete executes the behavioral counterexample and asserts not result.complete and (not result.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_claimed_success_without_grounding_is_incomplete[foreign]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_claimed_success_without_grounding_is_incomplete executes the behavioral counterexample and asserts not result.complete and (not result.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_claimed_success_without_grounding_is_incomplete[duplicate]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_claimed_success_without_grounding_is_incomplete executes the behavioral counterexample and asserts not result.complete and (not result.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_claimed_success_without_grounding_is_incomplete[citation]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_claimed_success_without_grounding_is_incomplete executes the behavioral counterexample and asserts not result.complete and (not result.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_claimed_success_without_grounding_is_incomplete[plan]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_claimed_success_without_grounding_is_incomplete executes the behavioral counterexample and asserts not result.complete and (not result.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_claimed_success_without_grounding_is_incomplete[sections]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_claimed_success_without_grounding_is_incomplete executes the behavioral counterexample and asserts not result.complete and (not result.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_oversized_indivisible_or_missing_reference_never_calls_provider",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 189,
+      "end_line": 189,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_oversized_indivisible_or_missing_reference_never_calls_provider executes the behavioral counterexample and asserts not result.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_batched_review_requires_complete_synthesis",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 201,
+      "end_line": 201,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_batched_review_requires_complete_synthesis executes the behavioral counterexample and asserts context.complete and len(context.batches) == 2. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_batched_review_requires_complete_synthesis",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 208,
+      "end_line": 208,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_batched_review_requires_complete_synthesis executes the behavioral counterexample and asserts not validate_review_result(context, raws).complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_batched_review_requires_complete_synthesis",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 216,
+      "end_line": 216,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_batched_review_requires_complete_synthesis executes the behavioral counterexample and asserts validate_review_result(context, raws, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_batched_review_requires_complete_synthesis",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 218,
+      "end_line": 218,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "test_batched_review_requires_complete_synthesis executes the behavioral counterexample and asserts not validate_review_result(context, raws, json.dumps(final)).complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 64,
+      "end_line": 64,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts context.complete and len(context.batches) == 3. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 64,
+      "end_line": 64,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts context.complete and len(context.batches) == 3. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 74,
+      "end_line": 74,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts seen_plan == {s.section_id for s in context.sections if s.role == 'plan'}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 74,
+      "end_line": 74,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts seen_plan == {s.section_id for s in context.sections if s.role == 'plan'}. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 81,
+      "end_line": 81,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts receipt.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 81,
+      "end_line": 81,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts receipt.complete. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts receipt.ready is not contradictory. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts receipt.ready is not contradictory. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 83,
+      "end_line": 83,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts provider.call_count == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 83,
+      "end_line": 83,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts provider.call_count == 4. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 84,
+      "end_line": 84,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts all((len(call.args[0]) <= context.max_chars for call in provider.call_args_list)). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 84,
+      "end_line": 84,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts all((len(call.args[0]) <= context.max_chars for call in provider.call_args_list)). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 68,
+      "end_line": 68,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts batch.requirement_ids == ('f:FR-001',). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 68,
+      "end_line": 68,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts batch.requirement_ids == ('f:FR-001',). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 69,
+      "end_line": 69,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts any((sections[s].role == 'spec' for s in batch.section_ids)). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 69,
+      "end_line": 69,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts any((sections[s].role == 'spec' for s in batch.section_ids)). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 71,
+      "end_line": 71,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts plan_ids. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 71,
+      "end_line": 71,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts plan_ids. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[False]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 73,
+      "end_line": 73,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts len(batch.prompt) <= context.max_chars. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_real_plan_batches_compare_all_plan_bytes_with_contract[True]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 73,
+      "end_line": 73,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_real_plan_batches_compare_all_plan_bytes_with_contract executes the behavioral counterexample and asserts len(batch.prompt) <= context.max_chars. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[ambiguity]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts not erased.complete and (not erased.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[finding]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts not erased.complete and (not erased.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[scope]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts not erased.complete and (not erased.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[contradiction]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts not erased.complete and (not erased.ready). This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[ambiguity]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts 'unresolved_batch_issues_erased' in erased.errors. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[finding]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts 'unresolved_batch_issues_erased' in erased.errors. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[scope]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts 'unresolved_batch_issues_erased' in erased.errors. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[contradiction]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts 'unresolved_batch_issues_erased' in erased.errors. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[ambiguity]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 132,
+      "end_line": 132,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts validate_review_result(context, encoded, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[finding]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 132,
+      "end_line": 132,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts validate_review_result(context, encoded, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[scope]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 132,
+      "end_line": 132,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts validate_review_result(context, encoded, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[contradiction]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 132,
+      "end_line": 132,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts validate_review_result(context, encoded, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[ambiguity]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 134,
+      "end_line": 134,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts not validate_review_result(context, encoded, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[finding]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 134,
+      "end_line": 134,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts not validate_review_result(context, encoded, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[scope]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 134,
+      "end_line": 134,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts not validate_review_result(context, encoded, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_erase_blockers_without_grounded_resolution[contradiction]",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 134,
+      "end_line": 134,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_erase_blockers_without_grounded_resolution executes the behavioral counterexample and asserts not validate_review_result(context, encoded, json.dumps(final)).ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_claim_covered_from_missing_only_batch_summaries",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 149,
+      "end_line": 149,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_claim_covered_from_missing_only_batch_summaries executes the behavioral counterexample and asserts not receipt.ready. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_batching::test_synthesis_cannot_claim_covered_from_missing_only_batch_summaries",
+      "expected": "All normative bytes and obligations remain reviewed; literal/descriptive links cannot add false contracts, real missing/partial/over-budget evidence cannot PASS.",
+      "assertion_path": "tests/test_review_batching.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "dffc434bb8573bc28126c6ddff70f395df4495d0631aa00ec34a284e57f5b31a",
+      "justification": "test_synthesis_cannot_claim_covered_from_missing_only_batch_summaries executes the behavioral counterexample and asserts 'synthesis_citation_not_observed_in_batch' in receipt.errors. This assertion contributes to the combined complete-context/incomplete-review AC-002 scope, not global feature acceptance."
+    }
+  ]
+}

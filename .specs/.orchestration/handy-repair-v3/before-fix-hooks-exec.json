@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "livespec",
+    "hooks",
+    "resolve",
+    "--event",
+    "before",
+    "--command",
+    "fix",
+    "--feature",
+    "078-requirement-evidence-integrity"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

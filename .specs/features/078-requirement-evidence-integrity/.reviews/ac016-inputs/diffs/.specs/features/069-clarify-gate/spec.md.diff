@@ -1,0 +1,31 @@
+--- INITIAL/.specs/features/069-clarify-gate/spec.md
++++ CURRENT/.specs/features/069-clarify-gate/spec.md
+@@ -18,6 +18,10 @@
+ - **Feature Number:** 069
+ 
+ ---
++
++## Evidence policy amendment — 2026-09-06
++
++Read [requirement evidence integrity](../078-requirement-evidence-integrity/spec.md) for current clarification policy. FR-002/FR-003 detect French and English quality ambiguity using metrics associated with the same claim; an unrelated digit is insufficient. FR-005/FR-007 and SC-002 cap presentation only: retain every unresolved item, including critical items beyond the fifth. Merge grounded spec-review ambiguities, reuse cited approved decisions and deduplicate by requirement and observable decision. Current automatic progression blocks on every unresolved critical business interpretation. Accepted decisions preserve requirement IDs and source changes invalidate dependent readiness.
+ 
+ ## User Scenarios & Testing
+ 
+@@ -333,7 +337,7 @@
+ | FR-002 | The system must detect vague quality adjectives from the `VAGUE_ADJECTIVES` seed set (`fast`, `scalable`, `secure`, `robust`) when used in a sentence that contains no standalone numeric token | AC-002 |
+ | FR-003 | The system must exclude digits glued to letters and requirement IDs (`FR-`, `AC-`, `SC-`) from the numeric-criterion check so they do not silence a genuine vague-adjective opportunity | AC-003 |
+ | FR-004 | The system must detect each `[NEEDS CLARIFICATION]` placeholder line and each `[ASSUMED]` or `TBD` assumption line as a clarification opportunity in its category | AC-004 |
+-| FR-005 | The system must score each opportunity as Impact × Uncertainty, order opportunities by descending score with a stable tie-break, and cap the returned queue at 5 | AC-005, AC-007 |
++| FR-005 | The system must score each opportunity as Impact × Uncertainty, order opportunities by descending score with a stable tie-break, and cap only the presented queue at 5 while retaining the complete unresolved inventory | AC-005, AC-007 |
+ | FR-006 | The system must produce identical scan and ranked-queue output for identical spec input on repeated invocations | AC-006 |
+ | FR-007 | The system must present queued questions one at a time in ranked order and never present more than 5 questions in a run | AC-007 |
+ | FR-008 | The system must write accepted answers under a `## Clarifications` heading grouped by a `### Session YYYY-MM-DD` subheading, one `- Q: <question> -> A: <answer>` bullet each, without duplicate session bullets | AC-008 |
+@@ -366,7 +370,7 @@
+ 
+ ### FR-005
+ 
+-**Requirement:** The system must score each opportunity as Impact × Uncertainty, order opportunities by descending score with a stable tie-break, and cap the returned queue at 5
++**Requirement:** The system must score each opportunity as Impact × Uncertainty, order opportunities by descending score with a stable tie-break, and cap only the presented queue at 5 while retaining the complete unresolved inventory
+ **AC References:** [AC-005](#ac-005), [AC-007](#ac-007)
+ 
+ ### FR-006

@@ -1,0 +1,419 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "e0fa13e30f6a5b8ac510c5a1c24d486b42f55b828d90b8afa8aa695efe184d4e",
+  "source_hashes": {
+    ".specs/constitution.md": "ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9",
+    ".specs/features/063-conventions-blocking-pipeline/spec.md": "c47d07c5aff74f9df159aca838a7f7c1ada815679b785ddaa27767161ace5d13",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686"
+  },
+  "reviewer_model": "gpt-6.1-sol",
+  "complete": true,
+  "ready": true,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-001",
+      "disposition": "covered",
+      "rationale": "The contract gives a concrete evidence name, conventions kind, and oracle. This is an executable recognition-and-verification assertion, consistent with layered structural validation.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-001: Given run receipt verification receives `conventions_receipt_path`, When it classifies the evidence key, Then it recognizes kind `conventions` and verifies it with the conventions receipt oracle."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-002",
+      "disposition": "covered",
+      "rationale": "Only a verified receipt with a genuine failing verdict gets the gate-failure classification. Tampering is separately covered by EC-004; no success path exists for either category.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-002: Given a verified conventions receipt has verdict `FAIL` or `BLOCKED`, When proof-chain verification evaluates it, Then it is not treated as proof-chain corruption but prevents success by producing drift or rejection."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-003",
+      "disposition": "covered",
+      "rationale": "The output rule has two named supported kinds. Its conventions-specific migration exception is bounded by absent gates and does not change the existing unknown-kind policy.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-003: Given verify-output evaluates `receipt_verdict` rules, When receipts are kind `conventions` or `visual`, Then it supports both kinds and skips conventions rules for unmigrated projects when gates are absent."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-004",
+      "disposition": "covered",
+      "rationale": "Presence of gates is the explicit compiler condition; final implement, test and fix tasks must carry the named receipt path. Both the trigger and the required output can be inspected.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-004: Given conventions gates exist, When final implement, test, or fix goal tasks are compiled, Then they require `conventions_receipt_path`."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-005",
+      "disposition": "covered",
+      "rationale": "A non-PASS verdict is sufficient to reject evidence. The statement does not make PASS sufficient for whole-pipeline success, because AC-013/014/015 impose independent supervisor constraints.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-005: Given `livespec goal prove` receives conventions evidence, When the receipt verdict is not `PASS`, Then it rejects that evidence."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-006",
+      "disposition": "covered",
+      "rationale": "The required receipt rule is specified for all five named command expectations, yielding a closed enumeration suitable for an expectation-level regression.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-006: Given command expectations are defined for spec-implement, spec-test, spec-fix, spec-feature, and spec-ship, When they declare receipt checks, Then they require a conventions `receipt_verdict` rule."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-007",
+      "disposition": "covered",
+      "rationale": "The verification point precedes phase output and the CLI arguments explicitly bind a feature slug or repo. Scope identity cannot be silently inferred from an unscoped invocation.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-007: Given spec-implement, spec-test, or spec-fix reaches pre-`PHASE_RESULT` verification, When conventions verification runs, Then it uses `livespec conventions verify --json --feature <slug>` and repo-scope goals use explicit `--feature repo` rather than an implicit receipt from `verify --json`."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-008",
+      "disposition": "covered",
+      "rationale": "The machine-readable verdict field and exact blocked output are both observable. FAIL and BLOCKED cannot be reduced to a warning or a successful phase result.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-008: Given a skill emits `PHASE_RESULT`, When conventions verification completes, Then the output includes `extra.conventions_verdict` and a `FAIL` or `BLOCKED` verdict emits `PHASE_RESULT: BLOCKED - conventions_gate_failed`."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-009",
+      "disposition": "covered",
+      "rationale": "The verifier and supervisor must honor failure as blocking; the pre-existing justification is explicitly forbidden. This prevents temporal excuses while preserving the possibility of actual repairs.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-009: Given gates exist and a verifier or supervisor prompt observes a conventions gate failure, When it decides whether the run may continue, Then it treats the failure as blocking and forbids \"pre-existing\" as a skip justification."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-010",
+      "disposition": "covered",
+      "rationale": "The trigger is a constitution-declared convention and the failure modes are missing or stale gates, with ERROR severity. Receipt compatibility skipping in EC-001 remains a different operation.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-010: Given the constitution declares conventions limits or linters, When R7 coherence rules find stale or missing gates, Then they report ERROR."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-011",
+      "disposition": "covered",
+      "rationale": "The threshold is above 30 percent rather than at least 30 percent. The detailed tracked-file Gherkin supplies the population for the repo-file wording, making the check reproducible.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-011: Given conventions exclusions are configured, When R7 coherence rules find an exclusion matching more than 30 percent of repo files, Then they report ERROR."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-012",
+      "disposition": "covered",
+      "rationale": "The stale-source comparison names ai-ressources and requires ERROR when recorded hashes no longer match. It can be tested through a controlled source change.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-012: Given rulebook source hashes are recorded, When R7 coherence rules find them stale versus ai-ressources, Then they report ERROR."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-013",
+      "disposition": "covered",
+      "rationale": "A protected gate, rulebook or declared linter config change must block. The paired story permits ordinary unprotected source edits, so fixing a violation is possible without weakening its gate.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-013: Given a pipeline diff touches protected gate, rulebook, or declared linter config files, When the supervisor diff guard runs, Then it blocks the pipeline diff."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-014",
+      "disposition": "covered",
+      "rationale": "Known hashes from the base branch are the authority; divergence of current gate/rule hashes is a blocking predicate. This complements the diff guard rather than replacing it.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-014: Given base branch gates/rules hashes are known, When current gates/rules hashes differ, Then the supervisor hash guard blocks."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-015",
+      "disposition": "covered",
+      "rationale": "Supervision requires fresh execution instead of relying on a previously supplied worker receipt. The fresh gate result must coexist with the other protected-file guards.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-015: Given a worker provides a conventions receipt, When the supervisor evaluates the gate, Then it gates on a fresh conventions verification result rather than the stale worker-provided receipt."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-001",
+      "disposition": "covered",
+      "rationale": "The receipt evidence extension is precisely the conventions_receipt_path-to-conventions mapping validated in AC-001. It stays within local run artifacts rather than introducing hosted state.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-001: Extend run receipt evidence keys with `conventions_receipt_path` mapped to receipt kind `conventions`."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-002",
+      "disposition": "covered",
+      "rationale": "Feature-scoped verification through the specified oracle is mandatory. The scope requirement is further made concrete by the feature and repo command forms in AC-007.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-002: Re-verify conventions receipts through `verify_conventions_receipt()` with feature scoping."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-003",
+      "disposition": "covered",
+      "rationale": "The error taxonomy separates an authentic failing verdict from an integrity failure. AC-002 rejects or produces drift for the former, while the tampering edge case keeps the latter a proof-chain error.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-003: Classify non-PASS conventions receipt verdicts as gate failures that become drift, not proof-chain errors."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-004",
+      "disposition": "covered",
+      "rationale": "The new output rule evaluates the archived receipts array. This makes archived evidence the input and allows receipt kind and expected verdict to be independently checked.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-004: Add verify-output `receipt_verdict` rule evaluation over archived `receipts[]`."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-005",
+      "disposition": "covered",
+      "rationale": "The migration rule applies only when conventions gates are absent. It does not allow skipping failure from present gates, nor does it assert that missing-gate coherence is valid.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-005: Skip conventions `receipt_verdict` rules when conventions gates are absent from an unmigrated project."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-006",
+      "disposition": "covered",
+      "rationale": "Final goals require the evidence and validate it when gates are present. The conjunction of AC-004 and AC-005 makes mere receipt-path inclusion insufficient.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-006: Require and validate conventions receipt evidence in final command goal tasks when gates exist."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-007",
+      "disposition": "covered",
+      "rationale": "Command completion requires conventions verification; the acceptance clauses specify expectation inventory, command timing, explicit scope and blocked phase behavior.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-007: Update command expectations and skills so conventions verification is part of command definition of done."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-008",
+      "disposition": "covered",
+      "rationale": "The two reviewer prompt roles acquire the blocking semantics already defined by the receipt and output rules. AC-009 explicitly closes the historical-failure bypass.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-008: Update verifier and supervisor prompts with blocking conventions gate semantics."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-009",
+      "disposition": "covered",
+      "rationale": "The new coherence family must be registered, not merely declared. Missing/stale gates, excessive exclusions and stale sources have concrete ERROR scenarios in the spec.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-009: Add and register R7 conventions coherence rules."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-010",
+      "disposition": "covered",
+      "rationale": "All three supervisor locks are required: protected diff, known baseline hashes and a fresh run. Their acceptance predicates prevent any one successful check from substituting for all the others.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-010: Add diff, hash, and fresh re-execution supervisor locks for conventions gates."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:SC-001",
+      "disposition": "covered",
+      "rationale": "The criterion requires before-and-after regression evidence for every FR, so its result is measurable. As a spec criterion it asserts a required demonstration, not an already observed test result.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162",
+          "excerpt": "- SC-001: Targeted tests for each FR fail before implementation and pass after implementation."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:SC-002",
+      "disposition": "covered",
+      "rationale": "The full test command and zero exit result are explicit. Reporting an accepted skip baseline preserves visibility and does not authorize unilateral new exclusions.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162",
+          "excerpt": "- SC-002: `pytest tests/ -x -q` exits 0 with the accepted project skip baseline reported."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:SC-003",
+      "disposition": "covered",
+      "rationale": "Lint, formatting and strict type checks are independently named and must have zero errors. Those tools agree with the established Python stack and constitution.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162",
+          "excerpt": "- SC-003: `ruff check .`, `ruff format --check .`, and `pyright` complete with zero errors."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [
+    {
+      "category": "contract_boundaries",
+      "severity": "info",
+      "description": "The contract remains internally consistent when authentic failing verdicts, tampering, compatibility skips, setup coherence and protected-file changes retain their distinct predicates. Fresh conventions verification is required alongside diff/hash protection; accepting a worker receipt alone cannot establish completion. The detailed exclusion scenario identifies tracked files as its denominator.",
+      "suggestion": "Retain these boundaries in implementation and tests. This spec review does not certify code, current lint/test results, or the separate plan.",
+      "citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L150-L157",
+          "excerpt": "EC-004: Tampered conventions receipts still force proof-chain error through receipt verification failure."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L150-L157",
+          "excerpt": "EC-001: Projects without conventions gates skip conventions receipt rules instead of failing migration-incomplete repositories."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L81-L111",
+          "excerpt": "Given the gates file excludes a pattern matching more than 30 percent of tracked files"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L52-L80",
+          "excerpt": "Given a base ref and HEAD diff excludes protected gates files"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "AC-015: Given a worker provides a conventions receipt, When the supervisor evaluates the gate, Then it gates on a fresh conventions verification result rather than the stale worker-provided receipt."
+        }
+      ]
+    }
+  ],
+  "confidence": 4,
+  "raw_results": [
+    "{\n  \"batch_id\": \"batch-001\",\n  \"reviewed_section_ids\": [\n    \".specs/constitution.md:L1-L8\",\n    \".specs/constitution.md:L9-L18\",\n    \".specs/constitution.md:L19-L20\",\n    \".specs/constitution.md:L21-L26\",\n    \".specs/constitution.md:L27-L32\",\n    \".specs/constitution.md:L33-L37\",\n    \".specs/constitution.md:L38-L43\",\n    \".specs/constitution.md:L44-L49\",\n    \".specs/constitution.md:L50-L56\",\n    \".specs/constitution.md:L57-L58\",\n    \".specs/constitution.md:L59-L65\",\n    \".specs/constitution.md:L66-L71\",\n    \".specs/constitution.md:L72-L75\",\n    \".specs/constitution.md:L76-L81\",\n    \".specs/constitution.md:L82-L83\",\n    \".specs/constitution.md:L84-L90\",\n    \".specs/constitution.md:L91-L96\",\n    \".specs/constitution.md:L97-L102\",\n    \".specs/constitution.md:L103-L109\",\n    \".specs/constitution.md:L110-L111\",\n    \".specs/constitution.md:L112-L118\",\n    \".specs/constitution.md:L119-L123\",\n    \".specs/constitution.md:L124-L131\",\n    \".specs/constitution.md:L132-L146\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L1-L8\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L9-L15\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L16-L17\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L18-L51\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L52-L80\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L81-L111\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L143-L149\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L150-L157\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162\",\n    \".specs/project.md:L1-L7\",\n    \".specs/project.md:L8-L20\",\n    \".specs/project.md:L21-L29\",\n    \".specs/project.md:L30-L43\",\n    \".specs/project.md:L44-L54\",\n    \".specs/project.md:L55-L63\",\n    \".specs/project.md:L64-L73\",\n    \".specs/project.md:L74-L82\",\n    \".specs/stacks/_default.md:L1-L5\",\n    \".specs/stacks/_default.md:L6-L12\",\n    \".specs/stacks/_default.md:L13-L38\",\n    \".specs/stacks/_default.md:L39-L48\",\n    \".specs/stacks/_default.md:L49-L60\",\n    \".specs/stacks/_default.md:L61-L68\",\n    \".specs/stacks/_default.md:L69-L71\"\n  ],\n  \"conclusions\": [\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The contract gives a concrete evidence name, conventions kind, and oracle. This is an executable recognition-and-verification assertion, consistent with layered structural validation.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-001: Given run receipt verification receives `conventions_receipt_path`, When it classifies the evidence key, Then it recognizes kind `conventions` and verifies it with the conventions receipt oracle.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Only a verified receipt with a genuine failing verdict gets the gate-failure classification. Tampering is separately covered by EC-004; no success path exists for either category.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-002: Given a verified conventions receipt has verdict `FAIL` or `BLOCKED`, When proof-chain verification evaluates it, Then it is not treated as proof-chain corruption but prevents success by producing drift or rejection.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The output rule has two named supported kinds. Its conventions-specific migration exception is bounded by absent gates and does not change the existing unknown-kind policy.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-003: Given verify-output evaluates `receipt_verdict` rules, When receipts are kind `conventions` or `visual`, Then it supports both kinds and skips conventions rules for unmigrated projects when gates are absent.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Presence of gates is the explicit compiler condition; final implement, test and fix tasks must carry the named receipt path. Both the trigger and the required output can be inspected.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-004: Given conventions gates exist, When final implement, test, or fix goal tasks are compiled, Then they require `conventions_receipt_path`.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"A non-PASS verdict is sufficient to reject evidence. The statement does not make PASS sufficient for whole-pipeline success, because AC-013/014/015 impose independent supervisor constraints.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-005: Given `livespec goal prove` receives conventions evidence, When the receipt verdict is not `PASS`, Then it rejects that evidence.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The required receipt rule is specified for all five named command expectations, yielding a closed enumeration suitable for an expectation-level regression.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-006: Given command expectations are defined for spec-implement, spec-test, spec-fix, spec-feature, and spec-ship, When they declare receipt checks, Then they require a conventions `receipt_verdict` rule.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-007\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The verification point precedes phase output and the CLI arguments explicitly bind a feature slug or repo. Scope identity cannot be silently inferred from an unscoped invocation.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-007: Given spec-implement, spec-test, or spec-fix reaches pre-`PHASE_RESULT` verification, When conventions verification runs, Then it uses `livespec conventions verify --json --feature <slug>` and repo-scope goals use explicit `--feature repo` rather than an implicit receipt from `verify --json`.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-008\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The machine-readable verdict field and exact blocked output are both observable. FAIL and BLOCKED cannot be reduced to a warning or a successful phase result.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-008: Given a skill emits `PHASE_RESULT`, When conventions verification completes, Then the output includes `extra.conventions_verdict` and a `FAIL` or `BLOCKED` verdict emits `PHASE_RESULT: BLOCKED - conventions_gate_failed`.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-009\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The verifier and supervisor must honor failure as blocking; the pre-existing justification is explicitly forbidden. This prevents temporal excuses while preserving the possibility of actual repairs.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-009: Given gates exist and a verifier or supervisor prompt observes a conventions gate failure, When it decides whether the run may continue, Then it treats the failure as blocking and forbids \\\"pre-existing\\\" as a skip justification.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-010\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The trigger is a constitution-declared convention and the failure modes are missing or stale gates, with ERROR severity. Receipt compatibility skipping in EC-001 remains a different operation.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-010: Given the constitution declares conventions limits or linters, When R7 coherence rules find stale or missing gates, Then they report ERROR.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-011\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The threshold is above 30 percent rather than at least 30 percent. The detailed tracked-file Gherkin supplies the population for the repo-file wording, making the check reproducible.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-011: Given conventions exclusions are configured, When R7 coherence rules find an exclusion matching more than 30 percent of repo files, Then they report ERROR.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-012\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The stale-source comparison names ai-ressources and requires ERROR when recorded hashes no longer match. It can be tested through a controlled source change.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-012: Given rulebook source hashes are recorded, When R7 coherence rules find them stale versus ai-ressources, Then they report ERROR.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-013\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"A protected gate, rulebook or declared linter config change must block. The paired story permits ordinary unprotected source edits, so fixing a violation is possible without weakening its gate.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-013: Given a pipeline diff touches protected gate, rulebook, or declared linter config files, When the supervisor diff guard runs, Then it blocks the pipeline diff.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-014\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Known hashes from the base branch are the authority; divergence of current gate/rule hashes is a blocking predicate. This complements the diff guard rather than replacing it.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-014: Given base branch gates/rules hashes are known, When current gates/rules hashes differ, Then the supervisor hash guard blocks.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-015\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Supervision requires fresh execution instead of relying on a previously supplied worker receipt. The fresh gate result must coexist with the other protected-file guards.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-015: Given a worker provides a conventions receipt, When the supervisor evaluates the gate, Then it gates on a fresh conventions verification result rather than the stale worker-provided receipt.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The receipt evidence extension is precisely the conventions_receipt_path-to-conventions mapping validated in AC-001. It stays within local run artifacts rather than introducing hosted state.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-001: Extend run receipt evidence keys with `conventions_receipt_path` mapped to receipt kind `conventions`.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Feature-scoped verification through the specified oracle is mandatory. The scope requirement is further made concrete by the feature and repo command forms in AC-007.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-002: Re-verify conventions receipts through `verify_conventions_receipt()` with feature scoping.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The error taxonomy separates an authentic failing verdict from an integrity failure. AC-002 rejects or produces drift for the former, while the tampering edge case keeps the latter a proof-chain error.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-003: Classify non-PASS conventions receipt verdicts as gate failures that become drift, not proof-chain errors.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The new output rule evaluates the archived receipts array. This makes archived evidence the input and allows receipt kind and expected verdict to be independently checked.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-004: Add verify-output `receipt_verdict` rule evaluation over archived `receipts[]`.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The migration rule applies only when conventions gates are absent. It does not allow skipping failure from present gates, nor does it assert that missing-gate coherence is valid.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-005: Skip conventions `receipt_verdict` rules when conventions gates are absent from an unmigrated project.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Final goals require the evidence and validate it when gates are present. The conjunction of AC-004 and AC-005 makes mere receipt-path inclusion insufficient.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-006: Require and validate conventions receipt evidence in final command goal tasks when gates exist.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-007\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Command completion requires conventions verification; the acceptance clauses specify expectation inventory, command timing, explicit scope and blocked phase behavior.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-007: Update command expectations and skills so conventions verification is part of command definition of done.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-008\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The two reviewer prompt roles acquire the blocking semantics already defined by the receipt and output rules. AC-009 explicitly closes the historical-failure bypass.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-008: Update verifier and supervisor prompts with blocking conventions gate semantics.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-009\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The new coherence family must be registered, not merely declared. Missing/stale gates, excessive exclusions and stale sources have concrete ERROR scenarios in the spec.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-009: Add and register R7 conventions coherence rules.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-010\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"All three supervisor locks are required: protected diff, known baseline hashes and a fresh run. Their acceptance predicates prevent any one successful check from substituting for all the others.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-010: Add diff, hash, and fresh re-execution supervisor locks for conventions gates.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:SC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The criterion requires before-and-after regression evidence for every FR, so its result is measurable. As a spec criterion it asserts a required demonstration, not an already observed test result.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162\",\n          \"excerpt\": \"- SC-001: Targeted tests for each FR fail before implementation and pass after implementation.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:SC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The full test command and zero exit result are explicit. Reporting an accepted skip baseline preserves visibility and does not authorize unilateral new exclusions.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162\",\n          \"excerpt\": \"- SC-002: `pytest tests/ -x -q` exits 0 with the accepted project skip baseline reported.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:SC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Lint, formatting and strict type checks are independently named and must have zero errors. Those tools agree with the established Python stack and constitution.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162\",\n          \"excerpt\": \"- SC-003: `ruff check .`, `ruff format --check .`, and `pyright` complete with zero errors.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    }\n  ],\n  \"ambiguities\": [],\n  \"extra_scope\": [],\n  \"findings\": [\n    {\n      \"category\": \"contract_boundaries\",\n      \"severity\": \"info\",\n      \"description\": \"The contract remains internally consistent when authentic failing verdicts, tampering, compatibility skips, setup coherence and protected-file changes retain their distinct predicates. Fresh conventions verification is required alongside diff/hash protection; accepting a worker receipt alone cannot establish completion. The detailed exclusion scenario identifies tracked files as its denominator.\",\n      \"suggestion\": \"Retain these boundaries in implementation and tests. This spec review does not certify code, current lint/test results, or the separate plan.\",\n      \"citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L150-L157\",\n          \"excerpt\": \"EC-004: Tampered conventions receipts still force proof-chain error through receipt verification failure.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L150-L157\",\n          \"excerpt\": \"EC-001: Projects without conventions gates skip conventions receipt rules instead of failing migration-incomplete repositories.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L81-L111\",\n          \"excerpt\": \"Given the gates file excludes a pattern matching more than 30 percent of tracked files\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L52-L80\",\n          \"excerpt\": \"Given a base ref and HEAD diff excludes protected gates files\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"AC-015: Given a worker provides a conventions receipt, When the supervisor evaluates the gate, Then it gates on a fresh conventions verification result rather than the stale worker-provided receipt.\"\n        }\n      ]\n    }\n  ],\n  \"confidence\": 4,\n  \"synthesized_batch_ids\": [],\n  \"resolutions\": []\n}"
+  ],
+  "synthesis": null,
+  "synthesis_transport_version": null
+}

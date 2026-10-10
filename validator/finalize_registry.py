@@ -20,7 +20,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 from .coherence.graph_builder import _parse_roadmap
-from .finalize_receipt import MARKER_TEMPLATE, FinalizeError
+from .finalize_receipt import MARKER_TEMPLATE
+from .finalize_spec import build_spec_status as build_spec_status
+from .finalize_spec import spec_status_pending as spec_status_pending
 
 if TYPE_CHECKING:  # Circular: finalize defines ApplyRequest and imports this module
     from .finalize import ApplyRequest
@@ -214,32 +216,3 @@ def _split_previous_years(content: str, current_year: int) -> tuple[str, dict[in
 def _append_archive_links(content: str, years: list[int]) -> str:
     links = " | ".join(f"[{year}](archive/changelog-{year}.md)" for year in years)
     return f"{content.rstrip()}\n\n{_ARCHIVE_LINK_PREFIX}{links}\n"
-
-
-def build_spec_status(path: Path, request: ApplyRequest, marker: str, today: date) -> str:
-    """Update the spec status in frontmatter + header, kept in sync.
-
-    Raises:
-        FinalizeError: ``state_invalid`` naming the file when either status
-            anchor is absent or non-standard (Edge Case 10) — apply never
-            guesses an insertion point.
-    """
-    if not path.is_file():
-        raise FinalizeError(f"spec_status target missing: {path}", subtype="state_invalid")
-    content = path.read_text(encoding="utf-8")
-    status = request.status or ""
-    frontmatter_re = re.compile(r"^status:\s*\S.*$", re.MULTILINE)
-    header_re = re.compile(r"^- \*\*Status:\*\* \S.*$", re.MULTILINE)
-    if not frontmatter_re.search(content) or not header_re.search(content):
-        raise FinalizeError(
-            f"spec status anchors missing or non-standard in {path}",
-            subtype="state_invalid",
-        )
-    content = frontmatter_re.sub(f"status: {status}", content, count=1)
-    content = header_re.sub(f"- **Status:** {status}", content, count=1)
-    updated_re = re.compile(r"^updated:\s*\S.*$", re.MULTILINE)
-    if updated_re.search(content):
-        content = updated_re.sub(f"updated: {today.isoformat()}", content, count=1)
-    if not marker_pattern(request.command, request.hash8()).search(content):
-        content = f"{content.rstrip()}\n\n{marker}\n"
-    return content

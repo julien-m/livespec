@@ -1,0 +1,15 @@
+{
+  "packet_sha256": "06de7e4754ac191a512bee112807ce2d89a6d7f25189bc09384359c1755f7cc3",
+  "operation": "os.rename active state only",
+  "old_state": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/livespec-goals/goal-spec-fix-370fa9ce.state.json",
+  "new_state": "/Users/julienm/projects/livespec/.specs/.runs/handy-repair-v3-controls/goal-spec-fix-370fa9ce.state.json",
+  "state_sha256_before": "b708c59a7cd6ab737e4232bba08a89005658ceb9ca00c3c323ae0a39228a3498",
+  "state_sha256_after": "b708c59a7cd6ab737e4232bba08a89005658ceb9ca00c3c323ae0a39228a3498",
+  "contract_path": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/livespec-goals/goal-spec-fix-370fa9ce.contract.json",
+  "contract_sha256_unchanged": "505198dab198fbfdba72d9abdb932592bad3dcb1017647a70dce979a9c9e0604",
+  "goal_hash": "370fa9cede143b10580b718316e714c0afdbb64033703c5d0032ac374b52bbdd",
+  "status_unchanged": "active",
+  "completed_tasks_unchanged": 22,
+  "future_state_binding": "/Users/julienm/projects/livespec/.specs/.runs/handy-repair-v3-controls/goal-spec-fix-370fa9ce.state.json",
+  "timestamp": "2026-10-10T03:41:25.451310+00:00"
+}

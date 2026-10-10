@@ -1,0 +1,20 @@
+--- INITIAL/tests/test_pre_impl_analysis_cli.py
++++ CURRENT/tests/test_pre_impl_analysis_cli.py
+@@ -78,7 +78,7 @@
+ 
+     result = runner.invoke(
+         app,
+-        ["validate", "--pre-impl", "--format", "json", str(feature_dir)],
++        ["validate", "--pre-impl", "--structural-only", "--format", "json", str(feature_dir)],
+         catch_exceptions=False,
+     )
+ 
+@@ -98,7 +98,7 @@
+ 
+     result = runner.invoke(
+         app,
+-        ["validate", "--pre-impl", str(feature_dir)],
++        ["validate", "--pre-impl", "--structural-only", str(feature_dir)],
+         catch_exceptions=False,
+     )
+ 

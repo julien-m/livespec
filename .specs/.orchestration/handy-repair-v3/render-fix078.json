@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "livespec",
+    "goal",
+    "render",
+    "spec-fix",
+    "--feature",
+    "078-requirement-evidence-integrity",
+    "--flags",
+    "--auto --functional --fr FR-004 --model=gpt-6.1-sol --review-max-chars=200000",
+    "--save"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "env": {
+    "TMPDIR": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls"
+  },
+  "exit_code": 0,
+  "stdout": "hash:370fa9cede143b10580b718316e714c0afdbb64033703c5d0032ac374b52bbdd | contract-file:/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/livespec-goals/goal-spec-fix-370fa9ce.contract.json | state-file:/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/livespec-goals/goal-spec-fix-370fa9ce.state.json\n",
+  "stderr": ""
+}

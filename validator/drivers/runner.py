@@ -19,6 +19,7 @@ from .schemas import (
     CAPABILITY_NAMES,
     CapabilityNotImplementedError,
     CapabilityResult,
+    DriverCapability,
     DriverManifest,
 )
 
@@ -46,24 +47,31 @@ def run_capability(
     project_root: Path | None = None,
     env: dict[str, str] | None = None,
     timeout: float | None = None,
+    feature: str | None = None,
 ) -> CapabilityResult:
-    """Execute a single capability and return a structured result.
+    """Execute a capability, retaining gaps when its result cannot certify acceptance.
 
     Args:
         driver: Driver manifest that owns the capability.
         capability: Capability name from ``CAPABILITY_NAMES``.
-        project_root: Working directory used for command execution.
-        env: Optional environment overrides merged onto ``os.environ``.
-        timeout: Optional subprocess timeout in seconds.
+        project_root: Command working directory; defaults to the current directory.
+        env: Overrides merged onto ``os.environ``; capture owns evidence variables.
+        timeout: Subprocess limit in seconds; captured timeouts return exit 124.
+        feature: Feature bound to receipt capture when a report adapter is declared.
 
     Returns:
-        Structured subprocess result, including synthetic failures such as
-        ``command not found`` and missing coverage artifacts.
+        Process output, exit code and certification gaps; missing commands return 127.
+        Captured runs include a receipt path; uncaptured runs cannot certify acceptance.
 
     Raises:
-        ValueError: ``capability`` is not a supported capability identifier.
+        ValueError: Invalid capability, command quoting, runner or capture publication.
         CapabilityNotImplementedError: The driver does not define the capability.
-        FileNotFoundError: ``script:`` references a non-existent file.
+        FileNotFoundError: A script reference or capture root does not exist.
+        OSError: Process launch or capture storage fails outside handled missing commands.
+        subprocess.TimeoutExpired: An uncaptured command exceeds its timeout.
+
+    Side effects:
+        Runs the command; captured runs persist immutable evidence under .specs/.execution.
     """
     if capability not in CAPABILITY_NAMES:
         raise ValueError(f"Unknown capability: {capability!r}")
@@ -75,23 +83,74 @@ def run_capability(
     cwd = project_root or Path.cwd()
     proc_env = {**os.environ, **(env or {})}
 
+    argv = _capability_argv(driver, capability, cap, cwd)
+    if cap.report_adapter is not None and feature is not None:
+        return _run_captured(cap, capability, argv, cwd, proc_env, timeout, feature)
+    return _run_uncertified(cap, capability, argv, cwd, proc_env, timeout)
+
+
+def _capability_argv(
+    driver: DriverManifest, capability: str, cap: DriverCapability, cwd: Path
+) -> list[str]:
+    """Resolve the manifest executable while preserving script validation errors."""
     if cap.script is not None:
         script_path = _resolve_script(cap.script, cwd)
         if not script_path.exists():
             raise FileNotFoundError(
                 f"Driver {driver.name!r} {capability} script not found: {script_path}"
             )
-        # Run scripts through bash so driver manifests can rely on standard shell semantics.
-        argv: list[str] = ["bash", str(script_path)]
-    else:
-        # The manifest validator guarantees one executable field is present, but mypy
-        # cannot infer that contract across the Pydantic model boundary.
-        assert cap.command is not None
-        argv = shlex.split(cap.command)
+        # Scripts keep explicit shell semantics; commands remain list-form subprocesses.
+        return ["bash", str(script_path)]
+    assert cap.command is not None
+    return shlex.split(cap.command)
 
+
+def _run_captured(
+    cap: DriverCapability,
+    capability: str,
+    argv: list[str],
+    cwd: Path,
+    proc_env: dict[str, str],
+    timeout: float | None,
+    feature: str,
+) -> CapabilityResult:
+    """Use runner-owned execution evidence for supported feature-scoped reports."""
+    from validator.execution_capture import capture_execution
+    from validator.execution_evidence import verify_execution_receipt
+
+    assert cap.report_adapter is not None
+    captured = capture_execution(
+        argv,
+        project_root=cwd,
+        feature=feature,
+        adapter=cap.report_adapter,
+        env=proc_env,
+        timeout=timeout,
+        acceptance_mapping=cap.acceptance_mapping,
+        required_report_path=cap.report_path if capability == "coverage" else None,
+    )
+    verified = verify_execution_receipt(Path(captured.receipt_path), cwd, feature)
+    return CapabilityResult(
+        capability_name=capability,
+        exit_code=captured.exit_code,
+        stdout=captured.stdout,
+        stderr=captured.stderr,
+        report_path=cap.report_path,
+        execution_receipt_path=captured.receipt_path,
+        certification_gaps=verified.gaps,
+    )
+
+
+def _run_uncertified(
+    cap: DriverCapability,
+    capability: str,
+    argv: list[str],
+    cwd: Path,
+    proc_env: dict[str, str],
+    timeout: float | None,
+) -> CapabilityResult:
+    """Keep legacy subprocess results and coverage-artifact failure semantics."""
     try:
-        # Use list-form subprocess invocation with shell=False so driver commands do not
-        # inherit shell interpolation beyond the manifest's explicit command tokenization.
         completed = subprocess.run(
             argv,
             cwd=str(cwd),
@@ -101,11 +160,7 @@ def run_capability(
             timeout=timeout,
             check=False,
         )
-        exit_code = completed.returncode
-        stdout = completed.stdout
-        stderr = completed.stderr
     except FileNotFoundError:
-        # Map a missing executable to 127 so callers get the conventional shell failure code.
         return CapabilityResult(
             capability_name=capability,
             exit_code=127,
@@ -113,30 +168,23 @@ def run_capability(
             stderr=f"command not found: {argv[0]}",
             report_path=cap.report_path,
         )
-
-    report_path = cap.report_path
-
-    # AC-011: coverage capability must produce its declared report file.
-    if capability == "coverage" and report_path:
-        rp = Path(report_path)
-        if not rp.is_absolute():
-            rp = cwd / rp
-        if not rp.exists():
-            return CapabilityResult(
-                capability_name=capability,
-                exit_code=exit_code if exit_code != 0 else 1,
-                stdout=stdout,
-                stderr=(stderr + f"\nMissing coverage report at {rp}").strip(),
-                report_path=report_path,
-            )
-
-    return CapabilityResult(
+    result = CapabilityResult(
         capability_name=capability,
-        exit_code=exit_code,
-        stdout=stdout,
-        stderr=stderr,
-        report_path=report_path,
+        exit_code=completed.returncode,
+        stdout=completed.stdout,
+        stderr=completed.stderr,
+        report_path=cap.report_path,
     )
+    if capability == "coverage" and cap.report_path:
+        report = _resolve_script(cap.report_path, cwd)
+        if not report.exists():
+            result.exit_code = result.exit_code or 1
+            result.stderr = (result.stderr + f"\nMissing coverage report at {report}").strip()
+            return result
+    result.certification_gaps = [
+        "Execution certification requires a supported report adapter and feature"
+    ]
+    return result
 
 
 # Feature 023: partial-driver capability loop.
@@ -148,23 +196,27 @@ def run_all_capabilities(
     project_root: Path | None = None,
     env: dict[str, str] | None = None,
     timeout: float | None = None,
+    feature: str | None = None,
 ) -> dict[str, CapabilityResult | None]:
-    """Run every capability the driver implements and skip the rest.
-
-    Each capability slot in :data:`CAPABILITY_NAMES` is mapped to either the
-    real :class:`CapabilityResult` produced by execution, or ``None`` when the
-    driver does not declare that capability. Callers can render
-    ``"not implemented for {driver}"`` for the ``None`` entries without having
-    to handle :class:`CapabilityNotImplementedError` themselves.
+    """Run declared capabilities sequentially and skip undeclared slots.
 
     Args:
         driver: Driver manifest whose capabilities are exercised.
-        project_root: Working directory used for command execution.
-        env: Optional environment overrides merged onto ``os.environ``.
-        timeout: Optional subprocess timeout in seconds.
+        project_root: Command working directory; defaults to the current directory.
+        env: Environment overrides forwarded to each capability.
+        timeout: Per-command subprocess limit in seconds.
+        feature: Feature forwarded to adapter-backed receipt capture for each capability.
 
     Returns:
-        Mapping from capability name to result (``None`` if not implemented).
+        Capability results with receipts and certification gaps, or None if undeclared.
+
+    Raises:
+        ValueError: A command, runner or capture publication is invalid.
+        OSError: A script/root is missing, launch fails or capture storage fails.
+        subprocess.TimeoutExpired: An uncaptured command exceeds its timeout.
+
+    Side effects:
+        Runs each command and persists adapter-backed execution evidence, as run_capability.
     """
     out: dict[str, CapabilityResult | None] = {}
     for cap in CAPABILITY_NAMES:
@@ -175,6 +227,7 @@ def run_all_capabilities(
                 project_root=project_root,
                 env=env,
                 timeout=timeout,
+                feature=feature,
             )
         except CapabilityNotImplementedError:
             out[cap] = None

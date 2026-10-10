@@ -2,93 +2,45 @@
 
 from __future__ import annotations
 
-import json
 import re
 from dataclasses import dataclass, field
-from typing import Any
+from pathlib import Path
 
 from validator.coherence.violation import Severity
 from validator.semantic.plan_review import ReviewFinding
+from validator.semantic.review_context import PreparedReview, prepare_review_context
+from validator.semantic.review_contract import ReviewReceipt
+from validator.semantic.review_receipts import legacy_display_fields, run_prepared_review
 
 
 # @spec FR-002: Build spec review prompt — .specs/features/001-auto-llm-review/spec.md#fr-002
 @dataclass
 class SpecReviewResult:
-    """Result of reviewing a spec.md for quality.
+    """Advisory spec-review display fields alongside independent receipt evidence.
+
+    Construction does not validate readiness. Empty findings are insufficient:
+    consumers require complete evidence and a receipt verified as ready against
+    the current context, model and policy before authorizing progression.
 
     Attributes:
-        findings: List of review findings.
-        reviewer_model: Model ID used for the review.
-        confidence: Self-reported reviewer confidence (1-5).
-        spec_metrics: Spec complexity metrics.
+        findings: Legacy display findings derived from the receipt; not exhaustive proof.
+        reviewer_model: Receipt's resolved model identity, or empty when unresolved.
+        confidence: Reviewer confidence from the receipt (1-5), or zero when unavailable.
+        spec_metrics: Counts of FR/AC references, stories and edge cases in supplied spec text;
+            these display counts do not establish semantic coverage.
+        complete: Receipt completeness copied by the producer; not its readiness verdict.
+        receipt: In-memory grounded review and raw evidence, or None when absent;
+            this field does not own a persisted cache path or perform freshness checks.
     """
 
     findings: list[ReviewFinding] = field(default_factory=list)
     reviewer_model: str = ""
     confidence: int = 0
     spec_metrics: dict[str, int] = field(default_factory=dict)
+    complete: bool = False
+    receipt: ReviewReceipt | None = None
 
 
-_SPEC_REVIEW_PROMPT = """\
-You are an adversarial spec quality auditor. \
-Your job is to find real problems, not validate.
-
-Review this feature specification for quality issues. Focus on:
-1. **FR testability**: Are functional requirements concrete enough to \
-   write a test? Flag vague verbs (e.g., "should handle", "manages") \
-   with no measurable outcome.
-2. **AC measurability**: Can each acceptance criterion be verified with \
-   a pass/fail test? Flag criteria that are subjective or unmeasurable.
-3. **Edge case coverage**: Are obvious edge cases missing? Consider \
-   empty inputs, error states, concurrency, timeouts, and boundary values.
-4. **Entity completeness**: Are all entities referenced in FRs defined \
-   in the Key Entities section? Are entity fields sufficient for the FRs?
-
-Be specific. Cite FR/AC IDs when possible. Do not praise the spec.
-
-## Specification
-{spec_content}
-
-Return JSON with your findings and a confidence score (1-5) rating \
-your thoroughness.
-A score of 5 means you are very confident you caught all issues.
-A score below 3 means you may have missed things."""
-
-_SPEC_REVIEW_SCHEMA: dict[str, Any] = {
-    "name": "spec_review",
-    "strict": True,
-    "schema": {
-        "type": "object",
-        "properties": {
-            "findings": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "category": {"type": "string"},
-                        "severity": {
-                            "type": "string",
-                            "enum": ["blocking", "warning", "info"],
-                        },
-                        "description": {"type": "string"},
-                        "suggestion": {"type": "string"},
-                    },
-                    "required": [
-                        "category",
-                        "severity",
-                        "description",
-                        "suggestion",
-                    ],
-                },
-            },
-            "confidence": {"type": "integer"},
-        },
-        "required": ["findings", "confidence"],
-    },
-}
-
-
-# @spec FR-002: Build spec review prompt — .specs/features/001-auto-llm-review/spec.md#fr-002
 def compute_spec_metrics(spec_content: str) -> dict[str, int]:
     """Extract quality metrics from spec markdown.
 
@@ -124,38 +76,41 @@ def compute_spec_metrics(spec_content: str) -> dict[str, int]:
 def review_spec(
     spec_content: str,
     model: str | None = None,
+    *,
+    prepared: PreparedReview | None = None,
+    cache_path: Path | None = None,
 ) -> SpecReviewResult:
-    """Review a spec via LLM for quality issues.
-
-    Sends an adversarial review prompt to the configured LLM provider and
-    returns structured findings.
+    """Review supplied context while retaining explicit incomplete advisory results.
 
     Args:
-        spec_content: Raw markdown of the feature spec.
-        model: Optional model ID override (e.g., "google/gemini-3.1-pro").
+        spec_content: Complete specification text; also used for displayed metrics.
+        model: Explicit provider model; None uses the prepared identity or provider default.
+        prepared: Authoritative assembled context, superseding the supplied review texts.
+        cache_path: Optional derived receipt path to read and atomically replace.
 
     Returns:
-        Review result with findings, confidence, and spec metrics.
+        Display findings, completeness, receipt, and its resolved model (empty if unknown).
 
     Raises:
-        LLMProviderNotConfigured: If no LLM provider is available.
-        json.JSONDecodeError: If the LLM response is not valid JSON.
+        ValueError: Explicit model conflicts with context or response JSON is malformed.
+        OSError: Cache publication fails.
+        LLMProviderNotConfigured: A provider call is needed but no provider is configured.
+
+    Side effects:
+        May invoke the configured provider and read/write the cache. Provider exceptions
+        propagate; incomplete evidence remains visible and does not certify readiness.
     """
-    from validator.llm_provider import call_llm
-
-    prompt = _SPEC_REVIEW_PROMPT.format(
-        spec_content=spec_content[:8000],
+    context = prepared or prepare_review_context(
+        "supplied", {"spec": spec_content}, kind="spec", model=model or ""
     )
+    receipt = run_prepared_review(context, cache_path=cache_path, model=model)
+    return _spec_result(spec_content, receipt)
 
-    raw = call_llm(prompt, json_schema=_SPEC_REVIEW_SCHEMA, model=model)
-    data = json.loads(raw)
 
-    severity_map = {
-        "blocking": Severity.ERROR,
-        "warning": Severity.WARNING,
-        "info": Severity.INFO,
-    }
-
+def _spec_result(spec_content: str, receipt: ReviewReceipt) -> SpecReviewResult:
+    """Render advisory fields without changing the validated receipt identity."""
+    fields, confidence = legacy_display_fields(receipt)
+    severity_map = {"blocking": Severity.ERROR, "warning": Severity.WARNING, "info": Severity.INFO}
     findings = [
         ReviewFinding(
             category=f.get("category", "general"),
@@ -163,12 +118,13 @@ def review_spec(
             description=f.get("description", ""),
             suggestion=f.get("suggestion", ""),
         )
-        for f in data.get("findings", [])
+        for f in fields
     ]
-
     return SpecReviewResult(
         findings=findings,
-        reviewer_model=model or "default",
-        confidence=data.get("confidence", 0),
+        reviewer_model=receipt.reviewer_model,
+        confidence=confidence,
         spec_metrics=compute_spec_metrics(spec_content),
+        complete=receipt.complete,
+        receipt=receipt,
     )

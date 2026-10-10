@@ -175,13 +175,13 @@ class TestReviewSpec:
         assert result.spec_metrics["fr_count"] == 3
         assert result.spec_metrics["story_count"] == 2
 
-    def test_default_model_label(self):
+    def test_default_model_stays_unresolved(self):
         response = self._mock_response([])
 
         with patch("validator.llm_provider.call_llm", return_value=response):
             result = review_spec(SAMPLE_SPEC, model=None)
 
-        assert result.reviewer_model == "default"
+        assert result.reviewer_model == ""
 
     def test_raises_on_invalid_json(self):
         with (
@@ -199,7 +199,7 @@ class TestReviewSpec:
         _, kwargs = mock.call_args
         assert kwargs.get("model") == "google/gemini-3.1-pro"
 
-    def test_truncates_long_spec(self):
+    def test_preserves_complete_long_spec(self):
         long_spec = "x" * 20000
         response = self._mock_response([])
 
@@ -207,5 +207,6 @@ class TestReviewSpec:
             review_spec(long_spec)
 
         prompt = mock.call_args[0][0]
-        # Prompt should contain truncated content (8000 chars max)
-        assert len(prompt) < 20000
+        # 078 supersedes the legacy truncation requirement.
+        assert long_spec in prompt
+        assert len(prompt) > 20000

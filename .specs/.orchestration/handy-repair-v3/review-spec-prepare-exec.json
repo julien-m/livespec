@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "livespec",
+    "validate",
+    ".specs/features/078-requirement-evidence-integrity",
+    "--prepare-review",
+    "spec",
+    "--model",
+    "gpt-6.1-sol"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "TMPDIR": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls",
+  "exit": 0,
+  "stdout_path": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/review-spec-prepared.json",
+  "stderr": ""
+}

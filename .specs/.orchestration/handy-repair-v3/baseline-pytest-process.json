@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "TMPDIR": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls",
+  "pid": 91952,
+  "status": "superseded_capture_without_exit"
+}

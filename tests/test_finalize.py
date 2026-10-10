@@ -424,9 +424,11 @@ def _registry_snapshot(specs: Path) -> dict[str, bytes]:
 
 
 class TestApplyFinalization:
-    def test_apply_writes_all_four_targets_with_markers(self, tmp_path: Path) -> None:
+    def test_apply_writes_lifecycle_fields_and_generated_registry_markers(
+        self, tmp_path: Path
+    ) -> None:
         """AC-001/AC-002: one apply call must update the four registry targets
-        and stamp each with the cmd+hash8 idempotence marker."""
+        and stamp generated registries with the cmd+hash8 idempotence marker."""
         specs = _make_specs_tree(tmp_path)
         request = _implement_request()
         result = apply_finalization(tmp_path, request)
@@ -440,7 +442,8 @@ class TestApplyFinalization:
         assert "Feature: Initial implementation" in feature_changelog
         assert "[Feature 004] Implemented: Notifications" in global_changelog
         assert "| Implemented |" in readme
-        for content in (feature_changelog, global_changelog, readme, spec_md):
+        assert "<!-- finalize:" not in spec_md
+        for content in (feature_changelog, global_changelog, readme):
             assert "finalize:spec-implement:" in content
             assert hash8 in content
         assert marker_core[:30]  # marker carries a date segment (informational)

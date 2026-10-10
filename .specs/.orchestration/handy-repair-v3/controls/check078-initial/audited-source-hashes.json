@@ -1,0 +1,16 @@
+{
+  "validator/semantic/review_files.py": "a1d7bf6088596aa1a987e8d894cdb241fc0fa4117be762810c3b7fa84be42a98",
+  "validator/semantic/review_api.py": "054626be1ef0a0f2973d4906a7e248620f23b19732a55fcfc460a6c6d7c95cd9",
+  "validator/semantic/review_receipts.py": "cd89eb48c7fc76ad5b46237cb3e94d6a8b47007ae0ca9a2655af5e4923d5e289",
+  "validator/semantic/review_context.py": "a1d0dc12bdeb4ddebc0614d8bfefac658d3a48cb510add61c14ce0cb2c685505",
+  "validator/semantic/review_contract.py": "f05438791e8ac6c5c7d41ace2e8030b3d0c06974f3ed922566e24e7f78d5f8f8",
+  "validator/goal_compile.py": "a582289c3bc5c0dce9ca9d597cdc7d20160f62edf32b01d9e00ddf63d94a2746",
+  "validator/goal_payload.py": "b985d48f177d86e4e5b796a5eeaf404f88b5d0e92db54c55dc57a5accf4464d3",
+  "validator/evidence_policy.py": "6fd885ca80fbfe674708315750f9ee63c4bcb1e276cab4545fac6e72f54ae5d9",
+  "tests/test_review_context.py": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+  "tests/test_lifecycle_metadata.py": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+  "tests/test_progression_integrity.py": "d0f0f6efb2afc83d509cacdab50a213d9ccf8cbecb43fb0731cd612e03a65b4b",
+  ".specs/features/078-requirement-evidence-integrity/spec.md": "360410369ff8da5d7ccd5325d84eb27ba76e3d71e13c3a3a32c4bcdffb744b0c",
+  ".specs/features/078-requirement-evidence-integrity/plan.md": "a778e04230063efd97cbb4bf79712261c3b9a9d5f1b86d34d648a37504254720",
+  ".specs/features/078-requirement-evidence-integrity/implementation.md": "a28b5db725560fa26a3aab96f3ebfdfa9cb753321c8f42b8d1d570c91e97cd07"
+}

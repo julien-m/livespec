@@ -1,0 +1,35 @@
+{
+  "078-requirement-evidence-integrity": {
+    "complete": true,
+    "feature": "078-requirement-evidence-integrity",
+    "context_hash": "c85d0b3b4c3cd70b47a431ed9e53a33878eb4742067e9a4e93ba2eaec886332b",
+    "errors": [],
+    "source_count": 4,
+    "requirements": 36,
+    "spec_present": true,
+    "review_path": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/.reviews/spec.json",
+    "compiled_feature": "078-requirement-evidence-integrity",
+    "goal_hash": "14f3dadff08cc69e609f3a2a3360c3da02e7fe2285061660bfa06d8e9ea800be",
+    "expected_features": [
+      "078-requirement-evidence-integrity"
+    ]
+  },
+  "requirement-evidence-integrity": {
+    "complete": false,
+    "feature": "requirement-evidence-integrity",
+    "context_hash": "32aafed17af9e340d92f9eabfc4e03e46029fff7bf9fd0903d7b23a3a317a1f3",
+    "errors": [
+      "unresolved_reference:unread_source:.specs/features/requirement-evidence-integrity/spec.md:FileNotFoundError",
+      "missing_spec"
+    ],
+    "source_count": 3,
+    "requirements": 0,
+    "spec_present": false,
+    "review_path": "/Users/julienm/projects/livespec/.specs/features/requirement-evidence-integrity/.reviews/spec.json",
+    "compiled_feature": "requirement-evidence-integrity",
+    "goal_hash": "cb801dd168b65069260707bac6721d43d9840d3584f6ca662e445f9f75c17274",
+    "expected_features": [
+      "requirement-evidence-integrity"
+    ]
+  }
+}

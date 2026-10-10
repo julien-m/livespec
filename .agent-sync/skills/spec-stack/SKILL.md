@@ -375,69 +375,69 @@ Lists all ADRs chronologically with summaries:
 
 ### Phase 0 — Goal Lock
 
-- [always] Lock goal contract via `livespec goal render spec-stack --save`
-- [always] Emit `/goal` slash command with contract/state file reference
+- [always] Lock goal contract via `livespec goal render spec-stack --save` <!-- evidence:documentary -->
+- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 1 — Show Current Stack (no-arg mode)
 
-- [always] Read stacks/_default.md and all ADRs in stacks/decisions/
-- [always] Display current stack table with layer, choice, and ADR reference
+- [always] Read stacks/_default.md and all ADRs in stacks/decisions/ <!-- evidence:documentary -->
+- [always] Display current stack table with layer, choice, and ADR reference <!-- evidence:documentary -->
 
 ### Phase 2 — Understand Change Request (change mode)
 
-- [always] Parse which layer is affected, what is replaced, and the reason
-- [always] Ask clarifying questions if scope is ambiguous (max 2)
+- [always] Parse which layer is affected, what is replaced, and the reason <!-- evidence:documentary -->
+- [always] Ask clarifying questions if scope is ambiguous (max 2) <!-- evidence:documentary -->
 
 ### Phase 3 — Impact Analysis
 
-- [always] Read all feature spec.md, plan.md, and implementation.md files
-- [always] Build impact table per layer (before/after, migration effort)
-- [always] Build affected features table with High/Medium/Low severity
-- [always] Classify migration strategy (big-bang / phased / hybrid)
-- [always] Document rollback trigger, window, owner, and validation checklist
+- [always] Read all feature spec.md, plan.md, and implementation.md files <!-- evidence:documentary -->
+- [always] Build impact table per layer (before/after, migration effort) <!-- evidence:documentary -->
+- [always] Build affected features table with High/Medium/Low severity <!-- evidence:documentary -->
+- [always] Classify migration strategy (big-bang / phased / hybrid) <!-- evidence:documentary -->
+- [always] Document rollback trigger, window, owner, and validation checklist <!-- evidence:documentary -->
 
 ### Phase 4 — Confirm Change
 
-- [always] Present impact summary and offer Proceed / Adjust scope / Cancel
+- [always] Present impact summary and offer Proceed / Adjust scope / Cancel <!-- evidence:documentary -->
 
 ### Phase 5 — Create ADR
 
-- [always] Generate ADR-NNN-short-name.md with context, decision, consequences, affected features
-- [always] Add ADR row to .specs/README.md Architecture Decisions table
-- [always] Regenerate Recent Activity section from .specs/changelog.md
-- [always] Update Last updated date in .specs/README.md
-- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path
+- [always] Generate ADR-NNN-short-name.md with context, decision, consequences, affected features <!-- evidence:documentary -->
+- [always] Add ADR row to .specs/README.md Architecture Decisions table <!-- evidence:documentary -->
+- [always] Regenerate Recent Activity section from .specs/changelog.md <!-- evidence:documentary -->
+- [always] Update Last updated date in .specs/README.md <!-- evidence:documentary -->
+- [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path <!-- evidence:documentary -->
 
 ### Phase 6 — Update Stack
 
-- [always] Update stacks/_default.md with new stack decisions
-- [always] Bump `updated` frontmatter field to today's date
+- [always] Update stacks/_default.md with new stack decisions <!-- evidence:documentary -->
+- [always] Bump `updated` frontmatter field to today's date <!-- evidence:documentary -->
 
 ### Phase 7 — Regenerate Preflight
 
-- [always] Merge new stack checks into .specs/preflight.md if manifest exists
-- [always] Preserve Custom section; deduplicate checks; display diff of additions/removals
+- [always] Merge new stack checks into .specs/preflight.md if manifest exists <!-- evidence:documentary -->
+- [always] Preserve Custom section; deduplicate checks; display diff of additions/removals <!-- evidence:documentary -->
 
 ### Phase 8 — Generate Migration Specs (optional)
 
-- [always] Offer to spawn independent native sub-agent for `/spec-specify` for each High/Medium impact feature if user confirms
+- [always] Offer to spawn independent native sub-agent for `/spec-specify` for each High/Medium impact feature if user confirms <!-- evidence:documentary -->
 
 ### Phase D — Show Decisions (decisions mode)
 
-- [always] Read all ADRs and display chronological decisions table
+- [always] Read all ADRs and display chronological decisions table <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 
 `/spec-stack` is complete only if all are true:
 
-- [ ] Requested change is clearly scoped (layer(s), before/after, reason)
-- [ ] Impact analysis lists affected features with severity
-- [ ] ADR is created/updated unless `--no-adr`
-- [ ] `_default.md` reflects the active decision state
-- [ ] Migration or rollback path is documented for non-trivial changes
-- [ ] `.specs/README.md` Architecture Decisions table updated with new ADR
-- [ ] `.specs/preflight.md` regenerated with new stack checks (if manifest exists)
-- [ ] Next action is proposed (e.g., migration specs or `/spec-plan`)
+- [ ] Requested change is clearly scoped (layer(s), before/after, reason) <!-- evidence:documentary -->
+- [ ] Impact analysis lists affected features with severity <!-- evidence:documentary -->
+- [ ] ADR is created/updated unless `--no-adr` <!-- evidence:documentary -->
+- [ ] `_default.md` reflects the active decision state <!-- evidence:documentary -->
+- [ ] Migration or rollback path is documented for non-trivial changes <!-- evidence:documentary -->
+- [ ] `.specs/README.md` Architecture Decisions table updated with new ADR <!-- evidence:documentary -->
+- [ ] `.specs/preflight.md` regenerated with new stack checks (if manifest exists) <!-- evidence:documentary -->
+- [ ] Next action is proposed (e.g., migration specs or `/spec-plan`) <!-- evidence:documentary -->
 
 If uncertainty remains high, default to `--dry-run` style output and request explicit confirmation.
 

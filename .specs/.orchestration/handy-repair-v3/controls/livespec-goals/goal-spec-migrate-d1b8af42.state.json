@@ -1,0 +1,328 @@
+{
+  "command": "spec-migrate",
+  "goal_hash": "d1b8af42a4d370e51090b209bc97ab9a74fd492347f9ec1689878415dc6882d8",
+  "schema_version": "2.0",
+  "status": "active",
+  "tasks": {
+    "archive.run": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+      "last_rejection": null,
+      "ordinal": 40,
+      "status": "pending"
+    },
+    "dod.033.all_pending_migrations_applied_in_order": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "All pending migrations applied in order",
+      "last_rejection": null,
+      "ordinal": 33,
+      "status": "pending"
+    },
+    "dod.034.scripts_sync_agent_assets_sh_completed_and_all_s": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "`scripts/sync-agent-assets.sh` completed and all skill/agent symlinks verified",
+      "last_rejection": null,
+      "ordinal": 34,
+      "status": "pending"
+    },
+    "dod.035.specs_livespec_version_matches_version_from_repo": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "`.specs/livespec-version` matches `VERSION` from repo",
+      "last_rejection": null,
+      "ordinal": 35,
+      "status": "pending"
+    },
+    "dod.036.visual_test_scaffolding_ran_or_was_skipped_with": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Visual test scaffolding ran (or was skipped with warning if unavailable)",
+      "last_rejection": null,
+      "ordinal": 36,
+      "status": "pending"
+    },
+    "dod.037.visual_test_reconciliation_ran_all_6_checks_on_n": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Visual test reconciliation ran all 6 checks on new files",
+      "last_rejection": null,
+      "ordinal": 37,
+      "status": "pending"
+    },
+    "dod.038.e2e_test_generation_ran_for_features_with_gherki": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "E2E test generation ran for features with Gherkin and no existing tests",
+      "last_rejection": null,
+      "ordinal": 38,
+      "status": "pending"
+    },
+    "dod.039.migration_summary_displayed_with_visual_and_e2e": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Migration summary displayed with visual and E2E results appended",
+      "last_rejection": null,
+      "ordinal": 39,
+      "status": "pending"
+    },
+    "task.001.lock_goal_contract_via_livespec_goal_render_spec": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Lock goal contract via `livespec goal render spec-migrate --save`",
+      "last_rejection": null,
+      "ordinal": 1,
+      "status": "pending"
+    },
+    "task.002.emit_goal_slash_command_with_contract_state_file": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Emit `/goal` slash command with contract/state file reference",
+      "last_rejection": null,
+      "ordinal": 2,
+      "status": "pending"
+    },
+    "task.003.read_specs_livespec_path_resolve_from_skill_syml": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read .specs/.livespec-path; resolve from skill symlink chain if missing",
+      "last_rejection": null,
+      "ordinal": 3,
+      "status": "pending"
+    },
+    "task.004.verify_resolved_path_contains_a_version_file": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Verify resolved path contains a VERSION file",
+      "last_rejection": null,
+      "ordinal": 4,
+      "status": "pending"
+    },
+    "task.005.write_specs_livespec_path_if_freshly_resolved": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Write .specs/.livespec-path if freshly resolved",
+      "last_rejection": null,
+      "ordinal": 5,
+      "status": "pending"
+    },
+    "task.006.read_specs_livespec_version_default_1_if_missing": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read .specs/livespec-version (default: 1 if missing)",
+      "last_rejection": null,
+      "ordinal": 6,
+      "status": "pending"
+    },
+    "task.007.read_version_from_livespec_repo": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read VERSION from LiveSpec repo",
+      "last_rejection": null,
+      "ordinal": 7,
+      "status": "pending"
+    },
+    "task.008.skip_to_phase_4_5_if_project_version_already_mat": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Skip to Phase 4.5 if project version already matches repo version",
+      "last_rejection": null,
+      "ordinal": 8,
+      "status": "pending"
+    },
+    "task.009.for_each_pending_version_read_migrations_n_migra": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "For each pending version: read migrations/N/migrate.md and execute migrate.sh",
+      "last_rejection": null,
+      "ordinal": 9,
+      "status": "pending"
+    },
+    "task.010.stop_and_report_on_non_zero_migration_script_exi": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Stop and report on non-zero migration script exit",
+      "last_rejection": null,
+      "ordinal": 10,
+      "status": "pending"
+    },
+    "task.011.verify_sync_agent_assets_sh_has_completed_and_al": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Verify sync-agent-assets.sh has completed and all skill/agent symlinks resolve",
+      "last_rejection": null,
+      "ordinal": 11,
+      "status": "pending"
+    },
+    "task.012.verify_specs_livespec_version_matches_version_fr": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Verify .specs/livespec-version matches VERSION from repo",
+      "last_rejection": null,
+      "ordinal": 12,
+      "status": "pending"
+    },
+    "task.013.read_and_validate_specs_surfaces_yaml_if_present": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read and validate .specs/surfaces.yaml if present",
+      "last_rejection": null,
+      "ordinal": 13,
+      "status": "pending"
+    },
+    "task.014.log_surfaces_with_unsupported_runners_skip_test": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Log surfaces with unsupported runners; skip test scaffolding if no Playwright surfaces",
+      "last_rejection": null,
+      "ordinal": 14,
+      "status": "pending"
+    },
+    "task.015.run_migrate_visual_tests_js_generate_guard_on_sc": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run migrate-visual-tests.js --generate (guard on script and Node.js availability)",
+      "last_rejection": null,
+      "ordinal": 15,
+      "status": "pending"
+    },
+    "task.016.parse_visual_scaffold_result_sentinel_for_files": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Parse VISUAL_SCAFFOLD_RESULT sentinel for FILES/DIRS/ROUTES counts",
+      "last_rejection": null,
+      "ordinal": 16,
+      "status": "pending"
+    },
+    "task.017.stage_scaffolded_files_to_establish_rollback_bou": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Stage scaffolded files to establish rollback boundary",
+      "last_rejection": null,
+      "ordinal": 17,
+      "status": "pending"
+    },
+    "task.018.run_check_0_classify_each_new_spec_ts_as_visual": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run Check 0: classify each new spec.ts as VISUAL/NON-VISUAL/AMBIGUOUS and delete non-visual files",
+      "last_rejection": null,
+      "ordinal": 18,
+      "status": "pending"
+    },
+    "task.019.run_check_1_detect_and_remove_duplicate_coverage": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run Check 1: detect and remove duplicate coverage across entire test directory",
+      "last_rejection": null,
+      "ordinal": 19,
+      "status": "pending"
+    },
+    "task.020.run_check_2_fix_syntax_errors_from_merge_unbalan": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run Check 2: fix syntax errors from merge (unbalanced braces, double });)",
+      "last_rejection": null,
+      "ordinal": 20,
+      "status": "pending"
+    },
+    "task.021.run_check_3_remove_empty_dead_stubs_from_preserv": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run Check 3: remove empty dead stubs from Preserved sections",
+      "last_rejection": null,
+      "ordinal": 21,
+      "status": "pending"
+    },
+    "task.022.run_check_4_warn_on_orphaned_route_tests_without": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run Check 4: warn on orphaned route tests without matching route files",
+      "last_rejection": null,
+      "ordinal": 22,
+      "status": "pending"
+    },
+    "task.023.run_check_5_verify_slug_route_heading_coherence": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Run Check 5: verify slug/route/heading coherence and log warnings",
+      "last_rejection": null,
+      "ordinal": 23,
+      "status": "pending"
+    },
+    "task.024.scan_for_features_with_gherkin_but_no_e2e_test_f": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Scan for features with Gherkin but no E2E test file",
+      "last_rejection": null,
+      "ordinal": 24,
+      "status": "pending"
+    },
+    "task.025.filter_non_visual_features_using_check_0_results": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Filter non-visual features using Check 0 results or fresh classification",
+      "last_rejection": null,
+      "ordinal": 25,
+      "status": "pending"
+    },
+    "task.026.read_route_files_component_source_fixtures_and_e": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Read route files, component source, fixtures, and existing tests for context",
+      "last_rejection": null,
+      "ordinal": 26,
+      "status": "pending"
+    },
+    "task.027.generate_complete_e2e_nnn_slug_spec_ts_files_wit": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Generate complete e2e-NNN-slug.spec.ts files with real selectors and assertions",
+      "last_rejection": null,
+      "ordinal": 27,
+      "status": "pending"
+    },
+    "task.028.verify_generated_files_compile_typescript_check": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Verify generated files compile (TypeScript check if available)",
+      "last_rejection": null,
+      "ordinal": 28,
+      "status": "pending"
+    },
+    "task.029.display_migration_summary_with_version_range_and": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Display migration summary with version range and validation results",
+      "last_rejection": null,
+      "ordinal": 29,
+      "status": "pending"
+    },
+    "task.030.append_visual_scaffolding_summary_files_created": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Append visual scaffolding summary (files created, baseline dirs)",
+      "last_rejection": null,
+      "ordinal": 30,
+      "status": "pending"
+    },
+    "task.031.append_reconciliation_summary_fixes_warnings_per": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Append reconciliation summary (fixes, warnings per check)",
+      "last_rejection": null,
+      "ordinal": 31,
+      "status": "pending"
+    },
+    "task.032.append_e2e_generation_summary_files_created_feat": {
+      "accepted_evidence": null,
+      "attempts": [],
+      "description": "Append E2E generation summary (files created, features skipped)",
+      "last_rejection": null,
+      "ordinal": 32,
+      "status": "pending"
+    }
+  }
+}

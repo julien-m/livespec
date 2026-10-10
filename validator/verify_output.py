@@ -334,7 +334,10 @@ def _evaluate_receipt_verdict(
             status=_status(verb, False),
             detail="receipt_verdict requires kind and verdict PASS|FAIL|BLOCKED",
         )
-    if receipt_kind == "conventions" and data.get("required_if_exists", True) is not False:
+    if (
+        receipt_kind in {"conventions", "conventions_repo"}
+        and data.get("required_if_exists", True) is not False
+    ):
         gates = project_root / ".specs" / "conventions-gates.yaml"
         if not gates.exists():
             return RuleResult(

@@ -78,7 +78,7 @@ def test_pre_impl_exits_0_when_no_critical_or_high(feature_dir: Path) -> None:
 
     result = runner.invoke(
         app,
-        ["validate", "--pre-impl", "--format", "json", str(feature_dir)],
+        ["validate", "--pre-impl", "--structural-only", "--format", "json", str(feature_dir)],
         catch_exceptions=False,
     )
 
@@ -98,7 +98,7 @@ def test_pre_impl_markdown_renders_report_heading(feature_dir: Path) -> None:
 
     result = runner.invoke(
         app,
-        ["validate", "--pre-impl", str(feature_dir)],
+        ["validate", "--pre-impl", "--structural-only", str(feature_dir)],
         catch_exceptions=False,
     )
 

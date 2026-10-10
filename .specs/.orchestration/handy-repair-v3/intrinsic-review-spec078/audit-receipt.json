@@ -1,0 +1,35 @@
+{
+  "batch_id": "batch-001",
+  "conclusions": 36,
+  "containment_verified": true,
+  "context_hash": "c85d0b3b4c3cd70b47a431ed9e53a33878eb4742067e9a4e93ba2eaec886332b",
+  "dependencies": {
+    "semantic_config": "9adb1ff5b032c23c9be0a343d1a8c157fe5826e696505bc723b69dc475920e18"
+  },
+  "kind": "spec",
+  "official_ingestion": "pending owner execution",
+  "only_files_written": [
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/intrinsic-review-spec078/batch-001.raw.json",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/intrinsic-review-spec078/audit-receipt.json"
+  ],
+  "output_realpath_after": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/intrinsic-review-spec078",
+  "output_realpath_before": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/intrinsic-review-spec078",
+  "packet_payload_sha256": "45decc370fe4cb4b9606aead3bf704dbfda2a62c92e4a421bf738985fb6e8b24",
+  "packet_version": "v6",
+  "prepared_path": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/review-spec-prepared.json",
+  "prepared_sha256": "26a4dc1bd4cc60fb97149da0ed4337eb07b72053c6051117b0ccf8b555d453ed",
+  "raw_bytes": 27986,
+  "raw_path": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/intrinsic-review-spec078/batch-001.raw.json",
+  "raw_sha256": "ff42e9ebcad077cb2e042e8fc0ef55e6377ec1d09f2bf17d8d3faa1bf784fbec",
+  "reviewed_sections": 92,
+  "role": "intrinsic-semantic-spec-review",
+  "runtime_certification": "not assessed",
+  "source_hashes": {
+    ".specs/constitution.md": "ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9",
+    ".specs/features/078-requirement-evidence-integrity/spec.md": "360410369ff8da5d7ccd5325d84eb27ba76e3d71e13c3a3a32c4bcdffb744b0c",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686"
+  },
+  "sources_unchanged_after": true,
+  "transport": "exact retained native reviewer JSON, no regenerated conclusions"
+}

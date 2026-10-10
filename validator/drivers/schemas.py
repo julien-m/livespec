@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -34,14 +35,21 @@ class DetectRule(BaseModel):
 
 
 class DriverCapability(BaseModel):
-    """Executable capability block for one driver feature.
+    """Executable driver configuration; construction neither runs code nor verifies files.
 
-    Args:
-        command: Shell command to execute for the capability.
-        script: Relative or absolute script path to execute instead of ``command``.
-        report_path: Optional path to an artifact the capability must produce.
-        threshold: Optional overall threshold for the capability output.
-        patch_threshold: Optional threshold for changed-line coverage gating.
+    Unknown fields and unsupported adapters are rejected by Pydantic; at least
+    one of command/script must be non-None. Paths are declarations, not proof.
+
+    Attributes:
+        command: Executable text split into argv, used only when script is absent.
+        script: Absolute or project-relative script; takes precedence when both are set.
+        report_path: Declared output path; the runner requires it for coverage capability.
+        report_adapter: junit or pytest-json enables capture when a feature is supplied;
+            None leaves execution uncertified. An adapter alone cannot certify acceptance.
+        acceptance_mapping: Mapping path passed to capture, resolved against the project
+            when relative; verification requires current independent mapping evidence.
+        threshold: Optional overall capability-output threshold.
+        patch_threshold: Optional changed-line coverage threshold.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -49,6 +57,8 @@ class DriverCapability(BaseModel):
     command: str | None = None
     script: str | None = None
     report_path: str | None = None
+    report_adapter: Literal["junit", "pytest-json"] | None = None
+    acceptance_mapping: str | None = None
     threshold: float | None = None
     patch_threshold: float | None = None
 
@@ -113,14 +123,21 @@ class DriverManifest(BaseModel):
 
 
 class CapabilityResult(BaseModel):
-    """Result of running one capability.
+    """Process facts and references to persisted runner-owned evidence.
 
-    Args:
+    This model rejects unknown fields but does not revalidate referenced files.
+    It owns no open resource and removes no artifacts; ok reflects exit_code only.
+
+    Attributes:
         capability_name: Name of the executed capability.
         exit_code: Process exit code or synthesized failure code.
-        report_path: Optional report artifact path declared by the capability.
-        stdout: Captured standard output from the subprocess.
-        stderr: Captured standard error from the subprocess.
+        report_path: Declared output path, relative to the command project when relative.
+        execution_receipt_path: Persisted runner receipt, or None for uncaptured execution;
+            consumers must verify it against current sources before certification.
+        certification_gaps: Reasons the observed execution cannot certify acceptance;
+            a successful process exit does not override these gaps.
+        stdout: Captured subprocess standard output.
+        stderr: Captured subprocess standard error and runner diagnostics.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -128,6 +145,8 @@ class CapabilityResult(BaseModel):
     capability_name: str
     exit_code: int
     report_path: str | None = None
+    execution_receipt_path: str | None = None
+    certification_gaps: list[str] = Field(default_factory=list)
     stdout: str = ""
     stderr: str = ""
 

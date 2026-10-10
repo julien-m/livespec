@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "livespec",
+    "validate",
+    ".specs/features/078-requirement-evidence-integrity",
+    "--progression",
+    "implement",
+    "--model",
+    "gpt-6.1-sol"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "exit": 1,
+  "stdout": "",
+  "stderr": "BLOCKED: clarify_not_ready:stale_or_incomplete_spec_review\n"
+}

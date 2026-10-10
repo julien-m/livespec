@@ -5,7 +5,7 @@ priority: P1
 status: Implemented
 title: Auto LLM Review
 type: spec
-updated: 2026-04-13
+updated: 2026-09-06
 ---
 
 # Feature Spec: Auto LLM Review
@@ -18,6 +18,10 @@ updated: 2026-04-13
 - **Feature Number:** 001
 
 ---
+
+## Evidence policy amendment — 2026-09-06
+
+Read [requirement evidence integrity](../078-requirement-evidence-integrity/spec.md) for current review policy. FR-003/FR-004/FR-006 and their acceptance criteria now require complete normative source inventory and grounded per-requirement conclusions. Never truncate normative input: coherent bounded batches and complete synthesis are allowed; missing context, malformed results or exhausted budgets are incomplete. Advisory legacy wrappers remain usable, but incomplete output cannot satisfy current mandatory progression. Source, model, schema, prompt and policy changes invalidate cached readiness.
 
 ## User Scenarios & Testing
 
@@ -417,12 +421,12 @@ flowchart TD
 
 ## Edge Cases
 
-- **LLM provider times out:** The review must not block indefinitely. Timeout after a configurable duration (default 60s), display a warning, and continue the parent command normally.
-- **LLM returns malformed JSON:** Parse error is caught, a warning is displayed with the raw response snippet, and the review is treated as skipped (not failed).
-- **Spec content exceeds LLM context window:** Truncate spec content to a safe limit (e.g., 8000 chars, matching the existing `plan_review.py` pattern) and note the truncation in the output.
+- **LLM provider times out:** Timeout after a configurable duration (default 60s). Legacy advisory wrappers may warn and continue; mandatory review remains incomplete and blocks progression.
+- **LLM returns malformed JSON:** Legacy advisory wrappers may catch the parse error, warn with the raw response snippet and continue. Mandatory review remains incomplete and blocks progression; malformed evidence cannot be treated as a successful skip.
+- **Spec content exceeds LLM context window:** Prepare complete bounded context; return incomplete when an indivisible normative section cannot fit. Never truncate normative source text.
 - **Review run on empty spec:** If spec.md has no FRs or ACs (template-only), the review prompt should detect this and return a single blocking finding: "spec contains no functional requirements."
 - **Concurrent reviews (spec + plan):** If both `--review-spec` and `--review-plan` are passed, run them sequentially (no parallel LLM calls) to avoid rate limiting.
-- **Provider returns empty findings array:** Treat as "no issues found" -- display a clean summary, do not warn about suspiciously empty results unless confidence is low (reuse existing low-confidence heuristic from plan_review CLI).
+- **Provider returns empty findings array:** Legacy advisory wrappers may display a clean summary with the existing low-confidence warning heuristic. Mandatory readiness additionally requires a validated complete requirement inventory and grounded dispositions for every requirement; an empty findings array alone is insufficient.
 
 ---
 

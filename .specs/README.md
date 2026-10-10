@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-09-05
+> Last updated: 2026-10-10
 
 
 ---
@@ -113,7 +113,10 @@
 | 073 | Multilang Convention AST Catalog + Enforce-by-Default | Implemented | 2026-06-29 | 2026-06-30 | [spec](features/073-conventions-multilang-catalog/spec.md), [plan](features/073-conventions-multilang-catalog/plan.md), [implementation](features/073-conventions-multilang-catalog/implementation.md) |
 | 074 | Agent Device Proof Adapter | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/074-agent-device-proof-adapter/spec.md), [plan](features/074-agent-device-proof-adapter/plan.md), [implementation](features/074-agent-device-proof-adapter/implementation.md) |
 | 075 | Design Direction Carry | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/075-design-direction-carry/spec.md), [plan](features/075-design-direction-carry/plan.md), [implementation](features/075-design-direction-carry/implementation.md) |
+| 076 | Spec Init Goal Bootstrap | Implemented | 2026-09-04 | 2026-09-04 | Read [spec](features/076-spec-init-goal-bootstrap/spec.md), [plan](features/076-spec-init-goal-bootstrap/plan.md), and [implementation](features/076-spec-init-goal-bootstrap/implementation.md) |
 | 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-09-05 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
+| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-10-10 | [spec](features/078-requirement-evidence-integrity/spec.md) |
+| 079 | Autonomous From-Code Recovery | Planned | 2026-10-09 | 2026-10-09 | [spec](features/079-autonomous-from-code-recovery/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -137,20 +140,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-09-05 | Feature | [Feature 077] Implemented: Penflow cumulative verification consumer and governed lifecycle closure |
-| 2026-09-05 | Feature | Feature 077: Composed procedure and selector authority |
-| 2026-07-04 | Feature | [Feature 075] Implemented: Design Direction Carry -- optional informative design direction line through template, specify, init, and docs, with no validation use |
-| 2026-07-04 | Feature | [Feature 074] Implemented: Agent Device Proof Adapter -- journey run receipts, `livespec device proof`, fail-fast bundle guards, watchOS guidance, and tests |
-| 2026-06-30 | Fix | [Feature 073] Immediate source decisions executable — 164 immediate sources executable/generated through 15 deterministic families, 28 conceptual/editorial deferred to Notion, 0 immediate non-executable |
-| 2026-06-30 | Feature | [Feature 073] Implemented: Exhaustive AI-res/ARS source manifest — verify JSON now proves 192/192 in-scope sources classified, 0 unclassified, with language/domain matrix and explicit exclusions |
-| 2026-06-29 | Feature | [Feature 072] /spec-feature complete: AST conventions rollout engine — implement/test/audit all green, full pytest 2281 passed, conventions receipt PASS |
-| 2026-06-29 | Feature | [Feature 072] Test: 100% AC covered (17/17), 0 tests generated — targeted Ruff, pytest 177 passed, `.specs` validation, and conventions receipt PASS |
-| 2026-06-29 | Feature | [Feature 072] Implemented: Conventions AST Rule Engine — v1/v2 gates, AST observe/enforce engine, v2 receipts, mode-aware policy, active ast/high catalogue, and scoped conventions receipt repair |
-| 2026-06-29 | Plan | [Feature 072] Plan created: Conventions AST Rule Engine — phased AST conventions rollout with v1/v2 gates, receipts, backend, doctor/spec-check, and catalogue activation |
-| 2026-06-29 | Spec | [Feature 072] Spec created: Conventions AST Rule Engine — 4 stories, 17 AC, 18 FR |
-| 2026-06-27 | Check | [Feature 071] Check: 100% FR/AC verified; implementation and conventions PASS; AC format warning remains |
-| 2026-06-27 | Feature | [Feature 071] Implemented: QE Analysis Native Module — native QE context, `qe.analysis` goal task, structured evidence validation, additive user hooks |
-| 2026-06-27 | Feature | [Feature 070] Analyze Gate — retroactive spec+plan+mapping for read-only pre-impl gate; dogfooded Clarify (empty queue) + Analyze (0 CRITICAL/HIGH, exit 0) |
+| 2026-10-10 | Bugfix | Fix existing-owner review and new-goal identity; 2 functional gaps closed, selected acceptance mapping independently ready |
+| 2026-10-10 | Check | [Feature 078] Check: post-fix canonical identity verified; acceptance capture pending |
+| 2026-10-10 | Check | [Feature 078] Check: initial FR-004 canonical feature identity gaps |
+| 2026-10-09 | Feature | [Feature 079] Plan validated: Autonomous From-Code Recovery — 6 steps, 2 diagrams; required frontmatter and Summary restored |
+| 2026-10-09 | Plan | [Feature 079] Plan created: Autonomous From-Code Recovery — 6 implementation steps, 2 diagrams |
+| 2026-10-09 | Check | [Feature 058] Check: initial lifecycle closure audit — two HIGH lifecycle gaps and three convention errors; 127 scoped tests pass |
+| 2026-10-09 | Plan | Feature079 Plan created: Autonomous From-Code Recovery — 6 implementation steps, 2 diagrams |
+| 2026-10-09 | Spec | [Feature 079] Spec created: Autonomous From-Code Recovery — 2 stories, 6 AC, 4 FR; native semantic review ready, implementation pending |
+| 2026-10-09 | Feature | Filtered FR-002/AC-002 reference-discovery repair registry synchronized; feature In Progress |
+| 2026-09-06 | Feature | [Feature 078] Test: 100% AC definitions covered (16/16), 0 tests generated; deterministic scope passed with historical limits retained |
 <!-- readme:activity:end -->
 
 ---
@@ -207,4 +206,60 @@
 
 <!-- finalize:spec-feature:2026-06-29:3ef3e24f -->
 
+<!-- finalize:spec-specify:2026-09-04:14b0e052 -->
+
+<!-- finalize:spec-plan:2026-09-04:89422724 -->
+
+<!-- finalize:spec-plan:2026-09-04:28e16cfb -->
+
+<!-- finalize:spec-implement:2026-09-04:a98e152e -->
+
+<!-- finalize:spec-implement:2026-09-04:9e1ef40b -->
+
+<!-- finalize:spec-test:2026-09-04:24b126d1 -->
+
+<!-- finalize:spec-test:2026-09-04:5d267080 -->
+
+<!-- finalize:spec-test:2026-09-04:ac9f0e2b -->
+
+<!-- finalize:spec-test:2026-09-04:b5339c37 -->
+
+<!-- finalize:spec-test:2026-09-04:9637faa2 -->
+
+<!-- finalize:spec-test:2026-09-04:07bc49d8 -->
+
+<!-- finalize:spec-test:2026-09-04:128dece7 -->
+
+<!-- finalize:spec-test:2026-09-04:c7b5977d -->
+
+<!-- finalize:spec-test:2026-09-04:9398704c -->
+
+<!-- finalize:spec-test:2026-09-04:43831902 -->
+
+<!-- finalize:spec-test:2026-09-04:1faecba9 -->
+
+<!-- finalize:spec-test:2026-09-04:79b41969 -->
+
 <!-- finalize:spec-implement:2026-09-05:6ce4661e -->
+
+<!-- finalize:spec-specify:2026-09-06:165bc17e -->
+
+<!-- finalize:spec-plan:2026-09-06:752c710f -->
+
+<!-- finalize:spec-plan:2026-09-06:b64026f3 -->
+
+<!-- finalize:spec-implement:2026-09-06:183269a4 -->
+
+<!-- finalize:spec-test:2026-09-06:aebeee31 -->
+
+<!-- finalize:spec-fix:2026-10-09:9aab10f2 -->
+
+<!-- finalize:spec-specify:2026-10-09:2dbaa83d -->
+
+<!-- finalize:spec-plan:2026-10-09:1bde99f4 -->
+
+<!-- finalize:spec-plan:2026-10-09:ba349e73 -->
+
+<!-- finalize:spec-plan:2026-10-09:bcaf92c9 -->
+
+<!-- finalize:spec-fix:2026-10-10:556265bd -->

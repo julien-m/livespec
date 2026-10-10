@@ -1,0 +1,37 @@
+{
+  "system_files": {
+    "spec-system.md": true,
+    "constitution.md": true,
+    "project.md": true,
+    "README.md": true,
+    "changelog.md": true,
+    "stacks/_default.md": true,
+    "testing/strategy.md": true
+  },
+  "adr_count": 3,
+  "stack_has_tbd": false,
+  "feature_count": 81,
+  "invalid_names": [],
+  "orphan_files": [],
+  "duplicate_numbers": [],
+  "completeness_gaps": [
+    {
+      "feature": "038-runner-config-wiring",
+      "status": "Implemented",
+      "missing": [
+        "changelog.md"
+      ]
+    },
+    {
+      "feature": "045-native-behavioral-specs",
+      "status": "Implemented",
+      "missing": [
+        "changelog.md"
+      ]
+    }
+  ],
+  "readme_missing": [],
+  "readme_extra": [],
+  "surfaces_present": false,
+  "unconfigured_app_candidates": []
+}

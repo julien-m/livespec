@@ -1,0 +1,10 @@
+# AC016 source inventory and provenance
+
+- Review the complete initial/current pairs listed in manifest.json. The six targeted old specifications and associated test changes remain complete, without excerpts or truncation. New files retain complete current bytes and explicit absent baselines.
+- Current078 spec/plan are supplied once by the canonical base review context. Their absent baseline and exact current SHA remain in source_records. Repeating them as after snapshots and diffs adds no evidence.
+- Every after/initial/HEAD SHA, the full changed-path inventory, all observed feature-spec paths and current input identities remain present. raw_hash_overrides reconstructs the exhaustive raw hash map from current_hashes without repeating identical entries.
+- The former source-inventory.json duplicated manifest fields exactly. Those fields remain in manifest.json. Third before-to-after diff representations were removed because the full pair derives them exactly.
+- The single HEAD/initial/current triple for test_goal_contracts retains the complete initial/current pair and the complete2763-byte HEAD-to-initial diff. Reversing that diff against initial recovers exact HEAD bytes, checked against retained HEAD SHA. No initial076 behavior is attributed to078.
+- Baseline: captured initial dirty files override tracked HEAD ae3c185. Uncaptured initial untracked076 bytes remain unknown. Of79 pre078spec paths, six targeted changed,72 unrelated tracked specs are unchanged, and076 is unverifiable. Ten of29 initial dirty files now have later deltas; complete original hashes distinguish them.
+- Historical reviewer notes were preparation only, not final review authority. Their obsolete security-comment warning was resolved before final freeze. The current full source and exact baseline remain the review authority.
+- This reduction claims no reviewer result or runtime certification. AC016 remains a required independent documentary acceptance conclusion, separate from the15 runtime ACs. Generated provenance uses the existing exact exclusion policy; explicit normative/documentary references override exclusions.

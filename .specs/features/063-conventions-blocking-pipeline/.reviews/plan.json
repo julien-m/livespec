@@ -1,0 +1,801 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "cbe204279a05d18b341ec57f198e3c6c84aa7758c0def2590c0dee9057d78de6",
+  "source_hashes": {
+    ".agent-sync/skills/spec-fix/SKILL.md": "a0505270db0d27069d947f930032c8e754ce3ba57f54d8535c25a3771a010ec7",
+    ".agent-sync/skills/spec-fix/expectations.md": "93bef729778990751a4c6f6d3f6b2c4560b4a87e0de56ca5c144a6c66e82a2ad",
+    ".agent-sync/skills/spec-implement/SKILL.md": "d0545bfbfde757ea3ac1ac1799a15a201c11c5a34835572d959bc9eb3d6e1014",
+    ".agent-sync/skills/spec-implement/expectations.md": "0907accf0a78dd585e584fd3a3bcf39b509082aa626788fecaa651f6a662ab76",
+    ".agent-sync/skills/spec-ship/SKILL.md": "ae943810e35d4ce88f22815de42dc87403345b240d95ab6feb0a3c110fb1b1d9",
+    ".agent-sync/skills/spec-ship/expectations.md": "1b059fe96049b592ab24ec82547146109e13c426d64ee2d10ef8b22787ddbd96",
+    ".agent-sync/skills/spec-test/SKILL.md": "34dd7183b76f031afa6859de834bc4fafc46d881aaa17be138e165f9a7ec1282",
+    ".agent-sync/skills/spec-test/expectations.md": "0c210c952b35fcdbe4dc46777d82b4214f4f1755ecda9b9203bc446cfeaa103a",
+    ".specs/constitution.md": "ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9",
+    ".specs/features/061-conventions-gates-engine/spec.md": "4b90e552cb7a69eaa16a8b8ddeadcd9148f8d6ffca4831439999107cda531501",
+    ".specs/features/063-conventions-blocking-pipeline/plan.md": "17c24ec2eff96a4de0a48492d34e9b95e9b0beab40626c8595787f7ac27d0dbe",
+    ".specs/features/063-conventions-blocking-pipeline/spec.md": "c47d07c5aff74f9df159aca838a7f7c1ada815679b785ddaa27767161ace5d13",
+    ".specs/features/065-conventions-migration-docs/spec.md": "43b080e906d25973fbe9d22ce97d66312b50f9b0ad0caceb6e76c383b7b0e14b",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/spec-system.md": "b241f939cacef9071e76d8228eec209ea12fa68a9211626572252b0870748235",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686",
+    "system/conventions-enforcement.md": "a6d3fca570c0453fdf9a6b87905a4e04b3d673463e38536e574c54b63770cdef",
+    "system/spec-system.md": "4f7ed66b7211358a589022d5c8a6b09c66b92cb34f1bb46a4c0ec64d402ea9f1"
+  },
+  "reviewer_model": "gpt-6.1-sol",
+  "complete": true,
+  "ready": true,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-001",
+      "disposition": "covered",
+      "rationale": "The implementation plan targets run_receipts for conventions evidence, and the revised sequence puts the scoped receipt oracle in both the final proof and archive paths. The actual feature key retains conventions identity; repo evidence adds a separate obligation rather than replacing it.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-001: Given run receipt verification receives `conventions_receipt_path`, When it classifies the evidence key, Then it recognizes kind `conventions` and verifies it with the conventions receipt oracle."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "3. Extend `validator/run_receipts.py` for conventions receipts."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "G->>C: Verify feature receipt identity and integrity"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "A->>C: Recheck scoped proof"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-002",
+      "disposition": "covered",
+      "rationale": "The negative Gherkin scenario explicitly yields drift for an intact verified FAIL receipt. The correction also blocks final FAIL/BLOCKED even when receipt integrity is valid, keeping a negative gate verdict distinct from corruption.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-002: Given a verified conventions receipt has verdict `FAIL` or `BLOCKED`, When proof-chain verification evaluates it, Then it is not treated as proof-chain corruption but prevents success by producing drift or rejection."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "Given a verified conventions receipt has verdict FAIL"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "Then the artifact outcome is drift"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "FAIL/BLOCKED blocks final success even when a historical receipt is internally valid."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-003",
+      "disposition": "covered",
+      "rationale": "verify_output and expectations are explicit receipt_verdict implementation targets; the gates-absent state keeps conditional skipping. Existing command contracts are preserved, so visual receipt_verdict remains supported alongside the conventions extensions rather than being displaced.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-003: Given verify-output evaluates `receipt_verdict` rules, When receipts are kind `conventions` or `visual`, Then it supports both kinds and skips conventions rules for unmigrated projects when gates are absent."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "4. Extend `validator/verify_output.py` and `validator/expectations.py` for `receipt_verdict`."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80",
+          "excerpt": "GatesAbsent --> Skipped: required_if_exists"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28",
+          "excerpt": "- Preserve existing command contracts and extend them through tests first."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-004",
+      "disposition": "covered",
+      "rationale": "A real documentary DoD row supplies the final convention obligations after all other DoD rows and before archive. The reconciliation makes final completion the PASS boundary while retaining early read/apply and progression; it does not silently drop convention evidence from earlier tasks.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-004: Given conventions gates exist, When final implement, test, or fix goal tasks are compiled, Then they require `conventions_receipt_path`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "- Declare a final documentary DoD row in the gated skills; compile its two conventions receipt obligations after all other DoD rows, immediately before archive."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "FR-006 / AC-004 / EC-003 apply only to final command completion, after code, tests and artifact writes."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-005",
+      "disposition": "covered",
+      "rationale": "The goal-contract verification step plus missing/non-PASS final-proof regressions implement rejection of non-PASS submitted evidence. The state diagram now refuses missing/FAIL/BLOCKED at both effective scopes and also refuses a failing fresh rerun.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-005: Given `livespec goal prove` receives conventions evidence, When the receipt verdict is not `PASS`, Then it rejects that evidence."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "5. Extend `validator/goal_contracts.py` so gates-aware tasks require and verify `conventions_receipt_path`."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80",
+          "excerpt": "FinalScopedCheck --> Blocked: missing/FAIL/BLOCKED"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "missing/non-PASS final proof"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-006",
+      "disposition": "covered",
+      "rationale": "Command expectations and SKILLs remain explicit update targets, both obligations are aligned, and spec-ship is now explicitly included with its final DoD. The plan preserves existing contracts, including the wrapping spec-feature receipt rule, rather than removing conventions checking from either parent workflow.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-006: Given command expectations are defined for spec-implement, spec-test, spec-fix, spec-feature, and spec-ship, When they declare receipt checks, Then they require a conventions `receipt_verdict` rule."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "8. Update command expectations, command SKILLs, and verifier/supervisor prompts."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "- Align affected skills/expectations with both final obligations; preserve all FR/AC declarations, protected gate checks and supervisor reruns."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "- Preserve final conventions blocking in spec-ship through the same final DoD row; retain its batch, branch, merge, roadmap and child workflow unchanged."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-007",
+      "disposition": "covered",
+      "rationale": "The feature receipt must carry the actual feature identity; the second obligation must carry repo identity. Repo/batch goals use explicit repo identity, and only a genuinely repo-scoped goal can use its one actual repo receipt under both distinct keys. This does not rely on implicit receipt emission.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-007: Given spec-implement, spec-test, or spec-fix reaches pre-`PHASE_RESULT` verification, When conventions verification runs, Then it uses `livespec conventions verify --json --feature <slug>` and repo-scope goals use explicit `--feature repo` rather than an implicit receipt from `verify --json`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "FR-002 / AC-007 require the actual feature identity in `conventions_receipt_path`."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "065 FR-005 / AC-013 require `repo_conventions_receipt_path` with identity `repo`; a feature PASS cannot substitute for repo PASS."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "Batch/repo goals use explicit repo identity."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-008",
+      "disposition": "covered",
+      "rationale": "Affected skills and expectations retain observable final gate semantics, and the plan explicitly denies PHASE_RESULT OK on historical debt or failed fresh verification. The supplied current four gated skills include BLOCKED conventions_gate_failed and the actual verdict/two-path fields, consistent with the planned DoD integration.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-008: Given a skill emits `PHASE_RESULT`, When conventions verification completes, Then the output includes `extra.conventions_verdict` and a `FAIL` or `BLOCKED` verdict emits `PHASE_RESULT: BLOCKED - conventions_gate_failed`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "- Align affected skills/expectations with both final obligations; preserve all FR/AC declarations, protected gate checks and supervisor reruns."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "historical debt never waives this rerun or authorizes `PHASE_RESULT: OK`."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-009",
+      "disposition": "covered",
+      "rationale": "The correction never uses pre-existing debt as a final exemption. Its explicit early baseline FAIL is only preparation evidence, with every progression prerequisite retained; final FAIL/BLOCKED remains blocking in the plan, state graph and current command contracts.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-009: Given gates exist and a verifier or supervisor prompt observes a conventions gate failure, When it decides whether the run may continue, Then it treats the failure as blocking and forbids \"pre-existing\" as a skip justification."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "Early tasks retain 053 read/apply evidence and all progression prerequisites; an early baseline FAIL is recorded without pretending final readiness."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "FAIL/BLOCKED blocks final success even when a historical receipt is internally valid."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "historical debt never waives this rerun or authorizes `PHASE_RESULT: OK`."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-010",
+      "disposition": "covered",
+      "rationale": "R7 has an explicit registered module target and planned failing tests, with all existing declarations and protected gate checks preserved. The final-only correction concerns receipt timing; it grants no exception to missing/stale gates when the constitution declares convention limits or linters.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-010: Given the constitution declares conventions limits or linters, When R7 coherence rules find stale or missing gates, Then they report ERROR."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "6. Add `validator/coherence/rules/r7_conventions_gates.py` and register it."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "R7, diff/hash/fresh locks, and command docs."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "preserve all FR/AC declarations, protected gate checks and supervisor reruns."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-011",
+      "disposition": "covered",
+      "rationale": "The registered R7 implementation and its failing regressions cover the existing exclusion-breadth rule. Express preservation of every declaration retains the greater-than-30-percent ERROR threshold; the plan neither alters exclusions nor relaxes that rule while moving final PASS evidence.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-011: Given conventions exclusions are configured, When R7 coherence rules find an exclusion matching more than 30 percent of repo files, Then they report ERROR."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "6. Add `validator/coherence/rules/r7_conventions_gates.py` and register it."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "preserve all FR/AC declarations, protected gate checks and supervisor reruns."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-012",
+      "disposition": "covered",
+      "rationale": "R7 remains an explicit, tested coherence component with all declarations preserved. That preserves the stale rulebook-source hash ERROR against ai-ressources; a historical intact receipt cannot excuse current source freshness.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-012: Given rulebook source hashes are recorded, When R7 coherence rules find them stale versus ai-ressources, Then they report ERROR."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "6. Add `validator/coherence/rules/r7_conventions_gates.py` and register it."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "preserve all FR/AC declarations, protected gate checks and supervisor reruns."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "Receipt integrity alone, a stale worker PASS, or historical debt never waives this rerun"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-013",
+      "disposition": "covered",
+      "rationale": "The existing dedicated diffguard target and supervisor-lock tests remain in the implementation plan. The bounded correction explicitly preserves protected checks, so workers cannot obtain PASS by changing protected gate/rulebook/linter configurations within the same pipeline.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-013: Given a pipeline diff touches protected gate, rulebook, or declared linter config files, When the supervisor diff guard runs, Then it blocks the pipeline diff."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "7. Add `validator/conventions_diffguard.py` for supervisor diff, hash, and fresh-run locks."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L93-L99",
+          "excerpt": "for supervisor locks."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "protected gate checks and supervisor reruns."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-014",
+      "disposition": "covered",
+      "rationale": "The supervisor hash lock is expressly implemented and tested in the dedicated diffguard path. Canonical evidence-key checking and historical compatibility do not authorize any changed gate/rulebook base hashes, since protected checks remain required.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-014: Given base branch gates/rules hashes are known, When current gates/rules hashes differ, Then the supervisor hash guard blocks."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "7. Add `validator/conventions_diffguard.py` for supervisor diff, hash, and fresh-run locks."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L93-L99",
+          "excerpt": "for supervisor locks."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "protected gate checks and supervisor reruns."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:AC-015",
+      "disposition": "covered",
+      "rationale": "The revised sequence and state graph now require actual fresh effective-feature and whole-repo supervisor execution after final writes. The reconciliation refuses stale worker PASS and mere receipt integrity, and changed-code rerun regressions directly cover this anti-forgery boundary.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129",
+          "excerpt": "- AC-015: Given a worker provides a conventions receipt, When the supervisor evaluates the gate, Then it gates on a fresh conventions verification result rather than the stale worker-provided receipt."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "S->>R: Fresh whole-repo rerun after final writes"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80",
+          "excerpt": "FreshSupervisorCheck --> Success: actual fresh feature and repo PASS"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "FR-010 / AC-015 and 061 AC-015 require a fresh supervisor rerun of the whole repository before final success."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "changed-code reruns and historical receipt compatibility."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-001",
+      "disposition": "covered",
+      "rationale": "run_receipts is a named conventions implementation target and the revised sequence verifies scoped evidence at proof and archive. Distinct repo evidence is an additional classified obligation, preserving the original conventions key and forbidding another evidence-family substitution.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-001: Extend run receipt evidence keys with `conventions_receipt_path` mapped to receipt kind `conventions`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "3. Extend `validator/run_receipts.py` for conventions receipts."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "Do not fabricate an unclassified task or reuse another specialized evidence family."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "- Require distinct feature and repo evidence keys, with canonical identity checks in goal proof and archive consumers; never reinterpret existing immutable goals."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-002",
+      "disposition": "covered",
+      "rationale": "Both proof and archive use the scoped receipt oracle and the reconciliation requires the actual feature identity. Canonical checks distinguish repo from feature instead of allowing one scope to silently stand in for the other.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-002: Re-verify conventions receipts through `verify_conventions_receipt()` with feature scoping."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "G->>C: Verify feature receipt identity and integrity"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "A->>C: Recheck scoped proof"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "FR-002 / AC-007 require the actual feature identity in `conventions_receipt_path`."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-003",
+      "disposition": "covered",
+      "rationale": "The plan retains a negative verdict scenario with drift and states that an internally valid historical receipt cannot permit final success when fresh verification fails. This treats non-PASS as a gate outcome, with corrupted proof retaining its separate existing contract.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-003: Classify non-PASS conventions receipt verdicts as gate failures that become drift, not proof-chain errors."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "Then the artifact outcome is drift"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "FAIL/BLOCKED blocks final success even when a historical receipt is internally valid."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28",
+          "excerpt": "- Preserve existing command contracts and extend them through tests first."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-004",
+      "disposition": "covered",
+      "rationale": "The technical plan explicitly extends verify_output and expectations for receipt_verdict; the updated archive sequence demands PASS for both actual receipt kinds. This plans evaluation of archived evidence, not trust in self-declared success text.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-004: Add verify-output `receipt_verdict` rule evaluation over archived `receipts[]`."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "4. Extend `validator/verify_output.py` and `validator/expectations.py` for `receipt_verdict`."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "A->>V: Require both receipt kinds PASS"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "V-->>A: Success only with both valid obligations"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-005",
+      "disposition": "covered",
+      "rationale": "The explicit GatesAbsent-to-Skipped transition uses required_if_exists, and existing command contracts are preserved. Thus unmigrated projects without gates do not receive a fabricated mandatory failing conventions receipt.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-005: Skip conventions `receipt_verdict` rules when conventions gates are absent from an unmigrated project."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80",
+          "excerpt": "GatesAbsent --> Skipped: required_if_exists"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28",
+          "excerpt": "- Preserve existing command contracts and extend them through tests first."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-006",
+      "disposition": "covered",
+      "rationale": "The final task is sourced from a canonical documentary DoD row, placed after other DoD and before archive. Both feature/repo obligations must pass; prior tasks keep convention read/apply and all progression evidence. Existing immutable goals remain governed by their original meanings.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-006: Require and validate conventions receipt evidence in final command goal tasks when gates exist."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "- Declare a final documentary DoD row in the gated skills; compile its two conventions receipt obligations after all other DoD rows, immediately before archive."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "Preserve convention read/apply fields on every existing row."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "never reinterpret existing immutable goals."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-007",
+      "disposition": "covered",
+      "rationale": "The plan explicitly updates expectations and skills and now requires the real final documentary DoD row rather than inventing an unclassified task. The current implement/test/fix/ship sources all carry that same final row, preserving their other tasks and proof families.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-007: Update command expectations and skills so conventions verification is part of command definition of done."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "8. Update command expectations, command SKILLs, and verifier/supervisor prompts."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "- Declare a final documentary DoD row in the gated skills; compile its two conventions receipt obligations after all other DoD rows, immediately before archive."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "- Preserve final conventions blocking in spec-ship through the same final DoD row;"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-008",
+      "disposition": "covered",
+      "rationale": "Verifier/supervisor prompt updates remain an explicit technical step. The reconciliation and updated flow make fresh FAIL/BLOCKED terminally blocking and refuse pre-existing debt or stale worker PASS as an exemption, while preserving protected checks.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-008: Update verifier and supervisor prompts with blocking conventions gate semantics."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "8. Update command expectations, command SKILLs, and verifier/supervisor prompts."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80",
+          "excerpt": "FreshSupervisorCheck --> Blocked: current rerun FAIL/BLOCKED"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "Receipt integrity alone, a stale worker PASS, or historical debt never waives this rerun or authorizes `PHASE_RESULT: OK`."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-009",
+      "disposition": "covered",
+      "rationale": "The R7 module is explicitly added and registered, with failing R7 regressions before production implementation. The bounded receipt-timing repair preserves every existing declaration and protected check, including setup coherence.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-009: Add and register R7 conventions coherence rules."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "6. Add `validator/coherence/rules/r7_conventions_gates.py` and register it."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "R7, diff/hash/fresh locks, and command docs."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "preserve all FR/AC declarations, protected gate checks and supervisor reruns."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:FR-010",
+      "disposition": "covered",
+      "rationale": "The dedicated diffguard retains diff/hash/fresh locks, and the revised sequence makes actual fresh supervisor reruns visible. Historical schemas 1/2 are explicitly limited to their old meaning; current verification must execute the real scoped and repo gates, with no unapproved new receipt schema proposed.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142",
+          "excerpt": "- FR-010: Add diff, hash, and fresh re-execution supervisor locks for conventions gates."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "7. Add `validator/conventions_diffguard.py` for supervisor diff, hash, and fresh-run locks."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "S->>C: Fresh effective feature rerun after final writes"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64",
+          "excerpt": "S->>R: Fresh whole-repo rerun after final writes"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "Existing receipt schemas 1/2 do not bind source-code hashes or enumerate the verified source dataset. Preserve their historical meaning; final current verification must execute the actual scoped and repo gates again."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:SC-001",
+      "disposition": "covered",
+      "rationale": "Failing tests precede the named implementation steps, and subsequent targeted/full validation establishes the green phase. The bounded regression list adds specific cases for documentary preparation, read/apply, final proof, scope substitution, code changes and immutable historical compatibility.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162",
+          "excerpt": "- SC-001: Targeted tests for each FR fail before implementation and pass after implementation."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "2. Add failing tests for receipt re-verification, artifact outcome, verify-output, goal proof, R7, diff/hash/fresh locks, and command docs."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "- Add regressions for early documentary proof, missing read/apply, missing/non-PASS final proof, feature/repo substitution, changed-code reruns and historical receipt compatibility."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "9. Run targeted tests, full tests, ruff, format check, and pyright."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:SC-002",
+      "disposition": "covered",
+      "rationale": "The full pytest -x -q invocation is explicit, and the risks section records the accepted global skip baseline while requiring no new feature-targeted skips. Final command contracts still require successful tests rather than counting a skipped suite as passing execution.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162",
+          "excerpt": "- SC-002: `pytest tests/ -x -q` exits 0 with the accepted project skip baseline reported."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L93-L99",
+          "excerpt": "- Re-run the full `pytest tests/ -x -q` suite."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L100-L104",
+          "excerpt": "- The global test suite contains existing skipped tests; the feature-specific targeted tests add no skips."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28",
+          "excerpt": "- Preserve existing command contracts and extend them through tests first."
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "063-conventions-blocking-pipeline:SC-003",
+      "disposition": "covered",
+      "rationale": "ruff, format check and pyright remain explicit quality gates in the technical context and final validation step. The final conventions task is additional to those existing successful check obligations; it is not a replacement or silent waiver.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162",
+          "excerpt": "- SC-003: `ruff check .`, `ruff format --check .`, and `pyright` complete with zero errors."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L16-L22",
+          "excerpt": "- Quality gates: ruff, ruff format, pyright"
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92",
+          "excerpt": "9. Run targeted tests, full tests, ruff, format check, and pyright."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28",
+          "excerpt": "- Preserve existing command contracts and extend them through tests first."
+        }
+      ],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [
+    {
+      "category": "reference_scope_reconciliation",
+      "severity": "info",
+      "description": "The earlier unbounded adoption of the full 065 migration/documentation feature is removed by the informational Inspect reference. Its complete current source remains examined as context, while the required repo-scope conjunction FR-005 / AC-013 is explicitly retained in the plan and both system Quality Gates. No migration requirement is silently certified as implemented.",
+      "suggestion": "Keep the explicit separate repo identity and fresh final PASS obligation during implementation; preserve the historical failed review as a record rather than rebinding its raw output to this new context.",
+      "citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "- Inspect: [repo completion requirements](../065-conventions-migration-docs/spec.md)."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "065 FR-005 / AC-013 require `repo_conventions_receipt_path` with identity `repo`; a feature PASS cannot substitute for repo PASS."
+        },
+        {
+          "section_id": ".specs/features/065-conventions-migration-docs/spec.md:L97-L113",
+          "excerpt": "- AC-013: `system/spec-system.md` Quality Gates require a repo-scope `livespec conventions verify` PASS before `PHASE_RESULT: OK` for implement, test, and fix, with no pre-existing exemption."
+        }
+      ]
+    },
+    {
+      "category": "evidence_and_freshness_boundary",
+      "severity": "info",
+      "description": "The new plan and diagrams describe the required final conjunction, actual current-data reruns and preservation of early read/apply. This semantic plan review does not establish that the compiler or proof/archive consumers implement those obligations, that all gates currently pass, or that Handy initialization has completed. Schemas 1/2 do not themselves prove current source-code coverage.",
+      "suggestion": "Require the planned changed-code, identity-substitution, missing/non-PASS and early-documentary regressions plus actual independent final supervisor reruns before claiming execution success; do not infer a new schema or current-code certification from this review.",
+      "citations": [
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112",
+          "excerpt": "- Add regressions for early documentary proof, missing read/apply, missing/non-PASS final proof, feature/repo substitution, changed-code reruns and historical receipt compatibility."
+        },
+        {
+          "section_id": ".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134",
+          "excerpt": "Existing receipt schemas 1/2 do not bind source-code hashes or enumerate the verified source dataset. Preserve their historical meaning; final current verification must execute the actual scoped and repo gates again."
+        },
+        {
+          "section_id": ".specs/features/061-conventions-gates-engine/spec.md:L172-L176",
+          "excerpt": "Un receipt PASS seul ne constitue pas une preuve de conformite suffisante."
+        }
+      ]
+    }
+  ],
+  "confidence": 4,
+  "raw_results": [
+    "{\n  \"batch_id\": \"batch-001\",\n  \"reviewed_section_ids\": [\n    \".agent-sync/skills/spec-fix/SKILL.md:L1-L13\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L14-L22\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L23-L49\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L50-L53\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L54-L61\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L62-L67\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L68-L81\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L82-L130\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L131-L141\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L142-L143\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L144-L151\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L152-L169\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L170-L204\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L205-L245\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L246-L292\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L293-L325\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L326-L351\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L352-L374\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L375-L416\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L417-L438\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L439-L452\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L453-L471\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L472-L480\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L481-L494\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L495-L501\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L502-L505\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L506-L513\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L514-L528\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L529-L534\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L535-L541\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L542-L551\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L552-L563\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L564-L575\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L576-L598\",\n    \".agent-sync/skills/spec-fix/SKILL.md:L599-L632\",\n    \".agent-sync/skills/spec-fix/expectations.md:L1-L8\",\n    \".agent-sync/skills/spec-fix/expectations.md:L9-L10\",\n    \".agent-sync/skills/spec-fix/expectations.md:L11-L14\",\n    \".agent-sync/skills/spec-fix/expectations.md:L15-L18\",\n    \".agent-sync/skills/spec-fix/expectations.md:L19-L29\",\n    \".agent-sync/skills/spec-fix/expectations.md:L30-L46\",\n    \".agent-sync/skills/spec-fix/expectations.md:L47-L57\",\n    \".agent-sync/skills/spec-fix/expectations.md:L58-L66\",\n    \".agent-sync/skills/spec-fix/expectations.md:L67-L76\",\n    \".agent-sync/skills/spec-fix/expectations.md:L77-L84\",\n    \".agent-sync/skills/spec-fix/expectations.md:L85-L91\",\n    \".agent-sync/skills/spec-fix/expectations.md:L92-L96\",\n    \".agent-sync/skills/spec-fix/expectations.md:L97-L100\",\n    \".agent-sync/skills/spec-fix/expectations.md:L101-L106\",\n    \".agent-sync/skills/spec-fix/expectations.md:L107-L119\",\n    \".agent-sync/skills/spec-fix/expectations.md:L120-L121\",\n    \".agent-sync/skills/spec-fix/expectations.md:L122-L133\",\n    \".agent-sync/skills/spec-fix/expectations.md:L134-L141\",\n    \".agent-sync/skills/spec-fix/expectations.md:L142-L147\",\n    \".agent-sync/skills/spec-fix/expectations.md:L148-L155\",\n    \".agent-sync/skills/spec-fix/expectations.md:L156-L161\",\n    \".agent-sync/skills/spec-fix/expectations.md:L162-L168\",\n    \".agent-sync/skills/spec-fix/expectations.md:L169-L179\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L1-L17\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L18-L26\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L27-L53\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L54-L60\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L61-L64\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L65-L72\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L73-L76\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L77-L84\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L85-L134\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L135-L140\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L141-L156\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L157-L158\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L159-L216\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L217-L229\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L230-L238\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L239-L246\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L247-L262\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L263-L282\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L283-L302\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L303-L326\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L327-L333\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L334-L340\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L341-L344\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L345-L348\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L349-L412\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L413-L435\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L436-L450\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L451-L472\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L473-L505\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L506-L526\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L527-L542\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L543-L570\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L571-L595\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L596-L609\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L610-L644\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L645-L650\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L651-L660\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L661-L667\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L668-L674\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L675-L680\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L681-L688\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L689-L697\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L698-L706\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L707-L715\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L716-L721\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L722-L727\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L728-L733\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L734-L738\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L739-L743\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L744-L750\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L751-L773\",\n    \".agent-sync/skills/spec-implement/SKILL.md:L774-L780\",\n    \".agent-sync/skills/spec-implement/expectations.md:L1-L6\",\n    \".agent-sync/skills/spec-implement/expectations.md:L7-L8\",\n    \".agent-sync/skills/spec-implement/expectations.md:L9-L12\",\n    \".agent-sync/skills/spec-implement/expectations.md:L13-L17\",\n    \".agent-sync/skills/spec-implement/expectations.md:L18-L30\",\n    \".agent-sync/skills/spec-implement/expectations.md:L31-L50\",\n    \".agent-sync/skills/spec-implement/expectations.md:L51-L62\",\n    \".agent-sync/skills/spec-implement/expectations.md:L63-L76\",\n    \".agent-sync/skills/spec-implement/expectations.md:L77-L82\",\n    \".agent-sync/skills/spec-implement/expectations.md:L83-L90\",\n    \".agent-sync/skills/spec-implement/expectations.md:L91-L97\",\n    \".agent-sync/skills/spec-implement/expectations.md:L98-L102\",\n    \".agent-sync/skills/spec-implement/expectations.md:L103-L108\",\n    \".agent-sync/skills/spec-implement/expectations.md:L109-L114\",\n    \".agent-sync/skills/spec-implement/expectations.md:L115-L139\",\n    \".agent-sync/skills/spec-implement/expectations.md:L140-L141\",\n    \".agent-sync/skills/spec-implement/expectations.md:L142-L155\",\n    \".agent-sync/skills/spec-implement/expectations.md:L156-L166\",\n    \".agent-sync/skills/spec-implement/expectations.md:L167-L172\",\n    \".agent-sync/skills/spec-implement/expectations.md:L173-L180\",\n    \".agent-sync/skills/spec-implement/expectations.md:L181-L188\",\n    \".agent-sync/skills/spec-implement/expectations.md:L189-L194\",\n    \".agent-sync/skills/spec-implement/expectations.md:L195-L200\",\n    \".agent-sync/skills/spec-implement/expectations.md:L201-L205\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L1-L8\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L9-L16\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L17-L43\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L44-L51\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L52-L57\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L58-L97\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L98-L110\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L111-L124\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L125-L126\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L127-L146\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L147-L154\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L155-L197\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L198-L209\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L210-L236\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L237-L240\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L241-L247\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L248-L281\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L282-L309\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L310-L328\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L329-L338\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L339-L356\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L357-L362\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L363-L375\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L376-L400\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L401-L422\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L423-L440\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L441-L449\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L450-L456\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L457-L463\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L464-L469\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L470-L476\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L477-L481\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L482-L500\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L501-L505\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L506-L518\",\n    \".agent-sync/skills/spec-ship/SKILL.md:L519-L540\",\n    \".agent-sync/skills/spec-ship/expectations.md:L1-L6\",\n    \".agent-sync/skills/spec-ship/expectations.md:L7-L8\",\n    \".agent-sync/skills/spec-ship/expectations.md:L9-L12\",\n    \".agent-sync/skills/spec-ship/expectations.md:L13-L16\",\n    \".agent-sync/skills/spec-ship/expectations.md:L17-L28\",\n    \".agent-sync/skills/spec-ship/expectations.md:L29-L43\",\n    \".agent-sync/skills/spec-ship/expectations.md:L44-L55\",\n    \".agent-sync/skills/spec-ship/expectations.md:L56-L59\",\n    \".agent-sync/skills/spec-ship/expectations.md:L60-L67\",\n    \".agent-sync/skills/spec-ship/expectations.md:L68-L74\",\n    \".agent-sync/skills/spec-ship/expectations.md:L75-L79\",\n    \".agent-sync/skills/spec-ship/expectations.md:L80-L84\",\n    \".agent-sync/skills/spec-ship/expectations.md:L85-L90\",\n    \".agent-sync/skills/spec-ship/expectations.md:L91-L109\",\n    \".agent-sync/skills/spec-ship/expectations.md:L110-L111\",\n    \".agent-sync/skills/spec-ship/expectations.md:L112-L123\",\n    \".agent-sync/skills/spec-ship/expectations.md:L124-L130\",\n    \".agent-sync/skills/spec-ship/expectations.md:L131-L136\",\n    \".agent-sync/skills/spec-ship/expectations.md:L137-L144\",\n    \".agent-sync/skills/spec-ship/expectations.md:L145-L150\",\n    \".agent-sync/skills/spec-ship/expectations.md:L151-L155\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1-L33\",\n    \".agent-sync/skills/spec-test/SKILL.md:L34-L42\",\n    \".agent-sync/skills/spec-test/SKILL.md:L43-L69\",\n    \".agent-sync/skills/spec-test/SKILL.md:L70-L75\",\n    \".agent-sync/skills/spec-test/SKILL.md:L76-L79\",\n    \".agent-sync/skills/spec-test/SKILL.md:L80-L87\",\n    \".agent-sync/skills/spec-test/SKILL.md:L88-L91\",\n    \".agent-sync/skills/spec-test/SKILL.md:L92-L99\",\n    \".agent-sync/skills/spec-test/SKILL.md:L100-L147\",\n    \".agent-sync/skills/spec-test/SKILL.md:L148-L165\",\n    \".agent-sync/skills/spec-test/SKILL.md:L166-L171\",\n    \".agent-sync/skills/spec-test/SKILL.md:L172-L173\",\n    \".agent-sync/skills/spec-test/SKILL.md:L174-L193\",\n    \".agent-sync/skills/spec-test/SKILL.md:L194-L213\",\n    \".agent-sync/skills/spec-test/SKILL.md:L214-L217\",\n    \".agent-sync/skills/spec-test/SKILL.md:L218-L229\",\n    \".agent-sync/skills/spec-test/SKILL.md:L230-L243\",\n    \".agent-sync/skills/spec-test/SKILL.md:L244-L284\",\n    \".agent-sync/skills/spec-test/SKILL.md:L285-L293\",\n    \".agent-sync/skills/spec-test/SKILL.md:L294-L320\",\n    \".agent-sync/skills/spec-test/SKILL.md:L321-L358\",\n    \".agent-sync/skills/spec-test/SKILL.md:L359-L362\",\n    \".agent-sync/skills/spec-test/SKILL.md:L363-L373\",\n    \".agent-sync/skills/spec-test/SKILL.md:L374-L379\",\n    \".agent-sync/skills/spec-test/SKILL.md:L380-L392\",\n    \".agent-sync/skills/spec-test/SKILL.md:L393-L406\",\n    \".agent-sync/skills/spec-test/SKILL.md:L407-L418\",\n    \".agent-sync/skills/spec-test/SKILL.md:L419-L425\",\n    \".agent-sync/skills/spec-test/SKILL.md:L426-L448\",\n    \".agent-sync/skills/spec-test/SKILL.md:L449-L507\",\n    \".agent-sync/skills/spec-test/SKILL.md:L508-L519\",\n    \".agent-sync/skills/spec-test/SKILL.md:L520-L530\",\n    \".agent-sync/skills/spec-test/SKILL.md:L531-L539\",\n    \".agent-sync/skills/spec-test/SKILL.md:L540-L548\",\n    \".agent-sync/skills/spec-test/SKILL.md:L549-L580\",\n    \".agent-sync/skills/spec-test/SKILL.md:L581-L586\",\n    \".agent-sync/skills/spec-test/SKILL.md:L587-L597\",\n    \".agent-sync/skills/spec-test/SKILL.md:L598-L611\",\n    \".agent-sync/skills/spec-test/SKILL.md:L612-L651\",\n    \".agent-sync/skills/spec-test/SKILL.md:L652-L673\",\n    \".agent-sync/skills/spec-test/SKILL.md:L674-L731\",\n    \".agent-sync/skills/spec-test/SKILL.md:L732-L751\",\n    \".agent-sync/skills/spec-test/SKILL.md:L752-L757\",\n    \".agent-sync/skills/spec-test/SKILL.md:L758-L771\",\n    \".agent-sync/skills/spec-test/SKILL.md:L772-L808\",\n    \".agent-sync/skills/spec-test/SKILL.md:L809-L814\",\n    \".agent-sync/skills/spec-test/SKILL.md:L815-L821\",\n    \".agent-sync/skills/spec-test/SKILL.md:L822-L864\",\n    \".agent-sync/skills/spec-test/SKILL.md:L865-L897\",\n    \".agent-sync/skills/spec-test/SKILL.md:L898-L901\",\n    \".agent-sync/skills/spec-test/SKILL.md:L902-L908\",\n    \".agent-sync/skills/spec-test/SKILL.md:L909-L934\",\n    \".agent-sync/skills/spec-test/SKILL.md:L935-L965\",\n    \".agent-sync/skills/spec-test/SKILL.md:L966-L998\",\n    \".agent-sync/skills/spec-test/SKILL.md:L999-L1005\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1006-L1031\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1032-L1033\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1034-L1085\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1086-L1109\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1110-L1131\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1132-L1150\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1151-L1198\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1199-L1208\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1209-L1210\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1211-L1220\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1221-L1224\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1225-L1230\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1231-L1291\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1292-L1297\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1298-L1305\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1306-L1316\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1317-L1328\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1329-L1335\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1336-L1346\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1347-L1354\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1355-L1366\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1367-L1396\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1397-L1410\",\n    \".agent-sync/skills/spec-test/SKILL.md:L1411-L1431\",\n    \".agent-sync/skills/spec-test/expectations.md:L1-L8\",\n    \".agent-sync/skills/spec-test/expectations.md:L9-L10\",\n    \".agent-sync/skills/spec-test/expectations.md:L11-L14\",\n    \".agent-sync/skills/spec-test/expectations.md:L15-L21\",\n    \".agent-sync/skills/spec-test/expectations.md:L22-L35\",\n    \".agent-sync/skills/spec-test/expectations.md:L36-L73\",\n    \".agent-sync/skills/spec-test/expectations.md:L74-L84\",\n    \".agent-sync/skills/spec-test/expectations.md:L85-L100\",\n    \".agent-sync/skills/spec-test/expectations.md:L101-L105\",\n    \".agent-sync/skills/spec-test/expectations.md:L106-L115\",\n    \".agent-sync/skills/spec-test/expectations.md:L116-L121\",\n    \".agent-sync/skills/spec-test/expectations.md:L122-L128\",\n    \".agent-sync/skills/spec-test/expectations.md:L129-L133\",\n    \".agent-sync/skills/spec-test/expectations.md:L134-L141\",\n    \".agent-sync/skills/spec-test/expectations.md:L142-L147\",\n    \".agent-sync/skills/spec-test/expectations.md:L148-L170\",\n    \".agent-sync/skills/spec-test/expectations.md:L171-L172\",\n    \".agent-sync/skills/spec-test/expectations.md:L173-L186\",\n    \".agent-sync/skills/spec-test/expectations.md:L187-L199\",\n    \".agent-sync/skills/spec-test/expectations.md:L200-L205\",\n    \".agent-sync/skills/spec-test/expectations.md:L206-L213\",\n    \".agent-sync/skills/spec-test/expectations.md:L214-L220\",\n    \".agent-sync/skills/spec-test/expectations.md:L221-L226\",\n    \".agent-sync/skills/spec-test/expectations.md:L227-L230\",\n    \".agent-sync/skills/spec-test/expectations.md:L231-L240\",\n    \".specs/constitution.md:L1-L8\",\n    \".specs/constitution.md:L9-L18\",\n    \".specs/constitution.md:L19-L20\",\n    \".specs/constitution.md:L21-L26\",\n    \".specs/constitution.md:L27-L32\",\n    \".specs/constitution.md:L33-L37\",\n    \".specs/constitution.md:L38-L43\",\n    \".specs/constitution.md:L44-L49\",\n    \".specs/constitution.md:L50-L56\",\n    \".specs/constitution.md:L57-L58\",\n    \".specs/constitution.md:L59-L65\",\n    \".specs/constitution.md:L66-L71\",\n    \".specs/constitution.md:L72-L75\",\n    \".specs/constitution.md:L76-L81\",\n    \".specs/constitution.md:L82-L83\",\n    \".specs/constitution.md:L84-L90\",\n    \".specs/constitution.md:L91-L96\",\n    \".specs/constitution.md:L97-L102\",\n    \".specs/constitution.md:L103-L109\",\n    \".specs/constitution.md:L110-L111\",\n    \".specs/constitution.md:L112-L118\",\n    \".specs/constitution.md:L119-L123\",\n    \".specs/constitution.md:L124-L131\",\n    \".specs/constitution.md:L132-L146\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L1-L10\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L11-L12\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L13-L22\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L23-L24\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L25-L55\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L56-L88\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L89-L117\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L118-L119\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L120-L123\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L124-L127\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L128-L131\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L132-L135\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L136-L139\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L140-L142\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L143-L146\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L147-L150\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L151-L153\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L154-L156\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L157-L159\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L160-L163\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L164-L167\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L168-L171\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L172-L176\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L177-L180\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L181-L185\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L186-L198\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L199-L206\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L207-L218\",\n    \".specs/features/061-conventions-gates-engine/spec.md:L219-L225\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L1-L9\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L10-L11\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L12-L15\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L16-L22\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L93-L99\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L100-L104\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n    \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L1-L8\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L9-L15\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L16-L17\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L18-L51\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L52-L80\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L81-L111\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L143-L149\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L150-L157\",\n    \".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L1-L8\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L9-L15\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L16-L17\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L18-L48\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L49-L72\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L73-L96\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L97-L113\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L114-L122\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L123-L129\",\n    \".specs/features/065-conventions-migration-docs/spec.md:L130-L134\",\n    \".specs/project.md:L1-L7\",\n    \".specs/project.md:L8-L20\",\n    \".specs/project.md:L21-L29\",\n    \".specs/project.md:L30-L43\",\n    \".specs/project.md:L44-L54\",\n    \".specs/project.md:L55-L63\",\n    \".specs/project.md:L64-L73\",\n    \".specs/project.md:L74-L82\",\n    \".specs/spec-system.md:L1-L4\",\n    \".specs/spec-system.md:L5-L11\",\n    \".specs/spec-system.md:L12-L37\",\n    \".specs/spec-system.md:L38-L95\",\n    \".specs/spec-system.md:L96-L99\",\n    \".specs/spec-system.md:L100-L131\",\n    \".specs/spec-system.md:L132-L145\",\n    \".specs/spec-system.md:L146-L162\",\n    \".specs/spec-system.md:L163-L177\",\n    \".specs/spec-system.md:L178-L181\",\n    \".specs/spec-system.md:L182-L185\",\n    \".specs/spec-system.md:L186-L189\",\n    \".specs/spec-system.md:L190-L193\",\n    \".specs/spec-system.md:L194-L203\",\n    \".specs/spec-system.md:L204-L207\",\n    \".specs/spec-system.md:L208-L227\",\n    \".specs/spec-system.md:L228-L254\",\n    \".specs/spec-system.md:L255-L269\",\n    \".specs/spec-system.md:L270-L271\",\n    \".specs/spec-system.md:L272-L278\",\n    \".specs/spec-system.md:L279-L292\",\n    \".specs/spec-system.md:L293-L317\",\n    \".specs/spec-system.md:L318-L335\",\n    \".specs/spec-system.md:L336-L339\",\n    \".specs/spec-system.md:L340-L351\",\n    \".specs/spec-system.md:L352-L359\",\n    \".specs/spec-system.md:L360-L367\",\n    \".specs/spec-system.md:L368-L384\",\n    \".specs/spec-system.md:L385-L392\",\n    \".specs/spec-system.md:L393-L400\",\n    \".specs/spec-system.md:L401-L413\",\n    \".specs/spec-system.md:L414-L451\",\n    \".specs/spec-system.md:L452-L478\",\n    \".specs/spec-system.md:L479-L488\",\n    \".specs/spec-system.md:L489-L498\",\n    \".specs/spec-system.md:L499-L506\",\n    \".specs/spec-system.md:L507-L533\",\n    \".specs/spec-system.md:L534-L567\",\n    \".specs/spec-system.md:L568-L594\",\n    \".specs/spec-system.md:L595-L618\",\n    \".specs/spec-system.md:L619-L656\",\n    \".specs/spec-system.md:L657-L679\",\n    \".specs/spec-system.md:L680-L701\",\n    \".specs/spec-system.md:L702-L713\",\n    \".specs/stacks/_default.md:L1-L5\",\n    \".specs/stacks/_default.md:L6-L12\",\n    \".specs/stacks/_default.md:L13-L38\",\n    \".specs/stacks/_default.md:L39-L48\",\n    \".specs/stacks/_default.md:L49-L60\",\n    \".specs/stacks/_default.md:L61-L68\",\n    \".specs/stacks/_default.md:L69-L71\",\n    \"system/conventions-enforcement.md:L1-L2\",\n    \"system/conventions-enforcement.md:L3-L6\",\n    \"system/conventions-enforcement.md:L7-L21\",\n    \"system/conventions-enforcement.md:L22-L23\",\n    \"system/conventions-enforcement.md:L24-L35\",\n    \"system/conventions-enforcement.md:L36-L46\",\n    \"system/conventions-enforcement.md:L47-L57\",\n    \"system/conventions-enforcement.md:L58-L68\",\n    \"system/conventions-enforcement.md:L69-L83\",\n    \"system/conventions-enforcement.md:L84-L95\",\n    \"system/conventions-enforcement.md:L96-L104\",\n    \"system/conventions-enforcement.md:L105-L109\",\n    \"system/spec-system.md:L1-L5\",\n    \"system/spec-system.md:L6-L12\",\n    \"system/spec-system.md:L13-L36\",\n    \"system/spec-system.md:L37-L49\",\n    \"system/spec-system.md:L50-L105\",\n    \"system/spec-system.md:L106-L109\",\n    \"system/spec-system.md:L110-L141\",\n    \"system/spec-system.md:L142-L155\",\n    \"system/spec-system.md:L156-L172\",\n    \"system/spec-system.md:L173-L187\",\n    \"system/spec-system.md:L188-L191\",\n    \"system/spec-system.md:L192-L195\",\n    \"system/spec-system.md:L196-L199\",\n    \"system/spec-system.md:L200-L203\",\n    \"system/spec-system.md:L204-L223\",\n    \"system/spec-system.md:L224-L250\",\n    \"system/spec-system.md:L251-L270\",\n    \"system/spec-system.md:L271-L272\",\n    \"system/spec-system.md:L273-L279\",\n    \"system/spec-system.md:L280-L293\",\n    \"system/spec-system.md:L294-L318\",\n    \"system/spec-system.md:L319-L332\",\n    \"system/spec-system.md:L333-L345\",\n    \"system/spec-system.md:L346-L353\",\n    \"system/spec-system.md:L354-L361\",\n    \"system/spec-system.md:L362-L378\",\n    \"system/spec-system.md:L379-L386\",\n    \"system/spec-system.md:L387-L394\",\n    \"system/spec-system.md:L395-L403\",\n    \"system/spec-system.md:L404-L413\",\n    \"system/spec-system.md:L414-L423\",\n    \"system/spec-system.md:L424-L431\",\n    \"system/spec-system.md:L432-L458\",\n    \"system/spec-system.md:L459-L492\",\n    \"system/spec-system.md:L493-L519\",\n    \"system/spec-system.md:L520-L543\",\n    \"system/spec-system.md:L544-L587\",\n    \"system/spec-system.md:L588-L610\",\n    \"system/spec-system.md:L611-L632\",\n    \"system/spec-system.md:L633-L644\"\n  ],\n  \"conclusions\": [\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The implementation plan targets run_receipts for conventions evidence, and the revised sequence puts the scoped receipt oracle in both the final proof and archive paths. The actual feature key retains conventions identity; repo evidence adds a separate obligation rather than replacing it.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-001: Given run receipt verification receives `conventions_receipt_path`, When it classifies the evidence key, Then it recognizes kind `conventions` and verifies it with the conventions receipt oracle.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"3. Extend `validator/run_receipts.py` for conventions receipts.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"G->>C: Verify feature receipt identity and integrity\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"A->>C: Recheck scoped proof\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The negative Gherkin scenario explicitly yields drift for an intact verified FAIL receipt. The correction also blocks final FAIL/BLOCKED even when receipt integrity is valid, keeping a negative gate verdict distinct from corruption.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-002: Given a verified conventions receipt has verdict `FAIL` or `BLOCKED`, When proof-chain verification evaluates it, Then it is not treated as proof-chain corruption but prevents success by producing drift or rejection.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"Given a verified conventions receipt has verdict FAIL\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"Then the artifact outcome is drift\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"FAIL/BLOCKED blocks final success even when a historical receipt is internally valid.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"verify_output and expectations are explicit receipt_verdict implementation targets; the gates-absent state keeps conditional skipping. Existing command contracts are preserved, so visual receipt_verdict remains supported alongside the conventions extensions rather than being displaced.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-003: Given verify-output evaluates `receipt_verdict` rules, When receipts are kind `conventions` or `visual`, Then it supports both kinds and skips conventions rules for unmigrated projects when gates are absent.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"4. Extend `validator/verify_output.py` and `validator/expectations.py` for `receipt_verdict`.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80\",\n          \"excerpt\": \"GatesAbsent --> Skipped: required_if_exists\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28\",\n          \"excerpt\": \"- Preserve existing command contracts and extend them through tests first.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"A real documentary DoD row supplies the final convention obligations after all other DoD rows and before archive. The reconciliation makes final completion the PASS boundary while retaining early read/apply and progression; it does not silently drop convention evidence from earlier tasks.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-004: Given conventions gates exist, When final implement, test, or fix goal tasks are compiled, Then they require `conventions_receipt_path`.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"- Declare a final documentary DoD row in the gated skills; compile its two conventions receipt obligations after all other DoD rows, immediately before archive.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"FR-006 / AC-004 / EC-003 apply only to final command completion, after code, tests and artifact writes.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The goal-contract verification step plus missing/non-PASS final-proof regressions implement rejection of non-PASS submitted evidence. The state diagram now refuses missing/FAIL/BLOCKED at both effective scopes and also refuses a failing fresh rerun.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-005: Given `livespec goal prove` receives conventions evidence, When the receipt verdict is not `PASS`, Then it rejects that evidence.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"5. Extend `validator/goal_contracts.py` so gates-aware tasks require and verify `conventions_receipt_path`.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80\",\n          \"excerpt\": \"FinalScopedCheck --> Blocked: missing/FAIL/BLOCKED\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"missing/non-PASS final proof\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Command expectations and SKILLs remain explicit update targets, both obligations are aligned, and spec-ship is now explicitly included with its final DoD. The plan preserves existing contracts, including the wrapping spec-feature receipt rule, rather than removing conventions checking from either parent workflow.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-006: Given command expectations are defined for spec-implement, spec-test, spec-fix, spec-feature, and spec-ship, When they declare receipt checks, Then they require a conventions `receipt_verdict` rule.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"8. Update command expectations, command SKILLs, and verifier/supervisor prompts.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"- Align affected skills/expectations with both final obligations; preserve all FR/AC declarations, protected gate checks and supervisor reruns.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"- Preserve final conventions blocking in spec-ship through the same final DoD row; retain its batch, branch, merge, roadmap and child workflow unchanged.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-007\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The feature receipt must carry the actual feature identity; the second obligation must carry repo identity. Repo/batch goals use explicit repo identity, and only a genuinely repo-scoped goal can use its one actual repo receipt under both distinct keys. This does not rely on implicit receipt emission.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-007: Given spec-implement, spec-test, or spec-fix reaches pre-`PHASE_RESULT` verification, When conventions verification runs, Then it uses `livespec conventions verify --json --feature <slug>` and repo-scope goals use explicit `--feature repo` rather than an implicit receipt from `verify --json`.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"FR-002 / AC-007 require the actual feature identity in `conventions_receipt_path`.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"065 FR-005 / AC-013 require `repo_conventions_receipt_path` with identity `repo`; a feature PASS cannot substitute for repo PASS.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"Batch/repo goals use explicit repo identity.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-008\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Affected skills and expectations retain observable final gate semantics, and the plan explicitly denies PHASE_RESULT OK on historical debt or failed fresh verification. The supplied current four gated skills include BLOCKED conventions_gate_failed and the actual verdict/two-path fields, consistent with the planned DoD integration.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-008: Given a skill emits `PHASE_RESULT`, When conventions verification completes, Then the output includes `extra.conventions_verdict` and a `FAIL` or `BLOCKED` verdict emits `PHASE_RESULT: BLOCKED - conventions_gate_failed`.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"- Align affected skills/expectations with both final obligations; preserve all FR/AC declarations, protected gate checks and supervisor reruns.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"historical debt never waives this rerun or authorizes `PHASE_RESULT: OK`.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-009\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The correction never uses pre-existing debt as a final exemption. Its explicit early baseline FAIL is only preparation evidence, with every progression prerequisite retained; final FAIL/BLOCKED remains blocking in the plan, state graph and current command contracts.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-009: Given gates exist and a verifier or supervisor prompt observes a conventions gate failure, When it decides whether the run may continue, Then it treats the failure as blocking and forbids \\\"pre-existing\\\" as a skip justification.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"Early tasks retain 053 read/apply evidence and all progression prerequisites; an early baseline FAIL is recorded without pretending final readiness.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"FAIL/BLOCKED blocks final success even when a historical receipt is internally valid.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"historical debt never waives this rerun or authorizes `PHASE_RESULT: OK`.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-010\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"R7 has an explicit registered module target and planned failing tests, with all existing declarations and protected gate checks preserved. The final-only correction concerns receipt timing; it grants no exception to missing/stale gates when the constitution declares convention limits or linters.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-010: Given the constitution declares conventions limits or linters, When R7 coherence rules find stale or missing gates, Then they report ERROR.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"6. Add `validator/coherence/rules/r7_conventions_gates.py` and register it.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"R7, diff/hash/fresh locks, and command docs.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"preserve all FR/AC declarations, protected gate checks and supervisor reruns.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-011\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The registered R7 implementation and its failing regressions cover the existing exclusion-breadth rule. Express preservation of every declaration retains the greater-than-30-percent ERROR threshold; the plan neither alters exclusions nor relaxes that rule while moving final PASS evidence.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-011: Given conventions exclusions are configured, When R7 coherence rules find an exclusion matching more than 30 percent of repo files, Then they report ERROR.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"6. Add `validator/coherence/rules/r7_conventions_gates.py` and register it.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"preserve all FR/AC declarations, protected gate checks and supervisor reruns.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-012\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"R7 remains an explicit, tested coherence component with all declarations preserved. That preserves the stale rulebook-source hash ERROR against ai-ressources; a historical intact receipt cannot excuse current source freshness.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-012: Given rulebook source hashes are recorded, When R7 coherence rules find them stale versus ai-ressources, Then they report ERROR.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"6. Add `validator/coherence/rules/r7_conventions_gates.py` and register it.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"preserve all FR/AC declarations, protected gate checks and supervisor reruns.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"Receipt integrity alone, a stale worker PASS, or historical debt never waives this rerun\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-013\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The existing dedicated diffguard target and supervisor-lock tests remain in the implementation plan. The bounded correction explicitly preserves protected checks, so workers cannot obtain PASS by changing protected gate/rulebook/linter configurations within the same pipeline.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-013: Given a pipeline diff touches protected gate, rulebook, or declared linter config files, When the supervisor diff guard runs, Then it blocks the pipeline diff.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"7. Add `validator/conventions_diffguard.py` for supervisor diff, hash, and fresh-run locks.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L93-L99\",\n          \"excerpt\": \"for supervisor locks.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"protected gate checks and supervisor reruns.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-014\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The supervisor hash lock is expressly implemented and tested in the dedicated diffguard path. Canonical evidence-key checking and historical compatibility do not authorize any changed gate/rulebook base hashes, since protected checks remain required.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-014: Given base branch gates/rules hashes are known, When current gates/rules hashes differ, Then the supervisor hash guard blocks.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"7. Add `validator/conventions_diffguard.py` for supervisor diff, hash, and fresh-run locks.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L93-L99\",\n          \"excerpt\": \"for supervisor locks.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"protected gate checks and supervisor reruns.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:AC-015\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The revised sequence and state graph now require actual fresh effective-feature and whole-repo supervisor execution after final writes. The reconciliation refuses stale worker PASS and mere receipt integrity, and changed-code rerun regressions directly cover this anti-forgery boundary.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L112-L129\",\n          \"excerpt\": \"- AC-015: Given a worker provides a conventions receipt, When the supervisor evaluates the gate, Then it gates on a fresh conventions verification result rather than the stale worker-provided receipt.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"S->>R: Fresh whole-repo rerun after final writes\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80\",\n          \"excerpt\": \"FreshSupervisorCheck --> Success: actual fresh feature and repo PASS\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"FR-010 / AC-015 and 061 AC-015 require a fresh supervisor rerun of the whole repository before final success.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"changed-code reruns and historical receipt compatibility.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"run_receipts is a named conventions implementation target and the revised sequence verifies scoped evidence at proof and archive. Distinct repo evidence is an additional classified obligation, preserving the original conventions key and forbidding another evidence-family substitution.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-001: Extend run receipt evidence keys with `conventions_receipt_path` mapped to receipt kind `conventions`.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"3. Extend `validator/run_receipts.py` for conventions receipts.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"Do not fabricate an unclassified task or reuse another specialized evidence family.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"- Require distinct feature and repo evidence keys, with canonical identity checks in goal proof and archive consumers; never reinterpret existing immutable goals.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Both proof and archive use the scoped receipt oracle and the reconciliation requires the actual feature identity. Canonical checks distinguish repo from feature instead of allowing one scope to silently stand in for the other.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-002: Re-verify conventions receipts through `verify_conventions_receipt()` with feature scoping.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"G->>C: Verify feature receipt identity and integrity\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"A->>C: Recheck scoped proof\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"FR-002 / AC-007 require the actual feature identity in `conventions_receipt_path`.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The plan retains a negative verdict scenario with drift and states that an internally valid historical receipt cannot permit final success when fresh verification fails. This treats non-PASS as a gate outcome, with corrupted proof retaining its separate existing contract.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-003: Classify non-PASS conventions receipt verdicts as gate failures that become drift, not proof-chain errors.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"Then the artifact outcome is drift\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"FAIL/BLOCKED blocks final success even when a historical receipt is internally valid.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28\",\n          \"excerpt\": \"- Preserve existing command contracts and extend them through tests first.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The technical plan explicitly extends verify_output and expectations for receipt_verdict; the updated archive sequence demands PASS for both actual receipt kinds. This plans evaluation of archived evidence, not trust in self-declared success text.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-004: Add verify-output `receipt_verdict` rule evaluation over archived `receipts[]`.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"4. Extend `validator/verify_output.py` and `validator/expectations.py` for `receipt_verdict`.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"A->>V: Require both receipt kinds PASS\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"V-->>A: Success only with both valid obligations\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The explicit GatesAbsent-to-Skipped transition uses required_if_exists, and existing command contracts are preserved. Thus unmigrated projects without gates do not receive a fabricated mandatory failing conventions receipt.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-005: Skip conventions `receipt_verdict` rules when conventions gates are absent from an unmigrated project.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80\",\n          \"excerpt\": \"GatesAbsent --> Skipped: required_if_exists\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28\",\n          \"excerpt\": \"- Preserve existing command contracts and extend them through tests first.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The final task is sourced from a canonical documentary DoD row, placed after other DoD and before archive. Both feature/repo obligations must pass; prior tasks keep convention read/apply and all progression evidence. Existing immutable goals remain governed by their original meanings.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-006: Require and validate conventions receipt evidence in final command goal tasks when gates exist.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"- Declare a final documentary DoD row in the gated skills; compile its two conventions receipt obligations after all other DoD rows, immediately before archive.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"Preserve convention read/apply fields on every existing row.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"never reinterpret existing immutable goals.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-007\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The plan explicitly updates expectations and skills and now requires the real final documentary DoD row rather than inventing an unclassified task. The current implement/test/fix/ship sources all carry that same final row, preserving their other tasks and proof families.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-007: Update command expectations and skills so conventions verification is part of command definition of done.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"8. Update command expectations, command SKILLs, and verifier/supervisor prompts.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"- Declare a final documentary DoD row in the gated skills; compile its two conventions receipt obligations after all other DoD rows, immediately before archive.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"- Preserve final conventions blocking in spec-ship through the same final DoD row;\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-008\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Verifier/supervisor prompt updates remain an explicit technical step. The reconciliation and updated flow make fresh FAIL/BLOCKED terminally blocking and refuse pre-existing debt or stale worker PASS as an exemption, while preserving protected checks.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-008: Update verifier and supervisor prompts with blocking conventions gate semantics.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"8. Update command expectations, command SKILLs, and verifier/supervisor prompts.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L65-L80\",\n          \"excerpt\": \"FreshSupervisorCheck --> Blocked: current rerun FAIL/BLOCKED\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"Receipt integrity alone, a stale worker PASS, or historical debt never waives this rerun or authorizes `PHASE_RESULT: OK`.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-009\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The R7 module is explicitly added and registered, with failing R7 regressions before production implementation. The bounded receipt-timing repair preserves every existing declaration and protected check, including setup coherence.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-009: Add and register R7 conventions coherence rules.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"6. Add `validator/coherence/rules/r7_conventions_gates.py` and register it.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"R7, diff/hash/fresh locks, and command docs.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"preserve all FR/AC declarations, protected gate checks and supervisor reruns.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:FR-010\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The dedicated diffguard retains diff/hash/fresh locks, and the revised sequence makes actual fresh supervisor reruns visible. Historical schemas 1/2 are explicitly limited to their old meaning; current verification must execute the real scoped and repo gates, with no unapproved new receipt schema proposed.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L130-L142\",\n          \"excerpt\": \"- FR-010: Add diff, hash, and fresh re-execution supervisor locks for conventions gates.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"7. Add `validator/conventions_diffguard.py` for supervisor diff, hash, and fresh-run locks.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"S->>C: Fresh effective feature rerun after final writes\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L29-L64\",\n          \"excerpt\": \"S->>R: Fresh whole-repo rerun after final writes\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"Existing receipt schemas 1/2 do not bind source-code hashes or enumerate the verified source dataset. Preserve their historical meaning; final current verification must execute the actual scoped and repo gates again.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:SC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Failing tests precede the named implementation steps, and subsequent targeted/full validation establishes the green phase. The bounded regression list adds specific cases for documentary preparation, read/apply, final proof, scope substitution, code changes and immutable historical compatibility.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162\",\n          \"excerpt\": \"- SC-001: Targeted tests for each FR fail before implementation and pass after implementation.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"2. Add failing tests for receipt re-verification, artifact outcome, verify-output, goal proof, R7, diff/hash/fresh locks, and command docs.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"- Add regressions for early documentary proof, missing read/apply, missing/non-PASS final proof, feature/repo substitution, changed-code reruns and historical receipt compatibility.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"9. Run targeted tests, full tests, ruff, format check, and pyright.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:SC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The full pytest -x -q invocation is explicit, and the risks section records the accepted global skip baseline while requiring no new feature-targeted skips. Final command contracts still require successful tests rather than counting a skipped suite as passing execution.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162\",\n          \"excerpt\": \"- SC-002: `pytest tests/ -x -q` exits 0 with the accepted project skip baseline reported.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L93-L99\",\n          \"excerpt\": \"- Re-run the full `pytest tests/ -x -q` suite.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L100-L104\",\n          \"excerpt\": \"- The global test suite contains existing skipped tests; the feature-specific targeted tests add no skips.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28\",\n          \"excerpt\": \"- Preserve existing command contracts and extend them through tests first.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"063-conventions-blocking-pipeline:SC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"ruff, format check and pyright remain explicit quality gates in the technical context and final validation step. The final conventions task is additional to those existing successful check obligations; it is not a replacement or silent waiver.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/spec.md:L158-L162\",\n          \"excerpt\": \"- SC-003: `ruff check .`, `ruff format --check .`, and `pyright` complete with zero errors.\"\n        }\n      ],\n      \"plan_citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L16-L22\",\n          \"excerpt\": \"- Quality gates: ruff, ruff format, pyright\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L81-L92\",\n          \"excerpt\": \"9. Run targeted tests, full tests, ruff, format check, and pyright.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L23-L28\",\n          \"excerpt\": \"- Preserve existing command contracts and extend them through tests first.\"\n        }\n      ],\n      \"searched_plan_sections\": []\n    }\n  ],\n  \"ambiguities\": [],\n  \"extra_scope\": [],\n  \"findings\": [\n    {\n      \"category\": \"reference_scope_reconciliation\",\n      \"severity\": \"info\",\n      \"description\": \"The earlier unbounded adoption of the full 065 migration/documentation feature is removed by the informational Inspect reference. Its complete current source remains examined as context, while the required repo-scope conjunction FR-005 / AC-013 is explicitly retained in the plan and both system Quality Gates. No migration requirement is silently certified as implemented.\",\n      \"suggestion\": \"Keep the explicit separate repo identity and fresh final PASS obligation during implementation; preserve the historical failed review as a record rather than rebinding its raw output to this new context.\",\n      \"citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"- Inspect: [repo completion requirements](../065-conventions-migration-docs/spec.md).\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"065 FR-005 / AC-013 require `repo_conventions_receipt_path` with identity `repo`; a feature PASS cannot substitute for repo PASS.\"\n        },\n        {\n          \"section_id\": \".specs/features/065-conventions-migration-docs/spec.md:L97-L113\",\n          \"excerpt\": \"- AC-013: `system/spec-system.md` Quality Gates require a repo-scope `livespec conventions verify` PASS before `PHASE_RESULT: OK` for implement, test, and fix, with no pre-existing exemption.\"\n        }\n      ]\n    },\n    {\n      \"category\": \"evidence_and_freshness_boundary\",\n      \"severity\": \"info\",\n      \"description\": \"The new plan and diagrams describe the required final conjunction, actual current-data reruns and preservation of early read/apply. This semantic plan review does not establish that the compiler or proof/archive consumers implement those obligations, that all gates currently pass, or that Handy initialization has completed. Schemas 1/2 do not themselves prove current source-code coverage.\",\n      \"suggestion\": \"Require the planned changed-code, identity-substitution, missing/non-PASS and early-documentary regressions plus actual independent final supervisor reruns before claiming execution success; do not infer a new schema or current-code certification from this review.\",\n      \"citations\": [\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L105-L112\",\n          \"excerpt\": \"- Add regressions for early documentary proof, missing read/apply, missing/non-PASS final proof, feature/repo substitution, changed-code reruns and historical receipt compatibility.\"\n        },\n        {\n          \"section_id\": \".specs/features/063-conventions-blocking-pipeline/plan.md:L113-L134\",\n          \"excerpt\": \"Existing receipt schemas 1/2 do not bind source-code hashes or enumerate the verified source dataset. Preserve their historical meaning; final current verification must execute the actual scoped and repo gates again.\"\n        },\n        {\n          \"section_id\": \".specs/features/061-conventions-gates-engine/spec.md:L172-L176\",\n          \"excerpt\": \"Un receipt PASS seul ne constitue pas une preuve de conformite suffisante.\"\n        }\n      ]\n    }\n  ],\n  \"confidence\": 4,\n  \"synthesized_batch_ids\": [],\n  \"resolutions\": []\n}"
+  ],
+  "synthesis": null,
+  "synthesis_transport_version": null
+}

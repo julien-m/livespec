@@ -45,6 +45,9 @@ class SemanticConfig:
     multi_model_divergence_threshold: float = 0.25
 
     # Plan review
+    # Conservative character budget bounds prompts, not model tokens; smaller budgets
+    # require more complete batches. Override via semantic config or review CLI budget.
+    review_max_chars: int = 60000
     review_model: str = ""
     review_reviewers: list[str] = field(default_factory=list)
     review_confidence_threshold: float = 3.0

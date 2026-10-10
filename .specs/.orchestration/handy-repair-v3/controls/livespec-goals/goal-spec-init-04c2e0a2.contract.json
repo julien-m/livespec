@@ -1,0 +1,3347 @@
+{
+  "canonical": {
+    "command": "spec-init",
+    "conventions": {
+      "available": false,
+      "index_path": null,
+      "selected_domains": []
+    },
+    "definition_of_done": [
+      "`.specs/spec-system.md` exists",
+      "`.specs/project.md` contains users, scale, geography (or explicit placeholders)",
+      "`.specs/stacks/_default.md` contains chosen stack + rationale",
+      "At least 1 ADR exists in `.specs/stacks/decisions/`",
+      "`.specs/testing/strategy.md` exists",
+      "`.specs/README.md` exists with project name and initial ADRs",
+      "`CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block",
+      "`.specs/hooks/` directory exists",
+      "`.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`",
+      "`.gitignore` contains `.specs/hooks/*.local.md`",
+      "`.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned)",
+      "`roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)",
+      "`.specs/preflight.md` exists with checks generated from stack",
+      "`.specs/preflight-report.md` exists with execution results",
+      "After-init hooks resolved and executed (Phase E)",
+      "`.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)",
+      "`scripts/sync-agent-assets.sh` completed through `cc-hub`",
+      "`.agent-sync.local/skills/spec-*`, `.claude/skills/spec-*` and `.agents/skills/spec-*` resolve for every LiveSpec skill in the source inventory",
+      "`.agent-sync.local/skills/source-command-cli`, `.claude/skills/source-command-cli` and `.agents/skills/source-command-cli` resolve",
+      "`.agent-sync.local/agents/livespec-*` contains project-local copies of every source agent (`agent.yaml` + `prompt.md`); generated `.claude/agents/livespec-*.md` and `.codex/agents/livespec-*.toml` resolve within the project",
+      "`.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo",
+      "`.specs/.livespec-path` exists and points to a valid LiveSpec repo directory",
+      "`.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`",
+      "If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`",
+      "If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)"
+    ],
+    "evidence_policy_version": "2",
+    "execution_tasks": [
+      "Lock goal contract via `livespec goal render spec-init --save`",
+      "Emit `/goal` slash command with contract/state file reference",
+      "Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt",
+      "If brainstorm detected and accepted: pre-fill project.md and skip to Phase B",
+      "If no brainstorm: run 6-question conversational interview (Q1-Q6)",
+      "Present project profile summary and confirm before proceeding",
+      "Run decision tree based on project profile signals",
+      "Present recommended stack with justifications per layer",
+      "Accept stack adjustments and confirm final stack",
+      "Define testing strategy for the project type",
+      "Ask dev tooling preferences (package manager, linter)",
+      "Check design tool configuration; run wizard if not configured",
+      "Detect and confirm brainstorm design/theme artifact import",
+      "Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists",
+      "Import theme.css and write theme.md if brainstorm theme detected",
+      "Create at least 1 ADR per significant stack choice",
+      "Create .specs/ directory structure with all required files",
+      "Generate constitution.md from conversation and stack",
+      "Generate project.md from Phase A answers",
+      "Generate stacks/_default.md with `updated` frontmatter",
+      "Generate testing/strategy.md from Phase B decisions",
+      "Generate roadmap.md via inference matrix from project profile",
+      "Create .specs/README.md with project name and ADRs; preserve existing registry or use an empty features table for a fresh project",
+      "Install LiveSpec section in CLAUDE.md (create or update idempotently)",
+      "Run sync-agent-assets.sh and verify all required skill links and local mutable agent copies",
+      "Install pre-commit hook via install-hooks.sh",
+      "Write .specs/livespec-version and .specs/.livespec-path",
+      "Update .gitignore with required patterns",
+      "Generate preflight.md from stack technologies catalog",
+      "Scan .env for creds:* entries and add token checks",
+      "Run 3-pass preflight engine (verify → auto-resolve → human blockers)",
+      "Present human-required blockers grouped for resolution",
+      "Ensure .gitignore has exact entry for .specs/preflight-report.md",
+      "Scan and resolve after-init hook chain (3 levels)",
+      "Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook"
+    ],
+    "expectation_sections": {
+      "filesystem_effects": [
+        "**create:**",
+        "- `.specs/`",
+        "- `.specs/spec-system.md`",
+        "- `.specs/project.md`",
+        "- `.specs/constitution.md`",
+        "- `.specs/roadmap.md`",
+        "- `.specs/.livespec-path`",
+        "- `.agent-sync.local/skills/spec-feature`",
+        "- `.agent-sync.local/skills/source-command-cli`",
+        "- `.agent-sync.local/agents/livespec-*` — mutable project-local copies (`agent.yaml` + `prompt.md`) for every source agent",
+        "- `.claude/skills/spec-feature`",
+        "- `.agents/skills/spec-feature`",
+        "- `.claude/agents/livespec-*.md`",
+        "- `.codex/agents/livespec-verifier.toml`",
+        "**update:**",
+        "- `.gitignore`",
+        "- `AGENTS.md` / `CLAUDE.md` LiveSpec markers, preserving user text",
+        "**autonomous recovery:**",
+        "- Unique project-local backup of prior specs, conventions, `.gitignore` and integration documents before overwrites",
+        "- Custom features/hooks/runs/history and all source/shared-target bytes remain unchanged",
+        "- Mutable local agents are copies before `cc-hub agent build`; valid conventions survive",
+        "- All source `spec-*` skills and `source-command-cli` resolve under `.agent-sync.local/skills/`, `.claude/skills/` and `.agents/skills/`; source `.agent-sync/` is not a required target directory. Generated agent outputs stay within the project.",
+        "- `--dry-run` previews with no project writes and no initialization-success claim; current `--verify-only` backend inspection is read-only",
+        "**optional:**",
+        "- `.specs/stacks/_default.md`",
+        "- `penflow/` when `handoff/penflow/` or legacy `penflow/` exists",
+        "**forbidden:**",
+        "- `src/`"
+      ],
+      "post_run_checks": [
+        "- [ ] `.specs/` directory present at repo root",
+        "- [ ] spec-system.md is the canonical version",
+        "- [ ] `/spec-feature` project command assets are present; missing assets are `BLOCKED`, not drift",
+        "- [ ] Every source skill resolves in the local and provider namespaces; every source agent has a local copy and generated Claude/Codex output. Check canonical read-only links explicitly; confined filesystem rules check local namespace roots and local agent files.",
+        "- [ ] Autonomous profiles retain observed native/frontend families and manager evidence; unobserved roles/scale/geography/budget/deployment are Unknown",
+        "- [ ] Constitution, observed stack ADR and testing strategy are project-specific; required bounded version probes have actual outputs/exits",
+        "- [ ] Current `--verify-only` succeeds after hooks; source or generated content drift prevents completion",
+        "- [ ] The immutable goal includes the applicable branch, every required task is proved and the actual run archive is verified"
+      ],
+      "preconditions": [
+        "- `Project directory exists (any structure).`",
+        "- No existing `.specs/` directory, or explicit `--from-code --auto --force` for backed-up recovery. Migration remains `/spec-migrate`.",
+        "- Normalize noninteractive from-code intent and aliases before rendering the new goal; preserve the selected `--dir` target and explicit force/preview flags. Reject unsupported autonomous `--deep`, `--stack` and incompatible combinations before mutation.",
+        "- Observe independent supported manifests; malformed/conflicting facts or escaping writable paths block initialization."
+      ],
+      "produced_artifacts": [
+        "- path: `.specs/project.md`",
+        "must_contain_sections:",
+        "- \"Vision\"",
+        "- \"Users\"",
+        "- \"Constraints\"",
+        "- stdout marker: `Penflow Contract Verdict: ABSENT | READY | FAIL | BLOCKED`",
+        "- `ABSENT`: unrequired non-UI inspection has no workspace.",
+        "- `READY`: required planning artifacts and ID mappings are available; `certified: false`.",
+        "- `FAIL` / `BLOCKED`: invalid or missing required preparation input; no certification is implied.",
+        "### C51 stage evidence",
+        "- This command prepares inputs; no runtime report/build manifest or final certificate is required before its producing/test stage."
+      ],
+      "purpose": [
+        "Initialize LiveSpec interactively or from observed code with safe autonomous recovery and complete current goal proof."
+      ]
+    },
+    "expectations": {
+      "command": "spec-init",
+      "contract_version": "1.0",
+      "last_reviewed": "2026-10-09",
+      "source_path": ".agent-sync/skills/spec-init/expectations.md"
+    },
+    "feature": null,
+    "hooks": {
+      "before": {
+        "command": "livespec hooks resolve --event before --command init",
+        "context": "# Before Init — Load Context & Preferences\n\n## 1. Conventions (if available)\n\nIf `.conventions/index.md` exists, **Read** it into context. Follow the **Load Path** in [`conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) to resolve the relevant sub-domains and surface the mandatory read list. This project may already have conventions from a previous setup.\n\nIf `.conventions/conventions.md` (legacy compiled format) exists but `.conventions/index.md` does not, note it and surface a one-line warning: `Legacy conventions format detected — will migrate via after-init hook.` Continue without reading the legacy file.\n\nIf neither file exists, skip silently — conventions will be generated by the `after-init` hook after the stack is defined.\n\n## 2. User Preferences\n\nUse `/memo.read dev` to load the user's preferred stack, runtime, package manager, and testing approach.\n\nPropose the user's preferred technologies first. Present alternatives second.\nIf a preferred technology is suboptimal for the project's constraints, explain why and suggest the alternative.\n\n## 3. Design Tool Config\n\n**Read** [`design.md`](~/.claude/livespec/design.md) — user's preferred design tool configuration.\n\nIf this file exists and `tool` is not `none`:\n- Include the design tool in the stack summary during Phase B\n- Note the design system for future reference in the constitution\n- Add a \"Design\" row to the recommended stack table\n\nIf this file does not exist:\n- Trigger the design gate during Phase B (after stack decisions, before Phase C)\n",
+        "context_sha256": "b967b893ca642afd90d5a2b3895e1d9995aae53ebb36de588dcc91d9aa3627b8",
+        "level0_integrations": [],
+        "non_empty": true
+      }
+    },
+    "internal_command_invocations": [],
+    "mode": "enforced",
+    "normalized_flags": [
+      "--auto",
+      "--dir=/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/pytest-of-julienm/pytest-0/test_rendered_symlink_root_rem0/original"
+    ],
+    "project_root": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/pytest-of-julienm/pytest-0/test_rendered_symlink_root_rem0/original",
+    "rules": {
+      "blocked_requires_canonical_line": true,
+      "completion_actor": "goal",
+      "missing_evidence_status": "REJECTED_NEEDS_ACTION",
+      "proof_required_for_each_task": true,
+      "worker_may_mark_tasks_complete": false
+    },
+    "runtime_context": {
+      "has_penflow": false,
+      "is_visual_feature": false,
+      "visual_feature_slugs": []
+    },
+    "schema_version": "2.0",
+    "tasks": [
+      {
+        "category": "injected",
+        "completion_actor": "goal",
+        "description": "Resolve and apply before-hook context via `livespec hooks resolve --event before --command init`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "hook_resolution_command": "livespec hooks resolve --event before --command init",
+          "resolved_hook_context_sha256": "b967b893ca642afd90d5a2b3895e1d9995aae53ebb36de588dcc91d9aa3627b8",
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "hooks.before",
+        "invalid_substitutes": [
+          "manual_integration_summary",
+          "config_file_exists_without_resolved_context",
+          "hook_command_mentioned_without_output_hash"
+        ],
+        "ordinal": 1,
+        "repair_if_missing": [
+          "run the exact `livespec hooks resolve --event before --command <command> [--feature <slug>]` command",
+          "apply the non-empty stdout as additional command context before continuing",
+          "submit the hook command, resolved stdout sha256, and hook_context_applied=true"
+        ],
+        "required_evidence": [
+          "hook_resolution_command",
+          "resolved_hook_context_sha256",
+          "hook_context_applied"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Lock goal contract via `livespec goal render spec-init --save`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.002.lock_goal_contract_via_livespec_goal_render_spec",
+        "invalid_substitutes": [],
+        "ordinal": 2,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Emit `/goal` slash command with contract/state file reference",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.003.emit_goal_slash_command_with_contract_state_file",
+        "invalid_substitutes": [],
+        "ordinal": 3,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.004.detect_handoff_livespec_project_profile_md_or_le",
+        "invalid_substitutes": [],
+        "ordinal": 4,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "If brainstorm detected and accepted: pre-fill project.md and skip to Phase B",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.005.if_brainstorm_detected_and_accepted_pre_fill_pro",
+        "invalid_substitutes": [],
+        "ordinal": 5,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "If no brainstorm: run 6-question conversational interview (Q1-Q6)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.006.if_no_brainstorm_run_6_question_conversational_i",
+        "invalid_substitutes": [],
+        "ordinal": 6,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Present project profile summary and confirm before proceeding",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.007.present_project_profile_summary_and_confirm_befo",
+        "invalid_substitutes": [],
+        "ordinal": 7,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run decision tree based on project profile signals",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.008.run_decision_tree_based_on_project_profile_signa",
+        "invalid_substitutes": [],
+        "ordinal": 8,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Present recommended stack with justifications per layer",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.009.present_recommended_stack_with_justifications_pe",
+        "invalid_substitutes": [],
+        "ordinal": 9,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Accept stack adjustments and confirm final stack",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.010.accept_stack_adjustments_and_confirm_final_stack",
+        "invalid_substitutes": [],
+        "ordinal": 10,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Define testing strategy for the project type",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.011.define_testing_strategy_for_the_project_type",
+        "invalid_substitutes": [],
+        "ordinal": 11,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Ask dev tooling preferences (package manager, linter)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.012.ask_dev_tooling_preferences_package_manager_lint",
+        "invalid_substitutes": [],
+        "ordinal": 12,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Check design tool configuration; run wizard if not configured",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.013.check_design_tool_configuration_run_wizard_if_no",
+        "invalid_substitutes": [],
+        "ordinal": 13,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Detect and confirm brainstorm design/theme artifact import",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.014.detect_and_confirm_brainstorm_design_theme_artif",
+        "invalid_substitutes": [],
+        "ordinal": 14,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.015.bootstrap_penflow_contract_workspace_if_a_brains",
+        "invalid_substitutes": [],
+        "ordinal": 15,
+        "repair_if_missing": [
+          "run the required Penflow command or create the missing Penflow prerequisite",
+          "record the concrete Penflow report path and final status"
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Import theme.css and write theme.md if brainstorm theme detected",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.016.import_theme_css_and_write_theme_md_if_brainstor",
+        "invalid_substitutes": [],
+        "ordinal": 16,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Create at least 1 ADR per significant stack choice",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.017.create_at_least_1_adr_per_significant_stack_choi",
+        "invalid_substitutes": [],
+        "ordinal": 17,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Create .specs/ directory structure with all required files",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.018.create_specs_directory_structure_with_all_requir",
+        "invalid_substitutes": [],
+        "ordinal": 18,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Generate constitution.md from conversation and stack",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.019.generate_constitution_md_from_conversation_and_s",
+        "invalid_substitutes": [],
+        "ordinal": 19,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Generate project.md from Phase A answers",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.020.generate_project_md_from_phase_a_answers",
+        "invalid_substitutes": [],
+        "ordinal": 20,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Generate stacks/_default.md with `updated` frontmatter",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.021.generate_stacks_default_md_with_updated_frontmat",
+        "invalid_substitutes": [],
+        "ordinal": 21,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Generate testing/strategy.md from Phase B decisions",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.022.generate_testing_strategy_md_from_phase_b_decisi",
+        "invalid_substitutes": [],
+        "ordinal": 22,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Generate roadmap.md via inference matrix from project profile",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.023.generate_roadmap_md_via_inference_matrix_from_pr",
+        "invalid_substitutes": [],
+        "ordinal": 23,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Create .specs/README.md with project name and ADRs; preserve existing registry or use an empty features table for a fresh project",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.024.create_specs_readme_md_with_project_name_and_adr",
+        "invalid_substitutes": [],
+        "ordinal": 24,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Install LiveSpec section in CLAUDE.md (create or update idempotently)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.025.install_livespec_section_in_claude_md_create_or",
+        "invalid_substitutes": [],
+        "ordinal": 25,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run sync-agent-assets.sh and verify all required skill links and local mutable agent copies",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.026.run_sync_agent_assets_sh_and_verify_all_required",
+        "invalid_substitutes": [],
+        "ordinal": 26,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Install pre-commit hook via install-hooks.sh",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.027.install_pre_commit_hook_via_install_hooks_sh",
+        "invalid_substitutes": [],
+        "ordinal": 27,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Write .specs/livespec-version and .specs/.livespec-path",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.028.write_specs_livespec_version_and_specs_livespec",
+        "invalid_substitutes": [],
+        "ordinal": 28,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Update .gitignore with required patterns",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.029.update_gitignore_with_required_patterns",
+        "invalid_substitutes": [],
+        "ordinal": 29,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Generate preflight.md from stack technologies catalog",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.030.generate_preflight_md_from_stack_technologies_ca",
+        "invalid_substitutes": [],
+        "ordinal": 30,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Scan .env for creds:* entries and add token checks",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.031.scan_env_for_creds_entries_and_add_token_checks",
+        "invalid_substitutes": [],
+        "ordinal": 31,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Run 3-pass preflight engine (verify → auto-resolve → human blockers)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.032.run_3_pass_preflight_engine_verify_auto_resolve",
+        "invalid_substitutes": [],
+        "ordinal": 32,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Present human-required blockers grouped for resolution",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.033.present_human_required_blockers_grouped_for_reso",
+        "invalid_substitutes": [],
+        "ordinal": 33,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Ensure .gitignore has exact entry for .specs/preflight-report.md",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.034.ensure_gitignore_has_exact_entry_for_specs_prefl",
+        "invalid_substitutes": [],
+        "ordinal": 34,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Scan and resolve after-init hook chain (3 levels)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.035.scan_and_resolve_after_init_hook_chain_3_levels",
+        "invalid_substitutes": [],
+        "ordinal": 35,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "execution",
+        "completion_actor": "goal",
+        "description": "Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "task.036.execute_hooks_in_order_generate_conventions_inde",
+        "invalid_substitutes": [],
+        "ordinal": 36,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/spec-system.md` exists",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.037.specs_spec_system_md_exists",
+        "invalid_substitutes": [],
+        "ordinal": 37,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/project.md` contains users, scale, geography (or explicit placeholders)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.038.specs_project_md_contains_users_scale_geography",
+        "invalid_substitutes": [],
+        "ordinal": 38,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/stacks/_default.md` contains chosen stack + rationale",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.039.specs_stacks_default_md_contains_chosen_stack_ra",
+        "invalid_substitutes": [],
+        "ordinal": 39,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "At least 1 ADR exists in `.specs/stacks/decisions/`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.040.at_least_1_adr_exists_in_specs_stacks_decisions",
+        "invalid_substitutes": [],
+        "ordinal": 40,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/testing/strategy.md` exists",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.041.specs_testing_strategy_md_exists",
+        "invalid_substitutes": [],
+        "ordinal": 41,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/README.md` exists with project name and initial ADRs",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.042.specs_readme_md_exists_with_project_name_and_ini",
+        "invalid_substitutes": [],
+        "ordinal": 42,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.043.claude_md_contains_a_valid_livespec_start_livesp",
+        "invalid_substitutes": [],
+        "ordinal": 43,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/hooks/` directory exists",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.044.specs_hooks_directory_exists",
+        "invalid_substitutes": [],
+        "ordinal": 44,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.045.specs_design_directory_exists_with_screens_subdi",
+        "invalid_substitutes": [],
+        "ordinal": 45,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.gitignore` contains `.specs/hooks/*.local.md`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.046.gitignore_contains_specs_hooks_local_md",
+        "invalid_substitutes": [],
+        "ordinal": 46,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.047.gitignore_contains_an_exact_specs_preflight_repo",
+        "invalid_substitutes": [],
+        "ordinal": 47,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.048.roadmap_md_exists_with_at_least_1_item_in_at_lea",
+        "invalid_substitutes": [],
+        "ordinal": 48,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/preflight.md` exists with checks generated from stack",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.049.specs_preflight_md_exists_with_checks_generated",
+        "invalid_substitutes": [],
+        "ordinal": 49,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/preflight-report.md` exists with execution results",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.050.specs_preflight_report_md_exists_with_execution",
+        "invalid_substitutes": [],
+        "ordinal": 50,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "After-init hooks resolved and executed (Phase E)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.051.after_init_hooks_resolved_and_executed_phase_e",
+        "invalid_substitutes": [],
+        "ordinal": 51,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.052.conventions_index_md_and_conventions_manifest_ya",
+        "invalid_substitutes": [],
+        "ordinal": 52,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`scripts/sync-agent-assets.sh` completed through `cc-hub`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.053.scripts_sync_agent_assets_sh_completed_through_c",
+        "invalid_substitutes": [],
+        "ordinal": 53,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.agent-sync.local/skills/spec-*`, `.claude/skills/spec-*` and `.agents/skills/spec-*` resolve for every LiveSpec skill in the source inventory",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.054.agent_sync_local_skills_spec_claude_skills_spec",
+        "invalid_substitutes": [],
+        "ordinal": 54,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.agent-sync.local/skills/source-command-cli`, `.claude/skills/source-command-cli` and `.agents/skills/source-command-cli` resolve",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.055.agent_sync_local_skills_source_command_cli_claud",
+        "invalid_substitutes": [],
+        "ordinal": 55,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.agent-sync.local/agents/livespec-*` contains project-local copies of every source agent (`agent.yaml` + `prompt.md`); generated `.claude/agents/livespec-*.md` and `.codex/agents/livespec-*.toml` resolve within the project",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.056.agent_sync_local_agents_livespec_contains_projec",
+        "invalid_substitutes": [],
+        "ordinal": 56,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.057.specs_livespec_version_exists_and_matches_versio",
+        "invalid_substitutes": [],
+        "ordinal": 57,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.specs/.livespec-path` exists and points to a valid LiveSpec repo directory",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.058.specs_livespec_path_exists_and_points_to_a_valid",
+        "invalid_substitutes": [],
+        "ordinal": 58,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "`.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.059.gitignore_contains_provider_generated_skill_agen",
+        "invalid_substitutes": [],
+        "ordinal": 59,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.060.if_from_code_specs_bootstrap_recap_md_exists_wit",
+        "invalid_substitutes": [],
+        "ordinal": 60,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "definition_of_done",
+        "completion_actor": "goal",
+        "description": "If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "dod.061.if_from_code_no_bootstrap_recap_md_in_project_ro",
+        "invalid_substitutes": [],
+        "ordinal": 61,
+        "repair_if_missing": [
+          "Run the described task and capture concrete evidence before proving it.",
+          "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+        ],
+        "required_evidence": [
+          "observable_output_or_artifact",
+          "success_criteria_met"
+        ]
+      },
+      {
+        "category": "injected",
+        "completion_actor": "goal",
+        "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+        "evidence_kind": "documentary",
+        "expected_evidence": {
+          "command": "spec-init",
+          "feature_slug": null,
+          "review_max_chars": null,
+          "reviewer_model": ""
+        },
+        "id": "archive.run",
+        "invalid_substitutes": [
+          "prose_archive_claim",
+          "exit_code_without_artifact",
+          "tmpdir_contract_state_paths_without_artifact"
+        ],
+        "ordinal": 62,
+        "repair_if_missing": [
+          "run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`",
+          "resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`"
+        ],
+        "required_evidence": [
+          "run_artifact_path"
+        ]
+      }
+    ],
+    "verify_rules": {
+      "may": [
+        {
+          "kind": "contains",
+          "payload": "stack",
+          "verb": "may"
+        }
+      ],
+      "must": [
+        {
+          "kind": "exit_code",
+          "payload": 0,
+          "verb": "must"
+        },
+        {
+          "kind": "contains",
+          "payload": "LiveSpec initialized",
+          "verb": "must"
+        },
+        {
+          "kind": "contains",
+          "payload": "Penflow contract",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/spec-system.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/project.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/constitution.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/stacks/_default.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/stacks/decisions",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/testing/strategy.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/preflight.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/preflight-report.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".specs/.livespec-path",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/skills",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".claude/skills",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agents/skills",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/agents/livespec-documenter/agent.yaml",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/agents/livespec-documenter/prompt.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/agents/livespec-implementer/agent.yaml",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/agents/livespec-implementer/prompt.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/agents/livespec-supervisor/agent.yaml",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/agents/livespec-supervisor/prompt.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/agents/livespec-verifier/agent.yaml",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".agent-sync.local/agents/livespec-verifier/prompt.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".claude/agents/livespec-documenter.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".claude/agents/livespec-implementer.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".claude/agents/livespec-supervisor.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".claude/agents/livespec-verifier.md",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".codex/agents/livespec-documenter.toml",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".codex/agents/livespec-implementer.toml",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".codex/agents/livespec-supervisor.toml",
+          "verb": "must"
+        },
+        {
+          "kind": "exists",
+          "payload": ".codex/agents/livespec-verifier.toml",
+          "verb": "must"
+        }
+      ],
+      "must_not": [
+        {
+          "kind": "contains",
+          "payload": "Traceback",
+          "verb": "must_not"
+        }
+      ],
+      "when": [
+        {
+          "flag": "--dry-run",
+          "may": [],
+          "must": [
+            {
+              "kind": "exit_code",
+              "payload": 0,
+              "verb": "must"
+            },
+            {
+              "kind": "contains",
+              "payload": "no changes applied",
+              "verb": "must"
+            }
+          ],
+          "must_not": [
+            {
+              "kind": "contains",
+              "payload": "LiveSpec initialized",
+              "verb": "must_not"
+            },
+            {
+              "kind": "contains",
+              "payload": "Traceback",
+              "verb": "must_not"
+            }
+          ],
+          "replace_base": true
+        },
+        {
+          "flag": "-d",
+          "may": [],
+          "must": [
+            {
+              "kind": "exit_code",
+              "payload": 0,
+              "verb": "must"
+            },
+            {
+              "kind": "contains",
+              "payload": "no changes applied",
+              "verb": "must"
+            }
+          ],
+          "must_not": [
+            {
+              "kind": "contains",
+              "payload": "LiveSpec initialized",
+              "verb": "must_not"
+            },
+            {
+              "kind": "contains",
+              "payload": "Traceback",
+              "verb": "must_not"
+            }
+          ],
+          "replace_base": true
+        }
+      ]
+    }
+  },
+  "canonical_json": "{\"command\":\"spec-init\",\"conventions\":{\"available\":false,\"index_path\":null,\"selected_domains\":[]},\"definition_of_done\":[\"`.specs/spec-system.md` exists\",\"`.specs/project.md` contains users, scale, geography (or explicit placeholders)\",\"`.specs/stacks/_default.md` contains chosen stack + rationale\",\"At least 1 ADR exists in `.specs/stacks/decisions/`\",\"`.specs/testing/strategy.md` exists\",\"`.specs/README.md` exists with project name and initial ADRs\",\"`CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block\",\"`.specs/hooks/` directory exists\",\"`.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`\",\"`.gitignore` contains `.specs/hooks/*.local.md`\",\"`.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned)\",\"`roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)\",\"`.specs/preflight.md` exists with checks generated from stack\",\"`.specs/preflight-report.md` exists with execution results\",\"After-init hooks resolved and executed (Phase E)\",\"`.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)\",\"`scripts/sync-agent-assets.sh` completed through `cc-hub`\",\"`.agent-sync.local/skills/spec-*`, `.claude/skills/spec-*` and `.agents/skills/spec-*` resolve for every LiveSpec skill in the source inventory\",\"`.agent-sync.local/skills/source-command-cli`, `.claude/skills/source-command-cli` and `.agents/skills/source-command-cli` resolve\",\"`.agent-sync.local/agents/livespec-*` contains project-local copies of every source agent (`agent.yaml` + `prompt.md`); generated `.claude/agents/livespec-*.md` and `.codex/agents/livespec-*.toml` resolve within the project\",\"`.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo\",\"`.specs/.livespec-path` exists and points to a valid LiveSpec repo directory\",\"`.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`\",\"If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`\",\"If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)\"],\"evidence_policy_version\":\"2\",\"execution_tasks\":[\"Lock goal contract via `livespec goal render spec-init --save`\",\"Emit `/goal` slash command with contract/state file reference\",\"Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt\",\"If brainstorm detected and accepted: pre-fill project.md and skip to Phase B\",\"If no brainstorm: run 6-question conversational interview (Q1-Q6)\",\"Present project profile summary and confirm before proceeding\",\"Run decision tree based on project profile signals\",\"Present recommended stack with justifications per layer\",\"Accept stack adjustments and confirm final stack\",\"Define testing strategy for the project type\",\"Ask dev tooling preferences (package manager, linter)\",\"Check design tool configuration; run wizard if not configured\",\"Detect and confirm brainstorm design/theme artifact import\",\"Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists\",\"Import theme.css and write theme.md if brainstorm theme detected\",\"Create at least 1 ADR per significant stack choice\",\"Create .specs/ directory structure with all required files\",\"Generate constitution.md from conversation and stack\",\"Generate project.md from Phase A answers\",\"Generate stacks/_default.md with `updated` frontmatter\",\"Generate testing/strategy.md from Phase B decisions\",\"Generate roadmap.md via inference matrix from project profile\",\"Create .specs/README.md with project name and ADRs; preserve existing registry or use an empty features table for a fresh project\",\"Install LiveSpec section in CLAUDE.md (create or update idempotently)\",\"Run sync-agent-assets.sh and verify all required skill links and local mutable agent copies\",\"Install pre-commit hook via install-hooks.sh\",\"Write .specs/livespec-version and .specs/.livespec-path\",\"Update .gitignore with required patterns\",\"Generate preflight.md from stack technologies catalog\",\"Scan .env for creds:* entries and add token checks\",\"Run 3-pass preflight engine (verify → auto-resolve → human blockers)\",\"Present human-required blockers grouped for resolution\",\"Ensure .gitignore has exact entry for .specs/preflight-report.md\",\"Scan and resolve after-init hook chain (3 levels)\",\"Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook\"],\"expectation_sections\":{\"filesystem_effects\":[\"**create:**\",\"- `.specs/`\",\"- `.specs/spec-system.md`\",\"- `.specs/project.md`\",\"- `.specs/constitution.md`\",\"- `.specs/roadmap.md`\",\"- `.specs/.livespec-path`\",\"- `.agent-sync.local/skills/spec-feature`\",\"- `.agent-sync.local/skills/source-command-cli`\",\"- `.agent-sync.local/agents/livespec-*` — mutable project-local copies (`agent.yaml` + `prompt.md`) for every source agent\",\"- `.claude/skills/spec-feature`\",\"- `.agents/skills/spec-feature`\",\"- `.claude/agents/livespec-*.md`\",\"- `.codex/agents/livespec-verifier.toml`\",\"**update:**\",\"- `.gitignore`\",\"- `AGENTS.md` / `CLAUDE.md` LiveSpec markers, preserving user text\",\"**autonomous recovery:**\",\"- Unique project-local backup of prior specs, conventions, `.gitignore` and integration documents before overwrites\",\"- Custom features/hooks/runs/history and all source/shared-target bytes remain unchanged\",\"- Mutable local agents are copies before `cc-hub agent build`; valid conventions survive\",\"- All source `spec-*` skills and `source-command-cli` resolve under `.agent-sync.local/skills/`, `.claude/skills/` and `.agents/skills/`; source `.agent-sync/` is not a required target directory. Generated agent outputs stay within the project.\",\"- `--dry-run` previews with no project writes and no initialization-success claim; current `--verify-only` backend inspection is read-only\",\"**optional:**\",\"- `.specs/stacks/_default.md`\",\"- `penflow/` when `handoff/penflow/` or legacy `penflow/` exists\",\"**forbidden:**\",\"- `src/`\"],\"post_run_checks\":[\"- [ ] `.specs/` directory present at repo root\",\"- [ ] spec-system.md is the canonical version\",\"- [ ] `/spec-feature` project command assets are present; missing assets are `BLOCKED`, not drift\",\"- [ ] Every source skill resolves in the local and provider namespaces; every source agent has a local copy and generated Claude/Codex output. Check canonical read-only links explicitly; confined filesystem rules check local namespace roots and local agent files.\",\"- [ ] Autonomous profiles retain observed native/frontend families and manager evidence; unobserved roles/scale/geography/budget/deployment are Unknown\",\"- [ ] Constitution, observed stack ADR and testing strategy are project-specific; required bounded version probes have actual outputs/exits\",\"- [ ] Current `--verify-only` succeeds after hooks; source or generated content drift prevents completion\",\"- [ ] The immutable goal includes the applicable branch, every required task is proved and the actual run archive is verified\"],\"preconditions\":[\"- `Project directory exists (any structure).`\",\"- No existing `.specs/` directory, or explicit `--from-code --auto --force` for backed-up recovery. Migration remains `/spec-migrate`.\",\"- Normalize noninteractive from-code intent and aliases before rendering the new goal; preserve the selected `--dir` target and explicit force/preview flags. Reject unsupported autonomous `--deep`, `--stack` and incompatible combinations before mutation.\",\"- Observe independent supported manifests; malformed/conflicting facts or escaping writable paths block initialization.\"],\"produced_artifacts\":[\"- path: `.specs/project.md`\",\"must_contain_sections:\",\"- \\\"Vision\\\"\",\"- \\\"Users\\\"\",\"- \\\"Constraints\\\"\",\"- stdout marker: `Penflow Contract Verdict: ABSENT | READY | FAIL | BLOCKED`\",\"- `ABSENT`: unrequired non-UI inspection has no workspace.\",\"- `READY`: required planning artifacts and ID mappings are available; `certified: false`.\",\"- `FAIL` / `BLOCKED`: invalid or missing required preparation input; no certification is implied.\",\"### C51 stage evidence\",\"- This command prepares inputs; no runtime report/build manifest or final certificate is required before its producing/test stage.\"],\"purpose\":[\"Initialize LiveSpec interactively or from observed code with safe autonomous recovery and complete current goal proof.\"]},\"expectations\":{\"command\":\"spec-init\",\"contract_version\":\"1.0\",\"last_reviewed\":\"2026-10-09\",\"source_path\":\".agent-sync/skills/spec-init/expectations.md\"},\"feature\":null,\"hooks\":{\"before\":{\"command\":\"livespec hooks resolve --event before --command init\",\"context\":\"# Before Init — Load Context & Preferences\\n\\n## 1. Conventions (if available)\\n\\nIf `.conventions/index.md` exists, **Read** it into context. Follow the **Load Path** in [`conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) to resolve the relevant sub-domains and surface the mandatory read list. This project may already have conventions from a previous setup.\\n\\nIf `.conventions/conventions.md` (legacy compiled format) exists but `.conventions/index.md` does not, note it and surface a one-line warning: `Legacy conventions format detected — will migrate via after-init hook.` Continue without reading the legacy file.\\n\\nIf neither file exists, skip silently — conventions will be generated by the `after-init` hook after the stack is defined.\\n\\n## 2. User Preferences\\n\\nUse `/memo.read dev` to load the user's preferred stack, runtime, package manager, and testing approach.\\n\\nPropose the user's preferred technologies first. Present alternatives second.\\nIf a preferred technology is suboptimal for the project's constraints, explain why and suggest the alternative.\\n\\n## 3. Design Tool Config\\n\\n**Read** [`design.md`](~/.claude/livespec/design.md) — user's preferred design tool configuration.\\n\\nIf this file exists and `tool` is not `none`:\\n- Include the design tool in the stack summary during Phase B\\n- Note the design system for future reference in the constitution\\n- Add a \\\"Design\\\" row to the recommended stack table\\n\\nIf this file does not exist:\\n- Trigger the design gate during Phase B (after stack decisions, before Phase C)\\n\",\"context_sha256\":\"b967b893ca642afd90d5a2b3895e1d9995aae53ebb36de588dcc91d9aa3627b8\",\"level0_integrations\":[],\"non_empty\":true}},\"internal_command_invocations\":[],\"mode\":\"enforced\",\"normalized_flags\":[\"--auto\",\"--dir=/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/pytest-of-julienm/pytest-0/test_rendered_symlink_root_rem0/original\"],\"project_root\":\"/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/pytest-of-julienm/pytest-0/test_rendered_symlink_root_rem0/original\",\"rules\":{\"blocked_requires_canonical_line\":true,\"completion_actor\":\"goal\",\"missing_evidence_status\":\"REJECTED_NEEDS_ACTION\",\"proof_required_for_each_task\":true,\"worker_may_mark_tasks_complete\":false},\"runtime_context\":{\"has_penflow\":false,\"is_visual_feature\":false,\"visual_feature_slugs\":[]},\"schema_version\":\"2.0\",\"tasks\":[{\"category\":\"injected\",\"completion_actor\":\"goal\",\"description\":\"Resolve and apply before-hook context via `livespec hooks resolve --event before --command init`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"hook_resolution_command\":\"livespec hooks resolve --event before --command init\",\"resolved_hook_context_sha256\":\"b967b893ca642afd90d5a2b3895e1d9995aae53ebb36de588dcc91d9aa3627b8\",\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"hooks.before\",\"invalid_substitutes\":[\"manual_integration_summary\",\"config_file_exists_without_resolved_context\",\"hook_command_mentioned_without_output_hash\"],\"ordinal\":1,\"repair_if_missing\":[\"run the exact `livespec hooks resolve --event before --command <command> [--feature <slug>]` command\",\"apply the non-empty stdout as additional command context before continuing\",\"submit the hook command, resolved stdout sha256, and hook_context_applied=true\"],\"required_evidence\":[\"hook_resolution_command\",\"resolved_hook_context_sha256\",\"hook_context_applied\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Lock goal contract via `livespec goal render spec-init --save`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.002.lock_goal_contract_via_livespec_goal_render_spec\",\"invalid_substitutes\":[],\"ordinal\":2,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Emit `/goal` slash command with contract/state file reference\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.003.emit_goal_slash_command_with_contract_state_file\",\"invalid_substitutes\":[],\"ordinal\":3,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.004.detect_handoff_livespec_project_profile_md_or_le\",\"invalid_substitutes\":[],\"ordinal\":4,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"If brainstorm detected and accepted: pre-fill project.md and skip to Phase B\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.005.if_brainstorm_detected_and_accepted_pre_fill_pro\",\"invalid_substitutes\":[],\"ordinal\":5,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"If no brainstorm: run 6-question conversational interview (Q1-Q6)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.006.if_no_brainstorm_run_6_question_conversational_i\",\"invalid_substitutes\":[],\"ordinal\":6,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Present project profile summary and confirm before proceeding\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.007.present_project_profile_summary_and_confirm_befo\",\"invalid_substitutes\":[],\"ordinal\":7,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run decision tree based on project profile signals\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.008.run_decision_tree_based_on_project_profile_signa\",\"invalid_substitutes\":[],\"ordinal\":8,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Present recommended stack with justifications per layer\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.009.present_recommended_stack_with_justifications_pe\",\"invalid_substitutes\":[],\"ordinal\":9,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Accept stack adjustments and confirm final stack\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.010.accept_stack_adjustments_and_confirm_final_stack\",\"invalid_substitutes\":[],\"ordinal\":10,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Define testing strategy for the project type\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.011.define_testing_strategy_for_the_project_type\",\"invalid_substitutes\":[],\"ordinal\":11,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Ask dev tooling preferences (package manager, linter)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.012.ask_dev_tooling_preferences_package_manager_lint\",\"invalid_substitutes\":[],\"ordinal\":12,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Check design tool configuration; run wizard if not configured\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.013.check_design_tool_configuration_run_wizard_if_no\",\"invalid_substitutes\":[],\"ordinal\":13,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Detect and confirm brainstorm design/theme artifact import\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.014.detect_and_confirm_brainstorm_design_theme_artif\",\"invalid_substitutes\":[],\"ordinal\":14,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.015.bootstrap_penflow_contract_workspace_if_a_brains\",\"invalid_substitutes\":[],\"ordinal\":15,\"repair_if_missing\":[\"run the required Penflow command or create the missing Penflow prerequisite\",\"record the concrete Penflow report path and final status\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Import theme.css and write theme.md if brainstorm theme detected\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.016.import_theme_css_and_write_theme_md_if_brainstor\",\"invalid_substitutes\":[],\"ordinal\":16,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Create at least 1 ADR per significant stack choice\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.017.create_at_least_1_adr_per_significant_stack_choi\",\"invalid_substitutes\":[],\"ordinal\":17,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Create .specs/ directory structure with all required files\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.018.create_specs_directory_structure_with_all_requir\",\"invalid_substitutes\":[],\"ordinal\":18,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Generate constitution.md from conversation and stack\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.019.generate_constitution_md_from_conversation_and_s\",\"invalid_substitutes\":[],\"ordinal\":19,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Generate project.md from Phase A answers\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.020.generate_project_md_from_phase_a_answers\",\"invalid_substitutes\":[],\"ordinal\":20,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Generate stacks/_default.md with `updated` frontmatter\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.021.generate_stacks_default_md_with_updated_frontmat\",\"invalid_substitutes\":[],\"ordinal\":21,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Generate testing/strategy.md from Phase B decisions\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.022.generate_testing_strategy_md_from_phase_b_decisi\",\"invalid_substitutes\":[],\"ordinal\":22,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Generate roadmap.md via inference matrix from project profile\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.023.generate_roadmap_md_via_inference_matrix_from_pr\",\"invalid_substitutes\":[],\"ordinal\":23,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Create .specs/README.md with project name and ADRs; preserve existing registry or use an empty features table for a fresh project\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.024.create_specs_readme_md_with_project_name_and_adr\",\"invalid_substitutes\":[],\"ordinal\":24,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Install LiveSpec section in CLAUDE.md (create or update idempotently)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.025.install_livespec_section_in_claude_md_create_or\",\"invalid_substitutes\":[],\"ordinal\":25,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run sync-agent-assets.sh and verify all required skill links and local mutable agent copies\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.026.run_sync_agent_assets_sh_and_verify_all_required\",\"invalid_substitutes\":[],\"ordinal\":26,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Install pre-commit hook via install-hooks.sh\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.027.install_pre_commit_hook_via_install_hooks_sh\",\"invalid_substitutes\":[],\"ordinal\":27,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Write .specs/livespec-version and .specs/.livespec-path\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.028.write_specs_livespec_version_and_specs_livespec\",\"invalid_substitutes\":[],\"ordinal\":28,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Update .gitignore with required patterns\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.029.update_gitignore_with_required_patterns\",\"invalid_substitutes\":[],\"ordinal\":29,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Generate preflight.md from stack technologies catalog\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.030.generate_preflight_md_from_stack_technologies_ca\",\"invalid_substitutes\":[],\"ordinal\":30,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Scan .env for creds:* entries and add token checks\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.031.scan_env_for_creds_entries_and_add_token_checks\",\"invalid_substitutes\":[],\"ordinal\":31,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Run 3-pass preflight engine (verify → auto-resolve → human blockers)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.032.run_3_pass_preflight_engine_verify_auto_resolve\",\"invalid_substitutes\":[],\"ordinal\":32,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Present human-required blockers grouped for resolution\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.033.present_human_required_blockers_grouped_for_reso\",\"invalid_substitutes\":[],\"ordinal\":33,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Ensure .gitignore has exact entry for .specs/preflight-report.md\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.034.ensure_gitignore_has_exact_entry_for_specs_prefl\",\"invalid_substitutes\":[],\"ordinal\":34,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Scan and resolve after-init hook chain (3 levels)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.035.scan_and_resolve_after_init_hook_chain_3_levels\",\"invalid_substitutes\":[],\"ordinal\":35,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"execution\",\"completion_actor\":\"goal\",\"description\":\"Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"task.036.execute_hooks_in_order_generate_conventions_inde\",\"invalid_substitutes\":[],\"ordinal\":36,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/spec-system.md` exists\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.037.specs_spec_system_md_exists\",\"invalid_substitutes\":[],\"ordinal\":37,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/project.md` contains users, scale, geography (or explicit placeholders)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.038.specs_project_md_contains_users_scale_geography\",\"invalid_substitutes\":[],\"ordinal\":38,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/stacks/_default.md` contains chosen stack + rationale\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.039.specs_stacks_default_md_contains_chosen_stack_ra\",\"invalid_substitutes\":[],\"ordinal\":39,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"At least 1 ADR exists in `.specs/stacks/decisions/`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.040.at_least_1_adr_exists_in_specs_stacks_decisions\",\"invalid_substitutes\":[],\"ordinal\":40,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/testing/strategy.md` exists\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.041.specs_testing_strategy_md_exists\",\"invalid_substitutes\":[],\"ordinal\":41,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/README.md` exists with project name and initial ADRs\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.042.specs_readme_md_exists_with_project_name_and_ini\",\"invalid_substitutes\":[],\"ordinal\":42,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.043.claude_md_contains_a_valid_livespec_start_livesp\",\"invalid_substitutes\":[],\"ordinal\":43,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/hooks/` directory exists\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.044.specs_hooks_directory_exists\",\"invalid_substitutes\":[],\"ordinal\":44,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.045.specs_design_directory_exists_with_screens_subdi\",\"invalid_substitutes\":[],\"ordinal\":45,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.gitignore` contains `.specs/hooks/*.local.md`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.046.gitignore_contains_specs_hooks_local_md\",\"invalid_substitutes\":[],\"ordinal\":46,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.047.gitignore_contains_an_exact_specs_preflight_repo\",\"invalid_substitutes\":[],\"ordinal\":47,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.048.roadmap_md_exists_with_at_least_1_item_in_at_lea\",\"invalid_substitutes\":[],\"ordinal\":48,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/preflight.md` exists with checks generated from stack\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.049.specs_preflight_md_exists_with_checks_generated\",\"invalid_substitutes\":[],\"ordinal\":49,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/preflight-report.md` exists with execution results\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.050.specs_preflight_report_md_exists_with_execution\",\"invalid_substitutes\":[],\"ordinal\":50,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"After-init hooks resolved and executed (Phase E)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.051.after_init_hooks_resolved_and_executed_phase_e\",\"invalid_substitutes\":[],\"ordinal\":51,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.052.conventions_index_md_and_conventions_manifest_ya\",\"invalid_substitutes\":[],\"ordinal\":52,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`scripts/sync-agent-assets.sh` completed through `cc-hub`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.053.scripts_sync_agent_assets_sh_completed_through_c\",\"invalid_substitutes\":[],\"ordinal\":53,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.agent-sync.local/skills/spec-*`, `.claude/skills/spec-*` and `.agents/skills/spec-*` resolve for every LiveSpec skill in the source inventory\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.054.agent_sync_local_skills_spec_claude_skills_spec\",\"invalid_substitutes\":[],\"ordinal\":54,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.agent-sync.local/skills/source-command-cli`, `.claude/skills/source-command-cli` and `.agents/skills/source-command-cli` resolve\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.055.agent_sync_local_skills_source_command_cli_claud\",\"invalid_substitutes\":[],\"ordinal\":55,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.agent-sync.local/agents/livespec-*` contains project-local copies of every source agent (`agent.yaml` + `prompt.md`); generated `.claude/agents/livespec-*.md` and `.codex/agents/livespec-*.toml` resolve within the project\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.056.agent_sync_local_agents_livespec_contains_projec\",\"invalid_substitutes\":[],\"ordinal\":56,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.057.specs_livespec_version_exists_and_matches_versio\",\"invalid_substitutes\":[],\"ordinal\":57,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.specs/.livespec-path` exists and points to a valid LiveSpec repo directory\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.058.specs_livespec_path_exists_and_points_to_a_valid\",\"invalid_substitutes\":[],\"ordinal\":58,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"`.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.059.gitignore_contains_provider_generated_skill_agen\",\"invalid_substitutes\":[],\"ordinal\":59,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.060.if_from_code_specs_bootstrap_recap_md_exists_wit\",\"invalid_substitutes\":[],\"ordinal\":60,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"definition_of_done\",\"completion_actor\":\"goal\",\"description\":\"If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"dod.061.if_from_code_no_bootstrap_recap_md_in_project_ro\",\"invalid_substitutes\":[],\"ordinal\":61,\"repair_if_missing\":[\"Run the described task and capture concrete evidence before proving it.\",\"If the task cannot run, emit a canonical BLOCKED line with the exact reason.\"],\"required_evidence\":[\"observable_output_or_artifact\",\"success_criteria_met\"]},{\"category\":\"injected\",\"completion_actor\":\"goal\",\"description\":\"Archive the run via `livespec goal archive` and prove archive.run with the artifact path\",\"evidence_kind\":\"documentary\",\"expected_evidence\":{\"command\":\"spec-init\",\"feature_slug\":null,\"review_max_chars\":null,\"reviewer_model\":\"\"},\"id\":\"archive.run\",\"invalid_substitutes\":[\"prose_archive_claim\",\"exit_code_without_artifact\",\"tmpdir_contract_state_paths_without_artifact\"],\"ordinal\":62,\"repair_if_missing\":[\"run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`\",\"resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`\"],\"required_evidence\":[\"run_artifact_path\"]}],\"verify_rules\":{\"may\":[{\"kind\":\"contains\",\"payload\":\"stack\",\"verb\":\"may\"}],\"must\":[{\"kind\":\"exit_code\",\"payload\":0,\"verb\":\"must\"},{\"kind\":\"contains\",\"payload\":\"LiveSpec initialized\",\"verb\":\"must\"},{\"kind\":\"contains\",\"payload\":\"Penflow contract\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/spec-system.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/project.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/constitution.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/stacks/_default.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/stacks/decisions\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/testing/strategy.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/preflight.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/preflight-report.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".specs/.livespec-path\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/skills\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".claude/skills\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agents/skills\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/agents/livespec-documenter/agent.yaml\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/agents/livespec-documenter/prompt.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/agents/livespec-implementer/agent.yaml\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/agents/livespec-implementer/prompt.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/agents/livespec-supervisor/agent.yaml\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/agents/livespec-supervisor/prompt.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/agents/livespec-verifier/agent.yaml\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".agent-sync.local/agents/livespec-verifier/prompt.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".claude/agents/livespec-documenter.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".claude/agents/livespec-implementer.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".claude/agents/livespec-supervisor.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".claude/agents/livespec-verifier.md\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".codex/agents/livespec-documenter.toml\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".codex/agents/livespec-implementer.toml\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".codex/agents/livespec-supervisor.toml\",\"verb\":\"must\"},{\"kind\":\"exists\",\"payload\":\".codex/agents/livespec-verifier.toml\",\"verb\":\"must\"}],\"must_not\":[{\"kind\":\"contains\",\"payload\":\"Traceback\",\"verb\":\"must_not\"}],\"when\":[{\"flag\":\"--dry-run\",\"may\":[],\"must\":[{\"kind\":\"exit_code\",\"payload\":0,\"verb\":\"must\"},{\"kind\":\"contains\",\"payload\":\"no changes applied\",\"verb\":\"must\"}],\"must_not\":[{\"kind\":\"contains\",\"payload\":\"LiveSpec initialized\",\"verb\":\"must_not\"},{\"kind\":\"contains\",\"payload\":\"Traceback\",\"verb\":\"must_not\"}],\"replace_base\":true},{\"flag\":\"-d\",\"may\":[],\"must\":[{\"kind\":\"exit_code\",\"payload\":0,\"verb\":\"must\"},{\"kind\":\"contains\",\"payload\":\"no changes applied\",\"verb\":\"must\"}],\"must_not\":[{\"kind\":\"contains\",\"payload\":\"LiveSpec initialized\",\"verb\":\"must_not\"},{\"kind\":\"contains\",\"payload\":\"Traceback\",\"verb\":\"must_not\"}],\"replace_base\":true}]}}",
+  "command": "spec-init",
+  "definition_of_done": [
+    "`.specs/spec-system.md` exists",
+    "`.specs/project.md` contains users, scale, geography (or explicit placeholders)",
+    "`.specs/stacks/_default.md` contains chosen stack + rationale",
+    "At least 1 ADR exists in `.specs/stacks/decisions/`",
+    "`.specs/testing/strategy.md` exists",
+    "`.specs/README.md` exists with project name and initial ADRs",
+    "`CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block",
+    "`.specs/hooks/` directory exists",
+    "`.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`",
+    "`.gitignore` contains `.specs/hooks/*.local.md`",
+    "`.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned)",
+    "`roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)",
+    "`.specs/preflight.md` exists with checks generated from stack",
+    "`.specs/preflight-report.md` exists with execution results",
+    "After-init hooks resolved and executed (Phase E)",
+    "`.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)",
+    "`scripts/sync-agent-assets.sh` completed through `cc-hub`",
+    "`.agent-sync.local/skills/spec-*`, `.claude/skills/spec-*` and `.agents/skills/spec-*` resolve for every LiveSpec skill in the source inventory",
+    "`.agent-sync.local/skills/source-command-cli`, `.claude/skills/source-command-cli` and `.agents/skills/source-command-cli` resolve",
+    "`.agent-sync.local/agents/livespec-*` contains project-local copies of every source agent (`agent.yaml` + `prompt.md`); generated `.claude/agents/livespec-*.md` and `.codex/agents/livespec-*.toml` resolve within the project",
+    "`.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo",
+    "`.specs/.livespec-path` exists and points to a valid LiveSpec repo directory",
+    "`.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`",
+    "If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`",
+    "If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)"
+  ],
+  "evidence_policy_version": "2",
+  "feature": null,
+  "goal_hash": "04c2e0a2be493ad8ccdb7b31b4008627b370652847c4cf5f9d44b343c1c914ee",
+  "hooks": {
+    "before": {
+      "command": "livespec hooks resolve --event before --command init",
+      "context": "# Before Init — Load Context & Preferences\n\n## 1. Conventions (if available)\n\nIf `.conventions/index.md` exists, **Read** it into context. Follow the **Load Path** in [`conventions-sync.md`](~/.claude/livespec/references/conventions-sync.md) to resolve the relevant sub-domains and surface the mandatory read list. This project may already have conventions from a previous setup.\n\nIf `.conventions/conventions.md` (legacy compiled format) exists but `.conventions/index.md` does not, note it and surface a one-line warning: `Legacy conventions format detected — will migrate via after-init hook.` Continue without reading the legacy file.\n\nIf neither file exists, skip silently — conventions will be generated by the `after-init` hook after the stack is defined.\n\n## 2. User Preferences\n\nUse `/memo.read dev` to load the user's preferred stack, runtime, package manager, and testing approach.\n\nPropose the user's preferred technologies first. Present alternatives second.\nIf a preferred technology is suboptimal for the project's constraints, explain why and suggest the alternative.\n\n## 3. Design Tool Config\n\n**Read** [`design.md`](~/.claude/livespec/design.md) — user's preferred design tool configuration.\n\nIf this file exists and `tool` is not `none`:\n- Include the design tool in the stack summary during Phase B\n- Note the design system for future reference in the constitution\n- Add a \"Design\" row to the recommended stack table\n\nIf this file does not exist:\n- Trigger the design gate during Phase B (after stack decisions, before Phase C)\n",
+      "context_sha256": "b967b893ca642afd90d5a2b3895e1d9995aae53ebb36de588dcc91d9aa3627b8",
+      "level0_integrations": [],
+      "non_empty": true
+    }
+  },
+  "mode": "enforced",
+  "normalized_flags": [
+    "--auto",
+    "--dir=/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/pytest-of-julienm/pytest-0/test_rendered_symlink_root_rem0/original"
+  ],
+  "project_root": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/pytest-of-julienm/pytest-0/test_rendered_symlink_root_rem0/original",
+  "rules": {
+    "blocked_requires_canonical_line": true,
+    "completion_actor": "goal",
+    "missing_evidence_status": "REJECTED_NEEDS_ACTION",
+    "proof_required_for_each_task": true,
+    "worker_may_mark_tasks_complete": false
+  },
+  "runtime_context": {
+    "has_penflow": false,
+    "is_visual_feature": false,
+    "visual_feature_slugs": []
+  },
+  "schema_version": "2.0",
+  "tasks": [
+    {
+      "category": "injected",
+      "completion_actor": "goal",
+      "description": "Resolve and apply before-hook context via `livespec hooks resolve --event before --command init`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "hook_resolution_command": "livespec hooks resolve --event before --command init",
+        "resolved_hook_context_sha256": "b967b893ca642afd90d5a2b3895e1d9995aae53ebb36de588dcc91d9aa3627b8",
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "hooks.before",
+      "invalid_substitutes": [
+        "manual_integration_summary",
+        "config_file_exists_without_resolved_context",
+        "hook_command_mentioned_without_output_hash"
+      ],
+      "ordinal": 1,
+      "repair_if_missing": [
+        "run the exact `livespec hooks resolve --event before --command <command> [--feature <slug>]` command",
+        "apply the non-empty stdout as additional command context before continuing",
+        "submit the hook command, resolved stdout sha256, and hook_context_applied=true"
+      ],
+      "required_evidence": [
+        "hook_resolution_command",
+        "resolved_hook_context_sha256",
+        "hook_context_applied"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Lock goal contract via `livespec goal render spec-init --save`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.002.lock_goal_contract_via_livespec_goal_render_spec",
+      "invalid_substitutes": [],
+      "ordinal": 2,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Emit `/goal` slash command with contract/state file reference",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.003.emit_goal_slash_command_with_contract_state_file",
+      "invalid_substitutes": [],
+      "ordinal": 3,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Detect handoff/livespec/project-profile.md or legacy .brainstorm/project-profile.md and present import/modify/ignore prompt",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.004.detect_handoff_livespec_project_profile_md_or_le",
+      "invalid_substitutes": [],
+      "ordinal": 4,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "If brainstorm detected and accepted: pre-fill project.md and skip to Phase B",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.005.if_brainstorm_detected_and_accepted_pre_fill_pro",
+      "invalid_substitutes": [],
+      "ordinal": 5,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "If no brainstorm: run 6-question conversational interview (Q1-Q6)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.006.if_no_brainstorm_run_6_question_conversational_i",
+      "invalid_substitutes": [],
+      "ordinal": 6,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Present project profile summary and confirm before proceeding",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.007.present_project_profile_summary_and_confirm_befo",
+      "invalid_substitutes": [],
+      "ordinal": 7,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run decision tree based on project profile signals",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.008.run_decision_tree_based_on_project_profile_signa",
+      "invalid_substitutes": [],
+      "ordinal": 8,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Present recommended stack with justifications per layer",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.009.present_recommended_stack_with_justifications_pe",
+      "invalid_substitutes": [],
+      "ordinal": 9,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Accept stack adjustments and confirm final stack",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.010.accept_stack_adjustments_and_confirm_final_stack",
+      "invalid_substitutes": [],
+      "ordinal": 10,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Define testing strategy for the project type",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.011.define_testing_strategy_for_the_project_type",
+      "invalid_substitutes": [],
+      "ordinal": 11,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Ask dev tooling preferences (package manager, linter)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.012.ask_dev_tooling_preferences_package_manager_lint",
+      "invalid_substitutes": [],
+      "ordinal": 12,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Check design tool configuration; run wizard if not configured",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.013.check_design_tool_configuration_run_wizard_if_no",
+      "invalid_substitutes": [],
+      "ordinal": 13,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Detect and confirm brainstorm design/theme artifact import",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.014.detect_and_confirm_brainstorm_design_theme_artif",
+      "invalid_substitutes": [],
+      "ordinal": 14,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Bootstrap Penflow contract workspace if a Brainstorm `handoff/penflow/` or legacy `penflow/` source exists",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.015.bootstrap_penflow_contract_workspace_if_a_brains",
+      "invalid_substitutes": [],
+      "ordinal": 15,
+      "repair_if_missing": [
+        "run the required Penflow command or create the missing Penflow prerequisite",
+        "record the concrete Penflow report path and final status"
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Import theme.css and write theme.md if brainstorm theme detected",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.016.import_theme_css_and_write_theme_md_if_brainstor",
+      "invalid_substitutes": [],
+      "ordinal": 16,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Create at least 1 ADR per significant stack choice",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.017.create_at_least_1_adr_per_significant_stack_choi",
+      "invalid_substitutes": [],
+      "ordinal": 17,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Create .specs/ directory structure with all required files",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.018.create_specs_directory_structure_with_all_requir",
+      "invalid_substitutes": [],
+      "ordinal": 18,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Generate constitution.md from conversation and stack",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.019.generate_constitution_md_from_conversation_and_s",
+      "invalid_substitutes": [],
+      "ordinal": 19,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Generate project.md from Phase A answers",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.020.generate_project_md_from_phase_a_answers",
+      "invalid_substitutes": [],
+      "ordinal": 20,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Generate stacks/_default.md with `updated` frontmatter",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.021.generate_stacks_default_md_with_updated_frontmat",
+      "invalid_substitutes": [],
+      "ordinal": 21,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Generate testing/strategy.md from Phase B decisions",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.022.generate_testing_strategy_md_from_phase_b_decisi",
+      "invalid_substitutes": [],
+      "ordinal": 22,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Generate roadmap.md via inference matrix from project profile",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.023.generate_roadmap_md_via_inference_matrix_from_pr",
+      "invalid_substitutes": [],
+      "ordinal": 23,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Create .specs/README.md with project name and ADRs; preserve existing registry or use an empty features table for a fresh project",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.024.create_specs_readme_md_with_project_name_and_adr",
+      "invalid_substitutes": [],
+      "ordinal": 24,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Install LiveSpec section in CLAUDE.md (create or update idempotently)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.025.install_livespec_section_in_claude_md_create_or",
+      "invalid_substitutes": [],
+      "ordinal": 25,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run sync-agent-assets.sh and verify all required skill links and local mutable agent copies",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.026.run_sync_agent_assets_sh_and_verify_all_required",
+      "invalid_substitutes": [],
+      "ordinal": 26,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Install pre-commit hook via install-hooks.sh",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.027.install_pre_commit_hook_via_install_hooks_sh",
+      "invalid_substitutes": [],
+      "ordinal": 27,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Write .specs/livespec-version and .specs/.livespec-path",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.028.write_specs_livespec_version_and_specs_livespec",
+      "invalid_substitutes": [],
+      "ordinal": 28,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Update .gitignore with required patterns",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.029.update_gitignore_with_required_patterns",
+      "invalid_substitutes": [],
+      "ordinal": 29,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Generate preflight.md from stack technologies catalog",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.030.generate_preflight_md_from_stack_technologies_ca",
+      "invalid_substitutes": [],
+      "ordinal": 30,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Scan .env for creds:* entries and add token checks",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.031.scan_env_for_creds_entries_and_add_token_checks",
+      "invalid_substitutes": [],
+      "ordinal": 31,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Run 3-pass preflight engine (verify → auto-resolve → human blockers)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.032.run_3_pass_preflight_engine_verify_auto_resolve",
+      "invalid_substitutes": [],
+      "ordinal": 32,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Present human-required blockers grouped for resolution",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.033.present_human_required_blockers_grouped_for_reso",
+      "invalid_substitutes": [],
+      "ordinal": 33,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Ensure .gitignore has exact entry for .specs/preflight-report.md",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.034.ensure_gitignore_has_exact_entry_for_specs_prefl",
+      "invalid_substitutes": [],
+      "ordinal": 34,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Scan and resolve after-init hook chain (3 levels)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.035.scan_and_resolve_after_init_hook_chain_3_levels",
+      "invalid_substitutes": [],
+      "ordinal": 35,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "execution",
+      "completion_actor": "goal",
+      "description": "Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "task.036.execute_hooks_in_order_generate_conventions_inde",
+      "invalid_substitutes": [],
+      "ordinal": 36,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/spec-system.md` exists",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.037.specs_spec_system_md_exists",
+      "invalid_substitutes": [],
+      "ordinal": 37,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/project.md` contains users, scale, geography (or explicit placeholders)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.038.specs_project_md_contains_users_scale_geography",
+      "invalid_substitutes": [],
+      "ordinal": 38,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/stacks/_default.md` contains chosen stack + rationale",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.039.specs_stacks_default_md_contains_chosen_stack_ra",
+      "invalid_substitutes": [],
+      "ordinal": 39,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "At least 1 ADR exists in `.specs/stacks/decisions/`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.040.at_least_1_adr_exists_in_specs_stacks_decisions",
+      "invalid_substitutes": [],
+      "ordinal": 40,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/testing/strategy.md` exists",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.041.specs_testing_strategy_md_exists",
+      "invalid_substitutes": [],
+      "ordinal": 41,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/README.md` exists with project name and initial ADRs",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.042.specs_readme_md_exists_with_project_name_and_ini",
+      "invalid_substitutes": [],
+      "ordinal": 42,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`CLAUDE.md` contains a valid `<!-- livespec:start --> ... <!-- livespec:end -->` block",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.043.claude_md_contains_a_valid_livespec_start_livesp",
+      "invalid_substitutes": [],
+      "ordinal": 43,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/hooks/` directory exists",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.044.specs_hooks_directory_exists",
+      "invalid_substitutes": [],
+      "ordinal": 44,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/design/` directory exists with `screens/` subdirectory and `changelog.md`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.045.specs_design_directory_exists_with_screens_subdi",
+      "invalid_substitutes": [],
+      "ordinal": 45,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.gitignore` contains `.specs/hooks/*.local.md`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.046.gitignore_contains_specs_hooks_local_md",
+      "invalid_substitutes": [],
+      "ordinal": 46,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.gitignore` contains an exact `.specs/preflight-report.md` entry (execution artifact, never versioned)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.047.gitignore_contains_an_exact_specs_preflight_repo",
+      "invalid_substitutes": [],
+      "ordinal": 47,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`roadmap.md` exists with at least 1 item in at least 1 tier (empty tiers are acceptable)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.048.roadmap_md_exists_with_at_least_1_item_in_at_lea",
+      "invalid_substitutes": [],
+      "ordinal": 48,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/preflight.md` exists with checks generated from stack",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.049.specs_preflight_md_exists_with_checks_generated",
+      "invalid_substitutes": [],
+      "ordinal": 49,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/preflight-report.md` exists with execution results",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.050.specs_preflight_report_md_exists_with_execution",
+      "invalid_substitutes": [],
+      "ordinal": 50,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "After-init hooks resolved and executed (Phase E)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.051.after_init_hooks_resolved_and_executed_phase_e",
+      "invalid_substitutes": [],
+      "ordinal": 51,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.conventions/index.md` AND `.conventions/manifest.yaml` exist (generated from stack by after-init hook, OR pre-existing in --from-code mode)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.052.conventions_index_md_and_conventions_manifest_ya",
+      "invalid_substitutes": [],
+      "ordinal": 52,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`scripts/sync-agent-assets.sh` completed through `cc-hub`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.053.scripts_sync_agent_assets_sh_completed_through_c",
+      "invalid_substitutes": [],
+      "ordinal": 53,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.agent-sync.local/skills/spec-*`, `.claude/skills/spec-*` and `.agents/skills/spec-*` resolve for every LiveSpec skill in the source inventory",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.054.agent_sync_local_skills_spec_claude_skills_spec",
+      "invalid_substitutes": [],
+      "ordinal": 54,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.agent-sync.local/skills/source-command-cli`, `.claude/skills/source-command-cli` and `.agents/skills/source-command-cli` resolve",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.055.agent_sync_local_skills_source_command_cli_claud",
+      "invalid_substitutes": [],
+      "ordinal": 55,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.agent-sync.local/agents/livespec-*` contains project-local copies of every source agent (`agent.yaml` + `prompt.md`); generated `.claude/agents/livespec-*.md` and `.codex/agents/livespec-*.toml` resolve within the project",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.056.agent_sync_local_agents_livespec_contains_projec",
+      "invalid_substitutes": [],
+      "ordinal": 56,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/livespec-version` exists and matches `VERSION` from LiveSpec repo",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.057.specs_livespec_version_exists_and_matches_versio",
+      "invalid_substitutes": [],
+      "ordinal": 57,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.specs/.livespec-path` exists and points to a valid LiveSpec repo directory",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.058.specs_livespec_path_exists_and_points_to_a_valid",
+      "invalid_substitutes": [],
+      "ordinal": 58,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "`.gitignore` contains provider-generated skill/agent/rule outputs, `.specs/.livespec-path`, `test-results/`, `playwright-report/`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.059.gitignore_contains_provider_generated_skill_agen",
+      "invalid_substitutes": [],
+      "ordinal": 59,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "If `--from-code`: `.specs/bootstrap-recap.md` exists with `status: completed`",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.060.if_from_code_specs_bootstrap_recap_md_exists_wit",
+      "invalid_substitutes": [],
+      "ordinal": 60,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "definition_of_done",
+      "completion_actor": "goal",
+      "description": "If `--from-code`: no `bootstrap-recap.md` in project root (moved to `.specs/`)",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "dod.061.if_from_code_no_bootstrap_recap_md_in_project_ro",
+      "invalid_substitutes": [],
+      "ordinal": 61,
+      "repair_if_missing": [
+        "Run the described task and capture concrete evidence before proving it.",
+        "If the task cannot run, emit a canonical BLOCKED line with the exact reason."
+      ],
+      "required_evidence": [
+        "observable_output_or_artifact",
+        "success_criteria_met"
+      ]
+    },
+    {
+      "category": "injected",
+      "completion_actor": "goal",
+      "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+      "evidence_kind": "documentary",
+      "expected_evidence": {
+        "command": "spec-init",
+        "feature_slug": null,
+        "review_max_chars": null,
+        "reviewer_model": ""
+      },
+      "id": "archive.run",
+      "invalid_substitutes": [
+        "prose_archive_claim",
+        "exit_code_without_artifact",
+        "tmpdir_contract_state_paths_without_artifact"
+      ],
+      "ordinal": 62,
+      "repair_if_missing": [
+        "run `livespec goal archive --contract <c> --state <s> [--feature <slug>]`",
+        "resubmit the printed `.specs/.runs/` artifact path as `run_artifact_path`"
+      ],
+      "required_evidence": [
+        "run_artifact_path"
+      ]
+    }
+  ],
+  "worker_may_mark_tasks_complete": false
+}

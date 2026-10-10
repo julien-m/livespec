@@ -117,36 +117,70 @@ flowchart TD
 
 ## Acceptance Criteria
 
-- **AC-001:** Gates model loads `.specs/conventions-gates.yaml`, rejects malformed thresholds, and
+### AC-001
+
+Gates model loads `.specs/conventions-gates.yaml`, rejects malformed thresholds, and
   preserves `generated_from.constitution_sha256`.
-- **AC-002:** `livespec conventions gates init` writes `.specs/conventions-gates.yaml` with file
+### AC-002
+
+`livespec conventions gates init` writes `.specs/conventions-gates.yaml` with file
   thresholds target 400/limit 500 and function thresholds target 30/limit 60.
-- **AC-003:** `livespec conventions verify [--json] [--report]` returns exit codes 0 PASS, 1 FAIL,
+### AC-003
+
+`livespec conventions verify [--json] [--report]` returns exit codes 0 PASS, 1 FAIL,
   2 BLOCKED.
-- **AC-004:** Verify executes declared linters, detects linter version mismatch, and checks
+### AC-004
+
+Verify executes declared linters, detects linter version mismatch, and checks
   gates-to-linter limit sync.
-- **AC-005:** Builtins detect file/function length, file headers, public doc coverage, token scale,
+### AC-005
+
+Builtins detect file/function length, file headers, public doc coverage, token scale,
   suppression directives, and import rules.
-- **AC-006:** Adapter registry covers Python, TypeScript/React, Swift, and a partial fallback.
-- **AC-007:** Receipt kind `conventions` records `gates_sha256`, verdict, blockers, violations, and
+### AC-006
+
+Adapter registry covers Python, TypeScript/React, Swift, and a partial fallback.
+### AC-007
+
+Receipt kind `conventions` records `gates_sha256`, verdict, blockers, violations, and
   rejects PASS with error violations.
-- **AC-008:** `--report` writes `.specs/conventions/debt-report.md` and `debt.json` grouped
+### AC-008
+
+`--report` writes `.specs/conventions/debt-report.md` and `debt.json` grouped
   worst-first with warnings, errors, and suppression counts.
-- **AC-009:** `livespec conventions scaffold --apply --sync-limits` syncs managed SwiftLint limits.
-- **AC-010:** Pytest coverage for 061 runs with zero skipped tests.
-- **AC-011:** Ruff flat JSON diagnostics are parsed as linter violations and make the gate fail.
-- **AC-012:** Conventions receipts are rejected when their `gates_sha256` differs from the current
+### AC-009
+
+`livespec conventions scaffold --apply --sync-limits` syncs managed SwiftLint limits.
+### AC-010
+
+Pytest coverage for 061 runs with zero skipped tests.
+### AC-011
+
+Ruff flat JSON diagnostics are parsed as linter violations and make the gate fail.
+### AC-012
+
+Conventions receipts are rejected when their `gates_sha256` differs from the current
   `.specs/conventions-gates.yaml`.
-- **AC-013:** Schema v1 rejects `delegate_to` and command `wiring`; declared linters never disable
+### AC-013
+
+Schema v1 rejects `delegate_to` and command `wiring`; declared linters never disable
   builtin checks.
-- **AC-014:** Verification blocks when `generated_from.constitution_sha256` is stale, and
+### AC-014
+
+Verification blocks when `generated_from.constitution_sha256` is stale, and
   `.specs/conventions/debt.json` remains a regenerable ignored artifact.
-- **AC-015:** Le receipt conventions est un artefact d'audit uniquement (preuve de traçabilite).
+### AC-015
+
+Le receipt conventions est un artefact d'audit uniquement (preuve de traçabilite).
   L'exigence anti-forgerie DURE est la re-execution par le superviseur (feature 063, must:).
   Un receipt PASS seul ne constitue pas une preuve de conformite suffisante.
-- **AC-016:** Builtin file/function thresholds stay active even when a linter such as SwiftLint is
+### AC-016
+
+Builtin file/function thresholds stay active even when a linter such as SwiftLint is
   declared in `commands.lint`.
-- **AC-017:** Les erreurs de lecture de fichier source produisent une violation `file_read_error`
+### AC-017
+
+Les erreurs de lecture de fichier source produisent une violation `file_read_error`
   bloquante au lieu d'un traceback.
 
 ## Functional Requirements

@@ -1,0 +1,1781 @@
+{
+  "command": "spec-check",
+  "goal_hash": "14f3dadff08cc69e609f3a2a3360c3da02e7fe2285061660bfa06d8e9ea800be",
+  "schema_version": "2.0",
+  "status": "complete",
+  "tasks": {
+    "archive.run": {
+      "accepted_evidence": {
+        "run_artifact_path": "/Users/julienm/projects/livespec/.specs/.runs/spec-check-2026-10-10T03-38-02.389404-14f3dadf-policy2.json"
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "run_artifact_path": "/Users/julienm/projects/livespec/.specs/.runs/spec-check-2026-10-10T03-38-02.389404-14f3dadf-policy2.json"
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Archive the run via `livespec goal archive` and prove archive.run with the artifact path",
+      "last_rejection": null,
+      "ordinal": 39,
+      "status": "complete"
+    },
+    "dod.031.tree_validation_executed_and_reported_or_skipped": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-validation.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Tree audit executed and reported;81 feature names, system/ADR presence and sixexisting structuralerrors preserved.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-validation.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Tree audit executed and reported;81 feature names, system/ADR presence and sixexisting structuralerrors preserved.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Tree validation executed and reported (or skipped by --skip-tree)",
+      "last_rejection": null,
+      "ordinal": 31,
+      "status": "complete"
+    },
+    "dod.032.spec_quality_gates_evaluated_per_feature": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Spec/plan/implementationqualityevaluated;initialcanonicalidentitygapsreported separatelyfromstructuralchecks.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Spec/plan/implementationqualityevaluated;initialcanonicalidentitygapsreported separatelyfromstructuralchecks.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Spec quality gates evaluated (per feature)",
+      "last_rejection": null,
+      "ordinal": 32,
+      "status": "complete"
+    },
+    "dod.033.gap_report_produced_and_displayed": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Structured gapreport produced/displayed;twoHIGH functionalgaps,oneLOW conventiongap,actualcounterexample.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Structured gapreport produced/displayed;twoHIGH functionalgaps,oneLOW conventiongap,actualcounterexample.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Gap report produced and displayed",
+      "last_rejection": null,
+      "ordinal": 33,
+      "status": "complete"
+    },
+    "dod.034.gap_report_saved_to_checks_yyyy_mm_dd_md": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Official checks/2026-10-10.md exists and matches preserved displayed report.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Official checks/2026-10-10.md exists and matches preserved displayed report.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Gap report saved to `checks/YYYY-MM-DD.md`",
+      "last_rejection": null,
+      "ordinal": 34,
+      "status": "complete"
+    },
+    "dod.035.feature_changelog_md_has_a_check_entry": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/changelog.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Feature changelog has dated initialFR004checkentry/reportlink.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/changelog.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Feature changelog has dated initialFR004checkentry/reportlink.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Feature `changelog.md` has a check entry",
+      "last_rejection": null,
+      "ordinal": 35,
+      "status": "complete"
+    },
+    "dod.036.global_specs_changelog_md_has_a_summary_entry": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/changelog.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Global changelog has dated feature078initialFR004checksummary.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/changelog.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Global changelog has dated feature078initialFR004checksummary.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Global `.specs/changelog.md` has a summary entry",
+      "last_rejection": null,
+      "ordinal": 36,
+      "status": "complete"
+    },
+    "dod.037.if_update_implementation_md_status_values_refres": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Conditional --update absent;parentownsimplementation map;no update performed.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Conditional --update absent;parentownsimplementation map;no update performed.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "If `--update`: `implementation.md` status values refreshed",
+      "last_rejection": null,
+      "ordinal": 37,
+      "status": "complete"
+    },
+    "dod.038.convention_compliance_checked_against_convention": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "ConventionCompliance checked against loadedindex/exactManagerbundlesources;publicdocumentationgap documented,no falsePASS.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "ConventionCompliance checked against loadedindex/exactManagerbundlesources;publicdocumentationgap documented,no falsePASS.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Convention Compliance checked against `.conventions/index.md` + selected `ai-ressources/` sources, or a `convention gap` explains why it could not run",
+      "last_rejection": null,
+      "ordinal": 38,
+      "status": "complete"
+    },
+    "task.001.read_before_check_hooks_all_3_levels_global_proj": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "All three before-check hook paths checked; absent. Official resolver exit0,empty stdout.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "All three before-check hook paths checked; absent. Official resolver exit0,empty stdout.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Read before-check hooks (all 3 levels: global, project, local)",
+      "last_rejection": null,
+      "ordinal": 1,
+      "status": "complete"
+    },
+    "task.002.resolve_flags_and_feature_argument_read_only": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Explicit canonical feature 078-requirement-evidence-integrity exists; flags frozen ['--fr=FR-004', '--model=gpt-6.1-sol', '--review-max-chars=200000'].",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Explicit canonical feature 078-requirement-evidence-integrity exists; flags frozen ['--fr=FR-004', '--model=gpt-6.1-sol', '--review-max-chars=200000'].",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Resolve flags and feature argument (read-only)",
+      "last_rejection": null,
+      "ordinal": 2,
+      "status": "complete"
+    },
+    "task.003.verify_no_active_goal_exists": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "get_goal returned goal:null before render/create_goal; fresh native session.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "get_goal returned goal:null before render/create_goal; fresh native session.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Verify no active goal exists",
+      "last_rejection": null,
+      "ordinal": 3,
+      "status": "complete"
+    },
+    "task.004.render_and_save_goal_contract_via_livespec_goal": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Official render exit0; contract/state persisted with hash 14f3dadff08cc69e609f3a2a3360c3da02e7fe2285061660bfa06d8e9ea800be",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Official render exit0; contract/state persisted with hash 14f3dadff08cc69e609f3a2a3360c3da02e7fe2285061660bfa06d8e9ea800be",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Render and save goal contract via `livespec goal render spec-check --save`",
+      "last_rejection": null,
+      "ordinal": 4,
+      "status": "complete"
+    },
+    "task.005.emit_goal_slash_command_with_hash_and_contract_s": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Native create_goal accepted the exact /goal objective and returned active goal thread01a123dc-9d40-7a41-b4f9-89a16104cd6a.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Native create_goal accepted the exact /goal objective and returned active goal thread01a123dc-9d40-7a41-b4f9-89a16104cd6a.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Emit `/goal` slash command with hash and contract/state file references",
+      "last_rejection": null,
+      "ordinal": 5,
+      "status": "complete"
+    },
+    "task.006.validate_system_files_presence_in_specs_spec_sys": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Seven required system files exist and are readable; ADR count3; stack has no[TBD]. Documentary audit completed, structural validation exit1 records baseline gaps separately.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Seven required system files exist and are readable; ADR count3; stack has no[TBD]. Documentary audit completed, structural validation exit1 records baseline gaps separately.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Validate system files presence in .specs/ (spec-system.md, constitution.md, project.md, README.md, changelog.md, stacks/_default.md, testing/strategy.md, ADRs)",
+      "last_rejection": null,
+      "ordinal": 6,
+      "status": "complete"
+    },
+    "task.007.validate_feature_directory_naming_pattern_from_s": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "All81 feature directories satisfy canonical dotted-number regex; zero invalid names,zero duplicate numbers.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "All81 feature directories satisfy canonical dotted-number regex; zero invalid names,zero duplicate numbers.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Validate feature directory naming pattern from `system/identity.md` (`^\\d{3}(\\.\\d+)?-[a-z0-9]+(-[a-z0-9]+)*$`)",
+      "last_rejection": null,
+      "ordinal": 7,
+      "status": "complete"
+    },
+    "task.008.check_feature_completeness_spec_md_changelog_md": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Completeness checked for81 features. Historical warnings:038 and045 missing changelog.md;078 has all required spec/plan/implementation/changelog/progress files.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Completeness checked for81 features. Historical warnings:038 and045 missing changelog.md;078 has all required spec/plan/implementation/changelog/progress files.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Check feature completeness (spec.md, changelog.md, implementation.md, plan.md per status)",
+      "last_rejection": null,
+      "ordinal": 8,
+      "status": "complete"
+    },
+    "task.009.detect_orphan_files_directly_under_features": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "No orphan files or invalid directory names directly under features/.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "No orphan files or invalid directory names directly under features/.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Detect orphan files directly under features/",
+      "last_rejection": null,
+      "ordinal": 9,
+      "status": "complete"
+    },
+    "task.010.verify_readme_md_features_table_sync_vs_disk": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "All81 feature directory names occur in current README; zero nonexistent README feature links;078 remains In Progress.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "All81 feature directory names occur in current README; zero nonexistent README feature links;078 remains In Progress.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Verify README.md features table sync vs disk",
+      "last_rejection": null,
+      "ordinal": 10,
+      "status": "complete"
+    },
+    "task.011.detect_surface_drift_validate_surfaces_yaml_vs_f": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "surfaces.yaml absent; no apps/packages/frontend/web/client package.json surface candidates; framework feature NON_VISUAL, no surface drift found.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "surfaces.yaml absent; no apps/packages/frontend/web/client package.json surface candidates; framework feature NON_VISUAL, no surface drift found.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Detect surface drift: validate surfaces.yaml vs filesystem, scan for unconfigured app directories",
+      "last_rejection": null,
+      "ordinal": 11,
+      "status": "complete"
+    },
+    "task.012.if_no_argument_list_features_sorted_by_last_modi": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Conditional selection is not applicable: explicit078 feature argument supplied. No interactive selection required.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Conditional selection is not applicable: explicit078 feature argument supplied. No interactive selection required.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "If no argument: list features sorted by last-modified date and prompt for selection",
+      "last_rejection": null,
+      "ordinal": 12,
+      "status": "complete"
+    },
+    "task.013.resolve_feature_argument_git_branch_interactive": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Explicit canonical directory078-requirement-evidence-integrity exists; git branch fallback and interactive choice not applicable.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/tree-observations.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Explicit canonical directory078-requirement-evidence-integrity exists; git branch fallback and interactive choice not applicable.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Resolve feature: argument → git branch → interactive selection",
+      "last_rejection": null,
+      "ordinal": 13,
+      "status": "complete"
+    },
+    "task.014.evaluate_spec_md_quality_gates_gherkin_mermaid_f": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Spec quality evaluated:five stories each Gherkin and Mermaid;16 FR/16AC,Given/When/Then AC table,zero clarificationmarkers. Structural spec validation100,semantic readiness remains independent.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Spec quality evaluated:five stories each Gherkin and Mermaid;16 FR/16AC,Given/When/Then AC table,zero clarificationmarkers. Structural spec validation100,semantic readiness remains independent.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Evaluate spec.md quality gates (Gherkin, Mermaid flowcharts, AC format, FR→AC mapping, clarification markers)",
+      "last_rejection": null,
+      "ordinal": 14,
+      "status": "complete"
+    },
+    "task.015.evaluate_plan_md_quality_gates_if_file_exists_se": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Plan quality evaluated:sequence and state diagrams,filled Constitution Check,all16FR referenced,eightsteps;ER not applicable to file receipt entities. Read-only quality does not attest current semantic review.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Plan quality evaluated:sequence and state diagrams,filled Constitution Check,all16FR referenced,eightsteps;ER not applicable to file receipt entities. Read-only quality does not attest current semantic review.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Evaluate plan.md quality gates if file exists (sequence/state/ER diagrams, constitution check, FR coverage)",
+      "last_rejection": null,
+      "ordinal": 15,
+      "status": "complete"
+    },
+    "task.016.check_implementation_quality_gates_implementatio": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Implementation,progress,changelog exist; structural parser reports implementation missingfrontmatter and both recognized mappingheadings. Existing tables provide source/test links,not current runtime certification.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Implementation,progress,changelog exist; structural parser reports implementation missingfrontmatter and both recognized mappingheadings. Existing tables provide source/test links,not current runtime certification.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Check implementation quality gates (implementation.md, changelog.md, progress.md)",
+      "last_rejection": null,
+      "ordinal": 16,
+      "status": "complete"
+    },
+    "task.017.read_spec_requirements_extract_all_ac_fr_sc_from": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Extracted16FR,16AC,fourSC. Filter selectedFR004 mapsAC002+AC004;other requirements retained in inventory and explicitly outside this bounded alignmentaudit.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Extracted16FR,16AC,fourSC. Filter selectedFR004 mapsAC002+AC004;other requirements retained in inventory and explicitly outside this bounded alignmentaudit.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Read spec requirements: extract all AC, FR, SC from spec.md",
+      "last_rejection": null,
+      "ordinal": 17,
+      "status": "complete"
+    },
+    "task.018.read_implementation_map_from_implementation_md_f": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Read actual implementation map;FR004 sources review_receipts/normative_identity/lifecycle_metadata and context/lifecycle/progression regressiontests. Existing baseline claims are dated;NON_VISUAL hasno screenshots.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Read actual implementation map;FR004 sources review_receipts/normative_identity/lifecycle_metadata and context/lifecycle/progression regressiontests. Existing baseline claims are dated;NON_VISUAL hasno screenshots.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Read implementation map from implementation.md (FR/@spec anchors, AC/test mappings, visual baselines)",
+      "last_rejection": null,
+      "ordinal": 18,
+      "status": "complete"
+    },
+    "task.019.recovery_mode_if_implementation_md_absent_grep_s": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Conditional recovery not applicable:implementation.md exists with substantive mapping. Existing heading/schema violations separately reported; no synthetic inferred verifiedmapping created.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Conditional recovery not applicable:implementation.md exists with substantive mapping. Existing heading/schema violations separately reported; no synthetic inferred verifiedmapping created.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Recovery mode if implementation.md absent: grep @spec anchors, infer AC coverage, mark as ~ Inferred",
+      "last_rejection": null,
+      "ordinal": 19,
+      "status": "complete"
+    },
+    "task.020.verify_each_fr_ac_against_actual_code_assign_ver": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Observed shortslug source/review location mismatch and literal shortslug immutable compiler freeze;FR004 andAC002/AC004 Partial. Counterexample output saved;canonical preparation currentcomplete but no readinessor executionclaimed.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Observed shortslug source/review location mismatch and literal shortslug immutable compiler freeze;FR004 andAC002/AC004 Partial. Counterexample output saved;canonical preparation currentcomplete but no readinessor executionclaimed.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Verify each FR/AC against actual code: assign ✅ Verified / ⚠️ Partial / ❌ Missing / 🔄 Drifted",
+      "last_rejection": null,
+      "ordinal": 20,
+      "status": "complete"
+    },
+    "task.021.load_conventions_index_md_when_present_resolve_s": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Loaded code convention domain and exactgeneral/python/javascript/cli/stack sources viaManager fullbundle1195lines. Python naming overrideskebab;JSCommander instructions excludedPython. Reviewed mapped boundary typing,scopevalidation,public docs andtest mechanics.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Loaded code convention domain and exactgeneral/python/javascript/cli/stack sources viaManager fullbundle1195lines. Python naming overrideskebab;JSCommander instructions excludedPython. Reviewed mapped boundary typing,scopevalidation,public docs andtest mechanics.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Load `.conventions/index.md` when present, resolve selected `ai-ressources/` files, and check Convention Compliance for mapped source/test files",
+      "last_rejection": null,
+      "ordinal": 21,
+      "status": "complete"
+    },
+    "task.022.report_missing_convention_bundle_or_violated_rul": {
+      "accepted_evidence": {
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Convention gap:existing review_files publicfunctions have summary-only docstrings missing explicitparameter/return/side-effectdocs under general24/PythonGoogle rules. RecordLOW documentationgap; no repoPASS claimed.",
+        "paths": [
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+          "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+        ],
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Convention gap:existing review_files publicfunctions have summary-only docstrings missing explicitparameter/return/side-effectdocs under general24/PythonGoogle rules. RecordLOW documentationgap; no repoPASS claimed.",
+            "paths": [
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/quality-observations.json",
+              "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/identity-counterexample.json"
+            ],
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Report missing convention bundle or violated rules as `convention gap` entries",
+      "last_rejection": null,
+      "ordinal": 22,
+      "status": "complete"
+    },
+    "task.023.produce_structured_gap_report_spec_quality_fr_ta": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/report-draft.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Structured initial gap report produced and displayed;Convention Compliance includes twoHIGH functional gaps,oneLOW publicdocumentationgap and sixdistinctpreexisting structuralerrors.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/report-draft.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Structured initial gap report produced and displayed;Convention Compliance includes twoHIGH functional gaps,oneLOW publicdocumentationgap and sixdistinctpreexisting structuralerrors.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Produce structured gap report (spec quality, FR table, AC table, Convention Compliance, summary)",
+      "last_rejection": null,
+      "ordinal": 23,
+      "status": "complete"
+    },
+    "task.024.include_convention_compliance_section_with_domai": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/report-draft.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Structured initial gap report produced and displayed;Convention Compliance includes twoHIGH functional gaps,oneLOW publicdocumentationgap and sixdistinctpreexisting structuralerrors.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/report-draft.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Structured initial gap report produced and displayed;Convention Compliance includes twoHIGH functional gaps,oneLOW publicdocumentationgap and sixdistinctpreexisting structuralerrors.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Include `Convention Compliance` section with domains checked, evidence, and convention gaps",
+      "last_rejection": null,
+      "ordinal": 24,
+      "status": "complete"
+    },
+    "task.025.save_gap_report_to_specs_features_nnn_checks_yyy": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Fresh initial filtered report saved to official checks/2026-10-10.md;read-back identical to displayed draft.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Fresh initial filtered report saved to official checks/2026-10-10.md;read-back identical to displayed draft.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Save gap report to .specs/features/NNN/checks/YYYY-MM-DD.md",
+      "last_rejection": null,
+      "ordinal": 25,
+      "status": "complete"
+    },
+    "task.026.add_check_entry_to_feature_changelog_md": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/changelog.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Feature changelog entry appended under official lock; reread/hash verified; includes actual selected gaps and report link.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/changelog.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Feature changelog entry appended under official lock; reread/hash verified; includes actual selected gaps and report link.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Add check entry to feature changelog.md",
+      "last_rejection": null,
+      "ordinal": 26,
+      "status": "complete"
+    },
+    "task.027.add_summary_entry_to_global_specs_changelog_md": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/changelog.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Global dated feature078 initial check entry added under lock and hash verified; all prior entries retained.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/changelog.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Global dated feature078 initial check entry added under lock and hash verified; all prior entries retained.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Add summary entry to global .specs/changelog.md",
+      "last_rejection": null,
+      "ordinal": 27,
+      "status": "complete"
+    },
+    "task.028.present_suggested_fixes_for_each_gap_with_action": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "Suggested fixes displayed in the structured report: continue parent filtered spec-fix, genuine readiness first, canonical scope resolution, new-goal freezing, meaningful boundary tests/docs; preserve immutable history.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "Suggested fixes displayed in the structured report: continue parent filtered spec-fix, genuine readiness first, canonical scope resolution, new-goal freezing, meaningful boundary tests/docs; preserve immutable history.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Present suggested fixes for each gap with actionable commands",
+      "last_rejection": null,
+      "ordinal": 28,
+      "status": "complete"
+    },
+    "task.029.prompt_to_update_implementation_md_status_or_aut": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "No --update flag. Manager assigned read-only source/maps to this child and parent owns implementation updates; no interactive metadata mutation required or performed.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/features/078-requirement-evidence-integrity/checks/2026-10-10.md",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "No --update flag. Manager assigned read-only source/maps to this child and parent owns implementation updates; no interactive metadata mutation required or performed.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Prompt to update implementation.md status (or auto-update if --update)",
+      "last_rejection": null,
+      "ordinal": 29,
+      "status": "complete"
+    },
+    "task.030.read_after_check_hooks_all_3_levels_global_proje": {
+      "accepted_evidence": {
+        "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/hooks-after.json",
+        "convention_domains": [
+          "code"
+        ],
+        "convention_sources": [
+          "$AIRESOURCES/code-conventions/general.md",
+          "$AIRESOURCES/code-conventions/python.md",
+          "$AIRESOURCES/code-conventions/javascript.md",
+          "$AIRESOURCES/code-conventions/cli.md",
+          "$AIRESOURCES/code-conventions/stack-commands.md"
+        ],
+        "conventions_applied_to_output": true,
+        "output": "All three after-check paths checked; all absent. Official resolver exit0,emptystdout.",
+        "success_criteria_met": true
+      },
+      "attempts": [
+        {
+          "evidence": {
+            "artifact": "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/hooks-after.json",
+            "convention_domains": [
+              "code"
+            ],
+            "convention_sources": [
+              "$AIRESOURCES/code-conventions/general.md",
+              "$AIRESOURCES/code-conventions/python.md",
+              "$AIRESOURCES/code-conventions/javascript.md",
+              "$AIRESOURCES/code-conventions/cli.md",
+              "$AIRESOURCES/code-conventions/stack-commands.md"
+            ],
+            "conventions_applied_to_output": true,
+            "output": "All three after-check paths checked; all absent. Official resolver exit0,emptystdout.",
+            "success_criteria_met": true
+          },
+          "invalid_substitutes": [],
+          "missing_evidence": [],
+          "status": "ACCEPTED"
+        }
+      ],
+      "description": "Read after-check hooks (all 3 levels: global, project, local)",
+      "last_rejection": null,
+      "ordinal": 30,
+      "status": "complete"
+    }
+  }
+}

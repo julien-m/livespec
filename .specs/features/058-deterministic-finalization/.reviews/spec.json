@@ -1,0 +1,896 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "a2f1ac4ebe81b79e3790161a907c1929c004ba3212375264f911f18ec961937a",
+  "source_hashes": {
+    ".specs/constitution.md": "ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9",
+    ".specs/features/058-deterministic-finalization/spec.md": "00e5a3b6158a257d21bbba739c470396a900aab2a8a6dc46d5045d15f3437c4b",
+    ".specs/features/078-requirement-evidence-integrity/spec.md": "360410369ff8da5d7ccd5325d84eb27ba76e3d71e13c3a3a32c4bcdffb744b0c",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686"
+  },
+  "reviewer_model": "gpt-6.1-sol",
+  "complete": true,
+  "ready": false,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "058-deterministic-finalization:AC-001",
+      "disposition": "contradictory",
+      "rationale": "The four targets, single lock, hash-checked writes and seven exact lifecycle states are explicit. However, the story promises no partial application while the edge case explicitly permits partial writes after failure; the all-target atomicity guarantee is internally contradictory until its meaning is qualified.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L293-L297",
+          "excerpt": "**Criterion:** `livespec finalize apply --feature <slug> --command <cmd>` writes the feature changelog entry, the global `.specs/changelog.md` summary, the README features row + Recent Activity regeneration, and the spec.md status (YAML frontmatter `status:` + header `- **Status:**` line, kept in sync) inside a single `acquire_lock` critical section, each write via `write_with_hash_check`"
+        },
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L475-L481",
+          "excerpt": "FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-002",
+      "disposition": "covered",
+      "rationale": "Generated registries own payload markers while the specification receives only recognized lifecycle field changes. Full payload/status identity, exact hashes, unchanged historical comments and zero-write identical reruns are explicit and compatible with the referenced identity policy.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L298-L302",
+          "excerpt": "**Criterion:** Generated changelogs and README carry the per-payload marker `<!-- finalize:<cmd>:<date>:<hash8> -->`; the spec status target changes only recognized lifecycle fields and never adds a body marker. Each status/payload retains its full identity and file hashes in the generated receipt. Re-running an identical apply performs zero registry writes, exits 0, and reports `already_finalized`"
+        },
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L475-L481",
+          "excerpt": "FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-003",
+      "disposition": "covered",
+      "rationale": "The receipt output path, schema, feature, command, outcome and per-file SHA256 are specified. The entity and FR-003 add oracle/payload identity without claiming that a receipt alone certifies runtime acceptance.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L303-L307",
+          "excerpt": "**Criterion:** apply emits a JSON finalize receipt (path printed on stdout) recording schema version, feature slug, command, outcome, and the sha256 of every touched file — same structural shape as the visual evidence receipt"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-004",
+      "disposition": "covered",
+      "rationale": "Default lock timeout and hash mismatch have separate canonical BLOCKED subtypes and observable nonzero exits. No-write is required for lock acquisition failure, while post-write failures have an explicit blocked receipt and recovery edge case.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L308-L312",
+          "excerpt": "**Criterion:** On lock timeout (default 10s, no `--retry`) apply exits non-zero with the canonical `BLOCKED ... policy_blocked` line and modifies no registry file; on post-write hash mismatch it exits non-zero with `BLOCKED ... state_invalid` naming the file"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-005",
+      "disposition": "covered",
+      "rationale": "Verification is explicitly read-only with feature-scoped R1/R4/R6 checks. The amendment preserves R4 equality and adds both directions of Approved/Planned mismatch as negative controls; lifecycle schema acceptance does not waive coherence.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L313-L317",
+          "excerpt": "**Criterion:** `livespec finalize verify --feature <slug>` is strictly read-only and re-evaluates coherence rules R1, R4, and R6 scoped to the feature"
+        },
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L475-L481",
+          "excerpt": "FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-006",
+      "disposition": "covered",
+      "rationale": "PASS/FAIL verdicts, checked file hashes, rule IDs, exit status and missing requested marker behavior are defined with positive and negative scenarios. Receipt production does not authorize modifying checked registries.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L318-L322",
+          "excerpt": "**Criterion:** verify emits a JSON receipt with verdict PASS/FAIL, per-file sha256, and the violated rule IDs on FAIL; exit 0 on PASS, non-zero on FAIL (including missing expected marker when `--command` is given)"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-007",
+      "disposition": "covered",
+      "rationale": "Completion requires a receipt bound to expected feature and command, current file hashes, schema and PASS verdict. This specialized gate remains additional to the referenced typed execution and documentary acceptance rules.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L323-L327",
+          "excerpt": "**Criterion:** Goal contracts for registry-finalizing commands include a `finalize.registry` evidence-family task whose only accepted completion evidence is a `finalize_receipt_path` validated by `verify_finalize_receipt()` (schema, on-disk hash re-verification, expected feature slug, expected command, verdict PASS)"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-008",
+      "disposition": "covered",
+      "rationale": "Missing paths, prose, FAIL and stale/tampered hashes are explicitly rejected with named missing evidence. Tests can observe rejection rather than inferring completion from an exit code.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L328-L332",
+          "excerpt": "**Criterion:** `livespec goal prove` rejects finalize.registry evidence lacking a valid receipt — prose claims, missing paths, FAIL verdicts, and tampered hashes all return `REJECTED_NEEDS_ACTION` with the missing evidence named"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-009",
+      "disposition": "covered",
+      "rationale": "Retry is opt-in and has exponential backoff, jitter, a named 45-second budget and a stated five-second tolerance. Transient success and exhausted-budget failures are independently observable.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L333-L337",
+          "excerpt": "**Criterion:** With `--retry`, lock acquisition retries with exponential backoff plus jitter within a total budget defined by a named constant defaulting to 45 seconds (tested with ±5s tolerance) before failing BLOCKED"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-010",
+      "disposition": "covered",
+      "rationale": "The existing single-attempt, ten-second default lock behavior must remain unchanged when retry is absent. The dedicated scenario and SC-006 preserve regression coverage for current callers.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L338-L342",
+          "excerpt": "**Criterion:** Without `--retry`, lock behavior is byte-for-byte the existing `acquire_lock` contract (single attempt window, 10s default timeout) — no behavior change for current callers"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-011",
+      "disposition": "covered",
+      "rationale": "Typer registration follows the existing register(app) pattern, with apply and verify visible through group help. It composes with the existing CLI rather than introducing a hosted service.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L343-L347",
+          "excerpt": "**Criterion:** `livespec finalize --help` lists `apply` and `verify`; the command group is registered through the existing typer `register(app)` pattern of `validator/cli_commands/`"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:AC-012",
+      "disposition": "covered",
+      "rationale": "Missing README reconstruction and previous-year changelog rotation have explicit artifact sources and archive destination. These are existing registry recovery responsibilities, not additional business behavior.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L348-L354",
+          "excerpt": "**Criterion:** If `.specs/README.md` is missing, apply rebuilds it from existing artifacts (per spec-system README Recovery) before inserting the feature row; if the global changelog contains previous-year entries, apply performs the documented year rotation into `.specs/archive/`"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-001",
+      "disposition": "contradictory",
+      "rationale": "The requested producer states and lifecycle-only finalizer exception are explicit and retain strict R2/R4 checks. The same requirement still promises an atomic all-target operation despite a story forbidding partial application and an edge case allowing partial writes, so its failure guarantee is contradictory.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L372-L376",
+          "excerpt": "**Requirement:** System must provide a `livespec finalize apply` subcommand that performs all four end-of-command registry updates (feature changelog, global changelog, README row + Recent Activity, spec status) in one atomic, lock-guarded, hash-verified operation"
+        },
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L475-L481",
+          "excerpt": "FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-002",
+      "disposition": "covered",
+      "rationale": "Idempotence binds feature, command and full payload including status; date is informational. Specification body markers are forbidden, historical comments preserved and only recognized status/updated slots mutable, matching Normative Identity v2.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L377-L381",
+          "excerpt": "**Requirement:** System must make apply idempotent via deterministic per-payload markers in generated registries, deriving `<hash8>` from feature slug, command and full update payload including status. The spec target updates only recognized lifecycle metadata, never appends a body marker, and preserves all historical comments unchanged. Receipts retain exact current file and payload hashes; the marker date remains informational"
+        },
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L475-L481",
+          "excerpt": "FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-003",
+      "disposition": "covered",
+      "rationale": "Apply and verify receipts retain touched/checked file hashes, schema, oracle and payload identity with verdict. The contract distinguishes apply/verify outcomes and does not substitute this proof for mapped execution evidence.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L382-L386",
+          "excerpt": "**Requirement:** System must emit a JSON finalize receipt for both apply and verify, recording the sha256 of every touched/checked registry file, structurally aligned with the visual evidence receipt (schema version, oracle name/version, payload hash, verdict)"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-004",
+      "disposition": "covered",
+      "rationale": "Read-only verification evaluates feature-scoped R1/R4/R6 and reports rule IDs. The compatibility amendment expressly keeps required-file and README/spec equality checks strict.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L387-L391",
+          "excerpt": "**Requirement:** System must provide a strictly read-only `livespec finalize verify` subcommand that re-evaluates coherence rules R1, R4, and R6 scoped to the target feature and reports violations by rule ID"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-005",
+      "disposition": "covered",
+      "rationale": "The six named registry-finalizing commands receive the specialized finalize.registry family and no prose, exit-code or declared-file-list substitute is allowed. Referenced policy preserves this specialized protection.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L392-L396",
+          "excerpt": "**Requirement:** System must add a `finalize.registry` evidence family to the goal contract validator that requires `finalize_receipt_path` and rejects all substitute evidence (prose, exit codes, declared file lists); the family is attached to the goal contracts of the six registry-finalizing commands: `spec-specify`, `spec-plan`, `spec-implement`, `spec-fix`, `spec-stack`, `spec-feature`"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-006",
+      "disposition": "covered",
+      "rationale": "Receipt validation checks schema, payload hash, current file hashes and expected feature/command/PASS; containment and stale-receipt edge cases are explicit. No source or acceptance identity is broadened by lifecycle normalization.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L397-L401",
+          "excerpt": "**Requirement:** System must provide `verify_finalize_receipt()` following the `verify_visual_receipt` pattern: schema validation, receipt payload-hash check, on-disk file sha256 re-verification, and expected feature/command/verdict matching"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-007",
+      "disposition": "covered",
+      "rationale": "The optional retry policy specifies exponential backoff, jitter and a finite total budget while retaining default lock behavior. This is a bounded technical concurrency mechanism consistent with the local CLI stack.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L402-L406",
+          "excerpt": "**Requirement:** System must support an opt-in retry mode on `locks.acquire_lock` with exponential backoff plus jitter and a total budget of ~45 seconds, leaving default (non-retry) lock behavior unchanged"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-008",
+      "disposition": "covered",
+      "rationale": "Failure classes are distinguished by canonical policy_blocked/state_invalid lines and nonzero coherence failures with rule IDs, making failures observable without a fabricated success state.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L407-L411",
+          "excerpt": "**Requirement:** System must surface failures with the canonical anti-drift BLOCKED format and specific exit codes: lock timeout → `policy_blocked`, hash mismatch → `state_invalid`, coherence FAIL → non-zero with rule IDs"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-009",
+      "disposition": "covered",
+      "rationale": "Logic and Typer surface are separated in the named existing validator modules and registered through the established pattern. Implementation organization remains local and within the current Python stack.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L412-L416",
+          "excerpt": "**Requirement:** System must implement the feature as `validator/finalize.py` (logic) plus `validator/cli_commands/finalize_cmd.py` (typer surface) registered via the existing `register(app)` pattern"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:FR-010",
+      "disposition": "covered",
+      "rationale": "Apply repairs the generated README and rotates old changelog years into explicit archive files. Recovery follows existing artifacts and does not expand the finalizer into roadmap ownership.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L417-L423",
+          "excerpt": "**Requirement:** System must handle registry recovery and rotation during apply: rebuild a missing README from artifacts and rotate previous-year global changelog entries to `.specs/archive/changelog-YYYY.md`"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:SC-001",
+      "disposition": "covered",
+      "rationale": "The measurement is actual green unit/integration tests for all P1 criteria. It is a future success condition and does not itself assert that tests have already executed.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L452-L470",
+          "excerpt": "| SC-001 | All P1 acceptance criteria pass automated tests | pytest suite green (unit + integration on fixture `.specs/` trees) |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:SC-002",
+      "disposition": "covered",
+      "rationale": "An identical second invocation must leave registry bytes unchanged; the measurement directly observes idempotence rather than a prose declaration.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L452-L470",
+          "excerpt": "| SC-002 | Apply is provably idempotent | Integration test: two identical apply runs produce byte-identical registry files on the second run |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:SC-003",
+      "disposition": "covered",
+      "rationale": "A freshly finalized fixture must have zero R4/R6 findings, so the outcome is independently verifiable and status-schema compatibility cannot conceal equality drift.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L452-L470",
+          "excerpt": "| SC-003 | A freshly finalized feature produces zero R4/R6 findings | `/spec-check` (coherence layer) on a fixture finalized via apply reports no R4/R6 violations |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:SC-004",
+      "disposition": "covered",
+      "rationale": "Negative receipt cases require complete rejection in goal-prove tests. The specialized finalization condition supplements, rather than replaces, the referenced execution evidence gates.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L452-L470",
+          "excerpt": "| SC-004 | DONE without finalization is structurally impossible | Goal-prove tests: 100% of fabricated, missing, tampered, or FAIL-verdict receipts are REJECTED_NEEDS_ACTION |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:SC-005",
+      "disposition": "covered",
+      "rationale": "Distinct-feature concurrent retry runs must show no hash mismatch or lost update under a shared lock. The specification defines the observable stress-test result but makes no claim of universal correctness from a finite corpus.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L452-L470",
+          "excerpt": "| SC-005 | Parallel finalization is safe | Stress test: N concurrent `apply --retry` runs over distinct features complete with no hash mismatch and no lost update |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "058-deterministic-finalization:SC-006",
+      "disposition": "covered",
+      "rationale": "Existing lock tests must pass unchanged, providing an explicit regression condition for non-retry callers.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L452-L470",
+          "excerpt": "| SC-006 | Default lock semantics are untouched | Existing `tests/` for `validator/locks.py` pass unmodified |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-001",
+      "disposition": "covered",
+      "rationale": "Qualified identities distinguish repeated numeric IDs and structural coverage is explicitly separated from semantic compliance. This is a governing review compatibility rule, not additional finalizer business scope.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L202-L206",
+          "excerpt": "**Criterion:** Given repeated FR/AC IDs across features, when context is inventoried, then feature-qualified identities remain distinct and reference coverage is labelled structural, never semantic compliance."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "disposition": "covered",
+      "rationale": "All normative sections and obligations must be submitted and concluded; malformed, omitted, partial and over-budget reviews cannot pass. The contract is measurable through coverage and invalid-review controls.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L207-L211",
+          "excerpt": "**Criterion:** Given all normative sections, Gherkin, exceptions and referenced contracts, when reviewed, then every section is submitted and every requirement concluded; malformed, omitted, partial or over-budget review is incomplete and cannot PASS."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-003",
+      "disposition": "covered",
+      "rationale": "The four semantic dispositions require exact grounding and distinguish approved technical necessities from unsupported business scope. It applies to review validity without requiring the finalizer to implement the entire review subsystem.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L212-L216",
+          "excerpt": "**Criterion:** Given equivalent paraphrases, contradictory retention, unrelated text with matching IDs, or extra business scope, when reviewed, then covered/contradictory/missing/ambiguous conclusions cite exact source and plan excerpts; unsupported scope blocks and justified technical necessities remain allowed."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "disposition": "covered",
+      "rationale": "Negated prohibited behavior is not itself a violation; source/model/policy/schema/prompt changes invalidate reuse. The identity section precisely bounds the lifecycle exception and keeps substantive edits governed.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L217-L221",
+          "excerpt": "**Criterion:** Given an explicit prohibition and a plan promising never to perform it, when checked, then mention alone does not create a violation; stale source/model/policy/schema/prompt reviews cannot be reused."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-005",
+      "disposition": "covered",
+      "rationale": "Bilingual vague quality detection cannot be resolved by unrelated numbers and approved decisions/questions are reused. It is a concrete clarification rule with context and negative controls.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L222-L226",
+          "excerpt": "**Criterion:** Given French or English vague quality language, when clarification is collected, then unrelated numbers do not resolve the quality ambiguity; approved-context decisions and duplicate questions are reused."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-006",
+      "disposition": "covered",
+      "rationale": "The presentation cap cannot discard the sixth critical question; accepted answers preserve IDs and invalidate affected proof. The separate full inventory and capped presentation are explicitly distinguished.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L227-L231",
+          "excerpt": "**Criterion:** Given six unresolved critical business questions, when five are presented, then six remain recorded and automatic progression blocks; accepted decisions preserve requirement IDs and invalidate dependent review/proof."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "disposition": "covered",
+      "rationale": "Documentary, review and execution tasks use their explicit evidence categories; text and a supplied success flag cannot prove runtime execution. Specialized finalize proof therefore cannot silently stand in for runtime acceptance.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L232-L236",
+          "excerpt": "**Criterion:** Given documentary, review and execution tasks, when proving them, then evidence is validated according to its explicit category; output text plus a success boolean cannot prove execution."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "disposition": "covered",
+      "rationale": "Runner-owned results bind executed assertions and behavioral mapping to invocation/project/feature and before/after governed source/test/config identities. The lifecycle exception remains narrow; uncovered criteria stay unproven.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L237-L241",
+          "excerpt": "**Criterion:** Given real runner results, when mapped to ACs, then the receipt records executed test identities, assertion/result counts, statuses, report identity and feature/source/test/config fingerprints; only passing executed assertions whose behavior and expected outcome justify the mapping can certify mapped ACs; the verifier independently checks runner-owned capture and report provenance bound to invocation/project/feature and before-and-after source/test/config identity, not caller-supplied verdict fields; uncovered ACs remain unproven."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "disposition": "covered",
+      "rationale": "Stale, foreign, empty, skipped, malformed and mismatched-report evidence is rejected even on exit zero. Source/test/config keyword paths remain governed, making the specified negative controls meaningful.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L242-L246",
+          "excerpt": "**Criterion:** Given stale, foreign, zero-test, entirely-skipped, malformed or mismatched-report evidence, when the completion gate runs, then it rejects the claimed execution scope even with exit code zero."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-010",
+      "disposition": "covered",
+      "rationale": "Unsupported manual/custom drivers may execute but cannot receive unsupported certification. This separates tool availability from proven acceptance and has an observable insufficient-evidence outcome.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L247-L251",
+          "excerpt": "**Criterion:** Given a custom or manual driver that cannot provide mandatory proof, when invoked, then execution remains available but certification reports insufficient evidence rather than fabricating a PASS."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "disposition": "covered",
+      "rationale": "The three defined witness contracts require correct candidates to pass frozen behavioral oracles and relevant mutants to fail. The detailed witness section supplies filesystem, persisted state and browser success observations.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L252-L256",
+          "excerpt": "**Criterion:** Given the three isolated witness projects, when deterministic evaluation runs, then each correct candidate passes its frozen independent behavioral oracle for the defined witness contract and at least one relevant mutant fails; modified oracles invalidate evaluation."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "disposition": "covered",
+      "rationale": "First-attempt, repaired, blocked, failed and not-run outcomes remain distinct with observed attempts, runtime, duration and cost or unknown. Missing capability is explicitly excluded from success and parity claims.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L257-L261",
+          "excerpt": "**Criterion:** Given real generation trials, when results are reported, then first-attempt success, repaired success, correct blocking, failure and not-run outcomes remain distinct with observed attempts, duration, runtime/model and measured cost or explicit unknown cost."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "disposition": "covered",
+      "rationale": "Routine deterministic checks, bounded core-change model samples and full release/model/runtime corpus runs are distinct policies. Absent runtimes cannot support parity, avoiding an unsupported release assertion.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L262-L266",
+          "excerpt": "**Criterion:** Given CI or release evaluation, when deterministic and real-model suites are selected, then cheap deterministic checks run routinely, core generation changes select a bounded model sample, and release/model/runtime changes select the full corpus; absent runtimes never imply parity."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-014",
+      "disposition": "covered",
+      "rationale": "Direct and automatic nested commands share Clarify and Analyze authority and cannot bypass either. Existing phases remain the integration surface without a new mandatory user command or document.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L267-L271",
+          "excerpt": "**Criterion:** Given a current pipeline, when phases advance directly or in automatic nested commands, then both Clarify and Analyze gates must hold through the same authority, with no added mandatory user command or document."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "disposition": "covered",
+      "rationale": "Historical evidence retains its explicit original policy and cannot certify a new run. Bootstrap, finalization, conventions, visual and cumulative Penflow protections remain additional constraints.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L272-L276",
+          "excerpt": "**Criterion:** Given legacy goals and archives, when loaded under upgraded code, then their versioned interpretation remains explicit and readable; they cannot certify a new run, and existing bootstrap, finalization, visual, conventions and cumulative Penflow protections still apply."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-016",
+      "disposition": "covered",
+      "rationale": "Targeted conflicting contracts/tests must migrate while unrelated history stays unchanged. The documentary review declaration and manifest provenance explicitly leave unavailable baseline bytes unproven; this spec review does not certify that acceptance evidence.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L277-L284",
+          "excerpt": "**Criterion:** Given the existing specifications and tests that require character truncation or ID-only Analyze compliance, when upgraded, then targeted normative contracts and tests adopt this feature while unrelated old features remain unchanged."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-001",
+      "disposition": "covered",
+      "rationale": "The inventory derives from canonical Markdown and preserves feature qualification without a second maintained source of truth. This requirement governs the reviewed context rather than expanding feature 058.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L306-L310",
+          "excerpt": "**Requirement:** Derive a feature-qualified normative inventory from canonical Markdown without a second user-maintained source of truth."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-002",
+      "disposition": "covered",
+      "rationale": "Complete source text is reviewed in one fitting call or coherent bounded batches with shared invariants and synthesis. Indivisible over-budget scope is explicitly incomplete, not silently truncated.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L311-L315",
+          "excerpt": "**Requirement:** Review complete normative context, using one review when it fits or coherent bounded batches plus shared invariants and cross-batch synthesis; never silently truncate source text."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-003",
+      "disposition": "covered",
+      "rationale": "Every qualified requirement receives a grounded disposition and unapproved business scope blocks while structural ID coverage stays separate. The requirement is precise enough to test false-PASS counterexamples.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L316-L320",
+          "excerpt": "**Requirement:** Produce and validate one grounded semantic disposition per requirement, detect unapproved business scope, and keep structural reference coverage separate."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-004",
+      "disposition": "covered",
+      "rationale": "Normative Identity v2 governs selected-feature lifecycle slots only, with raw provenance preserved and model/policy/schema/prompt identity bound. Referenced contracts stay byte-bound, so modifying this amendment properly invalidates dependent reviews.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L321-L325",
+          "excerpt": "**Requirement:** Reuse semantic reviews only for exact normative source identity under Normative Identity v2, reviewer-model and policy/prompt/schema identity; retain raw source identity for provenance and citations; a changed governed dependency or incomplete review blocks semantic readiness."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-005",
+      "disposition": "covered",
+      "rationale": "A negated prohibition mention alone cannot be treated as a violation. The requirement prevents false positives without waiving the actual prohibition.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L326-L330",
+          "excerpt": "**Requirement:** Avoid treating a negated prohibition mention as a constitutional violation."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-006",
+      "disposition": "covered",
+      "rationale": "Review and deterministic bilingual ambiguity findings merge using approved context and deduplication without an unnecessary mandatory model call. This is an existing workflow compatibility obligation.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L331-L335",
+          "excerpt": "**Requirement:** Merge existing review ambiguity findings with deterministic bilingual detection, resolving from approved context and deduplicating without an extra mandatory model call."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-007",
+      "disposition": "covered",
+      "rationale": "The full ambiguity inventory survives presentation limits and critical observable business uncertainty blocks progression; reversible technical choices follow conventions. The distinction avoids invented new business decisions.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L336-L340",
+          "excerpt": "**Requirement:** Retain the full ambiguity inventory independently of the presentation cap; unresolved critical observable business interpretations block automatic progression, while reversible technical choices follow conventions."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-008",
+      "disposition": "covered",
+      "rationale": "Accepted clarification decisions remain in the existing spec with stable IDs and affected proof invalidated. The canonical source remains authoritative rather than a new user ledger.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L341-L345",
+          "excerpt": "**Requirement:** Record accepted clarification decisions in the existing spec, preserving IDs and invalidating downstream proof affected by changed meaning."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-009",
+      "disposition": "covered",
+      "rationale": "Typed task evidence retains specialized gates and generic prose cannot satisfy runtime tasks. Feature 058 receipt checks can therefore coexist with execution and documentary evidence without substitution.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L346-L350",
+          "excerpt": "**Requirement:** Classify task evidence explicitly as documentary, review or execution, retaining specialized evidence requirements and preventing generic prose from satisfying runtime tasks."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-010",
+      "disposition": "covered",
+      "rationale": "Runner-owned captures and reports bind actual passing behavioral assertions to the mapped AC and current governed identities. Narrow lifecycle normalization preserves eligibility without authorizing source/test/config drift.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L351-L355",
+          "excerpt": "**Requirement:** Produce runner-owned execution receipts bound to project, feature and invocation, with independent capture/report verification, before-and-after application/shared-source, test and configuration identity, and executed passing assertions verifying each mapped AC expected outcome; uncovered ACs remain unproven."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-011",
+      "disposition": "covered",
+      "rationale": "Insufficient, stale and foreign evidence must expose the exact unproven scope; unsupported drivers still execute without mandatory certification. It defines an honest failure result rather than fabricating a PASS.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L356-L360",
+          "excerpt": "**Requirement:** Reject insufficient, stale or foreign execution evidence and report exact unproven scope; unsupported drivers remain usable without mandatory certification."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-012",
+      "disposition": "covered",
+      "rationale": "Python CLI, TypeScript API and isolated UI-Penflow witnesses have separate frozen behavioral contracts and negative controls. The UI fixture does not contradict the framework constitution saying the product has no UI.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L361-L365",
+          "excerpt": "**Requirement:** Supply three small isolated Python CLI, TypeScript API and UI-Penflow witnesses for the Witness Contracts below, with independent frozen behavioral acceptance oracles and negative controls."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-013",
+      "disposition": "covered",
+      "rationale": "Oracle identity belongs to the independent evaluator, candidate workspaces survive until evaluation, and attempts/timeouts are bounded. Generated candidates cannot rewrite their acceptance oracle.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L366-L370",
+          "excerpt": "**Requirement:** Evaluate generation using unchanged external oracles, bounded attempts and enforced execution timeouts, preserving the candidate workspace until independent evaluation completes, and observed outcome/runtime/duration/cost records; generated candidates cannot update their oracle."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-014",
+      "disposition": "covered",
+      "rationale": "Deterministic and opt-in real-model witness runs use existing test surfaces with explicit sample/full-corpus policies and observed runtime coverage. No network dependency is introduced for deterministic checks.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L371-L375",
+          "excerpt": "**Requirement:** Integrate deterministic and opt-in real-model witness runs into existing testing surfaces with core-change sample and release/model/runtime full-corpus policies; report actual runtime coverage only."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-015",
+      "disposition": "covered",
+      "rationale": "Shared authority enforces Clarify and Analyze in direct and nested commands without workflow inflation. The local finalizer correction must obey this gate but does not newly own the progression subsystem.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L376-L380",
+          "excerpt": "**Requirement:** Enforce Clarify and Analyze through shared progression rules in existing direct and nested commands, without adding recurring user process."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:FR-016",
+      "disposition": "covered",
+      "rationale": "New evidence policy is versioned; specialized 076/077 behavior and historical interpretation remain intact and conflicting contracts/tests change selectively. The amendment is targeted compatibility work rather than a corpus rewrite.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L381-L385",
+          "excerpt": "**Requirement:** Version new evidence policy, preserve historical meaning and specialized 076/077 protections, and update conflicting normative contracts and tests selectively."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:SC-001",
+      "disposition": "covered",
+      "rationale": "Every acceptance criterion needs observed passing evidence or an explicit external gap, and incomplete evidence cannot be certified. This is an acceptance measurement, not an assertion made by this specification review.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465",
+          "excerpt": "| SC-001 | All 16 acceptance criteria have passing evidence or an explicitly reported external execution gap; no incomplete evidence is labelled certified. | AC evidence matrix and actual command receipts |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:SC-002",
+      "disposition": "covered",
+      "rationale": "Specified negative controls must reject false compliance with corresponding positive controls passing. The requirement defines sensitive tests, not identifier-only or existence-only success.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465",
+          "excerpt": "| SC-002 | All specified negative controls reject false compliance while corresponding positive controls pass. | Deterministic unit/integration and witness suite |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:SC-003",
+      "disposition": "covered",
+      "rationale": "A fitting unchanged context uses at most one review followed by valid cache reuse; unsupported oversized context cannot pass. The measurement is model call count plus complete context coverage.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465",
+          "excerpt": "| SC-003 | The unchanged small-review path needs at most one review and then uses its exact valid cache; oversized unsupported context cannot PASS. | Provider call-count and context coverage tests |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:SC-004",
+      "disposition": "covered",
+      "rationale": "Focused compatibility suites cover bootstrap and cumulative Penflow regressions while archives remain readable. Historical readability does not elevate historical verdicts into current certification.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465",
+          "excerpt": "| SC-004 | Existing bootstrap and cumulative Penflow regressions pass and historical archives remain readable. | Focused compatibility suites |"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [
+    {
+      "category": "contract_consistency",
+      "severity": "blocking",
+      "description": "The all-target atomicity promise is internally inconsistent: Story 1 says registry updates never get partially applied, while the edge case explicitly permits a failed run to leave some files written and requires convergence on a later invocation. The seven-state/lifecycle-only amendment itself is coherent, but does not resolve this older failure guarantee.",
+      "suggestion": "Define atomicity precisely as lock-serialized hash-verified registry updates with explicit partial-failure BLOCKED receipts and convergent retry, or require a genuine all-target transaction/rollback. Align the story and FR-001 terminology with the already explicit failure semantics; do not claim success or DONE after a partial failure.",
+      "citations": [
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L31-L38",
+          "excerpt": "so that** registry updates never depend on LLM prose and never get partially applied."
+        },
+        {
+          "section_id": ".specs/features/058-deterministic-finalization/spec.md:L435-L451",
+          "excerpt": "- **Partial apply after a mid-section failure:** markers are per-file, so a re-run after a `WriteHashMismatchError` (or crash) skips the files already carrying the marker and writes only the remaining targets — apply converges to the fully finalized state without duplicating entries; the receipt of the failed run records outcome `BLOCKED` plus the files written so far."
+        }
+      ]
+    }
+  ],
+  "confidence": 4,
+  "raw_results": [
+    "{\n  \"batch_id\": \"batch-001\",\n  \"reviewed_section_ids\": [\n    \".specs/constitution.md:L1-L8\",\n    \".specs/constitution.md:L9-L18\",\n    \".specs/constitution.md:L19-L20\",\n    \".specs/constitution.md:L21-L26\",\n    \".specs/constitution.md:L27-L32\",\n    \".specs/constitution.md:L33-L37\",\n    \".specs/constitution.md:L38-L43\",\n    \".specs/constitution.md:L44-L49\",\n    \".specs/constitution.md:L50-L56\",\n    \".specs/constitution.md:L57-L58\",\n    \".specs/constitution.md:L59-L65\",\n    \".specs/constitution.md:L66-L71\",\n    \".specs/constitution.md:L72-L75\",\n    \".specs/constitution.md:L76-L81\",\n    \".specs/constitution.md:L82-L83\",\n    \".specs/constitution.md:L84-L90\",\n    \".specs/constitution.md:L91-L96\",\n    \".specs/constitution.md:L97-L102\",\n    \".specs/constitution.md:L103-L109\",\n    \".specs/constitution.md:L110-L111\",\n    \".specs/constitution.md:L112-L118\",\n    \".specs/constitution.md:L119-L123\",\n    \".specs/constitution.md:L124-L131\",\n    \".specs/constitution.md:L132-L146\",\n    \".specs/features/058-deterministic-finalization/spec.md:L1-L9\",\n    \".specs/features/058-deterministic-finalization/spec.md:L10-L13\",\n    \".specs/features/058-deterministic-finalization/spec.md:L14-L28\",\n    \".specs/features/058-deterministic-finalization/spec.md:L29-L30\",\n    \".specs/features/058-deterministic-finalization/spec.md:L31-L38\",\n    \".specs/features/058-deterministic-finalization/spec.md:L39-L84\",\n    \".specs/features/058-deterministic-finalization/spec.md:L85-L109\",\n    \".specs/features/058-deterministic-finalization/spec.md:L110-L117\",\n    \".specs/features/058-deterministic-finalization/spec.md:L118-L145\",\n    \".specs/features/058-deterministic-finalization/spec.md:L146-L166\",\n    \".specs/features/058-deterministic-finalization/spec.md:L167-L174\",\n    \".specs/features/058-deterministic-finalization/spec.md:L175-L204\",\n    \".specs/features/058-deterministic-finalization/spec.md:L205-L223\",\n    \".specs/features/058-deterministic-finalization/spec.md:L224-L231\",\n    \".specs/features/058-deterministic-finalization/spec.md:L232-L256\",\n    \".specs/features/058-deterministic-finalization/spec.md:L257-L273\",\n    \".specs/features/058-deterministic-finalization/spec.md:L274-L292\",\n    \".specs/features/058-deterministic-finalization/spec.md:L293-L297\",\n    \".specs/features/058-deterministic-finalization/spec.md:L298-L302\",\n    \".specs/features/058-deterministic-finalization/spec.md:L303-L307\",\n    \".specs/features/058-deterministic-finalization/spec.md:L308-L312\",\n    \".specs/features/058-deterministic-finalization/spec.md:L313-L317\",\n    \".specs/features/058-deterministic-finalization/spec.md:L318-L322\",\n    \".specs/features/058-deterministic-finalization/spec.md:L323-L327\",\n    \".specs/features/058-deterministic-finalization/spec.md:L328-L332\",\n    \".specs/features/058-deterministic-finalization/spec.md:L333-L337\",\n    \".specs/features/058-deterministic-finalization/spec.md:L338-L342\",\n    \".specs/features/058-deterministic-finalization/spec.md:L343-L347\",\n    \".specs/features/058-deterministic-finalization/spec.md:L348-L354\",\n    \".specs/features/058-deterministic-finalization/spec.md:L355-L371\",\n    \".specs/features/058-deterministic-finalization/spec.md:L372-L376\",\n    \".specs/features/058-deterministic-finalization/spec.md:L377-L381\",\n    \".specs/features/058-deterministic-finalization/spec.md:L382-L386\",\n    \".specs/features/058-deterministic-finalization/spec.md:L387-L391\",\n    \".specs/features/058-deterministic-finalization/spec.md:L392-L396\",\n    \".specs/features/058-deterministic-finalization/spec.md:L397-L401\",\n    \".specs/features/058-deterministic-finalization/spec.md:L402-L406\",\n    \".specs/features/058-deterministic-finalization/spec.md:L407-L411\",\n    \".specs/features/058-deterministic-finalization/spec.md:L412-L416\",\n    \".specs/features/058-deterministic-finalization/spec.md:L417-L423\",\n    \".specs/features/058-deterministic-finalization/spec.md:L424-L434\",\n    \".specs/features/058-deterministic-finalization/spec.md:L435-L451\",\n    \".specs/features/058-deterministic-finalization/spec.md:L452-L470\",\n    \".specs/features/058-deterministic-finalization/spec.md:L471-L474\",\n    \".specs/features/058-deterministic-finalization/spec.md:L475-L481\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L1-L8\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L9-L10\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L11-L20\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L21-L22\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L23-L55\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L56-L85\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L86-L115\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L116-L147\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L148-L180\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L181-L201\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L202-L206\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L207-L211\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L212-L216\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L217-L221\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L222-L226\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L227-L231\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L232-L236\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L237-L241\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L242-L246\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L247-L251\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L252-L256\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L257-L261\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L262-L266\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L267-L271\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L272-L276\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L277-L284\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L285-L305\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L306-L310\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L311-L315\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L316-L320\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L321-L325\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L326-L330\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L331-L335\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L336-L340\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L341-L345\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L346-L350\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L351-L355\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L356-L360\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L361-L365\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L366-L370\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L371-L375\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L376-L380\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L381-L385\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L386-L395\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L396-L403\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L404-L411\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L412-L419\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L420-L426\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L427-L436\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L437-L444\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L445-L446\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L447-L451\",\n    \".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465\",\n    \".specs/project.md:L1-L7\",\n    \".specs/project.md:L8-L20\",\n    \".specs/project.md:L21-L29\",\n    \".specs/project.md:L30-L43\",\n    \".specs/project.md:L44-L54\",\n    \".specs/project.md:L55-L63\",\n    \".specs/project.md:L64-L73\",\n    \".specs/project.md:L74-L82\",\n    \".specs/stacks/_default.md:L1-L5\",\n    \".specs/stacks/_default.md:L6-L12\",\n    \".specs/stacks/_default.md:L13-L38\",\n    \".specs/stacks/_default.md:L39-L48\",\n    \".specs/stacks/_default.md:L49-L60\",\n    \".specs/stacks/_default.md:L61-L68\",\n    \".specs/stacks/_default.md:L69-L71\"\n  ],\n  \"conclusions\": [\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-001\",\n      \"disposition\": \"contradictory\",\n      \"rationale\": \"The four targets, single lock, hash-checked writes and seven exact lifecycle states are explicit. However, the story promises no partial application while the edge case explicitly permits partial writes after failure; the all-target atomicity guarantee is internally contradictory until its meaning is qualified.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L293-L297\",\n          \"excerpt\": \"**Criterion:** `livespec finalize apply --feature <slug> --command <cmd>` writes the feature changelog entry, the global `.specs/changelog.md` summary, the README features row + Recent Activity regeneration, and the spec.md status (YAML frontmatter `status:` + header `- **Status:**` line, kept in sync) inside a single `acquire_lock` critical section, each write via `write_with_hash_check`\"\n        },\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L475-L481\",\n          \"excerpt\": \"FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Generated registries own payload markers while the specification receives only recognized lifecycle field changes. Full payload/status identity, exact hashes, unchanged historical comments and zero-write identical reruns are explicit and compatible with the referenced identity policy.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L298-L302\",\n          \"excerpt\": \"**Criterion:** Generated changelogs and README carry the per-payload marker `<!-- finalize:<cmd>:<date>:<hash8> -->`; the spec status target changes only recognized lifecycle fields and never adds a body marker. Each status/payload retains its full identity and file hashes in the generated receipt. Re-running an identical apply performs zero registry writes, exits 0, and reports `already_finalized`\"\n        },\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L475-L481\",\n          \"excerpt\": \"FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The receipt output path, schema, feature, command, outcome and per-file SHA256 are specified. The entity and FR-003 add oracle/payload identity without claiming that a receipt alone certifies runtime acceptance.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L303-L307\",\n          \"excerpt\": \"**Criterion:** apply emits a JSON finalize receipt (path printed on stdout) recording schema version, feature slug, command, outcome, and the sha256 of every touched file — same structural shape as the visual evidence receipt\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Default lock timeout and hash mismatch have separate canonical BLOCKED subtypes and observable nonzero exits. No-write is required for lock acquisition failure, while post-write failures have an explicit blocked receipt and recovery edge case.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L308-L312\",\n          \"excerpt\": \"**Criterion:** On lock timeout (default 10s, no `--retry`) apply exits non-zero with the canonical `BLOCKED ... policy_blocked` line and modifies no registry file; on post-write hash mismatch it exits non-zero with `BLOCKED ... state_invalid` naming the file\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Verification is explicitly read-only with feature-scoped R1/R4/R6 checks. The amendment preserves R4 equality and adds both directions of Approved/Planned mismatch as negative controls; lifecycle schema acceptance does not waive coherence.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L313-L317\",\n          \"excerpt\": \"**Criterion:** `livespec finalize verify --feature <slug>` is strictly read-only and re-evaluates coherence rules R1, R4, and R6 scoped to the feature\"\n        },\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L475-L481\",\n          \"excerpt\": \"FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"PASS/FAIL verdicts, checked file hashes, rule IDs, exit status and missing requested marker behavior are defined with positive and negative scenarios. Receipt production does not authorize modifying checked registries.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L318-L322\",\n          \"excerpt\": \"**Criterion:** verify emits a JSON receipt with verdict PASS/FAIL, per-file sha256, and the violated rule IDs on FAIL; exit 0 on PASS, non-zero on FAIL (including missing expected marker when `--command` is given)\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-007\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Completion requires a receipt bound to expected feature and command, current file hashes, schema and PASS verdict. This specialized gate remains additional to the referenced typed execution and documentary acceptance rules.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L323-L327\",\n          \"excerpt\": \"**Criterion:** Goal contracts for registry-finalizing commands include a `finalize.registry` evidence-family task whose only accepted completion evidence is a `finalize_receipt_path` validated by `verify_finalize_receipt()` (schema, on-disk hash re-verification, expected feature slug, expected command, verdict PASS)\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-008\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Missing paths, prose, FAIL and stale/tampered hashes are explicitly rejected with named missing evidence. Tests can observe rejection rather than inferring completion from an exit code.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L328-L332\",\n          \"excerpt\": \"**Criterion:** `livespec goal prove` rejects finalize.registry evidence lacking a valid receipt — prose claims, missing paths, FAIL verdicts, and tampered hashes all return `REJECTED_NEEDS_ACTION` with the missing evidence named\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-009\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Retry is opt-in and has exponential backoff, jitter, a named 45-second budget and a stated five-second tolerance. Transient success and exhausted-budget failures are independently observable.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L333-L337\",\n          \"excerpt\": \"**Criterion:** With `--retry`, lock acquisition retries with exponential backoff plus jitter within a total budget defined by a named constant defaulting to 45 seconds (tested with ±5s tolerance) before failing BLOCKED\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-010\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The existing single-attempt, ten-second default lock behavior must remain unchanged when retry is absent. The dedicated scenario and SC-006 preserve regression coverage for current callers.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L338-L342\",\n          \"excerpt\": \"**Criterion:** Without `--retry`, lock behavior is byte-for-byte the existing `acquire_lock` contract (single attempt window, 10s default timeout) — no behavior change for current callers\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-011\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Typer registration follows the existing register(app) pattern, with apply and verify visible through group help. It composes with the existing CLI rather than introducing a hosted service.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L343-L347\",\n          \"excerpt\": \"**Criterion:** `livespec finalize --help` lists `apply` and `verify`; the command group is registered through the existing typer `register(app)` pattern of `validator/cli_commands/`\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:AC-012\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Missing README reconstruction and previous-year changelog rotation have explicit artifact sources and archive destination. These are existing registry recovery responsibilities, not additional business behavior.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L348-L354\",\n          \"excerpt\": \"**Criterion:** If `.specs/README.md` is missing, apply rebuilds it from existing artifacts (per spec-system README Recovery) before inserting the feature row; if the global changelog contains previous-year entries, apply performs the documented year rotation into `.specs/archive/`\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-001\",\n      \"disposition\": \"contradictory\",\n      \"rationale\": \"The requested producer states and lifecycle-only finalizer exception are explicit and retain strict R2/R4 checks. The same requirement still promises an atomic all-target operation despite a story forbidding partial application and an edge case allowing partial writes, so its failure guarantee is contradictory.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L372-L376\",\n          \"excerpt\": \"**Requirement:** System must provide a `livespec finalize apply` subcommand that performs all four end-of-command registry updates (feature changelog, global changelog, README row + Recent Activity, spec status) in one atomic, lock-guarded, hash-verified operation\"\n        },\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L475-L481\",\n          \"excerpt\": \"FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Idempotence binds feature, command and full payload including status; date is informational. Specification body markers are forbidden, historical comments preserved and only recognized status/updated slots mutable, matching Normative Identity v2.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L377-L381\",\n          \"excerpt\": \"**Requirement:** System must make apply idempotent via deterministic per-payload markers in generated registries, deriving `<hash8>` from feature slug, command and full update payload including status. The spec target updates only recognized lifecycle metadata, never appends a body marker, and preserves all historical comments unchanged. Receipts retain exact current file and payload hashes; the marker date remains informational\"\n        },\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L475-L481\",\n          \"excerpt\": \"FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Apply and verify receipts retain touched/checked file hashes, schema, oracle and payload identity with verdict. The contract distinguishes apply/verify outcomes and does not substitute this proof for mapped execution evidence.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L382-L386\",\n          \"excerpt\": \"**Requirement:** System must emit a JSON finalize receipt for both apply and verify, recording the sha256 of every touched/checked registry file, structurally aligned with the visual evidence receipt (schema version, oracle name/version, payload hash, verdict)\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Read-only verification evaluates feature-scoped R1/R4/R6 and reports rule IDs. The compatibility amendment expressly keeps required-file and README/spec equality checks strict.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L387-L391\",\n          \"excerpt\": \"**Requirement:** System must provide a strictly read-only `livespec finalize verify` subcommand that re-evaluates coherence rules R1, R4, and R6 scoped to the target feature and reports violations by rule ID\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The six named registry-finalizing commands receive the specialized finalize.registry family and no prose, exit-code or declared-file-list substitute is allowed. Referenced policy preserves this specialized protection.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L392-L396\",\n          \"excerpt\": \"**Requirement:** System must add a `finalize.registry` evidence family to the goal contract validator that requires `finalize_receipt_path` and rejects all substitute evidence (prose, exit codes, declared file lists); the family is attached to the goal contracts of the six registry-finalizing commands: `spec-specify`, `spec-plan`, `spec-implement`, `spec-fix`, `spec-stack`, `spec-feature`\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Receipt validation checks schema, payload hash, current file hashes and expected feature/command/PASS; containment and stale-receipt edge cases are explicit. No source or acceptance identity is broadened by lifecycle normalization.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L397-L401\",\n          \"excerpt\": \"**Requirement:** System must provide `verify_finalize_receipt()` following the `verify_visual_receipt` pattern: schema validation, receipt payload-hash check, on-disk file sha256 re-verification, and expected feature/command/verdict matching\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-007\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The optional retry policy specifies exponential backoff, jitter and a finite total budget while retaining default lock behavior. This is a bounded technical concurrency mechanism consistent with the local CLI stack.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L402-L406\",\n          \"excerpt\": \"**Requirement:** System must support an opt-in retry mode on `locks.acquire_lock` with exponential backoff plus jitter and a total budget of ~45 seconds, leaving default (non-retry) lock behavior unchanged\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-008\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Failure classes are distinguished by canonical policy_blocked/state_invalid lines and nonzero coherence failures with rule IDs, making failures observable without a fabricated success state.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L407-L411\",\n          \"excerpt\": \"**Requirement:** System must surface failures with the canonical anti-drift BLOCKED format and specific exit codes: lock timeout → `policy_blocked`, hash mismatch → `state_invalid`, coherence FAIL → non-zero with rule IDs\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-009\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Logic and Typer surface are separated in the named existing validator modules and registered through the established pattern. Implementation organization remains local and within the current Python stack.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L412-L416\",\n          \"excerpt\": \"**Requirement:** System must implement the feature as `validator/finalize.py` (logic) plus `validator/cli_commands/finalize_cmd.py` (typer surface) registered via the existing `register(app)` pattern\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:FR-010\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Apply repairs the generated README and rotates old changelog years into explicit archive files. Recovery follows existing artifacts and does not expand the finalizer into roadmap ownership.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L417-L423\",\n          \"excerpt\": \"**Requirement:** System must handle registry recovery and rotation during apply: rebuild a missing README from artifacts and rotate previous-year global changelog entries to `.specs/archive/changelog-YYYY.md`\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:SC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The measurement is actual green unit/integration tests for all P1 criteria. It is a future success condition and does not itself assert that tests have already executed.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L452-L470\",\n          \"excerpt\": \"| SC-001 | All P1 acceptance criteria pass automated tests | pytest suite green (unit + integration on fixture `.specs/` trees) |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:SC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"An identical second invocation must leave registry bytes unchanged; the measurement directly observes idempotence rather than a prose declaration.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L452-L470\",\n          \"excerpt\": \"| SC-002 | Apply is provably idempotent | Integration test: two identical apply runs produce byte-identical registry files on the second run |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:SC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"A freshly finalized fixture must have zero R4/R6 findings, so the outcome is independently verifiable and status-schema compatibility cannot conceal equality drift.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L452-L470\",\n          \"excerpt\": \"| SC-003 | A freshly finalized feature produces zero R4/R6 findings | `/spec-check` (coherence layer) on a fixture finalized via apply reports no R4/R6 violations |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:SC-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Negative receipt cases require complete rejection in goal-prove tests. The specialized finalization condition supplements, rather than replaces, the referenced execution evidence gates.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L452-L470\",\n          \"excerpt\": \"| SC-004 | DONE without finalization is structurally impossible | Goal-prove tests: 100% of fabricated, missing, tampered, or FAIL-verdict receipts are REJECTED_NEEDS_ACTION |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:SC-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Distinct-feature concurrent retry runs must show no hash mismatch or lost update under a shared lock. The specification defines the observable stress-test result but makes no claim of universal correctness from a finite corpus.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L452-L470\",\n          \"excerpt\": \"| SC-005 | Parallel finalization is safe | Stress test: N concurrent `apply --retry` runs over distinct features complete with no hash mismatch and no lost update |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"058-deterministic-finalization:SC-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Existing lock tests must pass unchanged, providing an explicit regression condition for non-retry callers.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L452-L470\",\n          \"excerpt\": \"| SC-006 | Default lock semantics are untouched | Existing `tests/` for `validator/locks.py` pass unmodified |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Qualified identities distinguish repeated numeric IDs and structural coverage is explicitly separated from semantic compliance. This is a governing review compatibility rule, not additional finalizer business scope.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L202-L206\",\n          \"excerpt\": \"**Criterion:** Given repeated FR/AC IDs across features, when context is inventoried, then feature-qualified identities remain distinct and reference coverage is labelled structural, never semantic compliance.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"All normative sections and obligations must be submitted and concluded; malformed, omitted, partial and over-budget reviews cannot pass. The contract is measurable through coverage and invalid-review controls.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L207-L211\",\n          \"excerpt\": \"**Criterion:** Given all normative sections, Gherkin, exceptions and referenced contracts, when reviewed, then every section is submitted and every requirement concluded; malformed, omitted, partial or over-budget review is incomplete and cannot PASS.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The four semantic dispositions require exact grounding and distinguish approved technical necessities from unsupported business scope. It applies to review validity without requiring the finalizer to implement the entire review subsystem.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L212-L216\",\n          \"excerpt\": \"**Criterion:** Given equivalent paraphrases, contradictory retention, unrelated text with matching IDs, or extra business scope, when reviewed, then covered/contradictory/missing/ambiguous conclusions cite exact source and plan excerpts; unsupported scope blocks and justified technical necessities remain allowed.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Negated prohibited behavior is not itself a violation; source/model/policy/schema/prompt changes invalidate reuse. The identity section precisely bounds the lifecycle exception and keeps substantive edits governed.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L217-L221\",\n          \"excerpt\": \"**Criterion:** Given an explicit prohibition and a plan promising never to perform it, when checked, then mention alone does not create a violation; stale source/model/policy/schema/prompt reviews cannot be reused.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Bilingual vague quality detection cannot be resolved by unrelated numbers and approved decisions/questions are reused. It is a concrete clarification rule with context and negative controls.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L222-L226\",\n          \"excerpt\": \"**Criterion:** Given French or English vague quality language, when clarification is collected, then unrelated numbers do not resolve the quality ambiguity; approved-context decisions and duplicate questions are reused.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The presentation cap cannot discard the sixth critical question; accepted answers preserve IDs and invalidate affected proof. The separate full inventory and capped presentation are explicitly distinguished.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L227-L231\",\n          \"excerpt\": \"**Criterion:** Given six unresolved critical business questions, when five are presented, then six remain recorded and automatic progression blocks; accepted decisions preserve requirement IDs and invalidate dependent review/proof.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-007\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Documentary, review and execution tasks use their explicit evidence categories; text and a supplied success flag cannot prove runtime execution. Specialized finalize proof therefore cannot silently stand in for runtime acceptance.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L232-L236\",\n          \"excerpt\": \"**Criterion:** Given documentary, review and execution tasks, when proving them, then evidence is validated according to its explicit category; output text plus a success boolean cannot prove execution.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-008\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Runner-owned results bind executed assertions and behavioral mapping to invocation/project/feature and before/after governed source/test/config identities. The lifecycle exception remains narrow; uncovered criteria stay unproven.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L237-L241\",\n          \"excerpt\": \"**Criterion:** Given real runner results, when mapped to ACs, then the receipt records executed test identities, assertion/result counts, statuses, report identity and feature/source/test/config fingerprints; only passing executed assertions whose behavior and expected outcome justify the mapping can certify mapped ACs; the verifier independently checks runner-owned capture and report provenance bound to invocation/project/feature and before-and-after source/test/config identity, not caller-supplied verdict fields; uncovered ACs remain unproven.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-009\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Stale, foreign, empty, skipped, malformed and mismatched-report evidence is rejected even on exit zero. Source/test/config keyword paths remain governed, making the specified negative controls meaningful.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L242-L246\",\n          \"excerpt\": \"**Criterion:** Given stale, foreign, zero-test, entirely-skipped, malformed or mismatched-report evidence, when the completion gate runs, then it rejects the claimed execution scope even with exit code zero.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-010\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Unsupported manual/custom drivers may execute but cannot receive unsupported certification. This separates tool availability from proven acceptance and has an observable insufficient-evidence outcome.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L247-L251\",\n          \"excerpt\": \"**Criterion:** Given a custom or manual driver that cannot provide mandatory proof, when invoked, then execution remains available but certification reports insufficient evidence rather than fabricating a PASS.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-011\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The three defined witness contracts require correct candidates to pass frozen behavioral oracles and relevant mutants to fail. The detailed witness section supplies filesystem, persisted state and browser success observations.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L252-L256\",\n          \"excerpt\": \"**Criterion:** Given the three isolated witness projects, when deterministic evaluation runs, then each correct candidate passes its frozen independent behavioral oracle for the defined witness contract and at least one relevant mutant fails; modified oracles invalidate evaluation.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-012\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"First-attempt, repaired, blocked, failed and not-run outcomes remain distinct with observed attempts, runtime, duration and cost or unknown. Missing capability is explicitly excluded from success and parity claims.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L257-L261\",\n          \"excerpt\": \"**Criterion:** Given real generation trials, when results are reported, then first-attempt success, repaired success, correct blocking, failure and not-run outcomes remain distinct with observed attempts, duration, runtime/model and measured cost or explicit unknown cost.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-013\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Routine deterministic checks, bounded core-change model samples and full release/model/runtime corpus runs are distinct policies. Absent runtimes cannot support parity, avoiding an unsupported release assertion.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L262-L266\",\n          \"excerpt\": \"**Criterion:** Given CI or release evaluation, when deterministic and real-model suites are selected, then cheap deterministic checks run routinely, core generation changes select a bounded model sample, and release/model/runtime changes select the full corpus; absent runtimes never imply parity.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-014\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Direct and automatic nested commands share Clarify and Analyze authority and cannot bypass either. Existing phases remain the integration surface without a new mandatory user command or document.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L267-L271\",\n          \"excerpt\": \"**Criterion:** Given a current pipeline, when phases advance directly or in automatic nested commands, then both Clarify and Analyze gates must hold through the same authority, with no added mandatory user command or document.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-015\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Historical evidence retains its explicit original policy and cannot certify a new run. Bootstrap, finalization, conventions, visual and cumulative Penflow protections remain additional constraints.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L272-L276\",\n          \"excerpt\": \"**Criterion:** Given legacy goals and archives, when loaded under upgraded code, then their versioned interpretation remains explicit and readable; they cannot certify a new run, and existing bootstrap, finalization, visual, conventions and cumulative Penflow protections still apply.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:AC-016\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Targeted conflicting contracts/tests must migrate while unrelated history stays unchanged. The documentary review declaration and manifest provenance explicitly leave unavailable baseline bytes unproven; this spec review does not certify that acceptance evidence.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L277-L284\",\n          \"excerpt\": \"**Criterion:** Given the existing specifications and tests that require character truncation or ID-only Analyze compliance, when upgraded, then targeted normative contracts and tests adopt this feature while unrelated old features remain unchanged.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The inventory derives from canonical Markdown and preserves feature qualification without a second maintained source of truth. This requirement governs the reviewed context rather than expanding feature 058.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L306-L310\",\n          \"excerpt\": \"**Requirement:** Derive a feature-qualified normative inventory from canonical Markdown without a second user-maintained source of truth.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Complete source text is reviewed in one fitting call or coherent bounded batches with shared invariants and synthesis. Indivisible over-budget scope is explicitly incomplete, not silently truncated.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L311-L315\",\n          \"excerpt\": \"**Requirement:** Review complete normative context, using one review when it fits or coherent bounded batches plus shared invariants and cross-batch synthesis; never silently truncate source text.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Every qualified requirement receives a grounded disposition and unapproved business scope blocks while structural ID coverage stays separate. The requirement is precise enough to test false-PASS counterexamples.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L316-L320\",\n          \"excerpt\": \"**Requirement:** Produce and validate one grounded semantic disposition per requirement, detect unapproved business scope, and keep structural reference coverage separate.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Normative Identity v2 governs selected-feature lifecycle slots only, with raw provenance preserved and model/policy/schema/prompt identity bound. Referenced contracts stay byte-bound, so modifying this amendment properly invalidates dependent reviews.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L321-L325\",\n          \"excerpt\": \"**Requirement:** Reuse semantic reviews only for exact normative source identity under Normative Identity v2, reviewer-model and policy/prompt/schema identity; retain raw source identity for provenance and citations; a changed governed dependency or incomplete review blocks semantic readiness.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-005\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"A negated prohibition mention alone cannot be treated as a violation. The requirement prevents false positives without waiving the actual prohibition.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L326-L330\",\n          \"excerpt\": \"**Requirement:** Avoid treating a negated prohibition mention as a constitutional violation.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-006\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Review and deterministic bilingual ambiguity findings merge using approved context and deduplication without an unnecessary mandatory model call. This is an existing workflow compatibility obligation.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L331-L335\",\n          \"excerpt\": \"**Requirement:** Merge existing review ambiguity findings with deterministic bilingual detection, resolving from approved context and deduplicating without an extra mandatory model call.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-007\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"The full ambiguity inventory survives presentation limits and critical observable business uncertainty blocks progression; reversible technical choices follow conventions. The distinction avoids invented new business decisions.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L336-L340\",\n          \"excerpt\": \"**Requirement:** Retain the full ambiguity inventory independently of the presentation cap; unresolved critical observable business interpretations block automatic progression, while reversible technical choices follow conventions.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-008\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Accepted clarification decisions remain in the existing spec with stable IDs and affected proof invalidated. The canonical source remains authoritative rather than a new user ledger.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L341-L345\",\n          \"excerpt\": \"**Requirement:** Record accepted clarification decisions in the existing spec, preserving IDs and invalidating downstream proof affected by changed meaning.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-009\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Typed task evidence retains specialized gates and generic prose cannot satisfy runtime tasks. Feature 058 receipt checks can therefore coexist with execution and documentary evidence without substitution.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L346-L350\",\n          \"excerpt\": \"**Requirement:** Classify task evidence explicitly as documentary, review or execution, retaining specialized evidence requirements and preventing generic prose from satisfying runtime tasks.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-010\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Runner-owned captures and reports bind actual passing behavioral assertions to the mapped AC and current governed identities. Narrow lifecycle normalization preserves eligibility without authorizing source/test/config drift.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L351-L355\",\n          \"excerpt\": \"**Requirement:** Produce runner-owned execution receipts bound to project, feature and invocation, with independent capture/report verification, before-and-after application/shared-source, test and configuration identity, and executed passing assertions verifying each mapped AC expected outcome; uncovered ACs remain unproven.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-011\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Insufficient, stale and foreign evidence must expose the exact unproven scope; unsupported drivers still execute without mandatory certification. It defines an honest failure result rather than fabricating a PASS.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L356-L360\",\n          \"excerpt\": \"**Requirement:** Reject insufficient, stale or foreign execution evidence and report exact unproven scope; unsupported drivers remain usable without mandatory certification.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-012\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Python CLI, TypeScript API and isolated UI-Penflow witnesses have separate frozen behavioral contracts and negative controls. The UI fixture does not contradict the framework constitution saying the product has no UI.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L361-L365\",\n          \"excerpt\": \"**Requirement:** Supply three small isolated Python CLI, TypeScript API and UI-Penflow witnesses for the Witness Contracts below, with independent frozen behavioral acceptance oracles and negative controls.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-013\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Oracle identity belongs to the independent evaluator, candidate workspaces survive until evaluation, and attempts/timeouts are bounded. Generated candidates cannot rewrite their acceptance oracle.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L366-L370\",\n          \"excerpt\": \"**Requirement:** Evaluate generation using unchanged external oracles, bounded attempts and enforced execution timeouts, preserving the candidate workspace until independent evaluation completes, and observed outcome/runtime/duration/cost records; generated candidates cannot update their oracle.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-014\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Deterministic and opt-in real-model witness runs use existing test surfaces with explicit sample/full-corpus policies and observed runtime coverage. No network dependency is introduced for deterministic checks.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L371-L375\",\n          \"excerpt\": \"**Requirement:** Integrate deterministic and opt-in real-model witness runs into existing testing surfaces with core-change sample and release/model/runtime full-corpus policies; report actual runtime coverage only.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-015\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Shared authority enforces Clarify and Analyze in direct and nested commands without workflow inflation. The local finalizer correction must obey this gate but does not newly own the progression subsystem.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L376-L380\",\n          \"excerpt\": \"**Requirement:** Enforce Clarify and Analyze through shared progression rules in existing direct and nested commands, without adding recurring user process.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:FR-016\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"New evidence policy is versioned; specialized 076/077 behavior and historical interpretation remain intact and conflicting contracts/tests change selectively. The amendment is targeted compatibility work rather than a corpus rewrite.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L381-L385\",\n          \"excerpt\": \"**Requirement:** Version new evidence policy, preserve historical meaning and specialized 076/077 protections, and update conflicting normative contracts and tests selectively.\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:SC-001\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Every acceptance criterion needs observed passing evidence or an explicit external gap, and incomplete evidence cannot be certified. This is an acceptance measurement, not an assertion made by this specification review.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465\",\n          \"excerpt\": \"| SC-001 | All 16 acceptance criteria have passing evidence or an explicitly reported external execution gap; no incomplete evidence is labelled certified. | AC evidence matrix and actual command receipts |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:SC-002\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Specified negative controls must reject false compliance with corresponding positive controls passing. The requirement defines sensitive tests, not identifier-only or existence-only success.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465\",\n          \"excerpt\": \"| SC-002 | All specified negative controls reject false compliance while corresponding positive controls pass. | Deterministic unit/integration and witness suite |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:SC-003\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"A fitting unchanged context uses at most one review followed by valid cache reuse; unsupported oversized context cannot pass. The measurement is model call count plus complete context coverage.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465\",\n          \"excerpt\": \"| SC-003 | The unchanged small-review path needs at most one review and then uses its exact valid cache; oversized unsupported context cannot PASS. | Provider call-count and context coverage tests |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    },\n    {\n      \"requirement_id\": \"078-requirement-evidence-integrity:SC-004\",\n      \"disposition\": \"covered\",\n      \"rationale\": \"Focused compatibility suites cover bootstrap and cumulative Penflow regressions while archives remain readable. Historical readability does not elevate historical verdicts into current certification.\",\n      \"source_citations\": [\n        {\n          \"section_id\": \".specs/features/078-requirement-evidence-integrity/spec.md:L452-L465\",\n          \"excerpt\": \"| SC-004 | Existing bootstrap and cumulative Penflow regressions pass and historical archives remain readable. | Focused compatibility suites |\"\n        }\n      ],\n      \"plan_citations\": [],\n      \"searched_plan_sections\": []\n    }\n  ],\n  \"ambiguities\": [],\n  \"extra_scope\": [],\n  \"findings\": [\n    {\n      \"category\": \"contract_consistency\",\n      \"severity\": \"blocking\",\n      \"description\": \"The all-target atomicity promise is internally inconsistent: Story 1 says registry updates never get partially applied, while the edge case explicitly permits a failed run to leave some files written and requires convergence on a later invocation. The seven-state/lifecycle-only amendment itself is coherent, but does not resolve this older failure guarantee.\",\n      \"suggestion\": \"Define atomicity precisely as lock-serialized hash-verified registry updates with explicit partial-failure BLOCKED receipts and convergent retry, or require a genuine all-target transaction/rollback. Align the story and FR-001 terminology with the already explicit failure semantics; do not claim success or DONE after a partial failure.\",\n      \"citations\": [\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L31-L38\",\n          \"excerpt\": \"so that** registry updates never depend on LLM prose and never get partially applied.\"\n        },\n        {\n          \"section_id\": \".specs/features/058-deterministic-finalization/spec.md:L435-L451\",\n          \"excerpt\": \"- **Partial apply after a mid-section failure:** markers are per-file, so a re-run after a `WriteHashMismatchError` (or crash) skips the files already carrying the marker and writes only the remaining targets — apply converges to the fully finalized state without duplicating entries; the receipt of the failed run records outcome `BLOCKED` plus the files written so far.\"\n        }\n      ]\n    }\n  ],\n  \"confidence\": 4,\n  \"synthesized_batch_ids\": [],\n  \"resolutions\": []\n}\n"
+  ],
+  "synthesis": null,
+  "synthesis_transport_version": null
+}

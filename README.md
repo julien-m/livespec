@@ -69,6 +69,16 @@ flowchart LR
 
 Each command works standalone, or chain them all with `/spec-feature` for an end-to-end pipeline with validation gates.
 
+### Contract and execution evidence
+
+Reviews use complete, bounded source context and feature-qualified requirement IDs. Analyze reports structural reference coverage separately from grounded semantic conclusions: citing an ID cannot prove that a plan implements its meaning. Missing context, contradictions, stale reviews and unresolved critical clarifications block progression. An unchanged valid review is reused; the five-question presentation limit never discards outstanding questions.
+
+Current goals distinguish documentary, review and execution evidence. Execution certification requires a runner-owned receipt with current source/test/configuration identity, actual test results and independently reviewed acceptance mappings. A success sentence, exit code zero, or global coverage percentage is insufficient. Custom drivers remain runnable and report any certification gap. Existing visual, conventions, finalization, bootstrap and Penflow checks still apply; historical archives retain their original policy rather than becoming new proof.
+
+The generation evaluation corpus contains isolated Python CLI, TypeScript API and UI/Penflow witnesses. Independent frozen oracles check actual behavior and reject faulty mutants. Reports distinguish first-attempt success, repaired success, expected blocking, failure, invalid runs and unavailable runtimes. Routine checks are deterministic; selected real-model samples and full release runs report actual completed coverage and unknown costs explicitly. A passing finite corpus does not establish universal correctness or untested runtime parity.
+
+Read the [shared review protocol](system/review-protocol.md) and [execution rules](system/testing/execution-rules.md) for the internal adapters used by existing commands. Generated review caches and receipts require no additional user-maintained document.
+
 ---
 
 ## Conventions Enforcement
@@ -260,17 +270,21 @@ Run the full pipeline in one command with validation gates between each phase:
 
 ### `/spec-init`
 
-Initialize LiveSpec in a project. Runs a 3-phase conversational brainstorm (interview → stack decisions → file generation).
+Initialize LiveSpec through an interactive brainstorm or an observed from-code profile. Autonomous initialization preserves independent native/frontend families, keeps unobserved product facts Unknown and executes actual bounded tooling checks.
 
 ```bash
 /spec-init                       # Full interactive setup
 /spec-init --auto                # Use defaults, skip questions
 /spec-init --stack web-realtime  # Skip interview, use preset
 /spec-init --from-code           # Reverse-engineer existing codebase into specs
-/spec-init --from-code --deep    # Extended scan (git history, CI, env)
+/spec-init --from-code --auto    # Observed bootstrap with full verification/hooks/goal closure
+/spec-init --from-code --auto --force --dir "/path with spaces" # Backed-up recovery
+/spec-init --from-code --deep    # Interactive extended scan; rejected in autonomous mode
 ```
 
 Key flags: `--auto`, `--stack [preset]`, `--from-code`, `--deep`, `--force`, `--dir [path]`, `--dry-run`
+
+Explicit autonomous force recovery backs up prior specs, conventions and integration documents before overwriting owned bootstrap files, preserving custom history and source bytes. Mutable agents use local copies. `--dry-run` previews without project writes; the backend's `--verify-only` rechecks current profile/content identity without mutation. Autonomous `--deep` and conflicting presets fail before writes. Installer, sync, probes and hook subprocesses share one finite budget; backend exit zero still requires integration proof, after-init hooks, current verification and the authentic goal archive. Tooling READY does not certify application runtime.
 
 ### `/spec-propose`
 

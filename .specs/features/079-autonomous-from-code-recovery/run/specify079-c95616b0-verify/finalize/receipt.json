@@ -1,0 +1,40 @@
+{
+  "command": "spec-specify",
+  "created_at": "2026-10-09T12:15:21.478229+00:00",
+  "feature_slug": "079-autonomous-from-code-recovery",
+  "files": [
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/changelog.md",
+      "sha256": "74b45988229a195ac36c94eaadc08300b2ce8dc41857a9f9b4d402463add5f20"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "c7e7c68cdc1f1cbb571bbf1a74c86c1975dae528e85d57ef425bbf3bbf3320b0"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "336cae06fc35365afffee23789b1a2f9958957e91269c8c79c348b0a66f783f3"
+    },
+    {
+      "path": ".specs/features/079-autonomous-from-code-recovery/spec.md",
+      "sha256": "579a5ac7f2e9db9ebd37c3beb0c15e2a224ce6f221db92af83bbf300861fb132"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "56bdb660167aa8306227c3a544fce27aa6942465e4ca65797e8d4930e95ce9ff"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "f0fde8b0f40fb9160d7efd867dd3c5b90ab18ffb706d9112d7b9891340fd0360",
+  "receipt_hash": "26eb9652ca4659e6959c1e2dfb8984bd3d0ee5ced073bbeb8b4217643408ec8f",
+  "schema_version": "1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "message": "Feature '079-autonomous-from-code-recovery' is not referenced in any roadmap item",
+      "rule_id": "R1.2"
+    }
+  ]
+}

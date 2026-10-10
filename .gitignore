@@ -206,3 +206,7 @@ AUDIT-CODEX.md
 
 # Global write-lock target (feature 015/058) — runtime flock artifact
 .specs/.LOCK
+
+# Materialized conventions and local agent state
+.claude/
+.agents/

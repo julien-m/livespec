@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "livespec",
+    "validate",
+    ".specs/features/078-requirement-evidence-integrity",
+    "--progression",
+    "implement",
+    "--model",
+    "gpt-6.1-sol",
+    "--review-max-chars",
+    "200000"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "exit": 0,
+  "stdout": "Progression: READY\n",
+  "stderr": ""
+}

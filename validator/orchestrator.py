@@ -21,6 +21,7 @@ from .semantic.contradictions import (
     get_comparison_pairs,
 )
 from .semantic.plan_review import PlanReviewResult, review_plan
+from .semantic.review_files import prepare_feature_review, review_receipt_path
 from .semantic.spec_review import SpecReviewResult, review_spec
 
 logger = logging.getLogger(__name__)
@@ -222,6 +223,7 @@ def run_plan_review(
                         constitution_content,
                         model,
                         check_result,
+                        feature_dir=spec_path.parent,
                     )
                 except PlanReviewError as exc:
                     logger.warning("%s", exc)
@@ -238,6 +240,7 @@ def run_plan_review(
                     models or [],
                     confidence_threshold,
                     check_result,
+                    feature_dir=spec_path.parent,
                 )
             except PlanReviewError as exc:
                 logger.warning("%s", exc)
@@ -254,6 +257,7 @@ def _run_single_review(
     constitution_content: str,
     model: str | None,
     check_result: PlanReviewCheckResult,
+    feature_dir: Path | None = None,
 ) -> PlanReviewResult:
     """Run a single review and append to results.
 
@@ -279,6 +283,14 @@ def _run_single_review(
             stack_content=stack_content,
             constitution_content=constitution_content,
             model=model,
+            prepared=prepare_feature_review(
+                feature_dir.parents[2], feature_name, "plan", model or ""
+            )
+            if feature_dir
+            else None,
+            cache_path=review_receipt_path(feature_dir.parents[2], feature_name, "plan")
+            if feature_dir
+            else None,
         )
         check_result.reviews.append(PlanReviewEntry(feature_name=feature_name, result=result))
         return result
@@ -296,6 +308,7 @@ def _run_cascade_review(
     all_models: list[str],
     confidence_threshold: float,
     check_result: PlanReviewCheckResult,
+    feature_dir: Path | None = None,
 ) -> None:
     """Run reviews with cascade: if first is soft, try the next model.
 
@@ -323,6 +336,7 @@ def _run_cascade_review(
         constitution_content,
         review_models[0],
         check_result,
+        feature_dir=feature_dir,
     )
 
     # Cascade: if soft review and more models available, try next
@@ -342,6 +356,7 @@ def _run_cascade_review(
             constitution_content,
             cascade_model,
             check_result,
+            feature_dir=feature_dir,
         )
 
         # If second reviewer also finds nothing, mark confidence as validated
@@ -434,6 +449,10 @@ def run_spec_review(
                 result = review_spec(
                     spec_content=spec_content,
                     model=model,
+                    prepared=prepare_feature_review(
+                        specs_root.parent, feature.dir_name, "spec", model or ""
+                    ),
+                    cache_path=review_receipt_path(specs_root.parent, feature.dir_name, "spec"),
                 )
                 check_result.reviews.append(
                     SpecReviewEntry(feature_name=feature.dir_name, result=result)

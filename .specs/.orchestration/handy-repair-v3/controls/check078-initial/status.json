@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "livespec",
+    "goal",
+    "status",
+    "--state",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/check078-initial/livespec-goals/goal-spec-check-14f3dadf.state.json"
+  ],
+  "exit_code": 0,
+  "stdout": "goal_hash:14f3dadff08cc69e609f3a2a3360c3da02e7fe2285061660bfa06d8e9ea800be | status:complete | complete:39/39 | pending:0\n",
+  "stderr": ""
+}

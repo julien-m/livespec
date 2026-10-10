@@ -382,7 +382,12 @@ def test_goal_prove_accepts_cli_generated_pass_conventions_receipt(tmp_path: Pat
         EXPECTATIONS.replace("command: spec-demo", "command: spec-implement"),
         encoding="utf-8",
     )
-    (skill_dir / "SKILL.md").write_text(EXECUTION_TASK_SKILL, encoding="utf-8")
+    (skill_dir / "SKILL.md").write_text(
+        EXECUTION_TASK_SKILL
+        + "\n- [ ] Verify final feature and repo conventions PASS after all writes "
+        "and fresh supervisor rerun <!-- evidence:documentary -->\n",
+        encoding="utf-8",
+    )
     cli_result = _invoke_verify(project_root, "001-demo", "goal-pass")
     assert cli_result.exit_code == 0, cli_result.output
     receipt_path = json.loads(cli_result.output)["receipt_path"]
@@ -397,15 +402,18 @@ def test_goal_prove_accepts_cli_generated_pass_conventions_receipt(tmp_path: Pat
     task_id = next(
         task["id"]
         for task in contract["tasks"]
-        if "conventions_receipt_path"
-        in task["required_evidence"]
+        if "conventions_receipt_path" in task["required_evidence"]
     )
 
+    repo_result = _invoke_verify(project_root, "repo", "goal-repo-pass")
+    assert repo_result.exit_code == 0, repo_result.output
+    evidence = _convention_evidence(receipt_path)
+    evidence["repo_conventions_receipt_path"] = json.loads(repo_result.output)["receipt_path"]
     result = prove_goal_task(
         contract,
         state,
         task_id,
-        evidence=_convention_evidence(receipt_path),
+        evidence=evidence,
         project_root=project_root,
     )
 

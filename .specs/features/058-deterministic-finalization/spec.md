@@ -3,7 +3,7 @@ title: "Deterministic Finalization"
 status: Implemented
 priority: P1
 created: 2026-06-10
-updated: 2026-06-10
+updated: 2026-09-06
 scope: M
 ---
 
@@ -49,9 +49,17 @@ Feature: Deterministic registry apply
     And the .specs/README.md features table row and Recent Activity section are regenerated
     And the spec.md status is set to <status> in both the YAML frontmatter and the header Status line, kept in sync
     And all writes happen inside one acquire_lock critical section via write_with_hash_check
-    And each touched file carries the marker "<!-- finalize:<cmd>:<date>:<hash8> -->"
+    And generated registries carry the marker "<!-- finalize:<cmd>:<date>:<hash8> -->"
+    And spec.md changes only lifecycle metadata and preserves all existing body comments
     And a JSON finalize receipt is written and its path printed on stdout
     And the exit code is 0
+
+  Scenario: Lifecycle completion preserves the reviewed specification body
+    Given the reviewed spec has In Progress lifecycle metadata
+    When the same command applies Implemented with the same entry
+    Then only the spec lifecycle fields change
+    And generated registries and the new receipt record the complete new status payload
+    And a normative requirement edit still invalidates existing proof
 
   Scenario: Idempotent re-run performs zero writes
     Given a previous identical apply already inserted the finalize marker
@@ -268,7 +276,7 @@ flowchart TD
 | ID | Criterion | Priority | Story |
 |---|---|---|---|
 | AC-001 | `livespec finalize apply --feature <slug> --command <cmd>` writes the feature changelog entry, the global `.specs/changelog.md` summary, the README features row + Recent Activity regeneration, and the spec.md status (YAML frontmatter `status:` + header `- **Status:**` line, kept in sync) inside a single `acquire_lock` critical section, each write via `write_with_hash_check` | P1 | Story 1 |
-| AC-002 | Every registry file touched by apply carries the idempotence marker `<!-- finalize:<cmd>:<date>:<hash8> -->`; re-running the identical apply detects the marker by `<cmd>` + `<hash8>` and performs zero writes, exits 0, and reports `already_finalized` | P1 | Story 1 |
+| AC-002 | Generated changelogs and README carry the per-payload marker `<!-- finalize:<cmd>:<date>:<hash8> -->`; the spec status target changes only recognized lifecycle fields and never adds a body marker. Each status/payload retains its full identity and file hashes in the generated receipt. Re-running an identical apply performs zero registry writes, exits 0, and reports `already_finalized` | P1 | Story 1 |
 | AC-003 | apply emits a JSON finalize receipt (path printed on stdout) recording schema version, feature slug, command, outcome, and the sha256 of every touched file — same structural shape as the visual evidence receipt | P1 | Story 1 |
 | AC-004 | On lock timeout (default 10s, no `--retry`) apply exits non-zero with the canonical `BLOCKED ... policy_blocked` line and modifies no registry file; on post-write hash mismatch it exits non-zero with `BLOCKED ... state_invalid` naming the file | P1 | Story 1 |
 | AC-005 | `livespec finalize verify --feature <slug>` is strictly read-only and re-evaluates coherence rules R1, R4, and R6 scoped to the feature | P1 | Story 2 |
@@ -289,7 +297,7 @@ flowchart TD
 
 ### AC-002
 
-**Criterion:** Every registry file touched by apply carries the idempotence marker `<!-- finalize:<cmd>:<date>:<hash8> -->`; re-running the identical apply detects the marker by `<cmd>` + `<hash8>` and performs zero writes, exits 0, and reports `already_finalized`
+**Criterion:** Generated changelogs and README carry the per-payload marker `<!-- finalize:<cmd>:<date>:<hash8> -->`; the spec status target changes only recognized lifecycle fields and never adds a body marker. Each status/payload retains its full identity and file hashes in the generated receipt. Re-running an identical apply performs zero registry writes, exits 0, and reports `already_finalized`
 **Priority:** P1 | **Story:** Story 1
 
 ### AC-003
@@ -349,7 +357,7 @@ flowchart TD
 | ID | Requirement | AC References |
 |---|---|---|
 | FR-001 | System must provide a `livespec finalize apply` subcommand that performs all four end-of-command registry updates (feature changelog, global changelog, README row + Recent Activity, spec status) in one atomic, lock-guarded, hash-verified operation | AC-001, AC-011 |
-| FR-002 | System must make apply idempotent via the deterministic marker `<!-- finalize:<cmd>:<date>:<hash8> -->`, where `<hash8>` is derived from the feature slug, command, and update payload — identity is `<cmd>` + `<hash8>` (the `<date>` segment is informational only) | AC-002 |
+| FR-002 | System must make apply idempotent via deterministic per-payload markers in generated registries, deriving `<hash8>` from feature slug, command and full update payload including status. The spec target updates only recognized lifecycle metadata, never appends a body marker, and preserves all historical comments unchanged. Receipts retain exact current file and payload hashes; the marker date remains informational | AC-002 |
 | FR-003 | System must emit a JSON finalize receipt for both apply and verify, recording the sha256 of every touched/checked registry file, structurally aligned with the visual evidence receipt (schema version, oracle name/version, payload hash, verdict) | AC-003, AC-006 |
 | FR-004 | System must provide a strictly read-only `livespec finalize verify` subcommand that re-evaluates coherence rules R1, R4, and R6 scoped to the target feature and reports violations by rule ID | AC-005, AC-006 |
 | FR-005 | System must add a `finalize.registry` evidence family to the goal contract validator that requires `finalize_receipt_path` and rejects all substitute evidence (prose, exit codes, declared file lists); the family is attached to the goal contracts of the six registry-finalizing commands: `spec-specify`, `spec-plan`, `spec-implement`, `spec-fix`, `spec-stack`, `spec-feature` | AC-007, AC-008 |
@@ -368,7 +376,7 @@ flowchart TD
 
 ### FR-002
 
-**Requirement:** System must make apply idempotent via the deterministic marker `<!-- finalize:<cmd>:<date>:<hash8> -->`, where `<hash8>` is derived from the feature slug, command, and update payload — identity is `<cmd>` + `<hash8>` (the `<date>` segment is informational only)
+**Requirement:** System must make apply idempotent via deterministic per-payload markers in generated registries, deriving `<hash8>` from feature slug, command and full update payload including status. The spec target updates only recognized lifecycle metadata, never appends a body marker, and preserves all historical comments unchanged. Receipts retain exact current file and payload hashes; the marker date remains informational
 **AC References:** [AC-002](#ac-002)
 
 ### FR-003
@@ -459,3 +467,15 @@ flowchart TD
 <!-- finalize:spec-implement:2026-06-10:9a1dbf71 -->
 
 <!-- finalize:spec-feature:2026-06-10:96deb6de -->
+
+### 078 compatibility amendment — lifecycle-only spec writes
+
+Read the [requirement evidence contract](../078-requirement-evidence-integrity/spec.md). Finalization never appends body markers to spec.md, including the first invocation of a command. Existing historical comments remain unchanged. Every substantive entry, command and status retains its full payload identity/history in generated changelogs, README and receipts; spec status is exempt from marker requirements. Only status/updated slots in the initial valid YAML frontmatter and one recognized metadata band are mutation targets: the explicit unfenced Header section, or the legacy introductory band after the first H1 and before the next heading/thematic break. Duplicate or malformed anchors block; fenced/body examples cannot provide missing anchors. Both forms use the same bounded parser as normative identity, without a manual migration. No preparatory marker step or broader normative identity exclusion is required.
+
+### FR-001 compatibility amendment — official producer statuses
+
+FR-001 / AC-001 joint finalization uses exactly the existing seven lifecycle states: `Draft`, `Planned`, `In Progress`, `Approved`, `Implemented`, `Deprecated`, `Review`. Spec schema validation must accept every state recognized by R2, including Planned after planning and In Progress during implementation; unknown strings, spelling variants and Blocked remain invalid. Existing R2 required-file checks and R4 README/spec status equality remain strict.
+
+FR-002 / AC-002 lifecycle-only writes remain limited to recognized status/updated slots. The spec-plan expectation explicitly permits those slots only through the official finalizer; normative body, FR/AC IDs and text, title, creation date and other metadata remain forbidden mutations. Duplicate/malformed anchors remain blocking and normative review identity excludes only the recognized lifecycle slots.
+
+AC-001 regression: finalize a fully valid planned feature with command spec-plan and status Planned; README, YAML and Header all contain Planned, finalize verify passes R4 and structural spec validation exits zero. Validate In Progress with required progress.md and Implemented with required implementation.md. Exercise all seven states and reject unknown/typo/Blocked. AC-005/006 regression: mismatched Approved/Planned in either direction still fails R4.3/finalize verification. AC-002 regression: finalization preserves normative body/hash and current semantic review identity; body/FR/AC changes invalidate it, malformed/duplicate slots block.

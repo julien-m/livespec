@@ -1,0 +1,257 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "7d59b13b52b71ecd7ac7374d046712e64c6bf4ae2feeeb6633a4be7175159331",
+  "source_hashes": {
+    ".agent-sync/skills/spec-init/SKILL.md": "ca79a31f0770ae4aec1cc050c6adf999155fbac68e74a0c063bd1fb0ddd94599",
+    ".specs/constitution.md": "ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9",
+    ".specs/features/079-autonomous-from-code-recovery/spec.md": "871b7f99fc859f93948225bdac19defd6582901ec58393ae9f82eaa53d8eb4f2",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686"
+  },
+  "reviewer_model": "gpt-6.1-sol",
+  "complete": true,
+  "ready": true,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-001",
+      "disposition": "covered",
+      "rationale": "The hybrid fixture has an explicit complete family inventory and excludes unsupported business and deployment claims. Its independent-manifest scenario gives a concrete observed input and expected output; native tooling availability is distinguished from application runtime.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L107-L109",
+          "excerpt": "Tauri 2 + React/Vite/TypeScript + Bun fixture records all native/frontend families with file evidence"
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Detect manifest families independently."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-002",
+      "disposition": "covered",
+      "rationale": "Three separately named standalone fixtures establish bounded family coverage and guard against test-tool duplication and invented deployment. These are observable artifact assertions rather than a demand for an unsupported runtime certification.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L110-L112",
+          "excerpt": "Web/npm, Python and standalone Cargo fixtures record only observed families and tooling commands; testing tools are not duplicated and deployment is not invented."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-003",
+      "disposition": "covered",
+      "rationale": "Failure classes, readonly drift verification and target/force/dry-run compatibility are explicitly testable. Unsupported scan combinations must fail before any mutation, and the edge cases specify absent, failing and timed-out probes.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115",
+          "excerpt": "Malformed or contradictory manifests, failed required tooling and changed/escaping generated-artifact content return contextual nonzero exits and no completed claim; current profile verification reads without mutation."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115",
+          "excerpt": "Autonomous dispatch preserves the selected --dir target and explicit --force; --dry-run writes nothing, and unsupported --deep or flag combinations fail contextually before mutation."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-004",
+      "disposition": "covered",
+      "rationale": "Force recovery defines the temporal safety requirement (unique local backup before overwrite), retained feature/hook/run contents and byte-equality boundaries for application sources and external targets. Story 2 provides the corresponding repeat-run scenario.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L116-L118",
+          "excerpt": "A force rerun saves prior specs, conventions and integration documents in a unique local backup before overwrite, retains feature/hook/run contents, and leaves source/manifests and outside symlink targets byte-identical."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-005",
+      "disposition": "covered",
+      "rationale": "The criterion independently covers fresh and legacy mutable-agent isolation plus preservation or repair of convention sources. Shared hashes and actual resolvable paths provide concrete verification rather than treating link existence as success.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L119-L121",
+          "excerpt": "Fresh and legacy linked mutable-agent builds use local copies and leave shared-source hashes unchanged; valid convention sources remain intact and repaired convention sources resolve to actual ai-ressources files."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:AC-006",
+      "disposition": "covered",
+      "rationale": "The autonomous inventory removes conversational obligations while retaining closure, and its comparison boundary protects interactive and historical contracts. FR-004 additionally disallows backend exit zero as sufficient proof of command completion.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125",
+          "excerpt": "Autonomous from-code goal inventory excludes interview/stack confirmation but retains installation, generated-profile validation, integration verification, hooks and archive."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125",
+          "excerpt": "Interactive initialization retains its interview obligations; historical immutable goals are unchanged."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:FR-001",
+      "disposition": "covered",
+      "rationale": "Independent detection prevents a package manifest from hiding Cargo/Tauri evidence. Sources for package-manager evidence are named; contradictions or malformed/unsupported manifests fail visibly. Explicit unknown product fields avoid unauthorized product scope and map to fixture and failure criteria.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Detect manifest families independently."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Explicit package-manager declarations, corroborated native build commands and lockfiles establish manager evidence; contradictory manager evidence and unsupported/malformed manifests fail contextually."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Unsupported product roles, growth, geography, budget and deployment remain explicitly unknown."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:FR-002",
+      "disposition": "covered",
+      "rationale": "Tailored documents, observed ADR provenance, bounded argv probes and readonly source-identity verification form a coherent generation/verification boundary. Required failures prevent success claims; this fits the local filesystem and fail-fast constitution and avoids inferring runtime success from tools.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Generate project-specific constitution, observed stack ADR and testing strategy; execute bounded argv version probes for actual tooling preflight."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Required failures prevent completed recap and READY."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Validate current generated content against observed source identities through a read-only profile check; tooling availability never represents application runtime success."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:FR-003",
+      "disposition": "covered",
+      "rationale": "Recovery states and permission boundaries are explicit: selected target and flags survive dispatch, dry-run writes nothing, unsupported combinations fail before writes, force is noninteractive and backed up, history/source bytes survive, external symlinks are refused, mutable agents are copied and conventions are preserved or backed up before repair. AC-003 through AC-005 cover these observable guarantees without requiring a new runtime or hosted service.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Autonomous dispatch preserves the selected --dir target and explicit --force, honors --dry-run without writes, and rejects unsupported --deep or flag combinations contextually before mutation."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Force recovery is noninteractive and creates a unique local backup before overwriting generated specs, conventions or integration documents; retain features/hooks/run history and all source bytes."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Reject escaping generated-artifact symlinks and copy mutable shared agents before local builds."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Keep valid convention sources; back up and repair invalid generated conventions using actual ai-ressources paths."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:FR-004",
+      "disposition": "covered",
+      "rationale": "The branch is compiled before generation, so automatic execution cannot inherit a conversational inventory. Current artifact verification, integrations, hooks and authentic proof/archive remain mandatory; historical immutable contracts are preserved. This repairs the stated premature-return defect without changing goal-pairing or archive policy.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Compile a distinct autonomous from-code branch before generation, excluding interview/confirmation while retaining generation, current profile/output validation, integration verification, hooks and archive."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Only current artifacts plus authentic goal proof/archive permit command completion; interactive and historical contracts retain their original obligations."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:SC-001",
+      "disposition": "covered",
+      "rationale": "A four-profile matrix and a zero-invented-facts threshold make the source-derived behavior measurable and align with AC-001/AC-002 rather than creating additional product requirements.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168",
+          "excerpt": "All four fixture profiles (hybrid desktop, web/npm, Python, Cargo) match observed manifests with zero invented product or deployment facts."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:SC-002",
+      "disposition": "covered",
+      "rationale": "Backup content equality, unchanged source/shared hashes and nonzero/no-completed-claim failure outcomes are concrete repeatable safety assertions aligned with the recovery and unsafe-input scenarios.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168",
+          "excerpt": "Every recovery fixture retains prior generated backup contents and application/shared-source hashes; all unsafe/error fixtures return nonzero without completed claims."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "079-autonomous-from-code-recovery:SC-003",
+      "disposition": "covered",
+      "rationale": "The success condition requires an exhaustive autonomous closure inventory plus unchanged interactive/historical comparisons. It directly measures FR-004 and AC-006 without claiming the implementation or Handy initialization already passed.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168",
+          "excerpt": "Fresh autonomous goals retain every closure obligation and omit interview/confirmation; interactive and historical goal comparisons show no altered obligations."
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [
+    {
+      "category": "evidence-boundary",
+      "severity": "info",
+      "description": "This is a specification-readiness verdict. The inspected current init instructions still contain the premature exit-zero return; the corrective spec explicitly requires authentic closure. No runtime or implementation success is established by this review.",
+      "suggestion": "During implementation, verify removal of the premature return and retain fixture transcripts plus authentic goal proof/archive before announcing initialization success.",
+      "citations": [
+        {
+          "section_id": ".agent-sync/skills/spec-init/SKILL.md:L1003-L1028",
+          "excerpt": "On exit 0, return immediately with the command output summary."
+        },
+        {
+          "section_id": ".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132",
+          "excerpt": "Only current artifacts plus authentic goal proof/archive permit command completion; interactive and historical contracts retain their original obligations."
+        }
+      ]
+    }
+  ],
+  "confidence": 4,
+  "raw_results": [
+    "{\"batch_id\":\"batch-001\",\"reviewed_section_ids\":[\".agent-sync/skills/spec-init/SKILL.md:L1-L14\",\".agent-sync/skills/spec-init/SKILL.md:L15-L22\",\".agent-sync/skills/spec-init/SKILL.md:L23-L49\",\".agent-sync/skills/spec-init/SKILL.md:L50-L56\",\".agent-sync/skills/spec-init/SKILL.md:L57-L109\",\".agent-sync/skills/spec-init/SKILL.md:L110-L113\",\".agent-sync/skills/spec-init/SKILL.md:L114-L184\",\".agent-sync/skills/spec-init/SKILL.md:L185-L260\",\".agent-sync/skills/spec-init/SKILL.md:L261-L289\",\".agent-sync/skills/spec-init/SKILL.md:L290-L293\",\".agent-sync/skills/spec-init/SKILL.md:L294-L310\",\".agent-sync/skills/spec-init/SKILL.md:L311-L339\",\".agent-sync/skills/spec-init/SKILL.md:L340-L355\",\".agent-sync/skills/spec-init/SKILL.md:L356-L388\",\".agent-sync/skills/spec-init/SKILL.md:L389-L421\",\".agent-sync/skills/spec-init/SKILL.md:L422-L509\",\".agent-sync/skills/spec-init/SKILL.md:L510-L524\",\".agent-sync/skills/spec-init/SKILL.md:L525-L592\",\".agent-sync/skills/spec-init/SKILL.md:L593-L619\",\".agent-sync/skills/spec-init/SKILL.md:L620-L660\",\".agent-sync/skills/spec-init/SKILL.md:L661-L672\",\".agent-sync/skills/spec-init/SKILL.md:L673-L727\",\".agent-sync/skills/spec-init/SKILL.md:L728-L806\",\".agent-sync/skills/spec-init/SKILL.md:L807-L828\",\".agent-sync/skills/spec-init/SKILL.md:L829-L869\",\".agent-sync/skills/spec-init/SKILL.md:L870-L892\",\".agent-sync/skills/spec-init/SKILL.md:L893-L907\",\".agent-sync/skills/spec-init/SKILL.md:L908-L927\",\".agent-sync/skills/spec-init/SKILL.md:L928-L979\",\".agent-sync/skills/spec-init/SKILL.md:L980-L991\",\".agent-sync/skills/spec-init/SKILL.md:L992-L1002\",\".agent-sync/skills/spec-init/SKILL.md:L1003-L1028\",\".agent-sync/skills/spec-init/SKILL.md:L1029-L1048\",\".agent-sync/skills/spec-init/SKILL.md:L1049-L1065\",\".agent-sync/skills/spec-init/SKILL.md:L1066-L1067\",\".agent-sync/skills/spec-init/SKILL.md:L1068-L1080\",\".agent-sync/skills/spec-init/SKILL.md:L1081-L1089\",\".agent-sync/skills/spec-init/SKILL.md:L1090-L1094\",\".agent-sync/skills/spec-init/SKILL.md:L1095-L1101\",\".agent-sync/skills/spec-init/SKILL.md:L1102-L1106\",\".agent-sync/skills/spec-init/SKILL.md:L1107-L1113\",\".agent-sync/skills/spec-init/SKILL.md:L1114-L1126\",\".agent-sync/skills/spec-init/SKILL.md:L1127-L1142\",\".agent-sync/skills/spec-init/SKILL.md:L1143-L1150\",\".agent-sync/skills/spec-init/SKILL.md:L1151-L1155\",\".agent-sync/skills/spec-init/SKILL.md:L1156-L1188\",\".specs/constitution.md:L1-L8\",\".specs/constitution.md:L9-L18\",\".specs/constitution.md:L19-L20\",\".specs/constitution.md:L21-L26\",\".specs/constitution.md:L27-L32\",\".specs/constitution.md:L33-L37\",\".specs/constitution.md:L38-L43\",\".specs/constitution.md:L44-L49\",\".specs/constitution.md:L50-L56\",\".specs/constitution.md:L57-L58\",\".specs/constitution.md:L59-L65\",\".specs/constitution.md:L66-L71\",\".specs/constitution.md:L72-L75\",\".specs/constitution.md:L76-L81\",\".specs/constitution.md:L82-L83\",\".specs/constitution.md:L84-L90\",\".specs/constitution.md:L91-L96\",\".specs/constitution.md:L97-L102\",\".specs/constitution.md:L103-L109\",\".specs/constitution.md:L110-L111\",\".specs/constitution.md:L112-L118\",\".specs/constitution.md:L119-L123\",\".specs/constitution.md:L124-L131\",\".specs/constitution.md:L132-L146\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L1-L9\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L10-L18\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L19-L26\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L27-L28\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L29-L68\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L69-L104\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L105-L106\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L107-L109\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L110-L112\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L116-L118\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L119-L121\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L133-L138\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L139-L147\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L148-L157\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L158-L163\",\".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168\",\".specs/project.md:L1-L7\",\".specs/project.md:L8-L20\",\".specs/project.md:L21-L29\",\".specs/project.md:L30-L43\",\".specs/project.md:L44-L54\",\".specs/project.md:L55-L63\",\".specs/project.md:L64-L73\",\".specs/project.md:L74-L82\",\".specs/stacks/_default.md:L1-L5\",\".specs/stacks/_default.md:L6-L12\",\".specs/stacks/_default.md:L13-L38\",\".specs/stacks/_default.md:L39-L48\",\".specs/stacks/_default.md:L49-L60\",\".specs/stacks/_default.md:L61-L68\",\".specs/stacks/_default.md:L69-L71\"],\"conclusions\":[{\"requirement_id\":\"079-autonomous-from-code-recovery:AC-001\",\"disposition\":\"covered\",\"rationale\":\"The hybrid fixture has an explicit complete family inventory and excludes unsupported business and deployment claims. Its independent-manifest scenario gives a concrete observed input and expected output; native tooling availability is distinguished from application runtime.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L107-L109\",\"excerpt\":\"Tauri 2 + React/Vite/TypeScript + Bun fixture records all native/frontend families with file evidence\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Detect manifest families independently.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:AC-002\",\"disposition\":\"covered\",\"rationale\":\"Three separately named standalone fixtures establish bounded family coverage and guard against test-tool duplication and invented deployment. These are observable artifact assertions rather than a demand for an unsupported runtime certification.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L110-L112\",\"excerpt\":\"Web/npm, Python and standalone Cargo fixtures record only observed families and tooling commands; testing tools are not duplicated and deployment is not invented.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:AC-003\",\"disposition\":\"covered\",\"rationale\":\"Failure classes, readonly drift verification and target/force/dry-run compatibility are explicitly testable. Unsupported scan combinations must fail before any mutation, and the edge cases specify absent, failing and timed-out probes.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115\",\"excerpt\":\"Malformed or contradictory manifests, failed required tooling and changed/escaping generated-artifact content return contextual nonzero exits and no completed claim; current profile verification reads without mutation.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L113-L115\",\"excerpt\":\"Autonomous dispatch preserves the selected --dir target and explicit --force; --dry-run writes nothing, and unsupported --deep or flag combinations fail contextually before mutation.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:AC-004\",\"disposition\":\"covered\",\"rationale\":\"Force recovery defines the temporal safety requirement (unique local backup before overwrite), retained feature/hook/run contents and byte-equality boundaries for application sources and external targets. Story 2 provides the corresponding repeat-run scenario.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L116-L118\",\"excerpt\":\"A force rerun saves prior specs, conventions and integration documents in a unique local backup before overwrite, retains feature/hook/run contents, and leaves source/manifests and outside symlink targets byte-identical.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:AC-005\",\"disposition\":\"covered\",\"rationale\":\"The criterion independently covers fresh and legacy mutable-agent isolation plus preservation or repair of convention sources. Shared hashes and actual resolvable paths provide concrete verification rather than treating link existence as success.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L119-L121\",\"excerpt\":\"Fresh and legacy linked mutable-agent builds use local copies and leave shared-source hashes unchanged; valid convention sources remain intact and repaired convention sources resolve to actual ai-ressources files.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:AC-006\",\"disposition\":\"covered\",\"rationale\":\"The autonomous inventory removes conversational obligations while retaining closure, and its comparison boundary protects interactive and historical contracts. FR-004 additionally disallows backend exit zero as sufficient proof of command completion.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125\",\"excerpt\":\"Autonomous from-code goal inventory excludes interview/stack confirmation but retains installation, generated-profile validation, integration verification, hooks and archive.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L122-L125\",\"excerpt\":\"Interactive initialization retains its interview obligations; historical immutable goals are unchanged.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:FR-001\",\"disposition\":\"covered\",\"rationale\":\"Independent detection prevents a package manifest from hiding Cargo/Tauri evidence. Sources for package-manager evidence are named; contradictions or malformed/unsupported manifests fail visibly. Explicit unknown product fields avoid unauthorized product scope and map to fixture and failure criteria.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Detect manifest families independently.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Explicit package-manager declarations, corroborated native build commands and lockfiles establish manager evidence; contradictory manager evidence and unsupported/malformed manifests fail contextually.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Unsupported product roles, growth, geography, budget and deployment remain explicitly unknown.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:FR-002\",\"disposition\":\"covered\",\"rationale\":\"Tailored documents, observed ADR provenance, bounded argv probes and readonly source-identity verification form a coherent generation/verification boundary. Required failures prevent success claims; this fits the local filesystem and fail-fast constitution and avoids inferring runtime success from tools.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Generate project-specific constitution, observed stack ADR and testing strategy; execute bounded argv version probes for actual tooling preflight.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Required failures prevent completed recap and READY.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Validate current generated content against observed source identities through a read-only profile check; tooling availability never represents application runtime success.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:FR-003\",\"disposition\":\"covered\",\"rationale\":\"Recovery states and permission boundaries are explicit: selected target and flags survive dispatch, dry-run writes nothing, unsupported combinations fail before writes, force is noninteractive and backed up, history/source bytes survive, external symlinks are refused, mutable agents are copied and conventions are preserved or backed up before repair. AC-003 through AC-005 cover these observable guarantees without requiring a new runtime or hosted service.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Autonomous dispatch preserves the selected --dir target and explicit --force, honors --dry-run without writes, and rejects unsupported --deep or flag combinations contextually before mutation.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Force recovery is noninteractive and creates a unique local backup before overwriting generated specs, conventions or integration documents; retain features/hooks/run history and all source bytes.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Reject escaping generated-artifact symlinks and copy mutable shared agents before local builds.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Keep valid convention sources; back up and repair invalid generated conventions using actual ai-ressources paths.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:FR-004\",\"disposition\":\"covered\",\"rationale\":\"The branch is compiled before generation, so automatic execution cannot inherit a conversational inventory. Current artifact verification, integrations, hooks and authentic proof/archive remain mandatory; historical immutable contracts are preserved. This repairs the stated premature-return defect without changing goal-pairing or archive policy.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Compile a distinct autonomous from-code branch before generation, excluding interview/confirmation while retaining generation, current profile/output validation, integration verification, hooks and archive.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Only current artifacts plus authentic goal proof/archive permit command completion; interactive and historical contracts retain their original obligations.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:SC-001\",\"disposition\":\"covered\",\"rationale\":\"A four-profile matrix and a zero-invented-facts threshold make the source-derived behavior measurable and align with AC-001/AC-002 rather than creating additional product requirements.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168\",\"excerpt\":\"All four fixture profiles (hybrid desktop, web/npm, Python, Cargo) match observed manifests with zero invented product or deployment facts.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:SC-002\",\"disposition\":\"covered\",\"rationale\":\"Backup content equality, unchanged source/shared hashes and nonzero/no-completed-claim failure outcomes are concrete repeatable safety assertions aligned with the recovery and unsafe-input scenarios.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168\",\"excerpt\":\"Every recovery fixture retains prior generated backup contents and application/shared-source hashes; all unsafe/error fixtures return nonzero without completed claims.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]},{\"requirement_id\":\"079-autonomous-from-code-recovery:SC-003\",\"disposition\":\"covered\",\"rationale\":\"The success condition requires an exhaustive autonomous closure inventory plus unchanged interactive/historical comparisons. It directly measures FR-004 and AC-006 without claiming the implementation or Handy initialization already passed.\",\"source_citations\":[{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L164-L168\",\"excerpt\":\"Fresh autonomous goals retain every closure obligation and omit interview/confirmation; interactive and historical goal comparisons show no altered obligations.\"}],\"plan_citations\":[],\"searched_plan_sections\":[]}],\"ambiguities\":[],\"extra_scope\":[],\"findings\":[{\"category\":\"evidence-boundary\",\"severity\":\"info\",\"description\":\"This is a specification-readiness verdict. The inspected current init instructions still contain the premature exit-zero return; the corrective spec explicitly requires authentic closure. No runtime or implementation success is established by this review.\",\"suggestion\":\"During implementation, verify removal of the premature return and retain fixture transcripts plus authentic goal proof/archive before announcing initialization success.\",\"citations\":[{\"section_id\":\".agent-sync/skills/spec-init/SKILL.md:L1003-L1028\",\"excerpt\":\"On exit 0, return immediately with the command output summary.\"},{\"section_id\":\".specs/features/079-autonomous-from-code-recovery/spec.md:L126-L132\",\"excerpt\":\"Only current artifacts plus authentic goal proof/archive permit command completion; interactive and historical contracts retain their original obligations.\"}]}],\"confidence\":4,\"synthesized_batch_ids\":[],\"resolutions\":[]}"
+  ],
+  "synthesis": null,
+  "synthesis_transport_version": null
+}

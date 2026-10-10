@@ -1,0 +1,60 @@
+{
+  "role": "intrinsic-independent-semantic-plan-review",
+  "feature": "078-requirement-evidence-integrity",
+  "batch_id": "batch-001",
+  "scope": "Source-to-plan semantic review only; no runtime certification or outer gate decision",
+  "packet_version": "v6",
+  "packet_canonical_sha256": "45decc370fe4cb4b9606aead3bf704dbfda2a62c92e4a421bf738985fb6e8b24",
+  "prepared_sha256": "3153e972202355298f8278a96b51dc37fecd2764eb43143d42d0e544a48b9043",
+  "context_hash": "b214105aff4aaac997fd123037cc76cc8286f037d03bce0e03bd6cfa3f9b51e9",
+  "raw_file": "raw-response.json",
+  "raw_sha256": "d667a2256d30fe0d0d2a5f68a83cd8b8c3a22d3190e62285cd2c4d53b03ecb0a",
+  "raw_chars": 50675,
+  "reviewed_sections": 115,
+  "conclusions": 36,
+  "covered_conclusions": 36,
+  "warnings": 2,
+  "blocking_findings": 0,
+  "ambiguities": 0,
+  "extra_scope": 0,
+  "confidence": 4,
+  "actual_checks": {
+    "packet_canonical_hash_match": true,
+    "prepared_file_hash_match": true,
+    "all_five_source_hashes_match": true,
+    "all_115_exact_utf8_spans_match": true,
+    "batch_prompt_sections_requirements_equal_prepared": true,
+    "response_schema_parsed": true,
+    "official_validate_response_errors": [],
+    "scoped_11_input_hashes_before_after_equal": true,
+    "global_git_status_external_delta": [
+      " M test-results/.last-run.json"
+    ]
+  },
+  "input_hashes_before": {
+    ".specs/constitution.md": "ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9",
+    ".specs/features/078-requirement-evidence-integrity/plan.md": "a778e04230063efd97cbb4bf79712261c3b9a9d5f1b86d34d648a37504254720",
+    ".specs/features/078-requirement-evidence-integrity/spec.md": "360410369ff8da5d7ccd5325d84eb27ba76e3d71e13c3a3a32c4bcdffb744b0c",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686",
+    "AGENTS.md": "93388c5a449a128560933d9443c837f80c6b36add2f0314af2ec79ed2a651bf4",
+    ".specs/spec-system.md": "b241f939cacef9071e76d8228eec209ea12fa68a9211626572252b0870748235",
+    "system/review-protocol.md": "1f8f5bd9ccb38411196c3ebf72e8e66962d1a5e9343b85dad0ef2fc034c9d35d",
+    ".agents/skills/spec-plan/SKILL.md": "58603ba2cef2b26e7e08fc7f3aa1dedccd8321394fec647b4b48f11db49d7f81",
+    ".specs/.orchestration/handy-repair-v3/review-plan-prepared.json": "3153e972202355298f8278a96b51dc37fecd2764eb43143d42d0e544a48b9043",
+    ".specs/semantic/config.yaml": "9adb1ff5b032c23c9be0a343d1a8c157fe5826e696505bc723b69dc475920e18"
+  },
+  "authorized_outputs": [
+    "raw-response.json",
+    "audit-receipt.json"
+  ],
+  "prohibited_operations_performed": {
+    "source_edits": false,
+    "tests": false,
+    "goal_changes": false,
+    "review_ingestion": false,
+    "pen_reads": false,
+    "subagents": false
+  },
+  "model_identity_basis": "Prepared review config gpt-6.1-sol; parent current runtime observation supplied gpt-6.1-sol high inherited, not inferred from cached receipt"
+}

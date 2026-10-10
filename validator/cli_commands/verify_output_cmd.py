@@ -38,8 +38,9 @@ from ..run_artifacts import (
     load_run_artifact,
     recheck_receipts,
 )
+from ..run_receipt_types import archived_review_kinds
 from ..specs_utils import find_specs_root
-from ..verify_output import evaluate_rules, render_report, to_json_envelope
+from ..verify_output import VerifyReport, evaluate_rules, render_report, to_json_envelope
 
 COMMAND_ARGUMENT = typer.Argument(..., help="Command name or alias (e.g. specify).")
 RUN_OPTION = typer.Option(None, "--run", help="Explicit run artifact path.")
@@ -83,6 +84,20 @@ def verify_output_command(
         artifact = load_run_artifact(artifact_path)
     except ArtifactMalformed as exc:
         raise _blocked(str(exc), json_out=json_out) from exc
+    report = _evaluate_artifact(artifact, project_root, feature, scenario)
+    if json_out:
+        envelope = to_json_envelope(report, command=canonical, artifact_path=artifact_path)
+        typer.echo(json.dumps(envelope, indent=2))
+    else:
+        typer.echo(render_report(report, command=canonical, artifact_path=artifact_path))
+    final_exit = exit_code_for(report.outcome)
+    if final_exit != 0:
+        raise typer.Exit(final_exit)
+
+
+def _evaluate_artifact(
+    artifact: dict[str, Any], project_root: Path, feature: str | None, scenario: str | None
+) -> VerifyReport:
     # --scenario replaces the artifact flags as the when-branch source (AC-007).
     active_flags = shlex.split(scenario) if scenario else _string_list(artifact.get("flags"))
     placeholder_feature = feature or _optional_str(artifact.get("feature"))
@@ -93,7 +108,14 @@ def verify_output_command(
         else []
     )
     # Receipt feature scoping applies only when --feature was given (AC-007).
-    receipt_checks = recheck_receipts(receipt_entries, project_root=project_root, feature=feature)
+    receipt_checks = recheck_receipts(
+        receipt_entries,
+        project_root=project_root,
+        feature=feature,
+        requirement_feature=placeholder_feature,
+        evidence_policy="2" if artifact.get("evidence_policy_version") == "2" else "1",
+        expected_review_kinds=archived_review_kinds(artifact),
+    )
     goal_raw = artifact.get("goal")
     goal = cast(dict[str, Any], goal_raw) if isinstance(goal_raw, dict) else {"tasks": []}
     tasks = [
@@ -101,7 +123,10 @@ def verify_output_command(
         for task in cast(list[object], goal.get("tasks") or [])
         if isinstance(task, dict)
     ]
-    report = evaluate_rules(
+    from ..acceptance_evidence import archived_policy2_evidence_errors
+
+    acceptance_errors = archived_policy2_evidence_errors(artifact, project_root)
+    return evaluate_rules(
         _verify_rules(artifact),
         artifact=artifact,
         active_flags=active_flags,
@@ -110,16 +135,10 @@ def verify_output_command(
         # @spec FR-004: re-derivation shares the archive.run exclusion rule
         #   — .specs/features/059-pipeline-verify-phase/spec.md#fr-004
         goal_incomplete=goal_tasks_incomplete(tasks),
-        receipt_error=any(not check.verified for check in receipt_checks),
+        receipt_error=bool(artifact.get("evidence_errors"))
+        or bool(acceptance_errors)
+        or any(not check.verified for check in receipt_checks),
     )
-    if json_out:
-        envelope = to_json_envelope(report, command=canonical, artifact_path=artifact_path)
-        typer.echo(json.dumps(envelope, indent=2))
-    else:
-        typer.echo(render_report(report, command=canonical, artifact_path=artifact_path))
-    final_exit = exit_code_for(report.outcome)
-    if final_exit != 0:
-        raise typer.Exit(final_exit)
 
 
 def _run_preview(canonical: str, *, save: bool, json_out: bool) -> None:

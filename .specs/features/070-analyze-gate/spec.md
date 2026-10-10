@@ -3,7 +3,7 @@ title: "Analyze Gate"
 status: Implemented
 priority: P1
 created: 2026-06-27
-updated: 2026-06-27
+updated: 2026-09-06
 scope: M
 number: "070"
 ---
@@ -14,10 +14,16 @@ number: "070"
 - **Branch:** `feature/070-analyze-gate`
 - **Date:** 2026-06-27
 - **Status:** Implemented
-- **Input:** Analyze gate — a read-only pre-implementation cross-artifact consistency check, exposed as `spec-check --pre-impl` and as an automatic `spec-feature` phase before implementation, that detects coverage gaps and inconsistencies across spec, plan and implementation with deterministic finding IDs and CRITICAL/HIGH/MEDIUM/LOW severity, where constitution MUST violations and missing spec/plan are CRITICAL and an uncovered requirement is HIGH, and exits 1 only on CRITICAL or HIGH.
+- **Input:** Analyze gate — a read-only pre-implementation cross-artifact consistency check, exposed as `spec-check --pre-impl` and as an automatic `spec-feature` phase before implementation, that detects coverage gaps and inconsistencies across spec, plan and implementation with deterministic finding IDs and CRITICAL/HIGH/MEDIUM/LOW severity, where constitution MUST violations and missing spec/plan are CRITICAL and missing structural references are HIGH unless a current complete grounded review covers the qualified requirement, and exits 1 only on CRITICAL or HIGH.
 - **Feature Number:** 070
 
 ---
+
+## Evidence policy amendment — 2026-09-06
+
+Read [requirement evidence integrity](../078-requirement-evidence-integrity/spec.md) for current Analyze policy. FR-005/FR-011 and AC-005/AC-012 describe structural reference coverage only, never semantic compliance. Current mandatory Analyze additionally requires complete fresh grounded requirement dispositions; missing, contradictory or ambiguous obligations block. A diagnostic structural-only invocation remains available. FR-004/AC-004 require grounded constitutional contradictions; a phrase mentioned under negation is not a violation. Qualified requirement identities distinguish features; historical diagnostic reports retain their original meaning.
+
+When a complete fresh independent semantic review covers every obligation, missing literal ID references remain LOW structural findings and do not block a valid paraphrase. Structural-only diagnostics retain their HIGH reference findings; missing artifacts or unready semantic reviews still block.
 
 ## User Scenarios & Testing
 
@@ -29,7 +35,7 @@ number: "070"
 
 **Priority reason:** This is the gate's reason to exist. Without it, a spec whose requirements are unplanned or a plan that violates the constitution reaches the Implement phase and the cost of the gap multiplies. It is an integrated phase, not a new command.
 
-**Independent test:** Run the analyzer on a feature directory whose `plan.md` omits one requirement present in `spec.md`; verify a HIGH coverage finding is produced and the CLI exits 1 before any implementation step.
+**Independent test:** Run the analyzer on a feature directory whose `plan.md` omits one requirement present in `spec.md` and has no current complete grounded review covering it; verify a HIGH coverage finding is produced and the CLI exits 1 before any implementation step.
 
 #### Acceptance Scenarios (Gherkin — source of truth for tests)
 
@@ -68,11 +74,11 @@ flowchart TD
 
 ### Story 2 — Deterministic severity classification with stable finding IDs `P1`
 
-**As a** spec author, **I want** the analyzer to assign CRITICAL/HIGH/MEDIUM/LOW severity by a fixed rule and to give each finding a stable ID, **so that** the same artifacts always yield the same findings with no model judgement involved.
+**As a** spec author, **I want** the analyzer to assign CRITICAL/HIGH/MEDIUM/LOW severity by a fixed rule and to give each finding a stable ID, **so that** the same artifacts and current independent review receipt yield the same classified findings; grounded semantic review remains a separate input.
 
 **Priority reason:** Classification and IDs are the input to every gate decision. They must be closed-form and reproducible so the gate is testable and auditable across reruns.
 
-**Independent test:** Run `analyze_feature_artifacts` twice on the same fixture and assert the two finding lists (IDs, severities) are identical; assert a missing `plan.md` produces a CRITICAL and an unplanned requirement produces a HIGH.
+**Independent test:** Run `analyze_feature_artifacts` twice on the same fixture and assert the two finding lists (IDs, severities) are identical; assert a missing `plan.md` produces a CRITICAL and a missing structural reference without current complete grounded coverage produces a HIGH.
 
 #### Acceptance Scenarios (Gherkin — source of truth for tests)
 
@@ -83,19 +89,34 @@ Feature: Deterministic severity classification across artifact checks
     When the analyzer runs
     Then it records a CRITICAL artifact finding for plan.md
 
-  Scenario: Constitution MUST NOT violation is CRITICAL
-    Given a constitution clause forbidding a phrase
-    And spec.md or plan.md contains that phrase
+  Scenario: Grounded constitutional contradiction is blocking
+    Given a constitution prohibition and a reviewed plan that contradicts it
+    And the independent review grounds that contradiction in the current sources
     When the analyzer runs
-    Then it records a CRITICAL constitution finding referencing constitution.md
+    Then it reports a CRITICAL constitutional contradiction
+    And phrase presence alone is not evidence of that contradiction
 
-  Scenario: Unplanned requirement is HIGH
+  Scenario: Missing structural reference without semantic readiness is HIGH
     Given a requirement ID present in spec.md but absent from plan.md and implementation.md
+    And analysis is structural-only or lacks a current complete grounded review covering the qualified requirement
     When the analyzer runs
     Then it records a HIGH coverage finding for that requirement
 
+  Scenario: Grounded paraphrase leaves a LOW structural diagnostic
+    Given a qualified requirement whose literal ID is absent from plan.md and implementation.md
+    And a current complete grounded review covers all obligations including that requirement
+    When the analyzer runs
+    Then the missing reference produces a LOW coverage finding
+    And the structural coverage percentage does not increase
+
+  Scenario: Literal references cannot conceal missing or contradictory evidence
+    Given every requirement ID appears in plan.md
+    And semantic evidence is missing, stale, incomplete or contradictory
+    When mandatory analysis runs
+    Then semantic findings block progression despite full structural reference coverage
+
   Scenario: Finding IDs are deterministic and stable
-    Given the same spec.md and plan.md content
+    Given the same spec.md and plan.md content and the same current review evidence
     When the analyzer runs twice
     Then both runs produce identical finding IDs and severities
 ```
@@ -106,22 +127,25 @@ Feature: Deterministic severity classification across artifact checks
 flowchart TD
     A[Read spec, plan, optional implementation, constitution] --> B{spec.md or plan.md missing?}
     B -- Yes --> C[CRITICAL artifact finding]
-    A --> D{Constitution MUST NOT phrase present in spec or plan?}
+    A --> D{Grounded constitutional contradiction?}
     D -- Yes --> E[CRITICAL constitution finding]
     A --> F[Scan requirement IDs in spec.md]
     F --> G{ID present in plan.md or implementation.md?}
-    G -- No --> H[HIGH coverage finding]
-    G -- Yes --> I[Mark covered, no finding]
+    G -- No --> K{Current complete grounded coverage?}
+    K -- Yes --> L[LOW structural finding]
+    K -- No --> H[HIGH coverage finding]
+    G -- Yes --> I[Mark structural reference present only]
     C --> J[Assign AN-CATEGORY-hash id]
     E --> J
     H --> J
+    L --> J
 ```
 
 ---
 
 ### Story 3 — Coverage matrix across spec, plan and implementation `P1`
 
-**As a** reviewer, **I want** the report to list every requirement, whether a plan task references it, and the coverage percentage, **so that** I can see at a glance which requirements are unplanned before implementation begins.
+**As a** reviewer, **I want** the report to list every requirement, whether a plan task references it, and the coverage percentage, **so that** I can see literal-reference gaps independently of semantic readiness.
 
 **Priority reason:** The coverage matrix turns the gate from a pass/fail switch into an actionable map of gaps, which is what lets an author fix the plan instead of guessing.
 
@@ -134,12 +158,14 @@ Feature: Requirement coverage matrix and metrics
   Scenario: Requirement covered by plan is marked covered
     Given a requirement ID referenced in plan.md
     When the analyzer runs
-    Then the coverage matrix marks it covered with task_refs including plan.md
+    Then the structural coverage matrix marks its reference present with task_refs including plan.md
+    And this alone does not certify semantic readiness
 
   Scenario: Requirement covered only by implementation is still covered
     Given a requirement ID absent from plan.md but present in implementation.md
     When the analyzer runs
-    Then the coverage matrix marks it covered with task_refs including implementation.md
+    Then the structural coverage matrix marks its reference present with task_refs including implementation.md
+    And this alone does not certify semantic readiness
 
   Scenario: Coverage percentage reflects covered over total
     Given 4 requirement IDs in spec.md and 3 of them referenced in plan.md
@@ -149,7 +175,8 @@ Feature: Requirement coverage matrix and metrics
   Scenario: No requirements yields full coverage
     Given a spec.md with no FR/AC/SC requirement IDs
     When the analyzer runs
-    Then coverage_percent equals 100.0
+    Then structural coverage_percent equals 100.0
+    And this empty structural result cannot replace mandatory semantic evidence
 ```
 
 #### User Flow
@@ -164,9 +191,12 @@ flowchart TD
     D --> G[Covered]
     F --> G
     C -- No --> H{Any ref?}
-    H -- No --> I[Uncovered, HIGH finding]
+    H -- No --> K{Current complete grounded coverage?}
+    K -- Yes --> L[LOW structural finding]
+    K -- No --> I[HIGH structural finding]
     G --> J[coverage_percent = covered / total * 100]
     I --> J
+    L --> J
 ```
 
 ---
@@ -225,15 +255,15 @@ flowchart TD
 | AC-001 | The analyze phase runs after the plan-review phase and before the preflight and implement phases as `/spec-feature` Phase 2.6, and exposes no new command surface (it reuses `/spec-check --pre-impl` → `livespec validate --pre-impl`) | P1 | Story 1 |
 | AC-002 | `analyze_feature_artifacts(feature_dir, constitution_path)` reads `spec.md`, `plan.md`, optional `implementation.md`, and `constitution.md` and returns a `PreImplAnalysisReport` without writing any file | P1 | Story 1 |
 | AC-003 | A missing `spec.md` or a missing `plan.md` each produce a CRITICAL `artifact` finding | P1 | Story 2 |
-| AC-004 | A constitution `MUST NOT <phrase>` whose phrase appears (case-insensitively) in `spec.md` or `plan.md` produces a CRITICAL `constitution` finding located at `constitution.md` | P1 | Story 2 |
-| AC-005 | A requirement ID (matching `\b(?:FR\|AC\|SC)-\d+\b`) present in `spec.md` but absent from both `plan.md` and `implementation.md` produces a HIGH `coverage` finding | P1 | Story 2 |
-| AC-006 | A requirement ID present in `plan.md` or in `implementation.md` is marked covered with the corresponding `task_refs` and produces no finding | P1 | Story 3 |
-| AC-007 | Each finding has a deterministic ID of the form `AN-<CATEGORY>-<8 hex>` derived from category, severity, locations and summary, stable across reruns on unchanged artifacts | P1 | Story 2 |
-| AC-008 | Severity is exactly one of CRITICAL/HIGH/MEDIUM/LOW; only constitution violations and missing `spec.md`/`plan.md` are CRITICAL and only an uncovered requirement is HIGH | P1 | Story 2 |
+| AC-004 | A grounded contradiction of a constitutional prohibition produces a CRITICAL constitution finding citing the current sources; phrase presence, including a negated mention, is insufficient | P1 | Story 2 |
+| AC-005 | A requirement ID present in `spec.md` but absent from plan and implementation produces a HIGH structural `coverage` finding in structural-only or semantically unready analysis; it is LOW only when a current complete grounded review covers all qualified obligations including that requirement | P1 | Story 2 |
+| AC-006 | A requirement ID present in plan or implementation is structurally covered with corresponding `task_refs` and produces no missing-reference finding; missing or contradictory semantic evidence remains independently blocking | P1 | Story 3 |
+| AC-007 | Each finding has a deterministic ID of the form `AN-<CATEGORY>-<8 hex>` derived from category, severity, locations and summary, stable across reruns on unchanged artifacts and current review evidence | P1 | Story 2 |
+| AC-008 | Severity is CRITICAL/HIGH/MEDIUM/LOW. Missing required artifacts are CRITICAL; grounded constitutional contradictions and missing, stale, incomplete or contradictory semantic evidence remain blocking. Missing references are HIGH without current complete grounded coverage and LOW only with it | P1 | Story 2 |
 | AC-009 | `has_blocking_findings(report)` returns True iff any finding is CRITICAL or HIGH, and the CLI exits 1 in that case and 0 otherwise | P2 | Story 4 |
 | AC-010 | The report exposes a findings table, a coverage matrix, and metrics (total/covered requirements, coverage percent, critical/high counts, implementation present) rendered by both `render_report_markdown` (`## Specification Analysis Report`) and `render_report_json` | P2 | Story 3 |
 | AC-011 | `--pre-impl` mode is read-only: it creates no `checks/` file, adds no changelog entry, modifies no `src/` file, and a missing `implementation.md` is not itself a failure | P2 | Story 4 |
-| AC-012 | `coverage_percent` equals covered divided by total requirements times 100 rounded to 2 decimals, and equals 100.0 when there are no requirements | P2 | Story 3 |
+| AC-012 | `coverage_percent` is structural referenced requirements divided by total requirements times 100, rounded to 2 decimals, or 100.0 with no requirements. It is not a semantic percentage: grounded paraphrases can leave LOW reference gaps, while missing or contradictory evidence still blocks mandatory readiness | P2 | Story 3 |
 
 > **Deep-link anchors:** Each AC below has a heading anchor (`#ac-001`, `#ac-002`, ...) enabling direct navigation from `implementation.md` and `@spec` comments.
 
@@ -254,27 +284,27 @@ flowchart TD
 
 ### AC-004
 
-**Criterion:** A constitution `MUST NOT <phrase>` whose phrase appears (case-insensitively) in `spec.md` or `plan.md` produces a CRITICAL `constitution` finding located at `constitution.md`
+**Criterion:** A grounded contradiction of a constitutional prohibition produces a CRITICAL constitution finding citing the current sources; phrase presence, including a negated mention, is insufficient
 **Priority:** P1 | **Story:** Story 2
 
 ### AC-005
 
-**Criterion:** A requirement ID (matching `\b(?:FR\|AC\|SC)-\d+\b`) present in `spec.md` but absent from both `plan.md` and `implementation.md` produces a HIGH `coverage` finding
+**Criterion:** A requirement ID present in `spec.md` but absent from plan and implementation produces a HIGH structural `coverage` finding in structural-only or semantically unready analysis; it is LOW only when a current complete grounded review covers all qualified obligations including that requirement
 **Priority:** P1 | **Story:** Story 2
 
 ### AC-006
 
-**Criterion:** A requirement ID present in `plan.md` or in `implementation.md` is marked covered with the corresponding `task_refs` and produces no finding
+**Criterion:** A requirement ID present in plan or implementation is structurally covered with corresponding `task_refs` and produces no missing-reference finding; missing or contradictory semantic evidence remains independently blocking
 **Priority:** P1 | **Story:** Story 3
 
 ### AC-007
 
-**Criterion:** Each finding has a deterministic ID of the form `AN-<CATEGORY>-<8 hex>` derived from category, severity, locations and summary, stable across reruns on unchanged artifacts
+**Criterion:** Each finding has a deterministic ID of the form `AN-<CATEGORY>-<8 hex>` derived from category, severity, locations and summary, stable across reruns on unchanged artifacts and current review evidence
 **Priority:** P1 | **Story:** Story 2
 
 ### AC-008
 
-**Criterion:** Severity is exactly one of CRITICAL/HIGH/MEDIUM/LOW; only constitution violations and missing `spec.md`/`plan.md` are CRITICAL and only an uncovered requirement is HIGH
+**Criterion:** Severity is CRITICAL/HIGH/MEDIUM/LOW. Missing required artifacts are CRITICAL; grounded constitutional contradictions and missing, stale, incomplete or contradictory semantic evidence remain blocking. Missing references are HIGH without current complete grounded coverage and LOW only with it
 **Priority:** P1 | **Story:** Story 2
 
 ### AC-009
@@ -294,7 +324,7 @@ flowchart TD
 
 ### AC-012
 
-**Criterion:** `coverage_percent` equals covered divided by total requirements times 100 rounded to 2 decimals, and equals 100.0 when there are no requirements
+**Criterion:** `coverage_percent` is structural referenced requirements divided by total requirements times 100, rounded to 2 decimals, or 100.0 with no requirements. It is not a semantic percentage: grounded paraphrases can leave LOW reference gaps, while missing or contradictory evidence still blocks mandatory readiness
 **Priority:** P2 | **Story:** Story 3
 
 ---
@@ -308,14 +338,14 @@ flowchart TD
 | FR-001 | The system must run the analyze step as an integrated `/spec-feature` Phase 2.6 positioned after plan-review and before preflight and implement, reusing `/spec-check --pre-impl` (`livespec validate --pre-impl`) without adding a new command | AC-001, AC-011 |
 | FR-002 | The system must provide `analyze_feature_artifacts(feature_dir, constitution_path)` that reads `spec.md`, `plan.md`, optional `implementation.md` and `constitution.md` and returns a `PreImplAnalysisReport` without writing any file | AC-002 |
 | FR-003 | The system must emit a CRITICAL `artifact` finding for a missing `spec.md` and for a missing `plan.md` | AC-003 |
-| FR-004 | The system must extract each constitution `MUST NOT <phrase>` and emit a CRITICAL `constitution` finding when the phrase appears case-insensitively in `spec.md` or `plan.md` | AC-004 |
-| FR-005 | The system must collect requirement IDs from `spec.md` via the pattern `\b(?:FR\|AC\|SC)-\d+\b` and mark each covered iff its token appears in `plan.md` or `implementation.md`, emitting a HIGH `coverage` finding for each uncovered requirement | AC-005, AC-006 |
+| FR-004 | The system must emit a CRITICAL `constitution` finding only for a grounded contradiction of a constitutional prohibition, never from phrase presence alone | AC-004 |
+| FR-005 | The system must collect requirement IDs from `spec.md` and record structural coverage iff their tokens appear in plan or implementation. Missing references are HIGH in structural-only or semantically unready analysis, and LOW only when a current complete grounded review covers all qualified obligations including the requirement; semantic contradictions or missing evidence remain blocking | AC-005, AC-006 |
 | FR-006 | The system must derive each finding ID as `AN-<CATEGORY>-<first 8 hex of sha1(category\|severity\|locations\|summary)>` so identical artifacts yield identical IDs | AC-007 |
-| FR-007 | The system must restrict severity to the CRITICAL/HIGH/MEDIUM/LOW set, with CRITICAL reserved for constitution violations and missing `spec.md`/`plan.md` and HIGH reserved for an uncovered requirement | AC-008 |
+| FR-007 | The system must use CRITICAL/HIGH/MEDIUM/LOW, emit CRITICAL for missing required artifacts and keep constitutional contradictions or missing, stale, incomplete or contradictory semantic evidence blocking. Missing structural references are HIGH unless a current complete grounded review covers all qualified obligations including that requirement, when they are LOW | AC-008 |
 | FR-008 | The system must expose `has_blocking_findings(report)` that is True iff any finding is CRITICAL or HIGH, and the `--pre-impl` CLI branch must exit 1 when it is True and 0 otherwise | AC-009 |
 | FR-009 | The system must render the report as a `## Specification Analysis Report` markdown document (findings table, coverage matrix, metrics) via `render_report_markdown` and as a structured object via `render_report_json` | AC-010 |
 | FR-010 | The `--pre-impl` CLI branch must be read-only: it must create no `checks/` file, add no changelog entry, modify no `src/` file, and must treat a missing `implementation.md` as non-fatal | AC-011 |
-| FR-011 | The system must compute `coverage_percent` as covered over total requirements times 100 rounded to 2 decimals, defaulting to 100.0 when there are no requirements | AC-012 |
+| FR-011 | The system must compute structural `coverage_percent` as referenced over total requirements times 100 rounded to 2 decimals, defaulting to 100.0 when there are no requirements; this metric never certifies semantic readiness | AC-012 |
 
 > **Deep-link anchors:** Each FR below has a heading anchor (`#fr-001`, `#fr-002`, ...) enabling direct navigation from `implementation.md` and `@spec` comments.
 
@@ -336,12 +366,12 @@ flowchart TD
 
 ### FR-004
 
-**Requirement:** The system must extract each constitution `MUST NOT <phrase>` and emit a CRITICAL `constitution` finding when the phrase appears case-insensitively in `spec.md` or `plan.md`
+**Requirement:** The system must emit a CRITICAL `constitution` finding only for a grounded contradiction of a constitutional prohibition, never from phrase presence alone
 **AC References:** [AC-004](#ac-004)
 
 ### FR-005
 
-**Requirement:** The system must collect requirement IDs from `spec.md` via the pattern `\b(?:FR\|AC\|SC)-\d+\b` and mark each covered iff its token appears in `plan.md` or `implementation.md`, emitting a HIGH `coverage` finding for each uncovered requirement
+**Requirement:** The system must collect requirement IDs from `spec.md` and record structural coverage iff their tokens appear in plan or implementation. Missing references are HIGH in structural-only or semantically unready analysis, and LOW only when a current complete grounded review covers all qualified obligations including the requirement; semantic contradictions or missing evidence remain blocking
 **AC References:** [AC-005](#ac-005), [AC-006](#ac-006)
 
 ### FR-006
@@ -351,7 +381,7 @@ flowchart TD
 
 ### FR-007
 
-**Requirement:** The system must restrict severity to the CRITICAL/HIGH/MEDIUM/LOW set, with CRITICAL reserved for constitution violations and missing `spec.md`/`plan.md` and HIGH reserved for an uncovered requirement
+**Requirement:** The system must use CRITICAL/HIGH/MEDIUM/LOW, emit CRITICAL for missing required artifacts and keep constitutional contradictions or missing, stale, incomplete or contradictory semantic evidence blocking. Missing structural references are HIGH unless a current complete grounded review covers all qualified obligations including that requirement, when they are LOW
 **AC References:** [AC-008](#ac-008)
 
 ### FR-008
@@ -371,7 +401,7 @@ flowchart TD
 
 ### FR-011
 
-**Requirement:** The system must compute `coverage_percent` as covered over total requirements times 100 rounded to 2 decimals, defaulting to 100.0 when there are no requirements
+**Requirement:** The system must compute structural `coverage_percent` as referenced over total requirements times 100 rounded to 2 decimals, defaulting to 100.0 when there are no requirements; this metric never certifies semantic readiness
 **AC References:** [AC-012](#ac-012)
 
 ---
@@ -389,14 +419,16 @@ flowchart TD
 
 ### Classification Rules
 
-> The severity assignment (FR-007) is closed-form. The four categories the analyzer assigns are:
+> The severity assignment (FR-007) is closed-form. The structural and semantic finding categories are:
 
 | Category | Trigger | Severity |
 |---|---|---|
 | artifact | `spec.md` or `plan.md` missing | CRITICAL |
-| constitution | a constitution `MUST NOT <phrase>` appears in spec or plan | CRITICAL |
-| coverage | a `spec.md` requirement ID absent from plan and implementation | HIGH |
-| (none) | a requirement ID referenced in plan or implementation | covered, no finding |
+| constitution | grounded contradiction of a constitutional prohibition, never phrase presence alone | CRITICAL |
+| coverage | literal reference absent; structural-only or semantically unready | HIGH |
+| coverage | literal reference absent; current complete grounded review covers all qualified obligations including this requirement | LOW |
+| semantic | missing, stale, incomplete, ambiguous or contradictory evidence | HIGH |
+| structural reference | ID referenced in plan or implementation | structurally covered; semantic findings remain independent |
 
 ---
 
@@ -405,12 +437,12 @@ flowchart TD
 > Scenarios that aren't in the happy path but must be handled correctly.
 
 - **Missing implementation.md:** Treated as non-fatal; coverage falls back to plan references only and the report's `implementation_present` metric is 0 (AC-011, FR-005).
-- **No requirement IDs in spec:** `coverage_percent` defaults to 100.0 and no coverage findings are emitted (AC-012, FR-011).
+- **No requirement IDs in spec:** Structural `coverage_percent` defaults to 100.0 and no missing-reference findings are emitted; this does not establish mandatory semantic readiness (AC-012, FR-011).
 - **Duplicate requirement IDs in spec:** Each ID is counted once via ordered de-duplication, so the coverage total reflects unique requirements (FR-005).
-- **Empty constitution MUST NOT phrase:** A `MUST NOT` clause with no trailing phrase is skipped, never producing an empty-phrase finding (FR-004).
+- **No grounded contradiction:** An empty prohibition phrase or a negated mention cannot establish a constitutional violation by lexical matching; unresolved semantic evidence still blocks readiness (FR-004).
 - **Requirement covered only by implementation.md:** Still counted as covered, with `task_refs` listing `implementation.md` (AC-006).
-- **Only MEDIUM/LOW findings:** The CLI exits 0 and the warnings are surfaced without blocking the pipeline (AC-009).
-- **Re-run on unchanged artifacts:** Produces byte-identical finding IDs and severities because every score is closed-form (AC-007).
+- **Only MEDIUM/LOW findings:** The CLI exits 0 with diagnostics; mandatory progression still requires its current complete semantic evidence, which prevents missing/contradictory evidence from yielding this nonblocking case (AC-009).
+- **Re-run on unchanged artifacts and review evidence:** Produces identical finding IDs and severities; changed governing inputs invalidate review readiness (AC-007).
 - **Path is a file vs a directory:** When `--pre-impl` targets a file, the analyzer resolves its parent as the feature directory before reading artifacts (FR-001).
 
 ---
@@ -430,9 +462,9 @@ flowchart TD
 
 ## Clarifications
 
-> The Clarify gate (Phase 1.6) executed on this spec during the pipeline. `rank_clarification_opportunities(scan_clarification_opportunities(spec))` returned an empty queue (0 raw opportunities): the spec contains no vague quality adjective used without a standalone numeric token, no `[NEEDS CLARIFICATION]` placeholder, and no unconfirmed `[ASSUMED]`/`TBD` marker. Per the gate's empty-queue behavior, no question was asked and no spec text was rewritten.
+> Historical observation from 2026-06-27, retained as recorded below; it is not current clarification or semantic-readiness evidence. The original digit-anywhere detector description was superseded by the current clarification policy. The Clarify gate (Phase 1.6) executed on this spec during that pipeline. `rank_clarification_opportunities(scan_clarification_opportunities(spec))` returned an empty queue (0 raw opportunities): the spec contains no vague quality adjective used without a standalone numeric token, no `[NEEDS CLARIFICATION]` placeholder, and no unconfirmed `[ASSUMED]`/`TBD` marker. Per the gate's empty-queue behavior, no question was asked and no spec text was rewritten.
 
-### Session 2026-06-27
+### Session 2026-06-27 — Historical record
 
 - Clarify gate: no ambiguities — empty ranked queue (0 opportunities); pipeline continued to the plan phase without prompting.
 

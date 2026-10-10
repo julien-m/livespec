@@ -3,9 +3,56 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-09-05
+> Last updated: 2026-10-10
 
 ---
+
+## 2026-10-10 — Fix existing-owner review and new-goal identity; 2 functional gaps closed, selected acceptance mapping independently ready
+<!-- finalize:spec-fix:2026-10-10:556265bd -->
+
+## 2026-10-10 — [Feature 078] Check: post-fix canonical identity verified; acceptance capture pending
+
+Read the [independent gap report](features/078-requirement-evidence-integrity/checks/2026-10-10.md): G001/G002/C001 closed; three bounded FR/AC identity rows verified, no full16FR/16AC re-certification. Current genuine selected mapping review is complete/ready; final runner-owned capture pending. Worker177/63 tests and Ruff pass with provenance retained; three unrelated structural errors remain. No source/test changes by checker.
+
+<!-- check:94d7f83c:post-fix -->
+
+## 2026-10-10 — [Feature 078] Check: initial FR-004 canonical feature identity gaps
+
+Read the [initial report](features/078-requirement-evidence-integrity/checks/2026-10-10.md): 0/3 selected alignment rows verified, three Partial; two HIGH functional gaps and one LOW documentation convention gap. Six existing structural errors retained; no source/test changes or acceptance certification.
+
+## 2026-10-09 — [Feature 079] Plan validated: Autonomous From-Code Recovery — 6 steps, 2 diagrams; required frontmatter and Summary restored
+<!-- finalize:spec-plan:2026-10-09:bcaf92c9 -->
+
+## 2026-10-09 — [Feature 079] Plan created: Autonomous From-Code Recovery — 6 implementation steps, 2 diagrams
+<!-- finalize:spec-plan:2026-10-09:ba349e73 -->
+
+## 2026-10-09 — [Feature 058] Check: initial lifecycle closure audit — two HIGH lifecycle gaps and three convention errors; 127 scoped tests pass
+
+Read the [initial gap report](features/058-deterministic-finalization/checks/2026-10-09.md).
+
+## 2026-10-09 — Feature079 Plan created: Autonomous From-Code Recovery — 6 implementation steps, 2 diagrams
+<!-- finalize:spec-plan:2026-10-09:1bde99f4 -->
+
+## 2026-10-09 — [Feature 079] Spec created: Autonomous From-Code Recovery — 2 stories, 6 AC, 4 FR; native semantic review ready, implementation pending
+<!-- finalize:spec-specify:2026-10-09:2dbaa83d -->
+
+## 2026-10-09 — Filtered FR-002/AC-002 reference-discovery repair registry synchronized; feature In Progress
+<!-- finalize:spec-fix:2026-10-09:9aab10f2 -->
+
+## 2026-09-06 — [Feature 078] Test: 100% AC definitions covered (16/16), 0 tests generated; deterministic scope passed with historical limits retained
+<!-- finalize:spec-test:2026-09-06:aebeee31 -->
+
+## 2026-09-06 — [Feature 078] Implementation lifecycle: requirement evidence integrity
+<!-- finalize:spec-implement:2026-09-06:183269a4 -->
+
+## 2026-09-06 — Requirement Evidence Integrity: linked four success criteria to existing steps and evidence; scope unchanged
+<!-- finalize:spec-plan:2026-09-06:b64026f3 -->
+
+## 2026-09-06 — Requirement Evidence Integrity: plan created with eight steps across three lots and explicit proof boundaries
+<!-- finalize:spec-plan:2026-09-06:752c710f -->
+
+## 2026-09-06 — Feature078: specify requirement evidence integrity across five axes
+<!-- finalize:spec-specify:2026-09-06:165bc17e -->
 
 ## 2026-09-05 — [Feature 077] Implemented: Penflow cumulative verification consumer and governed lifecycle closure
 <!-- finalize:spec-implement:2026-09-05:6ce4661e -->
@@ -13,6 +60,58 @@
 ## 2026-09-05 — Feature 077: Composed procedure and selector authority
 
 Automatic active-plan policy union preserves earlier required procedures; the read-only pre-review C20 selector gate delegates to Penflow. Canonical fixture tests use the real CLI. Native source approval accepted; final runtime/closure/import proofs remain pending.
+
+## 2026-09-04 — Preserve Feature 076 eager legacy task validation with 179 regressions
+<!-- finalize:spec-test:2026-09-04:79b41969 -->
+
+## 2026-09-04 — Preserve Feature 076 legacy task-field compatibility with 179 regressions
+<!-- finalize:spec-test:2026-09-04:1faecba9 -->
+
+## 2026-09-04 — Preserve Feature 076 non-init compatibility and cooperative archive boundary
+<!-- finalize:spec-test:2026-09-04:43831902 -->
+
+## 2026-09-04 — Close Feature 076 boundary review with 185 feature tests and confined archive publication
+<!-- finalize:spec-test:2026-09-04:9398704c -->
+
+## 2026-09-04 — Feature 076 final concurrency review closed: 183 feature tests and locked exclusive archive publication
+<!-- finalize:spec-test:2026-09-04:c7b5977d -->
+
+## 2026-09-04 — Feature 076 final publication verified: 182 feature tests and exclusive inode-owned archive publication
+<!-- finalize:spec-test:2026-09-04:128dece7 -->
+
+## 2026-09-04 — Feature 076 final fingerprint verified: 180 feature tests and inode-owned archive writes
+<!-- finalize:spec-test:2026-09-04:9637faa2 -->
+
+## 2026-09-04 — Feature 076 final security review closed: 177 feature tests, pinned archive traversal and ownership verified
+<!-- finalize:spec-test:2026-09-04:b5339c37 -->
+
+## 2026-09-04 — [Feature 076] Second security review closed: 175 feature tests, descriptor lifetime and ownership verified
+<!-- finalize:spec-test:2026-09-04:ac9f0e2b -->
+
+## 2026-09-04 — [Feature 076] Final audit remediation verified: descriptor-safe archive, typed boundaries, 170 feature tests
+<!-- finalize:spec-test:2026-09-04:5d267080 -->
+
+## 2026-09-04 — [Feature 076] Test: 100% AC covered (10/10), 11 tests generated — Feature PASS; one external catalog regression and six non-feature format files remain repository follow-up
+<!-- finalize:spec-test:2026-09-04:24b126d1 -->
+
+## 2026-09-04 — [Feature 076] Implemented after independent review: complete schema pairing, 158 feature cases, confined archive writes, strict non-init compatibility
+<!-- finalize:spec-implement:2026-09-04:9e1ef40b -->
+
+## 2026-09-04 — [Feature 076] Initial implementation completed: canonical fresh root, fail-closed proof, contained archive, strict non-init compatibility
+<!-- finalize:spec-implement:2026-09-04:a98e152e -->
+
+## 2026-09-04 — [Feature 076] Plan refined: explicit SC-002, SC-003, and SC-004 mappings to existing steps, tests, and quality gates
+
+## 2026-09-04 — [Feature 076] Plan created: Spec Init Goal Bootstrap — 6 implementation steps, 3 diagrams
+<!-- finalize:spec-plan:2026-09-04:89422724 -->
+
+## 2026-09-04 — [Feature 076] Plan finalized: approved six-step implementation and quality-gate sequence
+<!-- finalize:spec-plan:2026-09-04:28e16cfb -->
+
+## 2026-09-04 — [Feature 076] Spec created: Spec Init Goal Bootstrap — 3 stories, 10 AC, 12 FR
+<!-- finalize:spec-specify:2026-09-04:14b0e052 -->
+
+## 2026-09-04 — [Feature 076] Spec refined: archive confinement, atomic pairing, external evidence boundary, and goal-state transitions clarified
 
 ## 2026-07-04 -- [Feature 075] Implemented: Design Direction Carry -- optional informative design direction line through generated specs without validation use
 
@@ -617,3 +716,30 @@ Automatic active-plan policy union preserves earlier required procedures; the re
 - **Author:** spec.init --from-code
 
 ---
+
+## 2026-10-09 — [Feature 076] Check: bootstrap contract verified
+
+- Existing FR 12/12 and AC 10/10 verified; 185 tests passed. Autonomous backend has six high gaps requiring contract extension; Handy initialization unverified. Read [the audit](features/076-spec-init-goal-bootstrap/checks/2026-10-09.md).
+
+
+## 2026-10-09 — Check: Feature 078 scoped FR-002 discovery audit
+
+- [Feature 078] Check: selected FR-002/AC-002 partial (0/1 fully verified); raw examples/descriptive links produce unresolved dependencies. Read [report](features/078-requirement-evidence-integrity/checks/2026-10-09.md). Goal18b10b99; no source edits.
+
+
+## 2026-10-09 — [Check]: Feature078 scoped discovery audit300k
+
+- [Feature078] Check: selectedFR-002/AC-002 remain partial (0/1 fully verified each);079 canonical preparation still has24 unresolved references. Read [report](features/078-requirement-evidence-integrity/checks/2026-10-09.md#fresh-initial-check--explicit-300000-character-budget). Goal8633e818;no source edits.
+
+
+## 2026-10-09 — [Check]: Feature078 post-fix scoped discovery verification
+
+- [Feature078] SelectedFR-002/AC-002 discoverybehavior independently verified;61 boundedtests,079 context5sources/0errors at300k and diagnosticdefault60k. Outside-scope warnings retained. Read [report](features/078-requirement-evidence-integrity/checks/2026-10-09.md#independent-post-fix-check). No checker source edits;freshpostfix state8633e818.
+
+
+## 2026-10-09 — [Feature 078] Fix: FR-002/AC-002 normative reference discovery;123 scoped tests passed, independent check complete, full feature remains In Progress
+
+### 2026-10-09 — Feature 063 Check: final gate before correction (8d60f7ad)
+
+- Lecture spec/code 72 % : 6/10 FR et 12/15 AC Verified, 5 Partial et 2 Drifted ; aucun test ou PASS global actuel certifié.
+- 4 HIGH, 1 MEDIUM, 1 LOW ; spec/code non modifiés par le checker. Lire [le rapport](features/063-conventions-blocking-pipeline/checks/2026-10-09.md).

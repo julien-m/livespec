@@ -230,13 +230,13 @@ class TestReviewPlan:
         assert result.complexity["fr_count"] == 3
         assert result.complexity["diagram_count"] == 2
 
-    def test_default_model_label(self):
+    def test_default_model_stays_unresolved(self):
         response = self._mock_response([])
 
         with patch("validator.llm_provider.call_llm", return_value=response):
             result = review_plan(SAMPLE_SPEC, SAMPLE_PLAN, model=None)
 
-        assert result.reviewer_model == "default"
+        assert result.reviewer_model == ""
 
     def test_raises_on_invalid_json(self):
         with (

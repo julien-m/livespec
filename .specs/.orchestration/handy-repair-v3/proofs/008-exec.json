@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "livespec",
+    "goal",
+    "prove",
+    "--contract",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/livespec-goals/goal-spec-fix-370fa9ce.contract.json",
+    "--state",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/controls/livespec-goals/goal-spec-fix-370fa9ce.state.json",
+    "--task",
+    "fix.child_goal.spec_check",
+    "--evidence",
+    "/Users/julienm/projects/livespec/.specs/.orchestration/handy-repair-v3/proofs/008.json"
+  ],
+  "cwd": "/Users/julienm/projects/livespec",
+  "exit": 0,
+  "stdout": "{\n  \"task_id\": \"fix.child_goal.spec_check\",\n  \"status\": \"ACCEPTED\",\n  \"accepted\": true,\n  \"missing_evidence\": [],\n  \"invalid_substitutes\": [],\n  \"required_actions\": [\n    \"spawn the required independent native sub-agent and let it create its own goal\",\n    \"record the child goal hash, contract file, state file, final status, and artifacts\",\n    \"Read and apply conventions before retrying: domains=code; sources=$AIRESOURCES/code-conventions/general.md, $AIRESOURCES/code-conventions/python.md, $AIRESOURCES/code-conventions/javascript.md, $AIRESOURCES/code-conventions/cli.md, $AIRESOURCES/code-conventions/stack-commands.md.\"\n  ]\n}\n",
+  "stderr": ""
+}
