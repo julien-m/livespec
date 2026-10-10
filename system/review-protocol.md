@@ -6,6 +6,7 @@
 - Add `--model=<actual-model>` to internal active flags even when the user supplied no flags. Forward it unchanged to every child command and child `goal render`, review preparation/ingestion, Analyze and progression gate. An explicit review budget follows the same path through `--review-max-chars`.
 - If unresolved, stop immediately with `BLOCKED at step 0 - prerequisite_unmet - reviewer_model_unresolved`; obtain available runtime metadata internally. No extra user command or configuration is required. The CLI refuses to save an unusable review-bearing goal.
 - Deterministic commands and pre-configuration bootstrap without review tasks or documentary acceptance receipts need no model identity; existing immutable goals keep their original policy.
+- Resolve an existing short feature slug only when exactly one confined feature directory matches. Review APIs and new existing-feature goals use that directory's actual numbered or historical identity for sources, qualified obligations and receipt paths. Explicit numbered requests remain exact; absent, ambiguous, linked or escaped owners fail closed without allocating a feature. Read the [existing-owner resolver](../validator/semantic/review_feature_scope.py). Existing immutable goals retain their bytes; consuming a historical short-bound review obligation resolves the actual owner without changing the contract or relaxing source, purpose, model or policy checks.
 
 
 <!-- @spec FR-002: Shared native review protocol — .specs/features/078-requirement-evidence-integrity/spec.md#fr-002 -->
@@ -44,6 +45,14 @@ flowchart LR
 - Read the returned receipt and diagnostics. `complete` means exhaustive valid grounding; `ready` additionally requires covered conclusions and no unresolved critical ambiguity, blocking finding or unapproved scope. Missing, partial, malformed or stale review cannot establish readiness. Return the actual receipt path with the phase result.
 - Generated `.reviews/spec.json` and `.reviews/plan.json` are disposable caches, not a second source of truth. Source/dependency, reviewer model, prompt/schema/policy changes invalidate reuse. Only the explicitly normalized selected spec/plan lifecycle metadata is excluded from normative identity; changed requirement meaning always invalidates it. Preserve archived raw source identity and historical verdicts.
 - UI and accepted Penflow history still require the existing bound snapshot/result and cumulative certification. This semantic receipt supplements that authority; it does not replace it.
+
+### Discover source dependencies
+
+- Discover genuine inline, reference-style and table Markdown links with the existing Markdown parser. Fenced/indented code, inline code, escaped literals and HTML remain in the exact submitted source bytes; illustrative link syntax inside them creates no dependency edge.
+- A genuine local `.md` link defaults to a normative referenced contract: load its full bytes, recursively resolve its genuine links, retain qualified obligations and fail closed on missing, external or outside-project contracts. A URL fragment conservatively retains the full target document; it never hides later obligations. Cycles terminate and the existing 128-source bound reports incomplete inventory.
+- Adjacent `Inspect [source](...)`, `Informative: [source](...)` or `Non-normative: [source](...)` wording declares context. Load a local inspected document entirely with exact hashes/sections, without importing its internal documentation graph or descriptive FR/AC IDs as normative obligations. Explicit informative external links remain in submitted text without asserting that the external contract was read. Mandatory wording (`must`, `shall`, `required`, `read`) in the same sentence preserves normative authority.
+- A later normative edge promotes an already inspected context source and traverses its full contract closure. Canonical spec, plan, constitution, project and stack roles never become descriptive context. Context byte changes invalidate reuse through the same governed identity.
+- Operational review budgets are explicit. A separately prepared assertion-mapping review retains its own schema-supported budget and identity; it cannot relabel or replace a feature spec/plan review budget.
 
 ## Clarification without lost questions
 
