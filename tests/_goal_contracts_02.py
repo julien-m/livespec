@@ -163,62 +163,71 @@ def test_compile_command_goal_is_reproducible_for_same_inputs(tmp_path: Path) ->
         "--priority=P1",
         "--strict",
     ]
-    assert first.payload["expectation_sections"]["filesystem_effects"] == ["- creates demo.txt."]
-    assert first.payload["expectation_sections"]["post_run_checks"] == ["- [ ] output checked."]
+    assert first.payload["expectations"]["command"] == "spec-demo"
+    assert first.payload["stop_condition"]["argv"] == [
+        "livespec",
+        "validate",
+        ".specs/features/052-deterministic-command-goal-contracts",
+    ]
     assert "timestamp" not in first.canonical_json.lower()
 
 
-def test_compile_command_goal_embeds_code_convention_domains(tmp_path: Path) -> None:
+# @spec FR-001: One stop condition, FR-003: Goal scope
+#   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-001
+def test_compile_command_goal_records_stop_condition_and_requirement(tmp_path: Path) -> None:
     project_root, livespec_root = _fixture_roots(tmp_path)
     _write_conventions(project_root, tmp_path / "ai")
 
-    goal = compile_command_goal(
+    interactive = compile_command_goal(
         "demo",
         project_root=project_root,
         livespec_root=livespec_root,
         feature="001-demo",
         flags="--strict",
     )
+    autonomous = compile_command_goal(
+        "demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-demo",
+        flags="--auto",
+    )
 
-    conventions = goal.payload["conventions"]
-    assert conventions["index_path"] == ".conventions/index.md"
-    assert [domain["name"] for domain in conventions["selected_domains"]] == ["code"]
-    assert conventions["selected_domains"][0]["source_files"] == [
-        {
-            "path": "$AIRESOURCES/code-conventions/general.md",
-            "sha256": conventions["selected_domains"][0]["source_files"][0]["sha256"],
-            "content": "# General\n- Prefer explicit typed APIs.",
-        },
-        {
-            "path": "$AIRESOURCES/code-conventions/python.md",
-            "sha256": conventions["selected_domains"][0]["source_files"][1]["sha256"],
-            "content": "# Python\n- Use pytest for tests.",
-        },
-    ]
+    assert interactive.payload["goal_requirement"] == "optional"
+    # An auto flag only requires a goal for autonomous-capable commands (081 AC-003).
+    assert autonomous.payload["goal_requirement"] == "optional"
+    assert interactive.payload["stop_condition"] == {
+        "argv": ["livespec", "validate", ".specs/features/001-demo"],
+        "display": "livespec validate .specs/features/001-demo exits 0",
+        "scope": "feature",
+    }
+    assert "conventions" not in interactive.payload
+    assert "Stop condition: livespec validate .specs/features/001-demo exits 0" in (
+        interactive.objective
+    )
 
 
-def test_compile_command_goal_adds_design_domain_for_ui_feature(tmp_path: Path) -> None:
+def test_compile_command_goal_scopes_stop_condition_to_existing_feature(tmp_path: Path) -> None:
     project_root, livespec_root = _fixture_roots(tmp_path)
-    _write_conventions(project_root, tmp_path / "ai")
     feature_dir = project_root / ".specs" / "features" / "002-ui"
     feature_dir.mkdir(parents=True)
-    (feature_dir / "spec.md").write_text(
-        "# UI Feature\n\nBuild a mockup-driven visual screen with spacing tokens.",
-        encoding="utf-8",
-    )
+    (feature_dir / "spec.md").write_text("# UI Feature\n", encoding="utf-8")
 
     goal = compile_command_goal(
         "demo",
         project_root=project_root,
         livespec_root=livespec_root,
-        feature="002-ui",
+        feature="ui",
         flags="--visual",
     )
 
-    selected = goal.payload["conventions"]["selected_domains"]
-    assert [domain["name"] for domain in selected] == ["code", "design-tokens"]
-    assert "design-tokens" in goal.objective
-    assert "$AIRESOURCES/design/tokens.md" in goal.objective
+    assert goal.payload["feature"] == "002-ui"
+    assert goal.payload["stop_condition"]["argv"] == [
+        "livespec",
+        "validate",
+        ".specs/features/002-ui",
+    ]
+    assert goal.payload["stop_condition"]["scope"] == "feature"
 
 
 def _write_check_fix_files_01(project_root: Path, feature_dir: Path, feature: str) -> None:

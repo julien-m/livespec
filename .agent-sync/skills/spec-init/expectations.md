@@ -1,7 +1,7 @@
 ---
 command: spec-init
 contract_version: "1.0"
-last_reviewed: 2026-10-09
+last_reviewed: 2026-10-10
 ---
 
 <!-- @spec(FR-001) -->

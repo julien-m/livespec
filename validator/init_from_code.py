@@ -169,8 +169,8 @@ def _generate(
         require_success(result, "required tooling")
     if detect_profile(root) != profile:
         raise InitError("current source/profile identity drift during initialization")
-    if time.monotonic() >= deadline:
-        raise InitError("total initialization deadline exhausted before completion")
+    # @spec FR-008: Never fail a verified run on the elapsed deadline (subprocesses are bounded)
+    #   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-008
     documents.update(_integration_artifacts(root))
     documents[".specs/preflight-report.md"] = report
     recap = """---

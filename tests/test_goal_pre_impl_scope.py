@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
+from tests.goal_checklist_support import checklist_tasks
 from validator.cli import app
 from validator.goal_contracts import compile_command_goal
 from validator.verify_output import evaluate_rules
@@ -47,7 +48,7 @@ def test_preparation_contract_excludes_post_implementation_tasks(
     goal = compile_command_goal(
         "spec-check", project_root=tmp_path, livespec_root=REPO_ROOT, feature=FEATURE, flags=flags
     )
-    tasks = [task["description"] for task in goal.payload["tasks"]]
+    tasks = [task["description"] for task in checklist_tasks(goal.payload)]
     forbidden = (
         "Read implementation map from",
         "Verify each FR/AC against actual code",
@@ -78,7 +79,7 @@ def test_default_full_check_keeps_implementation_and_visual_proof(tmp_path: Path
     goal = compile_command_goal(
         "spec-check", project_root=tmp_path, livespec_root=REPO_ROOT, feature=FEATURE
     )
-    tasks = [task["description"] for task in goal.payload["tasks"]]
+    tasks = [task["description"] for task in checklist_tasks(goal.payload)]
     for required in (
         "Read implementation map from",
         "Verify each FR/AC against actual code",

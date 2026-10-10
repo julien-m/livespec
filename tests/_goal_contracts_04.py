@@ -113,8 +113,10 @@ Personal QE addendum only.
     assert "qe.analysis" in [task["id"] for task in contract["tasks"]]
 
 
-def test_rendered_goal_tasks_replay_required_conventions(tmp_path: Path) -> None:
-    """AC-001/AC-002/AC-007/AC-008: tasks replay convention domains and sources."""
+# @spec FR-006: No per-task convention proofs
+#   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-006
+def test_rendered_goal_tasks_carry_no_per_task_convention_proofs(tmp_path: Path) -> None:
+    """081 AC-006: conventions are gated once, never replayed task by task."""
     project_root, livespec_root = _fixture_roots(tmp_path)
     _write_conventions(project_root, tmp_path / "ai")
     _write_execution_task_skill(livespec_root)
@@ -128,25 +130,20 @@ def test_rendered_goal_tasks_replay_required_conventions(tmp_path: Path) -> None
     )
     contract = json.loads(render_goal_contract_file(goal))
 
-    first_task = contract["tasks"][0]
-    assert first_task["required_conventions"] == {
-        "mode": "read_apply",
-        "domains": ["code"],
-        "source_paths": [
-            "$AIRESOURCES/code-conventions/general.md",
-            "$AIRESOURCES/code-conventions/python.md",
-        ],
-    }
-    assert "convention_domains_recorded" in first_task["required_evidence"]
-    assert "convention_sources_read" in first_task["required_evidence"]
-    assert "conventions_applied_to_output" in first_task["required_evidence"]
-    assert any("Read and apply conventions" in action for action in first_task["repair_if_missing"])
-    assert "Task-level convention replay:" in goal.objective
-    assert "task.001.always_task" in goal.objective
+    assert "conventions" not in goal.payload
+    for task in contract["tasks"]:
+        assert "required_conventions" not in task
+        assert not {
+            "convention_domains_recorded",
+            "convention_sources_read",
+            "conventions_applied_to_output",
+        } & set(task["required_evidence"])
+    assert "Task-level convention replay:" not in goal.objective
+    assert "Always task" in contract["checklist"]
 
 
-def test_goal_prove_rejects_missing_convention_evidence(tmp_path: Path) -> None:
-    """AC-003/AC-004/AC-005: convention-scoped tasks require convention proof."""
+def test_goal_prove_rejects_checklist_rows_as_unknown_tasks(tmp_path: Path) -> None:
+    """081 AC-001: indicative checklist rows are not proof obligations."""
     project_root, livespec_root = _fixture_roots(tmp_path)
     _write_conventions(project_root, tmp_path / "ai")
     _write_execution_task_skill(livespec_root)
@@ -158,29 +155,25 @@ def test_goal_prove_rejects_missing_convention_evidence(tmp_path: Path) -> None:
     )
     contract = json.loads(render_goal_contract_file(goal))
     state = json.loads(render_goal_state_file(goal))
-    task_id = contract["tasks"][0]["id"]
 
+    assert [task["id"] for task in contract["tasks"]] == ["outcome.verified", "archive.run"]
     result = prove_goal_task(
         contract,
         state,
-        task_id,
+        "task.001.always_task",
         evidence={"output": "done", "success_criteria_met": True},
         project_root=project_root,
     )
 
-    assert result["status"] == "REJECTED_NEEDS_ACTION"
-    assert result["missing_evidence"] == [
-        "convention_domains_recorded",
-        "convention_sources_read",
-        "conventions_applied_to_output",
-    ]
+    assert result["status"] == "REJECTED_UNKNOWN_TASK"
 
 
-def test_goal_prove_accepts_matching_convention_evidence(tmp_path: Path) -> None:
-    """AC-006: matching convention evidence satisfies convention-scoped tasks."""
+@pytest.mark.real_stop_condition
+def test_goal_prove_outcome_accepts_passing_stop_condition(tmp_path: Path) -> None:
+    """081 AC-002: the goal runs the stop condition; an existing artifact covers a silent check."""
     project_root, livespec_root = _fixture_roots(tmp_path)
-    _write_conventions(project_root, tmp_path / "ai")
     _write_execution_task_skill(livespec_root)
+    (project_root / "demo.txt").write_text("done\n", encoding="utf-8")
     goal = compile_command_goal(
         "spec-demo",
         project_root=project_root,
@@ -189,27 +182,27 @@ def test_goal_prove_accepts_matching_convention_evidence(tmp_path: Path) -> None
     )
     contract = json.loads(render_goal_contract_file(goal))
     state = json.loads(render_goal_state_file(goal))
-    task_id = contract["tasks"][0]["id"]
 
     result = prove_goal_task(
         contract,
         state,
-        task_id,
-        evidence={
-            "output": "done",
-            "success_criteria_met": True,
-            "convention_domains": ["code"],
-            "convention_sources": [
-                "$AIRESOURCES/code-conventions/general.md",
-                "$AIRESOURCES/code-conventions/python.md",
-            ],
-            "conventions_applied_to_output": True,
-        },
+        "outcome.verified",
+        evidence={"output": "validated"},
+        project_root=project_root,
+    )
+    assert result["missing_evidence"] == ["observable_output_or_artifact"]
+
+    result = prove_goal_task(
+        contract,
+        result["state"],
+        "outcome.verified",
+        evidence={"artifact": "demo.txt"},
         project_root=project_root,
     )
 
     assert result["status"] == "ACCEPTED"
-    assert result["state"]["tasks"][task_id]["status"] == "complete"
+    assert result["observed"]["exit_code"] == 0
+    assert result["state"]["tasks"]["outcome.verified"]["status"] == "complete"
 
 
 def test_conventions_gate_not_required_for_unlisted_command(tmp_path: Path) -> None:
@@ -249,9 +242,10 @@ def test_conventions_gate_not_required_for_spec_plan(tmp_path: Path) -> None:
     assert all("conventions_receipt_path" not in task["required_evidence"] for task in final_tasks)
 
 
-def test_conventions_gate_not_required_for_spec_feature_supervisor_tasks(
+def test_spec_feature_gates_conventions_once_at_feature_scope(
     tmp_path: Path,
 ) -> None:
+    """081 AC-006: the supervisor gets one end-of-run gate, matching its expectations."""
     project_root = tmp_path / "project"
     (project_root / ".specs").mkdir(parents=True)
     _write_conventions(project_root, tmp_path / "ai")
@@ -268,14 +262,19 @@ def test_conventions_gate_not_required_for_spec_feature_supervisor_tasks(
         task for task in contract["tasks"] if task["id"] not in {"archive.run", "hooks.before"}
     ]
 
-    assert supervisor_tasks
+    gated = [
+        task["id"]
+        for task in supervisor_tasks
+        if "conventions_receipt_path" in task["required_evidence"]
+    ]
+    assert gated == ["conventions.gate"]
     assert all(
-        "conventions_receipt_path" not in task["required_evidence"] for task in supervisor_tasks
+        "convention_sources_read" not in task["required_evidence"] for task in supervisor_tasks
     )
-    assert all("convention_sources_read" in task["required_evidence"] for task in supervisor_tasks)
 
 
 def test_conventions_gate_required_for_spec_implement(tmp_path: Path) -> None:
+    """081 AC-006: one feature-scope conventions receipt task replaces per-task receipts."""
     project_root = tmp_path / "project"
     (project_root / ".specs").mkdir(parents=True)
     _write_conventions_gates(project_root)
@@ -287,12 +286,15 @@ def test_conventions_gate_required_for_spec_implement(tmp_path: Path) -> None:
         feature="001-demo",
     )
     contract = json.loads(render_goal_contract_file(goal))
-    final_tasks = [
-        task for task in contract["tasks"] if task["id"] not in {"archive.run", "hooks.before"}
+    gated = [
+        task["id"]
+        for task in contract["tasks"]
+        if "conventions_receipt_path" in task["required_evidence"]
     ]
 
-    assert final_tasks
-    assert all("conventions_receipt_path" in task["required_evidence"] for task in final_tasks)
+    assert gated == ["conventions.gate"]
+    ids = [task["id"] for task in contract["tasks"]]
+    assert ids[-3:] == ["conventions.gate", "outcome.verified", "archive.run"]
 
 
 def test_goal_prove_rejects_non_pass_conventions_receipt(tmp_path: Path) -> None:

@@ -53,8 +53,10 @@ def test_fix_preview_cannot_require_report_generation_or_conventions_refresh(
     tmp_path: Path, flags: str, visual: bool
 ) -> None:
     goal = _goal(tmp_path, "spec-fix", flags, visual)
-    tasks = json.loads(render_goal_contract_file(goal))["tasks"]
-    descriptions = [task["description"] for task in tasks]
+    contract = json.loads(render_goal_contract_file(goal))
+    tasks = contract["tasks"]
+    # 081: inventory rows live in the indicative checklist; tasks hold required proofs only.
+    descriptions = contract["checklist"]
     assert not any(text.startswith("Spawn independent native sub-agent") for text in descriptions)
     assert not any("livespec conventions refresh" in text for text in descriptions)
     assert any("read-only" in text and "gap report" in text for text in descriptions)
@@ -80,8 +82,9 @@ def test_test_report_generation_and_full_suite_follow_the_effective_mode(
     tmp_path: Path, flags: str, visual: bool, persists: bool, executes: bool, generates: bool
 ) -> None:
     goal = _goal(tmp_path, "spec-test", flags, visual)
-    tasks = json.loads(render_goal_contract_file(goal))["tasks"]
-    descriptions = [task["description"] for task in tasks]
+    contract = json.loads(render_goal_contract_file(goal))
+    tasks = contract["tasks"]
+    descriptions = contract["checklist"]
     assert bool([text for text in descriptions if text.startswith(REPORT_WRITES)]) is persists
     full = [task for task in tasks if task["description"].startswith("Full test suite executed")]
     assert bool(full) is executes
@@ -101,16 +104,15 @@ def test_test_report_generation_and_full_suite_follow_the_effective_mode(
         assert not any("write to strategy.md" in text for text in descriptions)
         assert not any(task["evidence_kind"] == "execution" for task in tasks)
     if flags == "--visual" and visual:
-        assert any(task["id"].startswith("visual.gate_validate") for task in tasks)
+        assert any("visual-gate validate" in text for text in descriptions)
 
 
 def test_normal_fix_keeps_report_refresh_and_code_execution(tmp_path: Path) -> None:
-    tasks = _goal(tmp_path, "spec-fix", "", False).payload["tasks"]
-    assert any(
-        task["description"].startswith("Spawn independent native sub-agent") for task in tasks
-    )
-    assert any("livespec conventions refresh" in task["description"] for task in tasks)
-    assert any(task["evidence_kind"] == "execution" for task in tasks)
+    payload = _goal(tmp_path, "spec-fix", "", False).payload
+    checklist = [*payload["execution_tasks"], *payload["definition_of_done"]]
+    assert any(text.startswith("Spawn independent native sub-agent") for text in checklist)
+    assert any("livespec conventions refresh" in text for text in checklist)
+    assert any(task["evidence_kind"] == "execution" for task in payload["tasks"])
 
 
 def test_full_suite_cli_proof_rejects_prose_and_keeps_the_task_pending(
@@ -150,23 +152,18 @@ def test_full_suite_cli_proof_rejects_prose_and_keeps_the_task_pending(
 def test_behavioral_generation_reserves_baseline_and_metadata_storage_for_visual_execution(
     tmp_path: Path, flags: str, captures: bool
 ) -> None:
-    tasks = json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", flags, True)))[
-        "tasks"
+    checklist = json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", flags, True)))[
+        "checklist"
     ]
     generation = next(
-        task
-        for task in tasks
-        if "behavioral trait having visual_state Gherkin" in task["description"]
+        row for row in checklist if "behavioral trait having visual_state Gherkin" in row
     )
-    assert "generate toHaveScreenshot() assertions" in generation["description"]
-    assert "store baseline" not in generation["description"]
-    assert "generate [screenshot].meta.yml" not in generation["description"]
+    assert "generate toHaveScreenshot() assertions" in generation
+    assert "store baseline" not in generation
+    assert "generate [screenshot].meta.yml" not in generation
     storage = [
-        task
-        for task in tasks
-        if "baselines/states/" in task["description"]
-        and "[screenshot].meta.yml" in task["description"]
+        row for row in checklist if "baselines/states/" in row and "[screenshot].meta.yml" in row
     ]
     assert bool(storage) is captures
     if captures:
-        assert storage[0]["ordinal"] > generation["ordinal"]
+        assert checklist.index(storage[0]) > checklist.index(generation)

@@ -330,6 +330,12 @@ Before executing any `/spec-*` command (except `/spec-init` and `/spec-migrate`)
 
 This check is **non-blocking** — the command continues normally after the warning.
 
+### Runtime goals
+
+<!-- @spec FR-009: Outcome goals in the universal rules — .specs/features/081-lightweight-outcome-goals/spec.md#fr-009 -->
+
+Autonomous long runs (`/spec-ship`, `/spec-feature --auto`, `/spec-init --auto`, `/spec-implement` without `--step`, and `--auto` children) render an outcome goal: one executable stop condition verified by `livespec goal prove`, a few receipt-backed proofs, and the skill inventory as an indicative checklist. Interactive and short commands run without a goal. A missing native goal tool or an already active goal never blocks a command. **Read** [the runtime goal contract](../system/anti-drift-block.md#runtime-goal-contract) for the protocol.
+
 ### Command discovery
 
 Detailed step-by-step instructions for each `/spec-*` command live as portable

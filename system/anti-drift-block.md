@@ -22,10 +22,10 @@
 
 ## 1. Per-step canonical shape (6 fields)
 
-Every numbered step in a command or agent file MUST expose the following 6 sub-fields, **using these
+Every numbered step in a command or agent file exposes the following 6 sub-fields, **using these
 exact names as written**. They are the canonical labels — references in this block (§4, §5) and in
 all reviews target these names verbatim. Implementers may use Markdown headers, bullet lists, or
-inline prose, but each named sub-field MUST be present and observably verifiable.
+inline prose, but each named sub-field is present and observably verifiable.
 
 | # | Canonical field name | Purpose |
 |---|----------------------|---------|
@@ -66,7 +66,7 @@ Reference template (use the names from the table above, do NOT rename them):
 
 ## 2. Canonical failure lines
 
-All commands and agents MUST use these exact formats — no paraphrasing, no localisation.
+Commands and agents use these exact formats (no paraphrasing, no localisation).
 
 ### ERROR (recoverable or terminal command failure)
 
@@ -98,8 +98,8 @@ BLOCKED at step <N> - <subtype> - <one-line reason>
   - `verification_failed` — final consistency check (§5) failed.
 - `<one-line reason>` — single-line, no quotes, ≤120 chars.
 
-After emitting BLOCKED, the executor MUST stop. It does NOT silently substitute alternate commands,
-prompt the user (unless explicitly authorised), or skip ahead.
+After emitting BLOCKED, the executor hands control back with what was tried and what is missing;
+it does not silently substitute alternate commands or skip ahead.
 
 ---
 
@@ -111,7 +111,7 @@ or subprocess executed inside a step:
 | Setting | Default | Rationale |
 |---------|---------|-----------|
 | `timeout` | `90s` | Bounds runaway commands; aligns with workflow-apex defaults. |
-| `max_retries` | `1` | One retry on transient failure; subsequent failure → ERROR + stop. |
+| `max_retries` | `2` | Three attempts in total; then ERROR or BLOCKED with a handback report. |
 | Retry backoff | None (immediate) | Avoids masking systemic issues; if backoff is needed, the step must declare it. |
 | Concurrency | None within a step | Parallel tool calls are allowed only when the step explicitly states so. |
 
@@ -125,7 +125,7 @@ or subprocess executed inside a step:
 ### Evidence-first retry contract
 
 Before retrying any failed command, tool call, poll, or interactive write such as `write_stdin`, the
-executor MUST capture a one-line retry record with these fields:
+executor records one line with these fields:
 
 ```text
 retry_hypothesis="<why the previous attempt failed>" retry_evidence="<observable proof to collect before retry>" retry_result="<PASS|FAIL|BLOCKED after retry>"
@@ -138,8 +138,7 @@ Rules:
   command output required before the retry can count as progress.
 - `retry_result` is filled after the retry and determines the next action: `PASS` continues,
   `FAIL` emits ERROR when retries are exhausted, and `BLOCKED` emits the canonical BLOCKED line.
-- Repeating the same failing command without this record is prohibited, even when `max_retries`
-  allows one retry.
+- Repeating the same failing command without this record does not count as a retry.
 - For polling or terminal interaction failures, prefer a fresh artifact, state file, timestamp, or
   post-prompt screen region over a stale screen line.
 
@@ -147,130 +146,82 @@ Rules:
 
 ## 4. Anti-drift rules (apply to every command and agent)
 
-These rules are global. They override implicit assumptions; nothing in a step's prose can opt out
-unless an explicit override is declared.
+These rules apply unless a step declares an explicit override.
 
-1. Execute steps in the exact numbered order. Do NOT reorder, parallelise, merge, or skip.
-2. Do NOT start step N+1 until step N's `Success criteria` are observably met.
-3. Do NOT assume a step is already done. Capture evidence (§1) before advancing.
-4. Run listed commands as written. If denied by policy, emit BLOCKED (§2) and stop.
-5. On terminal failure beyond `max_retries`, emit ERROR (§2) and stop. No silent substitution.
-6. "Probably correct", "should work", "looks fine" are NOT success criteria. Replace with
-   observable predicates before finalising the file.
-7. In dry-run mode, do NOT mutate files, skills, tasks, or external systems. Output the proposed
-   change and an explicit "no changes applied" line.
-8. Activation Contracts (agents only) MUST run a filesystem check (e.g., `test -d .specs`) BEFORE
-   trusting any caller-supplied flag (`livespec_initialized`, `livespec_root`, etc.). See
-   Chantier 2 for the full return-contract specification.
+1. Follow the numbered order; a step starts once the previous step's success criteria are observed.
+2. Capture evidence (§1) instead of assuming a step is done.
+3. Run listed commands as written. A policy denial emits BLOCKED (§2).
+4. After `max_retries`, emit ERROR or BLOCKED (§2) with what was tried; no silent substitution.
+5. "Probably correct" or "looks fine" are not success criteria; use observable predicates.
+6. Dry-run mode mutates nothing and ends with an explicit "no changes applied" line.
+7. Agents check the filesystem (e.g., `test -d .specs`) before trusting caller-supplied flags
+   (`livespec_initialized`, `livespec_root`, etc.); see Chantier 2.
 
 ---
 
 ## 5. Final consistency check (run before declaring DONE)
 
+<!-- @spec FR-009: Short outcome-based goal protocol — .specs/features/081-lightweight-outcome-goals/spec.md#fr-009 -->
+
 ### Runtime goal contract
 
-Before any slash command starts command-specific work, it MUST compile a deterministic runtime goal:
+A goal is required only for autonomous long runs: `/spec-ship`, `/spec-feature --auto`, `/spec-init --auto` (including `--from-code --auto`), `/spec-implement` without `--step`, and `/spec-*` children spawned with `--auto` by those runs. Other commands run directly; a goal stays optional. The contract field `goal_requirement` records which case applies.
 
-**Precheck:** Before rendering, verify no goal is already active in the platform. If you see `The active goal is...` or similar, emit the canonical BLOCKED line (§2 `prerequisite_unmet`) and instruct the user to run `/goal clear` first.
-
-```bash
-livespec goal render <command-name> --feature <feature-slug> --flags "<active-flags>" --save
-```
-
-This writes an immutable contract file and mutable state file to `$TMPDIR/livespec-goals/` and prints:
-```
-hash:<full-sha256> | contract-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.state.json
-```
-
-- **Read the contract file and state file**. The contract contains ordered tasks, required evidence, invalid substitutes, and repair actions. The state contains only mutable task status.
-- **Immediately after rendering, emit the slash command `/goal`** with hash and machine references. Output exactly:
-  ```
-  /goal hash:<hash> | <command> for <feature> — contract-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-<command>-<hash8>.state.json — mode:enforced
-  ```
-  This compact form stays within the platform goal field character limit while preserving the full contract.
-  This is mandatory — no flag bypasses it.
-- **The contract file is the active working list for this run.** You MUST:
-  1. Execute tasks in order — no reordering, no skipping
-  2. Capture observable evidence before proving each task (§1 form)
-  3. Submit evidence through:
-     ```bash
-     livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
-     ```
-  4. Treat `ACCEPTED` as the only way a task becomes `complete`
-  5. Treat `REJECTED_NEEDS_ACTION` as a repair instruction: perform `repair_if_missing`, gather the missing proof, then resubmit
-  6. Consult [`SKILL.md`](SKILL.md) phase descriptions for implementation detail — but do NOT treat SKILL.md sections as a sequential execution plan; the contract file is authoritative
-  7. Before `DONE`, run `livespec goal status --state <state-file>` and require every required task to be complete or emit canonical BLOCKED
-- The goal is compiled from machine-readable `expectations.md`, the command Definition of Done, normalized flags, and resolved feature state. It MUST NOT be rewritten or improvised by the LLM.
-- A worker/executor MUST NOT mark task completion directly. Only `livespec goal prove` may update task status in the state file.
-- If goal rendering fails, emit the canonical BLOCKED line (§2) and stop.
-- If the current environment does not accept the `/goal` command, emit the canonical BLOCKED line (§2) and stop.
+1. Render once: `livespec goal render <command-name> [--feature <slug>] --flags "<active-flags>" --save`, adding `--model=<actual-model>` when the goal has review tasks and the model is resolved. It prints `hash:<sha256> | contract-file:<path> | state-file:<path>`; rendering the same goal again keeps its progress.
+2. Read the contract file: `stop_condition` is the completion check; `tasks` are the few proofs that matter (hook context, QE analysis, typed execution/review receipts with acceptance mapping, visual and finalize receipts, one feature-scope conventions receipt, `outcome.verified`, `archive.run`); `checklist` is the skill inventory as guidance, not proven item by item.
+3. Native goal: when the runtime offers one (Codex `create_goal`/`get_goal`/`update_goal`, Claude Code `/goal`), set it to `<command> for <feature>: <stop_condition.display> — contract-file:<path> — state-file:<path>`. If a goal is already active, update it when the tool allows; otherwise leave it untouched, warn and continue. Without native support, print one warning line and continue with the CLI contract.
+4. Prove each required task once its receipt exists: `livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'`. Only `goal prove` changes task status; never edit the contract or state files.
+5. `outcome.verified`: submit `{}`; the goal runs the stop condition itself (declared timeout override: 300 s) and accepts exit 0 with output.
+6. `REJECTED_NEEDS_ACTION` lists the missing evidence and repair actions. After three rejections of the same task, prove returns `BLOCKED` with a `handback` (attempts, missing evidence): report it to the user and hand back control.
+7. When inputs drift (feature slug, acceptance criteria, hook context, skill inventory), `goal prove` and `goal archive` recompile the contract in place, keep the evidence that still validates and report `recompiled`.
+8. Close: archive the run, prove `archive.run` with the printed `.specs/.runs/` path, require `livespec goal status --state <state-file>` to show every task complete before `DONE`, then mark the native mirror complete (`update_goal`) when one exists. A time budget that expires after the stop condition passed does not block completion.
 
 ### Versioned evidence purpose
 
 <!-- @spec FR-009: Typed evidence purpose — .specs/features/078-requirement-evidence-integrity/spec.md#fr-009 -->
 
-- Current task inventories declare `evidence_kind` separately from task category: documentary, review or execution. Use the compiled immutable contract's policy and requirements; never silently reinterpret an already active or historical goal.
-- Documentary proof can establish a document/action artifact; it cannot establish runtime behavior. Review proof requires current complete raw reviewer evidence under **Read** [the shared protocol](review-protocol.md). Execution proof requires the runner-owned receipt and independently reviewed mapped acceptance scope under **Read** [execution rules](testing/execution-rules.md#execution-evidence). Generic `output` plus `success_criteria_met: true` cannot prove execution.
-- All specialized conventions, finalization, child-goal, bootstrap, visual and cumulative Penflow validations still apply. Preserve original policy and meaning when reading legacy archives; legacy evidence cannot certify a new current-policy run, and unsupported future policy blocks certification.
-- `.reviews/` contains disposable derived caches. The canonical Markdown remains authoritative; never repair missing proof by editing the mutable goal state or setting receipt verdicts manually.
+- Task inventories declare `evidence_kind` (documentary, review, execution). Review proof requires current raw reviewer evidence (**Read** [the shared protocol](review-protocol.md)); execution proof requires the runner-owned receipt and reviewed acceptance scope (**Read** [execution rules](testing/execution-rules.md#execution-evidence)). Generic output cannot prove execution.
+- Legacy archives keep their original policy; `.reviews/` holds disposable caches and the canonical Markdown stays authoritative.
 
 ### Transcript capture
 
 <!-- @spec FR-009: Transcript capture protocol — .specs/features/059-pipeline-verify-phase/spec.md#fr-009 -->
 
-During the run, append the stdout/stderr of key CLI executions (e.g. `livespec validate`, `pytest`, `livespec finalize verify`) to a transcript pair under `$TMPDIR/livespec-goals/transcripts/`:
+Append key CLI output (`livespec validate`, `pytest`, `livespec finalize verify`) to `$TMPDIR/livespec-goals/transcripts/<command>-<hash8>.out/.err`, capturing the wrapped command status (not `tee`'s):
 
 ```bash
 T="$TMPDIR/livespec-goals/transcripts"; mkdir -p "$T"
-# <hash8> = first 8 chars of the active goal hash — pairs the transcript to the contract.
-# pipefail-safe: capture the WRAPPED command's exit code, not tee's — a plain
-# pipe would record tee's status and let `goal archive --exit-code` archive a
-# false success.
-set -o pipefail
-set +e
+set -o pipefail; set +e
 <cli command> 2>>"$T/<command>-<hash8>.err" | tee -a "$T/<command>-<hash8>.out"
-cmd_status=${PIPESTATUS[0]}
-set -e
+cmd_status=${PIPESTATUS[0]}; set -e
 ```
 
-Pass `"$cmd_status"` (the wrapped command's status) to `livespec goal archive --exit-code` — never the pipeline's last status.
-
-Rules:
-
-- **Truncation is executor-side (EC-009):** before archiving, if a file exceeds `MAX_TRANSCRIPT_BYTES` (10 MiB), truncate it keeping the **most recent** bytes (`tail -c <bound> file > tmp && mv tmp file`) — most recent output is the diagnostic payload. `goal archive` keeps rejecting oversized inputs with blocked/exit 2.
-- **Unreadable transcripts (EC-008):** if a transcript file is missing or unreadable at archive time, **omit** the flag instead of passing a broken path — `goal archive` blocks (exit 2) on unreadable input.
-- **Honest absence (AC-014, FR-010):** when no transcript is captured, run `goal archive` without `--stdout-file`/`--stderr-file`; every `contains` rule reports SKIP with a descriptive detail and the archive still succeeds. Absence is never converted into a failure.
+- Pass `"$cmd_status"` to `livespec goal archive --exit-code`.
+- Truncate files above `MAX_TRANSCRIPT_BYTES` (10 MiB) keeping the most recent bytes (EC-009); omit unreadable transcripts (EC-008); without transcripts, archive without `--stdout-file`/`--stderr-file` and `contains` rules report SKIP (AC-014, FR-010).
 
 ### Archive & prove archive.run
 
 <!-- @spec FR-009: Archive-then-prove protocol — .specs/features/059-pipeline-verify-phase/spec.md#fr-009 -->
 
-Every rendered contract ends with an injected `archive.run` task (last ordinal). Before `DONE`:
+Every contract ends with `archive.run`:
 
-1. Archive the run, passing the transcripts when captured:
-   ```bash
-   livespec goal archive --contract <c> --state <s> [--feature <slug>] [--exit-code <n>] [--stdout-file <out>] [--stderr-file <err>]
-   ```
-2. Prove the injected last task with the **printed artifact path**:
-   ```bash
-   livespec goal prove --contract <c> --state <s> --task archive.run --evidence '{"run_artifact_path": "<printed .specs/.runs/ path>"}'
-   ```
+```bash
+livespec goal archive --contract <c> --state <s> [--feature <slug>] [--exit-code <n>] [--stdout-file <out>] [--stderr-file <err>]
+livespec goal prove --contract <c> --state <s> --task archive.run --evidence '{"run_artifact_path": "<printed .specs/.runs/ path>"}'
+```
 
-`goal status` can only report the goal complete after this proof (EC-010). Prose claims, exit codes, and `$TMPDIR` contract/state paths are named invalid substitutes; the artifact must live under `.specs/.runs/` and match the contract's goal hash and command.
+`goal status` reports the goal complete only after this proof (EC-010); prose claims, exit codes and `$TMPDIR` paths are not substitutes.
 
 ### Internal Command Invocations
 
-When a LiveSpec slash command needs another executable `/spec-*` command while its own goal is active:
+When a goal-bearing command needs another `/spec-*` command:
 
-1. Do NOT run the nested slash command inline in the same session.
-2. Do NOT call a private CLI/API shortcut that bypasses the nested command goal.
-3. Resolve the current LiveSpec `project_root` before spawning.
-4. Spawn an independent native sub-agent for the nested slash command with its `cwd`/working directory fixed to `project_root`; if the native agent API has no cwd field, the prompt MUST first instruct `cd <project_root>` and **Read** [`../.specs/spec-system.md`](../.specs/spec-system.md) before any slash command.
-5. The first executable slash-command line in the prompt MUST be the literal nested command (for example `/spec-fix`) so the sub-agent compiles, emits, executes, and closes its own goal.
-6. The parent may only read the sub-agent's structured result, child goal hash, contract-file path, state-file path, artifacts, and final status.
-7. Plain text next-step hints such as `Run /spec-plan next` are suggestions, not executed invocations.
+1. Spawn an independent native sub-agent; do not run the nested slash command inline or through a private CLI shortcut.
+2. Fix its `cwd`/working directory to the resolved `project_root`; without a native cwd field, the prompt first runs `cd <project_root>` and **Read** [`../.specs/spec-system.md`](../.specs/spec-system.md).
+3. The first executable prompt line is the literal nested command (for example `/spec-fix`); the child owns its own goal when its run requires one.
+4. The parent reads only the child's structured result, artifacts and final status. Plain hints such as `Run /spec-plan next` are suggestions.
 
-Each skill that can mention nested `/spec-*` calls MUST include a machine-readable section:
+Each skill that mentions nested `/spec-*` calls includes a machine-readable section:
 
 ```markdown
 ## Internal Command Invocations
@@ -279,21 +230,19 @@ Each skill that can mention nested `/spec-*` calls MUST include a machine-readab
 - [suggestion] `/spec-plan <feature>` — displayed only as an operator next step; not executed by this command.
 ```
 
-`livespec goal render` rejects executable `/spec-*` entries marked `inline`, `direct`, `cli`, `api`, any mode other than `subagent` or `suggestion`, or any `[subagent]` row that omits `project_root`, `cwd`/working directory, or **Read** [`../.specs/spec-system.md`](../.specs/spec-system.md).
+`livespec goal render` rejects executable `/spec-*` entries marked `inline`, `direct`, `cli`, `api` or any mode other than `subagent`/`suggestion`, and `[subagent]` rows that omit `project_root`, `cwd`/working directory, or **Read** [`../.specs/spec-system.md`](../.specs/spec-system.md).
 
-Before any command or agent reports `DONE`, verify the following programmatically (or via a
-checklist when programmatic verification is unavailable):
+### Before DONE
 
 - [ ] Every step in the file has the 6 fields from §1.
 - [ ] Every failure path emits one of the canonical lines from §2.
 - [ ] Every command call respects the policy from §3, or declares its override inline.
 - [ ] Every "Success criteria" entry is observable (file path, exit code, hash, count, or quoted output).
 - [ ] No `[NEEDS CLARIFICATION]`, `[ASSUMED]`, or `<placeholder>` tokens remain unresolved.
-- [ ] Final report line is exactly `DONE` or the canonical BLOCKED line from §2
-      (`BLOCKED at step <N> - <subtype> - <one-line reason>`) — no "should", "probably", or "hopefully".
+- [ ] For goal runs: `livespec goal status` shows every task complete.
+- [ ] Final report line is `DONE` or the canonical BLOCKED line from §2 (`BLOCKED at step <N> - <subtype> - <one-line reason>`), with what was tried and what is missing.
 
-If any checklist item fails, emit the corresponding ERROR/BLOCKED line (using the §2 shape) and stop.
-Do NOT report DONE. The subtype for a §5 failure is `verification_failed`.
+The subtype for a §5 failure is `verification_failed`.
 
 ---
 
@@ -371,7 +320,7 @@ executing — NOT the outer pipeline name. Implementation contract:
    `before-feature` / `after-feature` at its outer boundary with
    `<NAME> = feature`.
 2. Before spawning each independent native sub-agent (Specify, Plan, Implement, Test, …),
-   the supervisor in [`../.agent-sync/skills/spec-feature/SKILL.md`](../.agent-sync/skills/spec-feature/SKILL.md) MUST prepend a synthetic
+   the supervisor in [`../.agent-sync/skills/spec-feature/SKILL.md`](../.agent-sync/skills/spec-feature/SKILL.md) prepends a synthetic
    invocation header to the sub-agent prompt, of the EXACT form:
 
        /spec-<subcmd>

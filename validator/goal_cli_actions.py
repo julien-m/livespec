@@ -20,8 +20,8 @@ from .goal_cli_inputs import (
     MAX_TRANSCRIPT_BYTES,
     GoalInputError,
     ResolvedGoalInputs,
+    prepare_archive_inputs,
     read_evidence_input,
-    read_transcript,
     resolve_goal_pair_inputs,
 )
 from .goal_cli_output import (
@@ -32,7 +32,6 @@ from .goal_cli_output import (
 )
 from .goal_contracts import (
     GoalContract,
-    compile_command_goal,
     prove_goal_task,
     render_goal_contract_file,
     render_goal_state_file,
@@ -41,7 +40,7 @@ from .goal_contracts import (
 from .goal_evidence_paths import GoalEvidencePathError
 from .goal_json import JsonObject
 from .goal_pairing import GoalPairError
-from .goal_review_identity import bind_review_model
+from .goal_recompile import compile_goal, refresh_for_cli, reusable_state
 from .run_artifacts import archive_goal_run
 
 
@@ -77,7 +76,7 @@ def render_goal_command(
         typer.echo(f"goal blocked: {exc}", err=True)
         raise typer.Exit(2) from exc
     try:
-        goal = compile_command_goal(
+        goal = compile_goal(
             command,
             project_root=context.project_root,
             livespec_root=livespec_root,
@@ -87,7 +86,6 @@ def render_goal_command(
     except (ExpectationsInvalid, ExpectationsMissing, OverrideMalformed) as exc:
         typer.echo(f"goal render blocked: {exc}", err=True)
         raise typer.Exit(2) from exc
-    goal = bind_review_model(goal, context.project_root, livespec_root, feature)
     _emit_rendered_goal(goal, json_out=json_out, save=save)
 
 
@@ -98,7 +96,9 @@ def _emit_rendered_goal(goal: GoalContract, *, json_out: bool, save: bool) -> No
         contract_file = goals_dir / f"goal-{goal.command}-{goal.goal_hash[:8]}.contract.json"
         state_file = goals_dir / f"goal-{goal.command}-{goal.goal_hash[:8]}.state.json"
         write_json_text_atomically(contract_file, render_goal_contract_file(goal))
-        write_json_text_atomically(state_file, render_goal_state_file(goal))
+        # @spec FR-005: Re-rendering the same goal reuses its progress instead of resetting it.
+        if not reusable_state(state_file, goal.goal_hash):
+            write_json_text_atomically(state_file, render_goal_state_file(goal))
         typer.echo(
             f"hash:{goal.goal_hash} | contract-file:{contract_file} | state-file:{state_file}"
         )
@@ -130,7 +130,8 @@ def prove_goal_command(
         OSError: If the accepted state cannot be persisted.
 
     Side effects:
-        Reads control files, may replace the state file, and emits CLI output.
+        Reads control files, may recompile a drifted pair in place, replaces the state file
+        and emits CLI output.
     """
     try:
         inputs = resolve_goal_pair_inputs(contract_path, state_path, operation="prove")
@@ -138,6 +139,9 @@ def prove_goal_command(
     except (GoalInputError, GoalPairError, OSError, SpecsRootNotFoundError) as exc:
         typer.echo(f"goal prove blocked: {exc}", err=True)
         raise typer.Exit(2) from exc
+    inputs, recompiled = refresh_for_cli(
+        inputs, livespec_root=_detect_livespec_root(), operation="prove"
+    )
     try:
         result = prove_goal_task(
             inputs.contract,
@@ -149,6 +153,8 @@ def prove_goal_command(
     except (GoalEvidencePathError, GoalPairError) as exc:
         typer.echo(f"goal prove blocked: {exc}", err=True)
         raise typer.Exit(2) from exc
+    if recompiled is not None:
+        result["recompiled"] = recompiled
     _emit_proof_result(inputs.state_path, result)
 
 
@@ -198,7 +204,7 @@ def archive_goal_command(
     if exit_code is not None and not 0 <= exit_code <= 255:
         raise archive_blocked("--exit-code must be between 0 and 255", json_out=json_out)
     try:
-        inputs, stdout_text, stderr_text = _prepare_archive_inputs(
+        inputs, stdout_text, stderr_text = prepare_archive_inputs(
             contract_path,
             state_path,
             feature,
@@ -208,6 +214,9 @@ def archive_goal_command(
         )
     except (GoalInputError, GoalPairError, OSError, SpecsRootNotFoundError, ValueError) as exc:
         raise archive_blocked(str(exc), json_out=json_out) from exc
+    inputs, _ = refresh_for_cli(
+        inputs, livespec_root=_detect_livespec_root(), operation="archive", json_out=json_out
+    )
     _archive_prepared(inputs, feature, exit_code, stdout_text, stderr_text, json_out)
 
 
@@ -256,25 +265,6 @@ def _archive_prepared(
         # The CLI owns formatting domain and I/O failures into stable exits.
         raise archive_blocked(str(exc), json_out=json_out) from exc
     emit_archive_result(result, json_out=json_out)
-
-
-def _prepare_archive_inputs(
-    contract_path: str | None,
-    state_path: str | None,
-    feature: str | None,
-    stdout_file: Path | None,
-    stderr_file: Path | None,
-    max_transcript_bytes: int,
-) -> tuple[ResolvedGoalInputs, str | None, str | None]:
-    inputs = resolve_goal_pair_inputs(
-        contract_path,
-        state_path,
-        operation="archive",
-        feature=feature,
-    )
-    stdout_text = read_transcript(stdout_file, max_bytes=max_transcript_bytes)
-    stderr_text = read_transcript(stderr_file, max_bytes=max_transcript_bytes)
-    return inputs, stdout_text, stderr_text
 
 
 def _detect_livespec_root() -> Path:

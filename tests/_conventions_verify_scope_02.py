@@ -39,7 +39,14 @@ def test_goal_prove_accepts_cli_generated_pass_conventions_receipt(tmp_path: Pat
     skill_dir = livespec_root / ".agent-sync" / "skills" / "spec-implement"
     skill_dir.mkdir(parents=True)
     (skill_dir / "expectations.md").write_text(
-        EXPECTATIONS.replace("command: spec-demo", "command: spec-implement"),
+        # 081: the conventions gate follows the command's own expectations receipt rule.
+        EXPECTATIONS.replace("command: spec-demo", "command: spec-implement").replace(
+            '    - contains: "done"\n',
+            '    - contains: "done"\n'
+            '    - receipt_verdict: {"kind": "conventions", "verdict": "PASS", '
+            '"required_if_exists": true}\n',
+            1,
+        ),
         encoding="utf-8",
     )
     (skill_dir / "SKILL.md").write_text(EXECUTION_TASK_SKILL, encoding="utf-8")

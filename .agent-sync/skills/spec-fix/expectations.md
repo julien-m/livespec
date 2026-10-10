@@ -1,7 +1,7 @@
 ---
 command: spec-fix
 contract_version: "1.0"
-last_reviewed: 2026-09-07
+last_reviewed: 2026-10-10
 ---
 
 <!-- @spec(FR-004) -->

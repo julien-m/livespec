@@ -21,35 +21,20 @@ description: "Full feature pipeline: specify → plan → review → implement �
 argument-hint: "[feature description]"
 ---
 
-> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — runtime goal contract (§5), 6-field step shape (§1), ERROR/BLOCKED format (§2), finalization gate.
+> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2), runtime goal contract for autonomous runs (§5).
 
-## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
+## STEP 0 — Goal (autonomous runs)
 
-La toute première action lors de `/spec-feature` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
+A goal is required with `--auto` (including runs spawned by `/spec-ship`); interactive runs skip this step. **Read** [runtime goal contract](../../../system/anti-drift-block.md#runtime-goal-contract) for the full protocol.
 
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
-   **Read** [goal review identity](../../../system/review-protocol.md#goal-review-identity) before locking a review-bearing goal; resolve the actual runtime model and preserve its internal flag through all child commands.
-2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat immuable et l'état mutable :
-   ```bash
-   livespec goal render spec-feature --feature <feature-slug> --flags "<active-flags>" --save
-   ```
-   Si aucune feature fournie, omettre `--feature`. Le flag interne `--model=<actual-model>` reste présent même sans flag utilisateur.
-   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.state.json`
-4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
-5. Émettre la commande slash `/goal` avec hash et références machine :
-   ```
-   /goal hash:<hash> | spec-feature for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-feature-<hash8>.state.json — mode:enforced
-   ```
-6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
-   ```bash
-   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
-   ```
-   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
-7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
+1. Resolve feature and flags read-only.
+   For review-bearing goals, **Read** [goal review identity](../../../system/review-protocol.md#goal-review-identity) and keep `--model=<actual-model>` in the flags of every child command.
+2. Run `livespec goal render spec-feature [--feature <feature-slug>] --flags "<active-flags>" --save` (add `--model=<actual-model>` for review-bearing goals), then read `stop_condition`, `tasks` and `checklist` from the printed contract file.
+3. Mirror the goal in the native goal tool when one exists (Codex `create_goal`/`update_goal`, Claude Code `/goal`); update an active goal when allowed, otherwise leave it untouched. Without a native tool, print a warning and continue with the CLI contract.
+4. Work toward the stop condition. Prove each required task with `livespec goal prove`; the goal checks `outcome.verified` itself. After three rejections of one task, hand back the `BLOCKED` report.
+5. Before `DONE`: `livespec goal archive`, prove `archive.run`, confirm `livespec goal status` is complete, then mark the native mirror complete.
 
-Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+If `goal render` fails, report `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` with its stderr.
 
 ## Requirement evidence integrity
 
@@ -191,7 +176,7 @@ The `conventions` field is the structured payload described in **Read** [`~/.cla
 
 <!-- @spec FR-006: RUN_ARTIFACT field in all goal-locked phase schemas — .specs/features/059-pipeline-verify-phase/spec.md#fr-006 -->
 
-> **RUN_ARTIFACT (059 AC-008):** every goal-locked phase schema carries a `RUN_ARTIFACT:` line (canonical JSON key `run_artifact`). The agent sets it to the **exact `.specs/.runs/` path printed by its own `livespec goal archive`** — the same path accepted for its `archive.run` proof. The supervisor verifies this exact artifact in the § Supervisor Verify Phase. Legacy blocks without the line parse with `run_artifact = null`.
+> **RUN_ARTIFACT (059 AC-008):** every goal-bearing phase schema carries a `RUN_ARTIFACT:` line (canonical JSON key `run_artifact`). The agent sets it to the **exact `.specs/.runs/` path printed by its own `livespec goal archive`** — the same path accepted for its `archive.run` proof. The supervisor verifies this exact artifact in the § Supervisor Verify Phase. Legacy blocks without the line parse with `run_artifact = null`.
 
 ### Specify agent schema
 
@@ -303,9 +288,9 @@ This recovery is not a bypass: it only converts already-written, validated phase
 
 <!-- @spec FR-007: Supervisor Verify phase — .specs/features/059-pipeline-verify-phase/spec.md#fr-007 -->
 
-Executed by the supervisor **after parsing each goal-locked PHASE_RESULT** (Specify, Plan, Analyze, Preflight, Implement, Test) and before any `pipeline update --status done` for that phase. The declaration alone is never trusted — the machine verdict of the archived run artifact is cross-checked.
+Executed by the supervisor **after parsing each goal-bearing PHASE_RESULT** (Specify, Plan, Implement, Test — children spawned with `--auto`) and before any `pipeline update --status done` for that phase. The declaration alone is never trusted — the machine verdict of the archived run artifact is cross-checked. Analyze and Preflight children run without a goal; the supervisor verifies them by re-running their read-only check (Phase 2.6, Phase 2.7).
 
-1. **Resolve the sub-command** (`spec-specify`, `spec-plan`, `spec-preflight`, `spec-implement`, `spec-test`) via alias normalization (`validator/command_registry.py` `canonical_command_name`).
+1. **Resolve the sub-command** (`spec-specify`, `spec-plan`, `spec-implement`, `spec-test`; Preflight is verified only by Phase 2.7) via alias normalization (`validator/command_registry.py` `canonical_command_name`).
 2. **Resolve the artifact.** `RUN_ARTIFACT` present → run:
    ```bash
    livespec verify-output <sub-command> --run <RUN_ARTIFACT> --json
@@ -734,8 +719,8 @@ Run: `livespec pipeline update --feature NNN-feature-name --phase plan-review --
 
 Runs after Plan Review (Phase 2.5) and **before** Preflight (Phase 2.7). It is a **read-only** cross-artifact gate that blocks implementation when `spec.md`/`plan.md` disagree or violate the constitution. It adds **no new command surface** — it runs the existing `/spec-check --pre-impl` mode.
 
-1. Spawn an independent native sub-agent whose **first prompt line** is `/spec-check --pre-impl NNN-feature-name`. Instruct it to capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture, pass them to `livespec goal archive --stdout-file/--stderr-file`, and return a PHASE_RESULT (`phase: analyze`) whose `RUN_ARTIFACT` is the exact artifact path printed by its own `goal archive`.
-2. Receive the Analyze PHASE_RESULT and run the § Supervisor Verify Phase: `livespec verify-output spec-check --run <RUN_ARTIFACT> --json` (cross-check matrix). On disagreement → canonical BLOCKED, `livespec pipeline update --feature NNN-feature-name --phase analyze --status blocked`, stop.
+1. Spawn an independent native sub-agent whose **first prompt line** is `/spec-check --pre-impl NNN-feature-name` and return a PHASE_RESULT (`phase: analyze`). This short read-only command runs without a goal (`RUN_ARTIFACT` may be null).
+2. Verify the declared result independently: run `livespec validate .specs/features/NNN-feature-name --pre-impl --format json` and compare its exit status (1 iff CRITICAL/HIGH) with the PHASE_RESULT. On disagreement → canonical BLOCKED, `livespec pipeline update --feature NNN-feature-name --phase analyze --status blocked`, stop.
 3. **Gate behavior (exit/severity unified — H3):** the analyzer exits **1 iff any finding is CRITICAL or HIGH**.
    - Any **CRITICAL or HIGH** finding → `livespec pipeline update --feature NNN-feature-name --phase analyze --status blocked`, emit the canonical `BLOCKED`, and **stop before Preflight/Implement**.
    - Only **MEDIUM/LOW** → surface the warnings and continue.
@@ -751,8 +736,8 @@ Runs after Plan Review (Phase 2.5) and **before** Preflight (Phase 2.7). It is a
 Before starting implementation, run a light preflight check:
 
 1. If `.specs/preflight.md` does not exist → log warning and continue
-2. Spawn an independent native sub-agent whose first prompt line is `/spec-preflight --light` with the current feature name as context. Instruct it to capture key-CLI transcripts per `system/anti-drift-block.md` §5 Transcript capture, pass them to `livespec goal archive --stdout-file/--stderr-file`, and return a PHASE_RESULT (Preflight agent schema, `phase: preflight`) whose `RUN_ARTIFACT` is the exact artifact path printed by its own `goal archive`.
-3. Receive the Preflight PHASE_RESULT and run the § Supervisor Verify Phase (`livespec verify-output spec-preflight --run <RUN_ARTIFACT> --json`, cross-check matrix). On disagreement → canonical BLOCKED, `livespec pipeline update --feature NNN-feature-name --phase preflight --status blocked`, stop.
+2. Spawn an independent native sub-agent whose first prompt line is `/spec-preflight --light` with the current feature name as context, and return a PHASE_RESULT (Preflight agent schema, `phase: preflight`). This short command runs without a goal (`RUN_ARTIFACT` may be null).
+3. Verify the declared verdict independently: read `.specs/preflight-report.md` and re-run `livespec preflight` (read-only, smart-scoped like `--light`, same target); a READY/WARNINGS declaration over a failing critical check → canonical BLOCKED, `livespec pipeline update --feature NNN-feature-name --phase preflight --status blocked`, stop.
 4. Gate behavior:
    - Any `critical` check failed → **STOP**. Write `preflight-report.md` with BLOCKED verdict. Report blocker + recovery command. Run: `livespec pipeline update --feature NNN-feature-name --phase preflight --status blocked`
    - Only `warning` checks failed → write `preflight-report.md` with WARNINGS verdict, display warning, continue
@@ -1060,12 +1045,11 @@ For UI certification closures, forward the same independent `--build-manifest <r
 > Active branches per run:
 > `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
 
-### Phase 0 — Goal Lock
+### Phase 0 — Goal
 
-- [always] Verify no active goal exists <!-- evidence:documentary -->
 - [always] Resolve feature slug and active flags from arguments <!-- evidence:documentary -->
-- [always] Run `livespec goal render spec-feature --save` and save contract/state files <!-- evidence:documentary -->
-- [always] Emit `/goal` slash command with hash and contract/state file reference <!-- evidence:documentary -->
+- [always] Render the goal via `livespec goal render spec-feature --save` when the run requires one <!-- evidence:documentary -->
+- [always] Mirror the goal in the native goal tool when available (optional; warn and continue otherwise) <!-- evidence:documentary -->
 
 ### Phase 0 — Roadmap Resolution (no argument)
 

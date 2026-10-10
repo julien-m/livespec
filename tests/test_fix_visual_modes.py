@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.goal_checklist_support import checklist_tasks
 from validator.goal_contracts import compile_command_goal, render_goal_contract_file
 
 ROOT = Path(__file__).parents[1]
@@ -33,7 +34,7 @@ def _rendered_tasks(root: Path, flags: str, visual: bool) -> list[dict[str, obje
     goal = compile_command_goal(
         "spec-fix", project_root=root, livespec_root=ROOT, feature=FEATURE, flags=flags
     )
-    return json.loads(render_goal_contract_file(goal))["tasks"]
+    return checklist_tasks(json.loads(render_goal_contract_file(goal)))
 
 
 @pytest.mark.parametrize("visual", [True, False])

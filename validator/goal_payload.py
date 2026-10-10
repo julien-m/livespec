@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 
 from . import goal_contracts as _contracts
+from .goal_outcome import MAX_ATTEMPTS_PER_TASK, goal_requirement, stop_condition
+from .goal_tasks import finalize_required_tasks
 
 __all__ = [
     "_bind_task_review_identity",
@@ -30,9 +32,16 @@ def _goal_payload(
     runtime, execution_tasks, definition_of_done = _contracts._goal_runtime(
         command, project_root, feature, skill_path, normalized_flags
     )
-    conventions, hooks, qe_analysis = _payload_extensions(
-        command, expectations, project_root, feature, normalized_flags, livespec_root
+    hooks = _contracts._compile_hooks_payload(
+        command=command,
+        livespec_root=livespec_root,
+        project_root=project_root,
+        feature=feature,
     )
+    qe_analysis = _contracts._compile_qe_analysis_payload(
+        command=command, livespec_root=livespec_root
+    )
+    stop = stop_condition(command, feature, normalized_flags, project_root)
     tasks = _compiled_payload_tasks(
         command,
         project_root,
@@ -42,22 +51,26 @@ def _goal_payload(
         runtime,
         execution_tasks,
         definition_of_done,
-        conventions,
         hooks,
         qe_analysis,
+        stop,
+        conventions_gated=_contracts.gates_path(project_root).exists()
+        and _expects_conventions_receipt(expectations),
     )
     payload = {
         **_goal_base_payload(command, feature, normalized_flags),
+        "goal_requirement": goal_requirement(command, normalized_flags),
+        "stop_condition": stop,
         "runtime_context": runtime,
+        # Indicative checklist: guidance only, never proven row by row.
         "execution_tasks": execution_tasks,
+        "definition_of_done": definition_of_done,
         "tasks": tasks,
         "internal_command_invocations": _contracts._extract_internal_command_invocations(
             skill_path
         ),
         "hooks": hooks,
         **({"qe_analysis": qe_analysis} if qe_analysis is not None else {}),
-        "conventions": conventions,
-        "definition_of_done": definition_of_done,
         **_contracts._goal_expectation_payload(expectations, project_root, livespec_root),
     }
     if command == "spec-init":
@@ -79,23 +92,6 @@ def _goal_expectation_payload(
                 expectations.source_path,
                 project_root=project_root,
                 livespec_root=livespec_root,
-            ),
-        },
-        "expectation_sections": {
-            "purpose": _contracts._normalize_section_lines(
-                expectations.prose_sections["1. Purpose"]
-            ),
-            "preconditions": _contracts._normalize_section_lines(
-                expectations.prose_sections["2. Preconditions"]
-            ),
-            "filesystem_effects": _contracts._normalize_section_lines(
-                expectations.prose_sections["4. Filesystem Effects"]
-            ),
-            "produced_artifacts": _contracts._normalize_section_lines(
-                expectations.prose_sections["6. Produced Artifacts"]
-            ),
-            "post_run_checks": _contracts._normalize_section_lines(
-                expectations.prose_sections["10. Post-run Checks"]
             ),
         },
         "verify_rules": _expectation_verify_rules(expectations),
@@ -172,10 +168,14 @@ def _goal_runtime(
 def _goal_rules() -> dict[str, Any]:
     return {
         "completion_actor": "goal",
-        "proof_required_for_each_task": True,
+        "checklist_is_indicative": True,
+        "proof_required_for_required_tasks_only": True,
         "worker_may_mark_tasks_complete": False,
         "missing_evidence_status": "REJECTED_NEEDS_ACTION",
-        "blocked_requires_canonical_line": True,
+        "max_attempts_per_task": MAX_ATTEMPTS_PER_TASK,
+        "exhausted_attempts_status": "BLOCKED",
+        "native_goal": "optional",
+        "recompile_on_input_drift": True,
     }
 
 
@@ -188,21 +188,27 @@ def _compiled_payload_tasks(
     runtime: dict[str, Any],
     execution_tasks: list[str],
     definition_of_done: list[str],
-    conventions: dict[str, Any],
     hooks: dict[str, Any],
     qe_analysis: dict[str, Any] | None,
+    stop: dict[str, Any],
+    *,
+    conventions_gated: bool,
 ) -> list[dict[str, Any]]:
     tasks = _contracts._build_goal_tasks(
         command=command,
         execution_tasks=execution_tasks,
         definition_of_done=definition_of_done,
         visual_feature_slugs=runtime["visual_feature_slugs"],
-        conventions=conventions,
-        conventions_gate_exists=_contracts.gates_path(project_root).exists(),
         hooks=hooks,
         qe_analysis=qe_analysis,
     )
     _contracts.apply_evidence_policy(tasks, skill_path, project_root=project_root, feature=feature)
+    tasks = finalize_required_tasks(
+        command,
+        tasks,
+        stop=stop,
+        conventions_gated=conventions_gated,
+    )
     if command == "spec-fix":
         from .fix_acceptance_scope import _bind_fix_acceptance_scope
 
@@ -211,31 +217,17 @@ def _compiled_payload_tasks(
     return tasks
 
 
-def _payload_extensions(
-    command: str,
-    expectations: _contracts.ExpectationsFile,
-    project_root: Path,
-    feature: str | None,
-    normalized_flags: list[str],
-    livespec_root: Path,
-) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any] | None]:
-    conventions = _contracts._compile_conventions_payload(
-        command=command,
-        expectations=expectations,
-        project_root=project_root,
-        feature=feature,
-        normalized_flags=normalized_flags,
+# @spec FR-006: Gate conventions where the command's expectations require the receipt
+#   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-006
+def _expects_conventions_receipt(expectations: _contracts.ExpectationsFile) -> bool:
+    buckets = [expectations.verify.must, *(branch.must for branch in expectations.verify.when)]
+    return any(
+        rule.kind == "receipt_verdict"
+        and isinstance(rule.payload, dict)
+        and rule.payload.get("kind") == "conventions"
+        for bucket in buckets
+        for rule in bucket
     )
-    hooks = _contracts._compile_hooks_payload(
-        command=command,
-        livespec_root=livespec_root,
-        project_root=project_root,
-        feature=feature,
-    )
-    qe_analysis = _contracts._compile_qe_analysis_payload(
-        command=command, livespec_root=livespec_root
-    )
-    return conventions, hooks, qe_analysis
 
 
 def _expectation_verify_rules(expectations: _contracts.ExpectationsFile) -> dict[str, Any]:
@@ -267,7 +259,7 @@ def _goal_base_payload(
         "command": command,
         "feature": feature,
         "normalized_flags": normalized_flags,
-        "mode": "enforced",
+        "mode": "outcome",
         "rules": _contracts._goal_rules(),
     }
 

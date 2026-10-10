@@ -124,37 +124,15 @@ def test_installed_namespaces_are_public_goal_provable(
     state_path = next((controls / "livespec-goals").glob("*.state.json"))
     immutable = contract_path.read_bytes()
     contract = json.loads(immutable)
-    tasks = [
-        task
-        for task in contract["tasks"]
-        if task["id"].startswith("dod.") and ".agent-sync" in task["description"]
-    ]
-    assert len(tasks) == 3
-    for task in tasks:
-        assert ".agent-sync.local/" in task["description"], task["description"]
-        assert ".agent-sync/" not in task["description"]
-        proof = runner.invoke(
-            app,
-            [
-                "goal",
-                "prove",
-                "--contract",
-                str(contract_path),
-                "--state",
-                str(state_path),
-                "--task",
-                task["id"],
-                "--evidence",
-                json.dumps(
-                    {
-                        "output": f"Verified installed assets: {paths}",
-                        "success_criteria_met": True,
-                        "artifact_paths": paths,
-                    }
-                ),
-            ],
-        )
-        assert proof.exit_code == 0 and "ACCEPTED" in proof.output, proof.output
+    # 081: DoD rows are indicative checklist items; they must still name the real namespaces.
+    rows = [row for row in contract["checklist"] if ".agent-sync" in row]
+    assert len(rows) == 3
+    for row in rows:
+        assert ".agent-sync.local/" in row, row
+        assert ".agent-sync/" not in row
+    assert all(Path(path).exists() for path in paths)
+    status = runner.invoke(app, ["goal", "status", "--state", str(state_path)])
+    assert status.exit_code == 0 and "status:active" in status.output, status.output
     assert contract_path.read_bytes() == immutable
     assert _hash_agents() == before
 

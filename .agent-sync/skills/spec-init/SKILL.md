@@ -18,36 +18,21 @@ description: Initialize LiveSpec interactively or from observed code with safe a
 description: "Initialize LiveSpec in a project through a 3-phase conversational brainstorm"
 ---
 
-> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — runtime goal contract (§5), 6-field step shape (§1), ERROR/BLOCKED format (§2), finalization gate.
+> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2), runtime goal contract for autonomous runs (§5).
 
-## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
+## STEP 0 — Goal (autonomous runs)
 
-La toute première action lors de `/spec-init` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
+A goal is required with `--auto` (including `--from-code --auto`); interactive and `--dry-run` runs may skip it. **Read** [runtime goal contract](../../../system/anti-drift-block.md#runtime-goal-contract) for the full protocol.
 
-1. Résoudre feature, cible et flags en lecture seule : normaliser `-f/-a/-D/-F/-d` vers `--from-code/--auto/--dir/--force/--dry-run`, conserver les valeurs de cible et de timeout. Si `--from-code` est demandé dans un flux non interactif ou avec « Proceed autonomously », « do not ask questions » ou équivalent, normaliser vers `--from-code --auto` **avant** `livespec goal render`. Résoudre `TARGET_DIR` depuis `--dir` (sinon cwd), puis utiliser cette même cible comme `project_root` du goal et pour le backend.
-   - En mode autonome, rejeter `--deep`, `--stack`, les flags non supportés et combinaisons incompatibles avant toute mutation ; ne pas les ignorer. `--force` et `--dry-run` restent explicites.
-   - `--dry-run` sélectionne `init-preview` : aucune installation, génération, sync ou exécution de hook mutante ; seule la preuve de preview et son archive sont produites hors du projet.
-2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat immuable et l'état mutable :
-   ```bash
-   livespec goal render spec-init --feature <feature-slug> --flags "<active-flags>" --save
-   ```
-   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.state.json`
-4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
-5. Émettre la commande slash `/goal` avec hash et références machine :
-   ```
-   /goal hash:<hash> | spec-init for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-init-<hash8>.state.json — mode:enforced
-   ```
-6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
-   ```bash
-   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
-   ```
-   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
-7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
+1. Resolve target and flags read-only: normalize `-f/-a/-D/-F/-d` to `--from-code/--auto/--dir/--force/--dry-run` and keep target and timeout values. A noninteractive `--from-code` request ("Proceed autonomously", "do not ask questions") becomes `--from-code --auto` before `livespec goal render`. `TARGET_DIR` comes from `--dir` (else cwd) and is both the goal `project_root` and the backend target.
+   - Autonomous mode rejects `--deep`, `--stack`, unsupported flags and incompatible combinations before any mutation; `--force` and `--dry-run` stay explicit.
+   - `--dry-run` selects `init-preview`: no installation, generation, sync or mutating hook; only the preview proof and its archive are produced outside the project.
+2. Run `livespec goal render spec-init --flags "<active-flags>" --save` (add `--model=<actual-model>` for review-bearing goals), then read `stop_condition`, `tasks` and `checklist` from the printed contract file.
+3. Mirror the goal in the native goal tool when one exists (Codex `create_goal`/`update_goal`, Claude Code `/goal`); update an active goal when allowed, otherwise leave it untouched. Without a native tool, print a warning and continue with the CLI contract.
+4. Work toward the stop condition. Prove each required task with `livespec goal prove`; the goal checks `outcome.verified` itself. After three rejections of one task, hand back the `BLOCKED` report.
+5. Before `DONE`: `livespec goal archive`, prove `archive.run`, confirm `livespec goal status` is complete, then mark the native mirror complete.
 
-Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+If `goal render` fails, report `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` with its stderr.
 
 # Command: /spec-init
 
@@ -1027,7 +1012,7 @@ Normalize autonomous intent to `--from-code --auto` at Step 0, before rendering 
    Record actual native/frontend families, product and technical names, package-manager evidence, explicit Unknown business fields, project-specific constitution, observed ADR, deduplicated testing tools and real probe results. Tooling READY certifies tool availability only.
 5. Verify integration markers, every required skill/provider output and project-local mutable agent copy. Check the unique local backup and retained feature/hook/run history for explicit force recovery. Preserve application/manifests/shared-source bytes; backend success never permits writes through shared links.
 6. Resolve the actual after-init hook chain at the selected target and apply its Markdown instructions in order. The backend does **not** execute these Markdown hooks. Preserve valid conventions; repair invalid generated conventions using backed-up content and actual ai-ressources sources. Every external command requested by a hook must use the same remaining global deadline through the bounded `validator.init_probes.run_command` API; no unbounded shell/CLI call or fresh 300-second allowance. Capture resolved context, applied instructions and actual subprocess outcomes. No hook is inferred executed from backend exit 0.
-7. Re-run current `--verify-only` after hooks and verify conventions/integration outputs; any content drift, required failure or exhausted deadline blocks completion. Do not manually rewrite `.specs/` artifacts to hide drift. Submit authentic task evidence through `livespec goal prove`, archive via `livespec goal archive`, prove `archive.run`, then check `livespec goal status` before command success. Backend `status: completed` describes its generated artifact; only this full goal closure completes `/spec-init`.
+7. Re-run current `--verify-only` after hooks and verify conventions/integration outputs; any content drift or required failure blocks completion. The deadline bounds each external command; once the current `--verify-only` passes (the goal stop condition), an elapsed deadline does not block completion. Do not manually rewrite `.specs/` artifacts to hide drift. Submit authentic task evidence through `livespec goal prove`, archive via `livespec goal archive`, prove `archive.run`, then check `livespec goal status` before command success. Backend `status: completed` describes its generated artifact; only this full goal closure completes `/spec-init`.
 
 Do not create repository history changes, branches, tags or pushes without explicit user authorization. Interactive from-code scan/recap validation remains the flow below; autonomous mode does not use its speculative inference or interview phases.
 
@@ -1106,10 +1091,10 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 > Active branches per run:
 > `init-autonomous` (--from-code + --auto, including aliases) · `init-interactive` (other installation modes) · `init-install` (shared non-preview installation) · `init-preview` (--dry-run/-d; no target mutation) · `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
 
-### Phase 0 — Goal Lock
+### Phase 0 — Goal
 
-- [always] Lock goal contract via `livespec goal render spec-init --save` <!-- evidence:documentary -->
-- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
+- [always] Render the goal via `livespec goal render spec-init --save` when the run requires one <!-- evidence:documentary -->
+- [always] Mirror the goal in the native goal tool when available (optional; warn and continue otherwise) <!-- evidence:documentary -->
 
 ### Phase A — Brainstorm
 
@@ -1169,7 +1154,7 @@ This command prepares inputs and reports inspection readiness. Do not require a 
 - [init-install] Scan and resolve after-init hook chain (3 levels) <!-- evidence:documentary -->
 - [init-install] Execute hooks in order; generate .conventions/index.md + manifest.yaml via after-init hook <!-- evidence:documentary -->
 
-- [init-autonomous] After hooks, rerun current --verify-only and verify integration/convention outputs within the remaining deadline <!-- evidence:documentary -->
+- [init-autonomous] After hooks, rerun current --verify-only and verify integration/convention outputs; an elapsed deadline never fails a passing verification <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
 

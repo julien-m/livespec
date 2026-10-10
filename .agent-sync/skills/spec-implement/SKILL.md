@@ -22,34 +22,20 @@ description: "Auto-implement from plan: analyze, code, test, map"
 argument-hint: "<feature-name>"
 ---
 
-> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — runtime goal contract (§5), 6-field step shape (§1), ERROR/BLOCKED format (§2), finalization gate.
+> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2), runtime goal contract for autonomous runs (§5).
 
-## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
+## STEP 0 — Goal (autonomous runs)
 
-La toute première action lors de `/spec-implement` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
+A goal is required unless `--step` or `--dry-run` is active. **Read** [runtime goal contract](../../../system/anti-drift-block.md#runtime-goal-contract) for the full protocol.
 
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule). **Read** [Goal review identity](../../../system/review-protocol.md#goal-review-identity) before rendering: include the actual resolved reviewer model and forward it with any review budget, including when documentary acceptance proof is required without a semantic-review task.
-2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat immuable et l'état mutable :
-   ```bash
-   livespec goal render spec-implement --feature <feature-slug> --flags "<active-flags>" --save
-   ```
-   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.state.json`
-4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
-5. Émettre la commande slash `/goal` avec hash et références machine :
-   ```
-   /goal hash:<hash> | spec-implement for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-implement-<hash8>.state.json — mode:enforced
-   ```
-6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
-   ```bash
-   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
-   ```
-   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
-7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
+1. Resolve feature and flags read-only.
+   For review-bearing goals, **Read** [goal review identity](../../../system/review-protocol.md#goal-review-identity) and keep `--model=<actual-model>` in the flags of every child command.
+2. Run `livespec goal render spec-implement [--feature <feature-slug>] --flags "<active-flags>" --save` (add `--model=<actual-model>` for review-bearing goals), then read `stop_condition`, `tasks` and `checklist` from the printed contract file.
+3. Mirror the goal in the native goal tool when one exists (Codex `create_goal`/`update_goal`, Claude Code `/goal`); update an active goal when allowed, otherwise leave it untouched. Without a native tool, print a warning and continue with the CLI contract.
+4. Work toward the stop condition. Prove each required task with `livespec goal prove`; the goal checks `outcome.verified` itself. After three rejections of one task, hand back the `BLOCKED` report.
+5. Before `DONE`: `livespec goal archive`, prove `archive.run`, confirm `livespec goal status` is complete, then mark the native mirror complete.
 
-Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+If `goal render` fails, report `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` with its stderr.
 
 ## Requirement evidence integrity
 
@@ -670,10 +656,10 @@ For UI certification closures, forward the same independent `--build-manifest <r
 > Active branches per run:
 > `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
 
-### Phase 0 — Goal Lock
+### Phase 0 — Goal
 
-- [always] Lock goal contract via `livespec goal render spec-implement --save` <!-- evidence:documentary -->
-- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
+- [always] Render the goal via `livespec goal render spec-implement --save` when the run requires one <!-- evidence:documentary -->
+- [always] Mirror the goal in the native goal tool when available (optional; warn and continue otherwise) <!-- evidence:documentary -->
 - [always] Read generated contract/state files and begin ordered proof-based execution <!-- evidence:documentary -->
 
 ### Phase 0.5 — Preflight Safety Contract
