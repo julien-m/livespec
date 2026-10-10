@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-10-11 — Feature 082 implemented: conventions gate signal (fixture exclusion, family grouping, framework applicability, repo baseline ratchet)
+<!-- finalize:spec-implement:2026-10-11:41daaa07 -->
+
 ## 2026-10-10 — Feature 082 Plan created: Conventions Gate Signal — 6 implementation steps, 2 diagrams
 <!-- finalize:spec-plan:2026-10-10:a5ebf692 -->
 

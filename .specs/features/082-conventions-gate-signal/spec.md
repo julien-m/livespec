@@ -1,10 +1,10 @@
 ---
 title: Conventions Gate Signal
 priority: P1
-updated: 2026-10-10
+updated: 2026-10-11
 feature: 082-conventions-gate-signal
 created: 2026-10-10
-status: Planned
+status: Implemented
 ---
 
 # Feature Spec: Conventions Gate Signal
@@ -13,7 +13,7 @@ status: Planned
 - **Feature Number:** 082
 - **Branch:** `fix/conventions-gate-signal`
 - **Date:** 2026-10-10
-- **Status:** Planned
+- **Status:** Implemented
 - **Input:** The repo-scope conventions gate on LiveSpec reports 1186 errors (main `457a252`): 849 come from intentionally invalid detector fixtures, one shared regex family detector multiplies a single match into 34 to 100 errors, framework rules (Next.js, Remotion) fire on a plain Node script, and there is no baseline, so pre-existing debt and new regressions are indistinguishable.
 
 ## Scope and Source Evidence

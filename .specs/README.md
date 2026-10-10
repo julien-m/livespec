@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-10-10
+> Last updated: 2026-10-11
 
 
 ---
@@ -118,7 +118,7 @@
 | 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-09-07 | [spec](features/078-requirement-evidence-integrity/spec.md) |
 | 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-09-08 | [spec](features/079-validator-ci-prerequisites/spec.md) |
 | 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-09 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
-| 082 | Conventions Gate Signal | Planned | 2026-10-10 | 2026-10-10 | [spec](features/082-conventions-gate-signal/spec.md) |
+| 082 | Conventions Gate Signal | Implemented | 2026-10-10 | 2026-10-11 | [spec](features/082-conventions-gate-signal/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -142,6 +142,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-11 | Feature | Feature 082 implemented: conventions gate signal (fixture exclusion, family grouping, framework applicability, repo baseline ratchet) |
 | 2026-10-10 | Plan | Feature 082 Plan created: Conventions Gate Signal — 6 implementation steps, 2 diagrams |
 | 2026-10-10 | Spec | Feature 082 Spec created: Conventions Gate Signal — 3 stories, 8 AC, 7 FR |
 | 2026-10-09 | Bugfix | Bugfix: observed autonomous init and safe force recovery |
@@ -151,7 +152,6 @@
 | 2026-09-08 | Check | Feature079 gen4 Check: deterministic CI, private corpus and AST prerequisites inspected; local gates verified, bounded native evidence separate, final CI/main pending. |
 | 2026-09-08 | Bugfix | Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending. |
 | 2026-09-08 | Check | Feature079 Check: local repair and native AC-002 verified; progress structure fixed; exact CI acceptance remains pending. |
-| 2026-09-07 | Check | [Feature 079] Check: Pre-fix audit resumed |
 <!-- readme:activity:end -->
 
 ---
@@ -277,3 +277,5 @@
 <!-- finalize:spec-specify:2026-10-10:e39214b3 -->
 
 <!-- finalize:spec-plan:2026-10-10:a5ebf692 -->
+
+<!-- finalize:spec-implement:2026-10-11:41daaa07 -->
