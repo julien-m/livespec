@@ -166,3 +166,79 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Code modified:** Pending implementation of the approved policy.
 - **Author:** Codex
 - GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.
+
+## 2026-10-09 — Check: Initial FR-002 normative-reference discovery audit
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **Coverage:** Selected FR-002/AC-002 partial; 36 bounded mechanics tests pass, current spec079 review preparation incomplete.
+- **Report:** Read [independent gap report](checks/2026-10-09.md).
+- **Author:** Codex native checker; goal18b10b99.
+
+
+## 2026-10-09 — [Check]: Fresh FR-002 discovery audit with explicit300k budget
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **Coverage:** SelectedFR-002/AC-002 partial;36 mechanics tests pass;079 preparation remains incomplete with24 reference errors at300000characters.
+- **Report:** Read [fresh independent gap report](checks/2026-10-09.md#fresh-initial-check--explicit-300000-character-budget).
+- **Author:** Native Codex checker;goal8633e818.
+
+
+## 2026-10-09 — [Check]: Independent post-fix FR-002 discovery verification
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None by checker
+- **Coverage:** Selecteddiscovery FR-002/AC-002 verified:61 tests plus independent complete-source/promotion/missing-contract counterexamples;five structural errors remain outside selected scope.
+- **Report:** Read [post-fix gap report](checks/2026-10-09.md#independent-post-fix-check).
+- **Author:** Native checker;contract8633e818 withfreshpostfix state.
+
+
+## 2026-10-09 — Bugfix: complete normative reference discovery
+
+- **Type:** Bugfix
+- **Spec modified:** No; filtered FR-002/AC-002 correction.
+- **Code modified:** Read the [canonical loader](../../../validator/semantic/review_files.py) and [discovery regressions](../../../tests/test_review_reference_discovery.py).
+- **Gaps closed:** Literal examples and inspected source documentation no longer create false normative dependencies; actual normative closure, full bytes, late fragment obligations and missing-contract rejection remain mandatory.
+- **Validation:** Authentic spec/plan reviews and implement progression used actual reviewer `gpt-6.1-sol`, operational300000-character budget. Independent assertion mapping used its own200000-character budget.123 actual tests passed; observed scoped runner capture certified AC-002. Independent post-fix check completed39/39 and confirmed selected discovery behavior.
+- **Remaining:** Five pre-existing structural errors across spec/implementation remain outside this filtered correction; full feature acceptance and Handy initialization are not claimed.
+- **Author:** spec-fix native child
+
+### 2026-10-09 — Filtered FR-002/AC-002 reference-discovery repair registry synchronized. Genuine Markdown contract closure and complete inspected source context are mapped to the loader and behavioral regressions. Full feature remains In Progress; independent check and actual scoped tests are recorded separately from full acceptance and Handy initialization.
+
+<!-- finalize:spec-fix:2026-10-09:9aab10f2 -->
+
+## 2026-10-10 — [Spec Update]: Independent initial FR-004 alignment check
+
+- Read the [initial report](checks/2026-10-10.md): two HIGH canonical feature identity gaps and one LOW public API documentation convention gap. Selected FR-004/AC-002/AC-004 are Partial; no runtime certification asserted.
+- Structural audit: 458 files, six existing errors in four files; preserved separately from selected repair gaps.
+- Spec/code/tests modified by checker: none. Implementation map remains parent-owned; feature stays In Progress.
+- Author: Codex independent check child; goal 14f3dadff08cc69e609f3a2a3360c3da02e7fe2285061660bfa06d8e9ea800be.
+
+
+## 2026-10-10 — [Check]: Post-fix canonical feature identity independently verified
+
+- **Type:** Spec Update; spec modified: No.
+- **Code/test modified by checker:** None.
+- **Coverage:** Three bounded identity rows (FR-004, AC-002, AC-004) verified; 0/16 FR and 0/16 AC fully re-certified by this check. Genuine selected mapping review complete/ready; runner-owned capture remains pending.
+- **Findings:** G001/G002/C001 closed in source; feature078 implementation schema restored by repair worker; three unrelated 074/079 structural errors retained.
+- **Execution provenance:** Worker177 affected tests and63 focused tests passed, current Ruff passed; these are not this checker's runner execution.
+- **Report:** Read the [independent post-fix gap report](checks/2026-10-10.md); read the [preserved initial report](../../.runs/handy-repair-v3-controls/check078-final/report-initial-preserved.md).
+- **Author:** Codex native independent checker; goal94d7f83c.
+
+<!-- check:94d7f83c:post-fix -->
+
+### 2026-10-10 — Fix: 2 selected functional gaps closed; boundary documentation and mapping structure completed
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** Read [owner resolution](../../../validator/semantic/review_feature_scope.py), [canonical review scope](../../../validator/semantic/review_files.py), [new-goal compilation](../../../validator/goal_compile.py), [boundary regressions](../../../tests/test_review_feature_resolution.py) and [complete v2 protocol pairs](../../../tests/test_review_lifecycle_protocol.py). Read the [protocol](../../../system/review-protocol.md), [implementation mapping](implementation.md) and [progress](progress.md) for the corresponding documentation.
+- **Gaps closed:** G001 canonical review owner/context; G002 new existing-feature goal identity. C001 public review boundary docstrings completed; implementation metadata and scoped FR/AC headings repaired. Existing numbered identity, stale/model/protocol checks and immutable goal contracts remain authoritative.
+- **Validation:** 63 focused and177 affected tests passed; five-file Ruff formatting/lint passed. Genuine independent mapping v1 rejected missing AC-004 pairs; new31 real API cases and fresh v2 review now cover AC-002/AC-004 with official complete/ready true and no blocking findings. Read the [v2 review receipt](../../.runs/handy-repair-v3-controls/mapping-review-v2.json). Final runner capture publishes its separate actual verdict after documentary freeze.
+- **Remaining:** Three structural errors in074 changelog/progress and079 implementation remain outside this repair, alongside preserved163 historical baseline failures. Native persisted opaque source remains unavailable, so no C46/UI certificate is created. The filtered feature remains In Progress.
+- **Author:** spec-fix
+
+<!-- finalize:spec-fix:2026-10-10:556265bd -->

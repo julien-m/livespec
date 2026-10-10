@@ -1,0 +1,35 @@
+{
+  "command": "spec-fix",
+  "created_at": "2026-10-09T11:53:41.398978+00:00",
+  "feature_slug": "078-requirement-evidence-integrity",
+  "files": [
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/changelog.md",
+      "sha256": "9bb103ea6348260fa1aadf89ea7f29424269ae87d7b15e29015a146a5b41dc23"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "8ed83fbefe44a6d7135171b520f72b6fd0b9f33f2ff9d2168268969bb6a5614c"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "7d09ecc8c34da3c5dff6686babb8c16f2f1c0fa947fcf49a353f3c58015cc19c"
+    },
+    {
+      "path": ".specs/features/078-requirement-evidence-integrity/spec.md",
+      "sha256": "360410369ff8da5d7ccd5325d84eb27ba76e3d71e13c3a3a32c4bcdffb744b0c"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "56bdb660167aa8306227c3a544fce27aa6942465e4ca65797e8d4930e95ce9ff"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "b6f0c7abd7ead76e5e26c055500aa3c074c3a9881867eef036e888a344b2f6c6",
+  "receipt_hash": "e71d6651e35680c601a002de6c6a5fa9cfde5da5eeb6b4574d134f5264d21d03",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

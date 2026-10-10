@@ -1,0 +1,127 @@
+--- INITIAL/tests/integration/helpers/sdk_runner.py
++++ CURRENT/tests/integration/helpers/sdk_runner.py
+@@ -1,11 +1,14 @@
++# @spec(FR-013)
++# .specs/features/078-requirement-evidence-integrity/spec.md#fr-013
+ """Claude Code SDK wrapper for running LiveSpec commands in tests."""
+ 
+ import asyncio
+ import shutil
+ import tempfile
+-from collections.abc import Awaitable, Callable
++from collections.abc import AsyncGenerator, Awaitable, Callable
+ from dataclasses import dataclass, field
+ from pathlib import Path
++from types import TracebackType
+ 
+ try:
+     from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, query
+@@ -23,6 +26,25 @@
+     total_input_tokens: int = 0
+     total_output_tokens: int = 0
+     error: str | None = None
++    timed_out: bool = False
++    _workspace: tempfile.TemporaryDirectory[str] | None = field(default=None, repr=False)
++
++    def close(self) -> None:
++        """Release the workspace only after caller-owned independent evaluation."""
++        if self._workspace is not None:
++            self._workspace.cleanup()
++            self._workspace = None
++
++    def __enter__(self) -> "CommandResult":
++        return self
++
++    def __exit__(
++        self,
++        exc_type: type[BaseException] | None,
++        exc_value: BaseException | None,
++        traceback: TracebackType | None,
++    ) -> None:
++        self.close()
+ 
+     @property
+     def estimated_cost_usd(self) -> float:
+@@ -41,36 +63,54 @@
+     Copy the fixture into a temporary directory and run the LiveSpec
+     command via the Claude Code SDK.
+     """
+-    fixture_src = fixtures_base / fixture_name
++    if timeout_sec <= 0:
++        raise ValueError("timeout_sec must be positive")
++    workspace = tempfile.TemporaryDirectory(prefix="livespec_test_")
++    cwd = Path(workspace.name)
++    result = CommandResult(success=False, cwd=cwd, _workspace=workspace)
++    try:
++        shutil.copytree(fixtures_base / fixture_name, cwd, dirs_exist_ok=True)
++        if not HAS_SDK:
++            result.error = "claude_agent_sdk unavailable"
++            return result
++        async with asyncio.timeout(timeout_sec):
++            await _collect_messages(command, cwd, max_turns, result)
++    except TimeoutError:
++        result.timed_out = True
++        result.error = "generation_timeout"
++    except Exception as exc:
++        # SDK/provider failures are returned as explicit diagnostics, never behavioral success.
++        result.error = str(exc)
++    return result
+ 
+-    with tempfile.TemporaryDirectory(prefix="livespec_test_") as tmp_dir:
+-        cwd = Path(tmp_dir)
+-        shutil.copytree(fixture_src, cwd, dirs_exist_ok=True)
+ 
+-        result = CommandResult(success=False, cwd=cwd)
+-
+-        try:
+-            async for message in query(
+-                prompt=command,
+-                options=ClaudeAgentOptions(
+-                    cwd=str(cwd),
+-                    allowed_tools=["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+-                    permission_mode="bypassPermissions",
+-                    max_turns=max_turns,
+-                    setting_sources=["project"],
+-                ),
+-            ):
+-                if isinstance(message, ResultMessage):
+-                    result.success = message.stop_reason == "end_turn"
+-                    result.stdout_messages.append(message.result or "")
+-                elif isinstance(message, AssistantMessage) and message.usage:
+-                    result.total_input_tokens += message.usage.get("input_tokens", 0)
+-                    result.total_output_tokens += message.usage.get("output_tokens", 0)
+-
+-        except Exception as e:
+-            result.error = str(e)
+-
+-        return result
++async def _collect_messages(command: str, cwd: Path, max_turns: int, result: CommandResult) -> None:
++    """Close the SDK transport on timeout/cancellation so its subprocess is reaped."""
++    messages = query(
++        prompt=command,
++        options=ClaudeAgentOptions(
++            cwd=str(cwd),
++            allowed_tools=["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
++            permission_mode="bypassPermissions",
++            max_turns=max_turns,
++            setting_sources=["project"],
++        ),
++    )
++    try:
++        async for message in messages:
++            if isinstance(message, ResultMessage):
++                result.success = not message.is_error
++                result.stdout_messages.append(message.result or "")
++            elif isinstance(message, AssistantMessage):
++                # Usage is provider-version-dependent; missing counters remain zero in this
++                # legacy estimate. Generation witnesses record measured nullable cost separately.
++                usage = getattr(message, "usage", None)
++                if isinstance(usage, dict):
++                    result.total_input_tokens += usage.get("input_tokens", 0)
++                    result.total_output_tokens += usage.get("output_tokens", 0)
++    finally:
++        if isinstance(messages, AsyncGenerator):
++            await messages.aclose()
+ 
+ 
+ async def run_with_retry(

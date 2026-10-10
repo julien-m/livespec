@@ -1,0 +1,33 @@
+--- INITIAL/.specs/features/070-analyze-gate/spec.md
++++ CURRENT/.specs/features/070-analyze-gate/spec.md
+@@ -18,6 +18,12 @@
+ - **Feature Number:** 070
+ 
+ ---
++
++## Evidence policy amendment — 2026-09-06
++
++Read [requirement evidence integrity](../078-requirement-evidence-integrity/spec.md) for current Analyze policy. FR-005/FR-011 and AC-005/AC-012 describe structural reference coverage only, never semantic compliance. Current mandatory Analyze additionally requires complete fresh grounded requirement dispositions; missing, contradictory or ambiguous obligations block. A diagnostic structural-only invocation remains available. FR-004/AC-004 require grounded constitutional contradictions; a phrase mentioned under negation is not a violation. Qualified requirement identities distinguish features; historical diagnostic reports retain their original meaning.
++
++When a complete fresh independent semantic review covers every obligation, missing literal ID references remain LOW structural findings and do not block a valid paraphrase. Structural-only diagnostics retain their HIGH reference findings; missing artifacts or unready semantic reviews still block.
+ 
+ ## User Scenarios & Testing
+ 
+@@ -308,7 +314,7 @@
+ | FR-001 | The system must run the analyze step as an integrated `/spec-feature` Phase 2.6 positioned after plan-review and before preflight and implement, reusing `/spec-check --pre-impl` (`livespec validate --pre-impl`) without adding a new command | AC-001, AC-011 |
+ | FR-002 | The system must provide `analyze_feature_artifacts(feature_dir, constitution_path)` that reads `spec.md`, `plan.md`, optional `implementation.md` and `constitution.md` and returns a `PreImplAnalysisReport` without writing any file | AC-002 |
+ | FR-003 | The system must emit a CRITICAL `artifact` finding for a missing `spec.md` and for a missing `plan.md` | AC-003 |
+-| FR-004 | The system must extract each constitution `MUST NOT <phrase>` and emit a CRITICAL `constitution` finding when the phrase appears case-insensitively in `spec.md` or `plan.md` | AC-004 |
++| FR-004 | The system must emit a CRITICAL `constitution` finding only for a grounded contradiction of a constitutional prohibition, never from phrase presence alone | AC-004 |
+ | FR-005 | The system must collect requirement IDs from `spec.md` via the pattern `\b(?:FR\|AC\|SC)-\d+\b` and mark each covered iff its token appears in `plan.md` or `implementation.md`, emitting a HIGH `coverage` finding for each uncovered requirement | AC-005, AC-006 |
+ | FR-006 | The system must derive each finding ID as `AN-<CATEGORY>-<first 8 hex of sha1(category\|severity\|locations\|summary)>` so identical artifacts yield identical IDs | AC-007 |
+ | FR-007 | The system must restrict severity to the CRITICAL/HIGH/MEDIUM/LOW set, with CRITICAL reserved for constitution violations and missing `spec.md`/`plan.md` and HIGH reserved for an uncovered requirement | AC-008 |
+@@ -336,7 +342,7 @@
+ 
+ ### FR-004
+ 
+-**Requirement:** The system must extract each constitution `MUST NOT <phrase>` and emit a CRITICAL `constitution` finding when the phrase appears case-insensitively in `spec.md` or `plan.md`
++**Requirement:** The system must emit a CRITICAL `constitution` finding only for a grounded contradiction of a constitutional prohibition, never from phrase presence alone
+ **AC References:** [AC-004](#ac-004)
+ 
+ ### FR-005

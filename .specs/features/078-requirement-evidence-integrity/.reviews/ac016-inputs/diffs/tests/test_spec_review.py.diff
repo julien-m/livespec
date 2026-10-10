@@ -1,0 +1,20 @@
+--- INITIAL/tests/test_spec_review.py
++++ CURRENT/tests/test_spec_review.py
+@@ -199,7 +199,7 @@
+         _, kwargs = mock.call_args
+         assert kwargs.get("model") == "google/gemini-3.1-pro"
+ 
+-    def test_truncates_long_spec(self):
++    def test_preserves_complete_long_spec(self):
+         long_spec = "x" * 20000
+         response = self._mock_response([])
+ 
+@@ -207,5 +207,6 @@
+             review_spec(long_spec)
+ 
+         prompt = mock.call_args[0][0]
+-        # Prompt should contain truncated content (8000 chars max)
+-        assert len(prompt) < 20000
++        # 078 supersedes the legacy truncation requirement.
++        assert long_spec in prompt
++        assert len(prompt) > 20000

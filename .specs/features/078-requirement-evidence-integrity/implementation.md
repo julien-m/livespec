@@ -1,15 +1,20 @@
+---
+title: "Requirement Evidence Integrity Implementation"
+feature: "078-requirement-evidence-integrity"
+---
+
 # Implementation — Requirement Evidence Integrity
 
 Read the [contract](spec.md), [approved plan](plan.md), [progress](progress.md) and [verification report](verification-report.md). All five axes and eight implementation steps are implemented and regression-tested. This map is frozen before final acceptance capture; canonical receipts and generated archives publish the actual later verdicts. Source links are traceability, not proof receipts.
 
-## Requirement and acceptance mapping
+## Requirement Mapping
 
 | Requirement | Acceptance scope | Implementation | Regression coverage |
 |---|---|---|---|
 | FR-001 | AC-001, AC-002 | Read [qualified inventory](../../../validator/semantic/review_context.py). | Read [context tests](../../../tests/test_review_context.py). |
-| FR-002 | AC-002 | Read [complete batches](../../../validator/semantic/review_batches.py), [synthesis](../../../validator/semantic/review_synthesis.py) and [lossless synthesis transport](../../../validator/semantic/review_synthesis_transport.py). | Read [paired-plan/blocker tests](../../../tests/test_review_batching.py) and [transport/budget tests](../../../tests/test_review_synthesis_transport.py). |
+| FR-002 | AC-002 | Read [canonical dependency discovery](../../../validator/semantic/review_files.py), [complete batches](../../../validator/semantic/review_batches.py), [synthesis](../../../validator/semantic/review_synthesis.py) and [lossless synthesis transport](../../../validator/semantic/review_synthesis_transport.py). | Read [reference-discovery counterexamples](../../../tests/test_review_reference_discovery.py), [paired-plan/blocker tests](../../../tests/test_review_batching.py) and [transport/budget tests](../../../tests/test_review_synthesis_transport.py). |
 | FR-003 | AC-003 | Read [grounded validation](../../../validator/semantic/review_contract.py) and [semantic Analyze](../../../validator/semantic_analysis.py). | Read [semantic gate tests](../../../tests/test_gate_review_evidence.py). |
-| FR-004 | AC-002, AC-004 | Read [review receipts](../../../validator/semantic/review_receipts.py), [v2 identity](../../../validator/normative_identity.py) and [metadata bounds](../../../validator/lifecycle_metadata.py). | Read [context tests](../../../tests/test_review_context.py), [legacy001/077 tests](../../../tests/test_lifecycle_metadata.py) and [freshness tests](../../../tests/test_progression_integrity.py). |
+| FR-004 | AC-002, AC-004 | Read [review receipts](../../../validator/semantic/review_receipts.py), [existing-owner resolution](../../../validator/semantic/review_feature_scope.py), [canonical review inputs](../../../validator/semantic/review_files.py), [new-goal compilation](../../../validator/goal_compile.py), [v2 identity](../../../validator/normative_identity.py) and [metadata bounds](../../../validator/lifecycle_metadata.py). | Read [existing-owner boundary tests](../../../tests/test_review_feature_resolution.py), [complete v2 protocol pairs](../../../tests/test_review_lifecycle_protocol.py), [context tests](../../../tests/test_review_context.py), [legacy001/077 tests](../../../tests/test_lifecycle_metadata.py) and [freshness tests](../../../tests/test_progression_integrity.py). |
 | FR-005 | AC-004 | Read [structural analysis](../../../validator/pre_impl_analysis.py) and [pure report rendering](../../../validator/pre_impl_render.py); semantic contradiction comes from grounded review. | Read [Analyze tests](../../../tests/test_pre_impl_analysis.py). |
 | FR-006 | AC-005 | Read [bilingual detection](../../../validator/clarify_gate.py) and [review/context inventory](../../../validator/clarify_inventory.py). | Read [clarification tests](../../../tests/test_clarify_gate.py) and [approved-context tests](../../../tests/test_gate_review_evidence.py). |
 | FR-007 | AC-006 | Read [complete ambiguity inventory](../../../validator/clarify_inventory.py). | Read [six-question/noncritical-choice tests](../../../tests/test_gate_review_evidence.py). |
@@ -22,6 +27,15 @@ Read the [contract](spec.md), [approved plan](plan.md), [progress](progress.md) 
 | FR-014 | AC-013 | Read [selection](../../../tests/integration/helpers/generation_selection.py), [opt-in evaluation runner](../../../tests/integration/helpers/generation_ci.py) and [workflow](../../../.github/workflows/ci.yml). | Read [selection tests](../../../tests/test_generation_selection.py) and [private corpus wiring tests](../../../tests/test_generation_ci_selection.py) and [deterministic GitHub policy tests](../../../tests/test_generation_ci_events.py). Runtime completion remains separate from selection. |
 | FR-015 | AC-014 | Read [shared progression](../../../validator/progression_gate.py), [pipeline](../../../validator/pipeline.py), [review validation](../../../validator/pipeline_review_validation.py), [approval recovery](../../../validator/pipeline_approval_write.py) and [native protocol](../../../system/review-protocol.md). | Read [direct/nested tests](../../../tests/test_progression_integrity.py), [publication tests](../../../tests/test_pipeline_gate_publication.py), [rollback tests](../../../tests/test_pipeline_approval_rollback.py), [CLI dispatch](../../../tests/test_gate_cli_dispatch.py) and [generation gates](../../../tests/test_spec_test_progression_contract.py). |
 | FR-016 | AC-015, AC-016 | Read [versioned policy](../../../validator/evidence_policy.py), [documentary acceptance review](../../../validator/semantic/acceptance_review.py), [lifecycle finalizer](../../../validator/finalize_spec.py) and [058 amendment](../058-deterministic-finalization/spec.md#fr-002). | Read [legacy policy tests](../../../tests/test_evidence_policy.py), [legacy archive CLI tests](../../../tests/test_verify_output_legacy_policy.py), [review-kind archive compatibility](../../../tests/test_review_kind_archives.py), [finalizer tests](../../../tests/test_finalize_lifecycle.py), [first CLI closure](../../../tests/test_finalize_review_boundary.py) and [077 identity tests](../../../tests/test_penflow_requirement_source.py). |
+
+## Acceptance Criteria Mapping
+
+This filtered FR-004 repair maps only AC-002 and AC-004 to a current independent assertion review. The requirement table above preserves all historical traceability; other acceptance scopes retain their original receipts and are not certified by this repair. Feature status remains In Progress.
+
+| Acceptance scope | Current regression sources | Current evidence boundary |
+|---|---|---|
+| AC-002 | Read [complete context tests](../../../tests/test_review_context.py), [dependency discovery](../../../tests/test_review_reference_discovery.py) and [owner resolution tests](../../../tests/test_review_feature_resolution.py). | Independent v2 mapping review complete/ready; final runner capture pending at this documentary checkpoint. |
+| AC-004 | Read [owner freshness tests](../../../tests/test_review_feature_resolution.py), [v2 identity pairs](../../../tests/test_review_lifecycle_protocol.py), [legacy metadata tests](../../../tests/test_lifecycle_metadata.py) and [negated prohibition tests](../../../tests/test_pre_impl_analysis.py). | Independent v2 mapping review complete/ready; final runner capture pending at this documentary checkpoint. |
 
 ## Behavior and process
 
@@ -132,3 +146,9 @@ Read the [mapping ingestion guard](../../../validator/mapping_review_validation.
 ## 2026-09-08 — GitHub policy amendment
 
 The explicit user decision supersedes the earlier CI selector descriptions: GitHub runs only deterministic unit and level_3a integration checks, without model providers or credentials. Local opt-in selection, generation and evidence helpers remain intact. Read [the policy tests](../../../tests/test_generation_ci_events.py) and [private corpus tests](../../../tests/test_generation_ci_selection.py) for current FR-014/AC-013 behavior. Historical trial and verification reports retain their original scope; current runtime and CI proof are pending.
+
+## 2026-10-09 — Filtered FR-002 repair
+
+- Read the [source loader](../../../validator/semantic/review_files.py): `@spec FR-002` and `@spec AC-002` map genuine Markdown dependency discovery, complete source inspection, normative promotion/closure and full fragment targets.
+- Read the [discovery counterexamples](../../../tests/test_review_reference_discovery.py): literal code/HTML/escaped links remain submitted data; genuine inline/reference/table links, missing/outside contracts, inspected context identity, later promotion, late fragment obligations and cycles receive behavioral assertions. Existing full-context/batch/malformed review tests retain their original coverage.
+- Authentic current spec/plan review and implement progression used actual reviewer `gpt-6.1-sol`, budget300000. The separately prepared AC-002 assertion-mapping review uses budget200000; source bytes and reviewed assertion spans govern that independent scope. Runner receipt and independent check provide their own later verdict; the feature remains In Progress because this repair is filtered.

@@ -1,0 +1,2589 @@
+{
+  "schema_version": "1",
+  "feature": "078-requirement-evidence-integrity",
+  "reviewer_model": "gpt-6-astra",
+  "review_max_chars": 200000,
+  "review_receipt_path": ".specs/features/078-requirement-evidence-integrity/.reviews/acceptance-review.json",
+  "bindings": [
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-001",
+      "test_id": "tests.test_review_context::test_cross_feature_ids_and_repeated_declarations_keep_all_spans",
+      "expected": "Repeated local FR IDs remain distinct as f:FR-001 and g:FR-001.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 95,
+      "end_line": 95,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-001",
+      "test_id": "tests.test_pre_impl_analysis::test_negated_prohibition_is_not_reported_as_violation",
+      "expected": "ID reference coverage is explicitly structural_reference.",
+      "assertion_path": "tests/test_pre_impl_analysis.py",
+      "start_line": 142,
+      "end_line": 142,
+      "source_sha256": "6a6e1498d1890e1f5072498f162444a0c75a9f2809ce81499d5692ed71b74488",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_late_source_and_all_normative_sections_are_submitted",
+      "expected": "The submitted context preserves all late spec text including Gherkin beyond the old cutoff.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_batched_review_requires_complete_synthesis",
+      "expected": "Missing cross-batch synthesis cannot complete a review.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 208,
+      "end_line": 208,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_batched_review_requires_complete_synthesis",
+      "expected": "A complete grounded synthesis can become ready.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 216,
+      "end_line": 216,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_oversized_indivisible_or_missing_reference_never_calls_provider",
+      "expected": "Oversized indivisible context and unresolved references remain incomplete.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 189,
+      "end_line": 189,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_claimed_success_without_grounding_is_incomplete[omitted]",
+      "expected": "Omitted conclusions cannot establish complete review.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-002",
+      "test_id": "tests.test_review_context::test_claimed_success_without_grounding_is_incomplete[citation]",
+      "expected": "Forged source citations cannot establish complete review.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-003",
+      "test_id": "tests.test_gate_review_evidence::test_matching_ids_cannot_override_contradictory_review",
+      "expected": "Matching IDs cannot override an independently contradictory disposition.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 87,
+      "end_line": 87,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. The reviewer response is a transport fixture; this tests gate mechanics, not universal model judgment."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-003",
+      "test_id": "tests.test_gate_review_evidence::test_complete_equivalent_review_allows_semantic_readiness",
+      "expected": "A grounded equivalent paraphrase can satisfy semantic readiness.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 103,
+      "end_line": 103,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Uses a grounded reviewer response fixture to test consumption."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-003",
+      "test_id": "tests.test_review_context::test_paraphrase_and_contradiction_are_independent_judgments",
+      "expected": "Unrelated matching-ID text with missing disposition is complete but not ready.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Uses actual schema validation with a reviewer transport fixture."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-003",
+      "test_id": "tests.test_review_context::test_extra_scope_needs_independent_justification",
+      "expected": "Unapproved extra business behavior blocks readiness.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 154,
+      "end_line": 154,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-003",
+      "test_id": "tests.test_review_context::test_extra_scope_needs_independent_justification",
+      "expected": "A justified technical necessity remains allowed.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 160,
+      "end_line": 160,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_pre_impl_analysis::test_negated_prohibition_is_not_reported_as_violation",
+      "expected": "A promise never to perform an explicitly forbidden action is not a contradiction.",
+      "assertion_path": "tests/test_pre_impl_analysis.py",
+      "start_line": 141,
+      "end_line": 141,
+      "source_sha256": "6a6e1498d1890e1f5072498f162444a0c75a9f2809ce81499d5692ed71b74488",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_review_context::test_exact_cache_reuses_only_complete_matching_raw_evidence",
+      "expected": "An unchanged exact review reuses the cache with one total provider call.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 230,
+      "end_line": 230,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_review_context::test_exact_cache_reuses_only_complete_matching_raw_evidence",
+      "expected": "Changed plan bytes invalidate prior review.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 234,
+      "end_line": 234,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_review_context::test_exact_cache_reuses_only_complete_matching_raw_evidence",
+      "expected": "Changed reviewer identity invalidates prior review.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 236,
+      "end_line": 236,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-005",
+      "test_id": "tests.test_clarify_gate::test_unrelated_population_does_not_resolve_security",
+      "expected": "French and English secure-for-ten-users claims both remain ambiguous.",
+      "assertion_path": "tests/test_clarify_gate.py",
+      "start_line": 157,
+      "end_line": 157,
+      "source_sha256": "5ccb45777ca8d21709222f2d05601e7f93cd5c81ca79b4d0ee888abe2d8ae46f",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-005",
+      "test_id": "tests.test_clarify_gate::test_metric_belongs_to_quality_not_neighbouring_claim",
+      "expected": "A latency metric does not resolve a neighboring security or robustness claim.",
+      "assertion_path": "tests/test_clarify_gate.py",
+      "start_line": 167,
+      "end_line": 167,
+      "source_sha256": "5ccb45777ca8d21709222f2d05601e7f93cd5c81ca79b4d0ee888abe2d8ae46f",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-005",
+      "test_id": "tests.test_gate_review_evidence::test_approved_context_resolves_business_question",
+      "expected": "Grounded approved-context resolution removes blocking ambiguity.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 154,
+      "end_line": 154,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-005",
+      "test_id": "tests.test_gate_review_evidence::test_duplicate_review_decisions_are_presented_once",
+      "expected": "Duplicate semantic questions are retained and presented once.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 167,
+      "end_line": 167,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-006",
+      "test_id": "tests.test_gate_review_evidence::test_six_critical_review_questions_are_never_lost",
+      "expected": "Six critical unresolved questions block progression.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-006",
+      "test_id": "tests.test_gate_review_evidence::test_six_critical_review_questions_are_never_lost",
+      "expected": "All six questions remain in the full inventory.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 178,
+      "end_line": 178,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-006",
+      "test_id": "tests.test_gate_review_evidence::test_six_critical_review_questions_are_never_lost",
+      "expected": "Only five questions are presented at once.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 179,
+      "end_line": 179,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-006",
+      "test_id": "tests.test_gate_review_evidence::test_accepted_decision_preserves_ids_and_invalidates_prior_review",
+      "expected": "Recording a decision preserves existing requirement text and IDs.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 202,
+      "end_line": 202,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-006",
+      "test_id": "tests.test_gate_review_evidence::test_accepted_decision_preserves_ids_and_invalidates_prior_review",
+      "expected": "An accepted decision invalidates the prior review until refreshed.",
+      "assertion_path": "tests/test_gate_review_evidence.py",
+      "start_line": 205,
+      "end_line": 205,
+      "source_sha256": "fb34f2deddb4eae327c8ab9fe8773f2a4bf973e24755146e9fdc246c29c37052",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_evidence_policy::test_current_execution_rejects_prose_but_old_contract_keeps_original_meaning",
+      "expected": "A current execution task rejects text plus success boolean.",
+      "assertion_path": "tests/test_evidence_policy.py",
+      "start_line": 21,
+      "end_line": 23,
+      "source_sha256": "6d0e3bac49b8430debfbe19537381da0e997595213da7b36b6274a0295050b27",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_evidence_policy::test_compiled_inventory_explicit_kind_and_scope",
+      "expected": "Compiled tasks explicitly distinguish documentary, review and execution proof.",
+      "assertion_path": "tests/test_evidence_policy.py",
+      "start_line": 41,
+      "end_line": 41,
+      "source_sha256": "6d0e3bac49b8430debfbe19537381da0e997595213da7b36b6274a0295050b27",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_evidence_policy::test_serialized_goal_enforces_canonical_policy_even_without_optional_mirror",
+      "expected": "Canonical current goal proof cannot be weakened by dropping an optional policy mirror.",
+      "assertion_path": "tests/test_evidence_policy.py",
+      "start_line": 73,
+      "end_line": 73,
+      "source_sha256": "6d0e3bac49b8430debfbe19537381da0e997595213da7b36b6274a0295050b27",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_evidence::test_real_pytest_proves_only_reviewed_acceptance",
+      "expected": "Real pytest execution with a grounded independent acceptance mapping can certify its scope.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 25,
+      "end_line": 25,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_evidence::test_real_pytest_proves_only_reviewed_acceptance",
+      "expected": "Only the mapped qualified AC is certified.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 26,
+      "end_line": 26,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_evidence::test_real_pytest_proves_only_reviewed_acceptance",
+      "expected": "The exact passing assertion callback count is observed as one.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 28,
+      "end_line": 28,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_evidence::test_real_pytest_proves_only_reviewed_acceptance",
+      "expected": "An additional uncovered AC remains unproven.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 29,
+      "end_line": 29,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_evidence::test_unexecuted_assertion_cannot_certify_a_passing_case[if False:]",
+      "expected": "A passing test with an unexecuted conditional assertion cannot certify its binding.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_evidence::test_unexecuted_assertion_cannot_certify_a_passing_case[def never_called():]",
+      "expected": "An assertion in an uncalled nested function cannot certify its binding.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_evidence::test_helper_assertion_cannot_impersonate_unexecuted_same_line_assertion",
+      "expected": "An executed helper assertion cannot impersonate an unexecuted same-line test-file assertion.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 240,
+      "end_line": 240,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_mapping::test_partial_mapping_reviews_full_context_but_certifies_only_declared_ac",
+      "expected": "A partial independent review keeps full normative context but certifies only the declared executed AC.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 90,
+      "end_line": 90,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_mapping::test_partial_mapping_reviews_full_context_but_certifies_only_declared_ac",
+      "expected": "Requiring an uncovered AC remains unproven after valid partial certification.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 91,
+      "end_line": 91,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_mapping::test_governed_inputs_changed_during_certification_cannot_pass[True-mapping]",
+      "expected": "Transient mapping bytes changed during consumption cannot certify even when restored before final verification.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_mapping::test_governed_inputs_changed_during_certification_cannot_pass[True-review]",
+      "expected": "Transient review bytes changed during consumption cannot certify even when restored before final verification.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_mapping::test_governed_review_changed_after_certification_cannot_pass",
+      "expected": "A governed raw review changed after certification is rejected by final current-input verification.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 186,
+      "end_line": 186,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_supported_pytest_input_mutation_rejects_passing_assertion",
+      "expected": "A supported trusted pytest invocation with one passing observed assertion and exit zero remains noncertifying when app source changes during that invocation.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 52,
+      "end_line": 52,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_supported_pytest_input_mutation_rejects_passing_assertion",
+      "expected": "The runner captures different before-and-after hashes for the actual application source changed during the passing invocation.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 49,
+      "end_line": 49,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_supported_pytest_input_mutation_rejects_passing_assertion",
+      "expected": "A supported trusted pytest invocation with one passing observed assertion and exit zero remains noncertifying when app source changes during that invocation.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 52,
+      "end_line": 52,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_supported_pytest_input_mutation_rejects_passing_assertion",
+      "expected": "The runner captures different before-and-after hashes for the actual application source changed during the passing invocation.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 49,
+      "end_line": 49,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_any_conservative_input_change_invalidates_capture[source]",
+      "expected": "A source input change invalidates an earlier runner capture.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 28,
+      "end_line": 28,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_any_conservative_input_change_invalidates_capture[test]",
+      "expected": "A test input change invalidates an earlier runner capture.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 28,
+      "end_line": 28,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_any_conservative_input_change_invalidates_capture[config]",
+      "expected": "A config input change invalidates an earlier runner capture.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 28,
+      "end_line": 28,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_any_conservative_input_change_invalidates_capture[new]",
+      "expected": "A new input change invalidates an earlier runner capture.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 28,
+      "end_line": 28,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_any_conservative_input_change_invalidates_capture[delete]",
+      "expected": "A delete input change invalidates an earlier runner capture.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 28,
+      "end_line": 28,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_changed_during_run_cannot_be_certified",
+      "expected": "Concurrent source mutation during the invocation cannot certify execution.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 37,
+      "end_line": 37,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_foreign_feature_and_copy_are_rejected",
+      "expected": "A receipt from another feature cannot certify this feature.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_evidence::test_real_pytest_all_skipped_reports_no_passing_execution",
+      "expected": "An actual all-skipped pytest report cannot certify execution.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 120,
+      "end_line": 120,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_report_replacement_with_identical_bytes_is_rejected",
+      "expected": "Replacing a captured report inode, even with identical bytes, invalidates provenance.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 71,
+      "end_line": 71,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-010",
+      "test_id": "tests.test_execution_evidence::test_unsupported_driver_still_runs_without_certification",
+      "expected": "A custom unsupported driver remains runnable.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 88,
+      "end_line": 88,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-010",
+      "test_id": "tests.test_execution_evidence::test_unsupported_driver_still_runs_without_certification",
+      "expected": "An unsupported driver reports a certification gap.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 90,
+      "end_line": 90,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-010",
+      "test_id": "tests.test_execution_evidence::test_fake_pytest_named_executable_cannot_certify",
+      "expected": "A lookalike executable producing valid XML cannot certify test execution.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 165,
+      "end_line": 165,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_generation_witnesses::test_correct_seed_observes_real_behavior[python-purge]",
+      "expected": "The frozen independent python-purge behavioral oracle observes its correct seed behavior.",
+      "assertion_path": "tests/integration/test_generation_witnesses.py",
+      "start_line": 33,
+      "end_line": 33,
+      "source_sha256": "d555028b6fde26355d19f77af2a52a5826c3f533495f8760f8a1025f2f4f49a8",
+      "justification": "The executed assertion directly checks this stated sub-obligation. For UI this is behavior only; complete C51 authority is checked in the separate prepared UI test."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_generation_witnesses::test_correct_seed_observes_real_behavior[typescript-api]",
+      "expected": "The frozen independent typescript-api behavioral oracle observes its correct seed behavior.",
+      "assertion_path": "tests/integration/test_generation_witnesses.py",
+      "start_line": 33,
+      "end_line": 33,
+      "source_sha256": "d555028b6fde26355d19f77af2a52a5826c3f533495f8760f8a1025f2f4f49a8",
+      "justification": "The executed assertion directly checks this stated sub-obligation. For UI this is behavior only; complete C51 authority is checked in the separate prepared UI test."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_generation_witnesses::test_correct_seed_observes_real_behavior[ui-form]",
+      "expected": "The frozen independent ui-form behavioral oracle observes its correct seed behavior.",
+      "assertion_path": "tests/integration/test_generation_witnesses.py",
+      "start_line": 33,
+      "end_line": 33,
+      "source_sha256": "d555028b6fde26355d19f77af2a52a5826c3f533495f8760f8a1025f2f4f49a8",
+      "justification": "The executed assertion directly checks this stated sub-obligation. For UI this is behavior only; complete C51 authority is checked in the separate prepared UI test."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_generation_witnesses::test_behavioral_mutants_fail[python-purge-purge.py-path.unlink()-pass]",
+      "expected": "A relevant behavior-breaking mutant is rejected by its independent frozen oracle.",
+      "assertion_path": "tests/integration/test_generation_witnesses.py",
+      "start_line": 63,
+      "end_line": 63,
+      "source_sha256": "d555028b6fde26355d19f77af2a52a5826c3f533495f8760f8a1025f2f4f49a8",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_generation_witnesses::test_behavioral_mutants_fail[typescript-api-app.ts-!== \"Bearer witness\"-=== \"never\"]",
+      "expected": "A relevant behavior-breaking mutant is rejected by its independent frozen oracle.",
+      "assertion_path": "tests/integration/test_generation_witnesses.py",
+      "start_line": 63,
+      "end_line": 63,
+      "source_sha256": "d555028b6fde26355d19f77af2a52a5826c3f533495f8760f8a1025f2f4f49a8",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_generation_witnesses::test_behavioral_mutants_fail[ui-form-index.html- required-]",
+      "expected": "A relevant behavior-breaking mutant is rejected by its independent frozen oracle.",
+      "assertion_path": "tests/integration/test_generation_witnesses.py",
+      "start_line": 63,
+      "end_line": 63,
+      "source_sha256": "d555028b6fde26355d19f77af2a52a5826c3f533495f8760f8a1025f2f4f49a8",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_generation_witnesses::test_modified_oracle_or_candidate_escape_invalidates[oracle]",
+      "expected": "An altered frozen oracle identity invalidates witness evaluation.",
+      "assertion_path": "tests/integration/test_generation_witnesses.py",
+      "start_line": 76,
+      "end_line": 76,
+      "source_sha256": "d555028b6fde26355d19f77af2a52a5826c3f533495f8760f8a1025f2f4f49a8",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_prepared_ui_authority::test_prepared_ui_c51_authority_is_independent_of_livespec_feature_pipeline",
+      "expected": "The actual prepared UI candidate passes cumulative C51 authority through its independently captured manifest and receipt.",
+      "assertion_path": "tests/integration/test_prepared_ui_authority.py",
+      "start_line": 29,
+      "end_line": 29,
+      "source_sha256": "d8be0715c9794b0b5294e382cbece79d1e1c1d3d5925803f82c2bc2972f9df5f",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Requires actual LIVESPEC_PREPARED_UI_RECEIPT input. A skipped test cannot certify this binding. External three-mutant C51 trial report remains separate supporting evidence."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-011",
+      "test_id": "tests.integration.test_prepared_ui_authority::test_prepared_ui_c51_authority_is_independent_of_livespec_feature_pipeline",
+      "expected": "All five actual UI behavior assertions and an independently verified authority capture are present.",
+      "assertion_path": "tests/integration/test_prepared_ui_authority.py",
+      "start_line": 30,
+      "end_line": 30,
+      "source_sha256": "d8be0715c9794b0b5294e382cbece79d1e1c1d3d5925803f82c2bc2972f9df5f",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Uses actual prepared UI capture, not a fabricated authority response."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_one_repair_is_distinct_from_first_attempt_success",
+      "expected": "A trial repaired on attempt two is reported distinctly as repaired_success with attempts=2.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 40,
+      "end_line": 40,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Transport is a deterministic double; this does not establish a real model trial or model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_unavailable_runtime_records_not_run_without_an_attempt",
+      "expected": "An unavailable runtime reports not_run and zero attempts.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 15,
+      "end_line": 15,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Runtime availability is a transport double, not a claim that a runtime was exercised."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_unavailable_runtime_records_not_run_without_an_attempt",
+      "expected": "Unmeasured trial cost remains explicitly unknown.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 16,
+      "end_line": 16,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_selection::test_core_sample_and_full_runtime_matrix_are_explicit",
+      "expected": "A core review change selects the bounded python-purge model sample.",
+      "assertion_path": "tests/test_generation_selection.py",
+      "start_line": 14,
+      "end_line": 14,
+      "source_sha256": "c341b79efad1a3f87a501f985286c35ec956bc77d914e76b3cf8795ac61cfd36",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_selection::test_core_sample_and_full_runtime_matrix_are_explicit",
+      "expected": "Full selection enumerates all three witnesses across both declared runtimes.",
+      "assertion_path": "tests/test_generation_selection.py",
+      "start_line": 20,
+      "end_line": 20,
+      "source_sha256": "c341b79efad1a3f87a501f985286c35ec956bc77d914e76b3cf8795ac61cfd36",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_selection::test_unavailable_or_duplicate_trials_are_not_completed",
+      "expected": "A missing runtime cannot count as completed coverage or parity.",
+      "assertion_path": "tests/test_generation_selection.py",
+      "start_line": 27,
+      "end_line": 27,
+      "source_sha256": "c341b79efad1a3f87a501f985286c35ec956bc77d914e76b3cf8795ac61cfd36",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-014",
+      "test_id": "tests.test_progression_integrity::test_native_prepare_and_ingest_feed_direct_and_nested_gate",
+      "expected": "Prepared and ingested current review permits direct implementation progression.",
+      "assertion_path": "tests/test_progression_integrity.py",
+      "start_line": 24,
+      "end_line": 24,
+      "source_sha256": "d0f0f6efb2afc83d509cacdab50a213d9ccf8cbecb43fb0731cd612e03a65b4b",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-014",
+      "test_id": "tests.test_progression_integrity::test_native_prepare_and_ingest_feed_direct_and_nested_gate",
+      "expected": "The same current review permits nested pipeline progression.",
+      "assertion_path": "tests/test_progression_integrity.py",
+      "start_line": 39,
+      "end_line": 39,
+      "source_sha256": "d0f0f6efb2afc83d509cacdab50a213d9ccf8cbecb43fb0731cd612e03a65b4b",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-014",
+      "test_id": "tests.test_progression_integrity::test_native_prepare_and_ingest_feed_direct_and_nested_gate",
+      "expected": "Changing the plan blocks direct implementation progression.",
+      "assertion_path": "tests/test_progression_integrity.py",
+      "start_line": 41,
+      "end_line": 43,
+      "source_sha256": "d0f0f6efb2afc83d509cacdab50a213d9ccf8cbecb43fb0731cd612e03a65b4b",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-014",
+      "test_id": "tests.test_progression_integrity::test_skip_cannot_erase_required_clarification",
+      "expected": "A skipped Clarify phase cannot erase a mandatory gate.",
+      "assertion_path": "tests/test_progression_integrity.py",
+      "start_line": 98,
+      "end_line": 98,
+      "source_sha256": "d0f0f6efb2afc83d509cacdab50a213d9ccf8cbecb43fb0731cd612e03a65b4b",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_evidence_policy::test_current_execution_rejects_prose_but_old_contract_keeps_original_meaning",
+      "expected": "Legacy immutable contracts retain their original readable evidence interpretation.",
+      "assertion_path": "tests/test_evidence_policy.py",
+      "start_line": 24,
+      "end_line": 24,
+      "source_sha256": "6d0e3bac49b8430debfbe19537381da0e997595213da7b36b6274a0295050b27",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_evidence_policy::test_current_execution_rejects_prose_but_old_contract_keeps_original_meaning",
+      "expected": "Unknown future policy versions fail closed.",
+      "assertion_path": "tests/test_evidence_policy.py",
+      "start_line": 25,
+      "end_line": 27,
+      "source_sha256": "6d0e3bac49b8430debfbe19537381da0e997595213da7b36b6274a0295050b27",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_goal_bootstrap_archive::test_archive_before_specs_blocks_without_creation",
+      "expected": "Bootstrap archive validation preserves its no-creation boundary before .specs exists.",
+      "assertion_path": "tests/test_goal_bootstrap_archive.py",
+      "start_line": 33,
+      "end_line": 33,
+      "source_sha256": "da4489f27ca1050452e0a8f3ee1dc84d624c72dde928f30d996e2cd6f30c3fb5",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_penflow_contract_verification::test_implementation_manifest_is_not_taken_from_report",
+      "expected": "Cumulative Penflow still requires an independently supplied build manifest.",
+      "assertion_path": "tests/test_penflow_contract_verification.py",
+      "start_line": 229,
+      "end_line": 229,
+      "source_sha256": "e22c8f1647e2941ccd073f7d6a574be8faf7f8a2b1fef807dbf0cf4827d6a78d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "First finalization of an actual legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "Subsequent completion of the same legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "A normative retention clause added after lifecycle finalization invalidates prior review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 61,
+      "end_line": 61,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "First finalization of an actual legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "Subsequent completion of the same legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "A normative retention clause added after lifecycle finalization invalidates prior review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 61,
+      "end_line": 61,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_finalize_lifecycle::test_status_completion_preserves_normative_body_and_current_receipt",
+      "expected": "Both recognized lifecycle bands update only Status/Updated values across completion; all other specification text stays exact.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 38,
+      "end_line": 40,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_finalize_lifecycle::test_status_completion_preserves_normative_body_and_current_receipt",
+      "expected": "First finalization adds no body marker to the specification.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 33,
+      "end_line": 33,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_finalize_lifecycle::test_existing_comments_and_examples_are_preserved_verbatim[<!-- finalize:spec-plan:2026-09-06:1234abcd -->]",
+      "expected": "Historical finalization comments remain verbatim while both declared lifecycle bands change.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 102,
+      "end_line": 104,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_finalize_lifecycle::test_crlf_non_lifecycle_bytes_survive_status_transition",
+      "expected": "CRLF specification bytes change only at the two recognized Status values.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 196,
+      "end_line": 196,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_review_context::test_lifecycle_only_change_preserves_review_but_body_and_creation_stay_bound",
+      "expected": "Lifecycle-equivalent semantic review retains different exact raw source provenance.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_review_context::test_lifecycle_only_change_preserves_review_but_body_and_creation_stay_bound",
+      "expected": "Changing the initial creation date rejects reuse.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 274,
+      "end_line": 274,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_evidence_policy::test_lifecycle_identity_rejects_malformed_or_business_metadata",
+      "expected": "Malformed, duplicate, business-valued and non-lifecycle metadata changes remain bound.",
+      "assertion_path": "tests/test_evidence_policy.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "6d0e3bac49b8430debfbe19537381da0e997595213da7b36b6274a0295050b27",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_progression_integrity::test_file_review_preserves_crlf_hashes_citations_and_freshness",
+      "expected": "A CRLF-to-LF rewrite outside lifecycle values invalidates current file-backed review.",
+      "assertion_path": "tests/test_progression_integrity.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "d0f0f6efb2afc83d509cacdab50a213d9ccf8cbecb43fb0731cd612e03a65b4b",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_application_execution_named_directory_remains_in_scope",
+      "expected": "Real application source under a generated-output-looking directory remains bound.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 122,
+      "end_line": 122,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "First finalization of an actual legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "Subsequent completion of the same legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "A normative retention clause added after lifecycle finalization invalidates prior review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 61,
+      "end_line": 61,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "First finalization of an actual legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "Subsequent completion of the same legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "A normative retention clause added after lifecycle finalization invalidates prior review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 61,
+      "end_line": 61,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_finalize_lifecycle::test_status_completion_preserves_normative_body_and_current_receipt",
+      "expected": "Both recognized lifecycle bands update only Status/Updated values across completion; all other specification text stays exact.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 38,
+      "end_line": 40,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_finalize_lifecycle::test_status_completion_preserves_normative_body_and_current_receipt",
+      "expected": "First finalization adds no body marker to the specification.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 33,
+      "end_line": 33,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_finalize_lifecycle::test_existing_comments_and_examples_are_preserved_verbatim[<!-- finalize:spec-plan:2026-09-06:1234abcd -->]",
+      "expected": "Historical finalization comments remain verbatim while both declared lifecycle bands change.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 102,
+      "end_line": 104,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_finalize_lifecycle::test_crlf_non_lifecycle_bytes_survive_status_transition",
+      "expected": "CRLF specification bytes change only at the two recognized Status values.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 196,
+      "end_line": 196,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_review_context::test_lifecycle_only_change_preserves_review_but_body_and_creation_stay_bound",
+      "expected": "Lifecycle-equivalent semantic review retains different exact raw source provenance.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_review_context::test_lifecycle_only_change_preserves_review_but_body_and_creation_stay_bound",
+      "expected": "Changing the initial creation date rejects reuse.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 274,
+      "end_line": 274,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_evidence_policy::test_lifecycle_identity_rejects_malformed_or_business_metadata",
+      "expected": "Malformed, duplicate, business-valued and non-lifecycle metadata changes remain bound.",
+      "assertion_path": "tests/test_evidence_policy.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "6d0e3bac49b8430debfbe19537381da0e997595213da7b36b6274a0295050b27",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_progression_integrity::test_file_review_preserves_crlf_hashes_citations_and_freshness",
+      "expected": "A CRLF-to-LF rewrite outside lifecycle values invalidates current file-backed review.",
+      "assertion_path": "tests/test_progression_integrity.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "d0f0f6efb2afc83d509cacdab50a213d9ccf8cbecb43fb0731cd612e03a65b4b",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_application_execution_named_directory_remains_in_scope",
+      "expected": "Real application source under a generated-output-looking directory remains bound.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 122,
+      "end_line": 122,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "First finalization of an actual legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "Subsequent completion of the same legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[001-auto-llm-review]",
+      "expected": "A normative retention clause added after lifecycle finalization invalidates prior review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 61,
+      "end_line": 61,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "First finalization of an actual legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 56,
+      "end_line": 56,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "Subsequent completion of the same legacy header copy preserves the independently grounded current review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_lifecycle_metadata::test_real_legacy_spec_finalization_keeps_review_current[077-penflow-cumulative-verdict-consumer]",
+      "expected": "A normative retention clause added after lifecycle finalization invalidates prior review.",
+      "assertion_path": "tests/test_lifecycle_metadata.py",
+      "start_line": 61,
+      "end_line": 61,
+      "source_sha256": "239fb02d3d32aa61fb2d07184c119bac151f620d411a780950e0bdcaf8572d59",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_finalize_lifecycle::test_status_completion_preserves_normative_body_and_current_receipt",
+      "expected": "Both recognized lifecycle bands update only Status/Updated values across completion; all other specification text stays exact.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 38,
+      "end_line": 40,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_finalize_lifecycle::test_status_completion_preserves_normative_body_and_current_receipt",
+      "expected": "First finalization adds no body marker to the specification.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 33,
+      "end_line": 33,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_finalize_lifecycle::test_existing_comments_and_examples_are_preserved_verbatim[<!-- finalize:spec-plan:2026-09-06:1234abcd -->]",
+      "expected": "Historical finalization comments remain verbatim while both declared lifecycle bands change.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 102,
+      "end_line": 104,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_finalize_lifecycle::test_crlf_non_lifecycle_bytes_survive_status_transition",
+      "expected": "CRLF specification bytes change only at the two recognized Status values.",
+      "assertion_path": "tests/test_finalize_lifecycle.py",
+      "start_line": 196,
+      "end_line": 196,
+      "source_sha256": "8a0b6364202fe72bba3eadceb03cd0716e31fbbb0930f6f212ea7c640e8c63a1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_review_context::test_lifecycle_only_change_preserves_review_but_body_and_creation_stay_bound",
+      "expected": "Lifecycle-equivalent semantic review retains different exact raw source provenance.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_review_context::test_lifecycle_only_change_preserves_review_but_body_and_creation_stay_bound",
+      "expected": "Changing the initial creation date rejects reuse.",
+      "assertion_path": "tests/test_review_context.py",
+      "start_line": 274,
+      "end_line": 274,
+      "source_sha256": "27ba50b3a17de3e0c94bc0159471c1108c9a090a71f4fbbbd46178b62dfd05a9",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_evidence_policy::test_lifecycle_identity_rejects_malformed_or_business_metadata",
+      "expected": "Malformed, duplicate, business-valued and non-lifecycle metadata changes remain bound.",
+      "assertion_path": "tests/test_evidence_policy.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "6d0e3bac49b8430debfbe19537381da0e997595213da7b36b6274a0295050b27",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_progression_integrity::test_file_review_preserves_crlf_hashes_citations_and_freshness",
+      "expected": "A CRLF-to-LF rewrite outside lifecycle values invalidates current file-backed review.",
+      "assertion_path": "tests/test_progression_integrity.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "d0f0f6efb2afc83d509cacdab50a213d9ccf8cbecb43fb0731cd612e03a65b4b",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_application_execution_named_directory_remains_in_scope",
+      "expected": "Real application source under a generated-output-looking directory remains bound.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 122,
+      "end_line": 122,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{\"model\":\"controlled-codex\",\"total_cost_usd\":0.125}-controlled-codex-0.125]",
+      "expected": "A correct first generated candidate is reported as first-attempt success with one actual attempted invocation.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{\"model\":\"controlled-codex\",\"total_cost_usd\":0.125}-controlled-codex-0.125]",
+      "expected": "Reported duration is measured and positive within the observed wall-clock trial duration.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{\"model\":\"controlled-codex\",\"total_cost_usd\":0.125}-controlled-codex-0.125]",
+      "expected": "Observed runtime and CLI version are retained.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 110,
+      "end_line": 110,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{\"model\":\"controlled-codex\",\"total_cost_usd\":0.125}-controlled-codex-0.125]",
+      "expected": "Model identity and measured-or-unknown cost come from the captured producer output.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 111,
+      "end_line": 111,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{\"model\":\"controlled-codex\",\"total_cost_usd\":0.125}-controlled-codex-0.125]",
+      "expected": "Persisted trial JSON retains the same model and measured-or-unknown cost.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 114,
+      "end_line": 114,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[claude-{\"modelUsage\":{\"controlled-claude\":{}},\"total_cost_usd\":0.25}-controlled-claude-0.25]",
+      "expected": "A correct first generated candidate is reported as first-attempt success with one actual attempted invocation.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[claude-{\"modelUsage\":{\"controlled-claude\":{}},\"total_cost_usd\":0.25}-controlled-claude-0.25]",
+      "expected": "Reported duration is measured and positive within the observed wall-clock trial duration.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[claude-{\"modelUsage\":{\"controlled-claude\":{}},\"total_cost_usd\":0.25}-controlled-claude-0.25]",
+      "expected": "Observed runtime and CLI version are retained.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 110,
+      "end_line": 110,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[claude-{\"modelUsage\":{\"controlled-claude\":{}},\"total_cost_usd\":0.25}-controlled-claude-0.25]",
+      "expected": "Model identity and measured-or-unknown cost come from the captured producer output.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 111,
+      "end_line": 111,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[claude-{\"modelUsage\":{\"controlled-claude\":{}},\"total_cost_usd\":0.25}-controlled-claude-0.25]",
+      "expected": "Persisted trial JSON retains the same model and measured-or-unknown cost.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 114,
+      "end_line": 114,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{}-None-None]",
+      "expected": "A correct first generated candidate is reported as first-attempt success with one actual attempted invocation.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 107,
+      "end_line": 107,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{}-None-None]",
+      "expected": "Reported duration is measured and positive within the observed wall-clock trial duration.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{}-None-None]",
+      "expected": "Observed runtime and CLI version are retained.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 110,
+      "end_line": 110,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{}-None-None]",
+      "expected": "Model identity and measured-or-unknown cost come from the captured producer output.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 111,
+      "end_line": 111,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_first_attempt_reports_observed_capture_fields[codex-{}-None-None]",
+      "expected": "Persisted trial JSON retains the same model and measured-or-unknown cost.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 114,
+      "end_line": 114,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Producer transport is an explicit deterministic double; independent behavioral oracle executes in a real subprocess. These assertions do not claim model performance."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_terminal_behavior_failure_preserves_attempt_count_and_unknown_cost",
+      "expected": "A behaviorally incorrect candidate remains failure after both allowed attempts.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 131,
+      "end_line": 131,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Explicit producer transport double, actual failing external behavioral oracle."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_expected_unauthorized_block_is_decided_by_external_http_oracle[False]",
+      "expected": "A predeclared unauthorized API scenario is correctly blocked only when the independent HTTP oracle observes authorization rejection and nonmutation.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 172,
+      "end_line": 172,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Transport double; actual HTTP oracle executes against the generated candidate."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_expected_unauthorized_block_is_decided_by_external_http_oracle[True]",
+      "expected": "An authorization-bypassing candidate fails the expected-block scenario.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Transport double; actual HTTP oracle."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_expected_block_does_not_relabel_missing_runtime_or_runtime_failure[False]",
+      "expected": "Unavailable runtime remains not_run and failed runtime remains failure, never correct_blocked.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 194,
+      "end_line": 194,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Explicit runtime transport doubles test outcome reporting only."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-012",
+      "test_id": "tests.test_generation_trials::test_expected_block_does_not_relabel_missing_runtime_or_runtime_failure[True]",
+      "expected": "Unavailable runtime remains not_run and failed runtime remains failure, never correct_blocked.",
+      "assertion_path": "tests/test_generation_trials.py",
+      "start_line": 194,
+      "end_line": 194,
+      "source_sha256": "06176cc7426a290e5507ee5b009f9cac83751df6a0c49d26c2ea18d12083ed81",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Explicit runtime transport doubles test outcome reporting only."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; lifecycle edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[retention-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; retention edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[threshold-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; threshold edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[permission-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; permission edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[created-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; created edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-explicit]",
+      "expected": "Lifecycle-equivalent explicit metadata updates keep distinct original raw provenance.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 247,
+      "end_line": 247,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; lifecycle edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[retention-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; retention edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[threshold-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; threshold edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[permission-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; permission edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[created-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; created edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-legacy]",
+      "expected": "Lifecycle-equivalent legacy metadata updates keep distinct original raw provenance.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 247,
+      "end_line": 247,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; lifecycle edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[retention-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; retention edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[threshold-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; threshold edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[permission-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; permission edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[created-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; created edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-explicit]",
+      "expected": "Lifecycle-equivalent explicit metadata updates keep distinct original raw provenance.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 247,
+      "end_line": 247,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; lifecycle edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[retention-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; retention edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[threshold-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; threshold edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[permission-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; permission edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[created-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; created edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-legacy]",
+      "expected": "Lifecycle-equivalent legacy metadata updates keep distinct original raw provenance.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 247,
+      "end_line": 247,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; lifecycle edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[retention-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; retention edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[threshold-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; threshold edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[permission-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; permission edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[created-explicit]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the explicit metadata band; created edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-explicit]",
+      "expected": "Lifecycle-equivalent explicit metadata updates keep distinct original raw provenance.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 247,
+      "end_line": 247,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; lifecycle edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[retention-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; retention edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[threshold-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; threshold edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[permission-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; permission edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[created-legacy]",
+      "expected": "Actual pytest execution remains certifying only for Status/Updated-only changes in the legacy metadata band; created edits have the explicitly expected eligibility.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 248,
+      "end_line": 248,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_scope::test_lifecycle_bands_preserve_only_status_updated_execution_identity[lifecycle-legacy]",
+      "expected": "Lifecycle-equivalent legacy metadata updates keep distinct original raw provenance.",
+      "assertion_path": "tests/test_execution_scope.py",
+      "start_line": 247,
+      "end_line": 247,
+      "source_sha256": "a5cb0756d0d98e75f6cd26ea48f516abb2ac6da9d85b5829d217ebff51bbb45d",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_evidence_upgrade_boundaries::test_current_policy_schema_or_prompt_change_rejects_old_review[POLICY_VERSION]",
+      "expected": "Changing current POLICY_VERSION invalidates the old independently grounded review.",
+      "assertion_path": "tests/test_evidence_upgrade_boundaries.py",
+      "start_line": 30,
+      "end_line": 30,
+      "source_sha256": "948da29aac95139cd258c94fd552e5ae5b0cbfe73cf77bb126f53deb53181c5c",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_evidence_upgrade_boundaries::test_current_policy_schema_or_prompt_change_rejects_old_review[SCHEMA_VERSION]",
+      "expected": "Changing current SCHEMA_VERSION invalidates the old independently grounded review.",
+      "assertion_path": "tests/test_evidence_upgrade_boundaries.py",
+      "start_line": 30,
+      "end_line": 30,
+      "source_sha256": "948da29aac95139cd258c94fd552e5ae5b0cbfe73cf77bb126f53deb53181c5c",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-004",
+      "test_id": "tests.test_evidence_upgrade_boundaries::test_current_policy_schema_or_prompt_change_rejects_old_review[PROMPT_VERSION]",
+      "expected": "Changing current PROMPT_VERSION invalidates the old independently grounded review.",
+      "assertion_path": "tests/test_evidence_upgrade_boundaries.py",
+      "start_line": 30,
+      "end_line": 30,
+      "source_sha256": "948da29aac95139cd258c94fd552e5ae5b0cbfe73cf77bb126f53deb53181c5c",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_evidence_upgrade_boundaries::test_legacy_archive_remains_readable_but_cannot_certify_current_execution",
+      "expected": "A real historical CLI archive remains readable and verifiable with its original versioned interpretation.",
+      "assertion_path": "tests/test_evidence_upgrade_boundaries.py",
+      "start_line": 59,
+      "end_line": 59,
+      "source_sha256": "948da29aac95139cd258c94fd552e5ae5b0cbfe73cf77bb126f53deb53181c5c",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_evidence_upgrade_boundaries::test_legacy_archive_remains_readable_but_cannot_certify_current_execution",
+      "expected": "That same readable historical archive cannot substitute for current runner execution evidence.",
+      "assertion_path": "tests/test_evidence_upgrade_boundaries.py",
+      "start_line": 66,
+      "end_line": 66,
+      "source_sha256": "948da29aac95139cd258c94fd552e5ae5b0cbfe73cf77bb126f53deb53181c5c",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_goal_bootstrap_prove::test_project_evidence_escape_blocks_without_state_mutation[absolute]",
+      "expected": "Rejected evidence outside the project cannot mutate goal state.",
+      "assertion_path": "tests/test_goal_bootstrap_prove.py",
+      "start_line": 115,
+      "end_line": 115,
+      "source_sha256": "724d90e35e7bb9b1a676929ec8e67500707b5b5d8f8655ae583aed2ecda0f452",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_goal_bootstrap_prove::test_receipt_symlink_escape_is_blocked_without_state_mutation",
+      "expected": "A linked conventions receipt outside the project cannot mutate goal state.",
+      "assertion_path": "tests/test_goal_bootstrap_prove.py",
+      "start_line": 266,
+      "end_line": 266,
+      "source_sha256": "724d90e35e7bb9b1a676929ec8e67500707b5b5d8f8655ae583aed2ecda0f452",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_finalize_review_boundary::test_first_finalize_preserves_current_review_prove_and_archive",
+      "expected": "Current independent review remains valid through first real finalization, proof, archive and terminal verification.",
+      "assertion_path": "tests/test_finalize_review_boundary.py",
+      "start_line": 105,
+      "end_line": 105,
+      "source_sha256": "4ce4fa6a31af04d23a8a6fc60c1b36f4687eb4a8b2069a847e9c06ca6ca0e279",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_run_receipts::test_v2_conventions_receipt_round_trip_verifies",
+      "expected": "A versioned conventions receipt remains independently revalidated at the run boundary.",
+      "assertion_path": "tests/test_run_receipts.py",
+      "start_line": 129,
+      "end_line": 129,
+      "source_sha256": "98cd5c8a1392324451c841b24741912769afc59c8f4709520db6a3355d2df7fc",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_penflow_closure::test_terminal_pipeline_revalidates_even_outside_test_phase[next]",
+      "expected": "Terminal pipeline progression continues to require cumulative visual certification.",
+      "assertion_path": "tests/test_penflow_closure.py",
+      "start_line": 84,
+      "end_line": 84,
+      "source_sha256": "2d765837f0046b912ab66ad7e9e1d6069c7ea439bc3d319006dcbc4e32cb16a2",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_finalize_penflow::test_real_visual_closure_blocks_before_implemented_write",
+      "expected": "A failed actual visual closure blocks the Implemented transition without modifying feature registries.",
+      "assertion_path": "tests/test_finalize_penflow.py",
+      "start_line": 139,
+      "end_line": 139,
+      "source_sha256": "14178170da78e45bae17f3233dd2f7d7937821289064e199e495454afb2a96c2",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_goal_contracts::test_goal_prove_rejects_non_pass_conventions_receipt",
+      "expected": "Current goal proof rejects a non-PASS conventions receipt.",
+      "assertion_path": "tests/test_goal_contracts.py",
+      "start_line": 1345,
+      "end_line": 1345,
+      "source_sha256": "43a9b42bcaf5fb8802387cdc51aacd07ec6cf96f9c3647e1877a23fcc847f4b1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_goal_contracts::test_goal_prove_rejects_legacy_visual_design_fidelity_payload",
+      "expected": "Current visual proof rejects the obsolete unbound visual payload.",
+      "assertion_path": "tests/test_goal_contracts.py",
+      "start_line": 2513,
+      "end_line": 2513,
+      "source_sha256": "43a9b42bcaf5fb8802387cdc51aacd07ec6cf96f9c3647e1877a23fcc847f4b1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_goal_contracts::test_goal_prove_rejects_visual_receipt_from_wrong_feature",
+      "expected": "A visual receipt for a different feature cannot complete current visual proof.",
+      "assertion_path": "tests/test_goal_contracts.py",
+      "start_line": 2670,
+      "end_line": 2670,
+      "source_sha256": "43a9b42bcaf5fb8802387cdc51aacd07ec6cf96f9c3647e1877a23fcc847f4b1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_goal_contracts::test_goal_prove_rejects_tampered_finalize_receipt",
+      "expected": "A tampered finalization receipt cannot complete current proof.",
+      "assertion_path": "tests/test_goal_contracts.py",
+      "start_line": 2879,
+      "end_line": 2879,
+      "source_sha256": "43a9b42bcaf5fb8802387cdc51aacd07ec6cf96f9c3647e1877a23fcc847f4b1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_goal_contracts::test_goal_prove_accepts_visual_design_fidelity_receipt",
+      "expected": "An independently verified current visual receipt can still satisfy its specialized goal task.",
+      "assertion_path": "tests/test_goal_contracts.py",
+      "start_line": 2585,
+      "end_line": 2585,
+      "source_sha256": "43a9b42bcaf5fb8802387cdc51aacd07ec6cf96f9c3647e1877a23fcc847f4b1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_execution_mapping::test_declared_review_acceptance_cannot_be_certified_by_passing_pytest",
+      "expected": "Actual passing pytest cannot substitute for a requirement explicitly declared to need independent review.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 199,
+      "end_line": 199,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_mapping::test_execution_mapping_certifies_only_its_declared_kind_with_review_ac_present",
+      "expected": "Only the declared execution requirement is certified when a separate review requirement exists.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 217,
+      "end_line": 217,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_mapping::test_execution_mapping_certifies_only_its_declared_kind_with_review_ac_present",
+      "expected": "Supplying an independent-review requirement as required runtime scope remains rejected.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 219,
+      "end_line": 219,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-008",
+      "test_id": "tests.test_execution_mapping::test_transient_spec_replacement_cannot_borrow_an_old_execution_review",
+      "expected": "A spec transiently replaced during read and restored before final verification cannot borrow an old execution review.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 247,
+      "end_line": 247,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_mapping::test_transient_spec_replacement_cannot_borrow_an_old_execution_review",
+      "expected": "A spec transiently replaced during read and restored before final verification cannot borrow an old execution review.",
+      "assertion_path": "tests/test_execution_mapping.py",
+      "start_line": 247,
+      "end_line": 247,
+      "source_sha256": "a5add7dd961f6e217adc93e0dbfb9c5fe3721192c2771b9d07fe310a6288364a",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_execution_join::test_real_execution_and_documentary_review_jointly_prove_archive_and_verify",
+      "expected": "A current canonical goal proves, archives and terminally verifies only with both real runtime capture and independently grounded documentary acceptance.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 113,
+      "end_line": 113,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_execution_join::test_real_runtime_cannot_replace_missing_forged_or_stale_documentary_review[missing]",
+      "expected": "Real runtime evidence cannot replace missing documentary acceptance in current goal proof.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_execution_join::test_real_runtime_cannot_replace_missing_forged_or_stale_documentary_review[forged]",
+      "expected": "Real runtime evidence cannot replace forged documentary acceptance in current goal proof.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_execution_join::test_real_runtime_cannot_replace_missing_forged_or_stale_documentary_review[stale]",
+      "expected": "Real runtime evidence cannot replace stale documentary acceptance in current goal proof.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_execution_join::test_archive_and_terminal_read_recheck_documentary_review_after_real_execution",
+      "expected": "Terminal archive reading revalidates documentary evidence and rejects a forged review after real runtime success.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 141,
+      "end_line": 141,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_execution_join::test_archive_and_terminal_read_recheck_documentary_review_after_real_execution",
+      "expected": "Rearchiving cannot retain success after its documentary review is forged.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 158,
+      "end_line": 158,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_execution_join::test_unchanged_policy1_real_capture_archives_and_rechecks_without_current_exemption",
+      "expected": "An immutable policy1 fixture with original declaration scope retains real runner proof through actual archive and verify-output.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 216,
+      "end_line": 216,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "The executed assertion directly checks this stated sub-obligation. The canonical version1 contract is an explicit compatibility fixture; capture, archive and read are real local executions."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_execution_join::test_unchanged_policy1_real_capture_archives_and_rechecks_without_current_exemption",
+      "expected": "The same policy1-compatible capture cannot gain a declaration exemption in current policy2 validation.",
+      "assertion_path": "tests/test_acceptance_execution_join.py",
+      "start_line": 219,
+      "end_line": 219,
+      "source_sha256": "67de8e5717e69ce21b58ae652efbe1ab8214369badc9d1df2b22e273f83e4e96",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_identical_sources_require_a_new_current_runner_capture[None]",
+      "expected": "A real historical runner capture remains certifying under its immutable original policy.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 39,
+      "end_line": 39,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Historical serializer is explicitly reproduced at runner publication; actual pytest process and source snapshots remain real."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_identical_sources_require_a_new_current_runner_capture[None]",
+      "expected": "An unchanged historical runner capture cannot certify current policy2 acceptance.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 41,
+      "end_line": 41,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_identical_sources_require_a_new_current_runner_capture[None]",
+      "expected": "Historical and current captures compare exactly identical normalized source snapshots.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 48,
+      "end_line": 48,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_identical_sources_require_a_new_current_runner_capture[None]",
+      "expected": "A fresh current-policy runner invocation certifies the same acceptance on unchanged sources.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 49,
+      "end_line": 49,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_identical_sources_require_a_new_current_runner_capture[1]",
+      "expected": "A real historical runner capture remains certifying under its immutable original policy.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 39,
+      "end_line": 39,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. Historical serializer is explicitly reproduced at runner publication; actual pytest process and source snapshots remain real."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_identical_sources_require_a_new_current_runner_capture[1]",
+      "expected": "An unchanged historical runner capture cannot certify current policy2 acceptance.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 41,
+      "end_line": 41,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_identical_sources_require_a_new_current_runner_capture[1]",
+      "expected": "Historical and current captures compare exactly identical normalized source snapshots.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 48,
+      "end_line": 48,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_identical_sources_require_a_new_current_runner_capture[1]",
+      "expected": "A fresh current-policy runner invocation certifies the same acceptance on unchanged sources.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 49,
+      "end_line": 49,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_unknown_runner_policy_cannot_certify_current_acceptance",
+      "expected": "An unknown runner evidence policy cannot certify current acceptance.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_runner_policy_is_bound_to_the_published_capture_hash",
+      "expected": "Changing the captured evidence-policy marker invalidates the runner receipt hash.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 85,
+      "end_line": 85,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_old_failed_assertion_remains_red_only_for_its_historical_policy",
+      "expected": "A real historical failed assertion remains an expected RED observation under its original policy only.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 94,
+      "end_line": 94,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_old_failed_assertion_remains_red_only_for_its_historical_policy",
+      "expected": "A real historical RED observation cannot be relabeled as current-policy evidence.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 99,
+      "end_line": 99,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[receipts]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects receipts tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[state]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects state tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[contract]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects contract tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[policy]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects policy tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[inventory]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects inventory tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[command]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects command tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[downgrade]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects downgrade tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[alias]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects alias tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[receipts]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects receipts tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[state]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects state tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[contract]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects contract tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[policy]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects policy tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[inventory]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects inventory tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[command]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects command tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[downgrade]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects downgrade tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_acceptance_archive_integrity::test_current_archive_cannot_erase_acceptance_obligations[alias]",
+      "expected": "After actual joint runtime/documentary proof and archive, terminal verification rejects alias tampering that attempts to remove immutable acceptance obligations.",
+      "assertion_path": "tests/test_acceptance_archive_integrity.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "d390c9e0c347ec22f285a9613f3726824614e51eabccc436c520d70e1653d6c7",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_requirements::test_declared_table_and_heading_are_one_obligation_with_explicit_type",
+      "expected": "Only actual heading/table declarations create qualified acceptance obligations; references and examples do not.",
+      "assertion_path": "tests/test_acceptance_requirements.py",
+      "start_line": 21,
+      "end_line": 21,
+      "source_sha256": "738b4a1aff3e99afda430141fe7fdb922f76104eadb39f1e5216c4dfda012ff1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_requirements::test_declared_table_and_heading_are_one_obligation_with_explicit_type",
+      "expected": "Declared review evidence remains separate from the default execution evidence kind.",
+      "assertion_path": "tests/test_acceptance_requirements.py",
+      "start_line": 22,
+      "end_line": 22,
+      "source_sha256": "738b4a1aff3e99afda430141fe7fdb922f76104eadb39f1e5216c4dfda012ff1",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_review::test_documentary_prepare_ingest_cli_is_distinct_and_current",
+      "expected": "Documentary acceptance review is explicitly scoped only to its declared review requirement.",
+      "assertion_path": "tests/test_acceptance_review.py",
+      "start_line": 28,
+      "end_line": 28,
+      "source_sha256": "1a4ab4e3cd75b5a439dac877ac6fefd7e6700df6400904c8ab941212264110dc",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_review::test_documentary_prepare_ingest_cli_is_distinct_and_current",
+      "expected": "The actual CLI-ingested grounded documentary receipt verifies under its current acceptance policy.",
+      "assertion_path": "tests/test_acceptance_review.py",
+      "start_line": 45,
+      "end_line": 45,
+      "source_sha256": "1a4ab4e3cd75b5a439dac877ac6fefd7e6700df6400904c8ab941212264110dc",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-007",
+      "test_id": "tests.test_acceptance_review::test_documentary_prepare_ingest_cli_is_distinct_and_current",
+      "expected": "Documentary acceptance review cannot substitute for the earlier global feature review gate.",
+      "assertion_path": "tests/test_acceptance_review.py",
+      "start_line": 46,
+      "end_line": 46,
+      "source_sha256": "1a4ab4e3cd75b5a439dac877ac6fefd7e6700df6400904c8ab941212264110dc",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-015",
+      "test_id": "tests.test_execution_capture_policy::test_unknown_runner_policy_is_not_a_historical_capture",
+      "expected": "Unknown runner policy cannot masquerade as a supported historical execution capture.",
+      "assertion_path": "tests/test_execution_capture_policy.py",
+      "start_line": 67,
+      "end_line": 67,
+      "source_sha256": "b0531cfaa8e717c612af62a0ba260738d9f8c77226c16a005d60cece1b345dad",
+      "justification": "The executed assertion directly checks this stated sub-obligation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_evidence::test_empty_and_all_skipped_results_are_not_execution_proof[<testsuite/>]",
+      "expected": "An exit-zero subprocess writes a zero-test JUnit report, and the actual execution verifier refuses certification.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 63,
+      "end_line": 63,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "An exit-zero subprocess writes a zero-test JUnit report, and the actual execution verifier refuses certification. The command is custom; this proves rejection of this evidence, not an independently isolated zero-count parser branch."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-009",
+      "test_id": "tests.test_execution_evidence::test_replaced_capture_bytes_are_rejected[report]",
+      "expected": "Replacing the report from a real passing pytest capture with malformed JUnit bytes {} causes actual execution verification to reject it.",
+      "assertion_path": "tests/test_execution_evidence.py",
+      "start_line": 38,
+      "end_line": 38,
+      "source_sha256": "e46dd78a1e15df946fda486a81ba739e6ef72899d746c32d36b201d45018dcf7",
+      "justification": "Replacing the report from a real passing pytest capture with malformed JUnit bytes {} causes actual execution verification to reject it. Replacement provenance can reject before parsing; no parser-only sensitivity is claimed."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_selection::test_model_runtime_changes_select_full_corpus",
+      "expected": "Changing the model provider selects full corpus evaluation.",
+      "assertion_path": "tests/test_generation_selection.py",
+      "start_line": 40,
+      "end_line": 40,
+      "source_sha256": "c341b79efad1a3f87a501f985286c35ec956bc77d914e76b3cf8795ac61cfd36",
+      "justification": "Changing the model provider selects full corpus evaluation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_selection::test_model_runtime_changes_select_full_corpus",
+      "expected": "Changing the model provider selects all three currently defined witnesses.",
+      "assertion_path": "tests/test_generation_selection.py",
+      "start_line": 41,
+      "end_line": 41,
+      "source_sha256": "c341b79efad1a3f87a501f985286c35ec956bc77d914e76b3cf8795ac61cfd36",
+      "justification": "Changing the model provider selects all three currently defined witnesses. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_selection::test_receipt_changes_sample_and_native_runner_changes_require_full",
+      "expected": "Changing native process execution infrastructure selects full corpus evaluation.",
+      "assertion_path": "tests/test_generation_selection.py",
+      "start_line": 46,
+      "end_line": 46,
+      "source_sha256": "c341b79efad1a3f87a501f985286c35ec956bc77d914e76b3cf8795ac61cfd36",
+      "justification": "Changing native process execution infrastructure selects full corpus evaluation. "
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_selection::test_pull_request_selector_covers_full_runtimes_and_bounds_sample[validator/semantic/plan_review.py-sample-claude-true]",
+      "expected": "The shipped CI selection script selects mode sample and runtimes claude for a pull request changing validator/semantic/plan_review.py.",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 26,
+      "end_line": 26,
+      "source_sha256": "a3c6296f2abe627b61031cacf55e4925c1b0b0a4b20076d618bb1c46bf73217b",
+      "justification": "The shipped CI selection script selects mode sample and runtimes claude for a pull request changing validator/semantic/plan_review.py. The script executes in a real subprocess; git changed-path output is controlled. No remote CI run or real model execution is claimed."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_selection::test_pull_request_selector_covers_full_runtimes_and_bounds_sample[validator/llm_provider.py-full-claude codex-true]",
+      "expected": "The shipped CI selection script selects mode full and runtimes claude codex for a pull request changing validator/llm_provider.py.",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 26,
+      "end_line": 26,
+      "source_sha256": "a3c6296f2abe627b61031cacf55e4925c1b0b0a4b20076d618bb1c46bf73217b",
+      "justification": "The shipped CI selection script selects mode full and runtimes claude codex for a pull request changing validator/llm_provider.py. The script executes in a real subprocess; git changed-path output is controlled. No remote CI run or real model execution is claimed."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_selection::test_pull_request_selector_covers_full_runtimes_and_bounds_sample[tests/integration/helpers/sdk_runner.py-full-claude codex-true]",
+      "expected": "The shipped CI selection script selects mode full and runtimes claude codex for a pull request changing tests/integration/helpers/sdk_runner.py.",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 26,
+      "end_line": 26,
+      "source_sha256": "a3c6296f2abe627b61031cacf55e4925c1b0b0a4b20076d618bb1c46bf73217b",
+      "justification": "The shipped CI selection script selects mode full and runtimes claude codex for a pull request changing tests/integration/helpers/sdk_runner.py. The script executes in a real subprocess; git changed-path output is controlled. No remote CI run or real model execution is claimed."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_events::test_registered_events_select_real_full_or_requested_corpus[release]",
+      "expected": "The shipped selector for a registered published release exits zero and requests the full corpus across both claude and codex.",
+      "assertion_path": "tests/test_generation_ci_events.py",
+      "start_line": 80,
+      "end_line": 87,
+      "source_sha256": "6f6457be74850a179ea5905f700f7b025ab1f687d3dd90a34fbe17af5c10460c",
+      "justification": "The shipped selector for a registered published release exits zero and requests the full corpus across both claude and codex. This observes the shipped workflow/selector locally, not a remote CI or real-model run."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_events::test_docs_only_pull_request_keeps_deterministic_jobs_without_model_selection[unit-tests]",
+      "expected": "A docs-only pull request executes the shipped selector and selects no paid model evaluation.",
+      "assertion_path": "tests/test_generation_ci_events.py",
+      "start_line": 97,
+      "end_line": 104,
+      "source_sha256": "6f6457be74850a179ea5905f700f7b025ab1f687d3dd90a34fbe17af5c10460c",
+      "justification": "A docs-only pull request executes the shipped selector and selects no paid model evaluation. This observes the shipped workflow/selector locally, not a remote CI or real-model run."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_events::test_docs_only_pull_request_keeps_deterministic_jobs_without_model_selection[unit-tests]",
+      "expected": "The actual workflow keeps the unit-tests deterministic job unconditional and independent of generation-selection dependencies.",
+      "assertion_path": "tests/test_generation_ci_events.py",
+      "start_line": 106,
+      "end_line": 106,
+      "source_sha256": "6f6457be74850a179ea5905f700f7b025ab1f687d3dd90a34fbe17af5c10460c",
+      "justification": "The actual workflow keeps the unit-tests deterministic job unconditional and independent of generation-selection dependencies. This observes the shipped workflow/selector locally, not a remote CI or real-model run."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_events::test_docs_only_pull_request_keeps_deterministic_jobs_without_model_selection[integration-3a]",
+      "expected": "The actual workflow keeps the integration-3a deterministic job unconditional and independent of generation-selection dependencies.",
+      "assertion_path": "tests/test_generation_ci_events.py",
+      "start_line": 106,
+      "end_line": 106,
+      "source_sha256": "6f6457be74850a179ea5905f700f7b025ab1f687d3dd90a34fbe17af5c10460c",
+      "justification": "The actual workflow keeps the integration-3a deterministic job unconditional and independent of generation-selection dependencies. This observes the shipped workflow/selector locally, not a remote CI or real-model run."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_events::test_docs_only_pull_request_keeps_deterministic_jobs_without_model_selection[unit-tests]",
+      "expected": "The unconditional unit-test job actually declares pytest over tests/ while excluding model integration tests.",
+      "assertion_path": "tests/test_generation_ci_events.py",
+      "start_line": 109,
+      "end_line": 112,
+      "source_sha256": "6f6457be74850a179ea5905f700f7b025ab1f687d3dd90a34fbe17af5c10460c",
+      "justification": "The unconditional unit-test job actually declares pytest over tests/ while excluding model integration tests. This observes the shipped workflow/selector locally, not a remote CI or real-model run."
+    },
+    {
+      "requirement_id": "078-requirement-evidence-integrity:AC-013",
+      "test_id": "tests.test_generation_ci_events::test_docs_only_pull_request_keeps_deterministic_jobs_without_model_selection[integration-3a]",
+      "expected": "The unconditional integration job actually declares pytest over the no-LLM level_3a suite.",
+      "assertion_path": "tests/test_generation_ci_events.py",
+      "start_line": 114,
+      "end_line": 117,
+      "source_sha256": "6f6457be74850a179ea5905f700f7b025ab1f687d3dd90a34fbe17af5c10460c",
+      "justification": "The unconditional integration job actually declares pytest over the no-LLM level_3a suite. This observes the shipped workflow/selector locally, not a remote CI or real-model run."
+    }
+  ]
+}

@@ -7,6 +7,22 @@
 
 ---
 
+## 2026-10-10 — Fix existing-owner review and new-goal identity; 2 functional gaps closed, selected acceptance mapping independently ready
+<!-- finalize:spec-fix:2026-10-10:556265bd -->
+
+## 2026-10-10 — [Feature 078] Check: post-fix canonical identity verified; acceptance capture pending
+
+Read the [independent gap report](features/078-requirement-evidence-integrity/checks/2026-10-10.md): G001/G002/C001 closed; three bounded FR/AC identity rows verified, no full16FR/16AC re-certification. Current genuine selected mapping review is complete/ready; final runner-owned capture pending. Worker177/63 tests and Ruff pass with provenance retained; three unrelated structural errors remain. No source/test changes by checker.
+
+<!-- check:94d7f83c:post-fix -->
+
+## 2026-10-10 — [Feature 078] Check: initial FR-004 canonical feature identity gaps
+
+Read the [initial report](features/078-requirement-evidence-integrity/checks/2026-10-10.md): 0/3 selected alignment rows verified, three Partial; two HIGH functional gaps and one LOW documentation convention gap. Six existing structural errors retained; no source/test changes or acceptance certification.
+
+## 2026-10-09 — Filtered FR-002/AC-002 reference-discovery repair registry synchronized; feature In Progress
+<!-- finalize:spec-fix:2026-10-09:9aab10f2 -->
+
 ## 2026-10-09 — Bugfix: observed autonomous init and safe force recovery
 
 - Read [the recovery implementation](features/080-autonomous-from-code-recovery/implementation.md): retain observed hybrid stacks, back up owned artifacts, isolate mutable agents, run bounded tooling probes and verify current hook/integration identity.
@@ -748,3 +764,21 @@ Read the [implementation checkpoint](features/079-validator-ci-prerequisites/imp
 ### 2026-09-08 — Feature079 v5 independent verification
 
 Read the [post-check gap report](features/079-validator-ci-prerequisites/checks/2026-09-08-v5-postcheck.md): the bounded fixture-isolation cause is fixed, with45/45 targeted tests and16 preserved node IDs. AC-005 remains pending and AC-006 partial; feature076 and final delivery remain separate.
+
+## 2026-10-09 — Check: Feature 078 scoped FR-002 discovery audit
+
+- [Feature 078] Check: selected FR-002/AC-002 partial (0/1 fully verified); raw examples/descriptive links produce unresolved dependencies. Read [report](features/078-requirement-evidence-integrity/checks/2026-10-09.md). Goal18b10b99; no source edits.
+
+
+## 2026-10-09 — [Check]: Feature078 scoped discovery audit300k
+
+- [Feature078] Check: selectedFR-002/AC-002 remain partial (0/1 fully verified each);079 canonical preparation still has24 unresolved references. Read [report](features/078-requirement-evidence-integrity/checks/2026-10-09.md#fresh-initial-check--explicit-300000-character-budget). Goal8633e818;no source edits.
+
+
+## 2026-10-09 — [Check]: Feature078 post-fix scoped discovery verification
+
+- [Feature078] SelectedFR-002/AC-002 discoverybehavior independently verified;61 boundedtests,079 context5sources/0errors at300k and diagnosticdefault60k. Outside-scope warnings retained. Read [report](features/078-requirement-evidence-integrity/checks/2026-10-09.md#independent-post-fix-check). No checker source edits;freshpostfix state8633e818.
+
+
+## 2026-10-09 — [Feature 078] Fix: FR-002/AC-002 normative reference discovery;123 scoped tests passed, independent check complete, full feature remains In Progress
+
