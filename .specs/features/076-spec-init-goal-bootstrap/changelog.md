@@ -187,3 +187,12 @@
 - **Author:** spec-fix
 
 <!-- finalize:spec-fix:2026-09-08:2d0a611e -->
+
+### 2026-10-09 — Check: Bootstrap contract verified; autonomous generator gaps
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **Coverage:** 12/12 existing FR and 10/10 AC verified; fresh 185 bootstrap tests passed. Six autonomous generator gaps remain outside current feature contract.
+- **Report:** Read [the gap report](checks/2026-10-09.md).
+- **Author:** Codex native spec-check subagent
