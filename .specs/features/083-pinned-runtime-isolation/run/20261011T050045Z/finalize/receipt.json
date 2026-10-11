@@ -1,0 +1,40 @@
+{
+  "command": "spec-specify",
+  "created_at": "2026-10-11T05:00:45.810822+00:00",
+  "feature_slug": "083-pinned-runtime-isolation",
+  "files": [
+    {
+      "path": ".specs/features/083-pinned-runtime-isolation/changelog.md",
+      "sha256": "1be2569a742677aaa52650e197b2aa102061595cb9f289dc951a46f491452811"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "f424c63fbf74f7ed68a63606107c92b5b429f95178dbf7e737361204d64a0d03"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "e6f1489400aca80896e93b310b00dde7830782a76e05f16e4dfa4aeda2f1317a"
+    },
+    {
+      "path": ".specs/features/083-pinned-runtime-isolation/spec.md",
+      "sha256": "037ea7ff10771eaf404f69c3ff71bd23e51008e2e3ddeaf3b0f121c221950c96"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "627c1ff58108f090b378521e3ddfb3229a0b9b5f11184a1316f0135c850659b4"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "e1d08abd1d8c6432237a42edd323fb33efa0c2ef3ff03a1fd559e57fb81c36ae",
+  "receipt_hash": "850aa8fbef4e3087fc864971fa6445a1d8dd522ed0c0bfb98d77624866513d9a",
+  "schema_version": "1",
+  "verdict": "FAIL",
+  "violations": [
+    {
+      "message": "Feature '083-pinned-runtime-isolation' is not referenced in any roadmap item",
+      "rule_id": "R1.2"
+    }
+  ]
+}

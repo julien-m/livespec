@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-11 — Feature 083 plan created: Pinned Runtime Isolation, 9 implementation steps, 3 diagrams, ADR-004
+<!-- finalize:spec-plan:2026-10-11:5ddfddac -->
+
+## 2026-10-11 — [Feature 083] Spec created: Pinned Runtime Isolation — 7 stories, 18 AC, 13 FR
+<!-- finalize:spec-specify:2026-10-11:60b23cb4 -->
+
 ## 2026-10-09 — Bugfix: observed autonomous init and safe force recovery
 
 - Read [the recovery implementation](features/080-autonomous-from-code-recovery/implementation.md): retain observed hybrid stacks, back up owned artifacts, isolate mutable agents, run bounded tooling probes and verify current hook/integration identity.
