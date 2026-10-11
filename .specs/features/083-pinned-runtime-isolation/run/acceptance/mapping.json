@@ -1,0 +1,1689 @@
+{
+  "schema_version": "1",
+  "feature": "083-pinned-runtime-isolation",
+  "reviewer_model": "claude-opus-5-5",
+  "review_max_chars": 200000,
+  "review_receipt_path": ".specs/features/083-pinned-runtime-isolation/run/acceptance/mapping-review-receipt.json",
+  "bindings": [
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 89,
+      "end_line": 89,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "exit 0, created, <VERSION>-<sha12>"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 93,
+      "end_line": 93,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "HEAD tree minus .specs/ and tests/"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 95,
+      "end_line": 95,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "manifest schema and full commit"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 96,
+      "end_line": 96,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "manifest runtime_id"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 97,
+      "end_line": 97,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "manifest version and absolute source"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 98,
+      "end_line": 98,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "created_at in UTC"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 99,
+      "end_line": 99,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "digest equals independent recomputation"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 102,
+      "end_line": 102,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "no write bit anywhere"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 103,
+      "end_line": 103,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "current resolves to snapshot"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "test_id": "tests.test_runtime_snapshot::test_clean_head_installs_read_only_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 104,
+      "end_line": 104,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "executable shim"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "test_id": "tests.test_runtime_snapshot::test_dirty_default_ref_is_refused[VERSION]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "dirty VERSION refused by name"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "test_id": "tests.test_runtime_snapshot::test_dirty_default_ref_is_refused[untracked.txt]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "dirty untracked.txt refused by name"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "test_id": "tests.test_runtime_snapshot::test_dirty_default_ref_is_refused[.specs/new.md]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "dirty .specs/new.md refused by name"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "test_id": "tests.test_runtime_snapshot::test_dirty_default_ref_is_refused[tests/new_test.py]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "dirty tests/new_test.py refused by name"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "test_id": "tests.test_runtime_snapshot::test_dirty_default_ref_is_refused[VERSION]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 119,
+      "end_line": 119,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "dirty: nothing under home"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "test_id": "tests.test_runtime_snapshot::test_explicit_ref_snapshots_committed_bytes_only",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 128,
+      "end_line": 128,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "--ref takes committed bytes"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "test_id": "tests.test_runtime_snapshot::test_explicit_ref_snapshots_committed_bytes_only",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 129,
+      "end_line": 129,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "--ref excludes uncommitted files"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "test_id": "tests.test_runtime_snapshot::test_invalid_source_or_ref_writes_nothing",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "bad source/ref: nothing written"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_reuse_no_activate_and_corruption",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 162,
+      "end_line": 162,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "reused, bytes unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_reuse_no_activate_and_corruption",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 163,
+      "end_line": 163,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "--no-activate keeps current, ensures shim"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_reuse_no_activate_and_corruption",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 171,
+      "end_line": 171,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "digest mismatch refused, unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_reuse_no_activate_and_corruption",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 172,
+      "end_line": 172,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "current unchanged after refusal"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_missing_manifest_is_refused",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 182,
+      "end_line": 182,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "missing manifest refused"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_mismatched_manifest_identity_is_refused[runtime_id]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 201,
+      "end_line": 201,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "manifest runtime_id mismatch refused"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_mismatched_manifest_identity_is_refused[commit]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 201,
+      "end_line": 201,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "manifest commit mismatch refused"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_interrupted_install_and_stale_staging",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 216,
+      "end_line": 216,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "interrupted: no final directory"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "test_id": "tests.test_runtime_snapshot::test_interrupted_install_and_stale_staging",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_snapshot.py",
+      "start_line": 224,
+      "end_line": 224,
+      "source_sha256": "63dc721b10c1420a192662fbca3c734a487cff0aef5394309473218019145202",
+      "justification": "stale read-only staging removed"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "test_id": "tests.test_runtime_shim::test_pinned_lock_runs_its_snapshot_from_nested_directory",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 89,
+      "end_line": 89,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "pinned snapshot runs from nested dir"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "test_id": "tests.test_runtime_shim::test_pinned_lock_runs_its_snapshot_from_nested_directory",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 90,
+      "end_line": 90,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "validator imported from snapshot"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "test_id": "tests.test_runtime_shim::test_pinned_lock_runs_its_snapshot_from_nested_directory",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 99,
+      "end_line": 99,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "interpreter imports its own validator"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "test_id": "tests.test_runtime_shim::test_pinned_lock_runs_its_snapshot_from_nested_directory",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 100,
+      "end_line": 100,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "interpreter's editable validator elsewhere"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "test_id": "tests.test_runtime_shim::test_dev_lock_passes_args_stdin_exit_and_home",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 116,
+      "end_line": 116,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "exit status passed through"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "test_id": "tests.test_runtime_shim::test_dev_lock_passes_args_stdin_exit_and_home",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "args and stdin passed through"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "test_id": "tests.test_runtime_shim::test_dev_lock_passes_args_stdin_exit_and_home",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 120,
+      "end_line": 120,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "relative dev source from project root (nested cwd)"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "test_id": "tests.test_runtime_shim::test_nested_project_without_lock_ignores_parent_lock",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 201,
+      "end_line": 201,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "unlocked nested project runs current"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_missing_pinned_snapshot_exits_3_then_runtime_falls_back",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 135,
+      "end_line": 135,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "missing snapshot: exit 3, nothing run"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_missing_pinned_snapshot_exits_3_then_runtime_falls_back",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 136,
+      "end_line": 136,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "prefix and runtime id"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_missing_pinned_snapshot_exits_3_then_runtime_falls_back",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 137,
+      "end_line": 137,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "install recovery with lock commit"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_missing_pinned_snapshot_exits_3_then_runtime_falls_back",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 146,
+      "end_line": 146,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "runtime subcommand falls back with warning"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_manifest_commit_differing_from_lock_exits_3",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 164,
+      "end_line": 164,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "manifest commit != lock: exit 3"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_manifest_commit_differing_from_lock_exits_3",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 165,
+      "end_line": 165,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "names id and recovery ref"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_invalid_lock_exits_3_except_runtime_subcommands[not-json]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 181,
+      "end_line": 181,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "not-json lock: exit 3 naming lock path"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_invalid_lock_exits_3_except_runtime_subcommands[unknown-schema]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 181,
+      "end_line": 181,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "unknown-schema lock: exit 3 naming lock path"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_invalid_lock_exits_3_except_runtime_subcommands[unknown-mode]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 181,
+      "end_line": 181,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "unknown-mode lock: exit 3 naming lock path"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_no_current_and_bad_dev_source_exit_3",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 212,
+      "end_line": 212,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "no lock, no current: checkout CLI"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_no_current_and_bad_dev_source_exit_3",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 216,
+      "end_line": 216,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "missing snapshot, no current: checkout CLI"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_no_current_and_bad_dev_source_exit_3",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 219,
+      "end_line": 219,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "dev source not a LiveSpec root"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_dev_lock_passes_args_stdin_exit_and_home",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 119,
+      "end_line": 119,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "LIVESPEC_HOME exported"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_generated_home_reaches_executed_runtime",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 228,
+      "end_line": 228,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "generated home reaches runtime"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_current_writes_portable_lock_and_retargets_links",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 79,
+      "end_line": 79,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "exactly five pinned keys"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_current_writes_portable_lock_and_retargets_links",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 80,
+      "end_line": 80,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "concrete id, not current"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_current_writes_portable_lock_and_retargets_links",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 83,
+      "end_line": 83,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": ".livespec-path = snapshot"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_fresh_machine_rematerializes_path_without_changing_lock",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "fresh machine: lock bytes kept"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_fresh_machine_rematerializes_path_without_changing_lock",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 119,
+      "end_line": 119,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "fresh machine: path re-materialized"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_fresh_machine_rematerializes_path_without_changing_lock",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 121,
+      "end_line": 121,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "pin creates no links"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_replaces_dev_lock_and_requires_a_runtime",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 129,
+      "end_line": 129,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "replaces dev lock, reports it"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_replaces_dev_lock_and_requires_a_runtime",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 134,
+      "end_line": 134,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "no runtime, no current: no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_warns_when_livespec_path_is_not_ignored",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 157,
+      "end_line": 157,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "warning when not ignored"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_warns_when_livespec_path_is_not_ignored",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 158,
+      "end_line": 158,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "warning case edits no ignore file"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_warns_when_livespec_path_is_not_ignored",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 161,
+      "end_line": 161,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "ignore file unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_project::test_pin_current_writes_portable_lock_and_retargets_links",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 85,
+      "end_line": 85,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "skill link retargeted"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_project::test_pin_current_writes_portable_lock_and_retargets_links",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 87,
+      "end_line": 87,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "rule link retargeted"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_project::test_pin_current_writes_portable_lock_and_retargets_links",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 88,
+      "end_line": 88,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "project-owned dir unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_project::test_pin_current_writes_portable_lock_and_retargets_links",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 89,
+      "end_line": 89,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "foreign symlink unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_project::test_link_missing_in_snapshot_is_reported_unchanged",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 101,
+      "end_line": 101,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "missing target listed"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_project::test_link_missing_in_snapshot_is_reported_unchanged",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 102,
+      "end_line": 102,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "missing-target link unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_project::test_link_missing_in_snapshot_is_reported_unchanged",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 103,
+      "end_line": 103,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "other links retargeted, exit 0"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_project::test_unsafe_pins_change_nothing",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "uninstalled/unverified: no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_cli::test_refusals_exit_1_without_writing[pin-uninstalled]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "uninstalled pin exits 1"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "test_id": "tests.test_runtime_cli::test_refusals_exit_1_without_writing[pin-uninstalled]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 113,
+      "end_line": 113,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "uninstalled pin: no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-008",
+      "test_id": "tests.test_runtime_project::test_unsafe_pins_change_nothing",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "pin to older runtime: no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-008",
+      "test_id": "tests.test_runtime_project::test_upgrade_requires_pinned_lock_and_newer_target",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 210,
+      "end_line": 210,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "upgrade to older runtime: no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_project::test_upgrade_moves_references_and_reports_migration",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "old and new ids"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_project::test_upgrade_moves_references_and_reports_migration",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 171,
+      "end_line": 171,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "migration_required + /spec-migrate"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_project::test_upgrade_moves_references_and_reports_migration",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 173,
+      "end_line": 173,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "path moved"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_project::test_upgrade_moves_references_and_reports_migration",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 174,
+      "end_line": 174,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "links moved"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_project::test_upgrade_moves_references_and_reports_migration",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 177,
+      "end_line": 177,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "no migration when equal"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_project::test_upgrade_noop_verifies_target_first",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 186,
+      "end_line": 186,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "same id: no-op"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_project::test_upgrade_requires_pinned_lock_and_newer_target",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 200,
+      "end_line": 200,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "no lock: pin, no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_project::test_upgrade_requires_pinned_lock_and_newer_target",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 205,
+      "end_line": 205,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "dev lock: pin, no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "test_id": "tests.test_runtime_cli::test_refusals_exit_1_without_writing[upgrade-uninstalled]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "unverified target exits 1"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "test_id": "tests.test_runtime_cli::test_runtime_commands_run_on_stale_project",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 55,
+      "end_line": 55,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "upgrade on stale project"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "test_id": "tests.test_runtime_cli::test_runtime_commands_run_on_stale_project",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 58,
+      "end_line": 58,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "status not guarded"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "test_id": "tests.test_runtime_cli::test_runtime_commands_run_on_stale_project",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 60,
+      "end_line": 60,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "pin on stale project"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "test_id": "tests.test_runtime_cli::test_runtime_commands_run_on_stale_project",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 63,
+      "end_line": 63,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "install on stale project"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "test_id": "tests.test_runtime_cli::test_runtime_commands_run_on_stale_project",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 65,
+      "end_line": 65,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "defect on stale project"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "test_id": "tests.test_runtime_cli::test_non_runtime_commands_stay_guarded",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 73,
+      "end_line": 73,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "doctor still guarded"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "test_id": "tests.test_runtime_cli::test_guard_exempts_only_the_runtime_group",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 83,
+      "end_line": 83,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "all six subcommands bypass"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "test_id": "tests.test_runtime_cli::test_guard_exempts_only_the_runtime_group",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 89,
+      "end_line": 89,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "non-runtime commands still raise"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-011",
+      "test_id": "tests.test_runtime_project::test_dev_lock_source_forms_and_refusal",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 217,
+      "end_line": 217,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "'.' for the repository itself"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-011",
+      "test_id": "tests.test_runtime_project::test_dev_lock_source_forms_and_refusal",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 220,
+      "end_line": 220,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "relative inside project"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-011",
+      "test_id": "tests.test_runtime_project::test_dev_lock_source_forms_and_refusal",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 223,
+      "end_line": 223,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "absolute outside project"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-011",
+      "test_id": "tests.test_runtime_project::test_dev_lock_source_forms_and_refusal",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 224,
+      "end_line": 224,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "links at checkout"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-011",
+      "test_id": "tests.test_runtime_project::test_dev_lock_source_forms_and_refusal",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 225,
+      "end_line": 225,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": ".livespec-path at checkout"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-011",
+      "test_id": "tests.test_runtime_project::test_dev_lock_source_forms_and_refusal",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 229,
+      "end_line": 229,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "non-root source: no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-011",
+      "test_id": "tests.test_runtime_cli::test_refusals_exit_1_without_writing[dev-not-root]",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_cli.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "ef5bef1292b933d70a3efdd374cf7a339d19834ce594ec430936e756dc496a77",
+      "justification": "non-root source exits 1"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-012",
+      "test_id": "tests.test_runtime_docs::test_boundary_rule_states_the_four_rules",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 100,
+      "end_line": 100,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "four rules stated"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-012",
+      "test_id": "tests.test_runtime_docs::test_each_entry_point_references_the_boundary_once",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 117,
+      "end_line": 117,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "six files: one line, resolves, names path"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-012",
+      "test_id": "tests.test_runtime_docs::test_linked_skill_references_resolve_inside_snapshot",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 151,
+      "end_line": 151,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "four skills resolve in snapshot"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_defect_report_blocks_phase_without_touching_runtimes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 109,
+      "end_line": 109,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "dated slug path"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_defect_report_blocks_phase_without_touching_runtimes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 112,
+      "end_line": 112,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "command, verbatim error, id, feature"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_defect_report_blocks_phase_without_touching_runtimes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 113,
+      "end_line": 113,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "status and pinned resume"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_defect_report_blocks_phase_without_touching_runtimes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 115,
+      "end_line": 115,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "version and commit values"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_defect_report_blocks_phase_without_touching_runtimes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 116,
+      "end_line": 116,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "phase and feature"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_defect_report_blocks_phase_without_touching_runtimes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 117,
+      "end_line": 117,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "pipeline shows Blocked"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_defect_report_blocks_phase_without_touching_runtimes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 118,
+      "end_line": 118,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "snapshot and checkout unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_defect_report_blocks_phase_without_touching_runtimes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 119,
+      "end_line": 119,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "no git call"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_same_day_collision_gets_numeric_suffix",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 127,
+      "end_line": 127,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "numeric suffix"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_same_day_collision_gets_numeric_suffix",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 128,
+      "end_line": 128,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "existing report untouched"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "test_id": "tests.test_runtime_defects::test_same_day_collision_gets_numeric_suffix",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 130,
+      "end_line": 130,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "command slug without title"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "test_id": "tests.test_runtime_defects::test_unpinned_and_dev_identities_and_resume",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 138,
+      "end_line": 138,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "unpinned + runtime path"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "test_id": "tests.test_runtime_defects::test_unpinned_and_dev_identities_and_resume",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 139,
+      "end_line": 139,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "unpinned resume"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "test_id": "tests.test_runtime_defects::test_unpinned_and_dev_identities_and_resume",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 143,
+      "end_line": 143,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "dev source + resume"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "test_id": "tests.test_runtime_defects::test_feature_without_phase_and_missing_pipeline",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "--feature alone: pipeline unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "test_id": "tests.test_runtime_defects::test_feature_without_phase_and_missing_pipeline",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 153,
+      "end_line": 153,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "failed update keeps report"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "test_id": "tests.test_runtime_defects::test_cli_usage_and_failure_exit_codes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 162,
+      "end_line": 162,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "--phase alone: exit 2, no write"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "test_id": "tests.test_runtime_defects::test_cli_usage_and_failure_exit_codes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 166,
+      "end_line": 166,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "failed update: exit 1"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "test_id": "tests.test_runtime_defects::test_cli_usage_and_failure_exit_codes",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_defects.py",
+      "start_line": 167,
+      "end_line": 167,
+      "source_sha256": "4354d983e09bbb29569be39d0705ece6e208ee6e1aeec35a6c224f56de76e955",
+      "justification": "exactly one report kept"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-015",
+      "test_id": "tests.test_runtime_inspection::test_unpinned_checkout_clean_warning_then_dirty_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 75,
+      "end_line": 75,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "clean checkout WARNING"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-015",
+      "test_id": "tests.test_runtime_inspection::test_unpinned_checkout_clean_warning_then_dirty_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 82,
+      "end_line": 82,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "dirty checkout ERROR"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-015",
+      "test_id": "tests.test_runtime_inspection::test_unpinned_checkout_clean_warning_then_dirty_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 83,
+      "end_line": 83,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "index unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-015",
+      "test_id": "tests.test_runtime_inspection::test_unpinned_checkout_clean_warning_then_dirty_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 84,
+      "end_line": 84,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "files unchanged"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-015",
+      "test_id": "tests.test_runtime_inspection::test_unpinned_snapshot_links_and_cumulative_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 93,
+      "end_line": 93,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "snapshot links WARNING"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-015",
+      "test_id": "tests.test_runtime_inspection::test_unpinned_snapshot_links_and_cumulative_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 96,
+      "end_line": 99,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "mixed: both findings"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-015",
+      "test_id": "tests.test_runtime_inspection::test_pinned_drift_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 119,
+      "end_line": 123,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "pinned: checkout ERROR + mismatch"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_pinned_drift_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 111,
+      "end_line": 113,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "other snapshot: mismatch WARNING"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_pinned_drift_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 125,
+      "end_line": 125,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "executing mismatch names root"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_pinned_drift_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 126,
+      "end_line": 126,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "executing mismatch names PATH"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_missing_or_corrupted_pinned_snapshot_is_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 140,
+      "end_line": 142,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "manifest commit mismatch ERROR"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_missing_or_corrupted_pinned_snapshot_is_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 147,
+      "end_line": 149,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "digest mismatch ERROR"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_missing_or_corrupted_pinned_snapshot_is_error",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 151,
+      "end_line": 153,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "missing snapshot ERROR"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_lock_modes_and_quiet_cases",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 163,
+      "end_line": 163,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "invalid lock ERROR"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_lock_modes_and_quiet_cases",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 164,
+      "end_line": 164,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "names lock path"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_inspection::test_lock_modes_and_quiet_cases",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 168,
+      "end_line": 168,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "dev: one INFO, no checkout finding"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "test_id": "tests.test_runtime_shim::test_missing_pinned_snapshot_exits_3_then_runtime_falls_back",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 141,
+      "end_line": 141,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "cumulative via fallback"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_lock_modes_and_quiet_cases",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 160,
+      "end_line": 160,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "untouched project: none"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_lock_modes_and_quiet_cases",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 170,
+      "end_line": 170,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "LiveSpec repo, no lock: none"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_lock_modes_and_quiet_cases",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 172,
+      "end_line": 172,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "LiveSpec repo, dev lock: none"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_and_exit_code",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 200,
+      "end_line": 200,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "no ERROR: exit 0"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_and_exit_code",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 202,
+      "end_line": 202,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "mode and lock"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_and_exit_code",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 203,
+      "end_line": 203,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "resolved root"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_and_exit_code",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 204,
+      "end_line": 204,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "executing validator path"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_and_exit_code",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 205,
+      "end_line": 205,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "findings"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_and_exit_code",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 207,
+      "end_line": 207,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "ERROR: exit 1"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_doctor_reports_the_same_runtime_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 220,
+      "end_line": 223,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "doctor: same findings"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_doctor_reports_the_same_runtime_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 224,
+      "end_line": 224,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "doctor status rules"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_doctor_reports_the_same_runtime_findings",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 227,
+      "end_line": 227,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "doctor on LiveSpec repo: none"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_docs_cover_every_runtime_command",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 161,
+      "end_line": 161,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "six commands in both docs"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_docs_cover_every_runtime_command",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 162,
+      "end_line": 162,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "PATH ordering + macOS example"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_docs_cover_every_runtime_command",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 163,
+      "end_line": 163,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "fresh machine"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_docs_cover_every_runtime_command",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 164,
+      "end_line": 166,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "identical migration block"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_documented_migration_runs_on_consumer_fixture",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 207,
+      "end_line": 207,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "documented migration runs"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_documented_migration_runs_on_consumer_fixture",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 208,
+      "end_line": 208,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "shim first on PATH"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_documented_migration_runs_on_consumer_fixture",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 212,
+      "end_line": 212,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "ends pinned"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_documented_migration_runs_on_consumer_fixture",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 213,
+      "end_line": 213,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "no ERROR/WARNING"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_documented_migration_runs_on_consumer_fixture",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 214,
+      "end_line": 214,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "lock committed"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "test_id": "tests.test_runtime_docs::test_documented_migration_runs_on_consumer_fixture",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_docs.py",
+      "start_line": 217,
+      "end_line": 217,
+      "source_sha256": "521aa5b52ad829b4dd32501d279e61e98fcf7d3bb9c8051e29c40f281aeca06d",
+      "justification": "real paths untouched"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_manifest_runtime_id_differing_from_lock_exits_3",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 288,
+      "end_line": 288,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "manifest runtime_id differs from lock: exit 3, no runtime output"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_manifest_runtime_id_differing_from_lock_exits_3",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 289,
+      "end_line": 289,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "stderr starts livespec-shim: and names the runtime id"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "test_id": "tests.test_runtime_shim::test_manifest_runtime_id_differing_from_lock_exits_3",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_shim.py",
+      "start_line": 290,
+      "end_line": 290,
+      "source_sha256": "126d8c39b57679f316774988e3451badab29a48110569808e9553c36b03b42ee",
+      "justification": "stderr names install --source <livespec repo> --ref <commit>"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_replaces_lock_pinned_to_another_runtime",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 238,
+      "end_line": 238,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "replacing a lock pinned to another runtime reports the previous lock"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_replaces_lock_pinned_to_another_runtime",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 240,
+      "end_line": 240,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": "lock replaced by a pinned lock for the new runtime"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "test_id": "tests.test_runtime_project::test_pin_replaces_lock_pinned_to_another_runtime",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_project.py",
+      "start_line": 242,
+      "end_line": 242,
+      "source_sha256": "3628d7961b0ee7ca5d47fdd66f5f53b3b85239c4cbe3f20d105a359a0456159f",
+      "justification": ".livespec-path rewritten to the new snapshot"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_in_dev_mode",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 241,
+      "end_line": 241,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "status --json in dev mode exits 0 (no ERROR)"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_in_dev_mode",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 243,
+      "end_line": 243,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "status reports mode dev"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_in_dev_mode",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 244,
+      "end_line": 244,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "status reports the dev lock content"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_in_dev_mode",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 245,
+      "end_line": 245,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "status reports the resolved dev checkout root"
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "test_id": "tests.test_runtime_inspection::test_status_json_in_dev_mode",
+      "expected": "passed",
+      "assertion_path": "tests/test_runtime_inspection.py",
+      "start_line": 246,
+      "end_line": 248,
+      "source_sha256": "b7c3a2f092acbfea3ea423ec3ec4bce6552f98c010bc8f4075bc87c5dfc627fc",
+      "justification": "dev mode findings: exactly one INFO, no checkout finding"
+    }
+  ]
+}

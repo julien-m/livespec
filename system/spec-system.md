@@ -270,6 +270,8 @@ runtime CLI (`livespec hooks resolve`), and chained-pipeline semantics.
 
 ## Rules for AI Tools
 
+> **Read** [`system/tool-project-boundary.md`](tool-project-boundary.md) before any consumer-project feature work: LiveSpec tool defects are reported with `livespec runtime defect` and never enter the project critical path (agents reading through symlinks: `system/tool-project-boundary.md` in the LiveSpec root recorded in `.specs/.livespec-path`).
+
 ### MANDATORY — Hooks Resolution Protocol
 
 **You MUST resolve hooks before and after EVERY `/spec-*` command execution.** This is not optional. Failure to resolve hooks means conventions are not loaded and the command runs without context.

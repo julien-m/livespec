@@ -27,3 +27,39 @@
 - Spec review re-run against the amended constitution and re-ingested complete+ready before planning; plan progression READY.
 
 <!-- finalize:spec-plan:2026-10-11:5ddfddac -->
+
+### 2026-10-11 — Feature: Pinned runtime implementation (steps 1-9; conventions certification pending)
+
+- **Type:** Feature
+- **Spec modified:** No (lifecycle status only: In Progress)
+- **Code modified:** validator/runtime/{__init__,models,home,git_tree,manifest,snapshot,shim_core,shim,links,project,inspection,defects}.py, validator/cli_commands/runtime_cmd.py, validator/doctor/runtime_scan.py, validator/doctor/scanner.py, validator/pipeline.py, validator/cli.py, validator/exceptions.py, system/tool-project-boundary.md, system/spec-system.md, .specs/spec-system.md, .agent-sync/skills/{spec-feature,spec-fix,spec-implement,spec-ship}/SKILL.md + expectations.md, README.md, docs/cli-reference.md, .specs/conventions-gates.yaml (constitution hash refresh only), tests/runtime_support.py, tests/test_runtime_{snapshot,shim,project,cli,inspection,defects,docs}.py
+- **AC impacted:** AC-001 through AC-018 (62 feature tests pass in temporary directories)
+- **Author:** Claude Code native spec-implement (claude-opus-5-5)
+- Read [implementation](implementation.md) and [progress](progress.md): `livespec runtime install|pin|upgrade|dev|status|defect`, stdlib shim with exit 3, shared drift scanner in `livespec doctor`, boundary rule referenced from six entry points, documented Handy migration verified on a temporary fixture.
+- Full unit suite: no new failure versus the recorded baseline (24 additional failures reproduce only without `AIRESOURCES` from this worktree location and pass with it set).
+- Status stays In Progress: `livespec conventions verify --feature 083-pinned-runtime-isolation` FAILs only on pre-existing debt in validator/cli.py, validator/doctor/scanner.py and validator/exceptions.py; execution certification is left to `/spec-test`.
+
+<!-- finalize:spec-implement:2026-10-11:68d31117 -->
+
+### 2026-10-11 — Feature: Pinned runtime implementation certified (resume)
+
+- **Type:** Feature
+- **Spec modified:** No (lifecycle status only: Implemented)
+- **Code modified:** validator/runtime/{__init__,errors,models,home,git_tree,manifest,snapshot,shim_core,shim,links,project,inspection,defects}.py, validator/cli_commands/runtime_cmd.py, validator/cli_commands/__init__.py, validator/doctor/runtime_scan.py, validator/doctor/__init__.py, validator/version_guard.py, validator/pipeline.py, system/tool-project-boundary.md, system/spec-system.md, .specs/spec-system.md, .agent-sync/skills/{spec-feature,spec-fix,spec-implement,spec-ship}/SKILL.md + expectations.md, README.md, docs/cli-reference.md, .specs/conventions-gates.yaml (constitution hash refresh only), tests/runtime_support.py, tests/test_runtime_{snapshot,shim,project,cli,inspection,defects,docs}.py
+- **AC impacted:** AC-001 through AC-018 (runner-owned execution receipt certifies 18/18)
+- **Author:** Claude Code native spec-implement (claude-opus-5-5)
+- Supervisor decision applied: feature edits moved out of the debt-laden validator/cli.py, validator/exceptions.py and validator/doctor/scanner.py (all reverted to HEAD); runtime registration goes through register_unified_commands, the FR-009 guard bypass lives in validator/version_guard.py, runtime errors in validator/runtime/errors.py, doctor integration in a package-level run_doctor wrapper.
+- `livespec conventions verify --feature 083-pinned-runtime-isolation` PASS; independent acceptance-mapping review complete and ready (18/18 covered); execution receipt valid with no gaps. Review-driven fix: manifest commit is now checked against the install ref and the lock.
+- Full unit suite with AIRESOURCES set: no new failure versus the recorded baseline.
+- Read [implementation](implementation.md) and [progress](progress.md).
+
+<!-- finalize:spec-implement:2026-10-11:027bff35 -->
+
+### 2026-10-11 — Test: AC coverage validated
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** tests/test_runtime_shim.py, tests/test_runtime_project.py, tests/test_runtime_inspection.py (3 appended tests); run/acceptance/mapping.json (+11 bindings, AC-003 rebind) and mapping-review-receipt.json (fresh review)
+- **Coverage:** 18/18 AC covered (100%), 3 generated, 64/64 feature tests passing; full unit suite no failure outside baseline
+- **Report:** `checks/2026-10-11-test.md`
+- **Author:** Claude Code native spec-test (claude-opus-5-5)

@@ -4,7 +4,7 @@ priority: P1
 feature: 083-pinned-runtime-isolation
 created: 2026-10-11
 updated: 2026-10-11
-status: Planned
+status: Implemented
 ---
 
 # Feature Spec: Pinned Runtime Isolation
@@ -13,7 +13,7 @@ status: Planned
 - **Feature Number:** 083
 - **Branch:** `feat/pinned-runtime-isolation` (existing; no branch creation in this phase)
 - **Date:** 2026-10-11
-- **Status:** Planned
+- **Status:** Implemented
 - **Input:** Consumer projects must run an immutable, versioned LiveSpec runtime that they pin explicitly, instead of whatever uncommitted state the LiveSpec development checkout is in; LiveSpec tool defects must never enter a consumer project's feature critical path.
 
 ## Scope and Source Evidence

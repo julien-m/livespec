@@ -3,9 +3,17 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-09
+> Last updated: 2026-10-11
 
 ---
+
+## 2026-10-11 — [Feature 083] Test: 100% AC covered (18/18), 3 tests generated
+
+## 2026-10-11 — Feature 083 implemented: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, tool/project boundary (18/18 AC certified)
+<!-- finalize:spec-implement:2026-10-11:027bff35 -->
+
+## 2026-10-11 — Feature 083 implementation: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, boundary rule (In Progress; conventions certification pending)
+<!-- finalize:spec-implement:2026-10-11:68d31117 -->
 
 ## 2026-10-11 — Feature 083 plan created: Pinned Runtime Isolation, 9 implementation steps, 3 diagrams, ADR-004
 <!-- finalize:spec-plan:2026-10-11:5ddfddac -->

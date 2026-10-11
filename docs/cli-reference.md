@@ -20,6 +20,7 @@ livespec drivers           # list discoverable drivers
 livespec mutation          # run mutation testing
 livespec preflight         # verify (or --fix) the preflight manifest
 livespec device proof      # capture Agent Device proof bound to a LiveSpec UDID
+livespec runtime ...       # install, pin, upgrade, dev, status, defect
 ```
 
 All six commands auto-detect everything they need and accept overrides
@@ -515,6 +516,120 @@ idempotently, and under `.specs/.LOCK`.
     (`verify_finalize_receipt()` re-validates schema, hashes, feature, command,
     and verdict).
   * Exit `0` (PASS) or `10` (FAIL).
+
+## `livespec runtime`
+
+<!-- @spec FR-013: Docs and migration — .specs/features/083-pinned-runtime-isolation/spec.md#fr-013 -->
+
+Pinned, immutable LiveSpec runtimes for consumer projects (feature 083). A
+consumer project commits `.specs/livespec.lock`; the generated shim
+`<home>/bin/livespec` executes the runtime that lock selects, so the mutable
+development checkout never runs unless dev mode is declared. `<home>` is
+`--home`, else `$LIVESPEC_HOME`, else `~/.livespec`. Every `runtime`
+subcommand bypasses the migration guard. Exit codes: `0` success, `1` refused
+or failed (reason on stderr), `2` usage error; the shim itself exits `3` with a
+`livespec-shim:` stderr prefix when it cannot resolve a runtime.
+
+### Subcommands
+
+```bash
+# Snapshot a committed tree (default source: the running checkout; default ref: HEAD,
+# refused when the working tree is dirty — pass --ref <commit> to snapshot history only).
+livespec runtime install [--source <livespec repo>] [--ref <rev>] [--home <dir>] [--no-activate] [--json]
+# Pin a project to an installed, verified runtime (default: current); replaces any lock.
+livespec runtime pin [--project <dir>] [--runtime <id>|current] [--home <dir>] [--json]
+# Move a pinned project to another runtime; reports migration_required (/spec-migrate).
+livespec runtime upgrade [--project <dir>] [--to <id>|current] [--home <dir>] [--json]
+# Declare dev mode (the LiveSpec repository itself: --project . --source .).
+livespec runtime dev --source <checkout> [--project <dir>] [--json]
+# Mode, lock, resolved runtime, executing validator path and drift findings; exit 1 iff ERROR.
+livespec runtime status [--project <dir>] [--home <dir>] [--json]
+# Record a LiveSpec tool defect in the project and mark the phase Blocked.
+livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature <slug>] [--phase <phase>] [--title '<title>'] [--project <dir>] [--json]
+```
+
+- **install** writes `<home>/versions/<VERSION>-<sha12>/` (committed tree minus top-level
+  `.specs/` and `tests/`, read-only, `.livespec-runtime.json` manifest with a content digest),
+  rewrites `<home>/bin/livespec` for the installing interpreter and points `<home>/current` at
+  the snapshot unless `--no-activate`. Re-installing reuses a verified snapshot; a corrupted
+  one is refused, never overwritten. Without a working `livespec` yet, run it through the
+  checkout's own CLI: `cd <livespec repo> && python3 -m validator.cli runtime install`.
+- **pin** writes the portable lock (`schema`, `mode`, `runtime_id`, `livespec_version`,
+  `commit`), rewrites `.specs/.livespec-path` and retargets LiveSpec-owned links under
+  `.agent-sync.local/{skills,rules}/` into the snapshot (missing targets are listed and left
+  unchanged). It warns when `.specs/.livespec-path` is not git-ignored and never creates links.
+- **upgrade** requires a pinned lock (otherwise run `pin`) and refuses a runtime older than
+  `.specs/livespec-version`; the same id is a no-op.
+- **status** / `livespec doctor` report: checkout references (WARNING clean, ERROR dirty),
+  snapshot links without lock (WARNING), missing/corrupted pinned snapshot (ERROR), executing
+  runtime other than the pinned snapshot (ERROR), mismatched references (WARNING), invalid
+  lock (ERROR), dev mode (one INFO). The LiveSpec repository itself reports nothing.
+- **defect** writes `.specs/tool-defects/<YYYY-MM-DD>-<slug>.md` (never overwritten: `-2`,
+  `-3`, ...) with the command, verbatim error, frozen runtime identity and resume commands,
+  then applies `livespec pipeline update --feature <slug> --phase <phase> --status blocked`.
+  See [`system/tool-project-boundary.md`](../system/tool-project-boundary.md).
+
+### PATH ordering
+
+The shim must come before any editable `livespec` on `PATH`; on macOS the editable
+development install is typically `/opt/homebrew/bin/livespec`:
+
+```bash
+export PATH="$HOME/.livespec/bin:$PATH"   # add to ~/.zshrc, then: hash -r
+command -v livespec                       # -> ~/.livespec/bin/livespec
+```
+
+`livespec runtime status` reports `runtime_executing_mismatch` (ERROR) when a pinned
+project is run by another CLI, for example `/opt/homebrew/bin/livespec`.
+
+### Fresh machine
+
+`.specs/livespec.lock` is committed; `.specs/.livespec-path` and `.agent-sync.local/` are
+machine-local. After cloning a pinned project:
+
+```bash
+livespec runtime install --source <livespec repo> --ref <commit from lock>
+<home>/versions/<runtime_id>/scripts/link-local.sh <project> <home>/versions/<runtime_id>
+livespec runtime pin --runtime <runtime_id from lock>   # lock bytes stay unchanged
+```
+
+The global bootstrap skills can be installed from the snapshot too:
+`bash <home>/versions/<runtime_id>/scripts/install.sh`.
+
+### Deleting a snapshot
+
+Snapshots are read-only and there is no delete command. Restore write permission first:
+
+```bash
+chmod -R u+w <home>/versions/<runtime_id> && rm -rf <home>/versions/<runtime_id>
+```
+
+### Migrating an existing consumer project (Handy)
+
+A consumer such as `~/projects/handy` that links into `~/projects/livespec` migrates with
+the commands below, in order (verified by `tests/test_runtime_docs.py` on a temporary copy):
+
+<!-- runtime-migration:start -->
+```bash
+# 1. Install a snapshot of a committed LiveSpec tree (never the dirty dev checkout).
+git -C ~/projects/livespec fetch origin
+cd ~/projects/livespec && python3 -m validator.cli runtime install --source ~/projects/livespec --ref origin/main
+# 2. Put the shim before any editable livespec (e.g. /opt/homebrew/bin/livespec); persist in ~/.zshrc.
+export PATH="$HOME/.livespec/bin:$PATH"
+hash -r
+command -v livespec
+# 3. Pin the consumer project to that runtime (lock, .livespec-path, LiveSpec-owned links).
+cd ~/projects/handy
+livespec runtime pin
+# 4. Verify: mode "pinned" and no ERROR or WARNING runtime finding.
+livespec runtime status --json
+# 5. Commit the portable lock (.specs/.livespec-path and .agent-sync.local/ stay machine-local).
+git add .specs/livespec.lock
+git commit -m "chore: pin LiveSpec runtime"
+```
+<!-- runtime-migration:end -->
+
+---
 
 ## CI / GitHub Actions snippets
 

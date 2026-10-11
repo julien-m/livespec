@@ -467,6 +467,8 @@ Total: 6/8 gaps closed (75%)
 
 ---
 
+> **Read** [`system/tool-project-boundary.md`](../../../system/tool-project-boundary.md) before any consumer-project feature work: LiveSpec tool defects are reported with `livespec runtime defect` and never enter the project critical path (agents reading through symlinks: `system/tool-project-boundary.md` in the LiveSpec root recorded in `.specs/.livespec-path`).
+
 ## Internal Command Invocations
 
 - [subagent] `/spec-fix <feature>` — executable only for collection `--all`; remove `--all`/`-A`, preserve the same model and review budget and remaining filters; resolve `project_root`, run child with `cwd`/working directory=`project_root`; child must **Read** [spec-system](../../../.specs/spec-system.md), own its feature goal and return its actual contract/state paths for parent inspection.
