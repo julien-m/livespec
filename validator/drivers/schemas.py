@@ -50,6 +50,8 @@ class DriverCapability(BaseModel):
             when relative; verification requires current independent mapping evidence.
         threshold: Optional overall capability-output threshold.
         patch_threshold: Optional changed-line coverage threshold.
+        test_selection: ``append`` lets callers append selected test paths to the
+            argv (feature-scoped runs); ``None`` refuses selection explicitly.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -61,6 +63,9 @@ class DriverCapability(BaseModel):
     acceptance_mapping: str | None = None
     threshold: float | None = None
     patch_threshold: float | None = None
+    # @spec AC-002: Additive opt-in test selection
+    # — .specs/features/035-unified-cli-surface/spec.md#ac-002
+    test_selection: Literal["append"] | None = None
 
     @model_validator(mode="after")
     def _at_least_one_executable(self) -> DriverCapability:

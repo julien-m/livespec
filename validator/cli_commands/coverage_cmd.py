@@ -12,9 +12,8 @@ from pathlib import Path
 import typer
 
 from ..cli_exit_codes import (
-    EXIT_CAPABILITY_UNSUPPORTED,
-    EXIT_COVERAGE_FAIL,
-    EXIT_MISSING_SPECS,
+    EXIT_CONFIG,
+    EXIT_FAILURE,
     EXIT_OK,
 )
 from ..cli_resolvers import detect_base_branch, read_threshold_from_conventions
@@ -26,6 +25,7 @@ from ..drivers.patch_coverage import (
 )
 from ._common import (
     emit_summary,
+    help_epilog,
     require_specs_root,
     resolve_primary_driver,
     run_with_debug,
@@ -73,15 +73,16 @@ def coverage_command(
         ),
         debug=debug,
         subcommand="coverage",
-        fail_exit_code=EXIT_COVERAGE_FAIL,
     )
 
 
 def register(app: typer.Typer) -> None:
     """Register the ``coverage`` subcommand."""
-    app.command(name="coverage", help="Compute patch coverage vs the base branch.")(
-        coverage_command
-    )
+    app.command(
+        name="coverage",
+        help="Compute patch coverage vs the base branch.",
+        epilog=help_epilog("livespec coverage --base origin/main"),
+    )(coverage_command)
 
 
 def _run_coverage(
@@ -97,12 +98,12 @@ def _run_coverage(
     base_ref = base or detect_base_branch(project_root)
     if base_ref is None:
         typer.echo(
-            "Error: no base branch detected (tried origin/main, origin/master, "
-            "develop, dev, main, master). Pass --base BRANCH to override.",
+            "Error: no base branch detected (tried origin/HEAD, main, master, "
+            "develop, dev). Pass --base BRANCH to override.",
             err=True,
         )
         emit_summary("coverage", "ERROR", reason="no_base_branch")
-        raise typer.Exit(EXIT_MISSING_SPECS)
+        raise typer.Exit(EXIT_CONFIG)
 
     threshold_pct = (
         threshold if threshold is not None else read_threshold_from_conventions(project_root)
@@ -132,7 +133,7 @@ def _run_coverage(
             err=True,
         )
         emit_summary("coverage", "ERROR", reason="no_coverage_capability")
-        raise typer.Exit(EXIT_CAPABILITY_UNSUPPORTED)
+        raise typer.Exit(EXIT_CONFIG)
 
     lcov_path = report_path or Path(cap.report_path)
     if not lcov_path.is_absolute():
@@ -145,7 +146,7 @@ def _run_coverage(
             err=True,
         )
         emit_summary("coverage", "ERROR", reason="lcov_missing")
-        raise typer.Exit(EXIT_COVERAGE_FAIL)
+        raise typer.Exit(EXIT_CONFIG)
 
     report = compute_patch_coverage(
         lcov_path,
@@ -164,7 +165,7 @@ def _run_coverage(
             threshold=threshold_pct,
             failing=len(failing),
         )
-        raise typer.Exit(EXIT_COVERAGE_FAIL)
+        raise typer.Exit(EXIT_FAILURE)
 
     emit_summary(
         "coverage",

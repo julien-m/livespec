@@ -21,11 +21,11 @@ The full reference is **Read** [`docs/cli-reference.md`](../../../docs/cli-refer
 
 | Subcommand | Purpose | Key flags | Exit codes specific to it |
 |------------|---------|-----------|---------------------------|
-| `livespec test` | Run the active driver's coverage capability. | `--feature`, `--mutation`, `--no-coverage` | 0 / 1 / 2 / 3 / 4 |
-| `livespec coverage` | Patch coverage vs base branch. | `--base`, `--threshold`, `--report-path` | 0 / 1 / 2 / 3 |
-| `livespec drivers` | List all drivers (built-in + custom). | `--json` | 0 / 1 |
-| `livespec mutation` | Mutation testing through the active driver. | `--threshold`, `--report-path` | 0 / 1 / 2 / 3 / 4 |
-| `livespec preflight` | Verify (or `--fix`) the preflight manifest. | `--fix`, `--full` | 0 / 1 / 5 |
+| `livespec test` | Run the active driver's coverage capability. | `--feature`, `--mutation`, `--no-coverage` | 0 / 1 / 2 / 3 / 130 |
+| `livespec coverage` | Patch coverage vs base branch. | `--base`, `--threshold`, `--report-path` | 0 / 1 / 2 / 3 / 130 |
+| `livespec drivers` | List all drivers (built-in + custom). | `--json` | 0 / 1 / 2 / 130 |
+| `livespec mutation` | Mutation testing through the active driver. | `--threshold`, `--report-path` | 0 / 1 / 2 / 3 / 130 |
+| `livespec preflight` | Verify (or `--fix`) the preflight manifest. | `--fix`, `--full` | 0 / 1 / 2 / 3 / 130 |
 
 Shared flag on every command: `--debug` (print the full Python stacktrace on errors).
 
@@ -44,7 +44,7 @@ Shared flag on every command: `--debug` (print the full Python stacktrace on err
 3. **Always**:
    - Run from the repository root (the directory containing `.specs/`).
    - Display the structured summary line at the end of your answer so the user can grep CI logs in the same shape.
-   - On non-zero exit, look up the meaning in [`docs/cli-reference.md`](../../../docs/cli-reference.md) and propose the next step (e.g. exit 5 → "run `livespec preflight --fix`").
+   - On non-zero exit, look up the meaning in [`docs/cli-reference.md`](../../../docs/cli-reference.md) and propose the next step (e.g. exit 3 from `livespec preflight` → "run `livespec preflight --fix`").
 
 ---
 
@@ -54,7 +54,7 @@ The CLI auto-resolves these without flags — only override when something is wr
 
 - **Project root** — first ancestor of `cwd` containing `.specs/`.
 - **Driver** — `DriverRegistry.discover()` + `pick_primary_driver()`.
-- **Base branch** — first hit in: `origin/main`, `origin/master`, `develop`, `dev`, `main`, `master`.
+- **Base branch** — `origin/HEAD` first, then the first local branch among `main`, `master`, `develop`, `dev`.
 - **Threshold** — `coverage threshold: NN` from `.conventions/index.md`, fallback 70.
 
 ---

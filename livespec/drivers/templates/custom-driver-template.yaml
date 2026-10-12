@@ -25,6 +25,7 @@ detect:
 #   report_path: coverage/lcov.info
 #   threshold: 0.85          # overall line coverage gate
 #   patch_threshold: 0.80    # changed-lines coverage gate (per-PR)
+#   test_selection: append   # optional: `livespec test --feature` appends selected test paths
 
 # === snapshots ===
 # Golden-file / snapshot tests. Same `command:` vs `script:` rules apply.

@@ -1,3 +1,11 @@
+## 2026-10-12 — [Feature]: Additive `test_selection` field on driver capabilities
+
+- **Type:** Feature (additive, backward compatible)
+- **Spec modified:** No
+- **Code modified:** `validator/drivers/schemas.py` (`DriverCapability.test_selection: Literal["append"] | None = None`), `validator/drivers/runner.py` (`run_capability(test_paths=)` appends selected paths only on `append`, otherwise raises `DriverTestSelectionError`), `livespec/drivers/python.yaml`, `livespec/drivers/templates/custom-driver-template.yaml`
+- **AC impacted:** None (existing manifests load unchanged); consumer: feature 035 AC-002
+- **Author:** spec-fix 035 (Claude Opus 5.5)
+
 ## 2026-05-06 — [Feature]: Cross-language test driver architecture implemented
 
 - **Type:** Feature

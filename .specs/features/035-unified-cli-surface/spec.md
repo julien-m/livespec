@@ -1,9 +1,9 @@
 ---
 title: "Unified CLI Surface for Drivers, Tests, Coverage, Mutation, Preflight"
-status: "Draft"
+status: "In Progress"
 priority: "P1"
 created: 2026-05-07
-updated: 2026-05-07
+updated: 2026-10-12
 ---
 
 # Feature Spec: Unified CLI Surface
@@ -11,12 +11,12 @@ updated: 2026-05-07
 - **Feature:** Unified CLI Surface
 - **Branch:** feature/035-unified-cli-surface
 - **Date:** 2026-05-07
-- **Status:** Draft
+- **Status:** In Progress
 - **Priority:** P1
 - **Scope:** M
 - **Input:** Features 016-034 added powerful Python modules under `validator/drivers/` and `validator/preflight/` but only exposed minimal CLI surface (`livespec spec.driver --new`, `livespec init test-config`). Users currently must invoke slash commands inside Claude Code or write Python scripts to run drivers, compute patch coverage, run mutation testing, or trigger preflight autofix. This feature exposes a coherent CLI with sensible auto-detection of all parameters (stack, threshold, base branch, current feature) so users can run `livespec test`, `livespec coverage`, `livespec drivers`, `livespec preflight --fix` directly from any project root.
 - **Feature Number:** 035
-- **Deps:** 016, 017, 018, 019, 020, 021, 022, 023, 024, 025, 026, 034
+- **Deps:** 016, 017, 018, 019, 020, 021, 022, 023, 024, 025, 026, 033, 034
 
 ---
 
@@ -54,29 +54,49 @@ Feature: Run tests with auto-detection
     When the developer runs `livespec test`
     Then the CLI emits the structured degradation message (feature 023)
     And lists currently supported stacks
+    And exits with code 3
+
+  Scenario: Feature-scoped run on anchored tests
+    Given exactly one directory matches .specs/features/035-*/
+    And the smart selector maps tests/test_cli_unified.py to that feature
+    And the python driver's coverage capability declares test_selection: append
+    When the developer runs `livespec test --feature 035`
+    Then the CLI appends only the selected test files to the coverage command
+    And exits with code 0 if the selected tests pass and the threshold is met
+
+  Scenario: Feature-scoped run refused
+    Given the --feature value matches zero or several feature directories
+    When the developer runs `livespec test --feature 999`
+    Then the CLI prints which directories matched
     And exits with code 2
 ```
 
 ```mermaid
 flowchart TD
     A["livespec test"] --> B{".specs/<br/>exists?"}
-    B -->|"no"| ERR1(["exit 1 — run /spec.init"])
+    B -->|"no"| ERR1(["exit 1 — run /spec-init"])
     B -->|"yes"| C["DriverRegistry.discover()"]
     C --> D{"matches<br/>found?"}
-    D -->|"none"| ERR2(["degradation message<br/>exit 2"])
+    D -->|"none"| ERR2(["degradation message<br/>exit 3"])
     D -->|"1"| E["selected driver"]
     D -->|"≥2"| F["pick_primary_driver()"]
     F --> E
-    E --> G["resolve threshold<br/>from conventions"]
+    E --> S{"--feature<br/>given?"}
+    S -->|"no"| G["resolve threshold<br/>from conventions"]
+    S -->|"yes"| R{"exactly one<br/>feature dir?"}
+    R -->|"no"| ERR3(["exit 2"])
+    R -->|"yes"| T{"selected tests +<br/>test_selection: append?"}
+    T -->|"no"| ERR4(["explicit refusal<br/>exit 3"])
+    T -->|"yes"| G
     G --> H["run_capability(coverage)"]
     H --> I{"exit 0 +<br/>threshold met?"}
     I -->|"yes"| OK(["summary + exit 0"])
-    I -->|"no"| KO(["summary + exit non-0"])
+    I -->|"no"| KO(["summary + exit 1"])
 ```
 
 ### Story 2 — Compute patch coverage vs main `P1`
 
-Before opening a PR, a developer runs `livespec coverage` from a feature branch. The CLI auto-detects the base branch (`origin/main` or `origin/master` or first match in [`develop`, `dev`, `main`, `master`]), reads `lcov.info` from the driver's default report path, intersects with `git diff <base>...HEAD`, and prints which changed files have insufficient coverage.
+Before opening a PR, a developer runs `livespec coverage` from a feature branch. The CLI auto-detects the base branch (`origin/HEAD`, the remote default branch, then the first existing local branch among `main`, `master`, `develop`, `dev`; `--base` always wins), reads `lcov.info` from the driver's default report path, intersects with `git diff <base>...HEAD`, and prints which changed files have insufficient coverage.
 
 **Priority reason:** Patch coverage is the most actionable feedback before review. Without CLI exposure, feature 024 is dormant.
 
@@ -86,29 +106,46 @@ Before opening a PR, a developer runs `livespec coverage` from a feature branch.
 Feature: Patch coverage vs base branch
   Scenario: Default base detection
     Given the developer is on feature/xyz
-    And origin/main exists
+    And origin/HEAD points to origin/main
     And lcov.info exists at the driver's default path
     When the developer runs `livespec coverage`
     Then the CLI uses origin/main as the base
     And computes patch coverage on changed files only
     And prints: "Patch coverage: 8/10 lines (80%) · 2 files below threshold: src/foo.py (60%), src/bar.py (50%)"
-    And exits with code 0 if all files >= threshold, else 3
+    And exits with code 0 if all files >= threshold, else 1
+
+  Scenario: Local fallback without origin/HEAD
+    Given origin/HEAD is not set
+    And the local branches master and develop exist
+    When the developer runs `livespec coverage`
+    Then the CLI uses master as the base
 
   Scenario: Explicit base branch override
     Given the developer wants to compare against develop instead
     When the developer runs `livespec coverage --base=develop`
     Then the CLI uses develop as the base
     And ignores auto-detection
+
+  Scenario: No base branch or no lcov report
+    Given neither origin/HEAD nor any of main, master, develop, dev exists, or lcov.info is absent
+    When the developer runs `livespec coverage`
+    Then the CLI prints one actionable message
+    And exits with code 3
 ```
 
 ```mermaid
 flowchart LR
-    A["livespec coverage"] --> B["detect base branch<br/>(auto or --base)"]
-    B --> C["git diff base...HEAD"]
-    C --> D["read lcov.info"]
-    D --> E["compute_patch_coverage()"]
+    A["livespec coverage"] --> B["base = --base, else origin/HEAD,<br/>else main, master, develop, dev"]
+    B --> B2{"base found?"}
+    B2 -->|"no"| X3(["exit 3"])
+    B2 -->|"yes"| C["git diff base...HEAD"]
+    C --> D{"lcov.info<br/>found?"}
+    D -->|"no"| X3
+    D -->|"yes"| E["compute_patch_coverage()"]
     E --> F["evaluate_patch_gate()"]
-    F --> G["summarise + exit code"]
+    F --> G{"all files >=<br/>threshold?"}
+    G -->|"yes"| OK(["summary + exit 0"])
+    G -->|"no"| KO(["summary + exit 1"])
 ```
 
 ### Story 3 — Inspect drivers `P2`
@@ -129,7 +166,19 @@ Feature: List discoverable drivers
 
   Scenario: --json output for tooling
     When the developer runs `livespec drivers --json`
-    Then the output is a JSON array consumable by other tools
+    Then stdout is only a JSON array consumable by other tools
+    And the one-line CI summary is written to stderr
+```
+
+```mermaid
+flowchart TD
+    A["livespec drivers"] --> B["DriverRegistry.discover()"]
+    B --> C["pick_primary_driver()"]
+    C --> D{"--json?"}
+    D -->|"no"| E["table: Driver, Source, Match, Capabilities<br/>+ primary marker"]
+    E --> F["summary on stdout + exit 0"]
+    D -->|"yes"| G["JSON array on stdout<br/>([] when nothing matches)"]
+    G --> H["summary on stderr + exit 0"]
 ```
 
 ### Story 4 — Run mutation testing on demand `P2`
@@ -151,7 +200,25 @@ Feature: Run mutation testing
     Given a Go project (no mutation tool in feature 020)
     When the developer runs `livespec mutation`
     Then the CLI emits a structured "not supported by go driver" message
-    And exits with code 4
+    And exits with code 3
+
+  Scenario: Mutation score below threshold
+    Given a Python project whose mutation score is below the threshold
+    When the developer runs `livespec mutation`
+    Then the CLI writes the report and prints the score
+    And exits with code 1
+```
+
+```mermaid
+flowchart TD
+    A["livespec mutation"] --> B["resolve primary driver"]
+    B --> C{"mutation<br/>capability?"}
+    C -->|"no"| X3(["not supported message<br/>exit 3"])
+    C -->|"yes"| D["run_capability(mutation)"]
+    D --> E["write .specs/reports/mutation-YYYY-MM-DD.md"]
+    E --> F{"score >=<br/>threshold?"}
+    F -->|"yes"| OK(["summary + exit 0"])
+    F -->|"no"| KO(["summary + exit 1"])
 ```
 
 ### Story 5 — Run preflight checks (read or fix) `P1`
@@ -167,7 +234,7 @@ Feature: Preflight from CLI
     And only pytest-cov is installed
     When the developer runs `livespec preflight`
     Then the CLI prints a summary table with status per tool
-    And exits with code 5 if any critical tool is missing
+    And exits with code 3 if the manifest or any critical tool is missing
 
   Scenario: Auto-install missing tools
     When the developer runs `livespec preflight --fix`
@@ -175,6 +242,21 @@ Feature: Preflight from CLI
     And installs missing auto-installable tools
     And re-verifies after install
     And exits with code 0 on full success
+    And exits with code 3 when a critical tool is still missing after the install attempt
+```
+
+```mermaid
+flowchart TD
+    A["livespec preflight [--fix]"] --> B{"manifest<br/>present?"}
+    B -->|"no"| X3(["exit 3"])
+    B -->|"yes"| C{"--fix?"}
+    C -->|"yes"| D["feature 034 install of<br/>auto-installable tools"]
+    D --> E["re-verify"]
+    C -->|"no"| E
+    E --> F["per-tool status table"]
+    F --> G{"critical tool<br/>missing?"}
+    G -->|"yes"| X3
+    G -->|"no"| OK(["summary + exit 0"])
 ```
 
 ---
@@ -182,18 +264,18 @@ Feature: Preflight from CLI
 ## Acceptance Criteria
 
 - **AC-001:** `livespec test` runs with zero arguments in a project that has a recognized driver and produces a coverage summary line in under 60 seconds for a small project.
-- **AC-002:** `livespec test --feature NNN` resolves to the feature directory under `.specs/features/NNN-*/` and limits test execution to anchored tests (using `@spec FR-XXX` anchors from feature 016 + smart selection from feature 033).
+- **AC-002:** `livespec test --feature NNN` resolves exactly one feature directory under `.specs/features/NNN-*/` (zero or several matches exit 2) and limits test execution to the tests that `SmartTestSelector.tests_for_features` maps to that feature (feature 033, using `@spec` anchors from feature 016 and implementation maps), appended to the driver's coverage command when its coverage capability declares `test_selection: append`; a driver without that declaration, or a feature with no selected test, is refused explicitly with exit 3.
 - **AC-003:** `livespec test --mutation` runs the mutation capability and prints the score, separate from the coverage summary.
-- **AC-004:** `livespec coverage` auto-detects the base branch by trying `origin/main`, `origin/master`, then falling back to local `main`/`master`/`develop` in that order.
+- **AC-004:** `livespec coverage` auto-detects the base branch by trying `origin/HEAD` (the remote default branch) first, then the local branches `main`, `master`, `develop`, `dev` in that order; when none exists it exits 3.
 - **AC-005:** `livespec coverage --base BRANCH` overrides auto-detection and uses the explicit branch.
 - **AC-006:** `livespec drivers` prints a table with columns: Driver, Source (built-in/custom), Match (yes/no), Capabilities (comma-separated).
 - **AC-007:** `livespec drivers --json` outputs a JSON array suitable for piping to `jq`.
 - **AC-008:** `livespec mutation` writes a historical Markdown report at `.specs/reports/mutation-YYYY-MM-DD.md` (creating `.specs/reports/` if absent).
 - **AC-009:** `livespec preflight` runs read-only verification and prints a per-tool status table.
 - **AC-010:** `livespec preflight --fix` invokes feature 034 logic and re-verifies after install.
-- **AC-011:** All commands exit with documented codes: 0 success, 1 missing `.specs/`, 2 no driver match, 3 coverage threshold failed, 4 capability not supported, 5 preflight critical failure.
-- **AC-012:** Each command emits a structured one-line summary suitable for CI logs (in addition to verbose human output).
-- **AC-013:** `--help` on each command produces user-facing help text generated from Typer (no developer-only jargon, includes one example per command).
+- **AC-011:** The five commands exit with the constitution codes only: 0 success; 1 failure of the run (test suite failed, coverage or mutation threshold not met, unexpected exception); 2 invalid arguments (Typer usage errors, unresolvable `--feature`); 3 missing configuration (no driver detected, lcov report not found, capability absent from the detected driver or without `test_selection: append` for `--feature`, no selected test, preflight manifest or critical tool missing, no resolvable base branch); 130 interrupted by Ctrl+C. Exception: a missing `.specs/` directory and a run outside a git repository exit 1, because the shared `.specs/` resolver serves every `livespec` command.
+- **AC-012:** Each command emits a structured one-line summary suitable for CI logs (in addition to verbose human output); in `--json` mode the summary goes to stderr so stdout stays valid JSON.
+- **AC-013:** `--help` on each of the five commands (`test`, `coverage`, `drivers`, `mutation`, `preflight`) produces user-facing help text generated from Typer (no developer-only jargon) that ends with one example line `livespec <command> …` whose options are accepted by that command's parser.
 - **AC-014:** Errors (missing tool, no driver, lcov absent) print a single actionable message — no Python stacktrace unless `--debug` is set.
 - **AC-015:** A canonical CLI reference document at `docs/cli-reference.md` is created and lists every command, every flag, every exit code, and one example per command. The doc is the authoritative source — no need to read code.
 - **AC-016:** A Claude Code slash command at `.claude/commands/cli.md` provides an interactive way to discover and run the CLI from inside Claude Code, mirroring the documentation.
@@ -202,17 +284,17 @@ Feature: Preflight from CLI
 
 ## Functional Requirements
 
-- **FR-001:** Add Typer subcommand `test` to `validator/cli.py` with optional `--feature NNN`, `--mutation`, `--no-coverage`, `--debug` flags.
+- **FR-001:** Add Typer subcommand `test` to `validator/cli.py` with optional `--feature NNN` (feature-scoped selection per AC-002), `--mutation` (also run the mutation capability), `--no-coverage` (skip the coverage capability; useful with `--mutation`), `--debug` flags.
 - **FR-002:** Add Typer subcommand `coverage` with optional `--base BRANCH`, `--threshold N`, `--report-path PATH`, `--debug` flags.
 - **FR-003:** Add Typer subcommand `drivers` with optional `--json`, `--debug` flags.
 - **FR-004:** Add Typer subcommand `mutation` with optional `--threshold N`, `--report-path PATH`, `--debug` flags.
-- **FR-005:** Add Typer subcommand `preflight` with optional `--fix`, `--full`, `--debug` flags. (Note: existing `livespec spec.preflight` remains for backward compatibility with the slash command; this new `preflight` is the canonical short form.)
-- **FR-006:** Implement a shared resolver module `validator/cli_resolvers.py` for: `detect_specs_root()`, `detect_base_branch()`, `detect_current_feature()`, `read_threshold_from_conventions()`. All four are pure functions, fully unit-tested.
-- **FR-007:** Implement structured exit codes per AC-011. Exit codes are constants in `validator/cli_exit_codes.py`.
+- **FR-005:** Add Typer subcommand `preflight` with optional `--fix` (feature 034 auto-install), `--full` (verify every manifest item instead of the impacted ones), `--debug` flags. (Note: existing `livespec spec.preflight` remains for backward compatibility with the slash command; this new `preflight` is the canonical short form.)
+- **FR-006:** Implement a shared resolver module `validator/cli_resolvers.py` for: `detect_specs_root()`, `detect_base_branch()` (order of AC-004), `detect_current_feature()`, `read_threshold_from_conventions()` (first `coverage threshold: NN` line of `.conventions/index.md`, default 70, shared by coverage and patch coverage). They only read files or git refs and are unit-tested.
+- **FR-007:** Implement the exit codes of AC-011 as constants in `validator/cli_exit_codes.py` (success 0, run failure 1, usage error 2, missing configuration 3, interrupted 130); the five commands use no other code.
 - **FR-008:** Each command catches generic exceptions and surfaces a single-line actionable error unless `--debug` is set (then prints stacktrace).
-- **FR-009:** Each command appends a one-line CI summary to stdout (after verbose output) of the form `LIVESPEC <subcommand> · <status> · <key=value> ...`.
+- **FR-009:** Each command appends a one-line CI summary (after verbose output) of the form `LIVESPEC <subcommand> · <status> · <key=value> ...`, on stdout, or on stderr when `--json` is set.
 - **FR-010:** Generate `docs/cli-reference.md` exhaustively listing all commands, flags, exit codes, environment variables (if any), and one example per command. Manual maintenance acceptable; the doc is committed alongside code.
-- **FR-011:** Generate `.claude/commands/cli.md` slash command that loads the CLI reference and provides interactive selection (matches the Claude Code skill pattern used by `/spec.*` commands).
+- **FR-011:** Generate `.claude/commands/cli.md` slash command that loads the CLI reference and provides interactive selection (matches the Claude Code skill pattern used by `/spec-*` commands).
 - **FR-012:** Create `tests/test_cli_unified.py` with end-to-end tests using `typer.testing.CliRunner` covering: `test`, `coverage`, `drivers`, `mutation`, `preflight` — at least one happy-path scenario per command.
 
 ---
@@ -226,11 +308,11 @@ Feature: Preflight from CLI
 
 ## Edge Cases
 
-- **EC-001:** `livespec test` on a project without `.specs/` exits 1 with a message pointing to `/spec.init`.
+- **EC-001:** `livespec test` on a project without `.specs/` exits 1 with a message pointing to `/spec-init`.
 - **EC-002:** `livespec coverage` on a branch with no diff vs base (already merged) exits 0 with summary "no changes since base".
 - **EC-003:** `livespec drivers --json` emits empty array `[]` when no drivers match (instead of failing).
-- **EC-004:** `livespec mutation` on a Go project (capability absent) exits 4 with a message pointing to feature 020 limitations.
-- **EC-005:** `livespec preflight --fix` partial success: some tools install, others fail; exits 5 (critical), prints which succeeded vs failed.
+- **EC-004:** `livespec mutation` on a Go project (capability absent) exits 3 with a message pointing to feature 020 limitations.
+- **EC-005:** `livespec preflight --fix` partial success: some tools install, others fail; exits 3 when a critical tool is still missing, prints which succeeded vs failed.
 - **EC-006:** Concurrent invocation of two `livespec test` runs (e.g., from a watcher): both proceed independently — no global lock added by this feature.
 - **EC-007:** `livespec test` invoked outside a git repo: exits 1 with "not in a git repository" message.
 
@@ -250,4 +332,21 @@ Feature: Preflight from CLI
 - Watch mode / continuous test runner (could be a future feature 036).
 - IDE integration / LSP — separate roadmap item.
 - Network-based reporting (Codecov, Slack notifications) — feature 024 explicitly local-only.
-- TUI / interactive picker — `--feature` and `--driver` flags are fine; no `inquirer`-style prompts.
+- TUI / interactive picker — the `--feature` flag is enough; no `inquirer`-style prompts and no `--driver` override flag.
+
+## Clarifications
+
+- Decision `035-unified-cli-surface:FR-004` / `mutation-defaults`: `livespec mutation` uses `--threshold` when given, else the `coverage threshold: NN` value of `.conventions/index.md`, else 70; `--report-path` overrides where the Markdown report is written (default `.specs/reports/mutation-YYYY-MM-DD.md`, AC-008).
+- Decision `035-unified-cli-surface:FR-006` / `current-feature-detection`: `detect_current_feature()` returns `NNN-kebab-name` when the current git branch is `feature/NNN-kebab-name` and `None` otherwise (other branch names, detached HEAD, no git); it is a resolver for slash commands and no unified command calls it implicitly.
+- Decision `035-unified-cli-surface:AC-002` / `feature-argument-forms`: `--feature` accepts a number (`035`, matched as `.specs/features/035-*`, so `005` never matches `005.1-*`) or an exact feature directory name (`035-unified-cli-surface`). The resolved slug feeds the journey checks of the driver mode. The native execution and review modes of `livespec test` (`--execution-command`, `--prepare-mapping-review`, `--ingest-mapping-review`, feature 078) keep their own `--feature` contract and exit 1 on invalid input.
+- Decision `035-unified-cli-surface:FR-001` / `no-coverage`: `--no-coverage` skips only the coverage capability; the journey checks still run, `--mutation` still runs when given, and the summary reports `coverage=n/a`.
+- Decision `035-unified-cli-surface:AC-011` / `exit-code-taxonomy-vs-constitution`: Human decision 2026-10-12: the five commands keep the constitution exit codes (0 success, 1 general error, 2 invalid args, 3 config error, 130 Ctrl+C) and the former codes 2 (no driver), 3 (threshold), 4 (capability) and 5 (preflight) are retired: no driver, lcov absent, capability absent, preflight manifest or critical tool missing and no base branch exit 3; test failure, threshold not met and unexpected exceptions exit 1; usage errors exit 2; Ctrl+C exits 130.
+- Decision `035-unified-cli-surface:AC-002` / `feature-scoped-test-selection`: Human decision 2026-10-12: `--feature` resolves exactly one `.specs/features/NNN-*` directory (otherwise exit 2), tests come from `SmartTestSelector.tests_for_features`, and only a coverage capability declaring the additive, backward-compatible field `test_selection: append` (declared by the built-in python driver) receives the selected test paths appended to its command; any other driver, or an empty selection, is refused with exit 3.
+- Decision `035-unified-cli-surface:AC-012` / `json-summary-channel`: Human decision 2026-10-12: with `--json` the CI summary line is written to stderr so stdout stays a valid JSON document.
+
+- Decision `035-unified-cli-surface:AC-011` / `unmapped-failure-exit-codes`: Human decision 2026-10-12: failing test suite, mutation score below threshold and unexpected exceptions exit 1; missing lcov report and an unresolvable base branch exit 3 (missing configuration); a missing .specs/ directory and a run outside a git repository keep exit 1 (general error, unchanged EC-001 and EC-007); Ctrl+C exits 130.
+<!-- livespec-clarification:{"requirement_id": "035-unified-cli-surface:AC-011", "decision_key": "unmapped-failure-exit-codes", "evidence_hash": "9105ad55f8669a31e56151b074a51e43d8b7f803094567e7e94de820194e914e", "answer": "Human decision 2026-10-12: failing test suite, mutation score below threshold and unexpected exceptions exit 1; missing lcov report and an unresolvable base branch exit 3 (missing configuration); a missing .specs/ directory and a run outside a git repository keep exit 1 (general error, unchanged EC-001 and EC-007); Ctrl+C exits 130."} -->
+
+- Decision `035-unified-cli-surface:AC-004` / `base-branch-fallback-order`: Human decision 2026-10-12: livespec coverage resolves the base branch from origin/HEAD first (the remote default branch, e.g. origin/main), then the first existing local branch among main, master, develop, dev, in that order; --base always overrides auto-detection. Story 2 and the base-detection acceptance criterion state this same order.
+<!-- livespec-clarification:{"requirement_id": "035-unified-cli-surface:AC-004", "decision_key": "base-branch-fallback-order", "evidence_hash": "59dcc6fbf1be416acf8886f4891c5e566bc14c88ab4247b349a0f6e600708ac1", "answer": "Human decision 2026-10-12: livespec coverage resolves the base branch from origin/HEAD first (the remote default branch, e.g. origin/main), then the first existing local branch among main, master, develop, dev, in that order; --base always overrides auto-detection. Story 2 and the base-detection acceptance criterion state this same order."} -->
+
