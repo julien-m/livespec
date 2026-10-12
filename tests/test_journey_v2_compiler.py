@@ -21,7 +21,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from pytest import MonkeyPatch
+from pytest import MonkeyPatch, fixture
 
 from tests.test_journey_v2_validation import _write_feature, _write_v2_journey
 from validator.journeys import compiler as compiler_module
@@ -29,6 +29,12 @@ from validator.journeys.capabilities import validate_runner_capability
 from validator.journeys.compiler import compile_journeys
 from validator.journeys.manifest import read_compiled_manifest
 from validator.journeys.models import ValidationResult
+
+
+@fixture(autouse=True)
+def _ui_test_target(tmp_path: Path) -> None:
+    """FR-007 (056): XCUITest output goes to the project's unique *UITests directory."""
+    (tmp_path / "STRAPTUITests").mkdir(exist_ok=True)
 
 
 def test_compile_v2_writes_manifest_and_playwright_artifact(tmp_path: Path) -> None:
@@ -189,7 +195,7 @@ def test_compile_v2_rejects_unsupported_xcuitest_steps_before_writing(
         .replace("runner: playwright", "runner: xcuitest")
         .replace(
             "  - action: open\n    target:\n      route: /signup\n",
-            "  - action: wait\n    seconds: 5\n",
+            "  - action: press\n    key: Enter\n",
         ),
         encoding="utf-8",
     )

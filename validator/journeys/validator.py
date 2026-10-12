@@ -87,6 +87,7 @@ def validate_journey_file(
 
     source_hash = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()
     issues = _validate_source_contract(project_root, path, source)
+    issues.extend(_validate_wait_and_manual(path, source))
     issues.extend(_validate_fixtures_contract(project_root, path, source))
     issues.extend(validate_history(project_root, source.id, source_hash))
     if any(issue.severity == JourneySeverity.ERROR for issue in issues):
@@ -107,7 +108,7 @@ def validate_journey_file(
             covers_ac=[cover.ref for cover in source.covers if cover.kind is CoverageRefKind.AC],
             covers_fr=[cover.ref for cover in source.covers if cover.kind is CoverageRefKind.FR],
             disabled=source.status.value == "disabled" or _primary_policy(source) == "disabled",
-            manual_reason=None,
+            manual_reason=source.manual_reason,
             source_hash=source_hash,
         ),
         issues,
@@ -162,6 +163,32 @@ def _validate_source_contract(
                     path,
                 )
             )
+    return issues
+
+
+def _validate_wait_and_manual(path: Path, source: JourneySourceV2) -> list[JourneyIssue]:
+    """Warn on unexplained fixed waits and block manual journeys without a reason."""
+    # @spec AC-004: Fixed wait warning, AC-015: manual reason required
+    # — .specs/features/056-executable-user-journeys/spec.md#ac-004
+    issues = [
+        _issue(
+            "wait_reason_missing",
+            JourneySeverity.WARNING,
+            f"wait.seconds at step {index} needs until or reason",
+            path,
+        )
+        for index, step in enumerate(source.steps, start=1)
+        if step.is_unexplained_fixed_wait
+    ]
+    if source.lacks_manual_reason:
+        issues.append(
+            _issue(
+                "journey_manual_reason_missing",
+                JourneySeverity.ERROR,
+                "manual journeys require manual_reason",
+                path,
+            )
+        )
     return issues
 
 
@@ -303,7 +330,7 @@ def _primary_policy(source: JourneySourceV2) -> str:
     """Return the most representative policy for legacy category counts."""
     if RunPolicyValue.DISABLED in source.run_policy.values():
         return "disabled"
-    if RunPolicyValue.MANUAL in source.run_policy.values():
+    if source.is_manual:
         return "manual"
     if RunPolicyValue.ALWAYS in source.run_policy.values():
         return "always"
@@ -328,6 +355,10 @@ def _legacy_steps(source: JourneySourceV2) -> list[dict[str, JsonValue]]:
             payload["seconds"] = step.seconds
         if step.key is not None:
             payload["key"] = step.key
+        if step.until is not None:
+            payload["until"] = step.until.model_dump(mode="json", exclude_none=True)
+        if step.reason is not None:
+            payload["reason"] = step.reason
         steps.append({step.action.value: payload})
     return steps
 

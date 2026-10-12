@@ -7,6 +7,11 @@
 
 ---
 
+## 2026-10-12 — Bugfix: missing requirements of features 035 and 056 implemented
+
+- [Feature 056](features/056-executable-user-journeys/changelog.md) Fix: AC-003, AC-004 and AC-015 were marked done but not implemented on the v2 path. `wait` now takes `until`/`reason` (bounded waits in Playwright, XCUITest and Maestro, `wait_reason_missing` warning), and manual journeys require `manual_reason`. Also fixed: FR-005 `select` (Playwright) and FR-007 portable XCUITest destination, with no hardcoded `STRAPTUITests`. Spec clarified and plan rewritten on the v2 pipeline after independent reviews.
+- [Feature 035](features/035-unified-cli-surface/changelog.md) Fix: every unified command's `--help` ends with an executable example (AC-013). Human decisions applied: constitution exit codes 0/1/2/3/130, base branch `origin/HEAD` then main/master/develop/dev, CI summary on stderr with `--json`, and real `--feature` selection through `SmartTestSelector` plus the additive driver field `test_selection: append` ([016](features/016-cross-language-test-driver-architecture/changelog.md)). implementation.md created; status In Progress pending the feature-scope conventions debt.
+
 ## 2026-10-12 — Refactor: test-suite cleanup lot 5
 
 - Removed or replaced tautological, vacuous and always-skipped tests across features 001, 002, 007, 009, 019, 020, 022, 030, 031, 037, 046 and 078. This includes the unmapped `tests/test_ui_runner_cli.py` (a redundant registry check) and `tests/test_ui_runner_tauri.py`, where the driver-capability test now pins both states instead of asserting nothing when tauri-driver is installed. The semantic matrix went from 171 to 42 cases, the visual gate stays at 94.41% coverage, and no production code changed.

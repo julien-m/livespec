@@ -219,13 +219,40 @@ class Preconditions(JourneyBaseModel):
 
 
 class JourneyStep(JourneyBaseModel):
-    """One portable journey action."""
+    """One portable journey action.
 
+    Attributes:
+        until: Target that must become visible; only valid on ``wait`` (bounded wait).
+        reason: Why a fixed ``wait`` (no ``until``) is needed; silences the warning.
+    """
+
+    # @spec AC-003, AC-004: wait fields
+    # — .specs/features/056-executable-user-journeys/spec.md#ac-004
     action: JourneyAction
     target: JourneyTargetRef | None = None
     value: str | None = None
     seconds: int | None = Field(default=None, gt=0)
     key: str | None = None
+    until: JourneyTargetRef | None = None
+    reason: str | None = None
+
+    @model_validator(mode="after")
+    def validate_wait_fields(self) -> JourneyStep:
+        """Keep every wait bounded and ``until`` exclusive to ``wait`` steps."""
+        if self.action is JourneyAction.WAIT and self.seconds is None:
+            raise ValueError("wait steps require seconds so the wait stays bounded")
+        if self.until is not None and self.action is not JourneyAction.WAIT:
+            raise ValueError("until is only valid on wait steps")
+        return self
+
+    @property
+    def is_unexplained_fixed_wait(self) -> bool:
+        """Return True for a fixed ``wait`` with neither ``until`` nor a non-blank reason."""
+        return (
+            self.action is JourneyAction.WAIT
+            and self.until is None
+            and not (self.reason or "").strip()
+        )
 
 
 class VisualCheck(JourneyBaseModel):
@@ -271,6 +298,20 @@ class JourneySourceV2(JourneyBaseModel):
     steps: list[JourneyStep] = Field(min_length=1)
     visual_checks: list[VisualCheck] = Field(default_factory=list)
     privacy: PrivacyPolicy = Field(default_factory=PrivacyPolicy)
+    # @spec AC-015: Manual reason — .specs/features/056-executable-user-journeys/spec.md#ac-015
+    manual_reason: str | None = None
+
+    @property
+    def is_manual(self) -> bool:
+        """Return True when the status or any stage policy is ``manual``."""
+        return self.status is JourneyStatus.MANUAL or RunPolicyValue.MANUAL in (
+            self.run_policy.values()
+        )
+
+    @property
+    def lacks_manual_reason(self) -> bool:
+        """Return True for a manual journey without a non-blank ``manual_reason``."""
+        return self.is_manual and not (self.manual_reason or "").strip()
 
     @model_validator(mode="after")
     def validate_privacy_for_visual_checks(self) -> JourneySourceV2:
