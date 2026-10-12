@@ -7,6 +7,11 @@
 
 ---
 
+## 2026-10-12 — Refactor: test cleanup lot 4 (legitimate assertions only)
+
+- Plan-review exit-code tests run the CLI instead of recomputing its expression ([001](features/001-auto-llm-review/changelog.md)); web-runner output-path tests stub Playwright instead of launching `npx` ([028](features/028-ui-runner-web/changelog.md)); review-identity and Analyze combinations trimmed to one case per branch ([078](features/078-requirement-evidence-integrity/changelog.md)); preflight YAML parsing, link-capability fallback, schema and ship-header tests assert real values ([034](features/034-preflight-autofix/changelog.md) records an open `pip install -e` parsing defect).
+- Kept on purpose: `tests/test_penflow_contract_command_contract.py` (documentation ACs of 051, 054, 066 and 077), `TestTruthFixes` in the run-artifact suite (039.1 AC-012), the per-runner dispatcher tests named by 037 SC-002, and `tests/test_review_api.py` (001 FR-010/FR-011).
+
 ## 2026-10-12 — Refactor: remove the `--mutate` and `--experimental-multi-model` stubs
 
 - `livespec validate --mutate` only printed a hint to run this repository's own pytest and exited 0; `--experimental-multi-model` only printed "not yet integrated" and exited 0. Both options, their legacy-conflict entries and the never-imported modules behind them (`validator/semantic/mutations.py`, `validator/semantic/multi_model.py`) are removed. Static grep over `validator/`, `tests/`, `scripts/`, `.agent-sync/`, `templates/`, `hooks/` and `pyproject.toml` found no importer, no string-based import and no entry point. Driver mutation testing (`livespec mutation`, feature 016) is unaffected.
