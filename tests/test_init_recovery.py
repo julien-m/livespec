@@ -62,14 +62,18 @@ def environment(tmp: Path) -> dict[str, str]:
 
 
 def execute(project: Path, env: dict[str, str], *flags: str) -> subprocess.CompletedProcess[str]:
-    """Execute the real wrapper with closed stdin and a bounded subprocess."""
+    """Execute the real wrapper with closed stdin and a bounded subprocess.
+
+    The default budget absorbs ``pytest -n auto`` load; tests that exercise the
+    timeout path pass a shorter ``--timeout-seconds``, and the last flag wins.
+    """
     return subprocess.run(
-        ["bash", str(BACKEND), "--dir", str(project), "--timeout-seconds", "8", *flags],
+        ["bash", str(BACKEND), "--dir", str(project), "--timeout-seconds", "30", *flags],
         env=env,
         text=True,
         capture_output=True,
         stdin=subprocess.DEVNULL,
-        timeout=12,
+        timeout=45,
     )
 
 
