@@ -1,3 +1,12 @@
+## 2026-10-12 — [Refactor]: Fold the 2x/3x duplicate-signal tests into one AC-010 test
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_specify_integration.py
+- **AC impacted:** AC-010
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** `test_duplicate_signals_normalized_double` now asserts both repetitions, and the duplicate `_triple` test is removed. The file has the 5 tests required by FR-005, and the implementation.md test table was updated to match.
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update

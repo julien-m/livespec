@@ -1,3 +1,12 @@
+## 2026-10-12 — [Refactor]: Protocol test now checks the production runner registry
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_ui_runner_protocol.py
+- **AC impacted:** None (FR-002)
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** The registry casts handlers to `RunnerHandler`, so static typing cannot detect drift. The test now asserts the exact `_resolve_registry()` routing (playwright, xcuitest, maestro, tauri; tauri was previously untested). For each route it checks protocol conformance, the stored `project_dir`, and that the handler signatures bind the dispatcher's `capture_screenshot(screen)` and `compare_baseline(...)` calls.
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update

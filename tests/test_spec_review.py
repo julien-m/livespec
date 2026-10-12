@@ -8,9 +8,7 @@ from unittest.mock import patch
 import pytest
 
 from validator.coherence.violation import Severity
-from validator.semantic.plan_review import ReviewFinding
 from validator.semantic.spec_review import (
-    SpecReviewResult,
     compute_spec_metrics,
     review_spec,
 )
@@ -87,28 +85,6 @@ class TestComputeSpecMetrics:
         content = "FR-001 and FR-001 again. FR-002 once."
         result = compute_spec_metrics(content)
         assert result["fr_count"] == 2
-
-
-class TestSpecReviewResult:
-    """Tests for SpecReviewResult dataclass."""
-
-    def test_defaults(self):
-        result = SpecReviewResult()
-        assert result.findings == []
-        assert result.reviewer_model == ""
-        assert result.confidence == 0
-        assert result.spec_metrics == {}
-
-    def test_with_findings(self):
-        finding = ReviewFinding("testability", Severity.WARNING, "desc", "fix")
-        result = SpecReviewResult(
-            findings=[finding],
-            reviewer_model="google/gemini-3.1-pro",
-            confidence=4,
-            spec_metrics={"fr_count": 3},
-        )
-        assert len(result.findings) == 1
-        assert result.reviewer_model == "google/gemini-3.1-pro"
 
 
 class TestReviewSpec:

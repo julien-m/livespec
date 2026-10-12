@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -190,8 +189,3 @@ def test_gate_missing_lcov_file_reports_missing_data() -> None:
 
     assert result.returncode == 1
     assert "Coverage data not generated" in result.stdout
-
-
-def test_bash_available_for_test_environment() -> None:
-    """Sanity check that the test environment has bash on PATH."""
-    assert shutil.which("bash") is not None

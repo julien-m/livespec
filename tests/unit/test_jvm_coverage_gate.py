@@ -10,7 +10,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -139,8 +138,3 @@ def test_gate_gradle_priority_over_maven() -> None:
 
     assert result.returncode == 0
     assert "JaCoCo not configured" in result.stdout
-
-
-def test_bash_available_for_test_environment() -> None:
-    """Sanity check that the test environment has bash on PATH."""
-    assert shutil.which("bash") is not None

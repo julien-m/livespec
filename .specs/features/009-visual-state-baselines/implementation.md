@@ -45,7 +45,7 @@ created: 2026-04-17
 
 ## Files Created
 
-- `tests/test_visual_states.py` — 14 unit tests for VisualState parsing, duplicate detection, taxonomy hash
+- `tests/test_visual_states.py` — 12 unit tests for VisualState parsing and duplicate detection (the taxonomy hash check was removed on 2026-10-12: it exercised the VCS tool, not LiveSpec)
 - `.specs/features/009-visual-state-baselines/implementation.md` — this file
 - `.specs/features/009-visual-state-baselines/progress.md` — step-by-step progress tracker
 

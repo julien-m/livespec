@@ -50,14 +50,11 @@ def _render(tmp_path: Path, flags: str, *, visual: bool = True) -> dict[str, Any
 
 
 @pytest.mark.parametrize("flags", (*PREVIEW_MODES, "--no-visual"))
-@pytest.mark.parametrize("description", VISUAL_DOD)
-def test_preview_does_not_require_visual_completion(
-    tmp_path: Path, flags: str, description: str
-) -> None:
+def test_preview_does_not_require_visual_completion(tmp_path: Path, flags: str) -> None:
     contract = _render(tmp_path, flags)
-    assert not any(
-        task["description"].startswith(description) for task in checklist_tasks(contract)
-    )
+    tasks = checklist_tasks(contract)
+    for description in VISUAL_DOD:
+        assert not any(task["description"].startswith(description) for task in tasks)
 
 
 @pytest.mark.parametrize("flags", ("", "--no-generate", "--all"))

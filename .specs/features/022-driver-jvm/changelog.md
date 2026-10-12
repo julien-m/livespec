@@ -1,3 +1,12 @@
+## 2026-10-12 — [Refactor]: Remove bash-on-PATH sanity test
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/unit/test_jvm_coverage_gate.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** `test_bash_available_for_test_environment` asserted the host has bash and tested no product behavior. The gate-script tests still run the real script.
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update

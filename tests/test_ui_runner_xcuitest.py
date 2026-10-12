@@ -956,21 +956,3 @@ def test_load_xcuitest_runner_manifest() -> None:
     assert isinstance(manifest, dict)
     assert "runner" in manifest
     assert manifest["runner"]["id"] == "ios"
-
-
-# ---------------------------------------------------------------------------
-# Coordinated execution markers (pytest.mark.macos)
-# These tests require a real macOS + Xcode environment and are skipped in CI.
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.macos
-def test_real_simulator_boot_integration(tmp_path: Path) -> None:  # pragma: no cover
-    """Integration: actually boot an iOS simulator (macOS only, skipped in CI)."""
-    pytest.skip("Requires real Xcode + iOS Simulator — run manually on macOS")
-
-
-@pytest.mark.macos
-def test_real_xcresult_extraction_integration(tmp_path: Path) -> None:  # pragma: no cover
-    """Integration: run real xcodebuild on fixture project (macOS only)."""
-    pytest.skip("Requires real Xcode + iOS Simulator — run manually on macOS")
