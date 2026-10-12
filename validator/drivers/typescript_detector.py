@@ -6,7 +6,7 @@
 
 # @spec FR-002: Test runner detection (vitest > jest)
 # — .specs/features/018-driver-typescript-javascript/spec.md#fr-002
-# @spec FR-004: Package manager detection from lockfile presence
+# @spec FR-004: Package manager detection (packageManager field, then lockfiles)
 # — .specs/features/018-driver-typescript-javascript/spec.md#fr-004
 
 from __future__ import annotations
@@ -32,10 +32,26 @@ _JEST_CONFIG_NAMES = (
 # lockfile wins when several coexist (e.g. migration in progress).
 _LOCKFILE_TO_PACKAGE_MANAGER: tuple[tuple[str, str], ...] = (
     ("bun.lockb", "bun"),
+    ("bun.lock", "bun"),
     ("pnpm-lock.yaml", "pnpm"),
     ("yarn.lock", "yarn"),
     ("package-lock.json", "npm"),
 )
+
+
+_PACKAGE_MANAGERS = frozenset({"bun", "pnpm", "yarn", "npm"})
+_EXEC_PREFIX: dict[str, tuple[str, ...]] = {
+    "npm": ("npx",),
+    "npx": ("npx",),
+    "pnpm": ("pnpm", "exec"),
+    "yarn": ("yarn",),
+    "bun": ("bunx",),
+}
+_ADD_DEV: dict[str, str] = {
+    "pnpm": "pnpm add -D",
+    "yarn": "yarn add -D",
+    "bun": "bun add -d",
+}
 
 
 def _read_package_json(project_root: Path) -> dict[str, Any]:
@@ -102,22 +118,64 @@ def detect_test_runner(project_root: str) -> str:
 
 
 def detect_package_manager(project_root: str) -> str:
-    """Detect the package manager from lockfile presence.
+    """Detect the package manager from ``packageManager`` or lockfile presence.
+
+    The Corepack ``packageManager`` field (``"pnpm@9.1.0"``) is an explicit
+    declaration and wins over lockfiles; lockfiles are then checked in
+    bun > pnpm > yarn > npm order.
 
     Args:
         project_root: Path to the project root.
 
     Returns:
         One of ``"bun"``, ``"pnpm"``, ``"yarn"``, ``"npm"``, or ``"npx"`` when
-        no lockfile is found (FR-004 default).
+        nothing is declared (FR-004 default).
     """
     project_root_path = Path(project_root)
-
+    declared = _read_package_json(project_root_path).get("packageManager")
+    if isinstance(declared, str):
+        name = declared.split("@", 1)[0].strip().lower()
+        if name in _PACKAGE_MANAGERS:
+            return name
     for lockfile_name, package_manager_name in _LOCKFILE_TO_PACKAGE_MANAGER:
         if (project_root_path / lockfile_name).is_file():
             return package_manager_name
-
     return "npx"
+
+
+def package_manager_exec(package_manager: str) -> list[str]:
+    """Return the argv prefix that runs a locally installed package binary.
+
+    Args:
+        package_manager: Value returned by ``detect_package_manager``.
+
+    Returns:
+        ``["npx"]``, ``["pnpm", "exec"]``, ``["yarn"]`` or ``["bunx"]``.
+    """
+    return list(_EXEC_PREFIX.get(package_manager, ("npx",)))
+
+
+def package_manager_add_dev(package_manager: str) -> str:
+    """Return the install command used in skip hints for a dev dependency."""
+    return _ADD_DEV.get(package_manager, "npm install -D")
+
+
+def runner_argv(test_runner: str, *, coverage: bool) -> list[str]:
+    """Return the runner argv (without exec prefix) for a test or coverage run.
+
+    Both runners write ``coverage/lcov.info`` when coverage is requested.
+
+    Args:
+        test_runner: ``"vitest"`` or ``"jest"``.
+        coverage: Whether to request lcov coverage output.
+
+    Returns:
+        Argument list such as ``["vitest", "run", "--coverage", ...]``.
+    """
+    if test_runner == "jest":
+        return ["jest", "--coverage", "--coverageReporters=lcov"] if coverage else ["jest"]
+    base = ["vitest", "run"]
+    return [*base, "--coverage", "--coverage.reporter=lcov"] if coverage else base
 
 
 def has_dependency(

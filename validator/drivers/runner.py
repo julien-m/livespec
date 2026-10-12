@@ -16,6 +16,7 @@ import subprocess
 from pathlib import Path
 
 from .placeholders import resolve_argv_placeholders
+from .preconditions import capability_skip_message
 from .schemas import (
     CAPABILITY_NAMES,
     CapabilityNotImplementedError,
@@ -82,6 +83,16 @@ def run_capability(
         raise CapabilityNotImplementedError(driver.name, capability)
 
     cwd = project_root or Path.cwd()
+    skip = capability_skip_message(driver, capability, cwd)
+    if skip is not None:
+        # A missing optional library is "not configured", not a failure (018 AC-008/AC-009).
+        return CapabilityResult(
+            capability_name=capability,
+            exit_code=0,
+            stdout=skip,
+            report_path=cap.report_path,
+            certification_gaps=[f"Capability skipped: {skip}"],
+        )
     proc_env = {**os.environ, **(env or {})}
 
     argv = _capability_argv(driver, capability, cap, cwd)

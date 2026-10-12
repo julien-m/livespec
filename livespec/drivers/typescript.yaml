@@ -2,19 +2,27 @@
 # @spec(FR-001)
 
 # @spec FR-001: TS/JS driver YAML with all 4 capabilities — .specs/features/018-driver-typescript-javascript/spec.md#fr-001
+# Whole-token placeholders are resolved by validator/drivers/placeholders.py:
+#   {js_exec}          npx | pnpm exec | yarn | bunx  (packageManager field, then lockfile)
+#   {js_coverage_args} vitest run --coverage --coverage.reporter=lcov | jest --coverage --coverageReporters=lcov
+#   {js_test_args}     vitest run | jest  (vitest/jest config, then devDependencies)
+# Both runners write coverage/lcov.info. A .specs/drivers/typescript.yaml override
+# replaces this manifest entirely and its commands run verbatim.
+# properties/mutation are skipped with an install hint when fast-check /
+# @stryker-mutator/core are absent (validator/drivers/preconditions.py).
 name: typescript
 detect:
   files:
     - package.json
 coverage:
-  command: npx vitest run --coverage --coverage.reporter=lcov
+  command: "{js_exec} {js_coverage_args}"
   report_path: coverage/lcov.info
   threshold: 80
 snapshots:
-  command: npx vitest run
+  command: "{js_exec} {js_test_args}"
 properties:
-  command: npx vitest run
+  command: "{js_exec} {js_test_args}"
 mutation:
-  command: npx stryker run
+  command: "{js_exec} stryker run"
   report_path: reports/mutation/mutation.json
   threshold: 60
