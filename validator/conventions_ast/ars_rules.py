@@ -357,7 +357,7 @@ _FAMILY_DETECTORS: dict[str, Callable[[str], bool]] = {
     "code_prose": _contains(r"\ballow\s+(?:any|object|untyped)\b"),
     "css_design_tokens": _contains(r"(?:#[0-9a-f]{3,8}\b|\b(?:m|p|gap|text|bg)-\[[^\]]+\])"),
     "database_sql": _contains(r"\b(?:select\s+\*|drop\s+table|delete\s+from\s+\w+\s*;)"),
-    "delphi_code": _contains(r"\bexcept\s*(?:\r?\n|\s)+end\s*;"),
+    "delphi_code": _contains(r"\bexcept\s+end\s*;"),
     "design_system": _contains(r"\b(?:gradient orb|bokeh|border-radius:\s*999px)\b"),
     "go_code": _contains(r"\bpanic\s*\("),
     "javascript_code": _contains(r"\brequire\s*\("),

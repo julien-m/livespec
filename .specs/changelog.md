@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-12 — Bugfix: ReDoS in the Delphi family detector
+
+- [082](features/082-conventions-gate-signal/changelog.md): the Delphi empty-handler detector uses an unambiguous `\bexcept\s+end\s*;` instead of a pattern with exponential backtracking (CodeQL py/redos, high).
+
 ## 2026-10-12 — Bugfix: CI uses the locked toolchain
 
 - [079](features/079-validator-ci-prerequisites/changelog.md): both CI jobs install the exact `uv.lock` versions instead of the newest ruff/mypy, so CI and local runs agree; the mypy 2.4 return-type finding in `validator/init_profile.py` is fixed.
