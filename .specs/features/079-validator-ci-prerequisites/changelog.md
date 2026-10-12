@@ -97,3 +97,15 @@
 ### 2026-09-08 — V5 bounded fixture-isolation fix independently verified:45 targeted tests and16 preserved node IDs. Read the [post-check gap report](checks/2026-09-08-v5-postcheck.md). Native acceptance remains AC-002 only; AC-005 pending, AC-006 partial, feature076 and main delivery separate. No normative spec change or lifecycle promotion.
 
 <!-- finalize:spec-fix:2026-09-08:e063bb60 -->
+
+### 2026-10-12 — Fix: hermetic convention manifest fixtures and CI-step interpreter (4 test gaps closed)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `tests/conventions_hermetic_catalogs.py` (new), `tests/test_conventions_generated_catalog.py`, `tests/test_conventions_source_decisions.py`, `tests/_conventions_source_decisions_serialization.py`, `tests/test_generation_ci_selection.py`
+- **Gaps closed:** FR-003 fixture isolation — catalog `source_hash mismatch` and three StopIteration failures without the private corpus; duplicated cases removed (3 selectors); the simulated cleanup step no longer depends on a `python` executable on PATH.
+- **Gate:** progression implement READY (claude-opus-5-5 reviews, 150000-character budget).
+- **Remaining:** None in scope.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:7208ea4d -->

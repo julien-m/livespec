@@ -90,40 +90,6 @@ def test_v1_verify_cli_blocks_on_broken_catalog(
     assert any("catalog_load_error:" in item["message"] for item in payload["blockers"])
 
 
-def test_receipt_and_cli_json_keep_rule_decision_manifest_parity(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    project = _enforce_project(tmp_path)
-    generate_conventions_gates(project, ast_mode="off", force=True)
-    monkeypatch.setattr(source_decisions, "DEFAULT_AST_CATALOGS", ())
-    result = verify_conventions(project)
-    receipt_path = write_conventions_receipt(
-        project_root=project,
-        feature_slug="073-conventions-multilang-catalog",
-        run_id="source-decisions-parity",
-        result=result,
-        gates_path=gates_path(project),
-    )
-
-    feature_dir = project / ".specs" / "features" / "073-conventions-multilang-catalog"
-    feature_dir.mkdir(parents=True, exist_ok=True)
-    (feature_dir / "implementation.md").write_text(
-        "| Requirement | File(s) | Last Verified |\n"
-        "|---|---|---|\n"
-        "| FR-008 | [ok.ts](../../../src/ok.ts) | 2026-06-30 |\n",
-        encoding="utf-8",
-    )
-    cli = _verify_cli(project, "source-decisions-parity-cli")
-
-    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-    payload = json.loads(cli.output)
-    assert cli.exit_code in (0, 1), cli.output
-    assert (
-        payload["rule_decision_manifest"]["decision_kind_counts"]
-        == receipt["rule_decision_manifest"]["decision_kind_counts"]
-    )
-
-
 def test_receipt_and_cli_json_rule_decision_manifest_parity(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -146,6 +112,7 @@ def test_receipt_and_cli_json_rule_decision_manifest_parity(
     receipt = json.loads((project / payload["receipt_path"]).read_text(encoding="utf-8"))
     cli_manifest = payload["rule_decision_manifest"]
     receipt_manifest = receipt["rule_decision_manifest"]
+    api_manifest = _api_receipt_manifest(project)
     for key in (
         "total_source_count",
         "decided_source_count",
@@ -164,7 +131,7 @@ def test_receipt_and_cli_json_rule_decision_manifest_parity(
         "notion_followup_task_id",
         "decision_kind_counts",
     ):
-        assert receipt_manifest[key] == cli_manifest[key]
+        assert receipt_manifest[key] == cli_manifest[key] == api_manifest[key], key
     nested_decision = next(
         item
         for item in cli_manifest["decisions"]
@@ -176,6 +143,19 @@ def test_receipt_and_cli_json_rule_decision_manifest_parity(
     assert nested["source_path"] == nested_decision["source_path"]
     assert nested["source_hash"] == nested_decision["source_hash"]
     assert nested["source_anchor"] == nested_decision["source_anchor"]
+
+
+def _api_receipt_manifest(project: Path) -> dict[str, object]:
+    """Serialize the manifest through the receipt API path, independently of the CLI."""
+    receipt_path = write_conventions_receipt(
+        project_root=project,
+        feature_slug="073-conventions-multilang-catalog",
+        run_id="source-decisions-parity-api",
+        result=verify_conventions(project),
+        gates_path=gates_path(project),
+    )
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    return receipt["rule_decision_manifest"]
 
 
 def _verify_cli(project: Path, run_id: str) -> Result:

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from tests.conventions_corpus_fixture import CORPUS_SOURCE_PATHS, convention_corpus_project
+from tests.conventions_hermetic_catalogs import bind_default_catalogs_to_corpus
 from validator.conventions_ast.source_decisions import (
     build_rule_decision_manifest,
     validate_rule_decision_manifest,
@@ -16,9 +17,15 @@ from validator.conventions_ast.source_decisions import (
 def test_generated_executable_sources_are_explicitly_counted(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Count the complete synthetic fixture, independently of a private HOME corpus."""
+    """Count the complete synthetic fixture, independently of any private corpus.
+
+    HOME is empty and the default catalogs are bound to the fixture bytes, so neither
+    AIRESOURCES nor ~/projects/ai-ressources can decide the counts or load errors.
+    """
     monkeypatch.setenv("HOME", str(tmp_path / "empty-home"))
-    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
+    project = convention_corpus_project(tmp_path)
+    bind_default_catalogs_to_corpus(project, tmp_path / "catalogs", monkeypatch)
+    manifest = build_rule_decision_manifest(project)
 
     assert manifest["total_source_count"] == len(CORPUS_SOURCE_PATHS)
     assert manifest["decided_source_count"] == len(CORPUS_SOURCE_PATHS)

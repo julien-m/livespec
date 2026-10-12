@@ -140,7 +140,7 @@ The six-module targeted suite passes, and the independent v5 post-check confirms
 
 | Requirement | Files | Status |
 |---|---|---|
-| FR-003, FR-005 | Read [conventions_corpus_fixture.py](../../../tests/conventions_corpus_fixture.py), Read [_conventions_source_decisions_serialization.py](../../../tests/_conventions_source_decisions_serialization.py), Read [test_conventions_ars_rules.py](../../../tests/test_conventions_ars_rules.py), Read [test_conventions_css_tailwind.py](../../../tests/test_conventions_css_tailwind.py), Read [test_conventions_generated_catalog.py](../../../tests/test_conventions_generated_catalog.py), Read [test_conventions_source_decisions.py](../../../tests/test_conventions_source_decisions.py), Read [test_conventions_source_family_checks.py](../../../tests/test_conventions_source_family_checks.py), Read [test_conventions_sql.py](../../../tests/test_conventions_sql.py) | Fixture isolation verified by independent v5 post-check; remote acceptance pending |
+| FR-003, FR-005 | Read [conventions_corpus_fixture.py](../../../tests/conventions_corpus_fixture.py), Read [conventions_hermetic_catalogs.py](../../../tests/conventions_hermetic_catalogs.py), Read [_conventions_source_decisions_serialization.py](../../../tests/_conventions_source_decisions_serialization.py), Read [test_conventions_ars_rules.py](../../../tests/test_conventions_ars_rules.py), Read [test_conventions_css_tailwind.py](../../../tests/test_conventions_css_tailwind.py), Read [test_conventions_generated_catalog.py](../../../tests/test_conventions_generated_catalog.py), Read [test_conventions_source_decisions.py](../../../tests/test_conventions_source_decisions.py), Read [test_conventions_source_family_checks.py](../../../tests/test_conventions_source_family_checks.py), Read [test_conventions_sql.py](../../../tests/test_conventions_sql.py) | Fixture isolation verified by independent v5 post-check; remote acceptance pending |
 
 - Inspect [tests/conventions_corpus_fixture.py](../../../tests/conventions_corpus_fixture.py) for the v5 deterministic regression scope.
 - Inspect [tests/_conventions_source_decisions_serialization.py](../../../tests/_conventions_source_decisions_serialization.py) for the v5 deterministic regression scope.
@@ -150,3 +150,9 @@ The six-module targeted suite passes, and the independent v5 post-check confirms
 - Inspect [tests/test_conventions_source_decisions.py](../../../tests/test_conventions_source_decisions.py) for the v5 deterministic regression scope.
 - Inspect [tests/test_conventions_source_family_checks.py](../../../tests/test_conventions_source_family_checks.py) for the v5 deterministic regression scope.
 - Inspect [tests/test_conventions_sql.py](../../../tests/test_conventions_sql.py) for the v5 deterministic regression scope.
+
+## 2026-10-12 — Hermetic manifest and CI-step fixtures (spec-fix)
+
+- Manifest tests that classify the synthetic corpus bind copies of the shipped AST catalogs to the fixture bytes (only `source_hash` is rebound; the loader still verifies path and hash) and remove `AIRESOURCES`, so neither a private corpus nor HOME decides them. Real catalog binding stays covered against the pinned corpus. Read [conventions_hermetic_catalogs.py](../../../tests/conventions_hermetic_catalogs.py).
+- Duplicates removed: the loader-monkeypatch catalog failure, the subset executable-metadata case and the repeated payload assertions; receipt-API/CLI parity folded into one test.
+- The simulated cleanup step receives an explicit `python` shim to the running interpreter. Read [CI selection tests](../../../tests/test_generation_ci_selection.py).

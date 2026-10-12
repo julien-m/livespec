@@ -47,3 +47,10 @@ No final feature certification or implemented lifecycle promotion is claimed.
 - The independent post-check at `bb76ca0ea75531e9b4322db9f0a03eb739cce3f9` completed its native goal39/39 and verified45/45 targeted tests, preserved16nodeIDs and current static/conventions evidence.
 - Read the [post-check report](checks/2026-09-08-v5-postcheck.md) for the exact requirement boundaries. Its addition changes the conservative execution manifest, so the historical83783 receipt is preserved and a fresh native capture is required for closure.
 - No source, test, normative spec or plan changed during closure. AC-005 remains pending, AC-006 partial, feature status In Progress;076 is a separate next operation. Current command state and archive remain the authority for completion.
+
+## 2026-10-12 — spec-fix: hermetic fixtures
+
+| Step | Status | Files | Verification | Result | Date |
+|---|---|---|---|---|---|
+| Readiness gate | Done | `.reviews/{spec,plan}.json` (claude-opus-5-5, 150000) | `livespec validate --progression implement` | READY | 2026-10-12 08:30 |
+| Fix | Done | `tests/conventions_hermetic_catalogs.py`, `tests/test_conventions_generated_catalog.py`, `tests/test_conventions_source_decisions.py`, `tests/_conventions_source_decisions_serialization.py`, `tests/test_generation_ci_selection.py` | conventions + CI suites, with and without AIRESOURCES | Pass | 2026-10-12 08:30 |
