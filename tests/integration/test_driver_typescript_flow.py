@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import stat
+from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
@@ -35,7 +36,7 @@ if any(arg.startswith("--coverage") for arg in sys.argv[1:]):
 """
 
 
-def _project(tmp_path: Path, monkeypatch: MonkeyPatch, package: dict[str, object]) -> Path:
+def _project(tmp_path: Path, monkeypatch: MonkeyPatch, package: Mapping[str, object]) -> Path:
     """Create a LiveSpec JS project and put fake npx/pnpm/yarn/bunx first on PATH."""
     project = tmp_path / "project"
     (project / ".specs").mkdir(parents=True)

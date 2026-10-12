@@ -13,6 +13,7 @@ from typing import Any
 import pytest
 
 from validator.runner_dispatcher_impl import _resolve_registry
+from validator.ui_runner_protocol import RunnerHandler
 from validator.ui_runner_web import UICapabilityResult
 
 _PROTOCOL_KWARGS: dict[str, Any] = {
@@ -21,6 +22,16 @@ _PROTOCOL_KWARGS: dict[str, Any] = {
     "feature_slug": "001-demo",
     "run_id": "20261012T000000Z",
 }
+
+
+def _build(runner: str, project_dir: Path) -> RunnerHandler:
+    """Instantiate a registry handler the way ``dispatcher_core._build_handler`` does.
+
+    ``RunnerHandler`` declares no constructor, so the class is called through ``Any``.
+    """
+    handler_factory: Any = _resolve_registry()[runner]
+    return handler_factory(project_dir)
+
 
 _FLOW_CORES = {
     "playwright": ("validator.web_runner_core.run_flow_command", lambda project_dir: None),
@@ -36,7 +47,7 @@ def test_registry_run_flow_accepts_protocol_keywords(
     target, _ = _FLOW_CORES[runner]
     observed = UICapabilityResult(success=True)
     monkeypatch.setattr(target, lambda *args, **kwargs: observed)
-    handler = _resolve_registry()[runner](tmp_path)
+    handler = _build(runner, tmp_path)
 
     try:
         result: object = handler.run_flow(**_PROTOCOL_KWARGS)
@@ -56,7 +67,7 @@ def test_registry_compare_baseline_accepts_paths(
         return UICapabilityResult(success=True)
 
     monkeypatch.setattr("validator.web_runner_core.compare_pixel_baseline", fake_compare)
-    handler = _resolve_registry()[runner](tmp_path)
+    handler = _build(runner, tmp_path)
 
     result = handler.compare_baseline(tmp_path / "base.png", tmp_path / "shot.png")
 
