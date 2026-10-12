@@ -1,3 +1,15 @@
+## 2026-10-12 — [Spec Update]: Status aligned with the registry (Draft -> Planned)
+
+- **Type:** Spec Update
+- **Spec modified:** Yes (frontmatter and header status Draft -> Planned)
+- **Code modified:** None
+- **AC impacted:** None
+- **Author:** claude-code (stabilization integration)
+
+`plan.md` exists, so the lifecycle is at least Planned; there is no `implementation.md` mapping, so Implemented is not certified. The registry already said Planned.
+
+---
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update

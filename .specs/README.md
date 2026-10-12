@@ -63,16 +63,16 @@
 | 025 | Mutation Testing On-Demand | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/025-mutation-testing-on-demand/spec.md) |
 | 026 | Conventions Propagation by Stack | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/026-conventions-propagation-by-stack/spec.md) |
 | 027 | UI Runner Architecture | Draft | 2026-05-06 | 2026-05-06 | [spec](features/027-ui-runner-architecture/spec.md) |
-| 028 | UI Runner Web (Playwright Refactor) | Draft | 2026-05-06 | 2026-05-06 | [spec](features/028-ui-runner-web/spec.md) |
+| 028 | UI Runner Web (Playwright Refactor) | Implemented | 2026-05-06 | 2026-10-12 | [spec](features/028-ui-runner-web/spec.md) |
 | 029 | UI Runner Tauri | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/029-ui-runner-tauri/spec.md) |
-| 030 | UI Runner iOS / watchOS | Draft | 2026-05-06 | 2026-05-06 | [spec](features/030-ui-runner-ios-watchos/spec.md) |
-| 031 | UI Runner Android | Draft | 2026-05-06 | 2026-05-06 | [spec](features/031-ui-runner-android/spec.md) |
+| 030 | UI Runner iOS / watchOS | Implemented | 2026-05-06 | 2026-10-12 | [spec](features/030-ui-runner-ios-watchos/spec.md) |
+| 031 | UI Runner Android | Implemented | 2026-05-06 | 2026-10-12 | [spec](features/031-ui-runner-android/spec.md) |
 | 032 | Pre-commit / Pre-push Test Hooks | Draft | 2026-05-06 | 2026-05-06 | [spec](features/032-test-hooks-pre-commit-pre-push/spec.md) |
-| 033 | Smart Test Selection | Draft | 2026-05-06 | 2026-05-06 | [spec](features/033-smart-test-selection/spec.md) |
+| 033 | Smart Test Selection | Implemented | 2026-05-06 | 2026-10-12 | [spec](features/033-smart-test-selection/spec.md) |
 | 034 | Preflight Auto-Install & Init | Draft | 2026-05-06 | 2026-05-06 | [spec](features/034-preflight-autofix/spec.md) |
 <!-- Note: NNN=012 reserved for in-flight feature/012-brainstorm-ingestion (separate branch) -->
 | 035 | Unified CLI Surface | In Progress | 2026-05-07 | 2026-10-12 | [spec](features/035-unified-cli-surface/spec.md), [plan](features/035-unified-cli-surface/plan.md), [implementation](features/035-unified-cli-surface/implementation.md) |
-| 036 | Multi-Surface Detection and Migration | Planned | 2026-05-07 | 2026-05-07 | [spec](features/036-multi-surface-detection-and-migration/spec.md) |
+| 036 | Multi-Surface Detection and Migration | Planned | 2026-05-07 | 2026-10-12 | [spec](features/036-multi-surface-detection-and-migration/spec.md) |
 | 037 | Test Multi-Runner Integration | Implemented | 2026-05-08 | 2026-05-08 | [spec](features/037-test-multi-runner-integration/spec.md), [plan](features/037-test-multi-runner-integration/plan.md), [implementation](features/037-test-multi-runner-integration/implementation.md) |
 | 038 | Runner Config Wiring | Implemented | 2026-05-08 | 2026-06-08 | [spec](features/038-runner-config-wiring/spec.md), [plan](features/038-runner-config-wiring/plan.md), [implementation](features/038-runner-config-wiring/implementation.md) |
 | 039 | Command Expectations and Verify Output | Implemented | 2026-05-12 | 2026-06-08 | [spec](features/039-command-expectations-and-verify-output/spec.md), [implementation](features/039-command-expectations-and-verify-output/implementation.md) |
@@ -146,6 +146,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-12 | Spec | Spec Update: registry statuses aligned after stabilization merges |
 | 2026-10-12 | Bugfix | Bugfix: audit bugs through the bugfix lane (084) |
 | 2026-10-12 | Bugfix | [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback) |
 | 2026-10-12 | Bugfix | Bugfix: declare unit-test dependencies (audit batch) |
@@ -155,7 +156,6 @@
 | 2026-10-12 | Spec | Spec Update: [Feature 077] AC-009 / FR-008 clarified, readiness gate closed |
 | 2026-10-12 | Feature | Refactor: test-suite cleanup lot 5 |
 | 2026-10-12 | Feature | Refactor: test cleanup lot 4 (legitimate assertions only) |
-| 2026-10-12 | Feature | Refactor: remove the `--mutate` and `--experimental-multi-model` stubs |
 <!-- readme:activity:end -->
 
 ---

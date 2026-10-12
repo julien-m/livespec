@@ -7,6 +7,11 @@
 
 ---
 
+## 2026-10-12 — Spec Update: registry statuses aligned after stabilization merges
+
+- README registry aligned to spec.md for [028](features/028-ui-runner-web/spec.md), [030](features/030-ui-runner-ios-watchos/spec.md), [031](features/031-ui-runner-android/spec.md) and [033](features/033-smart-test-selection/spec.md) (Implemented); [036](features/036-multi-surface-detection-and-migration/changelog.md) spec.md moves Draft -> Planned (plan present, no implementation map). 035 and 080 were already aligned (In Progress) by their merged fixes.
+- [056](features/056-executable-user-journeys/implementation.md) FR-007 status note no longer cites `surfaces.yaml` as a mapped source file (coherence R3.1). The autonomous-init recovery tests get a 30 s wrapper budget so `pytest -n auto` no longer times out; `.coverage` data files are ignored.
+
 ## 2026-10-12 — Bugfix: audit bugs through the bugfix lane (084)
 
 - [055](features/055-spec-doctor-project-health/changelog.md): doctor reports suppressed in-progress coherence findings as INFO `[in-progress, Nmin]` and attributes findings through `dir_name` (R3 contexts gain `dir_name`); lane ELIGIBLE (3 files, 55 lines), RED/GREEN receipts in implementation.md.

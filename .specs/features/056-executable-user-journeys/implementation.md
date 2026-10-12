@@ -17,7 +17,7 @@ updated: 2026-10-12
 | FR-004 | `validator/journeys/paths.py` | `@spec FR-004: Canonical journey source path` | ✅ Implemented | 2026-06-02 |
 | FR-005 | `validator/journeys/schema.py`, `validator/journeys/capabilities.py`, `validator/journeys/compiler.py` | `@spec FR-005: select on Playwright only` | ✅ Implemented (`select` compiles on Playwright; XCUITest/Maestro refuse it) | 2026-10-12 |
 | FR-006 | `validator/journeys/compiler.py` | `@spec FR-006: Playwright journey compiler` | ✅ Implemented | 2026-06-02 |
-| FR-007 | `validator/journeys/compiler.py`, `validator/journeys/paths.py`, `validator/cli_commands/journey_cmd.py`, `validator/exceptions.py` | `@spec FR-007, AC-006, AC-007: project-resolved XCUITest destination` | ✅ Implemented (destination from `surfaces.yaml` `testDir` or the unique `*UITests` directory; no hardcoded project name) | 2026-10-12 |
+| FR-007 | `validator/journeys/compiler.py`, `validator/journeys/paths.py`, `validator/cli_commands/journey_cmd.py`, `validator/exceptions.py` | `@spec FR-007, AC-006, AC-007: project-resolved XCUITest destination` | ✅ Implemented (destination from the surfaces.yaml testDir or the unique UITests-suffixed directory; no hardcoded project name) | 2026-10-12 |
 | FR-008 | `validator/journeys/compiler.py` | `@spec FR-008: Maestro journey compiler` | ✅ Implemented | 2026-06-02 |
 | FR-009 | `validator/journeys/compiler.py`, `validator/journeys/scanner.py` | `@spec FR-009: Source hash marker` | ✅ Implemented | 2026-06-02 |
 | FR-010 | `.agent-sync/skills/spec-specify/SKILL.md` | Journey proposal instruction | ✅ Implemented | 2026-06-02 |
