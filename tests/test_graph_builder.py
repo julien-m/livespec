@@ -242,6 +242,7 @@ class TestBuildGraphMissingFiles:
         assert graph.roadmap == []
         assert graph.features == []
         assert graph.readme_entries == []
+        assert graph.readme_statuses == {}
         assert graph.stack_technologies == []
         assert graph.preflight_checks == []
         assert graph.changelog_refs == []
@@ -259,25 +260,6 @@ class TestBuildGraphMissingFiles:
         (root / "roadmap.md").write_text("- [ ] Something\n")
         graph = build_graph(root)
         assert graph.features == []
-
-    def test_no_readme(self, tmp_path: Path) -> None:
-        root = tmp_path / ".specs"
-        root.mkdir()
-        graph = build_graph(root)
-        assert graph.readme_entries == []
-        assert graph.readme_statuses == {}
-
-    def test_no_stack(self, tmp_path: Path) -> None:
-        root = tmp_path / ".specs"
-        root.mkdir()
-        graph = build_graph(root)
-        assert graph.stack_technologies == []
-
-    def test_no_changelog(self, tmp_path: Path) -> None:
-        root = tmp_path / ".specs"
-        root.mkdir()
-        graph = build_graph(root)
-        assert graph.changelog_refs == []
 
     def test_feature_without_spec_md(self, tmp_path: Path) -> None:
         root = tmp_path / ".specs"

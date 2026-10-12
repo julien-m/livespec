@@ -256,34 +256,38 @@ def test_after_phase_does_not_pick_before_files(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_all_documented_template_vars_handled() -> None:
-    """Parse system/hooks.md for every {{var}} and check the resolver knows them."""
+def test_all_documented_template_vars_handled(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Every ``{{var}}`` in system/hooks.md is produced by a real resolver.
+
+    Feature variables come from the hook resolver context; commit-hook
+    variables come from the ``commit-context write`` JSON payload.
+    """
+    import json
     import re
 
+    from typer.testing import CliRunner
+
+    from validator.cli import app
     from validator.hook_resolver import _build_feature_ctx
 
     hooks_md = (Path(__file__).parent.parent / "system" / "hooks.md").read_text(encoding="utf-8")
     documented = set(re.findall(r"\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}", hooks_md))
 
-    ctx = _build_feature_ctx("plan", "042-foo", Path.cwd())
-    # All documented vars must be either resolved or known to be left literal.
-    # The hook resolver only handles the documented set:
-    resolver_known = {
-        "command",
-        "feature_name",
-        "feature_number",
-        "feature_path",
-        "stack",
-        "project_name",
-        # commit-hook variables documented in hooks.md but resolved elsewhere
-        # (commit_context.py) — they are intentionally NOT resolved by the
-        # general hook_resolver. We accept them as known-orphans.
-        "spec_path",
-        "plan_path",
-        "adr_paths",
-    }
-    orphans = documented - resolver_known
-    assert orphans == set(), f"undocumented {{var}} placeholders in hook_resolver: {orphans}"
-    # Sanity: feature_name and command must resolve when feature_slug given.
-    assert ctx["feature_name"] == "042-foo"
-    assert ctx["command"] == "plan"
+    specs = tmp_path / ".specs"
+    (specs / "stacks").mkdir(parents=True)
+    (specs / "features" / "042-foo").mkdir(parents=True)
+    (specs / "stacks" / "_default.md").write_text("---\nprimary_stack: python\n---\n")
+    (specs / "project.md").write_text("---\nname: demo\n---\n")
+    feature_vars = set(_build_feature_ctx("plan", "042-foo", tmp_path))
+
+    monkeypatch.chdir(tmp_path)
+    result = CliRunner().invoke(app, ["commit-context", "write", "--feature", "042-foo"])
+    assert result.exit_code == 0, result.output
+    context_files = list((specs / "hooks").glob("*.json"))
+    assert len(context_files) == 1
+    commit_vars = set(json.loads(context_files[0].read_text())) - {"version"}
+
+    orphans = documented - feature_vars - commit_vars
+    assert orphans == set(), f"documented {{var}} placeholders nobody resolves: {orphans}"
