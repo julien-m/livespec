@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-12 — [Spec Update]: AC-009 / FR-008 clarified to the implemented authority import
+
+- **Type:** Spec Update
+- **Spec modified:** Yes (sections: Acceptance Criteria AC-009, Functional Requirements FR-008, new Clarifications)
+- **Code modified:** None (behavior already implemented in `validator/penflow_authority_import.py`)
+- **AC impacted:** AC-009 (meaning made explicit, unchanged behavior)
+- **Author:** claude-code (spec-fix closure, user decision)
+
+User decision recorded: "authenticated and accepted" is the certifying `penflow authority collect` response produced by Penflow (report SHA-256 plus exact sorted file inventory with SHA-256); "bounded" is a project-confined archive under `.specs/penflow-authority/<digest>/` holding only the inventoried files, without path escape and without size cap. Fresh independent spec and plan reviews (claude-opus-5-5, budget 150000) are complete and ready; `validate --progression implement` returns READY, which closes the pending Penflow CLI resolution spec-fix.
+
 ## 2026-10-12 — [Refactor]: Strict-model combinatorics reduced
 
 - **Type:** Refactor

@@ -155,7 +155,7 @@ sequenceDiagram
 - **AC-007:** Finalization into Implemented, verification of Implemented, Test Done/Skipped and terminal pipeline success require fresh implementation certification for visual features before mutation or idempotent success. Preparation remains noncertifying. Active contradictory visual evidence blocks; explicit nonvisual work with only historical archives remains eligible.
 - **AC-008:** Workflow-owned selection and a pre-dispatch snapshot bind reviewed source, plan, mapping categories and predicates. Plan Review Done validates exact review result and current semantic identity under the existing project lock, publishes immutable approval/baseline before recording completion, and supports fail-closed interrupted replay. Only lifecycle status/updated metadata is excluded from semantic identity; reductions require reviewed prior/new identity changes. Backlog outside caller selection is excluded, report-selected reductions block.
 - **AC-006:** Targeted tests cover omitted evidence, transport boundaries and the real installed CLI; documentation distinguishes inspection from certification.
-- **AC-009:** An imported Brainstorm origin is established by an authenticated, locally archived accepted source package bound to the LiveSpec review and cumulative approvals. Moving or removing the original source directory does not remove inherited obligations. Missing, altered or unproven origin blocks certification without deleting the inspectable workspace. Import validates source before copying and rechecks identities before atomic publication; repeating the same bootstrap is idempotent.
+- **AC-009:** An imported Brainstorm origin is established by an authenticated, locally archived accepted source package bound to the LiveSpec review and cumulative approvals. Moving or removing the original source directory does not remove inherited obligations. Missing, altered or unproven origin blocks certification without deleting the inspectable workspace. Import validates source before copying and rechecks identities before atomic publication; repeating the same bootstrap is idempotent. Authenticated and accepted means Penflow itself produced the certifying response of its CLI `penflow authority collect` for the source workspace: exit 0, envelope kind `penflow-authority-result`, version 1, status PASS, operation `collect` and empty issues, binding the SHA-256 of the source `run-report.json` and the exact sorted inventory of source files (path plus SHA-256) that contains that report; LiveSpec never authenticates the package by itself.
 
 ## Functional Requirements
 
@@ -166,7 +166,7 @@ sequenceDiagram
 - **FR-006:** Enforce the lifecycle table through one shared closure helper using public visual classification, with independent build-manifest forwarding and no goal infrastructure changes (AC-007).
 - **FR-007:** Extract actual FR/AC definitions through Markdown AST, generate the approved projection automatically and revalidate the independently selected source approval before C51 without a second manual checklist (AC-008).
 - **FR-005:** Prove the revised contract through regression tests and synchronized documentation (AC-006).
-- **FR-008:** Extend the existing bootstrap to preserve reviewed Brainstorm source ancestry in bounded local archives with relative content references, carrying its obligations through subsequent LiveSpec approval revisions without a separate user-maintained registry or dependence on the old source location (AC-009).
+- **FR-008:** Extend the existing bootstrap to preserve reviewed Brainstorm source ancestry in bounded local archives with relative content references, carrying its obligations through subsequent LiveSpec approval revisions without a separate user-maintained registry or dependence on the old source location. Bounded means the archive is confined to the consumer project under `.specs/penflow-authority/<digest>/`, contains only the files of the authenticated inventory, and admits no path escape (every inventoried path stays inside the source project and every archived path resolves inside the consumer archive); no size limit applies (AC-009).
 
 ### P1 — Retain authenticated imported obligations
 
@@ -227,6 +227,10 @@ Risk high: false approval at a cross-project boundary. Correctness, compatibilit
 - **SC-001:** Every negative protocol case fails certification.
 - **SC-002:** Preparation and bootstrap work without final evidence.
 - **SC-003:** No Penflow policy is reimplemented and no new user step is required.
+
+## Clarifications
+
+- 2026-10-12 — Decision `AC-009` / `FR-008` (user, recorded through spec-fix): the specification records the current behavior. Inspect [the authority import](../../../validator/penflow_authority_import.py) for that behavior; no code change. "Authenticated and accepted" is the certifying `penflow authority collect` response produced by Penflow, binding the report SHA-256 and the exact sorted file inventory (path plus SHA-256). "Bounded" is a project-confined archive under `.specs/penflow-authority/<digest>/` holding only the inventoried files, without path escape; there is no size cap.
 
 ## Lifecycle Authority
 

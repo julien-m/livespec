@@ -7,6 +7,11 @@
 
 ---
 
+## 2026-10-12 — Spec Update: [Feature 077] AC-009 / FR-008 clarified, readiness gate closed
+
+- User decision recorded in [077](features/077-penflow-cumulative-verdict-consumer/changelog.md): an authenticated, accepted Brainstorm import is the certifying `penflow authority collect` response (report SHA-256 plus exact sorted file inventory); a bounded archive is confined to `.specs/penflow-authority/<digest>/`, holds only inventoried files, admits no path escape and has no size cap. Current behavior, no code change; requirement IDs preserved.
+- Fresh independent spec and plan reviews are ready; `validate --progression implement` returns READY, closing the pending Penflow CLI resolution spec-fix.
+
 ## 2026-10-12 — Refactor: test-suite cleanup lot 5
 
 - Removed or replaced tautological, vacuous and always-skipped tests across features 001, 002, 007, 009, 019, 020, 022, 030, 031, 037, 046 and 078. This includes the unmapped `tests/test_ui_runner_cli.py` (a redundant registry check) and `tests/test_ui_runner_tauri.py`, where the driver-capability test now pins both states instead of asserting nothing when tauri-driver is installed. The semantic matrix went from 171 to 42 cases, the visual gate stays at 94.41% coverage, and no production code changed.
