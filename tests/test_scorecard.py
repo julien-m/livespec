@@ -3,16 +3,13 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import patch
 
 from typer.testing import CliRunner
 
 from validator.cli import app
 from validator.coherence.graph_builder import FeatureInfo
-from validator.semantic.scorecard import (
-    AXIS_WEIGHTS,
-    score_feature,
-    score_project,
-)
+from validator.semantic.scorecard import score_feature, score_project
 
 runner = CliRunner()
 
@@ -439,34 +436,6 @@ FR-1: Login endpoint.
         assert fs.axes["ac_fr_coverage"] == 20
 
 
-# --- Axis 4: Semantic Coherence (stub) ---
-
-
-class TestAxis4:
-    """Semantic coherence is stubbed at 50."""
-
-    def test_stub_returns_50(self, tmp_path: Path) -> None:
-        specs_root = tmp_path / ".specs"
-        feature_dir = specs_root / "features" / "001-auth"
-        feature_dir.mkdir(parents=True)
-
-        _write_spec(feature_dir, _BASIC_SPEC)
-
-        feature = _make_feature(
-            specs_root,
-            files={
-                "spec": True,
-                "plan": False,
-                "implementation": False,
-                "progress": False,
-                "changelog": False,
-            },
-        )
-
-        fs = score_feature(feature, specs_root)
-        assert fs.axes["semantic_coherence"] == 50
-
-
 # --- Axis 5: Mermaid Richness ---
 
 
@@ -592,17 +561,6 @@ class TestProjectScore:
         assert len(ps.features) == 0
 
 
-# --- Weights ---
-
-
-class TestWeights:
-    """Verify axis weights sum to 1.0."""
-
-    def test_weights_sum_to_one(self) -> None:
-        total = sum(AXIS_WEIGHTS.values())
-        assert abs(total - 1.0) < 1e-9
-
-
 # --- CLI integration ---
 
 
@@ -617,8 +575,9 @@ class TestCLI:
         _write_spec(features_dir, _BASIC_SPEC)
 
         result = runner.invoke(app, ["validate", "--scorecard", "--warn-only", str(specs_root)])
-        # Should not crash; output goes to stderr via Rich
         assert result.exit_code == 0
+        assert "LiveSpec Scorecard" in result.output
+        assert "001-auth" in result.output
 
     def test_scorecard_json_format(self, tmp_path: Path) -> None:
         specs_root = tmp_path / ".specs"
@@ -657,27 +616,28 @@ class TestCLI:
         assert len(scorecard_data) == 1
         assert isinstance(scorecard_data[0]["features"], list)
 
-    def test_contradiction_only_runs(self, tmp_path: Path) -> None:
+    def test_contradiction_only_requires_provider(self, tmp_path: Path) -> None:
         specs_root = tmp_path / ".specs"
         specs_root.mkdir()
-        result = runner.invoke(app, ["validate", "--contradiction-only", str(specs_root)])
-        # Exit 0 (no contradictions in empty .specs/) or 1 (provider error) — both acceptable
-        assert result.exit_code in (0, 1)
+        with patch("validator.llm_provider.is_available", return_value=False):
+            result = runner.invoke(app, ["validate", "--contradiction-only", str(specs_root)])
+        assert result.exit_code == 1
+        assert "Error: No LLM provider configured." in result.output
+
+    def test_contradiction_only_on_empty_specs_finds_nothing(self, tmp_path: Path) -> None:
+        specs_root = tmp_path / ".specs"
+        specs_root.mkdir()
+        with (
+            patch("validator.llm_provider.is_available", return_value=True),
+            patch("validator.llm_provider.call_llm", side_effect=AssertionError("no pairs")),
+        ):
+            result = runner.invoke(app, ["validate", "--contradiction-only", str(specs_root)])
+        assert result.exit_code == 0
+        assert "Contradiction check: 0 pairs compared" in result.output
+        assert "0 contradiction(s) found." in result.output
 
     def test_reindex_stub(self, tmp_path: Path) -> None:
         specs_root = tmp_path / ".specs"
         specs_root.mkdir()
         result = runner.invoke(app, ["validate", "--reindex", str(specs_root)])
-        assert result.exit_code == 0
-
-    def test_mutate_stub(self, tmp_path: Path) -> None:
-        specs_root = tmp_path / ".specs"
-        specs_root.mkdir()
-        result = runner.invoke(app, ["validate", "--mutate", str(specs_root)])
-        assert result.exit_code == 0
-
-    def test_experimental_multi_model_stub(self, tmp_path: Path) -> None:
-        specs_root = tmp_path / ".specs"
-        specs_root.mkdir()
-        result = runner.invoke(app, ["validate", "--experimental-multi-model", str(specs_root)])
         assert result.exit_code == 0

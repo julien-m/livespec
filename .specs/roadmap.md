@@ -13,7 +13,7 @@
 
 - **Layer 1 — Structural validation** — Schema-based validation of all .specs/ file types (spec, plan, implementation, roadmap, changelog, stack, preflight, progress) · Scope: L
 - **Layer 2 — Coherence validation** — Cross-file rules R1-R6: roadmap↔features sync, status file integrity, spec anchors, README sync, stack↔preflight consistency, changelog refs · Scope: L
-- **Layer 4 — Semantic/LLM validation** — Scorecard, contradiction detection, plan review, embeddings, mutation testing · Scope: L
+- **Layer 4 — Semantic/LLM validation** — Scorecard, contradiction detection, plan review, embeddings · Scope: L
 - **Auto-fixer Pass 1** — Mechanical auto-fix of structural violations (`--fix` flag) · Scope: M
 - **Pipeline state management** — Track feature pipeline phases (specify → plan → implement → test) in pipeline.md · Scope: M
 - **Git integration + commit context** — Staged-file validation, git ops subcommand, commit context bridge · Scope: M
@@ -89,7 +89,7 @@
 - [x] **Visual Testing Complete** — Full visual testing framework tooling for downstream projects: mockup-driven baselines (Figma→code), full-page layout validation, responsive viewports (mobile/tablet/desktop), cross-browser (Chromium/Firefox/WebKit), animation keyframe tests, migration tool, CI/CD visual diff PR comments. Scope: L · Deps: 003, 009 → [010-visual-testing-complete](features/010-visual-testing-complete/spec.md)
 - [x] **Visual Migrate Integration** — Auto-invoke migrate-visual-tests.js --generate during spec-migrate; silent, always-on, idempotent visual scaffolding with post-migration summary. · Scope: S · Deps: 010 → [011-visual-migrate-integration](features/011-visual-migrate-integration/spec.md)
 - [ ] **Embedding reindex** — Connect embeddings to pluggable provider interface (stubbed: `--reindex` flag) · Scope: S · Deps: Layer 4
-- [ ] **Multi-model consensus** — Finalize `semantic/multi_model.py` integration (stubbed: `--experimental-multi-model` flag) · Scope: M · Deps: LLM provider
+- [ ] **Multi-model consensus** — Build multi-model consensus validation (the unwired `semantic/multi_model.py` stub and its `--experimental-multi-model` flag were removed on 2026-10-12) · Scope: M · Deps: LLM provider
 - [ ] **JSON output for all subcommands** — `pipeline` and `git` subcommands lack `--format json` · Scope: S
 - [x] **Cross-Language Test Driver Architecture** — YAML driver system with 5 capabilities (coverage, snapshots, properties, mutation, migration). Foundation for all per-stack drivers (017-022). Self-hosted, no external service. · Scope: L · Priority: P0 → [016-cross-language-test-driver-architecture](features/016-cross-language-test-driver-architecture/spec.md)
 - [x] **Driver Python** — Built-in driver for Python stack (pytest-cov, syrupy, hypothesis, mutmut). Pilote implementation. · Scope: M · Priority: P1 · Deps: 016 → [017-driver-python](features/017-driver-python/spec.md)

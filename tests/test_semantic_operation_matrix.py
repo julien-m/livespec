@@ -28,8 +28,6 @@ LEGACY_OPTIONS = (
     ("--plan-review",),
     ("--contradiction-only",),
     ("--reindex",),
-    ("--mutate",),
-    ("--experimental-multi-model",),
     ("--list-excluded",),
     ("--fix",),
     ("--smart",),

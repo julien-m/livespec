@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-12 — Refactor: remove the `--mutate` and `--experimental-multi-model` stubs
+
+- `livespec validate --mutate` only printed a hint to run this repository's own pytest and exited 0; `--experimental-multi-model` only printed "not yet integrated" and exited 0. Both options, their legacy-conflict entries and the never-imported modules behind them (`validator/semantic/mutations.py`, `validator/semantic/multi_model.py`) are removed. Static grep over `validator/`, `tests/`, `scripts/`, `.agent-sync/`, `templates/`, `hooks/` and `pyproject.toml` found no importer, no string-based import and no entry point. Driver mutation testing (`livespec mutation`, feature 016) is unaffected.
+- The scorecard Axis 4 placeholder (constant 50) is kept: it still contributes to every published total and removing it would reweight the scorecard. Its pinning test and the weight-constant test are removed; `--contradiction-only` tests no longer depend on the machine's provider.
+- No LiveSpec feature owns Layer 4. Code modified: `validator/cli.py`, `.specs/roadmap.md`, `tests/test_scorecard.py`, `tests/test_semantic_operation_matrix.py`.
+
 ## 2026-10-12 — Bugfix: coherence suppress_if_creating grace window never fired
 
 - The rule engine looked up the feature under `context["feature_dir"]`, a key no coherence rule emits; it now reads the canonical `dir_name` key, so violations of R1.2, R1.3, R2.1, R4.2 and R4.3 on a spec edited less than 30 minutes ago are demoted to INFO with the `[in-progress, Nmin]` tag, as described in [the Layer 2 design](../docs/superpowers/specs/2026-04-02-layer2-coherence-validation-design.md). `--no-suppress` and the finalize verifier still see them.
