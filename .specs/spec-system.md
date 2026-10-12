@@ -335,6 +335,12 @@ Run /spec-migrate or livespec migrate before running this command.
 
 This check is **blocking** — the command exits non-zero and does not continue. `/spec-init`, `/spec-migrate`, help output, and internal `livespec goal` control-plane calls remain available so the user can recover and so `/spec-migrate` can render its Step 0 goal before applying migrations.
 
+### Runtime goals
+
+<!-- @spec FR-009: Outcome goals in the universal rules — .specs/features/081-lightweight-outcome-goals/spec.md#fr-009 -->
+
+Autonomous long runs (`/spec-ship`, `/spec-feature --auto`, `/spec-init --auto`, `/spec-implement` without `--step`, and `--auto` children) render an outcome goal: one executable stop condition verified by `livespec goal prove`, a few receipt-backed proofs, and the skill inventory as an indicative checklist. Interactive and short commands run without a goal. A missing native goal tool or an already active goal never blocks a command. **Read** [the runtime goal contract](../system/anti-drift-block.md#runtime-goal-contract) for the protocol.
+
 ### Command discovery
 
 Detailed step-by-step instructions for each `/spec-*` command live as portable skills in `.agent-sync/skills/spec-*/SKILL.md`. `scripts/sync-agent-assets.sh` uses `cc-hub` to link those skills, rules, and agents into Claude Code and Codex provider outputs for each project. The 23 available commands are: `/spec-init`, `/spec-migrate`, `/spec-propose`, `/spec-specify`, `/spec-plan`, `/spec-implement`, `/spec-test`, `/spec-check`, `/spec-fix`, `/spec-explain`, `/spec-stack`, `/spec-feature`, `/spec-ship`, `/spec-preflight`, `/spec-hooks`, `/spec-play-coverage`, `/spec-refine`, `/spec-status`, `/spec-refresh-conventions`, `/spec-refresh-from-brainstorm`, `/spec-journey`, `/spec-verify-output`.

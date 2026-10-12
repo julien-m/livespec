@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.goal_checklist_support import checklist_tasks
 from validator.goal_contracts import compile_command_goal
 
 REPO = Path(__file__).resolve().parents[1]
@@ -34,14 +35,14 @@ def test_generation_readiness_precedes_writes_only_in_writing_modes(
         feature=feature.name,
         flags=f"{flags} --model=reviewer/v1",
     )
-    tasks = goal.payload["tasks"]
+    tasks = checklist_tasks(goal.payload)
     gates = [task for task in tasks if "test-generation readiness" in task["description"]]
     assert bool(gates) is generates
     if generates:
         gate = gates[0]
         assert "--progression implement" in gate["description"]
         assert "--model" in gate["description"] and "--review-max-chars" in gate["description"]
-        assert "execution_receipt_path" not in gate["required_evidence"]
+        assert "execution_receipt_path" not in gate.get("required_evidence", [])
         first_write = next(task for task in tasks if task["description"].startswith("Write tests:"))
         assert gate["ordinal"] < first_write["ordinal"]
     else:

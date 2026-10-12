@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.goal_checklist_support import checklist_tasks
 from tests.test_command_preview_obligations import ROOT, _goal
 from validator.goal_contracts import render_goal_contract_file
 
@@ -101,9 +102,9 @@ def test_adversarial_fixture_has_real_effects_when_executed(tmp_path: Path) -> N
 def test_generated_file_tasks_only_validate_syntax_until_runtime_phases(
     tmp_path: Path, flags: str, generates: bool
 ) -> None:
-    tasks = json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", flags, True)))[
-        "tasks"
-    ]
+    tasks = checklist_tasks(
+        json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", flags, True)))
+    )
     checks = [task for task in tasks if task["description"].startswith("Per generated")]
     assert bool(checks) is generates
     assert all(
@@ -118,7 +119,9 @@ def test_generated_file_tasks_only_validate_syntax_until_runtime_phases(
 
 
 def test_penflow_captures_are_confined_to_run_before_baseline_promotion(tmp_path: Path) -> None:
-    tasks = json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", "", True)))["tasks"]
+    tasks = checklist_tasks(
+        json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", "", True)))
+    )
     capture = next(task for task in tasks if task["description"].startswith("4.5.P Web runtime:"))
     assert ".specs/features/<feature>/run/<run-id>/<target>/" in capture["description"]
     assert (

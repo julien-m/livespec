@@ -112,7 +112,7 @@ def _validate_contract_identity(
 ) -> None:
     _require_fields(contract, _CONTRACT_FIELDS, "contract", operation)
     _require_fields(canonical, _MIRROR_FIELDS, "canonical", operation)
-    if canonical.get("schema_version") != "2.0":
+    if canonical.get("schema_version") not in ("2.0", "3.0"):
         _fail(operation, "canonical schema_version is invalid")
     if canonical.get("command") != SPEC_INIT_COMMAND:
         _fail(operation, "canonical command is not spec-init")

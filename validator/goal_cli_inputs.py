@@ -46,6 +46,7 @@ class ResolvedGoalInputs:
     contract: JsonObject
     state: JsonObject
     project_root: Path
+    contract_path: Path | None = None
 
 
 # @spec FR-004: Require explicit prove pair, FR-005: Require archive pair
@@ -113,12 +114,14 @@ def resolve_goal_pair_inputs(
             pair.contract,
             pair.state,
             pair.project_root,
+            inputs.contract_path,
         )
     return ResolvedGoalInputs(
         inputs.state_path,
         inputs.contract,
         inputs.state,
         find_specs_root().parent,
+        inputs.contract_path,
     )
 
 
@@ -170,6 +173,23 @@ def read_transcript(path: Path | None, *, max_bytes: int = MAX_TRANSCRIPT_BYTES)
     return path.read_text(encoding="utf-8")
 
 
+def prepare_archive_inputs(
+    contract_path: str | None,
+    state_path: str | None,
+    feature: str | None,
+    stdout_file: Path | None,
+    stderr_file: Path | None,
+    max_transcript_bytes: int,
+) -> tuple[ResolvedGoalInputs, str | None, str | None]:
+    """Resolve the archive pair and read its optional size-bounded transcripts."""
+    inputs = resolve_goal_pair_inputs(
+        contract_path, state_path, operation="archive", feature=feature
+    )
+    stdout_text = read_transcript(stdout_file, max_bytes=max_transcript_bytes)
+    stderr_text = read_transcript(stderr_file, max_bytes=max_transcript_bytes)
+    return inputs, stdout_text, stderr_text
+
+
 def _required_file(token: str | None, option: str, operation: GoalOperation) -> Path:
     if token is None:
         raise GoalInputError(f"{option} is required; rerender the goal before {operation}")
@@ -217,6 +237,7 @@ __all__ = [
     "GoalOperation",
     "ParsedGoalInputs",
     "ResolvedGoalInputs",
+    "prepare_archive_inputs",
     "read_evidence_input",
     "read_goal_pair_inputs",
     "read_transcript",

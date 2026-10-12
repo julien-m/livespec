@@ -1,7 +1,7 @@
 ---
 command: spec-plan
 contract_version: "1.0"
-last_reviewed: 2026-10-09
+last_reviewed: 2026-10-10
 ---
 
 # Expectations — /spec-plan

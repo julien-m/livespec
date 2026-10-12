@@ -155,7 +155,9 @@ def test_explicit_target_controls_root_and_conventions(
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
     assert contract["project_root"] == target.resolve().as_posix()
     assert contract["normalized_flags"] == ["--auto", f"--dir={target.resolve()}"]
-    assert contract["canonical"]["conventions"]["selected_domains"] == []
+    # 081: caller conventions never leak into the target contract (no conventions payload).
+    assert "conventions" not in contract["canonical"]
+    assert "caller" not in contract["canonical_json"]
     assert not (target / ".specs").exists()
 
 

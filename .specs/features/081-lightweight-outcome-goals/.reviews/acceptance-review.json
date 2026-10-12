@@ -1,0 +1,360 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "2a7665da4449bfcc92bd25adcc843667f246c9db451e550970ff8425ce900a1b",
+  "source_hashes": {
+    ".specs/features/081-lightweight-outcome-goals/acceptance-mapping.json": "69afeb39356ef033e4b9106ed217f61750606ada78937a5feb6fafa352275e1f",
+    ".specs/features/081-lightweight-outcome-goals/spec.md": "b592bce76198973beffcd10042c2d987943740a8a4a53cf8ca38c5bbc2390fee",
+    "tests/test_lightweight_goals.py": "8d8b6c568395255e5317335a9cabbc0be32452c258a0900c0457c5d69c52c82b"
+  },
+  "reviewer_model": "claude-opus-5-5",
+  "complete": true,
+  "ready": true,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-001",
+      "disposition": "covered",
+      "rationale": "The bound assertion requires zero violations across every repository command contract compiled with --auto. The helper checks at most 10 required tasks with contiguous ordinals, the outcome.verified/archive.run tail, that required tasks belong to receipt families or typed execution/review evidence, that only outcome.verified demands observable_output_or_artifact, a stop-condition argv starting with livespec and a display string derived from it, schema 3.0 in both payload and rendered contract, and a contract checklist equal to the active execution-task plus definition-of-done inventory. This verifies every conjunct of AC-001. Residual: the checklist is compared with the same compiled payload inventory, so a compile step that drops inventory rows would not be detected.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L127-L130",
+          "excerpt": "Every rendered contract (schema 3.0) carries `stop_condition` with an argv starting with `livespec` and a display string, a `checklist` with every active inventory row, and required tasks drawn only from typed execution/review receipts, visual/finalize receipts, QE, before-hook, conventions-gate, `outcome.verified` and `archive.run` families (at most 10 per contract); no required task demands `observable_output_or_artifact` from documentary prose."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-001:** Compile one executable stop condition per command (feature-scoped `livespec validate .specs/features/<feature>` whenever a feature is supplied, project-scoped `livespec validate`, autonomous from-code check displayed as `livespec init-from-code --verify-only` and executed as `python -m validator.init_from_code . --verify-only`; every stop condition is bounded to 300 s) into contract schema 3.0 and verify it independently at proof time. **Maps to:** AC-001, AC-002."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    contract_violations = [\n        problem for command in commands for problem in _contract_violations(command)\n    ]\n    assert contract_violations == []"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    stop = goal.payload[\"stop_condition\"]\n    if stop[\"argv\"][0] != \"livespec\" or not stop[\"display\"].startswith(\" \".join(stop[\"argv\"])):"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    if contract[\"schema_version\"] != \"3.0\" or goal.payload[\"schema_version\"] != \"3.0\":"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    if contract[\"checklist\"] != inventory:"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    problems = [f\"{command}: {len(tasks)} tasks\"] if len(tasks) > 10 else []"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-002",
+      "disposition": "covered",
+      "rationale": "The bound aggregate assertion replaces only subprocess.run inside the real run_stop_condition (real_stop_condition marker bypasses the conftest stub), so the goal still executes the stop condition itself. It requires rejection for a non-zero exit despite a declared exit_code 0, a launch failure (OSError) and a timeout (TimeoutExpired); acceptance for exit 0 with output and for a silent exit 0 naming an existing in-project artifact; and rejection for a silent exit 0 with only declared output text and exit code. The real-subprocess test (stop_condition_exit_zero on an invalid spec) and the launch-failure test (exit 127 with the error text) back it. This verifies AC-002. Residual: the aggregate checks statuses only; the observed error text is asserted for launch failure but not for timeout.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L131-L134",
+          "excerpt": "`goal prove --task outcome.verified` executes the contract stop condition itself; a non-zero exit, a launch failure or a timeout is rejected with the observed error; exit 0 is accepted when the check prints output or the evidence names an existing in-project artifact; agent-declared exit codes and output text are never trusted."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-002:** Record the Execution Tasks / Definition of Done inventory as an indicative checklist and keep only high-value evidence families as required tasks, preserving acceptance mapping and observable output in the final verification. **Maps to:** AC-001."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    assert observed == {\n        \"nonzero_exit\": \"REJECTED_NEEDS_ACTION\",\n        \"launch_failure\": \"REJECTED_NEEDS_ACTION\",\n        \"timeout\": \"REJECTED_NEEDS_ACTION\",\n        \"exit0_with_output\": \"ACCEPTED\",\n        \"exit0_silent_artifact\": \"ACCEPTED\",\n        \"exit0_silent_declared_text\": \"REJECTED_NEEDS_ACTION\",\n    }"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "        \"exit0_silent_declared_text\": (runner(0, \"\"), {\"output\": \"trust me\", \"exit_code\": 0}),"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    assert result[\"missing_evidence\"] == [\"stop_condition_exit_zero\"]\n    assert result[\"observed\"][\"exit_code\"] != 0"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    assert result[\"observed\"][\"exit_code\"] == 127\n    assert \"interpreter unavailable\" in result[\"observed\"][\"output_tail\"]"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-003",
+      "disposition": "covered",
+      "rationale": "The bound assertion compares goal_requirement over the matrix to the expected values. Required: spec-ship, spec-implement default, spec-feature --auto and -a, spec-init --auto --from-code and -a, spec-specify --auto and spec-fix --auto. Optional: spec-feature, spec-init --from-code, the new spec-init --auto --dry-run preview, spec-implement --step/--dry-run, spec-specify without flags, spec-test -a (audit-only), spec-check, spec-status, spec-explain, and the short auto-capable commands spec-propose --auto, spec-refine --auto and spec-preflight --fix --auto. This matches the revised AC-003, including the dry-run exception; the goal-step half is enforced by GOAL_SKILLS in the skills test. Residual: spec-plan --auto and spec-test --auto are not in the matrix (both returned required when I ran them in the previous round).",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L135-L138",
+          "excerpt": "`goal_requirement` returns `required` exactly for spec-ship, spec-implement without `--step`/`--dry-run`, spec-feature and spec-init with `--auto`/`-a` (including `--from-code --auto`; spec-init `--dry-run` previews stay optional), and spec-specify, spec-plan, spec-test and spec-fix with `--auto` (the children an autonomous parent spawns); every other combination is `optional`, including short commands that accept an auto flag such as spec-propose, spec-refine or spec-preflight. Only skills that can run in those modes (spec-ship, spec-feature, spec-init, spec-implement, spec-specify, spec-plan, spec-test, spec-fix) keep a goal step."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-003:** Resolve goal requirement by command and flags (spec-ship, spec-implement default, auto flag of the autonomous-capable commands only); keep a short goal step only in skills that can run autonomously and remove it elsewhere. **Maps to:** AC-003."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    observed = {case: goal_requirement(case[0], case[1]) for case in REQUIREMENT_CASES}\n    assert observed == REQUIREMENT_CASES"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    (\"spec-propose\", (\"--auto\",)): \"optional\",\n    (\"spec-refine\", (\"--auto\",)): \"optional\",\n    (\"spec-preflight\", (\"--fix\", \"--auto\")): \"optional\",\n    (\"spec-init\", (\"-a\",)): \"required\",\n    (\"spec-init\", (\"--auto\", \"--dry-run\")): \"optional\",  # preview writes nothing\n    (\"spec-fix\", (\"--auto\",)): \"required\","
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-004",
+      "disposition": "covered",
+      "rationale": "The bound assertion scans every spec-*/SKILL.md and requires zero occurrences of the historical blocking phrases (ABSOLU, /goal clear, '/goal slash command unavailable', 'active goal exists'), and requires each goal skill's STEP 0 to mention create_goal, /goal and a warning fallback. The anti-drift assertion in the same file adds: no '/goal clear' or 'BLOCKED and stop' anywhere in the block, and the revised active-goal rule 'already active, update it when the tool allows'. Together these check that no prompt text blocks on a missing native goal tool or an active goal and that absence degrades to a warning. Residual: a phrase blacklist plus token presence; get_goal/update_goal and the 'leave untouched with a warning' fallback are not asserted in the skills (their STEP 0 says 'leave it untouched' without a warning for that case).",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L139-L142",
+          "excerpt": "No skill or anti-drift text blocks on a missing native goal tool or an already active goal; Codex create_goal/get_goal/update_goal, Claude Code `/goal` or no native goal are all accepted, and absence produces a warning only; an already active native goal is updated when the tool allows, otherwise left untouched with a warning."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-004:** Treat native goal tools as optional mirrors of the CLI contract; update an already active native goal when the tool allows, otherwise leave it untouched with a warning, never stop, and mark the mirror complete after CLI closure. **Maps to:** AC-004."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "        for skill in sorted(SKILLS.glob(\"spec-*/SKILL.md\"))\n        for problem in _skill_violations(skill)\n    ]\n    assert skill_violations == []"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    forbidden = (\"ABSOLU\", \"/goal clear\", \"/goal slash command unavailable\", \"active goal exists\")"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "        expected = (\"## STEP 0 — Goal (autonomous runs)\", \"create_goal\", \"/goal\", \"warning\")"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "        [] if \"already active, update it when the tool allows\" in section else [\"no reuse rule\"]"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-005",
+      "disposition": "covered",
+      "rationale": "The test renders a goal with the unnumbered slug 'demo' and asserts it resolves to 001-demo, proves qe.analysis, re-renders the identical goal and asserts progress is kept, then adds hook-context drift and proves outcome.verified. The bound aggregate assertion requires: the recompiled report from the old hash; qe.analysis carried; contract and state rewritten in place under the new hash with the hooks.before task; qe.analysis and outcome.verified complete; state.recompiled_from recorded; and a re-render of the drifted goal at new paths adopting the carried progress. The failed-recompile test requires refresh_goal to raise GoalRecompileError without mutating the saved contract or state. This verifies AC-005. Residual: archive-time recompile and reset of non-revalidated evidence to pending are not asserted, and the failure block is tested at the refresh_goal level, not through the CLI exit 2. The code path in refresh_for_cli raises before any file write.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L143-L146",
+          "excerpt": "When the fresh compile of a saved schema 3.0 contract under the current evidence policy differs (feature slug, acceptance, hook context, skill inventory), prove and archive recompile the contract and state in place, carry forward every accepted evidence that revalidates, reset the rest to pending and report `recompiled` with old/new hashes (also recorded as `recompiled_from` in the state); an unnumbered feature slug resolves to the existing numbered feature; a recompilation that fails on invalid current inputs blocks prove and archive without rewriting files; re-rendering an identical goal keeps its existing state, including progress of a pair recompiled in place."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-005:** Recompile drifted current (schema 3.0, current evidence policy) contracts in place at prove/archive time with revalidated evidence carry-over, never rewriting historical contracts; resolve unnumbered feature slugs to existing numbered features for every command; preserve state when the same goal is re-rendered. **Maps to:** AC-005."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    assert recompile_facts == {\n        \"from_hash\": True,\n        \"carried\": [\"qe.analysis\"],\n        \"rewritten_in_place\": True,\n        \"state_hash\": True,\n        \"hook_task_added\": \"hooks.before\",\n        \"qe_status\": \"complete\",\n        \"outcome_status\": \"complete\",\n        \"recompiled_from\": True,\n        \"rerender_new_paths\": True,\n        \"rerender_adopts_qe\": \"complete\",\n    }"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "        \"rewritten_in_place\": rewritten[\"goal_hash\"] == output[\"recompiled\"][\"to_hash\"],"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    assert first[\"feature\"] == \"001-demo\"  # unnumbered slug resolved for every command"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    _render_saved(runner, controls)\n    assert json.loads(state_path.read_text())[\"tasks\"][\"qe.analysis\"][\"status\"] == \"complete\""
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    with pytest.raises(GoalRecompileError, match=\"recompile failed\"):\n        refresh_goal(contract, state, project_root=project, livespec_root=ROOT)\n    assert (json.dumps(contract, sort_keys=True), json.dumps(state, sort_keys=True)) == before"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-006",
+      "disposition": "covered",
+      "rationale": "The bound assertion requires an empty problem list. None of required_conventions, convention_domains_recorded, convention_sources_read or conventions_applied_to_output may appear in the canonical contract JSON, the payload may hold no conventions entry, conventions.gate must be the only task requiring conventions_receipt_path for a gated spec-implement with a gates file, and proving conventions.gate with a FAIL receipt must report conventions_receipt_verdict_pass missing. This verifies AC-006, including the PASS-receipt requirement. Residual: no positive case shows a PASS receipt being accepted in this file.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L147-L150",
+          "excerpt": "Contracts contain no `required_conventions`, `convention_domains_recorded`, `convention_sources_read` or `conventions_applied_to_output`; conventions-gated commands with a gates file require one `conventions.gate` task with a PASS feature-scope receipt."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-006:** Remove per-task convention proofs and the hashed conventions payload; gate conventions once per feature scope through the existing receipt verifier. **Maps to:** AC-006."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    if \"conventions_receipt_verdict_pass\" not in rejected[\"missing_evidence\"]:\n        convention_problems.append(\"non-PASS receipt accepted\")\n    assert convention_problems == []"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    convention_problems = [name for name in names if name in contract[\"canonical_json\"]]\n    convention_problems += [] if \"conventions\" not in goal.payload else [\"conventions payload\"]"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    convention_problems += [] if gated == [\"conventions.gate\"] else [f\"gated tasks {gated}\"]"
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-007",
+      "disposition": "covered",
+      "rationale": "Three invalid qe.analysis proofs are submitted. The bound assertion requires REJECTED_NEEDS_ACTION, REJECTED_NEEDS_ACTION, BLOCKED. Adjacent assertions check: the handback (attempts == 3, three tried entries, current missing evidence); a report starting with the canonical 'BLOCKED at step 1 - verification_failed - qe.analysis' line; the blocked count in goal status; and that a later valid proof is ACCEPTED and clears the blocked flag. Residual: repair actions in the handback are not explicitly asserted.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L151-L154",
+          "excerpt": "After three rejected attempts on one task, prove returns status `BLOCKED` with a `handback` whose report uses the canonical `BLOCKED at step <N> - verification_failed - <reason>` line and lists each attempt's missing evidence, the current missing evidence and repair actions; `goal status` reports the blocked count; a later valid proof is still accepted."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-007:** Bound rejected attempts per task to three and return a BLOCKED handback report while keeping later acceptance possible. **Maps to:** AC-007."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    assert statuses == [\"REJECTED_NEEDS_ACTION\", \"REJECTED_NEEDS_ACTION\", \"BLOCKED\"]\n    handback = result[\"handback\"]\n    assert handback[\"attempts\"] == 3 and len(handback[\"tried\"]) == 3"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    assert handback[\"report\"].startswith(\"BLOCKED at step 1 - verification_failed - qe.analysis\")"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    assert \"blocked:1 (qe.analysis)\" in render_goal_status(state)\n    accepted = prove_goal_task(contract, state, \"qe.analysis\", QE, project_root=project)\n    assert accepted[\"status\"] == \"ACCEPTED\""
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-008",
+      "disposition": "covered",
+      "rationale": "_generate is called with an already expired deadline after stubbing the bounded steps. The bound assertion requires the final write to be bootstrap-recap.md, which can only happen if no post-completion deadline error is raised. This verifies the primary AC-008 outcome. Residual: the clause that individual subprocesses stay bounded by the shared deadline is not exercised (run_probes is stubbed).",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L155-L158",
+          "excerpt": "Autonomous init no longer raises a deadline error after all generation, probes and profile checks succeeded; individual subprocesses stay bounded by the shared deadline."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-008:** Never block a completed autonomous initialization on the total deadline. **Maps to:** AC-008."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    init_from_code._generate(tmp_path, init_from_code.InitOptions(tmp_path), profile, {}, expired)\n    assert writes[-1] == \"bootstrap-recap.md\""
+        }
+      ],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "081-lightweight-outcome-goals:AC-009",
+      "disposition": "covered",
+      "rationale": "The bound assertion requires an empty problem list. Checks: no MUST/ABSOLU/'/goal clear'/'BLOCKED and stop' anywhere in the anti-drift block; a goal section of at most 15 lines with the revised active-goal rule ('already active, update it when the tool allows'); every STEP 0 at most 20 lines; README, system/expectations.md and both spec-system copies containing the outcome-contract needles; goal_conventions.py and init_goal_conventions.py deleted; no child_goal code in goal modules; goal module lines below the 5813-line baseline. This verifies AC-009. Residual: doc agreement is checked by keyword presence, and the baseline counts init_goal_conventions.py while the current count globs only goal_*.py. The like-for-like main figure is 5729; the current 5604 is still lower.",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L159-L162",
+          "excerpt": "The anti-drift goal section has at most 15 lines, every remaining STEP 0 at most 20 lines, and the whole anti-drift block (all sections) contains no `MUST`, `ABSOLU`, `/goal clear` or `BLOCKED and stop`; the expectations reference, README and spec-system describe the same contract (CLAUDE.md only routes to spec-system); obsolete goal code is deleted and the goal module line count decreases."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174",
+          "excerpt": "- **FR-009:** Rewrite goal prompts in short neutral outcome language, synchronize docs and expectations, and delete obsolete goal modules. **Maps to:** AC-009."
+        }
+      ],
+      "plan_citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    lines = sum(len(text.splitlines()) for text in goal_code)\n    prompt_problems += [] if lines < GOAL_LINES_BEFORE_081 else [f\"goal code grew to {lines} lines\"]\n    assert prompt_problems == []"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "        for token in (\"MUST\", \"ABSOLU\", \"/goal clear\", \"BLOCKED and stop\")\n        if token in anti_drift"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    prompt_problems += [f\"long STEP 0: {name}\" for name in long_steps]"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    obsolete = (\"goal_conventions.py\", \"init_goal_conventions.py\")"
+        }
+      ],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [
+    {
+      "category": "testability",
+      "severity": "info",
+      "description": "Residual unasserted clauses in otherwise covered ACs: AC-002 error text for the timeout case; AC-003 spec-plan --auto and spec-test --auto missing from the matrix; AC-005 archive-time recompile, reset-to-pending and the CLI exit 2 on a failed recompile; AC-006 positive PASS-receipt acceptance; AC-007 repair actions in the handback; AC-008 per-subprocess deadline bound (probes stubbed).",
+      "suggestion": "Optionally add these cases to harden the regression net; none blocks acceptance.",
+      "citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L135-L138",
+          "excerpt": "`goal_requirement` returns `required` exactly for spec-ship, spec-implement without `--step`/`--dry-run`, spec-feature and spec-init with `--auto`/`-a` (including `--from-code --auto`; spec-init `--dry-run` previews stay optional), and spec-specify, spec-plan, spec-test and spec-fix with `--auto` (the children an autonomous parent spawns); every other combination is `optional`, including short commands that accept an auto flag such as spec-propose, spec-refine or spec-preflight. Only skills that can run in those modes (spec-ship, spec-feature, spec-init, spec-implement, spec-specify, spec-plan, spec-test, spec-fix) keep a goal step."
+        },
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L143-L146",
+          "excerpt": "When the fresh compile of a saved schema 3.0 contract under the current evidence policy differs (feature slug, acceptance, hook context, skill inventory), prove and archive recompile the contract and state in place, carry forward every accepted evidence that revalidates, reset the rest to pending and report `recompiled` with old/new hashes (also recorded as `recompiled_from` in the state); an unnumbered feature slug resolves to the existing numbered feature; a recompilation that fails on invalid current inputs blocks prove and archive without rewriting files; re-rendering an identical goal keeps its existing state, including progress of a pair recompiled in place."
+        }
+      ]
+    },
+    {
+      "category": "testability",
+      "severity": "info",
+      "description": "The AC-001 checklist check compares contract['checklist'] with execution_tasks plus definition_of_done from the same compiled payload, so it proves the rendered contract matches the payload, not that the compile kept every active inventory row from the skill.",
+      "suggestion": "Optionally compare the checklist with the inventory parsed straight from each skill's Execution Tasks section.",
+      "citations": [
+        {
+          "section_id": ".specs/features/081-lightweight-outcome-goals/spec.md:L127-L130",
+          "excerpt": "Every rendered contract (schema 3.0) carries `stop_condition` with an argv starting with `livespec` and a display string, a `checklist` with every active inventory row, and required tasks drawn only from typed execution/review receipts, visual/finalize receipts, QE, before-hook, conventions-gate, `outcome.verified` and `archive.run` families (at most 10 per contract); no required task demands `observable_output_or_artifact` from documentary prose."
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "    inventory = [*goal.payload[\"execution_tasks\"], *goal.payload[\"definition_of_done\"]]"
+        }
+      ]
+    },
+    {
+      "category": "testability",
+      "severity": "info",
+      "description": "GOAL_LINES_BEFORE_081 (5813) includes validator/init_goal_conventions.py, but the current count only globs validator/goal_*.py, so the comparison is not like-for-like. The main goal_*.py figure is 5729; the current 5604 is still lower, so the AC-009 decrease holds.",
+      "suggestion": "Use 5729 as the goal_*.py baseline, or include the same file set on both sides.",
+      "citations": [
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "GOAL_LINES_BEFORE_081 = 5813"
+        },
+        {
+          "section_id": "tests/test_lightweight_goals.py:L29-L495",
+          "excerpt": "        path.read_text(encoding=\"utf-8\") for path in (ROOT / \"validator\").glob(\"goal_*.py\")"
+        }
+      ]
+    }
+  ],
+  "confidence": 4,
+  "raw_results": [
+    "{\n \"batch_id\": \"batch-001\",\n \"reviewed_section_ids\": [\n  \".specs/features/081-lightweight-outcome-goals/acceptance-mapping.json:L1-L1\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L1-L9\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L10-L18\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L19-L25\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L26-L27\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L28-L59\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L60-L86\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L87-L124\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L125-L126\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L127-L130\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L131-L134\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L135-L138\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L139-L142\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L143-L146\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L147-L150\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L151-L154\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L155-L158\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L159-L162\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L175-L181\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L182-L188\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L189-L195\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L196-L202\",\n  \".specs/features/081-lightweight-outcome-goals/spec.md:L203-L207\",\n  \"tests/test_lightweight_goals.py:L1-L2\",\n  \"tests/test_lightweight_goals.py:L3-L3\",\n  \"tests/test_lightweight_goals.py:L4-L28\",\n  \"tests/test_lightweight_goals.py:L29-L495\"\n ],\n \"conclusions\": [\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-001\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"The bound assertion requires zero violations across every repository command contract compiled with --auto. The helper checks at most 10 required tasks with contiguous ordinals, the outcome.verified/archive.run tail, that required tasks belong to receipt families or typed execution/review evidence, that only outcome.verified demands observable_output_or_artifact, a stop-condition argv starting with livespec and a display string derived from it, schema 3.0 in both payload and rendered contract, and a contract checklist equal to the active execution-task plus definition-of-done inventory. This verifies every conjunct of AC-001. Residual: the checklist is compared with the same compiled payload inventory, so a compile step that drops inventory rows would not be detected.\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L127-L130\",\n     \"excerpt\": \"Every rendered contract (schema 3.0) carries `stop_condition` with an argv starting with `livespec` and a display string, a `checklist` with every active inventory row, and required tasks drawn only from typed execution/review receipts, visual/finalize receipts, QE, before-hook, conventions-gate, `outcome.verified` and `archive.run` families (at most 10 per contract); no required task demands `observable_output_or_artifact` from documentary prose.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-001:** Compile one executable stop condition per command (feature-scoped `livespec validate .specs/features/<feature>` whenever a feature is supplied, project-scoped `livespec validate`, autonomous from-code check displayed as `livespec init-from-code --verify-only` and executed as `python -m validator.init_from_code . --verify-only`; every stop condition is bounded to 300 s) into contract schema 3.0 and verify it independently at proof time. **Maps to:** AC-001, AC-002.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    contract_violations = [\\n        problem for command in commands for problem in _contract_violations(command)\\n    ]\\n    assert contract_violations == []\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    stop = goal.payload[\\\"stop_condition\\\"]\\n    if stop[\\\"argv\\\"][0] != \\\"livespec\\\" or not stop[\\\"display\\\"].startswith(\\\" \\\".join(stop[\\\"argv\\\"])):\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    if contract[\\\"schema_version\\\"] != \\\"3.0\\\" or goal.payload[\\\"schema_version\\\"] != \\\"3.0\\\":\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    if contract[\\\"checklist\\\"] != inventory:\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    problems = [f\\\"{command}: {len(tasks)} tasks\\\"] if len(tasks) > 10 else []\"\n    }\n   ]\n  },\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-002\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"The bound aggregate assertion replaces only subprocess.run inside the real run_stop_condition (real_stop_condition marker bypasses the conftest stub), so the goal still executes the stop condition itself. It requires rejection for a non-zero exit despite a declared exit_code 0, a launch failure (OSError) and a timeout (TimeoutExpired); acceptance for exit 0 with output and for a silent exit 0 naming an existing in-project artifact; and rejection for a silent exit 0 with only declared output text and exit code. The real-subprocess test (stop_condition_exit_zero on an invalid spec) and the launch-failure test (exit 127 with the error text) back it. This verifies AC-002. Residual: the aggregate checks statuses only; the observed error text is asserted for launch failure but not for timeout.\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L131-L134\",\n     \"excerpt\": \"`goal prove --task outcome.verified` executes the contract stop condition itself; a non-zero exit, a launch failure or a timeout is rejected with the observed error; exit 0 is accepted when the check prints output or the evidence names an existing in-project artifact; agent-declared exit codes and output text are never trusted.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-002:** Record the Execution Tasks / Definition of Done inventory as an indicative checklist and keep only high-value evidence families as required tasks, preserving acceptance mapping and observable output in the final verification. **Maps to:** AC-001.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    assert observed == {\\n        \\\"nonzero_exit\\\": \\\"REJECTED_NEEDS_ACTION\\\",\\n        \\\"launch_failure\\\": \\\"REJECTED_NEEDS_ACTION\\\",\\n        \\\"timeout\\\": \\\"REJECTED_NEEDS_ACTION\\\",\\n        \\\"exit0_with_output\\\": \\\"ACCEPTED\\\",\\n        \\\"exit0_silent_artifact\\\": \\\"ACCEPTED\\\",\\n        \\\"exit0_silent_declared_text\\\": \\\"REJECTED_NEEDS_ACTION\\\",\\n    }\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"        \\\"exit0_silent_declared_text\\\": (runner(0, \\\"\\\"), {\\\"output\\\": \\\"trust me\\\", \\\"exit_code\\\": 0}),\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    assert result[\\\"missing_evidence\\\"] == [\\\"stop_condition_exit_zero\\\"]\\n    assert result[\\\"observed\\\"][\\\"exit_code\\\"] != 0\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    assert result[\\\"observed\\\"][\\\"exit_code\\\"] == 127\\n    assert \\\"interpreter unavailable\\\" in result[\\\"observed\\\"][\\\"output_tail\\\"]\"\n    }\n   ]\n  },\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-003\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"The bound assertion compares goal_requirement over the matrix to the expected values. Required: spec-ship, spec-implement default, spec-feature --auto and -a, spec-init --auto --from-code and -a, spec-specify --auto and spec-fix --auto. Optional: spec-feature, spec-init --from-code, the new spec-init --auto --dry-run preview, spec-implement --step/--dry-run, spec-specify without flags, spec-test -a (audit-only), spec-check, spec-status, spec-explain, and the short auto-capable commands spec-propose --auto, spec-refine --auto and spec-preflight --fix --auto. This matches the revised AC-003, including the dry-run exception; the goal-step half is enforced by GOAL_SKILLS in the skills test. Residual: spec-plan --auto and spec-test --auto are not in the matrix (both returned required when I ran them in the previous round).\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L135-L138\",\n     \"excerpt\": \"`goal_requirement` returns `required` exactly for spec-ship, spec-implement without `--step`/`--dry-run`, spec-feature and spec-init with `--auto`/`-a` (including `--from-code --auto`; spec-init `--dry-run` previews stay optional), and spec-specify, spec-plan, spec-test and spec-fix with `--auto` (the children an autonomous parent spawns); every other combination is `optional`, including short commands that accept an auto flag such as spec-propose, spec-refine or spec-preflight. Only skills that can run in those modes (spec-ship, spec-feature, spec-init, spec-implement, spec-specify, spec-plan, spec-test, spec-fix) keep a goal step.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-003:** Resolve goal requirement by command and flags (spec-ship, spec-implement default, auto flag of the autonomous-capable commands only); keep a short goal step only in skills that can run autonomously and remove it elsewhere. **Maps to:** AC-003.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    observed = {case: goal_requirement(case[0], case[1]) for case in REQUIREMENT_CASES}\\n    assert observed == REQUIREMENT_CASES\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    (\\\"spec-propose\\\", (\\\"--auto\\\",)): \\\"optional\\\",\\n    (\\\"spec-refine\\\", (\\\"--auto\\\",)): \\\"optional\\\",\\n    (\\\"spec-preflight\\\", (\\\"--fix\\\", \\\"--auto\\\")): \\\"optional\\\",\\n    (\\\"spec-init\\\", (\\\"-a\\\",)): \\\"required\\\",\\n    (\\\"spec-init\\\", (\\\"--auto\\\", \\\"--dry-run\\\")): \\\"optional\\\",  # preview writes nothing\\n    (\\\"spec-fix\\\", (\\\"--auto\\\",)): \\\"required\\\",\"\n    }\n   ]\n  },\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-004\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"The bound assertion scans every spec-*/SKILL.md and requires zero occurrences of the historical blocking phrases (ABSOLU, /goal clear, '/goal slash command unavailable', 'active goal exists'), and requires each goal skill's STEP 0 to mention create_goal, /goal and a warning fallback. The anti-drift assertion in the same file adds: no '/goal clear' or 'BLOCKED and stop' anywhere in the block, and the revised active-goal rule 'already active, update it when the tool allows'. Together these check that no prompt text blocks on a missing native goal tool or an active goal and that absence degrades to a warning. Residual: a phrase blacklist plus token presence; get_goal/update_goal and the 'leave untouched with a warning' fallback are not asserted in the skills (their STEP 0 says 'leave it untouched' without a warning for that case).\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L139-L142\",\n     \"excerpt\": \"No skill or anti-drift text blocks on a missing native goal tool or an already active goal; Codex create_goal/get_goal/update_goal, Claude Code `/goal` or no native goal are all accepted, and absence produces a warning only; an already active native goal is updated when the tool allows, otherwise left untouched with a warning.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-004:** Treat native goal tools as optional mirrors of the CLI contract; update an already active native goal when the tool allows, otherwise leave it untouched with a warning, never stop, and mark the mirror complete after CLI closure. **Maps to:** AC-004.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"        for skill in sorted(SKILLS.glob(\\\"spec-*/SKILL.md\\\"))\\n        for problem in _skill_violations(skill)\\n    ]\\n    assert skill_violations == []\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    forbidden = (\\\"ABSOLU\\\", \\\"/goal clear\\\", \\\"/goal slash command unavailable\\\", \\\"active goal exists\\\")\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"        expected = (\\\"## STEP 0 — Goal (autonomous runs)\\\", \\\"create_goal\\\", \\\"/goal\\\", \\\"warning\\\")\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"        [] if \\\"already active, update it when the tool allows\\\" in section else [\\\"no reuse rule\\\"]\"\n    }\n   ]\n  },\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-005\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"The test renders a goal with the unnumbered slug 'demo' and asserts it resolves to 001-demo, proves qe.analysis, re-renders the identical goal and asserts progress is kept, then adds hook-context drift and proves outcome.verified. The bound aggregate assertion requires: the recompiled report from the old hash; qe.analysis carried; contract and state rewritten in place under the new hash with the hooks.before task; qe.analysis and outcome.verified complete; state.recompiled_from recorded; and a re-render of the drifted goal at new paths adopting the carried progress. The failed-recompile test requires refresh_goal to raise GoalRecompileError without mutating the saved contract or state. This verifies AC-005. Residual: archive-time recompile and reset of non-revalidated evidence to pending are not asserted, and the failure block is tested at the refresh_goal level, not through the CLI exit 2. The code path in refresh_for_cli raises before any file write.\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L143-L146\",\n     \"excerpt\": \"When the fresh compile of a saved schema 3.0 contract under the current evidence policy differs (feature slug, acceptance, hook context, skill inventory), prove and archive recompile the contract and state in place, carry forward every accepted evidence that revalidates, reset the rest to pending and report `recompiled` with old/new hashes (also recorded as `recompiled_from` in the state); an unnumbered feature slug resolves to the existing numbered feature; a recompilation that fails on invalid current inputs blocks prove and archive without rewriting files; re-rendering an identical goal keeps its existing state, including progress of a pair recompiled in place.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-005:** Recompile drifted current (schema 3.0, current evidence policy) contracts in place at prove/archive time with revalidated evidence carry-over, never rewriting historical contracts; resolve unnumbered feature slugs to existing numbered features for every command; preserve state when the same goal is re-rendered. **Maps to:** AC-005.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    assert recompile_facts == {\\n        \\\"from_hash\\\": True,\\n        \\\"carried\\\": [\\\"qe.analysis\\\"],\\n        \\\"rewritten_in_place\\\": True,\\n        \\\"state_hash\\\": True,\\n        \\\"hook_task_added\\\": \\\"hooks.before\\\",\\n        \\\"qe_status\\\": \\\"complete\\\",\\n        \\\"outcome_status\\\": \\\"complete\\\",\\n        \\\"recompiled_from\\\": True,\\n        \\\"rerender_new_paths\\\": True,\\n        \\\"rerender_adopts_qe\\\": \\\"complete\\\",\\n    }\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"        \\\"rewritten_in_place\\\": rewritten[\\\"goal_hash\\\"] == output[\\\"recompiled\\\"][\\\"to_hash\\\"],\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    assert first[\\\"feature\\\"] == \\\"001-demo\\\"  # unnumbered slug resolved for every command\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    _render_saved(runner, controls)\\n    assert json.loads(state_path.read_text())[\\\"tasks\\\"][\\\"qe.analysis\\\"][\\\"status\\\"] == \\\"complete\\\"\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    with pytest.raises(GoalRecompileError, match=\\\"recompile failed\\\"):\\n        refresh_goal(contract, state, project_root=project, livespec_root=ROOT)\\n    assert (json.dumps(contract, sort_keys=True), json.dumps(state, sort_keys=True)) == before\"\n    }\n   ]\n  },\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-006\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"The bound assertion requires an empty problem list. None of required_conventions, convention_domains_recorded, convention_sources_read or conventions_applied_to_output may appear in the canonical contract JSON, the payload may hold no conventions entry, conventions.gate must be the only task requiring conventions_receipt_path for a gated spec-implement with a gates file, and proving conventions.gate with a FAIL receipt must report conventions_receipt_verdict_pass missing. This verifies AC-006, including the PASS-receipt requirement. Residual: no positive case shows a PASS receipt being accepted in this file.\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L147-L150\",\n     \"excerpt\": \"Contracts contain no `required_conventions`, `convention_domains_recorded`, `convention_sources_read` or `conventions_applied_to_output`; conventions-gated commands with a gates file require one `conventions.gate` task with a PASS feature-scope receipt.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-006:** Remove per-task convention proofs and the hashed conventions payload; gate conventions once per feature scope through the existing receipt verifier. **Maps to:** AC-006.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    if \\\"conventions_receipt_verdict_pass\\\" not in rejected[\\\"missing_evidence\\\"]:\\n        convention_problems.append(\\\"non-PASS receipt accepted\\\")\\n    assert convention_problems == []\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    convention_problems = [name for name in names if name in contract[\\\"canonical_json\\\"]]\\n    convention_problems += [] if \\\"conventions\\\" not in goal.payload else [\\\"conventions payload\\\"]\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    convention_problems += [] if gated == [\\\"conventions.gate\\\"] else [f\\\"gated tasks {gated}\\\"]\"\n    }\n   ]\n  },\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-007\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"Three invalid qe.analysis proofs are submitted. The bound assertion requires REJECTED_NEEDS_ACTION, REJECTED_NEEDS_ACTION, BLOCKED. Adjacent assertions check: the handback (attempts == 3, three tried entries, current missing evidence); a report starting with the canonical 'BLOCKED at step 1 - verification_failed - qe.analysis' line; the blocked count in goal status; and that a later valid proof is ACCEPTED and clears the blocked flag. Residual: repair actions in the handback are not explicitly asserted.\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L151-L154\",\n     \"excerpt\": \"After three rejected attempts on one task, prove returns status `BLOCKED` with a `handback` whose report uses the canonical `BLOCKED at step <N> - verification_failed - <reason>` line and lists each attempt's missing evidence, the current missing evidence and repair actions; `goal status` reports the blocked count; a later valid proof is still accepted.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-007:** Bound rejected attempts per task to three and return a BLOCKED handback report while keeping later acceptance possible. **Maps to:** AC-007.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    assert statuses == [\\\"REJECTED_NEEDS_ACTION\\\", \\\"REJECTED_NEEDS_ACTION\\\", \\\"BLOCKED\\\"]\\n    handback = result[\\\"handback\\\"]\\n    assert handback[\\\"attempts\\\"] == 3 and len(handback[\\\"tried\\\"]) == 3\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    assert handback[\\\"report\\\"].startswith(\\\"BLOCKED at step 1 - verification_failed - qe.analysis\\\")\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    assert \\\"blocked:1 (qe.analysis)\\\" in render_goal_status(state)\\n    accepted = prove_goal_task(contract, state, \\\"qe.analysis\\\", QE, project_root=project)\\n    assert accepted[\\\"status\\\"] == \\\"ACCEPTED\\\"\"\n    }\n   ]\n  },\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-008\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"_generate is called with an already expired deadline after stubbing the bounded steps. The bound assertion requires the final write to be bootstrap-recap.md, which can only happen if no post-completion deadline error is raised. This verifies the primary AC-008 outcome. Residual: the clause that individual subprocesses stay bounded by the shared deadline is not exercised (run_probes is stubbed).\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L155-L158\",\n     \"excerpt\": \"Autonomous init no longer raises a deadline error after all generation, probes and profile checks succeeded; individual subprocesses stay bounded by the shared deadline.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-008:** Never block a completed autonomous initialization on the total deadline. **Maps to:** AC-008.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    init_from_code._generate(tmp_path, init_from_code.InitOptions(tmp_path), profile, {}, expired)\\n    assert writes[-1] == \\\"bootstrap-recap.md\\\"\"\n    }\n   ]\n  },\n  {\n   \"requirement_id\": \"081-lightweight-outcome-goals:AC-009\",\n   \"disposition\": \"covered\",\n   \"rationale\": \"The bound assertion requires an empty problem list. Checks: no MUST/ABSOLU/'/goal clear'/'BLOCKED and stop' anywhere in the anti-drift block; a goal section of at most 15 lines with the revised active-goal rule ('already active, update it when the tool allows'); every STEP 0 at most 20 lines; README, system/expectations.md and both spec-system copies containing the outcome-contract needles; goal_conventions.py and init_goal_conventions.py deleted; no child_goal code in goal modules; goal module lines below the 5813-line baseline. This verifies AC-009. Residual: doc agreement is checked by keyword presence, and the baseline counts init_goal_conventions.py while the current count globs only goal_*.py. The like-for-like main figure is 5729; the current 5604 is still lower.\",\n   \"source_citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L159-L162\",\n     \"excerpt\": \"The anti-drift goal section has at most 15 lines, every remaining STEP 0 at most 20 lines, and the whole anti-drift block (all sections) contains no `MUST`, `ABSOLU`, `/goal clear` or `BLOCKED and stop`; the expectations reference, README and spec-system describe the same contract (CLAUDE.md only routes to spec-system); obsolete goal code is deleted and the goal module line count decreases.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L163-L174\",\n     \"excerpt\": \"- **FR-009:** Rewrite goal prompts in short neutral outcome language, synchronize docs and expectations, and delete obsolete goal modules. **Maps to:** AC-009.\"\n    }\n   ],\n   \"plan_citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    lines = sum(len(text.splitlines()) for text in goal_code)\\n    prompt_problems += [] if lines < GOAL_LINES_BEFORE_081 else [f\\\"goal code grew to {lines} lines\\\"]\\n    assert prompt_problems == []\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"        for token in (\\\"MUST\\\", \\\"ABSOLU\\\", \\\"/goal clear\\\", \\\"BLOCKED and stop\\\")\\n        if token in anti_drift\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    prompt_problems += [f\\\"long STEP 0: {name}\\\" for name in long_steps]\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    obsolete = (\\\"goal_conventions.py\\\", \\\"init_goal_conventions.py\\\")\"\n    }\n   ]\n  }\n ],\n \"ambiguities\": [],\n \"extra_scope\": [],\n \"findings\": [\n  {\n   \"category\": \"testability\",\n   \"severity\": \"info\",\n   \"description\": \"Residual unasserted clauses in otherwise covered ACs: AC-002 error text for the timeout case; AC-003 spec-plan --auto and spec-test --auto missing from the matrix; AC-005 archive-time recompile, reset-to-pending and the CLI exit 2 on a failed recompile; AC-006 positive PASS-receipt acceptance; AC-007 repair actions in the handback; AC-008 per-subprocess deadline bound (probes stubbed).\",\n   \"suggestion\": \"Optionally add these cases to harden the regression net; none blocks acceptance.\",\n   \"citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L135-L138\",\n     \"excerpt\": \"`goal_requirement` returns `required` exactly for spec-ship, spec-implement without `--step`/`--dry-run`, spec-feature and spec-init with `--auto`/`-a` (including `--from-code --auto`; spec-init `--dry-run` previews stay optional), and spec-specify, spec-plan, spec-test and spec-fix with `--auto` (the children an autonomous parent spawns); every other combination is `optional`, including short commands that accept an auto flag such as spec-propose, spec-refine or spec-preflight. Only skills that can run in those modes (spec-ship, spec-feature, spec-init, spec-implement, spec-specify, spec-plan, spec-test, spec-fix) keep a goal step.\"\n    },\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L143-L146\",\n     \"excerpt\": \"When the fresh compile of a saved schema 3.0 contract under the current evidence policy differs (feature slug, acceptance, hook context, skill inventory), prove and archive recompile the contract and state in place, carry forward every accepted evidence that revalidates, reset the rest to pending and report `recompiled` with old/new hashes (also recorded as `recompiled_from` in the state); an unnumbered feature slug resolves to the existing numbered feature; a recompilation that fails on invalid current inputs blocks prove and archive without rewriting files; re-rendering an identical goal keeps its existing state, including progress of a pair recompiled in place.\"\n    }\n   ]\n  },\n  {\n   \"category\": \"testability\",\n   \"severity\": \"info\",\n   \"description\": \"The AC-001 checklist check compares contract['checklist'] with execution_tasks plus definition_of_done from the same compiled payload, so it proves the rendered contract matches the payload, not that the compile kept every active inventory row from the skill.\",\n   \"suggestion\": \"Optionally compare the checklist with the inventory parsed straight from each skill's Execution Tasks section.\",\n   \"citations\": [\n    {\n     \"section_id\": \".specs/features/081-lightweight-outcome-goals/spec.md:L127-L130\",\n     \"excerpt\": \"Every rendered contract (schema 3.0) carries `stop_condition` with an argv starting with `livespec` and a display string, a `checklist` with every active inventory row, and required tasks drawn only from typed execution/review receipts, visual/finalize receipts, QE, before-hook, conventions-gate, `outcome.verified` and `archive.run` families (at most 10 per contract); no required task demands `observable_output_or_artifact` from documentary prose.\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"    inventory = [*goal.payload[\\\"execution_tasks\\\"], *goal.payload[\\\"definition_of_done\\\"]]\"\n    }\n   ]\n  },\n  {\n   \"category\": \"testability\",\n   \"severity\": \"info\",\n   \"description\": \"GOAL_LINES_BEFORE_081 (5813) includes validator/init_goal_conventions.py, but the current count only globs validator/goal_*.py, so the comparison is not like-for-like. The main goal_*.py figure is 5729; the current 5604 is still lower, so the AC-009 decrease holds.\",\n   \"suggestion\": \"Use 5729 as the goal_*.py baseline, or include the same file set on both sides.\",\n   \"citations\": [\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"GOAL_LINES_BEFORE_081 = 5813\"\n    },\n    {\n     \"section_id\": \"tests/test_lightweight_goals.py:L29-L495\",\n     \"excerpt\": \"        path.read_text(encoding=\\\"utf-8\\\") for path in (ROOT / \\\"validator\\\").glob(\\\"goal_*.py\\\")\"\n    }\n   ]\n  }\n ],\n \"confidence\": 4\n}"
+  ],
+  "synthesis": null,
+  "synthesis_transport_version": null
+}

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from . import goal_contracts as _contracts
+from .goal_contract_model import GOALS_DIR_MARKER
 
 
 # @spec FR-005: finalize.registry rejects all substitute evidence,
@@ -167,7 +168,4 @@ def _offers_tmpdir_contract_state_paths(evidence: Mapping[str, object]) -> bool:
     substitute_keys = {"contract_file", "state_file", "contract", "state"}
     if any(evidence.get(key) for key in substitute_keys):
         return True
-    return any(
-        isinstance(value, str) and _contracts.CHILD_GOAL_ARTIFACT_ROOT_MARKER in value
-        for value in evidence.values()
-    )
+    return any(isinstance(value, str) and GOALS_DIR_MARKER in value for value in evidence.values())

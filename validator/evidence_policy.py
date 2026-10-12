@@ -80,7 +80,9 @@ def apply_evidence_policy(
         description = str(task["description"])
         description = re.sub(r" \[feature: [^]]+\]$", "", description)
         task_id = str(task["id"])
-        specialized = task_id.startswith(("visual.", "finalize.", "archive.", "hooks.", "qe."))
+        specialized = task_id.startswith(
+            ("visual.", "finalize.", "archive.", "hooks.", "qe.", "outcome.", "conventions.")
+        )
         kind = "documentary" if specialized else declared.get(description, "unclassified")
         attributes = metadata.get(description, {})
         if "applicable" in attributes:

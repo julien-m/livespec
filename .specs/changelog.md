@@ -40,6 +40,9 @@
 ## 2026-10-10 — Feature 082 Spec created: Conventions Gate Signal — 3 stories, 8 AC, 7 FR
 <!-- finalize:spec-specify:2026-10-10:e39214b3 -->
 
+## 2026-10-10 — 081 Lightweight outcome-based goals — one stop condition per autonomous run, recoverable contracts, bounded retries
+<!-- finalize:spec-feature:2026-10-10:2db73a41 -->
+
 ## 2026-10-09 — Bugfix: observed autonomous init and safe force recovery
 
 - Read [the recovery implementation](features/080-autonomous-from-code-recovery/implementation.md): retain observed hybrid stacks, back up owned artifacts, isolate mutable agents, run bounded tooling probes and verify current hook/integration identity.

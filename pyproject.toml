@@ -47,6 +47,7 @@ markers = [
     "slow: tests > 30s",
     "android: tests requiring real Android SDK and AVD",
     "macos: tests requiring macOS + Xcode",
+    "real_stop_condition: run the goal stop condition subprocess instead of the test stub",
 ]
 
 [tool.setuptools.packages.find]

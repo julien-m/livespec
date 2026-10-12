@@ -16,6 +16,8 @@ def _historical_contract(contract, state, policy):
     document = json.loads(contract.read_text())
     canonical = document["canonical"]
     canonical["evidence_policy_version"] = policy
+    # Real pre-kind contracts predate the 081 outcome schema; 081 never recompiles them.
+    canonical["schema_version"] = document["schema_version"] = "2.0"
     for task in canonical["tasks"]:
         task.get("expected_evidence", {}).pop("review_kind", None)
     raw = json.dumps(canonical, sort_keys=True, separators=(",", ":"))

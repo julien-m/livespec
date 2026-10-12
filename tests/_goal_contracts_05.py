@@ -64,27 +64,34 @@ def test_render_goal_contract_and_state_replace_markdown_task_file(
     contract = json.loads(contract_text)
     state = json.loads(render_goal_state_file(goal))
 
-    assert contract["schema_version"] == "2.0"
+    assert contract["schema_version"] == "3.0"
     assert contract["goal_hash"] == goal.goal_hash
-    assert contract["mode"] == "enforced"
+    assert contract["mode"] == "outcome"
     assert contract["worker_may_mark_tasks_complete"] is False
     assert contract["rules"]["worker_may_mark_tasks_complete"] is False
     assert contract["rules"]["completion_actor"] == "goal"
-    assert contract["rules"]["proof_required_for_each_task"] is True
+    assert contract["rules"]["proof_required_for_required_tasks_only"] is True
+    assert contract["rules"]["max_attempts_per_task"] == 3
+    assert contract["rules"]["native_goal"] == "optional"
+    assert contract["stop_condition"]["argv"][0] == "livespec"
+    assert "Always task" in contract["checklist"]
     assert all(task["required_evidence"] for task in contract["tasks"])
     assert all(task["repair_if_missing"] for task in contract["tasks"])
     assert "task-file" not in contract_text
     assert "Check each task" not in contract_text
 
-    assert state["schema_version"] == "2.0"
+    assert state["schema_version"] == "3.0"
     assert state["goal_hash"] == goal.goal_hash
     assert state["status"] == "active"
     assert set(state["tasks"]) == {task["id"] for task in contract["tasks"]}
     assert all(task["status"] == "pending" for task in state["tasks"].values())
 
 
-def test_goal_prove_rejects_generic_output_when_required_evidence_missing(
+# @spec FR-001: The goal verifies the outcome itself
+#   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-001
+def test_goal_prove_outcome_rejects_failing_stop_condition(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     project_root, livespec_root = _fixture_roots(tmp_path)
     _write_execution_task_skill(livespec_root)
@@ -95,18 +102,26 @@ def test_goal_prove_rejects_generic_output_when_required_evidence_missing(
     )
     contract = json.loads(render_goal_contract_file(goal))
     state = json.loads(render_goal_state_file(goal))
-    task_id = contract["tasks"][0]["id"]
+    calls: list[list[str]] = []
+
+    def failing(argv: list[str], root: Path) -> tuple[int, str]:
+        calls.append(argv)
+        return 1, "ERROR spec.md"
+
+    monkeypatch.setattr("validator.goal_outcome.run_stop_condition", failing)
 
     result = prove_goal_task(
         contract,
         state,
-        task_id,
-        evidence={"output": "done"},
+        "outcome.verified",
+        evidence={"output": "done", "exit_code": 0, "success_criteria_met": True},
         project_root=project_root,
     )
 
+    assert calls == [["livespec", "validate"]]
     assert result["status"] == "REJECTED_NEEDS_ACTION"
-    assert "success_criteria_met" in result["missing_evidence"]
+    assert result["missing_evidence"] == ["stop_condition_exit_zero"]
+    assert result["observed"] == {"exit_code": 1, "output_tail": "ERROR spec.md"}
 
 
 def test_goal_render_save_writes_contract_and_state_files(
@@ -141,7 +156,7 @@ def test_goal_render_save_writes_contract_and_state_files(
     assert state_path.suffix == ".json"
     assert contract_path.exists()
     assert state_path.exists()
-    assert json.loads(contract_path.read_text(encoding="utf-8"))["mode"] == "enforced"
+    assert json.loads(contract_path.read_text(encoding="utf-8"))["mode"] == "outcome"
     assert json.loads(state_path.read_text(encoding="utf-8"))["status"] == "active"
 
 

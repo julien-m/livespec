@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.goal_checklist_support import checklist_tasks
 from tests.test_command_preview_obligations import ROOT, _goal
 
 
@@ -11,7 +12,7 @@ from tests.test_command_preview_obligations import ROOT, _goal
 def test_visual_prerequisite_distinguishes_failed_suite_from_unrequested_suite(
     tmp_path: Path, flags: str, suite_active: bool
 ) -> None:
-    tasks = _goal(tmp_path, "spec-test", flags, True).payload["tasks"]
+    tasks = checklist_tasks(_goal(tmp_path, "spec-test", flags, True).payload)
     suite = [task for task in tasks if task["description"] == "Full test suite executed"]
     assert bool(suite) is suite_active
     if suite:
@@ -26,10 +27,10 @@ def test_visual_prerequisite_distinguishes_failed_suite_from_unrequested_suite(
     dispatcher = next(
         task for task in tasks if "Select dispatcher based on surfaces.yaml" in task["description"]
     )
-    gate = next(task for task in tasks if task["id"] == "visual.gate_validate")
+    # 081: the gate row is indicative; the receipt itself is proven by visual receipt tasks.
+    gate = next(task for task in tasks if "visual-gate validate" in task["description"])
     assert guard["ordinal"] < dispatcher["ordinal"] < gate["ordinal"]
     assert "--receipt <receipt-path>" in gate["description"]
-    assert "verbal_visual_confirmation_without_artifact" in gate["invalid_substitutes"]
 
 
 def test_capture_prose_requires_only_an_applicable_functional_suite(tmp_path: Path) -> None:
@@ -46,8 +47,8 @@ def test_capture_prose_requires_only_an_applicable_functional_suite(tmp_path: Pa
 def test_inactive_visual_modes_have_no_capture_prerequisite_or_visual_receipt_task(
     tmp_path: Path, flags: str
 ) -> None:
-    tasks = _goal(tmp_path, "spec-test", flags, True).payload["tasks"]
+    tasks = checklist_tasks(_goal(tmp_path, "spec-test", flags, True).payload)
     assert not any("Skip phase 4.5" in task["description"] for task in tasks)
-    assert not any(task["id"].startswith("visual.gate_validate") for task in tasks)
+    assert not any("visual-gate validate" in task["description"] for task in tasks)
     assert not any("After runtime capture and approval" in task["description"] for task in tasks)
     assert not any(task["description"] == "Full test suite executed" for task in tasks)

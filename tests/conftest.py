@@ -12,6 +12,22 @@ from validator.config import ValidatorConfig
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
+@pytest.fixture(autouse=True)
+def _stub_goal_stop_condition(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Keep proof-mechanics tests independent of fixture structural validity (feature 081).
+
+    Tests marked ``real_stop_condition`` execute the actual ``livespec`` subprocess.
+    """
+    if request.node.get_closest_marker("real_stop_condition"):
+        return
+    monkeypatch.setattr(
+        "validator.goal_outcome.run_stop_condition",
+        lambda argv, root: (0, "validated (test stub)"),
+    )
+
+
 @pytest.fixture
 def specs_root(tmp_path: Path) -> Path:
     """Create a minimal .specs/ structure with a feature subdirectory."""
