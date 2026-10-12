@@ -39,3 +39,12 @@
 - **AC impacted:** None
 - **Author:** Claude Code (test-suite cleanup, lot 1)
 - Kept registry discovery and schema-validated capability set; removed YAML value pins and runner/package-manager cases duplicated by tests/unit/test_typescript_detector.py.
+
+## 2026-10-12 — Spec Update: runner/package-manager detection flagged as unwired
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None (implementation.md statuses only)
+- **AC impacted:** AC-002 (Partial)
+- **Author:** Claude Code (dead-code resolution)
+- `detect_test_runner`, `detect_package_manager` and `has_dependency` have no production caller: `typescript.yaml` hardcodes `npx vitest`/`npx stryker`. Both wiring (per-runner command variants) and removal (rely on `.specs/drivers/typescript.yaml` overrides) are defensible, so the code is kept and the decision is escalated to the user.

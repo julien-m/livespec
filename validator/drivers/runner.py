@@ -15,6 +15,7 @@ import shlex
 import subprocess
 from pathlib import Path
 
+from .placeholders import resolve_argv_placeholders
 from .schemas import (
     CAPABILITY_NAMES,
     CapabilityNotImplementedError,
@@ -102,7 +103,7 @@ def _capability_argv(
         # Scripts keep explicit shell semantics; commands remain list-form subprocesses.
         return ["bash", str(script_path)]
     assert cap.command is not None
-    return shlex.split(cap.command)
+    return resolve_argv_placeholders(shlex.split(cap.command), cap, cwd, driver.name)
 
 
 def _run_captured(

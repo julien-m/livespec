@@ -195,23 +195,23 @@ flowchart TD
 - **AC-001** — Driver file `livespec/drivers/rust.yaml` is loaded when `Cargo.toml` is found at project root.
 - **AC-002** — Coverage capability uses `cargo llvm-cov --lcov --output-path lcov.info --fail-under-lines {threshold}` (native flag, no script).
 - **AC-003** — If `cargo-llvm-cov` is not installed, capability exits non-zero with install instruction (required tool — not optional like snapshot libs).
-- **AC-004** — Snapshot capability detects `insta` in `Cargo.toml`; if absent, skips with exit 0. If present, runs `cargo insta test --unreferenced=reject`.
+- **AC-004** — **Removed (2026-10-12):** ~~Snapshot capability detects `insta` in `Cargo.toml`; if absent, skips with exit 0. If present, runs `cargo insta test --unreferenced=reject`.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally. The declared snapshots command stays `cargo insta test --unreferenced=reject`.
 - **AC-005** — On insta mismatch, LiveSpec surfaces the test failure and suggests `cargo insta review`.
-- **AC-006** — Properties capability detects `proptest` first, then `quickcheck` as fallback. If neither found, skips with exit 0.
+- **AC-006** — **Removed (2026-10-12):** ~~Properties capability detects `proptest` first, then `quickcheck` as fallback. If neither found, skips with exit 0.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally. `cargo test` already runs proptest and quickcheck cases.
 - **AC-007** — Mutation capability checks for `cargo-mutants` on PATH; if absent, emits install hint and exits 0.
 - **AC-008** — Mutation capability invokes `cargo mutants --json` and parses the structured output (caught/missed/timeout/unviable).
 - **AC-009** — The Rust driver YAML passes schema validation against `DriverSchema`.
-- **AC-010** — `Cargo.toml` parsing uses a dedicated parser (not shell grep) to detect `[dependencies]` and `[dev-dependencies]` entries.
+- **AC-010** — **Removed (2026-10-12):** ~~`Cargo.toml` parsing uses a dedicated parser (not shell grep) to detect `[dependencies]` and `[dev-dependencies]` entries.~~ Removed with FR-002: no capability parses `Cargo.toml`.
 
 ---
 
 ## Functional Requirements
 
 - **FR-001** — Write `livespec/drivers/rust.yaml` with detect rule (`files: [Cargo.toml]`) and all 4 capability blocks. Coverage uses native `command:` (no script escape hatch needed).
-- **FR-002** — Implement `Cargo.toml` dependency parser: extract `[dependencies]` and `[dev-dependencies]` section entries (using `tomllib` for correctness).
+- **FR-002** — **Removed (2026-10-12):** ~~Implement `Cargo.toml` dependency parser: extract `[dependencies]` and `[dev-dependencies]` section entries (using `tomllib` for correctness).~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally.
 - **FR-003** — Implement `cargo mutants --json` output parser: extract `caught`, `missed`, `timeout`, `unviable` counts from JSON report.
 - **FR-004** — Write integration tests for all 4 capabilities on Rust fixture projects.
-- **FR-005** — Write unit tests for Cargo.toml parser and cargo-mutants JSON parser.
+- **FR-005** — Write unit tests for Cargo.toml parser and cargo-mutants JSON parser. (Cargo.toml parser tests removed 2026-10-12 with FR-002; cargo-mutants parser tests remain.)
 
 ---
 

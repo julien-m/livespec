@@ -6,7 +6,7 @@
 # a native command — no escape-hatch script required:
 #   - coverage   : cargo llvm-cov has --fail-under-lines + native lcov output
 #   - snapshots  : cargo insta provides a TUI review affordance
-#   - properties : cargo test (proptest / quickcheck detected via Cargo.toml)
+#   - properties : cargo test (runs proptest / quickcheck cases natively)
 #   - mutation   : cargo mutants is fast + incremental + JSON-friendly
 #
 # Required tools (not installed by LiveSpec; runner surfaces install hints):
@@ -28,9 +28,8 @@ snapshots:
   # matching the spec contract (insta is the reference Rust snapshot library).
   command: cargo insta test --unreferenced=reject
 properties:
-  # cargo test runs every test, including proptest / quickcheck cases.
-  # Library detection (proptest preferred over quickcheck) lives in
-  # validator/drivers/rust_detector.py and is consulted by the runner.
+  # cargo test runs every test, including proptest / quickcheck cases; no
+  # library detection is needed to choose the command.
   command: cargo test
 mutation:
   # JSON output is parsed by validator/drivers/rust_detector.parse_cargo_mutants_json
