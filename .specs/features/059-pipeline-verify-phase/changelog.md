@@ -1,5 +1,15 @@
 # Changelog - 059-pipeline-verify-phase
 
+## 2026-10-12 — [Refactor]: Duplicate archive.run convention test removed
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/_goal_contracts_09.py, tests/test_goal_contracts.py, implementation.md (AC-003 row)
+- **AC impacted:** AC-003
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+`test_archive_run_task_carries_no_convention_evidence` repeated the per-task convention check and the archive.run evidence family. The AC-003 row named a test that no longer existed (`..._skips_convention_evidence_layering`); it now names the surviving `test_rendered_goal_tasks_carry_no_per_task_convention_proofs`.
+
 ## 2026-06-11 — [Spec]: Spec-code alignment verified
 
 - **Type:** Spec Update

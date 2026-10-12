@@ -1,3 +1,13 @@
+## 2026-10-12 — [Refactor]: Android manifest tests consolidated around the production loader
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_maestro_manifest.py, implementation.md (AC-001 row)
+- **AC impacted:** AC-001, AC-003
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+37 one-line key/value checks became one structural test loaded through `load_maestro_runner_manifest`, the AC-003 priority test, and a new check that every declared detect file/dir is honoured by `MaestroRunnerHandler.detect()`.
+
 ## 2026-05-06 — [Spec Update]: Feature specification created
 
 - **Type:** Spec Update

@@ -1,5 +1,15 @@
 # Changelog - 080-autonomous-from-code-recovery
 
+## 2026-10-12 — [Refactor]: Init goal profile aliases reduced to one case per profile
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_init_goal_profiles.py
+- **AC impacted:** AC-006 (coverage unchanged)
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+Alias permutations that reach the same profile branch were dropped (19 -> 13 cases); the `-d` alias stays where it has its own verify branch. One prose assertion was removed.
+
 ## 2026-10-09 — [Spec]: Feature specification created
 
 - **Type:** Spec Update

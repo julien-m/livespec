@@ -244,22 +244,6 @@ def test_archive_run_task_evidence_family_matches_constants(tmp_path: Path) -> N
     assert any("artifact path" in action for action in task["repair_if_missing"])
 
 
-def test_archive_run_task_carries_no_convention_evidence(tmp_path: Path) -> None:
-    """AC-003 + 081 AC-006: no task carries per-task convention proof fields."""
-    project_root, livespec_root = _fixture_roots(tmp_path)
-    _write_conventions(project_root, tmp_path / "ai")
-    _write_execution_task_skill(livespec_root)
-
-    contract, _state = _demo_contract_and_state(project_root, livespec_root)
-
-    task = next(task for task in contract["tasks"] if task["id"] == "archive.run")
-    assert task["required_evidence"] == ["run_artifact_path"]
-    assert all("required_conventions" not in item for item in contract["tasks"])
-    assert all(
-        "convention_domains_recorded" not in item["required_evidence"] for item in contract["tasks"]
-    )
-
-
 def test_archive_run_injection_preserves_hash_determinism(tmp_path: Path) -> None:
     """AC-002: same inputs → same canonical JSON and hash with the injected task."""
     project_root, livespec_root = _fixture_roots(tmp_path)

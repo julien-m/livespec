@@ -32,7 +32,7 @@ updated: 2026-06-02
 | AC-001 | `tests/test_journeys.py::test_journey_validate_accepts_valid_yaml` | ✅ Implemented |
 | AC-002 | `tests/test_journeys.py::test_journey_validate_rejects_unknown_action` | ✅ Implemented |
 | AC-003 | `tests/test_journeys.py::test_compile_generates_playwright_with_source_hash` | ✅ Implemented |
-| AC-004 | `tests/test_journeys.py::test_wait_without_until_or_reason_is_warning` | ✅ Implemented |
+| AC-004 | None — the v2 step schema (057) has no `until`/`reason` fields and no validator emits the fixed-wait warning; the former test validated a journey without any `wait` step | ❌ Missing (regressed by 057, reported 2026-10-12) |
 | AC-005 | `tests/test_journeys.py::test_compile_generates_playwright_with_source_hash` | ✅ Implemented |
 | AC-006 | `tests/test_journeys.py::test_compile_generates_xcuitest_for_ios_and_watchos` | ✅ Implemented |
 | AC-007 | `tests/test_journeys.py::test_compile_generates_xcuitest_for_ios_and_watchos` | ✅ Implemented |
@@ -43,7 +43,7 @@ updated: 2026-06-02
 | AC-012 | `.agent-sync/skills/spec-feature/SKILL.md` | ✅ Implemented |
 | AC-013 | `tests/test_journeys.py::test_journey_validate_rejects_unsupported_target` | ✅ Implemented |
 | AC-014 | `tests/test_journeys.py::test_manual_disabled_and_executable_categories_are_reported` | ✅ Implemented |
-| AC-015 | `tests/test_journeys.py::test_manual_journey_requires_reason` | ✅ Implemented |
+| AC-015 | None — `test_manual_journey_requires_reason` does not exist and a `manual` journey without `manual_reason` validates cleanly (the v2 validator sets `manual_reason=None`) | ❌ Missing (reported 2026-10-12) |
 
 ## Files Created/Modified
 

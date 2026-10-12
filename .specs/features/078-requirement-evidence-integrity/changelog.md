@@ -196,3 +196,13 @@ Parametrisations reduced to one case per real branch. The tag-legend test now ch
 - **Code modified:** `tests/test_fix_execution_scope.py`, `tests/test_fix_visual_modes.py`, `tests/test_generation_syntax_boundary.py`
 - **AC impacted:** None (coverage kept)
 - **Author:** Claude Code
+
+## 2026-10-12 — [Refactor]: Identity-version test made behavioural
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_lifecycle_metadata.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+`test_identity_policy_version_invalidates_prior_receipts` only compared the constant; it now proves a version bump changes the normative hash.

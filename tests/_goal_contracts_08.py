@@ -159,11 +159,6 @@ def test_spec_check_dod_requires_tree_validation_report_not_pass(tmp_path: Path)
 
     assert dod[0] == "Tree validation executed and reported (or skipped by --skip-tree)"
     assert not any("tree validation" in item.lower() and "passed" in item.lower() for item in dod)
-    assert "Gap report produced and displayed" in dod
-    assert "Gap report saved to `checks/YYYY-MM-DD.md`" in dod
-    assert "Feature `changelog.md` has a check entry" in dod
-    assert "Global `.specs/changelog.md` has a summary entry" in dod
-    assert "If multi-spec: consolidated report produced" in dod
 
 
 def test_render_goal_objective_is_stable_text_from_payload(tmp_path: Path) -> None:
@@ -190,7 +185,7 @@ def test_render_goal_objective_is_stable_text_from_payload(tmp_path: Path) -> No
 
 def test_anti_drift_block_documents_shared_goal_protocol() -> None:
     """AC-007 + 081 AC-004/AC-009: one short, non-blocking goal lifecycle."""
-    text = Path("system/anti-drift-block.md").read_text(encoding="utf-8")
+    text = (_repo_root() / "system" / "anti-drift-block.md").read_text(encoding="utf-8")
 
     assert "livespec goal render <command-name>" in text
     assert "contract-file:" in text

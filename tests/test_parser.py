@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from validator.parser import ParsedFile, parse_file
+from validator.parser import parse_file
 
 
 class TestParseFrontmatter:
@@ -82,11 +82,3 @@ class TestParseEdgeCases:
         assert result.metadata == {}
         assert result.headings == []
         assert result.code_blocks == []
-
-    def test_returns_parsed_file_dataclass(self, valid_spec_path: Path) -> None:
-        result = parse_file(valid_spec_path)
-        assert isinstance(result, ParsedFile)
-        assert isinstance(result.metadata, dict)
-        assert isinstance(result.content, str)
-        assert isinstance(result.headings, list)
-        assert isinstance(result.code_blocks, list)

@@ -134,7 +134,9 @@ class TestSlugRegex:
 
     def test_regex_pattern_matches_documentation(self) -> None:
         # If this test breaks, system/identity.md must be updated to match.
-        assert SLUG_REGEX.pattern == r"^\d{3}(\.\d+)?-[a-z0-9]+(-[a-z0-9]+)*$"
+        doc = Path(__file__).resolve().parents[1] / "system" / "identity.md"
+        documented = [line.strip() for line in doc.read_text(encoding="utf-8").splitlines()]
+        assert SLUG_REGEX.pattern in documented
 
     def test_regex_accepts_subfeatures(self) -> None:
         # Sub-features (NNN.M-name) are a real LiveSpec convention — see
