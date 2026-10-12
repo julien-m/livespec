@@ -9,9 +9,9 @@
       "test_id": "tests.test_lightweight_goals::test_every_command_contract_keeps_only_receipt_backed_tasks",
       "expected": "Every repository command contract keeps only receipt-backed tasks ending with outcome.verified and archive.run",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 153,
-      "end_line": 153,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 155,
+      "end_line": 155,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "The assertion requires zero violations across every repository command contract: schema 3.0, <=10 contiguous required tasks ending with outcome.verified/archive.run, receipt-backed families or typed execution/review evidence only, no documentary observable-output demand, a livespec stop condition argv with a matching display string, and a contract checklist equal to the active inventory."
     },
     {
@@ -19,9 +19,9 @@
       "test_id": "tests.test_lightweight_goals::test_outcome_rules_cover_exit_launch_timeout_and_silent_checks",
       "expected": "The goal runs the stop condition itself: non-zero exit, launch failure, timeout and a silent check with only declared text are rejected; exit 0 with output or a silent check with an existing artifact is accepted",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 458,
-      "end_line": 465,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 461,
+      "end_line": 468,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "The single assertion compares the proof status of six simulated stop-condition outcomes (the runner subprocess is replaced, the goal still executes it): declared exit 0 never overrides a non-zero exit, OSError/TimeoutExpired are rejected, exit 0 with output and silent exit 0 with an existing artifact are accepted, silent exit 0 with declared output text is rejected."
     },
     {
@@ -29,9 +29,9 @@
       "test_id": "tests.test_lightweight_goals::test_goal_requirement_targets_only_autonomous_long_runs",
       "expected": "Goal requirement is required only for autonomous long runs",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 91,
-      "end_line": 91,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 93,
+      "end_line": 93,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "The assertion compares goal_requirement for the full command/flag matrix (ship, feature --auto, init --auto, implement without --step/--dry-run versus interactive commands) with the expected required/optional values."
     },
     {
@@ -39,9 +39,9 @@
       "test_id": "tests.test_lightweight_goals::test_skills_never_block_on_native_goal_and_lock_only_autonomous_runs",
       "expected": "No skill blocks on native goal tools or an active goal; only autonomous-capable skills keep a goal step",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 183,
-      "end_line": 183,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 185,
+      "end_line": 185,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "The assertion requires zero violations: no ABSOLU, /goal clear, unavailable-/goal stop or active-goal stop text in any skill, STEP 0 with create_goal, /goal and a warning fallback in goal skills, and no goal render step elsewhere."
     },
     {
@@ -49,9 +49,9 @@
       "test_id": "tests.test_lightweight_goals::test_drifted_contract_recompiles_in_place_and_keeps_valid_evidence",
       "expected": "A drifted contract is recompiled in place and keeps still-valid evidence",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 337,
-      "end_line": 348,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 339,
+      "end_line": 350,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "After adding a before-test hook (input drift), the single assertion requires: recompiled report from the old hash, qe.analysis carried, contract and state rewritten in place under the new hash with the hooks.before task, qe.analysis and outcome.verified complete, recompiled_from recorded in the state, and a re-render of the drifted goal at new paths adopting the carried progress. The unnumbered slug resolution is asserted earlier in the same test and the failed-recompile block is covered by a dedicated test."
     },
     {
@@ -59,9 +59,9 @@
       "test_id": "tests.test_lightweight_goals::test_conventions_are_gated_once_per_feature_without_per_task_proofs",
       "expected": "The contract has no per-task convention proof names or conventions payload, conventions.gate is the only receipt task, and a non-PASS receipt is rejected",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 220,
-      "end_line": 220,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 222,
+      "end_line": 222,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "The single assertion requires an empty problem list: none of required_conventions, convention_domains_recorded, convention_sources_read, conventions_applied_to_output appears in the canonical contract, no conventions payload, conventions.gate is the only task requiring conventions_receipt_path, and proving it with a FAIL receipt reports conventions_receipt_verdict_pass missing."
     },
     {
@@ -69,9 +69,9 @@
       "test_id": "tests.test_lightweight_goals::test_three_rejections_hand_back_a_blocked_report_and_later_proof_still_counts",
       "expected": "The third rejection of a task returns BLOCKED",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 294,
-      "end_line": 294,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 296,
+      "end_line": 296,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "Three invalid qe.analysis proofs are submitted and the assertion requires the third result status to be BLOCKED after two REJECTED_NEEDS_ACTION results."
     },
     {
@@ -79,9 +79,9 @@
       "test_id": "tests.test_lightweight_goals::test_completed_autonomous_init_is_not_failed_by_an_elapsed_deadline",
       "expected": "A completed autonomous init writes its completed recap despite an elapsed deadline",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 385,
-      "end_line": 385,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 387,
+      "end_line": 387,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "_generate runs with an already expired deadline and stubbed bounded steps; the assertion requires the final write to be the completed bootstrap recap, so no deadline error was raised."
     },
     {
@@ -89,9 +89,9 @@
       "test_id": "tests.test_lightweight_goals::test_runtime_goal_prompt_is_short_and_neutral",
       "expected": "The runtime goal prompt is short, neutral and allows reusing an active goal",
       "assertion_path": "tests/test_lightweight_goals.py",
-      "start_line": 262,
-      "end_line": 262,
-      "source_sha256": "a52011f3eae790b90bcf85d0040c4ffefc39377016f86581ecc94240063670ad",
+      "start_line": 264,
+      "end_line": 264,
+      "source_sha256": "7c42fa995c1b6b30f6ebf43f78fe36cd6b4c63bd43f75a3f24aa3afd2e028b42",
       "justification": "The single assertion requires an empty problem list: no MUST/ABSOLU/'/goal clear'/'BLOCKED and stop' anywhere in the anti-drift block, a goal section of at most 15 lines with the active-goal reuse rule, every STEP 0 at most 20 lines, README/expectations/both spec-system copies naming the outcome contract, the obsolete goal modules and child-goal code deleted, and goal module lines below the 5813-line main baseline."
     }
   ]

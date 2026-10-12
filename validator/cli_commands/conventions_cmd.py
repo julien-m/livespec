@@ -361,7 +361,7 @@ def _read_worker_receipt(repo_root: Path, worker_receipt: Path | None) -> dict[s
 
 
 def _run_supervisor_verify(repo_root: Path, feature_slug: str | None) -> GateResult:
-    if feature_slug in (None, REPO_FEATURE_SCOPE):
+    if feature_slug is None or feature_slug == REPO_FEATURE_SCOPE:
         result = _with_rule_decision_blockers(verify_conventions(repo_root), repo_root)
         return apply_repo_baseline(repo_root, result)
     feature_scope = resolve_feature_scope(repo_root, feature_slug)

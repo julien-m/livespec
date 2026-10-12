@@ -7,7 +7,7 @@
 - **Code modified:** tests/test_lightweight_goals.py, tests/lightweight_goals_support.py (new); acceptance-mapping.json spans and source hash rebound to the unchanged assertions
 - **AC impacted:** AC-005 (test body only; assertions unchanged)
 - **Author:** Claude Code (integrator)
-- Against the 082 repo baseline, `test_drifted_contract_recompiles_in_place_and_keeps_valid_evidence` exceeded the 60-line function limit; its saved-goal setup and fact summary moved to a support module. The independent acceptance review receipt lives in the disposable `.reviews/` cache and must be regenerated before any re-certification.
+- Against the 082 repo baseline, `test_drifted_contract_recompiles_in_place_and_keeps_valid_evidence` exceeded the 60-line function limit; its saved-goal setup and fact summary moved to a support module. Typed the JSON goal helpers and the stubbed subprocess result so `mypy .` reports no new error versus main 457a252. The independent acceptance review receipt lives in the disposable `.reviews/` cache and must be regenerated before any re-certification.
 
 ## 2026-10-10 — [Feature]: Lightweight outcome-based goals
 

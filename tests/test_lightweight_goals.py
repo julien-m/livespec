@@ -9,7 +9,9 @@ from __future__ import annotations
 import json
 import re
 import time
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -262,7 +264,7 @@ def test_runtime_goal_prompt_is_short_and_neutral() -> None:
     assert prompt_problems == []
 
 
-def _spec_test_goal(project: Path) -> tuple[dict[str, object], dict[str, object]]:
+def _spec_test_goal(project: Path) -> tuple[dict[str, Any], dict[str, Any]]:  # parsed JSON
     goal = compile_command_goal(
         "spec-test", project_root=project, livespec_root=ROOT, feature="001-demo"
     )
@@ -436,11 +438,12 @@ def test_outcome_rules_cover_exit_launch_timeout_and_silent_checks(
         def run(*args: object, **kwargs: object) -> subprocess.CompletedProcess[str]:
             if error is not None:
                 raise error
-            return subprocess.CompletedProcess(args, code or 0, stdout=output, stderr="")
+            argv = [str(arg) for arg in args]
+            return subprocess.CompletedProcess(argv, code or 0, stdout=output, stderr="")
 
         return run
 
-    cases = {
+    cases: dict[str, tuple[Callable[..., object], dict[str, Any]]] = {
         "nonzero_exit": (runner(1, "ERROR spec.md"), {"exit_code": 0, "output": "fine"}),
         "launch_failure": (runner(None, "", OSError("no interpreter")), {}),
         "timeout": (runner(None, "", subprocess.TimeoutExpired("livespec", 300)), {}),
