@@ -166,3 +166,11 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Code modified:** Pending implementation of the approved policy.
 - **Author:** Codex
 - GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.
+
+## 2026-10-12 — Refactor: Trim redundant review-identity and Analyze test combinations
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_review_lifecycle_protocol.py (20 → 8 cases: the lifecycle exemption still runs for every header band and newline pair, each business change runs once); tests/test_pre_impl_missing_artifacts.py (18 → 5 cases: every missing set, both semantic statuses, and an invalid review config that must not preempt the CRITICAL diagnostics).
+- **AC impacted:** AC-004 (same branches still exercised)
+- **Author:** claude-code

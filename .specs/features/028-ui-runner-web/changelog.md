@@ -1,3 +1,11 @@
+## 2026-10-12 — [Refactor]: Deterministic web-runner output-path tests
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_runner_path_contracts.py — the canonical `feature_slug`+`run_id` and legacy opt-in cases launched a real `npx playwright test` when npx was installed and only asserted that no guard fired. They now replace the Playwright subprocess, then assert success, the exact resolved PNG path, the command, cwd and `LIVESPEC_SCREENSHOT_PATH_<SCREEN>`.
+- **AC impacted:** None
+- **Author:** claude-code
+
 ## 2026-05-07 — [Plan]: Technical plan generated
 
 - **Type:** Feature

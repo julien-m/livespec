@@ -56,15 +56,10 @@ def test_feature_supervisor_emits_subcommand_header(marker: str, expected: str) 
 
 def test_ship_supervisor_emits_feature_header() -> None:
     text = _read(SHIP_MD)
-    first = _extract_first_line_after(r"Spawn a new agent with a fresh context", text)
-    # The prompt template starts with "Agent prompt:" then the synthetic line.
-    # Accept either order: assert /spec-feature appears in the first two non-empty lines.
-    m = re.search(r"Spawn a new agent.*?```[a-zA-Z]*\n(.*?)```", text, re.DOTALL)
+    spawn = r"Spawn a new agent with a fresh context.*?```[a-zA-Z]*\n(.*?)```"
+    m = re.search(spawn, text, re.DOTALL)
     assert m, "ship spawn block not found"
     lines = [ln.strip() for ln in m.group(1).splitlines() if ln.strip()]
-    assert "/spec-feature" in lines[:3], (
-        f"`/spec-feature` not in the first 3 lines of the ship agent prompt: {lines[:3]}"
-    )
-    # _extract_first_line_after may return "Agent prompt:" — that's OK,
-    # the strict check above is what matters.
-    _ = first
+    # The template opens with a "Sub-agent prompt:" label; the synthetic header follows it.
+    assert lines[0].endswith("prompt:"), lines[:2]
+    assert lines[1] == "/spec-feature", lines[:2]

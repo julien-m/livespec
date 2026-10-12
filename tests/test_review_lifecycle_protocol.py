@@ -21,9 +21,22 @@ from validator.semantic.review_receipts import verify_review_receipt
 
 # @spec AC-004: Only recognized lifecycle fields can change without invalidation.
 #   — .specs/features/078-requirement-evidence-integrity/spec.md#ac-004
-@pytest.mark.parametrize("band", ["explicit", "legacy"])
-@pytest.mark.parametrize("newline", ["\n", "\r\n"], ids=["LF", "CRLF"])
-@pytest.mark.parametrize("change", ["lifecycle", "retention", "threshold", "permission", "created"])
+# The lifecycle exemption depends on header parsing, so it runs for every band/newline
+# pair; each business change (all on the same invalidation branch) runs once.
+@pytest.mark.parametrize(
+    ("band", "newline", "change"),
+    [
+        ("explicit", "\n", "lifecycle"),
+        ("explicit", "\r\n", "lifecycle"),
+        ("legacy", "\n", "lifecycle"),
+        ("legacy", "\r\n", "lifecycle"),
+        ("explicit", "\r\n", "retention"),
+        ("legacy", "\n", "threshold"),
+        ("explicit", "\n", "permission"),
+        ("legacy", "\r\n", "created"),
+    ],
+    ids=lambda value: {"\n": "LF", "\r\n": "CRLF"}.get(value, value),
+)
 def test_review_identity_retains_every_non_lifecycle_byte(
     tmp_path: Path, band: str, newline: str, change: str
 ) -> None:

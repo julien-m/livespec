@@ -19,9 +19,18 @@ def _snapshot(root: Path) -> dict[str, bytes | None]:
     }
 
 
-@pytest.mark.parametrize("missing", [("spec.md",), ("plan.md",), ("spec.md", "plan.md")])
-@pytest.mark.parametrize("mode", [[], ["--no-review"], ["--structural-only"]])
-@pytest.mark.parametrize("invalid_review_config", [False, True])
+# One case per missing-set, per mode (incomplete vs not_requested), and an invalid
+# review config that must not preempt the artifact diagnostics.
+@pytest.mark.parametrize(
+    ("missing", "mode", "invalid_review_config"),
+    [
+        (("spec.md",), [], False),
+        (("plan.md",), ["--no-review"], False),
+        (("spec.md", "plan.md"), ["--structural-only"], False),
+        (("spec.md", "plan.md"), [], True),
+        (("plan.md",), ["--structural-only"], True),
+    ],
+)
 def test_missing_canonical_inputs_return_critical_without_writes(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
