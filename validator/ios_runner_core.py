@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+# 030 FR-005: project ios.yaml scenarios feed scheme/launch arguments
+
 """XCUITest runner execution helpers."""
 
 from __future__ import annotations

@@ -23,7 +23,7 @@ updated: 2026-05-07
 | FR-004 | watchOS destination filtering | `validator/ui_runner_xcuitest.py` | `# @spec FR-004: watchOS destination filtering` |
 | FR-005 | launch_arguments injection | `validator/ui_runner_xcuitest.py` | `# @spec FR-005: launch_arguments injection` |
 | FR-005 | Swift template launch args | `livespec/ui-runners/xcuitest-template/LSSampleUITests.swift` | `// @spec FR-005: launch_arguments injection` |
-| FR-005 | Per-project scenarios: scheme + launch_arguments from `<project>/livespec/ui-runners/ios.yaml` (2026-10-12) | `validator/ios_project_config.py`, `validator/ios_runner_core.py`, `validator/dispatcher_core.py` | `resolve_ios_run_settings()` (CLI/runnerConfig > project config > detection), `runnerConfig.scenario` |
+| FR-005 | Per-project scenarios: scheme + launch_arguments from the project-level ios.yaml (2026-10-12) | `validator/ios_project_config.py`, `validator/ios_runner_core.py`, `validator/dispatcher_core.py` | `resolve_ios_run_settings()` (CLI/runnerConfig > project config > detection), `runnerConfig.scenario` |
 | FR-006 | Xcode license detection | `validator/ui_runner_xcuitest.py` | `# @spec FR-006: Xcode license detection` |
 | FR-007 | Integration tests iOS | ❌ Missing | none — the former `pytest.mark.macos` stubs were unconditional `pytest.skip()` and were removed on 2026-10-12; a real macOS fixture test is still required |
 | FR-008 | Integration tests watchOS | ❌ Missing | none — the former `pytest.mark.macos` stubs were unconditional `pytest.skip()` and were removed on 2026-10-12; a real macOS fixture test is still required |

@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
+import yaml
 
 PROJECT_CONFIG_RELATIVE = Path("livespec") / "ui-runners" / "ios.yaml"
 _SCENARIO_KEYS = frozenset({"name", "test_scheme", "launch_arguments"})

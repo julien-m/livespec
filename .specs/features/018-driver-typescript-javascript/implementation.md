@@ -46,7 +46,7 @@ status: Implemented
 |---|---|---|
 | AC-001 | `test_registry_loads_typescript_driver`, `test_typescript_driver_detects_package_json` | Implemented |
 | AC-002 | `tests/integration/test_driver_typescript_flow.py::test_jest_project_with_pnpm_runs_jest_coverage`, `test_vitest_project_with_bun_package_manager_field_runs_vitest_coverage`, `test_detect_test_runner_*` | Implemented |
-| AC-003 | `tests/integration/test_driver_typescript_flow.py` (both runners write `coverage/lcov.info`, parsed by `livespec test`) | Implemented |
+| AC-003 | `tests/integration/test_driver_typescript_flow.py` (both runners write the lcov report parsed by livespec test) | Implemented |
 | AC-004 | `test_coverage_capability_metadata` (threshold field) | Implemented |
 | AC-005 | `test_snapshots_capability_metadata` | Implemented |
 | AC-006 | Encoded in YAML (vitest / jest native diff + `-u` hint surfaced by runner output) | Implemented |

@@ -52,7 +52,7 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | FR-034 | `validator/journeys/compiler.py` | `@spec FR-034` | ⚠️ Partial — only `min_margin` and `text_fits` compile to Playwright assertions; the uncalled Python evaluator was removed 2026-10-12 | 2026-10-12 |
 | FR-035 | `validator/journeys/schema.py` | `@spec FR-035` | ✅ Implemented | 2026-10-12 |
 | FR-036 | `validator/journeys/compiler.py` | `@spec FR-036` | ✅ Implemented | 2026-10-12 |
-| FR-037 | `validator/journeys/visual_receipts.py`, `validator/cli_commands/journey_cmd.py`, `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-037` | ✅ Implemented (agent receipt + CLI verification; `llm_visual.py` removed 2026-10-12) | 2026-10-12 |
+| FR-037 | `validator/journeys/visual_receipts.py`, `validator/cli_commands/journey_cmd.py`, `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-037` | ✅ Implemented (agent receipt + CLI verification; the provider-based evaluator was removed 2026-10-12) | 2026-10-12 |
 | FR-038 | `validator/journeys/schema.py`, `validator/journeys/visual_receipts.py`, `validator/cli_commands/journey_cmd.py`, `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-038` | ✅ Implemented | 2026-10-12 |
 | FR-039 | `validator/journeys/schema.py`, `validator/journeys/visual_receipts.py` | `@spec FR-039` | ✅ Implemented | 2026-10-12 |
 | FR-040 | `validator/journeys/migration.py`, `validator/journeys/paths.py`, `migrations/20/migrate.md`, `scripts/migrate-journeys-compile.sh` | `@spec FR-040` | ✅ Implemented | 2026-06-09 |
