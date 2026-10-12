@@ -11,7 +11,7 @@
 
 - Wired: the Python driver now resolves `{module}`/`{report_path}`/`{threshold}` (via the previously unused `detect_python_module`), fixing `livespec test` on Python projects (017); iOS/Android UI runner detection now reads the `ios.yaml`/`android.yaml` `detect:` blocks (030, 031).
 - Retired (FR/AC marked Removed or remapped): Go, Swift and syrupy detectors and the unused Cargo.toml/JVM build-file helpers (017, 019–022); `deduplicate_tests` and a tautological test (006); journey assignment/bootstrap helpers and the native visual evaluator (057).
-- Undecided, kept and flagged Partial: TypeScript runner/package-manager detection (018) and the LLM visual evaluator (057).
+- Follow-up (user decisions): TypeScript commands now follow the detected jest/vitest runner and npm/pnpm/yarn/bun manager with override priority and Stryker/fast-check skip hints (018); web runner detection reads `web.yaml` (028); the iOS runner reads `test_scheme`/`scenarios` from the project `ios.yaml` (explicit > project config > detection) (030); LLM visual contracts are evaluated by the agent and verified by `livespec journey visual-verify`, replacing the unwired `llm_visual.py` (057). EC-002 stays a judgment call for `/spec-implement`.
 
 ## 2026-10-12 — Refactor: test-suite cleanup lot 5
 
