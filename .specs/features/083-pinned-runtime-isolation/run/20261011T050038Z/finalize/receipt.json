@@ -1,0 +1,31 @@
+{
+  "command": "spec-specify",
+  "created_at": "2026-10-11T05:00:38.964240+00:00",
+  "feature_slug": "083-pinned-runtime-isolation",
+  "files": [
+    {
+      "path": ".specs/features/083-pinned-runtime-isolation/changelog.md",
+      "sha256": "1be2569a742677aaa52650e197b2aa102061595cb9f289dc951a46f491452811"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "f424c63fbf74f7ed68a63606107c92b5b429f95178dbf7e737361204d64a0d03"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "e6f1489400aca80896e93b310b00dde7830782a76e05f16e4dfa4aeda2f1317a"
+    },
+    {
+      "path": ".specs/features/083-pinned-runtime-isolation/spec.md",
+      "sha256": "037ea7ff10771eaf404f69c3ff71bd23e51008e2e3ddeaf3b0f121c221950c96"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "applied",
+  "payload_hash": "60b23cb40670907dc69927446dd994d0a835ed2618709320e3d59bee49757489",
+  "receipt_hash": "ef077b3a646e3e3a41d6004368815e243a5d87d3a01cfbdd2f6a2f66dfa2e2a3",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

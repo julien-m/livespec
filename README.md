@@ -546,6 +546,53 @@ This asks `cc-hub` to install only the two bootstrap skills required before a
 project has `.specs/`:
 - `spec-init` and `spec-migrate` as portable skills for Claude Code and Codex
 
+### Pinned runtime for consumer projects
+
+<!-- @spec FR-013: Docs and migration — .specs/features/083-pinned-runtime-isolation/spec.md#fr-013 -->
+
+Consumer projects should run an immutable LiveSpec snapshot they pin, not the mutable
+development checkout. Full reference: [`docs/cli-reference.md`](docs/cli-reference.md#livespec-runtime).
+
+```bash
+cd ~/projects/livespec && python3 -m validator.cli runtime install --source ~/projects/livespec --ref <commit>
+# first snapshot via the checkout's own CLI; later `livespec runtime install` runs through the shim
+export PATH="$HOME/.livespec/bin:$PATH"   # shim before /opt/homebrew/bin/livespec (editable install)
+livespec runtime pin                      # in the project: writes .specs/livespec.lock
+livespec runtime upgrade --to current     # later, voluntarily; run /spec-migrate if reported
+livespec runtime dev --project . --source .   # the LiveSpec repository itself
+livespec runtime status --json            # drift findings (also part of livespec doctor)
+livespec runtime defect --command '<cmd>' --error '<error>' --feature <slug> --phase <phase>
+```
+
+Fresh machine (no `livespec` CLI yet): `cd <livespec repo> && python3 -m validator.cli runtime install
+--source <livespec repo> --ref <commit from lock>`,
+then `<home>/versions/<id>/scripts/link-local.sh <project> <home>/versions/<id>` and
+`livespec runtime pin --runtime <id from lock>`. To delete a read-only snapshot:
+`chmod -R u+w ~/.livespec/versions/<id> && rm -rf ~/.livespec/versions/<id>`.
+Consumer sessions follow [`system/tool-project-boundary.md`](system/tool-project-boundary.md).
+
+Migrating an existing consumer project such as Handy:
+
+<!-- runtime-migration:start -->
+```bash
+# 1. Install a snapshot of a committed LiveSpec tree (never the dirty dev checkout).
+git -C ~/projects/livespec fetch origin
+cd ~/projects/livespec && python3 -m validator.cli runtime install --source ~/projects/livespec --ref origin/main
+# 2. Put the shim before any editable livespec (e.g. /opt/homebrew/bin/livespec); persist in ~/.zshrc.
+export PATH="$HOME/.livespec/bin:$PATH"
+hash -r
+command -v livespec
+# 3. Pin the consumer project to that runtime (lock, .livespec-path, LiveSpec-owned links).
+cd ~/projects/handy
+livespec runtime pin
+# 4. Verify: mode "pinned" and no ERROR or WARNING runtime finding.
+livespec runtime status --json
+# 5. Commit the portable lock (.specs/.livespec-path and .agent-sync.local/ stay machine-local).
+git add .specs/livespec.lock
+git commit -m "chore: pin LiveSpec runtime"
+```
+<!-- runtime-migration:end -->
+
 ### Per-project (automatic after bootstrap)
 
 When you run `/spec-init` in a project, LiveSpec syncs `.agent-sync` assets

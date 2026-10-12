@@ -430,6 +430,8 @@ When all features are shipped:
 
 ---
 
+> **Read** [`system/tool-project-boundary.md`](../../../system/tool-project-boundary.md) before any consumer-project feature work: LiveSpec tool defects are reported with `livespec runtime defect` and never enter the project critical path (agents reading through symlinks: `system/tool-project-boundary.md` in the LiveSpec root recorded in `.specs/.livespec-path`).
+
 ## Internal Command Invocations
 
 - [subagent] `/spec-preflight` — executable full preflight command; resolve current LiveSpec `project_root`, run child with `cwd`/working directory=`project_root`; if native cwd is unavailable, child prompt must first `cd <project_root>` and **Read** [`../../../.specs/spec-system.md`](../../../.specs/spec-system.md) before command; child owns its goal.

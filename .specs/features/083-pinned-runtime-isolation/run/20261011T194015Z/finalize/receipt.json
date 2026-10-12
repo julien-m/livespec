@@ -1,0 +1,35 @@
+{
+  "command": "spec-implement",
+  "created_at": "2026-10-11T19:40:15.500771+00:00",
+  "feature_slug": "083-pinned-runtime-isolation",
+  "files": [
+    {
+      "path": ".specs/features/083-pinned-runtime-isolation/changelog.md",
+      "sha256": "196cc34d5fb18e63e1e6120310fb3c7c56973d81439e8509a33e2aa147e30535"
+    },
+    {
+      "path": ".specs/changelog.md",
+      "sha256": "04268d7f93e5ec0ce077137b6fef46aff0686fa339dc07ef84f0be37515cd871"
+    },
+    {
+      "path": ".specs/README.md",
+      "sha256": "6e4924d38c0d095d5b9ac3dad8735791ee3124a0c63124e834a408ab98ed8b6e"
+    },
+    {
+      "path": ".specs/features/083-pinned-runtime-isolation/spec.md",
+      "sha256": "77d27b71be13ca42851b55aeb4acce859534f01ab546d5be4170cd346201d12c"
+    },
+    {
+      "path": ".specs/roadmap.md",
+      "sha256": "706c9739aef62bd97b9ad9d123d066294101528a9dbc339a237272b9ab43daaa"
+    }
+  ],
+  "oracle": "livespec-finalize-evidence",
+  "oracle_version": "1",
+  "outcome": "verified",
+  "payload_hash": "de148fd7ffe69576169e498f12442a7331ff345d5964e4d1c799c321819f4435",
+  "receipt_hash": "f0d60331c51522f6cb10b0a969f4df4dc39043580d3e71ee84eb3a7ec1f16d9a",
+  "schema_version": "1",
+  "verdict": "PASS",
+  "violations": []
+}

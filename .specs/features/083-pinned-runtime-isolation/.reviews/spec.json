@@ -1,0 +1,544 @@
+{
+  "schema_version": "1",
+  "policy_version": "078.1",
+  "context_hash": "0cda79b3f69fe63b9fed2866177c2e43006828ba183b3ea12f9b5e1417691571",
+  "source_hashes": {
+    ".specs/constitution.md": "528bbf9bad1fed9b13790ff410f7b1d358c2eca875e5d05e369652fe16556b35",
+    ".specs/features/083-pinned-runtime-isolation/spec.md": "037ea7ff10771eaf404f69c3ff71bd23e51008e2e3ddeaf3b0f121c221950c96",
+    ".specs/project.md": "3e765d227b2f4fd7dced6f898124d875c1b38cd42ad8e0e1ac1d36423c2e9270",
+    ".specs/stacks/_default.md": "8e715fcb16da0b377cadbed4f5da06222ecd9319b4e6f822b0d97bb723d53686"
+  },
+  "reviewer_model": "claude-opus-5-5",
+  "complete": true,
+  "ready": true,
+  "errors": [],
+  "conclusions": [
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-001",
+      "disposition": "covered",
+      "rationale": "Commit-only install to versions/ and current; FR-001..003 align",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "only from a committed tree"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-002",
+      "disposition": "covered",
+      "rationale": "Dirty tree refusal listing paths; matches FR-001",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "working tree is refused"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-003",
+      "disposition": "covered",
+      "rationale": "Idempotent reinstall reports reused; matches FR-003",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "Install is idempotent"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-004",
+      "disposition": "covered",
+      "rationale": "Nearest-lock resolution ignores parent lock; FR-004",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "The shim resolves the"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-005",
+      "disposition": "covered",
+      "rationale": "Missing snapshot exits 3 with recovery, no fallback; FR-004",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "never fall back"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-006",
+      "disposition": "covered",
+      "rationale": "Portable lock without absolute paths; FR-005",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "the committed portable lock"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-007",
+      "disposition": "covered",
+      "rationale": "Missing links reported, project-owned entries kept; FR-006",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "leave project-owned entries"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-008",
+      "disposition": "covered",
+      "rationale": "Pin and upgrade share the same rule; FR-007",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "same rule for pin"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-009",
+      "disposition": "covered",
+      "rationale": "Upgrade over pinned lock reports migration_required; FR-007",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "existing pinned lock"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-010",
+      "disposition": "covered",
+      "rationale": "Migration guard not bypassed; FR-009",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "bypass the migration guard"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-011",
+      "disposition": "covered",
+      "rationale": "Dev lock records mode dev and source; FR-008",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "declare dev mode"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-012",
+      "disposition": "covered",
+      "rationale": "Boundary rule as exactly one line; FR-010",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "Add the boundary rule"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-013",
+      "disposition": "covered",
+      "rationale": "blocked-by-tool status when tool missing; FR-011",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "status `blocked-by-tool`"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-014",
+      "disposition": "covered",
+      "rationale": "Exit 2 with no writes on rejected input; FR-011",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "or `unpinned` plus"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-015",
+      "disposition": "covered",
+      "rationale": "Status reports all findings cumulatively; FR-012",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "all findings cumulatively"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-016",
+      "disposition": "covered",
+      "rationale": "Finding severities defined; dev-source edge noted",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "the executing runtime root"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-017",
+      "disposition": "covered",
+      "rationale": "Nonzero exit iff an ERROR finding exists; FR-012",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "when an ERROR finding exists"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:AC-018",
+      "disposition": "covered",
+      "rationale": "Fresh-machine fixture test for every subcommand; FR-013",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "verified by a fixture test"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-001",
+      "disposition": "covered",
+      "rationale": "Committed-tree snapshot, tests/ excluded; testable",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "`tests/` excluded"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-002",
+      "disposition": "covered",
+      "rationale": "Atomic publish in one operation; testable",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "in one operation"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-003",
+      "disposition": "covered",
+      "rationale": "Snapshots never overwritten; idempotent install",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "never overwritten"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-004",
+      "disposition": "covered",
+      "rationale": "Shim resolves lock without digest recompute",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "(no digest recomputation)"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-005",
+      "disposition": "covered",
+      "rationale": "Pin writes portable lock, never creates links",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "Pin never creates links"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-006",
+      "disposition": "covered",
+      "rationale": "Link check deterministic; cc-hub not invoked",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "cc-hub is not invoked"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-007",
+      "disposition": "covered",
+      "rationale": "Same-runtime pin is a no-op; upgrade rule defined",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "runtime id is a no-op"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-008",
+      "disposition": "covered",
+      "rationale": "Dev lock writing defined",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "writes a dev lock"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-009",
+      "disposition": "covered",
+      "rationale": "Migrate keeps current guard; constitution-approved",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "keeps its current guard behavior"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-010",
+      "disposition": "covered",
+      "rationale": "Boundary rule applies in every lock mode",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "applies in every lock mode"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-011",
+      "disposition": "covered",
+      "rationale": "Writes confined to allowed paths; testable",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "writes only inside"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-012",
+      "disposition": "covered",
+      "rationale": "Status via read-only git queries; defined",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "read-only git queries"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:FR-013",
+      "disposition": "covered",
+      "rationale": "Fixture test covers every runtime subcommand",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589",
+          "excerpt": "every runtime subcommand"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:SC-001",
+      "disposition": "covered",
+      "rationale": "AC-to-test matrix in temp dirs; measurable",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648",
+          "excerpt": "AC-to-test matrix"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:SC-002",
+      "disposition": "covered",
+      "rationale": "Protected set enumerated in Clarifications",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648",
+          "excerpt": "canonical protected set"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:SC-003",
+      "disposition": "covered",
+      "rationale": "Measurable; dev-lock read bound implicit",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648",
+          "excerpt": "Instrumented shim"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    },
+    {
+      "requirement_id": "083-pinned-runtime-isolation:SC-004",
+      "disposition": "covered",
+      "rationale": "Concrete end state: pinned, zero ERROR/WARNING",
+      "source_citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648",
+          "excerpt": "zero ERROR or WARNING"
+        }
+      ],
+      "plan_citations": [],
+      "searched_plan_sections": []
+    }
+  ],
+  "ambiguities": [],
+  "extra_scope": [],
+  "findings": [
+    {
+      "category": "feasibility",
+      "severity": "warning",
+      "description": "Recovery after a missing pinned snapshot dispatches to <home>/current, which the scenario never establishes; on a fresh machine without current the recovery path is undefined.",
+      "suggestion": "Add the <home>/current precondition or define recovery when current is absent.",
+      "citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L125-L172",
+          "excerpt": "Then the shim dispatches the runtime subcommand to \"<home>/current\""
+        }
+      ]
+    },
+    {
+      "category": "errors",
+      "severity": "warning",
+      "description": "AC-016 gives a dev-lock project exactly one INFO even if the dev source checkout is missing, while the shim fails there; status would under-report an unusable runtime.",
+      "suggestion": "Report an ERROR when the dev source is missing or not a LiveSpec checkout.",
+      "citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L562-L565",
+          "excerpt": "exactly one INFO"
+        }
+      ]
+    },
+    {
+      "category": "feasibility",
+      "severity": "info",
+      "description": "Removing write permissions before renaming a snapshot into versions/ may fail on some platforms; no cleanup path is described for a corrupt snapshot.",
+      "suggestion": "Chmod after rename or stage inside versions/; document corrupt-snapshot removal.",
+      "citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L102-L124",
+          "excerpt": "H[Remove write permissions and rename into place]"
+        }
+      ]
+    },
+    {
+      "category": "testability",
+      "severity": "info",
+      "description": "SC-003 bounds reads to one lock and one manifest; a dev lock has no manifest, so the dev-mode read bound is implicit.",
+      "suggestion": "State the dev-lock read bound in SC-003.",
+      "citations": [
+        {
+          "section_id": ".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648",
+          "excerpt": "read at most one lock and one manifest"
+        }
+      ]
+    },
+    {
+      "category": "stack",
+      "severity": "info",
+      "description": "Stack lists only the editable install; the constitution and ADR-004 add runtime snapshots and a CLI shim not yet recorded in the stack.",
+      "suggestion": "Record snapshots and shim via /spec-stack.",
+      "citations": [
+        {
+          "section_id": ".specs/stacks/_default.md:L13-L38",
+          "excerpt": "editable install (`pip install -e .`)"
+        }
+      ]
+    }
+  ],
+  "confidence": 4,
+  "raw_results": [
+    "{\"batch_id\":\"batch-001\",\"reviewed_section_ids\":[\".specs/constitution.md:L1-L8\",\".specs/constitution.md:L9-L18\",\".specs/constitution.md:L19-L20\",\".specs/constitution.md:L21-L26\",\".specs/constitution.md:L27-L32\",\".specs/constitution.md:L33-L38\",\".specs/constitution.md:L39-L44\",\".specs/constitution.md:L45-L51\",\".specs/constitution.md:L52-L58\",\".specs/constitution.md:L59-L60\",\".specs/constitution.md:L61-L67\",\".specs/constitution.md:L68-L73\",\".specs/constitution.md:L74-L77\",\".specs/constitution.md:L78-L83\",\".specs/constitution.md:L84-L85\",\".specs/constitution.md:L86-L92\",\".specs/constitution.md:L93-L98\",\".specs/constitution.md:L99-L104\",\".specs/constitution.md:L105-L111\",\".specs/constitution.md:L112-L113\",\".specs/constitution.md:L114-L120\",\".specs/constitution.md:L121-L125\",\".specs/constitution.md:L126-L133\",\".specs/constitution.md:L134-L148\",\".specs/project.md:L1-L7\",\".specs/project.md:L8-L20\",\".specs/project.md:L21-L29\",\".specs/project.md:L30-L43\",\".specs/project.md:L44-L54\",\".specs/project.md:L55-L63\",\".specs/project.md:L64-L73\",\".specs/project.md:L74-L82\",\".specs/stacks/_default.md:L1-L5\",\".specs/stacks/_default.md:L6-L12\",\".specs/stacks/_default.md:L13-L38\",\".specs/stacks/_default.md:L39-L48\",\".specs/stacks/_default.md:L49-L60\",\".specs/stacks/_default.md:L61-L68\",\".specs/stacks/_default.md:L69-L71\",\".specs/features/083-pinned-runtime-isolation/spec.md:L1-L9\",\".specs/features/083-pinned-runtime-isolation/spec.md:L10-L18\",\".specs/features/083-pinned-runtime-isolation/spec.md:L19-L29\",\".specs/features/083-pinned-runtime-isolation/spec.md:L30-L36\",\".specs/features/083-pinned-runtime-isolation/spec.md:L37-L52\",\".specs/features/083-pinned-runtime-isolation/spec.md:L53-L54\",\".specs/features/083-pinned-runtime-isolation/spec.md:L55-L101\",\".specs/features/083-pinned-runtime-isolation/spec.md:L102-L124\",\".specs/features/083-pinned-runtime-isolation/spec.md:L125-L172\",\".specs/features/083-pinned-runtime-isolation/spec.md:L173-L187\",\".specs/features/083-pinned-runtime-isolation/spec.md:L188-L238\",\".specs/features/083-pinned-runtime-isolation/spec.md:L239-L257\",\".specs/features/083-pinned-runtime-isolation/spec.md:L258-L298\",\".specs/features/083-pinned-runtime-isolation/spec.md:L299-L318\"],\"conclusions\":[],\"ambiguities\":[],\"extra_scope\":[],\"findings\":[{\"category\":\"feasibility\",\"severity\":\"warning\",\"description\":\"Shim recovery for a missing pinned snapshot relies on <home>/current, which the Given omits; with no current (fresh clone) every command exits 3.\",\"suggestion\":\"Add the <home>/current precondition and state that recovery then uses the checkout CLI.\",\"citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L125-L172\",\"excerpt\":\"Then the shim dispatches the runtime subcommand to \\\"<home>/current\\\"\"}]},{\"category\":\"feasibility\",\"severity\":\"info\",\"description\":\"Removing all write bits before renaming a directory into versions/ can fail (Linux needs write on a moved dir); no cleanup path for a corrupt snapshot.\",\"suggestion\":\"Stage under <home>/versions/ or chmod after rename; document corrupt-snapshot removal.\",\"citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L102-L124\",\"excerpt\":\"H[Remove write permissions and rename into place]\"}]}],\"confidence\":4,\"synthesized_batch_ids\":[]}",
+    "{\"batch_id\":\"batch-002\",\"reviewed_section_ids\":[\".specs/constitution.md:L1-L8\",\".specs/constitution.md:L9-L18\",\".specs/constitution.md:L19-L20\",\".specs/constitution.md:L21-L26\",\".specs/constitution.md:L27-L32\",\".specs/constitution.md:L33-L38\",\".specs/constitution.md:L39-L44\",\".specs/constitution.md:L45-L51\",\".specs/constitution.md:L52-L58\",\".specs/constitution.md:L59-L60\",\".specs/constitution.md:L61-L67\",\".specs/constitution.md:L68-L73\",\".specs/constitution.md:L74-L77\",\".specs/constitution.md:L78-L83\",\".specs/constitution.md:L84-L85\",\".specs/constitution.md:L86-L92\",\".specs/constitution.md:L93-L98\",\".specs/constitution.md:L99-L104\",\".specs/constitution.md:L105-L111\",\".specs/constitution.md:L112-L113\",\".specs/constitution.md:L114-L120\",\".specs/constitution.md:L121-L125\",\".specs/constitution.md:L126-L133\",\".specs/constitution.md:L134-L148\",\".specs/project.md:L1-L7\",\".specs/project.md:L8-L20\",\".specs/project.md:L21-L29\",\".specs/project.md:L30-L43\",\".specs/project.md:L44-L54\",\".specs/project.md:L55-L63\",\".specs/project.md:L64-L73\",\".specs/project.md:L74-L82\",\".specs/stacks/_default.md:L1-L5\",\".specs/stacks/_default.md:L6-L12\",\".specs/stacks/_default.md:L13-L38\",\".specs/stacks/_default.md:L39-L48\",\".specs/stacks/_default.md:L49-L60\",\".specs/stacks/_default.md:L61-L68\",\".specs/stacks/_default.md:L69-L71\",\".specs/features/083-pinned-runtime-isolation/spec.md:L319-L363\",\".specs/features/083-pinned-runtime-isolation/spec.md:L364-L381\",\".specs/features/083-pinned-runtime-isolation/spec.md:L382-L435\",\".specs/features/083-pinned-runtime-isolation/spec.md:L436-L462\",\".specs/features/083-pinned-runtime-isolation/spec.md:L463-L485\",\".specs/features/083-pinned-runtime-isolation/spec.md:L486-L499\",\".specs/features/083-pinned-runtime-isolation/spec.md:L500-L501\",\".specs/features/083-pinned-runtime-isolation/spec.md:L502-L505\",\".specs/features/083-pinned-runtime-isolation/spec.md:L506-L509\",\".specs/features/083-pinned-runtime-isolation/spec.md:L510-L513\",\".specs/features/083-pinned-runtime-isolation/spec.md:L514-L517\",\".specs/features/083-pinned-runtime-isolation/spec.md:L518-L521\",\".specs/features/083-pinned-runtime-isolation/spec.md:L522-L525\",\".specs/features/083-pinned-runtime-isolation/spec.md:L526-L529\",\".specs/features/083-pinned-runtime-isolation/spec.md:L530-L533\",\".specs/features/083-pinned-runtime-isolation/spec.md:L534-L537\",\".specs/features/083-pinned-runtime-isolation/spec.md:L538-L541\",\".specs/features/083-pinned-runtime-isolation/spec.md:L542-L545\",\".specs/features/083-pinned-runtime-isolation/spec.md:L546-L549\",\".specs/features/083-pinned-runtime-isolation/spec.md:L550-L553\",\".specs/features/083-pinned-runtime-isolation/spec.md:L554-L557\",\".specs/features/083-pinned-runtime-isolation/spec.md:L558-L561\",\".specs/features/083-pinned-runtime-isolation/spec.md:L562-L565\",\".specs/features/083-pinned-runtime-isolation/spec.md:L566-L569\",\".specs/features/083-pinned-runtime-isolation/spec.md:L570-L573\"],\"conclusions\":[{\"requirement_id\":\"083-pinned-runtime-isolation:AC-001\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L502-L505\",\"excerpt\":\"`<home>/current`\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-002\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L506-L509\",\"excerpt\":\"the dirty paths\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-003\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L510-L513\",\"excerpt\":\"reports `reused`\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-004\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L514-L517\",\"excerpt\":\"(parent project\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-005\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L518-L521\",\"excerpt\":\"The shim exits 3\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-006\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L522-L525\",\"excerpt\":\"(no absolute path\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-007\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L526-L529\",\"excerpt\":\"listed as missing\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-008\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L530-L533\",\"excerpt\":\"Pin and upgrade\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-009\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L534-L537\",\"excerpt\":\"migration_required\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-010\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L538-L541\",\"excerpt\":\"migration guard\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-011\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L542-L545\",\"excerpt\":\"`mode` `dev` and\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-012\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L546-L549\",\"excerpt\":\"exactly one line\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-013\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L550-L553\",\"excerpt\":\"`blocked-by-tool`\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-014\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L554-L557\",\"excerpt\":\"exits 2 with no\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-015\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L558-L561\",\"excerpt\":\"cumulatively (for\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-016\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L562-L565\",\"excerpt\":\"an invalid lock\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-017\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L566-L569\",\"excerpt\":\"if and only if an\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-018\",\"disposition\":\"covered\",\"rationale\":\"Clear\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L570-L573\",\"excerpt\":\"fresh-machine re\"}]}],\"ambiguities\":[],\"extra_scope\":[],\"findings\":[{\"category\":\"errors\",\"severity\":\"warning\",\"description\":\"Bad dev source: shim exits 3, status only INFO.\",\"suggestion\":\"Report ERROR.\",\"citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L562-L565\",\"excerpt\":\"exactly one INFO\"}]}],\"confidence\":4,\"synthesized_batch_ids\":[]}",
+    "{\"batch_id\":\"batch-003\",\"reviewed_section_ids\":[\".specs/constitution.md:L1-L8\",\".specs/constitution.md:L9-L18\",\".specs/constitution.md:L19-L20\",\".specs/constitution.md:L21-L26\",\".specs/constitution.md:L27-L32\",\".specs/constitution.md:L33-L38\",\".specs/constitution.md:L39-L44\",\".specs/constitution.md:L45-L51\",\".specs/constitution.md:L52-L58\",\".specs/constitution.md:L59-L60\",\".specs/constitution.md:L61-L67\",\".specs/constitution.md:L68-L73\",\".specs/constitution.md:L74-L77\",\".specs/constitution.md:L78-L83\",\".specs/constitution.md:L84-L85\",\".specs/constitution.md:L86-L92\",\".specs/constitution.md:L93-L98\",\".specs/constitution.md:L99-L104\",\".specs/constitution.md:L105-L111\",\".specs/constitution.md:L112-L113\",\".specs/constitution.md:L114-L120\",\".specs/constitution.md:L121-L125\",\".specs/constitution.md:L126-L133\",\".specs/constitution.md:L134-L148\",\".specs/project.md:L1-L7\",\".specs/project.md:L8-L20\",\".specs/project.md:L21-L29\",\".specs/project.md:L30-L43\",\".specs/project.md:L44-L54\",\".specs/project.md:L55-L63\",\".specs/project.md:L64-L73\",\".specs/project.md:L74-L82\",\".specs/stacks/_default.md:L1-L5\",\".specs/stacks/_default.md:L6-L12\",\".specs/stacks/_default.md:L13-L38\",\".specs/stacks/_default.md:L39-L48\",\".specs/stacks/_default.md:L49-L60\",\".specs/stacks/_default.md:L61-L68\",\".specs/stacks/_default.md:L69-L71\",\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\".specs/features/083-pinned-runtime-isolation/spec.md:L590-L600\",\".specs/features/083-pinned-runtime-isolation/spec.md:L601-L616\",\".specs/features/083-pinned-runtime-isolation/spec.md:L617-L626\",\".specs/features/083-pinned-runtime-isolation/spec.md:L627-L640\",\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\"],\"conclusions\":[{\"requirement_id\":\"083-pinned-runtime-isolation:AC-001\",\"disposition\":\"covered\",\"rationale\":\"FR-001..003\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"only from a committed tree\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-002\",\"disposition\":\"covered\",\"rationale\":\"FR-001\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"working tree is refused\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-003\",\"disposition\":\"covered\",\"rationale\":\"FR-003\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"Install is idempotent\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-004\",\"disposition\":\"covered\",\"rationale\":\"FR-004\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"The shim resolves the\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-005\",\"disposition\":\"covered\",\"rationale\":\"FR-004\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"never fall back\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-006\",\"disposition\":\"covered\",\"rationale\":\"FR-005\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"the committed portable lock\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-007\",\"disposition\":\"covered\",\"rationale\":\"FR-006\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"leave project-owned entries\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-008\",\"disposition\":\"covered\",\"rationale\":\"FR-007\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"same rule for pin\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-009\",\"disposition\":\"covered\",\"rationale\":\"FR-007\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"existing pinned lock\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-010\",\"disposition\":\"covered\",\"rationale\":\"FR-009\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"bypass the migration guard\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-011\",\"disposition\":\"covered\",\"rationale\":\"FR-008\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"declare dev mode\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-012\",\"disposition\":\"covered\",\"rationale\":\"FR-010\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"Add the boundary rule\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-013\",\"disposition\":\"covered\",\"rationale\":\"FR-011\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"status `blocked-by-tool`\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-014\",\"disposition\":\"covered\",\"rationale\":\"FR-011\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"or `unpinned` plus\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-015\",\"disposition\":\"covered\",\"rationale\":\"FR-012\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"all findings cumulatively\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-016\",\"disposition\":\"covered\",\"rationale\":\"FR-012\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"the executing runtime root\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-017\",\"disposition\":\"covered\",\"rationale\":\"FR-012\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"when an ERROR finding exists\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-018\",\"disposition\":\"covered\",\"rationale\":\"FR-013\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"verified by a fixture test\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-001\",\"disposition\":\"covered\",\"rationale\":\"Defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"`tests/` excluded\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-002\",\"disposition\":\"covered\",\"rationale\":\"Atomic publish\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"in one operation\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-003\",\"disposition\":\"covered\",\"rationale\":\"Testable\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"never overwritten\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-004\",\"disposition\":\"covered\",\"rationale\":\"Defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"(no digest recomputation)\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-005\",\"disposition\":\"covered\",\"rationale\":\"Defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"Pin never creates links\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-006\",\"disposition\":\"covered\",\"rationale\":\"Deterministic\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"cc-hub is not invoked\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-007\",\"disposition\":\"covered\",\"rationale\":\"Defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"runtime id is a no-op\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-008\",\"disposition\":\"covered\",\"rationale\":\"Dev lock defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"writes a dev lock\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-009\",\"disposition\":\"covered\",\"rationale\":\"Constitution-approved\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"keeps its current guard behavior\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-010\",\"disposition\":\"covered\",\"rationale\":\"Defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"applies in every lock mode\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-011\",\"disposition\":\"covered\",\"rationale\":\"Defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"writes only inside\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-012\",\"disposition\":\"covered\",\"rationale\":\"Defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"read-only git queries\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-013\",\"disposition\":\"covered\",\"rationale\":\"Testable\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"every runtime subcommand\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:SC-001\",\"disposition\":\"covered\",\"rationale\":\"Measurable\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"AC-to-test matrix\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:SC-002\",\"disposition\":\"covered\",\"rationale\":\"Protected set enumerated\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"canonical protected set\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:SC-003\",\"disposition\":\"covered\",\"rationale\":\"Measurable; dev read set implicit\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"Instrumented shim\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:SC-004\",\"disposition\":\"covered\",\"rationale\":\"Concrete end state\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"zero ERROR or WARNING\"}]}],\"ambiguities\":[],\"extra_scope\":[],\"findings\":[{\"category\":\"stack\",\"severity\":\"info\",\"description\":\"Stack lists only editable install; constitution and ADR-004 add runtime snapshots and a shim.\",\"suggestion\":\"Record snapshots and shim via /spec-stack.\",\"citations\":[{\"section_id\":\".specs/stacks/_default.md:L13-L38\",\"excerpt\":\"editable install (`pip install -e .`)\"}]},{\"category\":\"testability\",\"severity\":\"info\",\"description\":\"SC-003 read bound assumes a manifest; a dev lock has none, so the dev read set is implicit.\",\"suggestion\":\"State the dev-lock read bound.\",\"citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"read at most one lock and one manifest\"}]}],\"confidence\":4,\"synthesized_batch_ids\":[]}"
+  ],
+  "synthesis": "{\"batch_id\":\"synthesis\",\"reviewed_section_ids\":[\".specs/constitution.md:L1-L8\",\".specs/constitution.md:L9-L18\",\".specs/constitution.md:L19-L20\",\".specs/constitution.md:L21-L26\",\".specs/constitution.md:L27-L32\",\".specs/constitution.md:L33-L38\",\".specs/constitution.md:L39-L44\",\".specs/constitution.md:L45-L51\",\".specs/constitution.md:L52-L58\",\".specs/constitution.md:L59-L60\",\".specs/constitution.md:L61-L67\",\".specs/constitution.md:L68-L73\",\".specs/constitution.md:L74-L77\",\".specs/constitution.md:L78-L83\",\".specs/constitution.md:L84-L85\",\".specs/constitution.md:L86-L92\",\".specs/constitution.md:L93-L98\",\".specs/constitution.md:L99-L104\",\".specs/constitution.md:L105-L111\",\".specs/constitution.md:L112-L113\",\".specs/constitution.md:L114-L120\",\".specs/constitution.md:L121-L125\",\".specs/constitution.md:L126-L133\",\".specs/constitution.md:L134-L148\",\".specs/features/083-pinned-runtime-isolation/spec.md:L1-L9\",\".specs/features/083-pinned-runtime-isolation/spec.md:L10-L18\",\".specs/features/083-pinned-runtime-isolation/spec.md:L19-L29\",\".specs/features/083-pinned-runtime-isolation/spec.md:L30-L36\",\".specs/features/083-pinned-runtime-isolation/spec.md:L37-L52\",\".specs/features/083-pinned-runtime-isolation/spec.md:L53-L54\",\".specs/features/083-pinned-runtime-isolation/spec.md:L55-L101\",\".specs/features/083-pinned-runtime-isolation/spec.md:L102-L124\",\".specs/features/083-pinned-runtime-isolation/spec.md:L125-L172\",\".specs/features/083-pinned-runtime-isolation/spec.md:L173-L187\",\".specs/features/083-pinned-runtime-isolation/spec.md:L188-L238\",\".specs/features/083-pinned-runtime-isolation/spec.md:L239-L257\",\".specs/features/083-pinned-runtime-isolation/spec.md:L258-L298\",\".specs/features/083-pinned-runtime-isolation/spec.md:L299-L318\",\".specs/features/083-pinned-runtime-isolation/spec.md:L319-L363\",\".specs/features/083-pinned-runtime-isolation/spec.md:L364-L381\",\".specs/features/083-pinned-runtime-isolation/spec.md:L382-L435\",\".specs/features/083-pinned-runtime-isolation/spec.md:L436-L462\",\".specs/features/083-pinned-runtime-isolation/spec.md:L463-L485\",\".specs/features/083-pinned-runtime-isolation/spec.md:L486-L499\",\".specs/features/083-pinned-runtime-isolation/spec.md:L500-L501\",\".specs/features/083-pinned-runtime-isolation/spec.md:L502-L505\",\".specs/features/083-pinned-runtime-isolation/spec.md:L506-L509\",\".specs/features/083-pinned-runtime-isolation/spec.md:L510-L513\",\".specs/features/083-pinned-runtime-isolation/spec.md:L514-L517\",\".specs/features/083-pinned-runtime-isolation/spec.md:L518-L521\",\".specs/features/083-pinned-runtime-isolation/spec.md:L522-L525\",\".specs/features/083-pinned-runtime-isolation/spec.md:L526-L529\",\".specs/features/083-pinned-runtime-isolation/spec.md:L530-L533\",\".specs/features/083-pinned-runtime-isolation/spec.md:L534-L537\",\".specs/features/083-pinned-runtime-isolation/spec.md:L538-L541\",\".specs/features/083-pinned-runtime-isolation/spec.md:L542-L545\",\".specs/features/083-pinned-runtime-isolation/spec.md:L546-L549\",\".specs/features/083-pinned-runtime-isolation/spec.md:L550-L553\",\".specs/features/083-pinned-runtime-isolation/spec.md:L554-L557\",\".specs/features/083-pinned-runtime-isolation/spec.md:L558-L561\",\".specs/features/083-pinned-runtime-isolation/spec.md:L562-L565\",\".specs/features/083-pinned-runtime-isolation/spec.md:L566-L569\",\".specs/features/083-pinned-runtime-isolation/spec.md:L570-L573\",\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\".specs/features/083-pinned-runtime-isolation/spec.md:L590-L600\",\".specs/features/083-pinned-runtime-isolation/spec.md:L601-L616\",\".specs/features/083-pinned-runtime-isolation/spec.md:L617-L626\",\".specs/features/083-pinned-runtime-isolation/spec.md:L627-L640\",\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\".specs/project.md:L1-L7\",\".specs/project.md:L8-L20\",\".specs/project.md:L21-L29\",\".specs/project.md:L30-L43\",\".specs/project.md:L44-L54\",\".specs/project.md:L55-L63\",\".specs/project.md:L64-L73\",\".specs/project.md:L74-L82\",\".specs/stacks/_default.md:L1-L5\",\".specs/stacks/_default.md:L6-L12\",\".specs/stacks/_default.md:L13-L38\",\".specs/stacks/_default.md:L39-L48\",\".specs/stacks/_default.md:L49-L60\",\".specs/stacks/_default.md:L61-L68\",\".specs/stacks/_default.md:L69-L71\"],\"conclusions\":[{\"requirement_id\":\"083-pinned-runtime-isolation:AC-001\",\"disposition\":\"covered\",\"rationale\":\"Commit-only install to versions/ and current; FR-001..003 align\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"only from a committed tree\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-002\",\"disposition\":\"covered\",\"rationale\":\"Dirty tree refusal listing paths; matches FR-001\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"working tree is refused\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-003\",\"disposition\":\"covered\",\"rationale\":\"Idempotent reinstall reports reused; matches FR-003\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"Install is idempotent\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-004\",\"disposition\":\"covered\",\"rationale\":\"Nearest-lock resolution ignores parent lock; FR-004\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"The shim resolves the\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-005\",\"disposition\":\"covered\",\"rationale\":\"Missing snapshot exits 3 with recovery, no fallback; FR-004\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"never fall back\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-006\",\"disposition\":\"covered\",\"rationale\":\"Portable lock without absolute paths; FR-005\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"the committed portable lock\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-007\",\"disposition\":\"covered\",\"rationale\":\"Missing links reported, project-owned entries kept; FR-006\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"leave project-owned entries\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-008\",\"disposition\":\"covered\",\"rationale\":\"Pin and upgrade share the same rule; FR-007\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"same rule for pin\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-009\",\"disposition\":\"covered\",\"rationale\":\"Upgrade over pinned lock reports migration_required; FR-007\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"existing pinned lock\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-010\",\"disposition\":\"covered\",\"rationale\":\"Migration guard not bypassed; FR-009\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"bypass the migration guard\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-011\",\"disposition\":\"covered\",\"rationale\":\"Dev lock records mode dev and source; FR-008\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"declare dev mode\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-012\",\"disposition\":\"covered\",\"rationale\":\"Boundary rule as exactly one line; FR-010\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"Add the boundary rule\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-013\",\"disposition\":\"covered\",\"rationale\":\"blocked-by-tool status when tool missing; FR-011\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"status `blocked-by-tool`\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-014\",\"disposition\":\"covered\",\"rationale\":\"Exit 2 with no writes on rejected input; FR-011\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"or `unpinned` plus\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-015\",\"disposition\":\"covered\",\"rationale\":\"Status reports all findings cumulatively; FR-012\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"all findings cumulatively\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-016\",\"disposition\":\"covered\",\"rationale\":\"Finding severities defined; dev-source edge noted\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"the executing runtime root\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-017\",\"disposition\":\"covered\",\"rationale\":\"Nonzero exit iff an ERROR finding exists; FR-012\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"when an ERROR finding exists\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:AC-018\",\"disposition\":\"covered\",\"rationale\":\"Fresh-machine fixture test for every subcommand; FR-013\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"verified by a fixture test\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-001\",\"disposition\":\"covered\",\"rationale\":\"Committed-tree snapshot, tests/ excluded; testable\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"`tests/` excluded\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-002\",\"disposition\":\"covered\",\"rationale\":\"Atomic publish in one operation; testable\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"in one operation\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-003\",\"disposition\":\"covered\",\"rationale\":\"Snapshots never overwritten; idempotent install\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"never overwritten\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-004\",\"disposition\":\"covered\",\"rationale\":\"Shim resolves lock without digest recompute\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"(no digest recomputation)\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-005\",\"disposition\":\"covered\",\"rationale\":\"Pin writes portable lock, never creates links\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"Pin never creates links\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-006\",\"disposition\":\"covered\",\"rationale\":\"Link check deterministic; cc-hub not invoked\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"cc-hub is not invoked\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-007\",\"disposition\":\"covered\",\"rationale\":\"Same-runtime pin is a no-op; upgrade rule defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"runtime id is a no-op\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-008\",\"disposition\":\"covered\",\"rationale\":\"Dev lock writing defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"writes a dev lock\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-009\",\"disposition\":\"covered\",\"rationale\":\"Migrate keeps current guard; constitution-approved\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"keeps its current guard behavior\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-010\",\"disposition\":\"covered\",\"rationale\":\"Boundary rule applies in every lock mode\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"applies in every lock mode\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-011\",\"disposition\":\"covered\",\"rationale\":\"Writes confined to allowed paths; testable\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"writes only inside\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-012\",\"disposition\":\"covered\",\"rationale\":\"Status via read-only git queries; defined\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"read-only git queries\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:FR-013\",\"disposition\":\"covered\",\"rationale\":\"Fixture test covers every runtime subcommand\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L574-L589\",\"excerpt\":\"every runtime subcommand\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:SC-001\",\"disposition\":\"covered\",\"rationale\":\"AC-to-test matrix in temp dirs; measurable\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"AC-to-test matrix\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:SC-002\",\"disposition\":\"covered\",\"rationale\":\"Protected set enumerated in Clarifications\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"canonical protected set\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:SC-003\",\"disposition\":\"covered\",\"rationale\":\"Measurable; dev-lock read bound implicit\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"Instrumented shim\"}]},{\"requirement_id\":\"083-pinned-runtime-isolation:SC-004\",\"disposition\":\"covered\",\"rationale\":\"Concrete end state: pinned, zero ERROR/WARNING\",\"source_citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"zero ERROR or WARNING\"}]}],\"ambiguities\":[],\"extra_scope\":[],\"findings\":[{\"category\":\"feasibility\",\"severity\":\"warning\",\"description\":\"Recovery after a missing pinned snapshot dispatches to <home>/current, which the scenario never establishes; on a fresh machine without current the recovery path is undefined.\",\"suggestion\":\"Add the <home>/current precondition or define recovery when current is absent.\",\"citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L125-L172\",\"excerpt\":\"Then the shim dispatches the runtime subcommand to \\\"<home>/current\\\"\"}]},{\"category\":\"errors\",\"severity\":\"warning\",\"description\":\"AC-016 gives a dev-lock project exactly one INFO even if the dev source checkout is missing, while the shim fails there; status would under-report an unusable runtime.\",\"suggestion\":\"Report an ERROR when the dev source is missing or not a LiveSpec checkout.\",\"citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L562-L565\",\"excerpt\":\"exactly one INFO\"}]},{\"category\":\"feasibility\",\"severity\":\"info\",\"description\":\"Removing write permissions before renaming a snapshot into versions/ may fail on some platforms; no cleanup path is described for a corrupt snapshot.\",\"suggestion\":\"Chmod after rename or stage inside versions/; document corrupt-snapshot removal.\",\"citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L102-L124\",\"excerpt\":\"H[Remove write permissions and rename into place]\"}]},{\"category\":\"testability\",\"severity\":\"info\",\"description\":\"SC-003 bounds reads to one lock and one manifest; a dev lock has no manifest, so the dev-mode read bound is implicit.\",\"suggestion\":\"State the dev-lock read bound in SC-003.\",\"citations\":[{\"section_id\":\".specs/features/083-pinned-runtime-isolation/spec.md:L641-L648\",\"excerpt\":\"read at most one lock and one manifest\"}]},{\"category\":\"stack\",\"severity\":\"info\",\"description\":\"Stack lists only the editable install; the constitution and ADR-004 add runtime snapshots and a CLI shim not yet recorded in the stack.\",\"suggestion\":\"Record snapshots and shim via /spec-stack.\",\"citations\":[{\"section_id\":\".specs/stacks/_default.md:L13-L38\",\"excerpt\":\"editable install (`pip install -e .`)\"}]}],\"resolutions\":[],\"confidence\":4,\"synthesized_batch_ids\":[\"batch-001\",\"batch-002\",\"batch-003\"]}",
+  "synthesis_transport_version": "3"
+}

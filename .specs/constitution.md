@@ -33,6 +33,7 @@
 ### 3. File-System as Source of Truth
 - The `.specs/` directory is the sole source of truth for project state — no database, no remote service
 - All validator reads are from the file system; all writes are scoped to `.specs/` or the target project
+- Exception (ADR-004): `livespec runtime install` is an explicit, user-invoked machine-local install scope that writes only under the selected runtime home (`--home`, else `$LIVESPEC_HOME`, else `~/.livespec`); project-scoped `runtime` commands still write only inside the target project
 - Git is used for versioning and staged-file detection, never for state storage
 
 ### 4. Fail Fast, Exit Clearly
@@ -43,6 +44,7 @@
 
 ### 5. Minimal Surface, Maximum Composability
 - The CLI exposes a small number of well-defined subcommands: `validate`, `install-hook`, `pipeline`, `git`, `commit-context`
+- Related behaviour is grouped in command groups (for example `pipeline`, `goal`, `hooks`, `finalize`, `runtime`), each composing behaviour through flags; the `runtime` group (ADR-004) bypasses the migration guard so recovery works on stale projects
 - Features are composed via flags, not separate commands (e.g., `--coherence`, `--fix`, `--staged`)
 - No global state between invocations — the CLI is stateless except for what it reads from the file system
 - Every subcommand can be used independently or chained in CI pipelines
@@ -50,7 +52,7 @@
 ### 6. No Hosted Infrastructure
 - LiveSpec is a local developer tool and open-source library — no server, no SaaS, no telemetry
 - All LLM token costs are borne by the developer's own API key
-- Installation is via `pip install -e .` or globally via the bootstrap script
+- Installation is via `pip install -e .`, globally via the bootstrap script, or as immutable runtime snapshots plus a generated CLI shim installed by `livespec runtime install` beside the unchanged editable install (ADR-004)
 
 ---
 
