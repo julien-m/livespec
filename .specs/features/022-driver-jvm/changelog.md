@@ -61,3 +61,12 @@
 - **AC impacted:** None
 - **Author:** Claude Code (test-suite cleanup, lot 1)
 - Registry discovery is parametrized over the three build files; shipped scripts are derived from the manifest; Gradle/Maven parsing and Gradle priority stay in tests/unit/test_jvm_detector.py.
+
+## 2026-10-12 — Refactor: retire unused Python build-file detectors
+
+- **Type:** Refactor
+- **Spec modified:** Yes (FR-002, FR-003 annotated: implemented by shell scripts)
+- **Code modified:** validator/drivers/jvm_detector.py (detect_build_tool/parse_gradle_build/parse_maven_pom/parse_jvm_dependencies/has_jvm_dependency deleted), tests/unit/test_jvm_detector.py, livespec/drivers/scripts/jvm-*.sh (anchors), livespec/drivers/jvm.yaml (comment)
+- **AC impacted:** None (AC-010/AC-011 remapped to script tests)
+- **Author:** Claude Code (dead-code resolution)
+- The JVM scripts already detect Gradle/Maven and plugins themselves; the Python helpers duplicated that logic and were imported by tests only. `parse_pitest_xml` stays (used by `mutation_report.py`).

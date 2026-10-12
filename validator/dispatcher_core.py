@@ -1,3 +1,7 @@
+# LiveSpec traceability anchors
+# @spec(FR-005)
+# 030 FR-005: project ios.yaml scenarios feed scheme/launch arguments
+
 """Focused dispatch helpers for Phase 4.5 UI surfaces."""
 
 from __future__ import annotations
@@ -70,6 +74,11 @@ def _capture_surface_screens(
 ) -> list[VisualPhaseResult]:
     """Capture all requested screens for one preflight-passing surface."""
     capture_kwargs = _runner_config_to_kwargs(surface)
+    try:
+        capture_kwargs = _apply_ios_scenario(surface, handler, capture_kwargs)
+    except ValueError as exc:
+        logger.error("BLOCKED at step phase_4.5 - config_error - %s: %s", surface.runner, exc)
+        return [_error_row(surface, screen, exc) for screen in target_screens]
     shared = _shared_native_outcomes(surface, target_screens, handler, capture_kwargs)
     if isinstance(shared, list):
         return shared
@@ -223,6 +232,27 @@ _RUNNER_CONFIG_KEYS: dict[str, dict[str, str]] = {
         "legacy_design_screens": "legacy_design_screens",
     },
 }
+
+
+def _apply_ios_scenario(
+    surface: Surface, handler: RunnerHandler, kwargs: dict[str, Any]
+) -> dict[str, Any]:
+    """Resolve `runnerConfig.scenario` against the project ios.yaml (explicit keys win)."""
+    scenario = surface.runner_config.get("scenario")
+    if surface.runner != "xcuitest" or scenario is None:
+        return kwargs
+    from validator.ios_project_config import resolve_ios_run_settings
+
+    project_dir = Path(getattr(handler, "project_dir", "."))
+    test_scheme, launch_arguments = resolve_ios_run_settings(
+        project_dir, kwargs.get("test_scheme"), kwargs.get("launch_arguments"), str(scenario)
+    )
+    resolved = dict(kwargs)
+    if test_scheme is not None:
+        resolved["test_scheme"] = test_scheme
+    if launch_arguments is not None:
+        resolved["launch_arguments"] = launch_arguments
+    return resolved
 
 
 def _runner_config_to_kwargs(surface: Surface) -> dict[str, Any]:

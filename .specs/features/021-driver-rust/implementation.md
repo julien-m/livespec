@@ -16,19 +16,19 @@ status: Implemented
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
 | FR-001 | `livespec/drivers/rust.yaml` | `@spec FR-001: Rust driver YAML — .specs/features/021-driver-rust/spec.md#fr-001` | Implemented | 2026-05-07 |
-| FR-002 | `validator/drivers/rust_detector.py::parse_cargo_dependencies` | `@spec FR-002: Cargo.toml dependency parser` | Implemented | 2026-05-07 |
+| FR-002 | — | — | ❌ Removed 2026-10-12 (Cargo.toml parser deleted: no production caller) | 2026-10-12 |
 | FR-003 | `validator/drivers/rust_detector.py::parse_cargo_mutants_json` | `@spec FR-003: cargo-mutants JSON parser` | Implemented | 2026-05-07 |
 | FR-004 | `tests/integration/test_driver_rust.py` | `@spec FR-004: Integration tests for the Rust driver` | Implemented | 2026-05-07 |
-| FR-005 | `tests/unit/test_rust_detector.py` | `@spec FR-005: Unit tests for Cargo.toml parser and cargo-mutants JSON parser` | Implemented | 2026-05-07 |
+| FR-005 | `tests/unit/test_rust_detector.py` | `@spec FR-005: Unit tests for the cargo-mutants JSON parser` | Implemented (Cargo.toml tests removed 2026-10-12) | 2026-10-12 |
 
 ## Files Created
 
 | File | Purpose |
 |---|---|
 | `livespec/drivers/rust.yaml` | Rust built-in driver manifest with all 4 capabilities — coverage uses pure `command:` (native `cargo llvm-cov --fail-under-lines`), no escape-hatch script. |
-| `validator/drivers/rust_detector.py` | Pure-Python `Cargo.toml` parser via `tomllib` (extracts `[dependencies]`, `[dev-dependencies]`, `[build-dependencies]`) plus `cargo mutants --json` summary parser exposing caught/missed/timeout/unviable counts. |
+| `validator/drivers/rust_detector.py` | `cargo mutants --json` summary parser (the unused `Cargo.toml` parser was removed 2026-10-12) exposing caught/missed/timeout/unviable counts. |
 | `tests/unit/test_rust_detector.py` | 18 unit tests covering Cargo.toml parsing (string + table value forms, dedup, malformed input), case-insensitive crate lookup, and the cargo-mutants JSON parser (single-object, nested, line-delimited, missing keys, malformed input). |
-| `tests/integration/test_driver_rust.py` | 2 integration tests: registry detection and schema-validated 4-capability manifest with no escape-hatch script. Cargo parsing lives in `tests/unit/test_rust_detector.py` (2026-10-12 cleanup removed duplicates and YAML value pins). |
+| `tests/integration/test_driver_rust.py` | 2 integration tests: registry detection and schema-validated 4-capability manifest with no escape-hatch script. (2026-10-12 cleanup removed duplicates and YAML value pins; the Cargo.toml parser and its tests were removed as dead code.) |
 
 ## Files Modified
 
@@ -41,13 +41,13 @@ None — `livespec/drivers/rust.yaml` did not previously exist as a stub (unlike
 | AC-001 | `test_registry_loads_rust_driver`, `test_rust_driver_detects_cargo_toml` | Implemented |
 | AC-002 | `test_coverage_capability_uses_native_command` (asserts `cargo llvm-cov --lcov --output-path lcov.info --fail-under-lines`) | Implemented |
 | AC-003 | `test_coverage_capability_uses_native_command` (threshold 80) — runtime install hint surfaced by the existing capability runner | Implemented |
-| AC-004 | `test_snapshots_capability_metadata`, `test_dependency_detection_in_fixture_cargo_project` | Implemented |
+| AC-004 | — | ❌ Removed 2026-10-12 |
 | AC-005 | `test_snapshots_capability_metadata` (asserts `--unreferenced=reject`) — review hint surfaced by runner on failure | Implemented |
-| AC-006 | `test_properties_capability_metadata`, `test_dependency_detection_proptest_takes_priority_over_quickcheck` | Implemented |
+| AC-006 | — | ❌ Removed 2026-10-12 |
 | AC-007 | `test_mutation_capability_metadata` — install hint surfaced by runner when `cargo-mutants` absent | Implemented |
 | AC-008 | `test_mutation_capability_metadata` (asserts `--json`), `test_parse_cargo_mutants_json_*` (6 unit tests) | Implemented |
 | AC-009 | `test_rust_driver_schema_validation`, `test_rust_driver_capabilities_exist` | Implemented |
-| AC-010 | `test_parse_cargo_dependencies_*` (string + table value forms, dedup, malformed) | Implemented |
+| AC-010 | — | ❌ Removed 2026-10-12 |
 
 ## Test Results
 

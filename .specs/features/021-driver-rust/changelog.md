@@ -46,3 +46,12 @@
 - **AC impacted:** None
 - **Author:** Claude Code (test-suite cleanup, lot 1)
 - Kept registry discovery and the 4-capability, script-free manifest; removed command-string pins and Cargo parsing duplicated by tests/unit/test_rust_detector.py.
+
+## 2026-10-12 — Refactor: retire unused Cargo.toml detector
+
+- **Type:** Refactor
+- **Spec modified:** Yes (FR-002, AC-004, AC-006, AC-010 marked Removed; FR-005 annotated)
+- **Code modified:** validator/drivers/rust_detector.py (parse_cargo_dependencies/has_cargo_dependency/has_cargo_manifest deleted), tests/unit/test_rust_detector.py, livespec/drivers/rust.yaml (comment)
+- **AC impacted:** AC-004, AC-006, AC-010 (removed)
+- **Author:** Claude Code (dead-code resolution)
+- Only `parse_cargo_mutants_json` is used in production (`mutation_report.py`). The Cargo.toml helpers were imported by tests only, and `rust.yaml` wrongly claimed the runner consulted them; the comment is corrected.

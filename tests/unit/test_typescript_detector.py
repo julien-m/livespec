@@ -1,5 +1,7 @@
 # LiveSpec traceability anchors
 # @spec(FR-006)
+# @spec(FR-004)
+# @spec(AC-008)
 
 """Unit tests for TypeScript/JavaScript runner and package manager detection."""
 
@@ -12,10 +14,17 @@ import json
 import tempfile
 from pathlib import Path
 
+import pytest
+
+from validator.drivers.preconditions import capability_skip_message
+from validator.drivers.schemas import DriverCapability, DriverManifest
 from validator.drivers.typescript_detector import (
     detect_package_manager,
     detect_test_runner,
     has_dependency,
+    package_manager_add_dev,
+    package_manager_exec,
+    runner_argv,
 )
 
 
@@ -170,3 +179,44 @@ def test_has_dependency_handles_malformed_package_json() -> None:
         (project_root / "package.json").write_text("not valid json {{{", encoding="utf-8")
 
         assert has_dependency(str(project_root), "fast-check") is False
+
+
+@pytest.mark.parametrize(
+    ("declared", "expected"),
+    [("pnpm@9.1.0", "pnpm"), ("yarn@4.0.0", "yarn"), ("bun@1.1.0", "bun"), ("deno@2", "npm")],
+)
+def test_package_manager_field_wins_over_lockfile(
+    tmp_path: Path, declared: str, expected: str
+) -> None:
+    """Corepack ``packageManager`` beats lockfiles; unknown names fall back to them."""
+    _write_package_json(tmp_path, {"packageManager": declared})
+    (tmp_path / "package-lock.json").write_text("{}", encoding="utf-8")
+
+    assert detect_package_manager(str(tmp_path)) == expected
+
+
+def test_text_bun_lock_is_detected(tmp_path: Path) -> None:
+    """Bun >= 1.2 writes ``bun.lock`` (text) instead of ``bun.lockb``."""
+    (tmp_path / "bun.lock").write_text("{}", encoding="utf-8")
+
+    assert detect_package_manager(str(tmp_path)) == "bun"
+
+
+def test_exec_prefix_install_hint_and_runner_argv() -> None:
+    """Each package manager maps to its exec prefix; runners keep lcov output."""
+    assert package_manager_exec("npx") == ["npx"]
+    assert package_manager_exec("pnpm") == ["pnpm", "exec"]
+    assert package_manager_add_dev("bun") == "bun add -d"
+    assert runner_argv("jest", coverage=False) == ["jest"]
+    assert runner_argv("vitest", coverage=False) == ["vitest", "run"]
+
+
+def test_custom_override_is_never_skipped(tmp_path: Path) -> None:
+    """Missing Stryker skips the built-in mutation capability but not a custom one."""
+    _write_package_json(tmp_path, {"name": "app"})
+    builtin = DriverManifest(name="typescript", mutation=DriverCapability(command="x"))
+    custom = builtin.model_copy(update={"is_custom": True})
+
+    assert capability_skip_message(builtin, "mutation", tmp_path) is not None
+    assert capability_skip_message(custom, "mutation", tmp_path) is None
+    assert capability_skip_message(builtin, "coverage", tmp_path) is None

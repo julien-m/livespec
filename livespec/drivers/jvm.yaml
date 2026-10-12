@@ -28,8 +28,8 @@ coverage:
   report_path: build/reports/jacoco/test/lcov.info
   threshold: 80
 snapshots:
-  # Auto-detect kotest-snapshot (Kotlin-first) or approvaltests (Java-first) via
-  # validator/drivers/jvm_detector.py; the runner emits the skip-message when
+  # scripts/jvm-snapshots.sh detects kotest-snapshot (Kotlin-first) or
+  # approvaltests (Java-first) and emits the skip-message when
   # neither is present (AC-005). Tests run via the build tool's standard task.
   script: scripts/jvm-snapshots.sh
 properties:

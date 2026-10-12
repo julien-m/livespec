@@ -57,3 +57,12 @@
 - **AC impacted:** None (AC-006 now asserted through the runner)
 - **Author:** Claude Code (test-suite cleanup, lot 1)
 - Mutation absence is now checked as the runner's `CapabilityNotImplementedError` instead of a `None` field; removed YAML value pins and go.mod parsing duplicated by tests/unit/test_go_detector.py.
+
+## 2026-10-12 — Refactor: retire unused go.mod detector
+
+- **Type:** Refactor
+- **Spec modified:** Yes (FR-003, AC-004, AC-005, AC-009 marked Removed; FR-005 annotated)
+- **Code modified:** validator/drivers/go_detector.py (deleted), tests/unit/test_go_detector.py (deleted)
+- **AC impacted:** AC-004, AC-005, AC-009 (removed)
+- **Author:** Claude Code (dead-code resolution)
+- `go_detector` was imported only by its unit tests; the Go driver runs `go test` commands that need no library detection, and snapshots/properties are not executed by any production command.

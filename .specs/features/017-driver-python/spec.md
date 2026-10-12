@@ -209,9 +209,9 @@ flowchart TD
 - **AC-002** — Coverage capability executes `pytest --cov={module} --cov-report=lcov:{report_path} --cov-fail-under={threshold}` and returns a `CapabilityResult` with the actual exit code.
 - **AC-003** — Coverage capability writes `lcov.info` to the configured `report_path`. Absence of the file after execution = capability failure.
 - **AC-004** — The Python `module` to measure is configurable in `python.yaml` (default: inferred from `pyproject.toml` `[tool.pytest.ini_options]` or package name).
-- **AC-005** — Snapshots capability detects `syrupy` presence (`pip show syrupy`) and executes `pytest --snapshot-warn-unused` (pass) or `pytest` (standard run).
+- **AC-005** — **Removed (2026-10-12):** ~~Snapshots capability detects `syrupy` presence (`pip show syrupy`) and executes `pytest --snapshot-warn-unused` (pass) or `pytest` (standard run).~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence gate. The declared snapshots command stays `pytest --snapshot-warn-unused`.
 - **AC-006** — On snapshot mismatch, LiveSpec surfaces the snapshot diff in its output and suggests `pytest --snapshot-update`.
-- **AC-007** — On first run (no `__snapshots__/` directory), snapshot capability exits 0 with an informational message, not a failure.
+- **AC-007** — **Removed (2026-10-12):** ~~On first run (no `__snapshots__/` directory), snapshot capability exits 0 with an informational message, not a failure.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence gate.
 - **AC-008** — Properties capability executes `pytest -m property --hypothesis-show-statistics` and returns CapabilityResult. Missing `hypothesis` installation = warning, not hard failure.
 - **AC-009** — Mutation capability executes `mutmut run` followed by `mutmut results --use-coverage` and parses the kill rate. Missing `mutmut` = warning with install instruction, not hard failure.
 - **AC-010** — Each capability command is configurable via override keys in `python.yaml` (`coverage.command`, `snapshots.command`, etc.) to support non-standard project layouts.
@@ -224,8 +224,8 @@ flowchart TD
 
 - **FR-001** — Write `livespec/drivers/python.yaml` implementing all 4 active capabilities (coverage, snapshots, properties, mutation) with correct command templates and report paths.
 - **FR-002** — Implement module auto-detection: read `pyproject.toml` → `[tool.pytest.ini_options].testpaths` or `[project].name`; fall back to `src/` or project root scan.
-- **FR-003** — Implement syrupy detection: `pip show syrupy` — if not installed, emit "syrupy not installed" warning and skip snapshots capability (exit 0).
-- **FR-004** — Implement first-run detection for snapshots: check if `**/__snapshots__/` glob returns any `.ambr` files — if none, emit informational and exit 0.
+- **FR-003** — **Removed (2026-10-12):** ~~Implement syrupy detection: `pip show syrupy` — if not installed, emit "syrupy not installed" warning and skip snapshots capability (exit 0).~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence gate. The probe also inspected LiveSpec's own interpreter, not the project environment.
+- **FR-004** — **Removed (2026-10-12):** ~~Implement first-run detection for snapshots: check if `**/__snapshots__/` glob returns any `.ambr` files — if none, emit informational and exit 0.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence gate.
 - **FR-005** — Implement mutmut result parsing: run `mutmut results --json` (if available) or parse text output to extract killed/survived/timeout counts and compute score.
 - **FR-006** — Write integration tests in `tests/integration/test_driver_python.py` covering all 4 capabilities on fixture projects.
 - **FR-007** — Write unit tests for module auto-detection logic and mutmut result parser.

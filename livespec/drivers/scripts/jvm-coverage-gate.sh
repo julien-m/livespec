@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-002)
 # @spec FR-001: JVM coverage gate escape-hatch script — .specs/features/022-driver-jvm/spec.md#fr-001
 # @spec AC-002: Coverage capability auto-detects Gradle vs Maven and dispatches.
 # @spec AC-003: Locates JaCoCo lcov.info at the standard path (Gradle / Maven).
 # @spec AC-004: When JaCoCo is not configured, exit 0 with a setup-guide message.
 # @spec AC-010: Gradle takes priority when both build files are present.
+# @spec FR-002: Build tool detection (Gradle priority) — .specs/features/022-driver-jvm/spec.md#fr-002
 #
 # Usage:
 #   jvm-coverage-gate.sh [<lcov_path>] [<threshold>]

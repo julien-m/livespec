@@ -16,18 +16,15 @@
 # @spec(FR-002)
 # @spec(FR-003)
 # @spec(FR-004)
-# @spec(FR-005)
-# @spec(FR-006)
 # @spec(FR-007)
 
-"""Parse ui-behavioral-taxonomy.md and expose detect_traits / deduplicate_tests.
+"""Parse ui-behavioral-taxonomy.md and expose load_taxonomy / detect_traits.
 
 @spec FR-001 — load_taxonomy — .specs/features/006-taxonomy-testing-infra/spec.md#fr-001
 @spec FR-002 — path resolution — .specs/features/006-taxonomy-testing-infra/spec.md#fr-002
 @spec FR-003 — detect_traits — .specs/features/006-taxonomy-testing-infra/spec.md#fr-003
 @spec FR-004 — co-occurrence — .specs/features/006-taxonomy-testing-infra/spec.md#fr-004
-@spec FR-005 — deduplicate_tests — .specs/features/006-taxonomy-testing-infra/spec.md#fr-005
-@spec FR-006 — EC-004 dedup — .specs/features/006-taxonomy-testing-infra/spec.md#fr-006
+FR-005/FR-006 (deduplicate_tests) were removed on 2026-10-12: no production caller.
 @spec FR-007 — TaxonomyLoadError — .specs/features/006-taxonomy-testing-infra/spec.md#fr-007
 """
 
@@ -123,16 +120,6 @@ class Taxonomy:
             if t.name == name:
                 return t
         return None
-
-
-@dataclass
-class MergedTest:
-    """Result of deduplication — one logical test referencing AC and/or trait."""
-
-    ref: str
-    behavioral_trait: str | None
-    ac_id: str | None
-    gherkin: str
 
 
 # ---------------------------------------------------------------------------
@@ -646,154 +633,3 @@ def _check_trait(trait: Trait, normalised_signals: list[str], result: set[str]) 
         if len(normalised_signals) >= 2:
             result.add(trait.name)
             return
-
-
-# ---------------------------------------------------------------------------
-# Deduplication helpers
-# ---------------------------------------------------------------------------
-
-_AC_PATTERN: re.Pattern[str] = re.compile(r"^(AC-\d+):\s*(.+)", re.IGNORECASE)
-_STOPWORDS: frozenset[str] = frozenset(
-    {
-        "le",
-        "la",
-        "les",
-        "un",
-        "une",
-        "des",
-        "et",
-        "ou",
-        "de",
-        "du",
-        "avec",
-        "the",
-        "a",
-        "an",
-        "of",
-        "and",
-        "or",
-        "is",
-        "are",
-        "in",
-        "on",
-        "to",
-        "for",
-        "that",
-        "this",
-        "it",
-        "be",
-        "has",
-        "have",
-        "by",
-    }
-)
-
-
-def _tokenise(text: str) -> set[str]:
-    """Lowercase word tokens, stopwords removed."""
-    words = re.findall(r"\b[a-zA-ZÀ-ÿ]+\b", text.lower())
-    return {w for w in words if w not in _STOPWORDS and len(w) > 2}
-
-
-def _has_overlap(text_a: str, text_b: str) -> bool:
-    """Return True if the two texts share at least one content token."""
-    return bool(_tokenise(text_a) & _tokenise(text_b))
-
-
-# @spec FR-005, FR-006: deduplicate_tests — EC-002 overlap merge + EC-004 trait dedup
-def deduplicate_tests(
-    ac_list: list[str],
-    behavioral_ac_list: list[str],
-    path: Path | None = None,
-) -> list[MergedTest]:
-    """Merge overlapping AC and Behavioral AC entries into combined MergedTest items.
-
-    EC-002: overlapping AC + behavioral AC → single MergedTest with combined ref.
-    EC-004: duplicate trait entries in behavioral_ac_list injected only once.
-
-    Args:
-        ac_list: Manual AC lines, each formatted as "AC-NNN: <text>".
-        behavioral_ac_list: Behavioral AC lines, each formatted as "<trait>: <text>".
-        path: Override taxonomy path (unused here but accepted for API consistency).
-
-    Returns:
-        List of MergedTest items.
-    """
-    # Parse manual ACs
-    ac_structs: list[tuple[str, str]] = []  # (ac_id, text)
-    for item in ac_list:
-        m = _AC_PATTERN.match(item.strip())
-        if m:
-            ac_structs.append((m.group(1), m.group(2)))
-        else:
-            # AC without ID — treat as standalone
-            ac_structs.append(("", item.strip()))
-
-    consumed_ac: set[int] = set()
-    seen_traits: set[str] = set()
-    merged: list[MergedTest] = []
-
-    # EC-004: deduplicate behavioral entries by trait name
-    deduplicated_behavioral: list[tuple[str, str]] = []
-    for item in behavioral_ac_list:
-        if ": " in item:
-            trait_part, text_part = item.split(": ", 1)
-        else:
-            trait_part = item.strip()
-            text_part = ""
-        trait_part = trait_part.strip()
-        if trait_part not in seen_traits:
-            seen_traits.add(trait_part)
-            deduplicated_behavioral.append((trait_part, text_part))
-
-    seen_traits.clear()
-
-    for b_trait, b_text in deduplicated_behavioral:
-        if b_trait in seen_traits:
-            continue
-        seen_traits.add(b_trait)
-
-        # EC-002: look for keyword overlap with manual ACs
-        match_idx: int | None = None
-        for idx, (_ac_id, ac_text) in enumerate(ac_structs):
-            if idx in consumed_ac:
-                continue
-            if _has_overlap(ac_text, b_text):
-                match_idx = idx
-                break
-
-        if match_idx is not None:
-            ac_id, _ac_text = ac_structs[match_idx]
-            consumed_ac.add(match_idx)
-            ref = f"{ac_id} / Behavioral-{b_trait}" if ac_id else f"Behavioral-{b_trait}"
-            merged.append(
-                MergedTest(
-                    ref=ref,
-                    behavioral_trait=b_trait,
-                    ac_id=ac_id or None,
-                    gherkin="",
-                )
-            )
-        else:
-            merged.append(
-                MergedTest(
-                    ref=f"Behavioral-{b_trait}",
-                    behavioral_trait=b_trait,
-                    ac_id=None,
-                    gherkin="",
-                )
-            )
-
-    # Unconsumed manual ACs → standalone MergedTest
-    for idx, (ac_id, _ac_text) in enumerate(ac_structs):
-        if idx not in consumed_ac:
-            merged.append(
-                MergedTest(
-                    ref=ac_id if ac_id else _ac_text,
-                    behavioral_trait=None,
-                    ac_id=ac_id or None,
-                    gherkin="",
-                )
-            )
-
-    return merged

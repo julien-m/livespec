@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-003)
 # @spec AC-005: Snapshot capability detects kotest-snapshot or approvaltests-java.
 # — .specs/features/022-driver-jvm/spec.md#ac-005
+# @spec FR-003: Build file plugin/dependency detection — .specs/features/022-driver-jvm/spec.md#fr-003
 #
 # Detects build tool and snapshot library; runs the build tool's standard test
 # task. If neither library is configured, emits the skip-message and exits 0

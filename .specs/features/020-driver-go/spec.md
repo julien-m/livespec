@@ -171,12 +171,12 @@ flowchart TD
 - **AC-001** — Driver file `livespec/drivers/go.yaml` is loaded when `go.mod` is found at project root.
 - **AC-002** — Coverage capability runs `go test -coverprofile=coverage.out ./...` and converts `coverage.out` to `lcov.info` format via a gate script.
 - **AC-003** — Gate script applies threshold and exits non-zero if coverage is below it.
-- **AC-004** — Snapshot capability detects `go-snaps` or `cupaloy` in `go.mod`; if absent, skips with exit 0.
-- **AC-005** — Properties capability detects `gopter` in `go.mod`; if absent, skips with exit 0.
+- **AC-004** — **Removed (2026-10-12):** ~~Snapshot capability detects `go-snaps` or `cupaloy` in `go.mod`; if absent, skips with exit 0.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally.
+- **AC-005** — **Removed (2026-10-12):** ~~Properties capability detects `gopter` in `go.mod`; if absent, skips with exit 0.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally.
 - **AC-006** — Mutation capability is absent from `go.yaml` — reported as "not implemented" by the driver system with an explanatory message about go-mutesting being unmaintained.
 - **AC-007** — The gate script `livespec/drivers/scripts/go-coverage-gate.sh` accepts `coverage.out` path and threshold, converts to `lcov.info`, computes %, exits 0/1.
 - **AC-008** — The Go driver YAML passes schema validation against `DriverSchema`.
-- **AC-009** — `go.mod` parsing uses a dedicated parser (not shell grep) to extract module names and dependencies.
+- **AC-009** — **Removed (2026-10-12):** ~~`go.mod` parsing uses a dedicated parser (not shell grep) to extract module names and dependencies.~~ Removed with FR-003: no capability parses `go.mod`.
 
 ---
 
@@ -184,9 +184,9 @@ flowchart TD
 
 - **FR-001** — Write `livespec/drivers/go.yaml` with detect rule (`files: [go.mod]`) and 3 capability blocks (coverage, snapshots, properties). Mutation omitted.
 - **FR-002** — Write `livespec/drivers/scripts/go-coverage-gate.sh`: run `go tool cover -func=coverage.out`, parse total line, compare to threshold, emit lcov.info via `gocov-xml` or direct conversion.
-- **FR-003** — Implement `go.mod` dependency parser: extract `require` block entries for snapshot/property library detection.
+- **FR-003** — **Removed (2026-10-12):** ~~Implement `go.mod` dependency parser: extract `require` block entries for snapshot/property library detection.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally.
 - **FR-004** — Write integration tests for coverage capability on a Go fixture project.
-- **FR-005** — Write unit tests for go.mod parser and go-coverage-gate.sh script.
+- **FR-005** — Write unit tests for go.mod parser and go-coverage-gate.sh script. (go.mod parser tests removed 2026-10-12 with FR-003; gate-script tests remain.)
 
 ---
 

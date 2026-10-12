@@ -33,3 +33,12 @@
 - **AC impacted:** None
 - **Author:** Claude Code (test-suite cleanup, lot 1)
 - Tests parse the generated surfaces (runner, platform, path, testDir) instead of searching stdout for 'maestro'; explicit skip when `node` is absent.
+
+## 2026-10-12 — Refactor: runner detection reads the android.yaml manifest
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** validator/ui_runner_manifest.py (new), validator/runner_xcuitest_impl.py, validator/runner_maestro_impl.py, tests/test_ui_runner_manifest_detect.py (new)
+- **AC impacted:** AC-002 (now enforced through the production detection path)
+- **Author:** Claude Code (dead-code resolution)
+- `load_maestro_runner_manifest` had no production caller: the handler hardcoded the same markers that `android.yaml` declares. `detect()` now evaluates the manifest `detect:` block (files globs, dirs, OR/AND logic), so the manifest is the single source of truth; a dispatcher-level test fails without the wiring. Behaviour on the built-in manifests is unchanged.

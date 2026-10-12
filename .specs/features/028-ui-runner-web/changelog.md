@@ -29,3 +29,12 @@
 - **Code modified:** None
 - **AC impacted:** AC-001 through AC-008 (all defined)
 - **Author:** spec.specify
+
+## 2026-10-12 — Refactor: web runner detection reads web.yaml
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** validator/runner_web_impl.py, validator/ui_runner_manifest.py (brace alternatives), tests/test_ui_runner_manifest_detect.py
+- **AC impacted:** AC-002 (detection now driven by the manifest)
+- **Author:** Claude Code (dead-code resolution)
+- `load_web_runner_manifest` had no production caller. `detect()` now evaluates `package.json` AND `playwright*.config.{ts,js,mjs}` from web.yaml, matching EC-001; configs with other extensions (e.g. `.cjs`) no longer match, as the spec states.
