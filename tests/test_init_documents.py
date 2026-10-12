@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from tests.test_init_profile import hybrid
-from validator.init_documents import render_documents, render_preflight
+from validator.init_documents import render_documents, render_preflight, render_recap
 from validator.init_probes import ProbeResult
 from validator.init_profile import detect_profile
 
@@ -51,3 +51,21 @@ def test_bootstrap_conventions_use_configured_resource_root(
     docs = _prepare_documents(detect_profile(project), project)
     assert str(resources) in docs[".conventions/index.md"]
     assert str(resources) in docs[".conventions/manifest.yaml"]
+
+
+def test_ac007_profile_and_report_record_unsupported_and_warning(tmp_path: Path) -> None:
+    (tmp_path / "package.json").write_text('{"name":"plain"}')
+    (tmp_path / "go.mod").write_text("module example\n")
+    profile = detect_profile(tmp_path)
+    project = render_documents(profile)["project.md"]
+    recap = render_recap(profile)
+    for text in (project, recap):
+        assert "`go.mod`: unsupported manifest; ecosystem Unknown" in text
+        assert profile.warnings[0] in text
+    assert recap.startswith("---\nstatus: completed\n---\n")
+
+
+def test_ac007_report_without_findings_stays_minimal(tmp_path: Path) -> None:
+    hybrid(tmp_path)
+    recap = render_recap(detect_profile(tmp_path))
+    assert "unsupported manifest" not in recap and "Warning" not in recap

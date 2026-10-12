@@ -76,14 +76,53 @@ def test_ac002_missing_manager_stays_unknown(tmp_path: Path) -> None:
     assert "npm" not in profile.tools
 
 
-@pytest.mark.parametrize("change", ["conflict", "malformed", "unsupported"])
+@pytest.mark.parametrize("change", ["conflict", "malformed"])
 def test_ac003_bad_evidence_fails_contextually(tmp_path: Path, change: str) -> None:
     hybrid(tmp_path)
     if change == "conflict":
         (tmp_path / "package-lock.json").write_text("{}")
-    elif change == "malformed":
-        (tmp_path / "package.json").write_text("{")
     else:
-        (tmp_path / "src-tauri/tauri.conf.json5").write_text("{}")
-    with pytest.raises(InitError, match=r"package|tauri"):
+        (tmp_path / "package.json").write_text("{")
+    with pytest.raises(InitError, match=r"package"):
         detect_profile(tmp_path)
+
+
+@pytest.mark.parametrize("manifest", ["go.mod", "Gemfile", "pom.xml"])
+def test_ac007_unsupported_manifest_beside_supported_is_recorded(
+    tmp_path: Path, manifest: str
+) -> None:
+    (tmp_path / "pyproject.toml").write_text('[project]\nname="cli"\nversion="1"\n')
+    (tmp_path / manifest).write_text("unparsed\n")
+    profile = detect_profile(tmp_path)
+    assert {fact.name for fact in profile.facts} == {"Python"}
+    assert profile.unsupported_manifests == (manifest,)
+    assert profile.tools == ("python3",)
+
+
+def test_ac007_unsupported_tauri_format_is_recorded_not_fatal(tmp_path: Path) -> None:
+    hybrid(tmp_path)
+    (tmp_path / "src-tauri/tauri.conf.json5").write_text("{}")
+    profile = detect_profile(tmp_path)
+    assert profile.unsupported_manifests == ("src-tauri/tauri.conf.json5",)
+    assert {"Tauri", "Rust", "React"} <= {fact.name for fact in profile.facts}
+
+
+def test_ac007_only_unsupported_manifests_fail_naming_them(tmp_path: Path) -> None:
+    (tmp_path / "go.mod").write_text("module example\n")
+    (tmp_path / "Gemfile").write_text("source 'x'\n")
+    with pytest.raises(InitError, match=r"No supported.*Gemfile, go\.mod"):
+        detect_profile(tmp_path)
+
+
+def test_ac007_missing_manager_evidence_warns_without_failing(tmp_path: Path) -> None:
+    (tmp_path / "package.json").write_text('{"name":"plain"}')
+    profile = detect_profile(tmp_path)
+    assert profile.package_manager == "Unknown"
+    assert len(profile.warnings) == 1 and "package manager" in profile.warnings[0]
+    assert "npm" not in profile.tools
+
+
+def test_ac007_non_javascript_profile_has_no_manager_warning(tmp_path: Path) -> None:
+    (tmp_path / "Cargo.toml").write_text('[package]\nname="cli"\nversion="1"\n')
+    profile = detect_profile(tmp_path)
+    assert profile.warnings == () and profile.unsupported_manifests == ()

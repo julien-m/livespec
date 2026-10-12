@@ -10,7 +10,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from .init_documents import render_documents, render_preflight
+from .init_documents import render_documents, render_preflight, render_recap
 from .init_probes import require_success, run_command, run_probes
 from .init_profile import InitError, ObservedProfile, detect_profile
 from .init_recovery import (
@@ -173,14 +173,7 @@ def _generate(
     #   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-008
     documents.update(_integration_artifacts(root))
     documents[".specs/preflight-report.md"] = report
-    recap = """---
-status: completed
----
-
-Backend artifacts and observed tooling verified.
-Native command goal proof, after-init hooks and archive remain required.
-Application build/UI/runtime not executed.
-"""
+    recap = render_recap(profile)
     documents[".specs/bootstrap-recap.md"] = recap
     write_atomic(root, root / MANIFEST, render_manifest(profile, documents))
     write_atomic(root, root / ".specs/bootstrap-recap.md", recap)
@@ -268,6 +261,11 @@ def main(argv: list[str] | None = None) -> int:
     except (InitError, OSError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
+    for path in profile.unsupported_manifests:
+        message = f"unsupported manifest {path}: ecosystem Unknown, not parsed"
+        print(f"WARNING: {message}", file=sys.stderr)
+    for warning in profile.warnings:
+        print(f"WARNING: {warning}", file=sys.stderr)
     if options.dry_run:
         print(f"Preview: {profile.product_name}; no changes applied")
     elif options.verify_only:

@@ -145,6 +145,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-12 | Bugfix | [Feature 080] Fix: unsupported manifests recorded and missing package manager warns (FR-001 decision); implement gate READY |
 | 2026-10-12 | Spec Update | [Feature 077] AC-009/FR-008 clarified to the implemented authority import; implement gate READY |
 | 2026-10-12 | Bugfix | [Feature 083] Fix: consumer migration command executable as documented (venv interpreter) |
 | 2026-10-12 | Bugfix | [Feature 080] Fix: init probes tolerate zombie-group EPERM; init tests deterministic and hermetic (gate blocked on FR-001 decision) |
@@ -154,7 +155,6 @@
 | 2026-10-12 | Bugfix | Bugfix: integrate features 081, 082 and 083 on main |
 | 2026-10-12 | Feature | Feature 083 pipeline complete: pinned runtime isolation (18/18 AC certified, audit clean) |
 | 2026-10-12 | Feature | [Feature 083] Test: 100% AC covered (18/18), 1 test generated (re-certification after audit corrections) |
-| 2026-10-12 | Feature | Feature 083 second audit pass: redirected-path refusal, escaped defect values, lock-last publication, strict shim current manifest |
 <!-- readme:activity:end -->
 
 ---

@@ -1,5 +1,15 @@
 # Changelog - 080-autonomous-from-code-recovery
 
+## 2026-10-12 — [Bugfix]: Unsupported manifests recorded, missing package manager warns (FR-001 decision)
+
+- **Type:** Bugfix + Spec Update
+- **Spec modified:** Yes (sections: FR-001, new AC-007, Story 1 scenario and flowchart, Key Entities, Edge Cases, Clarifications; status Planned -> In Progress to match the registry)
+- **Code modified:** validator/init_profile.py, validator/init_documents.py, validator/init_from_code.py, tests/test_init_profile.py, tests/test_init_documents.py, tests/test_init_recovery.py; plan.md (FR-001 design, tests, AIRESOURCES order)
+- **AC impacted:** AC-001, AC-002, AC-003, AC-007
+- **Author:** claude-code (spec-fix closure, user decision)
+
+User decision recorded: an unsupported manifest (`go.mod`, `Gemfile`, `pom.xml`…) beside supported ones is recorded as unsupported/unknown in the profile and report and bootstrap continues; a `package.json` without any manager evidence warns explicitly and never fails. Supported ecosystems are listed in FR-001 as implemented. Fresh independent spec and plan reviews are ready and the implement gate returns READY, closing the pending EPERM/hermetic-tests spec-fix.
+
 ## 2026-10-12 — [Refactor]: Init goal profile aliases reduced to one case per profile
 
 - **Type:** Refactor
