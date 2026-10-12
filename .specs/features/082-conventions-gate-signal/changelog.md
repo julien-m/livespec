@@ -36,3 +36,12 @@
 - Unit suite: 3911 passed / 109 failed / 27 skipped, no new failure versus the main 457a252 reference run in the same environment (3866 / 112 / 27); integration 3a 89 passed.
 
 <!-- finalize:spec-implement:2026-10-11:41daaa07 -->
+
+### 2026-10-12 — Bugfix: nested worktrees excluded from the source scan
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/conventions_gates.py, validator/conventions_gate.py, validator/conventions_linter_runner.py, tests/test_conventions_gate_signal.py
+- **AC impacted:** None (source collection boundary, same spirit as FR-001 fixture exclusion)
+- **Author:** Claude Code (integrator)
+- On the main checkout, repo scope walked `.claude/worktrees/*` agent checkouts (~28k extra violations). `.claude/worktrees/**`, `.worktrees/**` and any nested directory holding a `.git` entry are now never sources; repo scope is PASS against the unchanged baseline (280 recorded, 0 new).

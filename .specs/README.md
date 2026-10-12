@@ -145,6 +145,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-12 | Bugfix | Bugfix: integrate features 081, 082 and 083 on main |
 | 2026-10-12 | Feature | Feature 083 pipeline complete: pinned runtime isolation (18/18 AC certified, audit clean) |
 | 2026-10-12 | Feature | [Feature 083] Test: 100% AC covered (18/18), 1 test generated (re-certification after audit corrections) |
 | 2026-10-12 | Feature | Feature 083 second audit pass: redirected-path refusal, escaped defect values, lock-last publication, strict shim current manifest |
@@ -154,7 +155,6 @@
 | 2026-10-11 | Feature | Feature 083 implementation: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, boundary rule (In Progress; conventions certification pending) |
 | 2026-10-11 | Feature | Feature 083 plan created: Pinned Runtime Isolation, 9 implementation steps, 3 diagrams, ADR-004 |
 | 2026-10-11 | Spec | [Feature 083] Spec created: Pinned Runtime Isolation — 7 stories, 18 AC, 13 FR |
-| 2026-10-11 | Feature | Feature 082 implemented: conventions gate signal (fixture exclusion, family grouping, framework applicability, repo baseline ratchet) |
 <!-- readme:activity:end -->
 
 ---

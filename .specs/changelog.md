@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-12 — Bugfix: integrate features 081, 082 and 083 on main
+
+- Conventions source collection skips `.claude/worktrees/**`, `.worktrees/**` and any nested directory holding a `.git` entry; repo scope returns PASS against [the versioned baseline](conventions/baseline.json) without rewriting it.
+- spec-system rules and the supervisor/verifier prompts describe the 082 ratchet: new repo-scope violations fail, recorded debt is reported separately, feature closure requires feature-scope PASS.
+- Runtime receipts and review caches committed by 081/083 are no longer versioned, as required by the 082 ignore rules.
+
 ## 2026-10-12 — Feature 083 pipeline complete: pinned runtime isolation (18/18 AC certified, audit clean)
 <!-- finalize:spec-feature:2026-10-12:21b73207 -->
 
