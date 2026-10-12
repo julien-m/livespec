@@ -29,7 +29,7 @@ updated: 2026-05-07
 
 | AC | Description | Test File | Test Function |
 |---|---|---|---|
-| AC-001 | Android runner manifest validates against UIRunnerSchema | `livespec/ui-runners/android.yaml`; `tests/test_maestro_manifest.py` | `test_manifest_is_valid_yaml`, `test_manifest_has_runner_section`, ... |
+| AC-001 | Android runner manifest validates against UIRunnerSchema | `livespec/ui-runners/android.yaml`; `tests/test_maestro_manifest.py` | `test_manifest_is_valid_yaml`, `test_manifest_detect_rules_match_runner_handler` |
 | AC-002 | detect.files matches build.gradle/build.gradle.kts | `tests/test_ui_runner_maestro.py` | `test_detect_build_gradle`, `test_detect_build_gradle_kts` |
 | AC-003 | Android runner priority 50 > JVM driver | `tests/test_maestro_manifest.py` | `test_manifest_runner_priority_is_50` |
 | AC-004 | run_flow invokes maestro test | `tests/test_ui_runner_maestro.py` | `test_run_flow_executes_maestro_test` |

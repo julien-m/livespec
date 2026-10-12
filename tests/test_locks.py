@@ -61,8 +61,29 @@ class TestAcquireLock:
         with acquire_lock(specs):
             pass
 
-    def test_default_timeout_is_10s(self) -> None:
-        assert DEFAULT_LOCK_TIMEOUT_SECONDS == 10
+    def test_default_timeout_is_10s(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Without an explicit timeout a held lock is abandoned after 10 seconds."""
+        import fcntl
+
+        from validator import locks as locks_module
+
+        specs = tmp_path / ".specs"
+        specs.mkdir()
+        now = [100.0]
+        monkeypatch.setattr(locks_module.time, "monotonic", lambda: now[0])
+        monkeypatch.setattr(
+            locks_module.time, "sleep", lambda seconds: now.__setitem__(0, now[0] + seconds)
+        )
+        with (specs / LOCK_FILENAME).open("a+b") as holder:
+            fcntl.flock(holder.fileno(), fcntl.LOCK_EX)
+            with (
+                pytest.raises(
+                    LockAcquisitionError, match=f"within {DEFAULT_LOCK_TIMEOUT_SECONDS}s"
+                ),
+                acquire_lock(specs),
+            ):
+                pass
+        assert 110.0 <= now[0] < 111.0
 
 
 # Helper for inter-process lock contention test
@@ -330,55 +351,41 @@ class TestReserveNnn:
         assert result.slug == "006-new-feature"
         assert result.resumed is False
 
-    def test_resumes_when_reserved_marker_present(self, tmp_path: Path) -> None:
+    def test_reserved_slot_is_not_reused_by_a_later_scan(self, tmp_path: Path) -> None:
         specs = tmp_path / ".specs"
-        # First reservation
         first = reserve_nnn(specs, "auth")
-        # Simulate a crashed run: marker remains, spec.md never written
-        # Second call with the SAME name + same NNN slot should resume
-        # (We simulate by manually computing the same target)
-        (specs / "features" / "001-auth" / RESERVED_MARKER).is_file()  # confirm marker
-
-        # Second call allocates NNN=002 because 001-auth exists with marker
-        # → it doesn't recurse into "resume" for a different slug name
         second = reserve_nnn(specs, "auth")
-        # 002 because 001-auth exists; same name but new NNN
+        assert first.slug == "001-auth"
         assert second.slug == "002-auth"
         assert second.resumed is False
-        assert first.slug == "001-auth"
 
-    def test_collision_without_marker_raises(self, tmp_path: Path) -> None:
-        specs = tmp_path / ".specs"
-        # Pre-create a directory at 001 WITHOUT a .reserved marker
-        (specs / "features" / "001-foreign").mkdir(parents=True)
-        # The next reservation will try 002 first (since 001-foreign occupies that NNN)
-        # — to actually trigger collision, we need the candidate directory to exist
-        # without a marker. Use a name that lands on the SAME NNN as 001-foreign
-        # by manually creating the candidate path before calling reserve_nnn.
-        target = specs / "features" / "002-collision"
-        target.mkdir(parents=True)
-        # Now scan_max_nnn returns 2 (from 001-foreign and 002-collision both),
-        # so reserve_nnn will try 003-test → no collision. To force one, create 003 too.
-        (specs / "features" / "003-other").mkdir()
-        # Now call: scan returns 3, candidate is 004-test → succeeds.
-        # To truly test collision we need the candidate to be exactly the next NNN.
-        # Easier: pre-create the target path and rely on scan returning N-1 then N.
-        # Cleanest: directly call mkdir on the candidate before reserve_nnn.
-        # The candidate is f"{max_nnn+1:03d}-{name}". Let's name it to match.
-        precreated = specs / "features" / "004-test"
-        precreated.mkdir()  # without a .reserved marker
-        # Now scan returns max=4. Next NNN=5. Slug=005-test → no collision.
-        # OK, we need to call AFTER scan but BEFORE mkdir. Race window is tiny.
-        # Alternative: monkey-patch _scan_max_nnn.
+    def test_resumes_when_reserved_marker_present(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A crashed run left its marker: the same slot is resumed, not duplicated."""
         from validator import locks as locks_module
 
-        original = locks_module._scan_max_nnn  # type: ignore[attr-defined]
-        try:
-            locks_module._scan_max_nnn = lambda _features_dir: 3  # type: ignore[assignment, attr-defined]
-            with pytest.raises(NnnCollisionError):
-                reserve_nnn(specs, "test")  # candidate = 004-test, exists w/o marker
-        finally:
-            locks_module._scan_max_nnn = original  # type: ignore[assignment]
+        specs = tmp_path / ".specs"
+        first = reserve_nnn(specs, "auth")
+        # The scan/mkdir race: the candidate exists with our marker when mkdir runs.
+        monkeypatch.setattr(locks_module, "_scan_max_nnn", lambda _features_dir: 0)
+        resumed = reserve_nnn(specs, "auth")
+        assert resumed.slug == first.slug == "001-auth"
+        assert resumed.directory == first.directory
+        assert resumed.resumed is True
+
+    def test_collision_without_marker_raises(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The candidate exists without a .reserved marker: never adopt it."""
+        from validator import locks as locks_module
+
+        specs = tmp_path / ".specs"
+        (specs / "features" / "004-test").mkdir(parents=True)
+        monkeypatch.setattr(locks_module, "_scan_max_nnn", lambda _features_dir: 3)
+        with pytest.raises(NnnCollisionError):
+            reserve_nnn(specs, "test")
+        assert not (specs / "features" / "004-test" / RESERVED_MARKER).exists()
 
     def test_empty_name_rejected(self, tmp_path: Path) -> None:
         specs = tmp_path / ".specs"

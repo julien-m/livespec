@@ -354,24 +354,17 @@ def test_body_byte_equivalent_to_f041_import(specs_root: Path) -> None:
 # ─── --force / specStatus: manual guard (FR-014, AC-017) ─────────────────────
 
 
-def test_specStatus_manual_target_protected(specs_root: Path) -> None:
-    """Producer-side: a manual file's frontmatter is detectable.
+def test_specStatus_manual_target_protected(specs_root: Path, feature_dir: Path) -> None:
+    """Producer-side: the file written by the gate carries ``specStatus: manual``.
 
     The actual `--force` flag handling lives in the slash-command Step 4.5
-    (markdown). This test verifies the producer leaves frontmatter
-    introspectable so Step 4.5 can implement the guard cheaply.
+    (markdown). This test verifies the produced file keeps the marker
+    introspectable on disk so Step 4.5 can implement the guard cheaply.
     """
-    target = specs_root / "flows" / "foo.md"
-    target.parent.mkdir(parents=True)
-    target.write_text(
-        "---\nspecStatus: manual\nkind: flow\n---\n# Flow\n"
-        "## Acteur\nx\n## Préconditions\nx\n## Déclencheur\nx\n"
-        "## Étapes nominales\nx\n## Règles métier\nx\n"
-        "## Erreurs & exceptions\nx\n## Side-effects\nx\n"
-        "## Postconditions\nx\n"
-    )
-    parsed = frontmatter.load(target)
-    assert parsed.metadata.get("specStatus") == "manual"
+    artefact = run_native_interview("foo", "flow", specs_root, asker=_const_asker("skip"))
+
+    assert apply_validation_gate(artefact, feature_dir, log=lambda _line: None) == 0
+    assert frontmatter.load(artefact.path).metadata.get("specStatus") == "manual"
 
 
 # ─── --from-mockups impossible-mode block (FR-015, AC-019) ───────────────────
