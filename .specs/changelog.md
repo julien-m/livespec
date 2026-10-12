@@ -11,6 +11,7 @@
 
 - README registry aligned to spec.md for [028](features/028-ui-runner-web/spec.md), [030](features/030-ui-runner-ios-watchos/spec.md), [031](features/031-ui-runner-android/spec.md) and [033](features/033-smart-test-selection/spec.md) (Implemented); [036](features/036-multi-surface-detection-and-migration/changelog.md) spec.md moves Draft -> Planned (plan present, no implementation map). 035 and 080 were already aligned (In Progress) by their merged fixes.
 - [056](features/056-executable-user-journeys/implementation.md) FR-007 status note no longer cites `surfaces.yaml` as a mapped source file (coherence R3.1). The autonomous-init recovery tests get a 30 s wrapper budget so `pytest -n auto` no longer times out; `.coverage` data files are ignored.
+- `run_capability` (`validator/drivers/runner.py`) splits the skip result and the 035 AC-002 test-path append into helpers after the merge pushed it past the 60-line convention limit (behavior unchanged); `conventions verify --feature repo` passes again.
 
 ## 2026-10-12 — Bugfix: audit bugs through the bugfix lane (084)
 

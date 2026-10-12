@@ -92,26 +92,48 @@ def run_capability(
     cwd = project_root or Path.cwd()
     skip = capability_skip_message(driver, capability, cwd)
     if skip is not None:
-        # A missing optional library is "not configured", not a failure (018 AC-008/AC-009).
-        return CapabilityResult(
-            capability_name=capability,
-            exit_code=0,
-            stdout=skip,
-            report_path=cap.report_path,
-            certification_gaps=[f"Capability skipped: {skip}"],
-        )
+        return _skipped_result(capability, cap, skip)
     proc_env = {**os.environ, **(env or {})}
 
     argv = _capability_argv(driver, capability, cap, cwd)
     if test_paths is not None:
-        # @spec AC-002: Append selected tests only on opt-in
-        # — .specs/features/035-unified-cli-surface/spec.md#ac-002
-        if cap.test_selection != "append":
-            raise DriverTestSelectionError(driver.name, capability)
-        argv = [*argv, *test_paths]
+        argv = _append_test_paths(driver, capability, cap, argv, test_paths)
     if cap.report_adapter is not None and feature is not None:
         return _run_captured(cap, capability, argv, cwd, proc_env, timeout, feature)
     return _run_uncertified(cap, capability, argv, cwd, proc_env, timeout)
+
+
+def _skipped_result(capability: str, cap: DriverCapability, skip: str) -> CapabilityResult:
+    """Report a skipped capability as an uncertified success.
+
+    A missing optional library is "not configured", not a failure (018 AC-008/AC-009).
+    """
+    return CapabilityResult(
+        capability_name=capability,
+        exit_code=0,
+        stdout=skip,
+        report_path=cap.report_path,
+        certification_gaps=[f"Capability skipped: {skip}"],
+    )
+
+
+def _append_test_paths(
+    driver: DriverManifest,
+    capability: str,
+    cap: DriverCapability,
+    argv: list[str],
+    test_paths: Sequence[str],
+) -> list[str]:
+    """Append selected test files when the capability opts in to test selection.
+
+    Raises:
+        DriverTestSelectionError: The capability does not declare ``test_selection: append``.
+    """
+    # @spec AC-002: Append selected tests only on opt-in
+    # — .specs/features/035-unified-cli-surface/spec.md#ac-002
+    if cap.test_selection != "append":
+        raise DriverTestSelectionError(driver.name, capability)
+    return [*argv, *test_paths]
 
 
 def _capability_argv(
