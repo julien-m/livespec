@@ -47,8 +47,14 @@ class LinkUpdate:
 def recorded_root(project: Path) -> Path | None:
     """Return the resolved LiveSpec root recorded in ``.specs/.livespec-path``, if any."""
     path_file = project / LIVESPEC_PATH_RELPATH
-    text = path_file.read_text(encoding="utf-8").strip() if path_file.is_file() else ""
-    return Path(text).expanduser().resolve() if text else None
+    try:
+        text = path_file.read_text(encoding="utf-8").strip() if path_file.is_file() else ""
+        candidate = Path(text).expanduser()
+        # Only an absolute recorded root is trusted; relative or unreadable values are ignored.
+        return candidate.resolve() if text and candidate.is_absolute() else None
+    except (OSError, UnicodeError, ValueError, RuntimeError):
+        # Malformed provenance means "no trusted root": broken links then stay untouched.
+        return None
 
 
 # @spec FR-006: Owned-link provenance

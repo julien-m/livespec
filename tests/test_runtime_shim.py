@@ -347,3 +347,30 @@ def test_looping_current_symlink_exits_3_without_traceback(
         result = run_shim(home, outside, *args, env=_env(installed))
         assert result.returncode == 3, args
         assert result.stderr.startswith("livespec-shim:") and "Traceback" not in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("source", "created_at"),
+    [("relative/source", "2026-10-11T00:00:00+00:00"), ("/abs/source", "yesterday")],
+)
+def test_current_with_malformed_source_or_timestamp_exits_3(
+    installed: Installed, tmp_path: Path, source: str, created_at: str
+) -> None:
+    """Audit round 3 #4: non-digest manifest fields are validated without recomputing it."""
+    home = RuntimeHome((tmp_path / "fake-home").resolve())
+    write_shim(home, PYTHON)
+    manifest: dict[str, object] = {
+        "schema": 1,
+        "runtime_id": "21-aaaaaaaaaaaa",
+        "livespec_version": 21,
+        "commit": "a" * 40,
+        "source": source,
+        "created_at": created_at,
+        "content_digest": "sha256:" + "0" * 64,
+    }
+    os.symlink(_fake_snapshot(home, "21-aaaaaaaaaaaa", manifest), home.current)
+    outside = tmp_path / "no-project"
+    outside.mkdir()
+    result = run_shim(home, outside, "status", env=_env(installed))
+    assert result.returncode == 3
+    assert "does not point to an installed runtime snapshot" in result.stderr

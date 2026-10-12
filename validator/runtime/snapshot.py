@@ -81,6 +81,8 @@ def remove_tree(root: Path, container: Path) -> None:
     """
     if root.is_symlink():
         raise LiveSpecRuntimeError(f"refusing to delete through a symlink: {root}")
+    if not root.is_dir():
+        raise LiveSpecRuntimeError(f"refusing to delete a non-directory: {root}")
     if root.resolve().parent != container.resolve():
         raise LiveSpecRuntimeError(f"refusing to delete outside {container}: {root}")
     restore_write_bits(root)

@@ -323,3 +323,12 @@ def test_lock_is_published_last_and_rollback_failure_is_reported(
     monkeypatch.setattr(project_module, "replace_symlink", failing_restore)
     with pytest.raises(RuntimeSelectionError, match="rollback incomplete"):
         upgrade_project(project, runtimes.v22, runtimes.home)
+
+
+@pytest.mark.parametrize("content", [b"relative/livespec\n", b"\xff\xfe not utf-8\n"])
+def test_untrusted_recorded_root_is_ignored(tmp_path: Path, content: bytes) -> None:
+    """Audit round 3 #3: relative or undecodable .livespec-path never yields a trusted root."""
+    project = tmp_path / "consumer"
+    (project / ".specs").mkdir(parents=True)
+    (project / ".specs" / ".livespec-path").write_bytes(content)
+    assert links_module.recorded_root(project) is None

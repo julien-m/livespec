@@ -120,6 +120,10 @@ Shared fixtures: `tests/runtime_support.py` (temporary git sources with a real-c
 | R2#6 incomplete `current` manifest (blocker) | `_manifest_identity_ok` in `validator/runtime/shim_core.py` checks exact key set, int schema 1 and digest format; digest is still not recomputed (FR-004) | `tests/test_runtime_shim.py::test_current_with_incomplete_manifest_exits_3` |
 | R2#7 looping `current` traceback | `_current_snapshot` resolves strictly inside `try` and maps `OSError`/`RuntimeError` to the install recovery error | `tests/test_runtime_shim.py::test_looping_current_symlink_exits_3_without_traceback` |
 | R2#8 optional deletion container | `remove_tree(root, container)` requires the container (`validator/runtime/snapshot.py`) | `tests/test_runtime_snapshot.py::test_remove_tree_requires_a_real_direct_child` |
+| R3#3 untrusted recorded root | `recorded_root` in `validator/runtime/links.py` trusts only an absolute, decodable `.livespec-path` | `tests/test_runtime_project.py::test_untrusted_recorded_root_is_ignored` |
+| R3#4 `current` manifest source/created_at | `_manifest_identity_ok` requires an absolute `source` and a UTC ISO-8601 `created_at` (`validator/runtime/shim_core.py`) | `tests/test_runtime_shim.py::test_current_with_malformed_source_or_timestamp_exits_3` |
+| R3#5 non-directory deletion | `remove_tree` refuses non-directories (`validator/runtime/snapshot.py`) | `tests/test_runtime_snapshot.py::test_remove_tree_refuses_a_regular_file_child` |
+| R3#1/#2 registry and resume line | README activity row and `progress.md` resume point updated | — |
 | R2#9-#11 Markdown link style in feature docs | no change: implementation maps use code spans, parsed by the feature-scope resolver | — |
 
 Execution certification is re-run after these corrections by `/spec-test`.

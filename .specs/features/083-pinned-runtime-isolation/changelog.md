@@ -84,3 +84,4 @@
 - **AC impacted:** AC-003, AC-005, AC-007, AC-013, AC-018
 - **Author:** Claude Code supervisor (claude-opus-5-5), implementing agent interrupted by an API limit
 - Read [implementation](implementation.md) (Second audit pass table): redirected `.specs` paths refused before defect writes, HTML-escaped single-line report values, bytecode-free docs fixture, lock published last with explicit incomplete-rollback error, strict `current` manifest shape and loop-safe resolution in the shim, mandatory deletion container.
+- Third audit pass (0 blocker): absolute-only trusted `.livespec-path`, `current` manifest source/created_at validation, non-directory deletion refused.

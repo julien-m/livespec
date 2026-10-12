@@ -340,3 +340,15 @@ def test_remove_tree_requires_a_real_direct_child(tmp_path: Path) -> None:
     assert (outside / "keep").is_dir() and (container / "nested" / "deeper").is_dir()
     snapshot_module.remove_tree(container / "nested", container)
     assert not (container / "nested").exists()
+
+
+def test_remove_tree_refuses_a_regular_file_child(tmp_path: Path) -> None:
+    """Audit round 3 #5: a direct-child regular file is refused with the runtime error."""
+    from validator.runtime.errors import LiveSpecRuntimeError
+
+    container = tmp_path / "versions"
+    container.mkdir()
+    (container / "file.txt").write_text("keep\n")
+    with pytest.raises(LiveSpecRuntimeError, match="non-directory"):
+        snapshot_module.remove_tree(container / "file.txt", container)
+    assert (container / "file.txt").read_text() == "keep\n"

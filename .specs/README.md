@@ -143,6 +143,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-12 | Feature | Feature 083 second audit pass: redirected-path refusal, escaped defect values, lock-last publication, strict shim current manifest |
 | 2026-10-11 | Feature | Feature 083 audit corrections: defect input validation, staging symlink containment, strict manifest, read-only verification, locked selection rollback |
 | 2026-10-11 | Feature | [Feature 083] Test: 100% AC covered (18/18), 3 tests generated |
 | 2026-10-11 | Feature | Feature 083 implemented: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, tool/project boundary (18/18 AC certified) |
@@ -152,7 +153,6 @@
 | 2026-10-09 | Bugfix | Bugfix: observed autonomous init and safe force recovery |
 | 2026-09-08 | Feature | Feature 076 V5 temporary ownership verified; native AC-006 only; full-feature and main delivery not certified. |
 | 2026-09-08 | Feature | Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion. |
-| 2026-09-08 | Bugfix | Feature079 gen4 Fix: deterministic CI, pinned private corpus and AST backend repaired; all local checks pass, AC002 native only, final CI/main pending. |
 <!-- readme:activity:end -->
 
 ---

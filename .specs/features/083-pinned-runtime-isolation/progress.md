@@ -21,7 +21,8 @@
 | Review fixes | Done | `validator/runtime/{manifest,snapshot,inspection}.py` (manifest commit checked against the install ref / lock), tests strengthened after the independent mapping review | runtime tests | Pass | 2026-10-11 22:30 |
 | Execution proof | Done | `.specs/features/083-pinned-runtime-isolation/run/acceptance/{mapping.json,mapping-review-receipt.json}` | `livespec test --acceptance-mapping … --execution-command '<pytest runtime tests>' --report-adapter junit` | valid, 18/18 AC certified, no gaps | 2026-10-11 22:40 |
 | Audit corrections | Done | `validator/runtime/{defects,errors,snapshot,manifest,models,links,project,inspection,shim_core}.py`, `validator/cli_commands/runtime_cmd.py`, runtime tests, `README.md`, `docs/cli-reference.md` | runtime + doctor + version-guard tests; conventions verify; full suite vs baseline | Pass | 2026-10-11 23:30 |
+| Second audit pass | Done | `validator/runtime/{defects,project,shim_core,snapshot,links}.py`, runtime tests | runtime + doctor + version-guard tests; conventions verify | Pass | 2026-10-12 05:15 |
 
 ## Resume point
 
-None for implementation: steps, `/spec-test` and the 2026-10-11 audit corrections are done; the supervisor re-runs `/spec-test` to re-certify execution after the corrections.
+Implementation corrections (both audit passes) are done; execution re-certification is pending: run `/spec-test 083-pinned-runtime-isolation`.

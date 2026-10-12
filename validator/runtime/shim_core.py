@@ -19,6 +19,7 @@ import os
 import re
 import sys
 from collections.abc import Callable
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import NamedTuple, cast
 
@@ -185,12 +186,26 @@ def _project_resolution(project: Path, home: Path) -> Resolution:
     return Resolution(root, (f"{NOTICE_PREFIX} dev mode executes the LiveSpec checkout {root}",))
 
 
+def _is_utc_timestamp(value: str) -> bool:
+    """Return whether ``value`` is an ISO-8601 timestamp with a zero UTC offset."""
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return False
+    return parsed.utcoffset() == timedelta(0)
+
+
 def _manifest_identity_ok(identity: dict[str, object], directory: Path) -> bool:
     runtime_id, commit = identity.get("runtime_id"), identity.get("commit")
     version = identity.get("livespec_version")
     schema, digest = identity.get("schema"), identity.get("content_digest")
+    source, created_at = identity.get("source"), identity.get("created_at")
     return (
         frozenset(identity) == MANIFEST_SHAPE_KEYS
+        and isinstance(source, str)
+        and Path(source).is_absolute()
+        and isinstance(created_at, str)
+        and _is_utc_timestamp(created_at)
         and type(schema) is int
         and schema == LOCK_SCHEMA
         and isinstance(digest, str)
