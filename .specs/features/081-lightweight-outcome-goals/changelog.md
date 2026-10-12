@@ -1,5 +1,14 @@
 # Changelog - 081-lightweight-outcome-goals
 
+## 2026-10-12 — [Bugfix]: Inline evidence and init deadline test pass on Python 3.12
+
+- **Type:** Bugfix (PR #36 CI)
+- **Spec modified:** No
+- **Code modified:** `validator/goal_cli_inputs.py` (`--evidence` path probe tolerates ENAMETOOLONG), `tests/test_goal_cli_inputs.py` (new), `tests/test_lightweight_goals.py` (real `ObservedProfile` instead of an empty `object.__new__`)
+- **Cause:** CI runs Python 3.12, where `Path(<long inline JSON>).exists()` raises `File name too long` (3.14 returns False), so `goal prove --evidence '<json>'` failed; the deadline test compared a field-less dataclass instance, which only 3.13+ short-circuits on identity.
+- **Proof:** unit suite 3840 passed under a Python 3.12 venv with `GITHUB_ACTIONS=true CI=true` and without `AIRESOURCES`, and under the local 3.14 venv; the new evidence test fails without the fix on 3.12.
+- **Author:** spec-fix (claude-code)
+
 ## 2026-10-12 — [Bugfix]: A missing feature target can no longer satisfy the stop condition
 
 - **Type:** Bugfix (PR #36 review)

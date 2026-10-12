@@ -138,7 +138,12 @@ def read_evidence_input(evidence_input: str) -> JsonObject:
         GoalInputError: If evidence is unreadable, malformed, or not an object.
     """
     candidate = Path(evidence_input)
-    if candidate.exists():
+    try:
+        is_path = candidate.exists()
+    except OSError:
+        # Inline JSON longer than the filename limit raises ENAMETOOLONG on Python < 3.14.
+        is_path = False
+    if is_path:
         return _read_json_object(candidate, "prove")
     try:
         parsed: object = json.loads(evidence_input)

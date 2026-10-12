@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shlex
 import subprocess
 import textwrap
@@ -260,10 +261,10 @@ def test_help_ends_with_executable_example(command_name: str) -> None:
     """AC-013 / SC-003: each --help shows one example its own parser accepts."""
     result = runner.invoke(app, [command_name, "--help"], terminal_width=200)
     assert result.exit_code == 0, result.output
+    # Rich colors help under CI (GITHUB_ACTIONS); strip ANSI styling before parsing.
+    plain = re.sub(r"\x1b\[[0-9;]*m", "", result.output)
     example_lines = [
-        line.strip()
-        for line in result.output.splitlines()
-        if line.strip().startswith("Example: livespec ")
+        line.strip() for line in plain.splitlines() if line.strip().startswith("Example: livespec ")
     ]
     assert len(example_lines) == 1, result.output
     argv = shlex.split(example_lines[0].removeprefix("Example: "))

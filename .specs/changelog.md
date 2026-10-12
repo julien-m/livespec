@@ -7,6 +7,11 @@
 
 ---
 
+## 2026-10-12 — Bugfix: CI parity on Python 3.12
+
+- [081](features/081-lightweight-outcome-goals/changelog.md): `goal prove --evidence '<json>'` no longer fails on Python 3.12 when the inline JSON exceeds the filename limit; the deadline test uses a real profile.
+- [035](features/035-unified-cli-surface/changelog.md): the help-example test strips Rich ANSI styling emitted under GitHub Actions.
+
 ## 2026-10-12 — Bugfix: PR #36 review findings
 
 - [081](features/081-lightweight-outcome-goals/changelog.md): `livespec validate <path>` fails (exit 2) for a missing explicit target, so a never-created feature cannot satisfy its goal stop condition.

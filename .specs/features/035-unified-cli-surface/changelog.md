@@ -1,5 +1,14 @@
 ## 2026-10-12 — [Bugfix]: Fix: AC-013 help examples, constitution exit codes, base order, JSON summary channel, AC-002 feature selection
 
+## 2026-10-12 — [Test]: Help-example test strips ANSI styling
+
+- **Type:** Test fix (PR #36 CI)
+- **Spec modified:** No
+- **Code modified:** `tests/test_cli_unified_exit_codes.py`
+- **Cause:** under GitHub Actions Rich colors `--help`, so the AC-013 example line was parsed with ANSI escape codes as arguments.
+- **Proof:** passes with `GITHUB_ACTIONS=true` on Python 3.12.
+- **Author:** spec-fix (claude-code)
+
 - **Type:** Bug Fix
 - **Spec modified:** Yes (human decisions in Clarifications: exit-code taxonomy 0/1/2/3/130 with the shared `.specs/` resolver exception, base branch origin/HEAD then main, master, develop, dev, JSON summary on stderr, feature-scoped selection with `test_selection: append`; AC-002, AC-004, AC-011, AC-012, AC-013, FR-001, FR-005, FR-006, FR-007, FR-009, EC-004, EC-005 reworded; Mermaid added to Stories 3–5; Deps +033; status Draft → In Progress)
 - **Plan modified:** Yes (rewritten: technical context, constitution check, sequence diagrams, steps 1–12)

@@ -370,7 +370,16 @@ def test_outcome_runs_the_real_stop_condition_and_rejects_invalid_specs(tmp_path
 def test_completed_autonomous_init_is_not_failed_by_an_elapsed_deadline(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    profile = object.__new__(ObservedProfile)
+    profile = ObservedProfile(
+        product_name="demo",
+        technical_names=(),
+        package_manager="unknown",
+        facts=(),
+        sources=(),
+        tools=(),
+        testing_tools=(),
+        test_commands=(),
+    )
     for name in ("_install", "_ensure_core", "_install_hooks", "verify_current_profile"):
         monkeypatch.setattr(init_from_code, name, lambda *args, **kwargs: None)
     monkeypatch.setattr(init_from_code, "run_probes", lambda *args: ())
