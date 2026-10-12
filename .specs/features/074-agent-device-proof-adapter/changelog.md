@@ -1,6 +1,6 @@
 # Changelog: Agent Device Proof Adapter (074)
 
-## 2026-07-04 - [Feature]: Agent Device proof adapter
+## 2026-07-04 — [Feature]: Agent Device proof adapter
 
 - **Type:** Feature
 - **Spec modified:** Yes (new feature spec, plan, progress, implementation map)

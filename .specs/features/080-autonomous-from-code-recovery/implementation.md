@@ -1,3 +1,8 @@
+---
+title: Autonomous From-Code Recovery implementation
+feature: 080-autonomous-from-code-recovery
+---
+
 # Implementation — Autonomous From-Code Recovery
 
 ## Requirement Mapping
