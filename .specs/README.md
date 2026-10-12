@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-10-11
+> Last updated: 2026-10-12
 
 
 ---
@@ -118,7 +118,7 @@
 | 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-09-07 | [spec](features/078-requirement-evidence-integrity/spec.md) |
 | 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-09-08 | [spec](features/079-validator-ci-prerequisites/spec.md) |
 | 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-09 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
-| 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-11 | [spec](features/083-pinned-runtime-isolation/spec.md) |
+| 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-12 | [spec](features/083-pinned-runtime-isolation/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -143,6 +143,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-12 | Feature | Feature 083 pipeline complete: pinned runtime isolation (18/18 AC certified, audit clean) |
+| 2026-10-12 | Feature | [Feature 083] Test: 100% AC covered (18/18), 1 test generated (re-certification after audit corrections) |
 | 2026-10-12 | Feature | Feature 083 second audit pass: redirected-path refusal, escaped defect values, lock-last publication, strict shim current manifest |
 | 2026-10-11 | Feature | Feature 083 audit corrections: defect input validation, staging symlink containment, strict manifest, read-only verification, locked selection rollback |
 | 2026-10-11 | Feature | [Feature 083] Test: 100% AC covered (18/18), 3 tests generated |
@@ -151,8 +153,6 @@
 | 2026-10-11 | Feature | Feature 083 plan created: Pinned Runtime Isolation, 9 implementation steps, 3 diagrams, ADR-004 |
 | 2026-10-11 | Spec | [Feature 083] Spec created: Pinned Runtime Isolation — 7 stories, 18 AC, 13 FR |
 | 2026-10-09 | Bugfix | Bugfix: observed autonomous init and safe force recovery |
-| 2026-09-08 | Feature | Feature 076 V5 temporary ownership verified; native AC-006 only; full-feature and main delivery not certified. |
-| 2026-09-08 | Feature | Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion. |
 <!-- readme:activity:end -->
 
 ---
@@ -284,3 +284,5 @@
 <!-- finalize:spec-implement:2026-10-11:027bff35 -->
 
 <!-- finalize:spec-implement:2026-10-11:c4506f10 -->
+
+<!-- finalize:spec-feature:2026-10-12:21b73207 -->

@@ -332,3 +332,19 @@ def test_untrusted_recorded_root_is_ignored(tmp_path: Path, content: bytes) -> N
     (project / ".specs").mkdir(parents=True)
     (project / ".specs" / ".livespec-path").write_bytes(content)
     assert links_module.recorded_root(project) is None
+
+
+def test_dev_from_pinned_moves_path_and_links_to_checkout(
+    runtimes: Runtimes, tmp_path: Path
+) -> None:
+    """AC-011: dev mode points .livespec-path and owned links from a snapshot to the checkout."""
+    project = _consumer(tmp_path, runtimes.checkout)
+    pin_project(project, runtimes.v21, runtimes.home)
+    snapshot = _snapshot(runtimes, runtimes.v21)
+    skill = project / ".agent-sync.local/skills/spec-check"
+    rule = project / ".agent-sync.local/rules/commands.md"
+    assert Path(os.readlink(skill)) == snapshot / ".agent-sync/skills/spec-check"
+    dev_project(project, runtimes.checkout)
+    assert (project / ".specs/.livespec-path").read_text().strip() == str(runtimes.checkout)
+    assert Path(os.readlink(skill)) == runtimes.checkout / ".agent-sync/skills/spec-check"
+    assert Path(os.readlink(rule)) == runtimes.checkout / ".agent-sync/rules/livespec/commands.md"

@@ -85,3 +85,22 @@
 - **Author:** Claude Code supervisor (claude-opus-5-5), implementing agent interrupted by an API limit
 - Read [implementation](implementation.md) (Second audit pass table): redirected `.specs` paths refused before defect writes, HTML-escaped single-line report values, bytecode-free docs fixture, lock published last with explicit incomplete-rollback error, strict `current` manifest shape and loop-safe resolution in the shim, mandatory deletion container.
 - Third audit pass (0 blocker): absolute-only trusted `.livespec-path`, `current` manifest source/created_at validation, non-directory deletion refused.
+
+### 2026-10-12 — Test: AC coverage re-certified after audit corrections
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** tests/test_runtime_project.py (1 appended test: `test_dev_from_pinned_moves_path_and_links_to_checkout`); run/acceptance/mapping.json (re-bound to HEAD 83a48c5, +11/−2 bindings, 177 total) and mapping-review-receipt.json (fresh review)
+- **Coverage:** 18/18 AC covered (100%), 1 generated, 103/103 feature tests passing; full unit suite no failure outside baseline
+- **Report:** `checks/2026-10-12-test.md`
+- **Author:** Claude Code native spec-test (claude-opus-5-5)
+
+### 2026-10-12 — Feature: Pipeline complete (/spec-feature --auto)
+
+- **Type:** Feature
+- **Spec modified:** No
+- **Code modified:** No (pipeline closure only)
+- **Author:** Claude Code spec-feature supervisor (claude-opus-5-5)
+- Specify, Clarify, Plan, Analyze, Preflight, Implement and Test phases done; three read-only audit passes with corrections (0 unresolved blockers); execution re-certified 18/18 AC after the corrections.
+
+<!-- finalize:spec-feature:2026-10-12:21b73207 -->

@@ -25,4 +25,8 @@
 
 ## Resume point
 
-Implementation corrections (both audit passes) are done; execution re-certification is pending: run `/spec-test 083-pinned-runtime-isolation`.
+Implementation corrections (both audit passes) are done; execution re-certified by `/spec-test` on 2026-10-12 (18/18 AC, see [checks/2026-10-12-test.md](checks/2026-10-12-test.md)).
+
+## Pipeline closure
+
+`/spec-feature --auto` supervisor goal `8a7aa28f` complete 55/55, archived with outcome success (`.specs/.runs/spec-feature-2026-10-12T04-01-14.707032-8a7aa28f-policy2.json`, gitignored). `/goal` is not invocable by sub-agents: the lead-authorized fallback, the CLI contract `livespec goal render/prove/status/archive`, was the completion proof for the supervisor and every phase child (specify `91ae1b55`, plan `6fe93f7d`, analyze `abbe831c`, preflight `72fdf6c3`, implement `df4ee1ef`, test `553c9ac8`).

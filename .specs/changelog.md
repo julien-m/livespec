@@ -3,9 +3,14 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-11
+> Last updated: 2026-10-12
 
 ---
+
+## 2026-10-12 — Feature 083 pipeline complete: pinned runtime isolation (18/18 AC certified, audit clean)
+<!-- finalize:spec-feature:2026-10-12:21b73207 -->
+
+## 2026-10-12 — [Feature 083] Test: 100% AC covered (18/18), 1 test generated (re-certification after audit corrections)
 
 ## 2026-10-12 — Feature 083 second audit pass: redirected-path refusal, escaped defect values, lock-last publication, strict shim current manifest
 

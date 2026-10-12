@@ -24,26 +24,26 @@
 
 | AC | Test File | Status |
 |---|---|---|
-| AC-001 | `tests/test_runtime_snapshot.py` | ✅ Pass 2026-10-11 |
-| AC-002 | `tests/test_runtime_snapshot.py` | ✅ Pass 2026-10-11 |
-| AC-003 | `tests/test_runtime_snapshot.py` (post-refusal binding line 172) | ✅ Pass 2026-10-11 (spec-test) |
-| AC-004 | `tests/test_runtime_shim.py` | ✅ Pass 2026-10-11 |
-| AC-005 | `tests/test_runtime_shim.py` (incl. `test_manifest_runtime_id_differing_from_lock_exits_3`) | ✅ Pass 2026-10-11 (spec-test) |
-| AC-006 | `tests/test_runtime_project.py` (incl. `test_pin_replaces_lock_pinned_to_another_runtime`) | ✅ Pass 2026-10-11 (spec-test) |
-| AC-007 | `tests/test_runtime_project.py` | ✅ Pass 2026-10-11 |
-| AC-008 | `tests/test_runtime_project.py` | ✅ Pass 2026-10-11 |
-| AC-009 | `tests/test_runtime_project.py` | ✅ Pass 2026-10-11 |
-| AC-010 | `tests/test_runtime_cli.py` | ✅ Pass 2026-10-11 |
-| AC-011 | `tests/test_runtime_project.py` | ✅ Pass 2026-10-11 |
-| AC-012 | `tests/test_runtime_docs.py` | ✅ Pass 2026-10-11 |
-| AC-013 | `tests/test_runtime_defects.py` | ✅ Pass 2026-10-11 |
-| AC-014 | `tests/test_runtime_defects.py` | ✅ Pass 2026-10-11 |
-| AC-015 | `tests/test_runtime_inspection.py`, `tests/test_runtime_shim.py` | ✅ Pass 2026-10-11 |
-| AC-016 | `tests/test_runtime_inspection.py`, `tests/test_runtime_shim.py` | ✅ Pass 2026-10-11 |
-| AC-017 | `tests/test_runtime_inspection.py` (incl. `test_status_json_in_dev_mode`) | ✅ Pass 2026-10-11 (spec-test) |
-| AC-018 | `tests/test_runtime_docs.py`, `tests/runtime_support.py` | ✅ Pass 2026-10-11 |
+| AC-001 | `tests/test_runtime_snapshot.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-002 | `tests/test_runtime_snapshot.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-003 | `tests/test_runtime_snapshot.py` (incl. `test_staging_named_symlink_is_unlinked_without_following`) | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-004 | `tests/test_runtime_shim.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-005 | `tests/test_runtime_shim.py` (incl. `test_current_must_be_a_verified_snapshot`, `test_looping_current_symlink_exits_3_without_traceback`) | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-006 | `tests/test_runtime_project.py` (incl. `test_pin_replaces_lock_pinned_to_another_runtime`) | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-007 | `tests/test_runtime_project.py` (incl. `test_broken_links_need_trusted_provenance`), `tests/test_runtime_cli.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-008 | `tests/test_runtime_project.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-009 | `tests/test_runtime_project.py`, `tests/test_runtime_cli.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-010 | `tests/test_runtime_cli.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-011 | `tests/test_runtime_project.py` (incl. generated `test_dev_from_pinned_moves_path_and_links_to_checkout`), `tests/test_runtime_cli.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-012 | `tests/test_runtime_docs.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-013 | `tests/test_runtime_defects.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-014 | `tests/test_runtime_defects.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-015 | `tests/test_runtime_inspection.py`, `tests/test_runtime_shim.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-016 | `tests/test_runtime_inspection.py`, `tests/test_runtime_shim.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-017 | `tests/test_runtime_inspection.py` (incl. `test_status_json_in_dev_mode`, `test_pinned_lock_without_livespec_path_warns`) | ✅ Pass 2026-10-12 (spec-test re-certification) |
+| AC-018 | `tests/test_runtime_docs.py` (isolated HOME/TMPDIR/git config, written-path containment, fixture-tree hashes), `tests/runtime_support.py` | ✅ Pass 2026-10-12 (spec-test re-certification) |
 
-Shared fixtures: `tests/runtime_support.py` (temporary git sources with a real-code copy, consumer fixtures, independent digest, write-bit restoration, protected-set fingerprint).
+Shared fixtures: `tests/runtime_support.py` (temporary git sources with a real-code copy, consumer fixtures, independent digest, write-bit restoration, tree hashes).
 
 ## Files Created/Modified
 
@@ -89,6 +89,13 @@ Shared fixtures: `tests/runtime_support.py` (temporary git sources with a real-c
 - Independent mapping review (claude-opus-5-5, 2 batches + synthesis): receipt `.specs/features/083-pinned-runtime-isolation/run/acceptance/mapping-review-receipt.json`, complete and ready, 18/18 covered. Non-blocking reviewer warnings kept for `/spec-test`: one AC-003 binding labelled "current unchanged after refusal" cites the pre-refusal check (the post-refusal assertion in the same test is unbound); manifest runtime_id≠lock is not exercised at shim level; pin replacing another pinned lock and `status` JSON in dev mode are not asserted.
 - Runner-owned execution receipt: `.specs/.execution/d513ca6e4a0744b8a6a62ab564770a00/receipt.json` (61 tests passed, 18 AC certified, no gaps).
 - `/spec-test` 2026-10-11: closed the four reviewer gaps (AC-003 rebind to line 172; new AC-005, AC-006, AC-017 tests). Mapping now 168 bindings; fresh mapping review receipt complete/ready 18/18; runner-owned execution receipt captured after these feature files were finalized (64 passed, 18 AC certified, no gaps; path recorded in the spec-test goal archive under `.specs/.runs/`, since editing this directory after capture would stale it). Report: [checks/2026-10-11-test.md](checks/2026-10-11-test.md).
+- `/spec-test` 2026-10-12 (re-certification after the audit passes):
+  - Mapping re-bound to HEAD 83a48c5: 95 of 168 spans moved; the AC-018 protected-path binding was re-pointed to the isolated fixture check.
+  - Added 8 bindings for audit-pass tests.
+  - The fresh independent mapping review (claude-opus-5-5, foreground) found the AC-011 path/link assertions non-discriminating. A test was generated for it (`test_dev_from_pinned_moves_path_and_links_to_checkout`), and the two old bindings were replaced.
+  - Mapping: 177 bindings. Review receipt complete and ready, 18/18 covered.
+  - The runner-owned execution receipt was captured after these feature files were finalized: 103 passed, 18 AC certified, no gaps. Its path is recorded in the spec-test goal archive under `.specs/.runs/`.
+  - Report: [checks/2026-10-12-test.md](checks/2026-10-12-test.md).
 
 ## Audit Corrections (2026-10-11)
 
