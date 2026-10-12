@@ -28,10 +28,10 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | FR-010 | `validator/journeys/history.py` | `@spec FR-010` | ✅ Implemented | 2026-06-05 |
 | FR-011 | `validator/journeys/history.py` | `@spec FR-011` | ✅ Implemented | 2026-06-05 |
 | FR-012 | `validator/journeys/history.py` | `@spec FR-012` | ✅ Implemented | 2026-06-05 |
-| FR-013 | `validator/journeys/assignment.py`, `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-013` | ✅ Implemented | 2026-06-05 |
-| FR-014 | `validator/journeys/assignment.py`, `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-014` | ✅ Implemented | 2026-06-05 |
-| FR-015 | `validator/journeys/bootstrap.py`, `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-015` | ✅ Implemented | 2026-06-05 |
-| FR-016 | `validator/journeys/assignment.py`, `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-016` | ✅ Implemented | 2026-06-05 |
+| FR-013 | `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-013` | ✅ Implemented (skill-owned; unused Python helper removed 2026-10-12) | 2026-10-12 |
+| FR-014 | `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-014` | ⚠️ Partial — agent-driven inference only; no deterministic helper or test (assignment helper removed 2026-10-12) | 2026-10-12 |
+| FR-015 | `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-015` | ⚠️ Partial — agent-driven bootstrap only; no deterministic helper or test (bootstrap helper removed 2026-10-12) | 2026-10-12 |
+| FR-016 | `.agent-sync/skills/spec-journey/SKILL.md` | `@spec FR-016` | ✅ Implemented (skill-owned) | 2026-10-12 |
 | FR-017 | `validator/journeys/schema.py`, `validator/journeys/validator.py` | `@spec FR-017` | ✅ Implemented | 2026-06-05 |
 | FR-018 | `validator/journeys/validator.py`, `validator/journeys/scanner.py` | `@spec FR-018` | ✅ Implemented | 2026-06-05 |
 | FR-019 | `validator/journeys/impact.py` | `@spec FR-019` | ✅ Implemented | 2026-06-05 |
@@ -48,12 +48,12 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | FR-030 | `validator/journeys/manifest.py`, `validator/journeys/compiler.py` | `@spec FR-030` | ✅ Implemented | 2026-06-09 |
 | FR-031 | `validator/journeys/schema.py` | `@spec FR-031` | ✅ Implemented | 2026-06-05 |
 | FR-032 | `validator/journeys/schema.py`, `validator/journeys/impact.py` | `@spec FR-032` | ✅ Implemented | 2026-06-05 |
-| FR-033 | `validator/journeys/schema.py`, `validator/journeys/visual_contracts.py` | `@spec FR-033` | ✅ Implemented | 2026-06-05 |
-| FR-034 | `validator/journeys/visual_contracts.py`, `validator/journeys/compiler.py` | `@spec FR-034` | ✅ Implemented | 2026-06-05 |
-| FR-035 | `validator/journeys/schema.py`, `validator/journeys/visual_contracts.py`, `validator/journeys/llm_visual.py` | `@spec FR-035` | ✅ Implemented | 2026-06-05 |
+| FR-033 | `validator/journeys/schema.py` | `@spec FR-033` | ✅ Implemented | 2026-10-12 |
+| FR-034 | `validator/journeys/compiler.py` | `@spec FR-034` | ⚠️ Partial — only `min_margin` and `text_fits` compile to Playwright assertions; the uncalled Python evaluator was removed 2026-10-12 | 2026-10-12 |
+| FR-035 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-035` | ✅ Implemented | 2026-10-12 |
 | FR-036 | `validator/journeys/compiler.py`, `validator/journeys/llm_visual.py` | `@spec FR-036` | ✅ Implemented | 2026-06-05 |
-| FR-037 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-037` | ✅ Implemented | 2026-06-05 |
-| FR-038 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-038` | ✅ Implemented | 2026-06-05 |
+| FR-037 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-037` | ⚠️ Partial — `evaluate_llm_visual_contract` exists but no command calls it; compiled contracts are never evaluated (decision pending 2026-10-12) | 2026-10-12 |
+| FR-038 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-038` | ⚠️ Partial — `evaluate_llm_visual_contract` exists but no command calls it; compiled contracts are never evaluated (decision pending 2026-10-12) | 2026-10-12 |
 | FR-039 | `validator/journeys/schema.py`, `validator/journeys/llm_visual.py` | `@spec FR-039` | ✅ Implemented | 2026-06-05 |
 | FR-040 | `validator/journeys/migration.py`, `validator/journeys/paths.py`, `migrations/20/migrate.md`, `scripts/migrate-journeys-compile.sh` | `@spec FR-040` | ✅ Implemented | 2026-06-09 |
 | FR-041 | `.agent-sync/skills/spec-journey/SKILL.md`, `system/testing/user-journeys.md`, `.agent-sync/skills/spec-test/SKILL.md`, `.agent-sync/skills/spec-feature/SKILL.md`, `.agent-sync/skills/spec-specify/SKILL.md` | `@spec FR-041` | ✅ Implemented | 2026-06-05 |
@@ -74,11 +74,11 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | AC-010 | `tests/test_journey_v2_history.py` | ✅ Implemented |
 | AC-011 | `tests/test_journey_v2_history.py` | ✅ Implemented |
 | AC-012 | `tests/test_journey_v2_docs_skills.py` | ✅ Implemented |
-| AC-013 | `tests/test_journey_v2_assignment_bootstrap.py`, `tests/test_journey_v2_docs_skills.py` | ✅ Implemented |
-| AC-014 | `tests/test_journey_v2_assignment_bootstrap.py` | ✅ Implemented |
-| AC-015 | `tests/test_journey_v2_assignment_bootstrap.py` | ✅ Implemented |
-| AC-016 | `tests/test_journey_v2_assignment_bootstrap.py`, `tests/test_journey_v2_compiler.py`, `tests/test_journey_v2_runner.py` | ✅ Implemented |
-| AC-017 | `tests/test_journey_v2_assignment_bootstrap.py`, `tests/test_journey_v2_docs_skills.py` | ✅ Implemented |
+| AC-013 | `tests/test_journey_v2_docs_skills.py` | ⚠️ Partial (skill text only) |
+| AC-014 | — (agent-driven; no deterministic test since 2026-10-12) | ⚠️ Partial |
+| AC-015 | `tests/test_journey_v2_docs_skills.py` (skill contract: propose before writing) | ⚠️ Partial |
+| AC-016 | `tests/test_journey_v2_compiler.py`, `tests/test_journey_v2_runner.py` | ✅ Implemented |
+| AC-017 | `tests/test_journey_v2_docs_skills.py` | ✅ Implemented |
 | AC-018 | `tests/test_journey_v2_schema.py`, `tests/test_journey_v2_validation.py`, `tests/test_journey_v2_compiler.py` | ✅ Implemented |
 | AC-019 | `tests/test_journey_v2_doctor.py`, `tests/test_doctor.py` | ✅ Implemented |
 | AC-020 | `tests/test_journey_v2_impact.py`, `tests/test_selector.py` | ✅ Implemented |
@@ -99,11 +99,11 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | AC-035 | `tests/test_journey_v2_schema.py`, `tests/test_journeys.py` | ✅ Implemented |
 | AC-036 | `tests/test_journey_v2_schema.py`, `tests/test_journey_v2_impact.py` | ✅ Implemented |
 | AC-037 | `tests/test_journey_v2_compiler.py`, `tests/test_journey_v2_schema.py` | ✅ Implemented |
-| AC-038 | `tests/test_journey_v2_visual_llm.py`, `tests/test_journey_v2_compiler.py` | ✅ Implemented |
-| AC-039 | `tests/test_journey_v2_schema.py`, `tests/test_journey_v2_visual_llm.py` | ✅ Implemented |
+| AC-038 | `tests/test_journey_v2_compiler.py::test_compile_v2_writes_playwright_native_visual_assertions` (min_margin only compiled for Playwright) | ⚠️ Partial |
+| AC-039 | `tests/test_journey_v2_schema.py` | ✅ Implemented |
 | AC-040 | `tests/test_journey_v2_compiler.py`, `tests/test_journey_v2_visual_llm.py` | ✅ Implemented |
-| AC-041 | `tests/test_journey_v2_visual_llm.py` | ✅ Implemented |
-| AC-042 | `tests/test_journey_v2_schema.py`, `tests/test_journey_v2_visual_llm.py` | ✅ Implemented |
+| AC-041 | `tests/test_journey_v2_visual_llm.py` (evaluator unit-tested, not wired) | ⚠️ Partial |
+| AC-042 | `tests/test_journey_v2_schema.py`, `tests/test_journey_v2_visual_llm.py` (advisory/blocking not enforced by any command) | ⚠️ Partial |
 | AC-043 | `tests/test_journey_v2_schema.py`, `tests/test_journey_v2_visual_llm.py` | ✅ Implemented |
 | AC-044 | `tests/test_journey_v2_migration.py`, `tests/test_journey_v2_doctor.py` | ✅ Implemented |
 | AC-045 | `tests/test_journey_v2_docs_skills.py`, `tests/test_command_registry.py`, `tests/test_agent_sync_layout.py` | ✅ Implemented |
@@ -119,8 +119,6 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | `validator/journeys/index.py` | Reusable journey index by ID, feature, refs, targets, visuals, manifests, and decisions. |
 | `validator/journeys/backlinks.py` | Generated feature-local `journeys.md` backlinks. |
 | `validator/journeys/history.py` | Changelog/decision/source-hash governance. |
-| `validator/journeys/assignment.py` | Deterministic free-form assignment candidates with evidence. |
-| `validator/journeys/bootstrap.py` | Existing-project journey candidate bootstrap without writes. |
 | `validator/journeys/impact.py` | Journey impact detection from SmartTestSelector, product text, stable selectors, and visual targets. |
 | `validator/journeys/compiler.py` | Ahead-of-time compiler facade, native artifact generation, and XcodeGen refresh for generated XCUITest files. |
 | `validator/journeys/compiler_registry.py` | Runner backend registry. |
@@ -129,8 +127,7 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | `validator/journeys/runner.py` | Compiled-only journey run selection, run-policy gates, stale manifest checks, and native runner execution. |
 | `validator/journeys/scanner.py` | Doctor journey stale checks, including old compiler manifests. |
 | `validator/journeys/migration.py` | v1 `.journey.yaml` migration to v2 global directories. |
-| `validator/journeys/visual_contracts.py` | Native deterministic visual checks. |
-| `validator/journeys/llm_visual.py` | Strict JSON LLM screenshot evaluator. |
+| `validator/journeys/llm_visual.py` | Strict JSON LLM screenshot evaluator (no production caller as of 2026-10-12; wiring decision pending). |
 | `validator/cli_commands/journey_cmd.py` | `livespec journey validate|compile|run|impact|migrate|list|inspect`. |
 | `validator/cli_commands/test_cmd.py` | `livespec test` compiled-only journey gate. |
 | `.agent-sync/skills/spec-journey/` | User-facing journey create/edit/bootstrap/impact/run/list/inspect workflow. |

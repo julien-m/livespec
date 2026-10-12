@@ -157,3 +157,14 @@ The tests read the skill and system docs relative to the cwd and failed outside 
 - Added `livespec journey validate|compile|run|impact|migrate|list|inspect`, v1 migration, native visual checks, LLM visual contracts/evaluator, and `$spec-journey` docs/expectations.
 - Updated `livespec test`, spec skills, system journey docs, command routing, and init command list.
 - Verified with targeted journey tests, full non-integration suite, changed-file lint/format checks, and Pyright.
+
+## 2026-10-12 - Refactor: retire unused assignment/bootstrap/native-visual helpers
+
+- **Type:** Refactor
+- **Spec modified:** No (implementation.md statuses corrected)
+- **Code modified:** validator/journeys/assignment.py, validator/journeys/bootstrap.py, validator/journeys/visual_contracts.py (deleted); tests/test_journey_v2_assignment_bootstrap.py (deleted); tests/test_journey_v2_visual_llm.py (native tests removed)
+- **AC impacted:** AC-013, AC-014, AC-015, AC-038 (Partial); AC-041, AC-042 (Partial, evaluator unwired)
+- **Author:** Claude Code (dead-code resolution)
+- `infer_journey_assignment` / `bootstrap_journey_candidates` were called only by their tests. Measured on this repository they are unusable as-is (392 refs across 24 features for one intent; 221 bootstrap candidates averaging 187 refs) and only parse the `- **AC-NNN:**` bullet form, so they were removed rather than wired. FR-013..FR-016 stay owned by the `$spec-journey` skill; FR-014/FR-015 are now honestly marked Partial.
+- `evaluate_native_visual_check` duplicated the Playwright assertions emitted by `compiler.py` and was never fed measured bounds; removed. FR-034 is Partial: only `min_margin`/`text_fits` compile.
+- `evaluate_llm_visual_contract` is kept but flagged: compiled LLM visual contracts are never evaluated by any command (decision escalated).
