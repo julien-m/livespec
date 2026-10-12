@@ -104,3 +104,15 @@
 - Specify, Clarify, Plan, Analyze, Preflight, Implement and Test phases done; three read-only audit passes with corrections (0 unresolved blockers); execution re-certified 18/18 AC after the corrections.
 
 <!-- finalize:spec-feature:2026-10-12:21b73207 -->
+
+### 2026-10-12 — Fix: documented migration command runs with LiveSpec's own venv (1 gap closed)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `README.md`, `docs/cli-reference.md`, `tests/test_runtime_docs.py`
+- **Gaps closed:** FR-013/AC-018 — `python3 -m validator.cli runtime install` failed without the dependencies (`ModuleNotFoundError: typer`) and would have bound the shim to that interpreter; the docs now use `<livespec repo>/.venv/bin/python` (`uv sync` once) and the test runs the exact block without venv activation or a python3 shim.
+- **Gate:** progression implement READY.
+- **Remaining:** None.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:5728df60 -->

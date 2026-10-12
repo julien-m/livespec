@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 from collections.abc import Iterator
 from pathlib import Path
@@ -186,6 +187,25 @@ def _handy_fixture(user_home: Path) -> tuple[Path, Path]:
     return checkout, handy
 
 
+def _checkout_venv(checkout: Path) -> None:
+    """Stand in for the checkout's ``uv sync`` venv: ``.venv/bin/python`` runs this venv.
+
+    An ``exec`` wrapper, not a symlink: a symlinked interpreter outside its venv directory
+    loses the venv's site-packages (typer, pydantic) and would hide a broken command.
+    """
+    python = checkout / ".venv/bin/python"
+    write(python, f'#!/bin/sh\nexec "{PYTHON}" "$@"\n')
+    python.chmod(0o755)
+
+
+def _git_only_bin(base: Path) -> Path:
+    """A PATH directory exposing the caller's git and nothing else."""
+    git_path = shutil.which("git")
+    assert git_path is not None, "git is required by the documented migration"
+    write(base / "git-only-bin/git", f'#!/bin/sh\nexec "{git_path}" "$@"\n', mode=0o755)
+    return base / "git-only-bin"
+
+
 def _inside(path: Path, root: Path) -> bool:
     return path.resolve().is_relative_to(root.resolve())
 
@@ -207,13 +227,17 @@ def test_documented_migration_runs_on_consumer_fixture(
     monkeypatch.delenv("LIVESPEC_HOME", raising=False)
     user_home = Path(isolated["HOME"]).resolve()
     checkout, handy = _handy_fixture(user_home)
+    _checkout_venv(checkout)
     protected = (user_home.parent / "origin", checkout)
     before = [_working_tree_hashes(root) for root in protected]
-    tool_bin = tmp_path / "bin"
-    tool_bin.mkdir()
-    os.symlink(PYTHON, tool_bin / "python3")
-    env = {key: value for key, value in os.environ.items() if key != "LIVESPEC_HOME"}
-    env.update(_GIT_IDENTITY, PATH=f"{tool_bin}:{env['PATH']}")
+    # Run as a user with no activated venv and no interpreter that happens to carry
+    # LiveSpec's dependencies: only git (via a wrapper) and the base system directories.
+    env = {
+        key: value
+        for key, value in os.environ.items()
+        if key not in {"LIVESPEC_HOME", "VIRTUAL_ENV"}
+    }
+    env.update(_GIT_IDENTITY, PATH=f"{_git_only_bin(tmp_path)}:/usr/bin:/bin")
     script = write(tmp_path / "migration.sh", _migration_block(WORKTREE / "docs/cli-reference.md"))
     try:
         completed = subprocess.run(

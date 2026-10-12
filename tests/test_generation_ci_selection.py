@@ -6,6 +6,7 @@
 import os
 import shlex
 import subprocess
+import sys
 from pathlib import Path
 from typing import cast
 
@@ -95,9 +96,20 @@ def test_corpus_cleanup_runs_after_all_consumers_even_when_a_check_fails(tmp_pat
     (corpus / "sentinel.md").write_text("isolated test fixture")
     retained = tmp_path / "keep.txt"
     retained.write_text("unrelated")
+    # CI runners expose `python`; locally only `python3` may exist, so the step gets an
+    # explicit `python` shim to the running interpreter instead of the developer's PATH.
+    shim_bin = tmp_path / "interpreter-shim"
+    shim_bin.mkdir()
+    shim = shim_bin / "python"
+    shim.write_text(f'#!/bin/sh\nexec {shlex.quote(sys.executable)} "$@"\n')
+    shim.chmod(0o755)
     # Exercise actual cleanup in an isolated cwd; unrelated files must survive.
     result = subprocess.run(
-        ["bash", "-c", step["run"]], cwd=tmp_path, capture_output=True, timeout=20
+        ["bash", "-c", step["run"]],
+        cwd=tmp_path,
+        env={**os.environ, "PATH": f"{shim_bin}{os.pathsep}{os.environ.get('PATH', '')}"},
+        capture_output=True,
+        timeout=20,
     )
     assert result.returncode == 0, result.stderr
     assert not corpus.exists()

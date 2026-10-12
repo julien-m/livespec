@@ -166,3 +166,14 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Code modified:** Pending implementation of the approved policy.
 - **Author:** Codex
 - GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.
+
+### 2026-10-12 — Fix: warm-cache regression controls its subprocess environment (test only)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `tests/test_execution_bytecode.py`
+- **Gaps closed:** with `PYTHONDONTWRITEBYTECODE=1` neither the warm-up nor the runner wrote bytecode, so the regression failed; it now removes the variable from its own environment.
+- **Remaining:** none for this test; production capture unchanged.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:b581f1b1 -->

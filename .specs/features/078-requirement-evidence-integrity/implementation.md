@@ -132,3 +132,7 @@ Read the [mapping ingestion guard](../../../validator/mapping_review_validation.
 ## 2026-09-08 — GitHub policy amendment
 
 The explicit user decision supersedes the earlier CI selector descriptions: GitHub runs only deterministic unit and level_3a integration checks, without model providers or credentials. Local opt-in selection, generation and evidence helpers remain intact. Read [the policy tests](../../../tests/test_generation_ci_events.py) and [private corpus tests](../../../tests/test_generation_ci_selection.py) for current FR-014/AC-013 behavior. Historical trial and verification reports retain their original scope; current runtime and CI proof are pending.
+
+## 2026-10-12 — Warm-cache regression environment (spec-fix, test only)
+
+The [warm-cache regression](../../../tests/test_execution_bytecode.py) removes `PYTHONDONTWRITEBYTECODE` from its own environment: the scenario needs real bytecode from both the warm-up and the runner subprocess. The production capture is unchanged.

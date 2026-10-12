@@ -553,7 +553,8 @@ livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature 
   rewrites `<home>/bin/livespec` for the installing interpreter and points `<home>/current` at
   the snapshot unless `--no-activate`. Re-installing reuses a verified snapshot; a corrupted
   one is refused, never overwritten. Without a working `livespec` yet, run it through the
-  checkout's own CLI: `cd <livespec repo> && python3 -m validator.cli runtime install`.
+  checkout's own environment: `cd <livespec repo> && uv sync && .venv/bin/python -m
+  validator.cli runtime install` (a bare `python3` lacks LiveSpec's dependencies).
 - **pin** writes the portable lock (`schema`, `mode`, `runtime_id`, `livespec_version`,
   `commit`), rewrites `.specs/.livespec-path` and retargets LiveSpec-owned links under
   `.agent-sync.local/{skills,rules}/` into the snapshot (missing targets are listed and left
@@ -588,8 +589,8 @@ project is run by another CLI, for example `/opt/homebrew/bin/livespec`.
 machine-local. After cloning a pinned project:
 
 ```bash
-# No livespec CLI exists yet on a fresh machine: use the checkout's own CLI first.
-cd <livespec repo> && python3 -m validator.cli runtime install --source <livespec repo> --ref <commit from lock>
+# No livespec CLI exists yet on a fresh machine: use the checkout's own environment first.
+cd <livespec repo> && uv sync && .venv/bin/python -m validator.cli runtime install --source <livespec repo> --ref <commit from lock>
 <home>/versions/<runtime_id>/scripts/link-local.sh <project> <home>/versions/<runtime_id>
 livespec runtime pin --runtime <runtime_id from lock>   # lock bytes stay unchanged
 ```
@@ -608,13 +609,17 @@ chmod -R u+w <home>/versions/<runtime_id> && rm -rf <home>/versions/<runtime_id>
 ### Migrating an existing consumer project (Handy)
 
 A consumer such as `~/projects/handy` that links into `~/projects/livespec` migrates with
-the commands below, in order (verified by `tests/test_runtime_docs.py` on a temporary copy):
+the commands below, in order (verified by `tests/test_runtime_docs.py` on a temporary copy).
+Prerequisite: the LiveSpec checkout has its own environment, `~/projects/livespec/.venv`
+(create it once with `cd ~/projects/livespec && uv sync`). The shim written by step 1 runs
+that same interpreter, so it keeps LiveSpec's dependencies without an activated venv.
 
 <!-- runtime-migration:start -->
 ```bash
-# 1. Install a snapshot of a committed LiveSpec tree (never the dirty dev checkout).
+# 1. Install a snapshot of a committed LiveSpec tree (never the dirty dev checkout) with the
+#    checkout's own venv: a bare python3 lacks LiveSpec's dependencies (typer, pydantic).
 git -C ~/projects/livespec fetch origin
-cd ~/projects/livespec && python3 -m validator.cli runtime install --source ~/projects/livespec --ref origin/main
+cd ~/projects/livespec && .venv/bin/python -m validator.cli runtime install --source ~/projects/livespec --ref origin/main
 # 2. Put the shim before any editable livespec (e.g. /opt/homebrew/bin/livespec); persist in ~/.zshrc.
 export PATH="$HOME/.livespec/bin:$PATH"
 hash -r

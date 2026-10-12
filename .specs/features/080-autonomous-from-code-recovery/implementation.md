@@ -33,3 +33,9 @@ The delivery snapshot starts at origin/main b468d0a and preserves its existing f
 Handy initialization separately completed 49/49 proofs and an authentic successful archive on 2026-10-09, preserving its 389 source files, HEAD and main branch. Handy was not executed by the delivery worker. Repository-wide feature/conventions certification remains incomplete.
 
 Shipping also supplies the four required bootstrap convention documents through CI's existing pinned sparse checkout. The corpus revision, credential policy and cleanup are unchanged. A pre-existing archive test's membership guard uses a tuple so Mypy narrows its Literal; archive runtime bytes are unchanged and its seven regressions pass.
+
+## 2026-10-12 — Bounded probes and hermetic init tests (spec-fix)
+
+- `_kill_group` in [init_probes.py](../../../validator/init_probes.py) also ignores EPERM: macOS returns it while a killed group only holds zombies (reproduced 1/200).
+- Budget tests drive `run_command` from a fake monotonic clock and record the real wait timeouts ([init_clock_support.py](../../../tests/init_clock_support.py)), so they assert the remaining budget instead of wall-clock bounds.
+- Init tests set `AIRESOURCES` to a fixture corpus, never a sibling or private checkout.

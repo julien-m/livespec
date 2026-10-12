@@ -13,13 +13,13 @@ from typing import cast
 import pytest
 
 from tests._conventions_source_decisions_serialization import (
-    test_receipt_and_cli_json_keep_rule_decision_manifest_parity,
     test_receipt_and_cli_json_rule_decision_manifest_parity,
     test_v1_receipt_serializes_rule_decision_manifest,
     test_v1_verify_cli_blocks_on_broken_catalog,
     test_v1_verify_cli_json_serializes_taxonomy_and_rule_decisions,
 )
 from tests.conventions_corpus_fixture import convention_corpus_project
+from tests.conventions_hermetic_catalogs import bind_default_catalogs_to_corpus
 from tests.test_conventions_taxonomy import _enforce_project, _write_ai_resources_fixture
 from validator.conventions_ast import source_decisions
 from validator.conventions_ast.catalog import load_ast_catalog
@@ -31,12 +31,22 @@ from validator.conventions_ast.taxonomy import taxonomy_fields
 from validator.conventions_gates import DEFAULT_AST_CATALOGS
 
 __all__ = [
-    "test_receipt_and_cli_json_keep_rule_decision_manifest_parity",
     "test_receipt_and_cli_json_rule_decision_manifest_parity",
     "test_v1_receipt_serializes_rule_decision_manifest",
     "test_v1_verify_cli_blocks_on_broken_catalog",
     "test_v1_verify_cli_json_serializes_taxonomy_and_rule_decisions",
 ]
+
+
+@pytest.fixture
+def corpus_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Synthetic twelve-source corpus with default catalogs bound to its own bytes.
+
+    Neither AIRESOURCES nor a private corpus can change executable decisions.
+    """
+    project = convention_corpus_project(tmp_path)
+    bind_default_catalogs_to_corpus(project, tmp_path / "catalogs", monkeypatch)
+    return project
 
 
 def test_rule_decision_manifest_decides_every_classified_source(tmp_path: Path) -> None:
@@ -69,8 +79,8 @@ def test_rule_decision_manifest_decides_every_classified_source(tmp_path: Path) 
         assert decision["rule_decision"]["decision_kind"] == decision["rule_decision"]["kind"]
 
 
-def test_named_source_decision_has_anchored_reason(tmp_path: Path) -> None:
-    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
+def test_named_source_decision_has_anchored_reason(corpus_project: Path) -> None:
+    manifest = build_rule_decision_manifest(corpus_project)
     decision = next(
         item
         for item in manifest["decisions"]
@@ -105,22 +115,9 @@ def test_catalog_load_failure_is_manifest_blocker(
 
     manifest = build_rule_decision_manifest(project)
 
-    assert manifest["catalog_load_errors"]
-    assert "catalog_load_error:" in validate_rule_decision_manifest(manifest)[0]
-
-
-def test_validate_rejects_incomplete_executable_metadata(tmp_path: Path) -> None:
-    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
-    executable = next(
-        decision
-        for decision in manifest["decisions"]
-        if decision["rule_decision"]["kind"] == "executable"
-    )
-    executable["rule_decision"]["detector_ids"] = []
-
-    issues = validate_rule_decision_manifest(manifest)
-
-    assert any(issue.startswith("missing_detectors:") for issue in issues)
+    errors = manifest["catalog_load_errors"]
+    assert len(errors) == 1 and "missing-catalog.yaml" in errors[0]
+    assert f"catalog_load_error:{errors[0]}" in validate_rule_decision_manifest(manifest)
 
 
 def test_validate_rejects_incomplete_non_blocking_metadata(tmp_path: Path) -> None:
@@ -139,9 +136,9 @@ def test_validate_rejects_incomplete_non_blocking_metadata(tmp_path: Path) -> No
 
 
 def test_validate_rejects_generated_executable_without_generator_evidence(
-    tmp_path: Path,
+    corpus_project: Path,
 ) -> None:
-    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
+    manifest = build_rule_decision_manifest(corpus_project)
     executable = next(
         decision
         for decision in manifest["decisions"]
@@ -189,31 +186,12 @@ def test_active_catalog_rules_include_executable_contract_metadata() -> None:
         assert payload["fixture_family"]
         assert payload["fixtures"]
         assert payload["deterministic_test_evidence"]
-        payload = rule.metadata_payload()
         assert payload["source_hash"]
         assert payload["source_anchor"]
-        assert payload["fixture_family"]
-        assert payload["deterministic_test_evidence"]
 
 
-def test_catalog_load_error_is_blocking(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    from validator.conventions_ast import source_decisions
-
-    def broken_catalogs(*_args: object, **_kwargs: object) -> object:
-        from validator.conventions_ast.catalog import AstCatalogError
-
-        raise AstCatalogError("broken catalog")
-
-    monkeypatch.setattr(source_decisions, "load_ast_catalogs", broken_catalogs)
-
-    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
-
-    assert manifest["catalog_load_errors"] == ["broken catalog"]
-    assert "catalog_load_error:broken catalog" in validate_rule_decision_manifest(manifest)
-
-
-def test_validation_rejects_incomplete_executable_contract(tmp_path: Path) -> None:
-    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
+def test_validation_rejects_incomplete_executable_contract(corpus_project: Path) -> None:
+    manifest = build_rule_decision_manifest(corpus_project)
     decision = next(
         item for item in manifest["decisions"] if item["rule_decision"]["kind"] == "executable"
     )
@@ -226,8 +204,8 @@ def test_validation_rejects_incomplete_executable_contract(tmp_path: Path) -> No
     assert f"missing_tests:{decision['source_path']}" in issues
 
 
-def test_validation_rejects_false_non_executable_rule_wiring(tmp_path: Path) -> None:
-    manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
+def test_validation_rejects_false_non_executable_rule_wiring(corpus_project: Path) -> None:
+    manifest = build_rule_decision_manifest(corpus_project)
     decision = next(
         item
         for item in manifest["decisions"]
