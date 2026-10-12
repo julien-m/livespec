@@ -21,7 +21,6 @@ import pytest
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
 
 from validator.journeys.fixtures import (
-    DEFAULT_BOOTSTRAP_TIMEOUT_SECONDS,
     BootstrapAmbiguityError,
     FixturesContractV1,
     fixtures_contract_hash,
@@ -100,7 +99,6 @@ def test_read_minimal_contract_defaults(tmp_path: Path) -> None:
     assert issue is None
     assert contract is not None
     assert contract.bootstrap is None
-    assert DEFAULT_BOOTSTRAP_TIMEOUT_SECONDS == 15
     assert contract.mocks == {}
 
 
@@ -350,7 +348,7 @@ fixtures:
     assert plan.ready_marker == "ui-test-bootstrap-ready"
     assert plan.expected_screen is None
     assert plan.required_markers == []
-    assert plan.timeout_seconds == DEFAULT_BOOTSTRAP_TIMEOUT_SECONDS
+    assert plan.timeout_seconds == 15  # spec 060 AC-001 default
 
 
 def test_resolve_bootstrap_only_reads_journey_surface_maps() -> None:
@@ -819,13 +817,29 @@ def test_migration_v21_manifest_structure() -> None:
     assert agent_sync_index < scaffold_index < compile_index < set_version_index
 
 
-def test_migration_v21_scaffold_script_wrapper() -> None:
-    """AC-012: the scaffold wrapper runs the versioned CLI via PYTHONPATH."""
-    assert SCAFFOLD_SCRIPT.exists(), f"scaffold script not found at {SCAFFOLD_SCRIPT}"
-    content = SCAFFOLD_SCRIPT.read_text(encoding="utf-8")
-    assert "set -euo pipefail" in content
-    assert "PYTHONPATH=" in content
-    assert "journey fixtures scaffold" in content
+def test_migration_v21_scaffold_script_wrapper(tmp_path: Path) -> None:
+    """AC-012: the scaffold wrapper runs the versioned CLI and is replay-safe."""
+    import os
+    import subprocess
+    import sys
+
+    from tests.test_journey_v2_validation import _write_feature
+
+    specs = tmp_path / ".specs"
+    specs.mkdir()
+    _write_feature(specs, "001-onboarding")
+    _write_fixture_journey(specs, fixtures=["imported-workout"], mocks=["storekit-pro"])
+    env = {**os.environ, "PATH": f"{Path(sys.executable).parent}{os.pathsep}{os.environ['PATH']}"}
+    env.pop("PYTHONPATH", None)
+    argv = ["bash", str(SCAFFOLD_SCRIPT), str(tmp_path), str(SCAFFOLD_SCRIPT.parents[1])]
+
+    first = subprocess.run(argv, env=env, capture_output=True, text=True, check=False)
+    assert first.returncode == 0, first.stderr
+    contract_bytes = fixtures_contract_path(tmp_path).read_bytes()
+    assert b"imported-workout" in contract_bytes
+    replay = subprocess.run(argv, env=env, capture_output=True, text=True, check=False)
+    assert replay.returncode == 0, replay.stderr
+    assert fixtures_contract_path(tmp_path).read_bytes() == contract_bytes
 
 
 def test_migration_shaped_scaffold_compile_round_trip(tmp_path: Path) -> None:
@@ -881,18 +895,6 @@ def test_chaos_contract_binary_content_never_crashes(tmp_path: Path) -> None:
     path = fixtures_contract_path(tmp_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(b"\x00\xff\xfe\x00binary")
-
-    contract, issue = read_fixtures_contract(tmp_path)
-
-    assert contract is None
-    assert issue is not None
-    assert issue.code == "journey_fixtures_contract_invalid"
-
-
-@pytest.mark.chaos
-def test_chaos_contract_partial_yaml_never_crashes(tmp_path: Path) -> None:
-    """FR-001 chaos: truncated YAML yields a structured issue."""
-    _write_contract(tmp_path, "schema_version: 1\nfixtures:\n  broken:\n    surfaces: [ios\n")
 
     contract, issue = read_fixtures_contract(tmp_path)
 

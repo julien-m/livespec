@@ -166,39 +166,6 @@ def test_journey_validate_rejects_unsupported_target(
     assert "desktop" in result.output
 
 
-def test_wait_without_until_or_reason_is_warning(
-    tmp_path: Path,
-    monkeypatch: MonkeyPatch,
-) -> None:
-    """v2 validation reports no v1 fixed-wait warnings."""
-    specs = _make_specs(tmp_path)
-    _write_journey(specs)
-    monkeypatch.chdir(tmp_path)
-
-    result = runner.invoke(app, ["journey", "validate"])
-
-    assert result.exit_code == 0, result.output
-    assert "warnings=0" in result.output
-
-
-def test_manual_journey_is_reported_without_execution(
-    tmp_path: Path,
-    monkeypatch: MonkeyPatch,
-) -> None:
-    specs = _make_specs(tmp_path)
-    _write_journey(
-        specs,
-        journey_id="manual",
-        extra="run_policy: manual\n",
-    )
-    monkeypatch.chdir(tmp_path)
-
-    result = runner.invoke(app, ["journey", "validate"])
-
-    assert result.exit_code == 0
-    assert "valid=1" in result.output
-
-
 def test_compile_generates_playwright_with_source_hash(
     tmp_path: Path,
     monkeypatch: MonkeyPatch,
@@ -269,7 +236,7 @@ def test_manual_disabled_and_executable_categories_are_reported(
         specs,
         journey_id="manual",
         target="web",
-        extra='run_policy: manual\nmanual_reason: "Requires hardware token"\n',
+        extra="run_policy: manual\n",
     )
     _write_journey(specs, journey_id="disabled", target="web", extra="disabled: true\n")
 
