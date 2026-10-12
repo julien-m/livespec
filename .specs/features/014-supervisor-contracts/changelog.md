@@ -35,3 +35,16 @@
 - **AC impacted:** None (AC-005 stays covered by TestSuperpowersReturnParser)
 - **Author:** Claude Code (test-suite cleanup, lot 1)
 - Removed the `ANCHOR_WINDOW_LINES == 30` constant check (behavior kept by the 30-line window test), two direct pydantic model checks duplicated through the parser, a duplicate unknown-key test and two round-trips superseded by the run_artifact round-trips.
+
+## 2026-10-12 — [Bugfix]: spec-feature resume resolves the latest pipeline.md without the nonexistent livespec pipeline latest
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** .agent-sync/skills/spec-feature/SKILL.md, .agent-sync/skills/spec-feature/expectations.md, tests/test_skill_cli_invocations.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_skill_cli_invocations.py::test_skill_cited_livespec_command_paths_exist
+- **RED receipt:** `.specs/.execution/ac35273e5289403ea5d86867cfd2a8ba/receipt.json`
+- **GREEN receipt:** `.specs/.execution/1f73695886424ccd988e64a426797917/receipt.json`
+<!-- bugfix:1f73695886424ccd988e64a426797917 -->

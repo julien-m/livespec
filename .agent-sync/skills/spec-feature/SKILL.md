@@ -910,7 +910,7 @@ When `--resume` is provided:
    - For the **Implement agent**: the agent reads `progress.md` internally to resume at the first non-Done step.
 6. If `pipeline.md` doesn't exist (exit 1) → start fresh from Phase 1 (spawn Specify agent with original description)
 
-**Feature resolution for resume:** If no feature name is provided with `--resume`, run `livespec pipeline latest` to find the most recently modified `pipeline.md` across all feature directories.
+**Feature resolution for resume:** If no feature name is provided with `--resume`, take the most recently modified `pipeline.md` across all feature directories (`ls -t .specs/features/*/pipeline.md | head -n 1`), then use its directory name as the feature.
 
 ---
 
