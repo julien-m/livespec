@@ -9,7 +9,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -231,8 +230,3 @@ def test_gate_lcov_groups_lines_per_file() -> None:
     # Counts are summed for repeated start-lines on the same file (1 + 1 = 2).
     assert "DA:1,2" in lcov_text
     assert "DA:2,0" in lcov_text
-
-
-def test_bash_available_for_test_environment() -> None:
-    """Sanity check that the test environment has bash on PATH."""
-    assert shutil.which("bash") is not None

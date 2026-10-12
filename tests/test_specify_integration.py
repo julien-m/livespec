@@ -65,17 +65,10 @@ def test_ambiguous_save_signal_alone_produces_no_traits() -> None:
 
 
 def test_duplicate_signals_normalized_double() -> None:
-    """AC-010: detect_traits(["form", "form"]) == detect_traits(["form"]) — EC-003."""
-    result_dup = detect_traits(["form", "form"], path=_TAXONOMY_PATH)
-    result_single = detect_traits(["form"], path=_TAXONOMY_PATH)
-    assert result_dup == result_single
-
-
-def test_duplicate_signals_normalized_triple() -> None:
-    """AC-010: detect_traits(["form","form","form"]) == detect_traits(["form"]).
+    """AC-010: repeated signals (2x, 3x) == detect_traits(["form"]) — EC-003.
 
     Rules out frequency-dependent behavior in detect_traits().
     """
-    result_triple = detect_traits(["form", "form", "form"], path=_TAXONOMY_PATH)
     result_single = detect_traits(["form"], path=_TAXONOMY_PATH)
-    assert result_triple == result_single
+    assert detect_traits(["form", "form"], path=_TAXONOMY_PATH) == result_single
+    assert detect_traits(["form", "form", "form"], path=_TAXONOMY_PATH) == result_single

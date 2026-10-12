@@ -1,3 +1,12 @@
+## 2026-10-12 — [Refactor]: Remove constructor-only SpecReviewResult tests
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_spec_review.py
+- **AC impacted:** None (AC-002/005/008 tests unchanged)
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** Dropped `TestSpecReviewResult`: it only exercised dataclass construction and defaults.
+
 ## 2026-04-13 — [Check]: Spec-code alignment verified
 
 - **Type:** Spec Update
