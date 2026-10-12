@@ -45,3 +45,13 @@
 - **AC impacted:** None (source collection boundary, same spirit as FR-001 fixture exclusion)
 - **Author:** Claude Code (integrator)
 - On the main checkout, repo scope walked `.claude/worktrees/*` agent checkouts (~28k extra violations). `.claude/worktrees/**`, `.worktrees/**` and any nested directory holding a `.git` entry are now never sources; repo scope is PASS against the unchanged baseline (280 recorded, 0 new).
+
+## 2026-10-12 — [Bugfix]: Delphi family detector no longer backtracks exponentially
+
+- **Type:** Bugfix (security, CodeQL py/redos high)
+- **Spec modified:** No
+- **Code modified:** `validator/conventions_ast/ars_rules.py`, `validator/conventions_ast/source_family_checks.py`
+- **Cause:** `\bexcept\s*(?:\r?\n|\s)+end\s*;` lets `\s*` and the overlapping `(?:\r?\n|\s)+` split a run of newlines in exponentially many ways.
+- **Fix:** equivalent unambiguous `\bexcept\s+end\s*;` (`\r?\n` is already whitespace). Same matches on the pass/fail fixtures and edge cases; a 28-newline adversarial input returns immediately.
+- **Proof:** unit suite 3834 passed; `conventions verify --feature repo` PASS.
+- **Author:** spec-fix (claude-code)
