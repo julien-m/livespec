@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-12 — Bugfix: declare unit-test dependencies (audit batch)
+
+- [079](features/079-validator-ci-prerequisites/changelog.md): `click`, `jsonschema` and `pluggy` move into the `dev` extra (typer 0.27 vendors its own click, so they only arrived through `integration`); `uv.lock` regenerated and a guard test checks every unit-suite third-party import against runtime/dev requirements.
+
 ## 2026-10-12 — Refactor: test-suite cleanup lot 5
 
 - Removed or replaced tautological, vacuous and always-skipped tests across features 001, 002, 007, 009, 019, 020, 022, 030, 031, 037, 046 and 078. This includes the unmapped `tests/test_ui_runner_cli.py` (a redundant registry check) and `tests/test_ui_runner_tauri.py`, where the driver-capability test now pins both states instead of asserting nothing when tauri-driver is installed. The semantic matrix went from 171 to 42 cases, the visual gate stays at 94.41% coverage, and no production code changed.
