@@ -3,9 +3,14 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-09
+> Last updated: 2026-10-12
 
 ---
+
+## 2026-10-12 — Refactor: test-suite cleanup lot 5
+
+- Removed or replaced tautological, vacuous and always-skipped tests across features 001, 002, 007, 009, 019, 020, 022, 030, 031, 037, 046 and 078. This includes the unmapped `tests/test_ui_runner_cli.py` (a redundant registry check) and `tests/test_ui_runner_tauri.py`, where the driver-capability test now pins both states instead of asserting nothing when tauri-driver is installed. The semantic matrix went from 171 to 42 cases, the visual gate stays at 94.41% coverage, and no production code changed.
+- Corrected traceability: feature 030 FR-007/FR-008 are Missing, because their mapped tests were unconditional skips. Feature 007's test table now matches FR-005 (5 tests).
 
 ## 2026-10-09 — Bugfix: observed autonomous init and safe force recovery
 

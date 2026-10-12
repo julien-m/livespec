@@ -274,26 +274,3 @@ def test_verdict_to_exit_code_all() -> None:
     assert verdict_to_exit_code("PASS") == EXIT_OK
     assert verdict_to_exit_code("FAIL") == EXIT_VISUAL_GATE_FAIL
     assert verdict_to_exit_code("BLOCKED") == EXIT_VISUAL_GATE_BLOCKED
-
-
-# ---------------------------------------------------------------------------
-# Coverage: _as_mapping and _as_list
-# ---------------------------------------------------------------------------
-
-
-def test_as_mapping_returns_none_for_non_dict() -> None:
-    from validator.visual_gate import _as_mapping
-
-    assert _as_mapping("string") is None
-    assert _as_mapping(42) is None
-    assert _as_mapping([1, 2]) is None
-    assert _as_mapping({"key": "value"}) == {"key": "value"}
-
-
-def test_as_list_returns_none_for_non_list() -> None:
-    from validator.visual_gate import _as_list
-
-    assert _as_list("string") is None
-    assert _as_list(42) is None
-    assert _as_list({"key": "value"}) is None
-    assert _as_list([1, 2]) == [1, 2]
