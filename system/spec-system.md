@@ -575,7 +575,7 @@ Before a plan is considered complete:
 Before implementation is considered complete:
 - [ ] `progress.md` exists with a checkpoint row for **every** step (BLOCKING — enables `--resume`)
 - [ ] `implementation.md` is created and all FR/AC have status ✅
-- [ ] Before any `PHASE_RESULT: OK` for implement/test/fix: receipt from `livespec conventions verify` is PASS at repo scope; no pre-existing exemption is allowed.
+- [ ] Before any `PHASE_RESULT: OK` for implement/test/fix: receipt from `livespec conventions verify --feature repo` is PASS at repo scope, where only violations new versus the versioned baseline (`.specs/conventions/baseline.json`) fail; existing debt is reported separately under `baselined_violations` and never justifies skipping the receipt or editing the baseline inside a pipeline. Closing a feature requires PASS at feature scope (`--feature NNN-slug`, which never uses the baseline).
 - [ ] All tests pass
 - [ ] `changelog.md` has an entry
 - [ ] For visual features: Playwright baselines captured in `baselines/`
