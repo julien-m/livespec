@@ -177,3 +177,12 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Author:** spec-fix (claude-opus-5-5)
 
 <!-- finalize:spec-fix:2026-10-12:b581f1b1 -->
+
+## 2026-10-12 — [Refactor]: ui-form witness skips cleanly without Node
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_generation_witnesses.py
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- ui-form cases skip with a clear reason when `node` is absent instead of failing as `node_unavailable`.

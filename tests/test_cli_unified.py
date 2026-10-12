@@ -89,21 +89,6 @@ class TestReadThresholdFromConventions:
 
 
 # ---------------------------------------------------------------------------
-# Command help (AC-013)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    "subcommand",
-    ["test", "coverage", "drivers", "mutation", "preflight"],
-)
-def test_each_command_has_help(subcommand: str) -> None:
-    result = runner.invoke(app, [subcommand, "--help"])
-    assert result.exit_code == 0
-    assert "Usage" in result.output
-
-
-# ---------------------------------------------------------------------------
 # Missing .specs/ exit code (AC-011, EC-001)
 # ---------------------------------------------------------------------------
 

@@ -67,3 +67,12 @@
 - **Code modified:** None
 - **AC impacted:** AC-001 through AC-012 (all defined)
 - **Author:** spec.specify
+
+## 2026-10-12 — [Refactor]: Node-only guard test removed, Node skip made explicit
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_migrate_visual.py, tests/integration/test_migrate_visual_stdout.py, implementation.md
+- **AC impacted:** AC-010 now Documented (command-layer guard, as AC-011)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- `test_warning_when_script_missing` only proved that Node fails on a missing file. Both modules skip with a clear reason when `node` is absent.

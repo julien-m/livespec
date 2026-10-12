@@ -38,9 +38,7 @@ updated: 2026-05-08
 - `tests/test_preflight_messages.py`
 - `tests/test_phase_4_5_dispatcher.py`
 - `tests/integration/test_generate_surfaces_xcode.py`
-- `tests/integration/test_visual_dispatch_xcuitest.py`
-- `tests/integration/test_visual_dispatch_maestro.py`
-- `tests/integration/test_visual_dispatch_playwright.py`
+- `tests/integration/test_visual_dispatch_registry.py` (2026-10-12: replaces the former xcuitest/maestro/playwright dispatch files; fake-handler routing stays in `tests/test_phase_4_5_dispatcher.py`)
 
 ## Files modified
 

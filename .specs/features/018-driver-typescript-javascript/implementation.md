@@ -30,7 +30,7 @@ status: Implemented
 | `validator/drivers/stryker_parser.py` | Stryker mutation report parser (`files` and `metrics` shapes) |
 | `tests/unit/test_typescript_detector.py` | 16 unit tests for runner / package-manager / dependency detection |
 | `tests/unit/test_stryker_parser.py` | 11 unit tests for Stryker parsing and kill-rate computation |
-| `tests/integration/test_driver_typescript.py` | 11 integration tests for manifest, registry, capability metadata, fixture detection |
+| `tests/integration/test_driver_typescript.py` | 2 integration tests: registry detection and schema-validated 4-capability manifest. Runner and package-manager detection live in `tests/unit/test_typescript_detector.py` (2026-10-12 cleanup removed duplicates and YAML value pins). |
 
 ## Files Modified
 

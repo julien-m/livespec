@@ -8,7 +8,6 @@
 # @spec(AC-007)
 # @spec(AC-008)
 # @spec(AC-009)
-# @spec(AC-010)
 # @spec(AC-012)
 
 """Level 3A — Integration tests for visual scaffolding in spec-migrate.
@@ -32,6 +31,10 @@ import pytest
 
 FIXTURES = Path(__file__).parent / "fixtures"
 SCRIPT_PATH = Path(__file__).parent.parent.parent / "scripts" / "migrate-visual-tests.js"
+
+pytestmark = pytest.mark.skipif(
+    shutil.which("node") is None, reason="node is not installed; migrate-visual-tests.js cannot run"
+)
 
 
 @pytest.fixture()
@@ -213,24 +216,7 @@ class TestMigrateVisualGenerate:
 
 @pytest.mark.level_3a
 class TestMigrateVisualGuards:
-    """Tests for graceful degradation when script or Node.js is missing."""
-
-    # @spec FR-008: Script-missing guard, AC-010 — spec.md#fr-008
-    def test_warning_when_script_missing(self, tmp_path: Path) -> None:
-        """FR-008, AC-010: exits 0 with warning when migrate-visual-tests.js absent."""
-        # Run with a non-existent script path
-        fake_script = tmp_path / "nonexistent.js"
-        result = subprocess.run(
-            ["node", str(fake_script), "--generate"],
-            cwd=str(tmp_path),
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        # Node.js will exit non-zero when script doesn't exist
-        assert result.returncode != 0, "Expected non-zero exit for missing script"
-        # The command layer (migrate.md) handles this by checking file existence first
-        # This test validates the script-level behavior: Node exits non-zero
+    """Tests for the script's own failure guard (exit code on unusable projects)."""
 
     # @spec FR-010: Non-zero exit guard, AC-012 — spec.md#fr-010
     def test_nonzero_exit_on_missing_specs_dir(self, tmp_path: Path) -> None:

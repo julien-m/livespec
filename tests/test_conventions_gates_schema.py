@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from validator.conventions_gates import (
+    DEFAULT_AST_CATALOGS,
     AstRulesConfig,
     ConventionsGates,
     ConventionsGatesV2,
@@ -46,7 +47,7 @@ def test_generate_gates_uses_two_level_thresholds_and_source_hash(tmp_path: Path
 
 
 def test_load_real_repo_gates_file() -> None:
-    gates = load_conventions_gates(Path("."))
+    gates = load_conventions_gates(Path(__file__).resolve().parents[1])
 
     assert gates.schema_version == 1
 
@@ -64,6 +65,8 @@ def test_generate_gates_defaults_to_v2_enforce_with_off_opt_out(
     assert isinstance(default_gates, ConventionsGatesV2)
     assert default_gates.schema_version == 2
     assert default_gates.ast_rules.mode == "enforce"
+    # The multilang catalogs ship by default.
+    assert tuple(default_gates.ast_rules.catalogs) == DEFAULT_AST_CATALOGS
 
     off_path = generate_conventions_gates(project_root, force=True, ast_mode="off")
     off_gates = load_conventions_gates(off_path)

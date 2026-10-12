@@ -29,7 +29,7 @@ status: Implemented
 | `validator/drivers/go_detector.py` | Pure-Python `go.mod` parser: module path + single-line and multi-line `require` blocks, with `// indirect` stripping. |
 | `tests/unit/test_go_detector.py` | 14 unit tests covering module parsing, single/multi-line `require`, dedup, comment stripping, case-insensitive substring lookup. |
 | `tests/unit/test_go_coverage_gate.py` | 9 bash-script unit tests: above/below threshold, default 70 threshold, no go.mod, empty coverprofile, missing coverprofile, and lcov grouping per source file. |
-| `tests/integration/test_driver_go.py` | 10 integration tests covering manifest schema, registry detection, capability metadata, mutation absence, and dependency detection on a Go fixture. |
+| `tests/integration/test_driver_go.py` | 4 integration tests: registry detection, schema-validated 3-capability manifest, runner `CapabilityNotImplementedError` for mutation, shipped executable gate script. go.mod parsing lives in `tests/unit/test_go_detector.py` (2026-10-12 cleanup removed duplicates and YAML value pins). |
 
 ## Files Modified
 

@@ -49,3 +49,12 @@
   - `tests/integration/test_visual_dispatch_playwright.py` (new, 2 tests)
 - **AC impacted:** AC-001..AC-007, AC-008, AC-010, AC-011..AC-015 (AC-009 documented in commands/spec-test.md)
 - **Author:** /spec.implement (--auto)
+
+## 2026-10-12 — [Refactor]: Visual dispatch integration tests merged
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_visual_dispatch_registry.py (new), tests/integration/test_visual_dispatch_{xcuitest,maestro,playwright}.py (deleted), implementation.md
+- **AC impacted:** None (AC-001..AC-003 routing via the production registry kept)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- One parametrized test keeps the only behavior the fake-handler unit tests cannot see: the default registry routes each runner to its real handler class. BLOCKED, legacy fallback and no-artifact cases were duplicates of tests/test_phase_4_5_dispatcher.py.

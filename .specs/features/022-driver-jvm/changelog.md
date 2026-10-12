@@ -43,3 +43,12 @@
 - **AC impacted:** AC-001 through AC-011 — all Implemented
 - **Tests:** 59 new (44 unit + 15 integration); full suite 843 passed, 28 skipped, 0 failed.
 - **Author:** spec.feature
+
+## 2026-10-12 — [Refactor]: Driver integration tests reduced to real behavior
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_driver_jvm.py, implementation.md
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Registry discovery is parametrized over the three build files; shipped scripts are derived from the manifest; Gradle/Maven parsing and Gradle priority stay in tests/unit/test_jvm_detector.py.

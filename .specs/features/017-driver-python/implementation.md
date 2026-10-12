@@ -33,7 +33,7 @@ status: Implemented
 | `validator/drivers/mutmut_parser.py` | Mutmut result parsing and mutation score computation |
 | `tests/unit/test_python_detector.py` | Unit tests for python_detector module (4 tests) |
 | `tests/unit/test_mutmut_parser.py` | Unit tests for mutmut_parser module (7 tests) |
-| `tests/integration/test_driver_python.py` | Integration tests for Python driver (6 tests) |
+| `tests/integration/test_driver_python.py` | 2 integration tests: registry detection and schema-validated 4-capability manifest (2026-10-12 cleanup removed YAML value pins). |
 
 ## Files Modified
 

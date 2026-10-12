@@ -42,3 +42,12 @@
   - `validator/preflight_autofix.py` — added public `verify_item` wrapper
 - **Tests:** 992 passed, 28 skipped (917 baseline + 26 new tests + 49 from concurrent merges)
 - **Author:** Claude Opus 4.7 via `/spec.feature 035-unified-cli-surface --auto --branch`
+
+## 2026-10-12 — [Refactor]: Help smoke test removed
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_cli_unified.py
+- **AC impacted:** AC-013 (unmet product promise reported)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- `test_each_command_has_help` only checked that Typer prints 'Usage'. AC-013 also promises one example per command; the shipped help of test/coverage/drivers/mutation/preflight contains no example, so the AC is not met by the product.

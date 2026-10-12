@@ -34,7 +34,7 @@ status: Implemented
 | `tests/unit/test_jvm_detector.py` | 24 unit tests covering build tool detection (Gradle priority, Kotlin DSL, Maven-only, empty), Gradle Groovy/Kotlin DSL parsing, Maven POM artifactId extraction, comment stripping, malformed/unreadable input degradation, substring `has_jvm_dependency` lookups (case-insensitive), and the pitest XML parser (counts, zero-fill, mixed case, malformed, empty, unknown statuses, missing attributes). |
 | `tests/unit/test_jvm_coverage_gate.py` | 8 bash-script unit tests for `jvm-coverage-gate.sh`: no build file, JaCoCo absent (Gradle/Maven), JaCoCo present with/without lcov, Gradle-priority-over-Maven dispatch, executable bit. |
 | `tests/unit/test_jvm_mutation_script.py` | 12 bash-script unit tests covering all three sibling scripts (`jvm-mutation.sh`, `jvm-snapshots.sh`, `jvm-properties.sh`): probe-only paths, skip-with-hint paths, library detection on Gradle Groovy/Kotlin DSL/Maven. |
-| `tests/integration/test_driver_jvm.py` | 15 integration tests covering registry detection on each of the three build files, schema validation, all-4-capability metadata, script-escape-hatch wiring, dependency detection on Gradle Groovy / Gradle Kotlin / Maven fixtures, and Gradle-priority detection. |
+| `tests/integration/test_driver_jvm.py` | 5 integration tests: registry detection on each of the three build files, schema-validated 4-capability manifest, every referenced script shipped and executable. Gradle/Maven parsing and Gradle priority live in `tests/unit/test_jvm_detector.py` (2026-10-12 cleanup removed duplicates and YAML value pins). |
 
 ## Files Modified
 

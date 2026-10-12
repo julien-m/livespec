@@ -26,3 +26,12 @@
 - **Code modified:** None
 - **AC impacted:** AC-001 through AC-010 (all defined)
 - **Author:** /spec.specify --auto (Chantier 2 from AUDIT.md)
+
+## 2026-10-12 — [Refactor]: Constant, pydantic-only and duplicate round-trip tests removed
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_contracts.py, implementation.md
+- **AC impacted:** None (AC-005 stays covered by TestSuperpowersReturnParser)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Removed the `ANCHOR_WINDOW_LINES == 30` constant check (behavior kept by the 30-line window test), two direct pydantic model checks duplicated through the parser, a duplicate unknown-key test and two round-trips superseded by the run_artifact round-trips.

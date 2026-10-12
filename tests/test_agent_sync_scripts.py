@@ -3,6 +3,7 @@
 # @spec(AC-005)
 # @spec(AC-006)
 # @spec(AC-009)
+# @spec(FR-010)
 
 """Tests for cc-hub based agent-sync scripts."""
 
@@ -11,6 +12,8 @@ from __future__ import annotations
 import os
 import subprocess
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _fake_cc_hub(bin_dir: Path, log_path: Path) -> None:
@@ -41,11 +44,12 @@ def test_link_local_delegates_to_cc_hub_without_manual_claude_symlinks(
     env, log_path = _env_with_fake_cc_hub(tmp_path)
 
     result = subprocess.run(
-        ["bash", "scripts/link-local.sh", str(project), str(Path.cwd())],
+        ["bash", str(REPO_ROOT / "scripts" / "link-local.sh"), str(project), str(REPO_ROOT)],
         text=True,
         capture_output=True,
         check=False,
         env=env,
+        cwd=REPO_ROOT,
     )
 
     assert result.returncode == 0, result.stderr
@@ -75,11 +79,12 @@ def test_install_dry_run_reports_cc_hub_bootstrap_calls(tmp_path: Path) -> None:
     env, _log_path = _env_with_fake_cc_hub(tmp_path)
 
     result = subprocess.run(
-        ["bash", "scripts/install.sh", "--dry-run"],
+        ["bash", str(REPO_ROOT / "scripts" / "install.sh"), "--dry-run"],
         text=True,
         capture_output=True,
         check=False,
         env=env,
+        cwd=REPO_ROOT,
     )
 
     assert result.returncode == 0, result.stderr
@@ -100,11 +105,17 @@ def test_migrate_agent_sync_removes_relative_legacy_command_symlinks(
     env, log_path = _env_with_fake_cc_hub(tmp_path)
 
     result = subprocess.run(
-        ["bash", "scripts/migrate-agent-sync.sh", str(project), str(Path.cwd())],
+        [
+            "bash",
+            str(REPO_ROOT / "scripts" / "migrate-agent-sync.sh"),
+            str(project),
+            str(REPO_ROOT),
+        ],
         text=True,
         capture_output=True,
         check=False,
         env=env,
+        cwd=REPO_ROOT,
     )
 
     assert result.returncode == 0, result.stderr

@@ -40,3 +40,12 @@
 - **Author:** spec.specify --auto
 
 ---
+
+## 2026-10-12 — [Refactor]: CLI and SDK specify tests made deterministic
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_cli.py, tests/integration/test_spec_specify.py
+- **AC impacted:** None (AC-010 help test kept)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- `--sdk-isolated` tests now resolve `.specs/` from a per-test project instead of the caller's working directory; the `--smart` test asserts the explicit Pass 2 refusal instead of any non-zero exit; help-only tests for validate, install-hook and `--no-review` removed. The opt-in specify test counts distinct AC/FR ids, so legitimate re-references no longer fail the sequence check.

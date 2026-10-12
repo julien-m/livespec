@@ -20,7 +20,7 @@ updated: 2026-05-18
 | FR-007 | `validator/command_audit.py` | `FR-007` | ✅ Implemented | 2026-05-18 |
 | FR-008 | `migrations/15/migrate.md`, `scripts/migrate-command-naming.sh` | `FR-008` | ✅ Implemented | 2026-05-18 |
 | FR-009 | `validator/command_registry.py`, `validator/expectations.py`, `validator/goal_contracts.py` | `FR-009` | ✅ Implemented | 2026-05-18 |
-| FR-010 | `tests/test_command_registry.py`, `tests/test_command_aliases.py`, `tests/test_integrations.py`, `tests/test_hooks_cli.py` | `FR-010` | ✅ Implemented | 2026-05-18 |
+| FR-010 | `tests/test_command_registry.py`, `tests/test_agent_sync_scripts.py`, `tests/test_integrations.py`, `tests/test_hooks_cli.py` | `FR-010` | ✅ Implemented | 2026-05-18 |
 | FR-011 | `.agent-sync/skills/spec-*`, `validator/command_audit.py`, `validator/state_files.py` | `FR-011` | ✅ Implemented | 2026-05-18 |
 
 ## Acceptance Criteria Mapping
@@ -28,10 +28,10 @@ updated: 2026-05-18
 | AC | Test File / Command | Status |
 |---|---|---|
 | AC-001 | `tests/test_command_registry.py` | ✅ |
-| AC-002 | `tests/test_command_aliases.py` | ✅ |
+| AC-002 | `tests/test_command_registry.py` | ✅ |
 | AC-003 | `tests/test_command_registry.py` | ✅ |
-| AC-004 | `tests/test_command_aliases.py`, `tests/test_hooks_cli.py`, `tests/test_integrations.py` | ✅ |
-| AC-005 | `tests/test_command_aliases.py` | ✅ |
+| AC-004 | `tests/test_agent_sync_scripts.py`, `tests/test_hooks_cli.py`, `tests/test_integrations.py` | ✅ |
+| AC-005 | `tests/test_agent_sync_scripts.py` | ✅ |
 | AC-006 | `grep -R --exclude-dir='__pycache__' "/spec\\.<command>" ...` leaves only legacy-alias tests/docstrings | ✅ |
 | AC-007 | `tests/integration/test_migration_v14_v15.py` | ✅ |
 | AC-008 | `tests/test_command_audit_cli.py` | ✅ |

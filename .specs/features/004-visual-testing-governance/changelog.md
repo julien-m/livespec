@@ -41,3 +41,12 @@
 - **Code modified:** None
 - **AC impacted:** AC-001 through AC-012 (all defined)
 - **Author:** spec.specify
+
+## 2026-10-12 — [Refactor]: Markdown word-search tests removed
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_baseline_manifest.py (deleted), tests/fixtures/baseline_manifest/ (deleted)
+- **AC impacted:** None (executable consumer validator/visual_gate.py stays covered by tests/test_visual_gate.py and tests/test_visual_implementation_gate.py)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- The 41 tests searched SKILL.md, the schema document and migration v5 for words and re-parsed their own fixtures; none exercised LiveSpec code.

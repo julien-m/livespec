@@ -19,6 +19,7 @@ from typer.testing import CliRunner
 from validator.cli import app
 
 runner = CliRunner()
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.mark.parametrize(
@@ -36,7 +37,7 @@ def test_traceback_guard_requires_an_actual_error_signature(
     commands = tmp_path / "commands"
     commands.mkdir()
     (commands / "spec-demo.md").write_text("# Command: /spec-demo\n")
-    template = Path(".agent-sync/skills/spec-status/expectations.md").read_text()
+    template = (REPO_ROOT / ".agent-sync/skills/spec-status/expectations.md").read_text()
     (commands / "spec-demo.expectations.md").write_text(
         template.replace("command: spec-status", "command: spec-demo", 1).replace(
             'contains: "Traceback"', "contains: " + json.dumps(signature)
@@ -51,7 +52,7 @@ def test_traceback_guard_requires_an_actual_error_signature(
 
 
 def test_command_audit_reports_all_builtin_commands() -> None:
-    result = runner.invoke(app, ["command-audit", "--repo", ".", "--json"])
+    result = runner.invoke(app, ["command-audit", "--repo", str(REPO_ROOT), "--json"])
 
     assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
@@ -83,7 +84,7 @@ def test_command_audit_fails_when_antidrift_import_is_missing(tmp_path: Path) ->
     commands_dir = tmp_path / "commands"
     commands_dir.mkdir()
     (commands_dir / "spec-demo.md").write_text("# Command: /spec-demo\n", encoding="utf-8")
-    expectation_text = Path(".agent-sync/skills/spec-status/expectations.md").read_text(
+    expectation_text = (REPO_ROOT / ".agent-sync/skills/spec-status/expectations.md").read_text(
         encoding="utf-8"
     )
     (commands_dir / "spec-demo.expectations.md").write_text(
@@ -104,8 +105,10 @@ def test_command_audit_fails_when_antidrift_import_is_missing(tmp_path: Path) ->
 def test_command_audit_fails_when_source_filename_is_not_canonical(tmp_path: Path) -> None:
     commands_dir = tmp_path / "commands"
     commands_dir.mkdir()
-    source_text = Path(".agent-sync/skills/spec-status/SKILL.md").read_text(encoding="utf-8")
-    expectation_text = Path(".agent-sync/skills/spec-status/expectations.md").read_text(
+    source_text = (REPO_ROOT / ".agent-sync/skills/spec-status/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    expectation_text = (REPO_ROOT / ".agent-sync/skills/spec-status/expectations.md").read_text(
         encoding="utf-8"
     )
     (commands_dir / "demo.md").write_text(
@@ -142,7 +145,7 @@ def test_command_audit_fails_subagent_internal_command_without_workdir_guard(
 
 - [subagent] `/spec-fix <feature>` — executable nested command with child goal.
 """
-    expectation_text = Path(".agent-sync/skills/spec-status/expectations.md").read_text(
+    expectation_text = (REPO_ROOT / ".agent-sync/skills/spec-status/expectations.md").read_text(
         encoding="utf-8"
     )
     (commands_dir / "spec-demo.md").write_text(source_text, encoding="utf-8")
@@ -167,7 +170,7 @@ def test_command_audit_fails_subagent_internal_command_without_workdir_guard(
 def test_command_audit_enforces_hyphenated_policy() -> None:
     result = runner.invoke(
         app,
-        ["command-audit", "--repo", ".", "--naming-policy", "hyphenated", "--json"],
+        ["command-audit", "--repo", str(REPO_ROOT), "--naming-policy", "hyphenated", "--json"],
     )
 
     assert result.exit_code == 0, result.output

@@ -31,3 +31,12 @@
 - **Code modified:** `.agent-sync/`, `.specs/` state files, `validator/state_files.py`, active docs, CLI help, tests
 - **AC impacted:** AC-001, AC-002, AC-011
 - **Author:** codex
+
+## 2026-10-12 — [Refactor]: Duplicate alias tests removed
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_command_aliases.py (deleted), tests/test_command_registry.py, implementation.md
+- **AC impacted:** AC-002, AC-004, AC-005, FR-010 remapped
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Both tests duplicated tests/test_agent_sync_scripts.py. Dotted aliases (AC-002) are certified by test_command_registry.py; the builtin inventory moved to tests/test_agent_sync_layout.py.
