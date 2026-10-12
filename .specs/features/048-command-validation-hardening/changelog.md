@@ -19,3 +19,12 @@
 - **Code modified:** `validator/command_registry.py`, `validator/command_audit.py`, `validator/cli_commands/command_audit_cmd.py`, `validator/cli_commands/run_cmd.py`, `validator/cli_commands/utility_cmd.py`, `scripts/check-coherence.sh`, `scripts/play-coverage.sh`, `migrations/14/migrate.md`
 - **AC impacted:** AC-001 through AC-013
 - **Author:** codex
+
+## 2026-10-12 — [Refactor]: Command audit tests independent of the working directory
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_command_audit_cli.py
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Paths and `--repo` are anchored on the repository root.

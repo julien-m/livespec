@@ -7,6 +7,13 @@
 
 ---
 
+## 2026-10-12 — Refactor: test-suite cleanup, lot 1
+
+- Removed tests that exercised no LiveSpec code (self-tested helpers, Markdown word searches, a static fixture checked by test-only validators, Node failing on a missing file) and duplicates (command aliases, visual dispatch, driver detector cases, gates init, help smoke tests).
+- Replaced prose pins with machine contracts: documented `livespec conventions` and `livespec hooks resolve` invocations must resolve in the real CLI; migration v22 runs end to end; surface generator tests parse the YAML they would write.
+- Fixed weak or environment-dependent tests: coherence JSON, `--smart`, distinct AC/FR numbering, cwd-independent paths, explicit skips when `node` is absent.
+- Feature changelogs: 002, 004, 005.1, 011, 014, 017 to 022, 026, 030, 031, 035, 037, 039, 048, 049, 050, 065, 073, 078.
+
 ## 2026-10-12 — Bugfix: integrate features 081, 082 and 083 on main
 
 - Conventions source collection skips `.claude/worktrees/**`, `.worktrees/**` and any nested directory holding a `.git` entry; repo scope returns PASS against [the versioned baseline](conventions/baseline.json) without rewriting it.

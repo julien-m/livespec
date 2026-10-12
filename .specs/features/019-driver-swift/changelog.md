@@ -30,3 +30,12 @@
 - **AC impacted:** AC-001 through AC-010 (all covered)
 - **Verification:** `pytest tests/` — 723 passed, 28 skipped. `pyright validator/drivers/` — 0 errors. `ruff check` — passes.
 - **Author:** spec.feature (auto)
+
+## 2026-10-12 — [Refactor]: Driver integration tests reduced to real behavior
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_driver_swift.py, implementation.md
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Kept registry discovery, Xcode-only non-match, capability set and shipped gate script (now derived from the manifest); removed YAML value pins and SwiftPM parsing duplicated by tests/unit/test_swift_detector.py.

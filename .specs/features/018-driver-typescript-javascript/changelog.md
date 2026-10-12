@@ -30,3 +30,12 @@
 - **AC impacted:** AC-001 through AC-012 (all covered)
 - **Verification:** `ruff check .` passes. `mypy .` currently reports pre-existing repository issues outside the Feature 018 file set.
 - **Author:** spec.feature (auto)
+
+## 2026-10-12 — [Refactor]: Driver integration tests reduced to real behavior
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_driver_typescript.py, implementation.md
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Kept registry discovery and schema-validated capability set; removed YAML value pins and runner/package-manager cases duplicated by tests/unit/test_typescript_detector.py.

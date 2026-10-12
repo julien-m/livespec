@@ -52,7 +52,7 @@ updated: 2026-05-06
 | AC-002 | Covered | `tests/test_contracts.py::TestPhaseResultParser` (BLOCKED line format on parse error) |
 | AC-003 | Covered | `tests/test_contracts.py::TestShipResultParser` (missing-status rejection); `.agent-sync/skills/spec-ship/SKILL.md` |
 | AC-004 | Covered | All 4 `.agent-sync/agents/livespec-*/prompt.md` import `system/contracts/ACTIVATION_CONTRACT.md` (`test -d .specs` Step 1) |
-| AC-005 | Covered | `tests/test_contracts.py::TestSuperpowersReturnParser`, `TestSchemaModels` |
+| AC-005 | Covered | `tests/test_contracts.py::TestSuperpowersReturnParser` |
 | AC-006 | Covered | `validator/contracts.py` — Pydantic-based validation; `tests/test_contracts.py::TestRoundTrip` |
 | AC-007 | Covered | `tests/test_contracts.py::TestPhaseResultParser` — multi-block extraction (only final result) |
 | AC-008 | Covered | `system/contracts/ACTIVATION_CONTRACT.md` reused via @import in 4 agent files |

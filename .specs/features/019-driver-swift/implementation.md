@@ -30,7 +30,7 @@ status: Implemented
 | `validator/drivers/swift_detector.py` | Pure-Python `Package.swift` parser + Xcode-only project fallback. |
 | `tests/unit/test_swift_detector.py` | 11 unit tests for dependency parsing, case-insensitive lookup, and Xcode fallback. |
 | `tests/unit/test_swift_coverage_gate.py` | 9 bash-script unit tests covering threshold pass/fail, default threshold, Xcode-only skip, no Swift project, and missing/empty lcov. |
-| `tests/integration/test_driver_swift.py` | 11 integration tests covering manifest schema, registry detection, capability metadata, gate-script presence, Xcode-only non-match, and dependency detection on a SwiftPM fixture. |
+| `tests/integration/test_driver_swift.py` | 4 integration tests: registry detection, Xcode-only non-match, schema-validated 4-capability manifest, shipped executable gate script. SwiftPM parsing lives in `tests/unit/test_swift_detector.py` (2026-10-12 cleanup removed duplicates and YAML value pins). |
 
 ## Files Modified
 

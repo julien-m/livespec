@@ -37,3 +37,12 @@
 - **AC impacted:** AC-001 through AC-010 — all Implemented
 - **Tests:** 28 new (18 unit + 10 integration); full suite 784 passed, 28 skipped, 0 failed.
 - **Author:** spec.feature
+
+## 2026-10-12 — [Refactor]: Driver integration tests reduced to real behavior
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_driver_rust.py, implementation.md
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Kept registry discovery and the 4-capability, script-free manifest; removed command-string pins and Cargo parsing duplicated by tests/unit/test_rust_detector.py.

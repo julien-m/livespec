@@ -29,3 +29,12 @@
 - **AC impacted:** AC-001 through AC-008 (all covered)
 - **Tests:** 917 passed (+43 new vs 874 baseline), 28 skipped, 0 failed
 - **Author:** spec.feature
+
+## 2026-10-12 — [Refactor]: Prose-pinning contract test replaced by CLI resolution
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_command_conventions_contract.py
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Every `livespec conventions ...` invocation documented in a SKILL.md must resolve to a real subcommand and real options of the shipped Typer app; sentence pins removed.

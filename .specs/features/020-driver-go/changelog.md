@@ -39,3 +39,12 @@
 - **AC impacted:** AC-001 through AC-009 — all Implemented
 - **Tests:** Targeted Go driver unit and integration coverage added; verification status is recorded in the implementation report for this feature.
 - **Author:** spec.feature
+
+## 2026-10-12 — [Refactor]: Driver integration tests reduced to real behavior
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_driver_go.py, implementation.md
+- **AC impacted:** None (AC-006 now asserted through the runner)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Mutation absence is now checked as the runner's `CapabilityNotImplementedError` instead of a `None` field; removed YAML value pins and go.mod parsing duplicated by tests/unit/test_go_detector.py.

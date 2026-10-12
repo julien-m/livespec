@@ -28,7 +28,7 @@ status: Implemented
 | `livespec/drivers/rust.yaml` | Rust built-in driver manifest with all 4 capabilities — coverage uses pure `command:` (native `cargo llvm-cov --fail-under-lines`), no escape-hatch script. |
 | `validator/drivers/rust_detector.py` | Pure-Python `Cargo.toml` parser via `tomllib` (extracts `[dependencies]`, `[dev-dependencies]`, `[build-dependencies]`) plus `cargo mutants --json` summary parser exposing caught/missed/timeout/unviable counts. |
 | `tests/unit/test_rust_detector.py` | 18 unit tests covering Cargo.toml parsing (string + table value forms, dedup, malformed input), case-insensitive crate lookup, and the cargo-mutants JSON parser (single-object, nested, line-delimited, missing keys, malformed input). |
-| `tests/integration/test_driver_rust.py` | 10 integration tests covering manifest schema, registry detection, all 4 capability metadata blocks, native-command coverage assertion (no script), and dependency detection on a Cargo fixture. |
+| `tests/integration/test_driver_rust.py` | 2 integration tests: registry detection and schema-validated 4-capability manifest with no escape-hatch script. Cargo parsing lives in `tests/unit/test_rust_detector.py` (2026-10-12 cleanup removed duplicates and YAML value pins). |
 
 ## Files Modified
 

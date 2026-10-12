@@ -4,14 +4,13 @@ Migration v13 backfills feature 039 (`/spec-verify-output` + last_reviewed
 pre-commit hook) and feature 040 (expectations gitignore entries) on
 pre-v13 projects:
 
-  - Refreshes `.claude/commands/` symlinks via the patched
-    `scripts/link-local.sh` (drops orphan `spec.*.expectations.md`
-    entries, adds `/spec-verify-output`).
+  - Re-runs `scripts/link-local.sh` (now a cc-hub agent-sync delegate,
+    covered by `tests/test_agent_sync_scripts.py`).
   - Installs the pre-commit hook via `scripts/install-hooks.sh`.
   - Appends `.specs/.runs/` and `.specs/.previews/` to `.gitignore`.
 
 These tests invoke the migration end-to-end against an isolated fake
-project tree to validate idempotency, orphan cleanup, and missing-
+project tree to validate idempotency and missing-
 optional-component handling (no `.claude/` directory, no `.git/`).
 """
 
@@ -29,7 +28,6 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MIGRATE_SH = REPO_ROOT / "scripts" / "migrate.sh"
 MIGRATION_FILE = REPO_ROOT / "migrations" / "13" / "migrate.md"
-LINK_LOCAL_SH = REPO_ROOT / "scripts" / "link-local.sh"
 
 
 def _fake_project(root: Path, *, with_claude: bool, with_git: bool) -> Path:
@@ -138,38 +136,3 @@ class TestMigrationV13:
         gitignore = (project / ".gitignore").read_text()
         assert ".specs/.previews/" in gitignore
         assert (project / ".specs" / "livespec-version").read_text().strip() == "13"
-
-
-@pytest.mark.level_3a
-class TestLinkLocalFilter:
-    """`link-local.sh` must skip `*.expectations.md` and clean orphans."""
-
-    def test_expectations_files_are_not_linked(self, tmp_path: Path) -> None:
-        project = _fake_project(tmp_path / "proj", with_claude=True, with_git=False)
-        env = _fake_cc_hub(tmp_path / "bin", tmp_path / "cc-hub.log")
-        result = subprocess.run(
-            ["bash", str(LINK_LOCAL_SH), str(project), str(REPO_ROOT)],
-            capture_output=True,
-            text=True,
-            timeout=30,
-            env=env,
-        )
-        assert result.returncode == 0, result.stderr
-        assert not (project / ".claude" / "commands" / "spec.verify-output.md").exists()
-
-    def test_legacy_orphan_symlinks_are_not_recreated_by_agent_sync(self, tmp_path: Path) -> None:
-        project = _fake_project(tmp_path / "proj", with_claude=True, with_git=False)
-        orphan = project / ".claude" / "commands" / "spec.feature.expectations.md"
-        orphan.symlink_to(REPO_ROOT / ".agent-sync" / "skills" / "spec-feature" / "expectations.md")
-        assert orphan.is_symlink()
-        env = _fake_cc_hub(tmp_path / "bin", tmp_path / "cc-hub.log")
-
-        result = subprocess.run(
-            ["bash", str(LINK_LOCAL_SH), str(project), str(REPO_ROOT)],
-            capture_output=True,
-            text=True,
-            timeout=30,
-            env=env,
-        )
-        assert result.returncode == 0, result.stderr
-        assert orphan.is_symlink()

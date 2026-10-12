@@ -15,6 +15,11 @@ from tests.integration.helpers.sdk_runner import run_livespec_command
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
+def _distinct_ids(prefix: str, content: str) -> list[int]:
+    """Return the sorted distinct numbers of ``<prefix>-NNN`` ids in a spec."""
+    return sorted({int(number) for number in re.findall(rf"{prefix}-(\d{{3}})", content)})
+
+
 @pytest.mark.level_3b
 @pytest.mark.slow
 @pytest.mark.skipif(
@@ -89,18 +94,18 @@ class TestSpecSpecify:
         )
 
     def test_ac_numbered_sequentially(self, spec_md_content: str):
-        ac = re.findall(r"AC-(\d{3})", spec_md_content)
-        expected = [f"{i + 1:03d}" for i in range(len(ac))]
-        assert ac == expected, f"Non-sequential ACs: {ac}"
+        """Distinct AC ids form 001..N with no gap (re-references are allowed)."""
+        ac = _distinct_ids("AC", spec_md_content)
+        assert ac == list(range(1, len(ac) + 1)), f"Non-sequential ACs: {ac}"
 
     def test_fr_numbered_sequentially(self, spec_md_content: str):
-        fr = re.findall(r"FR-(\d{3})", spec_md_content)
-        expected = [f"{i + 1:03d}" for i in range(len(fr))]
-        assert fr == expected, f"Non-sequential FRs: {fr}"
+        """Distinct FR ids form 001..N with no gap (re-references are allowed)."""
+        fr = _distinct_ids("FR", spec_md_content)
+        assert fr == list(range(1, len(fr) + 1)), f"Non-sequential FRs: {fr}"
 
     def test_at_least_5_ac(self, spec_md_content: str):
-        ac = re.findall(r"AC-\d{3}", spec_md_content)
-        assert len(ac) >= 5, f"Only {len(ac)} ACs (min: 5)"
+        ac = _distinct_ids("AC", spec_md_content)
+        assert len(ac) >= 5, f"Only {len(ac)} distinct ACs (min: 5)"
 
     def test_no_decision_needed(self, spec_md_content: str):
         assert "[DECISION NEEDED]" not in spec_md_content.upper()

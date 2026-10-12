@@ -47,3 +47,12 @@
 - **Code modified:** `scripts/sync-agent-assets.sh`, `scripts/migrate-agent-sync.sh`, `scripts/init.sh`, `.agent-sync/skills/spec-init/SKILL.md`, `migrations/16/migrate.md`, `.gitignore`, tests
 - **AC impacted:** AC-007, AC-009
 - **Author:** codex
+
+## 2026-10-12 — [Refactor]: Layout and agent-sync script tests deduplicated
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_agent_sync_layout.py, tests/test_agent_sync_scripts.py, implementation.md
+- **AC impacted:** AC-005, AC-006 remapped to test_agent_sync_scripts.py
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- The layout module owns the inventory through `discover_commands`; registry, expectations-identity and spec-migrate prose duplicates removed; script tests no longer depend on the working directory.

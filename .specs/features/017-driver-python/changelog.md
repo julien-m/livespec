@@ -23,3 +23,12 @@
 - **Code modified:** None
 - **AC impacted:** AC-001 through AC-012 (all defined)
 - **Author:** spec.specify
+
+## 2026-10-12 — [Refactor]: Driver integration tests reduced to real behavior
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_driver_python.py, tests/integration/helpers/driver_manifests.py (new), implementation.md
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Kept registry discovery and schema-validated capability set; removed YAML value pins (threshold, report path, command presence).

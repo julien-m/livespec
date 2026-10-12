@@ -48,11 +48,8 @@ updated: 2026-04-14
 | `.claude/.agent-sync/skills/spec.test.md` | Modified | Phase 4.5.3 Step D: manifest write after approval; DoD checklist updated |
 | `.claude/.agent-sync/skills/spec.check.md` | Modified | Step 3.1: --show-provenance; Step 8.0: Staleness Gate (mockup hash + browser version); Step 8.5: --visual-status governance dashboard; Flags table updated; Overview updated |
 | `migrations/5/migrate.md` | Created | Migration v5: GENERATE_STUB for existing baselines, IDEMPOTENCY_CHECK, SET_VERSION 5 |
-| `tests/test_baseline_manifest.py` | Created | 41 unit tests covering all 8 FRs and 12 ACs |
+| `tests/test_baseline_manifest.py` | Removed (2026-10-12) | The 41 tests only searched SKILL.md, schema and migration Markdown for words and re-parsed their own YAML fixtures; the executable consumer `validator/visual_gate.py` is covered by `tests/test_visual_gate.py` and `tests/test_visual_implementation_gate.py` |
 | `tests/test_visual_implementation_gate.py` | Modified | Regression tests for missing legacy mockup, stale legacy mockup hash, and runtime-state to mockup-path mapping |
-| `tests/fixtures/baseline_manifest/valid_manifest.yml` | Created | Valid manifest fixture (2 screens) |
-| `tests/fixtures/baseline_manifest/stub_manifest.yml` | Created | Migration v5 stub fixture (pre-v5 untracked) |
-| `tests/fixtures/baseline_manifest/corrupted_manifest.yml` | Created | Corrupted YAML fixture for error-handling tests |
 | `.specs/features/004-visual-testing-governance/plan.md` | Created | Technical implementation plan |
 | `.specs/features/004-visual-testing-governance/progress.md` | Created | Step-by-step implementation checkpoints |
 

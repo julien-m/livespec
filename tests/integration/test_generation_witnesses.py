@@ -21,6 +21,8 @@ from tests.integration.helpers.witness_generation import run_generation_trial
 
 
 def seed_candidate(root: Path, witness: str) -> Path:
+    if witness == "ui-form" and shutil.which("node") is None:
+        pytest.skip("node is not installed; the ui-form witness oracle runs under Node")
     candidate = root / witness
     shutil.copytree(FIXTURES / f"witness-{witness}" / "seed", candidate)
     return candidate

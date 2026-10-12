@@ -166,3 +166,12 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Code modified:** Pending implementation of the approved policy.
 - **Author:** Codex
 - GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.
+
+## 2026-10-12 — [Refactor]: ui-form witness skips cleanly without Node
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_generation_witnesses.py
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- ui-form cases skip with a clear reason when `node` is absent instead of failing as `node_unavailable`.
