@@ -11,6 +11,7 @@
 
 - [055](features/055-spec-doctor-project-health/changelog.md): doctor reports suppressed in-progress coherence findings as INFO `[in-progress, Nmin]` and attributes findings through `dir_name` (R3 contexts gain `dir_name`); lane ELIGIBLE (3 files, 55 lines), RED/GREEN receipts in implementation.md.
 - [014](features/014-supervisor-contracts/changelog.md): spec-feature `--resume` resolves the latest `pipeline.md` with `ls -t .specs/features/*/pipeline.md` instead of the nonexistent `livespec pipeline latest`; new guard test checks every `livespec` command path cited by a skill; lane ELIGIBLE (3 files, 60 lines).
+- [016](features/016-cross-language-test-driver-architecture/changelog.md): built-in driver scripts resolve beside their shipped manifest (`livespec/drivers/scripts/`), custom `.specs/drivers` scripts stay project-relative; lane ELIGIBLE (2 files, 58 lines).
 
 ## 2026-10-12 — [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback)
 <!-- finalize:spec-feature:2026-10-12:a6abad0a -->
