@@ -12,8 +12,12 @@ import time
 from pathlib import Path
 
 import pytest
-from typer.testing import CliRunner
 
+from tests.lightweight_goals_support import (
+    isolate_saved_goals,
+    render_saved,
+    summarize_recompile,
+)
 from validator import init_from_code
 from validator.cli import app
 from validator.goal_contracts import (
@@ -300,32 +304,12 @@ def test_three_rejections_hand_back_a_blocked_report_and_later_proof_still_count
     assert "blocked" not in accepted["state"]["tasks"]["qe.analysis"]
 
 
-def _render_saved(runner: CliRunner, controls: Path) -> tuple[Path, Path]:
-    result = runner.invoke(
-        app,
-        ["goal", "render", "spec-test", "--feature", "demo", "--flags", "--auto", "--save"],
-    )
-    assert result.exit_code == 0, result.output
-    match = re.search(r"contract-file:(\S+) \| state-file:(\S+)", result.output)
-    assert match is not None
-    return Path(match.group(1)), Path(match.group(2))
-
-
 def test_drifted_contract_recompiles_in_place_and_keeps_valid_evidence(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     project = _project(tmp_path)
-    (project / ".specs/livespec-version").write_text((ROOT / "VERSION").read_text())
-    controls = tmp_path / "controls"
-    controls.mkdir()
-    import tempfile
-
-    monkeypatch.setattr(tempfile, "tempdir", str(controls))
-    monkeypatch.setattr("validator.integrations.INTEGRATIONS_DIR", tmp_path / "none")
-    monkeypatch.setattr("validator.hook_resolver.GLOBAL_HOOKS_DIR", tmp_path / "none")
-    monkeypatch.chdir(project)
-    runner = CliRunner()
-    contract_path, state_path = _render_saved(runner, controls)
+    runner = isolate_saved_goals(project, tmp_path, monkeypatch)
+    contract_path, state_path = render_saved(runner)
     first = json.loads(contract_path.read_text())
     assert first["feature"] == "001-demo"  # unnumbered slug resolved for every command
     common = ["--contract", str(contract_path), "--state", str(state_path)]
@@ -335,7 +319,7 @@ def test_drifted_contract_recompiles_in_place_and_keeps_valid_evidence(
     assert proved.exit_code == 0, proved.output
 
     # Same goal re-rendered: progress is kept, not reset.
-    _render_saved(runner, controls)
+    render_saved(runner)
     assert json.loads(state_path.read_text())["tasks"]["qe.analysis"]["status"] == "complete"
 
     # Input drift: a project hook now adds before-test context.
@@ -346,24 +330,10 @@ def test_drifted_contract_recompiles_in_place_and_keeps_valid_evidence(
         app, ["goal", "prove", *common, "--task", "outcome.verified", "--evidence", "{}"]
     )
     assert result.exit_code == 0, result.output
-    output = json.loads(result.output)
-    rewritten = json.loads(contract_path.read_text())
-    state = json.loads(state_path.read_text())
     # Re-rendering the drifted goal adopts the progress of the pair recompiled in place.
-    new_contract_path, new_state_path = _render_saved(runner, controls)
-    adopted = json.loads(new_state_path.read_text())
-    recompile_facts = {
-        "from_hash": output["recompiled"]["from_hash"] == first["goal_hash"],
-        "carried": output["recompiled"]["carried"],
-        "rewritten_in_place": rewritten["goal_hash"] == output["recompiled"]["to_hash"],
-        "state_hash": state["goal_hash"] == rewritten["goal_hash"],
-        "hook_task_added": rewritten["tasks"][0]["id"],
-        "qe_status": state["tasks"]["qe.analysis"]["status"],
-        "outcome_status": state["tasks"]["outcome.verified"]["status"],
-        "recompiled_from": state["recompiled_from"] == first["goal_hash"],
-        "rerender_new_paths": new_contract_path != contract_path,
-        "rerender_adopts_qe": adopted["tasks"]["qe.analysis"]["status"],
-    }
+    new_paths = render_saved(runner)
+    paths = (contract_path, state_path, *new_paths)
+    recompile_facts = summarize_recompile(first, json.loads(result.output), paths)
     assert recompile_facts == {
         "from_hash": True,
         "carried": ["qe.analysis"],

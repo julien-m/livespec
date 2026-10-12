@@ -38,6 +38,6 @@ updated: 2026-10-10
 
 ## Files Created/Modified
 
-- Created `validator/goal_outcome.py` (scope, stop condition, outcome/conventions tasks), `validator/goal_recompile.py` (drift recompilation, state reuse), `validator/goal_canonical.py` (canonical JSON helpers kept from the deleted conventions module), `tests/test_lightweight_goals.py`, `tests/goal_checklist_support.py`.
+- Created `validator/goal_outcome.py` (scope, stop condition, outcome/conventions tasks), `validator/goal_recompile.py` (drift recompilation, state reuse), `validator/goal_canonical.py` (canonical JSON helpers kept from the deleted conventions module), `tests/test_lightweight_goals.py`, `tests/lightweight_goals_support.py` (saved-goal helpers extracted on integration to keep the test module within the repo file and function limits), `tests/goal_checklist_support.py`.
 - Deleted `validator/goal_conventions.py`, `validator/init_goal_conventions.py`, `tests/test_init_goal_conventions.py` (per-task convention payload), child-goal proof helpers and obsolete per-row evidence rules.
 - Modified goal compile/payload/tasks/proof/render/CLI modules, `validator/evidence_policy.py`, `validator/init_from_code.py`, 20 skills and their expectations `last_reviewed`, `system/anti-drift-block.md`, `system/expectations.md`, `system/spec-system.md`, `.specs/spec-system.md`, `README.md`, goal-related tests and `tests/conftest.py` (autouse stop-condition stub; `real_stop_condition` marker opts out).
