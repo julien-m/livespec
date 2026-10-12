@@ -23,8 +23,8 @@ updated: 2026-05-07
 | FR-005 | launch_arguments injection | `validator/ui_runner_xcuitest.py` | `# @spec FR-005: launch_arguments injection` |
 | FR-005 | Swift template launch args | `livespec/ui-runners/xcuitest-template/LSSampleUITests.swift` | `// @spec FR-005: launch_arguments injection` |
 | FR-006 | Xcode license detection | `validator/ui_runner_xcuitest.py` | `# @spec FR-006: Xcode license detection` |
-| FR-007 | Integration tests iOS | `tests/test_ui_runner_xcuitest.py` | pytest.mark.macos tests |
-| FR-008 | Integration tests watchOS | `tests/test_ui_runner_xcuitest.py` | pytest.mark.macos tests |
+| FR-007 | Integration tests iOS | ❌ Missing | none — the former `pytest.mark.macos` stubs were unconditional `pytest.skip()` and were removed on 2026-10-12; a real macOS fixture test is still required |
+| FR-008 | Integration tests watchOS | ❌ Missing | none — the former `pytest.mark.macos` stubs were unconditional `pytest.skip()` and were removed on 2026-10-12; a real macOS fixture test is still required |
 | FR-009 | Developer documentation | `docs/ui-runners/xcuitest.md` | `<!-- @spec FR-009: developer documentation -->` |
 
 ## AC → Test Mapping
@@ -93,8 +93,8 @@ updated: 2026-05-07
 | FR-004 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-004) | ✅ Implemented | 2026-06-08 |
 | FR-005 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-005) | ✅ Implemented | 2026-06-08 |
 | FR-006 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-006) | ✅ Implemented | 2026-06-08 |
-| FR-007 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-007) | ✅ Implemented | 2026-06-08 |
-| FR-008 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-008) | ✅ Implemented | 2026-06-08 |
+| FR-007 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-007) | ❌ Missing | 2026-10-12 |
+| FR-008 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-008) | ❌ Missing | 2026-10-12 |
 | FR-009 | `.specs/features/030-ui-runner-ios-watchos/implementation.md` | @spec(FR-009) | ✅ Implemented | 2026-06-08 |
 
 ## Acceptance Criteria

@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -12,7 +13,6 @@ import pytest
 
 from validator.exceptions import SdkTestRunError
 from validator.sdk_test_runner import (
-    SdkTestResult,
     SdkTestRunner,
     _build_pytest_cmd,
     _build_subprocess_env,
@@ -97,10 +97,15 @@ class TestBuildSubprocessEnv:
         assert env["LIVESPEC_TEST_BUDGET_USD"] == "10.0"
 
     def test_without_budget(self) -> None:
-        env = _build_subprocess_env(None)
-        assert "LIVESPEC_TEST_BUDGET_USD" not in env or env.get(
-            "LIVESPEC_TEST_BUDGET_USD"
-        ) == env.get("LIVESPEC_TEST_BUDGET_USD")
+        with patch.dict("os.environ", {"LIVESPEC_TEST_BUDGET_USD": "x"}):
+            del os.environ["LIVESPEC_TEST_BUDGET_USD"]
+            env = _build_subprocess_env(None)
+        assert "LIVESPEC_TEST_BUDGET_USD" not in env
+
+    def test_without_budget_keeps_inherited_budget(self) -> None:
+        with patch.dict("os.environ", {"LIVESPEC_TEST_BUDGET_USD": "2.5"}):
+            env = _build_subprocess_env(None)
+        assert env["LIVESPEC_TEST_BUDGET_USD"] == "2.5"
 
     def test_inherits_environ(self) -> None:
         with patch.dict("os.environ", {"MY_VAR": "test123"}, clear=False):
@@ -210,18 +215,3 @@ class TestSdkTestRunnerRun:
             result = SdkTestRunner(tmp_path).run()
         assert "line1" in result.raw_output
         assert "line2" in result.raw_output
-
-
-class TestSdkTestResultDataclass:
-    """SdkTestResult construction."""
-
-    def test_total_equals_sum(self) -> None:
-        result = SdkTestResult(
-            passed=3,
-            failed=1,
-            skipped=2,
-            total=6,
-            exit_code=0,
-            raw_output="",
-        )
-        assert result.total == result.passed + result.failed + result.skipped

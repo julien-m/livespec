@@ -3,6 +3,15 @@
 > Per-feature changelog for Layer 3 CLI Surface.
 > Global changes are tracked in `.specs/changelog.md`.
 
+## 2026-10-12 — [Refactor]: Replace tautological SdkTestRunner tests
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_sdk_test_runner.py
+- **AC impacted:** AC-007 (budget env, unchanged test)
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** `test_without_budget` compared a value with itself; it now asserts the variable is absent without a budget, and a new case asserts an inherited budget is preserved. Removed `test_total_equals_sum`, which checked a field the test had just set.
+
 ---
 
 ## 2026-04-13 — [Fix]: Added missing @spec anchors

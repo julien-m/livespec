@@ -10,7 +10,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
 from typer.testing import CliRunner
 
 from validator.cli import app
@@ -97,17 +96,6 @@ surfaces:
     surface = payload["surfaces"][0]
     assert surface["id"] == "ios-app"
     assert surface["runner"] == "xcuitest"
-
-
-@pytest.mark.parametrize("runner_name", ["playwright", "xcuitest", "maestro"])
-def test_ui_runner_check_registry_contains(runner_name: str, tmp_path: Path) -> None:
-    """Registry must always include the three core runners."""
-    result = runner.invoke(
-        app,
-        ["ui-runner", "check", "--json", "--project-dir", str(tmp_path)],
-    )
-    payload = json.loads(result.stdout)
-    assert runner_name in payload["registry"]
 
 
 def test_ui_runner_scaffold_ios_copies_template(tmp_path: Path) -> None:

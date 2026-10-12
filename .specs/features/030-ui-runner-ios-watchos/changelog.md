@@ -1,3 +1,12 @@
+## 2026-10-12 — [Refactor]: Remove unconditional-skip integration stubs; FR-007/FR-008 marked Missing
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_ui_runner_xcuitest.py, implementation.md
+- **AC impacted:** None (FR-007, FR-008 status corrected)
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** `test_real_simulator_boot_integration` and `test_real_xcresult_extraction_integration` always called `pytest.skip()` and never asserted anything, yet implementation.md mapped FR-007/FR-008 to them as Implemented. The stubs are removed and both FRs now show Missing until a real macOS fixture test exists.
+
 ## 2026-05-06 — [Spec Update]: Feature specification created
 
 - **Type:** Spec Update
