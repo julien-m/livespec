@@ -7,6 +7,13 @@
 
 ---
 
+## 2026-10-12 — Refactor: test-suite cleanup lot 3 (goal, journey, locks, manifests, Penflow models)
+
+- 1033 -> 911 test cases in the lot with no validator line losing coverage (23800 -> 23807 covered lines); no new failure in the unit suite.
+- Lying or vacuous tests corrected: the lock resume test now reaches the resume branch; 056 AC-004 (fixed-wait warning) and AC-015 (manual reason) were certified by tests that never exercised them and are now recorded as Missing.
+- Constant, library and fixture self-checks replaced by observable behaviour (hook variables, slug regex doc, identity policy version, specStatus marker, Maestro detect rules, v21 scaffold wrapper).
+- Label-only parametrization and duplicated cases removed from goal pairing/proof, goal contracts, graph builder, init goal profiles, journey fixtures and Penflow approval models; mapping rows of 031 and 059 updated.
+
 ## 2026-10-12 — Bugfix: integrate features 081, 082 and 083 on main
 
 - Conventions source collection skips `.claude/worktrees/**`, `.worktrees/**` and any nested directory holding a `.git` entry; repo scope returns PASS against [the versioned baseline](conventions/baseline.json) without rewriting it.

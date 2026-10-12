@@ -1,5 +1,15 @@
 # Changelog - Cross-Feature User Journeys v2
 
+## 2026-10-12 — [Refactor]: Docs/skill tests resolve paths from the repository root
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_journey_v2_docs_skills.py
+- **AC impacted:** AC-012, AC-013, AC-017, AC-029, AC-030, AC-045
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+The tests read the skill and system docs relative to the cwd and failed outside the repository root. `assignment.py`, `bootstrap.py`, `llm_visual.py` and the native visual checks in `visual_contracts.py` have no production caller but remain the mapped implementation of FR-013..016 and FR-033/034, so they and their tests are kept.
+
 ### 2026-06-09 — Fix: 7 gaps closed (7 functional, 0 visual)
 
 - **Type:** Bug Fix

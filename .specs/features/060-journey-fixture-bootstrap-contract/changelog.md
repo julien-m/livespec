@@ -1,5 +1,15 @@
 # Changelog - 060-journey-fixture-bootstrap-contract
 
+## 2026-10-12 — [Refactor]: Fixture-contract tests exercise the scaffold wrapper
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_journey_v2_fixtures_contract.py
+- **AC impacted:** AC-001, AC-012
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+The v21 scaffold wrapper is executed (twice, replay-safe) instead of grepped; the default timeout is asserted on a resolved plan against the spec value instead of the constant; a chaos case repeating the invalid-YAML branch was removed.
+
 ## 2026-06-11 — [Spec]: Journey Fixture Bootstrap Contract specified
 
 - **Spec modified:** Yes (created — all sections)

@@ -107,3 +107,13 @@
 ## 2026-09-06 — Requirement evidence policy
 
 Updated affected requirements before behavior changes; read [feature 078](../078-requirement-evidence-integrity/spec.md) for the complete versioned contract. Preserved existing IDs and historical entries.
+
+## 2026-10-12 — [Refactor]: Goal-contract tests trimmed
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/_goal_contracts_07.py, tests/_goal_contracts_08.py, tests/_goal_contracts_09.py, tests/test_goal_contracts.py
+- **AC impacted:** AC-007 (path fix only)
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+The anti-drift test reads `system/anti-drift-block.md` from the repository root instead of the cwd. Removed fixture self-assertions, frozen spec-check DoD prose (the 'tree validation is not a pass gate' regression guard stays) and a duplicate per-task convention test.

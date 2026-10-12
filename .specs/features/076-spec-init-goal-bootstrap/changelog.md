@@ -196,3 +196,13 @@
 - **Coverage:** 12/12 existing FR and 10/10 AC verified; fresh 185 bootstrap tests passed. Six autonomous generator gaps remain outside current feature contract.
 - **Report:** Read [the gap report](checks/2026-10-09.md).
 - **Author:** Codex native spec-check subagent
+
+## 2026-10-12 — [Refactor]: Pairing and proof matrices lightened
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_goal_bootstrap_pairing.py, tests/test_goal_bootstrap_prove.py
+- **AC impacted:** AC-004, AC-005, AC-010 (coverage unchanged)
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+`operation` only selects the diagnostic label in `validate_goal_pair`, so API matrices keep one operation and the CLI boundary pairs each operation with one option (88 -> 48 cases). Two proof tests duplicated transition-matrix cells; the matrix now also asserts input-state immutability.

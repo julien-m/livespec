@@ -166,3 +166,13 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Code modified:** Pending implementation of the approved policy.
 - **Author:** Codex
 - GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.
+
+## 2026-10-12 — [Refactor]: Identity-version test made behavioural
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_lifecycle_metadata.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+`test_identity_policy_version_invalidates_prior_receipts` only compared the constant; it now proves a version bump changes the normative hash.

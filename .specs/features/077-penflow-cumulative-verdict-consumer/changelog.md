@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-12 — [Refactor]: Strict-model combinatorics reduced
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_penflow_approval_models.py
+- **AC impacted:** AC-008 (coverage unchanged)
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+The shared `VersionOne` validator is checked once with the full value set and every versioned model with two values (42 -> 13 cases); redundant strictness, digest and decision values were dropped.
+
 ## 2026-09-05 — Verification: Shared callers applied and SC005 verified
 
 - **Type:** Spec Update; final implementation mappings and proof documentation.

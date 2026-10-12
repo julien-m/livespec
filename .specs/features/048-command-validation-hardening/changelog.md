@@ -1,5 +1,15 @@
 # Changelog - Command Validation Hardening
 
+## 2026-10-12 — [Refactor]: Hook template-variable sync derived from the resolvers
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_hook_resolver.py, tests/test_integrations.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+The `{{var}}` documentation check compared `system/hooks.md` with a list hard-coded in the test; known variables now come from `_build_feature_ctx` and the `commit-context write` payload. A stale `pytest.skip` on the shipped `mockups.md.example` was removed.
+
 ## 2026-09-06 — [Spec Update]: Precise traceback guard
 
 - **AC impacted:** AC-002. Accept the exact Python traceback header with an actual newline alongside the legacy broad signature; reject missing guards. Read [feature 078](../078-requirement-evidence-integrity/spec.md) for structured review output provenance.

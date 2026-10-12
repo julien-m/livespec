@@ -1,3 +1,13 @@
+## 2026-10-12 — [Refactor]: Slug regex test reads system/identity.md
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_identity.py
+- **AC impacted:** None (FR-002 regex/doc sync)
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+The regex test compared `SLUG_REGEX.pattern` with a literal copied into the test; it now checks that the pattern appears in `system/identity.md`.
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update
