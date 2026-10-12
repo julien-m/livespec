@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.init_clock_support import FakeClock, install_deadline_seams
 from tests.test_init_profile import hybrid
 from tests.test_init_recovery import ROOT, environment, execute, tree
 from validator import init_from_code
@@ -79,15 +80,17 @@ def test_hook_installer_uses_remaining_deadline_and_cancels_descendants(
 ) -> None:
     scripts = tmp_path / "fixture/scripts"
     scripts.mkdir(parents=True)
-    (scripts / "install-hooks.sh").write_text("(sleep .4; echo bad > late) & wait\n")
+    (scripts / "install-hooks.sh").write_text("(sleep 1; echo bad > late) & wait\n")
     monkeypatch.setattr(init_from_code, "LIVESPEC_ROOT", scripts.parent)
-    deadline = time.monotonic() + 0.15
-    time.sleep(0.08)
-    started = time.monotonic()
+    clock = FakeClock()
+    timeouts = install_deadline_seams(monkeypatch, clock)
+    deadline = clock.now + 0.15
+    clock.now += 0.08  # earlier init steps already consumed part of the run budget
     with pytest.raises(InitError, match=r"install pre-commit hooks.*timeout"):
         init_from_code._install_hooks(tmp_path, deadline)
-    assert time.monotonic() - started < 0.3
-    time.sleep(0.5)
+    # The installer got the remaining 0.07 s, not a fresh budget; the late write never lands.
+    assert timeouts[0] == pytest.approx(0.07)
+    time.sleep(1.2)
     assert not (tmp_path / "late").exists()
 
 

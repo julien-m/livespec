@@ -55,3 +55,14 @@
 - **Code modified:** observed profile/documents/probes/recovery/verification, init goal conventions and branches, installer/sync and canonical init skill.
 - **AC impacted:** AC-001 through AC-006.
 - Read [implementation](implementation.md) for fixture checks and operational limits. Final feature/repo certification remains incomplete; successful Handy init is distinct operational evidence.
+
+### 2026-10-12 — Fix: zombie-group EPERM, deterministic budgets and hermetic init tests
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `validator/init_probes.py`, `tests/init_clock_support.py` (new), `tests/test_init_probes.py`, `tests/test_init_hook_pipeline.py`, `tests/test_init_recovery.py`, `tests/test_spec_init_autonomous_bootstrap.py`
+- **Gaps closed:** FR-002/AC-003 — `killpg` EPERM on macOS zombie-only groups escaped as PermissionError; budget tests depended on machine load; init tests depended on a sibling `../ai-ressources` checkout.
+- **Remaining:** readiness gate BLOCKED — the claude-opus-5-5 spec review marks FR-001 ambiguous (supported manifest ecosystems); business decision pending.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:7710d267 -->

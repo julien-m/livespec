@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -26,8 +27,25 @@ def tree(root: Path) -> dict[str, str]:
     }
 
 
+CONVENTION_SOURCES = ("general.md", "python.md", "javascript.md", "cli.md", "stack-commands.md")
+
+
+def conventions_corpus(tmp: Path) -> Path:
+    """Write the five code-convention sources init routes to, as real fixture files."""
+    resources = tmp / "ai-ressources-fixture"
+    for name in CONVENTION_SOURCES:
+        source = resources / "code-conventions" / name
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.write_text(f"# {name}\nFixture convention source.\n", encoding="utf-8")
+    return resources
+
+
 def environment(tmp: Path) -> dict[str, str]:
-    """Install controlled executable version and cc-hub fixtures."""
+    """Install controlled executable version, cc-hub and conventions corpus fixtures.
+
+    AIRESOURCES always names the fixture corpus, so neither a caller's private corpus nor a
+    sibling ``../ai-ressources`` checkout can decide the outcome.
+    """
     bindir = tmp / "bin"
     bindir.mkdir()
     for tool in ("cc-hub", "bun", "cargo", "npm"):
@@ -36,7 +54,11 @@ def environment(tmp: Path) -> dict[str, str]:
             "#!/bin/sh\n" + ("exit 0\n" if tool == "cc-hub" else f'echo "{tool} fixture-version"\n')
         )
         path.chmod(0o755)
-    return dict(os.environ, PATH=str(bindir) + ":" + os.environ["PATH"])
+    return dict(
+        os.environ,
+        PATH=str(bindir) + ":" + os.environ["PATH"],
+        AIRESOURCES=str(conventions_corpus(tmp)),
+    )
 
 
 def execute(project: Path, env: dict[str, str], *flags: str) -> subprocess.CompletedProcess[str]:
@@ -203,7 +225,8 @@ def test_ac003_failed_required_tool_no_completed_ready(tmp_path: Path, failure: 
         (project / "bun.lock").unlink()
         (project / "pnpm-lock.yaml").write_text("fixture")
         (project / "src-tauri/tauri.conf.json").write_text('{"productName":"Handy"}')
-        env["PATH"] = str(tmp_path / "bin") + ":/usr/bin:/bin"
+        # pnpm stays absent; the running interpreter stays reachable for the wrapper's python3.
+        env["PATH"] = f"{tmp_path / 'bin'}:{Path(sys.executable).parent}:/usr/bin:/bin"
     result = execute(project, env, "--timeout-seconds", "2")
     assert result.returncode != 0, result.stdout
     assert "LiveSpec initialized" not in result.stdout
