@@ -22,6 +22,7 @@ from tests.runtime_support import (
     tree_hashes,
     write,
 )
+from validator.runtime import links as links_module
 from validator.runtime.errors import (
     RuntimeLockError,
     RuntimeSelectionError,
@@ -240,3 +241,85 @@ def test_pin_replaces_lock_pinned_to_another_runtime(runtimes: Runtimes, tmp_pat
     assert lock["mode"] == "pinned" and lock["runtime_id"] == runtimes.v22
     snapshot = _snapshot(runtimes, runtimes.v22)
     assert (project / ".specs/.livespec-path").read_text().strip() == str(snapshot)
+
+
+def test_broken_links_need_trusted_provenance(runtimes: Runtimes, tmp_path: Path) -> None:
+    """Audit #11: a broken link is owned only when its root is the recorded .livespec-path."""
+    project = make_project(tmp_path / "consumer")
+    vanished = tmp_path / "unrelated-root"
+    foreign_text = str(vanished / ".agent-sync/skills/spec-check")
+    foreign = link_into(project, "skills/foreign-broken", Path(foreign_text))
+    recorded = tmp_path / "deleted-runtime"
+    write(project / ".specs/.livespec-path", f"{recorded}\n")
+    trusted = link_into(project, "skills/spec-check", recorded / ".agent-sync/skills/spec-check")
+    result = pin_project(project, runtimes.v21, runtimes.home)
+    snapshot = runtimes.home.snapshot(runtimes.v21)
+    assert os.readlink(foreign) == foreign_text
+    assert Path(os.readlink(trusted)) == snapshot / ".agent-sync/skills/spec-check"
+    assert result.links.retargeted == (".agent-sync.local/skills/spec-check",)
+
+
+def test_selection_failure_restores_previous_state(
+    runtimes: Runtimes, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Audit #12: a failure mid-publication restores lock, .livespec-path and links."""
+    project = _consumer(tmp_path, runtimes.checkout)
+    pin_project(project, runtimes.v21, runtimes.home)
+    before = tree_hashes(project)
+    calls: list[Path] = []
+    real = links_module.replace_symlink
+
+    def failing(path: Path, target: Path | str) -> None:
+        """Retarget the first link, then fail on the second."""
+        calls.append(path)
+        if len(calls) == 2:
+            raise OSError("injected link failure")
+        real(path, target)
+
+    monkeypatch.setattr(links_module, "replace_symlink", failing)
+    with pytest.raises(RuntimeSelectionError, match="rolled back"):
+        upgrade_project(project, runtimes.v22, runtimes.home)
+    monkeypatch.undo()
+    assert len(calls) == 2 and tree_hashes(project) == before
+
+
+def test_lock_is_published_last_and_rollback_failure_is_reported(
+    runtimes: Runtimes, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Audit round 2 #4/#5: links change before the lock; a failed rollback is not hidden."""
+    from validator.runtime import project as project_module
+
+    project = _consumer(tmp_path, runtimes.checkout)
+    pin_project(project, runtimes.v21, runtimes.home)
+    lock_path = project / ".specs" / "livespec.lock"
+    old_lock = lock_path.read_bytes()
+    real = links_module.replace_symlink
+    seen_locks: list[bytes] = []
+
+    def failing_link(path: Path, target: Path | str) -> None:
+        """Record the lock visible while links are being written, then fail."""
+        seen_locks.append(lock_path.read_bytes())
+        raise OSError("injected link failure")
+
+    monkeypatch.setattr(links_module, "replace_symlink", failing_link)
+    with pytest.raises(RuntimeSelectionError, match="rolled back"):
+        upgrade_project(project, runtimes.v22, runtimes.home)
+    assert seen_locks == [old_lock] and lock_path.read_bytes() == old_lock
+
+    calls: list[Path] = []
+
+    def second_fails(path: Path, target: Path | str) -> None:
+        """Retarget the first link, then fail so that a rollback is needed."""
+        calls.append(path)
+        if len(calls) == 2:
+            raise OSError("injected link failure")
+        real(path, target)
+
+    def failing_restore(path: Path, target: Path | str) -> None:
+        """Make the rollback of link texts fail too."""
+        raise OSError("injected rollback failure")
+
+    monkeypatch.setattr(links_module, "replace_symlink", second_fails)
+    monkeypatch.setattr(project_module, "replace_symlink", failing_restore)
+    with pytest.raises(RuntimeSelectionError, match="rollback incomplete"):
+        upgrade_project(project, runtimes.v22, runtimes.home)

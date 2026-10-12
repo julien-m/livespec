@@ -89,3 +89,37 @@ Shared fixtures: `tests/runtime_support.py` (temporary git sources with a real-c
 - Independent mapping review (claude-opus-5-5, 2 batches + synthesis): receipt `.specs/features/083-pinned-runtime-isolation/run/acceptance/mapping-review-receipt.json`, complete and ready, 18/18 covered. Non-blocking reviewer warnings kept for `/spec-test`: one AC-003 binding labelled "current unchanged after refusal" cites the pre-refusal check (the post-refusal assertion in the same test is unbound); manifest runtime_id≠lock is not exercised at shim level; pin replacing another pinned lock and `status` JSON in dev mode are not asserted.
 - Runner-owned execution receipt: `.specs/.execution/d513ca6e4a0744b8a6a62ab564770a00/receipt.json` (61 tests passed, 18 AC certified, no gaps).
 - `/spec-test` 2026-10-11: closed the four reviewer gaps (AC-003 rebind to line 172; new AC-005, AC-006, AC-017 tests). Mapping now 168 bindings; fresh mapping review receipt complete/ready 18/18; runner-owned execution receipt captured after these feature files were finalized (64 passed, 18 AC certified, no gaps; path recorded in the spec-test goal archive under `.specs/.runs/`, since editing this directory after capture would stale it). Report: [checks/2026-10-11-test.md](checks/2026-10-11-test.md).
+
+## Audit Corrections (2026-10-11)
+
+| Finding | Fix | Test |
+|---|---|---|
+| #7 defect `--feature`/`--phase` unvalidated (blocker) | `validate_target` in `validator/runtime/defects.py` (slug only, resolves directly under `.specs/features`, known phase) runs before any write; CLI maps `RuntimeDefectInputError` (`validator/runtime/errors.py`) to exit 2 | `tests/test_runtime_defects.py::test_unsafe_feature_is_refused_before_any_write`, `test_unknown_phase_is_refused_before_any_write` |
+| #13 stale-staging symlink followed (blocker) | `remove_stale_staging` unlinks staging-named symlinks without following; `remove_tree` refuses symlinks and paths not directly under `<home>/versions` (`validator/runtime/snapshot.py`) | `tests/test_runtime_snapshot.py::test_staging_named_symlink_is_unlinked_without_following` |
+| #8 untrusted Markdown in defect reports | one-line title and identity values; command and error in dynamically sized fences | `tests/test_runtime_defects.py::test_report_renders_untrusted_text_safely` |
+| #9 lax manifest schema | strict `manifest_from_dict` (`validator/runtime/models.py`): int schema 1, id/commit formats and relation, `sha256:`+64 hex, UTC ISO-8601, absolute source | `tests/test_runtime_snapshot.py::test_manifest_schema_is_strict` |
+| #10 writable snapshot accepted | `verify_snapshot` rejects symlinked snapshot dirs and any write bit (`writable_entries`, `validator/runtime/manifest.py`) | `tests/test_runtime_snapshot.py::test_writable_snapshot_is_refused` |
+| #11 broken foreign links retargeted | broken links owned only when their root equals the recorded `.specs/.livespec-path` (`validator/runtime/links.py`) | `tests/test_runtime_project.py::test_broken_links_need_trusted_provenance` |
+| #12 non-atomic selection | `_select` holds `.specs/.LOCK` (`validator.locks.acquire_lock`) and restores lock/path/links on failure (`validator/runtime/project.py`) | `tests/test_runtime_project.py::test_selection_failure_restores_previous_state` |
+| #14 pinned lock without `.livespec-path` silent | WARNING `runtime_reference_missing` with `livespec runtime pin --runtime <id>` (`validator/runtime/inspection.py`) | `tests/test_runtime_inspection.py::test_pinned_lock_without_livespec_path_warns` |
+| #15 shim accepted any LiveSpec-shaped `current` | `_current_snapshot` requires a snapshot under `<home>/versions` whose single manifest identity matches the directory (`validator/runtime/shim_core.py`), also on the runtime-subcommand fallback | `tests/test_runtime_shim.py::test_current_must_be_a_verified_snapshot` |
+| #6 docs test touched real paths | `tests/test_runtime_docs.py` runs with HOME/TMPDIR/GIT_CONFIG_GLOBAL under `tmp_path`, asserts every selected path stays in the fixture and fixture sources keep their content hashes | `tests/test_runtime_docs.py::test_documented_migration_runs_on_consumer_fixture` |
+| #3/#4/#5 docs | fresh machine starts with `cd <livespec repo> && python3 -m validator.cli runtime install …` (README and `docs/cli-reference.md`); stale "All six commands" sentence replaced | `tests/test_runtime_docs.py::test_docs_cover_every_runtime_command` |
+| #2 progress resume line | updated in `progress.md` | — |
+| #1 pipeline timestamps | no change (UTC by design) | — |
+
+### Second audit pass (2026-10-12, applied by the supervisor after the implementing agent was interrupted)
+
+| Finding | Fix | Test |
+|---|---|---|
+| R2#1 symlinked `.specs/features` redirect (blocker) | `_refuse_redirected` in `validator/runtime/defects.py` refuses symlinked or escaping `.specs`, `.specs/tool-defects`, `.specs/features` and feature components before any write | `tests/test_runtime_defects.py::test_symlinked_features_dir_is_refused_before_any_write` |
+| R2#2 HTML in single-line values | `_one_line` escapes `&`, `<`, `>` after whitespace collapse (title, feature, phase, identity) | `tests/test_runtime_defects.py::test_title_html_cannot_hide_report_content` |
+| R2#3 bytecode in docs fixture | `PYTHONDONTWRITEBYTECODE=1` and fixture-local `PYTHONPYCACHEPREFIX` in `tests/test_runtime_docs.py` | `tests/test_runtime_docs.py::test_documented_migration_runs_on_consumer_fixture` |
+| R2#4 mixed generation for readers (blocker) | no reader locking (shim/status key on the lock only); `_publish` in `validator/runtime/project.py` writes `.livespec-path` and links first and the lock last | `tests/test_runtime_project.py::test_lock_is_published_last_and_rollback_failure_is_reported` |
+| R2#5 rollback failure reported as success | `_publish` raises `RuntimeSelectionError("selection failed; rollback incomplete: …")` chaining the original error | same test |
+| R2#6 incomplete `current` manifest (blocker) | `_manifest_identity_ok` in `validator/runtime/shim_core.py` checks exact key set, int schema 1 and digest format; digest is still not recomputed (FR-004) | `tests/test_runtime_shim.py::test_current_with_incomplete_manifest_exits_3` |
+| R2#7 looping `current` traceback | `_current_snapshot` resolves strictly inside `try` and maps `OSError`/`RuntimeError` to the install recovery error | `tests/test_runtime_shim.py::test_looping_current_symlink_exits_3_without_traceback` |
+| R2#8 optional deletion container | `remove_tree(root, container)` requires the container (`validator/runtime/snapshot.py`) | `tests/test_runtime_snapshot.py::test_remove_tree_requires_a_real_direct_child` |
+| R2#9-#11 Markdown link style in feature docs | no change: implementation maps use code spans, parsed by the feature-scope resolver | — |
+
+Execution certification is re-run after these corrections by `/spec-test`.

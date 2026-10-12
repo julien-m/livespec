@@ -7,6 +7,11 @@
 
 ---
 
+## 2026-10-12 — Feature 083 second audit pass: redirected-path refusal, escaped defect values, lock-last publication, strict shim current manifest
+
+## 2026-10-11 — Feature 083 audit corrections: defect input validation, staging symlink containment, strict manifest, read-only verification, locked selection rollback
+<!-- finalize:spec-implement:2026-10-11:c4506f10 -->
+
 ## 2026-10-11 — [Feature 083] Test: 100% AC covered (18/18), 3 tests generated
 
 ## 2026-10-11 — Feature 083 implemented: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, tool/project boundary (18/18 AC certified)

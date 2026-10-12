@@ -43,3 +43,7 @@ class RuntimeDefectError(LiveSpecRuntimeError):
     def __init__(self, message: str, report_path: str) -> None:
         super().__init__(message)
         self.report_path = report_path
+
+
+class RuntimeDefectInputError(LiveSpecRuntimeError):
+    """Raised before any write when defect ``--feature``/``--phase`` values are unsafe."""

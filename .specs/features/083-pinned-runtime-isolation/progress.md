@@ -20,7 +20,8 @@
 | Gate | Done | — | `livespec conventions verify --json --feature 083-pinned-runtime-isolation` | PASS | 2026-10-11 21:48 |
 | Review fixes | Done | `validator/runtime/{manifest,snapshot,inspection}.py` (manifest commit checked against the install ref / lock), tests strengthened after the independent mapping review | runtime tests | Pass | 2026-10-11 22:30 |
 | Execution proof | Done | `.specs/features/083-pinned-runtime-isolation/run/acceptance/{mapping.json,mapping-review-receipt.json}` | `livespec test --acceptance-mapping … --execution-command '<pytest runtime tests>' --report-adapter junit` | valid, 18/18 AC certified, no gaps | 2026-10-11 22:40 |
+| Audit corrections | Done | `validator/runtime/{defects,errors,snapshot,manifest,models,links,project,inspection,shim_core}.py`, `validator/cli_commands/runtime_cmd.py`, runtime tests, `README.md`, `docs/cli-reference.md` | runtime + doctor + version-guard tests; conventions verify; full suite vs baseline | Pass | 2026-10-11 23:30 |
 
 ## Resume point
 
-None: all steps are Done. Next phase: `/spec-test 083-pinned-runtime-isolation`.
+None for implementation: steps, `/spec-test` and the 2026-10-11 audit corrections are done; the supervisor re-runs `/spec-test` to re-certify execution after the corrections.

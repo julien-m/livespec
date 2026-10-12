@@ -69,8 +69,20 @@ def restore_write_bits(root: Path) -> None:
                 path.chmod(stat.S_IMODE(mode) | stat.S_IWUSR)
 
 
-def remove_tree(root: Path) -> None:
-    """Delete a possibly read-only directory tree after restoring write bits."""
+def remove_tree(root: Path, container: Path) -> None:
+    """Delete a possibly read-only directory tree after restoring write bits.
+
+    Args:
+        root: Real directory to delete (never a symlink).
+        container: Directory that ``root`` must resolve to a direct child of.
+
+    Raises:
+        LiveSpecRuntimeError: If ``root`` is a symlink or escapes ``container``.
+    """
+    if root.is_symlink():
+        raise LiveSpecRuntimeError(f"refusing to delete through a symlink: {root}")
+    if root.resolve().parent != container.resolve():
+        raise LiveSpecRuntimeError(f"refusing to delete outside {container}: {root}")
     restore_write_bits(root)
     shutil.rmtree(root)
 
@@ -98,10 +110,18 @@ def remove_stale_staging(home: RuntimeHome) -> list[Path]:
     removed: list[Path] = []
     for child in sorted(home.versions.iterdir()):
         match = _STAGING_RE.match(child.name)
-        # Live writers keep their staging directory; only dead pids are reclaimed.
-        if match is None or not child.is_dir() or _pid_alive(int(match.group("pid"))):
+        if match is None:
             continue
-        remove_tree(child)
+        # A staging-named symlink is never followed: only the link itself is removed,
+        # so no chmod or deletion can reach outside the runtime home.
+        if child.is_symlink():
+            child.unlink()
+            removed.append(child)
+            continue
+        # Live writers keep their staging directory; only dead pids are reclaimed.
+        if not child.is_dir() or _pid_alive(int(match.group("pid"))):
+            continue
+        remove_tree(child, home.versions)
         removed.append(child)
     return removed
 
@@ -159,7 +179,7 @@ def _seal_and_publish(home: RuntimeHome, staging: Path, base: RuntimeManifest) -
         if not home.snapshot(base.runtime_id).is_dir():
             raise
         # A concurrent install won the rename; reuse its snapshot once verified.
-        remove_tree(staging)
+        remove_tree(staging, home.versions)
         verify_snapshot(home, base.runtime_id, base.commit)
         return "reused"
     return "created"
@@ -178,7 +198,7 @@ def _build_snapshot(
     except BaseException:
         # Interrupted or failed install: never leave a partial tree behind, then re-raise.
         if staging.exists():
-            remove_tree(staging)
+            remove_tree(staging, home.versions)
         raise
 
 

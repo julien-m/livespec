@@ -554,7 +554,8 @@ Consumer projects should run an immutable LiveSpec snapshot they pin, not the mu
 development checkout. Full reference: [`docs/cli-reference.md`](docs/cli-reference.md#livespec-runtime).
 
 ```bash
-livespec runtime install --source ~/projects/livespec --ref <commit>   # snapshot into ~/.livespec/versions/
+cd ~/projects/livespec && python3 -m validator.cli runtime install --source ~/projects/livespec --ref <commit>
+# first snapshot via the checkout's own CLI; later `livespec runtime install` runs through the shim
 export PATH="$HOME/.livespec/bin:$PATH"   # shim before /opt/homebrew/bin/livespec (editable install)
 livespec runtime pin                      # in the project: writes .specs/livespec.lock
 livespec runtime upgrade --to current     # later, voluntarily; run /spec-migrate if reported
@@ -563,7 +564,8 @@ livespec runtime status --json            # drift findings (also part of livespe
 livespec runtime defect --command '<cmd>' --error '<error>' --feature <slug> --phase <phase>
 ```
 
-Fresh machine: `livespec runtime install --source <livespec repo> --ref <commit from lock>`,
+Fresh machine (no `livespec` CLI yet): `cd <livespec repo> && python3 -m validator.cli runtime install
+--source <livespec repo> --ref <commit from lock>`,
 then `<home>/versions/<id>/scripts/link-local.sh <project> <home>/versions/<id>` and
 `livespec runtime pin --runtime <id from lock>`. To delete a read-only snapshot:
 `chmod -R u+w ~/.livespec/versions/<id> && rm -rf ~/.livespec/versions/<id>`.

@@ -16,7 +16,11 @@ import typer
 
 from validator.pipeline import PHASE_MAP
 from validator.runtime.defects import DefectRequest, report_defect
-from validator.runtime.errors import LiveSpecRuntimeError, RuntimeDefectError
+from validator.runtime.errors import (
+    LiveSpecRuntimeError,
+    RuntimeDefectError,
+    RuntimeDefectInputError,
+)
 from validator.runtime.home import (
     executing_root,
     executing_validator,
@@ -203,6 +207,9 @@ def defect_command(
     )
     try:
         result = report_defect(request)
+    except RuntimeDefectInputError as exc:
+        typer.echo(f"Error: {exc.message} (nothing written)", err=True)
+        raise typer.Exit(EXIT_USAGE) from exc
     except RuntimeDefectError as exc:
         typer.echo(f"Error: {exc.message} (report kept: {exc.report_path})", err=True)
         raise typer.Exit(1) from exc

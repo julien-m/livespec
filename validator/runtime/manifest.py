@@ -19,6 +19,8 @@ from .models import (
     require_snapshot_identity,
 )
 
+_WRITE_BITS = stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH
+
 
 def _iter_entries(root: Path) -> Iterator[tuple[str, str, str, bytes]]:
     """Yield ``(relpath, kind, exec, payload)`` for every file and symlink under ``root``."""
@@ -57,6 +59,26 @@ def compute_digest(root: Path) -> str:
         line = f"{kind}\0{executable}\0{rel}\0{hashlib.sha256(payload).hexdigest()}\n"
         digest.update(line.encode("utf-8", "surrogateescape"))
     return f"{DIGEST_PREFIX}{digest.hexdigest()}"
+
+
+# @spec FR-002: Read-only verification
+#   — .specs/features/083-pinned-runtime-isolation/spec.md#fr-002
+def writable_entries(root: Path) -> list[str]:
+    """List the root and entries (symlinks excluded) carrying any write permission bit.
+
+    Args:
+        root: Snapshot directory.
+
+    Returns:
+        Relative POSIX paths (``.`` for the root) that are writable, sorted.
+    """
+    found: list[str] = []
+    candidates = [root, *(Path(d) / n for d, ds, fs in os.walk(root) for n in [*ds, *fs])]
+    for path in candidates:
+        mode = path.lstat().st_mode
+        if not stat.S_ISLNK(mode) and mode & _WRITE_BITS:
+            found.append(path.relative_to(root).as_posix())
+    return sorted(found)
 
 
 def manifest_bytes(manifest: RuntimeManifest) -> bytes:
@@ -98,11 +120,12 @@ def verify_snapshot(
         The verified manifest.
 
     Raises:
-        RuntimeSnapshotError: If the snapshot is missing, its manifest does not match
-            the runtime id or commit, or its content digest differs from the manifest.
+        RuntimeSnapshotError: If the snapshot is missing or a symlink, its manifest does
+            not match the runtime id or commit, its content digest differs from the
+            manifest, or any directory or file regained a write permission bit.
     """
     snapshot = home.snapshot(runtime_id)
-    if not snapshot.is_dir():
+    if snapshot.is_symlink() or not snapshot.is_dir():
         raise RuntimeSnapshotError(
             f"runtime {runtime_id} is not installed under {home.versions}; "
             "run `livespec runtime install --source <livespec repo> --ref <commit>`"
@@ -115,4 +138,10 @@ def verify_snapshot(
         )
     if compute_digest(snapshot) != manifest.content_digest:
         raise RuntimeSnapshotError(f"runtime snapshot content digest mismatch: {snapshot}")
+    writable = writable_entries(snapshot)
+    if writable:
+        raise RuntimeSnapshotError(
+            f"runtime snapshot is no longer read-only ({len(writable)} writable entries, "
+            f"first: {writable[0]}): {snapshot}"
+        )
     return manifest

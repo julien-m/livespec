@@ -63,3 +63,24 @@
 - **Coverage:** 18/18 AC covered (100%), 3 generated, 64/64 feature tests passing; full unit suite no failure outside baseline
 - **Report:** `checks/2026-10-11-test.md`
 - **Author:** Claude Code native spec-test (claude-opus-5-5)
+
+### 2026-10-11 — Bugfix: Audit corrections for pinned runtime isolation
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/runtime/{defects,errors,snapshot,manifest,models,links,project,inspection,shim_core}.py, validator/cli_commands/runtime_cmd.py, README.md, docs/cli-reference.md, tests/test_runtime_{snapshot,shim,project,inspection,defects,docs}.py
+- **AC impacted:** AC-001, AC-003, AC-005, AC-006, AC-007, AC-012, AC-013, AC-014, AC-016, AC-018
+- **Author:** Claude Code native spec-implement (claude-opus-5-5)
+- Read [implementation](implementation.md) (Audit Corrections table): defect --feature/--phase validated before any write (traversal blocker), staging-named symlinks unlinked without following (containment blocker), safe defect Markdown, strict manifest schema, read-only verification, trusted provenance for broken links, locked all-or-nothing selection with rollback, runtime_reference_missing warning, verified-snapshot `current` in the shim, docs test isolated from real paths, fresh-machine docs start with the checkout's own CLI.
+- Execution certification not re-run here; the supervisor re-runs /spec-test.
+
+<!-- finalize:spec-implement:2026-10-11:c4506f10 -->
+
+### 2026-10-12 — Bugfix: Second audit pass corrections
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** validator/runtime/{defects,project,shim_core,snapshot}.py, tests/test_runtime_{defects,project,shim,snapshot,inspection,docs}.py
+- **AC impacted:** AC-003, AC-005, AC-007, AC-013, AC-018
+- **Author:** Claude Code supervisor (claude-opus-5-5), implementing agent interrupted by an API limit
+- Read [implementation](implementation.md) (Second audit pass table): redirected `.specs` paths refused before defect writes, HTML-escaped single-line report values, bytecode-free docs fixture, lock published last with explicit incomplete-rollback error, strict `current` manifest shape and loop-safe resolution in the shim, mandatory deletion container.

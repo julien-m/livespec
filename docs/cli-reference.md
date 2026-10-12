@@ -23,9 +23,9 @@ livespec device proof      # capture Agent Device proof bound to a LiveSpec UDID
 livespec runtime ...       # install, pin, upgrade, dev, status, defect
 ```
 
-All six commands auto-detect everything they need and accept overrides
-through flags. Errors are surfaced as a single line; pass `--debug` to
-display the full Python stacktrace.
+Command-specific defaults and overrides are documented below. Errors of the
+unified commands are surfaced as a single line; pass `--debug` to display the
+full Python stacktrace.
 
 ---
 
@@ -588,7 +588,8 @@ project is run by another CLI, for example `/opt/homebrew/bin/livespec`.
 machine-local. After cloning a pinned project:
 
 ```bash
-livespec runtime install --source <livespec repo> --ref <commit from lock>
+# No livespec CLI exists yet on a fresh machine: use the checkout's own CLI first.
+cd <livespec repo> && python3 -m validator.cli runtime install --source <livespec repo> --ref <commit from lock>
 <home>/versions/<runtime_id>/scripts/link-local.sh <project> <home>/versions/<runtime_id>
 livespec runtime pin --runtime <runtime_id from lock>   # lock bytes stay unchanged
 ```

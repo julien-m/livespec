@@ -163,7 +163,24 @@ def _pinned_findings(
                 f"livespec runtime pin --runtime {lock['runtime_id']}",
             )
         )
-    return findings + _checkout_findings(mismatched)
+    return findings + _missing_path_findings(lock, references) + _checkout_findings(mismatched)
+
+
+# @spec FR-012: Missing .livespec-path drift
+#   — .specs/features/083-pinned-runtime-isolation/spec.md#fr-012
+def _missing_path_findings(lock: LockData, references: list[Reference]) -> list[RuntimeFinding]:
+    """Warn when a pinned project lacks the machine-local ``.specs/.livespec-path``."""
+    if any(label == str(LIVESPEC_PATH_RELPATH) for label, _root in references):
+        return []
+    return [
+        RuntimeFinding(
+            "runtime_reference_missing",
+            FindingSeverity.WARNING,
+            f"pinned project has no {LIVESPEC_PATH_RELPATH} (fresh machine or deleted file)",
+            str(LIVESPEC_PATH_RELPATH),
+            f"livespec runtime pin --runtime {lock['runtime_id']}",
+        )
+    ]
 
 
 def _dev_findings(project: Path, lock: LockData) -> list[RuntimeFinding]:

@@ -8,9 +8,11 @@ import subprocess
 from dataclasses import replace
 from pathlib import Path
 
+from validator.locks import LockAcquisitionError, acquire_lock
+
 from .errors import RuntimeLockError, RuntimeSelectionError
 from .home import RuntimeHome, is_livespec_root, read_project_version, require_project_root
-from .links import apply_link_updates, plan_link_updates
+from .links import LinkUpdate, apply_link_updates, plan_link_updates, replace_symlink
 from .manifest import read_manifest, verify_snapshot
 from .models import (
     LIVESPEC_PATH_RELPATH,
@@ -18,11 +20,14 @@ from .models import (
     SCHEMA_VERSION,
     JsonObject,
     JsonValue,
+    LinkReport,
     RuntimeManifest,
     SelectionResult,
 )
 from .shim_core import RUNTIME_ID_RE, LockData, ShimResolutionError, parse_lock
 
+# Previous lock/.livespec-path bytes (None = absent) and previous link texts.
+SavedState = tuple[dict[Path, bytes | None], dict[Path, str]]
 # `git check-ignore -q` exit status meaning "the path is not ignored".
 _NOT_IGNORED = 1
 _GIT_TIMEOUT_SECONDS = 60
@@ -113,15 +118,71 @@ def _pinned_lock(manifest: RuntimeManifest) -> LockData:
     }
 
 
+def _saved_state(project: Path, updates: list[LinkUpdate]) -> SavedState:
+    paths = _selection_files(project)
+    files = {path: path.read_bytes() if path.is_file() else None for path in paths}
+    links = {u.link.path: u.link.text for u in updates if u.action == "retarget"}
+    return files, links
+
+
+def _selection_files(project: Path) -> tuple[Path, Path]:
+    return project / LOCK_RELPATH, project / LIVESPEC_PATH_RELPATH
+
+
+def _restore_state(saved: SavedState) -> None:
+    """Put back the previous lock, ``.livespec-path`` and link texts after a failure."""
+    files, links = saved
+    for path, data in files.items():
+        if data is None:
+            path.unlink(missing_ok=True)
+        else:
+            _write_if_changed(path, data)
+    for link, text in links.items():
+        replace_symlink(link, text)
+
+
+def _publish(project: Path, lock: LockData, runtime_root: Path) -> tuple[bool, LinkReport]:
+    """Validate links, then write ``.livespec-path``, links and the lock (D-14), all-or-nothing.
+
+    Order matters: the lock is the generation marker read by the shim and status, so it
+    is replaced last; a reader that sees the new lock already sees the new references.
+
+    Raises:
+        RuntimeSelectionError: If the publication failed and the rollback could not
+            restore the previous selection (the original error is chained).
+    """
+    updates = plan_link_updates(project, runtime_root)
+    saved = _saved_state(project, updates)
+    lock_path, path_file = _selection_files(project)
+    try:
+        changed = _write_if_changed(path_file, f"{runtime_root}\n".encode())
+        links = apply_link_updates(project, updates)
+        changed = _write_if_changed(lock_path, lock_bytes(lock)) or changed
+    except BaseException as failure:
+        # Any failure (including an interrupt) restores the previous selection, then re-raises.
+        try:
+            _restore_state(saved)
+        except OSError as rollback_error:
+            raise RuntimeSelectionError(
+                f"selection failed; rollback incomplete: {rollback_error} (after: {failure})"
+            ) from failure
+        raise
+    return changed or bool(links.retargeted), links
+
+
+# @spec FR-005: Locked atomic selection, FR-006: Link rollback
+#   — .specs/features/083-pinned-runtime-isolation/spec.md#fr-005
 def _select(
     project: Path, lock: LockData, runtime_root: Path, previous: JsonValue
 ) -> SelectionResult:
-    """Validate links, then write lock, ``.livespec-path`` and links in that order (D-14)."""
-    updates = plan_link_updates(project, runtime_root)
-    changed = _write_if_changed(project / LOCK_RELPATH, lock_bytes(lock))
-    path_bytes = f"{runtime_root}\n".encode()
-    changed = _write_if_changed(project / LIVESPEC_PATH_RELPATH, path_bytes) or changed
-    links = apply_link_updates(project, updates)
+    """Publish a selection while holding the project's ``.specs/.LOCK``."""
+    try:
+        with acquire_lock(project / ".specs"):
+            changed, links = _publish(project, lock, runtime_root)
+    except LockAcquisitionError as exc:
+        raise RuntimeSelectionError(f"project lock busy, nothing written: {exc}") from exc
+    except OSError as exc:
+        raise RuntimeSelectionError(f"selection failed and was rolled back: {exc}") from exc
     lock_json: JsonObject = dict(lock)
     return SelectionResult(
         project=project,
@@ -129,7 +190,7 @@ def _select(
         lock=lock_json,
         previous_lock=previous,
         runtime_root=runtime_root,
-        changed=changed or bool(links.retargeted),
+        changed=changed,
         links=links,
         warnings=_ignore_warnings(project),
     )

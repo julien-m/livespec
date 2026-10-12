@@ -14,9 +14,9 @@ from pathlib import Path
 
 import typer
 
-from validator.pipeline import PHASE_UPDATE_ERRORS, write_phase_update
+from validator.pipeline import PHASE_MAP, PHASE_UPDATE_ERRORS, write_phase_update
 
-from .errors import RuntimeDefectError
+from .errors import RuntimeDefectError, RuntimeDefectInputError
 from .home import RuntimeHome, executing_root, require_project_root
 from .models import JsonObject
 from .project import read_lock
@@ -29,6 +29,9 @@ _SLUG_MAX = 60
 _NON_SLUG_RE = re.compile(r"[^a-z0-9]+")
 # Bound on same-day collisions; far beyond any realistic number of reports per day.
 _MAX_SUFFIX = 1000
+# Feature directory slug: starts alphanumeric, then [A-Za-z0-9._-] (e.g. "007-export",
+# "005.1-crash"); no separators, so it can never be absolute, "." or "..".
+_FEATURE_RE = re.compile(r"\A[0-9A-Za-z][0-9A-Za-z._-]*\Z")
 
 
 @dataclass(frozen=True)
@@ -92,6 +95,62 @@ def runtime_identity(project: Path, home: RuntimeHome) -> JsonObject:
     return {key: lock[key] for key in ("mode", "runtime_id", "livespec_version", "commit")}
 
 
+# @spec FR-011: Defect target validation
+#   — .specs/features/083-pinned-runtime-isolation/spec.md#fr-011
+def validate_target(project: Path, feature: str | None, phase: str | None) -> None:
+    """Refuse unsafe ``--feature``/``--phase`` values before anything is written.
+
+    Args:
+        project: Project root.
+        feature: Feature directory slug or None.
+        phase: Pipeline phase slug or None.
+
+    Raises:
+        RuntimeDefectInputError: For a phase without feature, an unknown phase, or a
+            feature that is not a plain slug resolving directly under ``.specs/features``.
+    """
+    if phase is not None and (feature is None or phase not in PHASE_MAP):
+        raise RuntimeDefectInputError(f"--phase requires --feature and a known phase: {phase!r}")
+    _refuse_redirected(project, DEFECTS_RELPATH)
+    if feature is None:
+        return
+    if not _FEATURE_RE.match(feature):
+        raise RuntimeDefectInputError(
+            f"--feature must be a feature slug under .specs/features: {feature!r}"
+        )
+    _refuse_redirected(project, Path(".specs") / "features" / feature)
+
+
+def _refuse_redirected(project: Path, relative: Path) -> None:
+    """Refuse a symlinked or escaping component of ``relative`` below ``project``.
+
+    A symlinked ``.specs``, ``.specs/features``, feature or report directory could
+    redirect the report or the phase update outside the project; each existing
+    component must be a real directory whose resolved path stays inside the project.
+
+    Raises:
+        RuntimeDefectInputError: If a component is a symlink or escapes the project.
+    """
+    root = project.resolve()
+    current = project
+    for part in relative.parts:
+        current = current / part
+        if current.is_symlink() or (
+            current.exists() and not current.resolve().is_relative_to(root)
+        ):
+            raise RuntimeDefectInputError(f"refusing redirected path inside the project: {current}")
+
+
+def _one_line(text: str) -> str:
+    """Collapse whitespace and escape HTML so a value cannot forge Markdown structure.
+
+    Newlines would start new Markdown blocks and ``<``/``>``/``&`` could open an HTML
+    comment or tag hiding the rest of the report; both are neutralized here.
+    """
+    collapsed = " ".join(text.split())
+    return collapsed.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def _resume_steps(identity: JsonObject, feature: str | None, phase: str | None) -> list[str]:
     mode = identity["mode"]
     # D-03: the fix ships in LiveSpec separately; each lock mode has its own way back.
@@ -117,9 +176,9 @@ def _fence(text: str) -> str:
 def render_report(request: DefectRequest, identity: JsonObject, date: str) -> str:
     """Render the Markdown defect report.
 
-    The document has a title, a metadata bullet list (status, date, command,
-    feature, phase, runtime identity), the verbatim error inside a fence longer
-    than any backtick run it contains, and the numbered resume steps.
+    The document has a one-line title, a metadata bullet list (status, date,
+    feature, phase, runtime identity), the verbatim command and error each inside
+    a fence longer than any backtick run it contains, and the numbered resume steps.
 
     Args:
         request: Defect inputs.
@@ -129,13 +188,16 @@ def render_report(request: DefectRequest, identity: JsonObject, date: str) -> st
     Returns:
         Report Markdown.
     """
-    title = request.title or request.command
+    title = _one_line(request.title or request.command)
     lines = [f"# Tool defect: {title}", "", f"- **Status:** {STATUS_BLOCKED}"]
-    lines += [f"- **Date:** {date}", f"- **Command:** `{request.command}`"]
-    lines += [f"- **Feature:** {request.feature or '—'}", f"- **Phase:** {request.phase or '—'}"]
-    lines += [f"- **Runtime {key}:** {value}" for key, value in identity.items()]
-    fence = _fence(request.error)
-    lines += ["", "## Error", "", f"{fence}text", request.error, fence, "", "## Resume", ""]
+    lines += [f"- **Date:** {date}"]
+    feature, phase = _one_line(request.feature or "—"), _one_line(request.phase or "—")
+    lines += [f"- **Feature:** {feature}", f"- **Phase:** {phase}"]
+    lines += [f"- **Runtime {key}:** {_one_line(str(value))}" for key, value in identity.items()]
+    command_fence, error_fence = _fence(request.command), _fence(request.error)
+    lines += ["", "## Command", "", f"{command_fence}text", request.command, command_fence]
+    lines += ["", "## Error", "", f"{error_fence}text", request.error, error_fence]
+    lines += ["", "## Resume", ""]
     steps = _resume_steps(identity, request.feature, request.phase)
     lines += [f"{index}. {step}" for index, step in enumerate(steps, start=1)]
     return "\n".join(lines) + "\n"
@@ -188,17 +250,18 @@ def report_defect(request: DefectRequest) -> DefectResult:
     """Write a never-overwritten defect report, then block the feature phase if given.
 
     Args:
-        request: Defect inputs; the CLI checks that ``phase`` is a known slug and
-            requires ``feature``.
+        request: Defect inputs (``feature``/``phase`` are validated before any write).
 
     Returns:
         The report path, frozen identity and whether the pipeline was updated.
 
     Raises:
         RuntimeLockError: No project root.
+        RuntimeDefectInputError: Unsafe feature or phase; nothing written.
         RuntimeDefectError: The report was kept but the phase update failed.
     """
     project = require_project_root(request.start)
+    validate_target(project, request.feature, request.phase)
     identity = runtime_identity(project, request.home)
     date = request.clock().astimezone(UTC).strftime("%Y-%m-%d")
     stem = f"{date}-{slugify(request.title or request.command)}"

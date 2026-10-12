@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from collections.abc import Iterator
@@ -23,7 +24,7 @@ from tests.runtime_support import (
 )
 from validator.cli import app
 from validator.runtime.defects import DefectRequest, report_defect
-from validator.runtime.errors import RuntimeDefectError
+from validator.runtime.errors import RuntimeDefectError, RuntimeDefectInputError
 from validator.runtime.home import RuntimeHome
 from validator.runtime.project import dev_project, pin_project
 
@@ -165,3 +166,93 @@ def test_cli_usage_and_failure_exit_codes(pinned: Pinned, monkeypatch: pytest.Mo
     result = CliRunner().invoke(app, failing)
     assert result.exit_code == 1 and "report kept" in result.stderr
     assert len(list((pinned.project / REPORTS).iterdir())) == 1
+
+
+def _headings(text: str) -> list[str]:
+    """Markdown heading lines outside fenced blocks (a fence closes on its own marker)."""
+    headings: list[str] = []
+    fence = ""
+    for line in text.splitlines():
+        marker = re.match(r"^(`{3,})", line)
+        if fence:
+            fence = "" if line.strip() == fence else fence
+        elif marker:
+            fence = marker.group(1)
+        elif line.startswith("#"):
+            headings.append(line)
+    return headings
+
+
+@pytest.mark.parametrize(
+    "feature",
+    ["../../outside", "/tmp/elsewhere", "007-export/../../x", "a/b", "..", "."],
+)
+def test_unsafe_feature_is_refused_before_any_write(
+    pinned: Pinned, monkeypatch: pytest.MonkeyPatch, feature: str
+) -> None:
+    """Audit #7: traversal, absolute or separator feature values exit 2 and write nothing."""
+    before = _pipeline(pinned.project)
+    with pytest.raises(RuntimeDefectInputError):
+        report_defect(_request(pinned.project, pinned.home, feature, "implement", "t"))
+    args = ["runtime", "defect", "--command", "x", "--error", "y", "--project"]
+    args += [str(pinned.project), "--feature", feature, "--phase", "implement"]
+    monkeypatch.setattr(sys, "argv", ["livespec", *args])
+    result = CliRunner().invoke(app, args)
+    assert result.exit_code == 2 and "nothing written" in result.stderr
+    assert not (pinned.project / REPORTS).exists() and _pipeline(pinned.project) == before
+
+
+def test_unknown_phase_is_refused_before_any_write(pinned: Pinned) -> None:
+    """Audit #7: a phase outside the pipeline phases is refused with no report."""
+    with pytest.raises(RuntimeDefectInputError):
+        report_defect(_request(pinned.project, pinned.home, "007-export", "deploy", "t"))
+    assert not (pinned.project / REPORTS).exists()
+
+
+def test_report_renders_untrusted_text_safely(pinned: Pinned) -> None:
+    """Audit #8: newline/backtick title, command and error cannot forge report structure."""
+    request = DefectRequest(
+        start=pinned.project,
+        command="run `x`\n# Forged command heading",
+        error="boom ```` fence\n## Forged error heading",
+        home=pinned.home,
+        clock=fixed_clock,
+        title="Line one\n## Forged title heading",
+    )
+    text = report_defect(request).report.read_text()
+    assert _headings(text) == [
+        "# Tool defect: Line one ## Forged title heading",
+        "## Command",
+        "## Error",
+        "## Resume",
+    ]
+    assert "```text\nrun `x`\n# Forged command heading\n```\n" in text
+    assert "`````text\nboom ```` fence\n## Forged error heading\n`````\n" in text
+
+
+def test_symlinked_features_dir_is_refused_before_any_write(pinned: Pinned, tmp_path: Path) -> None:
+    """Audit round 2 #1: a features dir redirected outside the project writes nothing."""
+    outside = tmp_path / "outside-features"
+    features = pinned.project / ".specs" / "features"
+    features.rename(outside)
+    features.symlink_to(outside, target_is_directory=True)
+    before = (outside / "007-export" / "pipeline.md").read_text()
+    with pytest.raises(RuntimeDefectInputError):
+        report_defect(_request(pinned.project, pinned.home, "007-export", "implement", "t"))
+    assert not (pinned.project / REPORTS).exists()
+    assert (outside / "007-export" / "pipeline.md").read_text() == before
+
+
+def test_title_html_cannot_hide_report_content(pinned: Pinned) -> None:
+    """Audit round 2 #2: an HTML comment opener in the title is escaped literally."""
+    request = DefectRequest(
+        start=pinned.project,
+        command="livespec finalize verify",
+        error="boom",
+        home=pinned.home,
+        clock=fixed_clock,
+        title="Crash <!-- hidden & more",
+    )
+    text = report_defect(request).report.read_text()
+    assert "# Tool defect: Crash &lt;!-- hidden &amp; more" in text
+    assert "<!--" not in text

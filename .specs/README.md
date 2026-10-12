@@ -143,6 +143,8 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-11 | Feature | Feature 083 audit corrections: defect input validation, staging symlink containment, strict manifest, read-only verification, locked selection rollback |
+| 2026-10-11 | Feature | [Feature 083] Test: 100% AC covered (18/18), 3 tests generated |
 | 2026-10-11 | Feature | Feature 083 implemented: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, tool/project boundary (18/18 AC certified) |
 | 2026-10-11 | Feature | Feature 083 implementation: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, boundary rule (In Progress; conventions certification pending) |
 | 2026-10-11 | Feature | Feature 083 plan created: Pinned Runtime Isolation, 9 implementation steps, 3 diagrams, ADR-004 |
@@ -151,8 +153,6 @@
 | 2026-09-08 | Feature | Feature 076 V5 temporary ownership verified; native AC-006 only; full-feature and main delivery not certified. |
 | 2026-09-08 | Feature | Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion. |
 | 2026-09-08 | Bugfix | Feature079 gen4 Fix: deterministic CI, pinned private corpus and AST backend repaired; all local checks pass, AC002 native only, final CI/main pending. |
-| 2026-09-08 | Check | Feature079 gen4 Check: deterministic CI, private corpus and AST prerequisites inspected; local gates verified, bounded native evidence separate, final CI/main pending. |
-| 2026-09-08 | Bugfix | Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending. |
 <!-- readme:activity:end -->
 
 ---
@@ -282,3 +282,5 @@
 <!-- finalize:spec-implement:2026-10-11:68d31117 -->
 
 <!-- finalize:spec-implement:2026-10-11:027bff35 -->
+
+<!-- finalize:spec-implement:2026-10-11:c4506f10 -->

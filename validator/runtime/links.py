@@ -2,9 +2,10 @@
 
 A LiveSpec-owned link is a symlink directly under ``.agent-sync.local/skills/``
 or ``.agent-sync.local/rules/`` whose link text points inside the ``.agent-sync/``
-directory of a LiveSpec root. Classification uses the link text, so a broken link
-to a deleted runtime is still recognised; project-owned files, directories and
-foreign symlinks are never touched.
+directory of a LiveSpec root. Classification uses the link text; a broken link is
+owned only when its root is the one recorded in ``.specs/.livespec-path`` (trusted
+provenance, e.g. a deleted runtime). Project-owned files, directories and foreign
+symlinks are never touched.
 """
 
 from __future__ import annotations
@@ -14,7 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .home import is_livespec_root
-from .models import LinkReport
+from .models import LIVESPEC_PATH_RELPATH, LinkReport
 
 LINK_DIRECTORIES = ("skills", "rules")
 AGENT_SYNC = ".agent-sync"
@@ -43,7 +44,16 @@ class LinkUpdate:
     action: str
 
 
-def _classify(entry: Path) -> OwnedLink | None:
+def recorded_root(project: Path) -> Path | None:
+    """Return the resolved LiveSpec root recorded in ``.specs/.livespec-path``, if any."""
+    path_file = project / LIVESPEC_PATH_RELPATH
+    text = path_file.read_text(encoding="utf-8").strip() if path_file.is_file() else ""
+    return Path(text).expanduser().resolve() if text else None
+
+
+# @spec FR-006: Owned-link provenance
+#   — .specs/features/083-pinned-runtime-isolation/spec.md#fr-006
+def _classify(entry: Path, trusted_root: Path | None) -> OwnedLink | None:
     text = os.readlink(entry)
     absolute = Path(os.path.normpath(os.path.join(entry.parent.resolve(), text)))
     parts = absolute.parts
@@ -54,10 +64,14 @@ def _classify(entry: Path) -> OwnedLink | None:
     if not relative:
         return None
     if root.exists():
-        # An existing root must really be a LiveSpec root; a vanished one is judged by text.
+        # An existing root must really be a LiveSpec root.
         if not is_livespec_root(root.resolve()):
             return None
         root = root.resolve()
+    elif trusted_root is None or root.resolve() != trusted_root:
+        # A vanished root is LiveSpec-owned only with trusted provenance: the root the
+        # project recorded in .specs/.livespec-path. Any other broken link stays foreign.
+        return None
     return OwnedLink(path=entry, text=text, root=root, relative=relative)
 
 
@@ -71,12 +85,13 @@ def owned_links(project: Path) -> list[OwnedLink]:
         Owned links found directly under the skills and rules directories.
     """
     links: list[OwnedLink] = []
+    trusted_root = recorded_root(project)
     for name in LINK_DIRECTORIES:
         directory = project / ".agent-sync.local" / name
         if not directory.is_dir():
             continue
         for entry in sorted(directory.iterdir()):
-            link = _classify(entry) if entry.is_symlink() else None
+            link = _classify(entry, trusted_root) if entry.is_symlink() else None
             if link is not None:
                 links.append(link)
     return links
@@ -105,7 +120,8 @@ def plan_link_updates(project: Path, runtime_root: Path) -> list[LinkUpdate]:
     return updates
 
 
-def _replace_symlink(path: Path, target: Path) -> None:
+def replace_symlink(path: Path, target: Path | str) -> None:
+    """Atomically point the symlink ``path`` at ``target`` (sibling link + rename)."""
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     if temporary.is_symlink():
         temporary.unlink()
@@ -128,7 +144,7 @@ def apply_link_updates(project: Path, updates: list[LinkUpdate]) -> LinkReport:
     grouped: dict[str, list[str]] = {"retarget": [], "missing": [], "unchanged": []}
     for update in updates:
         if update.action == "retarget":
-            _replace_symlink(update.link.path, update.target)
+            replace_symlink(update.link.path, update.target)
         grouped[update.action].append(update.link.path.relative_to(project).as_posix())
     return LinkReport(
         retargeted=tuple(grouped["retarget"]),

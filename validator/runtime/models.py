@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from enum import StrEnum
 from pathlib import Path
 from typing import TypeAlias, cast
 
 from .errors import RuntimeSnapshotError
+from .shim_core import COMMIT_RE, RUNTIME_ID_RE
 
 JsonValue: TypeAlias = str | int | bool | list["JsonValue"] | dict[str, "JsonValue"] | None
 JsonObject: TypeAlias = dict[str, JsonValue]
@@ -15,6 +18,8 @@ JsonObject: TypeAlias = dict[str, JsonValue]
 MANIFEST_NAME = ".livespec-runtime.json"
 SCHEMA_VERSION = 1
 DIGEST_PREFIX = "sha256:"
+# Content digest "sha256:" followed by exactly 64 lowercase hex characters.
+_DIGEST_RE = re.compile(r"\Asha256:[0-9a-f]{64}\Z")
 # Top-level directories of the LiveSpec repository that never ship in a snapshot (FR-001).
 EXCLUDED_TOP_LEVEL = frozenset({".specs", "tests"})
 LOCK_RELPATH = Path(".specs") / "livespec.lock"
@@ -59,8 +64,37 @@ class RuntimeManifest:
         }
 
 
+def _is_utc_timestamp(value: str) -> bool:
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return False
+    return parsed.utcoffset() == timedelta(0)
+
+
+def _manifest_errors(data: dict[str, object]) -> list[str]:
+    """Return schema-1 violations of a decoded manifest (empty when valid)."""
+    text_keys = ("runtime_id", "commit", "source", "created_at", "content_digest")
+    if not all(isinstance(data[key], str) for key in text_keys):
+        return ["field types"]
+    runtime_id, commit = str(data["runtime_id"]), str(data["commit"])
+    version, schema = data["livespec_version"], data["schema"]
+    checks = {
+        "schema": type(schema) is int and schema == SCHEMA_VERSION,
+        "runtime_id": bool(RUNTIME_ID_RE.match(runtime_id)),
+        "commit": bool(COMMIT_RE.match(commit)),
+        "version/prefix": type(version) is int and runtime_id == f"{version}-{commit[:12]}",
+        "content_digest": bool(_DIGEST_RE.match(str(data["content_digest"]))),
+        "created_at": _is_utc_timestamp(str(data["created_at"])),
+        "source": Path(str(data["source"])).is_absolute(),
+    }
+    return [name for name, valid in checks.items() if not valid]
+
+
+# @spec FR-002: Strict manifest schema
+#   — .specs/features/083-pinned-runtime-isolation/spec.md#fr-002
 def manifest_from_dict(raw: object, path: Path) -> RuntimeManifest:
-    """Validate a decoded manifest mapping.
+    """Validate a decoded manifest mapping strictly against schema 1.
 
     Args:
         raw: Decoded JSON value.
@@ -70,7 +104,9 @@ def manifest_from_dict(raw: object, path: Path) -> RuntimeManifest:
         The validated manifest.
 
     Raises:
-        RuntimeSnapshotError: If keys, types or schema do not match schema 1.
+        RuntimeSnapshotError: If keys, types, formats or the id/version/commit relation
+            do not match schema 1 (integer schema 1, ``<VERSION>-<sha12>`` id, full hex
+            commit, ``sha256:`` + 64 hex digest, UTC ISO-8601 ``created_at``).
     """
     if not isinstance(raw, dict):
         raise RuntimeSnapshotError(f"runtime manifest is not a JSON object: {path}")
@@ -78,16 +114,12 @@ def manifest_from_dict(raw: object, path: Path) -> RuntimeManifest:
     data = cast("dict[str, object]", raw)
     if frozenset(data) != MANIFEST_KEYS:
         raise RuntimeSnapshotError(f"invalid runtime manifest keys: {path}")
-    text_keys = ("runtime_id", "commit", "source", "created_at", "content_digest")
-    if not all(isinstance(data[key], str) for key in text_keys):
-        raise RuntimeSnapshotError(f"invalid runtime manifest field types: {path}")
-    version = data["livespec_version"]
-    schema = data["schema"]
-    if type(version) is not int or schema != SCHEMA_VERSION:
-        raise RuntimeSnapshotError(f"invalid runtime manifest schema or version: {path}")
+    errors = _manifest_errors(data)
+    if errors:
+        raise RuntimeSnapshotError(f"invalid runtime manifest ({', '.join(errors)}): {path}")
     return RuntimeManifest(
         runtime_id=str(data["runtime_id"]),
-        livespec_version=version,
+        livespec_version=cast("int", data["livespec_version"]),
         commit=str(data["commit"]),
         source=str(data["source"]),
         created_at=str(data["created_at"]),

@@ -71,6 +71,7 @@ def _pin_lock(project: Path, home: RuntimeHome, runtime_id: str) -> Path:
         "livespec_version": manifest.livespec_version,
         "commit": manifest.commit,
     }
+    write(project / ".specs/.livespec-path", f"{home.snapshot(runtime_id).resolve()}\n")
     return write(project / ".specs/livespec.lock", lock_bytes(lock).decode())
 
 
@@ -288,3 +289,61 @@ def test_manifest_runtime_id_differing_from_lock_exits_3(
     assert refused.returncode == 3 and refused.stdout == ""
     assert refused.stderr.startswith("livespec-shim:") and installed.runtime_a in refused.stderr
     assert f"livespec runtime install --source <livespec repo> --ref {commit}" in refused.stderr
+
+
+def _fake_snapshot(home: RuntimeHome, name: str, manifest: dict[str, object]) -> Path:
+    root = home.snapshot(name)
+    write(root / "VERSION", "21\n")
+    (root / ".agent-sync").mkdir()
+    write(root / "validator/__init__.py", '"""Fake runtime package."""\n')
+    write(root / ".livespec-runtime.json", json.dumps(manifest))
+    return root
+
+
+@pytest.mark.parametrize("target", ["checkout", "mismatched-manifest"])
+def test_current_must_be_a_verified_snapshot(
+    installed: Installed, tmp_path: Path, target: str
+) -> None:
+    """Audit #15: current pointing at a checkout or a mismatched manifest is refused (exit 3)."""
+    home = RuntimeHome((tmp_path / "fake-home").resolve())
+    write_shim(home, PYTHON)
+    if target == "checkout":
+        destination = make_stub_checkout(tmp_path / "checkout")
+    else:
+        identity = {"runtime_id": "21-bbbbbbbbbbbb", "livespec_version": 21, "commit": "b" * 40}
+        destination = _fake_snapshot(home, "21-aaaaaaaaaaaa", identity)
+    os.symlink(destination, home.current)
+    outside = tmp_path / "no-project"
+    outside.mkdir()
+    for args in (["status"], ["runtime", "status"]):
+        result = run_shim(home, outside, *args, env=_env(installed))
+        assert result.returncode == 3 and result.stdout == "", args
+        assert "does not point to an installed runtime snapshot" in result.stderr
+
+
+def test_current_with_incomplete_manifest_exits_3(installed: Installed, tmp_path: Path) -> None:
+    """Audit round 2 #6: a matching identity in an incomplete manifest is not a snapshot."""
+    home = RuntimeHome((tmp_path / "fake-home").resolve())
+    write_shim(home, PYTHON)
+    identity = {"runtime_id": "21-aaaaaaaaaaaa", "livespec_version": 21, "commit": "a" * 40}
+    os.symlink(_fake_snapshot(home, "21-aaaaaaaaaaaa", identity), home.current)
+    outside = tmp_path / "no-project"
+    outside.mkdir()
+    result = run_shim(home, outside, "status", env=_env(installed))
+    assert result.returncode == 3 and result.stdout == ""
+    assert "does not point to an installed runtime snapshot" in result.stderr
+
+
+def test_looping_current_symlink_exits_3_without_traceback(
+    installed: Installed, tmp_path: Path
+) -> None:
+    """Audit round 2 #7: a self-referential current is reported, never a traceback."""
+    home = RuntimeHome((tmp_path / "fake-home").resolve())
+    write_shim(home, PYTHON)
+    os.symlink(home.current, home.current)
+    outside = tmp_path / "no-project"
+    outside.mkdir()
+    for args in (["status"], ["runtime", "status"]):
+        result = run_shim(home, outside, *args, env=_env(installed))
+        assert result.returncode == 3, args
+        assert result.stderr.startswith("livespec-shim:") and "Traceback" not in result.stderr

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import os
-import pwd
 import re
 import subprocess
 from collections.abc import Iterator
@@ -22,6 +21,7 @@ from tests.runtime_support import (
     make_source,
     restore_write_bits,
     run_shim,
+    tree_hashes,
     write,
 )
 from validator.runtime.home import RuntimeHome
@@ -50,29 +50,28 @@ _GIT_IDENTITY = {
     "GIT_COMMITTER_EMAIL": "docs@example.invalid",
 }
 
-REAL_HOME = Path(pwd.getpwuid(os.getuid()).pw_dir)
-DEV_CHECKOUT = REAL_HOME / "projects" / "livespec"
-HANDY = REAL_HOME / "projects" / "handy"
-EDITABLE_ENTRY = Path("/opt/homebrew/bin/livespec")
 
-
-def _listing(path: Path) -> list[str] | None:
-    return sorted(child.name for child in path.iterdir()) if path.is_dir() else None
-
-
-def protected_fingerprint() -> str:
-    """Fingerprint the canonical protected set (spec Clarifications; absent stays absent)."""
-    entry = EDITABLE_ENTRY.read_bytes().hex() if EDITABLE_ENTRY.is_file() else None
-    status = (
-        git(DEV_CHECKOUT, "status", "--porcelain") if (DEV_CHECKOUT / ".git").exists() else None
-    )
-    state = {
-        "real_home_livespec": _listing(REAL_HOME / ".livespec"),
-        "editable_entry": entry,
-        "handy": _listing(HANDY),
-        "dev_checkout_status": status,
+def _isolated_environment(base: Path) -> dict[str, str]:
+    """Environment rooted under ``base``: HOME, TMPDIR and git config never reach real ones."""
+    for directory in ("user-home", "tmpdir"):
+        (base / directory).mkdir(parents=True, exist_ok=True)
+    write(base / "gitconfig", "")
+    return {
+        "HOME": str(base / "user-home"),
+        "TMPDIR": str(base / "tmpdir"),
+        "GIT_CONFIG_GLOBAL": str(base / "gitconfig"),
+        "GIT_CONFIG_NOSYSTEM": "1",
+        # Bytecode caches would otherwise land in the protected fixture checkout.
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPYCACHEPREFIX": str(base / "pycache"),
     }
-    return json.dumps(state, sort_keys=True)
+
+
+def _working_tree_hashes(root: Path) -> dict[str, str]:
+    """Full content hash of a fixture tree, git internals excluded."""
+    return {
+        path: value for path, value in tree_hashes(root).items() if not path.startswith(".git/")
+    }
 
 
 def _reference_lines(path: Path) -> list[str]:
@@ -121,14 +120,18 @@ def test_each_entry_point_references_the_boundary_once() -> None:
 def pinned_consumer(tmp_path_factory: pytest.TempPathFactory) -> Iterator[tuple[Path, Path]]:
     """Pin a consumer whose lifecycle skill links point into a real-code snapshot."""
     base = tmp_path_factory.mktemp("boundary").resolve()
-    checkout = make_source(base / "checkout", real_code=True)
-    home = RuntimeHome(base / "home")
-    runtime_id = install(home, checkout).runtime_id
-    project = make_project(base / "consumer")
-    for skill in LIFECYCLE_SKILLS:
-        link_into(project, f"skills/{skill}", checkout / ".agent-sync/skills" / skill)
-    pin_project(project, runtime_id, home)
-    yield project, home.snapshot(runtime_id)
+    with pytest.MonkeyPatch.context() as patch:
+        for key, value in _isolated_environment(base).items():
+            patch.setenv(key, value)
+        patch.delenv("LIVESPEC_HOME", raising=False)
+        checkout = make_source(base / "checkout", real_code=True)
+        home = RuntimeHome(base / "home")
+        runtime_id = install(home, checkout).runtime_id
+        project = make_project(base / "consumer")
+        for skill in LIFECYCLE_SKILLS:
+            link_into(project, f"skills/{skill}", checkout / ".agent-sync/skills" / skill)
+        pin_project(project, runtime_id, home)
+        yield project, home.snapshot(runtime_id)
     restore_write_bits(base)
 
 
@@ -183,16 +186,34 @@ def _handy_fixture(user_home: Path) -> tuple[Path, Path]:
     return checkout, handy
 
 
-def test_documented_migration_runs_on_consumer_fixture(tmp_path: Path) -> None:
-    """AC-018/SC-002/SC-004: the documented commands end pinned and clean, real paths untouched."""
-    before = protected_fingerprint()
-    user_home = (tmp_path / "user-home").resolve()
-    _checkout, handy = _handy_fixture(user_home)
+def _inside(path: Path, root: Path) -> bool:
+    return path.resolve().is_relative_to(root.resolve())
+
+
+def _written_paths(home: RuntimeHome, handy: Path) -> list[Path]:
+    """Every location the migration selected: shim, current, .livespec-path and links."""
+    recorded = Path((handy / ".specs/.livespec-path").read_text().strip())
+    links = [link for link in (handy / ".agent-sync.local").rglob("*") if link.is_symlink()]
+    return [home.shim, home.current.resolve(), recorded, *(link.resolve() for link in links)]
+
+
+def test_documented_migration_runs_on_consumer_fixture(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AC-018/SC-002/SC-004: documented commands end pinned and clean, all writes in the fixture."""
+    isolated = _isolated_environment(tmp_path)
+    for key, value in isolated.items():
+        monkeypatch.setenv(key, value)
+    monkeypatch.delenv("LIVESPEC_HOME", raising=False)
+    user_home = Path(isolated["HOME"]).resolve()
+    checkout, handy = _handy_fixture(user_home)
+    protected = (user_home.parent / "origin", checkout)
+    before = [_working_tree_hashes(root) for root in protected]
     tool_bin = tmp_path / "bin"
     tool_bin.mkdir()
     os.symlink(PYTHON, tool_bin / "python3")
     env = {key: value for key, value in os.environ.items() if key != "LIVESPEC_HOME"}
-    env.update(_GIT_IDENTITY, HOME=str(user_home), PATH=f"{tool_bin}:{env['PATH']}")
+    env.update(_GIT_IDENTITY, PATH=f"{tool_bin}:{env['PATH']}")
     script = write(tmp_path / "migration.sh", _migration_block(WORKTREE / "docs/cli-reference.md"))
     try:
         completed = subprocess.run(
@@ -212,6 +233,7 @@ def test_documented_migration_runs_on_consumer_fixture(tmp_path: Path) -> None:
         assert status.returncode == 0 and payload["mode"] == "pinned"
         assert [item for item in payload["findings"] if item["severity"] != "INFO"] == []
         assert git(handy, "ls-files", ".specs/livespec.lock").strip() == ".specs/livespec.lock"
+        assert [path for path in _written_paths(home, handy) if not _inside(path, tmp_path)] == []
+        assert [_working_tree_hashes(root) for root in protected] == before
     finally:
         restore_write_bits(tmp_path)
-    assert protected_fingerprint() == before

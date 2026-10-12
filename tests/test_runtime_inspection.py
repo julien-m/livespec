@@ -147,7 +147,7 @@ def test_missing_or_corrupted_pinned_snapshot_is_error(setup: Setup, tmp_path: P
     assert _codes(runtime_findings(project, setup.home, snapshot)) == [
         ("runtime_snapshot_invalid", "ERROR")
     ]
-    remove_tree(snapshot)
+    remove_tree(snapshot, setup.home.versions)
     assert _codes(runtime_findings(project, setup.home, snapshot)) == [
         ("runtime_snapshot_missing", "ERROR")
     ]
@@ -246,3 +246,36 @@ def test_status_json_in_dev_mode(
     assert [(item["code"], item["severity"]) for item in payload["findings"]] == [
         ("runtime_dev_mode", "INFO")
     ]
+
+
+def test_pinned_lock_without_livespec_path_warns(
+    setup: Setup, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Audit #14: a pinned project missing .specs/.livespec-path gets a recoverable WARNING."""
+    project = make_project(tmp_path / "consumer")
+    pin_project(project, setup.pinned, setup.home)
+    (project / ".specs/.livespec-path").unlink()
+    snapshot = setup.home.snapshot(setup.pinned)
+    findings = runtime_findings(project, setup.home, snapshot)
+    expected = (
+        "runtime_reference_missing",
+        "WARNING",
+        f"livespec runtime pin --runtime {setup.pinned}",
+    )
+    assert [(f.code, f.severity.value, f.suggested_action) for f in findings] == [expected]
+    args = [
+        "runtime",
+        "status",
+        "--project",
+        str(project),
+        "--home",
+        str(setup.home.root),
+        "--json",
+    ]
+    monkeypatch.setattr(sys, "argv", ["livespec", *args])
+    status = json.loads(CliRunner().invoke(app, args).stdout)
+    assert "runtime_reference_missing" in {item["code"] for item in status["findings"]}
+    doctor_codes = {
+        item.code for item in run_doctor(project).findings if item.category == "runtime"
+    }
+    assert "runtime_reference_missing" in doctor_codes

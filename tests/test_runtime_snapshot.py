@@ -27,7 +27,7 @@ from validator.runtime import snapshot as snapshot_module
 from validator.runtime.errors import RuntimeSnapshotError, RuntimeSourceError
 from validator.runtime.home import RuntimeHome
 from validator.runtime.manifest import read_manifest
-from validator.runtime.models import MANIFEST_NAME
+from validator.runtime.models import MANIFEST_NAME, manifest_from_dict
 
 
 def independent_digest(root: Path) -> str:
@@ -258,3 +258,85 @@ def test_unsafe_committed_trees_are_refused(home: RuntimeHome, source: Path) -> 
     with pytest.raises(RuntimeSourceError, match="vendor/sub"):
         install(home, source)
     assert not home.root.exists()
+
+
+def test_staging_named_symlink_is_unlinked_without_following(
+    home: RuntimeHome, source: Path, tmp_path: Path
+) -> None:
+    """Audit #13: a staging-named symlink is removed itself; its outside target is untouched."""
+    outside = tmp_path / "outside"
+    kept = write(outside / "keep.txt", "keep\n", mode=0o444)
+    outside.chmod(0o555)
+    home.versions.mkdir(parents=True)
+    link = home.versions / ".staging-21-aaaaaaaaaaaa-999999-link"
+    os.symlink(outside, link)
+    modes = (outside.stat().st_mode, kept.stat().st_mode)
+    result = install(home, source)
+    assert not link.is_symlink() and result.status == "created"
+    assert (outside.stat().st_mode, kept.stat().st_mode, kept.read_text()) == (*modes, "keep\n")
+
+
+@pytest.mark.parametrize("relative", ["VERSION", "."], ids=["file", "root"])
+def test_writable_snapshot_is_refused(home: RuntimeHome, source: Path, relative: str) -> None:
+    """Audit #10: a chmod-only change (write bit regained) fails verification."""
+    result = install(home, source)
+    (result.snapshot / relative).chmod(0o755 if relative == "." else 0o644)
+    before = tree_hashes(result.snapshot)
+    with pytest.raises(RuntimeSnapshotError, match="read-only"):
+        install(home, source, activate=False)
+    assert tree_hashes(result.snapshot) == before
+
+
+VALID_MANIFEST: dict[str, object] = {
+    "schema": 1,
+    "runtime_id": "21-0123456789ab",
+    "livespec_version": 21,
+    "commit": "0123456789ab" + "c" * 28,
+    "source": "/srv/livespec",
+    "created_at": "2026-10-11T12:00:00Z",
+    "content_digest": "sha256:" + "d" * 64,
+}
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("schema", True),
+        ("schema", "1"),
+        ("runtime_id", "21-NOTHEX"),
+        ("runtime_id", "22-0123456789ab"),
+        ("commit", "0123456789ab"),
+        ("content_digest", "sha256:abc"),
+        ("content_digest", "d" * 64),
+        ("created_at", "2026-10-11T12:00:00"),
+        ("created_at", "2026-10-11T12:00:00+02:00"),
+        ("created_at", "yesterday"),
+        ("source", "relative/path"),
+    ],
+)
+def test_manifest_schema_is_strict(tmp_path: Path, field: str, value: object) -> None:
+    """Audit #9: types, formats, id/version/commit relation, digest and UTC timestamp."""
+    assert manifest_from_dict(dict(VALID_MANIFEST), tmp_path).runtime_id == "21-0123456789ab"
+    invalid = {**VALID_MANIFEST, field: value}
+    with pytest.raises(RuntimeSnapshotError, match="invalid runtime manifest"):
+        manifest_from_dict(invalid, tmp_path)
+
+
+def test_remove_tree_requires_a_real_direct_child(tmp_path: Path) -> None:
+    """Audit round 2 #8: deletion refuses symlinks and paths outside the container."""
+    from validator.runtime.errors import LiveSpecRuntimeError
+
+    container = tmp_path / "versions"
+    outside = tmp_path / "outside"
+    (outside / "keep").mkdir(parents=True)
+    (container / "nested" / "deeper").mkdir(parents=True)
+    os.symlink(outside, container / "link")
+    with pytest.raises(LiveSpecRuntimeError, match="symlink"):
+        snapshot_module.remove_tree(container / "link", container)
+    with pytest.raises(LiveSpecRuntimeError, match="outside"):
+        snapshot_module.remove_tree(outside, container)
+    with pytest.raises(LiveSpecRuntimeError, match="outside"):
+        snapshot_module.remove_tree(container / "nested" / "deeper", container)
+    assert (outside / "keep").is_dir() and (container / "nested" / "deeper").is_dir()
+    snapshot_module.remove_tree(container / "nested", container)
+    assert not (container / "nested").exists()

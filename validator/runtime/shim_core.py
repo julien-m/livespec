@@ -38,6 +38,12 @@ DEV_KEYS = frozenset({"mode", "schema", "source"})
 RUNTIME_ID_RE = re.compile(r"\A[0-9]+-[0-9a-f]{12}\Z")
 # Full commit hash: 40 hex (SHA-1 repositories) or 64 hex (SHA-256 repositories).
 COMMIT_RE = re.compile(r"\A(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
+# Manifest shape checked by the shim without importing validator (mirrors models.MANIFEST_KEYS).
+MANIFEST_SHAPE_KEYS = frozenset(
+    {"schema", "runtime_id", "livespec_version", "commit", "source", "created_at", "content_digest"}
+)
+# Content digest format "sha256:<64 hex>"; the shim never recomputes it (FR-004).
+DIGEST_RE = re.compile(r"\Asha256:[0-9a-f]{64}\Z")
 CHECKOUT_INSTALL = "python3 -m validator.cli runtime install"
 
 LockData = dict[str, str | int]
@@ -179,14 +185,54 @@ def _project_resolution(project: Path, home: Path) -> Resolution:
     return Resolution(root, (f"{NOTICE_PREFIX} dev mode executes the LiveSpec checkout {root}",))
 
 
-def _current_resolution(home: Path) -> Resolution:
-    current = home / "current"
-    if current.is_dir() and is_livespec_root(current.resolve()):
-        return Resolution(current.resolve())
-    raise ShimResolutionError(
-        f"no runtime installed under {home}; install one from the LiveSpec checkout with its "
-        f"own CLI: `cd <livespec repo> && {CHECKOUT_INSTALL}`"
+def _manifest_identity_ok(identity: dict[str, object], directory: Path) -> bool:
+    runtime_id, commit = identity.get("runtime_id"), identity.get("commit")
+    version = identity.get("livespec_version")
+    schema, digest = identity.get("schema"), identity.get("content_digest")
+    return (
+        frozenset(identity) == MANIFEST_SHAPE_KEYS
+        and type(schema) is int
+        and schema == LOCK_SCHEMA
+        and isinstance(digest, str)
+        and bool(DIGEST_RE.match(digest))
+        and isinstance(runtime_id, str)
+        and isinstance(commit, str)
+        and type(version) is int
+        and runtime_id == directory.name
+        and bool(RUNTIME_ID_RE.match(runtime_id) and COMMIT_RE.match(commit))
+        and runtime_id == f"{version}-{commit[:12]}"
     )
+
+
+# @spec FR-004: Current must be a verified snapshot
+#   — .specs/features/083-pinned-runtime-isolation/spec.md#fr-004
+def _current_snapshot(home: Path) -> Path:
+    """Return ``<home>/current``'s snapshot after one manifest identity read (no digest)."""
+    current = home / "current"
+    missing = ShimResolutionError(
+        f"no runtime installed under {home}; install one from the LiveSpec checkout with "
+        f"its own CLI: `cd <livespec repo> && {CHECKOUT_INSTALL}`"
+    )
+    try:
+        target = current.resolve(strict=True)
+        installed = target.parent == (home / "versions").resolve() and is_livespec_root(target)
+        is_directory = current.is_dir()
+    except (OSError, RuntimeError) as exc:
+        # A dangling, looping or unreadable `current` is an absent runtime, not a crash.
+        raise missing from exc
+    if not is_directory:
+        raise missing
+    try:
+        manifest: object = json.loads((target / MANIFEST_FILE).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        manifest = None
+    identity = cast("dict[str, object]", manifest) if isinstance(manifest, dict) else {}
+    if not (installed and _manifest_identity_ok(identity, target)):
+        raise ShimResolutionError(
+            f"{current} does not point to an installed runtime snapshot ({target}); "
+            f"reinstall from the LiveSpec checkout: `cd <livespec repo> && {CHECKOUT_INSTALL}`"
+        )
+    return target
 
 
 def resolve_runtime(cwd: Path, home: Path, argv: list[str]) -> Resolution:
@@ -207,14 +253,18 @@ def resolve_runtime(cwd: Path, home: Path, argv: list[str]) -> Resolution:
     try:
         if project is not None and (project / ".specs" / LOCK_NAME).exists():
             return _project_resolution(project, home)
-        return _current_resolution(home)
+        return Resolution(_current_snapshot(home))
     except ShimResolutionError as exc:
-        current = home / "current"
-        # Only recovery/inspection (`livespec runtime ...`) may run on another runtime.
-        if argv[:1] == ["runtime"] and current.is_dir() and is_livespec_root(current.resolve()):
-            warning = f"{WARNING_PREFIX} {exc.message}; dispatching to {current.resolve()}"
-            return Resolution(current.resolve(), (warning,))
-        raise
+        # Only recovery/inspection (`livespec runtime ...`) may run on another runtime,
+        # and only on a verified installed snapshot (the one extra manifest read).
+        if argv[:1] != ["runtime"]:
+            raise
+        try:
+            fallback = _current_snapshot(home)
+        except ShimResolutionError:
+            raise exc from None
+        warning = f"{WARNING_PREFIX} {exc.message}; dispatching to {fallback}"
+        return Resolution(fallback, (warning,))
 
 
 def run_runtime(root: Path, argv: list[str]) -> int:
