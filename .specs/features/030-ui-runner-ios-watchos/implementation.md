@@ -23,6 +23,7 @@ updated: 2026-05-07
 | FR-004 | watchOS destination filtering | `validator/ui_runner_xcuitest.py` | `# @spec FR-004: watchOS destination filtering` |
 | FR-005 | launch_arguments injection | `validator/ui_runner_xcuitest.py` | `# @spec FR-005: launch_arguments injection` |
 | FR-005 | Swift template launch args | `livespec/ui-runners/xcuitest-template/LSSampleUITests.swift` | `// @spec FR-005: launch_arguments injection` |
+| FR-005 | Per-project scenarios: scheme + launch_arguments from `<project>/livespec/ui-runners/ios.yaml` (2026-10-12) | `validator/ios_project_config.py`, `validator/ios_runner_core.py`, `validator/dispatcher_core.py` | `resolve_ios_run_settings()` (CLI/runnerConfig > project config > detection), `runnerConfig.scenario` |
 | FR-006 | Xcode license detection | `validator/ui_runner_xcuitest.py` | `# @spec FR-006: Xcode license detection` |
 | FR-007 | Integration tests iOS | ❌ Missing | none — the former `pytest.mark.macos` stubs were unconditional `pytest.skip()` and were removed on 2026-10-12; a real macOS fixture test is still required |
 | FR-008 | Integration tests watchOS | ❌ Missing | none — the former `pytest.mark.macos` stubs were unconditional `pytest.skip()` and were removed on 2026-10-12; a real macOS fixture test is still required |
@@ -43,6 +44,7 @@ updated: 2026-05-07
 | AC-008 | Simulator auto-boot | `tests/test_ui_runner_xcuitest.py` | `test_simulator_boot_from_shutdown` |
 | AC-009 | Missing watchOS runtime → clear error | `tests/test_ui_runner_xcuitest.py` | filter + error message tests |
 | AC-010 | launch_arguments per scenario | `tests/test_ui_runner_xcuitest.py` | `test_launch_arguments_propagated_to_env` |
+| AC-010 | Project scenarios reach xcodebuild (scheme + XCUI_LAUNCH_ARGS) with CLI > config > detection precedence | `tests/test_ios_project_config.py` | `test_run_flow_uses_default_scenario_and_top_level_scheme`, `test_cli_values_win_over_project_config`, `test_dispatcher_runner_config_selects_named_scenario` |
 | AC-011 | Coordinated execution | Via dispatch table in spec.test command |
 | AC-012 | HEIC→PNG conversion | `tests/test_ui_runner_xcuitest.py` | `test_xcresult_heic_conversion` |
 | AC-013 | Per-destination output subdirs | `validator/ui_runner_xcuitest.py` | `_parse_xcresult` destination_id param |

@@ -42,6 +42,10 @@ def capture_screenshot(
     output_path, blocked = _capture_blocker(handler, screen, output_path, feature_slug, run_id)
     if blocked is not None:
         return blocked
+    settings = _project_settings(handler, test_scheme, launch_arguments)
+    if isinstance(settings, UICapabilityResult):
+        return settings
+    test_scheme, launch_arguments = settings
     return _capture_after_preflight(
         handler,
         destination,
@@ -53,6 +57,20 @@ def capture_screenshot(
         only_testing,
         output_path,
     )
+
+
+def _project_settings(
+    handler: Any,
+    test_scheme: str | None,
+    launch_arguments: list[str] | None,
+) -> tuple[str | None, list[str] | None] | UICapabilityResult:
+    """Fill scheme/launch arguments from the project ios.yaml (CLI > config > detection)."""
+    from validator.ios_project_config import resolve_ios_run_settings
+
+    try:
+        return resolve_ios_run_settings(handler.project_dir, test_scheme, launch_arguments)
+    except ValueError as exc:
+        return UICapabilityResult(success=False, error=f"Invalid iOS runner config: {exc}")
 
 
 def _capture_blocker(
@@ -414,4 +432,8 @@ def run_flow(
     """Run the full XCUITest suite and report pass/fail."""
     from validator.ios_flow_core import run_flow as run_xcuitest_flow
 
+    settings = _project_settings(handler, test_scheme, launch_arguments)
+    if isinstance(settings, UICapabilityResult):
+        return settings
+    test_scheme, launch_arguments = settings
     return run_xcuitest_flow(handler, destination, test_scheme, launch_arguments, platform_name)

@@ -41,16 +41,33 @@ Rename the class to match your app (e.g. `StraptUITests`).
 
 ### Step 3 — Configure ios.yaml
 
-Add or update `livespec/ui-runners/ios.yaml` in your project root. At minimum,
-set the `test_scheme` to match your Xcode scheme:
+Create `livespec/ui-runners/ios.yaml` in your project root (the runner looks for it
+from the iOS surface directory up to the directory holding `.specs/` or `.git/`).
+Only `test_scheme` and `scenarios` are read; other keys are ignored:
 
 ```yaml
+test_scheme: "MyAppUITests"       # optional project-wide scheme
 scenarios:
-  - name: default
-    test_scheme: "MyAppUITests"   # ← your scheme name
+  - name: default                 # used when no scenario is requested
     launch_arguments: []
-    timeout_seconds: 300
+  - name: logged_in
+    test_scheme: "MyAppUITests"   # optional, overrides the top-level scheme
+    launch_arguments: ["--ui-test-mode", "--mock-user=admin"]
 ```
+
+Scenario entries accept exactly `name`, `test_scheme` and `launch_arguments`;
+unknown keys, duplicate names or an unknown requested scenario make the run fail
+with `Invalid iOS runner config: ...` instead of being ignored.
+
+**Precedence** for the scheme and launch arguments:
+
+1. Explicit values: `runnerConfig.scheme` / `runnerConfig.launchArguments` in
+   `.specs/surfaces.yaml`, or the `test_scheme` / `launch_arguments` arguments of
+   a direct `XCUITestRunnerHandler` call (an explicit empty list is kept).
+2. Project config: the scenario selected by `runnerConfig.scenario` (otherwise the
+   scenario named `default`, otherwise the first one), then the top-level
+   `test_scheme`.
+3. Detection: the runner autodetects a shared scheme from the `.xcodeproj`.
 
 ### Step 4 — Run visual tests
 
@@ -82,8 +99,9 @@ Screenshots are written to `.specs/design/screens/<destination_id>/home.png`.
 
 ## Launch Arguments for State Presets
 
-The manifest `launch_arguments` field lets you preset app state without UI navigation —
-a key advantage of XCUITest over Maestro for iOS.
+The scenario `launch_arguments` field lets you preset app state without UI navigation —
+a key advantage of XCUITest over Maestro for iOS. Select the scenario per surface with
+`runnerConfig: { scenario: logged_in }` in `.specs/surfaces.yaml`.
 
 **ios.yaml:**
 ```yaml
@@ -170,7 +188,7 @@ Detected surface entry:
 |---|---|
 | `Xcode license not accepted` | `sudo xcodebuild -license accept` |
 | `watchOS simulator runtime not installed` | Xcode > Settings > Platforms > install watchOS |
-| `Simulator not found` | `xcrun simctl list devices` — check UDID in ios.yaml |
+| `Simulator not found` | `xcrun simctl list devices` — check the destination passed via `runnerConfig.destination` |
 | `No .xcresult bundle produced` | Verify scheme includes UITests target and it runs on simulator |
 | HEIC screenshots not converting to PNG | Verify macOS `sips` tool: `which sips` |
 | Tests skip on CI | Expected on non-macOS hosts — exit code 0 (not a failure) |
@@ -184,7 +202,8 @@ The iOS runner consists of:
 | File | Role |
 |---|---|
 | `validator/ui_runner_xcuitest.py` | Python orchestrator (subprocess wrapper) |
-| `livespec/ui-runners/ios.yaml` | Manifest: detect rules, capabilities, destinations |
+| `livespec/ui-runners/ios.yaml` | Built-in manifest: detect rules, capabilities, destinations |
+| `<project>/livespec/ui-runners/ios.yaml` | Project config: `test_scheme`, `scenarios` (`validator/ios_project_config.py`) |
 | `scripts/xcuitest-capture.sh` | Shell script for direct invocation from CI |
 | `livespec/ui-runners/xcuitest-template/` | Template XCUITest target for downstream projects |
 
