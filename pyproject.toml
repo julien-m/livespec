@@ -64,6 +64,8 @@ line-length = 100
 extend-exclude = [
     # Local planning output is not ship source; keep real runtime/tests in Ruff scope.
     ".claude/output",
+    # CI checks out external dependencies (ai-ressources, penflow) here; they are not LiveSpec source.
+    ".ci-deps",
     # Detector payload fixtures are intentionally invalid snippets, not runtime Python modules.
     "tests/fixtures/conventions_ast/ars_rules",
     "tests/fixtures/conventions_ast/generated/python_code",

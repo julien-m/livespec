@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-12 — Bugfix: CI Ruff scope excludes external checkouts
+
+- [079](features/079-validator-ci-prerequisites/changelog.md): `.ci-deps` (pinned ai-ressources and penflow checkouts) is excluded from Ruff, which failed CI on a Markdown code block in the external corpus.
+
 ## 2026-10-12 — Spec Update: registry statuses aligned after stabilization merges
 
 - README registry aligned to spec.md for [028](features/028-ui-runner-web/spec.md), [030](features/030-ui-runner-ios-watchos/spec.md), [031](features/031-ui-runner-android/spec.md) and [033](features/033-smart-test-selection/spec.md) (Implemented); [036](features/036-multi-surface-detection-and-migration/changelog.md) spec.md moves Draft -> Planned (plan present, no implementation map). 035 and 080 were already aligned (In Progress) by their merged fixes.

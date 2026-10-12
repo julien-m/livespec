@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-12 — [Bugfix]: Keep CI-checked-out dependencies out of Ruff scope
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `pyproject.toml` (`[tool.ruff] extend-exclude` adds `.ci-deps`)
+- **Cause:** the CI checks out the pinned ai-ressources corpus under `.ci-deps/`; `ruff format --check .` now formats Python blocks inside Markdown and failed on `.ci-deps/ai-ressources/code-conventions/python.md:61`, an external file that is not LiveSpec source.
+- **Proof:** with the pinned `python.md` copied to `.ci-deps/`, `ruff format --check .` and `ruff check .` pass locally.
+- **Author:** spec-fix (claude-code)
+
 ## 2026-10-12 — [Bugfix]: Declare unit-test dependencies in the dev extra
 
 - **Type:** Bugfix
