@@ -1,4 +1,5 @@
 # LiveSpec traceability anchors
+# @spec(FR-001)
 # @spec(FR-002)
 
 """Web UI runner support for Playwright-based projects.
@@ -10,6 +11,7 @@ expected screenshot, flow, and baseline-comparison commands.
 
 # @spec Feature 028 mapping:
 # - FR-001 / AC-001: manifest file at livespec/ui-runners/web.yaml
+# - FR-001 / AC-002: detect() evaluates the manifest detect block
 # - FR-002 / AC-003 / AC-004 / AC-005 / AC-006: handler methods below
 
 from __future__ import annotations
@@ -75,11 +77,11 @@ class WebRunnerHandler:
             `playwright*.config.*` file, otherwise `False`.
         """
 
-        has_package_json = (self.project_dir / "package.json").exists()
-        # The runner contract requires both signals so generic Node projects do
+        from validator.ui_runner_manifest import manifest_detects
+
+        # web.yaml requires both signals (AND logic) so generic Node projects do
         # not get misclassified as Playwright projects.
-        has_playwright_config = any(self.project_dir.glob("playwright*.config.*"))
-        return has_package_json and has_playwright_config
+        return manifest_detects(self.project_dir, load_web_runner_manifest()["detect"])
 
     # @spec(FR-011)
     def preflight_message(self) -> str:

@@ -19,6 +19,7 @@ from pytest import MonkeyPatch
 from validator.runner_dispatcher_impl import Surface
 from validator.ui_runner_maestro import MaestroRunnerHandler
 from validator.ui_runner_manifest import manifest_detects
+from validator.ui_runner_web import WebRunnerHandler
 from validator.ui_runner_xcuitest import XCUITestRunnerHandler
 
 
@@ -73,3 +74,13 @@ def test_malformed_detect_block_is_rejected(tmp_path: Path, detect: dict[str, ob
     """Unknown logic, missing markers and non-list markers fail loudly."""
     with pytest.raises(ValueError):
         manifest_detects(tmp_path, detect)
+
+
+def test_builtin_web_manifest_requires_package_json_and_playwright_config(tmp_path: Path) -> None:
+    """web.yaml AND logic plus `{ts,js,mjs}` brace alternatives drive the web runner."""
+    (tmp_path / "playwright.visual.config.mjs").write_text("", encoding="utf-8")
+    assert WebRunnerHandler(tmp_path).detect() is False
+    (tmp_path / "package.json").write_text("{}", encoding="utf-8")
+    assert WebRunnerHandler(tmp_path).detect() is True
+    (tmp_path / "playwright.visual.config.mjs").rename(tmp_path / "playwright.config.yaml")
+    assert WebRunnerHandler(tmp_path).detect() is False

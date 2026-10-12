@@ -21,6 +21,7 @@ allowed by the file constraints for this review:
 | Requirement | File(s) | Status | Notes |
 |---|---|---|---|
 | FR-001 | livespec/ui-runners/web.yaml | ✅ Implemented | Built-in manifest added |
+| FR-001 | validator/ui_runner_manifest.py, validator/runner_web_impl.py | ✅ Implemented | `WebRunnerHandler.detect()` evaluates the web.yaml `detect:` block via `load_web_runner_manifest()` (2026-10-12) |
 | FR-002 | validator/ui_runner_web.py | ✅ Implemented | Handler delegates to existing commands |
 | FR-003 | validator/cli.py | ⏸ Not in this diff | CLI wiring not part of the allowed file set |
 | FR-004 | Feature 010 docs | ⏸ Not in this diff | Integration docs not updated here |
