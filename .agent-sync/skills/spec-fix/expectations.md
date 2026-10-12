@@ -1,7 +1,7 @@
 ---
 command: spec-fix
 contract_version: "1.0"
-last_reviewed: 2026-10-11
+last_reviewed: 2026-10-12
 ---
 
 <!-- @spec(FR-004) -->
@@ -176,3 +176,9 @@ tests/<new or modified tests>
 - Filtered AC/FR tasks freeze the selected declared execution ACs and current normative source; unrelated passing assertions, unknown selectors, absent/ambiguous FR links and stale selection fail closed. Review ACs require the existing complete verification. Preview/batch/conventions inventories exclude feature code/test/artifact writes and feature finalization; batch children retain their applicable tasks.
 
 - Visual applicability follows the existing compiler: `visual` requires an executable feature fix. In --dry-run/-d, read-only audit, conventions-only and collection --all/-A, visual inspection and mutation rows are inactive; none requires capture, cleanup, baseline promotion or visual artifact updates. Normal visual repairs retain every existing visual gate.
+
+## Bugfix lane (084)
+
+- `/spec-fix <feature> --bugfix` replaces whole-feature readiness by `livespec bugfix gate`: READY before the edit (owner identified, RED receipt, no FR/AC/SC definition change, cited requirement clean), ELIGIBLE after it (GREEN receipt current, same regression test, confined diff). Exit 1 prints `Bugfix gate: FALLBACK`, every reason and the complete gate `livespec validate <feature-dir> --progression implement`; the run then follows the normal fix contract.
+- Effects: `capture` writes runner-owned receipts under `.specs/.execution/`; `gate` writes nothing; `record` appends one Bugfix entry to the feature `changelog.md` and one `## Bugfix Receipts` row to `implementation.md`, idempotently.
+- Success: closing gate ELIGIBLE, feature-scope conventions receipt PASS, trace recorded. Drift: FALLBACK followed without the complete gate. Blocked: no RED receipt or unidentified owner.

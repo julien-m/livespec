@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-10-12 — [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback)
+<!-- finalize:spec-feature:2026-10-12:a6abad0a -->
+
 ## 2026-10-12 — Bugfix: declare unit-test dependencies (audit batch)
 
 - [079](features/079-validator-ci-prerequisites/changelog.md): `click`, `jsonschema` and `pluggy` move into the `dev` extra (typer 0.27 vendors its own click, so they only arrived through `integration`); `uv.lock` regenerated and a guard test checks every unit-suite third-party import against runtime/dev requirements.

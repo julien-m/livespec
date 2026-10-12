@@ -546,6 +546,22 @@ This asks `cc-hub` to install only the two bootstrap skills required before a
 project has `.specs/`:
 - `spec-init` and `spec-migrate` as portable skills for Claude Code and Codex
 
+### Bugfix lane
+
+<!-- @spec FR-012: Bugfix lane commands — .specs/features/084-bugfix-lane/spec.md#fr-012 -->
+
+`/spec-fix <feature> --bugfix` fixes a confined bug without whole-feature spec and plan reviews, when the CLI proves eligibility; otherwise it falls back to the complete gate with its reasons.
+
+```bash
+livespec bugfix capture --feature <slug> --expect red --command "<python> -m pytest tests/test_x.py"
+livespec bugfix gate --feature <slug> --red <red-receipt> [--requirement AC-003]
+livespec bugfix capture --feature <slug> --expect green --command "<same command>"
+livespec bugfix gate --feature <slug> --red <red-receipt> --green <green-receipt> [--base <rev>]
+livespec bugfix record --feature <slug> --red <red-receipt> --green <green-receipt> --summary "<one line>"
+```
+
+Eligibility: owner feature with `implementation.md`, no FR/AC/SC definition or Gherkin change, the same regression test RED then GREEN, at most 8 files and 300 lines (override in `.specs/bugfix.yaml`). Exit codes: 0 READY/ELIGIBLE, 1 FALLBACK, 2 usage, 3 invalid configuration.
+
 ### Pinned runtime for consumer projects
 
 <!-- @spec FR-013: Docs and migration — .specs/features/083-pinned-runtime-isolation/spec.md#fr-013 -->

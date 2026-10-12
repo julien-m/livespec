@@ -17,6 +17,7 @@ from __future__ import annotations
 import typer
 
 from . import (
+    bugfix_cmd,
     command_audit_cmd,
     coverage_cmd,
     design_alignment_cmd,
@@ -45,6 +46,7 @@ def register_unified_commands(app: typer.Typer) -> None:
         app: Top-level ``livespec`` Typer application.
     """
     test_cmd.register(app)
+    bugfix_cmd.register(app)
     coverage_cmd.register(app)
     design_alignment_cmd.register(app)
     device_cmd.register(app)

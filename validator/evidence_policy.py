@@ -225,14 +225,16 @@ def _execution_missing(
 
     if selection_missing := _fix_selection_missing(task, project_root, feature):
         return selection_missing
-    if task.get("evidence_expected_outcome") == "red":
+    expected_outcome = task.get("evidence_expected_outcome")
+    if expected_outcome in ("red", "passed"):
         from .execution_evidence import verify_execution_observation
 
+        # @spec FR-011: outcome:passed proves a current GREEN observation (084)
         observed = verify_execution_observation(
             receipt,
             project_root,
             feature,
-            "red",
+            "red" if expected_outcome == "red" else "passed",
             evidence_policy="1" if policy == "1" else "2",
         )
         return [] if observed.valid else list(observed.gaps)
