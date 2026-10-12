@@ -50,3 +50,9 @@ Final real lifecycle complete: apply/verify A+B PASS; TestDone with manifest PAS
 |---|---|---|---|---|---|
 | Fix | Done | `validator/penflow_cli.py`, `validator/penflow_contract_validation.py`, `validator/penflow_verification.py`, `validator/penflow_authority_import.py`, `tests/test_penflow_cli.py`, `tests/test_penflow_contract_validation.py` | penflow suites (venv not activated) | 172 pass | 2026-10-12 08:30 |
 | Readiness gate | Blocked | `.reviews/{spec,plan}.json` (claude-opus-5-5, 150000) | `livespec validate --progression implement` | BLOCKED: spec review AC-009 ambiguous (business decision `brainstorm-source-authentication`) | 2026-10-12 08:30 |
+| Clarification | Done | `spec.md` (AC-009, FR-008, Clarifications) | user decision recorded in place; IDs preserved | current behavior documented, no code change | 2026-10-12 |
+| Readiness gate | Done | `.reviews/{spec,plan}.json` (claude-opus-5-5, 150000), fresh independent reviewers | `livespec validate --progression implement` | READY | 2026-10-12 |
+
+Native goal: none was required for this short spec-fix closure (optional since 081); the CLI contract `livespec validate` provided every gate.
+
+PHASE_RESULT: OK (fix) — implement gate READY, unit suite 0 failed (3707 passed), repo conventions PASS.

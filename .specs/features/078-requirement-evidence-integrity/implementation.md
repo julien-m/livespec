@@ -1,8 +1,13 @@
+---
+title: Requirement Evidence Integrity implementation
+feature: 078-requirement-evidence-integrity
+---
+
 # Implementation — Requirement Evidence Integrity
 
 Read the [contract](spec.md), [approved plan](plan.md), [progress](progress.md) and [verification report](verification-report.md). All five axes and eight implementation steps are implemented and regression-tested. This map is frozen before final acceptance capture; canonical receipts and generated archives publish the actual later verdicts. Source links are traceability, not proof receipts.
 
-## Requirement and acceptance mapping
+## Requirement Mapping
 
 | Requirement | Acceptance scope | Implementation | Regression coverage |
 |---|---|---|---|
@@ -22,6 +27,29 @@ Read the [contract](spec.md), [approved plan](plan.md), [progress](progress.md) 
 | FR-014 | AC-013 | Read [selection](../../../tests/integration/helpers/generation_selection.py), [opt-in evaluation runner](../../../tests/integration/helpers/generation_ci.py) and [workflow](../../../.github/workflows/ci.yml). | Read [selection tests](../../../tests/test_generation_selection.py) and [private corpus wiring tests](../../../tests/test_generation_ci_selection.py) and [deterministic GitHub policy tests](../../../tests/test_generation_ci_events.py). Runtime completion remains separate from selection. |
 | FR-015 | AC-014 | Read [shared progression](../../../validator/progression_gate.py), [pipeline](../../../validator/pipeline.py), [review validation](../../../validator/pipeline_review_validation.py), [approval recovery](../../../validator/pipeline_approval_write.py) and [native protocol](../../../system/review-protocol.md). | Read [direct/nested tests](../../../tests/test_progression_integrity.py), [publication tests](../../../tests/test_pipeline_gate_publication.py), [rollback tests](../../../tests/test_pipeline_approval_rollback.py), [CLI dispatch](../../../tests/test_gate_cli_dispatch.py) and [generation gates](../../../tests/test_spec_test_progression_contract.py). |
 | FR-016 | AC-015, AC-016 | Read [versioned policy](../../../validator/evidence_policy.py), [documentary acceptance review](../../../validator/semantic/acceptance_review.py), [lifecycle finalizer](../../../validator/finalize_spec.py) and [058 amendment](../058-deterministic-finalization/spec.md#fr-002). | Read [legacy policy tests](../../../tests/test_evidence_policy.py), [legacy archive CLI tests](../../../tests/test_verify_output_legacy_policy.py), [review-kind archive compatibility](../../../tests/test_review_kind_archives.py), [finalizer tests](../../../tests/test_finalize_lifecycle.py), [first CLI closure](../../../tests/test_finalize_review_boundary.py) and [077 identity tests](../../../tests/test_penflow_requirement_source.py). |
+
+## Acceptance Criteria
+
+Derived from the requirement mapping above (no new claim): each AC is covered by the regression tests listed on its requirement rows; scoped verdicts and receipts remain in the [verification report](verification-report.md). Source anchors use `@spec` comments, for example `# @spec FR-008: Accepted source decisions` in [clarify_decisions.py](../../../validator/clarify_decisions.py).
+
+| AC | Requirement rows |
+|---|---|
+| AC-001 | FR-001 |
+| AC-002 | FR-001, FR-002, FR-004 |
+| AC-003 | FR-003 |
+| AC-004 | FR-004, FR-005 |
+| AC-005 | FR-006 |
+| AC-006 | FR-007, FR-008 |
+| AC-007 | FR-009 |
+| AC-008 | FR-010 |
+| AC-009 | FR-011 |
+| AC-010 | FR-011 |
+| AC-011 | FR-012, FR-013 |
+| AC-012 | FR-013 |
+| AC-013 | FR-014 |
+| AC-014 | FR-015 |
+| AC-015 | FR-009, FR-016 |
+| AC-016 | FR-016 |
 
 ## Behavior and process
 

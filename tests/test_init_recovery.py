@@ -122,6 +122,26 @@ def test_ac001_ac004_force_backup_custom_history_source_and_readonly_verify(tmp_
     assert repeated.returncode == 0 and len(list((project / ".livespec-backups").iterdir())) == 2
 
 
+def test_ac007_unsupported_manifest_and_missing_manager_continue(tmp_path: Path) -> None:
+    project = tmp_path / "app"
+    project.mkdir()
+    (project / "package.json").write_text('{"name":"plain","dependencies":{"react":"19"}}')
+    (project / "go.mod").write_text("module example\n")
+    env = environment(tmp_path)
+    preview = execute(project, env, "--dry-run")
+    assert preview.returncode == 0, preview.stderr
+    assert "WARNING: unsupported manifest go.mod" in preview.stderr
+    assert "WARNING: no package manager evidence" in preview.stderr
+    result = execute(project, env)
+    assert result.returncode == 0, result.stderr
+    assert "WARNING: unsupported manifest go.mod" in result.stderr
+    profile = json.loads((project / ".specs/bootstrap-profile.json").read_text())["profile"]
+    assert profile["unsupported_manifests"] == ["go.mod"] and len(profile["warnings"]) == 1
+    for document in (".specs/project.md", ".specs/bootstrap-recap.md"):
+        assert "`go.mod`: unsupported manifest" in (project / document).read_text()
+    assert execute(project, env, "--verify-only").returncode == 0
+
+
 @pytest.mark.parametrize("change", ["manifest", "content"])
 def test_ac003_current_verification_drift_writes_nothing(tmp_path: Path, change: str) -> None:
     project = tmp_path / "app"

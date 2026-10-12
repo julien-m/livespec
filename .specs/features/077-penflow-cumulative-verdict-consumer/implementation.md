@@ -111,3 +111,5 @@ The real current-year apply lost the final LF because year splitting joined line
 ## 2026-10-12 — Penflow CLI resolution (spec-fix)
 
 The guard, the report verification and the authority import resolve the CLI through [penflow_cli.py](../../../validator/penflow_cli.py): an explicit `LIVESPEC_PENFLOW_BIN` override (no fallback), then `penflow` beside `sys.executable`, then `PATH`. A venv that is not activated now reaches its pinned CLI; an absent CLI still blocks with the same codes, followed by the searched locations. Read [resolution tests](../../../tests/test_penflow_cli.py) and [absent-CLI guard test](../../../tests/test_penflow_contract_validation.py).
+
+The readiness gate blocked on AC-009 is closed: the spec now states the implemented meaning of an authenticated, bounded import ([spec clarification](spec.md#clarifications)); fresh independent spec and plan reviews are ready and `validate --progression implement` returns READY. No code changed for the clarification.

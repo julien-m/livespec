@@ -7,6 +7,16 @@
 
 ---
 
+## 2026-10-12 — Bugfix: [Feature 080] Unsupported manifests recorded, missing package manager warns; readiness gate closed
+
+- User decision recorded in [080](features/080-autonomous-from-code-recovery/changelog.md) (FR-001, new AC-007, IDs preserved): an unsupported manifest (`go.mod`, `Gemfile`, `pom.xml`…) beside supported ones is recorded as unsupported/unknown in `bootstrap-profile.json`, `project.md` and `bootstrap-recap.md`, and bootstrap continues with the supported ecosystems (JavaScript/TypeScript with bun/npm/pnpm/yarn, Python via `pyproject.toml`, Rust, Tauri); unsupported-only projects fail naming the files; a `package.json` without manager evidence warns (`WARNING:` on stderr) and never fails.
+- Code modified: `validator/init_profile.py`, `validator/init_documents.py`, `validator/init_from_code.py` (TDD). Spec status aligned to In Progress. Fresh independent spec and plan reviews are ready; `validate --progression implement` returns READY.
+
+## 2026-10-12 — Spec Update: [Feature 077] AC-009 / FR-008 clarified, readiness gate closed
+
+- User decision recorded in [077](features/077-penflow-cumulative-verdict-consumer/changelog.md): an authenticated, accepted Brainstorm import is the certifying `penflow authority collect` response (report SHA-256 plus exact sorted file inventory); a bounded archive is confined to `.specs/penflow-authority/<digest>/`, holds only inventoried files, admits no path escape and has no size cap. Current behavior, no code change; requirement IDs preserved.
+- Fresh independent spec and plan reviews are ready; `validate --progression implement` returns READY, closing the pending Penflow CLI resolution spec-fix.
+
 ## 2026-10-12 — Refactor: test-suite cleanup lot 5
 
 - Removed or replaced tautological, vacuous and always-skipped tests across features 001, 002, 007, 009, 019, 020, 022, 030, 031, 037, 046 and 078. This includes the unmapped `tests/test_ui_runner_cli.py` (a redundant registry check) and `tests/test_ui_runner_tauri.py`, where the driver-capability test now pins both states instead of asserting nothing when tauri-driver is installed. The semantic matrix went from 171 to 42 cases, the visual gate stays at 94.41% coverage, and no production code changed.
