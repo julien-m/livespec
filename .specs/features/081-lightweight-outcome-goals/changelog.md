@@ -37,3 +37,16 @@
 - Required tasks per contract drop from 25–62 to 2–9; goal step kept in 8 autonomous-capable skills; spec, plan and acceptance-mapping reviews produced by independent reviewer agents and ingested complete/ready.
 
 <!-- finalize:spec-feature:2026-10-10:2db73a41 -->
+
+## 2026-10-12 — [Bugfix]: Stop conditions use the caller validator package instead of a consumer-local shadow
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_goal_outcome_runtime.py, validator/goal_outcome.py
+- **AC impacted:** implementation
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_goal_outcome_runtime.py::test_stop_condition_rejects_consumer_validator_shadow[init-from-code], tests/test_goal_outcome_runtime.py::test_stop_condition_rejects_consumer_validator_shadow[validate]
+- **RED receipt:** `.specs/.execution/ecdd63efc0304b2db2865cf69ef8cddd/receipt.json`
+- **GREEN receipt:** `.specs/.execution/8cc6c57f4f854191baa743e989f7f3bf/receipt.json`
+<!-- bugfix:8cc6c57f4f854191baa743e989f7f3bf -->

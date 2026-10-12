@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-12 — Bugfix: Stop conditions keep the caller runtime
+
+- Read [081's bugfix trace](features/081-lightweight-outcome-goals/changelog.md): a consumer-local `validator` package can no longer return a false successful outcome; both stop conditions retain the consumer working directory and their 300-second bound.
+
 ## 2026-10-12 — Bugfix: CI parity on Python 3.12
 
 - [081](features/081-lightweight-outcome-goals/changelog.md): `goal prove --evidence '<json>'` no longer fails on Python 3.12 when the inline JSON exceeds the filename limit; the deadline test uses a real profile.

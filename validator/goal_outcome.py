@@ -152,10 +152,11 @@ def run_stop_condition(argv: list[str], project_root: Path) -> tuple[int, str]:
     Returns:
         Exit code and combined output; launch failures return exit 127.
     """
+    # -P excludes the consumer cwd from module lookup without changing its file context.
     if argv[:2] == ["livespec", "init-from-code"]:
-        command = [sys.executable, "-B", "-m", "validator.init_from_code", ".", *argv[2:]]
+        command = [sys.executable, "-P", "-B", "-m", "validator.init_from_code", ".", *argv[2:]]
     else:
-        command = [sys.executable, "-m", "validator.cli", *argv[1:]]
+        command = [sys.executable, "-P", "-m", "validator.cli", *argv[1:]]
     # Run the same validator package as the caller, not whichever copy the cwd would import.
     package_root = str(Path(__file__).resolve().parents[1])
     env = {
