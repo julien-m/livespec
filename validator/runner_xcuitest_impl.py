@@ -85,14 +85,10 @@ class XCUITestRunnerHandler:
         return ""
 
     def detect(self) -> bool:
-        """Check whether the project is an Xcode/Swift project."""
-        if (self.project_dir / "Package.swift").exists():
-            return True
-        if not self.project_dir.exists():
-            return False
-        return any(
-            entry.suffix in {".xcodeproj", ".xcworkspace"} for entry in self.project_dir.iterdir()
-        )
+        """Check the project against the `detect:` markers declared in ios.yaml."""
+        from validator.ui_runner_manifest import manifest_detects
+
+        return manifest_detects(self.project_dir, load_xcuitest_runner_manifest()["detect"])
 
     def _list_simulators(self) -> dict[str, Any]:
         """Return parsed output of `xcrun simctl list devices --json`."""

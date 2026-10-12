@@ -14,6 +14,7 @@ updated: 2026-05-07
 |---|---|---|---|
 | FR-001 | Author iOS runner manifest | `livespec/ui-runners/ios.yaml` | `# @spec FR-001: iOS/watchOS runner manifest` |
 | FR-001 | Manifest runner Python module | `validator/ui_runner_xcuitest.py` | `# @spec FR-001: iOS/watchOS XCUITest manifest runner` |
+| FR-001 | Handler detection reads ios.yaml `detect:` (2026-10-12) | `validator/ui_runner_manifest.py`, `validator/runner_xcuitest_impl.py` | `manifest_detects()`, `XCUITestRunnerHandler.detect()` -> `load_xcuitest_runner_manifest()` |
 | FR-001 | Surface detection in generate-surfaces.js | `scripts/generate-surfaces.js` | `// @spec FR-001: iOS/watchOS surface detection` |
 | FR-002 | .xcresult bundle parsing + HEIC→PNG | `validator/ui_runner_xcuitest.py` | `# @spec FR-002: .xcresult parsing + HEIC→PNG` |
 | FR-002 | Shell script xcresult extraction | `scripts/xcuitest-capture.sh` | `# @spec FR-002: .xcresult parsing + HEIC→PNG` |
@@ -33,6 +34,7 @@ updated: 2026-05-07
 |---|---|---|---|
 | AC-001 | ios.yaml validates against UIRunnerSchema | `tests/test_xcuitest_manifest.py` | Multiple manifest tests |
 | AC-002 | detect.files matches .xcodeproj/.xcworkspace/Package.swift | `tests/test_xcuitest_manifest.py` | `test_manifest_detect_files_*` |
+| AC-002 | Dispatcher detection follows the manifest markers | `tests/test_ui_runner_manifest_detect.py` | `test_dispatcher_detection_follows_the_ios_manifest`, `test_and_logic_requires_every_marker` |
 | AC-003 | destinations array with default iOS Simulator | `tests/test_xcuitest_manifest.py` | `test_manifest_has_ios_simulator_destination` |
 | AC-004 | capture_screenshot runs xcodebuild, parses .xcresult | `tests/test_ui_runner_xcuitest.py` | `test_xcresult_parsing_png` |
 | AC-005 | run_flow surfaces test failures | `tests/test_ui_runner_xcuitest.py` | `test_non_macos_run_flow_returns_skipped` |

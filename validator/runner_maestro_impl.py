@@ -89,15 +89,10 @@ class MaestroRunnerHandler:
         return ""
 
     def detect(self) -> bool:
-        """Check whether the project is an Android Gradle / Maestro project."""
-        if not self.project_dir.exists():
-            return False
-        for marker in ("build.gradle", "build.gradle.kts", "AndroidManifest.xml"):
-            if (self.project_dir / marker).exists():
-                return True
-        return (self.project_dir / "maestro").exists() or (
-            self.project_dir / ".specs" / "maestro"
-        ).exists()
+        """Check the project against the `detect:` markers declared in android.yaml."""
+        from validator.ui_runner_manifest import manifest_detects
+
+        return manifest_detects(self.project_dir, load_maestro_runner_manifest()["detect"])
 
     def _list_avds(self) -> list[str]:
         """Return available AVD names from avdmanager."""
