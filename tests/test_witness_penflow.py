@@ -2,11 +2,30 @@
 
 import json
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
 
 from tests.integration.helpers.witness_penflow import REPO, capture_penflow
+
+
+def _playwright_resolvable() -> bool:
+    """Resolve @playwright/test exactly as capture.mjs does (createRequire on package.json)."""
+    node = shutil.which("node")
+    if node is None:
+        return False
+    probe = subprocess.run(
+        [
+            node,
+            "-e",
+            "require('node:module').createRequire(process.argv[1]).resolve('@playwright/test')",
+            str(REPO / "package.json"),
+        ],
+        capture_output=True,
+        check=False,
+    )
+    return probe.returncode == 0
 
 
 def test_capture_rejects_evidence_inside_generator_workspace(tmp_path: Path) -> None:
@@ -25,7 +44,7 @@ def test_capture_rejects_candidate_symlink_escape(tmp_path: Path) -> None:
 
 
 def test_real_browser_capture_retains_missing_penflow_authority(tmp_path: Path) -> None:
-    if not shutil.which("node") or not (REPO / "node_modules/@playwright/test").exists():
+    if not _playwright_resolvable():
         pytest.skip("Node/Playwright unavailable")
     candidate = tmp_path / "candidate"
     shutil.copytree(REPO / "tests/integration/fixtures/witness-ui-form/seed", candidate)
@@ -107,6 +126,8 @@ def _measured_candidate(tmp_path: Path, *, duplicate: bool = False) -> tuple[Pat
     from tests.integration.helpers.witness_penflow import ADAPTER, _execute
     from tests.integration.helpers.witness_penflow_runtime import SCENARIOS
 
+    if not _playwright_resolvable():
+        pytest.skip("Node/Playwright unavailable")
     candidate, runner = tmp_path / "candidate", tmp_path / "candidate/runner"
     runner.mkdir(parents=True)
     source = _semantic_source(duplicate)
@@ -123,20 +144,22 @@ def _measured_candidate(tmp_path: Path, *, duplicate: bool = False) -> tuple[Pat
             }
         )
     )
-    assert (
-        _execute(
-            [
-                shutil.which("node") or "node",
-                str(ADAPTER),
-                str(candidate),
-                str(runner / "browser.json"),
-                str(REPO / "package.json"),
-            ],
-            candidate,
-            tmp_path / "browser-process.json",
-        )
-        == 0
+    transcript = tmp_path / "browser-process.json"
+    exit_code = _execute(
+        [
+            shutil.which("node") or "node",
+            str(ADAPTER),
+            str(candidate),
+            str(runner / "browser.json"),
+            str(REPO / "package.json"),
+        ],
+        candidate,
+        transcript,
     )
+    stderr = json.loads(transcript.read_text())["stderr"] if exit_code != 0 else ""
+    if "Executable doesn't exist" in stderr:
+        pytest.skip("Chromium unavailable")
+    assert exit_code == 0
     return candidate, runner
 
 

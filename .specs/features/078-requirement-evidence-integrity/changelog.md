@@ -1,5 +1,14 @@
 # Changelog - 078-requirement-evidence-integrity
 
+## 2026-10-12 — [Refactor]: Reduce the semantic operation matrix to one case per rejection branch
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_semantic_operation_matrix.py, tests/test_spec_test_visual_modes.py, tests/test_witness_penflow.py
+- **AC impacted:** AC-014 (FR-015 option authority, still covered)
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** Before: 171 cases, 155 of them from a 5 operations x 31 legacy options cross product that hit the same guard. After: 42 cases. Each legacy option is still checked once (rotating across operations) and must be named in the diagnostic, and there is one pair per conflict branch with its diagnostic. `--reindex` was dropped together with its removal from the CLI (cleanup lot 2). The visual-mode DoD parametrization went from 24 to 6 cases. The browser-measured witness tests now skip when Node, Playwright or Chromium is unavailable, using the same resolution as `capture.mjs`.
+
 ### 2026-09-06 — Specified the complete five-axis requirement/evidence integrity programme in three delivery lots: full-context semantic review, consequential clarification, independently verified execution receipts, functional generation witnesses and versioned compatibility. Defined16FR and16AC, five Gherkin/Mermaid stories and three concrete witness contracts. Structural validation100/100; independent review0blocking, two planning warnings: snapshot stability and selected versus actually executed full corpus. No runtime implementation proof claimed.
 
 <!-- finalize:spec-specify:2026-09-06:165bc17e -->

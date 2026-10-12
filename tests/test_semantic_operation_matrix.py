@@ -1,7 +1,6 @@
 """Native validation operations never discard another requested action or modifier."""
 
 import json
-from itertools import combinations
 from pathlib import Path
 
 import pytest
@@ -18,7 +17,17 @@ OPERATIONS = (
     ("--ingest-review", "review.json"),
     ("--progression", "plan"),
 )
-PAIRS = tuple(pair for pair in combinations(OPERATIONS, 2) if pair != OPERATIONS[:2])
+# One representative pair per rejection branch: progression versus review I/O, and the
+# generic single-operation rule (clarification counts once whether inspected or answered).
+PROGRESSION_REVIEW_PAIRS = (
+    (OPERATIONS[4], OPERATIONS[2]),
+    (OPERATIONS[4], OPERATIONS[3]),
+)
+MULTIPLE_OPERATION_PAIRS = (
+    (OPERATIONS[0], OPERATIONS[4]),
+    (OPERATIONS[1], OPERATIONS[2]),
+    (OPERATIONS[2], OPERATIONS[3]),
+)
 LEGACY_OPTIONS = (
     ("--staged",),
     ("--state-files",),
@@ -27,7 +36,6 @@ LEGACY_OPTIONS = (
     ("--review-spec",),
     ("--plan-review",),
     ("--contradiction-only",),
-    ("--reindex",),
     ("--mutate",),
     ("--experimental-multi-model",),
     ("--list-excluded",),
@@ -54,20 +62,34 @@ LEGACY_OPTIONS = (
 )
 
 
-@pytest.mark.parametrize("pair", PAIRS)
-def test_every_distinct_semantic_operation_pair_rejects_without_writes(
-    tmp_path: Path, pair: tuple[tuple[str, ...], tuple[str, ...]]
+@pytest.mark.parametrize(
+    ("pair", "diagnostic"),
+    [
+        *((pair, "--progression cannot be combined") for pair in PROGRESSION_REVIEW_PAIRS),
+        *((pair, "select one semantic operation") for pair in MULTIPLE_OPERATION_PAIRS),
+    ],
+)
+def test_distinct_semantic_operation_pairs_reject_without_writes(
+    tmp_path: Path, pair: tuple[tuple[str, ...], tuple[str, ...]], diagnostic: str
 ) -> None:
     feature = reviewed_project(tmp_path)
     before = {str(p): p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
     result = CliRunner().invoke(app, ["validate", str(feature), *pair[0], *pair[1]])
     assert result.exit_code == 1
     assert result.output.startswith("Error:")
+    assert diagnostic in result.output
     assert {str(p): p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()} == before
 
 
-@pytest.mark.parametrize("operation", OPERATIONS)
-@pytest.mark.parametrize("modifier", LEGACY_OPTIONS)
+# Every legacy modifier is wired into the rejection guard; operations rotate so each one
+# is exercised without multiplying identical guard checks.
+@pytest.mark.parametrize(
+    ("operation", "modifier"),
+    [
+        (OPERATIONS[index % len(OPERATIONS)], modifier)
+        for index, modifier in enumerate(LEGACY_OPTIONS)
+    ],
+)
 def test_semantic_operation_rejects_unconsumed_legacy_options_before_resolution(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -84,6 +106,7 @@ def test_semantic_operation_rejects_unconsumed_legacy_options_before_resolution(
     result = CliRunner().invoke(app, ["validate", str(tmp_path), *operation, *modifier])
     assert result.exit_code == 1
     assert result.output.startswith("Error:")
+    assert modifier[0] in result.output
     assert calls == []
 
 
