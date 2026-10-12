@@ -350,7 +350,6 @@ def validate(
         "--contradiction-only",
         help="Run contradiction detection only",
     ),
-    reindex: bool = typer.Option(False, "--reindex", help="Reindex embeddings"),
     mutate: bool = typer.Option(False, "--mutate", help="Run mutation testing"),
     experimental_multi_model: bool = typer.Option(
         False,
@@ -464,7 +463,6 @@ def validate(
         semantic: Run Layer 4 semantic validation.
         scorecard: Run scorecard only.
         contradiction_only: Run contradiction detection only.
-        reindex: Reindex embeddings.
         mutate: Run mutation testing.
         experimental_multi_model: Enable multi-model consensus.
         plan_review: Run LLM-based plan substance review.
@@ -545,7 +543,6 @@ def validate(
                 "--semantic": semantic,
                 "--scorecard": scorecard,
                 "--contradiction-only": contradiction_only,
-                "--reindex": reindex,
                 "--mutate": mutate,
                 "--experimental-multi-model": experimental_multi_model,
                 "--plan-review": plan_review,
@@ -887,9 +884,6 @@ def validate(
         typer.echo(f"\n{len(check_result.contradictions)} contradiction(s) found.", err=True)
         raise typer.Exit(1 if check_result.contradictions else 0)
 
-    if reindex:
-        typer.echo("Embedding reindex requires OpenAI API (not yet integrated).", err=True)
-        raise typer.Exit(0)
     if mutate:
         typer.echo(
             "Mutation testing: run `pytest tests/ -k mutation` for available tests.",
