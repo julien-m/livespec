@@ -39,6 +39,7 @@ from .conventions_gates import (
     GateCommand,
     effective_source_exclusions,
     gates_path,
+    is_nested_checkout,
     load_conventions_gates,
 )
 from .conventions_lang import adapter_for_path
@@ -230,6 +231,7 @@ def _source_files(
             dirname
             for dirname in dirnames
             if not _is_excluded_path((root_path / dirname).relative_to(project_root), exclusions)
+            and not is_nested_checkout(root_path / dirname)
         )
         for filename in sorted(filenames):
             path = root_path / filename

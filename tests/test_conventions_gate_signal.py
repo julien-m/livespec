@@ -24,7 +24,7 @@ from validator.conventions_ast.ars_rules import (
 )
 from validator.conventions_feature_scope import FeatureScope
 from validator.conventions_gate import GateViolation, verify_conventions
-from validator.conventions_gates import DEFAULT_SOURCE_EXCLUSIONS
+from validator.conventions_gates import DEFAULT_SOURCE_EXCLUSIONS, inside_nested_checkout
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_ROOT = "tests/fixtures/conventions_ast"
@@ -292,3 +292,22 @@ def test_non_root_ars_rules_directory_is_not_a_fixture(tmp_path: Path) -> None:
     reported = _reported_ids(verify_conventions(project).violations, rel)
 
     assert not reported & _doc_rule_ids("nextjs")
+
+
+def test_nested_worktrees_are_never_sources(tmp_path: Path) -> None:
+    project = _write_project(tmp_path)
+    agent_rel = ".claude/worktrees/agent-1/src/run.go"
+    nested_rel = "vendor/other-checkout/src/run.go"
+    _write(project, agent_rel, GO_SOURCE)
+    _write(project, ".claude/worktrees/agent-1/.git", "gitdir: ../../../.git/worktrees/a\n")
+    _write(project, nested_rel, GO_SOURCE)
+    _write(project, "vendor/other-checkout/.git", "gitdir: /elsewhere/.git/worktrees/b\n")
+    _write(project, "src/run.go", GO_SOURCE)
+
+    violations = verify_conventions(project).violations
+
+    assert not [item for item in violations if item.path.startswith((".claude/", "vendor/"))]
+    assert _ars(violations, "src/run.go")
+    assert inside_nested_checkout(project, nested_rel)
+    assert not inside_nested_checkout(project, "src/run.go")
+    assert not inside_nested_checkout(project, str(project / "src/run.go"))

@@ -8,7 +8,11 @@ from pathlib import Path
 
 from .conventions_feature_scope import FeatureScope
 from .conventions_gate_types import GateSeverity, GateViolation
-from .conventions_gates import ConventionsGatesAny, effective_source_exclusions
+from .conventions_gates import (
+    ConventionsGatesAny,
+    effective_source_exclusions,
+    inside_nested_checkout,
+)
 from .conventions_linter import LinterViolationPayload, parse_linter_json
 
 
@@ -60,6 +64,8 @@ def _parsed_linter_violations(
     for item in parsed:
         rel = _project_relative_path(project_root, item.path)
         if _is_excluded_path(rel, exclusions) or not _is_in_scope(rel, feature_scope):
+            continue
+        if inside_nested_checkout(project_root, rel):
             continue
         violations.append(
             GateViolation(
