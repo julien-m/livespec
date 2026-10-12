@@ -16,7 +16,7 @@ BLOCKED preflight line.
 """
 
 # @spec FR-001: surfaces.yaml iteration — .specs/features/037-test-multi-runner-integration/spec.md#fr-001  # noqa: E501
-# @spec FR-002: registry routing — .specs/features/037-test-multi-runner-integration/spec.md#fr-002  # noqa: E501
+# @spec FR-002: registry routing — .specs/features/037-test-multi-runner-integration/spec.md#fr-002
 # @spec FR-003: no Playwright artefacts on native runners — .specs/features/037-test-multi-runner-integration/spec.md#fr-003  # noqa: E501
 # @spec FR-011: detect() preflight gate — .specs/features/037-test-multi-runner-integration/spec.md#fr-011  # noqa: E501
 # @spec FR-014: aggregated VisualPhaseResult rows — .specs/features/037-test-multi-runner-integration/spec.md#fr-014  # noqa: E501
