@@ -76,7 +76,7 @@ Implemented global User Journeys v2 across schema, validation, indexing, history
 | AC-012 | `tests/test_journey_v2_docs_skills.py` | ✅ Implemented |
 | AC-013 | `tests/test_journey_v2_docs_skills.py` | ⚠️ Partial (skill text only) |
 | AC-014 | — (agent-driven; no deterministic test since 2026-10-12) | ⚠️ Partial |
-| AC-015 | `tests/test_journey_v2_docs_skills.py` (skill contract: propose before writing) | ⚠️ Partial |
+| AC-015 | — (skill contract only: propose candidates before writing; no deterministic test since 2026-10-12) | ⚠️ Partial |
 | AC-016 | `tests/test_journey_v2_compiler.py`, `tests/test_journey_v2_runner.py` | ✅ Implemented |
 | AC-017 | `tests/test_journey_v2_docs_skills.py` | ✅ Implemented |
 | AC-018 | `tests/test_journey_v2_schema.py`, `tests/test_journey_v2_validation.py`, `tests/test_journey_v2_compiler.py` | ✅ Implemented |

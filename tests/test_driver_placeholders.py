@@ -1,5 +1,6 @@
 # LiveSpec traceability anchors
 # @spec(FR-002)
+# @spec(AC-002)
 
 """Unit tests for driver command placeholder resolution."""
 

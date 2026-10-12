@@ -16,9 +16,9 @@ status: Implemented
 | Requirement | File(s) | @spec Anchor | Status | Last Verified |
 |---|---|---|---|---|
 | FR-001 | `livespec/drivers/typescript.yaml` | `@spec FR-001: TS/JS driver YAML with all 4 capabilities` | Implemented | 2026-05-07 |
-| FR-002 | `validator/drivers/typescript_detector.py::detect_test_runner` | `@spec FR-002: Test runner detection (vitest > jest)` | ⚠️ Partial — detector unit-tested but not wired: `typescript.yaml` always runs `npx vitest` (decision pending, 2026-10-12) | 2026-10-12 |
+| FR-002 | `validator/drivers/typescript_detector.py::detect_test_runner` | `@spec FR-002: Test runner detection (vitest > jest)` | ⚠️ Partial — detector unit-tested but not wired: the built-in TypeScript manifest always runs npx vitest (decision pending, 2026-10-12) | 2026-10-12 |
 | FR-003 | `validator/drivers/stryker_parser.py` | `@spec FR-003: Stryker JSON report parser` | Implemented | 2026-05-07 |
-| FR-004 | `validator/drivers/typescript_detector.py::detect_package_manager` | `@spec FR-004: Package manager detection from lockfile presence` | ⚠️ Partial — detector unit-tested but not wired: commands always use `npx` (decision pending, 2026-10-12) | 2026-10-12 |
+| FR-004 | `validator/drivers/typescript_detector.py::detect_package_manager` | `@spec FR-004: Package manager detection from lockfile presence` | ⚠️ Partial — detector unit-tested but not wired: commands always use npx (decision pending, 2026-10-12) | 2026-10-12 |
 | FR-005 | `tests/integration/test_driver_typescript.py` | `@spec FR-005: Integration tests for the TS/JS driver` | Implemented | 2026-05-07 |
 | FR-006 | `tests/unit/test_typescript_detector.py`, `tests/unit/test_stryker_parser.py` | `@spec FR-006: Unit tests for runner detection and parser` | Implemented | 2026-05-07 |
 

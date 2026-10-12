@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-12 — Refactor: dead-code resolution (wire or retire)
+
+- Wired: the Python driver now resolves `{module}`/`{report_path}`/`{threshold}` (via the previously unused `detect_python_module`), fixing `livespec test` on Python projects (017); iOS/Android UI runner detection now reads the `ios.yaml`/`android.yaml` `detect:` blocks (030, 031).
+- Retired (FR/AC marked Removed or remapped): Go, Swift and syrupy detectors and the unused Cargo.toml/JVM build-file helpers (017, 019–022); `deduplicate_tests` and a tautological test (006); journey assignment/bootstrap helpers and the native visual evaluator (057).
+- Undecided, kept and flagged Partial: TypeScript runner/package-manager detection (018) and the LLM visual evaluator (057).
+
 ## 2026-10-12 — Refactor: test-suite cleanup lot 5
 
 - Removed or replaced tautological, vacuous and always-skipped tests across features 001, 002, 007, 009, 019, 020, 022, 030, 031, 037, 046 and 078. This includes the unmapped `tests/test_ui_runner_cli.py` (a redundant registry check) and `tests/test_ui_runner_tauri.py`, where the driver-capability test now pins both states instead of asserting nothing when tauri-driver is installed. The semantic matrix went from 171 to 42 cases, the visual gate stays at 94.41% coverage, and no production code changed.

@@ -1,5 +1,6 @@
 # LiveSpec traceability anchors
 # @spec(FR-007)
+# @spec(AC-004)
 
 """Unit tests for Python module auto-detection."""
 
