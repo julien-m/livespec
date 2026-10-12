@@ -105,3 +105,14 @@ Added actual AST requirement extraction and a bound review snapshot/result trans
 - **Author:** Codex
 
 <!-- finalize:spec-implement:2026-09-05:6ce4661e -->
+
+### 2026-10-12 — Fix: Penflow CLI found without an activated venv (1 functional gap closed)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `validator/penflow_cli.py` (new), `validator/penflow_contract_validation.py`, `validator/penflow_verification.py`, `validator/penflow_authority_import.py`, `tests/test_penflow_cli.py`, `tests/test_penflow_contract_validation.py`
+- **Gaps closed:** FR-007 guard (and the verification/authority transports) resolved `penflow` only from PATH, so 71 tests failed with `review_contract_penflow_cli_required` when the venv holding the pinned CLI was not activated. Order now: `LIVESPEC_PENFLOW_BIN` override, the interpreter's bin directory, PATH; absence still blocks, with the searched locations.
+- **Remaining:** readiness gate BLOCKED — the claude-opus-5-5 spec review marks AC-009 ambiguous (`brainstorm-source-authentication`); business decision pending, no review fabricated.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:771b8f83 -->

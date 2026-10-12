@@ -21,7 +21,7 @@ Feature 077 is Implemented and its actual nonvisual registry finalization is com
 | FR-004 | Read [status](../../../validator/penflow_contract.py) | FR-004 | Implemented | 2026-09-05 |
 | FR-005 | Read [protocol tests](../../../tests/test_penflow_contract_verification.py) and [documentation](../../../system/testing/penflow-contract.md) | FR-005 | Implemented; final callers applied and hash-checked; SC005 verified | 2026-09-05 |
 | FR-006 | Read [closure](../../../validator/penflow_closure.py), [finalize](../../../validator/finalize.py), [registry builders](../../../validator/finalize_registry.py), [README recovery](../../../validator/finalize_readme.py) and [pipeline](../../../validator/pipeline.py) | FR-006 | Implemented; real LiveSpec source and lifecycle proof passed | 2026-09-05 |
-| FR-007 | Read [AST source](../../../validator/penflow_requirement_source.py), [review snapshot](../../../validator/penflow_review_snapshot.py), [canonical input guard](../../../validator/penflow_contract_validation.py), [approval](../../../validator/penflow_review_approval.py) and [models](../../../validator/penflow_approval_models.py) | FR-007 | Implemented; real LiveSpec source and lifecycle proof passed | 2026-09-05 |
+| FR-007 | Read [AST source](../../../validator/penflow_requirement_source.py), [review snapshot](../../../validator/penflow_review_snapshot.py), [canonical input guard](../../../validator/penflow_contract_validation.py), [Penflow CLI resolution](../../../validator/penflow_cli.py), [approval](../../../validator/penflow_review_approval.py) and [models](../../../validator/penflow_approval_models.py) | FR-007 | Implemented; real LiveSpec source and lifecycle proof passed | 2026-09-05 |
 | FR-008 | Read [authority import](../../../validator/penflow_authority_import.py), [policy source](../../../validator/penflow_policy_source.py) and [inherited projection](../../../validator/penflow_authority_projection.py) | FR-008 | Implemented; actual import, native union review, consumer approval and both loaders passed | 2026-09-05 |
 
 ## Acceptance Criteria Mapping
@@ -107,3 +107,7 @@ Read [the actual import final proof](checks/2026-09-05-native-consumer/import-fi
 ## Finalizer newline regression
 
 The real current-year apply lost the final LF because year splitting joined lines without their trailing separator. The global changelog builder now appends LF only when absent. Read [the RED/GREEN receipt](checks/2026-09-05-native-consumer/finalizer-newline-regression.json): 67 finalizer/closure tests pass, including old entry preservation and byte-identical replay; Ruff and Pyright pass. No pilot or goal infrastructure changed.
+
+## 2026-10-12 — Penflow CLI resolution (spec-fix)
+
+The guard, the report verification and the authority import resolve the CLI through [penflow_cli.py](../../../validator/penflow_cli.py): an explicit `LIVESPEC_PENFLOW_BIN` override (no fallback), then `penflow` beside `sys.executable`, then `PATH`. A venv that is not activated now reaches its pinned CLI; an absent CLI still blocks with the same codes, followed by the searched locations. Read [resolution tests](../../../tests/test_penflow_cli.py) and [absent-CLI guard test](../../../tests/test_penflow_contract_validation.py).

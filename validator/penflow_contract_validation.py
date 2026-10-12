@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 
 from .penflow_approval_files import PenflowApprovalError, load_object
+from .penflow_cli import penflow_cli_missing, resolve_penflow_cli
 
 
 # @spec FR-007: Validate canonical input before review
@@ -27,9 +28,9 @@ def validate_review_contract(project_root: Path, contract_path: Path) -> None:
         resolved = original.resolve(strict=True)
         resolved.relative_to(root)
         raw = resolved.read_bytes()
-        executable = shutil.which("penflow")
+        executable = resolve_penflow_cli(shutil.which)
         if executable is None:
-            raise PenflowApprovalError("review_contract_penflow_cli_required")
+            raise PenflowApprovalError(penflow_cli_missing("review_contract_penflow_cli_required"))
         result = subprocess.run(
             [
                 executable,
