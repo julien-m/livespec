@@ -50,6 +50,7 @@ privacy:
 - `livespec journey run [--journey ID] [--feature SLUG] [--stage STAGE] [--json]`: run compiled artifacts through their native runner; does not compile.
 - `livespec journey impact --changed-file PATH [--json]`: find journeys touched by changed labels, selectors, semantic IDs, visual targets.
 - `livespec journey migrate --from-v1`: convert `.specs/journeys/<feature>/*.journey.yaml` to v2.
+- `livespec journey visual-verify [--journey ID] [--json]`: verify the agent-written receipts for compiled LLM visual contracts (`.specs/journeys/<id>/visual-receipts/<check>.json`): presence, strict schema, contract and capture SHA-256, privacy (`llm_allowed`, `local_only`, `retention`) and verdict; non-blocking failures are advisory.
 - `livespec journey list|inspect`: inspect global coverage.
 
 ## Fixture Bootstrap Contract

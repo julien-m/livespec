@@ -4,10 +4,13 @@
 # @spec(FR-023)
 # @spec(FR-024)
 # @spec(FR-027)
+# @spec(FR-037)
+# @spec(FR-038)
 
 """CLI commands for global User Journeys v2."""
 
-# @spec FR-022, FR-023, FR-024, FR-027, FR-040: journey CLI, run, policies, migration
+# @spec FR-022, FR-023, FR-024, FR-027, FR-037, FR-038, FR-040: journey CLI, run, policies,
+# visual receipts, migration
 # — .specs/features/057-cross-feature-user-journeys-v2/spec.md#fr-022
 
 from __future__ import annotations
@@ -29,6 +32,7 @@ from validator.journeys.models import JourneyIssue
 from validator.journeys.paths import fixtures_contract_path, relative_to_project
 from validator.journeys.runner import run_journeys
 from validator.journeys.schema import RunStage
+from validator.journeys.visual_receipts import verify_visual_receipts
 
 journey_app = typer.Typer(help="Validate, compile, run, and inspect User Journeys v2.")
 fixtures_app = typer.Typer(help="Manage the journey fixtures bootstrap contract.")
@@ -233,6 +237,40 @@ def inspect_command(
         "source": relative_to_project(project_root, journey.path),
     }
     typer.echo(json.dumps(data) if json_output else f"{data['id']} {data['source']}")
+
+
+@journey_app.command(name="visual-verify")
+def visual_verify_command(
+    journey: str | None = typer.Option(None, "--journey", help="Journey ID to verify."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    """Verify agent receipts for compiled LLM visual contracts (no model is called)."""
+    # @spec FR-037, FR-038: receipt presence, schema, hashes and verdict
+    # — .specs/features/057-cross-feature-user-journeys-v2/spec.md#fr-037
+    project_root = require_specs_root()
+    verification = verify_visual_receipts(project_root, journey)
+    if json_output:
+        payload = {
+            "outcomes": [asdict(outcome) for outcome in verification.outcomes],
+            "error_count": verification.error_count,
+        }
+        typer.echo(json.dumps(payload))
+    else:
+        for outcome in verification.outcomes:
+            detail = f" — {outcome.message}" if outcome.message else ""
+            typer.echo(
+                f"{outcome.status.upper()} {outcome.journey_id}/{outcome.check_id} "
+                f"receipt={outcome.receipt_path}{detail}"
+            )
+        verdict = "FAIL" if verification.error_count else "OK"
+        emit_summary(
+            "journey visual-verify",
+            verdict,
+            contracts=len(verification.outcomes),
+            errors=verification.error_count,
+        )
+    if verification.error_count:
+        raise typer.Exit(1)
 
 
 @journey_app.command(name="migrate")

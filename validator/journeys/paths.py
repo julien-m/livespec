@@ -72,6 +72,11 @@ def visual_contracts_dir(project_root: Path, journey_id: str) -> Path:
     return journey_compiled_dir(project_root, journey_id) / "visual-contracts"
 
 
+def visual_receipts_dir(project_root: Path, journey_id: str) -> Path:
+    """Return the directory holding agent-written LLM visual evaluation receipts."""
+    return journey_directory(project_root, journey_id) / "visual-receipts"
+
+
 def feature_backlink_path(project_root: Path, feature: str) -> Path:
     """Return the generated feature-to-journeys backlink path."""
     return project_root / ".specs" / "features" / feature / "journeys.md"

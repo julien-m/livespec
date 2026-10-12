@@ -120,6 +120,7 @@ Crée, édite, bootstrap, impact-check, liste, inspecte et lance des User Journe
 - `/spec-journey run` — exécution compiled-only
 - `/spec-journey list`
 - `/spec-journey inspect <journey-id>`
+- `/spec-journey visual` — l'agent évalue les contrats visuels LLM, écrit les reçus, puis `livespec journey visual-verify`
 
 ### /spec-plan
 Génère un plan technique avec diagrammes (sequence, state, ER).
