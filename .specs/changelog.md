@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-12 — Bugfix: coherence suppress_if_creating grace window never fired
+
+- The rule engine looked up the feature under `context["feature_dir"]`, a key no coherence rule emits; it now reads the canonical `dir_name` key, so violations of R1.2, R1.3, R2.1, R4.2 and R4.3 on a spec edited less than 30 minutes ago are demoted to INFO with the `[in-progress, Nmin]` tag, as described in [the Layer 2 design](../docs/superpowers/specs/2026-04-02-layer2-coherence-validation-design.md). `--no-suppress` and the finalize verifier still see them.
+- R2.2 no longer requests suppression, matching the design table.
+- No LiveSpec feature owns the Layer 2 engine; `tests/test_rule_engine.py` now exercises the real demotion, the aged case and non-empty filter results. Code modified: `validator/coherence/rule_engine.py`, `validator/coherence/rules/r2_status_files.py`, `tests/test_rule_engine.py`, `tests/test_coherence_cli.py`.
+
 ## 2026-10-12 — Bugfix: integrate features 081, 082 and 083 on main
 
 - Conventions source collection skips `.claude/worktrees/**`, `.worktrees/**` and any nested directory holding a `.git` entry; repo scope returns PASS against [the versioned baseline](conventions/baseline.json) without rewriting it.

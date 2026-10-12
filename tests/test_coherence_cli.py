@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import time
 from pathlib import Path
 
 import click
@@ -109,6 +111,9 @@ class TestStrict:
         feat = specs / "features" / "001-auth"
         feat.mkdir(parents=True)
         (feat / "spec.md").write_text("---\nstatus: Draft\n---\n# Auth\n")
+        # Age spec.md past the 30-minute suppress_if_creating window so R1.2 stays a WARNING.
+        old_mtime = time.time() - 2 * 60 * 60
+        os.utime(feat / "spec.md", (old_mtime, old_mtime))
 
         # Empty roadmap
         (specs / "roadmap.md").write_text("# Roadmap\n")

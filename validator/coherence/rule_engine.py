@@ -82,10 +82,10 @@ def run_coherence(
         for v in violations:
             # Apply suppress_if_creating
             if v.suppress_if_creating and not no_suppress:
-                # Find the feature this violation relates to
-                feature_dir = v.context.get("feature_dir")
-                if isinstance(feature_dir, str) and feature_dir:
-                    feature = graph.get_feature(feature_dir)
+                # Rules carry the feature directory under the canonical "dir_name" key.
+                dir_name = v.context.get("dir_name")
+                if isinstance(dir_name, str) and dir_name:
+                    feature = graph.get_feature(dir_name)
                     if feature and feature.spec_mtime:
                         age = now - feature.spec_mtime
                         if age < suppress_threshold:
