@@ -32,7 +32,7 @@ updated: 2026-06-25
 |---|---|---|
 | AC-001 | tests/test_goal_contracts.py `test_every_contract_carries_exactly_one_archive_run_task`, `test_every_registry_command_contract_ends_with_archive_run` (SC-001 sweep) | ✅ Implemented |
 | AC-002 | tests/test_goal_contracts.py `test_archive_run_task_has_strictly_highest_ordinal`, `test_archive_run_injection_preserves_hash_determinism` | ✅ Implemented |
-| AC-003 | tests/test_goal_contracts.py `test_archive_run_task_evidence_family_matches_constants`, `test_archive_run_task_skips_convention_evidence_layering`, `test_archive_run_prove_rejects_prose_claim`, `test_archive_run_prove_rejects_exit_code_substitute`, `test_archive_run_prove_rejects_tmpdir_contract_state_paths` | ✅ Implemented |
+| AC-003 | tests/test_goal_contracts.py `test_archive_run_task_evidence_family_matches_constants`, `test_rendered_goal_tasks_carry_no_per_task_convention_proofs`, `test_archive_run_prove_rejects_prose_claim`, `test_archive_run_prove_rejects_exit_code_substitute`, `test_archive_run_prove_rejects_tmpdir_contract_state_paths` | ✅ Implemented |
 | AC-004 | tests/test_goal_contracts.py `test_archive_run_prove_rejects_path_outside_specs_runs`, `test_archive_run_prove_rejects_malformed_artifact_file`, `test_archive_run_prove_rejects_foreign_goal_artifact`, `test_archive_run_prove_rejects_foreign_command_artifact` | ✅ Implemented |
 | AC-005 | tests/test_goal_contracts.py `test_archive_run_prove_accepts_matching_artifact_read_only` (runs-dir listing unchanged) | ✅ Implemented |
 | AC-006 | tests/test_run_artifact.py `TestArchiveRunExclusion`, tests/test_verify_output_cli.py `TestArchiveRunExclusion`, tests/test_goal_contracts.py `test_archive_run_end_to_end_drill` (SC-004) | ✅ Implemented |

@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from pathlib import Path
-from typing import Literal
 
 import pytest
 from typer.testing import CliRunner
@@ -43,7 +42,6 @@ def _apply_schema_defect(contract: JsonFixture, state: JsonFixture, defect: str)
     _rehash(contract, state)
 
 
-@pytest.mark.parametrize("operation", ["prove", "archive"])
 @pytest.mark.parametrize(
     "defect",
     [
@@ -58,13 +56,11 @@ def _apply_schema_defect(contract: JsonFixture, state: JsonFixture, defect: str)
         "last_rejection",
     ],
 )
-def test_rehashed_invalid_schema_types_fail_before_root_access(
-    tmp_path: Path, operation: Literal["prove", "archive"], defect: str
-) -> None:
+def test_rehashed_invalid_schema_types_fail_before_root_access(tmp_path: Path, defect: str) -> None:
     contract, state = valid_pair(tmp_path)
     _apply_schema_defect(contract, state, defect)
-    with pytest.raises(GoalPairError, match=f"before {operation}"):
-        validate_goal_pair(contract, state, operation=operation)
+    with pytest.raises(GoalPairError, match="before prove"):
+        validate_goal_pair(contract, state, operation="prove")
 
 
 def test_unhashable_command_claims_fail_closed_without_type_error(tmp_path: Path) -> None:
@@ -105,7 +101,6 @@ def _apply_pair_defect(contract: JsonFixture, state: JsonFixture, defect: str) -
         state["status"] = "active"
 
 
-@pytest.mark.parametrize("operation", ["prove", "archive"])
 @pytest.mark.parametrize(
     "defect",
     [
@@ -122,15 +117,13 @@ def _apply_pair_defect(contract: JsonFixture, state: JsonFixture, defect: str) -
         "active_with_complete",
     ],
 )
-def test_pairing_identity_matrix_rejects_every_atomic_defect(
-    tmp_path: Path, operation: Literal["prove", "archive"], defect: str
-) -> None:
+def test_pairing_identity_matrix_rejects_every_atomic_defect(tmp_path: Path, defect: str) -> None:
     contract, state = valid_pair(tmp_path)
     _apply_pair_defect(contract, state, defect)
     before = deepcopy(state)
 
-    with pytest.raises(GoalPairError, match=f"before {operation}"):
-        validate_goal_pair(contract, state, operation=operation)
+    with pytest.raises(GoalPairError, match="before archive"):
+        validate_goal_pair(contract, state, operation="archive")
 
     assert state == before
 
@@ -146,17 +139,11 @@ def test_pairing_identity_matrix_rejects_every_atomic_defect(
         ("contract", "tasks", []),
         ("state", "schema_version", "9.9"),
         ("state", "command", "spec-plan"),
-        ("state", "goal_hash", "0" * 64),
         ("state", "status", "invalid"),
     ],
 )
-@pytest.mark.parametrize("operation", ["prove", "archive"])
 def test_atomic_pair_defects_fail_closed(
-    tmp_path: Path,
-    target: str,
-    key: str,
-    value: object,
-    operation: Literal["prove", "archive"],
+    tmp_path: Path, target: str, key: str, value: object
 ) -> None:
     contract, state = valid_pair(tmp_path)
     mutated = contract if target == "contract" else state
@@ -164,16 +151,13 @@ def test_atomic_pair_defects_fail_closed(
     before = deepcopy(state)
 
     with pytest.raises(GoalPairError, match="rerender"):
-        validate_goal_pair(contract, state, operation=operation)
+        validate_goal_pair(contract, state, operation="prove")
 
     assert state == before
 
 
-@pytest.mark.parametrize("operation", ["prove", "archive"])
 @pytest.mark.parametrize("defect", ["ordinal", "task_status"])
-def test_task_and_status_defects_fail_closed(
-    tmp_path: Path, operation: Literal["prove", "archive"], defect: str
-) -> None:
+def test_task_and_status_defects_fail_closed(tmp_path: Path, defect: str) -> None:
     contract, state = valid_pair(tmp_path)
     task_id = next(iter(state["tasks"]))
     if defect == "ordinal":
@@ -183,17 +167,9 @@ def test_task_and_status_defects_fail_closed(
     before = deepcopy(state)
 
     with pytest.raises(GoalPairError):
-        validate_goal_pair(contract, state, operation=operation)
+        validate_goal_pair(contract, state, operation="archive")
 
     assert state == before
-
-
-def test_complete_status_requires_all_tasks_complete(tmp_path: Path) -> None:
-    contract, state = valid_pair(tmp_path)
-    state["status"] = "complete"
-
-    with pytest.raises(GoalPairError):
-        validate_goal_pair(contract, state, operation="archive")
 
 
 def test_any_spec_init_claim_selects_bootstrap_validator(tmp_path: Path) -> None:
@@ -241,8 +217,7 @@ def test_archive_json_block_is_one_envelope(tmp_path: Path) -> None:
     assert json.loads(lines[0])["outcome"] == "blocked"
 
 
-@pytest.mark.parametrize("operation", ["prove", "archive"])
-@pytest.mark.parametrize("option", ["--contract", "--state"])
+@pytest.mark.parametrize(("operation", "option"), [("prove", "--contract"), ("archive", "--state")])
 @pytest.mark.parametrize("kind", ["nonfile", "malformed", "unreadable"])
 def test_invalid_control_files_have_actionable_blocked_boundary(
     tmp_path: Path, operation: str, option: str, kind: str

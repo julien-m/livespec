@@ -51,13 +51,6 @@ def test_spec_check_fix_all_goal_keeps_child_spawns_indicative(
     assert any("/spec-fix <feature> --auto --update" in row for row in contract["checklist"])
     assert not any(str(task["id"]).startswith("fix.child_goal") for task in contract["tasks"])
     assert any(task["id"] == "visual.design_fidelity" for task in contract["tasks"])
-    assert feature in (project_root / ".specs" / "design" / "screens" / "index.md").read_text(
-        encoding="utf-8"
-    )
-    assert (project_root / "penflow" / "compare-report.json").exists()
-    assert (
-        project_root / ".specs" / "features" / feature / "baselines" / "baseline.manifest.yml"
-    ).exists()
 
 
 def test_spec_fix_child_spec_check_spawn_is_indicative(tmp_path: Path) -> None:

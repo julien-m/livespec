@@ -39,6 +39,7 @@ def test_complete_proof_transition_matrix(
         task_before["accepted_evidence"] = {"output": "A"}
     state["status"] = "active" if other_pending or not initial_complete else "complete"
     other_before = json.dumps(state["tasks"]["task.002.other"], sort_keys=True)
+    input_before = json.dumps(state, sort_keys=True)
 
     result = prove_goal_task(contract, state, task_id, {"output": "B"} if accepted else {})
 
@@ -52,34 +53,7 @@ def test_complete_proof_transition_matrix(
     assert result["state"]["status"] == ("active" if other_pending or not accepted else "complete")
     assert json.dumps(result["state"]["tasks"]["task.002.other"], sort_keys=True) == other_before
     assert len(task["attempts"]) == 1
-
-
-def test_pending_acceptance_completes_named_task(tmp_path: Path) -> None:
-    contract, state, task_id = proof_pair(tmp_path)
-
-    result = prove_goal_task(contract, state, task_id, {"output": "B"})
-
-    task = result["state"]["tasks"][task_id]
-    assert result["status"] == "ACCEPTED"
-    assert task["status"] == "complete"
-    assert task["accepted_evidence"] == {"output": "B"}
-    assert result["state"]["status"] == "complete"
-    assert state["tasks"][task_id]["status"] == "pending"
-
-
-def test_complete_rejection_reopens_and_retains_evidence(tmp_path: Path) -> None:
-    contract, state, task_id = proof_pair(tmp_path)
-    state["status"] = "complete"
-    state["tasks"][task_id]["status"] = "complete"
-    state["tasks"][task_id]["accepted_evidence"] = {"output": "A"}
-
-    result = prove_goal_task(contract, state, task_id, {})
-
-    task = result["state"]["tasks"][task_id]
-    assert result["status"] == "REJECTED_NEEDS_ACTION"
-    assert task["status"] == "pending"
-    assert task["accepted_evidence"] == {"output": "A"}
-    assert result["state"]["status"] == "active"
+    assert json.dumps(state, sort_keys=True) == input_before
 
 
 def test_contained_relative_artifact_is_accepted(tmp_path: Path) -> None:
