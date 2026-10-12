@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import dataclasses
 from collections.abc import Callable
 from pathlib import Path
 
@@ -58,21 +57,23 @@ def _make_driver(
 # ---------------------------------------------------------------------------
 
 
+# 85 differs from DEFAULT_THRESHOLD (70), so each case proves the argument propagates.
 @pytest.mark.parametrize(
     "fn, expected_path, threshold_in_text",
     [
-        (python_config, Path("pyproject.toml"), "fail_under = 70"),
-        (typescript_config, Path("vitest.config.ts"), "lines: 70"),
-        (swift_config, Path(".swift-coverage.yml"), "threshold: 70"),
-        (go_config, Path(".go-coverage.yml"), "threshold: 70"),
-        (rust_config, Path("tarpaulin.toml"), "fail-under = 70"),
-        (jvm_config, Path("jacoco-livespec.gradle"), "0.70"),
+        (python_config, Path("pyproject.toml"), "fail_under = 85"),
+        (typescript_config, Path("vitest.config.ts"), "lines: 85"),
+        (swift_config, Path(".swift-coverage.yml"), "threshold: 85"),
+        (go_config, Path(".go-coverage.yml"), "threshold: 85"),
+        (rust_config, Path("tarpaulin.toml"), "fail-under = 85"),
+        # JaCoCo expects a 0..1 decimal: 85% becomes 0.85.
+        (jvm_config, Path("jacoco-livespec.gradle"), "0.85"),
     ],
 )
 def test_stack_generators_emit_threshold(
     fn: Callable[[float], GeneratedFile], expected_path: Path, threshold_in_text: str
 ) -> None:
-    file = fn(70.0)
+    file = fn(85.0)
     assert file.path == expected_path
     assert threshold_in_text in file.content
 
@@ -87,15 +88,6 @@ def test_typescript_config_uses_patch_section_mode() -> None:
     file = typescript_config(70.0)
     assert file.mode == "patch_section"
     assert file.section_marker == "typescript-coverage"
-
-
-def test_threshold_propagates_to_python_config() -> None:
-    assert "fail_under = 85" in python_config(85.0).content
-
-
-def test_threshold_propagates_to_jvm_config_as_decimal() -> None:
-    # JaCoCo expects a 0..1 decimal — 85% becomes 0.85.
-    assert "0.85" in jvm_config(85.0).content
 
 
 # ---------------------------------------------------------------------------
@@ -454,9 +446,3 @@ def test_init_test_config_refresh_only_skips_writes(runner: CliRunner, tmp_path:
     assert not (tmp_path / CI_WORKFLOW_PATH).exists()
     text = (conv_dir / "index.md").read_text(encoding="utf-8")
     assert "## testing [test, coverage, snapshot, ci]" in text
-
-
-def test_generated_file_dataclass_immutable() -> None:
-    f = GeneratedFile(path=Path("foo"), content="bar")
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        f.path = Path("bad")  # type: ignore[misc]

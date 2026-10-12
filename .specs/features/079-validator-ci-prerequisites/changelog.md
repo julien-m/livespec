@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-12 — [Refactor]: Test suite cleanup (lot 2)
+
+The event-policy test asserted the same facts three times regardless of its parameter; it is now a single test that pins the exact event set.
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** `tests/test_generation_ci_events.py`
+- **AC impacted:** AC-006 (coverage kept)
+- **Author:** Claude Code
+
 ## 2026-09-08 — Check: V5 fixture isolation independently verified
 
 - Read [the V5 post-check](checks/2026-09-08-v5-postcheck.md): the six manifest-dependent modules pass 45/45 with an explicit synthetic corpus, and serialization preserves all 16 node IDs.

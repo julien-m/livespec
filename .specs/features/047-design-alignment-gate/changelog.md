@@ -10,6 +10,16 @@
 
 # Changelog - Feature 047 - Design Alignment Gate
 
+## 2026-10-12 — [Refactor]: Test suite cleanup (lot 2)
+
+AC-010 is checked on the parsed spec-test verify contract: `Design Alignment Verdict` is a `may` rule of the `--visual` branch (the verdict is only emitted when `ui.pen` exists), instead of a raw substring of the file.
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** `tests/test_design_alignment_command_contract.py`
+- **AC impacted:** AC-010 (coverage kept)
+- **Author:** Claude Code
+
 ## 2026-05-17 — Feature: Design Alignment Gate
 
 - **Type:** Feature

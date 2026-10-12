@@ -74,7 +74,9 @@ class TestScoreComputation:
         bad = specs_root / "features" / "001-test" / "spec.md"
         bad.write_text("---\ntitle: ''\nstatus: bad\n---\n\nNo sections.\n")
         result = validate_file(bad, specs_root, default_config)
-        assert result.score >= 0
+        # The raw deduction must exceed 100 for this case to exercise the clamp.
+        assert len(result.errors) * 20 + len(result.warnings) * 5 > 100
+        assert result.score == 0
 
 
 class TestValidateAll:

@@ -166,3 +166,13 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Code modified:** Pending implementation of the approved policy.
 - **Author:** Codex
 - GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.
+
+## 2026-10-12 — [Refactor]: Test suite cleanup (lot 2)
+
+Parametrisations reduced to one case per real branch. The tag-legend test now checks every tag used by spec-fix inventory rows. JS/TS syntax cases skip explicitly when node or `node_modules/typescript` is missing; the invalid-TS case previously passed vacuously because the missing compiler also exits non-zero.
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** `tests/test_fix_execution_scope.py`, `tests/test_fix_visual_modes.py`, `tests/test_generation_syntax_boundary.py`
+- **AC impacted:** None (coverage kept)
+- **Author:** Claude Code

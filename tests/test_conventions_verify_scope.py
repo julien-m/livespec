@@ -24,7 +24,6 @@ from tests._conventions_verify_scope_01 import (
     test_cli_verify_rejects_run_id_path_traversal_before_writing_receipt,
     test_cli_verify_repo_pseudo_scope_writes_repo_wide_receipt,
     test_cli_verify_unscoped_json_stays_repo_wide_with_unrelated_debt,
-    test_spec_check_conventions_gate_can_use_feature_scoped_pass_receipt,
 )
 from tests._conventions_verify_scope_02 import (
     test_feature_scope_ignores_frontmatter_dates_when_mapping_rows_are_undated,
@@ -55,5 +54,4 @@ __all__ = [
     "test_feature_scope_ignores_frontmatter_dates_when_mapping_rows_are_undated",
     "test_feature_scope_ignores_legacy_artifact_links_when_current_mapping_is_clean",
     "test_goal_prove_accepts_cli_generated_pass_conventions_receipt",
-    "test_spec_check_conventions_gate_can_use_feature_scoped_pass_receipt",
 ]

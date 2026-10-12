@@ -52,28 +52,16 @@ def _economy_blockquote_sections() -> list[str]:
     return blockquotes
 
 
-def test_economy_paragraphs_present() -> None:
-    """Sanity — the economy mode blockquotes still exist."""
+def test_economy_paragraphs_never_inject_sub_phase_hooks_or_headers() -> None:
     paragraphs = _economy_blockquote_sections()
-    assert paragraphs, (
-        "no economy mode blockquote found in .agent-sync/skills/spec-feature/SKILL.md"
-    )
-
-
-def test_economy_paragraphs_do_not_call_hooks_resolve_for_subphases() -> None:
-    for paragraph in _economy_blockquote_sections():
-        assert "livespec hooks resolve --event before --command specify" not in paragraph
-        assert "livespec hooks resolve --event before --command plan" not in paragraph
-        assert "livespec hooks resolve --event before --command implement" not in paragraph
-        assert "livespec hooks resolve --event before --command test" not in paragraph
-
-
-def test_economy_paragraphs_do_not_prepend_subcmd_headers() -> None:
-    for paragraph in _economy_blockquote_sections():
+    # Guard against a vacuous pass: the negative checks below need real economy blocks.
+    assert paragraphs, "no economy mode blockquote found in spec-feature SKILL.md"
+    for paragraph in paragraphs:
+        for sub_phase in ("specify", "plan", "implement", "test"):
+            assert f"livespec hooks resolve --event before --command {sub_phase}" not in paragraph
         # Economy mode may reference canonical command source files such as
         # `.agent-sync/skills/spec-specify/SKILL.md`; it must not inject a standalone slash
         # command header because no subagent prompt is spawned.
         lines = [line.strip() for line in paragraph.splitlines()]
-        assert "/spec-specify" not in lines, paragraph
-        assert "/spec-plan" not in lines, paragraph
-        assert "/spec-implement" not in lines, paragraph
+        for header in ("/spec-specify", "/spec-plan", "/spec-implement"):
+            assert header not in lines, paragraph
