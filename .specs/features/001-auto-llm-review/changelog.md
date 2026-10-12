@@ -1,3 +1,13 @@
+## 2026-10-12 — [Refactor]: Plan-review exit-code tests exercise the CLI
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_plan_review.py — `TestPlanReviewErrorHandling` recomputed the exit expression inside the test; `TestPlanReviewExitCode` now invokes `livespec validate --plan-review` with the orchestrator replaced at its module boundary and checks advisory exit 0, `--strict` blocking on ERROR findings, review errors and incomplete reviews, and `--warn-only` precedence. Dataclass construction tests removed. `tests/test_review_api.py` kept: `review_spec_auto`/`review_plan_auto` have no in-repo caller but are the FR-010/FR-011 public API certified for AC-011, AC-012 and AC-014.
+- **AC impacted:** None (FR-005 exit behavior now covered through the CLI)
+- **Author:** claude-code
+
+---
+
 ## 2026-04-13 — [Check]: Spec-code alignment verified
 
 - **Type:** Spec Update

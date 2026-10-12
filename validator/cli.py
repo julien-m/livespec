@@ -350,12 +350,6 @@ def validate(
         "--contradiction-only",
         help="Run contradiction detection only",
     ),
-    mutate: bool = typer.Option(False, "--mutate", help="Run mutation testing"),
-    experimental_multi_model: bool = typer.Option(
-        False,
-        "--experimental-multi-model",
-        help="Enable multi-model consensus",
-    ),
     plan_review: bool = typer.Option(
         False,
         "--plan-review",
@@ -463,8 +457,6 @@ def validate(
         semantic: Run Layer 4 semantic validation.
         scorecard: Run scorecard only.
         contradiction_only: Run contradiction detection only.
-        mutate: Run mutation testing.
-        experimental_multi_model: Enable multi-model consensus.
         plan_review: Run LLM-based plan substance review.
         review_spec: Run LLM-based spec quality review.
         all_reviewers: Use all configured reviewer models.
@@ -543,8 +535,6 @@ def validate(
                 "--semantic": semantic,
                 "--scorecard": scorecard,
                 "--contradiction-only": contradiction_only,
-                "--mutate": mutate,
-                "--experimental-multi-model": experimental_multi_model,
                 "--plan-review": plan_review,
                 "--review-spec": review_spec,
                 "--all-reviewers": all_reviewers,
@@ -884,14 +874,6 @@ def validate(
         typer.echo(f"\n{len(check_result.contradictions)} contradiction(s) found.", err=True)
         raise typer.Exit(1 if check_result.contradictions else 0)
 
-    if mutate:
-        typer.echo(
-            "Mutation testing: run `pytest tests/ -k mutation` for available tests.",
-            err=True,
-        )
-        raise typer.Exit(0)
-    if experimental_multi_model:
-        typer.echo("Multi-model validation is experimental and not yet integrated.", err=True)
         raise typer.Exit(0)
 
     # Pass 2 stub

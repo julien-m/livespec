@@ -9,7 +9,9 @@ contract for the four targets in scope: web, ios, android, tauri.
 
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -55,18 +57,36 @@ def test_web_runner_blocks_when_no_output_context_provided(tmp_path: Path) -> No
     assert outcome.metadata.get("guard") == "missing_output_context"
 
 
-def test_web_runner_accepts_feature_slug_run_id_canonical_path(tmp_path: Path) -> None:
+def _fake_playwright(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
+    """Replace the Playwright subprocess: record the call and write the requested PNG."""
+    calls: list[dict[str, Any]] = []
+
+    def run(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        target = Path(kwargs["env"]["LIVESPEC_SCREENSHOT_PATH"])
+        target.write_bytes(b"\x89PNG")
+        calls.append({"command": command, **kwargs})
+        return subprocess.CompletedProcess(command, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr("validator.web_runner_core.subprocess.run", run)
+    return calls
+
+
+def test_web_runner_accepts_feature_slug_run_id_canonical_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """C6 strict: feature_slug+run_id derives `.specs/features/<slug>/run/<ts>/web/`."""
-    handler = WebRunnerHandler(tmp_path)
-    # The runner does not actually execute Playwright here; we only check the
-    # path-resolution branch by passing a non-existent project. The subprocess
-    # call will fail but the early path computation happens first. We assert
-    # that the *guard* did not fire and that the resolved path matches.
-    outcome = handler.capture_screenshot("dash", feature_slug="050-foo", run_id="20260523T000000Z")
-    # Subprocess will fail in tmp_path (no npx); the important invariant is
-    # that the path was NOT under .specs/design/screens/.
-    assert outcome.metadata.get("guard") != "missing_output_context"
-    assert outcome.metadata.get("guard") != "runtime_under_design_screens"
+    calls = _fake_playwright(monkeypatch)
+    expected = tmp_path / ".specs/features/050-foo/run/20260523T000000Z/web/dash.png"
+
+    outcome = WebRunnerHandler(tmp_path).capture_screenshot(
+        "dash", feature_slug="050-foo", run_id="20260523T000000Z"
+    )
+
+    assert outcome.success is True
+    assert outcome.output_path == expected
+    assert calls[0]["command"] == ["npx", "playwright", "test", "--grep", "@capture-dash"]
+    assert calls[0]["cwd"] == tmp_path
+    assert calls[0]["env"]["LIVESPEC_SCREENSHOT_PATH_DASH"] == str(expected)
 
 
 def test_web_runner_legacy_design_screens_disabled_by_default(
@@ -85,13 +105,13 @@ def test_web_runner_legacy_design_screens_opt_in_requires_env(
 ) -> None:
     """C6 strict: legacy_design_screens=True only honoured with explicit env var."""
     monkeypatch.setenv("LIVESPEC_LEGACY_DESIGN_SCREENS", "1")
-    handler = WebRunnerHandler(tmp_path)
-    outcome = handler.capture_screenshot("dash", legacy_design_screens=True)
-    # Subprocess will fail in tmp_path (no npx); the important invariant is
-    # that neither the missing-context guard nor the legacy-disabled guard
-    # fired — the legacy path was honoured.
-    assert outcome.metadata.get("guard") != "missing_output_context"
-    assert outcome.metadata.get("guard") != "legacy_design_screens_disabled"
+    calls = _fake_playwright(monkeypatch)
+
+    outcome = WebRunnerHandler(tmp_path).capture_screenshot("dash", legacy_design_screens=True)
+
+    assert outcome.success is True
+    assert outcome.output_path == tmp_path / ".specs/design/screens/dash.png"
+    assert len(calls) == 1
 
 
 def test_xcuitest_runner_returns_failure_when_output_path_under_design_screens(

@@ -27,8 +27,6 @@ LEGACY_OPTIONS = (
     ("--review-spec",),
     ("--plan-review",),
     ("--contradiction-only",),
-    ("--mutate",),
-    ("--experimental-multi-model",),
     ("--list-excluded",),
     ("--fix",),
     ("--smart",),

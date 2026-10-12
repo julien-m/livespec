@@ -7,6 +7,23 @@
 
 ---
 
+## 2026-10-12 — Refactor: test cleanup lot 4 (legitimate assertions only)
+
+- Plan-review exit-code tests run the CLI instead of recomputing its expression ([001](features/001-auto-llm-review/changelog.md)); web-runner output-path tests stub Playwright instead of launching `npx` ([028](features/028-ui-runner-web/changelog.md)); review-identity and Analyze combinations trimmed to one case per branch ([078](features/078-requirement-evidence-integrity/changelog.md)); preflight YAML parsing, link-capability fallback, schema and ship-header tests assert real values ([034](features/034-preflight-autofix/changelog.md) records an open `pip install -e` parsing defect).
+- Kept on purpose: `tests/test_penflow_contract_command_contract.py` (documentation ACs of 051, 054, 066 and 077), `TestTruthFixes` in the run-artifact suite (039.1 AC-012), the per-runner dispatcher tests named by 037 SC-002, and `tests/test_review_api.py` (001 FR-010/FR-011).
+
+## 2026-10-12 — Refactor: remove the `--mutate` and `--experimental-multi-model` stubs
+
+- `livespec validate --mutate` only printed a hint to run this repository's own pytest and exited 0; `--experimental-multi-model` only printed "not yet integrated" and exited 0. Both options, their legacy-conflict entries and the never-imported modules behind them (`validator/semantic/mutations.py`, `validator/semantic/multi_model.py`) are removed. Static grep over `validator/`, `tests/`, `scripts/`, `.agent-sync/`, `templates/`, `hooks/` and `pyproject.toml` found no importer, no string-based import and no entry point. Driver mutation testing (`livespec mutation`, feature 016) is unaffected.
+- The scorecard Axis 4 placeholder (constant 50) is kept: it still contributes to every published total and removing it would reweight the scorecard. Its pinning test and the weight-constant test are removed; `--contradiction-only` tests no longer depend on the machine's provider.
+- No LiveSpec feature owns Layer 4. Code modified: `validator/cli.py`, `.specs/roadmap.md`, `tests/test_scorecard.py`, `tests/test_semantic_operation_matrix.py`.
+
+## 2026-10-12 — Bugfix: coherence suppress_if_creating grace window never fired
+
+- The rule engine looked up the feature under `context["feature_dir"]`, a key no coherence rule emits; it now reads the canonical `dir_name` key, so violations of R1.2, R1.3, R2.1, R4.2 and R4.3 on a spec edited less than 30 minutes ago are demoted to INFO with the `[in-progress, Nmin]` tag, as described in [the Layer 2 design](../docs/superpowers/specs/2026-04-02-layer2-coherence-validation-design.md). `--no-suppress` and the finalize verifier still see them.
+- R2.2 no longer requests suppression, matching the design table.
+- No LiveSpec feature owns the Layer 2 engine; `tests/test_rule_engine.py` now exercises the real demotion, the aged case and non-empty filter results. Code modified: `validator/coherence/rule_engine.py`, `validator/coherence/rules/r2_status_files.py`, `tests/test_rule_engine.py`, `tests/test_coherence_cli.py`.
+
 ## 2026-10-12 — Refactor: test-suite cleanup lot 3 (goal, journey, locks, manifests, Penflow models)
 
 - 1033 -> 911 test cases in the lot with no validator line losing coverage (23800 -> 23807 covered lines); no new failure in the unit suite.

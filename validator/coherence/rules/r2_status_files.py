@@ -99,7 +99,7 @@ class R2_2_AdvancedFileForLowStatus:
                         ),
                         context={"dir_name": feature.dir_name, "status": "Draft"},
                         fix_hint="Update the feature status or remove implementation.md",
-                        suppress_if_creating=True,
+                        suppress_if_creating=False,
                     )
                 )
         return violations

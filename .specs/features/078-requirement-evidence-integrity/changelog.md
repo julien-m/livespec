@@ -206,3 +206,11 @@ Parametrisations reduced to one case per real branch. The tag-legend test now ch
 - **Author:** claude-code (test-suite cleanup lot 3)
 
 `test_identity_policy_version_invalidates_prior_receipts` only compared the constant; it now proves a version bump changes the normative hash.
+
+## 2026-10-12 — Refactor: Trim redundant review-identity and Analyze test combinations
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_review_lifecycle_protocol.py (20 → 8 cases: the lifecycle exemption still runs for every header band and newline pair, each business change runs once); tests/test_pre_impl_missing_artifacts.py (18 → 5 cases: every missing set, both semantic statuses, and an invalid review config that must not preempt the CRITICAL diagnostics).
+- **AC impacted:** AC-004 (same branches still exercised)
+- **Author:** claude-code
