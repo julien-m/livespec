@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
+import yaml
 
 LEGACY_DESIGN_SCREENS_ENV = "LIVESPEC_LEGACY_DESIGN_SCREENS"
 
@@ -130,22 +130,27 @@ class WebRunnerHandler:
             return blocked
         return core.run_screenshot_command(self.project_dir, command, output_path, screen)
 
-    def run_flow(self) -> UICapabilityResult:
-        """Run the default Playwright flow for the project."""
+    def run_flow(self, **kwargs: Any) -> UICapabilityResult:
+        """Run the default Playwright flow for the project.
+
+        Protocol keywords (screen, output_path, feature_slug, run_id) are accepted and
+        ignored: the Playwright flow always runs the project's whole configured suite.
+        """
         from validator.web_runner_core import run_flow_command
 
+        del kwargs
         return run_flow_command(self.project_dir)
 
     def compare_baseline(
         self,
-        baseline: str,
-        screenshot: str,
+        baseline: Path | str,
+        screenshot: Path | str,
         threshold: float = DEFAULT_COMPARE_THRESHOLD,
     ) -> UICapabilityResult:
         """Compare a screenshot against a baseline image."""
         from validator.web_runner_core import compare_pixel_baseline
 
-        return compare_pixel_baseline(self.project_dir, baseline, screenshot, threshold)
+        return compare_pixel_baseline(self.project_dir, str(baseline), str(screenshot), threshold)
 
 
 def load_web_runner_manifest() -> dict[str, Any]:

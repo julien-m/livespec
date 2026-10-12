@@ -184,7 +184,12 @@ def _read_results(
 
 
 def _inspect(
-    path: Path, root: Path, feature: str, evidence_policy: Literal["1", "2"]
+    path: Path,
+    root: Path,
+    feature: str,
+    evidence_policy: Literal["1", "2"],
+    *,
+    require_current: bool = True,
 ) -> _Inspection:
     if evidence_policy not in ("1", "2"):
         raise ValueError("Unsupported execution evidence policy")
@@ -196,7 +201,9 @@ def _inspect(
         gaps.append("Runner capture does not declare current acceptance evidence policy 2")
     if capture.runner_provenance != runner_provenance():
         gaps.append("Trusted runner provenance changed or missing")
-    if capture.before != capture.after or capture.after != source_manifest(root, feature):
+    if capture.before != capture.after or (
+        require_current and capture.after != source_manifest(root, feature)
+    ):
         gaps.append("Source, test or configuration inputs are stale")
     tests, assertions = _read_results(capture, directory, root)
     if not capture.assertion_trace_sha256:

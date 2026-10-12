@@ -7,6 +7,20 @@
 
 ---
 
+## 2026-10-12 — Bugfix: audit bugs through the bugfix lane (084)
+
+- [055](features/055-spec-doctor-project-health/changelog.md): doctor reports suppressed in-progress coherence findings as INFO `[in-progress, Nmin]` and attributes findings through `dir_name` (R3 contexts gain `dir_name`); lane ELIGIBLE (3 files, 55 lines), RED/GREEN receipts in implementation.md.
+- [014](features/014-supervisor-contracts/changelog.md): spec-feature `--resume` resolves the latest `pipeline.md` with `ls -t .specs/features/*/pipeline.md` instead of the nonexistent `livespec pipeline latest`; new guard test checks every `livespec` command path cited by a skill; lane ELIGIBLE (3 files, 60 lines).
+- [016](features/016-cross-language-test-driver-architecture/changelog.md): built-in driver scripts resolve beside their shipped manifest (`livespec/drivers/scripts/`), custom `.specs/drivers` scripts stay project-relative; lane ELIGIBLE (2 files, 58 lines).
+- [037](features/037-test-multi-runner-integration/changelog.md): Web/XCUITest/Maestro handlers accept the `RunnerHandler` keywords (`**kwargs: Any`) and `Path | str` baselines, XCUITest/Maestro reuse the web `UICapabilityResult`, the registry drops its `cast` (pyright clean) and stale yaml suppressions go; lane ELIGIBLE (5 files, 175 lines).
+
+## 2026-10-12 — [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback)
+<!-- finalize:spec-feature:2026-10-12:a6abad0a -->
+
+## 2026-10-12 — Bugfix: declare unit-test dependencies (audit batch)
+
+- [079](features/079-validator-ci-prerequisites/changelog.md): `click`, `jsonschema` and `pluggy` move into the `dev` extra (typer 0.27 vendors its own click, so they only arrived through `integration`); `uv.lock` regenerated and a guard test checks every unit-suite third-party import against runtime/dev requirements.
+
 ## 2026-10-12 — Bugfix: missing requirements of features 035 and 056 implemented
 
 - [Feature 056](features/056-executable-user-journeys/changelog.md) Fix: AC-003, AC-004 and AC-015 were marked done but not implemented on the v2 path. `wait` now takes `until`/`reason` (bounded waits in Playwright, XCUITest and Maestro, `wait_reason_missing` warning), and manual journeys require `manual_reason`. Also fixed: FR-005 `select` (Playwright) and FR-007 portable XCUITest destination, with no hardcoded `STRAPTUITests`. Spec clarified and plan rewritten on the v2 pipeline after independent reviews.

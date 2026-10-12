@@ -121,6 +121,7 @@
 | 081 | Lightweight Outcome-Based Goals | Implemented | 2026-10-10 | 2026-10-10 | Read [spec](features/081-lightweight-outcome-goals/spec.md) |
 | 082 | Conventions Gate Signal | Implemented | 2026-10-10 | 2026-10-11 | [spec](features/082-conventions-gate-signal/spec.md) |
 | 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-12 | [spec](features/083-pinned-runtime-isolation/spec.md) |
+| 084 | Bugfix Lane | Implemented | 2026-10-12 | 2026-10-12 | [spec](features/084-bugfix-lane/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -145,16 +146,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-10-12 | Bugfix | [Feature 080] Fix: unsupported manifests recorded and missing package manager warns (FR-001 decision); implement gate READY |
-| 2026-10-12 | Spec Update | [Feature 077] AC-009/FR-008 clarified to the implemented authority import; implement gate READY |
-| 2026-10-12 | Bugfix | [Feature 083] Fix: consumer migration command executable as documented (venv interpreter) |
-| 2026-10-12 | Bugfix | [Feature 080] Fix: init probes tolerate zombie-group EPERM; init tests deterministic and hermetic (gate blocked on FR-001 decision) |
-| 2026-10-12 | Bugfix | [Feature 079] Fix: convention manifest tests and CI cleanup step made hermetic |
-| 2026-10-12 | Bugfix | [Feature 078] Fix: warm-cache regression independent of PYTHONDONTWRITEBYTECODE |
-| 2026-10-12 | Bugfix | [Feature 077] Fix: Penflow CLI resolved beside the interpreter before PATH (gate blocked on AC-009 decision) |
-| 2026-10-12 | Bugfix | Bugfix: integrate features 081, 082 and 083 on main |
-| 2026-10-12 | Feature | Feature 083 pipeline complete: pinned runtime isolation (18/18 AC certified, audit clean) |
-| 2026-10-12 | Feature | [Feature 083] Test: 100% AC covered (18/18), 1 test generated (re-certification after audit corrections) |
+| 2026-10-12 | Bugfix | Bugfix: audit bugs through the bugfix lane (084) |
+| 2026-10-12 | Bugfix | [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback) |
+| 2026-10-12 | Bugfix | Bugfix: declare unit-test dependencies (audit batch) |
+| 2026-10-12 | Bugfix | Bugfix: missing requirements of features 035 and 056 implemented |
+| 2026-10-12 | Feature | Refactor: dead-code resolution (wire or retire) |
+| 2026-10-12 | Bugfix | Bugfix: [Feature 080] Unsupported manifests recorded, missing package manager warns; readiness gate closed |
+| 2026-10-12 | Spec | Spec Update: [Feature 077] AC-009 / FR-008 clarified, readiness gate closed |
+| 2026-10-12 | Feature | Refactor: test-suite cleanup lot 5 |
+| 2026-10-12 | Feature | Refactor: test cleanup lot 4 (legitimate assertions only) |
+| 2026-10-12 | Feature | Refactor: remove the `--mutate` and `--experimental-multi-model` stubs |
 <!-- readme:activity:end -->
 
 ---
@@ -306,3 +307,5 @@
 <!-- finalize:spec-fix:2026-10-12:7710d267 -->
 
 <!-- finalize:spec-fix:2026-10-12:5728df60 -->
+
+<!-- finalize:spec-feature:2026-10-12:a6abad0a -->

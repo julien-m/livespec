@@ -119,7 +119,13 @@ def _capability_argv(
 ) -> list[str]:
     """Resolve the manifest executable while preserving script validation errors."""
     if cap.script is not None:
-        script_path = _resolve_script(cap.script, cwd)
+        # @spec FR-003: Built-in scripts ship beside their manifest (livespec/drivers/scripts);
+        #   custom `.specs/drivers` scripts stay project-relative.
+        #   — .specs/features/016-cross-language-test-driver-architecture/spec.md#fr-003
+        anchor = cwd
+        if not driver.is_custom and driver.source_path is not None:
+            anchor = driver.source_path.parent
+        script_path = _resolve_script(cap.script, anchor)
         if not script_path.exists():
             raise FileNotFoundError(
                 f"Driver {driver.name!r} {capability} script not found: {script_path}"

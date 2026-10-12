@@ -71,6 +71,7 @@
 - [x] **Lightweight Outcome-Based Goals** — One executable stop condition per autonomous run, receipt-only required tasks, optional native goals, recoverable contracts, bounded retries and short prompts. · Scope: L · Priority: P1 → Read [081-lightweight-outcome-goals](features/081-lightweight-outcome-goals/spec.md)
 - [x] **Conventions Gate Signal** — Repo-scope conventions verification ignores declared detector fixtures, groups shared ARS family matches into one violation, applies framework rules only with framework evidence, and ratchets repo scope against a versioned baseline. · Scope: M · Priority: P1 · Deps: 061, 063, 073 → [082-conventions-gate-signal](features/082-conventions-gate-signal/spec.md)
 - [x] **Pinned Runtime Isolation** — Immutable versioned LiveSpec runtime snapshots, CLI shim, project pin/upgrade/dev modes, tool/project boundary with project-local defect reports, and runtime drift detection · Roles: Maintainer, Consumer-project developer · Scope: L · Priority: P1 → [083-pinned-runtime-isolation](features/083-pinned-runtime-isolation/spec.md)
+- [x] **Bugfix Lane** — `/spec-fix --bugfix` with CLI-verified eligibility (owner feature, unchanged requirement text, RED then GREEN regression receipts, confined diff), scoped gate and explicit fallback to the complete gate · Roles: Maintainer · Scope: M · Priority: P1 → [084-bugfix-lane](features/084-bugfix-lane/spec.md)
 <!-- roadmap:mvp:end -->
 
 ---

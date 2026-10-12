@@ -63,6 +63,8 @@ EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
         "fix-execute",
         "fix-feature",
         "fix-conventions",
+        "fix-readiness",
+        "fix-bugfix",
         "pre-impl",
         "full-check",
         "pre-impl-penflow",

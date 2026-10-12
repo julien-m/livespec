@@ -406,6 +406,12 @@ To prevent changelogs from growing unbounded:
 4. Fix the issue
 5. Update `changelog.md` with a Bugfix entry
 
+### Bugfix lane (`/spec-fix <feature> --bugfix`)
+
+<!-- @spec FR-012: Bugfix lane in the universal rules — .specs/features/084-bugfix-lane/spec.md#fr-012 -->
+
+A confined bug in an implemented feature can skip whole-feature readiness when `livespec bugfix gate` proves four conditions: owner feature identified (`spec.md` + `implementation.md`), no FR/AC/SC definition or Gherkin change in any `spec.md`, a regression test RED before and GREEN after (same test command, runner-owned receipts from `livespec bugfix capture`), and a diff within `max_files`/`max_lines` (defaults 8/300, `.specs/bugfix.yaml` read at the base revision). A cited requirement (`--requirement`) is checked alone; an uncited implementation bug needs no review; the feature-scope conventions gate still applies. Any failed condition prints `Bugfix gate: FALLBACK` with its reasons and the complete gate `livespec validate <feature-dir> --progression implement`. `livespec bugfix record` writes the Bugfix changelog entry and the `## Bugfix Receipts` row of `implementation.md`.
+
 ### When working with DESIGN mockups
 
 <!-- @spec FR-010: Screens table format with selector and aa_tolerance — .specs/features/003-visual-testing-fidelity/spec.md#fr-010 -->

@@ -49,6 +49,7 @@ class R3_1_SourceFileNotFound:
                                     f"in feature '{feature.dir_name}' does not exist"
                                 ),
                                 context={
+                                    "dir_name": feature.dir_name,
                                     "feature": feature.dir_name,
                                     "anchor": anchor_id,
                                     "path": file_path,
@@ -111,6 +112,7 @@ class R3_2_SpecAnchorMissing:
                                     f"@spec({anchor_id}) annotation"
                                 ),
                                 context={
+                                    "dir_name": feature.dir_name,
                                     "feature": feature.dir_name,
                                     "anchor": anchor_id,
                                     "path": file_path,
