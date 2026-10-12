@@ -15,6 +15,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    # Imported directly by unit tests: typer no longer depends on click, and
+    # jsonschema/pluggy must not arrive only transitively through other extras.
+    "click>=8.1",
+    "jsonschema>=4.23",
+    "pluggy>=1.5",
     "mypy>=1.13",
     "pytest>=8.0",
     "pytest-cov>=5.0",

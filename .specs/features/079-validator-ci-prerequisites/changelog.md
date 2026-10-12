@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-12 — [Bugfix]: Declare unit-test dependencies in the dev extra
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `pyproject.toml` (dev extra: `click`, `jsonschema`, `pluggy`), `uv.lock`, `tests/test_declared_test_dependencies.py` (new)
+- **AC impacted:** AC-003
+- **Readiness:** `livespec validate --progression implement` READY after independent spec and plan reviews (claude-opus-5-5).
+- **Author:** spec-fix (claude-code)
+
 ## 2026-10-12 — [Refactor]: Test suite cleanup (lot 2)
 
 The event-policy test asserted the same facts three times regardless of its parameter; it is now a single test that pins the exact event set.
