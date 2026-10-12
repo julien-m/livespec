@@ -33,6 +33,9 @@ def test_actual_warm_pytest_cache_cannot_suppress_runner_assertions(
         monkeypatch.setenv("PYTHONPYCACHEPREFIX", str(prefix))
     else:
         monkeypatch.delenv("PYTHONPYCACHEPREFIX", raising=False)
+    # The scenario needs real bytecode on disk: both the warm-up and the runner subprocess
+    # inherit os.environ, so a caller's PYTHONDONTWRITEBYTECODE=1 must not reach either.
+    monkeypatch.delenv("PYTHONDONTWRITEBYTECODE", raising=False)
     warmed = subprocess.run(
         [sys.executable, "-m", "pytest", "test_app.py", "-q"],
         cwd=project,
