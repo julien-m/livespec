@@ -26,7 +26,7 @@ updated: 2026-10-12
 | [FR-010: Boundary rule and references](spec.md#fr-010) | [`system/tool-project-boundary.md`](../../../system/tool-project-boundary.md), `system/spec-system.md`, `.specs/spec-system.md`, spec-feature/fix/implement/ship `SKILL.md` | `@spec FR-010: Tool/project boundary rule — .specs/features/083-pinned-runtime-isolation/spec.md#fr-010` | ✅ Implemented | 2026-10-11 |
 | [FR-011: Defect report](spec.md#fr-011) | `validator/runtime/defects.py`, `validator/pipeline.py`, `validator/cli_commands/runtime_cmd.py` | `@spec FR-011: Report and blocked phase — .specs/features/083-pinned-runtime-isolation/spec.md#fr-011` | ✅ Implemented | 2026-10-11 |
 | [FR-012: Runtime scanner, status and doctor](spec.md#fr-012) | `validator/runtime/inspection.py`, `validator/doctor/runtime_scan.py`, `validator/doctor/__init__.py`, `validator/cli_commands/runtime_cmd.py` | `@spec FR-012: Runtime scanner and doctor — .specs/features/083-pinned-runtime-isolation/spec.md#fr-012` | ✅ Implemented | 2026-10-11 |
-| [FR-013: Docs and migration](spec.md#fr-013) | `README.md`, `docs/cli-reference.md` | `@spec FR-013: Docs and migration — .specs/features/083-pinned-runtime-isolation/spec.md#fr-013` | ✅ Implemented | 2026-10-11 |
+| [FR-013: Docs and migration](spec.md#fr-013) | `README.md`, `docs/cli-reference.md` | `@spec FR-013: Docs and migration — .specs/features/083-pinned-runtime-isolation/spec.md#fr-013` | ✅ Implemented | 2026-10-12 |
 
 ## Acceptance Criteria Mapping
 
@@ -142,3 +142,7 @@ Shared fixtures: `tests/runtime_support.py` (temporary git sources with a real-c
 | R2#9-#11 Markdown link style in feature docs | no change: implementation maps use code spans, parsed by the feature-scope resolver | — |
 
 Execution certification is re-run after these corrections by `/spec-test`.
+
+## 2026-10-12 — Executable migration command (spec-fix)
+
+The documented first install runs the checkout's own venv (`.venv/bin/python -m validator.cli runtime install …`, created once by `uv sync`). A bare `python3` lacks LiveSpec's dependencies and would also become the shim interpreter. [test_runtime_docs.py](../../../tests/test_runtime_docs.py) runs the exact documented block with `PATH` limited to git and `/usr/bin:/bin`, without venv activation; the fixture checkout venv is an `exec` wrapper. Restoring the `python3` wording makes it fail with `ModuleNotFoundError: typer`.

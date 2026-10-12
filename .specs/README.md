@@ -114,10 +114,10 @@
 | 074 | Agent Device Proof Adapter | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/074-agent-device-proof-adapter/spec.md), [plan](features/074-agent-device-proof-adapter/plan.md), [implementation](features/074-agent-device-proof-adapter/implementation.md) |
 | 075 | Design Direction Carry | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/075-design-direction-carry/spec.md), [plan](features/075-design-direction-carry/plan.md), [implementation](features/075-design-direction-carry/implementation.md) |
 | 076 | Spec Init Goal Bootstrap | Implemented | 2026-09-04 | 2026-09-08 | Read [spec](features/076-spec-init-goal-bootstrap/spec.md), [plan](features/076-spec-init-goal-bootstrap/plan.md), and [implementation](features/076-spec-init-goal-bootstrap/implementation.md) |
-| 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-09-05 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
-| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-09-07 | [spec](features/078-requirement-evidence-integrity/spec.md) |
-| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-09-08 | [spec](features/079-validator-ci-prerequisites/spec.md) |
-| 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-09 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
+| 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-10-12 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
+| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-10-12 | [spec](features/078-requirement-evidence-integrity/spec.md) |
+| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-10-12 | [spec](features/079-validator-ci-prerequisites/spec.md) |
+| 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-12 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
 | 081 | Lightweight Outcome-Based Goals | Implemented | 2026-10-10 | 2026-10-10 | Read [spec](features/081-lightweight-outcome-goals/spec.md) |
 | 082 | Conventions Gate Signal | Implemented | 2026-10-10 | 2026-10-11 | [spec](features/082-conventions-gate-signal/spec.md) |
 | 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-12 | [spec](features/083-pinned-runtime-isolation/spec.md) |
@@ -145,16 +145,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-12 | Bugfix | [Feature 083] Fix: consumer migration command executable as documented (venv interpreter) |
+| 2026-10-12 | Bugfix | [Feature 080] Fix: init probes tolerate zombie-group EPERM; init tests deterministic and hermetic (gate blocked on FR-001 decision) |
+| 2026-10-12 | Bugfix | [Feature 079] Fix: convention manifest tests and CI cleanup step made hermetic |
+| 2026-10-12 | Bugfix | [Feature 078] Fix: warm-cache regression independent of PYTHONDONTWRITEBYTECODE |
+| 2026-10-12 | Bugfix | [Feature 077] Fix: Penflow CLI resolved beside the interpreter before PATH (gate blocked on AC-009 decision) |
 | 2026-10-12 | Bugfix | Bugfix: integrate features 081, 082 and 083 on main |
 | 2026-10-12 | Feature | Feature 083 pipeline complete: pinned runtime isolation (18/18 AC certified, audit clean) |
 | 2026-10-12 | Feature | [Feature 083] Test: 100% AC covered (18/18), 1 test generated (re-certification after audit corrections) |
 | 2026-10-12 | Feature | Feature 083 second audit pass: redirected-path refusal, escaped defect values, lock-last publication, strict shim current manifest |
 | 2026-10-11 | Feature | Feature 083 audit corrections: defect input validation, staging symlink containment, strict manifest, read-only verification, locked selection rollback |
-| 2026-10-11 | Feature | [Feature 083] Test: 100% AC covered (18/18), 3 tests generated |
-| 2026-10-11 | Feature | Feature 083 implemented: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, tool/project boundary (18/18 AC certified) |
-| 2026-10-11 | Feature | Feature 083 implementation: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, boundary rule (In Progress; conventions certification pending) |
-| 2026-10-11 | Feature | Feature 083 plan created: Pinned Runtime Isolation, 9 implementation steps, 3 diagrams, ADR-004 |
-| 2026-10-11 | Spec | [Feature 083] Spec created: Pinned Runtime Isolation — 7 stories, 18 AC, 13 FR |
 <!-- readme:activity:end -->
 
 ---
@@ -296,3 +296,13 @@
 <!-- finalize:spec-feature:2026-10-12:21b73207 -->
 
 <!-- finalize:spec-feature:2026-10-10:2db73a41 -->
+
+<!-- finalize:spec-fix:2026-10-12:771b8f83 -->
+
+<!-- finalize:spec-fix:2026-10-12:b581f1b1 -->
+
+<!-- finalize:spec-fix:2026-10-12:7208ea4d -->
+
+<!-- finalize:spec-fix:2026-10-12:7710d267 -->
+
+<!-- finalize:spec-fix:2026-10-12:5728df60 -->

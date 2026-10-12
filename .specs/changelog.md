@@ -7,6 +7,21 @@
 
 ---
 
+## 2026-10-12 — [Feature 083] Fix: consumer migration command executable as documented (venv interpreter)
+<!-- finalize:spec-fix:2026-10-12:5728df60 -->
+
+## 2026-10-12 — [Feature 080] Fix: init probes tolerate zombie-group EPERM; init tests deterministic and hermetic (gate blocked on FR-001 decision)
+<!-- finalize:spec-fix:2026-10-12:7710d267 -->
+
+## 2026-10-12 — [Feature 079] Fix: convention manifest tests and CI cleanup step made hermetic
+<!-- finalize:spec-fix:2026-10-12:7208ea4d -->
+
+## 2026-10-12 — [Feature 078] Fix: warm-cache regression independent of PYTHONDONTWRITEBYTECODE
+<!-- finalize:spec-fix:2026-10-12:b581f1b1 -->
+
+## 2026-10-12 — [Feature 077] Fix: Penflow CLI resolved beside the interpreter before PATH (gate blocked on AC-009 decision)
+<!-- finalize:spec-fix:2026-10-12:771b8f83 -->
+
 ## 2026-10-12 — Bugfix: integrate features 081, 082 and 083 on main
 
 - Conventions source collection skips `.claude/worktrees/**`, `.worktrees/**` and any nested directory holding a `.git` entry; repo scope returns PASS against [the versioned baseline](conventions/baseline.json) without rewriting it.
