@@ -664,12 +664,6 @@ class TestCLI:
         # Exit 0 (no contradictions in empty .specs/) or 1 (provider error) — both acceptable
         assert result.exit_code in (0, 1)
 
-    def test_reindex_stub(self, tmp_path: Path) -> None:
-        specs_root = tmp_path / ".specs"
-        specs_root.mkdir()
-        result = runner.invoke(app, ["validate", "--reindex", str(specs_root)])
-        assert result.exit_code == 0
-
     def test_mutate_stub(self, tmp_path: Path) -> None:
         specs_root = tmp_path / ".specs"
         specs_root.mkdir()

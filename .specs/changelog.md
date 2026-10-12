@@ -7,6 +7,12 @@
 
 ---
 
+## 2026-10-12 — Refactor: test suite cleanup lot 2 and dead embeddings stub removal
+
+- Removed `validator/semantic/embeddings.py` (imported only by its own test; `compute_embedding` raised `NotImplementedError`), the `livespec validate --reindex` stub that only printed "not yet integrated", and their tests (`tests/test_embeddings.py`, `test_scorecard.py::test_reindex_stub`, the `--reindex` legacy-option case). The roadmap "Embedding reindex" item stays open.
+- Weak tests now exercise the real behaviour: expectations rules are parsed with `validator.expectations`, the score clamp is proven at 0, economy-mode guards cannot pass on zero blocks, JS/TS syntax checks skip explicitly without node/`node_modules/typescript` instead of passing vacuously.
+- Duplicated and label-only parametrised cases trimmed in features 026, 047, 063, 078 and 079 (see their changelogs); no production behaviour changed besides the removed stub.
+
 ## 2026-10-12 — Refactor: test-suite cleanup, lot 1
 
 - Removed tests that exercised no LiveSpec code (self-tested helpers, Markdown word searches, a static fixture checked by test-only validators, Node failing on a missing file) and duplicates (command aliases, visual dispatch, driver detector cases, gates init, help smoke tests).

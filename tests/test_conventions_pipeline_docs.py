@@ -12,7 +12,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tests.test_goal_contracts import EXPECTATIONS
 from validator.expectations import parse_expectations
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -23,10 +22,11 @@ def _text(path: str) -> str:
 
 
 def test_expectations_require_conventions_receipt_verdict_rule() -> None:
+    expected = {"kind": "conventions", "verdict": "PASS", "required_if_exists": True}
     for command in ("spec-implement", "spec-test", "spec-fix", "spec-feature", "spec-ship"):
-        text = _text(f".agent-sync/skills/{command}/expectations.md")
-        assert "last_reviewed:" in text
-        assert 'receipt_verdict: {"kind": "conventions", "verdict": "PASS"' in text
+        parsed = parse_expectations(REPO_ROOT / f".agent-sync/skills/{command}/expectations.md")
+        rules = [rule.payload for rule in parsed.verify.must if rule.kind == "receipt_verdict"]
+        assert rules == [expected], command
 
 
 def test_final_command_skills_verify_conventions_before_phase_result() -> None:
@@ -51,15 +51,6 @@ def test_spec_fix_documents_conventions_burndown_mode() -> None:
     assert "zero new violations" in text
 
 
-def test_python_ruff_template_enables_pylint_rules_without_file_length_as_line_width() -> None:
-    rendered = _text("templates/conventions/python_ruff.toml.tmpl")
-    rendered = rendered.replace("{{max_file_lines}}", "500")
-    rendered = rendered.replace("{{max_function_lines}}", "60")
-
-    assert 'select = ["E", "F", "I", "PLR"]' in rendered
-    assert "line-length = 500" not in rendered
-
-
 def test_agent_prompts_treat_conventions_gate_as_blocking() -> None:
     verifier = _text(".agent-sync/agents/livespec-verifier/prompt.md")
     supervisor = _text(".agent-sync/agents/livespec-supervisor/prompt.md")
@@ -70,25 +61,6 @@ def test_agent_prompts_treat_conventions_gate_as_blocking() -> None:
     assert "pre-existing" in verifier
     assert "never justifies skipping conventions" in supervisor
     assert "never justifies skipping conventions" in verifier
-
-
-def test_expectations_parser_accepts_receipt_verdict_rule(tmp_path: Path) -> None:
-    expectations = EXPECTATIONS.replace(
-        "    - exit_code: 0",
-        '    - receipt_verdict: {"kind": "conventions", "verdict": "PASS", '
-        '"required_if_exists": true}',
-    )
-    path = tmp_path / "expectations.md"
-    path.write_text(expectations, encoding="utf-8")
-
-    parsed = parse_expectations(path)
-
-    assert parsed.verify.must[0].kind == "receipt_verdict"
-    assert parsed.verify.must[0].payload == {
-        "kind": "conventions",
-        "verdict": "PASS",
-        "required_if_exists": True,
-    }
 
 
 def test_evidence_first_retry_contract_is_documented_for_goal_locked_commands() -> None:
