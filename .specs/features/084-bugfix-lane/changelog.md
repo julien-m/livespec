@@ -1,6 +1,6 @@
 # Changelog - 084-bugfix-lane
 
-### 2026-10-12 — [Feature]: Bugfix lane specified, planned, reviewed and implemented
+## 2026-10-12 — [Feature]: Bugfix lane specified, planned, reviewed and implemented
 
 - **Type:** Feature
 - **Spec modified:** Yes (created: five stories, fourteen AC, twelve FR, three SC)
