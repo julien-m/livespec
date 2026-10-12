@@ -1,0 +1,1535 @@
+{
+  "entries": [
+    {
+      "count": 1,
+      "messages": [
+        "ARS family database_sql: 9 matched rule(s) (ARS-RULE-00002, ARS-RULE-00004, ARS-RULE-00006, +6 more)"
+      ],
+      "path": "tests/test_contracts.py",
+      "rule_id": "ars.family.database_sql",
+      "rule_ids": [
+        "ars.rule.00002",
+        "ars.rule.00004",
+        "ars.rule.00006",
+        "ars.rule.00010",
+        "ars.rule.00011",
+        "ars.rule.00018",
+        "ars.rule.00019",
+        "ars.rule.00047",
+        "ars.rule.00062"
+      ]
+    },
+    {
+      "count": 1,
+      "messages": [
+        "ARS family platform_ops: 1 matched rule(s) (ARS-RULE-05888)"
+      ],
+      "path": "scripts/migrate_expectations_section13.py",
+      "rule_id": "ars.family.platform_ops",
+      "rule_ids": [
+        "ars.rule.05888"
+      ]
+    },
+    {
+      "count": 1,
+      "messages": [
+        "ARS family python_code: 14 matched rule(s) (ARS-RULE-00818, ARS-RULE-00822, ARS-RULE-00826, +11 more)"
+      ],
+      "path": "validator/visual_gate.py",
+      "rule_id": "ars.family.python_code",
+      "rule_ids": [
+        "ars.rule.00818",
+        "ars.rule.00822",
+        "ars.rule.00826",
+        "ars.rule.00827",
+        "ars.rule.00828",
+        "ars.rule.00844",
+        "ars.rule.00845",
+        "ars.rule.00846",
+        "ars.rule.00849",
+        "ars.rule.00850",
+        "ars.rule.00854",
+        "ars.rule.00855",
+        "ars.rule.00857",
+        "ars.rule.00872"
+      ]
+    },
+    {
+      "count": 1,
+      "messages": [
+        "missing required file header"
+      ],
+      "path": "livespec/ui-runners/xcuitest-template/LSSampleUITests.swift",
+      "rule_id": "builtin.file_header",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "898 lines > 500"
+      ],
+      "path": "scripts/generate-surfaces.js",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "1573 lines > 500"
+      ],
+      "path": "scripts/migrate-visual-tests.js",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "1116 lines > 500"
+      ],
+      "path": "scripts/migrate_expectations_section13.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "623 lines > 500"
+      ],
+      "path": "tests/integration/test_migrate_visual.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "860 lines > 500"
+      ],
+      "path": "tests/test_coherence_rules.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "544 lines > 500"
+      ],
+      "path": "tests/test_drivers.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "1242 lines > 500"
+      ],
+      "path": "tests/test_finalize.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "623 lines > 500"
+      ],
+      "path": "tests/test_generate_surfaces.js",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "753 lines > 500"
+      ],
+      "path": "tests/test_journey_v2_compiler.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "914 lines > 500"
+      ],
+      "path": "tests/test_journey_v2_fixtures_contract.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "797 lines > 500"
+      ],
+      "path": "tests/test_penflow_contract.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "589 lines > 500"
+      ],
+      "path": "tests/test_plan_review.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "683 lines > 500"
+      ],
+      "path": "tests/test_scorecard.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "908 lines > 500"
+      ],
+      "path": "tests/test_ui_runner_maestro.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "976 lines > 500"
+      ],
+      "path": "tests/test_ui_runner_xcuitest.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "826 lines > 500"
+      ],
+      "path": "tests/test_verify_output.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "683 lines > 500"
+      ],
+      "path": "tests/test_visual_implementation_gate.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "517 lines > 500"
+      ],
+      "path": "validator/behavioral_grammar.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "1065 lines > 500"
+      ],
+      "path": "validator/cli.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "967 lines > 500"
+      ],
+      "path": "validator/cli_commands/ui_runner_cmd.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "555 lines > 500"
+      ],
+      "path": "validator/doctor/scanner.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "592 lines > 500"
+      ],
+      "path": "validator/drivers/mutation_report.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "584 lines > 500"
+      ],
+      "path": "validator/drivers/test_config.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "570 lines > 500"
+      ],
+      "path": "validator/expectations.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "542 lines > 500"
+      ],
+      "path": "validator/finalize.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "734 lines > 500"
+      ],
+      "path": "validator/journeys/compiler.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "1013 lines > 500"
+      ],
+      "path": "validator/journeys/runner.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "683 lines > 500"
+      ],
+      "path": "validator/penflow_contract.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "884 lines > 500"
+      ],
+      "path": "validator/preflight_autofix.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "634 lines > 500"
+      ],
+      "path": "validator/registry_links.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "661 lines > 500"
+      ],
+      "path": "validator/selector.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "799 lines > 500"
+      ],
+      "path": "validator/taxonomy.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "818 lines > 500"
+      ],
+      "path": "validator/visual_evidence.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "1712 lines > 500"
+      ],
+      "path": "validator/visual_gate.py",
+      "rule_id": "builtin.max_file_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "captureKeyframes has 70 lines > 60"
+      ],
+      "path": "scripts/capture-keyframes.ts",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "generateTestFile has 64 lines > 60",
+        "generateTests has 62 lines > 60"
+      ],
+      "path": "scripts/generate-e2e-tests.js",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "detectSurfaces has 275 lines > 60"
+      ],
+      "path": "scripts/generate-surfaces.js",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "resolveFromFilesystem has 79 lines > 60"
+      ],
+      "path": "scripts/lib/surface-resolver.js",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 6,
+      "messages": [
+        "ensurePlaywrightFrontendConfig has 408 lines > 60",
+        "generateE2ETemplate has 206 lines > 60",
+        "generateLegacyTemplate has 90 lines > 60",
+        "generateTests has 133 lines > 60",
+        "isRedirectOnlyFile has 1030 lines > 60",
+        "printCompletionReport has 85 lines > 60"
+      ],
+      "path": "scripts/migrate-visual-tests.js",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "_pixelmatchDiff has 68 lines > 60"
+      ],
+      "path": "templates/visual.ts",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "approved_feature has 78 lines > 60",
+        "canonical_approval_contract has 164 lines > 60"
+      ],
+      "path": "tests/penflow_approval_fixtures.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "test_verify_applies_exclusions_to_linter_output has 64 lines > 60"
+      ],
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "test_public_init_render_and_lock_proof_read_existing_canonical_sources has 68 lines > 60"
+      ],
+      "path": "tests/test_init_goal_conventions.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "test_compile_v2_xcuitest_injects_preconditions_before_launch has 73 lines > 60"
+      ],
+      "path": "tests/test_journey_v2_compiler.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "_write_journey has 64 lines > 60"
+      ],
+      "path": "tests/test_journeys.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "_check_sections has 63 lines > 60",
+        "validate_behavioral has 72 lines > 60"
+      ],
+      "path": "validator/behavioral_grammar.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "_display_review_findings has 76 lines > 60",
+        "validate has 712 lines > 60"
+      ],
+      "path": "validator/cli.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "_run_coverage has 90 lines > 60"
+      ],
+      "path": "validator/cli_commands/coverage_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "_run_drivers has 64 lines > 60"
+      ],
+      "path": "validator/cli_commands/drivers_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "apply_command has 99 lines > 60"
+      ],
+      "path": "validator/cli_commands/finalize_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "status_command has 118 lines > 60"
+      ],
+      "path": "validator/cli_commands/penflow_contract_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "_run_test has 124 lines > 60",
+        "test_command has 107 lines > 60"
+      ],
+      "path": "validator/cli_commands/test_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 7,
+      "messages": [
+        "_converge_loop has 80 lines > 60",
+        "_discover_screens_in_feature has 81 lines > 60",
+        "check_command has 103 lines > 60",
+        "converge_command has 170 lines > 60",
+        "dispatch_command has 61 lines > 60",
+        "inspect_command has 79 lines > 60",
+        "scaffold_command has 99 lines > 60"
+      ],
+      "path": "validator/cli_commands/ui_runner_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 4,
+      "messages": [
+        "certify_command has 69 lines > 60",
+        "cleanup_command has 86 lines > 60",
+        "promote_command has 62 lines > 60",
+        "validate_command has 63 lines > 60"
+      ],
+      "path": "validator/cli_commands/visual_gate_cmd.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "_parse_features has 69 lines > 60"
+      ],
+      "path": "validator/coherence/graph_builder.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "_report_console has 68 lines > 60"
+      ],
+      "path": "validator/coherence/report.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "run_semantic_conventions has 61 lines > 60"
+      ],
+      "path": "validator/conventions_engine_c.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "compare_contract_files has 67 lines > 60"
+      ],
+      "path": "validator/design_alignment/core.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "parse_go_dependencies has 64 lines > 60"
+      ],
+      "path": "validator/drivers/go_detector.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "run_mutation has 62 lines > 60"
+      ],
+      "path": "validator/drivers/mutation_report.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "compute_patch_coverage has 66 lines > 60"
+      ],
+      "path": "validator/drivers/patch_coverage.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "parse_cargo_mutants_json has 72 lines > 60"
+      ],
+      "path": "validator/drivers/rust_detector.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "test_config_command has 84 lines > 60"
+      ],
+      "path": "validator/drivers/test_config_cli.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "validate_file has 62 lines > 60"
+      ],
+      "path": "validator/engine.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "apply_finalization has 137 lines > 60",
+        "verify_finalization has 68 lines > 60"
+      ],
+      "path": "validator/finalize.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "_rebuild_readme_skeleton has 61 lines > 60"
+      ],
+      "path": "validator/finalize_readme.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "verify_finalize_receipt has 79 lines > 60"
+      ],
+      "path": "validator/finalize_receipt.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "fix_file has 153 lines > 60"
+      ],
+      "path": "validator/fixer.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "git_status has 61 lines > 60"
+      ],
+      "path": "validator/git_ops.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "render_documents has 159 lines > 60"
+      ],
+      "path": "validator/init_documents.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "detect_profile has 81 lines > 60"
+      ],
+      "path": "validator/init_profile.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "_validate_frontmatter has 77 lines > 60",
+        "discover_integrations has 70 lines > 60"
+      ],
+      "path": "validator/integrations.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "compile_journeys has 97 lines > 60"
+      ],
+      "path": "validator/journeys/compiler.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "resolve_bootstrap has 68 lines > 60"
+      ],
+      "path": "validator/journeys/fixtures.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "_list_simulators has 66 lines > 60",
+        "run_journeys has 90 lines > 60"
+      ],
+      "path": "validator/journeys/runner.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "scan_journeys has 64 lines > 60"
+      ],
+      "path": "validator/journeys/scanner.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "acquire_lock has 64 lines > 60"
+      ],
+      "path": "validator/locks.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "apply_validation_gate has 74 lines > 60",
+        "run_mockup_derived has 62 lines > 60"
+      ],
+      "path": "validator/native_behavioral.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 3,
+      "messages": [
+        "_run_cascade_review has 70 lines > 60",
+        "run_plan_review has 100 lines > 60",
+        "run_spec_review has 65 lines > 60"
+      ],
+      "path": "validator/orchestrator.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "get_penflow_contract_status has 135 lines > 60"
+      ],
+      "path": "validator/penflow_contract.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "project_requirements has 83 lines > 60"
+      ],
+      "path": "validator/penflow_requirement_projection.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "approve_review_result has 79 lines > 60",
+        "validate_approval_history has 102 lines > 60"
+      ],
+      "path": "validator/penflow_review_approval.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "create_review_snapshot has 65 lines > 60",
+        "validate_snapshot_inputs has 67 lines > 60"
+      ],
+      "path": "validator/penflow_review_snapshot.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "verify_penflow_report has 65 lines > 60"
+      ],
+      "path": "validator/penflow_verification.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "_conventions_command_items has 61 lines > 60",
+        "fix_item has 82 lines > 60"
+      ],
+      "path": "validator/preflight_autofix.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 4,
+      "messages": [
+        "_iter_manifest_violations has 117 lines > 60",
+        "check_link has 68 lines > 60",
+        "find_runtime_misplaced_under_design_screens has 70 lines > 60",
+        "validate_manifest has 90 lines > 60"
+      ],
+      "path": "validator/registry_links.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "get_comparison_pairs has 65 lines > 60"
+      ],
+      "path": "validator/semantic/contradictions.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "run_mutation_suite has 83 lines > 60"
+      ],
+      "path": "validator/semantic/mutations.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "_validate_value_shapes has 87 lines > 60",
+        "migrate_state_file has 75 lines > 60"
+      ],
+      "path": "validator/state_files.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 3,
+      "messages": [
+        "_parse_traits has 128 lines > 60",
+        "deduplicate_tests has 96 lines > 60",
+        "load_taxonomy has 73 lines > 60"
+      ],
+      "path": "validator/taxonomy.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "_evaluate_receipt_verdict has 63 lines > 60"
+      ],
+      "path": "validator/verify_output.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 3,
+      "messages": [
+        "_read_png_rgba has 66 lines > 60",
+        "compare_visual_images has 71 lines > 60",
+        "verify_visual_receipt has 74 lines > 60"
+      ],
+      "path": "validator/visual_evidence.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 5,
+      "messages": [
+        "_detect_plain_copies has 79 lines > 60",
+        "_legacy_manifest_mockup_checks has 70 lines > 60",
+        "certify_visual_evidence has 128 lines > 60",
+        "detect_visual_feature has 61 lines > 60",
+        "validate_gate has 151 lines > 60"
+      ],
+      "path": "validator/visual_gate.py",
+      "rule_id": "builtin.max_function_lines",
+      "rule_ids": []
+    },
+    {
+      "count": 4,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/integration/test_generate_surfaces_xcode.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "tests/integration/test_visual_dispatch_playwright.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_cli_unified.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_drivers_test_config.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_finalize.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_journey_v2_fixtures_contract.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 4,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_locks.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_maestro_manifest.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 9,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_mutation_report.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_native_behavioral_specs.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 7,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "tests/test_phase_4_5_dispatcher.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 12,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_plan_review.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 3,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "tests/test_preflight_messages.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 4,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_specify_integration.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 4,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_taxonomy_detection.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "tests/test_ui_runner_protocol.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 3,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_visual_states.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 8,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "tests/test_xcuitest_scheme_detection.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 5,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/behavioral_grammar.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 6,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/cli.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/cli_commands/conventions_scaffold.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/cli_commands/coverage_cmd.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/cli_commands/mutation_cmd.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/cli_commands/ui_runner_cmd.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 4,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/commit_context.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/contracts.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/conventions_engine_c.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/conventions_lang/python_adapter.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/conventions_rules.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/drivers/loader.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 5,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/drivers/stryker_parser.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/drivers/test_config_cli.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 3,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/drivers/typescript_detector.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/exceptions.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/expectations.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/goal_tasks.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/journeys/_fixtures_helpers.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/journeys/compiler.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/journeys/fixtures.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/journeys/impact.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/journeys/migration.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/journeys/runner.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/journeys/validator.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 4,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/native_behavioral.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/preview.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/registry_links.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/runner_dispatcher_impl.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/runner_maestro_impl.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/runner_web_impl.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/runner_xcuitest_impl.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 2,
+      "messages": [
+        "suppression directive `# noqa` exceeds budget 0",
+        "suppression directive `# noqa` exceeds budget 0"
+      ],
+      "path": "validator/sdk_test_runner.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 11,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/state_files.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/taxonomy.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 3,
+      "messages": [
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0",
+        "suppression directive `# type: ignore` exceeds budget 0"
+      ],
+      "path": "validator/visual_gate.py",
+      "rule_id": "builtin.suppression_directives",
+      "rule_ids": []
+    },
+    {
+      "count": 1,
+      "messages": [
+        "padding uses 10, outside token scale"
+      ],
+      "path": "tests/test_conventions_verify.py",
+      "rule_id": "builtin.token_scale",
+      "rule_ids": []
+    }
+  ],
+  "schema_version": 1,
+  "scope": "repo",
+  "summary": {
+    "entries": 152,
+    "violations": 282
+  }
+}

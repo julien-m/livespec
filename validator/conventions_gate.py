@@ -34,10 +34,10 @@ from .conventions_gate_types import (
     SourceKind,
 )
 from .conventions_gates import (
-    DEFAULT_SOURCE_EXCLUSIONS,
     ConventionsGatesAny,
     ConventionsGatesV2,
     GateCommand,
+    effective_source_exclusions,
     gates_path,
     load_conventions_gates,
 )
@@ -248,8 +248,10 @@ def _is_in_scope(rel: str, feature_scope: FeatureScope | None) -> bool:
     return feature_scope is None or rel in feature_scope.paths
 
 
+# @spec FR-001: Fixture root excluded at every scope
+#   .specs/features/082-conventions-gate-signal/spec.md#fr-001
 def _effective_exclusions(gates: ConventionsGatesAny) -> tuple[str, ...]:
-    return (*DEFAULT_SOURCE_EXCLUSIONS, *gates.exclusions)
+    return effective_source_exclusions(gates)
 
 
 def _is_excluded_path(path: Path | str, exclusions: tuple[str, ...]) -> bool:

@@ -98,8 +98,9 @@ def test_real_project_ars_violations_are_blocking_errors(tmp_path: Path, invento
     result = verify_conventions(project)
 
     assert result.verdict is GateVerdict.FAIL
+    # Feature 082 groups shared family matches: the rule is one of the grouped `rule_ids`.
     assert any(
-        violation.rule_id == rule.runtime_rule_id
+        rule.runtime_rule_id in violation.rule_ids
         and violation.path == source.relative_to(project).as_posix()
         and violation.severity is GateSeverity.ERROR
         for violation in result.violations

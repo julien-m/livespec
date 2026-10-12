@@ -43,6 +43,9 @@ DEFAULT_SOURCE_EXCLUSIONS = (
     "**/Generated/**",
     "**/node_modules/**",
 )
+# @spec FR-001: Declared detector fixtures are never sources
+#   .specs/features/082-conventions-gate-signal/spec.md#fr-001
+DETECTOR_FIXTURE_EXCLUSIONS = ("tests/fixtures/conventions_ast/**",)
 
 
 class GatesBaseModel(BaseModel):
@@ -184,6 +187,11 @@ class ConventionsGatesV2(GatesBaseModel):
 
 
 ConventionsGatesAny: TypeAlias = ConventionsGates | ConventionsGatesV2
+
+
+def effective_source_exclusions(gates: ConventionsGatesAny) -> tuple[str, ...]:
+    """Return built-in, detector-fixture and project exclusions used for source collection."""
+    return (*DEFAULT_SOURCE_EXCLUSIONS, *DETECTOR_FIXTURE_EXCLUSIONS, *gates.exclusions)
 
 
 # @spec FR-003: Compatible gate loading

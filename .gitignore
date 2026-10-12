@@ -196,6 +196,11 @@ AUDIT-CODEX.md
 
 # Conventions debt JSON is regenerable; keep the Markdown report versioned.
 .specs/conventions/debt.json
+# Runtime evidence written by commands; already-tracked historical receipts stay versioned.
+.specs/conventions/runs/
+.specs/features/*/run/*/finalize/
+# Disposable native review caches (system/review-protocol.md).
+.specs/features/*/.reviews/
 
 # LiveSpec local run artifacts (feature 039)
 .specs/.runs/

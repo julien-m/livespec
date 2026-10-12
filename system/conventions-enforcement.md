@@ -64,22 +64,22 @@ projects and new v2-gates projects. The manifest is built from
 | False-positive waiver | Edit `.specs/conventions-rulebook.yaml` waiver entry | Include rule id, reason, expiry, and path scope when possible. |
 | Linter config missing | `livespec conventions scaffold --apply` | Writes supported linter templates without overwriting existing configs unless sync is requested. |
 | Add a language | Extend gates commands and coverage | Add command adapter coverage before making the language blocking. |
-| Deblock dirty project | `livespec conventions verify --report` then `/spec-fix --conventions` | Burn down worst-first; pre-existing debt is not an exemption for new pipeline completion. |
+| Deblock dirty project | `livespec conventions verify --report` then `/spec-fix --conventions`; record accepted debt with `livespec conventions verify --feature repo --write-baseline` | Burn down worst-first. The versioned `.specs/conventions/baseline.json` keeps existing debt visible (`baselined_violations`) while any new repo-scope violation still fails. |
 
 ## Anti-Bypass Locks
 
 | # | Lock | Enforcement |
 |---|---|---|
-| 1 | Repo-scope receipt | `livespec conventions verify` must PASS for implement/test/fix success. |
+| 1 | Repo-scope receipt | `livespec conventions verify --feature repo` must PASS for implement/test/fix success: no new error versus the versioned baseline (feature 082). |
 | 2 | Receipt artifacts | Run artifacts store conventions receipt paths for verification. |
 | 3 | Verify-output rule | Expectations require `receipt_verdict` when conventions gates exist. |
 | 4 | Goal contracts | `conventions_receipt_path` is required for implementation commands. |
-| 5 | Supervisor diff guard | Protected convention files cannot change inside a worker pipeline. |
+| 5 | Supervisor diff guard | Protected convention files, including `.specs/conventions/baseline.json`, cannot change inside a worker pipeline. |
 | 6 | Base hash guard | Supervisor compares base gates/rulebook hashes before accepting output. |
 | 7 | Fresh supervisor run | Supervisor reruns conventions verify instead of trusting worker declarations. |
 | 8 | R7 coherence | Coherence rules detect stale gates/rulebook sources and hash drift. |
 | 9 | Waiver expiry | Semantic waivers are explicit, scoped, and temporary. |
-| 10 | No pre-existing exemption | Existing debt still blocks new OK phase results until burned down. |
+| 10 | Ratchet, not exemption | Existing debt is reported separately and can only be recorded by an explicit, reviewed `--write-baseline`; receipts bind the baseline hash; new violations always block. |
 
 ## CLI Reference
 
@@ -89,7 +89,8 @@ projects and new v2-gates projects. The manifest is built from
 | `livespec conventions compile --force` | Compile the semantic rulebook from `.conventions/` sources. |
 | `livespec conventions scaffold --apply` | Write supported linter config templates from gates limits. |
 | `livespec conventions verify --report` | Run conventions gates and write debt/report artifacts. |
-| `livespec conventions verify --json --feature <slug> [--run-id <id>]` | Run conventions gates, emit `source_manifest`, and write a project-local receipt under `.specs/conventions/runs/`. Use `--feature repo` for repo-scope goal proof. |
+| `livespec conventions verify --json --feature <slug> [--run-id <id>]` | Run conventions gates, emit `source_manifest`, and write a project-local receipt under `.specs/conventions/runs/`. Use `--feature repo` for repo-scope goal proof; repo scope compares against `.specs/conventions/baseline.json` when present (an invalid file is BLOCKED `baseline_invalid`). Feature scope never uses the baseline. |
+| `livespec conventions verify --feature repo --write-baseline` | Record current repo-scope errors as the baseline (deterministic, no timestamp), report recorded/added/removed, then evaluate; refused when verification is BLOCKED or with a feature slug. |
 | `livespec conventions supervisor-gate --base-ref <ref> --head-ref <ref>` | Run supervisor-only diff/hash/freshness locks. |
 | `/spec-fix --conventions` | Burn down conventions debt worst-first and require no new violations. |
 
@@ -98,6 +99,13 @@ projects and new v2-gates projects. The manifest is built from
 Before any `PHASE_RESULT: OK` for implement, test, or fix, the repo-scope
 conventions receipt must be `PASS`. Commands that need repo-scope proof call
 `livespec conventions verify --json --feature repo`; `verify --json` without
-`--feature` remains a compatibility path and does not emit a receipt.
-Pre-existing debt never justifies skipping the receipt or downgrading a failed
-conventions gate.
+`--feature` remains a compatibility path and does not emit a receipt. At repo
+scope, `PASS` means no new error versus the versioned baseline; recorded debt
+stays listed under `baselined_violations`. Pre-existing debt never justifies
+skipping the receipt, editing the baseline inside a pipeline or downgrading a
+failed conventions gate.
+
+Detector fixtures under `tests/fixtures/conventions_ast/` are not scanned;
+shared ARS family matches yield one violation carrying `rule_ids`; framework
+rules (Next.js, React, Remotion, Tailwind, ...) apply only to files showing that
+framework's evidence (feature 082).
