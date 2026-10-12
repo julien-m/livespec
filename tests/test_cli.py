@@ -32,6 +32,21 @@ class TestMutualExclusion:
         assert "mutually exclusive" in result.output.lower()
 
 
+class TestMissingTarget:
+    """An explicit path that does not exist must fail, never validate as an empty set."""
+
+    def test_missing_feature_directory_exits_2(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        (tmp_path / ".specs" / "features").mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["validate", ".specs/features/999-never-created"])
+
+        assert result.exit_code == 2
+        assert "path not found" in result.output
+
+
 class TestSmartFlag:
     """--smart (Pass 2) is not implemented and must refuse explicitly."""
 

@@ -886,6 +886,10 @@ def validate(
 
     # Resolve paths
     target = Path(path) if path else None
+    if target is not None and not target.exists():
+        # A missing explicit target must never validate as an empty, passing set.
+        typer.echo(f"Error: path not found: {target}", err=True)
+        raise typer.Exit(2)
     specs_root = _require_specs_root(target)
     config = load_config(specs_root)
 

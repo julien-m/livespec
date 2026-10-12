@@ -1,5 +1,14 @@
 # Changelog - 081-lightweight-outcome-goals
 
+## 2026-10-12 — [Bugfix]: A missing feature target can no longer satisfy the stop condition
+
+- **Type:** Bugfix (PR #36 review)
+- **Spec modified:** No
+- **Code modified:** `validator/cli.py` (`validate <path>` exits 2 when the explicit path does not exist), `tests/_goal_contracts_04.py`, `tests/test_goal_contracts.py`, `tests/test_cli.py`
+- **Cause:** `livespec validate .specs/features/<slug>` collected no file for a nonexistent path and exited 0, so an unrelated in-project artifact could certify `outcome.verified` for a feature that was never created.
+- **Proof:** new tests fail without the fix and pass with it (missing-target CLI exit 2; outcome proof rejected for a missing feature); the passing-outcome test now creates its feature directory.
+- **Author:** spec-fix (claude-code)
+
 ## 2026-10-12 — [Refactor]: Conventions limits after integration on main
 
 - **Type:** Refactor

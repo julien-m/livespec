@@ -92,9 +92,13 @@ def owned_links(project: Path) -> list[OwnedLink]:
     """
     links: list[OwnedLink] = []
     trusted_root = recorded_root(project)
+    project_root = project.resolve()
     for name in LINK_DIRECTORIES:
         directory = project / ".agent-sync.local" / name
-        if not directory.is_dir():
+        # A symlinked or escaping link directory would expose entries outside the project.
+        if directory.is_symlink() or not directory.is_dir():
+            continue
+        if not directory.resolve().is_relative_to(project_root):
             continue
         for entry in sorted(directory.iterdir()):
             link = _classify(entry, trusted_root) if entry.is_symlink() else None

@@ -116,3 +116,12 @@
 - **Author:** spec-fix (claude-opus-5-5)
 
 <!-- finalize:spec-fix:2026-10-12:5728df60 -->
+
+## 2026-10-12 — [Bugfix]: Link discovery stays inside the project; unreadable path file is drift
+
+- **Type:** Bugfix (PR #36 review)
+- **Spec modified:** No
+- **Code modified:** `validator/runtime/links.py` (a symlinked or escaping `.agent-sync.local/{skills,rules}` is never followed), `validator/runtime/inspection.py` (unreadable or non-UTF-8 `.specs/.livespec-path` becomes `runtime_reference_broken`), `tests/test_runtime_project.py`, `tests/test_runtime_inspection.py`
+- **Cause:** `is_dir()`/`iterdir()` followed a symlinked link directory, so `runtime pin|upgrade|dev` could rewrite links outside the project; `read_text()` raised on invalid UTF-8 and hid the recovery diagnostics.
+- **Proof:** both regression tests fail without the fix and pass with it.
+- **Author:** spec-fix (claude-code)

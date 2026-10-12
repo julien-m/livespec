@@ -279,3 +279,13 @@ def test_pinned_lock_without_livespec_path_warns(
         item.code for item in run_doctor(project).findings if item.category == "runtime"
     }
     assert "runtime_reference_missing" in doctor_codes
+
+
+def test_unreadable_livespec_path_is_broken_reference(setup: Setup, tmp_path: Path) -> None:
+    """Invalid UTF-8 in .specs/.livespec-path is reported as drift, never a traceback."""
+    project = make_project(tmp_path / "consumer")
+    (project / ".specs/.livespec-path").write_bytes(b"\xff\xfe not utf-8\n")
+    findings = runtime_findings(project, setup.home, setup.home.snapshot(setup.pinned))
+    broken = [item for item in findings if item.code == "runtime_reference_broken"]
+    assert len(broken) == 1
+    assert ".specs/.livespec-path" in broken[0].message

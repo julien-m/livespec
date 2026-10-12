@@ -54,9 +54,13 @@ class StatusReport:
 def _references(project: Path) -> list[Reference]:
     references: list[Reference] = []
     path_file = project / LIVESPEC_PATH_RELPATH
-    text = path_file.read_text(encoding="utf-8").strip() if path_file.is_file() else ""
-    if text:
-        references.append((str(LIVESPEC_PATH_RELPATH), Path(text).expanduser().resolve()))
+    try:
+        text = path_file.read_text(encoding="utf-8").strip() if path_file.is_file() else ""
+        if text:
+            references.append((str(LIVESPEC_PATH_RELPATH), Path(text).expanduser().resolve()))
+    except (OSError, UnicodeError, ValueError, RuntimeError):
+        # Unreadable metadata is drift to report, not a crash that hides the diagnostics.
+        references.append((str(LIVESPEC_PATH_RELPATH), path_file.absolute() / "<unreadable>"))
     for link in owned_links(project):
         references.append((link.path.relative_to(project).as_posix(), link.root.resolve()))
     return references

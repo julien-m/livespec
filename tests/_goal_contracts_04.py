@@ -173,6 +173,7 @@ def test_goal_prove_outcome_accepts_passing_stop_condition(tmp_path: Path) -> No
     """081 AC-002: the goal runs the stop condition; an existing artifact covers a silent check."""
     project_root, livespec_root = _fixture_roots(tmp_path)
     _write_execution_task_skill(livespec_root)
+    (project_root / ".specs" / "features" / "001-demo").mkdir(parents=True)
     (project_root / "demo.txt").write_text("done\n", encoding="utf-8")
     goal = compile_command_goal(
         "spec-demo",
@@ -203,6 +204,33 @@ def test_goal_prove_outcome_accepts_passing_stop_condition(tmp_path: Path) -> No
     assert result["status"] == "ACCEPTED"
     assert result["observed"]["exit_code"] == 0
     assert result["state"]["tasks"]["outcome.verified"]["status"] == "complete"
+
+
+@pytest.mark.real_stop_condition
+def test_goal_prove_outcome_rejects_missing_feature_target(tmp_path: Path) -> None:
+    """A feature that was never created cannot be certified by an unrelated artifact."""
+    project_root, livespec_root = _fixture_roots(tmp_path)
+    _write_execution_task_skill(livespec_root)
+    (project_root / "demo.txt").write_text("stale\n", encoding="utf-8")
+    goal = compile_command_goal(
+        "spec-demo",
+        project_root=project_root,
+        livespec_root=livespec_root,
+        feature="001-demo",
+    )
+    contract = json.loads(render_goal_contract_file(goal))
+    state = json.loads(render_goal_state_file(goal))
+
+    result = prove_goal_task(
+        contract,
+        state,
+        "outcome.verified",
+        evidence={"artifact": "demo.txt"},
+        project_root=project_root,
+    )
+
+    assert result["status"] != "ACCEPTED"
+    assert result["state"]["tasks"]["outcome.verified"]["status"] != "complete"
 
 
 def test_conventions_gate_not_required_for_unlisted_command(tmp_path: Path) -> None:

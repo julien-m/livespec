@@ -348,3 +348,18 @@ def test_dev_from_pinned_moves_path_and_links_to_checkout(
     assert (project / ".specs/.livespec-path").read_text().strip() == str(runtimes.checkout)
     assert Path(os.readlink(skill)) == runtimes.checkout / ".agent-sync/skills/spec-check"
     assert Path(os.readlink(rule)) == runtimes.checkout / ".agent-sync/rules/livespec/commands.md"
+
+
+def test_symlinked_link_directory_is_never_followed(runtimes: Runtimes, tmp_path: Path) -> None:
+    """A symlinked .agent-sync.local/skills must not expose (or rewrite) external links."""
+    project = make_project(tmp_path / "consumer", 22)
+    write(project / ".specs/.livespec-path", f"{runtimes.checkout}\n")
+    outside = tmp_path / "outside-skills"
+    outside.mkdir()
+    external = outside / "spec-check"
+    os.symlink(str(runtimes.checkout / ".agent-sync/skills/spec-check"), external)
+    (project / ".agent-sync.local").mkdir(parents=True, exist_ok=True)
+    os.symlink(str(outside), project / ".agent-sync.local/skills")
+    assert links_module.owned_links(project) == []
+    pin_project(project, "current", runtimes.home)
+    assert Path(os.readlink(external)) == runtimes.checkout / ".agent-sync/skills/spec-check"

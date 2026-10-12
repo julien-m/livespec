@@ -7,6 +7,11 @@
 
 ---
 
+## 2026-10-12 — Bugfix: PR #36 review findings
+
+- [081](features/081-lightweight-outcome-goals/changelog.md): `livespec validate <path>` fails (exit 2) for a missing explicit target, so a never-created feature cannot satisfy its goal stop condition.
+- [083](features/083-pinned-runtime-isolation/changelog.md): runtime link discovery never follows a symlinked or escaping link directory; an unreadable `.specs/.livespec-path` is reported as a broken reference instead of crashing.
+
 ## 2026-10-12 — Bugfix: ReDoS in the Delphi family detector
 
 - [082](features/082-conventions-gate-signal/changelog.md): the Delphi empty-handler detector uses an unambiguous `\bexcept\s+end\s*;` instead of a pattern with exponential backtracking (CodeQL py/redos, high).
