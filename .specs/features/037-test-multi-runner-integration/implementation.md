@@ -14,7 +14,7 @@ updated: 2026-05-08
 | Requirement | Source file | Anchor | Status | Date |
 |---|---|---|---|---|
 | [FR-001: Phase 4.5 reads surfaces.yaml + iterates](spec.md#fr-001) | `validator/ui_runner_dispatcher.py` | `# @spec FR-001: Phase 4.5 reads surfaces.yaml + iterates — .specs/features/037-test-multi-runner-integration/spec.md#fr-001` | Implemented | 2026-05-08 |
-| [FR-002: Runner registry maps runner→handler](spec.md#fr-002) | `validator/ui_runner_dispatcher.py`, `validator/ui_runner_protocol.py` | `# @spec FR-002: Runner registry maps runner→handler — .specs/features/037-test-multi-runner-integration/spec.md#fr-002` | Implemented | 2026-05-08 |
+| [FR-002: Runner registry maps runner→handler](spec.md#fr-002) | `validator/ui_runner_dispatcher.py`, `validator/ui_runner_protocol.py`, `validator/runner_dispatcher_impl.py`, `validator/runner_web_impl.py`, `validator/runner_xcuitest_impl.py`, `validator/runner_maestro_impl.py` | `# @spec FR-002: Runner registry maps runner→handler — .specs/features/037-test-multi-runner-integration/spec.md#fr-002` (handlers satisfy `RunnerHandler` structurally, no cast; one shared `UICapabilityResult`) | Implemented | 2026-10-12 |
 | [FR-003: No Playwright artefacts for non-playwright runners](spec.md#fr-003) | `validator/ui_runner_dispatcher.py` (gate handlers per runner) | `# @spec FR-003 ...` | Implemented | 2026-05-08 |
 | [FR-004: enumerate Xcode test targets](spec.md#fr-004) | `scripts/lib/pbxproj.js`, `scripts/generate-surfaces.js` | `// @spec FR-004 ...` | Implemented | 2026-05-08 |
 | [FR-005: pbxproj fallback glob](spec.md#fr-005) | `scripts/lib/pbxproj.js` (`fallbackGlobTestDirs`) | `// @spec FR-005 ...` | Implemented | 2026-05-08 |
@@ -100,3 +100,9 @@ updated: 2026-05-08
 | AC-013 | `.specs/features/037-test-multi-runner-integration/implementation.md` @spec(AC-013) | ✅ Implemented |
 | AC-014 | `.specs/features/037-test-multi-runner-integration/implementation.md` @spec(AC-014) | ✅ Implemented |
 | AC-015 | `.specs/features/037-test-multi-runner-integration/implementation.md` @spec(AC-015) | ✅ Implemented |
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-12 | FR-002 | `tests/test_runner_registry_protocol.py::test_registry_run_flow_accepts_protocol_keywords[maestro]`, `tests/test_runner_registry_protocol.py::test_registry_run_flow_accepts_protocol_keywords[playwright]`, `tests/test_runner_registry_protocol.py::test_registry_run_flow_accepts_protocol_keywords[xcuitest]` | `.specs/.execution/1ca6a78d8c8549308b6739975ce0bedd/receipt.json` | `.specs/.execution/60a7a8bec5cb48b28c8ee4444024dcfb/receipt.json` |

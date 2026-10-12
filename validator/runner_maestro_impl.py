@@ -11,11 +11,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
+import yaml
+
+from validator.runner_web_impl import UICapabilityResult
 
 DEFAULT_COMPARE_THRESHOLD = 0.05
 FLOW_TIMEOUT_SECONDS = 300
@@ -39,16 +40,6 @@ _ADB_NO_DEVICES_ERROR = (
     "Check ANDROID_HOME and emulator path, or run avdmanager to list available AVDs."
 )
 _AVD_BOOT_TIMEOUT_ERROR = "Emulator failed to reach adb-ready state within {timeout}s."
-
-
-@dataclass
-class UICapabilityResult:
-    """Describe the outcome of one UI runner capability invocation."""
-
-    success: bool
-    output_path: Path | None = None
-    error: str | None = None
-    metadata: dict[str, Any] = field(default_factory=lambda: cast(dict[str, Any], {}))
 
 
 def maestro_runner_manifest_path() -> Path:
@@ -176,10 +167,16 @@ class MaestroRunnerHandler:
         platform: str = "android",
         fail_fast: bool = False,
         timeout: int = FLOW_TIMEOUT_SECONDS,
+        **kwargs: Any,
     ) -> UICapabilityResult:
-        """Run all Maestro flows in .specs/maestro/ and report results."""
+        """Run all Maestro flows in .specs/maestro/ and report results.
+
+        Other protocol keywords (screen, output_path, feature_slug, run_id) are accepted
+        and ignored: every flow under .specs/maestro/ runs.
+        """
         from validator.android_runner_core import run_flow
 
+        del kwargs
         return run_flow(self, avd_name, platform, fail_fast, timeout)
 
     def capture_screenshot(
@@ -193,9 +190,15 @@ class MaestroRunnerHandler:
         output_path: Path | None = None,
         feature_slug: str | None = None,
         run_id: str | None = None,
+        **kwargs: Any,
     ) -> UICapabilityResult:
-        """Run flows, extract tagged screenshots, and fall back to adb screencap."""
+        """Run flows, extract tagged screenshots, and fall back to adb screencap.
+
+        Unknown runner keywords from surfaces.yaml are accepted and ignored (protocol).
+        """
         from validator.android_runner_core import capture_screenshot
+
+        del kwargs
 
         return capture_screenshot(
             self, screen, avd_name, platform, fail_fast, timeout, output_path, feature_slug, run_id
@@ -203,14 +206,14 @@ class MaestroRunnerHandler:
 
     def compare_baseline(
         self,
-        baseline: str,
-        screenshot: str,
+        baseline: Path | str,
+        screenshot: Path | str,
         threshold: float = DEFAULT_COMPARE_THRESHOLD,
     ) -> UICapabilityResult:
         """Compare a screenshot against a baseline image using pixelmatch."""
         from validator.android_capture_core import compare_baseline
 
-        return compare_baseline(self.project_dir, baseline, screenshot, threshold)
+        return compare_baseline(self.project_dir, str(baseline), str(screenshot), threshold)
 
 
 def load_maestro_runner_manifest() -> dict[str, Any]:

@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
+import yaml
 
 from validator.ui_runner_protocol import RunnerHandler
 
@@ -104,12 +104,15 @@ def _resolve_registry() -> dict[str, type[RunnerHandler]]:
     from validator.ui_runner_web import WebRunnerHandler
     from validator.ui_runner_xcuitest import XCUITestRunnerHandler
 
-    return {
-        "playwright": cast(type[RunnerHandler], WebRunnerHandler),
-        "xcuitest": cast(type[RunnerHandler], XCUITestRunnerHandler),
-        "maestro": cast(type[RunnerHandler], MaestroRunnerHandler),
-        "tauri": cast(type[RunnerHandler], TauriRunnerHandler),
+    # @spec FR-002: every handler satisfies RunnerHandler structurally (no cast)
+    #   — .specs/features/037-test-multi-runner-integration/spec.md#fr-002
+    registry: dict[str, type[RunnerHandler]] = {
+        "playwright": WebRunnerHandler,
+        "xcuitest": XCUITestRunnerHandler,
+        "maestro": MaestroRunnerHandler,
+        "tauri": TauriRunnerHandler,
     }
+    return registry
 
 
 def _stable_sort_key(surface: Surface) -> tuple[str, int]:

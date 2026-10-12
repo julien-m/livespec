@@ -67,3 +67,16 @@
 - **AC impacted:** None (AC-001..AC-003 routing via the production registry kept)
 - **Author:** Claude Code (test-suite cleanup, lot 1)
 - One parametrized test keeps the only behavior the fake-handler unit tests cannot see: the default registry routes each runner to its real handler class. BLOCKED, legacy fallback and no-artifact cases were duplicates of tests/test_phase_4_5_dispatcher.py.
+
+## 2026-10-12 — [Bugfix]: runner handlers accept RunnerHandler protocol keywords and Path baselines; registry cast removed; one shared UICapabilityResult
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_runner_registry_protocol.py, validator/runner_dispatcher_impl.py, validator/runner_maestro_impl.py, validator/runner_web_impl.py, validator/runner_xcuitest_impl.py
+- **AC impacted:** FR-002
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_runner_registry_protocol.py::test_registry_run_flow_accepts_protocol_keywords[maestro], tests/test_runner_registry_protocol.py::test_registry_run_flow_accepts_protocol_keywords[playwright], tests/test_runner_registry_protocol.py::test_registry_run_flow_accepts_protocol_keywords[xcuitest]
+- **RED receipt:** `.specs/.execution/1ca6a78d8c8549308b6739975ce0bedd/receipt.json`
+- **GREEN receipt:** `.specs/.execution/60a7a8bec5cb48b28c8ee4444024dcfb/receipt.json`
+<!-- bugfix:60a7a8bec5cb48b28c8ee4444024dcfb -->
