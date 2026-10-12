@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-12 — Bugfix: CI uses the locked toolchain
+
+- [079](features/079-validator-ci-prerequisites/changelog.md): both CI jobs install the exact `uv.lock` versions instead of the newest ruff/mypy, so CI and local runs agree; the mypy 2.4 return-type finding in `validator/init_profile.py` is fixed.
+
 ## 2026-10-12 — Bugfix: CI Ruff scope excludes external checkouts
 
 - [079](features/079-validator-ci-prerequisites/changelog.md): `.ci-deps` (pinned ai-ressources and penflow checkouts) is excluded from Ruff, which failed CI on a Markdown code block in the external corpus.

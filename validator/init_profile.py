@@ -155,9 +155,8 @@ def _package_facts(
     if (root / "tsconfig.json").exists() and "typescript" not in dependencies:
         _read_mapping(root, "tsconfig.json")
         facts.append(Fact("TypeScript", UNKNOWN, "tsconfig.json"))
-    tests = sorted(
-        key for key in ("vitest", "@playwright/test", "playwright", "jest") if key in dependencies
-    )
+    test_markers: tuple[str, ...] = ("vitest", "@playwright/test", "playwright", "jest")
+    tests = sorted(key for key in test_markers if key in dependencies)
     scripts = _mapping(package.get("scripts", {}), "package.json scripts")
     # Declared scripts are documentation only; initialization never runs package scripts.
     commands = [

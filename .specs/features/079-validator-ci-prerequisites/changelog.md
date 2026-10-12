@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-12 — [Bugfix]: CI installs the locked toolchain
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `.github/workflows/ci.yml` (both jobs install `uv export --frozen` of the `dev` + `integration` extras, then the project without dependencies), `validator/init_profile.py` (explicit `tuple[str, ...]` for the JavaScript test markers)
+- **Cause:** CI ran `uv pip install -e ".[dev]"`, which ignores `uv.lock` and always takes the newest ruff/mypy. mypy 2.4 reported a return-type error in `_package_facts` that the locked mypy did not, and a newer ruff started formatting Markdown code blocks. Local and CI results diverged without any code change.
+- **Proof:** local venv synced to the lock (mypy 2.3.1, ruff 0.16.6) and mypy 2.4.0: no issues in 705 files; `ruff format --check .` and `ruff check .` pass; unit suite 3834 passed in the real environment.
+- **Author:** spec-fix (claude-code)
+
 ## 2026-10-12 — [Bugfix]: Keep CI-checked-out dependencies out of Ruff scope
 
 - **Type:** Bugfix

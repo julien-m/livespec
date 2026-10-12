@@ -25,7 +25,12 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: 'false'
-      - run: uv pip install --system -e ".[dev,integration]"
+      - name: Install locked toolchain and dependencies
+        # Install the exact versions from uv.lock so ruff/mypy/pytest match local runs.
+        run: |
+          uv export --frozen --no-hashes --no-emit-project --extra dev --extra integration -o "$RUNNER_TEMP/requirements.txt"
+          uv pip install --system -r "$RUNNER_TEMP/requirements.txt"
+          uv pip install --system --no-deps -e .
       - name: Require read-only Penflow capability
         env:
           PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
@@ -136,7 +141,12 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: 'false'
-      - run: uv pip install --system -e ".[dev]" pyyaml jsonschema anyio
+      - name: Install locked toolchain and dependencies
+        # Install the exact versions from uv.lock so ruff/mypy/pytest match local runs.
+        run: |
+          uv export --frozen --no-hashes --no-emit-project --extra dev --extra integration -o "$RUNNER_TEMP/requirements.txt"
+          uv pip install --system -r "$RUNNER_TEMP/requirements.txt"
+          uv pip install --system --no-deps -e .
       - name: Require read-only Penflow capability
         env:
           PENFLOW_KEY: ${{ secrets.PENFLOW_READONLY_DEPLOY_KEY }}
