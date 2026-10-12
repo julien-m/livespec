@@ -286,8 +286,6 @@ def test_template_variables_left_literal_at_discovery(tmp_path: Path) -> None:
 def test_example_template_parses(tmp_path: Path) -> None:
     """The shipped examples/config/mockups.md.example must be a valid integration."""
     src = Path(__file__).parent.parent / "examples" / "config" / "mockups.md.example"
-    if not src.is_file():
-        pytest.skip("mockups.md.example not present yet (Phase F)")
     d = tmp_path / "cfg"
     d.mkdir()
     (d / "mockups.md").write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
