@@ -13,7 +13,7 @@
 
 - **Layer 1 — Structural validation** — Schema-based validation of all .specs/ file types (spec, plan, implementation, roadmap, changelog, stack, preflight, progress) · Scope: L
 - **Layer 2 — Coherence validation** — Cross-file rules R1-R6: roadmap↔features sync, status file integrity, spec anchors, README sync, stack↔preflight consistency, changelog refs · Scope: L
-- **Layer 4 — Semantic/LLM validation** — Scorecard, contradiction detection, plan review, embeddings · Scope: L
+- **Layer 4 — Semantic/LLM validation** — Scorecard, contradiction detection, plan review · Scope: L
 - **Auto-fixer Pass 1** — Mechanical auto-fix of structural violations (`--fix` flag) · Scope: M
 - **Pipeline state management** — Track feature pipeline phases (specify → plan → implement → test) in pipeline.md · Scope: M
 - **Git integration + commit context** — Staged-file validation, git ops subcommand, commit context bridge · Scope: M
