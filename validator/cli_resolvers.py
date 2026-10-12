@@ -14,6 +14,7 @@ import subprocess
 from pathlib import Path
 
 from .drivers.test_config import DEFAULT_THRESHOLD
+from .exceptions import FeatureResolutionError
 
 
 def detect_specs_root(start: Path | None = None) -> Path | None:
@@ -34,47 +35,81 @@ def detect_specs_root(start: Path | None = None) -> Path | None:
     return None
 
 
-_BRANCH_LOOKUP_ORDER: tuple[str, ...] = (
-    "origin/main",
-    "origin/master",
-    "develop",
-    "dev",
-    "main",
-    "master",
-)
+# @spec AC-004: origin/HEAD first, then local branches
+# — .specs/features/035-unified-cli-surface/spec.md#ac-004
+_LOCAL_BRANCH_ORDER: tuple[str, ...] = ("main", "master", "develop", "dev")
+_REMOTE_HEAD_REF = "refs/remotes/origin/HEAD"
+_REMOTE_PREFIX = "refs/remotes/"
+
+
+def _run_git(cwd: Path, *args: str) -> subprocess.CompletedProcess[str] | None:
+    """Run one read-only git query, returning ``None`` when git is unavailable."""
+    try:
+        return subprocess.run(
+            ["git", *args],
+            cwd=str(cwd),
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError:
+        return None
 
 
 def detect_base_branch(project_root: Path | None = None) -> str | None:
-    """Return the most plausible base branch to diff against.
+    """Return the base branch to diff against (AC-004).
 
-    The CLI tries the following references in order, returning the first one
-    that ``git rev-parse --verify`` accepts: ``origin/main``,
-    ``origin/master``, ``develop``, ``dev``, ``main``, ``master``.
+    The remote default branch wins: ``refs/remotes/origin/HEAD`` resolved to
+    ``origin/<branch>``. Without it, the first existing local branch among
+    ``main``, ``master``, ``develop`` and ``dev`` is returned. Tags never match.
 
     Args:
         project_root: Working directory used for the ``git`` invocation. Defaults
             to the current working directory.
 
     Returns:
-        The first existing ref (verbatim), or ``None`` when none of the
-        candidates resolve. ``None`` is also returned when ``git`` is not
-        available on ``PATH``.
+        ``origin/<branch>``, a local branch name, or ``None`` when no candidate
+        exists or ``git`` is not available on ``PATH``.
     """
     cwd = project_root or Path.cwd()
-    for ref in _BRANCH_LOOKUP_ORDER:
-        try:
-            result = subprocess.run(
-                ["git", "rev-parse", "--verify", "--quiet", ref],
-                cwd=str(cwd),
-                check=False,
-                capture_output=True,
-                text=True,
-            )
-        except FileNotFoundError:
-            return None
-        if result.returncode == 0:
-            return ref
+    remote_head = _run_git(cwd, "symbolic-ref", "--quiet", _REMOTE_HEAD_REF)
+    if remote_head is None:
+        return None
+    target = remote_head.stdout.strip()
+    if remote_head.returncode == 0 and target.startswith(_REMOTE_PREFIX):
+        return target.removeprefix(_REMOTE_PREFIX)
+    for branch in _LOCAL_BRANCH_ORDER:
+        verified = _run_git(cwd, "rev-parse", "--verify", "--quiet", f"refs/heads/{branch}")
+        if verified is not None and verified.returncode == 0:
+            return branch
     return None
+
+
+def resolve_feature_dir(project_root: Path, value: str) -> Path:
+    """Resolve a ``--feature`` value to exactly one feature directory (AC-002).
+
+    An exact directory name under ``.specs/features/`` wins. Otherwise the value
+    is a number matched as ``<value>-*``, so ``005`` never matches ``005.1-*``.
+
+    Args:
+        project_root: Project root containing ``.specs/features/``.
+        value: The number (``035``) or full directory name (``035-unified-cli-surface``).
+
+    Returns:
+        The single matching feature directory.
+
+    Raises:
+        FeatureResolutionError: When zero or several directories match.
+    """
+    # @spec AC-002: Unique feature directory
+    # — .specs/features/035-unified-cli-surface/spec.md#ac-002
+    features_dir = project_root / ".specs" / "features"
+    if value and "/" not in value and (features_dir / value).is_dir():
+        return features_dir / value
+    matches = sorted(p for p in features_dir.glob(f"{value}-*") if p.is_dir()) if value else []
+    if len(matches) != 1:
+        raise FeatureResolutionError(value, [p.name for p in matches])
+    return matches[0]
 
 
 _FEATURE_BRANCH_RE = re.compile(r"^feature/(\d{3}-[a-z0-9][a-z0-9-]*)$")
@@ -156,4 +191,5 @@ __all__ = [
     "detect_current_feature",
     "detect_specs_root",
     "read_threshold_from_conventions",
+    "resolve_feature_dir",
 ]

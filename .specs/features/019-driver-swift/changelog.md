@@ -1,3 +1,12 @@
+## 2026-10-12 — [Refactor]: Remove bash-on-PATH sanity test
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/unit/test_swift_coverage_gate.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** `test_bash_available_for_test_environment` asserted the host has bash and tested no product behavior. The gate-script tests still run the real script.
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update
@@ -30,3 +39,21 @@
 - **AC impacted:** AC-001 through AC-010 (all covered)
 - **Verification:** `pytest tests/` — 723 passed, 28 skipped. `pyright validator/drivers/` — 0 errors. `ruff check` — passes.
 - **Author:** spec.feature (auto)
+
+## 2026-10-12 — [Refactor]: Driver integration tests reduced to real behavior
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_driver_swift.py, implementation.md
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Kept registry discovery, Xcode-only non-match, capability set and shipped gate script (now derived from the manifest); removed YAML value pins and SwiftPM parsing duplicated by tests/unit/test_swift_detector.py.
+
+## 2026-10-12 — Refactor: retire unused Package.swift detector
+
+- **Type:** Refactor
+- **Spec modified:** Yes (FR-003, AC-005, AC-006, AC-010 marked Removed)
+- **Code modified:** validator/drivers/swift_detector.py (deleted), tests/unit/test_swift_detector.py (deleted), livespec/drivers/scripts/swift-coverage-gate.sh (FR-004 anchor)
+- **AC impacted:** AC-005, AC-006, AC-010 (removed); AC-004 unchanged (gate script)
+- **Author:** Claude Code (dead-code resolution)
+- `swift_detector` was imported only by its unit tests. Snapshots/properties are never executed by a production command, so the library gate had no consumer. FR-004 (Xcode fallback) stays implemented by `swift-coverage-gate.sh`; the duplicate Python helper was removed.

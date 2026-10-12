@@ -100,9 +100,14 @@ def _execution_receipt_result(
 
     if policy not in ("1", "2"):
         raise ValueError("unknown_evidence_policy_version")
-    if outcome == "red":
+    if outcome in ("red", "passed"):
+        # outcome:passed is a current GREEN observation without AC mapping (084 FR-011).
         result = verify_execution_observation(
-            selected, root, feature, "red", evidence_policy="1" if policy == "1" else "2"
+            selected,
+            root,
+            feature,
+            "red" if outcome == "red" else "passed",
+            evidence_policy="1" if policy == "1" else "2",
         )
     else:
         result = verify_execution_receipt(

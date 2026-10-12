@@ -8,6 +8,9 @@ description: LiveSpec command for creating, editing, bootstrapping, impacting, a
 <!-- @spec(FR-015) -->
 <!-- @spec(FR-016) -->
 <!-- @spec(FR-041) -->
+<!-- @spec(FR-037) -->
+<!-- @spec(FR-038) -->
+<!-- @spec(FR-039) -->
 
 
 # $spec-journey
@@ -24,6 +27,19 @@ Use when the user wants to create, edit, bootstrap, inspect, impact-check, compi
 - `$spec-journey impact`: run `livespec journey impact --changed-file <path> --json` and require explicit classification for blocking impacts.
 - `$spec-journey run`: run `livespec journey run`; compiled-only native execution, no recompilation.
 - `$spec-journey list` / `$spec-journey inspect <journey-id>`: inspect global journey coverage and feature backlinks.
+- `$spec-journey visual`: after `journey run`, evaluate every compiled LLM visual contract yourself (see below), then run `livespec journey visual-verify [--journey <id>] --json`; it exits 1 while any receipt is missing, invalid, stale, disabled or a blocking check failed.
+
+## LLM visual contracts
+
+`livespec journey compile` writes one contract per `llm` / `native_then_llm` check to `.specs/journeys/<id>/compiled/visual-contracts/<check>.json`. You are the evaluator; the CLI never calls a model.
+
+1. Run `livespec journey visual-verify --json` to list contracts and their expected `receipt_path`.
+2. Skip evaluation when the contract has `privacy.llm_allowed: false`. When `privacy.local_only: true`, evaluate only with a local model and record `"locality": "local"`; otherwise do not evaluate and report BLOCKED.
+3. Use the screenshot produced by the native run for the contract target; if the run did not keep one, capture that screen with the project runner and save it inside the project (for example `.specs/journeys/<id>/runs/visual/<check>.png`). Ignore regions listed in `privacy.masking`.
+4. Examine only the screenshot against `instructions` and `assertion`; never navigate or operate the UI to decide.
+5. Write the receipt as strict JSON with exactly these keys: `schema_version` (1), `journey_id`, `check_id`, `contract_sha256` (SHA-256 of the contract file), `capture_path` (project-relative), `capture_sha256`, `verdict` (`pass`/`fail`), `confidence` (0–1), `criteria_passed`, `criteria_failed` (non-empty iff `fail`), `explanation` (≤ 500 chars), `bounding_boxes` (`x`, `y`, `width`, `height`, optional `label`; when possible), `evaluator` (`name`, `locality`), `evaluated_at` (ISO-8601).
+6. With `privacy.retention: none` delete the capture after writing the receipt; otherwise keep it so its hash can be re-verified.
+7. Re-run `livespec journey visual-verify`. A failed non-blocking check is advisory (`ADVISORY_FAIL`); a failed `blocking: true` check fails the command.
 
 ## Rules
 

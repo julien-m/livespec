@@ -104,7 +104,7 @@ Each feature lives in `.specs/features/NNN-feature-name/` where `NNN` is a zero-
 - **Feature Name** — short, descriptive
 - **Branch** — associated git branch
 - **Date** — creation date
-- **Status** — Draft | Review | Approved | Implemented | Deprecated
+- **Status** — Draft | Planned | In Progress | Approved | Implemented | Deprecated | Review
 - **Input** — original request or user problem
 
 **User Scenarios & Testing:**
@@ -269,6 +269,8 @@ LiveSpec supports **lifecycle hooks** — Markdown files with instructions injec
 
 ## Rules for AI Tools
 
+> **Read** [`system/tool-project-boundary.md`](../system/tool-project-boundary.md) before any consumer-project feature work: LiveSpec tool defects are reported with `livespec runtime defect` and never enter the project critical path (agents reading through symlinks: `system/tool-project-boundary.md` in the LiveSpec root recorded in `.specs/.livespec-path`).
+
 ### MANDATORY — Hooks Resolution Protocol
 
 **You MUST resolve hooks before and after EVERY `/spec-*` command execution.** This is not optional. Failure to resolve hooks means conventions are not loaded and the command runs without context.
@@ -332,6 +334,12 @@ Run /spec-migrate or livespec migrate before running this command.
 ```
 
 This check is **blocking** — the command exits non-zero and does not continue. `/spec-init`, `/spec-migrate`, help output, and internal `livespec goal` control-plane calls remain available so the user can recover and so `/spec-migrate` can render its Step 0 goal before applying migrations.
+
+### Runtime goals
+
+<!-- @spec FR-009: Outcome goals in the universal rules — .specs/features/081-lightweight-outcome-goals/spec.md#fr-009 -->
+
+Autonomous long runs (`/spec-ship`, `/spec-feature --auto`, `/spec-init --auto`, `/spec-implement` without `--step`, and `--auto` children) render an outcome goal: one executable stop condition verified by `livespec goal prove`, a few receipt-backed proofs, and the skill inventory as an indicative checklist. Interactive and short commands run without a goal. A missing native goal tool or an already active goal never blocks a command. **Read** [the runtime goal contract](../system/anti-drift-block.md#runtime-goal-contract) for the protocol.
 
 ### Command discovery
 
@@ -397,6 +405,12 @@ To prevent changelogs from growing unbounded:
 3. Compare spec vs actual code to identify the gap
 4. Fix the issue
 5. Update `changelog.md` with a Bugfix entry
+
+### Bugfix lane (`/spec-fix <feature> --bugfix`)
+
+<!-- @spec FR-012: Bugfix lane in the universal rules — .specs/features/084-bugfix-lane/spec.md#fr-012 -->
+
+A confined bug in an implemented feature can skip whole-feature readiness when `livespec bugfix gate` proves four conditions: owner feature identified (`spec.md` + `implementation.md`), no FR/AC/SC definition or Gherkin change in any `spec.md`, a regression test RED before and GREEN after (same test command, runner-owned receipts from `livespec bugfix capture`), and a diff within `max_files`/`max_lines` (defaults 8/300, `.specs/bugfix.yaml` read at the base revision). A cited requirement (`--requirement`) is checked alone; an uncited implementation bug needs no review; the feature-scope conventions gate still applies. Any failed condition prints `Bugfix gate: FALLBACK` with its reasons and the complete gate `livespec validate <feature-dir> --progression implement`. `livespec bugfix record` writes the Bugfix changelog entry and the `## Bugfix Receipts` row of `implementation.md`.
 
 ### When working with DESIGN mockups
 
@@ -639,7 +653,7 @@ Before a plan is considered complete:
 Before implementation is considered complete:
 - [ ] `progress.md` exists with a checkpoint row for **every** step (BLOCKING — enables `--resume`)
 - [ ] `implementation.md` is created and all FR/AC have status ✅
-- [ ] Before any `PHASE_RESULT: OK` for implement/test/fix: receipt from `livespec conventions verify` is PASS at repo scope; no pre-existing exemption is allowed.
+- [ ] Before any `PHASE_RESULT: OK` for implement/test/fix: receipt from `livespec conventions verify --feature repo` is PASS at repo scope, where only violations new versus the versioned baseline (`.specs/conventions/baseline.json`) fail; existing debt is reported separately under `baselined_violations` and never justifies skipping the receipt or editing the baseline inside a pipeline. Closing a feature requires PASS at feature scope (`--feature NNN-slug`, which never uses the baseline).
 - [ ] All tests pass
 - [ ] `changelog.md` has an entry
 - [ ] For visual features: Playwright baselines captured in `baselines/`

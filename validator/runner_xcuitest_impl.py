@@ -13,11 +13,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
 
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
+import yaml
+
+from validator.runner_web_impl import UICapabilityResult
 
 DEFAULT_COMPARE_THRESHOLD = 0.05
 SCREENSHOT_TIMEOUT_SECONDS = 1200
@@ -30,16 +31,6 @@ _XCODE_MISSING_ERROR = (
     "Xcode not installed. Install from App Store or https://developer.apple.com/xcode/"
 )
 _LICENSE_ERROR = "Xcode license not accepted. Run: sudo xcodebuild -license accept"
-
-
-@dataclass
-class UICapabilityResult:
-    """Describe the outcome of one UI runner capability invocation."""
-
-    success: bool
-    output_path: Path | None = None
-    error: str | None = None
-    metadata: dict[str, Any] = field(default_factory=lambda: cast(dict[str, Any], {}))
 
 
 def xcuitest_runner_manifest_path() -> Path:
@@ -85,14 +76,10 @@ class XCUITestRunnerHandler:
         return ""
 
     def detect(self) -> bool:
-        """Check whether the project is an Xcode/Swift project."""
-        if (self.project_dir / "Package.swift").exists():
-            return True
-        if not self.project_dir.exists():
-            return False
-        return any(
-            entry.suffix in {".xcodeproj", ".xcworkspace"} for entry in self.project_dir.iterdir()
-        )
+        """Check the project against the `detect:` markers declared in ios.yaml."""
+        from validator.ui_runner_manifest import manifest_detects
+
+        return manifest_detects(self.project_dir, load_xcuitest_runner_manifest()["detect"])
 
     def _list_simulators(self) -> dict[str, Any]:
         """Return parsed output of `xcrun simctl list devices --json`."""
@@ -190,9 +177,15 @@ class XCUITestRunnerHandler:
         output_path: Path | None = None,
         feature_slug: str | None = None,
         run_id: str | None = None,
+        **kwargs: Any,
     ) -> UICapabilityResult:
-        """Run xcodebuild test and extract screenshots from .xcresult bundle."""
+        """Run xcodebuild test and extract screenshots from .xcresult bundle.
+
+        Unknown runner keywords from surfaces.yaml are accepted and ignored (protocol).
+        """
         from validator.ios_runner_core import capture_screenshot
+
+        del kwargs
 
         args = (self, screen, destination, test_scheme, launch_arguments, project, workspace)
         return capture_screenshot(*args, platform, only_testing, output_path, feature_slug, run_id)
@@ -209,22 +202,28 @@ class XCUITestRunnerHandler:
         test_scheme: str | None = None,
         launch_arguments: list[str] | None = None,
         platform: str | None = None,
+        **kwargs: Any,
     ) -> UICapabilityResult:
-        """Run the full XCUITest suite and report pass/fail."""
+        """Run the full XCUITest suite and report pass/fail.
+
+        Other protocol keywords (screen, output_path, feature_slug, run_id) are accepted
+        and ignored: the suite run is not scoped to one screen.
+        """
         from validator.ios_runner_core import run_flow
 
+        del kwargs
         return run_flow(self, destination, test_scheme, launch_arguments, platform)
 
     def compare_baseline(
         self,
-        baseline: str,
-        screenshot: str,
+        baseline: Path | str,
+        screenshot: Path | str,
         threshold: float = DEFAULT_COMPARE_THRESHOLD,
     ) -> UICapabilityResult:
         """Compare a screenshot against a baseline image using pixelmatch."""
         from validator.ios_hash_core import compare_baseline
 
-        return compare_baseline(self.project_dir, baseline, screenshot, threshold)
+        return compare_baseline(self.project_dir, str(baseline), str(screenshot), threshold)
 
     def _find_xcodeproj(self) -> Path | None:
         """Return the first .xcodeproj or .xcworkspace under project_dir."""

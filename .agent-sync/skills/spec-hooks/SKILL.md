@@ -13,34 +13,7 @@ description: "Show, create, or edit lifecycle hooks for a command"
 argument-hint: "[command-name]"
 ---
 
-> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — runtime goal contract (§5), 6-field step shape (§1), ERROR/BLOCKED format (§2), finalization gate.
-
-## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
-
-La toute première action lors de `/spec-hooks` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
-
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule).
-2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat immuable et l'état mutable :
-   ```bash
-   livespec goal render spec-hooks --feature <feature-slug> --flags "<active-flags>" --save
-   ```
-   Si aucune feature fournie, omettre `--feature`. Si aucun flag actif, passer `--flags ""`.
-   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-hooks-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-hooks-<hash8>.state.json`
-4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
-5. Émettre la commande slash `/goal` avec hash et références machine :
-   ```
-   /goal hash:<hash> | spec-hooks for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-hooks-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-hooks-<hash8>.state.json — mode:enforced
-   ```
-6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
-   ```bash
-   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
-   ```
-   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
-7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
-
-Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2).
 
 # Command: /spec-hooks
 
@@ -363,11 +336,6 @@ Legacy aliases such as `/spec.check` are normalized to the matching `spec-check`
 > Format: `- [branch] task description`
 > Active branches per run:
 > `always` · `visual` (UI feature with ## Screens, no --no-visual) · `penflow` (visual + penflow/ dir exists) · `generate` (no --audit-only, no --no-generate) · `visual-generate` (visual + generate both active) · `execute` (no --audit-only)
-
-### Phase 0 — Goal Lock
-
-- [always] Lock goal contract via `livespec goal render spec-hooks --save` <!-- evidence:documentary -->
-- [always] Emit `/goal` slash command with contract/state file reference <!-- evidence:documentary -->
 
 ### Phase 1 — Resolve Command Name
 

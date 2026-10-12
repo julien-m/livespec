@@ -6,6 +6,8 @@ import os
 import subprocess
 from pathlib import Path
 
+from tests.test_init_recovery import conventions_corpus
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -63,6 +65,8 @@ def test_from_code_autonomous_bootstrap_script_completes_vite_react(
     env = os.environ.copy()
     env["PATH"] = f"{bin_dir}:{env['PATH']}"
     env["CC_HUB_LOG"] = str(log_path)
+    # Hermetic corpus: never a caller's AIRESOURCES nor a sibling ../ai-ressources checkout.
+    env["AIRESOURCES"] = str(conventions_corpus(tmp_path))
 
     result = subprocess.run(
         [

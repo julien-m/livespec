@@ -447,8 +447,11 @@ auto_resolve: pip install -e ".[dev]"
 ```
 """
     items = parse_preflight_manifest(text)
-    # YAML style is partially supported - at minimum we do not crash.
-    assert isinstance(items, list)
+    assert len(items) == 1
+    assert items[0].name == "Python 3.11+"
+    assert items[0].binary is None
+    assert items[0].installer == "pip"
+    assert items[0].verify_cmd == ("sh", "-c", "python --version")
 
 
 def test_render_guide_numbered_steps() -> None:

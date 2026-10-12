@@ -1,3 +1,12 @@
+## 2026-10-12 — [Refactor]: Replace private-helper coverage tests with a public serialization test
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_visual_gate.py, tests/_visual_gate_02.py, tests/_visual_gate_04.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** Removed the `_as_list`/`_as_mapping` tests and `_manifest_status_to_dict(None)`. `test_non_visual_report_serializes_without_manifest_status` now covers the same branch through `validate_gate(...).to_dict()`. The CI visual-gate coverage is unchanged at 94.41% (threshold 94%).
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update

@@ -1,12 +1,14 @@
 """Use the real Penflow subprocess for the C20 guard; no runtime certificate is implied."""
 
 import json
+import sys
 
 import pytest
 
 from tests.test_penflow_review_approval import ReviewProject
 from tests.test_penflow_review_approval import project as project
 from validator.penflow_approval_files import PenflowApprovalError
+from validator.penflow_cli import PENFLOW_CLI_ENV
 from validator.penflow_contract_validation import validate_review_contract
 
 
@@ -37,7 +39,11 @@ def test_real_c20_guard_rejects_unreviewable_contract(
 def test_absent_penflow_cannot_approve_contract(
     project: ReviewProject, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    # No override, no penflow beside the interpreter and an empty PATH: nothing to run.
+    monkeypatch.delenv(PENFLOW_CLI_ENV, raising=False)
+    monkeypatch.setattr(sys, "executable", str(project.root / "no-penflow-bin" / "python"))
     monkeypatch.setenv("PATH", "")
     with pytest.raises(PenflowApprovalError, match="review_contract_penflow_cli_required") as exc:
         validate_review_contract(project.root, project.contract)
-    assert str(exc.value) == "review_contract_penflow_cli_required"
+    assert str(exc.value).startswith("review_contract_penflow_cli_required: penflow not found")
+    assert PENFLOW_CLI_ENV in str(exc.value)

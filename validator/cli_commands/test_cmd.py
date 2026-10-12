@@ -18,24 +18,24 @@ from typing import Annotated
 
 import typer
 
-from ..cli_exit_codes import (
-    EXIT_CAPABILITY_UNSUPPORTED,
-    EXIT_COVERAGE_FAIL,
-    EXIT_OK,
-)
+from ..cli_exit_codes import EXIT_FAILURE, EXIT_OK
 from ..cli_resolvers import read_threshold_from_conventions
-from ..drivers.patch_coverage import parse_lcov
-from ..drivers.runner import run_capability
-from ..drivers.schemas import CapabilityNotImplementedError
 from ..journeys.paths import relative_to_project
 from ..journeys.runner import run_journeys
 from ._common import (
     emit_summary,
+    help_epilog,
     require_specs_root,
     resolve_primary_driver,
     run_with_debug,
 )
 from .journey_cmd import journey_category_counts
+from .test_selection import (
+    resolve_feature_or_exit,
+    run_coverage_step,
+    run_mutation_step,
+    selected_tests_or_exit,
+)
 
 
 def test_command(
@@ -43,8 +43,8 @@ def test_command(
         None,
         "--feature",
         help=(
-            "Feature slug (e.g. 035-unified-cli-surface). "
-            "Reserved for future smart-selection integration (feature 033)."
+            "Run only the tests mapped to one feature: its number (035) or full "
+            "directory name (035-unified-cli-surface)."
         ),
     ),
     mutation: bool = typer.Option(
@@ -143,13 +143,16 @@ def test_command(
         ),
         debug=debug,
         subcommand="test",
-        fail_exit_code=EXIT_COVERAGE_FAIL,
     )
 
 
 def register(app: typer.Typer) -> None:
     """Register the ``test`` subcommand."""
-    app.command(name="test", help="Run the active driver's coverage capability.")(test_command)
+    app.command(
+        name="test",
+        help="Run the active driver's coverage capability.",
+        epilog=help_epilog("livespec test --feature 035"),
+    )(test_command)
 
 
 def _run_test(
@@ -158,13 +161,21 @@ def _run_test(
     mutation: bool,
     no_coverage: bool,
 ) -> None:
-    """Execute the ``test`` subcommand body."""
+    """Execute the ``test`` subcommand body (driver mode)."""
     project_root = require_specs_root()
     driver = resolve_primary_driver(project_root)
 
     typer.echo(f"Driver: {driver.name}")
+    test_paths: list[str] | None = None
     if feature:
-        typer.echo(f"Feature scope: {feature} (informational)")
+        # @spec AC-002: Resolve one feature, then its mapped tests
+        # — .specs/features/035-unified-cli-surface/spec.md#ac-002
+        feature = resolve_feature_or_exit(project_root, feature)
+        typer.echo(f"Feature scope: {feature}")
+        if not no_coverage:
+            # Selection only feeds the coverage capability; --no-coverage skips it.
+            test_paths = selected_tests_or_exit(project_root, feature)
+            typer.echo(f"Selected tests: {len(test_paths)} file(s)")
 
     executable_journeys, manual_journeys, disabled_journeys = journey_category_counts(
         project_root,
@@ -190,80 +201,17 @@ def _run_test(
             journeys=len(journey_run.executed),
             journey_errors=journey_run.error_count,
         )
-        raise typer.Exit(EXIT_COVERAGE_FAIL)
+        raise typer.Exit(EXIT_FAILURE)
 
-    coverage_pct: float | None = None
     threshold_pct = read_threshold_from_conventions(project_root)
-
-    if not no_coverage:
-        try:
-            result = run_capability(driver, "coverage", project_root=project_root, feature=feature)
-        except CapabilityNotImplementedError:
-            typer.echo(f"Error: driver {driver.name!r} has no coverage capability.", err=True)
-            emit_summary("test", "FAIL", driver=driver.name, reason="no_coverage")
-            raise typer.Exit(EXIT_CAPABILITY_UNSUPPORTED) from None
-
-        if result.execution_receipt_path:
-            typer.echo(f"Execution receipt: {result.execution_receipt_path}")
-        for gap in result.certification_gaps:
-            typer.echo(f"Certification gap: {gap}")
-        if result.stdout:
-            typer.echo(result.stdout)
-        if result.stderr:
-            typer.echo(result.stderr, err=True)
-
-        if result.exit_code != 0:
-            emit_summary(
-                "test",
-                "FAIL",
-                driver=driver.name,
-                exit_code=result.exit_code,
-                threshold=threshold_pct,
-            )
-            raise typer.Exit(EXIT_COVERAGE_FAIL)
-
-        # Best-effort coverage percentage: parse lcov when the driver declares one.
-        if result.report_path:
-            lcov_path = Path(result.report_path)
-            if not lcov_path.is_absolute():
-                lcov_path = project_root / lcov_path
-            if lcov_path.exists():
-                coverage_pct = _percent_from_lcov(lcov_path)
-
-        coverage_str = f"{coverage_pct:.1f}%" if coverage_pct is not None else "not parsed"
-        verdict = "OK"
-        if coverage_pct is not None and coverage_pct < threshold_pct:
-            verdict = "FAIL"
-        typer.echo(f"Coverage: {coverage_str} (threshold {threshold_pct:.1f}%) · {verdict}")
-        if verdict == "FAIL":
-            emit_summary(
-                "test",
-                "FAIL",
-                driver=driver.name,
-                coverage=round(coverage_pct or 0.0, 2),
-                threshold=threshold_pct,
-            )
-            raise typer.Exit(EXIT_COVERAGE_FAIL)
+    coverage_pct = (
+        None
+        if no_coverage
+        else run_coverage_step(project_root, driver, feature, test_paths, threshold_pct)
+    )
 
     if mutation:
-        try:
-            mut = run_capability(driver, "mutation", project_root=project_root, feature=feature)
-        except CapabilityNotImplementedError:
-            typer.echo(
-                f"Note: driver {driver.name!r} does not implement mutation testing.",
-                err=True,
-            )
-            emit_summary(
-                "test",
-                "WARN",
-                driver=driver.name,
-                mutation="unsupported",
-            )
-            raise typer.Exit(EXIT_CAPABILITY_UNSUPPORTED) from None
-        if mut.stdout:
-            typer.echo(mut.stdout)
-        if mut.stderr:
-            typer.echo(mut.stderr, err=True)
+        run_mutation_step(project_root, driver, feature)
 
     emit_summary(
         "test",
@@ -276,28 +224,6 @@ def _run_test(
         manual=manual_journeys,
     )
     raise typer.Exit(EXIT_OK)
-
-
-def _percent_from_lcov(lcov_path: Path) -> float | None:
-    """Compute a global line-coverage percentage from an ``lcov.info`` file.
-
-    Args:
-        lcov_path: Path to the lcov report.
-
-    Returns:
-        Percentage (0-100) or ``None`` when the file has no ``DA:`` records.
-    """
-    data = parse_lcov(lcov_path)
-    total = 0
-    covered = 0
-    for line_map in data.values():
-        for hit in line_map.values():
-            total += 1
-            if hit:
-                covered += 1
-    if total == 0:
-        return None
-    return (covered / total) * 100.0
 
 
 __all__ = ["register"]

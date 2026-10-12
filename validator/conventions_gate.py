@@ -34,11 +34,12 @@ from .conventions_gate_types import (
     SourceKind,
 )
 from .conventions_gates import (
-    DEFAULT_SOURCE_EXCLUSIONS,
     ConventionsGatesAny,
     ConventionsGatesV2,
     GateCommand,
+    effective_source_exclusions,
     gates_path,
+    is_nested_checkout,
     load_conventions_gates,
 )
 from .conventions_lang import adapter_for_path
@@ -230,6 +231,7 @@ def _source_files(
             dirname
             for dirname in dirnames
             if not _is_excluded_path((root_path / dirname).relative_to(project_root), exclusions)
+            and not is_nested_checkout(root_path / dirname)
         )
         for filename in sorted(filenames):
             path = root_path / filename
@@ -248,8 +250,10 @@ def _is_in_scope(rel: str, feature_scope: FeatureScope | None) -> bool:
     return feature_scope is None or rel in feature_scope.paths
 
 
+# @spec FR-001: Fixture root excluded at every scope
+#   .specs/features/082-conventions-gate-signal/spec.md#fr-001
 def _effective_exclusions(gates: ConventionsGatesAny) -> tuple[str, ...]:
-    return (*DEFAULT_SOURCE_EXCLUSIONS, *gates.exclusions)
+    return effective_source_exclusions(gates)
 
 
 def _is_excluded_path(path: Path | str, exclusions: tuple[str, ...]) -> bool:

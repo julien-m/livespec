@@ -171,25 +171,24 @@ crashed.
 
 ## 8.5 Deterministic Command Goals
 
-Feature 052 layers deterministic runtime goals on top of this expectations system.
-The goal compiler reads the same expectations file resolved by §6, extracts the
-command Definition of Done from `.agent-sync/skills/<X>/SKILL.md`, normalizes
-active flags, and writes a canonical JSON payload with sorted keys and no
-wall-clock fields. Runtime completion is stateful: the immutable `contract.json`
-lists ordered tasks and required evidence, while the mutable `state.json` can
-only be updated by `livespec goal prove`.
+<!-- @spec FR-009: Outcome goal reference — .specs/features/081-lightweight-outcome-goals/spec.md#fr-009 -->
 
-CLI:
+Feature 052 layers deterministic runtime goals on top of this expectations system; feature 081
+makes them outcome-based. The compiler reads the expectations file resolved by §6, the command
+inventory of `.agent-sync/skills/<X>/SKILL.md` and normalized flags, and writes a canonical JSON
+payload (schema `3.0`, sorted keys, no wall-clock fields).
 
 ```bash
 livespec goal render <command> --feature <feature> --flags "<flags>" --save
 ```
 
-- Same project state + command + feature + flags + expectations + SKILL.md → same canonical JSON and SHA-256 hash.
-- `--save` writes `$TMPDIR/livespec-goals/goal-<cmd>-<hash8>.contract.json` and `$TMPDIR/livespec-goals/goal-<cmd>-<hash8>.state.json`, then prints `hash:<sha256> | contract-file:<path> | state-file:<path>`.
-- `livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'` is the only mechanism allowed to mark a task `complete`; missing proof returns `REJECTED_NEEDS_ACTION`.
-- `livespec goal status --state <state-file>` reports aggregate completion before a command may emit `DONE`.
-- If `.conventions/index.md` exists, the goal embeds selected convention domains, source paths, source content, and content hashes. `code` is selected by default; `design-*` domains are selected for UI/mockup/visual/CSS/screen/theme/baseline/Penflow signals.
+- Same project state + command + feature + flags + expectations + SKILL.md → same canonical JSON and SHA-256 hash. `--save` writes `$TMPDIR/livespec-goals/goal-<cmd>-<hash8>.contract.json` and `.state.json`, prints `hash:<sha256> | contract-file:<path> | state-file:<path>`, and keeps an existing state with the same hash.
+- `goal_requirement` is `required` for autonomous long runs (spec-ship, `--auto` runs, spec-implement without `--step`/`--dry-run`) and `optional` otherwise.
+- `stop_condition` is one executable check (`livespec validate .specs/features/<feature>`, `livespec validate`, or the from-code `--verify-only` backend). `goal prove --task outcome.verified` runs it itself; exit 0 with output is accepted.
+- `tasks` keep only high-value proofs: before-hook context, QE analysis, typed execution/review receipts (acceptance mapping), visual and finalize receipts, one `conventions.gate` receipt for gated commands, `outcome.verified`, `archive.run`. `execution_tasks` and `definition_of_done` form the indicative checklist.
+- `livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'` is the only mechanism that marks a task `complete`; missing proof returns `REJECTED_NEEDS_ACTION`, and the third rejection of a task returns `BLOCKED` with a `handback` report.
+- When inputs drift, `goal prove`/`goal archive` recompile a 3.0 contract in place and carry forward evidence that still validates (`recompiled` in the output). Pre-3.0 contracts keep their original obligations.
+- `livespec goal status --state <state-file>` reports aggregate completion (and blocked tasks) before a command may emit `DONE`.
 
 ## 8.6 RunArtifact v2 (goal archive)
 

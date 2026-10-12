@@ -32,17 +32,33 @@ def test_detect_capability_returns_tauri_app_missing(tmp_path: Path) -> None:
     assert "Tauri app" in handler.preflight_message()
 
 
-def test_detect_capability_returns_tauri_driver_missing(tmp_path: Path) -> None:
+def test_detect_capability_returns_tauri_driver_missing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     _seed_tauri_app(tmp_path)
+    monkeypatch.setattr("validator.runner_tauri_impl.shutil.which", lambda _name: None)
     handler = TauriRunnerHandler(tmp_path)
     status = handler.detect_capability()
-    # CI / dev hosts rarely have tauri-driver installed; the test pins the
-    # diagnostic exactly so missing the binary surfaces as a structured
-    # capability outcome rather than a crash.
-    assert status.state in ("tauri_driver_missing", "available")
-    if status.state == "tauri_driver_missing":
-        assert status.driver_path is None
-        assert "tauri-driver" in handler.preflight_message()
+    assert status.state == "tauri_driver_missing"
+    assert status.driver_path is None
+    assert handler.detect() is False
+    assert "tauri-driver" in handler.preflight_message()
+
+
+def test_detect_capability_returns_available_with_driver(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    marker = _seed_tauri_app(tmp_path)
+    monkeypatch.setattr(
+        "validator.runner_tauri_impl.shutil.which",
+        lambda name: "/opt/bin/tauri-driver" if name == "tauri-driver" else None,
+    )
+    handler = TauriRunnerHandler(tmp_path)
+    status = handler.detect_capability()
+    assert status.state == "available"
+    assert status.driver_path == "/opt/bin/tauri-driver"
+    assert status.app_path == marker
+    assert handler.detect() is True
 
 
 def test_capture_screenshot_blocks_runtime_under_design_screens(tmp_path: Path) -> None:

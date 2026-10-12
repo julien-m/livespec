@@ -234,6 +234,54 @@ def _parse_features(specs_root: Path) -> list[FeatureInfo]:
     return features
 
 
+def _canonical_readme_status(line: str) -> tuple[str, str] | None:
+    """Read the six-column feature row emitted by official registry finalization."""
+    cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+    # Matching producer shape/identities keep activity and header rows from falsely certifying R4.
+    if len(cells) != 6 or re.fullmatch(r"\d+(?:\.\d+)?", cells[0]) is None:
+        return None
+    links = re.findall(r"\[[^\]]+\]\(features/(\d+(?:\.\d+)?-[^/)\s|]+)/spec\.md\)", cells[5])
+    if len(links) != 1 or links[0].split("-", 1)[0] != cells[0] or not cells[2]:
+        return None
+    return links[0], cells[2]
+
+
+def _readme_visible_lines(content: str) -> list[str]:
+    """Exclude Markdown examples and HTML comments from registry interpretation."""
+    visible: list[str] = []
+    fence: str | None = None
+    in_comment = False
+    for line in content.splitlines():
+        # Matching character and minimum length keep nested-looking example fences inert.
+        if fence is not None:
+            closing = r" {0,3}" + re.escape(fence[0]) + "{" + str(len(fence)) + r",}\s*"
+            if re.fullmatch(closing, line):
+                fence = None
+            continue
+        # Four columns of indentation are Markdown code, even without a fence delimiter.
+        if re.match(r"^(?: {4}| {0,3}\t)", line):
+            continue
+        opening = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if not in_comment and opening:
+            fence = opening.group(1)
+            continue
+        if in_comment:
+            if "-->" not in line:
+                continue
+            line = line.split("-->", 1)[1]
+            in_comment = False
+        # Inline and unterminated comments must not turn examples into authoritative registry rows.
+        while "<!--" in line:
+            prefix, _, suffix = line.partition("<!--")
+            if "-->" not in suffix:
+                line = prefix
+                in_comment = True
+                break
+            line = prefix + suffix.split("-->", 1)[1]
+        visible.append(line)
+    return visible
+
+
 def _parse_readme(specs_root: Path) -> tuple[list[str], dict[str, str]]:
     """Parse .specs/README.md for feature references and statuses."""
     readme_path = specs_root / "README.md"
@@ -251,14 +299,19 @@ def _parse_readme(specs_root: Path) -> tuple[list[str], dict[str, str]]:
         r"\|\s*(\w[\w\s]*?)\s*\|"
     )
 
-    for line in content.splitlines():
+    for line in _readme_visible_lines(content):
         for m in feature_link_re.finditer(line):
             dir_name = m.group(1).rstrip("/")
             if dir_name not in entries:
                 entries.append(dir_name)
 
+        canonical_status = _canonical_readme_status(line)
+        if canonical_status is not None:
+            statuses[canonical_status[0]] = canonical_status[1]
+            continue
         sm = status_re.match(line)
-        if sm:
+        # Preserve legacy feature-first rows, but never interpret activity dates as feature IDs.
+        if sm and re.fullmatch(r"\d{4}-\d{2}-\d{2}", sm.group(1)) is None:
             statuses[sm.group(1)] = sm.group(2).strip()
 
     return entries, statuses

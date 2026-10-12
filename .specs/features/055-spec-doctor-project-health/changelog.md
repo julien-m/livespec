@@ -28,3 +28,16 @@
 - **Docs modified:** `README.md`, `.agent-sync/skills/spec-doctor/SKILL.md`, `.agent-sync/skills/spec-doctor/expectations.md`
 - **AC impacted:** AC-001 through AC-014
 - **Author:** Codex
+
+## 2026-10-12 — [Bugfix]: doctor reports suppressed in-progress coherence findings as INFO and attributes them via dir_name
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** tests/test_doctor_coherence_suppressed.py, validator/coherence/rules/r3_spec_anchors.py, validator/doctor/scanner.py
+- **AC impacted:** FR-004
+- **Author:** livespec bugfix record
+- **Base revision:** HEAD
+- **Regression tests:** tests/test_doctor_coherence_suppressed.py::test_doctor_attributes_settled_coherence_violation_to_its_feature
+- **RED receipt:** `.specs/.execution/a2612583165a449781b5cba2b3e8bc9d/receipt.json`
+- **GREEN receipt:** `.specs/.execution/29e0ed33a36c426d820ee14eff9a020d/receipt.json`
+<!-- bugfix:29e0ed33a36c426d820ee14eff9a020d -->

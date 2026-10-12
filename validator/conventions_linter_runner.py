@@ -8,7 +8,11 @@ from pathlib import Path
 
 from .conventions_feature_scope import FeatureScope
 from .conventions_gate_types import GateSeverity, GateViolation
-from .conventions_gates import DEFAULT_SOURCE_EXCLUSIONS, ConventionsGatesAny
+from .conventions_gates import (
+    ConventionsGatesAny,
+    effective_source_exclusions,
+    inside_nested_checkout,
+)
 from .conventions_linter import LinterViolationPayload, parse_linter_json
 
 
@@ -19,7 +23,7 @@ def collect_linter_violations(
 ) -> list[GateViolation]:
     """Run configured lint commands and normalize their violations."""
     violations: list[GateViolation] = []
-    exclusions = (*DEFAULT_SOURCE_EXCLUSIONS, *gates.exclusions)
+    exclusions = effective_source_exclusions(gates)
     for command in gates.commands.lint:
         try:
             # `command.run` comes from trusted gates config. stdout is parsed as
@@ -61,10 +65,12 @@ def _parsed_linter_violations(
         rel = _project_relative_path(project_root, item.path)
         if _is_excluded_path(rel, exclusions) or not _is_in_scope(rel, feature_scope):
             continue
+        if inside_nested_checkout(project_root, rel):
+            continue
         violations.append(
             GateViolation(
                 item.rule_id,
-                item.path,
+                rel,
                 item.line,
                 GateSeverity(item.severity),
                 item.message,

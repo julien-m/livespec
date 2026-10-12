@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, TypeAlias, TypedDict
+from typing import Any, NotRequired, TypedDict
 
 __all__ = [
     "ALLOWED_INTERNAL_INVOCATION_MODES",
@@ -13,17 +13,14 @@ __all__ = [
     "ARCHIVE_REPAIR_ACTIONS",
     "ARCHIVE_REQUIRED_EVIDENCE",
     "ARCHIVE_RUN_TASK_DESCRIPTION",
-    "CHILD_GOAL_ARTIFACT_ROOT_MARKER",
     "CONVENTIONS_REQUIRED_EVIDENCE",
-    "CONVENTIONS_VERIFY_COMMAND",
-    "CONVENTION_SIGNAL_FILES",
-    "DESIGN_SIGNAL_WORDS",
     "EXECUTION_TASK_BRANCHES",
     "FINALIZE_INVALID_SUBSTITUTES",
     "FINALIZE_REPAIR_ACTIONS",
     "FINALIZE_REQUIRED_EVIDENCE",
     "GENERIC_REPAIR_ACTIONS",
     "GENERIC_REQUIRED_EVIDENCE",
+    "GOALS_DIR_MARKER",
     "GOAL_CONTRACT_VERSION",
     "HOOKS_BEFORE_INVALID_SUBSTITUTES",
     "HOOKS_BEFORE_REPAIR_ACTIONS",
@@ -42,15 +39,11 @@ __all__ = [
     "VISUAL_DESIGN_REPAIR_ACTIONS",
     "VISUAL_DESIGN_REQUIRED_EVIDENCE",
     "VISUAL_FEATURE_HEADING_RE",
-    "_CONVENTIONS_GATED_COMMANDS",
     "GoalContract",
-    "RequiredConventions",
     "_TaskEvidenceValidation",
 ]
 
-GOAL_CONTRACT_VERSION = "2.0"
-RequiredConventions: TypeAlias = dict[str, str | list[str]]
-CONVENTION_SIGNAL_FILES: tuple[str, ...] = ("spec.md", "plan.md")
+GOAL_CONTRACT_VERSION = "3.0"
 EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
     {
         "always",
@@ -70,6 +63,8 @@ EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
         "fix-execute",
         "fix-feature",
         "fix-conventions",
+        "fix-readiness",
+        "fix-bugfix",
         "pre-impl",
         "full-check",
         "pre-impl-penflow",
@@ -86,20 +81,6 @@ INTERNAL_SUBAGENT_GUARD_REQUIREMENTS: tuple[tuple[str, tuple[str, ...]], ...] = 
     (".specs/spec-system.md", (".specs/spec-system.md",)),
 )
 MARKDOWN_HORIZONTAL_RULES: frozenset[str] = frozenset({"---", "***", "___"})
-DESIGN_SIGNAL_WORDS: frozenset[str] = frozenset(
-    {
-        "--visual",
-        "baseline",
-        "css",
-        "design",
-        "mockup",
-        "penflow",
-        "screen",
-        "theme.css",
-        "ui",
-        "visual",
-    }
-)
 SPEC_CHECK_ALL_FEATURE_FLAGS: frozenset[str] = frozenset({"--all", "-A"})
 GENERIC_REQUIRED_EVIDENCE: tuple[str, ...] = (
     "observable_output_or_artifact",
@@ -170,17 +151,6 @@ HOOKS_BEFORE_REPAIR_ACTIONS: tuple[str, ...] = (
     "submit the hook command, resolved stdout sha256, and hook_context_applied=true",
 )
 CONVENTIONS_REQUIRED_EVIDENCE: tuple[str, ...] = ("conventions_receipt_path",)
-CONVENTIONS_VERIFY_COMMAND = "livespec conventions verify --json --feature <slug>"
-# `spec-feature` supervisors run before the feature scope can exist; their child
-# implement/test/fix goals own task-level convention receipts.
-_CONVENTIONS_GATED_COMMANDS: frozenset[str] = frozenset(
-    {
-        "spec-implement",
-        "spec-test",
-        "spec-fix",
-        "spec-ship",
-    }
-)
 
 # @spec FR-002: Embed native QE for affected commands
 #   — .specs/features/071-qe-analysis-native-module/spec.md#fr-002
@@ -213,7 +183,7 @@ VISUAL_FEATURE_HEADING_RE = re.compile(
     r"^##\s+(Screens|Penflow Contract)\b",
     re.MULTILINE,
 )
-CHILD_GOAL_ARTIFACT_ROOT_MARKER = "livespec-goals"
+GOALS_DIR_MARKER = "livespec-goals"
 
 
 class _TaskEvidenceValidation(TypedDict):
@@ -224,6 +194,7 @@ class _TaskEvidenceValidation(TypedDict):
     missing_evidence: list[str]
     invalid_substitutes: list[str]
     required_actions: list[str]
+    observed: NotRequired[dict[str, Any]]
 
 
 @dataclass(frozen=True)
@@ -235,6 +206,7 @@ class GoalContract:
     canonical_json: str
     goal_hash: str
     objective: str
+    project_root: str | None = None
 
     def to_json_envelope(self) -> dict[str, Any]:
         """Return the CLI JSON envelope."""

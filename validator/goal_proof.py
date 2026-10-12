@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, cast
 
 from . import goal_contracts as _contracts
+from .goal_outcome import MAX_ATTEMPTS_PER_TASK
 
 
 # @spec FR-010: Preserve proof transitions, FR-011: Confine project evidence
@@ -127,6 +128,8 @@ def _record_task_proof(
         "missing_evidence": missing_evidence,
         "invalid_substitutes": invalid_substitutes,
     }
+    if "observed" in proof:
+        attempt["observed"] = cast(_contracts.JsonValue, proof["observed"])
     if "attempts" not in task_state:
         attempts_value: _contracts.JsonValue = []
         task_state["attempts"] = attempts_value
@@ -140,7 +143,12 @@ def _record_task_proof(
         task_state["status"] = "complete"
         task_state["accepted_evidence"] = evidence
         task_state["last_rejection"] = None
+        task_state.pop("blocked", None)
     else:
+        # @spec FR-007: Bounded retries
+        #   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-007
+        if _rejected_streak(attempts) >= MAX_ATTEMPTS_PER_TASK:
+            task_state["blocked"] = True
         task_state["status"] = "pending"
         rejection: _contracts.JsonObject = {
             "missing_evidence": missing_evidence,
@@ -155,16 +163,56 @@ def _goal_proof_result(
     updated_state: _contracts.JsonObject,
     proof: _contracts._TaskEvidenceValidation,
 ) -> _contracts.JsonObject:
+    task_state = cast(_contracts.JsonObject, cast(dict[str, Any], updated_state["tasks"])[task_id])
+    blocked = not proof["accepted"] and task_state.get("blocked") is True
     result: _contracts.JsonObject = {
         "task_id": task_id,
-        "status": proof["status"],
+        "status": "BLOCKED" if blocked else proof["status"],
         "accepted": proof["accepted"],
         "missing_evidence": [value for value in proof["missing_evidence"]],
         "invalid_substitutes": [value for value in proof["invalid_substitutes"]],
         "required_actions": [value for value in proof["required_actions"]],
         "state": updated_state,
     }
+    if "observed" in proof:
+        result["observed"] = cast(_contracts.JsonValue, proof["observed"])
+    if blocked:
+        result["handback"] = _handback(task_id, task_state, proof)
     return result
+
+
+def _rejected_streak(attempts: list[_contracts.JsonValue]) -> int:
+    streak = 0
+    for attempt in reversed(attempts):
+        if not isinstance(attempt, dict) or attempt.get("status") == "ACCEPTED":
+            break
+        streak += 1
+    return streak
+
+
+def _handback(
+    task_id: str,
+    task_state: _contracts.JsonObject,
+    proof: _contracts._TaskEvidenceValidation,
+) -> _contracts.JsonObject:
+    """Summarize what was tried and what is still missing before handing control back."""
+    attempts = cast(list[dict[str, Any]], task_state.get("attempts") or [])
+    tried: list[_contracts.JsonValue] = [
+        {"attempt": index, "missing_evidence": attempt.get("missing_evidence") or []}
+        for index, attempt in enumerate(attempts, 1)
+    ]
+    return {
+        "task_id": task_id,
+        "attempts": len(attempts),
+        "tried": tried,
+        "missing_evidence": [value for value in proof["missing_evidence"]],
+        "required_actions": [value for value in proof["required_actions"]],
+        "report": (
+            f"BLOCKED at step {task_state.get('ordinal')} - verification_failed - "
+            f"{task_id} rejected {len(attempts)} times; missing: "
+            f"{', '.join(proof['missing_evidence']) or 'none'}"
+        )[:200],
+    }
 
 
 def _goal_tasks_by_id(contract: Mapping[str, object]) -> dict[str, _contracts.JsonObject]:

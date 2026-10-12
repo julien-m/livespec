@@ -36,8 +36,10 @@ class ProbeResult:
 def _kill_group(process: subprocess.Popen[str]) -> None:
     # All children inherit a new process group. Kill remaining grandchildren too,
     # including children that kept running after their immediate parent exited.
-    # A completed group has no remaining process to cancel.
-    with suppress(ProcessLookupError):
+    # A completed group has no remaining process to cancel. macOS reports EPERM instead of
+    # ESRCH while the killed group only holds zombies awaiting their reaper; a pgid we may
+    # not signal is not ours to cancel either, so both mean nothing is left to kill.
+    with suppress(ProcessLookupError, PermissionError):
         os.killpg(process.pid, signal.SIGKILL)
 
 

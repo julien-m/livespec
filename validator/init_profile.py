@@ -20,6 +20,27 @@ LOCKFILES = {
     "pnpm-lock.yaml": "pnpm",
     "yarn.lock": "yarn",
 }
+# Recognized manifests of ecosystems or formats this bootstrap does not parse.
+UNSUPPORTED_MANIFESTS = (
+    "go.mod",
+    "Gemfile",
+    "pom.xml",
+    "build.gradle",
+    "build.gradle.kts",
+    "composer.json",
+    "mix.exs",
+    "Package.swift",
+    "pubspec.yaml",
+    "requirements.txt",
+    "setup.py",
+    "Pipfile",
+    "src-tauri/tauri.conf.json5",
+    "src-tauri/Tauri.toml",
+)
+MISSING_MANAGER_WARNING = (
+    "no package manager evidence in package.json (packageManager, lockfile or corroborated "
+    "native command); the package manager stays Unknown and no manager probe runs"
+)
 
 
 class InitError(Exception):
@@ -55,6 +76,8 @@ class ObservedProfile:
     tools: tuple[str, ...]
     testing_tools: tuple[str, ...]
     test_commands: tuple[str, ...]
+    unsupported_manifests: tuple[str, ...] = ()
+    warnings: tuple[str, ...] = ()
 
 
 def _read_mapping(root: Path, relative: str) -> dict[str, object]:
@@ -132,9 +155,8 @@ def _package_facts(
     if (root / "tsconfig.json").exists() and "typescript" not in dependencies:
         _read_mapping(root, "tsconfig.json")
         facts.append(Fact("TypeScript", UNKNOWN, "tsconfig.json"))
-    tests = sorted(
-        key for key in ("vitest", "@playwright/test", "playwright", "jest") if key in dependencies
-    )
+    test_markers: tuple[str, ...] = ("vitest", "@playwright/test", "playwright", "jest")
+    tests = sorted(key for key in test_markers if key in dependencies)
     scripts = _mapping(package.get("scripts", {}), "package.json scripts")
     # Declared scripts are documentation only; initialization never runs package scripts.
     commands = [
@@ -171,16 +193,16 @@ def detect_profile(project: Path) -> ObservedProfile:
     Args:
         project: Existing selected project directory.
     Returns:
-        Independent stack evidence and required version-probe tool names.
+        Independent stack evidence, required version-probe tools, recorded unsupported
+        manifests and warnings.
     Raises:
-        InitError: Manifests are malformed, unsupported or contradictory.
+        InitError: Manifests are malformed or contradictory, or none is supported.
     """
     root = project.resolve()
     if not root.is_dir():
         raise InitError(f"{project}: project directory not found")
-    for unsupported in ("src-tauri/tauri.conf.json5", "src-tauri/Tauri.toml"):
-        if (root / unsupported).exists():
-            raise InitError(f"{unsupported}: unsupported manifest format; provide tauri.conf.json")
+    # Unsupported manifests are recorded, never parsed; supported ecosystems still bootstrap.
+    unsupported = tuple(path for path in UNSUPPORTED_MANIFESTS if (root / path).exists())
     package = _read_mapping(root, "package.json")
     config = _read_mapping(root, "src-tauri/tauri.conf.json")
     python = _read_mapping(root, "pyproject.toml")
@@ -203,8 +225,13 @@ def detect_profile(project: Path) -> ObservedProfile:
             tests.append("pytest")
             commands.append("pytest")
     if not facts:
-        raise InitError("No supported package.json, pyproject.toml or Cargo.toml manifest found")
+        found = ", ".join(sorted(unsupported))
+        raise InitError(
+            "No supported package.json, pyproject.toml or Cargo.toml manifest found"
+            + (f"; unsupported manifests: {found}" if found else "")
+        )
     manager = _manager(package, config, root) if package else UNKNOWN
+    warnings = (MISSING_MANAGER_WARNING,) if package and manager == UNKNOWN else ()
     required = [manager] if manager != UNKNOWN else []
     if any(fact.name == "Rust" for fact in facts):
         required.append("cargo")
@@ -245,4 +272,6 @@ def detect_profile(project: Path) -> ObservedProfile:
         tuple(required),
         tuple(dict.fromkeys(tests)),
         tuple(dict.fromkeys(commands)),
+        unsupported,
+        warnings,
     )

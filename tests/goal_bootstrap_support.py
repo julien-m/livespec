@@ -61,6 +61,9 @@ def proof_pair(project_root: Path) -> tuple[JsonFixture, JsonFixture, str]:
     }
     contract["canonical"]["tasks"] = [task]
     contract["tasks"] = [task]
+    # Hand-built tasks model a historical (2.0) pair: 081 recompiles only current contracts.
+    for document in (contract, contract["canonical"]):
+        document["schema_version"] = "2.0"
     rehash_pair(contract, state)
     task_id = str(task["id"])
     state = {

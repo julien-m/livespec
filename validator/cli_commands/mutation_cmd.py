@@ -2,7 +2,7 @@
 
 # @spec FR-004: mutation subcommand — .specs/features/035-unified-cli-surface/spec.md#fr-004
 # @spec AC-008: historical Markdown report — .specs/features/035-unified-cli-surface/spec.md#ac-008
-# @spec EC-004: capability absent → exit 4 — .specs/features/035-unified-cli-surface/spec.md#ec-004
+# @spec EC-004: capability absent → exit 3 — .specs/features/035-unified-cli-surface/spec.md#ec-004
 
 from __future__ import annotations
 
@@ -12,14 +12,15 @@ from pathlib import Path
 import typer
 
 from ..cli_exit_codes import (
-    EXIT_CAPABILITY_UNSUPPORTED,
-    EXIT_COVERAGE_FAIL,
+    EXIT_CONFIG,
+    EXIT_FAILURE,
     EXIT_OK,
 )
 from ..cli_resolvers import read_threshold_from_conventions
 from ..drivers.mutation_report import run_mutation, write_mutation_report
 from ._common import (
     emit_summary,
+    help_epilog,
     require_specs_root,
     resolve_primary_driver,
     run_with_debug,
@@ -51,7 +52,6 @@ def mutation_command(
         lambda: _run_mutation(threshold=threshold, report_path=report_path),
         debug=debug,
         subcommand="mutation",
-        fail_exit_code=EXIT_COVERAGE_FAIL,
     )
 
 
@@ -60,6 +60,7 @@ def register(app: typer.Typer) -> None:
     app.command(
         name="mutation",
         help="Run mutation testing using the active driver.",
+        epilog=help_epilog("livespec mutation --threshold 70"),
     )(mutation_command)
 
 
@@ -87,7 +88,7 @@ def _run_mutation(*, threshold: float | None, report_path: Path | None) -> None:
             err=True,
         )
         emit_summary("mutation", "FAIL", driver=driver.name, reason="unsupported")
-        raise typer.Exit(EXIT_CAPABILITY_UNSUPPORTED)
+        raise typer.Exit(EXIT_CONFIG)
 
     # Apply threshold and write report.
     from dataclasses import replace
@@ -119,7 +120,7 @@ def _run_mutation(*, threshold: float | None, report_path: Path | None) -> None:
         threshold=threshold_pct,
         report=str(target_path),
     )
-    raise typer.Exit(EXIT_OK if not gated.gate_failed else EXIT_COVERAGE_FAIL)
+    raise typer.Exit(EXIT_OK if not gated.gate_failed else EXIT_FAILURE)
 
 
 __all__ = ["register"]

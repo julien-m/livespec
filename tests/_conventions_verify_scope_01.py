@@ -290,24 +290,6 @@ def test_cli_verify_unscoped_json_stays_repo_wide_with_unrelated_debt(tmp_path: 
     assert "receipt_path" not in output
 
 
-def test_spec_check_conventions_gate_can_use_feature_scoped_pass_receipt(tmp_path: Path) -> None:
-    project_root = _write_project(tmp_path)
-    (project_root / "src" / "scoped.py").write_text('"""Scoped module."""\n', encoding="utf-8")
-    _write_feature_scope(project_root, FEATURE, ["src/scoped.py"])
-
-    result = _invoke_verify(project_root, FEATURE, "spec-check-gate")
-
-    assert result.exit_code == 0, result.output
-    output = json.loads(result.output)
-    assert output["feature_slug"] == FEATURE
-    receipt = verify_conventions_receipt(
-        project_root / output["receipt_path"],
-        project_root=project_root,
-        expected_feature_slug=FEATURE,
-    )
-    assert receipt.verdict == "PASS"
-
-
 def test_cli_verify_invalid_feature_inputs_block_without_receipt(tmp_path: Path) -> None:
     project_root = _write_project(tmp_path)
 

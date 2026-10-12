@@ -1,9 +1,9 @@
 ---
 title: "Multi-Surface Detection and Migration"
-status: "Draft"
+status: "Planned"
 priority: "P1"
 created: 2026-05-07
-updated: 2026-05-07
+updated: 2026-10-12
 ---
 
 # Feature Spec: Multi-Surface Detection and Migration
@@ -11,7 +11,7 @@ updated: 2026-05-07
 - **Feature:** Multi-Surface Detection and Migration
 - **Branch:** feature/036-multi-surface-detection-and-migration
 - **Date:** 2026-05-07
-- **Status:** Draft
+- **Status:** Planned
 - **Priority:** P1
 - **Scope:** M
 - **Input:** Support detection of multiple Playwright surfaces (e2e + visual) in `.specs/surfaces.yaml`. For new projects, the surface generator (`scripts/generate-surfaces.js`) must auto-detect when both `tests/e2e/` and `tests/visual/` coexist (each with their own `playwright.config.ts` / `playwright.visual.config.ts`) and emit one `surfaces.yaml` entry per detected surface. For legacy projects already initialized with a single-surface manifest, provide a migration path to add and manage the missing visual surface(s). Must not break projects already on the canonical post-`migrate-visual-tests.js` layout (single unified surface).

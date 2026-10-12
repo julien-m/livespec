@@ -120,51 +120,6 @@ class TestComputePlanComplexity:
         assert result["fr_count"] == 2
 
 
-class TestReviewFinding:
-    """Tests for ReviewFinding dataclass."""
-
-    def test_construction(self):
-        finding = ReviewFinding(
-            category="coverage_gap",
-            severity=Severity.ERROR,
-            description="AC-003 not covered",
-            suggestion="Add token expiry test step",
-        )
-        assert finding.category == "coverage_gap"
-        assert finding.severity == Severity.ERROR
-
-    def test_free_form_category(self):
-        finding = ReviewFinding(
-            category="custom_category",
-            severity=Severity.INFO,
-            description="test",
-            suggestion="test",
-        )
-        assert finding.category == "custom_category"
-
-
-class TestPlanReviewResult:
-    """Tests for PlanReviewResult dataclass."""
-
-    def test_defaults(self):
-        result = PlanReviewResult()
-        assert result.findings == []
-        assert result.reviewer_model == ""
-        assert result.confidence == 0
-        assert result.complexity == {}
-
-    def test_with_findings(self):
-        finding = ReviewFinding("gap", Severity.WARNING, "desc", "fix")
-        result = PlanReviewResult(
-            findings=[finding],
-            reviewer_model="google/gemini-3.1-pro",
-            confidence=4,
-            complexity={"fr_count": 3},
-        )
-        assert len(result.findings) == 1
-        assert result.reviewer_model == "google/gemini-3.1-pro"
-
-
 class TestReviewPlan:
     """Tests for review_plan() with mocked LLM."""
 
@@ -551,39 +506,80 @@ class TestPlanReviewFeatureFilter:
         assert len(result.reviews) == 0
 
 
-class TestPlanReviewErrorHandling:
-    """Tests for error-as-blocking and warn_only in plan-review."""
+class TestPlanReviewExitCode:
+    """`validate --plan-review` exit codes: advisory by default, blocking with --strict.
 
-    def test_errors_set_has_blocking(self) -> None:
-        """Review errors set has_blocking=True in result processing."""
-        from validator.orchestrator import PlanReviewCheckResult
+    The orchestrator is replaced at its module boundary so the CLI exit policy
+    (`_display_review_findings` + the --strict/--warn-only branch) runs unchanged.
+    """
 
-        result = PlanReviewCheckResult()
-        result.errors.append("feature-001: JSONDecodeError")
+    _BLOCKING = ReviewFinding(
+        category="coverage_gap",
+        severity=Severity.ERROR,
+        description="AC-003 has no implementation step",
+        suggestion="Add token expiry handling",
+    )
 
-        # Simulate CLI logic
-        has_blocking = False
-        if result.errors:
-            has_blocking = True
-        assert has_blocking is True
+    def _invoke(
+        self,
+        tmp_path: Path,
+        *flags: str,
+        findings: list[ReviewFinding] | None = None,
+        complete: bool = True,
+        errors: list[str] | None = None,
+    ) -> Any:
+        from typer.testing import CliRunner
 
-    def test_warn_only_suppresses_exit_code(self) -> None:
-        """warn_only suppresses exit code even with blocking findings."""
-        has_blocking = True
-        warn_only = True
-        exit_code = 0 if warn_only else (1 if has_blocking else 0)
-        assert exit_code == 0
+        from validator.cli import app
+        from validator.orchestrator import PlanReviewCheckResult, PlanReviewEntry
 
-    def test_no_warn_only_with_blocking_exits_1(self) -> None:
-        """Without warn_only, blocking findings exit 1."""
-        has_blocking = True
-        warn_only = False
-        exit_code = 0 if warn_only else (1 if has_blocking else 0)
-        assert exit_code == 1
+        feature = tmp_path / ".specs" / "features" / "001-auth"
+        feature.mkdir(parents=True)
+        (feature / "spec.md").write_text(SAMPLE_SPEC)
+        (feature / "plan.md").write_text(SAMPLE_PLAN)
+        review = PlanReviewResult(
+            findings=findings or [], reviewer_model="m/1", confidence=4, complete=complete
+        )
+        outcome = PlanReviewCheckResult(
+            reviews=[PlanReviewEntry(feature_name="001-auth", result=review)],
+            errors=errors or [],
+        )
+        with (
+            patch("validator.llm_provider.is_available", return_value=True),
+            patch("validator.orchestrator.run_plan_review", return_value=outcome),
+        ):
+            return CliRunner().invoke(app, ["validate", "--plan-review", *flags, str(feature)])
 
-    def test_no_errors_no_findings_exits_0(self) -> None:
-        """Clean review exits 0."""
-        has_blocking = False
-        warn_only = False
-        exit_code = 0 if warn_only else (1 if has_blocking else 0)
-        assert exit_code == 0
+    def test_blocking_finding_is_advisory_without_strict(self, tmp_path: Path) -> None:
+        result = self._invoke(tmp_path, findings=[self._BLOCKING])
+
+        assert result.exit_code == 0
+        assert "[ERROR] coverage_gap: AC-003 has no implementation step" in result.output
+
+    def test_blocking_finding_exits_1_with_strict(self, tmp_path: Path) -> None:
+        result = self._invoke(tmp_path, "--strict", findings=[self._BLOCKING])
+
+        assert result.exit_code == 1
+
+    def test_warn_only_overrides_strict(self, tmp_path: Path) -> None:
+        result = self._invoke(tmp_path, "--strict", "--warn-only", findings=[self._BLOCKING])
+
+        assert result.exit_code == 0
+
+    def test_review_error_blocks_with_strict(self, tmp_path: Path) -> None:
+        result = self._invoke(tmp_path, "--strict", errors=["001-auth: JSONDecodeError"])
+
+        assert result.exit_code == 1
+        assert "Error: 001-auth: JSONDecodeError" in result.output
+
+    def test_incomplete_review_blocks_with_strict(self, tmp_path: Path) -> None:
+        result = self._invoke(tmp_path, "--strict", complete=False)
+
+        assert result.exit_code == 1
+
+    def test_clean_complete_review_exits_0_with_strict(self, tmp_path: Path) -> None:
+        warning = ReviewFinding("style", Severity.WARNING, "Long step", "Split it")
+        result = self._invoke(tmp_path, "--strict", findings=[warning])
+
+        assert result.exit_code == 0
+        assert "1 finding(s) across 1 review(s)." in result.output

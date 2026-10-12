@@ -13,8 +13,12 @@ from __future__ import annotations
 import os
 import shlex
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
 
+from ..exceptions import DriverTestSelectionError
+from .placeholders import resolve_argv_placeholders
+from .preconditions import capability_skip_message
 from .schemas import (
     CAPABILITY_NAMES,
     CapabilityNotImplementedError,
@@ -48,6 +52,7 @@ def run_capability(
     env: dict[str, str] | None = None,
     timeout: float | None = None,
     feature: str | None = None,
+    test_paths: Sequence[str] | None = None,
 ) -> CapabilityResult:
     """Execute a capability, retaining gaps when its result cannot certify acceptance.
 
@@ -58,6 +63,8 @@ def run_capability(
         env: Overrides merged onto ``os.environ``; capture owns evidence variables.
         timeout: Subprocess limit in seconds; captured timeouts return exit 124.
         feature: Feature bound to receipt capture when a report adapter is declared.
+        test_paths: Selected test files appended to the argv; requires the capability
+            to declare ``test_selection: append`` (feature 035 AC-002).
 
     Returns:
         Process output, exit code and certification gaps; missing commands return 127.
@@ -66,6 +73,8 @@ def run_capability(
     Raises:
         ValueError: Invalid capability, command quoting, runner or capture publication.
         CapabilityNotImplementedError: The driver does not define the capability.
+        DriverTestSelectionError: ``test_paths`` given to a capability without
+            ``test_selection: append``.
         FileNotFoundError: A script reference or capture root does not exist.
         OSError: Process launch or capture storage fails outside handled missing commands.
         subprocess.TimeoutExpired: An uncaptured command exceeds its timeout.
@@ -81,12 +90,50 @@ def run_capability(
         raise CapabilityNotImplementedError(driver.name, capability)
 
     cwd = project_root or Path.cwd()
+    skip = capability_skip_message(driver, capability, cwd)
+    if skip is not None:
+        return _skipped_result(capability, cap, skip)
     proc_env = {**os.environ, **(env or {})}
 
     argv = _capability_argv(driver, capability, cap, cwd)
+    if test_paths is not None:
+        argv = _append_test_paths(driver, capability, cap, argv, test_paths)
     if cap.report_adapter is not None and feature is not None:
         return _run_captured(cap, capability, argv, cwd, proc_env, timeout, feature)
     return _run_uncertified(cap, capability, argv, cwd, proc_env, timeout)
+
+
+def _skipped_result(capability: str, cap: DriverCapability, skip: str) -> CapabilityResult:
+    """Report a skipped capability as an uncertified success.
+
+    A missing optional library is "not configured", not a failure (018 AC-008/AC-009).
+    """
+    return CapabilityResult(
+        capability_name=capability,
+        exit_code=0,
+        stdout=skip,
+        report_path=cap.report_path,
+        certification_gaps=[f"Capability skipped: {skip}"],
+    )
+
+
+def _append_test_paths(
+    driver: DriverManifest,
+    capability: str,
+    cap: DriverCapability,
+    argv: list[str],
+    test_paths: Sequence[str],
+) -> list[str]:
+    """Append selected test files when the capability opts in to test selection.
+
+    Raises:
+        DriverTestSelectionError: The capability does not declare ``test_selection: append``.
+    """
+    # @spec AC-002: Append selected tests only on opt-in
+    # — .specs/features/035-unified-cli-surface/spec.md#ac-002
+    if cap.test_selection != "append":
+        raise DriverTestSelectionError(driver.name, capability)
+    return [*argv, *test_paths]
 
 
 def _capability_argv(
@@ -94,7 +141,13 @@ def _capability_argv(
 ) -> list[str]:
     """Resolve the manifest executable while preserving script validation errors."""
     if cap.script is not None:
-        script_path = _resolve_script(cap.script, cwd)
+        # @spec FR-003: Built-in scripts ship beside their manifest (livespec/drivers/scripts);
+        #   custom `.specs/drivers` scripts stay project-relative.
+        #   — .specs/features/016-cross-language-test-driver-architecture/spec.md#fr-003
+        anchor = cwd
+        if not driver.is_custom and driver.source_path is not None:
+            anchor = driver.source_path.parent
+        script_path = _resolve_script(cap.script, anchor)
         if not script_path.exists():
             raise FileNotFoundError(
                 f"Driver {driver.name!r} {capability} script not found: {script_path}"
@@ -102,7 +155,7 @@ def _capability_argv(
         # Scripts keep explicit shell semantics; commands remain list-form subprocesses.
         return ["bash", str(script_path)]
     assert cap.command is not None
-    return shlex.split(cap.command)
+    return resolve_argv_placeholders(shlex.split(cap.command), cap, cwd, driver.name)
 
 
 def _run_captured(

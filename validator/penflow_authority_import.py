@@ -32,6 +32,7 @@ from .penflow_approval_models import (
     StrictModel,
     VersionOne,
 )
+from .penflow_cli import penflow_cli_missing, resolve_penflow_cli
 
 AUTHORITY_POINTER = Path(".specs/penflow-brainstorm-authority.json")
 AUTHORITY_ARCHIVE = Path(".specs/penflow-authority")
@@ -92,9 +93,9 @@ def authority_command(
         PenflowApprovalError: Missing CLI, execution failure or noncertifying response.
     """
     try:
-        executable = shutil.which("penflow")
+        executable = resolve_penflow_cli(shutil.which)
         if executable is None:
-            raise PenflowApprovalError("authority_cli_required")
+            raise PenflowApprovalError(penflow_cli_missing("authority_cli_required"))
         result = subprocess.run(
             [
                 executable,

@@ -97,5 +97,16 @@ def test_ambiguous_or_malformed_bands_remain_fully_bound(text: str) -> None:
     )
 
 
-def test_identity_policy_version_invalidates_prior_receipts() -> None:
-    assert NORMATIVE_IDENTITY_VERSION == "2"
+def test_identity_policy_version_invalidates_prior_receipts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Bumping the identity policy version changes every normative hash."""
+    import validator.normative_identity as normative_identity
+
+    text = "# Feature\n- **Status:** Approved\n## Rules\n- keep\n"
+    current = normative_hash(text, lifecycle_document=True)
+    monkeypatch.setattr(
+        normative_identity, "NORMATIVE_IDENTITY_VERSION", f"{NORMATIVE_IDENTITY_VERSION}-prior"
+    )
+
+    assert normative_hash(text, lifecycle_document=True) != current

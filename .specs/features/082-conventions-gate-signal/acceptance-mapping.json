@@ -1,0 +1,849 @@
+{
+  "schema_version": "1",
+  "feature": "082-conventions-gate-signal",
+  "reviewer_model": "claude-opus-5-5",
+  "review_max_chars": 120000,
+  "review_receipt_path": ".specs/features/082-conventions-gate-signal/.reviews/acceptance-mapping.json",
+  "bindings": [
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-001",
+      "test_id": "tests.test_conventions_gate_signal::test_fixture_root_is_excluded_at_repo_and_feature_scope",
+      "expected": "no violation under the fixture root at repo and feature scope",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 124,
+      "end_line": 124,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Loop over repo and feature-scope results asserts no path starts with the fixture root."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-001",
+      "test_id": "tests.test_conventions_gate_signal::test_fixture_root_is_excluded_at_repo_and_feature_scope",
+      "expected": "identical content outside the root is reported",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 125,
+      "end_line": 125,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Control copy under src/ still yields ARS violations at both scopes."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-001",
+      "test_id": "tests.test_conventions_gate_signal::test_fixture_root_is_excluded_at_repo_and_feature_scope",
+      "expected": "exclusion needs no gates edit",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 122,
+      "end_line": 122,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "The fixture root is not added to generated default exclusions; the gates file lacks it."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-002",
+      "test_id": "tests.test_conventions_gate_signal::test_every_declared_fixture_triggers_exactly_its_rule",
+      "expected": "each FAIL fixture yields exactly its own rule id",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 135,
+      "end_line": 135,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "For all 564 rules the runtime scan of the FAIL fixture returns one violation whose rule_ids is the rule."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-002",
+      "test_id": "tests.test_conventions_gate_signal::test_every_declared_fixture_triggers_exactly_its_rule",
+      "expected": "each PASS fixture yields no violation",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 136,
+      "end_line": 136,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "For all 564 rules the PASS fixture produces no violation."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-002",
+      "test_id": "tests.test_conventions_gate_signal::test_ast_fixtures_satisfy_configured_language_headers",
+      "expected": "AST fixtures satisfy the configured header",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 150,
+      "end_line": 150,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Swift fixtures match the configured header regex."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-003",
+      "test_id": "tests.test_conventions_gate_signal::test_shared_family_match_produces_one_grouped_violation",
+      "expected": "one ARS violation per file and shared detector",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 160,
+      "end_line": 160,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "A Go file with one panic( yields exactly one ARS violation at repo and feature scope."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-003",
+      "test_id": "tests.test_conventions_gate_signal::test_shared_family_match_produces_one_grouped_violation",
+      "expected": "rule_id is ars.family.<family>",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 161,
+      "end_line": 161,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "The grouped violation uses the family id."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-003",
+      "test_id": "tests.test_conventions_gate_signal::test_shared_family_match_produces_one_grouped_violation",
+      "expected": "sorted rule_ids list every matched rule",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 162,
+      "end_line": 162,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "rule_ids equals the sorted ten go_code runtime ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-003",
+      "test_id": "tests.test_conventions_gate_signal::test_shared_family_match_produces_one_grouped_violation",
+      "expected": "first matching line",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 164,
+      "end_line": 164,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Line is the first line matching the detector."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-003",
+      "test_id": "tests.test_conventions_gate_signal::test_shared_family_match_produces_one_grouped_violation",
+      "expected": "message names family and count",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 165,
+      "end_line": 165,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Message names the family and the matched count."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-003",
+      "test_id": "tests.test_conventions_gate_signal::test_single_rule_fixture_keeps_family_identity",
+      "expected": "family id even for one matched rule",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 173,
+      "end_line": 175,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "A single-rule fixture of a shared family keeps ars.family.go_code with only its own rule id."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-003",
+      "test_id": "tests.test_conventions_gate_signal::test_rule_specific_detector_keeps_runtime_rule_id",
+      "expected": "rule-specific detector keeps its runtime id",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 183,
+      "end_line": 185,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "ARS-RULE-02508 keeps its own runtime rule id and rule_ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_plain_node_script_reports_no_framework_rule",
+      "expected": "plain Node .mjs reports no framework rule",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 197,
+      "end_line": 197,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "No rule id from the ten framework documents is reported for the require( script."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_nextjs_file_reports_nextjs_rules",
+      "expected": "next/link .tsx reports Next.js rule ids",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 208,
+      "end_line": 208,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "All Next.js rule ids are reported for a .tsx file importing next/link."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_table_covers_framework_sources_with_prefix_normalization",
+      "expected": "every framework document maps to its evidence row",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 284,
+      "end_line": 284,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Each inventory framework source resolves to a Framework Evidence row after prefix normalization."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_non_root_ars_rules_directory_is_not_a_fixture",
+      "expected": "only declared fixtures bypass framework evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 294,
+      "end_line": 294,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "A non-root ars_rules path is not a fixture, so Next.js rules stay gated."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_write_then_verify_passes_and_reports_debt",
+      "expected": "PASS with exit 0 when nothing is new",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 110,
+      "end_line": 110,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Repo verify after the write is PASS."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_write_then_verify_passes_and_reports_debt",
+      "expected": "baseline summary counts",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 116,
+      "end_line": 120,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Summary reports baselined, new and resolved counts."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_write_then_verify_passes_and_reports_debt",
+      "expected": "written receipt verifies",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 122,
+      "end_line": 122,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The repo receipt verifies with verdict PASS."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_write_then_verify_passes_and_reports_debt",
+      "expected": "receipt records the same summary",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 124,
+      "end_line": 124,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The receipt stores the same baseline summary."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_new_violation_fails_while_debt_stays_separate",
+      "expected": "FAIL lists only new errors",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 137,
+      "end_line": 137,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Only the new file is listed as an error after the write."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_new_violation_fails_while_debt_stays_separate",
+      "expected": "debt reported under baselined_violations",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 140,
+      "end_line": 140,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Recorded debt stays listed separately."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_matching_ignores_lines_and_is_bounded_by_count",
+      "expected": "line shifts and message drift stay baselined",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 188,
+      "end_line": 188,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Shifted lines and a changed message within the recorded count keep PASS."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_matching_ignores_lines_and_is_bounded_by_count",
+      "expected": "occurrence beyond the count is new",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 191,
+      "end_line": 191,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Only the extra third occurrence is reported as new."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_new_family_rule_is_new_and_resolved_is_counted",
+      "expected": "rule_ids subset and resolved count",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 244,
+      "end_line": 244,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "A family violation with a rule outside the recorded set is new; missing occurrences count as resolved."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[malformed]",
+      "expected": "invalid baseline is BLOCKED baseline_invalid",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 305,
+      "end_line": 305,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Malformed baseline yields blocker baseline_invalid."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[malformed]",
+      "expected": "fix hint names --write-baseline",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 308,
+      "end_line": 308,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The blocker hint names the flag."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_absent_baseline_keeps_legacy_verdict",
+      "expected": "no baseline file keeps legacy verdict",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 162,
+      "end_line": 162,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Without a baseline file no partition applies."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-007",
+      "test_id": "tests.test_conventions_baseline::test_write_is_deterministic_and_reports_delta",
+      "expected": "byte-identical baseline on unchanged input",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 335,
+      "end_line": 335,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Two writes produce identical bytes."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-007",
+      "test_id": "tests.test_conventions_baseline::test_write_is_deterministic_and_reports_delta",
+      "expected": "recorded/added/removed counts",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 339,
+      "end_line": 339,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The write reports the delta against the previous baseline."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-007",
+      "test_id": "tests.test_conventions_baseline::test_write_replaces_invalid_baseline",
+      "expected": "invalid previous baseline is replaced",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 321,
+      "end_line": 321,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "An unreadable previous baseline is reported invalid and replaced."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-007",
+      "test_id": "tests.test_conventions_baseline::test_write_refused_when_blocked_or_with_feature_slug",
+      "expected": "no write when BLOCKED or with a feature slug",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 366,
+      "end_line": 366,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Both refusals leave no baseline file."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-008",
+      "test_id": "tests.test_conventions_baseline::test_feature_scope_ignores_baseline",
+      "expected": "feature receipts carry no baseline",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 385,
+      "end_line": 385,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Feature-scope receipt has no baseline field."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-008",
+      "test_id": "tests.test_conventions_baseline::test_receipt_rejects_changed_or_deleted_baseline[edit]",
+      "expected": "changed baseline rejects the receipt",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 402,
+      "end_line": 402,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Editing the baseline makes receipt verification fail with baseline_sha256_mismatch."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-008",
+      "test_id": "tests.test_conventions_baseline::test_receipt_without_baseline_still_verifies",
+      "expected": "receipts without baseline verify as before",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 413,
+      "end_line": 413,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "A receipt recording no baseline still verifies."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-008",
+      "test_id": "tests.test_conventions_baseline::test_baseline_path_is_protected_by_diff_guard",
+      "expected": "baseline is a protected conventions path",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 421,
+      "end_line": 421,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The diff guard reports the baseline path."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[astro-0]",
+      "expected": "astro-0: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[astro-0]",
+      "expected": "astro-0: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[nextjs-1]",
+      "expected": "nextjs-1: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[nextjs-1]",
+      "expected": "nextjs-1: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[react-2]",
+      "expected": "react-2: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[react-2]",
+      "expected": "react-2: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[react-3]",
+      "expected": "react-3: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[react-3]",
+      "expected": "react-3: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[remotion-4]",
+      "expected": "remotion-4: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[remotion-4]",
+      "expected": "remotion-4: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[shadcn-5]",
+      "expected": "shadcn-5: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[shadcn-5]",
+      "expected": "shadcn-5: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[tanstack-6]",
+      "expected": "tanstack-6: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[tanstack-6]",
+      "expected": "tanstack-6: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[drizzle-7]",
+      "expected": "drizzle-7: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[drizzle-7]",
+      "expected": "drizzle-7: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[prisma-8]",
+      "expected": "prisma-8: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[prisma-8]",
+      "expected": "prisma-8: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[tailwind-9]",
+      "expected": "tailwind-9: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[tailwind-9]",
+      "expected": "tailwind-9: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[cloudflare-10]",
+      "expected": "cloudflare-10: rules apply with evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 270,
+      "end_line": 270,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "File with the row's evidence reports that framework's matched rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-004",
+      "test_id": "tests.test_conventions_gate_signal::test_framework_evidence_rows_gate_rules_at_runtime[cloudflare-10]",
+      "expected": "cloudflare-10: rules skipped without evidence",
+      "assertion_path": "tests/test_conventions_gate_signal.py",
+      "start_line": 271,
+      "end_line": 271,
+      "source_sha256": "bb31276b02734c0a3b877b345a256973bb4763907f852700b1d9caff6b278e32",
+      "justification": "Same detector match without the evidence reports none of that framework's rule ids."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_repo_scope_without_feature_applies_baseline_without_receipt",
+      "expected": "no --feature repo form passes against the baseline",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 149,
+      "end_line": 149,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Exit 0 without --feature."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_repo_scope_without_feature_applies_baseline_without_receipt",
+      "expected": "no --feature form applies the baseline",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 152,
+      "end_line": 152,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Debt reported without --feature."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-005",
+      "test_id": "tests.test_conventions_baseline::test_repo_scope_without_feature_applies_baseline_without_receipt",
+      "expected": "no receipt without --feature",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 153,
+      "end_line": 153,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "No receipt is written without --feature."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_identical_message_is_matched_before_count",
+      "expected": "identical message matched first",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 214,
+      "end_line": 214,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The identical-message occurrence is debt even though a new one precedes it."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_identical_message_is_matched_before_count",
+      "expected": "different earlier message is new",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 215,
+      "end_line": 215,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The preceding different message is new."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[malformed]",
+      "expected": "malformed: exit 2",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 301,
+      "end_line": 301,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Invalid baseline exits 2."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[malformed]",
+      "expected": "malformed: message names the path",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 306,
+      "end_line": 306,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Blocker message names the baseline path."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[malformed]",
+      "expected": "malformed: message names the reason",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 307,
+      "end_line": 307,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Blocker message names the specific reason."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[schema]",
+      "expected": "schema: BLOCKED baseline_invalid",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 305,
+      "end_line": 305,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The schema defect yields blocker baseline_invalid."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[schema]",
+      "expected": "schema: hint names the flag",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 308,
+      "end_line": 308,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The fix hint names --write-baseline."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[schema]",
+      "expected": "schema: exit 2",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 301,
+      "end_line": 301,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Invalid baseline exits 2."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[schema]",
+      "expected": "schema: message names the path",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 306,
+      "end_line": 306,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Blocker message names the baseline path."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[schema]",
+      "expected": "schema: message names the reason",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 307,
+      "end_line": 307,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Blocker message names the specific reason."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[scope]",
+      "expected": "scope: BLOCKED baseline_invalid",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 305,
+      "end_line": 305,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The scope defect yields blocker baseline_invalid."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[scope]",
+      "expected": "scope: hint names the flag",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 308,
+      "end_line": 308,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The fix hint names --write-baseline."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[scope]",
+      "expected": "scope: exit 2",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 301,
+      "end_line": 301,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Invalid baseline exits 2."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[scope]",
+      "expected": "scope: message names the path",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 306,
+      "end_line": 306,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Blocker message names the baseline path."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[scope]",
+      "expected": "scope: message names the reason",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 307,
+      "end_line": 307,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Blocker message names the specific reason."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[count]",
+      "expected": "count: BLOCKED baseline_invalid",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 305,
+      "end_line": 305,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The count defect yields blocker baseline_invalid."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[count]",
+      "expected": "count: hint names the flag",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 308,
+      "end_line": 308,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "The fix hint names --write-baseline."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[count]",
+      "expected": "count: exit 2",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 301,
+      "end_line": 301,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Invalid baseline exits 2."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[count]",
+      "expected": "count: message names the path",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 306,
+      "end_line": 306,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Blocker message names the baseline path."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-006",
+      "test_id": "tests.test_conventions_baseline::test_invalid_baseline_blocks_with_path_reason_and_hint[count]",
+      "expected": "count: message names the reason",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 307,
+      "end_line": 307,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Blocker message names the specific reason."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-007",
+      "test_id": "tests.test_conventions_baseline::test_written_baseline_entries_are_sorted",
+      "expected": "baseline entries are sorted",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 350,
+      "end_line": 350,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Entries are written in sorted order."
+    },
+    {
+      "requirement_id": "082-conventions-gate-signal:AC-008",
+      "test_id": "tests.test_conventions_baseline::test_receipt_rejects_changed_or_deleted_baseline[delete]",
+      "expected": "deleted baseline rejects the receipt",
+      "assertion_path": "tests/test_conventions_baseline.py",
+      "start_line": 402,
+      "end_line": 402,
+      "source_sha256": "55a2b55429f186eceb78d4d903a34d5e60860f6aa94678be495fe6cc8d1b26cd",
+      "justification": "Deleting the baseline makes receipt verification fail with baseline_sha256_mismatch."
+    }
+  ]
+}

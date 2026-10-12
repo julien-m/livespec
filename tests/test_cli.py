@@ -7,6 +7,7 @@ import shutil
 from pathlib import Path
 
 import click
+import pytest
 from typer.testing import CliRunner
 
 from validator.cli import app
@@ -14,15 +15,6 @@ from validator.cli import app
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 runner = CliRunner()
-
-
-class TestValidateHelp:
-    """Basic CLI availability."""
-
-    def test_validate_help(self) -> None:
-        result = runner.invoke(app, ["validate", "--help"])
-        assert result.exit_code == 0
-        assert "Validate" in result.output or "validate" in result.output.lower()
 
 
 class TestMutualExclusion:
@@ -40,15 +32,34 @@ class TestMutualExclusion:
         assert "mutually exclusive" in result.output.lower()
 
 
-class TestSmartFlag:
-    """--smart flag raises error (not implemented)."""
+class TestMissingTarget:
+    """An explicit path that does not exist must fail, never validate as an empty set."""
 
-    def test_smart_raises_error(self, tmp_path: Path) -> None:
-        specs = tmp_path / ".specs"
-        specs.mkdir()
+    def test_missing_feature_directory_exits_2(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        (tmp_path / ".specs" / "features").mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["validate", ".specs/features/999-never-created"])
+
+        assert result.exit_code == 2
+        assert "path not found" in result.output
+
+
+class TestSmartFlag:
+    """--smart (Pass 2) is not implemented and must refuse explicitly."""
+
+    def test_smart_refuses_with_not_implemented_error(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        (tmp_path / ".specs").mkdir()
+        monkeypatch.chdir(tmp_path)
+
         result = runner.invoke(app, ["validate", "--smart"], catch_exceptions=False)
-        # May fail on specs not found or smart error; either is non-zero
-        assert result.exit_code != 0
+
+        assert result.exit_code == 1
+        assert "Pass 2 (Claude SDK) not implemented" in result.output
 
 
 class TestJsonFormat:
@@ -215,15 +226,14 @@ class TestNoReviewFlag:
         # --no-review should not cause an error; normal validation proceeds
         assert result.exit_code == 0
 
-    def test_no_review_appears_in_help(self) -> None:
-        """--no-review flag is documented in validate help."""
-        result = runner.invoke(app, ["validate", "--help"])
-        assert result.exit_code == 0
-        assert "--no-review" in click.unstyle(result.output)
-
 
 class TestSdkIsolatedFlag:
     """Tests for --sdk-isolated CLI flag (Layer 3 CLI surface)."""
+
+    @pytest.fixture(autouse=True)
+    def _run_from_tmp_project(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Resolve `.specs/` from the per-test project, never from the caller's cwd."""
+        monkeypatch.chdir(tmp_path)
 
     def test_sdk_isolated_help_text_contains_flag(self) -> None:
         """--sdk-isolated flag appears in validate --help output."""
@@ -418,12 +428,3 @@ class TestSdkIsolatedFlag:
         assert result.exit_code == 0
         call_args = mock_runner_cls.return_value.run.call_args
         assert call_args[0][0] == "001_auto_llm_review"
-
-
-class TestInstallHookHelp:
-    """install-hook command exists."""
-
-    def test_install_hook_help(self) -> None:
-        result = runner.invoke(app, ["install-hook", "--help"])
-        assert result.exit_code == 0
-        assert "hook" in result.output.lower()

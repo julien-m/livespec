@@ -1,5 +1,14 @@
 # Changelog - 078-requirement-evidence-integrity
 
+## 2026-10-12 — [Refactor]: Reduce the semantic operation matrix to one case per rejection branch
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_semantic_operation_matrix.py, tests/test_spec_test_visual_modes.py, tests/test_witness_penflow.py
+- **AC impacted:** AC-014 (FR-015 option authority, still covered)
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** Before: 171 cases, 155 of them from a 5 operations x 31 legacy options cross product that hit the same guard. After: 42 cases. Each legacy option is still checked once (rotating across operations) and must be named in the diagnostic, and there is one pair per conflict branch with its diagnostic. `--reindex` was dropped together with its removal from the CLI (cleanup lot 2). The visual-mode DoD parametrization went from 24 to 6 cases. The browser-measured witness tests now skip when Node, Playwright or Chromium is unavailable, using the same resolution as `capture.mjs`.
+
 ### 2026-09-06 — Specified the complete five-axis requirement/evidence integrity programme in three delivery lots: full-context semantic review, consequential clarification, independently verified execution receipts, functional generation witnesses and versioned compatibility. Defined16FR and16AC, five Gherkin/Mermaid stories and three concrete witness contracts. Structural validation100/100; independent review0blocking, two planning warnings: snapshot stability and selected versus actually executed full corpus. No runtime implementation proof claimed.
 
 <!-- finalize:spec-specify:2026-09-06:165bc17e -->
@@ -166,3 +175,51 @@ Record lifecycle synchronization for deterministic checks, mapped execution and 
 - **Code modified:** Pending implementation of the approved policy.
 - **Author:** Codex
 - GitHub model generation is removed by explicit user decision; local opt-in evaluation remains. Privately supply the pinned normative corpus with unchanged hash validation. Historical reports and completed goal states retain their original meaning; current reviews will be refreshed.
+
+### 2026-10-12 — Fix: warm-cache regression controls its subprocess environment (test only)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `tests/test_execution_bytecode.py`
+- **Gaps closed:** with `PYTHONDONTWRITEBYTECODE=1` neither the warm-up nor the runner wrote bytecode, so the regression failed; it now removes the variable from its own environment.
+- **Remaining:** none for this test; production capture unchanged.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:b581f1b1 -->
+
+## 2026-10-12 — [Refactor]: ui-form witness skips cleanly without Node
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_generation_witnesses.py
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- ui-form cases skip with a clear reason when `node` is absent instead of failing as `node_unavailable`.
+
+## 2026-10-12 — [Refactor]: Test suite cleanup (lot 2)
+
+Parametrisations reduced to one case per real branch. The tag-legend test now checks every tag used by spec-fix inventory rows. JS/TS syntax cases skip explicitly when node or `node_modules/typescript` is missing; the invalid-TS case previously passed vacuously because the missing compiler also exits non-zero.
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** `tests/test_fix_execution_scope.py`, `tests/test_fix_visual_modes.py`, `tests/test_generation_syntax_boundary.py`
+- **AC impacted:** None (coverage kept)
+- **Author:** Claude Code
+
+## 2026-10-12 — [Refactor]: Identity-version test made behavioural
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_lifecycle_metadata.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+`test_identity_policy_version_invalidates_prior_receipts` only compared the constant; it now proves a version bump changes the normative hash.
+
+## 2026-10-12 — Refactor: Trim redundant review-identity and Analyze test combinations
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_review_lifecycle_protocol.py (20 → 8 cases: the lifecycle exemption still runs for every header band and newline pair, each business change runs once); tests/test_pre_impl_missing_artifacts.py (18 → 5 cases: every missing set, both semantic statuses, and an invalid review config that must not preempt the CRITICAL diagnostics).
+- **AC impacted:** AC-004 (same branches still exercised)
+- **Author:** claude-code

@@ -13,7 +13,10 @@ from .base import BaseFrontmatter
 class SpecFrontmatter(BaseFrontmatter):
     """Frontmatter schema for spec.md files."""
 
-    status: Literal["Draft", "Review", "Approved", "Implemented", "Deprecated"]
+    # Official plan/implementation producers and R2 require these same seven lifecycle states.
+    status: Literal[
+        "Draft", "Planned", "In Progress", "Approved", "Implemented", "Deprecated", "Review"
+    ]
     priority: Literal["P1", "P2", "P3"]
     created: date
     updated: date

@@ -14,7 +14,7 @@ updated: 2026-06-03
 | FR-001 | `validator/cli_commands/doctor_cmd.py` | `@spec FR-001: Public doctor CLI` | ✅ Implemented | 2026-06-02 |
 | FR-002 | `.agent-sync/skills/spec-doctor/SKILL.md`, `migrations/18/migrate.md` | `Command: /spec-doctor` | ✅ Implemented | 2026-06-03 |
 | FR-003 | `validator/doctor/models.py`, `validator/doctor/scanner.py`, `validator/doctor/report.py` | `@spec FR-003: Doctor package orchestration` | ✅ Implemented | 2026-06-02 |
-| FR-004 | `validator/doctor/scanner.py` | `@spec FR-004: Reuse coherence engine` | ✅ Implemented | 2026-06-02 |
+| FR-004 | `validator/doctor/scanner.py`, `validator/coherence/rules/r3_spec_anchors.py` | `@spec FR-004: Reuse coherence engine` (suppressed in-progress findings, `dir_name` attribution) | ✅ Implemented | 2026-10-12 |
 | FR-005 | `validator/doctor/scanner.py` | `@spec FR-005: Implementation map scan` | ✅ Implemented | 2026-06-02 |
 | FR-006 | `validator/doctor/scanner.py` | `@spec FR-006: Runner inclusion scan` | ✅ Implemented | 2026-06-02 |
 | FR-007 | `validator/doctor/scanner.py` | `@spec FR-007: Hook enforcement scan` | ✅ Implemented | 2026-06-02 |
@@ -59,3 +59,9 @@ updated: 2026-06-03
 | `migrations/18/migrate.md` | Re-runs agent asset sync so existing v17 projects receive `spec-doctor`. |
 | `VERSION` | Bumps LiveSpec target version to 18 for downstream migration planning. |
 | `README.md` | Command list and validator docs updated. |
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-12 | FR-004 | `tests/test_doctor_coherence_suppressed.py::test_doctor_attributes_settled_coherence_violation_to_its_feature` | `.specs/.execution/a2612583165a449781b5cba2b3e8bc9d/receipt.json` | `.specs/.execution/29e0ed33a36c426d820ee14eff9a020d/receipt.json` |

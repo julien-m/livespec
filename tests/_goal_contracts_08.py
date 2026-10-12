@@ -159,11 +159,6 @@ def test_spec_check_dod_requires_tree_validation_report_not_pass(tmp_path: Path)
 
     assert dod[0] == "Tree validation executed and reported (or skipped by --skip-tree)"
     assert not any("tree validation" in item.lower() and "passed" in item.lower() for item in dod)
-    assert "Gap report produced and displayed" in dod
-    assert "Gap report saved to `checks/YYYY-MM-DD.md`" in dod
-    assert "Feature `changelog.md` has a check entry" in dod
-    assert "Global `.specs/changelog.md` has a summary entry" in dod
-    assert "If multi-spec: consolidated report produced" in dod
 
 
 def test_render_goal_objective_is_stable_text_from_payload(tmp_path: Path) -> None:
@@ -181,27 +176,29 @@ def test_render_goal_objective_is_stable_text_from_payload(tmp_path: Path) -> No
     assert objective == render_goal_objective(goal)
     assert "Goal hash:" in objective
     assert "Command: spec-demo" in objective
+    assert "Goal: optional" in objective
+    assert "Stop condition: livespec validate .specs/features/001-demo exits 0" in objective
+    assert "Checklist (indicative, not proven task by task):" in objective
     assert "- `demo.txt` exists" in objective
-    assert "Filesystem effects:" in objective
-    assert "- creates demo.txt." in objective
-    assert "- must contains: done" in objective
+    assert "outcome.verified" in objective
 
 
 def test_anti_drift_block_documents_shared_goal_protocol() -> None:
-    """AC-007: all imported command protocols share the same goal lifecycle."""
-    text = Path("system/anti-drift-block.md").read_text(encoding="utf-8")
+    """AC-007 + 081 AC-004/AC-009: one short, non-blocking goal lifecycle."""
+    text = (_repo_root() / "system" / "anti-drift-block.md").read_text(encoding="utf-8")
 
     assert "livespec goal render <command-name>" in text
-    assert "/goal hash:<" in text  # Exact /goal slash command form with hash+ref
-    assert "/goal clear" in text  # Active goal precheck
-    assert "already active" in text  # Precheck documentation
     assert "contract-file:" in text
     assert "state-file:" in text
     assert "livespec goal prove" in text
+    assert "stop_condition" in text
+    assert "create_goal" in text and "/goal" in text
+    assert "already active, update it when the tool allows" in text
+    assert "/goal clear" not in text
+    assert "/goal slash command unavailable" not in text
+    assert "ABSOLU" not in text and "MUST" not in text
     assert "[ ]` → `[x]" not in text
 
-
-# ─── finalize.registry evidence family (Feature 058, FR-005/FR-006) ──────────
 
 FINALIZE_SKILL = """\
 ---

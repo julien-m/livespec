@@ -148,7 +148,7 @@ SOURCE_FAMILY_CHECKS: dict[str, SourceFamilyCheck] = {
     "delphi_code": _family(
         "delphi_code",
         description="Delphi guidance must catch empty exception handlers.",
-        pattern=r"\bexcept\s*(?:\r?\n|\s)+end\s*;",
+        pattern=r"\bexcept\s+end\s*;",
         pass_name="pass.pas",
         fail_name="fail.pas",
     ),

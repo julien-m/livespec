@@ -17,20 +17,17 @@ status: Implemented
 |---|---|---|---|---|
 | FR-001 | `livespec/drivers/swift.yaml` | `@spec FR-001: Swift driver YAML with all 4 capabilities` | Implemented | 2026-05-07 |
 | FR-002 | `livespec/drivers/scripts/swift-coverage-gate.sh` | `@spec FR-002: Swift coverage gate escape-hatch script` | Implemented | 2026-05-07 |
-| FR-003 | `validator/drivers/swift_detector.py::parse_package_dependencies` | `@spec FR-003: Package.swift dependency parser` | Implemented | 2026-05-07 |
-| FR-004 | `validator/drivers/swift_detector.py::is_xcode_only_project` | `@spec FR-004: Xcode project detection fallback` | Implemented | 2026-05-07 |
+| FR-003 | — | — | ❌ Removed 2026-10-12 (Package.swift parser deleted: no production caller) | 2026-10-12 |
+| FR-004 | `livespec/drivers/scripts/swift-coverage-gate.sh` | `@spec FR-004: Xcode project detection fallback` | Implemented (gate script; the Python helper was unused and removed 2026-10-12) | 2026-10-12 |
 | FR-005 | `tests/integration/test_driver_swift.py` | `@spec FR-005: Integration tests for the Swift driver` | Implemented | 2026-05-07 |
-| FR-006 | `tests/unit/test_swift_detector.py`, `tests/unit/test_swift_coverage_gate.py` | `@spec FR-006: Unit tests for detector and gate script` | Implemented | 2026-05-07 |
+| FR-006 | `tests/unit/test_swift_coverage_gate.py` | `@spec FR-006: Unit tests for the gate script` | Implemented | 2026-10-12 |
 
 ## Files Created
 
 | File | Purpose |
 |---|---|
 | `livespec/drivers/scripts/swift-coverage-gate.sh` | Escape-hatch shell script that runs `swift test --enable-code-coverage`, exports lcov via `xcrun llvm-cov` (or `llvm-cov` on Linux), parses DA: lines, and gates on threshold. |
-| `validator/drivers/swift_detector.py` | Pure-Python `Package.swift` parser + Xcode-only project fallback. |
-| `tests/unit/test_swift_detector.py` | 11 unit tests for dependency parsing, case-insensitive lookup, and Xcode fallback. |
 | `tests/unit/test_swift_coverage_gate.py` | 9 bash-script unit tests covering threshold pass/fail, default threshold, Xcode-only skip, no Swift project, and missing/empty lcov. |
-| `tests/integration/test_driver_swift.py` | 11 integration tests covering manifest schema, registry detection, capability metadata, gate-script presence, Xcode-only non-match, and dependency detection on a SwiftPM fixture. |
 
 ## Files Modified
 
@@ -45,13 +42,13 @@ status: Implemented
 | AC-001 | `test_registry_loads_swift_driver`, `test_swift_driver_detects_package_swift` | Implemented |
 | AC-002 | `test_coverage_capability_uses_script_escape_hatch`, gate script `swift test --enable-code-coverage` invocation | Implemented |
 | AC-003 | `test_gate_passes_when_above_threshold`, `test_gate_fails_when_below_threshold`, `test_gate_default_threshold_is_75` | Implemented |
-| AC-004 | `test_gate_xcode_only_project_skips_with_hint`, `test_xcode_only_project_does_not_match_swift_driver`, `test_is_xcode_only_project_*` | Implemented |
-| AC-005 | `test_dependency_detection_in_fixture_swiftpm`, `test_has_swift_dependency_case_insensitive`, `test_snapshots_capability_metadata` | Implemented |
-| AC-006 | `test_dependency_detection_in_fixture_swiftpm`, `test_properties_capability_metadata` | Implemented |
+| AC-004 | `test_gate_xcode_only_project_skips_with_hint`, `test_xcode_only_project_does_not_match_swift_driver` | Implemented |
+| AC-005 | — | ❌ Removed 2026-10-12 |
+| AC-006 | — | ❌ Removed 2026-10-12 |
 | AC-007 | `test_mutation_capability_metadata` (muter command surfaces install hint via runner) | Implemented |
 | AC-008 | `test_coverage_capability_uses_script_escape_hatch`, `test_coverage_gate_script_is_shipped_and_executable` | Implemented |
 | AC-009 | `test_swift_driver_schema_validation`, `test_swift_driver_capabilities_exist` | Implemented |
-| AC-010 | `test_parse_package_dependencies_*`, `test_dependency_detection_in_fixture_swiftpm` | Implemented |
+| AC-010 | — | ❌ Removed 2026-10-12 |
 
 ## Test Results
 

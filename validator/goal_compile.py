@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import shlex
 from pathlib import Path
 
 from . import goal_contracts as _contracts
+from .identity import SLUG_REGEX
+from .semantic.review_feature_scope import resolve_existing_feature
 
 __all__ = ["_compile_command_goal", "compile_command_goal", "normalize_goal_flags"]
 
@@ -97,6 +100,24 @@ def _compile_command_goal(
     flags: str | list[str] | tuple[str, ...] | None,
 ) -> _contracts.GoalContract:
     normalized_command = _contracts.normalize_command_name(command)
+    # @spec FR-004: Freeze actual existing owner; never rewrite an active goal (078).
+    existing_commands = {
+        "spec-check",
+        "spec-fix",
+        "spec-plan",
+        "spec-implement",
+        "spec-test",
+        "spec-refine",
+        "spec-explain",
+    }
+    if feature and normalized_command in existing_commands and not SLUG_REGEX.fullmatch(feature):
+        feature = resolve_existing_feature(project_root, feature).name
+    elif feature and not SLUG_REGEX.fullmatch(feature):
+        # @spec FR-005: Same slug for every command
+        #   — .specs/features/081-lightweight-outcome-goals/spec.md#fr-005
+        # A feature not created yet keeps its slug; the goal recompiles once it exists.
+        with contextlib.suppress(OSError, ValueError):
+            feature = resolve_existing_feature(project_root, feature).name
     expectations = _contracts.load_expectations(
         normalized_command,
         project_root,
@@ -126,4 +147,5 @@ def _compile_command_goal(
         canonical_json=canonical_json,
         goal_hash=goal_hash,
         objective=objective,
+        project_root=project_root.resolve().as_posix(),
     )

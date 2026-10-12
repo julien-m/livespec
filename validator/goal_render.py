@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, cast
+from typing import Any
 
 from . import goal_contracts as _contracts
 
@@ -11,7 +11,7 @@ from . import goal_contracts as _contracts
 # @spec FR-003: Mirror the canonical project root in saved contracts
 #   — .specs/features/076-spec-init-goal-bootstrap/spec.md#fr-003
 def render_goal_contract_file(goal: _contracts.GoalContract) -> str:
-    """Render the immutable JSON contract consumed by ``livespec goal prove``.
+    """Render the JSON contract consumed by ``livespec goal prove``.
 
     Args:
         goal: Compiled deterministic goal contract.
@@ -20,31 +20,36 @@ def render_goal_contract_file(goal: _contracts.GoalContract) -> str:
         Pretty-printed JSON contract text. The function has no filesystem
         side effects; callers decide where to persist it.
     """
+    payload = goal.payload
     contract = {
         "schema_version": _contracts.GOAL_CONTRACT_VERSION,
-        "evidence_policy_version": goal.payload.get("evidence_policy_version"),
+        "evidence_policy_version": payload.get("evidence_policy_version"),
         "goal_hash": goal.goal_hash,
         "command": goal.command,
-        "feature": goal.payload.get("feature"),
-        "normalized_flags": list(goal.payload.get("normalized_flags") or []),
-        "mode": goal.payload["mode"],
+        "feature": payload.get("feature"),
+        "normalized_flags": list(payload.get("normalized_flags") or []),
+        "mode": payload["mode"],
+        "goal_requirement": payload["goal_requirement"],
+        "stop_condition": payload["stop_condition"],
         "worker_may_mark_tasks_complete": False,
-        "rules": goal.payload["rules"],
-        "tasks": goal.payload["tasks"],
-        "definition_of_done": goal.payload["definition_of_done"],
-        "runtime_context": goal.payload["runtime_context"],
-        "hooks": goal.payload["hooks"],
-        **({"qe_analysis": goal.payload["qe_analysis"]} if "qe_analysis" in goal.payload else {}),
-        "canonical": goal.payload,
+        "rules": payload["rules"],
+        "tasks": payload["tasks"],
+        "checklist": [*payload["execution_tasks"], *payload["definition_of_done"]],
+        "runtime_context": payload["runtime_context"],
+        "hooks": payload["hooks"],
+        **({"qe_analysis": payload["qe_analysis"]} if "qe_analysis" in payload else {}),
+        "canonical": payload,
         "canonical_json": goal.canonical_json,
     }
     if goal.command == "spec-init":
-        contract["project_root"] = goal.payload["project_root"]
+        contract["project_root"] = payload["project_root"]
+    elif goal.project_root is not None:
+        # Not hashed: lets prove/archive recompile the goal against the same project.
+        contract["compiled_project_root"] = goal.project_root
     return json.dumps(contract, indent=2, sort_keys=True, ensure_ascii=False)
 
 
 __all__ = [
-    "_goal_objective_context",
     "render_goal_contract_file",
     "render_goal_objective",
     "render_goal_state_file",
@@ -90,101 +95,58 @@ def render_goal_status(state: dict[str, Any]) -> str:
 
     Returns:
         One-line status summary with goal hash, status, completed count, and
-        pending count.
+        pending count; blocked tasks are appended when present.
     """
     tasks = dict(state.get("tasks") or {})
     total = len(tasks)
     complete = sum(1 for task in tasks.values() if task.get("status") == "complete")
     pending = total - complete
     status = state.get("status") or "unknown"
-    return (
+    line = (
         f"goal_hash:{state.get('goal_hash', 'unknown')} | "
         f"status:{status} | complete:{complete}/{total} | pending:{pending}"
     )
+    blocked = [
+        task_id
+        for task_id, task in tasks.items()
+        if task.get("status") != "complete" and task.get("blocked")
+    ]
+    if blocked:
+        line += f" | blocked:{len(blocked)} ({', '.join(blocked)})"
+    return line
 
 
 def render_goal_objective(goal: _contracts.GoalContract) -> str:
     """Render stable human text from the canonical payload."""
     payload = goal.payload
+    stop = payload["stop_condition"]
     lines = [
         f"Goal hash: {goal.goal_hash}",
         f"Command: {payload['command']}",
         f"Feature: {payload['feature'] or 'none'}",
         f"Flags: {', '.join(payload['normalized_flags']) or 'none'}",
+        f"Goal: {payload['goal_requirement']}",
+        f"Stop condition: {stop['display']}",
+        "",
+        "Required proofs (in order):",
     ]
-    lines.extend(_contracts._goal_objective_context(payload))
-    lines.append("Definition of Done:")
-    definition_of_done = list(payload["definition_of_done"])
-    if definition_of_done:
-        lines.extend(f"- {item}" for item in definition_of_done)
-    else:
-        lines.append("- No Definition of Done found in command skill; use expectations only.")
-    conventions = payload.get("conventions", {})
-    selected_domains = list(conventions.get("selected_domains") or [])
-    if selected_domains:
+    lines.extend(f"  {task['ordinal']:>2}. {task['id']}" for task in payload["tasks"])
+    checklist = [*payload["execution_tasks"], *payload["definition_of_done"]]
+    if checklist:
         lines.append("")
-        lines.append("Conventions to apply:")
-        for domain in selected_domains:
-            lines.append(f"- {domain['name']}: {', '.join(domain['paths'])}")
-    sections = payload["expectation_sections"]
-    for label, key in (
-        ("Preconditions", "preconditions"),
-        ("Filesystem effects", "filesystem_effects"),
-        ("Produced artifacts", "produced_artifacts"),
-        ("Post-run checks", "post_run_checks"),
-    ):
-        values = list(sections[key])
-        if not values:
-            continue
-        lines.append("")
-        lines.append(f"{label}:")
-        lines.extend(f"- {value}" for value in values)
-    lines.append("")
-    lines.append("Verification rules:")
-    for rule in payload["verify_rules"]["must"]:
-        lines.append(f"- must {rule['kind']}: {rule['payload']}")
-    for rule in payload["verify_rules"]["must_not"]:
-        lines.append(f"- must_not {rule['kind']}: {rule['payload']}")
-    return "\n".join(lines)
-
-
-def _goal_objective_context(payload: dict[str, Any]) -> list[str]:
-    lines: list[str] = []
-    execution_tasks = list(payload.get("execution_tasks") or [])
-    if execution_tasks:
-        lines.append("")
-        lines.append("Execution tasks (in order):")
-        for i, task in enumerate(execution_tasks, 1):
-            lines.append(f"  {i:>2}. {task}")
-    tasks = list(payload.get("tasks") or [])
+        lines.append("Checklist (indicative, not proven task by task):")
+        lines.extend(f"- {item}" for item in checklist)
     hooks = payload.get("hooks")
-    if isinstance(hooks, dict):
-        before_hook = hooks.get("before")
-        if isinstance(before_hook, dict) and before_hook.get("non_empty"):
-            lines.append("")
-            lines.append("Hook context to apply:")
-            lines.append(f"- before: {before_hook.get('command')}")
-            lines.append(f"- sha256: {before_hook.get('context_sha256')}")
+    before_hook = hooks.get("before") if isinstance(hooks, dict) else None
+    if isinstance(before_hook, dict) and before_hook.get("non_empty"):
+        lines.append("")
+        lines.append(f"Hook context to apply: {before_hook.get('command')}")
     # @spec FR-002: Surface native QE context in rendered objective
     #   — .specs/features/071-qe-analysis-native-module/spec.md#fr-002
     qe_analysis = payload.get("qe_analysis")
     if isinstance(qe_analysis, dict) and qe_analysis.get("native") is True:
         lines.append("")
-        lines.append("Native QE Analysis:")
-        lines.append(f"- source: {qe_analysis.get('source_path')}")
-        lines.append("- user hooks: extension_only")
-    # @spec FR-005: Render task-level convention replay
-    #   — .specs/features/053-goal-tasks-replay-required-conventions-per-step/spec.md#fr-005
-    convention_tasks = [
-        task for task in tasks if isinstance(task, dict) and task.get("required_conventions")
-    ]
-    if convention_tasks:
-        lines.append("")
-        lines.append("Task-level convention replay:")
-        for task in convention_tasks:
-            required = cast(dict[str, Any], task["required_conventions"])
-            domains = ", ".join(cast(list[str], required.get("domains") or []))
-            sources = ", ".join(cast(list[str], required.get("source_paths") or []))
-            lines.append(f"- {task['id']}: read_apply domains [{domains}] from {sources}")
-    lines.append("")
-    return lines
+        lines.append(
+            f"Native QE Analysis: {qe_analysis.get('source_path')} (user hooks: extension_only)"
+        )
+    return "\n".join(lines)

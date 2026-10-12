@@ -14,10 +14,10 @@ import typer
 
 from .. import preflight_autofix
 from ..cli_exit_codes import (
+    EXIT_CONFIG,
     EXIT_OK,
-    EXIT_PREFLIGHT_FAIL,
 )
-from ._common import emit_summary, require_specs_root, run_with_debug
+from ._common import emit_summary, help_epilog, require_specs_root, run_with_debug
 
 
 def preflight_command(
@@ -46,7 +46,6 @@ def preflight_command(
         lambda: _run_preflight(fix=fix, full=full),
         debug=debug,
         subcommand="preflight",
-        fail_exit_code=EXIT_PREFLIGHT_FAIL,
     )
 
 
@@ -55,6 +54,7 @@ def register(app: typer.Typer) -> None:
     app.command(
         name="preflight",
         help="Verify the preflight manifest (read-only or with --fix).",
+        epilog=help_epilog("livespec preflight --fix"),
     )(preflight_command)
 
 
@@ -69,7 +69,7 @@ def _run_preflight(*, fix: bool, full: bool) -> None:
             err=True,
         )
         emit_summary("preflight", "FAIL", reason="manifest_missing")
-        raise typer.Exit(EXIT_PREFLIGHT_FAIL)
+        raise typer.Exit(EXIT_CONFIG)
 
     items = preflight_autofix.parse_preflight_manifest(manifest_path.read_text(encoding="utf-8"))
     items.extend(preflight_autofix.conventions_preflight_items(project_root))
@@ -113,7 +113,7 @@ def _run_verify_mode(items: list[preflight_autofix.PreflightItem]) -> None:
             ok=ok_count,
             missing=missing_count,
         )
-        raise typer.Exit(EXIT_PREFLIGHT_FAIL)
+        raise typer.Exit(EXIT_CONFIG)
     emit_summary("preflight", "OK", ok=ok_count, missing=0)
 
 
@@ -146,7 +146,7 @@ def _run_fix_mode(
             manual_required=manual,
             installed=installed,
         )
-        raise typer.Exit(EXIT_PREFLIGHT_FAIL)
+        raise typer.Exit(EXIT_CONFIG)
 
     emit_summary(
         "preflight",

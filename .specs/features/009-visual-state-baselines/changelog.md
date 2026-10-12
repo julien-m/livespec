@@ -1,5 +1,14 @@
 # Changelog — 009-visual-state-baselines
 
+## 2026-10-12 — [Refactor]: Replace tautological visual-state tests with parsed-taxonomy assertions
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_visual_states.py
+- **AC impacted:** AC-001, AC-013, AC-014
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** `test_visual_state_fields` and `test_missing_visual_states_table_returns_empty_list` now assert on traits parsed from the real taxonomy instead of on hand-built dataclasses. `test_all_five_traits_have_visual_states` now requires every documented visual trait to exist with at least 2 states; it absorbed the earlier per-trait loop, which passed silently when a trait was missing. Removed the taxonomy hash test because it exercised the VCS tool, not LiveSpec.
+
 ## 2026-04-17 — [Feature]: Spec created
 
 - **Type:** Feature

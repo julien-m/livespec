@@ -3,9 +3,171 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-09
+> Last updated: 2026-10-12
 
 ---
+
+## 2026-10-12 — Bugfix: CI parity on Python 3.12
+
+- [081](features/081-lightweight-outcome-goals/changelog.md): `goal prove --evidence '<json>'` no longer fails on Python 3.12 when the inline JSON exceeds the filename limit; the deadline test uses a real profile.
+- [035](features/035-unified-cli-surface/changelog.md): the help-example test strips Rich ANSI styling emitted under GitHub Actions.
+
+## 2026-10-12 — Bugfix: PR #36 review findings
+
+- [081](features/081-lightweight-outcome-goals/changelog.md): `livespec validate <path>` fails (exit 2) for a missing explicit target, so a never-created feature cannot satisfy its goal stop condition.
+- [083](features/083-pinned-runtime-isolation/changelog.md): runtime link discovery never follows a symlinked or escaping link directory; an unreadable `.specs/.livespec-path` is reported as a broken reference instead of crashing.
+
+## 2026-10-12 — Bugfix: ReDoS in the Delphi family detector
+
+- [082](features/082-conventions-gate-signal/changelog.md): the Delphi empty-handler detector uses an unambiguous `\bexcept\s+end\s*;` instead of a pattern with exponential backtracking (CodeQL py/redos, high).
+
+## 2026-10-12 — Bugfix: CI uses the locked toolchain
+
+- [079](features/079-validator-ci-prerequisites/changelog.md): both CI jobs install the exact `uv.lock` versions instead of the newest ruff/mypy, so CI and local runs agree; the mypy 2.4 return-type finding in `validator/init_profile.py` is fixed.
+
+## 2026-10-12 — Bugfix: CI Ruff scope excludes external checkouts
+
+- [079](features/079-validator-ci-prerequisites/changelog.md): `.ci-deps` (pinned ai-ressources and penflow checkouts) is excluded from Ruff, which failed CI on a Markdown code block in the external corpus.
+
+## 2026-10-12 — Spec Update: registry statuses aligned after stabilization merges
+
+- README registry aligned to spec.md for [028](features/028-ui-runner-web/spec.md), [030](features/030-ui-runner-ios-watchos/spec.md), [031](features/031-ui-runner-android/spec.md) and [033](features/033-smart-test-selection/spec.md) (Implemented); [036](features/036-multi-surface-detection-and-migration/changelog.md) spec.md moves Draft -> Planned (plan present, no implementation map). 035 and 080 were already aligned (In Progress) by their merged fixes.
+- [056](features/056-executable-user-journeys/implementation.md) FR-007 status note no longer cites `surfaces.yaml` as a mapped source file (coherence R3.1). The autonomous-init recovery tests get a 30 s wrapper budget so `pytest -n auto` no longer times out; `.coverage` data files are ignored.
+- `run_capability` (`validator/drivers/runner.py`) splits the skip result and the 035 AC-002 test-path append into helpers after the merge pushed it past the 60-line convention limit (behavior unchanged); `conventions verify --feature repo` passes again.
+
+## 2026-10-12 — Bugfix: audit bugs through the bugfix lane (084)
+
+- [055](features/055-spec-doctor-project-health/changelog.md): doctor reports suppressed in-progress coherence findings as INFO `[in-progress, Nmin]` and attributes findings through `dir_name` (R3 contexts gain `dir_name`); lane ELIGIBLE (3 files, 55 lines), RED/GREEN receipts in implementation.md.
+- [014](features/014-supervisor-contracts/changelog.md): spec-feature `--resume` resolves the latest `pipeline.md` with `ls -t .specs/features/*/pipeline.md` instead of the nonexistent `livespec pipeline latest`; new guard test checks every `livespec` command path cited by a skill; lane ELIGIBLE (3 files, 60 lines).
+- [016](features/016-cross-language-test-driver-architecture/changelog.md): built-in driver scripts resolve beside their shipped manifest (`livespec/drivers/scripts/`), custom `.specs/drivers` scripts stay project-relative; lane ELIGIBLE (2 files, 58 lines).
+- [037](features/037-test-multi-runner-integration/changelog.md): Web/XCUITest/Maestro handlers accept the `RunnerHandler` keywords (`**kwargs: Any`) and `Path | str` baselines, XCUITest/Maestro reuse the web `UICapabilityResult`, the registry drops its `cast` (pyright clean) and stale yaml suppressions go; lane ELIGIBLE (5 files, 175 lines).
+
+## 2026-10-12 — [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback)
+<!-- finalize:spec-feature:2026-10-12:a6abad0a -->
+
+## 2026-10-12 — Bugfix: declare unit-test dependencies (audit batch)
+
+- [079](features/079-validator-ci-prerequisites/changelog.md): `click`, `jsonschema` and `pluggy` move into the `dev` extra (typer 0.27 vendors its own click, so they only arrived through `integration`); `uv.lock` regenerated and a guard test checks every unit-suite third-party import against runtime/dev requirements.
+
+## 2026-10-12 — Bugfix: missing requirements of features 035 and 056 implemented
+
+- [Feature 056](features/056-executable-user-journeys/changelog.md) Fix: AC-003, AC-004 and AC-015 were marked done but not implemented on the v2 path. `wait` now takes `until`/`reason` (bounded waits in Playwright, XCUITest and Maestro, `wait_reason_missing` warning), and manual journeys require `manual_reason`. Also fixed: FR-005 `select` (Playwright) and FR-007 portable XCUITest destination, with no hardcoded `STRAPTUITests`. Spec clarified and plan rewritten on the v2 pipeline after independent reviews.
+- [Feature 035](features/035-unified-cli-surface/changelog.md) Fix: every unified command's `--help` ends with an executable example (AC-013). Human decisions applied: constitution exit codes 0/1/2/3/130, base branch `origin/HEAD` then main/master/develop/dev, CI summary on stderr with `--json`, and real `--feature` selection through `SmartTestSelector` plus the additive driver field `test_selection: append` ([016](features/016-cross-language-test-driver-architecture/changelog.md)). implementation.md created; status In Progress pending the feature-scope conventions debt.
+
+## 2026-10-12 — Refactor: dead-code resolution (wire or retire)
+
+- Wired: the Python driver now resolves `{module}`/`{report_path}`/`{threshold}` (via the previously unused `detect_python_module`), fixing `livespec test` on Python projects (017); iOS/Android UI runner detection now reads the `ios.yaml`/`android.yaml` `detect:` blocks (030, 031).
+- Retired (FR/AC marked Removed or remapped): Go, Swift and syrupy detectors and the unused Cargo.toml/JVM build-file helpers (017, 019–022); `deduplicate_tests` and a tautological test (006); journey assignment/bootstrap helpers and the native visual evaluator (057).
+- Follow-up (user decisions): TypeScript commands now follow the detected jest/vitest runner and npm/pnpm/yarn/bun manager with override priority and Stryker/fast-check skip hints (018); web runner detection reads `web.yaml` (028); the iOS runner reads `test_scheme`/`scenarios` from the project `ios.yaml` (explicit > project config > detection) (030); LLM visual contracts are evaluated by the agent and verified by `livespec journey visual-verify`, replacing the unwired `llm_visual.py` (057). EC-002 stays a judgment call for `/spec-implement`.
+
+## 2026-10-12 — Bugfix: [Feature 080] Unsupported manifests recorded, missing package manager warns; readiness gate closed
+
+- User decision recorded in [080](features/080-autonomous-from-code-recovery/changelog.md) (FR-001, new AC-007, IDs preserved): an unsupported manifest (`go.mod`, `Gemfile`, `pom.xml`…) beside supported ones is recorded as unsupported/unknown in `bootstrap-profile.json`, `project.md` and `bootstrap-recap.md`, and bootstrap continues with the supported ecosystems (JavaScript/TypeScript with bun/npm/pnpm/yarn, Python via `pyproject.toml`, Rust, Tauri); unsupported-only projects fail naming the files; a `package.json` without manager evidence warns (`WARNING:` on stderr) and never fails.
+- Code modified: `validator/init_profile.py`, `validator/init_documents.py`, `validator/init_from_code.py` (TDD). Spec status aligned to In Progress. Fresh independent spec and plan reviews are ready; `validate --progression implement` returns READY.
+
+## 2026-10-12 — Spec Update: [Feature 077] AC-009 / FR-008 clarified, readiness gate closed
+
+- User decision recorded in [077](features/077-penflow-cumulative-verdict-consumer/changelog.md): an authenticated, accepted Brainstorm import is the certifying `penflow authority collect` response (report SHA-256 plus exact sorted file inventory); a bounded archive is confined to `.specs/penflow-authority/<digest>/`, holds only inventoried files, admits no path escape and has no size cap. Current behavior, no code change; requirement IDs preserved.
+- Fresh independent spec and plan reviews are ready; `validate --progression implement` returns READY, closing the pending Penflow CLI resolution spec-fix.
+
+## 2026-10-12 — Refactor: test-suite cleanup lot 5
+
+- Removed or replaced tautological, vacuous and always-skipped tests across features 001, 002, 007, 009, 019, 020, 022, 030, 031, 037, 046 and 078. This includes the unmapped `tests/test_ui_runner_cli.py` (a redundant registry check) and `tests/test_ui_runner_tauri.py`, where the driver-capability test now pins both states instead of asserting nothing when tauri-driver is installed. The semantic matrix went from 171 to 42 cases, the visual gate stays at 94.41% coverage, and no production code changed.
+- Corrected traceability: feature 030 FR-007/FR-008 are Missing, because their mapped tests were unconditional skips. Feature 007's test table now matches FR-005 (5 tests).
+
+## 2026-10-12 — Refactor: test cleanup lot 4 (legitimate assertions only)
+
+- Plan-review exit-code tests run the CLI instead of recomputing its expression ([001](features/001-auto-llm-review/changelog.md)); web-runner output-path tests stub Playwright instead of launching `npx` ([028](features/028-ui-runner-web/changelog.md)); review-identity and Analyze combinations trimmed to one case per branch ([078](features/078-requirement-evidence-integrity/changelog.md)); preflight YAML parsing, link-capability fallback, schema and ship-header tests assert real values ([034](features/034-preflight-autofix/changelog.md) records an open `pip install -e` parsing defect).
+- Kept on purpose: `tests/test_penflow_contract_command_contract.py` (documentation ACs of 051, 054, 066 and 077), `TestTruthFixes` in the run-artifact suite (039.1 AC-012), the per-runner dispatcher tests named by 037 SC-002, and `tests/test_review_api.py` (001 FR-010/FR-011).
+
+## 2026-10-12 — Refactor: remove the `--mutate` and `--experimental-multi-model` stubs
+
+- `livespec validate --mutate` only printed a hint to run this repository's own pytest and exited 0; `--experimental-multi-model` only printed "not yet integrated" and exited 0. Both options, their legacy-conflict entries and the never-imported modules behind them (`validator/semantic/mutations.py`, `validator/semantic/multi_model.py`) are removed. Static grep over `validator/`, `tests/`, `scripts/`, `.agent-sync/`, `templates/`, `hooks/` and `pyproject.toml` found no importer, no string-based import and no entry point. Driver mutation testing (`livespec mutation`, feature 016) is unaffected.
+- The scorecard Axis 4 placeholder (constant 50) is kept: it still contributes to every published total and removing it would reweight the scorecard. Its pinning test and the weight-constant test are removed; `--contradiction-only` tests no longer depend on the machine's provider.
+- No LiveSpec feature owns Layer 4. Code modified: `validator/cli.py`, `.specs/roadmap.md`, `tests/test_scorecard.py`, `tests/test_semantic_operation_matrix.py`.
+
+## 2026-10-12 — Bugfix: coherence suppress_if_creating grace window never fired
+
+- The rule engine looked up the feature under `context["feature_dir"]`, a key no coherence rule emits; it now reads the canonical `dir_name` key, so violations of R1.2, R1.3, R2.1, R4.2 and R4.3 on a spec edited less than 30 minutes ago are demoted to INFO with the `[in-progress, Nmin]` tag, as described in [the Layer 2 design](../docs/superpowers/specs/2026-04-02-layer2-coherence-validation-design.md). `--no-suppress` and the finalize verifier still see them.
+- R2.2 no longer requests suppression, matching the design table.
+- No LiveSpec feature owns the Layer 2 engine; `tests/test_rule_engine.py` now exercises the real demotion, the aged case and non-empty filter results. Code modified: `validator/coherence/rule_engine.py`, `validator/coherence/rules/r2_status_files.py`, `tests/test_rule_engine.py`, `tests/test_coherence_cli.py`.
+
+## 2026-10-12 — Refactor: test-suite cleanup lot 3 (goal, journey, locks, manifests, Penflow models)
+
+- 1033 -> 911 test cases in the lot with no validator line losing coverage (23800 -> 23807 covered lines); no new failure in the unit suite.
+- Lying or vacuous tests corrected: the lock resume test now reaches the resume branch; 056 AC-004 (fixed-wait warning) and AC-015 (manual reason) were certified by tests that never exercised them and are now recorded as Missing.
+- Constant, library and fixture self-checks replaced by observable behaviour (hook variables, slug regex doc, identity policy version, specStatus marker, Maestro detect rules, v21 scaffold wrapper).
+- Label-only parametrization and duplicated cases removed from goal pairing/proof, goal contracts, graph builder, init goal profiles, journey fixtures and Penflow approval models; mapping rows of 031 and 059 updated.
+
+## 2026-10-12 — Refactor: test suite cleanup lot 2 and dead embeddings stub removal
+
+- Removed `validator/semantic/embeddings.py` (imported only by its own test; `compute_embedding` raised `NotImplementedError`), the `livespec validate --reindex` stub that only printed "not yet integrated", and their tests (`tests/test_embeddings.py`, `test_scorecard.py::test_reindex_stub`, the `--reindex` legacy-option case). The roadmap "Embedding reindex" item stays open.
+- Weak tests now exercise the real behaviour: expectations rules are parsed with `validator.expectations`, the score clamp is proven at 0, economy-mode guards cannot pass on zero blocks, JS/TS syntax checks skip explicitly without node/`node_modules/typescript` instead of passing vacuously.
+- Duplicated and label-only parametrised cases trimmed in features 026, 047, 063, 078 and 079 (see their changelogs); no production behaviour changed besides the removed stub.
+
+## 2026-10-12 — Refactor: test-suite cleanup, lot 1
+
+- Removed tests that exercised no LiveSpec code (self-tested helpers, Markdown word searches, a static fixture checked by test-only validators, Node failing on a missing file) and duplicates (command aliases, visual dispatch, driver detector cases, gates init, help smoke tests).
+- Replaced prose pins with machine contracts: documented `livespec conventions` and `livespec hooks resolve` invocations must resolve in the real CLI; migration v22 runs end to end; surface generator tests parse the YAML they would write.
+- Fixed weak or environment-dependent tests: coherence JSON, `--smart`, distinct AC/FR numbering, cwd-independent paths, explicit skips when `node` is absent.
+- Feature changelogs: 002, 004, 005.1, 011, 014, 017 to 022, 026, 030, 031, 035, 037, 039, 048, 049, 050, 065, 073, 078.
+
+## 2026-10-12 — [Feature 083] Fix: consumer migration command executable as documented (venv interpreter)
+<!-- finalize:spec-fix:2026-10-12:5728df60 -->
+
+## 2026-10-12 — [Feature 080] Fix: init probes tolerate zombie-group EPERM; init tests deterministic and hermetic (gate blocked on FR-001 decision)
+<!-- finalize:spec-fix:2026-10-12:7710d267 -->
+
+## 2026-10-12 — [Feature 079] Fix: convention manifest tests and CI cleanup step made hermetic
+<!-- finalize:spec-fix:2026-10-12:7208ea4d -->
+
+## 2026-10-12 — [Feature 078] Fix: warm-cache regression independent of PYTHONDONTWRITEBYTECODE
+<!-- finalize:spec-fix:2026-10-12:b581f1b1 -->
+
+## 2026-10-12 — [Feature 077] Fix: Penflow CLI resolved beside the interpreter before PATH (gate blocked on AC-009 decision)
+<!-- finalize:spec-fix:2026-10-12:771b8f83 -->
+
+## 2026-10-12 — Bugfix: integrate features 081, 082 and 083 on main
+
+- Conventions source collection skips `.claude/worktrees/**`, `.worktrees/**` and any nested directory holding a `.git` entry; repo scope returns PASS against [the versioned baseline](conventions/baseline.json) without rewriting it.
+- spec-system rules and the supervisor/verifier prompts describe the 082 ratchet: new repo-scope violations fail, recorded debt is reported separately, feature closure requires feature-scope PASS.
+- Runtime receipts and review caches committed by 081/083 are no longer versioned, as required by the 082 ignore rules.
+
+## 2026-10-12 — Feature 083 pipeline complete: pinned runtime isolation (18/18 AC certified, audit clean)
+<!-- finalize:spec-feature:2026-10-12:21b73207 -->
+
+## 2026-10-12 — [Feature 083] Test: 100% AC covered (18/18), 1 test generated (re-certification after audit corrections)
+
+## 2026-10-12 — Feature 083 second audit pass: redirected-path refusal, escaped defect values, lock-last publication, strict shim current manifest
+
+## 2026-10-11 — Feature 083 audit corrections: defect input validation, staging symlink containment, strict manifest, read-only verification, locked selection rollback
+<!-- finalize:spec-implement:2026-10-11:c4506f10 -->
+
+## 2026-10-11 — [Feature 083] Test: 100% AC covered (18/18), 3 tests generated
+
+## 2026-10-11 — Feature 083 implemented: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, tool/project boundary (18/18 AC certified)
+<!-- finalize:spec-implement:2026-10-11:027bff35 -->
+
+## 2026-10-11 — Feature 083 implementation: livespec runtime install/pin/upgrade/dev/status/defect, shim, drift scanner, boundary rule (In Progress; conventions certification pending)
+<!-- finalize:spec-implement:2026-10-11:68d31117 -->
+
+## 2026-10-11 — Feature 083 plan created: Pinned Runtime Isolation, 9 implementation steps, 3 diagrams, ADR-004
+<!-- finalize:spec-plan:2026-10-11:5ddfddac -->
+
+## 2026-10-11 — [Feature 083] Spec created: Pinned Runtime Isolation — 7 stories, 18 AC, 13 FR
+<!-- finalize:spec-specify:2026-10-11:60b23cb4 -->
+
+## 2026-10-11 — Feature 082 implemented: conventions gate signal (fixture exclusion, family grouping, framework applicability, repo baseline ratchet)
+<!-- finalize:spec-implement:2026-10-11:41daaa07 -->
+
+## 2026-10-10 — Feature 082 Plan created: Conventions Gate Signal — 6 implementation steps, 2 diagrams
+<!-- finalize:spec-plan:2026-10-10:a5ebf692 -->
+
+## 2026-10-10 — Feature 082 Spec created: Conventions Gate Signal — 3 stories, 8 AC, 7 FR
+<!-- finalize:spec-specify:2026-10-10:e39214b3 -->
+
+## 2026-10-10 — 081 Lightweight outcome-based goals — one stop condition per autonomous run, recoverable contracts, bounded retries
+<!-- finalize:spec-feature:2026-10-10:2db73a41 -->
 
 ## 2026-10-09 — Bugfix: observed autonomous init and safe force recovery
 

@@ -1,10 +1,10 @@
 ---
 title: Autonomous From-Code Recovery
 priority: P1
-updated: 2026-10-09
+updated: 2026-10-12
 feature: 080-autonomous-from-code-recovery
 created: 2026-10-09
-status: Planned
+status: In Progress
 ---
 
 # Feature Spec: Autonomous From-Code Recovery
@@ -13,7 +13,7 @@ status: Planned
 - **Feature Number:** 080
 - **Branch:** Current branch; no branch creation in this phase
 - **Date:** 2026-10-09
-- **Status:** Planned
+- **Status:** In Progress
 - **Input:** Repair autonomous from-code initialization that misidentifies desktop projects, reports unexecuted checks, and leaves command completion unfinished.
 
 ## Scope and Source Evidence
@@ -54,12 +54,23 @@ Scenario: Current profile verification detects drift without changing files
   Then it returns a contextual nonzero exit for inconsistent generated content
   And generated artifacts and application sources retain their prior bytes
   And no completed recap or READY claim is emitted
+Scenario: Unsupported manifests are recorded without blocking supported ecosystems
+  Given a pyproject.toml fixture that also contains go.mod
+  And a package.json fixture without packageManager, lockfile or corroborated manager command
+  When autonomous initialization runs on each fixture
+  Then go.mod is recorded as an unsupported manifest with unknown ecosystem in the profile and the bootstrap report
+  And the Python ecosystem is still initialized
+  And the package.json fixture keeps its manager Unknown with an explicit warning and does not fail
+  And a fixture containing only go.mod fails contextually and names the unsupported manifest
 ```
 
 ```mermaid
 flowchart TD
-    M[Read independent manifests and lockfiles] --> F[Record source-backed families]
-    F --> U[Keep unsupported product facts unknown]
+    M[Read independent manifests and lockfiles] --> S{Any supported manifest?}
+    S -- No --> X[Fail naming unsupported manifests]
+    S -- Yes --> F[Record source-backed families]
+    F --> R[Record unsupported manifests and missing-manager warning]
+    R --> U[Keep unsupported product facts unknown]
     U --> G[Generate documents and run tooling probes]
     G --> V{Current profile matches artifacts?}
     V -- No --> B[Block without completed claim]
@@ -122,17 +133,20 @@ Fresh and legacy linked mutable-agent builds use local copies and leave shared-s
 ### AC-006
 
 Autonomous from-code goal inventory excludes interview/stack confirmation but retains installation, generated-profile validation, integration verification, hooks and archive. Interactive initialization retains its interview obligations; historical immutable goals are unchanged.
+### AC-007
+
+A fixture with supported manifests plus `go.mod`, `Gemfile` or `pom.xml` records each unsupported manifest as unsupported with unknown ecosystem in the observed profile (`.specs/bootstrap-profile.json`), the generated project profile (`.specs/project.md`) and the bootstrap report (`.specs/bootstrap-recap.md`), and initializes the supported ecosystems; a fixture with only unsupported manifests fails contextually and names them. A `package.json` without `packageManager`, lockfile or corroborated native manager command emits an explicit warning in the profile, the report and the command output, keeps the manager Unknown and does not fail.
 
 ## Functional Requirements
 
-- **FR-001:** Detect manifest families independently. Explicit package-manager declarations, corroborated native build commands and lockfiles establish manager evidence; contradictory manager evidence and unsupported/malformed manifests fail contextually. Unsupported product roles, growth, geography, budget and deployment remain explicitly unknown. **Maps to:** AC-001, AC-002, AC-003.
+- **FR-001:** Detect manifest families independently. The supported ecosystems, as implemented, are: JavaScript/TypeScript from `package.json` (React, Vite and TypeScript markers, plus `tsconfig.json`) with package manager bun, npm, pnpm or yarn; Python from `pyproject.toml`; Rust from root or `src-tauri/Cargo.toml`; Tauri from a `tauri` dependency in that Cargo manifest, with optional `src-tauri/tauri.conf.json`. Explicit package-manager declarations, corroborated native build commands and lockfiles establish manager evidence; contradictory manager evidence, an unsupported `packageManager` value and malformed manifests fail contextually. A recognized unsupported manifest (`go.mod`, `Gemfile`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `composer.json`, `mix.exs`, `Package.swift`, `pubspec.yaml`, `requirements.txt`, `setup.py`, `Pipfile`, `src-tauri/tauri.conf.json5`, `src-tauri/Tauri.toml`) beside supported manifests is recorded as unsupported with unknown ecosystem in the observed profile, the generated project profile and the bootstrap report, and bootstrap continues with the supported ecosystems; when no supported manifest exists, initialization fails contextually and names the unsupported manifests found. A `package.json` without any package-manager evidence emits an explicit warning in the profile, the report and the command output, keeps the manager Unknown and does not fail. Unsupported product roles, growth, geography, budget and deployment remain explicitly unknown. **Maps to:** AC-001, AC-002, AC-003, AC-007.
 - **FR-002:** Generate project-specific constitution, observed stack ADR and testing strategy; execute bounded argv version probes for actual tooling preflight. Required failures prevent completed recap and READY. Validate current generated content against observed source identities through a read-only profile check; tooling availability never represents application runtime success. **Maps to:** AC-001, AC-002, AC-003.
 - **FR-003:** Autonomous dispatch preserves the selected --dir target and explicit --force, honors --dry-run without writes, and rejects unsupported --deep or flag combinations contextually before mutation. Force recovery is noninteractive and creates a unique local backup before overwriting generated specs, conventions or integration documents; retain features/hooks/run history and all source bytes. Reject escaping generated-artifact symlinks and copy mutable shared agents before local builds. Keep valid convention sources; back up and repair invalid generated conventions using actual ai-ressources paths. Resolve explicit AIRESOURCES configuration before the sibling checkout default. **Maps to:** AC-003, AC-004, AC-005.
 - **FR-004:** Compile a distinct autonomous from-code branch before generation, excluding interview/confirmation while retaining generation, current profile/output validation, integration verification, hooks and archive. Only current artifacts plus authentic goal proof/archive permit command completion; interactive and historical contracts retain their original obligations. **Maps to:** AC-006.
 
 ## Key Entities
 
-- **Observed profile:** Independently detected manifest families, package manager, source identities and explicit unknown product fields.
+- **Observed profile:** Independently detected manifest families, package manager, source identities, recorded unsupported manifests, warnings and explicit unknown product fields.
 - **Recovery backup:** Unique project-local snapshot of prior generated artifacts before overwrite.
 - **Autonomous command run:** Immutable current goal, task evidence and archive; backend success is one input only.
 
@@ -140,6 +154,8 @@ Autonomous from-code goal inventory excludes interview/stack confirmation but re
 
 - Unsupported autonomous flags or combinations fail before any write; --dry-run leaves source and generated artifact bytes unchanged.
 - Package-manager declaration conflicts with lockfiles or corroborated native commands: fail contextually without READY.
+- Unsupported manifest beside supported ones: record it as unsupported/unknown and continue; only unsupported manifests: fail contextually naming them.
+- `package.json` without any manager evidence: warn explicitly, keep the manager Unknown, never default to npm and do not fail.
 - Manifest decoding fails or observed source changes after generation: read-only verification detects drift.
 - Existing generated artifact points outside the project: refuse mutation, retain outside bytes.
 - Required version probe is absent, fails or times out: report the exact tooling failure and prevent completion.
@@ -160,6 +176,7 @@ Autonomous from-code goal inventory excludes interview/stack confirmation but re
 - Accepted parent scope: non-UI LiveSpec bootstrap recovery only; application source, user product decisions and goal-pairing/archive repair are excluded.
 - Existing flag compatibility is a technical recovery constraint: preserve target/force and dry-run semantics, or reject unsupported scan combinations before writes.
 - Missing business facts remain explicit unknowns; this correction does not authorize product assumptions.
+- 2026-10-12 — Decision `FR-001` (user, recorded through spec-fix): an unsupported manifest (`go.mod`, `Gemfile`, `pom.xml`…) beside supported manifests is recorded as unsupported/unknown in the profile and report and bootstrap continues with the supported ecosystems; total absence of package-manager evidence (for example `package.json` without `packageManager` or lockfile) produces an explicit warning, never a failure. The supported ecosystems are listed explicitly in FR-001 as implemented.
 
 ## Success Criteria
 

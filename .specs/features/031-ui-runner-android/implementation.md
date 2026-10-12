@@ -14,6 +14,7 @@ updated: 2026-05-07
 |---|---|---|---|
 | FR-001 | Android/Maestro runner manifest | `livespec/ui-runners/android.yaml` | Module-level comment |
 | FR-001 | Manifest loading + detection | `validator/ui_runner_maestro.py` | `MaestroRunnerHandler.detect()`, `maestro_runner_manifest_path()`, `load_maestro_runner_manifest()`, `detect_maestro_runner()` |
+| FR-001 | Handler detection reads android.yaml `detect:` files/dirs (2026-10-12) | `validator/ui_runner_manifest.py`, `validator/runner_maestro_impl.py` | `manifest_detects()`, `MaestroRunnerHandler.detect()` -> `load_maestro_runner_manifest()` |
 | FR-001 | Android surface detection | `scripts/generate-surfaces.js` | `hasAndroidProject()`, `hasMaestroFlows()` |
 | FR-002 | AVD orchestration | `validator/ui_runner_maestro.py` | `_check_android_sdk()`, `_check_maestro()`, `_list_avds()`, `_get_running_emulator()`, `_boot_avd()`, `_wait_for_boot()`, `_boot_avd_and_wait()` |
 | FR-003 | Maestro screenshot extraction | `validator/ui_runner_maestro.py` | `_find_maestro_screenshots()`, `capture_screenshot()` |
@@ -29,8 +30,9 @@ updated: 2026-05-07
 
 | AC | Description | Test File | Test Function |
 |---|---|---|---|
-| AC-001 | Android runner manifest validates against UIRunnerSchema | `livespec/ui-runners/android.yaml`; `tests/test_maestro_manifest.py` | `test_manifest_is_valid_yaml`, `test_manifest_has_runner_section`, ... |
+| AC-001 | Android runner manifest validates against UIRunnerSchema | `livespec/ui-runners/android.yaml`; `tests/test_maestro_manifest.py` | `test_manifest_is_valid_yaml`, `test_manifest_detect_rules_match_runner_handler` |
 | AC-002 | detect.files matches build.gradle/build.gradle.kts | `tests/test_ui_runner_maestro.py` | `test_detect_build_gradle`, `test_detect_build_gradle_kts` |
+| AC-002 | android.yaml `dirs` markers honoured by the handler | `tests/test_ui_runner_manifest_detect.py` | `test_builtin_android_manifest_dirs_are_honoured` |
 | AC-003 | Android runner priority 50 > JVM driver | `tests/test_maestro_manifest.py` | `test_manifest_runner_priority_is_50` |
 | AC-004 | run_flow invokes maestro test | `tests/test_ui_runner_maestro.py` | `test_run_flow_executes_maestro_test` |
 | AC-005 | capture_screenshot handles tagged + fallback | `tests/test_ui_runner_maestro.py` | `test_find_maestro_screenshots_*`, `test_capture_adb_screenshot_*` |

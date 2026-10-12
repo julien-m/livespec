@@ -1,5 +1,25 @@
 # Changelog - 080-autonomous-from-code-recovery
 
+## 2026-10-12 — [Bugfix]: Unsupported manifests recorded, missing package manager warns (FR-001 decision)
+
+- **Type:** Bugfix + Spec Update
+- **Spec modified:** Yes (sections: FR-001, new AC-007, Story 1 scenario and flowchart, Key Entities, Edge Cases, Clarifications; status Planned -> In Progress to match the registry)
+- **Code modified:** validator/init_profile.py, validator/init_documents.py, validator/init_from_code.py, tests/test_init_profile.py, tests/test_init_documents.py, tests/test_init_recovery.py; plan.md (FR-001 design, tests, AIRESOURCES order)
+- **AC impacted:** AC-001, AC-002, AC-003, AC-007
+- **Author:** claude-code (spec-fix closure, user decision)
+
+User decision recorded: an unsupported manifest (`go.mod`, `Gemfile`, `pom.xml`…) beside supported ones is recorded as unsupported/unknown in the profile and report and bootstrap continues; a `package.json` without any manager evidence warns explicitly and never fails. Supported ecosystems are listed in FR-001 as implemented. Fresh independent spec and plan reviews are ready and the implement gate returns READY, closing the pending EPERM/hermetic-tests spec-fix.
+
+## 2026-10-12 — [Refactor]: Init goal profile aliases reduced to one case per profile
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_init_goal_profiles.py
+- **AC impacted:** AC-006 (coverage unchanged)
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+Alias permutations that reach the same profile branch were dropped (19 -> 13 cases); the `-d` alias stays where it has its own verify branch. One prose assertion was removed.
+
 ## 2026-10-09 — [Spec]: Feature specification created
 
 - **Type:** Spec Update
@@ -55,3 +75,14 @@
 - **Code modified:** observed profile/documents/probes/recovery/verification, init goal conventions and branches, installer/sync and canonical init skill.
 - **AC impacted:** AC-001 through AC-006.
 - Read [implementation](implementation.md) for fixture checks and operational limits. Final feature/repo certification remains incomplete; successful Handy init is distinct operational evidence.
+
+### 2026-10-12 — Fix: zombie-group EPERM, deterministic budgets and hermetic init tests
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `validator/init_probes.py`, `tests/init_clock_support.py` (new), `tests/test_init_probes.py`, `tests/test_init_hook_pipeline.py`, `tests/test_init_recovery.py`, `tests/test_spec_init_autonomous_bootstrap.py`
+- **Gaps closed:** FR-002/AC-003 — `killpg` EPERM on macOS zombie-only groups escaped as PermissionError; budget tests depended on machine load; init tests depended on a sibling `../ai-ressources` checkout.
+- **Remaining:** readiness gate BLOCKED — the claude-opus-5-5 spec review marks FR-001 ambiguous (supported manifest ecosystems); business decision pending.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:7710d267 -->

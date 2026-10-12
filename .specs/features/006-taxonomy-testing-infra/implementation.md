@@ -10,7 +10,7 @@ updated: 2026-06-08
 
 ## Summary
 
-Implemented deterministic taxonomy parsing and testing in `validator/taxonomy.py`. The module loads `system/testing/ui-behavioral-taxonomy.md`, exposes `load_taxonomy()`, `detect_traits()`, and `deduplicate_tests()`, and uses `TaxonomyLoadError` for fail-fast taxonomy load failures. Feature 005.2 later expanded the taxonomy from 5 traits and 3 patterns to 22 traits and 6 patterns; the parser and tests now validate the expanded data.
+Implemented deterministic taxonomy parsing and testing in `validator/taxonomy.py`. The module loads `system/testing/ui-behavioral-taxonomy.md`, exposes `load_taxonomy()` and `detect_traits()` (`deduplicate_tests()` was removed on 2026-10-12 as dead code), and uses `TaxonomyLoadError` for fail-fast taxonomy load failures. Feature 005.2 later expanded the taxonomy from 5 traits and 3 patterns to 22 traits and 6 patterns; the parser and tests now validate the expanded data.
 
 ## Requirement Mapping
 | Requirement | Implementation | Tests / Evidence | Status |
@@ -19,8 +19,8 @@ Implemented deterministic taxonomy parsing and testing in `validator/taxonomy.py
 | FR-002 | `validator/taxonomy.py` | `tests/test_taxonomy_detection.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
 | FR-003 | `validator/taxonomy.py` | `tests/test_taxonomy_detection.py`; `tests/test_specify_integration.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
 | FR-004 | `validator/taxonomy.py`; `system/testing/ui-behavioral-taxonomy.md` | `tests/test_taxonomy_detection.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
-| FR-005 | `validator/taxonomy.py` | `tests/test_taxonomy_detection.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
-| FR-006 | `validator/taxonomy.py`; `system/testing/ui-behavioral-taxonomy.md` | `tests/test_taxonomy_detection.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
+| FR-005 | — | — | ❌ Removed 2026-10-12 (deduplicate_tests deleted: no production caller) |
+| FR-006 | — | — | ❌ Removed 2026-10-12 (deduplicate_tests deleted: no production caller) |
 | FR-007 | `validator/exceptions.py`; `validator/taxonomy.py` | `tests/test_taxonomy_detection.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
 | FR-008 | `tests/test_taxonomy_detection.py` | `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md`; `tests/test_specify_integration.py`; `tests/test_visual_states.py` | Complete |
 
@@ -36,9 +36,9 @@ Implemented deterministic taxonomy parsing and testing in `validator/taxonomy.py
 | AC-006 | `validator/taxonomy.py`; `tests/test_taxonomy_detection.py` | Complete |
 | AC-007 | `validator/taxonomy.py`; `tests/test_taxonomy_detection.py` | Complete |
 | AC-008 | `validator/exceptions.py`; `validator/taxonomy.py`; `tests/test_taxonomy_detection.py` | Complete |
-| AC-009 | `validator/taxonomy.py`; `tests/test_taxonomy_detection.py` | Complete |
-| AC-010 | `validator/taxonomy.py`; `tests/test_taxonomy_detection.py` | Complete |
-| AC-011 | `validator/taxonomy.py`; `tests/test_taxonomy_detection.py` | Complete |
+| AC-009 | — | ❌ Removed 2026-10-12 |
+| AC-010 | — | ❌ Removed 2026-10-12 |
+| AC-011 | — | ❌ Removed 2026-10-12 |
 | AC-012 | `tests/test_taxonomy_detection.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
 | AC-013 | `tests/test_taxonomy_detection.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
 | AC-014 | `validator/taxonomy.py`; `.specs/features/006-taxonomy-testing-infra/checks/2026-04-15-test.md` | Complete |
@@ -54,8 +54,6 @@ Read [`checks/2026-04-15-test.md`](checks/2026-04-15-test.md) for the original 1
 <!-- @spec(FR-002) -->
 <!-- @spec(FR-003) -->
 <!-- @spec(FR-004) -->
-<!-- @spec(FR-005) -->
-<!-- @spec(FR-006) -->
 <!-- @spec(FR-007) -->
 <!-- @spec(FR-008) -->
 <!-- @spec(AC-001) -->
@@ -66,9 +64,6 @@ Read [`checks/2026-04-15-test.md`](checks/2026-04-15-test.md) for the original 1
 <!-- @spec(AC-006) -->
 <!-- @spec(AC-007) -->
 <!-- @spec(AC-008) -->
-<!-- @spec(AC-009) -->
-<!-- @spec(AC-010) -->
-<!-- @spec(AC-011) -->
 <!-- @spec(AC-012) -->
 <!-- @spec(AC-013) -->
 <!-- @spec(AC-014) -->

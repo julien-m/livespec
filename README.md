@@ -73,7 +73,7 @@ Each command works standalone, or chain them all with `/spec-feature` for an end
 
 Reviews use complete, bounded source context and feature-qualified requirement IDs. Analyze reports structural reference coverage separately from grounded semantic conclusions: citing an ID cannot prove that a plan implements its meaning. Missing context, contradictions, stale reviews and unresolved critical clarifications block progression. An unchanged valid review is reused; the five-question presentation limit never discards outstanding questions.
 
-Current goals distinguish documentary, review and execution evidence. Execution certification requires a runner-owned receipt with current source/test/configuration identity, actual test results and independently reviewed acceptance mappings. A success sentence, exit code zero, or global coverage percentage is insufficient. Custom drivers remain runnable and report any certification gap. Existing visual, conventions, finalization, bootstrap and Penflow checks still apply; historical archives retain their original policy rather than becoming new proof.
+Autonomous runs (`/spec-ship`, `--auto` pipelines, `/spec-implement`) carry an outcome goal: one executable stop condition that `livespec goal prove` verifies itself, a short list of receipt-backed proofs, and the skill inventory as an indicative checklist. Native goal tools (Codex `create_goal`, Claude Code `/goal`) are optional mirrors; drifted contracts recompile with their valid evidence, and three rejections of one proof hand control back with a report. Short interactive commands run without a goal. Current goals distinguish documentary, review and execution evidence. Execution certification requires a runner-owned receipt with current source/test/configuration identity, actual test results and independently reviewed acceptance mappings. A success sentence, exit code zero, or global coverage percentage is insufficient. Custom drivers remain runnable and report any certification gap. Existing visual, conventions, finalization, bootstrap and Penflow checks still apply; historical archives retain their original policy rather than becoming new proof.
 
 The generation evaluation corpus contains isolated Python CLI, TypeScript API and UI/Penflow witnesses. Independent frozen oracles check actual behavior and reject faulty mutants. Reports distinguish first-attempt success, repaired success, expected blocking, failure, invalid runs and unavailable runtimes. GitHub checks are deterministic and require no model provider or model credential. Real-model samples and full-corpus evaluations remain explicit local opt-in operations; their reports distinguish actual completed coverage and unknown costs. A passing finite corpus does not establish universal correctness or untested runtime parity.
 
@@ -362,6 +362,7 @@ Create and govern cross-feature User Journeys v2. Journey sources live globally 
 /spec-journey run                          # Execute compiled native artifacts only
 /spec-journey list
 /spec-journey inspect onboarding-first-project
+/spec-journey visual                       # Agent evaluates LLM visual contracts, writes receipts
 ```
 
 Low-level CLI:
@@ -372,10 +373,11 @@ livespec journey compile [--journey ID] [--feature SLUG] [--changed] [--force]
 livespec journey run [--journey ID] [--feature SLUG] [--impacted] [--all] [--json]
 livespec journey impact --changed-file PATH [--feature SLUG] [--json]
 livespec journey migrate --from-v1 [--apply] [--json]
+livespec journey visual-verify [--journey ID] [--json]   # verify agent receipts (no model call)
 livespec journey list|inspect
 ```
 
-Rules: create/edit compiles once; `run` executes native artifacts without recompiling and fails on stale source or old compiler manifests. XCUITest compilation runs `xcodegen generate` when `project.yml`/`project.yaml` is present. Edits require classification (`regression`, `intentional_update`, `obsolete`, `selector_fix`, or `coverage_expansion`) plus decision, changelog, validation, and run evidence. Visual checks may be native deterministic checks or strict JSON LLM screenshot checks. **Read** [`system/testing/user-journeys.md`](system/testing/user-journeys.md).
+Rules: create/edit compiles once; `run` executes native artifacts without recompiling and fails on stale source or old compiler manifests. XCUITest compilation runs `xcodegen generate` when `project.yml`/`project.yaml` is present. Edits require classification (`regression`, `intentional_update`, `obsolete`, `selector_fix`, or `coverage_expansion`) plus decision, changelog, validation, and run evidence. Visual checks may be native deterministic checks or LLM screenshot checks: the agent evaluates each compiled contract and writes a strict JSON receipt that `livespec journey visual-verify` checks (schema, contract/capture hashes, privacy, verdict). **Read** [`system/testing/user-journeys.md`](system/testing/user-journeys.md).
 
 ### `/spec-check`
 
@@ -545,6 +547,74 @@ bash ~/livespec/scripts/install.sh
 This asks `cc-hub` to install only the two bootstrap skills required before a
 project has `.specs/`:
 - `spec-init` and `spec-migrate` as portable skills for Claude Code and Codex
+
+### Bugfix lane
+
+<!-- @spec FR-012: Bugfix lane commands — .specs/features/084-bugfix-lane/spec.md#fr-012 -->
+
+`/spec-fix <feature> --bugfix` fixes a confined bug without whole-feature spec and plan reviews, when the CLI proves eligibility; otherwise it falls back to the complete gate with its reasons.
+
+```bash
+livespec bugfix capture --feature <slug> --expect red --command "<python> -m pytest tests/test_x.py"
+livespec bugfix gate --feature <slug> --red <red-receipt> [--requirement AC-003]
+livespec bugfix capture --feature <slug> --expect green --command "<same command>"
+livespec bugfix gate --feature <slug> --red <red-receipt> --green <green-receipt> [--base <rev>]
+livespec bugfix record --feature <slug> --red <red-receipt> --green <green-receipt> --summary "<one line>"
+```
+
+Eligibility: owner feature with `implementation.md`, no FR/AC/SC definition or Gherkin change, the same regression test RED then GREEN, at most 8 files and 300 lines (override in `.specs/bugfix.yaml`). Exit codes: 0 READY/ELIGIBLE, 1 FALLBACK, 2 usage, 3 invalid configuration.
+
+### Pinned runtime for consumer projects
+
+<!-- @spec FR-013: Docs and migration — .specs/features/083-pinned-runtime-isolation/spec.md#fr-013 -->
+
+Consumer projects should run an immutable LiveSpec snapshot they pin, not the mutable
+development checkout. Full reference: [`docs/cli-reference.md`](docs/cli-reference.md#livespec-runtime).
+
+```bash
+cd ~/projects/livespec && uv sync    # once: the checkout's venv holds LiveSpec's dependencies
+cd ~/projects/livespec && .venv/bin/python -m validator.cli runtime install --source ~/projects/livespec --ref <commit>
+# first snapshot via the checkout's own venv; later `livespec runtime install` runs through the shim
+export PATH="$HOME/.livespec/bin:$PATH"   # shim before /opt/homebrew/bin/livespec (editable install)
+livespec runtime pin                      # in the project: writes .specs/livespec.lock
+livespec runtime upgrade --to current     # later, voluntarily; run /spec-migrate if reported
+livespec runtime dev --project . --source .   # the LiveSpec repository itself
+livespec runtime status --json            # drift findings (also part of livespec doctor)
+livespec runtime defect --command '<cmd>' --error '<error>' --feature <slug> --phase <phase>
+```
+
+Fresh machine (no `livespec` CLI yet): `cd <livespec repo> && uv sync && .venv/bin/python -m
+validator.cli runtime install --source <livespec repo> --ref <commit from lock>`,
+then `<home>/versions/<id>/scripts/link-local.sh <project> <home>/versions/<id>` and
+`livespec runtime pin --runtime <id from lock>`. To delete a read-only snapshot:
+`chmod -R u+w ~/.livespec/versions/<id> && rm -rf ~/.livespec/versions/<id>`.
+Consumer sessions follow [`system/tool-project-boundary.md`](system/tool-project-boundary.md).
+
+Migrating an existing consumer project such as Handy (verified by
+`tests/test_runtime_docs.py`). Prerequisite: the LiveSpec checkout has its own environment, `~/projects/livespec/.venv`
+(create it once with `cd ~/projects/livespec && uv sync`). The shim written by step 1 runs
+that same interpreter, so it keeps LiveSpec's dependencies without an activated venv.
+
+<!-- runtime-migration:start -->
+```bash
+# 1. Install a snapshot of a committed LiveSpec tree (never the dirty dev checkout) with the
+#    checkout's own venv: a bare python3 lacks LiveSpec's dependencies (typer, pydantic).
+git -C ~/projects/livespec fetch origin
+cd ~/projects/livespec && .venv/bin/python -m validator.cli runtime install --source ~/projects/livespec --ref origin/main
+# 2. Put the shim before any editable livespec (e.g. /opt/homebrew/bin/livespec); persist in ~/.zshrc.
+export PATH="$HOME/.livespec/bin:$PATH"
+hash -r
+command -v livespec
+# 3. Pin the consumer project to that runtime (lock, .livespec-path, LiveSpec-owned links).
+cd ~/projects/handy
+livespec runtime pin
+# 4. Verify: mode "pinned" and no ERROR or WARNING runtime finding.
+livespec runtime status --json
+# 5. Commit the portable lock (.specs/.livespec-path and .agent-sync.local/ stay machine-local).
+git add .specs/livespec.lock
+git commit -m "chore: pin LiveSpec runtime"
+```
+<!-- runtime-migration:end -->
 
 ### Per-project (automatic after bootstrap)
 

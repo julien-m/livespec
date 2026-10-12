@@ -1,5 +1,15 @@
 # Changelog — Conventions Blocking Pipeline
 
+## 2026-10-12 — [Refactor]: Test suite cleanup (lot 2)
+
+AC-006 is now proven by parsing each real `expectations.md` with `validator.expectations`. Removed a ruff-template test that re-implemented the renderer (the real scaffold is covered by `tests/test_status_play_conventions_cli.py`), a synthetic parser test superseded by the real-file check, and `test_spec_check_conventions_gate_can_use_feature_scoped_pass_receipt`, which never ran spec-check and duplicated the feature-scope PASS tests.
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** `tests/test_conventions_pipeline_docs.py`, `tests/_conventions_verify_scope_01.py`, `tests/test_conventions_verify_scope.py`
+- **AC impacted:** AC-006, AC-007 (coverage kept)
+- **Author:** Claude Code
+
 ## 2026-06-29 — [Bugfix]: Scope feature supervisor receipt gates to child goals
 
 - **Type:** Bugfix

@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Literal
 
 from .schemas import DriverManifest
+from .typescript_detector import detect_test_runner
 
 WriteMode = Literal["create", "patch_section", "skip_if_exists"]
 
@@ -320,8 +321,8 @@ def generate_test_config(
 
     Args:
         driver: The detected primary ``DriverManifest``.
-        project_root: Repository root (kept for future driver-specific decisions
-            such as detecting `pnpm-workspace.yaml` polyglots).
+        project_root: Repository root; the built-in TypeScript driver detects
+            jest/vitest here to pick the runner label and config generator.
         threshold: Coverage percentage to enforce. Defaults to
             :data:`DEFAULT_THRESHOLD`.
 
@@ -334,25 +335,29 @@ def generate_test_config(
     """
     if not 0.0 < threshold <= 100.0:
         raise ValueError(f"threshold must be in (0, 100], got {threshold}")
-    # project_root is reserved for future polyglot heuristics; reference it so
-    # static checkers do not flag it as unused while keeping the public API
-    # forward-compatible (EC-003 will refine the primary-driver pick here).
-    _ = project_root
     plan = TestConfigPlan(threshold=threshold)
+    runner = _runner_for(driver, project_root)
     generator = _GENERATORS.get(driver.name)
+    if driver.name == "typescript" and runner == "jest":
+        # Writing vitest.config.ts into a jest project would flip runner detection
+        # (018 FR-002); jest keeps its own configuration.
+        generator = None
     if generator is not None:
         plan.files.append(generator(threshold))
     plan.files.append(generate_ci_workflow(driver))
-    plan.runner = _runner_for(driver)
-    plan.snapshot_lib = _snapshot_lib_for(driver)
+    plan.runner = runner
+    plan.snapshot_lib = _snapshot_lib_for(driver, runner)
     return plan
 
 
-def _runner_for(driver: DriverManifest) -> str:
+def _runner_for(driver: DriverManifest, project_root: Path) -> str:
     """Infer the user-facing test runner name from a driver manifest."""
     coverage = driver.coverage
     command = (coverage.command or coverage.script or "") if coverage else ""
     lowered = command.lower()
+    if "{js_coverage_args}" in lowered:
+        # Built-in TypeScript manifest: the runner is detected per project.
+        return detect_test_runner(str(project_root))
     if "pytest" in lowered:
         return "pytest"
     if "vitest" in lowered:
@@ -372,12 +377,14 @@ def _runner_for(driver: DriverManifest) -> str:
     return driver.name
 
 
-def _snapshot_lib_for(driver: DriverManifest) -> str:
+def _snapshot_lib_for(driver: DriverManifest, runner: str) -> str:
     """Infer a snapshot library label from the driver's snapshot capability."""
     snapshots = driver.snapshots
     if snapshots is None:
         return "none"
     command = (snapshots.command or snapshots.script or "").lower()
+    if "{js_test_args}" in command:
+        return f"{runner} snapshot"
     if "syrupy" in command or "pytest" in command:
         return "syrupy"
     if "vitest" in command or "jest" in command:

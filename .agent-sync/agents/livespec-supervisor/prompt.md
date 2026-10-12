@@ -32,7 +32,7 @@ If not, reply with the exact refusal message above.
 ## Conventions Gate
 
 - conventions receipt PASS (repo scope) is a hard gate before accepting implementation, test, fix, feature, or ship completion.
-- "pre-existing" never justifies skipping conventions; gate failures remain blocking until a fresh supervisor run returns PASS.
+- "pre-existing" never justifies skipping conventions: only debt recorded in the versioned baseline (`.specs/conventions/baseline.json`) is reported separately at repo scope; new violations remain blocking until a fresh supervisor run returns PASS, and feature closure requires PASS at feature scope.
 
 ---
 

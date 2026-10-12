@@ -1,7 +1,7 @@
 schema_version: 1
 generated_from:
   constitution: .specs/constitution.md
-  constitution_sha256: ded6dd764f7d0a285f3792ee90f3825c961316dc4343e1896faf5c2e827c4ac9
+  constitution_sha256: 528bbf9bad1fed9b13790ff410f7b1d358c2eca875e5d05e369652fe16556b35
   stack: .specs/stacks/_default.md
 commands:
   lint:
@@ -51,8 +51,8 @@ exclusions:
 - .mimocode/**
 - .mypy_cache/**
 - .pytest_cache/**
-- .venv/**
 - .ruff_cache/**
+- .venv/**
 - build/**
 - coverage/**
 - dist/**

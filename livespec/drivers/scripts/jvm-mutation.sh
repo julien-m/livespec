@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-003)
 # @spec AC-007: Mutation capability detects pitest plugin (Gradle or Maven).
 # @spec AC-008: Mutation capability parses mutations.xml.
 # — .specs/features/022-driver-jvm/spec.md#ac-007
+# @spec FR-003: Build file plugin/dependency detection — .specs/features/022-driver-jvm/spec.md#fr-003
 #
 # Environment overrides:
 #   LIVESPEC_JVM_BUILD_TOOL  — force "gradle" or "maven"

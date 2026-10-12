@@ -131,7 +131,9 @@ def _scan_coherence(specs_root: Path) -> list[DoctorFinding]:
         ]
     result = run_coherence(specs_root)
     findings: list[DoctorFinding] = []
-    for violation in result.violations:
+    # Suppressed violations are in-progress findings: the engine already set INFO and
+    # the "[in-progress, Nmin]" prefix, so they are reported as is.
+    for violation in [*result.violations, *result.suppressed]:
         findings.append(
             DoctorFinding(
                 code=violation.rule_id,
@@ -536,7 +538,7 @@ def _from_journey_severity(severity: JourneySeverity) -> DoctorSeverity:
 
 def _context_feature(context: dict[str, object]) -> str | None:
     """Extract a feature slug from a coherence violation context."""
-    value = context.get("feature_dir") or context.get("feature")
+    value = context.get("dir_name")
     return value if isinstance(value, str) else None
 
 

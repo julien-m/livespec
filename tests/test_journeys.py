@@ -78,13 +78,15 @@ def _write_journey(
     # XCUITest open steps require a URL/deep link (feature 057 capability gate);
     # web/maestro keep the relative route.
     route = "myapp://login" if runner == "xcuitest" else "/login"
+    # AC-015: a manual journey must state why it is not executable.
+    manual_reason = "manual_reason: Needs a physical device.\n" if status == "manual" else ""
     path.write_text(
         f"""schema_version: 2
 id: {journey_id}
 title: User can log in
 status: {status}
 description: User logs in.
-covers:
+{manual_reason}covers:
   - feature: {feature}
     kind: ac
     ref: AC-001
@@ -166,39 +168,6 @@ def test_journey_validate_rejects_unsupported_target(
     assert "desktop" in result.output
 
 
-def test_wait_without_until_or_reason_is_warning(
-    tmp_path: Path,
-    monkeypatch: MonkeyPatch,
-) -> None:
-    """v2 validation reports no v1 fixed-wait warnings."""
-    specs = _make_specs(tmp_path)
-    _write_journey(specs)
-    monkeypatch.chdir(tmp_path)
-
-    result = runner.invoke(app, ["journey", "validate"])
-
-    assert result.exit_code == 0, result.output
-    assert "warnings=0" in result.output
-
-
-def test_manual_journey_is_reported_without_execution(
-    tmp_path: Path,
-    monkeypatch: MonkeyPatch,
-) -> None:
-    specs = _make_specs(tmp_path)
-    _write_journey(
-        specs,
-        journey_id="manual",
-        extra="run_policy: manual\n",
-    )
-    monkeypatch.chdir(tmp_path)
-
-    result = runner.invoke(app, ["journey", "validate"])
-
-    assert result.exit_code == 0
-    assert "valid=1" in result.output
-
-
 def test_compile_generates_playwright_with_source_hash(
     tmp_path: Path,
     monkeypatch: MonkeyPatch,
@@ -222,8 +191,10 @@ def test_compile_generates_xcuitest_for_ios_and_watchos(
     tmp_path: Path,
     monkeypatch: MonkeyPatch,
 ) -> None:
-    """Apple surfaces compile to Swift UI test artifacts."""
+    """Apple surfaces compile to the project's own iOS and watchOS UI test targets."""
     specs = _make_specs(tmp_path)
+    (tmp_path / "AppUITests").mkdir()
+    (tmp_path / "AppWatchUITests").mkdir()
     _write_journey(specs, journey_id="ios-login", target="ios")
     _write_journey(specs, journey_id="watch-login", target="watchos")
     monkeypatch.chdir(tmp_path)
@@ -231,8 +202,8 @@ def test_compile_generates_xcuitest_for_ios_and_watchos(
     result = runner.invoke(app, ["journey", "compile", "--feature", "012-auth"])
 
     assert result.exit_code == 0, result.output
-    assert (tmp_path / "STRAPTUITests" / "Journeys" / "IosLoginJourney.swift").exists()
-    assert (tmp_path / "STRAPTUITests" / "Journeys" / "WatchLoginJourney.swift").exists()
+    assert (tmp_path / "AppUITests" / "Journeys" / "IosLoginJourney.swift").exists()
+    assert (tmp_path / "AppWatchUITests" / "Journeys" / "WatchLoginJourney.swift").exists()
 
 
 def test_doctor_reports_stale_and_removed_ac(
@@ -269,7 +240,7 @@ def test_manual_disabled_and_executable_categories_are_reported(
         specs,
         journey_id="manual",
         target="web",
-        extra='run_policy: manual\nmanual_reason: "Requires hardware token"\n',
+        extra="run_policy: manual\n",
     )
     _write_journey(specs, journey_id="disabled", target="web", extra="disabled: true\n")
 

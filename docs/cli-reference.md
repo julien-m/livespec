@@ -20,11 +20,12 @@ livespec drivers           # list discoverable drivers
 livespec mutation          # run mutation testing
 livespec preflight         # verify (or --fix) the preflight manifest
 livespec device proof      # capture Agent Device proof bound to a LiveSpec UDID
+livespec runtime ...       # install, pin, upgrade, dev, status, defect
 ```
 
-All six commands auto-detect everything they need and accept overrides
-through flags. Errors are surfaced as a single line; pass `--debug` to
-display the full Python stacktrace.
+Command-specific defaults and overrides are documented below. Errors of the
+unified commands are surfaced as a single line; pass `--debug` to display the
+full Python stacktrace.
 
 ---
 
@@ -87,19 +88,20 @@ $ livespec device proof com.example.app --platform ios --udid IPHONE-17 --json
 | Code | Constant in `validator/cli_exit_codes.py` | Meaning |
 |------|-------------------------------------------|---------|
 | 0 | `EXIT_OK` | Success — verdict matches the gate. |
-| 1 | `EXIT_MISSING_SPECS` | Required environment is missing. Typically `.specs/` is absent or the command was run outside a git working tree. |
-| 2 | `EXIT_NO_DRIVER` | No driver matched the project. Run `livespec drivers` to inspect what is available, or scaffold one with `livespec spec.driver --new`. |
-| 3 | `EXIT_COVERAGE_FAIL` | Coverage threshold failed (used by `livespec test` and `livespec coverage`). |
-| 4 | `EXIT_CAPABILITY_UNSUPPORTED` | The active driver does not implement the requested capability (`livespec mutation` on a driver without a `mutation` block, etc.). |
-| 5 | `EXIT_PREFLIGHT_FAIL` | Preflight detected at least one critical missing tool. |
+| 1 | `EXIT_FAILURE` | The run failed: test suite failure, coverage or mutation threshold not met, unexpected exception. |
+| 1 | `EXIT_MISSING_SPECS` | `.specs/` is absent or the command was run outside a git working tree (shared by every `livespec` command, so it stays at the general-error code). |
+| 2 | `EXIT_USAGE` | Invalid arguments: Typer usage errors (unknown flag, bad value) or a `--feature` value matching zero or several feature directories. |
+| 3 | `EXIT_CONFIG` | Missing configuration: no driver detected (run `livespec drivers`, or scaffold one with `livespec spec.driver --new`), lcov report not found, capability absent, coverage capability without `test_selection: append` for `--feature`, no test mapped to the feature, preflight manifest or critical tool missing, no resolvable base branch. |
+| 130 | `EXIT_INTERRUPTED` | Interrupted by Ctrl+C. |
 | 6 | `EXIT_VISUAL_GATE_FAIL` | `livespec visual-gate validate` found comparison drift, a physical-copy violation under `.specs/features/<slug>/baselines/`, a runtime capture stored under `.specs/design/screens/`, or a Penflow / design-alignment FAIL verdict. |
 | 7 | `EXIT_VISUAL_GATE_BLOCKED` | `livespec visual-gate validate` could not decide because required artifacts, comparison reports, or Penflow workspace pieces are missing. A visual feature MUST NOT be marked done while this exit code is emitted. |
 | 8 | `EXIT_VISUAL_GATE_CLEANUP_DRIFT` | `livespec visual-gate cleanup --dry-run` found misplaced runtime captures that would be quarantined on `--apply`. |
 | 9 | `EXIT_FINALIZE_BLOCKED` | `livespec finalize apply` was blocked — lock timeout (`policy_blocked`) or post-write hash mismatch / partial apply (`state_invalid`). No registry state may be claimed finalized while this code is emitted. |
 | 10 | `EXIT_FINALIZE_VERIFY_FAIL` | `livespec finalize verify` found coherence violations (R1/R4/R6 scoped to the feature) or a missing finalize marker for the expected command. |
 
-Every command also prints a structured one-line CI summary on stdout of
-the form:
+Every command also prints a structured one-line CI summary of the form
+below, on stdout, or on stderr when `--json` is set so stdout stays valid
+JSON:
 
 ```
 LIVESPEC <subcommand> · <STATUS> · key=value · key=value · ...
@@ -121,9 +123,10 @@ The following heuristics are shared across the unified surface:
   driver (custom drivers under `.specs/drivers/` win over built-ins of
   the same name); `pick_primary_driver()` then resolves the dominant
   one for polyglot projects (most matched files at the project root).
-- **Base branch** — tried in order until one resolves: `origin/main`,
-  `origin/master`, `develop`, `dev`, `main`, `master`. Pass
-  `--base BRANCH` to skip the search.
+- **Base branch** — `origin/HEAD` (the remote default branch, e.g.
+  `origin/main`) first, then the first existing local branch among
+  `main`, `master`, `develop`, `dev`. Pass `--base BRANCH` to skip the
+  search; no candidate exits 3.
 - **Coverage threshold** — read from `.conventions/index.md` (first
   match of `coverage threshold: NN`, optional `%`). Falls back to `70`.
 - **Current feature slug** — parsed from the current git branch when it
@@ -132,7 +135,7 @@ The following heuristics are shared across the unified surface:
 The four helpers powering this logic are documented in
 `validator/cli_resolvers.py` and exposed for reuse:
 `detect_specs_root()`, `detect_base_branch()`, `detect_current_feature()`,
-`read_threshold_from_conventions()`.
+`read_threshold_from_conventions()`, plus `resolve_feature_dir()` for `--feature`.
 
 ---
 
@@ -143,14 +146,14 @@ Run the active driver's `coverage` capability and report a verdict.
 ### Synopsis
 
 ```
-livespec test [--feature SLUG] [--mutation] [--no-coverage] [--debug]
+livespec test [--feature NNN|SLUG] [--mutation] [--no-coverage] [--debug]
 ```
 
 ### Flags
 
 | Flag | Type | Default | Description |
 |------|------|---------|-------------|
-| `--feature` | string | _auto_ | Feature slug for downstream smart-selection (Feature 033). Currently informational. |
+| `--feature` | string | _none_ | Run only the tests mapped to one feature: its number (`035`, matched as `.specs/features/035-*`) or its full directory name. Tests come from `SmartTestSelector.tests_for_features` (Feature 033) and are appended to the coverage command when its capability declares `test_selection: append`. |
 | `--mutation` | bool | `false` | Also run the driver's `mutation` capability after coverage. |
 | `--no-coverage` | bool | `false` | Skip the coverage capability (useful with `--mutation`). |
 | `--debug` | bool | `false` | Print the full Python stacktrace on errors. |
@@ -159,21 +162,25 @@ livespec test [--feature SLUG] [--mutation] [--no-coverage] [--debug]
 
 1. Locate `.specs/` upward from `cwd` (exit 1 if absent).
 2. Pick the primary driver via `DriverRegistry.discover()` +
-   `pick_primary_driver()` (exit 2 if none).
-3. Run `coverage` capability through `validator/drivers/runner.py`.
-4. Parse the produced lcov report (when declared) and compare against
+   `pick_primary_driver()` (exit 3 if none).
+3. With `--feature`, resolve exactly one feature directory (exit 2
+   otherwise) and, unless `--no-coverage`, select its mapped tests (exit 3
+   when none); a coverage capability without `test_selection: append`
+   is refused with exit 3.
+4. Run `coverage` capability through `validator/drivers/runner.py`.
+5. Parse the produced lcov report (when declared) and compare against
    the threshold from `.conventions/index.md` (default 70).
-5. Optionally run `mutation` capability when `--mutation` is set.
+6. Optionally run `mutation` capability when `--mutation` is set.
 
 ### Exit codes
 
 | Code | Meaning |
 |------|---------|
 | 0 | Tests passed and coverage ≥ threshold. |
-| 1 | `.specs/` not found. |
-| 2 | No matching driver. |
-| 3 | Coverage capability failed or threshold not met. |
-| 4 | Capability not implemented by the driver. |
+| 1 | Test suite or journey run failed, threshold not met, unexpected error, or `.specs/` not found. |
+| 2 | Invalid arguments, including an unresolvable `--feature`. |
+| 3 | No matching driver, capability absent, no `test_selection: append`, or no test mapped to the feature. |
+| 130 | Interrupted. |
 
 ### Summary line
 
@@ -184,8 +191,10 @@ LIVESPEC test · OK · driver=python · coverage=87.3 · threshold=70.0 · mutat
 ### Example
 
 ```
-$ livespec test
+$ livespec test --feature 035
 Driver: python
+Feature scope: 035-unified-cli-surface
+Selected tests: 3 file(s)
 ok
 Coverage: 87.3% (threshold 70.0%) · OK
 LIVESPEC test · OK · driver=python · coverage=87.3 · threshold=70.0 · mutation=skipped
@@ -207,7 +216,7 @@ livespec coverage [--base BRANCH] [--threshold N] [--report-path PATH] [--debug]
 
 | Flag | Type | Default | Description |
 |------|------|---------|-------------|
-| `--base` | string | _auto_ | Base branch / ref. Auto-detection order: `origin/main`, `origin/master`, `develop`, `dev`, `main`, `master`. |
+| `--base` | string | _auto_ | Base branch / ref. Auto-detection order: `origin/HEAD`, then local `main`, `master`, `develop`, `dev`. |
 | `--threshold` | float | _conventions_ | Patch coverage threshold (0–100). Defaults to the `.conventions/index.md` value or 70. |
 | `--report-path` | path | _driver_ | lcov.info path. Defaults to the active driver's `coverage.report_path`. |
 | `--debug` | bool | `false` | Print the full Python stacktrace on errors. |
@@ -215,7 +224,7 @@ livespec coverage [--base BRANCH] [--threshold N] [--report-path PATH] [--debug]
 ### Behavior
 
 1. Locate `.specs/` and the primary driver.
-2. Resolve the base branch (auto unless `--base` is given). Exit 1 with
+2. Resolve the base branch (auto unless `--base` is given). Exit 3 with
    a clear message if no candidate ref exists.
 3. Run `git diff --unified=0 <base>...HEAD`. Empty diff → exit 0 with
    `"no changes since base"`.
@@ -228,9 +237,10 @@ livespec coverage [--base BRANCH] [--threshold N] [--report-path PATH] [--debug]
 | Code | Meaning |
 |------|---------|
 | 0 | Patch coverage meets threshold (or no diff vs base). |
-| 1 | `.specs/` missing or no base branch detected. |
-| 2 | No matching driver. |
-| 3 | Coverage report missing or threshold failed. |
+| 1 | Threshold failed, unexpected error, or `.specs/` missing. |
+| 2 | Invalid arguments. |
+| 3 | No matching driver, no base branch, coverage capability absent, or lcov report missing. |
+| 130 | Interrupted. |
 
 ### Summary line
 
@@ -280,7 +290,8 @@ livespec drivers [--json] [--debug]
 | Code | Meaning |
 |------|---------|
 | 0 | Discovery succeeded (regardless of whether anything matched). |
-| 1 | `.specs/` missing. |
+| 1 | `.specs/` missing or unexpected error. |
+| 2 | Invalid arguments. |
 
 ### Output
 
@@ -308,7 +319,8 @@ JSON (`--json`):
 ]
 ```
 
-When no driver matches, `--json` emits `[]` and exits 0 (EC-003).
+When no driver matches, `--json` emits `[]` and exits 0 (EC-003). With
+`--json`, the `LIVESPEC drivers` summary line goes to stderr.
 
 ### Example
 
@@ -344,7 +356,7 @@ livespec mutation [--threshold N] [--report-path PATH] [--debug]
 
 1. Locate `.specs/` and the primary driver.
 2. Call `run_mutation()` (returns `None` if the driver does not declare a
-   mutation capability — exit 4).
+   mutation capability — exit 3).
 3. Apply the threshold and call `write_mutation_report()` to append a
    timestamped entry to the report file.
 
@@ -353,10 +365,10 @@ livespec mutation [--threshold N] [--report-path PATH] [--debug]
 | Code | Meaning |
 |------|---------|
 | 0 | Kill rate ≥ threshold. |
-| 1 | `.specs/` missing. |
-| 2 | No matching driver. |
-| 3 | Kill rate below threshold. |
-| 4 | Driver does not implement mutation testing. |
+| 1 | Kill rate below threshold, unexpected error, or `.specs/` missing. |
+| 2 | Invalid arguments. |
+| 3 | No matching driver, or driver does not implement mutation testing. |
+| 130 | Interrupted. |
 
 ### Summary line
 
@@ -397,20 +409,22 @@ livespec preflight [--fix] [--full] [--debug]
 ### Behavior
 
 1. Locate `.specs/` (exit 1 if absent) and read `.specs/preflight.md`
-   (exit 5 if missing).
+   (exit 3 if missing).
 2. Parse the manifest into `PreflightItem` objects.
 3. **Read-only mode (default)** — call `verify_item()` per item and print
-   a status table. Exit 5 if any item is missing.
+   a status table. Exit 3 if any item is missing.
 4. **Fix mode (`--fix`)** — call `run_fix()` with `auto=True` and respect
-   smart scoping unless `--full` is set. Exit 5 if any item still fails.
+   smart scoping unless `--full` is set. Exit 3 if any item still fails.
 
 ### Exit codes
 
 | Code | Meaning |
 |------|---------|
 | 0 | All tools present (or installed successfully). |
-| 1 | `.specs/` missing. |
-| 5 | Manifest missing, or critical item failed verify/install. |
+| 1 | `.specs/` missing or unexpected error. |
+| 2 | Invalid arguments. |
+| 3 | Manifest missing, or critical item failed verify/install. |
+| 130 | Interrupted. |
 
 ### Summary line
 
@@ -515,6 +529,126 @@ idempotently, and under `.specs/.LOCK`.
     (`verify_finalize_receipt()` re-validates schema, hashes, feature, command,
     and verdict).
   * Exit `0` (PASS) or `10` (FAIL).
+
+## `livespec runtime`
+
+<!-- @spec FR-013: Docs and migration — .specs/features/083-pinned-runtime-isolation/spec.md#fr-013 -->
+
+Pinned, immutable LiveSpec runtimes for consumer projects (feature 083). A
+consumer project commits `.specs/livespec.lock`; the generated shim
+`<home>/bin/livespec` executes the runtime that lock selects, so the mutable
+development checkout never runs unless dev mode is declared. `<home>` is
+`--home`, else `$LIVESPEC_HOME`, else `~/.livespec`. Every `runtime`
+subcommand bypasses the migration guard. Exit codes: `0` success, `1` refused
+or failed (reason on stderr), `2` usage error; the shim itself exits `3` with a
+`livespec-shim:` stderr prefix when it cannot resolve a runtime.
+
+### Subcommands
+
+```bash
+# Snapshot a committed tree (default source: the running checkout; default ref: HEAD,
+# refused when the working tree is dirty — pass --ref <commit> to snapshot history only).
+livespec runtime install [--source <livespec repo>] [--ref <rev>] [--home <dir>] [--no-activate] [--json]
+# Pin a project to an installed, verified runtime (default: current); replaces any lock.
+livespec runtime pin [--project <dir>] [--runtime <id>|current] [--home <dir>] [--json]
+# Move a pinned project to another runtime; reports migration_required (/spec-migrate).
+livespec runtime upgrade [--project <dir>] [--to <id>|current] [--home <dir>] [--json]
+# Declare dev mode (the LiveSpec repository itself: --project . --source .).
+livespec runtime dev --source <checkout> [--project <dir>] [--json]
+# Mode, lock, resolved runtime, executing validator path and drift findings; exit 1 iff ERROR.
+livespec runtime status [--project <dir>] [--home <dir>] [--json]
+# Record a LiveSpec tool defect in the project and mark the phase Blocked.
+livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature <slug>] [--phase <phase>] [--title '<title>'] [--project <dir>] [--json]
+```
+
+- **install** writes `<home>/versions/<VERSION>-<sha12>/` (committed tree minus top-level
+  `.specs/` and `tests/`, read-only, `.livespec-runtime.json` manifest with a content digest),
+  rewrites `<home>/bin/livespec` for the installing interpreter and points `<home>/current` at
+  the snapshot unless `--no-activate`. Re-installing reuses a verified snapshot; a corrupted
+  one is refused, never overwritten. Without a working `livespec` yet, run it through the
+  checkout's own environment: `cd <livespec repo> && uv sync && .venv/bin/python -m
+  validator.cli runtime install` (a bare `python3` lacks LiveSpec's dependencies).
+- **pin** writes the portable lock (`schema`, `mode`, `runtime_id`, `livespec_version`,
+  `commit`), rewrites `.specs/.livespec-path` and retargets LiveSpec-owned links under
+  `.agent-sync.local/{skills,rules}/` into the snapshot (missing targets are listed and left
+  unchanged). It warns when `.specs/.livespec-path` is not git-ignored and never creates links.
+- **upgrade** requires a pinned lock (otherwise run `pin`) and refuses a runtime older than
+  `.specs/livespec-version`; the same id is a no-op.
+- **status** / `livespec doctor` report: checkout references (WARNING clean, ERROR dirty),
+  snapshot links without lock (WARNING), missing/corrupted pinned snapshot (ERROR), executing
+  runtime other than the pinned snapshot (ERROR), mismatched references (WARNING), invalid
+  lock (ERROR), dev mode (one INFO). The LiveSpec repository itself reports nothing.
+- **defect** writes `.specs/tool-defects/<YYYY-MM-DD>-<slug>.md` (never overwritten: `-2`,
+  `-3`, ...) with the command, verbatim error, frozen runtime identity and resume commands,
+  then applies `livespec pipeline update --feature <slug> --phase <phase> --status blocked`.
+  See [`system/tool-project-boundary.md`](../system/tool-project-boundary.md).
+
+### PATH ordering
+
+The shim must come before any editable `livespec` on `PATH`; on macOS the editable
+development install is typically `/opt/homebrew/bin/livespec`:
+
+```bash
+export PATH="$HOME/.livespec/bin:$PATH"   # add to ~/.zshrc, then: hash -r
+command -v livespec                       # -> ~/.livespec/bin/livespec
+```
+
+`livespec runtime status` reports `runtime_executing_mismatch` (ERROR) when a pinned
+project is run by another CLI, for example `/opt/homebrew/bin/livespec`.
+
+### Fresh machine
+
+`.specs/livespec.lock` is committed; `.specs/.livespec-path` and `.agent-sync.local/` are
+machine-local. After cloning a pinned project:
+
+```bash
+# No livespec CLI exists yet on a fresh machine: use the checkout's own environment first.
+cd <livespec repo> && uv sync && .venv/bin/python -m validator.cli runtime install --source <livespec repo> --ref <commit from lock>
+<home>/versions/<runtime_id>/scripts/link-local.sh <project> <home>/versions/<runtime_id>
+livespec runtime pin --runtime <runtime_id from lock>   # lock bytes stay unchanged
+```
+
+The global bootstrap skills can be installed from the snapshot too:
+`bash <home>/versions/<runtime_id>/scripts/install.sh`.
+
+### Deleting a snapshot
+
+Snapshots are read-only and there is no delete command. Restore write permission first:
+
+```bash
+chmod -R u+w <home>/versions/<runtime_id> && rm -rf <home>/versions/<runtime_id>
+```
+
+### Migrating an existing consumer project (Handy)
+
+A consumer such as `~/projects/handy` that links into `~/projects/livespec` migrates with
+the commands below, in order (verified by `tests/test_runtime_docs.py` on a temporary copy).
+Prerequisite: the LiveSpec checkout has its own environment, `~/projects/livespec/.venv`
+(create it once with `cd ~/projects/livespec && uv sync`). The shim written by step 1 runs
+that same interpreter, so it keeps LiveSpec's dependencies without an activated venv.
+
+<!-- runtime-migration:start -->
+```bash
+# 1. Install a snapshot of a committed LiveSpec tree (never the dirty dev checkout) with the
+#    checkout's own venv: a bare python3 lacks LiveSpec's dependencies (typer, pydantic).
+git -C ~/projects/livespec fetch origin
+cd ~/projects/livespec && .venv/bin/python -m validator.cli runtime install --source ~/projects/livespec --ref origin/main
+# 2. Put the shim before any editable livespec (e.g. /opt/homebrew/bin/livespec); persist in ~/.zshrc.
+export PATH="$HOME/.livespec/bin:$PATH"
+hash -r
+command -v livespec
+# 3. Pin the consumer project to that runtime (lock, .livespec-path, LiveSpec-owned links).
+cd ~/projects/handy
+livespec runtime pin
+# 4. Verify: mode "pinned" and no ERROR or WARNING runtime finding.
+livespec runtime status --json
+# 5. Commit the portable lock (.specs/.livespec-path and .agent-sync.local/ stay machine-local).
+git add .specs/livespec.lock
+git commit -m "chore: pin LiveSpec runtime"
+```
+<!-- runtime-migration:end -->
+
+---
 
 ## CI / GitHub Actions snippets
 

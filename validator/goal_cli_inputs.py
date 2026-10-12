@@ -46,6 +46,7 @@ class ResolvedGoalInputs:
     contract: JsonObject
     state: JsonObject
     project_root: Path
+    contract_path: Path | None = None
 
 
 # @spec FR-004: Require explicit prove pair, FR-005: Require archive pair
@@ -113,12 +114,14 @@ def resolve_goal_pair_inputs(
             pair.contract,
             pair.state,
             pair.project_root,
+            inputs.contract_path,
         )
     return ResolvedGoalInputs(
         inputs.state_path,
         inputs.contract,
         inputs.state,
         find_specs_root().parent,
+        inputs.contract_path,
     )
 
 
@@ -135,7 +138,12 @@ def read_evidence_input(evidence_input: str) -> JsonObject:
         GoalInputError: If evidence is unreadable, malformed, or not an object.
     """
     candidate = Path(evidence_input)
-    if candidate.exists():
+    try:
+        is_path = candidate.exists()
+    except OSError:
+        # Inline JSON longer than the filename limit raises ENAMETOOLONG on Python < 3.14.
+        is_path = False
+    if is_path:
         return _read_json_object(candidate, "prove")
     try:
         parsed: object = json.loads(evidence_input)
@@ -168,6 +176,23 @@ def read_transcript(path: Path | None, *, max_bytes: int = MAX_TRANSCRIPT_BYTES)
     if size > max_bytes:
         raise ValueError(f"transcript file {path} is {size} bytes; max {max_bytes} bytes")
     return path.read_text(encoding="utf-8")
+
+
+def prepare_archive_inputs(
+    contract_path: str | None,
+    state_path: str | None,
+    feature: str | None,
+    stdout_file: Path | None,
+    stderr_file: Path | None,
+    max_transcript_bytes: int,
+) -> tuple[ResolvedGoalInputs, str | None, str | None]:
+    """Resolve the archive pair and read its optional size-bounded transcripts."""
+    inputs = resolve_goal_pair_inputs(
+        contract_path, state_path, operation="archive", feature=feature
+    )
+    stdout_text = read_transcript(stdout_file, max_bytes=max_transcript_bytes)
+    stderr_text = read_transcript(stderr_file, max_bytes=max_transcript_bytes)
+    return inputs, stdout_text, stderr_text
 
 
 def _required_file(token: str | None, option: str, operation: GoalOperation) -> Path:
@@ -217,6 +242,7 @@ __all__ = [
     "GoalOperation",
     "ParsedGoalInputs",
     "ResolvedGoalInputs",
+    "prepare_archive_inputs",
     "read_evidence_input",
     "read_goal_pair_inputs",
     "read_transcript",

@@ -1,3 +1,14 @@
+## 2026-10-12 — [Refactor]: YAML-style manifest parsing test asserts parsed fields
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_preflight_autofix.py — `test_parse_preflight_manifest_yaml_style` only asserted `isinstance(items, list)`; it now checks the parsed name, binary, installer and verify command.
+- **AC impacted:** None
+- **Open defect (not fixed here):** `auto_resolve: pip install -e ".[dev]"` is classified as `pip` with `install_arg='".[dev]"'`, so `build_install_cmd` yields `pip install --user '".[dev]"'`: the `-e` flag is dropped and the shell quotes stay literal. The test does not pin that argument.
+- **Author:** claude-code
+
+---
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update

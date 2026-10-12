@@ -105,3 +105,12 @@
 - `gates init` defaults to schema v2 `enforce`; `--ast-mode off` opts out to legacy v1; `observe` explicit.
 - Receipt + `verify --json` now serialize `advisory_rules[]` / `unsupported_rules[]` (SQL/design/payment advisory; legal/copy/pricing + kotlin `!!`/swift `!` unsupported) — never blocking.
 - 072 default-mode invariant superseded (recorded in 072 changelog).
+
+## 2026-10-12 — [Refactor]: Gate and ARS tests deduplicated and anchored on the repo root
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_conventions_ars_rules.py, tests/test_conventions_lang_multilang.py, tests/test_conventions_gates_schema.py
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- ARS fixture paths and the real-repo gates load no longer depend on the working directory; three gates-init tests duplicated in test_conventions_gates_schema.py removed (the default-catalog assertion moved there).

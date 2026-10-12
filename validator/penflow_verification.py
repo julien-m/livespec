@@ -11,6 +11,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
+from .penflow_cli import penflow_cli_missing, resolve_penflow_cli
+
 
 class VerificationProfile(StrEnum):
     """Caller-selected certification stage; never inferred from a report."""
@@ -84,9 +86,11 @@ def verify_penflow_report(
         identity = _validation_identity(project_root, workspace, effective_build)
     except (OSError, RuntimeError) as exc:
         return PenflowVerification("BLOCKED", f"verification_input_unreadable: {exc}")
-    executable = shutil.which("penflow")
+    executable = resolve_penflow_cli(shutil.which)
     if executable is None:
-        return PenflowVerification("BLOCKED", "compatible_penflow_cli_required")
+        return PenflowVerification(
+            "BLOCKED", penflow_cli_missing("compatible_penflow_cli_required")
+        )
     arguments = [
         executable,
         "validate-report",

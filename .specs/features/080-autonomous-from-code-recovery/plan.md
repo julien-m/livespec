@@ -2,7 +2,7 @@
 title: Autonomous From-Code Recovery
 spec_ref: spec.md
 created: 2026-10-09
-updated: 2026-10-09
+updated: 2026-10-12
 status: Approved
 ---
 
@@ -11,7 +11,7 @@ status: Approved
 - **Feature:** 080-autonomous-from-code-recovery
 - **Date:** 2026-10-09
 - **Status:** Approved
-- **Scope:** M — four FR, six AC; local bootstrap metadata and subprocess boundaries.
+- **Scope:** M — four FR, seven AC; local bootstrap metadata and subprocess boundaries.
 
 ## Summary
 
@@ -53,14 +53,14 @@ Implementation context:
 
 ## Design Decisions
 
-- Independently inspect `package.json`, root and `src-tauri/Cargo.toml`, `pyproject.toml`, Tauri JSON configuration and corroborating TypeScript/lockfile markers. Parse supported manifest structures strictly; contextual errors replace guessed fallbacks. Unsupported evidence-bearing manifest formats fail explicitly rather than silently misclassifying them.
+- Independently inspect `package.json`, root and `src-tauri/Cargo.toml`, `pyproject.toml`, Tauri JSON configuration and corroborating TypeScript/lockfile markers. Parse supported manifest structures strictly; contextual errors replace guessed fallbacks. A fixed list of recognized unsupported manifests (the FR-001 list, including `src-tauri/tauri.conf.json5` and `src-tauri/Tauri.toml`) is never parsed: each one present is recorded in `ObservedProfile.unsupported_manifests` with unknown ecosystem, rendered in `project.md` and the completed bootstrap recap, and detection continues with the supported ecosystems; if no supported manifest exists, detection fails and names the unsupported manifests found.
 - Product name precedence: observed Tauri `productName`, then observed package/project name; directory basename may identify the local directory but cannot become an observed product claim. Preserve technical package names separately. Retain every detected frontend/native family; Tauri native surface must not collapse to web-only.
-- Manager evidence: explicit `packageManager`, then corroborated native build-command manager, then unique lockfile. Recognize manager command tokens without executing manifest commands. Conflicting evidence fails; absence stays unknown and cannot produce an npm probe/default. Installed testing tools and declared scripts are listed once; unobserved product roles, growth, regions, budget, deployment and auth remain Unknown.
+- Manager evidence: explicit `packageManager`, then corroborated native build-command manager, then unique lockfile. Recognize manager command tokens without executing manifest commands. Conflicting evidence and an unsupported `packageManager` value fail; absence stays unknown and cannot produce an npm probe/default. A `package.json` with no manager evidence adds an explicit warning to `ObservedProfile.warnings`, rendered in `project.md`, the completed recap and the command stderr (`WARNING:` lines, every mode), without failing. Installed testing tools and declared scripts are listed once; unobserved product roles, growth, regions, budget, deployment and auth remain Unknown.
 - `ObservedProfile` includes evidence paths, content identities and fact provenance. `InitOptions` contains resolved target, force, dry-run, verify-only and finite total timeout. `ProbeResult` contains argv, actual stdout/stderr, exit, duration and timeout/missing status. No persisted database model; ER diagram and OpenAPI contract are not applicable.
 - `--verify-only` re-detects current profile and checks the generated profile identity plus critical document values/content identity; existence or an old completed marker is insufficient. It writes no receipt, cache, directory, hook, integration or artifact. Missing/changed manifests, edited generated content and escaping paths return nonzero.
 - Required probes come from observed families and selected manager (e.g. Bun plus Cargo for hybrid, npm for web/npm, current Python for Python, Cargo for standalone Rust). Execute only allowlisted version argv with stdin closed, captured output, finite per-call timeout capped by remaining total budget. Missing tool, nonzero or timeout yields an actual failure report and no READY/completed recap. Tool availability proves tooling only.
 - Plan generation and path validation precede mutations. For existing specs without force, fail noninteractively; with force, back up existing `.specs`, `.conventions`, `.gitignore`, `AGENTS.md`, `CLAUDE.md` into a unique sibling project-local directory before any overwrite. Snapshot links without following external targets. Check every planned destination and ancestor; reject escaping symlinks, including integration/asset/provider-output paths. Source/manifests are never destinations.
-- Recovery overlays an explicit generated-file allowlist rather than deleting `.specs`. Retain existing feature/hook/run histories, custom files and user integration text outside LiveSpec markers; retain custom preflight sections and valid convention routing. Back up invalid generated conventions before repairing their index/manifest to existing `ai-ressources/code-conventions` sources. Preserve historical ADRs/changelogs and update only owned bootstrap artifacts.
+- Recovery overlays an explicit generated-file allowlist rather than deleting `.specs`. Retain existing feature/hook/run histories, custom files and user integration text outside LiveSpec markers; retain custom preflight sections and valid convention routing. Back up invalid generated conventions before repairing their index/manifest to existing `ai-ressources/code-conventions` sources. The resource root is the explicit `AIRESOURCES` environment value when set, otherwise the sibling `ai-ressources` checkout next to the LiveSpec repository; `tests/test_init_documents.py` proves the explicit value wins over the sibling default. Preserve historical ADRs/changelogs and update only owned bootstrap artifacts.
 - Stage document bytes and use safe atomic replacement for each generated file after backup. Any subsequent sync/probe/verification failure leaves a non-completed state with exact diagnostics and the preserved backup; an old completed recap must not survive as current success. No promise of application runtime or all-or-nothing rollback after an external sync failure.
 - Reuse official install/sync/hook procedures through explicit noninteractive paths. Add only the minimal installer compatibility needed to prevent prompts/false success during authorized force recovery; preserve standalone interactive behavior. Mutable local agents are copies, including replacing legacy shared-source symlinks safely before `cc-hub agent build`; read-only skill/rule links may remain links. Never write through a shared agent directory or provider-output escape.
 - Normalize autonomous invocation to `--from-code --auto` before new goal render. Preserve `--dir` target and `--force`, support `--dry-run` without writes, and reject `--deep` or incompatible autonomous combinations contextually before mutations. Dry-run must not claim completed initialization. Interactive inventories keep interviews and stack confirmation; new autonomous inventories keep installation, observed generation, current verification, integrations, hooks and archive. Historical goals are immutable.
@@ -146,13 +146,13 @@ stateDiagram-v2
 ### Step 1 — Detect typed observed profiles
 
 **FR covered:** FR-001.1: Independent manifest detection.
-- New `validator/init_profile.py`: `detect_profile`, supported JSON/TOML parsers, immutable profile/evidence models; split family helpers if the module reaches 300 lines. Record source hash identities, product/technical names, independent families, manager conflicts and unknown fields.
-- Derive tests from AC-001/002/003 in new `tests/test_init_profile.py`: hybrid Bun/Tauri/React, web/npm, Python, standalone Cargo, missing/ambiguous manager, malformed manifests, unsupported formats and contradictory manager evidence.
+- New `validator/init_profile.py`: `detect_profile`, supported JSON/TOML parsers, immutable profile/evidence models; split family helpers if the module reaches 300 lines. Record source hash identities, product/technical names, independent families, manager conflicts, recorded unsupported manifests, warnings and unknown fields.
+- Derive tests from AC-001/002/003/007 in new `tests/test_init_profile.py`: hybrid Bun/Tauri/React, web/npm, Python, standalone Cargo, missing manager evidence with warning (never npm), conflicting manager evidence failure, malformed manifests, unsupported manifests recorded beside supported ones, unsupported-only failure and contradictory manager evidence. `tests/test_init_documents.py` proves the rendered project profile and recap; a real subprocess in `tests/test_init_recovery.py` proves the dry-run and completed-run `WARNING:` output, the written `.specs/bootstrap-profile.json`, `.specs/project.md` and `.specs/bootstrap-recap.md`, and a passing read-only verification (AC-007).
 
 ### Step 2 — Render documents and run actual tooling probes
 
 **FR covered:** FR-001.2: Preserve observed facts, FR-002.1: Documents and bounded tooling proof.
-- New `validator/init_documents.py`: `render_documents` returns path/content map for project, constitution, stack, observed ADR, roadmap, testing, preflight/report and recap; use explicit unknowns instead of invented product backlog. New focused `validator/init_probes.py` if needed: `run_probes` captures allowlisted bounded argv outcomes under total deadline.
+- New `validator/init_documents.py`: `render_documents` returns path/content map for project, constitution, stack, observed ADR, roadmap, testing, preflight/report and recap; use explicit unknowns instead of invented product backlog. Focused `validator/init_probes.py`: `run_command` executes one bounded argv (also used for installer, hooks and path checks) and `run_probes` captures allowlisted bounded version-probe outcomes under the total deadline.
 - Generate a project-specific constitution and observed stack retention rationale, deduplicated declared test scripts/tools and native/frontend evidence distinctions. No generic unfilled templates or deployment assumption. Completed recap is written only after all required success predicates.
 - New `tests/test_init_documents.py` and probe integration coverage: exact evidence values, unknown product/deployment values, no duplicate tests, missing tool, nonzero, timeout and no READY/completion on failure.
 
@@ -200,7 +200,7 @@ stateDiagram-v2
 
 | Priority/gate | Concrete tests and evidence | FR/AC |
 |---|---|---|
-| P0 profile correctness | `test_init_profile.py` and `test_init_documents.py`: all four fixture families, evidence citations, unknowns, deduplication | FR-001/002; AC-001/002 |
+| P0 profile correctness | `test_init_profile.py` and `test_init_documents.py`: all four fixture families, evidence citations, unknowns, deduplication, recorded unsupported manifests and manager warning | FR-001/002; AC-001/002/007 |
 | P0 fail-closed commands | `test_spec_init_autonomous_bootstrap.py`: malformed/conflict, real failed/missing/timed-out fixture probes, verify-only tamper/drift, dry-run/unsupported flags/selected target; nonzero and no READY/completed claim | FR-001/002/003; AC-003 |
 | P0 preservation | Bootstrap subprocess backup equality, custom history and source bytes; reject escaping generated paths before outside-target mutation | FR-003; AC-004 |
 | P0 shared isolation/conventions | `test_init_agent_isolation.py`: controlled executable mutates actual local copy only, legacy-link detachment, source hashes; valid routing unchanged/invalid repair resolves real files | FR-003; AC-005 |
@@ -215,7 +215,7 @@ stateDiagram-v2
 ## Risks & Considerations
 
 - Partial external sync can fail after backup and some installation writes; preserve backup, invalidate current completion and report the exact step. Safe force re-run is the recovery path; no silent destructive rollback.
-- Mixed or incomplete manager evidence must remain unknown or fail on contradiction; no convention/runtime preference may override target manifests. Unsupported formats must name the unsupported file and recovery action.
+- Mixed or incomplete manager evidence must remain unknown or fail on contradiction; no convention/runtime preference may override target manifests. Recorded unsupported manifests must name the file; an unsupported-only project fails with the file names and recovery action.
 - Symlink containment checks apply to all writable paths, including assets/integration outputs and backup ancestry. Preserve link metadata without following it; concurrent target mutation remains outside this single-run contract and should be detected by source identity recheck before completion.
 - Probe timeout uses remaining total budget, preventing a sequence of individually bounded calls from exceeding autonomous execution budget. No package installation or dependency script execution occurs during detection/probes.
 - Shared source and user history must remain byte-identical. Introduce narrowly scoped noninteractive installer behavior and test existing interactive semantics; avoid a wholesale unrelated installer rewrite.

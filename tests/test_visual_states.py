@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-import subprocess
 from collections.abc import Generator
 from pathlib import Path
 
@@ -41,36 +40,15 @@ def clear_taxonomy_cache() -> Generator[None, None, None]:
 class TestVisualStateParsing:
     """Tests for VisualState parsing from the real taxonomy document."""
 
-    def test_visual_states_parsed_from_taxonomy(self) -> None:
-        """Load the real taxonomy and assert traits with visual states have >= 2 states."""
-        # Traits documented as having visual states (5 core + 6 from 005.2 expansion)
-        traits_with_visual_states = {
-            "is_submittable",
-            "async_action",
-            "has_overlay",
-            "dismissible_layer",
-            "has_validation",
-            "is_navigable",
-            "is_sortable",
-            "shows_notification",
-            "has_drag_drop",
-            "has_date_picker",
-        }
-        taxonomy = load_taxonomy(_TAXONOMY_PATH)
-        for trait in taxonomy.traits:
-            if trait.name in traits_with_visual_states:
-                assert len(trait.visual_states) >= 2, (
-                    f"Trait '{trait.name}' has {len(trait.visual_states)} visual states, "
-                    f"expected at least 2"
-                )
-
     def test_visual_state_fields(self) -> None:
-        """Assert VisualState has state_id: str, css_attributes: list[str], screenshot: str."""
-        vs = VisualState(state_id="test", css_attributes=["a", "b"], screenshot="test.png")
-        assert isinstance(vs.state_id, str)
-        assert isinstance(vs.css_attributes, list)
-        assert all(isinstance(a, str) for a in vs.css_attributes)
-        assert isinstance(vs.screenshot, str)
+        """Parsed traits expose typed VisualState rows (state_id, css_attributes, screenshot)."""
+        taxonomy = load_taxonomy(_TAXONOMY_PATH)
+        trait = taxonomy.trait_by_name("has_validation")
+        assert trait is not None
+        invalid = next(vs for vs in trait.visual_states if vs.state_id == "invalid")
+        assert isinstance(invalid, VisualState)
+        assert invalid.css_attributes and all(isinstance(a, str) for a in invalid.css_attributes)
+        assert invalid.screenshot.endswith(".png")
 
     def test_is_submittable_has_disabled_enabled_loading(self) -> None:
         """Assert exactly 3 states: disabled, enabled, loading for is_submittable."""
@@ -91,9 +69,10 @@ class TestVisualStateParsing:
         assert 'aria-disabled="true"' in disabled.css_attributes
 
     def test_missing_visual_states_table_returns_empty_list(self) -> None:
-        """A Trait without visual states in the doc should parse with empty list."""
-        # Create a minimal trait manually — no visual states
-        trait = Trait(name="test_trait", description="No visual states")
+        """A documented trait without a visual states table parses with an empty list."""
+        taxonomy = load_taxonomy(_TAXONOMY_PATH)
+        trait = taxonomy.trait_by_name("has_dropdown")
+        assert trait is not None
         assert trait.visual_states == []
 
     def test_duplicate_screenshot_detection(self) -> None:
@@ -113,21 +92,26 @@ class TestVisualStateParsing:
         assert "'b'" in warnings[0]
 
     def test_all_five_traits_have_visual_states(self) -> None:
-        """After reading the taxonomy, all 5 trait names are present with visual states."""
-        taxonomy = load_taxonomy(_TAXONOMY_PATH)
-        expected_traits = [
+        """The core traits and the 005.2 traits with visual states each define >= 2 states."""
+        traits_with_visual_states = {
             "is_submittable",
             "async_action",
             "has_overlay",
             "dismissible_layer",
             "has_validation",
-        ]
-        trait_names = [t.name for t in taxonomy.traits]
-        for name in expected_traits:
-            assert name in trait_names, f"Trait '{name}' not found in taxonomy"
+            "is_navigable",
+            "is_sortable",
+            "shows_notification",
+            "has_drag_drop",
+            "has_date_picker",
+        }
+        taxonomy = load_taxonomy(_TAXONOMY_PATH)
+        for name in sorted(traits_with_visual_states):
             trait = taxonomy.trait_by_name(name)
-            assert trait is not None
-            assert len(trait.visual_states) > 0, f"Trait '{name}' has no visual states"
+            assert trait is not None, f"Trait '{name}' not found in taxonomy"
+            assert len(trait.visual_states) >= 2, (
+                f"Trait '{name}' has {len(trait.visual_states)} visual states, expected >= 2"
+            )
 
     def test_visual_state_screenshot_not_empty(self) -> None:
         """All visual states have non-empty screenshot fields."""
@@ -150,20 +134,6 @@ class TestVisualStateParsing:
                 assert len(vs.css_attributes) > 0, (
                     f"Empty css_attributes for state '{vs.state_id}' in trait '{trait.name}'"
                 )
-
-    def test_taxonomy_hash_computable(self) -> None:
-        """git hash-object on the taxonomy returns a non-empty string."""
-        try:
-            result = subprocess.run(
-                ["git", "hash-object", str(_TAXONOMY_PATH)],
-                capture_output=True,
-                text=True,
-                check=True,
-            )
-            assert result.stdout.strip(), "git hash-object returned empty string"
-            assert len(result.stdout.strip()) == 40, "Expected 40-char SHA1 hash"
-        except FileNotFoundError:
-            pytest.skip("git not available")
 
 
 class TestAsyncActionStates:

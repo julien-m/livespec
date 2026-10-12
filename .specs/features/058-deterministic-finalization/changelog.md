@@ -1,5 +1,14 @@
 # Changelog - Deterministic Finalization
 
+## 2026-10-09 — [Check]: Initial lifecycle closure audit
+
+- **Type:** Check
+- **Spec modified:** No
+- **Code modified:** None
+- **Findings:** Planned/In Progress schema rejection; plan output contract forbids lifecycle writes; conventions FAIL with three finalizer size violations. Current127 scoped tests pass; one slow test not rerun.
+- Read the [initial gap report](checks/2026-10-09.md).
+- **Goal:** 08ee488363fac19f85642212954d14846815de89a90957044c917719bd01f39f
+
 ## 2026-06-10 — [Spec]: Feature specification created
 
 - **Type:** Spec Update

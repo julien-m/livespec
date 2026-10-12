@@ -1,3 +1,13 @@
+## 2026-10-12 — [Refactor]: Lock tests exercise the real resume and timeout paths
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_locks.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+`test_resumes_when_reserved_marker_present` never reached the resume branch (it asserted a new slot); it now forces the scan/mkdir race and asserts `resumed=True`, and the next-slot case keeps its own honest test. The collision test lost its dead setup; the 10 s default timeout is proved with a held lock and a fake clock instead of a constant comparison.
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update

@@ -28,7 +28,7 @@ If not, reply with the exact refusal message above.
 ## Conventions Gate
 
 - conventions gate failure is BLOCKING when gates file exists.
-- "pre-existing" never justifies skipping conventions; require a fresh PASS receipt or report BLOCKING.
+- "pre-existing" never justifies skipping conventions: apart from debt recorded in the versioned baseline (reported separately at repo scope), require a fresh PASS receipt or report BLOCKING; feature closure requires PASS at feature scope.
 
 ---
 

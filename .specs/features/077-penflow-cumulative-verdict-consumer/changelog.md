@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-10-12 — [Spec Update]: AC-009 / FR-008 clarified to the implemented authority import
+
+- **Type:** Spec Update
+- **Spec modified:** Yes (sections: Acceptance Criteria AC-009, Functional Requirements FR-008, new Clarifications)
+- **Code modified:** None (behavior already implemented in `validator/penflow_authority_import.py`)
+- **AC impacted:** AC-009 (meaning made explicit, unchanged behavior)
+- **Author:** claude-code (spec-fix closure, user decision)
+
+User decision recorded: "authenticated and accepted" is the certifying `penflow authority collect` response produced by Penflow (report SHA-256 plus exact sorted file inventory with SHA-256); "bounded" is a project-confined archive under `.specs/penflow-authority/<digest>/` holding only the inventoried files, without path escape and without size cap. Fresh independent spec and plan reviews (claude-opus-5-5, budget 150000) are complete and ready; `validate --progression implement` returns READY, which closes the pending Penflow CLI resolution spec-fix.
+
+## 2026-10-12 — [Refactor]: Strict-model combinatorics reduced
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_penflow_approval_models.py
+- **AC impacted:** AC-008 (coverage unchanged)
+- **Author:** claude-code (test-suite cleanup lot 3)
+
+The shared `VersionOne` validator is checked once with the full value set and every versioned model with two values (42 -> 13 cases); redundant strictness, digest and decision values were dropped.
+
 ## 2026-09-05 — Verification: Shared callers applied and SC005 verified
 
 - **Type:** Spec Update; final implementation mappings and proof documentation.
@@ -105,3 +125,14 @@ Added actual AST requirement extraction and a bound review snapshot/result trans
 - **Author:** Codex
 
 <!-- finalize:spec-implement:2026-09-05:6ce4661e -->
+
+### 2026-10-12 — Fix: Penflow CLI found without an activated venv (1 functional gap closed)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `validator/penflow_cli.py` (new), `validator/penflow_contract_validation.py`, `validator/penflow_verification.py`, `validator/penflow_authority_import.py`, `tests/test_penflow_cli.py`, `tests/test_penflow_contract_validation.py`
+- **Gaps closed:** FR-007 guard (and the verification/authority transports) resolved `penflow` only from PATH, so 71 tests failed with `review_contract_penflow_cli_required` when the venv holding the pinned CLI was not activated. Order now: `LIVESPEC_PENFLOW_BIN` override, the interpreter's bin directory, PATH; absence still blocks, with the searched locations.
+- **Remaining:** readiness gate BLOCKED — the claude-opus-5-5 spec review marks AC-009 ambiguous (`brainstorm-source-authentication`); business decision pending, no review fabricated.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:771b8f83 -->

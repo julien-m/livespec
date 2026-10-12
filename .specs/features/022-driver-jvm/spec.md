@@ -230,8 +230,8 @@ flowchart TD
 ## Functional Requirements
 
 - **FR-001** — Write `livespec/drivers/jvm.yaml` with detect rule (`files: [build.gradle, build.gradle.kts, pom.xml]`) and 4 capability blocks with Gradle/Maven conditional commands.
-- **FR-002** — Implement build tool detection: prefer Gradle when both present; detect Kotlin DSL (`build.gradle.kts`) for library naming preference.
-- **FR-003** — Implement `build.gradle` / `pom.xml` parser to detect plugin and dependency presence (JaCoCo, pitest, kotest-snapshot, approvaltests, jqwik, kotest-property).
+- **FR-002** — Implement build tool detection: prefer Gradle when both present; detect Kotlin DSL (`build.gradle.kts`) for library naming preference. (Implemented by `livespec/drivers/scripts/jvm-*.sh`; the unused Python helper was removed 2026-10-12.)
+- **FR-003** — Implement `build.gradle` / `pom.xml` parser to detect plugin and dependency presence (JaCoCo, pitest, kotest-snapshot, approvaltests, jqwik, kotest-property). (Implemented by `livespec/drivers/scripts/jvm-*.sh`; the unused Python parsers were removed 2026-10-12.)
 - **FR-004** — Implement pitest XML parser: read `mutations.xml`, extract `<mutation status="KILLED|SURVIVED|TIMED_OUT">` elements, compute score.
 - **FR-005** — Write integration tests for coverage capability on Gradle and Maven fixture projects.
 - **FR-006** — Write unit tests for build file parser and pitest XML parser.

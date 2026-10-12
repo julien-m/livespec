@@ -9,6 +9,8 @@ import json
 import os
 from pathlib import Path
 
+import pytest
+
 from validator.registry_links import (
     LinkViolation,
     check_link,
@@ -45,6 +47,19 @@ def test_expected_registry_paths_match_canonical_layout() -> None:
 
 def test_detect_link_capability_returns_symlink_on_posix(tmp_path: Path) -> None:
     assert detect_link_capability(tmp_path) == "symlink"
+    assert not (tmp_path / ".specs/design/.probe").exists()
+
+
+def test_detect_link_capability_falls_back_to_manifest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def refuse(*_args: object, **_kwargs: object) -> None:
+        raise OSError("symlinks not permitted")
+
+    monkeypatch.setattr("validator.registry_links.os.symlink", refuse)
+
+    assert detect_link_capability(tmp_path) == "manifest"
+    assert not (tmp_path / ".specs/design/.probe").exists()
 
 
 def test_write_and_read_link_mode_round_trip(tmp_path: Path) -> None:

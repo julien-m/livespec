@@ -22,6 +22,10 @@ lib-cov
 coverage
 *.lcov
 
+# coverage.py data file (pytest-cov)
+.coverage
+.coverage.*
+
 # nyc test coverage
 .nyc_output
 
@@ -196,9 +200,17 @@ AUDIT-CODEX.md
 
 # Conventions debt JSON is regenerable; keep the Markdown report versioned.
 .specs/conventions/debt.json
+# Runtime evidence written by commands; already-tracked historical receipts stay versioned.
+.specs/conventions/runs/
+.specs/features/*/run/*/finalize/
+# Disposable native review caches (system/review-protocol.md).
+.specs/features/*/.reviews/
 
 # LiveSpec local run artifacts (feature 039)
 .specs/.runs/
+# Runner-owned execution captures and agent orchestration scratch (runtime only)
+.specs/.execution/
+.specs/.orchestration/
 /.tmp-orchestrate/
 
 # LiveSpec local preview artifacts (feature 040, --save output)

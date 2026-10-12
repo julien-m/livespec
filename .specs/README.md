@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-09-08
+> Last updated: 2026-10-12
 
 
 ---
@@ -63,16 +63,16 @@
 | 025 | Mutation Testing On-Demand | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/025-mutation-testing-on-demand/spec.md) |
 | 026 | Conventions Propagation by Stack | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/026-conventions-propagation-by-stack/spec.md) |
 | 027 | UI Runner Architecture | Draft | 2026-05-06 | 2026-05-06 | [spec](features/027-ui-runner-architecture/spec.md) |
-| 028 | UI Runner Web (Playwright Refactor) | Draft | 2026-05-06 | 2026-05-06 | [spec](features/028-ui-runner-web/spec.md) |
+| 028 | UI Runner Web (Playwright Refactor) | Implemented | 2026-05-06 | 2026-10-12 | [spec](features/028-ui-runner-web/spec.md) |
 | 029 | UI Runner Tauri | Implemented | 2026-05-06 | 2026-05-06 | [spec](features/029-ui-runner-tauri/spec.md) |
-| 030 | UI Runner iOS / watchOS | Draft | 2026-05-06 | 2026-05-06 | [spec](features/030-ui-runner-ios-watchos/spec.md) |
-| 031 | UI Runner Android | Draft | 2026-05-06 | 2026-05-06 | [spec](features/031-ui-runner-android/spec.md) |
+| 030 | UI Runner iOS / watchOS | Implemented | 2026-05-06 | 2026-10-12 | [spec](features/030-ui-runner-ios-watchos/spec.md) |
+| 031 | UI Runner Android | Implemented | 2026-05-06 | 2026-10-12 | [spec](features/031-ui-runner-android/spec.md) |
 | 032 | Pre-commit / Pre-push Test Hooks | Draft | 2026-05-06 | 2026-05-06 | [spec](features/032-test-hooks-pre-commit-pre-push/spec.md) |
-| 033 | Smart Test Selection | Draft | 2026-05-06 | 2026-05-06 | [spec](features/033-smart-test-selection/spec.md) |
+| 033 | Smart Test Selection | Implemented | 2026-05-06 | 2026-10-12 | [spec](features/033-smart-test-selection/spec.md) |
 | 034 | Preflight Auto-Install & Init | Draft | 2026-05-06 | 2026-05-06 | [spec](features/034-preflight-autofix/spec.md) |
 <!-- Note: NNN=012 reserved for in-flight feature/012-brainstorm-ingestion (separate branch) -->
-| 035 | Unified CLI Surface | Implemented | 2026-05-07 | 2026-05-07 | [spec](features/035-unified-cli-surface/spec.md) |
-| 036 | Multi-Surface Detection and Migration | Planned | 2026-05-07 | 2026-05-07 | [spec](features/036-multi-surface-detection-and-migration/spec.md) |
+| 035 | Unified CLI Surface | In Progress | 2026-05-07 | 2026-10-12 | [spec](features/035-unified-cli-surface/spec.md), [plan](features/035-unified-cli-surface/plan.md), [implementation](features/035-unified-cli-surface/implementation.md) |
+| 036 | Multi-Surface Detection and Migration | Planned | 2026-05-07 | 2026-10-12 | [spec](features/036-multi-surface-detection-and-migration/spec.md) |
 | 037 | Test Multi-Runner Integration | Implemented | 2026-05-08 | 2026-05-08 | [spec](features/037-test-multi-runner-integration/spec.md), [plan](features/037-test-multi-runner-integration/plan.md), [implementation](features/037-test-multi-runner-integration/implementation.md) |
 | 038 | Runner Config Wiring | Implemented | 2026-05-08 | 2026-06-08 | [spec](features/038-runner-config-wiring/spec.md), [plan](features/038-runner-config-wiring/plan.md), [implementation](features/038-runner-config-wiring/implementation.md) |
 | 039 | Command Expectations and Verify Output | Implemented | 2026-05-12 | 2026-06-08 | [spec](features/039-command-expectations-and-verify-output/spec.md), [implementation](features/039-command-expectations-and-verify-output/implementation.md) |
@@ -93,7 +93,7 @@
 | 053 | Goal Tasks Replay Required Conventions Per Step | Implemented | 2026-06-01 | 2026-06-01 | [spec](features/053-goal-tasks-replay-required-conventions-per-step/spec.md), [plan](features/053-goal-tasks-replay-required-conventions-per-step/plan.md), [implementation](features/053-goal-tasks-replay-required-conventions-per-step/implementation.md) |
 | 054 | Migration Planner and Penflow Backfill | Implemented | 2026-06-01 | 2026-06-01 | [spec](features/054-migration-planner-penflow-backfill/spec.md), [plan](features/054-migration-planner-penflow-backfill/plan.md), [implementation](features/054-migration-planner-penflow-backfill/implementation.md) |
 | 055 | Spec Doctor Project Health | Implemented | 2026-06-01 | 2026-06-02 | [spec](features/055-spec-doctor-project-health/spec.md), [plan](features/055-spec-doctor-project-health/plan.md), [implementation](features/055-spec-doctor-project-health/implementation.md) |
-| 056 | Executable User Journeys | Implemented | 2026-06-01 | 2026-06-02 | [spec](features/056-executable-user-journeys/spec.md), [plan](features/056-executable-user-journeys/plan.md), [implementation](features/056-executable-user-journeys/implementation.md) |
+| 056 | Executable User Journeys | Implemented | 2026-06-01 | 2026-10-12 | [spec](features/056-executable-user-journeys/spec.md), [plan](features/056-executable-user-journeys/plan.md), [implementation](features/056-executable-user-journeys/implementation.md) |
 | 057 | Cross-Feature User Journeys v2 | Implemented | 2026-06-04 | 2026-06-09 | [spec](features/057-cross-feature-user-journeys-v2/spec.md), [plan](features/057-cross-feature-user-journeys-v2/plan.md), [implementation](features/057-cross-feature-user-journeys-v2/implementation.md) |
 | 058 | Deterministic Finalization | Implemented | 2026-06-10 | 2026-06-10 | [spec](features/058-deterministic-finalization/spec.md), [plan](features/058-deterministic-finalization/plan.md), [implementation](features/058-deterministic-finalization/implementation.md) |
 | 059 | Pipeline Verify Phase | Implemented | 2026-06-11 | 2026-06-11 | [spec](features/059-pipeline-verify-phase/spec.md), [plan](features/059-pipeline-verify-phase/plan.md), [implementation](features/059-pipeline-verify-phase/implementation.md) |
@@ -114,10 +114,14 @@
 | 074 | Agent Device Proof Adapter | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/074-agent-device-proof-adapter/spec.md), [plan](features/074-agent-device-proof-adapter/plan.md), [implementation](features/074-agent-device-proof-adapter/implementation.md) |
 | 075 | Design Direction Carry | Implemented | 2026-07-04 | 2026-07-04 | [spec](features/075-design-direction-carry/spec.md), [plan](features/075-design-direction-carry/plan.md), [implementation](features/075-design-direction-carry/implementation.md) |
 | 076 | Spec Init Goal Bootstrap | Implemented | 2026-09-04 | 2026-09-08 | Read [spec](features/076-spec-init-goal-bootstrap/spec.md), [plan](features/076-spec-init-goal-bootstrap/plan.md), and [implementation](features/076-spec-init-goal-bootstrap/implementation.md) |
-| 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-09-05 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
-| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-09-07 | [spec](features/078-requirement-evidence-integrity/spec.md) |
-| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-09-08 | [spec](features/079-validator-ci-prerequisites/spec.md) |
-| 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-09 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
+| 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-10-12 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
+| 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-10-12 | [spec](features/078-requirement-evidence-integrity/spec.md) |
+| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-10-12 | [spec](features/079-validator-ci-prerequisites/spec.md) |
+| 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-12 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
+| 081 | Lightweight Outcome-Based Goals | Implemented | 2026-10-10 | 2026-10-10 | Read [spec](features/081-lightweight-outcome-goals/spec.md) |
+| 082 | Conventions Gate Signal | Implemented | 2026-10-10 | 2026-10-11 | [spec](features/082-conventions-gate-signal/spec.md) |
+| 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-12 | [spec](features/083-pinned-runtime-isolation/spec.md) |
+| 084 | Bugfix Lane | Implemented | 2026-10-12 | 2026-10-12 | [spec](features/084-bugfix-lane/spec.md) |
 <!-- readme:features:end -->
 
 ---
@@ -130,6 +134,7 @@
 | ADR-001 | Python 3.11+ as primary language | 2026-04-13 | Active |
 | ADR-002 | Typer + Pydantic as CLI and validation frameworks | 2026-04-13 | Active |
 | ADR-003 | Ruff + Pyright for code quality | 2026-04-13 | Active |
+| ADR-004 | Pinned runtime snapshots, `runtime` command group and shim installation | 2026-10-11 | Active |
 <!-- readme:decisions:end -->
 
 ---
@@ -141,16 +146,16 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
-| 2026-09-08 | Feature | Feature 076 V5 temporary ownership verified; native AC-006 only; full-feature and main delivery not certified. |
-| 2026-09-08 | Feature | Feature079 v5 fixture isolation verified; AC005 pending and AC006 partial; no lifecycle promotion. |
-| 2026-09-08 | Bugfix | Feature079 gen4 Fix: deterministic CI, pinned private corpus and AST backend repaired; all local checks pass, AC002 native only, final CI/main pending. |
-| 2026-09-08 | Check | Feature079 gen4 Check: deterministic CI, private corpus and AST prerequisites inspected; local gates verified, bounded native evidence separate, final CI/main pending. |
-| 2026-09-08 | Bugfix | Feature079 Fix: four local acceptance checks verified; browser installer repaired without changing test runtime; final CI remains pending. |
-| 2026-09-08 | Check | Feature079 Check: local repair and native AC-002 verified; progress structure fixed; exact CI acceptance remains pending. |
-| 2026-09-07 | Check | [Feature 079] Check: Pre-fix audit resumed |
-| 2026-09-07 | Bugfix | Fix independent pipeline closure: bound CLI/runtime, explicit feature and review identity, reject usage exit2. |
-| 2026-09-07 | Feature | 078: repair reviewed-spec coordinator binding, reject incomplete mapping reviews before execution, preserve active child waits and isolated snapshot evidence. |
-| 2026-09-07 | Feature | 078: correct coordinator reviewed-spec acceptance and isolated snapshot inputs; full feature closure remains pending. |
+| 2026-10-12 | Spec | Spec Update: registry statuses aligned after stabilization merges |
+| 2026-10-12 | Bugfix | Bugfix: audit bugs through the bugfix lane (084) |
+| 2026-10-12 | Bugfix | [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback) |
+| 2026-10-12 | Bugfix | Bugfix: declare unit-test dependencies (audit batch) |
+| 2026-10-12 | Bugfix | Bugfix: missing requirements of features 035 and 056 implemented |
+| 2026-10-12 | Feature | Refactor: dead-code resolution (wire or retire) |
+| 2026-10-12 | Bugfix | Bugfix: [Feature 080] Unsupported manifests recorded, missing package manager warns; readiness gate closed |
+| 2026-10-12 | Spec | Spec Update: [Feature 077] AC-009 / FR-008 clarified, readiness gate closed |
+| 2026-10-12 | Feature | Refactor: test-suite cleanup lot 5 |
+| 2026-10-12 | Feature | Refactor: test cleanup lot 4 (legitimate assertions only) |
 <!-- readme:activity:end -->
 
 ---
@@ -272,3 +277,35 @@
 <!-- finalize:spec-fix:2026-09-08:e063bb60 -->
 
 <!-- finalize:spec-fix:2026-09-08:2d0a611e -->
+
+<!-- finalize:spec-specify:2026-10-10:e39214b3 -->
+
+<!-- finalize:spec-plan:2026-10-10:a5ebf692 -->
+
+<!-- finalize:spec-implement:2026-10-11:41daaa07 -->
+
+<!-- finalize:spec-specify:2026-10-11:60b23cb4 -->
+
+<!-- finalize:spec-plan:2026-10-11:5ddfddac -->
+
+<!-- finalize:spec-implement:2026-10-11:68d31117 -->
+
+<!-- finalize:spec-implement:2026-10-11:027bff35 -->
+
+<!-- finalize:spec-implement:2026-10-11:c4506f10 -->
+
+<!-- finalize:spec-feature:2026-10-12:21b73207 -->
+
+<!-- finalize:spec-feature:2026-10-10:2db73a41 -->
+
+<!-- finalize:spec-fix:2026-10-12:771b8f83 -->
+
+<!-- finalize:spec-fix:2026-10-12:b581f1b1 -->
+
+<!-- finalize:spec-fix:2026-10-12:7208ea4d -->
+
+<!-- finalize:spec-fix:2026-10-12:7710d267 -->
+
+<!-- finalize:spec-fix:2026-10-12:5728df60 -->
+
+<!-- finalize:spec-feature:2026-10-12:a6abad0a -->

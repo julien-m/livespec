@@ -29,3 +29,12 @@
 - Added comprehensive test suites (`tests/test_expectations.py`, `test_run_artifact.py`, `test_placeholders.py`, `test_outcome.py`, `test_verify_output.py`, `test_verify_output_cli.py`, `test_last_reviewed_hook.py`, `test_builtin_expectations_corpus.py`).
 
 Addresses FR-001…FR-012, AC-001…AC-011, EC-001…EC-010, SC-001…SC-007 of `spec.md`.
+
+## 2026-10-12 — [Refactor]: Expectations corpus follows the real command inventory
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_builtin_expectations_corpus.py, tests/integration/test_migration_v13.py
+- **AC impacted:** None
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- The corpus is parametrized over the commands the registry discovers (now including spec-doctor and spec-journey) instead of a frozen list; two duplicate existence tests removed. Migration v13 lost two obsolete link-local tests: link-local now delegates to cc-hub (tests/test_agent_sync_scripts.py).

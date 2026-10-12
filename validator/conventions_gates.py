@@ -43,6 +43,12 @@ DEFAULT_SOURCE_EXCLUSIONS = (
     "**/Generated/**",
     "**/node_modules/**",
 )
+# @spec FR-001: Declared detector fixtures are never sources
+#   .specs/features/082-conventions-gate-signal/spec.md#fr-001
+DETECTOR_FIXTURE_EXCLUSIONS = ("tests/fixtures/conventions_ast/**",)
+# Agent worktrees nested in the project are other checkouts of the repository,
+# never sources of the scanned working tree.
+AGENT_WORKTREE_EXCLUSIONS = (".claude/worktrees/**", ".worktrees/**")
 
 
 class GatesBaseModel(BaseModel):
@@ -184,6 +190,36 @@ class ConventionsGatesV2(GatesBaseModel):
 
 
 ConventionsGatesAny: TypeAlias = ConventionsGates | ConventionsGatesV2
+
+
+def effective_source_exclusions(gates: ConventionsGatesAny) -> tuple[str, ...]:
+    """Return built-in, detector-fixture, worktree and project exclusions for source collection."""
+    return (
+        *DEFAULT_SOURCE_EXCLUSIONS,
+        *DETECTOR_FIXTURE_EXCLUSIONS,
+        *AGENT_WORKTREE_EXCLUSIONS,
+        *gates.exclusions,
+    )
+
+
+def is_nested_checkout(directory: Path) -> bool:
+    """Return whether a directory below the project root is another git checkout.
+
+    A `.git` file (linked worktree, submodule) or directory (clone) marks a
+    separate working tree whose files belong to another checkout.
+    """
+    return (directory / ".git").exists()
+
+
+def inside_nested_checkout(project_root: Path, rel: str) -> bool:
+    """Return whether a project-relative path lives inside a nested git checkout."""
+    if Path(rel).is_absolute():
+        return False
+    return any(
+        is_nested_checkout(project_root / parent)
+        for parent in Path(rel).parents
+        if parent != Path(".")
+    )
 
 
 # @spec FR-003: Compatible gate loading

@@ -16,9 +16,18 @@ from .models import JourneyIssue, JourneySeverity, JsonValue
 
 UI_RUNNERS = supported_native_runners()
 _COMMON_TARGET_ACTIONS = {"click", "assert", "assert_not", "fill"}
-_PLAYWRIGHT_ACTIONS = _COMMON_TARGET_ACTIONS | {"open", "back", "press", "screenshot"}
-_XCUITEST_ACTIONS = _COMMON_TARGET_ACTIONS | {"open", "back", "screenshot"}
-_MAESTRO_ACTIONS = _COMMON_TARGET_ACTIONS | {"open", "back", "press"}
+# @spec AC-003: wait on every runner, FR-005: select on Playwright only
+# — .specs/features/056-executable-user-journeys/spec.md#fr-005
+_PLAYWRIGHT_ACTIONS = _COMMON_TARGET_ACTIONS | {
+    "open",
+    "back",
+    "press",
+    "screenshot",
+    "wait",
+    "select",
+}
+_XCUITEST_ACTIONS = _COMMON_TARGET_ACTIONS | {"open", "back", "screenshot", "wait"}
+_MAESTRO_ACTIONS = _COMMON_TARGET_ACTIONS | {"open", "back", "press", "wait"}
 _RUNNER_ACTIONS = {
     "playwright": _PLAYWRIGHT_ACTIONS,
     "xcuitest": _XCUITEST_ACTIONS,
@@ -78,6 +87,15 @@ def _unsupported_step_issue(
             not isinstance(payload, dict) or not isinstance(payload.get("key"), str)
         ):
             return _issue(runner, journey_id, "press action without a key")
+        if action == "select" and (
+            not _has_target_payload(payload)
+            or not isinstance(payload, dict)
+            or not isinstance(payload.get("value"), str)
+        ):
+            return _issue(runner, journey_id, "select action without a target and value")
+        if action == "wait" and runner == "maestro" and _wait_until(payload) is None:
+            # Maestro has no fixed-delay command; only conditional waits compile.
+            return _issue(runner, journey_id, "fixed wait without until")
     return None
 
 
@@ -89,6 +107,14 @@ def _has_target_payload(payload: JsonValue) -> bool:
         if isinstance(value, str) and value:
             return True
     return False
+
+
+def _wait_until(payload: JsonValue) -> dict[str, JsonValue] | None:
+    """Return the ``until`` target of a wait payload, if any."""
+    if not isinstance(payload, dict):
+        return None
+    until = payload.get("until")
+    return until if isinstance(until, dict) else None
 
 
 def _is_url(value: str) -> bool:

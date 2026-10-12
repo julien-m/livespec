@@ -49,6 +49,8 @@ def _setup_xcuitest_compiled_project(tmp_path: Path) -> None:
         .replace("route: /signup", "route: strapt://signup"),
         encoding="utf-8",
     )
+    # FR-007 (056): XCUITest artifacts go to the project's unique *UITests directory.
+    (tmp_path / "STRAPTUITests").mkdir()
     compile_result = compile_journeys(tmp_path, journey="onboarding-first-project")
     assert compile_result.error_count == 0
     (tmp_path / "App.xcodeproj").mkdir()
@@ -147,7 +149,9 @@ def test_run_journeys_reports_manual_and_disabled_without_execution(tmp_path: Pa
     _write_feature(specs, "012-projects")
     source = _write_v2_journey(specs)
     source.write_text(
-        source.read_text(encoding="utf-8").replace("local: impacted", "local: manual"),
+        source.read_text(encoding="utf-8")
+        .replace("local: impacted", "local: manual")
+        .replace("status: active\n", "status: active\nmanual_reason: Needs a device.\n"),
         encoding="utf-8",
     )
 

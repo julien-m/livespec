@@ -41,7 +41,7 @@ updated: 2026-05-06
 | @spec FR-006 | `spec.md#fr-006` | `.agent-sync/agents/livespec-supervisor/prompt.md`, `livespec-documenter.md:11`, `livespec-implementer.md`, `livespec-verifier.md` (Activation Contract @import) |
 | @spec FR-007 | `spec.md#fr-007` | `validator/contracts.py` — Pydantic `model_validate`; `.agent-sync/skills/spec-ship/SKILL.md` — validation gate |
 | @spec FR-008 | `spec.md#fr-008` | `tests/test_contracts.py` — covers valid returns, malformed returns, multi-block output, injection attempts |
-| @spec FR-009 | `spec.md#fr-009` | `.agent-sync/skills/spec-feature/SKILL.md`, `.agent-sync/skills/spec-ship/SKILL.md`, all 4 `.agent-sync/agents/livespec-*/prompt.md` updated to use new contracts |
+| @spec FR-009 | `spec.md#fr-009` | `.agent-sync/skills/spec-feature/SKILL.md`, `.agent-sync/skills/spec-ship/SKILL.md`, all 4 `.agent-sync/agents/livespec-*/prompt.md` updated to use new contracts; resume resolution no longer cites the nonexistent `livespec pipeline latest` (bugfix 2026-10-12, guarded by `tests/test_skill_cli_invocations.py`) |
 | @spec FR-010 | `spec.md#fr-010` | `system/contracts/{PHASE_RESULT,SHIP_RESULT,SUPERPOWERS_RETURN,ACTIVATION_CONTRACT}.md` |
 
 ## AC Coverage
@@ -52,7 +52,7 @@ updated: 2026-05-06
 | AC-002 | Covered | `tests/test_contracts.py::TestPhaseResultParser` (BLOCKED line format on parse error) |
 | AC-003 | Covered | `tests/test_contracts.py::TestShipResultParser` (missing-status rejection); `.agent-sync/skills/spec-ship/SKILL.md` |
 | AC-004 | Covered | All 4 `.agent-sync/agents/livespec-*/prompt.md` import `system/contracts/ACTIVATION_CONTRACT.md` (`test -d .specs` Step 1) |
-| AC-005 | Covered | `tests/test_contracts.py::TestSuperpowersReturnParser`, `TestSchemaModels` |
+| AC-005 | Covered | `tests/test_contracts.py::TestSuperpowersReturnParser` |
 | AC-006 | Covered | `validator/contracts.py` — Pydantic-based validation; `tests/test_contracts.py::TestRoundTrip` |
 | AC-007 | Covered | `tests/test_contracts.py::TestPhaseResultParser` — multi-block extraction (only final result) |
 | AC-008 | Covered | `system/contracts/ACTIVATION_CONTRACT.md` reused via @import in 4 agent files |
@@ -73,3 +73,9 @@ updated: 2026-05-06
 | FR-008 | `.specs/features/014-supervisor-contracts/implementation.md` | @spec(FR-008) | ✅ Implemented | 2026-06-08 |
 | FR-009 | `.specs/features/014-supervisor-contracts/implementation.md` | @spec(FR-009) | ✅ Implemented | 2026-06-08 |
 | FR-010 | `.specs/features/014-supervisor-contracts/implementation.md` | @spec(FR-010) | ✅ Implemented | 2026-06-08 |
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-12 | implementation | `tests/test_skill_cli_invocations.py::test_skill_cited_livespec_command_paths_exist` | `.specs/.execution/ac35273e5289403ea5d86867cfd2a8ba/receipt.json` | `.specs/.execution/1f73695886424ccd988e64a426797917/receipt.json` |

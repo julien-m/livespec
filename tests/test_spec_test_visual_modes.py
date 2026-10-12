@@ -6,6 +6,7 @@ from typing import Any
 
 import pytest
 
+from tests.goal_checklist_support import checklist_tasks
 from validator.goal_contracts import compile_command_goal
 from validator.goal_render import render_goal_contract_file
 
@@ -49,12 +50,11 @@ def _render(tmp_path: Path, flags: str, *, visual: bool = True) -> dict[str, Any
 
 
 @pytest.mark.parametrize("flags", (*PREVIEW_MODES, "--no-visual"))
-@pytest.mark.parametrize("description", VISUAL_DOD)
-def test_preview_does_not_require_visual_completion(
-    tmp_path: Path, flags: str, description: str
-) -> None:
+def test_preview_does_not_require_visual_completion(tmp_path: Path, flags: str) -> None:
     contract = _render(tmp_path, flags)
-    assert not any(task["description"].startswith(description) for task in contract["tasks"])
+    tasks = checklist_tasks(contract)
+    for description in VISUAL_DOD:
+        assert not any(task["description"].startswith(description) for task in tasks)
 
 
 @pytest.mark.parametrize("flags", ("", "--no-generate", "--all"))
@@ -62,7 +62,7 @@ def test_each_selected_visual_feature_keeps_actual_visual_closure(
     tmp_path: Path, flags: str
 ) -> None:
     contract = _render(tmp_path, flags)
-    tasks = contract["tasks"]
+    tasks = checklist_tasks(contract)
     for description in VISUAL_DOD:
         assert any(task["description"].startswith(description) for task in tasks)
     assert any(task["description"].startswith("4.5.2 Baseline capture") for task in tasks)
@@ -74,13 +74,15 @@ def test_non_visual_feature_has_no_visual_closure(tmp_path: Path, flags: str) ->
     contract = _render(tmp_path, flags, visual=False)
     assert not any(task["id"].startswith("visual.") for task in contract["tasks"])
     for description in VISUAL_DOD:
-        assert not any(task["description"].startswith(description) for task in contract["tasks"])
+        assert not any(
+            task["description"].startswith(description) for task in checklist_tasks(contract)
+        )
 
 
 @pytest.mark.parametrize("flags", PREVIEW_MODES)
 def test_preview_already_excludes_visual_execution_tasks(tmp_path: Path, flags: str) -> None:
     contract = _render(tmp_path, flags)
-    tasks = contract["tasks"]
+    tasks = checklist_tasks(contract)
     assert not any(task["description"].startswith("4.5.") for task in tasks)
     generates = flags == "--regenerate-missing --confirm"
     assert any(task["description"].startswith("Write tests:") for task in tasks) is generates

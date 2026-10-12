@@ -43,3 +43,16 @@ Strict C20 selector guard: real current pilot contract passes read-only. Missing
 Final current runtime e699444a-6d9d-480b-976e-04eea6c6c85a: C51 implementation PASS with 34/34 obligations,132 manifest references match; report71266f48 and manifest e757b336 bind source C2046483 and baseline71eaba. Actual public validation and LiveSpec A+B status return PASS/certifiedtrue. Five adversarial mutations (FR, visual, predicate, report-source hash, absent manifest) all refuse certification; exact restoration returns PASS even after A status/marker changed. Actual finalize apply A passed, initial verify found roadmap R1.3 mismatch; automatic registry repair is now tested and actual replay/verify A+B pass, initial failure preserved.
 
 Final real lifecycle complete: apply/verify A+B PASS; TestDone with manifest PASS; idempotent TestDone without manifest BLOCKED with pipeline bytes unchanged; same report revalidates PASS after all metadata/registry changes; final Doctor PASS with zero findings. Native Brainstorm source and references are ready in separate stnvnm1m workspace, target abfu24y8 prepared for authenticated import when its native design certificate is ready.
+
+## 2026-10-12 — spec-fix: Penflow CLI resolution
+
+| Step | Status | Files | Verification | Result | Date |
+|---|---|---|---|---|---|
+| Fix | Done | `validator/penflow_cli.py`, `validator/penflow_contract_validation.py`, `validator/penflow_verification.py`, `validator/penflow_authority_import.py`, `tests/test_penflow_cli.py`, `tests/test_penflow_contract_validation.py` | penflow suites (venv not activated) | 172 pass | 2026-10-12 08:30 |
+| Readiness gate | Blocked | `.reviews/{spec,plan}.json` (claude-opus-5-5, 150000) | `livespec validate --progression implement` | BLOCKED: spec review AC-009 ambiguous (business decision `brainstorm-source-authentication`) | 2026-10-12 08:30 |
+| Clarification | Done | `spec.md` (AC-009, FR-008, Clarifications) | user decision recorded in place; IDs preserved | current behavior documented, no code change | 2026-10-12 |
+| Readiness gate | Done | `.reviews/{spec,plan}.json` (claude-opus-5-5, 150000), fresh independent reviewers | `livespec validate --progression implement` | READY | 2026-10-12 |
+
+Native goal: none was required for this short spec-fix closure (optional since 081); the CLI contract `livespec validate` provided every gate.
+
+PHASE_RESULT: OK (fix) — implement gate READY, unit suite 0 failed (3707 passed), repo conventions PASS.

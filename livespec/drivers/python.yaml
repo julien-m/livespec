@@ -12,6 +12,7 @@ coverage:
   command: pytest --cov={module} --cov-report=lcov:{report_path} --cov-fail-under={threshold}
   report_path: lcov.info
   threshold: 80
+  test_selection: append
 snapshots:
   command: pytest --snapshot-warn-unused
 properties:

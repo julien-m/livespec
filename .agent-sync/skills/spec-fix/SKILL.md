@@ -18,34 +18,20 @@ description: "Fix implementation gaps from spec-check — functional and visual 
 argument-hint: "<feature-name>"
 ---
 
-> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — runtime goal contract (§5), 6-field step shape (§1), ERROR/BLOCKED format (§2), finalization gate.
+> **Read** [`system/anti-drift-block.md`](../../../system/anti-drift-block.md) before starting — 6-field step shape (§1), ERROR/BLOCKED format (§2), runtime goal contract for autonomous runs (§5).
 
-## STEP 0 — Goal Lock (ABSOLU — aucun flag ne bypasse cette étape)
+## STEP 0 — Goal (autonomous runs)
 
-La toute première action lors de `/spec-fix` est de poser le goal durable avec un contrat machine, puis de laisser `livespec goal prove` valider chaque tâche.
+A goal is required only with `--auto` (for example as a child of an autonomous run); targeted interactive fixes skip this step. **Read** [runtime goal contract](../../../system/anti-drift-block.md#runtime-goal-contract) for the full protocol.
 
-1. Résoudre feature et flags à partir des arguments de la commande (lecture seule). **Read** [Goal review identity](../../../system/review-protocol.md#goal-review-identity) : résoudre le modèle réel et conserver `--model=<actual-model>` et tout budget explicite dans les flags internes du goal et des enfants.
-2. Vérifier qu'aucun goal n'est actif. Si actif → `BLOCKED at step 0 - prerequisite_unmet - active goal exists — run /goal clear first` et stop.
-3. Rendre et sauvegarder le contrat immuable et l'état mutable :
-   ```bash
-   livespec goal render spec-fix --feature <feature-slug> --flags "<active-flags>" --save
-   ```
-   Si aucune feature fournie, omettre `--feature`. Conserver les flags internes de modèle/budget même sans flag utilisateur.
-   Le stdout affiche : `hash:<hash> | contract-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.contract.json | state-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.state.json`
-4. Lire le `contract-file` et le `state-file`. Le contrat contient la liste authoritative des tâches, preuves requises, substitutions interdites, et actions de réparation. Le state contient uniquement les statuts `pending`/`complete`.
-5. Émettre la commande slash `/goal` avec hash et références machine :
-   ```
-   /goal hash:<hash> | spec-fix for <feature> — contract-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.contract.json — state-file:$TMPDIR/livespec-goals/goal-spec-fix-<hash8>.state.json — mode:enforced
-   ```
-6. Exécuter les tâches dans l'ordre du `contract-file`. Après chaque tâche, soumettre une preuve :
-   ```bash
-   livespec goal prove --contract <contract-file> --state <state-file> --task <task-id> --evidence '<json>'
-   ```
-   Seul `goal prove` peut marquer une tâche `complete`. Si le résultat est `REJECTED_NEEDS_ACTION`, effectuer les actions `repair_if_missing`, produire la preuve manquante, puis resoumettre. Ne jamais cocher, simuler, ou marquer manuellement une tâche.
-7. Avant `DONE`, exécuter `livespec goal status --state <state-file>` et vérifier que toutes les tâches requises sont `complete`, ou émettre un `BLOCKED` canonique avec la tâche et la preuve manquante.
+1. Resolve feature and flags read-only.
+   For review-bearing goals, **Read** [goal review identity](../../../system/review-protocol.md#goal-review-identity) and keep `--model=<actual-model>` in the flags of every child command.
+2. Run `livespec goal render spec-fix [--feature <feature-slug>] --flags "<active-flags>" --save` (add `--model=<actual-model>` for review-bearing goals), then read `stop_condition`, `tasks` and `checklist` from the printed contract file.
+3. Mirror the goal in the native goal tool when one exists (Codex `create_goal`/`update_goal`, Claude Code `/goal`); update an active goal when allowed, otherwise leave it untouched. Without a native tool, print a warning and continue with the CLI contract.
+4. Work toward the stop condition. Prove each required task with `livespec goal prove`; the goal checks `outcome.verified` itself. After three rejections of one task, hand back the `BLOCKED` report.
+5. Before `DONE`: `livespec goal archive`, prove `archive.run`, confirm `livespec goal status` is complete, then mark the native mirror complete.
 
-Si le rendu échoue → `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` et stop.
-Si l'environnement courant n'accepte pas `/goal` → `BLOCKED at step 0 - dependency_unmet - /goal slash command unavailable` et stop.
+If `goal render` fails, report `BLOCKED at step 0 - dependency_unmet - livespec goal render failed` with its stderr.
 
 ## STEP 0.8 — Evidence-First Retry Contract
 
@@ -74,8 +60,23 @@ Si verdict `PASS`, soumettre `{"conventions_receipt_path":"<receipt_path>"}` au 
 /spec-fix feature-name --dry-run     → show what would be fixed without changing code
 /spec-fix feature-name --resume      → resume interrupted fix session
 /spec-fix feature-name --conventions → burn down conventions debt worst-first
+/spec-fix feature-name --bugfix     → bugfix lane: RED/GREEN regression proof, scoped gate
 /spec-fix --all                      → fix all features with gaps
 ```
+
+### `--bugfix` Mode
+
+<!-- @spec FR-012: Bugfix lane in spec-fix — .specs/features/084-bugfix-lane/spec.md#fr-012 -->
+
+A confined bug in an implemented feature skips whole-feature readiness when the CLI proves four conditions: owner feature identified (`spec.md` + `implementation.md`), no FR/AC/SC definition text change in any `spec.md`, a regression test RED before and GREEN after through runner-owned receipts, and a diff within `max_files`/`max_lines` (defaults 8/300, `.specs/bugfix.yaml` at the base revision). The bug report and its regression test replace the gap report: Steps 2, 4 and 5 and the `/spec-check` spawns do not apply, and a zero-gap report never stops a bugfix.
+
+1. Write only the regression test, then `livespec bugfix capture --feature <slug> --expect red --command "<python> -m pytest <test>"` (exit 0 only for a real failing assertion).
+2. Pre-edit gate: `livespec bugfix gate --feature <slug> --red <red-receipt> [--requirement <ID>]`. Cite FR/AC/SC only when the bug contradicts that requirement; only its section is checked. An uncited implementation bug needs no review.
+3. Apply the smallest correction, run the project test suite (non-certifying regression check; the lane certifies only the regression test), then `livespec bugfix capture --feature <slug> --expect green --command "<same command>"` so nothing runs after GREEN.
+4. Closing gate: `livespec bugfix gate --feature <slug> --red <red-receipt> --green <green-receipt>` (`--base <rev>` when the correction is already committed), then the unchanged feature-scope conventions gate (STEP 0.9).
+5. Trace: `livespec bugfix record --feature <slug> --red <red-receipt> --green <green-receipt> --summary "<one line>"` writes the Bugfix changelog entry and the `## Bugfix Receipts` row in `implementation.md`; add the global changelog line (Step 8.4).
+
+On `Bugfix gate: FALLBACK`, report every reason and continue only through the complete gate printed by the CLI (`livespec validate <feature-dir> --progression implement`); a spec change goes through `/spec-refine` first. `--visual` fixes never use the lane.
 
 ### `--conventions` Mode
 
@@ -290,6 +291,7 @@ The fix plan is displayed but NOT saved to disk (it is ephemeral — the gap rep
 
 ### Step 6 — Execute Fixes
 
+- With `--bugfix`, the pre-edit `livespec bugfix gate` READY replaces the readiness check below; FALLBACK restores it.
 - For feature code/test writes, before the first edit and each retry/resume, run `livespec validate <feature-dir> --progression implement --model <resolved-model>` with `--review-max-chars <resolved-budget>` when an explicit budget was resolved. Stop on nonzero exit: missing, stale or incomplete Clarify/Analyze cannot be waived by absent pipeline, filtered gaps or `--auto`.
 - **Read** [review and progression rules](../../../system/review-protocol.md) to refresh required reviews; forward the same model and budget to preparation, ingestion and nested commands. Never fabricate a review to unblock a fix.
 - `--dry-run` / read-only audit stops after displaying Step 5; no Phase 6 edits, readiness gate, runtime obligation or mutation in Steps 7–8. `--conventions` follows its independent debt workflow; no feature readiness/certification. If that workflow needs a functional change, route the change through the feature fix gate first.
@@ -464,8 +466,11 @@ Total: 6/8 gaps closed (75%)
 | `--max-iter N` | | Override max iterations (default: 3) |
 | `--all` | `-A` | Fix all features with gaps (multi-feature mode) |
 | `--no-visual` | `-V` | Fix everything except visual gaps |
+| `--bugfix` | | Bugfix lane: RED/GREEN receipts, scoped gate, explicit fallback (see `--bugfix` Mode) |
 
 ---
+
+> **Read** [`system/tool-project-boundary.md`](../../../system/tool-project-boundary.md) before any consumer-project feature work: LiveSpec tool defects are reported with `livespec runtime defect` and never enter the project critical path (agents reading through symlinks: `system/tool-project-boundary.md` in the LiveSpec root recorded in `.specs/.livespec-path`).
 
 ## Internal Command Invocations
 
@@ -483,7 +488,9 @@ Total: 6/8 gaps closed (75%)
 > Active branches per run (the existing compiler predicates):
 > - `always`: every mode.
 > - `fix-execute` / `execute`: no --dry-run/-d, --audit-only, --conventions or --all/-A.
-> - `fix-feature`: fix-execute without --fr/--ac/--visual/-v/--functional/-f/--no-visual/-V.
+> - `fix-readiness`: fix-execute without --bugfix (complete readiness, gap report, mapped acceptance).
+> - `fix-bugfix`: fix-execute with --bugfix (scoped bugfix lane, feature 084).
+> - `fix-feature`: fix-readiness without --fr/--ac/--visual/-v/--functional/-f/--no-visual/-V.
 > - `visual`: UI feature, no --no-visual, and fix-execute; visual inspection and mutation rows are both inactive in excluded modes.
 > - `penflow`: visual and a penflow/ directory.
 > - `generate`: fix-execute without --no-generate; `visual-generate`: visual and generate.
@@ -505,7 +512,7 @@ Total: 6/8 gaps closed (75%)
 
 - [always] Look for most recent gap report in `.specs/features/NNN/checks/` <!-- evidence:documentary -->
 - [always] Check report staleness (same calendar day + no commits since report date) <!-- evidence:documentary -->
-- [fix-execute] Spawn independent native sub-agent for `/spec-check <feature>` and save gap report if missing or stale <!-- evidence:documentary -->
+- [fix-readiness] Spawn independent native sub-agent for `/spec-check <feature>` and save gap report if missing or stale <!-- evidence:documentary -->
 - [always] Load a fresh gap report or a read-only in-memory scan; if neither is usable, block and suggest `/spec-check <feature>` outside preview <!-- evidence:documentary -->
 - [always] Exit if gap report shows 0 gaps <!-- evidence:documentary -->
 
@@ -540,7 +547,9 @@ Total: 6/8 gaps closed (75%)
 ### Phase 6 — Execute Fixes
 
 - [multi] Delegate each collection feature repair to its own spec-fix child without --all/-A; inspect actual child goal contract/state and preserve filters, model and budget <!-- evidence:documentary -->
-- [fix-execute] Require current Clarify and Analyze with `livespec validate <feature-dir> --progression implement --model <resolved-model>` and the same explicit review budget before any code/test edit or retry <!-- evidence:documentary -->
+- [fix-readiness] Require current Clarify and Analyze with `livespec validate <feature-dir> --progression implement --model <resolved-model>` and the same explicit review budget before any code/test edit or retry <!-- evidence:documentary -->
+- [fix-bugfix] Write only the regression test, then capture RED with `livespec bugfix capture --feature <slug> --expect red --command "<pytest command>"` (the gate verifies RED as a historical observation) <!-- evidence:documentary -->
+- [fix-bugfix] Before any code edit run `livespec bugfix gate --feature <slug> --red <red-receipt> [--requirement <ID>]`; on FALLBACK run the complete gate `livespec validate <feature-dir> --progression implement` and continue only as a normal fix <!-- evidence:documentary -->
 - [fix-execute] Execute functional fixes in order (add @spec anchors, follow stack patterns, follow conventions) <!-- evidence:documentary -->
 - [generate] Generate tests for new AC implementations <!-- evidence:documentary -->
 - [fix-execute] Update progress.md with fix checkpoint <!-- evidence:documentary -->
@@ -549,26 +558,29 @@ Total: 6/8 gaps closed (75%)
 
 ### Phase 7 — Verify Fixes
 
-- [fix-execute] Run test suite from plan.md or testing/strategy.md <!-- evidence:execution -->
+- [fix-readiness] Run test suite from plan.md or testing/strategy.md <!-- evidence:execution -->
+- [fix-bugfix] Capture GREEN with `livespec bugfix capture --feature <slug> --expect green --command "<same pytest command>"` <!-- evidence:execution outcome:passed -->
+- [fix-bugfix] Run the closing `livespec bugfix gate --feature <slug> --red <red-receipt> --green <green-receipt>`; FALLBACK leaves the lane for the complete gate <!-- evidence:documentary -->
 - [visual] Re-capture Playwright screenshots after visual fixes <!-- evidence:documentary -->
 - [visual] Publish newly recaptured runtime PNGs and any diff PNGs through Markdown proof plus Browser annotation URL, or `Visual preview: unavailable - visual-preview CLI missing` <!-- evidence:documentary -->
 - [visual] Re-capture runtime PNGs into `.specs/features/<slug>/run/<run-id>/<target>/`, run `livespec visual-gate certify --feature <slug> --command spec-fix --target <t> --run-id <run-id> --json`, then `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path> --json` — refuse `done` while exit_code != 0 <!-- evidence:documentary -->
 - [visual] Submit only `{"visual_evidence_receipt_path":"<receipt-path>"}` to `goal prove`; design-alignment is semantic-only and cannot prove pixel fidelity <!-- evidence:documentary -->
 - [visual] If gate exit_code == 7 (prereqs missing): run `livespec visual-gate cleanup --feature <slug> --apply` (archive is default) + recreate baselines via runner + `livespec visual-gate promote` BEFORE touching code, then re-run gate <!-- evidence:documentary -->
-- [fix-execute] Spawn independent native sub-agent for `/spec-check <feature>` to verify closure after fixes <!-- evidence:documentary -->
-- [fix-execute] Score results per gap (Fixed / Improved / Still failing) <!-- evidence:documentary -->
-- [fix-execute] Apply iteration logic — exit early if all fixed or regression detected, retry remaining gaps up to max iterations <!-- evidence:documentary -->
+- [fix-readiness] Spawn independent native sub-agent for `/spec-check <feature>` to verify closure after fixes <!-- evidence:documentary -->
+- [fix-readiness] Score results per gap (Fixed / Improved / Still failing) <!-- evidence:documentary -->
+- [fix-readiness] Apply iteration logic — exit early if all fixed or regression detected, retry remaining gaps up to max iterations <!-- evidence:documentary -->
 
 ### Phase 8 — Update Artifacts
 
-- [fix-execute] Update `implementation.md` — FR→code and AC→test mappings, status columns <!-- evidence:documentary -->
+- [fix-readiness] Update `implementation.md` — FR→code and AC→test mappings, status columns <!-- evidence:documentary -->
 - [visual] Copy new Playwright screenshots to `baselines/` <!-- evidence:documentary -->
 - [visual] Update Last Modified in `screens/index.md` if mockups regenerated <!-- evidence:documentary -->
-- [fix-execute] Write feature changelog entry with gaps closed count and file list <!-- evidence:documentary -->
+- [fix-readiness] Write feature changelog entry with gaps closed count and file list <!-- evidence:documentary -->
 - [fix-execute] Write global `.specs/changelog.md` summary entry (with lock) <!-- evidence:documentary -->
-- [fix-execute] Overwrite today's gap report in `checks/YYYY-MM-DD.md` with fixed items marked <!-- evidence:documentary -->
-- [fix-execute] Update README.md status to Implemented only after unfiltered feature gap closure, full acceptance proof and existing closure gates <!-- evidence:documentary -->
-- [fix-execute] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path <!-- evidence:documentary -->
+- [fix-readiness] Overwrite today's gap report in `checks/YYYY-MM-DD.md` with fixed items marked <!-- evidence:documentary -->
+- [fix-readiness] Update README.md status to Implemented only after unfiltered feature gap closure, full acceptance proof and existing closure gates <!-- evidence:documentary -->
+- [fix-readiness] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path <!-- evidence:documentary -->
+- [fix-bugfix] Record traceability with `livespec bugfix record --feature <slug> --red <red-receipt> --green <green-receipt> --summary "<one line>"` <!-- evidence:documentary -->
 - [always] Read after-fix hooks from all 3 levels <!-- evidence:documentary -->
 
 ## Definition of Done (Command-Level)
@@ -579,14 +591,15 @@ Total: 6/8 gaps closed (75%)
 - [ ] Full context loaded (spec, plan, mockups, conventions, stack) <!-- evidence:documentary -->
 - [ ] Fix plan generated and displayed <!-- evidence:documentary -->
 - [ ] Fixes executed (or dry-run displayed) <!-- evidence:documentary -->
-- [ ] [fix-execute] Verification run (tests + visual comparison) <!-- evidence:execution -->
+- [ ] [fix-readiness] Verification run (tests + visual comparison) <!-- evidence:execution -->
 - [ ] [fix-feature] Complete feature acceptance verified from execution and declared documentary review receipts <!-- evidence:execution ac-scope:feature -->
-- [ ] [fix-execute] `implementation.md` updated with new mappings <!-- evidence:documentary -->
+- [ ] [fix-readiness] `implementation.md` updated with new mappings <!-- evidence:documentary -->
 - [ ] [visual] Baselines updated (if visual fixes) <!-- evidence:documentary -->
-- [ ] [fix-execute] Feature `changelog.md` has fix entry <!-- evidence:documentary -->
+- [ ] [fix-readiness] Feature `changelog.md` has fix entry <!-- evidence:documentary -->
 - [ ] [fix-execute] Global `.specs/changelog.md` has summary entry <!-- evidence:documentary -->
-- [ ] [fix-execute] Gap report updated with fix results <!-- evidence:documentary -->
-- [ ] [fix-execute] If all feature gaps closed in an unfiltered report with full acceptance and closure proof: README status updated <!-- evidence:documentary -->
+- [ ] [fix-readiness] Gap report updated with fix results <!-- evidence:documentary -->
+- [ ] [fix-readiness] If all feature gaps closed in an unfiltered report with full acceptance and closure proof: README status updated <!-- evidence:documentary -->
+- [ ] [fix-bugfix] RED and GREEN receipts captured, closing gate ELIGIBLE and trace recorded <!-- evidence:documentary -->
 - [ ] Remaining gaps (if any) clearly listed <!-- evidence:documentary -->
 - [ ] [visual] For VISUAL features: every touched validation PNG (mockup, current baseline, recaptured runtime, diff) was published with absolute-path Markdown proof and either a Browser annotation URL or `Visual preview: unavailable - visual-preview CLI missing` <!-- evidence:documentary -->
 - [ ] [visual] For VISUAL features: `livespec visual-gate certify ... --command spec-fix` produced a PASS receipt and `livespec visual-gate validate --feature <slug> --command spec-fix --target <t> --receipt <receipt-path>` exited 0 ; exit 6/7 = `done` interdit <!-- evidence:documentary -->

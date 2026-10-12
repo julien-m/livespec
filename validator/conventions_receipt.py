@@ -1,5 +1,6 @@
 # LiveSpec traceability anchors
 # @spec(FR-004)
+# @spec FR-007: Receipts bound to the current baseline (082-conventions-gate-signal)
 
 """Conventions verification receipt oracle."""
 
@@ -12,6 +13,7 @@ from pathlib import Path
 from typing import Any, Literal, cast
 
 from .conventions_ast.taxonomy import taxonomy_fields
+from .conventions_baseline_apply import baseline_receipt_fields, receipt_baseline_current
 from .conventions_gate import GateResult
 from .conventions_gates import gates_path
 from .visual_evidence import receipt_payload_hash, sha256_file
@@ -66,6 +68,7 @@ def write_conventions_receipt(
         payload.update(_ast_receipt_fields(ast_summary))
     else:
         payload.update(_receipt_taxonomy_fields(project_root))
+    payload.update(baseline_receipt_fields(result))
     payload["receipt_hash"] = receipt_payload_hash(payload)
     output_dir = project_root / ".specs" / "conventions" / "runs" / run_id
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -117,9 +120,42 @@ def verify_conventions_receipt(
     project_root: Path,
     expected_feature_slug: str | None = None,
 ) -> ConventionsReceipt:
-    """Verify a conventions receipt by checking hashes and verdict coherence."""
+    """Verify a conventions receipt by checking hashes, verdict coherence and baseline."""
     receipt_abs = _resolve_within_project(project_root, receipt_path)
     payload = _read_receipt_payload(receipt_abs)
+    schema_version, feature_slug, verdict = _checked_identity(payload, expected_feature_slug)
+    violations = _list_field(payload, "violations")
+    blockers = _list_field(payload, "blockers")
+    _check_verdict_consistency(verdict, violations, blockers)
+    ast = _checked_ast_fields(schema_version, payload, violations)
+    _check_current_gates_hash(project_root, payload)
+    if not receipt_baseline_current(project_root, payload):
+        raise ConventionsReceiptError("baseline_sha256_mismatch")
+    if payload.get("receipt_hash") != receipt_payload_hash(payload):
+        raise ConventionsReceiptError("receipt_hash_mismatch")
+    return ConventionsReceipt(
+        schema_version=schema_version,
+        oracle=str(payload["oracle"]),
+        oracle_version=str(payload.get("oracle_version", "")),
+        feature_slug=feature_slug,
+        run_id=_string_field(payload, "run_id"),
+        verdict=verdict,
+        gates_sha256=_string_field(payload, "gates_sha256"),
+        violations=tuple(cast(list[dict[str, object]], violations)),
+        blockers=tuple(cast(list[dict[str, str]], blockers)),
+        receipt_hash=_string_field(payload, "receipt_hash"),
+        path=receipt_abs,
+        ast_mode=ast.ast_mode if ast else None,
+        ast_backend=ast.ast_backend if ast else None,
+        ast_catalogs_sha256=ast.ast_catalogs_sha256 if ast else None,
+        ast_observations=ast.ast_observations if ast else (),
+        ast_would_fail_count=ast.ast_would_fail_count if ast else None,
+    )
+
+
+def _checked_identity(
+    payload: dict[str, Any], expected_feature_slug: str | None
+) -> tuple[str, str, ReceiptVerdict]:
     if payload.get("oracle") != ORACLE_NAME:
         raise ConventionsReceiptError("oracle_mismatch")
     schema_version = _string_field(payload, "schema_version")
@@ -131,44 +167,16 @@ def verify_conventions_receipt(
     verdict = _string_field(payload, "verdict")
     if verdict not in ("PASS", "FAIL", "BLOCKED"):
         raise ConventionsReceiptError("verdict_invalid")
-    violations = _list_field(payload, "violations")
-    blockers = _list_field(payload, "blockers")
-    _check_verdict_consistency(cast(ReceiptVerdict, verdict), violations, blockers)
-    ast_mode: str | None = None
-    ast_backend: dict[str, object] | None = None
-    ast_catalogs_sha256: str | None = None
-    ast_observations: tuple[dict[str, object], ...] = ()
-    ast_would_fail_count: int | None = None
+    return schema_version, feature_slug, cast(ReceiptVerdict, verdict)
+
+
+def _checked_ast_fields(
+    schema_version: str, payload: dict[str, Any], violations: list[object]
+) -> _VerifiedAstFields | None:
     if schema_version == "2":
-        ast_fields = _verified_v2_ast_fields(payload, violations)
-        ast_mode = ast_fields.ast_mode
-        ast_backend = ast_fields.ast_backend
-        ast_catalogs_sha256 = ast_fields.ast_catalogs_sha256
-        ast_observations = ast_fields.ast_observations
-        ast_would_fail_count = ast_fields.ast_would_fail_count
-    else:
-        _reject_ast_fields_in_v1(payload, violations)
-    _check_current_gates_hash(project_root, payload)
-    if payload.get("receipt_hash") != receipt_payload_hash(payload):
-        raise ConventionsReceiptError("receipt_hash_mismatch")
-    return ConventionsReceipt(
-        schema_version=schema_version,
-        oracle=str(payload["oracle"]),
-        oracle_version=str(payload.get("oracle_version", "")),
-        feature_slug=feature_slug,
-        run_id=_string_field(payload, "run_id"),
-        verdict=cast(ReceiptVerdict, verdict),
-        gates_sha256=_string_field(payload, "gates_sha256"),
-        violations=tuple(cast(list[dict[str, object]], violations)),
-        blockers=tuple(cast(list[dict[str, str]], blockers)),
-        receipt_hash=_string_field(payload, "receipt_hash"),
-        path=receipt_abs,
-        ast_mode=ast_mode,
-        ast_backend=ast_backend,
-        ast_catalogs_sha256=ast_catalogs_sha256,
-        ast_observations=ast_observations,
-        ast_would_fail_count=ast_would_fail_count,
-    )
+        return _verified_v2_ast_fields(payload, violations)
+    _reject_ast_fields_in_v1(payload, violations)
+    return None
 
 
 def _read_receipt_payload(receipt_abs: Path) -> dict[str, Any]:

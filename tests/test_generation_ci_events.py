@@ -24,10 +24,9 @@ def _workflow() -> JsonFixture:
     return cast(JsonFixture, TypeAdapter(dict[str, JsonValue]).validate_python(raw))
 
 
-@pytest.mark.parametrize("event", ["pull_request", "workflow_dispatch", "release"])
-def test_registered_events_keep_deterministic_jobs_without_model_inputs(event: str) -> None:
+def test_registered_events_keep_deterministic_jobs_without_model_inputs() -> None:
     workflow = _workflow()
-    assert event in workflow["on"]
+    assert set(workflow["on"]) == {"pull_request", "workflow_dispatch", "release"}
     assert workflow["on"]["pull_request"]["branches"] == ["main"]
     assert workflow["on"]["release"]["types"] == ["published"]
     assert not workflow["on"]["workflow_dispatch"]

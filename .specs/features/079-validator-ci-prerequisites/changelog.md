@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-10-12 — [Bugfix]: CI installs the locked toolchain
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `.github/workflows/ci.yml` (both jobs install `uv export --frozen` of the `dev` + `integration` extras, then the project without dependencies), `validator/init_profile.py` (explicit `tuple[str, ...]` for the JavaScript test markers)
+- **Cause:** CI ran `uv pip install -e ".[dev]"`, which ignores `uv.lock` and always takes the newest ruff/mypy. mypy 2.4 reported a return-type error in `_package_facts` that the locked mypy did not, and a newer ruff started formatting Markdown code blocks. Local and CI results diverged without any code change.
+- **Proof:** local venv synced to the lock (mypy 2.3.1, ruff 0.16.6) and mypy 2.4.0: no issues in 705 files; `ruff format --check .` and `ruff check .` pass; unit suite 3834 passed in the real environment.
+- **Author:** spec-fix (claude-code)
+
+## 2026-10-12 — [Bugfix]: Keep CI-checked-out dependencies out of Ruff scope
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `pyproject.toml` (`[tool.ruff] extend-exclude` adds `.ci-deps`)
+- **Cause:** the CI checks out the pinned ai-ressources corpus under `.ci-deps/`; `ruff format --check .` now formats Python blocks inside Markdown and failed on `.ci-deps/ai-ressources/code-conventions/python.md:61`, an external file that is not LiveSpec source.
+- **Proof:** with the pinned `python.md` copied to `.ci-deps/`, `ruff format --check .` and `ruff check .` pass locally.
+- **Author:** spec-fix (claude-code)
+
+## 2026-10-12 — [Bugfix]: Declare unit-test dependencies in the dev extra
+
+- **Type:** Bugfix
+- **Spec modified:** No
+- **Code modified:** `pyproject.toml` (dev extra: `click`, `jsonschema`, `pluggy`), `uv.lock`, `tests/test_declared_test_dependencies.py` (new)
+- **AC impacted:** AC-003
+- **Readiness:** `livespec validate --progression implement` READY after independent spec and plan reviews (claude-opus-5-5).
+- **Author:** spec-fix (claude-code)
+
+## 2026-10-12 — [Refactor]: Test suite cleanup (lot 2)
+
+The event-policy test asserted the same facts three times regardless of its parameter; it is now a single test that pins the exact event set.
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** `tests/test_generation_ci_events.py`
+- **AC impacted:** AC-006 (coverage kept)
+- **Author:** Claude Code
+
 ## 2026-09-08 — Check: V5 fixture isolation independently verified
 
 - Read [the V5 post-check](checks/2026-09-08-v5-postcheck.md): the six manifest-dependent modules pass 45/45 with an explicit synthetic corpus, and serialization preserves all 16 node IDs.
@@ -97,3 +134,15 @@
 ### 2026-09-08 — V5 bounded fixture-isolation fix independently verified:45 targeted tests and16 preserved node IDs. Read the [post-check gap report](checks/2026-09-08-v5-postcheck.md). Native acceptance remains AC-002 only; AC-005 pending, AC-006 partial, feature076 and main delivery separate. No normative spec change or lifecycle promotion.
 
 <!-- finalize:spec-fix:2026-09-08:e063bb60 -->
+
+### 2026-10-12 — Fix: hermetic convention manifest fixtures and CI-step interpreter (4 test gaps closed)
+
+- **Type:** Bug Fix
+- **Spec modified:** No
+- **Code modified:** `tests/conventions_hermetic_catalogs.py` (new), `tests/test_conventions_generated_catalog.py`, `tests/test_conventions_source_decisions.py`, `tests/_conventions_source_decisions_serialization.py`, `tests/test_generation_ci_selection.py`
+- **Gaps closed:** FR-003 fixture isolation — catalog `source_hash mismatch` and three StopIteration failures without the private corpus; duplicated cases removed (3 selectors); the simulated cleanup step no longer depends on a `python` executable on PATH.
+- **Gate:** progression implement READY (claude-opus-5-5 reviews, 150000-character budget).
+- **Remaining:** None in scope.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-12:7208ea4d -->

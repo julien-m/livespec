@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from validator.expectations import parse_expectations
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -42,8 +44,13 @@ def test_spec_test_documents_design_alignment_before_baseline_capture() -> None:
 
 
 def test_test_expectations_require_design_alignment_for_visual_runs() -> None:
-    body = _read(".agent-sync/skills/spec-test/expectations.md")
+    parsed = parse_expectations(ROOT / ".agent-sync/skills/spec-test/expectations.md")
+    visual = [branch for branch in parsed.verify.when if branch.flag == "--visual"]
 
-    assert "Design Alignment Verdict" in body
-    assert ".specs/features/<feature>/design-alignment/" in body
-    assert 'contains: "Design Alignment Verdict"' in body
+    # The verdict only appears when ui.pen exists, so the machine rule is a --visual "may".
+    assert len(visual) == 1
+    assert ("contains", "Design Alignment Verdict") in [
+        (rule.kind, rule.payload) for rule in visual[0].may
+    ]
+    filesystem = parsed.prose_sections["4. Filesystem Effects"]
+    assert ".specs/features/<feature>/design-alignment/" in filesystem

@@ -35,7 +35,7 @@ Implemented per-stack test config propagation as a pure-Python module
 | AC-001 | `test_stack_generators_emit_threshold`, `test_init_test_config_python_project` |
 | AC-002 | `test_init_test_config_unsupported_stack_skips` |
 | AC-003 | `test_generate_ci_workflow_uses_livespec_spec_test`, `test_generate_ci_workflow_includes_install_step_before_test_step` |
-| AC-004 | `test_threshold_propagates_to_python_config`, `test_init_test_config_threshold_flag_propagates` |
+| AC-004 | `test_stack_generators_emit_threshold` (non-default 85% threshold), `test_init_test_config_threshold_flag_propagates` |
 | AC-005 | `test_init_test_config_updates_conventions_index`, `test_update_conventions_creates_block_when_absent` |
 | AC-006 | `test_init_test_config_refresh_only_skips_writes`, `test_update_conventions_replaces_existing_block` |
 | AC-007 | `test_init_test_config_python_project` (asserts file paths in output) |

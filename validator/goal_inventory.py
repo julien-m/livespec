@@ -169,6 +169,11 @@ def _fix_execution_branches(flag_names: set[str]) -> set[str]:
             return {"fix-conventions"}
         return set()
     active = {"fix-execute"}
+    # @spec FR-011: Bugfix lane replaces readiness, gap report and feature acceptance
+    #   — .specs/features/084-bugfix-lane/spec.md#fr-011
+    if "--bugfix" in flag_names and not flag_names.intersection({"--visual", "-v"}):
+        return active | {"fix-bugfix"}
+    active.add("fix-readiness")
     # A filtered repair certifies its mapped assertions, not unrelated feature ACs.
     if not flag_names.intersection(
         {"--fr", "--ac", "--visual", "-v", "--functional", "-f", "--no-visual", "-V"}

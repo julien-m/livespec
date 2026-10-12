@@ -23,9 +23,11 @@ from validator.conventions_ast.source_decisions import build_rule_decision_manif
 from validator.conventions_feature_scope import SOURCE_SUFFIXES
 from validator.conventions_gate import GateSeverity, GateVerdict, verify_conventions
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
 
 def test_csv_inventory_loads_as_564_individual_runtime_rules() -> None:
-    rules = load_ars_executable_rules(Path.cwd())
+    rules = load_ars_executable_rules(REPO_ROOT)
     detectors = [detector_for_rule(rule) for rule in rules]
 
     assert len(rules) == EXPECTED_ARS_RULE_COUNT
@@ -34,27 +36,37 @@ def test_csv_inventory_loads_as_564_individual_runtime_rules() -> None:
     assert len({rule.detector_id for rule in rules}) == EXPECTED_ARS_RULE_COUNT
     assert len({id(detector) for detector in detectors}) == EXPECTED_ARS_RULE_COUNT
     assert len({detector.execution_path for detector in detectors}) == (EXPECTED_ARS_RULE_COUNT)
-    assert validate_ars_rule_registry(Path.cwd()) == []
+    assert validate_ars_rule_registry(REPO_ROOT) == []
     assert all(not rule.backend_id.startswith("source-family:") for rule in rules)
     assert all(not rule.detector_id.startswith("source-family.") for rule in rules)
 
 
 def test_all_csv_rules_have_pass_fail_fixtures() -> None:
-    for rule in load_ars_executable_rules(Path.cwd()):
-        assert evaluate_ars_rule_fixture(rule.inventory_id, Path(rule.pass_fixture)) == []
-        assert evaluate_ars_rule_fixture(rule.inventory_id, Path(rule.fail_fixture)) == [
-            rule.detector_id
-        ]
+    for rule in load_ars_executable_rules(REPO_ROOT):
+        assert (
+            evaluate_ars_rule_fixture(
+                rule.inventory_id, REPO_ROOT / rule.pass_fixture, project_root=REPO_ROOT
+            )
+            == []
+        )
+        assert evaluate_ars_rule_fixture(
+            rule.inventory_id, REPO_ROOT / rule.fail_fixture, project_root=REPO_ROOT
+        ) == [rule.detector_id]
 
 
 def test_ars_rule_02508_destructive_modal_requires_explicit_confirmation() -> None:
-    rule = ars_rule_by_id(Path.cwd())["ARS-RULE-02508"]
+    rule = ars_rule_by_id(REPO_ROOT)["ARS-RULE-02508"]
     detector = detector_for_rule(rule)
 
-    assert evaluate_ars_rule_fixture(rule.inventory_id, Path(rule.fail_fixture)) == [
-        "ars.rule.02508.detector"
-    ]
-    assert evaluate_ars_rule_fixture(rule.inventory_id, Path(rule.pass_fixture)) == []
+    assert evaluate_ars_rule_fixture(
+        rule.inventory_id, REPO_ROOT / rule.fail_fixture, project_root=REPO_ROOT
+    ) == ["ars.rule.02508.detector"]
+    assert (
+        evaluate_ars_rule_fixture(
+            rule.inventory_id, REPO_ROOT / rule.pass_fixture, project_root=REPO_ROOT
+        )
+        == []
+    )
     assert not detector(
         "<Dialog><p>Discard local edits?</p>"
         "<button>Cancel</button><button>Close</button><button>Back</button></Dialog>"
@@ -68,7 +80,7 @@ def test_ars_rule_02508_destructive_modal_requires_explicit_confirmation() -> No
         "<AlertDialog><p>Delete project?</p>"
         '<Button variant="destructive">Delete project</Button></AlertDialog>'
     )
-    violations = run_ars_executable_rules(Path.cwd(), [Path(rule.fail_fixture)])
+    violations = run_ars_executable_rules(REPO_ROOT, [REPO_ROOT / rule.fail_fixture])
 
     assert len(violations) == 1
     assert violations[0].rule_id == rule.runtime_rule_id
@@ -77,7 +89,7 @@ def test_ars_rule_02508_destructive_modal_requires_explicit_confirmation() -> No
 
 
 def test_language_specific_rules_are_reachable_by_source_suffix_scope() -> None:
-    rules = load_ars_executable_rules(Path.cwd())
+    rules = load_ars_executable_rules(REPO_ROOT)
     unreachable = [
         rule.inventory_id
         for rule in rules
@@ -91,15 +103,16 @@ def test_language_specific_rules_are_reachable_by_source_suffix_scope() -> None:
 @pytest.mark.parametrize("inventory_id", ["ARS-RULE-00321", "ARS-RULE-00515", "ARS-RULE-02484"])
 def test_real_project_ars_violations_are_blocking_errors(tmp_path: Path, inventory_id: str) -> None:
     project = _write_ars_project(tmp_path)
-    rule = ars_rule_by_id(Path.cwd())[inventory_id]
+    rule = ars_rule_by_id(REPO_ROOT)[inventory_id]
     source = project / "src" / f"{inventory_id.lower()}{Path(rule.fail_fixture).suffix}"
-    source.write_text(Path(rule.fail_fixture).read_text(encoding="utf-8"), encoding="utf-8")
+    source.write_text((REPO_ROOT / rule.fail_fixture).read_text(encoding="utf-8"), encoding="utf-8")
 
     result = verify_conventions(project)
 
     assert result.verdict is GateVerdict.FAIL
+    # Feature 082 groups shared family matches: the rule is one of the grouped `rule_ids`.
     assert any(
-        violation.rule_id == rule.runtime_rule_id
+        rule.runtime_rule_id in violation.rule_ids
         and violation.path == source.relative_to(project).as_posix()
         and violation.severity is GateSeverity.ERROR
         for violation in result.violations
@@ -117,7 +130,7 @@ def test_rule_decision_manifest_exposes_rule_level_inventory(tmp_path: Path) -> 
 
 def test_generated_decisions_use_ars_rule_backends_not_family_backends(tmp_path: Path) -> None:
     manifest = build_rule_decision_manifest(convention_corpus_project(tmp_path))
-    csv_sources = {rule.source_path for rule in load_ars_executable_rules(Path.cwd())}
+    csv_sources = {rule.source_path for rule in load_ars_executable_rules(REPO_ROOT)}
     generated = [
         decision
         for decision in manifest["decisions"]
@@ -171,7 +184,7 @@ scope: repo
     )
     inventory = tmp_path / INVENTORY_RELATIVE_PATH
     inventory.parent.mkdir(parents=True)
-    shutil.copyfile(Path.cwd() / INVENTORY_RELATIVE_PATH, inventory)
+    shutil.copyfile(REPO_ROOT / INVENTORY_RELATIVE_PATH, inventory)
     (tmp_path / "src").mkdir()
     return tmp_path
 

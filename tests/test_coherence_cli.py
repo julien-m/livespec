@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
+import os
+import time
 from pathlib import Path
 
-import click
 from typer.testing import CliRunner
 
 from validator.cli import app
@@ -49,22 +51,6 @@ def _write_clean_specs(base: Path) -> Path:
     return specs
 
 
-class TestCoherenceHelp:
-    """Verify coherence flags appear in --help."""
-
-    def test_validate_help_shows_coherence_flags(self) -> None:
-        result = runner.invoke(app, ["validate", "--help"])
-        assert result.exit_code == 0
-        output = click.unstyle(result.output)
-        assert "--coherence" in output
-        assert "--coherence-only" in output
-        assert "--strict" in output
-        assert "--wave" in output
-        assert "--rules" in output
-        assert "--ignore" in output
-        assert "--no-suppress" in output
-
-
 class TestCoherenceOnly:
     """--coherence-only runs only Layer 2."""
 
@@ -86,7 +72,10 @@ class TestCoherenceOnly:
             app,
             ["validate", "--coherence-only", "--format", "json", str(tmp_path / ".specs")],
         )
-        assert "violations" in result.output or result.exit_code == 1
+        assert result.exit_code == 1
+        payload = json.loads(result.stdout)
+        errors = {v["rule_id"] for v in payload["violations"] if v["severity"] == "ERROR"}
+        assert {"R1.1", "R4.1"} <= errors
 
     def test_coherence_only_clean_exits_0(self, tmp_path: Path) -> None:
         _write_clean_specs(tmp_path)
@@ -109,6 +98,9 @@ class TestStrict:
         feat = specs / "features" / "001-auth"
         feat.mkdir(parents=True)
         (feat / "spec.md").write_text("---\nstatus: Draft\n---\n# Auth\n")
+        # Age spec.md past the 30-minute suppress_if_creating window so R1.2 stays a WARNING.
+        old_mtime = time.time() - 2 * 60 * 60
+        os.utime(feat / "spec.md", (old_mtime, old_mtime))
 
         # Empty roadmap
         (specs / "roadmap.md").write_text("# Roadmap\n")

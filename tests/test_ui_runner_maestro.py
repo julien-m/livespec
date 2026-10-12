@@ -599,35 +599,64 @@ def test_capture_adb_screenshot_returns_false_on_failure(
 # @spec FR-003: capture_screenshot capability — .specs/features/031-ui-runner-android/spec.md#fr-003
 
 
-def test_capture_screenshot_uses_avd_subdirectory(
-    android_project_with_maestro: Path, tmp_path: Path
+def test_capture_screenshot_writes_flows_into_canonical_run_dir(
+    android_project_with_maestro: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """capture_screenshot stores PNGs under .specs/design/screens/<avd_name>/."""
+    """feature_slug+run_id route every flow capture to .specs/features/<slug>/run/<id>/android/."""
     handler = MaestroRunnerHandler(android_project_with_maestro)
+    monkeypatch.setattr(Path, "home", lambda: tmp_path / "home")  # no Maestro screenshots
+    flows_run: list[str] = []
 
-    def mock_run(cmd, *args, **kwargs):
-        mock = MagicMock()
-        mock.returncode = 0
-        mock.stdout = "Flow Completed\n"
-        mock.stderr = ""
-        return mock
+    def mock_run(cmd: list[str], *args: object, **kwargs: object) -> MagicMock:
+        flows_run.append(Path(cmd[-1]).name)
+        return MagicMock(returncode=0, stdout="Flow Completed\n", stderr="")
+
+    def adb_capture(serial: str, destination: Path) -> bool:
+        destination.write_bytes(b"png")
+        return serial == "emulator-5554"
 
     with (
         patch.object(handler, "_check_android_sdk", return_value=True),
         patch.object(handler, "_check_maestro", return_value=True),
         patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
-        patch.object(
-            handler,
-            "_find_maestro_screenshots",
-            return_value=[tmp_path / "home.png"],
-        ),
+        patch.object(handler, "_capture_adb_screenshot", side_effect=adb_capture),
         patch("validator.ui_runner_maestro.subprocess.run", side_effect=mock_run),
     ):
-        result = handler.capture_screenshot(avd_name="Pixel_8_API_35")
+        result = handler.capture_screenshot(
+            avd_name="Pixel_8_API_35", feature_slug="031-android", run_id="20260101T000000Z"
+        )
 
-    # Output path should include the avd name
-    if result.output_path is not None:
-        assert "Pixel_8_API_35" in str(result.output_path) or result.success
+    run_dir = (
+        android_project_with_maestro
+        / ".specs"
+        / "features"
+        / "031-android"
+        / "run"
+        / "20260101T000000Z"
+        / "android"
+    )
+    assert result.success is True, result.error
+    assert sorted(flows_run) == ["home.yaml", "settings.yaml"]
+    assert result.output_path is not None
+    assert result.output_path.parent == run_dir
+    assert sorted(p.name for p in run_dir.iterdir()) == ["home.png", "settings.png"]
+
+
+def test_capture_screenshot_without_output_context_is_refused(
+    android_project_with_maestro: Path,
+) -> None:
+    """Without output_path or feature_slug+run_id the runner refuses to pick a location."""
+    handler = MaestroRunnerHandler(android_project_with_maestro)
+    with (
+        patch.object(handler, "_check_android_sdk", return_value=True),
+        patch.object(handler, "_check_maestro", return_value=True),
+        patch.object(handler, "_get_running_emulator", return_value="emulator-5554"),
+        patch("validator.ui_runner_maestro.subprocess.run") as run,
+    ):
+        result = handler.capture_screenshot(avd_name="Pixel_8_API_35")
+    assert result.success is False
+    assert result.metadata["guard"] == "missing_output_context"
+    run.assert_not_called()
 
 
 # ---------------------------------------------------------------------------
@@ -889,20 +918,3 @@ def test_load_maestro_runner_manifest() -> None:
     assert isinstance(manifest, dict)
     assert "runner" in manifest
     assert manifest["runner"]["id"] == "maestro"
-
-
-# ---------------------------------------------------------------------------
-# Integration markers (require real Android SDK — skipped in CI)
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.android
-def test_real_avd_boot_integration(tmp_path: Path) -> None:  # pragma: no cover
-    """Integration: actually boot an Android AVD (Android SDK only)."""
-    pytest.skip("Requires real Android SDK + AVD — run manually on developer host")
-
-
-@pytest.mark.android
-def test_real_maestro_flow_integration(tmp_path: Path) -> None:  # pragma: no cover
-    """Integration: run real Maestro flow on fixture Android project."""
-    pytest.skip("Requires real Android SDK + Maestro CLI — run manually on developer host")

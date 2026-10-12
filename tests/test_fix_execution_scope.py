@@ -14,9 +14,8 @@ ROOT = Path(__file__).parents[1]
 SKILL = ROOT / ".agent-sync/skills/spec-fix/SKILL.md"
 
 
-@pytest.mark.parametrize(
-    "flags", ["", "--resume", "--ac AC-001", "--fr FR-001", "--visual", "--functional"]
-)
+# --ac/--fr/--visual/--functional share one filtered branch; --resume must stay feature-wide.
+@pytest.mark.parametrize("flags", ["", "--resume", "--ac AC-001", "--visual"])
 def test_fix_test_execution_cannot_be_proven_with_prose(tmp_path: Path, flags: str) -> None:
     feature = reviewed_project(tmp_path)
     with (feature / "spec.md").open("a") as source:

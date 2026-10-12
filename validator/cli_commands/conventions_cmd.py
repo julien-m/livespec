@@ -2,6 +2,7 @@
 
 # LiveSpec traceability anchors
 # @spec(FR-009)
+# @spec FR-005, FR-006: Repo scope applies/rewrites the baseline (082-conventions-gate-signal)
 
 """Conventions CLI commands for LiveSpec."""
 
@@ -12,7 +13,7 @@ import re
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, NoReturn, cast
 
 import typer
 
@@ -23,6 +24,8 @@ from ..conventions_ast.source_decisions import (
     validate_rule_decision_manifest,
 )
 from ..conventions_ast.taxonomy import advisory_rules, unsupported_rules
+from ..conventions_baseline import write_baseline
+from ..conventions_baseline_apply import apply_repo_baseline
 from ..conventions_diffguard import (
     base_hash_snapshot,
     changed_protected_conventions_paths,
@@ -66,6 +69,7 @@ AST_MODE_OPTION = typer.Option(
         "schema v1 (no AST enforcement)."
     ),
 )
+WRITE_BASELINE_OPTION = typer.Option(False, "--write-baseline", help="Rewrite repo baseline first.")
 WORKER_RECEIPT_OPTION = typer.Option(
     None,
     "--worker-receipt",
@@ -131,44 +135,32 @@ def conventions_verify_command(
     report: bool = typer.Option(False, "--report", help="Write debt report artifacts."),
     feature: str | None = FEATURE_OPTION,
     run_id: str | None = RUN_ID_OPTION,
+    write_baseline_flag: bool = WRITE_BASELINE_OPTION,
 ) -> None:
     """Verify conventions deterministically."""
     repo_root = repo.resolve()
+    baseline_write: dict[str, object] | None = None
     try:
         validated_feature = _validate_conventions_feature(feature) if feature is not None else None
         if validated_feature is not None and run_id is not None:
             _validate_conventions_run_id(run_id)
-        feature_scope = (
-            resolve_feature_scope(repo_root, validated_feature)
-            if validated_feature is not None and validated_feature != REPO_FEATURE_SCOPE
-            else None
-        )
+        repo_scope = validated_feature in (None, REPO_FEATURE_SCOPE)
+        if write_baseline_flag and not repo_scope:
+            raise ValueError("--write-baseline requires repo scope (--feature repo or none)")
+        feature_scope = None if repo_scope else resolve_feature_scope(repo_root, feature or "")
         result = verify_conventions(repo_root, report=report, feature_scope=feature_scope)
         result = _with_rule_decision_blockers(result, repo_root)
+        if repo_scope:
+            result, baseline_write = _repo_baseline_result(repo_root, result, write_baseline_flag)
     except (FeatureScopeError, FileNotFoundError, ValueError) as exc:
-        payload: dict[str, object] = {"verdict": "BLOCKED", "blockers": [str(exc)]}
-        if feature is not None:
-            payload.update({"feature_slug": feature, "run_id": run_id, "receipt_path": None})
-        typer.echo(
-            json.dumps(payload, indent=2) if json_out else f"BLOCKED: {exc}",
-            err=not json_out,
-        )
-        raise typer.Exit(2) from exc
+        _exit_blocked(exc, json_out, feature, run_id)
     try:
         payload = _conventions_verify_payload(
             repo_root, feature=validated_feature, run_id=run_id, result=result
         )
     except ValueError as exc:
-        payload = {"verdict": "BLOCKED", "blockers": [str(exc)]}
-        if validated_feature is not None:
-            payload.update(
-                {"feature_slug": validated_feature, "run_id": run_id, "receipt_path": None}
-            )
-        typer.echo(
-            json.dumps(payload, indent=2) if json_out else f"BLOCKED: {exc}",
-            err=not json_out,
-        )
-        raise typer.Exit(2) from exc
+        _exit_blocked(exc, json_out, validated_feature, run_id)
+    payload.update({"baseline_write": baseline_write} if baseline_write else {})
     if json_out:
         typer.echo(json.dumps(payload, indent=2, sort_keys=True))
     else:
@@ -179,6 +171,22 @@ def conventions_verify_command(
         for blocker in result.blockers:
             typer.echo(f"BLOCKED: {blocker.message}", err=True)
     raise typer.Exit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[result.verdict.value])
+
+
+def _exit_blocked(exc: Exception, as_json: bool, feature: str | None, run: str | None) -> NoReturn:
+    payload: dict[str, object] = {"verdict": "BLOCKED", "blockers": [str(exc)]}
+    if feature is not None:
+        payload.update({"feature_slug": feature, "run_id": run, "receipt_path": None})
+    typer.echo(json.dumps(payload, indent=2) if as_json else f"BLOCKED: {exc}", err=not as_json)
+    raise typer.Exit(2) from exc
+
+
+def _repo_baseline_result(
+    repo_root: Path, result: GateResult, write: bool
+) -> tuple[GateResult, dict[str, object] | None]:
+    # Write only for an unblocked result, then evaluate against the written baseline.
+    summary = write_baseline(repo_root, result).to_dict() if write and not result.blockers else None
+    return apply_repo_baseline(repo_root, result), summary
 
 
 def _default_conventions_run_id() -> str:
@@ -353,8 +361,9 @@ def _read_worker_receipt(repo_root: Path, worker_receipt: Path | None) -> dict[s
 
 
 def _run_supervisor_verify(repo_root: Path, feature_slug: str | None) -> GateResult:
-    if feature_slug is None:
-        return _with_rule_decision_blockers(verify_conventions(repo_root), repo_root)
+    if feature_slug is None or feature_slug == REPO_FEATURE_SCOPE:
+        result = _with_rule_decision_blockers(verify_conventions(repo_root), repo_root)
+        return apply_repo_baseline(repo_root, result)
     feature_scope = resolve_feature_scope(repo_root, feature_slug)
     result = verify_conventions(repo_root, feature_scope=feature_scope)
     return _with_rule_decision_blockers(result, repo_root)

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+# LiveSpec traceability anchors
+# @spec(FR-003)
 # @spec AC-006: Properties capability detects kotest-property or jqwik.
 # — .specs/features/022-driver-jvm/spec.md#ac-006
+# @spec FR-003: Build file plugin/dependency detection — .specs/features/022-driver-jvm/spec.md#fr-003
 #
 # kotest-property is preferred over jqwik when both are configured (Story 3 —
 # Kotlin-first projects ship the kotest runner end-to-end).

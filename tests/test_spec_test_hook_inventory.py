@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.goal_checklist_support import checklist_tasks
 from validator.goal_contracts import compile_command_goal
 
 
@@ -34,7 +35,7 @@ def test_test_contract_names_each_hook_level_and_resolves_the_actual_chain(
     )
     row = next(
         task["description"]
-        for task in goal.payload["tasks"]
+        for task in checklist_tasks(goal.payload)
         if "Read before-test hooks" in task["description"]
     )
     assert "~/.claude/livespec/hooks/before-test.md" in row

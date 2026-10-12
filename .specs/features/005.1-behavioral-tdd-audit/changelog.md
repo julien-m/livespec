@@ -28,3 +28,12 @@ Initial spec created for Feature 005.1. Investigation revealed that 13 of 15 ACs
 - **Gaps closed:** AC-012, AC-013, AC-014, AC-015
 - **Remaining:** None — feature 005.1 is now 15/15 AC (100%)
 - **Author:** spec.fix
+
+## 2026-10-12 — [Refactor]: Self-testing helper tests removed
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/test_behavioral_tdd.py (deleted), implementation.md
+- **AC impacted:** AC-001, AC-004, AC-007, AC-008, AC-009 now Documented (prompt contracts)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- The helpers under test were defined in the test file itself; the behavior exists only in the spec-implement and spec-test SKILL.md prompts.

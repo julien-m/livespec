@@ -14,7 +14,7 @@ from typing import TypeVar
 
 import typer
 
-from ..cli_exit_codes import EXIT_MISSING_SPECS, EXIT_NO_DRIVER
+from ..cli_exit_codes import EXIT_CONFIG, EXIT_FAILURE, EXIT_INTERRUPTED, EXIT_MISSING_SPECS
 from ..cli_resolvers import detect_specs_root
 from ..drivers.degradation import format_degradation_message
 from ..drivers.registry import DriverRegistry
@@ -58,17 +58,17 @@ def resolve_primary_driver(project_root: Path) -> DriverManifest:
 
     Raises:
         typer.Exit: When no driver matches the project (exit code
-            :data:`EXIT_NO_DRIVER`).
+            :data:`EXIT_CONFIG`).
     """
     registry = DriverRegistry(project_root)
     matching = registry.discover()
     if not matching:
         typer.echo(format_degradation_message(project_root), err=True)
-        raise typer.Exit(EXIT_NO_DRIVER)
+        raise typer.Exit(EXIT_CONFIG)
     primary = pick_primary_driver(matching, project_root)
     if primary is None:
         typer.echo(format_degradation_message(project_root), err=True)
-        raise typer.Exit(EXIT_NO_DRIVER)
+        raise typer.Exit(EXIT_CONFIG)
     return primary
 
 
@@ -88,9 +88,31 @@ def format_summary_line(subcommand: str, status: str, **fields: object) -> str:
     return " · ".join(parts)
 
 
-def emit_summary(subcommand: str, status: str, **fields: object) -> None:
-    """Print the structured CI summary to stdout."""
-    typer.echo(format_summary_line(subcommand, status, **fields))
+def emit_summary(
+    subcommand: str, status: str, *, to_stderr: bool = False, **fields: object
+) -> None:
+    """Print the structured CI summary (FR-009).
+
+    Args:
+        subcommand: The name of the subcommand emitting the summary.
+        status: A short verdict (``OK``, ``FAIL``, ``ERROR``…).
+        to_stderr: Write to stderr so a ``--json`` stdout stays valid JSON (AC-012).
+        **fields: Extra ``key=value`` pairs appended in insertion order.
+    """
+    typer.echo(format_summary_line(subcommand, status, **fields), err=to_stderr)
+
+
+def help_epilog(example: str) -> str:
+    """Return the ``--help`` epilog carrying one runnable example (AC-013).
+
+    Args:
+        example: Full command line starting with ``livespec <command>``.
+
+    Returns:
+        The epilog text rendered after the options panel.
+    """
+    # @spec AC-013: One example per command — .specs/features/035-unified-cli-surface/spec.md#ac-013
+    return f"Example: {example}"
 
 
 def run_with_debug(
@@ -98,27 +120,24 @@ def run_with_debug(
     *,
     debug: bool,
     subcommand: str,
-    fail_exit_code: int,
 ) -> T:
     """Execute ``func`` with the standard error-handling wrapper.
 
     Generic exceptions are caught and surfaced as a one-line message unless
     ``debug`` is true, in which case the full stacktrace is printed before the
-    exit. ``typer.Exit`` and ``KeyboardInterrupt`` are re-raised verbatim so
-    callers can drive the exit code precisely.
+    exit. ``typer.Exit`` is re-raised verbatim so callers drive the exit code.
 
     Args:
         func: Callable executing the subcommand body.
         debug: Whether to surface the full Python stacktrace on failure.
         subcommand: Subcommand name used in the structured summary.
-        fail_exit_code: Exit code applied when a generic exception bubbles up.
 
     Returns:
         Whatever ``func`` returns when it completes successfully.
 
     Raises:
-        typer.Exit: Either re-raised from ``func`` or synthesized with
-            ``fail_exit_code``.
+        typer.Exit: Re-raised from ``func``, :data:`EXIT_INTERRUPTED` on Ctrl+C,
+            or :data:`EXIT_FAILURE` for an unexpected exception (AC-011).
     """
     try:
         return func()
@@ -126,14 +145,14 @@ def run_with_debug(
         raise
     except KeyboardInterrupt:
         typer.echo("\nInterrupted.", err=True)
-        raise typer.Exit(fail_exit_code) from None
+        raise typer.Exit(EXIT_INTERRUPTED) from None
     except Exception as exc:  # CLI boundary — surface generic errors as one line
         if debug:
             typer.echo(traceback.format_exc(), err=True)
         else:
             typer.echo(f"Error: {exc}", err=True)
         emit_summary(subcommand, "ERROR", reason=type(exc).__name__)
-        raise typer.Exit(fail_exit_code) from exc
+        raise typer.Exit(EXIT_FAILURE) from exc
 
 
 def join_capabilities(driver: DriverManifest) -> str:
@@ -150,6 +169,7 @@ __all__ = [
     "coalesce_paths",
     "emit_summary",
     "format_summary_line",
+    "help_epilog",
     "join_capabilities",
     "require_specs_root",
     "resolve_primary_driver",

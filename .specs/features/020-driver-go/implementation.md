@@ -17,19 +17,16 @@ status: Implemented
 |---|---|---|---|---|
 | FR-001 | `livespec/drivers/go.yaml` | `@spec FR-001: Go driver YAML — .specs/features/020-driver-go/spec.md#fr-001` | Implemented | 2026-05-07 |
 | FR-002 | `livespec/drivers/scripts/go-coverage-gate.sh` | `@spec FR-002: Go coverage gate escape-hatch script` | Implemented | 2026-05-07 |
-| FR-003 | `validator/drivers/go_detector.py` | `@spec FR-003: go.mod dependency parser` | Implemented | 2026-05-07 |
+| FR-003 | — | — | ❌ Removed 2026-10-12 (go.mod parser deleted: no production caller) | 2026-10-12 |
 | FR-004 | `tests/integration/test_driver_go.py` | `@spec FR-004: Integration tests for the Go driver` | Implemented | 2026-05-07 |
-| FR-005 | `tests/unit/test_go_detector.py`, `tests/unit/test_go_coverage_gate.py` | `@spec FR-005: Unit tests for go.mod parser and gate script` | Implemented | 2026-05-07 |
+| FR-005 | `tests/unit/test_go_coverage_gate.py` | `@spec FR-005: Unit tests for go-coverage-gate.sh` | Implemented (parser tests removed 2026-10-12) | 2026-10-12 |
 
 ## Files Created
 
 | File | Purpose |
 |---|---|
 | `livespec/drivers/scripts/go-coverage-gate.sh` | Escape-hatch shell script: runs `go test -coverprofile=...`, applies threshold via `go tool cover -func` (with awk fallback), and writes inline-converted lcov.info per EC-004. |
-| `validator/drivers/go_detector.py` | Pure-Python `go.mod` parser: module path + single-line and multi-line `require` blocks, with `// indirect` stripping. |
-| `tests/unit/test_go_detector.py` | 14 unit tests covering module parsing, single/multi-line `require`, dedup, comment stripping, case-insensitive substring lookup. |
 | `tests/unit/test_go_coverage_gate.py` | 9 bash-script unit tests: above/below threshold, default 70 threshold, no go.mod, empty coverprofile, missing coverprofile, and lcov grouping per source file. |
-| `tests/integration/test_driver_go.py` | 10 integration tests covering manifest schema, registry detection, capability metadata, mutation absence, and dependency detection on a Go fixture. |
 
 ## Files Modified
 
@@ -44,12 +41,12 @@ status: Implemented
 | AC-001 | `test_registry_loads_go_driver`, `test_go_driver_detects_go_mod` | Implemented |
 | AC-002 | `test_coverage_capability_uses_script_escape_hatch`, gate script `go test -coverprofile` invocation | Implemented |
 | AC-003 | `test_gate_passes_when_above_threshold`, `test_gate_fails_when_below_threshold`, `test_gate_default_threshold_is_70` | Implemented |
-| AC-004 | `test_snapshots_capability_metadata`, `test_dependency_detection_in_fixture_go_module`, `test_has_go_dependency_substring_match` | Implemented |
-| AC-005 | `test_properties_capability_metadata`, `test_dependency_detection_in_fixture_go_module` | Implemented |
+| AC-004 | — | ❌ Removed 2026-10-12 |
+| AC-005 | — | ❌ Removed 2026-10-12 |
 | AC-006 | `test_mutation_capability_is_absent`, `test_go_driver_capabilities_exist` | Implemented |
 | AC-007 | `test_coverage_gate_script_is_shipped_and_executable`, `test_gate_lcov_groups_lines_per_file` | Implemented |
 | AC-008 | `test_go_driver_schema_validation` | Implemented |
-| AC-009 | `test_parse_go_module_*`, `test_parse_go_dependencies_*` | Implemented |
+| AC-009 | — | ❌ Removed 2026-10-12 |
 
 ## Test Results
 

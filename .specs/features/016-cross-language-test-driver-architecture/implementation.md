@@ -17,7 +17,7 @@ status: Implemented
 |---|---|---|---|---|
 | FR-001 | `validator/drivers/schemas.py` | `@spec FR-001: YAML driver schema with detect rules plus optional capability blocks` | Implemented | 2026-05-06 |
 | FR-002 | `validator/drivers/registry.py` | `@spec FR-002: Registry scans shipped manifests first, then project overrides.` | Implemented | 2026-05-06 |
-| FR-003 | `validator/drivers/runner.py` | `@spec FR-003: Driver capabilities execute through one subprocess-based API.` | Implemented | 2026-05-06 |
+| FR-003 | `validator/drivers/runner.py` | `@spec FR-003: Driver capabilities execute through one subprocess-based API.` (built-in scripts resolve beside their manifest) | Implemented | 2026-10-12 |
 | FR-004 | `validator/drivers/degradation.py` | `@spec FR-004: Unsupported projects receive a structured degradation message.` | Implemented | 2026-05-06 |
 | FR-005 | `validator/drivers/patch_coverage.py` | `@spec FR-005: compute_patch_coverage` | Implemented | 2026-05-06 |
 | FR-006 | `validator/drivers/scaffold.py`, `validator/drivers/cli.py` | `@spec FR-006: The CLI can scaffold a project-local driver manifest from a template.` | Implemented | 2026-05-06 |
@@ -95,3 +95,9 @@ status: Implemented
 - `livespec spec-driver --new <stack>` is the public scaffold entry point (FR-006).
 - Patch coverage is fully local — no Codecov / Coveralls / SonarCloud dependency (AC-015).
 - `/spec.test`, `/spec.feature`, and `/spec.implement` slash commands will call `validator.drivers.run_capability()` once feature 017+ wiring lands. The stable Python API is in place (FR-007).
+
+## Bugfix Receipts
+
+| Date | Requirement | Regression tests | RED receipt | GREEN receipt |
+|---|---|---|---|---|
+| 2026-10-12 | FR-003 | `tests/test_builtin_driver_scripts.py::test_builtin_script_capability_runs_shipped_script_in_any_project` | `.specs/.execution/43a0f6cd9da54d839e88f1b07b8c070e/receipt.json` | `.specs/.execution/f6d981248e6644659579d7e7d317fe24/receipt.json` |

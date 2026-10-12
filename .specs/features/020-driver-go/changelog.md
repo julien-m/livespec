@@ -1,3 +1,12 @@
+## 2026-10-12 — [Refactor]: Remove bash-on-PATH sanity test
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/unit/test_go_coverage_gate.py
+- **AC impacted:** None
+- **Author:** claude-code (test-suite cleanup, lot 5)
+- **Details:** `test_bash_available_for_test_environment` asserted the host has bash and tested no product behavior. The gate-script tests still run the real script.
+
 ## 2026-06-08 — [Spec Update]: Normalize changelog format
 
 - **Type:** Spec Update
@@ -39,3 +48,21 @@
 - **AC impacted:** AC-001 through AC-009 — all Implemented
 - **Tests:** Targeted Go driver unit and integration coverage added; verification status is recorded in the implementation report for this feature.
 - **Author:** spec.feature
+
+## 2026-10-12 — [Refactor]: Driver integration tests reduced to real behavior
+
+- **Type:** Refactor
+- **Spec modified:** No
+- **Code modified:** tests/integration/test_driver_go.py, implementation.md
+- **AC impacted:** None (AC-006 now asserted through the runner)
+- **Author:** Claude Code (test-suite cleanup, lot 1)
+- Mutation absence is now checked as the runner's `CapabilityNotImplementedError` instead of a `None` field; removed YAML value pins and go.mod parsing duplicated by tests/unit/test_go_detector.py.
+
+## 2026-10-12 — Refactor: retire unused go.mod detector
+
+- **Type:** Refactor
+- **Spec modified:** Yes (FR-003, AC-004, AC-005, AC-009 marked Removed; FR-005 annotated)
+- **Code modified:** validator/drivers/go_detector.py (deleted), tests/unit/test_go_detector.py (deleted)
+- **AC impacted:** AC-004, AC-005, AC-009 (removed)
+- **Author:** Claude Code (dead-code resolution)
+- `go_detector` was imported only by its unit tests; the Go driver runs `go test` commands that need no library detection, and snapshots/properties are not executed by any production command.

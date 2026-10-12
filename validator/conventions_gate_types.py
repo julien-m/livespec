@@ -8,7 +8,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Literal
 
@@ -42,11 +42,14 @@ class GateViolation:
     message: str
     source: SourceKind
     fix_hint: str = ""
+    # @spec FR-003: Matched rule ids of a grouped violation
+    #   .specs/features/082-conventions-gate-signal/spec.md#fr-003
+    rule_ids: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, object]:
-        """Return JSON-serializable violation payload."""
+        """Return JSON-serializable violation payload (`rule_ids` only when present)."""
         severity = self.severity.value if isinstance(self.severity, GateSeverity) else self.severity
-        return {
+        payload: dict[str, object] = {
             "rule_id": self.rule_id,
             "path": self.path,
             "line": self.line,
@@ -55,6 +58,9 @@ class GateViolation:
             "source": self.source,
             "fix_hint": self.fix_hint,
         }
+        if self.rule_ids:
+            payload["rule_ids"] = list(self.rule_ids)
+        return payload
 
 
 @dataclass(frozen=True)
@@ -78,6 +84,10 @@ class GateResult:
     violations: list[GateViolation]
     blockers: list[GateBlocker]
     ast_summary: dict[str, object] | None = None
+    # @spec FR-005: Recorded debt reported apart from new violations
+    #   .specs/features/082-conventions-gate-signal/spec.md#fr-005
+    baselined_violations: list[GateViolation] = field(default_factory=lambda: [])
+    baseline: dict[str, object] | None = None
 
     def to_dict(self) -> dict[str, object]:
         """Return JSON-serializable result payload."""
@@ -88,4 +98,7 @@ class GateResult:
         }
         if self.ast_summary is not None:
             payload["ast_summary"] = self.ast_summary
+        if self.baseline is not None:
+            payload["baseline"] = self.baseline
+            payload["baselined_violations"] = [v.to_dict() for v in self.baselined_violations]
         return payload

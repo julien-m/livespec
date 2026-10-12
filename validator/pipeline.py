@@ -255,6 +255,7 @@ def _write_phase_update(
     model: str,
     review_max_chars: int | None,
     review_result: Path | None,
+    report: bool = True,
 ) -> None:
     """Keep gate checks and atomic phase publication within the existing project lock."""
     with acquire_lock(feature_dir.parents[1]):
@@ -291,7 +292,13 @@ def _write_phase_update(
             write=write_with_hash_check,
         )
 
-        typer.echo(f"Updated {display_phase} → {display_status}")
+        if report:
+            typer.echo(f"Updated {display_phase} → {display_status}")
+
+
+# Public alias and failure set for in-process callers (runtime defect reports, feature 083).
+PHASE_UPDATE_ERRORS = (PenflowApprovalError, OSError, ValueError, RuntimeError, YAMLError)
+write_phase_update = _write_phase_update
 
 
 def _resolve_update_target(feature: str, phase: str, status: str) -> tuple[Path, Path]:
@@ -343,7 +350,7 @@ def _apply_update(
         )
     except typer.Exit:
         raise
-    except (PenflowApprovalError, OSError, ValueError, RuntimeError, YAMLError) as exc:
+    except PHASE_UPDATE_ERRORS as exc:
         typer.echo(f"BLOCKED: {exc}", err=True)
         raise typer.Exit(1) from exc
 

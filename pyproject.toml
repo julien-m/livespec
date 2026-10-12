@@ -15,6 +15,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    # Imported directly by unit tests: typer no longer depends on click, and
+    # jsonschema/pluggy must not arrive only transitively through other extras.
+    "click>=8.1",
+    "jsonschema>=4.23",
+    "pluggy>=1.5",
     "mypy>=1.13",
     "pytest>=8.0",
     "pytest-cov>=5.0",
@@ -47,6 +52,7 @@ markers = [
     "slow: tests > 30s",
     "android: tests requiring real Android SDK and AVD",
     "macos: tests requiring macOS + Xcode",
+    "real_stop_condition: run the goal stop condition subprocess instead of the test stub",
 ]
 
 [tool.setuptools.packages.find]
@@ -58,6 +64,8 @@ line-length = 100
 extend-exclude = [
     # Local planning output is not ship source; keep real runtime/tests in Ruff scope.
     ".claude/output",
+    # CI checks out external dependencies (ai-ressources, penflow) here; they are not LiveSpec source.
+    ".ci-deps",
     # Detector payload fixtures are intentionally invalid snippets, not runtime Python modules.
     "tests/fixtures/conventions_ast/ars_rules",
     "tests/fixtures/conventions_ast/generated/python_code",

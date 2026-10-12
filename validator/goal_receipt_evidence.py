@@ -7,6 +7,7 @@ from typing import Any
 
 from . import goal_contracts as _contracts
 from .evidence_policy import SUPPORTED_EVIDENCE_POLICIES
+from .goal_outcome import OUTCOME_TASK_ID, validate_outcome_evidence
 
 __all__ = [
     "_nonempty_string_list",
@@ -58,6 +59,8 @@ def _validate_task_evidence(
             contract=contract,
             project_root=project_root,
         )
+    if task_id == OUTCOME_TASK_ID:
+        return validate_outcome_evidence(task, evidence, project_root)
     if _task_family_matches(task_id, _contracts.HOOKS_BEFORE_TASK_ID):
         return _contracts._validate_hooks_before_evidence(task, evidence)
     if _task_family_matches(task_id, _contracts.QE_ANALYSIS_TASK_ID):

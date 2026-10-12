@@ -64,10 +64,12 @@ from .goal_archive_evidence import _validate_archive_run_evidence as _validate_a
 from .goal_archive_evidence import (
     _validate_finalize_receipt_evidence as _validate_finalize_receipt_evidence,
 )
+from .goal_canonical import _canonical_json as _canonical_json
+from .goal_canonical import _canonical_rules as _canonical_rules
+from .goal_canonical import _stable_path as _stable_path
 from .goal_compile import _compile_command_goal as _compile_command_goal
 from .goal_compile import compile_command_goal as compile_command_goal
 from .goal_compile import normalize_goal_flags as normalize_goal_flags
-from .goal_contract_model import _CONVENTIONS_GATED_COMMANDS as _CONVENTIONS_GATED_COMMANDS
 from .goal_contract_model import (
     ALLOWED_INTERNAL_INVOCATION_MODES as ALLOWED_INTERNAL_INVOCATION_MODES,
 )
@@ -75,11 +77,7 @@ from .goal_contract_model import ARCHIVE_INVALID_SUBSTITUTES as ARCHIVE_INVALID_
 from .goal_contract_model import ARCHIVE_REPAIR_ACTIONS as ARCHIVE_REPAIR_ACTIONS
 from .goal_contract_model import ARCHIVE_REQUIRED_EVIDENCE as ARCHIVE_REQUIRED_EVIDENCE
 from .goal_contract_model import ARCHIVE_RUN_TASK_DESCRIPTION as ARCHIVE_RUN_TASK_DESCRIPTION
-from .goal_contract_model import CHILD_GOAL_ARTIFACT_ROOT_MARKER as CHILD_GOAL_ARTIFACT_ROOT_MARKER
-from .goal_contract_model import CONVENTION_SIGNAL_FILES as CONVENTION_SIGNAL_FILES
 from .goal_contract_model import CONVENTIONS_REQUIRED_EVIDENCE as CONVENTIONS_REQUIRED_EVIDENCE
-from .goal_contract_model import CONVENTIONS_VERIFY_COMMAND as CONVENTIONS_VERIFY_COMMAND
-from .goal_contract_model import DESIGN_SIGNAL_WORDS as DESIGN_SIGNAL_WORDS
 from .goal_contract_model import EXECUTION_TASK_BRANCHES as EXECUTION_TASK_BRANCHES
 from .goal_contract_model import FINALIZE_INVALID_SUBSTITUTES as FINALIZE_INVALID_SUBSTITUTES
 from .goal_contract_model import FINALIZE_REPAIR_ACTIONS as FINALIZE_REPAIR_ACTIONS
@@ -111,35 +109,14 @@ from .goal_contract_model import VISUAL_DESIGN_REPAIR_ACTIONS as VISUAL_DESIGN_R
 from .goal_contract_model import VISUAL_DESIGN_REQUIRED_EVIDENCE as VISUAL_DESIGN_REQUIRED_EVIDENCE
 from .goal_contract_model import VISUAL_FEATURE_HEADING_RE as VISUAL_FEATURE_HEADING_RE
 from .goal_contract_model import GoalContract as GoalContract
-from .goal_contract_model import RequiredConventions as RequiredConventions
 from .goal_contract_model import _TaskEvidenceValidation as _TaskEvidenceValidation
-from .goal_conventions import _build_convention_signal_text as _build_convention_signal_text
-from .goal_conventions import _canonical_json as _canonical_json
-from .goal_conventions import _canonical_rules as _canonical_rules
-from .goal_conventions import _compile_conventions_payload as _compile_conventions_payload
-from .goal_conventions import _extract_airesources_root as _extract_airesources_root
-from .goal_conventions import _normalize_section_lines as _normalize_section_lines
-from .goal_conventions import _parse_convention_domains as _parse_convention_domains
-from .goal_conventions import _parse_convention_refs as _parse_convention_refs
-from .goal_conventions import _parse_keyword_list as _parse_keyword_list
-from .goal_conventions import _render_convention_domain as _render_convention_domain
-from .goal_conventions import _render_convention_file as _render_convention_file
-from .goal_conventions import _resolve_convention_ref as _resolve_convention_ref
-from .goal_conventions import _should_select_convention_domain as _should_select_convention_domain
-from .goal_conventions import _stable_path as _stable_path
 from .goal_evidence_files import _any_evidence_path_exists as _any_evidence_path_exists
-from .goal_evidence_files import _child_goal_artifact_exists as _child_goal_artifact_exists
-from .goal_evidence_files import _nonempty_str as _nonempty_str
 from .goal_evidence_files import _path_exists as _path_exists
-from .goal_evidence_files import _valid_child_goal_artifact as _valid_child_goal_artifact
 from .goal_evidence_paths import confine_bootstrap_evidence as confine_bootstrap_evidence
-from .goal_generic_evidence import _convention_evidence_satisfied as _convention_evidence_satisfied
 from .goal_generic_evidence import (
     _conventions_receipt_missing_items as _conventions_receipt_missing_items,
 )
-from .goal_generic_evidence import _manifest_or_boolean_evidence as _manifest_or_boolean_evidence
 from .goal_generic_evidence import _required_evidence_satisfied as _required_evidence_satisfied
-from .goal_generic_evidence import _string_set_evidence as _string_set_evidence
 from .goal_generic_evidence import _validate_generic_evidence as _validate_generic_evidence
 from .goal_hooks import _archive_run_task as _archive_run_task
 from .goal_hooks import _compile_hooks_payload as _compile_hooks_payload
@@ -205,7 +182,6 @@ from .goal_receipt_evidence import _validate_task_evidence as _validate_task_evi
 from .goal_receipt_evidence import (
     _validate_visual_receipt_evidence as _validate_visual_receipt_evidence,
 )
-from .goal_render import _goal_objective_context as _goal_objective_context
 from .goal_render import render_goal_contract_file as render_goal_contract_file
 from .goal_render import render_goal_objective as render_goal_objective
 from .goal_render import render_goal_state_file as render_goal_state_file
@@ -217,8 +193,6 @@ from .goal_task_rules import _slugify_task_id as _slugify_task_id
 from .goal_task_rules import _task_id_for_description as _task_id_for_description
 from .goal_tasks import _build_goal_tasks as _build_goal_tasks
 from .goal_tasks import _goal_row_tasks as _goal_row_tasks
-from .goal_tasks import _task_proof_requirements as _task_proof_requirements
-from .goal_tasks import _task_required_conventions as _task_required_conventions
 from .goal_tasks import _unique_task_id as _unique_task_id
 from .hook_resolver import render_chain_for_stdout as render_chain_for_stdout
 from .integrations import resolve_for as resolve_for

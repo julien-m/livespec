@@ -11,10 +11,20 @@ from pathlib import Path
 
 import pytest
 
+from tests.goal_checklist_support import checklist_tasks
 from tests.test_command_preview_obligations import ROOT, _goal
 from validator.goal_contracts import render_goal_contract_file
 
 SKILL = ROOT / ".agent-sync/skills/spec-test/SKILL.md"
+TYPESCRIPT_COMPILER = ROOT / "node_modules/typescript/lib/typescript.js"
+
+
+def _require_node_toolchain(extension: str) -> None:
+    """Skip, never pass vacuously, when the optional JS toolchain is not installed."""
+    if extension in {"js", "ts"} and shutil.which("node") is None:
+        pytest.skip("node is not installed; JS/TS syntax commands cannot run")
+    if extension == "ts" and not TYPESCRIPT_COMPILER.is_file():
+        pytest.skip("node_modules/typescript is missing; run `npm ci` to install the compiler")
 
 
 def _syntax_command(extension: str, generated: Path) -> list[str]:
@@ -22,12 +32,11 @@ def _syntax_command(extension: str, generated: Path) -> list[str]:
     commands = re.findall(r"```bash\n([^`]+)\n```", section)
     command = next((line for line in commands if f"<generated-file.{extension}>" in line), None)
     assert command, f"Missing verified non-executing {extension} syntax command"
-    compiler = ROOT / "node_modules/typescript/lib/typescript.js"
     argv = shlex.split(command)
     return [
         sys.executable
         if token == "python"
-        else str(compiler)
+        else str(TYPESCRIPT_COMPILER)
         if token == "<typescript-compiler.js>"
         else str(generated)
         if token == f"<generated-file.{extension}>"
@@ -55,6 +64,7 @@ def _adversarial_source(extension: str) -> str:
 def test_documented_parser_rejects_syntax_errors_without_executing_source_or_hooks(
     tmp_path: Path, extension: str, valid: bool
 ) -> None:
+    _require_node_toolchain(extension)
     generated = tmp_path / f"generated.{extension}"
     generated.write_text(_adversarial_source(extension) + ("" if valid else "\ninvalid = ("))
     (tmp_path / "runtime_hook.py").write_text('raise RuntimeError("must not import")\n')
@@ -85,6 +95,7 @@ def test_adversarial_fixture_has_real_effects_when_executed(tmp_path: Path) -> N
     (tmp_path / "runtime_hook.cjs").write_text(
         'require("node:fs").writeFileSync("hook", "executed");'
     )
+    _require_node_toolchain("js")
     node = shutil.which("node")
     assert node is not None
     result = subprocess.run([node, str(generated)], cwd=tmp_path, capture_output=True, timeout=30)
@@ -101,9 +112,9 @@ def test_adversarial_fixture_has_real_effects_when_executed(tmp_path: Path) -> N
 def test_generated_file_tasks_only_validate_syntax_until_runtime_phases(
     tmp_path: Path, flags: str, generates: bool
 ) -> None:
-    tasks = json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", flags, True)))[
-        "tasks"
-    ]
+    tasks = checklist_tasks(
+        json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", flags, True)))
+    )
     checks = [task for task in tasks if task["description"].startswith("Per generated")]
     assert bool(checks) is generates
     assert all(
@@ -118,7 +129,9 @@ def test_generated_file_tasks_only_validate_syntax_until_runtime_phases(
 
 
 def test_penflow_captures_are_confined_to_run_before_baseline_promotion(tmp_path: Path) -> None:
-    tasks = json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", "", True)))["tasks"]
+    tasks = checklist_tasks(
+        json.loads(render_goal_contract_file(_goal(tmp_path, "spec-test", "", True)))
+    )
     capture = next(task for task in tasks if task["description"].startswith("4.5.P Web runtime:"))
     assert ".specs/features/<feature>/run/<run-id>/<target>/" in capture["description"]
     assert (

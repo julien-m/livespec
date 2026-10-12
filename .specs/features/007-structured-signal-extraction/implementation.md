@@ -28,7 +28,7 @@ Added `@spec` anchors for FR-001, FR-002, FR-003.
 
 ### tests/test_specify_integration.py
 
-6 pytest test functions validating the Phase 2 contract:
+5 pytest test functions validating the Phase 2 contract (FR-005):
 
 | # | Test | AC |
 |---|------|----|
@@ -36,8 +36,7 @@ Added `@spec` anchors for FR-001, FR-002, FR-003.
 | 2 | `test_modal_close_signals_detect_overlay_and_dismissible` | AC-006 |
 | 3 | `test_empty_signals_produce_no_traits` | AC-007 |
 | 4 | `test_ambiguous_save_signal_alone_produces_no_traits` | AC-008 |
-| 5 | `test_duplicate_signals_normalized_double` | AC-010 |
-| 6 | `test_duplicate_signals_normalized_triple` | AC-010 |
+| 5 | `test_duplicate_signals_normalized_double` (2x and 3x repetitions) | AC-010 |
 
 All tests call `detect_traits()` directly with fixed signal lists and real taxonomy data (no mocking).
 
@@ -59,7 +58,7 @@ All tests call `detect_traits()` directly with fixed signal lists and real taxon
 - FR-002: Structured JSON prompt — Phase 1 instructions with retry/fallback
 - FR-003: detect_traits delegation — Phase 2 in `.agent-sync/skills/spec-specify/SKILL.md`
 - FR-004: Phase 3 unchanged — sub-steps 4-8 byte-identical
-- FR-005: 6 integration tests in `tests/test_specify_integration.py`
+- FR-005: 5 integration tests in `tests/test_specify_integration.py` (the 2x/3x duplicate-signal checks for AC-010 share one test since 2026-10-12)
 - FR-006: Real taxonomy data, no mocking
 - FR-007: 15/15 non-regression tests pass
 

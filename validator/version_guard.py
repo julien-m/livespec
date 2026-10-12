@@ -13,6 +13,9 @@ RECOVERY_HINT = "Run /spec-migrate or livespec migrate before running this comma
 MIGRATION_IN_PROGRESS_ENV = "LIVESPEC_MIGRATION_IN_PROGRESS"
 MIGRATION_LIVESPEC_ENV = "LIVESPEC_MIGRATION_LIVESPEC"
 MIGRATION_PROJECT_ENV = "LIVESPEC_MIGRATION_PROJECT"
+# Command groups that must run on stale projects so they can recover or inspect the
+# runtime itself (feature 083: `livespec runtime ...`).
+GUARD_EXEMPT_GROUPS = frozenset({"runtime"})
 
 
 @dataclass(frozen=True)
@@ -99,6 +102,9 @@ def enforce_project_migrated(
     livespec_root: Path | None = None,
 ) -> None:
     """Raise when a command targets a stale LiveSpec project."""
+    # @spec FR-009: Guard bypass — .specs/features/083-pinned-runtime-isolation/spec.md#fr-009
+    if args[:1] and args[0] in GUARD_EXEMPT_GROUPS:
+        return
     project_root = find_project_for_guard(args, cwd=cwd)
     if project_root is None:
         return
@@ -177,6 +183,7 @@ def _parse_int(raw: object, *, field: str) -> int:
 
 # Export only the migration guard API used by CLI entry points and tests.
 __all__ = [
+    "GUARD_EXEMPT_GROUPS",
     "ProjectMigrationRequiredError",
     "ProjectVersionState",
     "enforce_project_migrated",

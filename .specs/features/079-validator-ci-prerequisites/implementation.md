@@ -140,7 +140,7 @@ The six-module targeted suite passes, and the independent v5 post-check confirms
 
 | Requirement | Files | Status |
 |---|---|---|
-| FR-003, FR-005 | Read [conventions_corpus_fixture.py](../../../tests/conventions_corpus_fixture.py), Read [_conventions_source_decisions_serialization.py](../../../tests/_conventions_source_decisions_serialization.py), Read [test_conventions_ars_rules.py](../../../tests/test_conventions_ars_rules.py), Read [test_conventions_css_tailwind.py](../../../tests/test_conventions_css_tailwind.py), Read [test_conventions_generated_catalog.py](../../../tests/test_conventions_generated_catalog.py), Read [test_conventions_source_decisions.py](../../../tests/test_conventions_source_decisions.py), Read [test_conventions_source_family_checks.py](../../../tests/test_conventions_source_family_checks.py), Read [test_conventions_sql.py](../../../tests/test_conventions_sql.py) | Fixture isolation verified by independent v5 post-check; remote acceptance pending |
+| FR-003, FR-005 | Read [conventions_corpus_fixture.py](../../../tests/conventions_corpus_fixture.py), Read [conventions_hermetic_catalogs.py](../../../tests/conventions_hermetic_catalogs.py), Read [_conventions_source_decisions_serialization.py](../../../tests/_conventions_source_decisions_serialization.py), Read [test_conventions_ars_rules.py](../../../tests/test_conventions_ars_rules.py), Read [test_conventions_css_tailwind.py](../../../tests/test_conventions_css_tailwind.py), Read [test_conventions_generated_catalog.py](../../../tests/test_conventions_generated_catalog.py), Read [test_conventions_source_decisions.py](../../../tests/test_conventions_source_decisions.py), Read [test_conventions_source_family_checks.py](../../../tests/test_conventions_source_family_checks.py), Read [test_conventions_sql.py](../../../tests/test_conventions_sql.py) | Fixture isolation verified by independent v5 post-check; remote acceptance pending |
 
 - Inspect [tests/conventions_corpus_fixture.py](../../../tests/conventions_corpus_fixture.py) for the v5 deterministic regression scope.
 - Inspect [tests/_conventions_source_decisions_serialization.py](../../../tests/_conventions_source_decisions_serialization.py) for the v5 deterministic regression scope.
@@ -150,3 +150,19 @@ The six-module targeted suite passes, and the independent v5 post-check confirms
 - Inspect [tests/test_conventions_source_decisions.py](../../../tests/test_conventions_source_decisions.py) for the v5 deterministic regression scope.
 - Inspect [tests/test_conventions_source_family_checks.py](../../../tests/test_conventions_source_family_checks.py) for the v5 deterministic regression scope.
 - Inspect [tests/test_conventions_sql.py](../../../tests/test_conventions_sql.py) for the v5 deterministic regression scope.
+
+## 2026-10-12 — Hermetic manifest and CI-step fixtures (spec-fix)
+
+- Manifest tests that classify the synthetic corpus bind copies of the shipped AST catalogs to the fixture bytes (only `source_hash` is rebound; the loader still verifies path and hash) and remove `AIRESOURCES`, so neither a private corpus nor HOME decides them. Real catalog binding stays covered against the pinned corpus. Read [conventions_hermetic_catalogs.py](../../../tests/conventions_hermetic_catalogs.py).
+- Duplicates removed: the loader-monkeypatch catalog failure, the subset executable-metadata case and the repeated payload assertions; receipt-API/CLI parity folded into one test.
+- The simulated cleanup step receives an explicit `python` shim to the running interpreter. Read [CI selection tests](../../../tests/test_generation_ci_selection.py).
+
+## 2026-10-12 — Declared unit-test dependencies (spec-fix, FR-003 / AC-003)
+
+- Cause: `typer` 0.27 vendors its own click, so `click` (imported by `tests/test_cli.py`), `jsonschema` (`tests/test_penflow_approval_models.py`) and `pluggy` (`tests/test_execution_assertion_origin.py`) only arrived transitively through the `integration` extra; a `uv sync --extra dev` environment could not collect `tests/test_cli.py` and silently skipped the strict schema test.
+- Fix: the `dev` extra in Read [pyproject.toml](../../../pyproject.toml) declares the three packages; `uv.lock` regenerated. `pytest-xdist` stays in `integration`: no test or workflow passes `-n`. CI keeps installing `.[dev,integration]`.
+- Regression: Read [test_declared_test_dependencies.py](../../../tests/test_declared_test_dependencies.py) — every third-party import (including `pytest.importorskip`) of the unit suite must resolve from runtime or `dev` requirements; `except ImportError` boundaries stay optional.
+
+| Requirement | Files | Status |
+|---|---|---|
+| FR-003 | `pyproject.toml`, `uv.lock`, `tests/test_declared_test_dependencies.py` | Fresh `uv sync --extra dev --frozen` environment collects the full unit suite |

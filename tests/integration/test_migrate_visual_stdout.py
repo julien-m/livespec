@@ -12,6 +12,10 @@ import pytest
 FIXTURE = Path(__file__).parent / "fixtures" / "migrate-visual"
 SCRIPT = Path(__file__).resolve().parents[2] / "scripts" / "migrate-visual-tests.js"
 
+pytestmark = pytest.mark.skipif(
+    shutil.which("node") is None, reason="node is not installed; migrate-visual-tests.js cannot run"
+)
+
 
 def _project_with_large_scan(tmp_path: Path, already_covered: bool) -> Path:
     project = tmp_path / "project"

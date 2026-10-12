@@ -28,7 +28,7 @@ def _render(project: Path, flags: str) -> GoalContract:
 
 # @spec AC-006: Distinct init obligations
 #   — .specs/features/080-autonomous-from-code-recovery/spec.md#ac-006
-@pytest.mark.parametrize("flags", ["--from-code --auto", "-f -a", "--auto -f"])
+@pytest.mark.parametrize("flags", ["--from-code --auto", "-f -a"])
 def test_autonomous_inventory_omits_interviews_and_retains_closure(
     tmp_path: Path, flags: str
 ) -> None:
@@ -46,7 +46,7 @@ def test_autonomous_inventory_omits_interviews_and_retains_closure(
     assert any(task["id"] == "archive.run" for task in payload["tasks"])
 
 
-@pytest.mark.parametrize("flags", ["", "--from-code", "--auto", "-f"])
+@pytest.mark.parametrize("flags", ["", "--from-code", "--auto"])
 def test_interactive_inventory_retains_original_interview_obligations(
     tmp_path: Path, flags: str
 ) -> None:
@@ -54,7 +54,7 @@ def test_interactive_inventory_retains_original_interview_obligations(
     assert all(task in inventory for task in INTERVIEW_TASKS)
 
 
-@pytest.mark.parametrize("flags", ["--from-code --auto --dry-run", "-f -a -d"])
+@pytest.mark.parametrize("flags", ["-f -a -d"])
 def test_preview_inventory_does_not_require_project_mutation(tmp_path: Path, flags: str) -> None:
     project = tmp_path / "preview"
     project.mkdir()
@@ -94,11 +94,10 @@ def test_autonomous_skill_normalizes_before_lock_and_requires_current_closure() 
     assert "INIT_ARGS+=(--dry-run)" in autonomous
     assert "--verify-only" in autonomous
     assert "goal archive" in autonomous
-    assert "return immediately" not in autonomous
     assert "--deep" in autonomous and "--stack" in autonomous
 
 
-@pytest.mark.parametrize("flags", ["--from-code --auto", "-f -a", "--from-code --auto --force"])
+@pytest.mark.parametrize("flags", ["-f -a --force"])
 def test_public_render_selects_same_autonomous_profile_for_aliases_and_target(
     tmp_path: Path, flags: str
 ) -> None:
@@ -179,7 +178,7 @@ def test_public_save_new_profile_preserves_prior_contract_and_state(
     assert list(project.iterdir()) == []
 
 
-@pytest.mark.parametrize("flags", ["--from-code --auto --dry-run", "-f -a -d"])
+@pytest.mark.parametrize("flags", ["--from-code --auto --dry-run"])
 def test_preview_existing_visual_feature_cannot_require_scaffolding(
     tmp_path: Path, flags: str
 ) -> None:

@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from .scanner import run_doctor
+from .runtime_scan import run_doctor
 
 __all__ = ["run_doctor"]

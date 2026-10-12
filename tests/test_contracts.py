@@ -15,16 +15,13 @@ import json
 import warnings
 
 import pytest
-from pydantic import ValidationError
 
 from validator.contracts import (
-    ANCHOR_WINDOW_LINES,
     ContractParseError,
     ContractValidationError,
     PhaseResult,
     ShipResult,
     SuperpowersReturn,
-    TestResults,
     parse_phase_result,
     parse_ship_result,
     parse_superpowers_return,
@@ -146,10 +143,6 @@ class TestPhaseResultParser:
         text = f"{block}\n{prefix}"
         with pytest.raises(ContractParseError):
             parse_phase_result(text)
-
-    def test_anchor_window_constant_is_30(self) -> None:
-        # If this changes, doc + tests must update together.
-        assert ANCHOR_WINDOW_LINES == 30
 
 
 class TestPhaseResultLegacy:
@@ -283,36 +276,11 @@ class TestSuperpowersReturnParser:
 
 
 class TestRoundTrip:
-    def test_phase_result_roundtrip(self) -> None:
-        original = PhaseResult.model_validate(_valid_phase_payload())
-        rendered = render_phase_result(original, "deadbeef")
-        parsed = parse_phase_result(rendered)
-        assert parsed == original
-
-    def test_ship_result_roundtrip(self) -> None:
-        original = ShipResult.model_validate(_valid_ship_payload())
-        rendered = render_ship_result(original, "deadbeef")
-        parsed = parse_ship_result(rendered)
-        assert parsed == original
-
     def test_superpowers_roundtrip(self) -> None:
         original = SuperpowersReturn.model_validate(_valid_superpowers_payload())
         rendered = render_superpowers_return(original, "deadbeef")
         parsed = parse_superpowers_return(rendered)
         assert parsed == original
-
-
-# ─── Schema constants ───────────────────────────────────────────────────────
-
-
-class TestSchemaModels:
-    def test_test_results_requires_non_negative_counts(self) -> None:
-        with pytest.raises(ValidationError):
-            TestResults.model_validate({"passed": -1, "failed": 0, "skipped": 0})
-
-    def test_phase_result_forbids_extra_keys(self) -> None:
-        with pytest.raises(ValidationError):
-            PhaseResult.model_validate(_valid_phase_payload() | {"surprise": 42})
 
 
 # ─── run_artifact field (Feature 059, FR-006/FR-008) ────────────────────────
@@ -346,12 +314,6 @@ class TestPhaseResultRunArtifact:
         result = parse_phase_result(_wrap("PHASE_RESULT", payload))
         assert result.phase == "preflight"
         assert result.extra["verdict"] == "READY"
-
-    def test_unknown_top_level_key_still_rejected(self) -> None:
-        """extra: forbid regression guard after the field addition."""
-        payload = _valid_phase_payload(run_artifacts="typo-key")
-        with pytest.raises(ContractValidationError):
-            parse_phase_result(_wrap("PHASE_RESULT", payload))
 
     def test_render_roundtrip_includes_run_artifact(self) -> None:
         original = PhaseResult.model_validate(

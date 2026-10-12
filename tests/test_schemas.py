@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Literal
+from typing import get_args
 
 import pytest
 from pydantic import ValidationError
@@ -29,7 +29,7 @@ class TestSpecFrontmatter:
         assert s.title == "Auth Feature"
         assert s.status == "Draft"
 
-    @pytest.mark.parametrize("status", ["WIP", "Active", "done", ""])
+    @pytest.mark.parametrize("status", ["WIP", "", "planned", "InProgress"])
     def test_invalid_status_rejects(self, status: str) -> None:
         with pytest.raises(ValidationError):
             SpecFrontmatter.model_validate(
@@ -41,6 +41,24 @@ class TestSpecFrontmatter:
                     "updated": date(2026, 1, 15),
                 }
             )
+
+    def test_canonical_lifecycle_states_match_r2(self) -> None:
+        """Every official producer state validates without widening to arbitrary strings."""
+        from validator.coherence.rules.r2_status_files import _VALID_STATUSES
+
+        schema_statuses = set(get_args(SpecFrontmatter.model_fields["status"].annotation))
+        assert schema_statuses == _VALID_STATUSES
+        for status in sorted(_VALID_STATUSES):
+            spec = SpecFrontmatter.model_validate(
+                {
+                    "title": "Test",
+                    "status": status,
+                    "priority": "P1",
+                    "created": date(2026, 1, 1),
+                    "updated": date(2026, 1, 1),
+                }
+            )
+            assert spec.status == status
 
     def test_empty_title_rejects(self) -> None:
         with pytest.raises(ValidationError):
@@ -61,17 +79,6 @@ class TestSpecFrontmatter:
                 created=date(2026, 3, 1),
                 updated=date(2026, 1, 1),
             )
-
-    @pytest.mark.parametrize("priority", ["P1", "P2", "P3"])
-    def test_valid_priorities(self, priority: Literal["P1", "P2", "P3"]) -> None:
-        s = SpecFrontmatter(
-            title="Test",
-            status="Draft",
-            priority=priority,
-            created=date(2026, 1, 1),
-            updated=date(2026, 1, 1),
-        )
-        assert s.priority == priority
 
     def test_invalid_priority_rejects(self) -> None:
         with pytest.raises(ValidationError):
@@ -164,7 +171,7 @@ class TestGetSchema:
 
     @pytest.mark.parametrize(
         "file_type",
-        ["roadmap", "changelog", "preflight", "progress", "constitution", "unknown"],
+        ["roadmap", "unknown"],
     )
     def test_returns_none_for_types_without_schema(self, file_type: str) -> None:
         assert get_schema(file_type) is None

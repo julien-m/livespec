@@ -10,29 +10,30 @@ title: Implementation — Behavioral TDD Audit (005.1)
 | FR | Description | File | @spec Anchor |
 |----|-------------|------|-------------|
 | FR-011 | Crash test procedure document | `.specs/features/005-ui-behavioral-testing/checks/procedure.md` | `@spec FR-011: Crash test procedure doc` |
-| FR-001 | Behavioral AC detection in /spec.implement | `tests/test_behavioral_tdd.py` | `@spec FR-001: Behavioral TDD detection` |
-| FR-004 | Skip without Behavioral AC | `tests/test_behavioral_tdd.py` | `@spec FR-004: Skip without Behavioral AC` |
-| FR-007 | Coverage matrix output | `tests/test_behavioral_tdd.py` | `@spec FR-007: Coverage matrix output` |
-| FR-008 | All covered message | `tests/test_behavioral_tdd.py` | `@spec FR-008: All covered message` |
-| FR-009 | Taxonomy ref in gaps | `tests/test_behavioral_tdd.py` | `@spec FR-009: Taxonomy ref in gaps` |
+| FR-001 | Behavioral AC detection in /spec.implement | spec-implement SKILL.md, Behavioral AC detection and Step 0a | prompt contract (no executable code) |
+| FR-004 | Skip without Behavioral AC | spec-implement SKILL.md, Step 0a skip rule | prompt contract (no executable code) |
+| FR-007 | Coverage matrix output | spec-test SKILL.md, Behavioral Audit sub-phase 1.5 | prompt contract (no executable code) |
+| FR-008 | All covered message | spec-test SKILL.md, Behavioral Audit sub-phase 1.5 | prompt contract (no executable code) |
+| FR-009 | Taxonomy ref in gaps | spec-test SKILL.md, Behavioral Audit sub-phase 1.5 | prompt contract (no executable code) |
 
 ## AC Coverage
 
 | AC | Status | Evidence |
 |----|--------|----------|
-| AC-001 | Verified | `test_implement_detects_behavioral_ac` passes |
-| AC-004 | Verified | `test_implement_skips_without_behavioral_ac` passes |
-| AC-007 | Verified | `test_test_behavioral_audit_coverage_matrix_structure` passes |
-| AC-008 | Verified | `test_test_audit_all_covered_message` passes |
-| AC-009 | Verified | `test_test_audit_missing_pattern_with_taxonomy_ref` passes |
+| AC-001 | Documented | spec-implement SKILL.md prompt contract; no automated test (see note) |
+| AC-004 | Documented | spec-implement SKILL.md prompt contract; no automated test (see note) |
+| AC-007 | Documented | spec-test SKILL.md prompt contract; no automated test (see note) |
+| AC-008 | Documented | spec-test SKILL.md prompt contract; no automated test (see note) |
+| AC-009 | Documented | spec-test SKILL.md prompt contract; no automated test (see note) |
 | AC-011 | Verified | `.specs/features/005-ui-behavioral-testing/checks/procedure.md` exists with 4 required sections |
+
+> **Note (2026-10-12):** `tests/test_behavioral_tdd.py` was removed. Its helpers `_has_behavioral_ac_section` and `_build_audit_output` were defined in the test file itself and then asserted, so the five tests exercised no LiveSpec code. The behavior exists only as SKILL.md prompt instructions executed by agents; there is no executable implementation to test.
 
 ## Files Created
 
 | File | Purpose | Lines |
 |------|---------|-------|
 | `.specs/features/005-ui-behavioral-testing/checks/procedure.md` | Crash test procedure document | 118 |
-| `tests/test_behavioral_tdd.py` | 5 unit tests for behavioral TDD/audit | 209 |
 
 ## Requirement Mapping
 

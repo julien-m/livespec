@@ -14,6 +14,33 @@ def _table(header: str, rows: list[str]) -> str:
     return header + "\n" + "\n".join(rows) + "\n"
 
 
+def _findings(profile: ObservedProfile) -> str:
+    """Return a section listing unsupported manifests and warnings, or nothing."""
+    lines = [
+        f"- `{path}`: unsupported manifest; ecosystem Unknown (not parsed)."
+        for path in profile.unsupported_manifests
+    ] + [f"- Warning: {warning}." for warning in profile.warnings]
+    return "\n## Observation Findings\n\n" + "\n".join(lines) + "\n" if lines else ""
+
+
+# @spec FR-001: Record unsupported manifests and warnings in the report
+#   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-001
+def render_recap(profile: ObservedProfile) -> str:
+    """Return the completed bootstrap report, listing unsupported manifests and warnings.
+
+    Args:
+        profile: Independently observed manifest facts.
+    Returns:
+        Completed recap bytes; written only after every success predicate holds.
+    """
+    return (
+        "---\nstatus: completed\n---\n\n"
+        "Backend artifacts and observed tooling verified.\n"
+        "Native command goal proof, after-init hooks and archive remain required.\n"
+        "Application build/UI/runtime not executed.\n" + _findings(profile)
+    )
+
+
 # @spec FR-002: Evidence-based project artifacts
 #   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-002
 def render_documents(
@@ -67,7 +94,7 @@ Read [testing strategy](testing/strategy.md).
 ## Source Evidence
 
 {evidence}
-"""
+{_findings(profile)}"""
     constitution = f"""# Constitution — {name}
 
 ## Project Identity

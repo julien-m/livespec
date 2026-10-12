@@ -195,12 +195,12 @@ flowchart TD
 - **AC-002** — Coverage capability runs `swift test --enable-code-coverage` followed by `xcrun llvm-cov export --format=lcov` to produce `lcov.info`.
 - **AC-003** — A gate script (escape hatch via `script:` key) parses the lcov.info, computes line coverage percentage, compares to threshold, and exits with the correct code.
 - **AC-004** — When an `.xcodeproj` is found without `Package.swift`, coverage capability exits 0 with a message directing the user to configure xcodebuild manually.
-- **AC-005** — Snapshots capability checks for `swift-snapshot-testing` in `Package.swift` dependencies; if absent, skips with warning and exits 0.
-- **AC-006** — Properties capability checks for `SwiftCheck` in `Package.swift`; if absent, skips with warning and exits 0.
+- **AC-005** — **Removed (2026-10-12):** ~~Snapshots capability checks for `swift-snapshot-testing` in `Package.swift` dependencies; if absent, skips with warning and exits 0.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally.
+- **AC-006** — **Removed (2026-10-12):** ~~Properties capability checks for `SwiftCheck` in `Package.swift`; if absent, skips with warning and exits 0.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally.
 - **AC-007** — Mutation capability checks for `muter` on PATH (`which muter`); if absent, emits brew install hint and exits 0.
 - **AC-008** — The gate script is stored in `livespec/drivers/scripts/swift-coverage-gate.sh` and referenced via the `script:` escape hatch key.
 - **AC-009** — The Swift driver YAML passes schema validation against `DriverSchema` (Feature 016).
-- **AC-010** — All capabilities that require parsing `Package.swift` use a dedicated parser function (not shell grep) to extract dependency names reliably.
+- **AC-010** — **Removed (2026-10-12):** ~~All capabilities that require parsing `Package.swift` use a dedicated parser function (not shell grep) to extract dependency names reliably.~~ Removed with FR-003: no remaining capability parses `Package.swift`.
 
 ---
 
@@ -208,7 +208,7 @@ flowchart TD
 
 - **FR-001** — Write `livespec/drivers/swift.yaml` with detect rule (`files: [Package.swift]`) and 4 capability blocks. Coverage block uses `script:` escape hatch (not `command:`).
 - **FR-002** — Write `livespec/drivers/scripts/swift-coverage-gate.sh`: accepts lcov.info path and threshold as args, parses DA lines, computes %, exits 0/1.
-- **FR-003** — Implement `Package.swift` dependency parser: extract `name:` values from `.package(url:, from:)` entries — used for swift-snapshot-testing and SwiftCheck detection.
+- **FR-003** — **Removed (2026-10-12):** ~~Implement `Package.swift` dependency parser: extract `name:` values from `.package(url:, from:)` entries — used for swift-snapshot-testing and SwiftCheck detection.~~ Dead code retired: `livespec test` only runs the coverage and mutation capabilities, so no production command consumes this library-presence detection; the declared command runs unconditionally.
 - **FR-004** — Implement Xcode project detection fallback: check for `*.xcodeproj` when Package.swift absent.
 - **FR-005** — Write integration tests in `tests/integration/test_driver_swift.py` for coverage (using a minimal Swift fixture).
 - **FR-006** — Write unit tests for swift-coverage-gate.sh script (input/output validation).

@@ -1,7 +1,7 @@
 ---
 command: spec-plan
 contract_version: "1.0"
-last_reviewed: 2026-09-07
+last_reviewed: 2026-10-10
 ---
 
 # Expectations — /spec-plan
@@ -35,18 +35,20 @@ Generate a technical plan with sequence, state, and ER diagrams.
 
 **update:**
 - `.specs/features/<feature>/changelog.md`
+- `.specs/features/<feature>/spec.md`: only recognized lifecycle `status` and `updated` slots in frontmatter and the bounded header, through the official `livespec finalize apply` command; status becomes `Planned` and remains synchronized with README.
 
 **optional:**
 - `## Penflow Contract Inputs` in plan.md for UI features
 - `penflow/code-ir.json` generated or verified before UI plan output
 
 **forbidden:**
-- `.specs/features/<feature>/spec.md`
+- Every other byte of `.specs/features/<feature>/spec.md`: normative body, FR/AC text and IDs, headings/title, `created`, other frontmatter, examples and comments. Do not add body markers or treat a body/example field as a lifecycle slot. Missing, duplicate or malformed lifecycle slots remain blocking.
 
 ## 5. Git Effects
 
 **expected dirty paths:**
 - `.specs/features/<feature>/plan.md`
+- `.specs/features/<feature>/spec.md` only for the lifecycle update permitted above; feature/global changelogs and `.specs/README.md` through official finalization.
 
 **forbidden changes:**
 - _(none)_

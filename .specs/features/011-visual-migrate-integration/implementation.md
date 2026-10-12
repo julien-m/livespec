@@ -34,7 +34,7 @@ title: Implementation — 011-visual-migrate-integration
 | AC-007 | tests/integration/test_migrate_visual.py::test_sentinel_shows_zero_when_all_covered | ✅ |
 | AC-008 | tests/integration/test_migrate_visual.py::test_idempotent_on_second_run | ✅ |
 | AC-009 | tests/integration/test_migrate_visual.py::test_picks_up_new_feature_on_rerun | ✅ |
-| AC-010 | tests/integration/test_migrate_visual.py::test_warning_when_script_missing | ✅ |
+| AC-010 | .agent-sync/skills/spec-migrate/SKILL.md Step 4.5 guard (command-layer spec) — no automated test; the former `test_warning_when_script_missing` only checked that Node fails on a missing file (removed 2026-10-12) | Documented |
 | AC-011 | .agent-sync/skills/spec-migrate/SKILL.md Step 4.5 guard (command-layer spec) — no automated test; PATH manipulation deferred | Documented |
 | AC-012 | tests/integration/test_migrate_visual.py::test_nonzero_exit_on_missing_specs_dir | ✅ |
 

@@ -12,13 +12,13 @@ from validator.visual_gate import (
     _has_feature_scoped_penflow,
     _legacy_manifest_mockup_checks,
     _legacy_mockup_hash,
-    _manifest_status_to_dict,
     _read_manifest_mapping,
     _read_spec_visual_marker,
     _resolve_legacy_mockup_path,
     _surfaces_yaml_mentions_feature,
     detect_visual_feature,
     promote_baseline,
+    validate_gate,
 )
 
 # ---------------------------------------------------------------------------
@@ -290,8 +290,16 @@ def test_resolve_legacy_mockup_path_relative_escape(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_manifest_status_to_dict_none() -> None:
-    assert _manifest_status_to_dict(None) is None
+def test_non_visual_report_serializes_without_manifest_status(tmp_path: Path) -> None:
+    slug = "001-no-ui"
+    _write_spec(tmp_path, slug, marker="visual: false")
+    report = validate_gate(
+        project_root=tmp_path, feature_slug=slug, command="spec-test", target=None
+    )
+    payload = json.loads(json.dumps(report.to_dict()))
+    assert payload["verdict"] == "PASS"
+    assert payload["classification"] == "NON_VISUAL"
+    assert payload["manifest_status"] is None
 
 
 # ---------------------------------------------------------------------------
