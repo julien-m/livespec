@@ -13,8 +13,10 @@ from __future__ import annotations
 import os
 import shlex
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
 
+from ..exceptions import DriverTestSelectionError
 from .placeholders import resolve_argv_placeholders
 from .preconditions import capability_skip_message
 from .schemas import (
@@ -50,6 +52,7 @@ def run_capability(
     env: dict[str, str] | None = None,
     timeout: float | None = None,
     feature: str | None = None,
+    test_paths: Sequence[str] | None = None,
 ) -> CapabilityResult:
     """Execute a capability, retaining gaps when its result cannot certify acceptance.
 
@@ -60,6 +63,8 @@ def run_capability(
         env: Overrides merged onto ``os.environ``; capture owns evidence variables.
         timeout: Subprocess limit in seconds; captured timeouts return exit 124.
         feature: Feature bound to receipt capture when a report adapter is declared.
+        test_paths: Selected test files appended to the argv; requires the capability
+            to declare ``test_selection: append`` (feature 035 AC-002).
 
     Returns:
         Process output, exit code and certification gaps; missing commands return 127.
@@ -68,6 +73,8 @@ def run_capability(
     Raises:
         ValueError: Invalid capability, command quoting, runner or capture publication.
         CapabilityNotImplementedError: The driver does not define the capability.
+        DriverTestSelectionError: ``test_paths`` given to a capability without
+            ``test_selection: append``.
         FileNotFoundError: A script reference or capture root does not exist.
         OSError: Process launch or capture storage fails outside handled missing commands.
         subprocess.TimeoutExpired: An uncaptured command exceeds its timeout.
@@ -96,6 +103,12 @@ def run_capability(
     proc_env = {**os.environ, **(env or {})}
 
     argv = _capability_argv(driver, capability, cap, cwd)
+    if test_paths is not None:
+        # @spec AC-002: Append selected tests only on opt-in
+        # — .specs/features/035-unified-cli-surface/spec.md#ac-002
+        if cap.test_selection != "append":
+            raise DriverTestSelectionError(driver.name, capability)
+        argv = [*argv, *test_paths]
     if cap.report_adapter is not None and feature is not None:
         return _run_captured(cap, capability, argv, cwd, proc_env, timeout, feature)
     return _run_uncertified(cap, capability, argv, cwd, proc_env, timeout)

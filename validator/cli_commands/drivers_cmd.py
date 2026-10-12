@@ -11,11 +11,11 @@ import json
 
 import typer
 
-from ..cli_exit_codes import EXIT_MISSING_SPECS
 from ..drivers.registry import DriverRegistry
 from ..drivers.test_config import pick_primary_driver
 from ._common import (
     emit_summary,
+    help_epilog,
     join_capabilities,
     require_specs_root,
     run_with_debug,
@@ -41,7 +41,6 @@ def drivers_command(
         lambda: _run_drivers(as_json=as_json),
         debug=debug,
         subcommand="drivers",
-        fail_exit_code=EXIT_MISSING_SPECS,
     )
 
 
@@ -50,6 +49,7 @@ def register(app: typer.Typer) -> None:
     app.command(
         name="drivers",
         help="List discoverable drivers for the current project.",
+        epilog=help_epilog("livespec drivers --json"),
     )(drivers_command)
 
 
@@ -116,6 +116,7 @@ def _run_drivers(*, as_json: bool) -> None:
         total=len(all_drivers),
         matching=len(matching),
         primary=primary_name or "-",
+        to_stderr=as_json,
     )
 
 

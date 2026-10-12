@@ -26,6 +26,7 @@ from pathlib import Path
 import yaml  # type: ignore[import-untyped]  # PyYAML has no typed metadata.
 from pydantic import ValidationError
 
+from ..exceptions import XcuitestTargetUnresolvedError
 from .capabilities import validate_runner_capability
 from .compiler_registry import get_compiler_backend
 from .fixtures import (
@@ -44,11 +45,19 @@ from .models import (
     JourneySeverity,
     JsonValue,
 )
-from .paths import relative_to_project, slug_to_pascal, slug_to_snake, visual_contracts_dir
+from .paths import (
+    relative_to_project,
+    resolve_xcuitest_target_dir,
+    slug_to_pascal,
+    slug_to_snake,
+    visual_contracts_dir,
+)
 from .schema import JourneySourceV2, JourneyTargetRef, VisualCheckMode
 from .validator import validate_journeys
 
 HASH_MARKER = "livespec-journey-source-hash:"
+# Configuration error code: `livespec journey compile` exits 3 when it is present.
+XCUITEST_TARGET_UNRESOLVED = "journey_xcuitest_target_unresolved"
 UI_TEST_JOURNEY_AUTH_ENV = "UI_TEST_JOURNEY_AUTH"
 UI_TEST_JOURNEY_FIXTURES_ENV = "UI_TEST_JOURNEY_FIXTURES"
 UI_TEST_JOURNEY_MOCKS_ENV = "UI_TEST_JOURNEY_MOCKS"
@@ -114,7 +123,18 @@ def compile_journeys(
         except _JourneySourceReadError as error:
             issues.append(_source_read_issue(error))
             continue
-        output_path = _native_artifact_path(project_root, source)
+        try:
+            output_path = _native_artifact_path(project_root, source)
+        except XcuitestTargetUnresolvedError as error:
+            issues.append(
+                JourneyIssue(
+                    code=XCUITEST_TARGET_UNRESOLVED,
+                    severity=JourneySeverity.ERROR,
+                    message=str(error),
+                    path=source.path,
+                )
+            )
+            continue
         content = _compile_native(project_root, source, source_model, contract)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(content, encoding="utf-8")
@@ -248,7 +268,8 @@ def _native_artifact_path(project_root: Path, journey: JourneyFile) -> Path:
         return project_root / "tests" / "e2e" / "journeys" / f"{stem}.spec.ts"
     if journey.runner == "xcuitest":
         filename = f"{slug_to_pascal(journey.journey_id)}Journey.swift"
-        return project_root / "STRAPTUITests" / "Journeys" / filename
+        target_dir = resolve_xcuitest_target_dir(project_root, journey.target_surface)
+        return target_dir / "Journeys" / filename
     if journey.runner == "maestro":
         return project_root / ".specs" / "maestro" / "journeys" / f"{stem}.yaml"
     filename = f"{stem}.{journey.runner}.txt"
@@ -460,6 +481,20 @@ def _playwright_step(step: dict[str, JsonValue]) -> list[str]:
         return ["await page.goBack();"]
     if action == "press" and isinstance(payload, dict):
         return [f"await page.keyboard.press({_literal(str(payload.get('key', 'Enter')))});"]
+    if action == "select" and isinstance(payload, dict):
+        # @spec FR-005: select compiles on Playwright
+        # — .specs/features/056-executable-user-journeys/spec.md#fr-005
+        target = _playwright_locator(_target_from_payload(payload))
+        return [f"await {target}.selectOption({_literal(str(payload.get('value', '')))});"]
+    if action == "wait" and isinstance(payload, dict):
+        # @spec AC-003: Bounded conditional wait
+        # — .specs/features/056-executable-user-journeys/spec.md#ac-003
+        timeout_ms = _wait_seconds(payload) * 1000
+        until = payload.get("until")
+        if isinstance(until, dict):
+            locator = _playwright_locator(_target_from_payload(until))
+            return [f"await expect({locator}).toBeVisible({{ timeout: {timeout_ms} }});"]
+        return [f"await page.waitForTimeout({timeout_ms});"]
     raise ValueError(f"unsupported playwright action after capability validation: {action}")
 
 
@@ -564,6 +599,26 @@ def _xcuitest_step(step: dict[str, JsonValue]) -> list[str]:
         return _xcuitest_screenshot()
     if action == "back":
         return ['app.buttons["Back"].tap()']
+    if action == "wait" and isinstance(payload, dict):
+        # @spec AC-003: Bounded conditional wait (exists and hittable)
+        # — .specs/features/056-executable-user-journeys/spec.md#ac-003
+        seconds = _wait_seconds(payload)
+        until = payload.get("until")
+        if not isinstance(until, dict):
+            return [f"Thread.sleep(forTimeInterval: {seconds})"]
+        return [
+            "XCTAssertEqual(",
+            "    XCTWaiter.wait(",
+            "        for: [XCTNSPredicateExpectation(",
+            '            predicate: NSPredicate(format: "exists == true AND hittable == true"),',
+            f"            object: {_xcuitest_target(until)}",
+            "        )],",
+            f"        timeout: {seconds}",
+            "    ),",
+            "    .completed,",
+            f"    {_swift_literal('journey wait timed out: ' + _target_identifier(until))}",
+            ")",
+        ]
     raise ValueError(f"unsupported xcuitest action after capability validation: {action}")
 
 
@@ -681,7 +736,21 @@ def _maestro_step(step: dict[str, JsonValue]) -> list[dict[str, object]]:
         return [{"back": True}]
     if action == "press" and isinstance(payload, dict):
         return [{"pressKey": str(payload.get("key", "Enter"))}]
+    until = payload.get("until") if isinstance(payload, dict) else None
+    if action == "wait" and isinstance(payload, dict) and isinstance(until, dict):
+        # @spec AC-003: Bounded conditional wait
+        # — .specs/features/056-executable-user-journeys/spec.md#ac-003
+        timeout_ms = _wait_seconds(payload) * 1000
+        return [{"extendedWaitUntil": {"visible": _target_text(until), "timeout": timeout_ms}}]
     raise ValueError(f"unsupported maestro action after capability validation: {action}")
+
+
+def _wait_seconds(payload: dict[str, JsonValue]) -> int:
+    """Return the validated positive ``seconds`` of a wait payload."""
+    seconds = payload.get("seconds")
+    if not isinstance(seconds, int) or isinstance(seconds, bool) or seconds <= 0:
+        raise ValueError("wait payload requires positive integer seconds")
+    return seconds
 
 
 def _target_text(payload: dict[str, JsonValue]) -> str:

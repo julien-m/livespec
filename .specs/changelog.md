@@ -7,6 +7,11 @@
 
 ---
 
+## 2026-10-12 — Bugfix: missing requirements of features 035 and 056 implemented
+
+- [Feature 056](features/056-executable-user-journeys/changelog.md) Fix: AC-003, AC-004 and AC-015 were marked done but not implemented on the v2 path. `wait` now takes `until`/`reason` (bounded waits in Playwright, XCUITest and Maestro, `wait_reason_missing` warning), and manual journeys require `manual_reason`. Also fixed: FR-005 `select` (Playwright) and FR-007 portable XCUITest destination, with no hardcoded `STRAPTUITests`. Spec clarified and plan rewritten on the v2 pipeline after independent reviews.
+- [Feature 035](features/035-unified-cli-surface/changelog.md) Fix: every unified command's `--help` ends with an executable example (AC-013). Human decisions applied: constitution exit codes 0/1/2/3/130, base branch `origin/HEAD` then main/master/develop/dev, CI summary on stderr with `--json`, and real `--feature` selection through `SmartTestSelector` plus the additive driver field `test_selection: append` ([016](features/016-cross-language-test-driver-architecture/changelog.md)). implementation.md created; status In Progress pending the feature-scope conventions debt.
+
 ## 2026-10-12 — Refactor: dead-code resolution (wire or retire)
 
 - Wired: the Python driver now resolves `{module}`/`{report_path}`/`{threshold}` (via the previously unused `detect_python_module`), fixing `livespec test` on Python projects (017); iOS/Android UI runner detection now reads the `ios.yaml`/`android.yaml` `detect:` blocks (030, 031).

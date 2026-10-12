@@ -11,20 +11,22 @@ from __future__ import annotations
 
 #: Operation completed successfully.
 EXIT_OK: int = 0
-#: Required environment is missing — typically ``.specs/`` is absent or the
-#: command was invoked outside a git working tree.
+#: The run itself failed: test suite failure, coverage or mutation threshold not
+#: met, or an unexpected exception (constitution "general error").
+EXIT_FAILURE: int = 1
+#: Required environment is missing — ``.specs/`` is absent or the command was
+#: invoked outside a git working tree. Every ``livespec`` command shares this
+#: through ``require_specs_root``, so it stays at the general-error code 1.
 EXIT_MISSING_SPECS: int = 1
-#: No driver matched the project — see ``livespec drivers`` for the list of
-#: known stacks.
-EXIT_NO_DRIVER: int = 2
-#: A coverage threshold failed (used by ``livespec test`` and
-#: ``livespec coverage``).
-EXIT_COVERAGE_FAIL: int = 3
-#: The active driver does not implement the requested capability — for
-#: example, ``livespec mutation`` on a driver without a ``mutation`` block.
-EXIT_CAPABILITY_UNSUPPORTED: int = 4
-#: ``livespec preflight`` detected at least one critical missing tool.
-EXIT_PREFLIGHT_FAIL: int = 5
+#: Invalid arguments: Typer/Click usage errors or a ``--feature`` value that
+#: matches zero or several feature directories.
+EXIT_USAGE: int = 2
+#: Missing configuration: no driver detected, lcov report not found, capability
+#: absent (or without ``test_selection: append`` for ``--feature``), no selected
+#: test, preflight manifest or critical tool missing, no resolvable base branch.
+EXIT_CONFIG: int = 3
+#: Interrupted by Ctrl+C (128 + SIGINT).
+EXIT_INTERRUPTED: int = 130
 #: ``livespec visual-gate validate`` detected a comparison drift, a broken
 #: registry invariant (e.g. physical copy where a symlink is required), a
 #: runtime capture stored under ``.specs/design/screens/``, or a Penflow /
@@ -49,14 +51,14 @@ EXIT_FINALIZE_BLOCKED: int = 9
 EXIT_FINALIZE_VERIFY_FAIL: int = 10
 
 __all__ = [
-    "EXIT_CAPABILITY_UNSUPPORTED",
-    "EXIT_COVERAGE_FAIL",
+    "EXIT_CONFIG",
+    "EXIT_FAILURE",
     "EXIT_FINALIZE_BLOCKED",
     "EXIT_FINALIZE_VERIFY_FAIL",
+    "EXIT_INTERRUPTED",
     "EXIT_MISSING_SPECS",
-    "EXIT_NO_DRIVER",
     "EXIT_OK",
-    "EXIT_PREFLIGHT_FAIL",
+    "EXIT_USAGE",
     "EXIT_VISUAL_GATE_BLOCKED",
     "EXIT_VISUAL_GATE_CLEANUP_DRIFT",
     "EXIT_VISUAL_GATE_FAIL",

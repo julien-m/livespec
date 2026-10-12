@@ -202,3 +202,67 @@ class SdkTestRunError(Exception):
         super().__init__(f"pytest subprocess failed ({reason}): {' '.join(command)}")
         self.command = command
         self.reason = reason
+
+
+class FeatureResolutionError(Exception):
+    """Raised when a ``--feature`` value does not name exactly one feature directory.
+
+    Args:
+        value: The ``--feature`` argument as typed by the user.
+        matches: Feature directory names that matched (zero or several).
+    """
+
+    # @spec AC-002: Unique feature resolution
+    # — .specs/features/035-unified-cli-surface/spec.md#ac-002
+
+    def __init__(self, value: str, matches: list[str]) -> None:
+        found = ", ".join(matches) if matches else "none"
+        super().__init__(
+            f"--feature {value!r} must match exactly one .specs/features/ directory "
+            f"(matched: {found}). Pass the number (e.g. 035) or the full directory name."
+        )
+        self.value = value
+        self.matches = matches
+
+
+class DriverTestSelectionError(Exception):
+    """Raised when a capability cannot run a selected subset of tests.
+
+    Args:
+        driver_name: Driver whose capability lacks ``test_selection: append``.
+        capability: Capability name that was asked to run selected tests.
+    """
+
+    # @spec AC-002: Explicit refusal without test_selection
+    # — .specs/features/035-unified-cli-surface/spec.md#ac-002
+
+    def __init__(self, driver_name: str, capability: str) -> None:
+        super().__init__(
+            f"driver {driver_name!r} {capability} capability does not declare "
+            "test_selection: append, so it cannot run feature-scoped tests. "
+            "Add `test_selection: append` to the capability or run without --feature."
+        )
+        self.driver_name = driver_name
+        self.capability = capability
+
+
+class XcuitestTargetUnresolvedError(Exception):
+    """Raised when no single XCUITest target directory receives generated journeys.
+
+    Args:
+        surface: Journey surface (``ios`` or ``watchos``).
+        candidates: Matching ``*UITests`` directory names (zero or several).
+    """
+
+    # @spec FR-007: Explicit refusal instead of a hardcoded destination
+    # — .specs/features/056-executable-user-journeys/spec.md#fr-007
+
+    def __init__(self, surface: str, candidates: list[str]) -> None:
+        found = ", ".join(candidates) if candidates else "none"
+        super().__init__(
+            f"cannot resolve the {surface} XCUITest target directory (candidates: {found}); "
+            f"keep exactly one top-level *UITests directory for {surface} or declare testDir "
+            "on the matching runner: xcuitest surface in .specs/surfaces.yaml"
+        )
+        self.surface = surface
+        self.candidates = candidates

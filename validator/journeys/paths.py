@@ -15,6 +15,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import yaml
+
+from ..exceptions import XcuitestTargetUnresolvedError
+
 _NON_IDENTIFIER_RE = re.compile(r"[^0-9A-Za-z]+")
 
 
@@ -131,21 +135,63 @@ def slug_to_pascal(value: str) -> str:
     return "".join(part.capitalize() for part in slug_to_snake(value).split("_")) or "Journey"
 
 
-def compiled_artifact_path(project_root: Path, feature: str, journey_id: str, surface: str) -> Path:
-    """Return the native artifact destination for a journey target surface."""
-    stem = slug_to_snake(journey_id)
-    if surface == "web":
-        return project_root / "tests" / "e2e" / "journeys" / feature / f"{stem}.spec.ts"
-    if surface in {"ios", "watchos"}:
-        return (
-            project_root
-            / "STRAPTUITests"
-            / "Journeys"
-            / f"{slug_to_pascal(journey_id)}Journey.swift"
-        )
-    if surface in {"android", "maestro"}:
-        return project_root / ".specs" / "maestro" / "journeys" / feature / f"{stem}.yaml"
-    return project_root / ".specs" / "journeys" / ".compiled" / feature / f"{stem}.{surface}.txt"
+def resolve_xcuitest_target_dir(project_root: Path, surface: str) -> Path:
+    """Return the XCUITest target directory that receives generated journeys.
+
+    An explicit ``testDir`` on the matching ``runner: xcuitest`` surface of
+    ``.specs/surfaces.yaml`` (matched by ``platform``) wins. Otherwise the
+    project's unique top-level ``*UITests`` directory is used: for ``ios`` the
+    one without ``watch`` in its name, for ``watchos`` the one with it
+    (case-insensitive). No project name is hardcoded.
+
+    Args:
+        project_root: Project root containing ``.specs/``.
+        surface: ``ios`` or ``watchos``.
+
+    Returns:
+        The target directory; artifacts go under its ``Journeys/`` subdirectory.
+
+    Raises:
+        XcuitestTargetUnresolvedError: When zero or several directories match.
+    """
+    # @spec FR-007, AC-006, AC-007: project-resolved XCUITest destination
+    # — .specs/features/056-executable-user-journeys/spec.md#fr-007
+    override = _surfaces_test_dir(project_root, surface)
+    if override is not None:
+        return project_root / override
+    wants_watch = surface == "watchos"
+    candidates = sorted(
+        path.name
+        for path in project_root.glob("*UITests")
+        if path.is_dir() and ("watch" in path.name.lower()) == wants_watch
+    )
+    if len(candidates) != 1:
+        raise XcuitestTargetUnresolvedError(surface, candidates)
+    return project_root / candidates[0]
+
+
+def _surfaces_test_dir(project_root: Path, surface: str) -> str | None:
+    """Return the declared ``testDir`` of the xcuitest surface for ``surface``."""
+    surfaces_path = project_root / ".specs" / "surfaces.yaml"
+    if not surfaces_path.is_file():
+        return None
+    try:
+        parsed: object = yaml.safe_load(surfaces_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError):
+        return None
+    raw = parsed.get("surfaces") if isinstance(parsed, dict) else None
+    entries: list[object] = raw if isinstance(raw, list) else []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        runner = str(entry.get("runner", "")).lower()
+        platform = str(entry.get("platform", "")).lower()
+        test_dir = entry.get("testDir")
+        if runner == "xcuitest" and platform == surface and isinstance(test_dir, str):
+            stripped = test_dir.strip()
+            if stripped:
+                return stripped
+    return None
 
 
 def relative_to_project(project_root: Path, path: Path) -> str:

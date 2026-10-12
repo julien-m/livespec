@@ -393,6 +393,8 @@ def _write_fixture_journey(
     mocks: list[str] | None = None,
     bootstrap_yaml: str = "",
 ) -> Path:
+    # FR-007 (056): XCUITest compilation needs one project *UITests target directory.
+    (specs.parent / "STRAPTUITests").mkdir(exist_ok=True)
     journey_dir = specs / "journeys" / journey_id
     journey_dir.mkdir(parents=True, exist_ok=True)
     preconditions_lines = ["preconditions:"]

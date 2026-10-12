@@ -36,6 +36,7 @@ def test_run_journeys_executes_xcuitest_with_only_testing(
         .replace("route: /signup", "route: strapt://signup"),
         encoding="utf-8",
     )
+    (tmp_path / "STRAPTUITests").mkdir()
     compile_result = compile_journeys(tmp_path, journey="onboarding-first-project")
     assert compile_result.error_count == 0
     (tmp_path / "App.xcodeproj").mkdir()
@@ -351,6 +352,7 @@ surfaces:
       destination: platform=iOS Simulator,id=IPHONE-CONFIG
   - id: straptwatchuitests
     name: STRAPTWATCHUITests
+    testDir: STRAPTUITests
     runner: xcuitest
     platform: watchos
     runnerConfig:

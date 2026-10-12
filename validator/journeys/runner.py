@@ -180,7 +180,18 @@ def run_journeys(
             disabled.append(source.id)
             continue
         if policy is RunPolicyValue.MANUAL or source.status.value == "manual":
-            manual.append(source.id)
+            # @spec AC-015: A manual journey without a reason cannot suppress execution
+            # — .specs/features/056-executable-user-journeys/spec.md#ac-015
+            if source.lacks_manual_reason:
+                issues.append(
+                    _issue(
+                        "journey_manual_reason_missing",
+                        "manual journeys require manual_reason",
+                        source_path,
+                    )
+                )
+            else:
+                manual.append(source.id)
             continue
         manifest = read_compiled_manifest(project_root, source.id)
         current_hash = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()

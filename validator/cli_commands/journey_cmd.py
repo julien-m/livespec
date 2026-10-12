@@ -23,7 +23,9 @@ from typing import Annotated
 import typer
 
 from validator.cli_commands._common import emit_summary, require_specs_root
+from validator.cli_exit_codes import EXIT_CONFIG
 from validator.journeys import compile_journeys, scan_journeys, validate_journeys
+from validator.journeys.compiler import XCUITEST_TARGET_UNRESOLVED
 from validator.journeys.fixtures import scaffold_fixtures_contract
 from validator.journeys.impact import analyze_journey_impacts
 from validator.journeys.index import build_journey_index
@@ -108,6 +110,10 @@ def compile_command(
         compiled=len(result.artifacts),
         errors=result.error_count,
     )
+    # @spec FR-007: an unresolved XCUITest target is a configuration error (exit 3)
+    # — .specs/features/056-executable-user-journeys/spec.md#fr-007
+    if any(issue.code == XCUITEST_TARGET_UNRESOLVED for issue in result.issues):
+        raise typer.Exit(EXIT_CONFIG)
     raise typer.Exit(0 if result.error_count == 0 else 1)
 
 

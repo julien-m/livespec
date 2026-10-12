@@ -84,24 +84,24 @@ def _write_v2(project_root: Path, journey_id: str, data: dict[str, object]) -> N
     target = data.get("target")
     surface = target.get("surface", "web") if isinstance(target, dict) else "web"
     steps = [{"action": "open", "target": {"route": "/"}}]
-    source.write_text(
-        yaml.safe_dump(
-            {
-                "schema_version": 2,
-                "id": journey_id,
-                "title": str(data.get("title") or journey_id),
-                "status": "active",
-                "description": f"Migrated v1 journey {journey_id}.",
-                "covers": covers_list,
-                "run_policy": {"local": str(data.get("run_policy") or "always")},
-                "targets": [{"surface": surface, "runner": "playwright"}],
-                "steps": steps,
-                "privacy": {"llm_allowed": False, "retention": "none"},
-            },
-            sort_keys=False,
-        ),
-        encoding="utf-8",
-    )
+    document: dict[str, object] = {
+        "schema_version": 2,
+        "id": journey_id,
+        "title": str(data.get("title") or journey_id),
+        "status": "active",
+        "description": f"Migrated v1 journey {journey_id}.",
+        "covers": covers_list,
+        "run_policy": {"local": str(data.get("run_policy") or "always")},
+        "targets": [{"surface": surface, "runner": "playwright"}],
+        "steps": steps,
+        "privacy": {"llm_allowed": False, "retention": "none"},
+    }
+    manual_reason = data.get("manual_reason")
+    if isinstance(manual_reason, str) and manual_reason.strip():
+        # @spec AC-015: Migration keeps the manual reason
+        # — .specs/features/056-executable-user-journeys/spec.md#ac-015
+        document["manual_reason"] = manual_reason.strip()
+    source.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
     (source.parent / "changelog.md").write_text(
         "# Changelog\n\n## 2026-06-04 - Migration\n\n- Migrated from v1 journey source.\n",
         encoding="utf-8",

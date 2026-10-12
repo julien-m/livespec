@@ -183,7 +183,7 @@ def test_coverage_no_diff_exits_zero(monkeypatch: pytest.MonkeyPatch, tmp_path: 
     assert "LIVESPEC coverage" in result.output
 
 
-def test_coverage_unsupported_exits_4(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_coverage_unsupported_exits_3(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     _make_python_project(tmp_path)
     monkeypatch.chdir(tmp_path)
     with (
@@ -203,7 +203,7 @@ def test_coverage_unsupported_exits_4(monkeypatch: pytest.MonkeyPatch, tmp_path:
             detect=DetectRule(files=["pyproject.toml"]),
         )
         result = runner.invoke(app, ["coverage"])
-    assert result.exit_code == 4, result.output
+    assert result.exit_code == 3, result.output
     assert "does not declare a coverage capability" in result.output
 
 
@@ -212,13 +212,13 @@ def test_coverage_unsupported_exits_4(monkeypatch: pytest.MonkeyPatch, tmp_path:
 # ---------------------------------------------------------------------------
 
 
-def test_preflight_missing_manifest_exits_5(
+def test_preflight_missing_manifest_exits_3(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     _make_python_project(tmp_path)
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["preflight"])
-    assert result.exit_code == 5, result.output
+    assert result.exit_code == 3, result.output
 
 
 def test_preflight_read_only_table(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -265,7 +265,7 @@ def test_test_subcommand_happy_path(monkeypatch: pytest.MonkeyPatch, tmp_path: P
         )
 
     with patch(
-        "validator.cli_commands.test_cmd.run_capability",
+        "validator.cli_commands.test_selection.run_capability",
         side_effect=_fake_run_positional,
     ):
         result = runner.invoke(app, ["test"])
@@ -279,13 +279,13 @@ def test_test_subcommand_happy_path(monkeypatch: pytest.MonkeyPatch, tmp_path: P
 # ---------------------------------------------------------------------------
 
 
-def test_mutation_unsupported_exits_4(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    """EC-004: driver without mutation capability returns exit 4."""
+def test_mutation_unsupported_exits_3(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """EC-004: driver without mutation capability returns exit 3 (missing configuration)."""
     _make_python_project(tmp_path)
     monkeypatch.chdir(tmp_path)
     with patch("validator.cli_commands.mutation_cmd.run_mutation", return_value=None):
         result = runner.invoke(app, ["mutation"])
-    assert result.exit_code == 4, result.output
+    assert result.exit_code == 3, result.output
     assert "does not implement mutation" in result.output
 
 
@@ -308,6 +308,6 @@ def test_mutation_threshold_uses_percentage_units(
 
     with patch("validator.cli_commands.mutation_cmd.run_mutation", return_value=fake_result):
         result = runner.invoke(app, ["mutation", "--threshold", "80"])
-    assert result.exit_code == 3, result.output
+    assert result.exit_code == 1, result.output
     assert "threshold=80.0%" in result.output
     assert "FAIL" in result.output

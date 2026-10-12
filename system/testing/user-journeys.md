@@ -144,6 +144,47 @@ surface-agnostic maps keep the schema forward-compatible.
 existing journeys (ids enumerated, surfaces inferred from targets, no screens,
 no markers, no bootstrap block) and never overwrites an existing file.
 
+## Steps, Waits, Manual Journeys and Native Targets
+
+<!-- @spec FR-001: Wait, manual, select and XCUITest target rules
+     — ../../.specs/features/056-executable-user-journeys/spec.md#fr-001 -->
+
+- `wait` always declares a positive integer `seconds`. With `until` (a target)
+  it compiles to a bounded conditional wait: Playwright
+  `expect(<locator>).toBeVisible({ timeout })`, XCUITest `XCTWaiter` on
+  `exists == true AND hittable == true`, Maestro `extendedWaitUntil`.
+  Without `until` it is a fixed delay (Playwright `waitForTimeout`, XCUITest
+  `Thread.sleep`; Maestro refuses it). A fixed delay without a non-blank
+  `reason` triggers the warning `wait_reason_missing`
+  (`wait.seconds at step N needs until or reason`); `until` on any other
+  action, or a `wait` without `seconds`, fails schema validation.
+
+  ```yaml
+  - action: wait
+    seconds: 10
+    until: { text: "Dashboard", product_contract: true }
+  - action: wait
+    seconds: 2
+    reason: Toast animation settles.
+  ```
+
+- A journey is manual when its `status` or any `run_policy` stage is
+  `manual`. It must declare a non-blank top-level `manual_reason`; otherwise
+  `livespec journey validate` fails with `journey_manual_reason_missing`, the
+  journey is not counted as a manual obligation, and `livespec journey run`
+  reports the same error instead of skipping it. `journey migrate --from-v1`
+  keeps a v1 `manual_reason`.
+- `select` (target + string `value`) compiles only on Playwright
+  (`<locator>.selectOption(value)`); XCUITest and Maestro refuse it with
+  `journey_capability_unsupported`.
+- XCUITest artifacts go to `<Target>/Journeys/<Name>Journey.swift`. An
+  explicit `testDir` on the matching `runner: xcuitest` surface of
+  `.specs/surfaces.yaml` (matched by `platform: ios|watchos`) wins; otherwise
+  `<Target>` is the project's unique top-level `*UITests` directory, without
+  `watch` in its name for `ios`, with `watch` for `watchos`
+  (case-insensitive). Zero or several candidates fail compilation with
+  `journey_xcuitest_target_unresolved`, and `livespec journey compile` exits 3.
+
 ## Execution Rules
 
 - Create/edit validates, compiles once, runs once, and records history.
