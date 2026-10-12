@@ -1,6 +1,6 @@
 # Changelog - 082-conventions-gate-signal
 
-### 2026-10-10 — Spec: Feature specification created
+## 2026-10-10 — [Spec]: Feature specification created
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (created — all sections)
@@ -14,7 +14,7 @@
 
 <!-- finalize:spec-specify:2026-10-10:e39214b3 -->
 
-### 2026-10-10 — Plan: Technical plan generated
+## 2026-10-10 — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No requirement changes; lifecycle status Planned
@@ -25,7 +25,7 @@
 
 <!-- finalize:spec-plan:2026-10-10:a5ebf692 -->
 
-### 2026-10-11 — Feature: Conventions gate signal implemented
+## 2026-10-11 — [Feature]: Conventions gate signal implemented
 
 - **Type:** Feature
 - **Spec modified:** No requirement changes; lifecycle status Implemented
@@ -37,7 +37,7 @@
 
 <!-- finalize:spec-implement:2026-10-11:41daaa07 -->
 
-### 2026-10-12 — Bugfix: nested worktrees excluded from the source scan
+## 2026-10-12 — [Bugfix]: nested worktrees excluded from the source scan
 
 - **Type:** Bugfix
 - **Spec modified:** No

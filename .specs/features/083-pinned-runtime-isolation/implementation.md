@@ -1,3 +1,11 @@
+---
+created: 2026-10-11
+feature: 083-pinned-runtime-isolation
+title: 'Implementation Map: Pinned Runtime Isolation'
+type: implementation
+updated: 2026-10-12
+---
+
 # Implementation — Pinned Runtime Isolation
 
 > Read [spec](spec.md) and [plan](plan.md). Non-UI feature (CLI + files); no visual baselines.

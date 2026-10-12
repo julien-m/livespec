@@ -1,3 +1,11 @@
+---
+created: 2026-10-10
+feature: 082-conventions-gate-signal
+title: 'Implementation Map: Conventions Gate Signal'
+type: implementation
+updated: 2026-10-12
+---
+
 # Implementation: Conventions Gate Signal
 
 > Feature 082 · Read [spec](spec.md) and [plan](plan.md). Updated by `/spec-implement`.

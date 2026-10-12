@@ -1,6 +1,6 @@
 # Changelog - 083-pinned-runtime-isolation
 
-### 2026-10-11 — Spec: Feature specification created
+## 2026-10-11 — [Spec]: Feature specification created
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (created — all sections: pinned runtime snapshots, CLI shim, pin/upgrade/dev, tool/project boundary and defect reports, drift detection, documentation)
@@ -13,7 +13,7 @@
 
 <!-- finalize:spec-specify:2026-10-11:60b23cb4 -->
 
-### 2026-10-11 — Plan: Technical plan generated
+## 2026-10-11 — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No (lifecycle status only: Planned)
@@ -28,7 +28,7 @@
 
 <!-- finalize:spec-plan:2026-10-11:5ddfddac -->
 
-### 2026-10-11 — Feature: Pinned runtime implementation (steps 1-9; conventions certification pending)
+## 2026-10-11 — [Feature]: Pinned runtime implementation (steps 1-9; conventions certification pending)
 
 - **Type:** Feature
 - **Spec modified:** No (lifecycle status only: In Progress)
@@ -41,7 +41,7 @@
 
 <!-- finalize:spec-implement:2026-10-11:68d31117 -->
 
-### 2026-10-11 — Feature: Pinned runtime implementation certified (resume)
+## 2026-10-11 — [Feature]: Pinned runtime implementation certified (resume)
 
 - **Type:** Feature
 - **Spec modified:** No (lifecycle status only: Implemented)
@@ -55,7 +55,7 @@
 
 <!-- finalize:spec-implement:2026-10-11:027bff35 -->
 
-### 2026-10-11 — Test: AC coverage validated
+## 2026-10-11 — [Test]: AC coverage validated
 
 - **Type:** Spec Update
 - **Spec modified:** No
@@ -64,7 +64,7 @@
 - **Report:** `checks/2026-10-11-test.md`
 - **Author:** Claude Code native spec-test (claude-opus-5-5)
 
-### 2026-10-11 — Bugfix: Audit corrections for pinned runtime isolation
+## 2026-10-11 — [Bugfix]: Audit corrections for pinned runtime isolation
 
 - **Type:** Bugfix
 - **Spec modified:** No
@@ -76,7 +76,7 @@
 
 <!-- finalize:spec-implement:2026-10-11:c4506f10 -->
 
-### 2026-10-12 — Bugfix: Second audit pass corrections
+## 2026-10-12 — [Bugfix]: Second audit pass corrections
 
 - **Type:** Bugfix
 - **Spec modified:** No
@@ -86,7 +86,7 @@
 - Read [implementation](implementation.md) (Second audit pass table): redirected `.specs` paths refused before defect writes, HTML-escaped single-line report values, bytecode-free docs fixture, lock published last with explicit incomplete-rollback error, strict `current` manifest shape and loop-safe resolution in the shim, mandatory deletion container.
 - Third audit pass (0 blocker): absolute-only trusted `.livespec-path`, `current` manifest source/created_at validation, non-directory deletion refused.
 
-### 2026-10-12 — Test: AC coverage re-certified after audit corrections
+## 2026-10-12 — [Test]: AC coverage re-certified after audit corrections
 
 - **Type:** Spec Update
 - **Spec modified:** No
@@ -95,7 +95,7 @@
 - **Report:** `checks/2026-10-12-test.md`
 - **Author:** Claude Code native spec-test (claude-opus-5-5)
 
-### 2026-10-12 — Feature: Pipeline complete (/spec-feature --auto)
+## 2026-10-12 — [Feature]: Pipeline complete (/spec-feature --auto)
 
 - **Type:** Feature
 - **Spec modified:** No
