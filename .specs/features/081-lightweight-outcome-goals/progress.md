@@ -10,6 +10,7 @@ Read the [approved plan](plan.md) and [implementation map](implementation.md).
 | 4 | Deadline | Done | Post-completion deadline check removed from autonomous init. |
 | 5 | Prompts and docs | Done | Anti-drift §5 rewritten; STEP 0 short goal step in 8 skills, removed from 12; inventory rows, spec-feature Verify, expectations reference, README, spec-system updated. |
 | 6 | Tests and dead code | Done | `tests/test_lightweight_goals.py`; goal tests adapted; child-goal and per-task convention code deleted. |
+| Bugfix | Caller runtime import priority | Done | `python -P` excludes consumer cwd from module lookup; real `validate` and `init-from-code --verify-only` subprocess regressions reject a consumer-local validator returning exit 0. |
 
 ## Goal Lock of this run
 
