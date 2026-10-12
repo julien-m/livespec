@@ -57,6 +57,8 @@ include = ["validator*"]
 target-version = "py311"
 line-length = 100
 extend-exclude = [
+    # CI dependency checkouts retain their pinned bytes; validate owned source only.
+    ".ci-deps",
     # Local planning output is not ship source; keep real runtime/tests in Ruff scope.
     ".claude/output",
     # Detector payload fixtures are intentionally invalid snippets, not runtime Python modules.
