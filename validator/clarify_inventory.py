@@ -146,6 +146,12 @@ def collect_clarification_inventory(
                 semantic = _review_items(receipt, prepared_review, spec_path, source_hash)
             else:
                 errors.append("stale_or_incomplete_spec_review")
+                if receipt.reviewer_model != prepared_review.reviewer_model:
+                    # Name the usual cause: a gate prepared with another (or no) model.
+                    errors.append(
+                        "spec_review_model_mismatch:"
+                        f"{receipt.reviewer_model}!={prepared_review.reviewer_model or '<none>'}"
+                    )
         except (OSError, ValueError, ValidationError) as error:
             errors.append(f"invalid_spec_review:{error}")
     inventory = apply_recorded_decisions(spec_path, _merge(deterministic, semantic))

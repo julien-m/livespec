@@ -384,7 +384,7 @@ If `.specs/README.md` does not exist, create it by scanning existing artifacts (
 Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 
 ```markdown
-### YYYY-MM-DD — Plan: Technical plan generated
+## YYYY-MM-DD — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No
