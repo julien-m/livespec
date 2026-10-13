@@ -28,3 +28,14 @@ PHASE_RESULT: OK (fix) — implement gate READY, unit suite 0 failed, repo conve
 | Conventions | Blocked (environment) | — | `livespec conventions verify --feature repo` | BLOCKED: `ai-ressources` corpus absent in this environment (`catalog_load_error`); 0 error-severity violation | 2026-10-13 |
 
 PHASE_RESULT: OK (fix) — implement gate READY; unit suite: only failures also present on the base branch (environment); repo conventions gate to rerun where the `ai-ressources` corpus exists.
+
+## 2026-10-13 — spec-fix: migration v23 for already initialized projects (FR-006)
+
+| Step | Status | Files | Verification | Result | Date |
+|---|---|---|---|---|---|
+| Spec update | Done | `spec.md` (FR-006, AC-009, SC-005, Clarifications: user decision to apply v22), `plan.md` Step 8 | `livespec validate spec.md` | OK | 2026-10-13 |
+| RED | Done | `tests/test_init_bootstrap_migration.py` | targeted suite | 3 failed | 2026-10-13 |
+| GREEN | Done | `validator/init_bootstrap_repair.py`, `scripts/migrate-init-bootstrap-repair.sh`, `migrations/23/migrate.md`, `VERSION`, `.specs/livespec-version` | targeted suite; full unit suite (same failures as the base branch, environment); ruff, pyright, mypy | PASS | 2026-10-13 |
+| Readiness gate | Done | `.reviews/spec.json`, `.reviews/plan.json` (plan: 3 batches + synthesis), claude-opus-5-5, 150000, fresh independent native reviewers | `livespec validate --progression implement` | READY | 2026-10-13 |
+
+PHASE_RESULT: OK (fix) — implement gate READY; repo conventions gate still to rerun where the `ai-ressources` corpus exists.
