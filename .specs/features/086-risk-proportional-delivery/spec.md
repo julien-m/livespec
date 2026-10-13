@@ -171,7 +171,7 @@ The lane is `full` with every applicable reason: `qe_section_missing`, `critical
 
 ### AC-003
 
-`livespec delivery review prepare --feature <feature> --base <rev>` writes `.reviews/delivery-scope.json` with the resolved base commit, the lane and every Feature diff path with its SHA-256 (or `deleted`), prints the scope, and exits 1 with `diff_unavailable` or `empty_scope` when no scope can be built.
+`livespec delivery review prepare --feature <feature> --base <rev>` writes `.reviews/delivery-scope.json` with the resolved base commit, the lane and every Feature diff path with its SHA-256 (or `deleted`), prints the scope, and exits 1 with `diff_unavailable`, `empty_scope`, or `base_not_feature_start` when the base is not an ancestor of HEAD or is newer than the commit before the one that created the feature `spec.md`; a feature `spec.md` or `plan.md` whose normative content equals the base is not in the scope, and changed ones are identified by their normative hash, so lifecycle metadata edits never change the scope.
 
 ### AC-004
 
@@ -183,7 +183,7 @@ When the initial report and two correction rounds of the same kind are all BLOCK
 
 ### AC-006
 
-`livespec delivery review verify --feature <feature> [--json]` exits 0 only when the latest round of every kind the current lane requires (`combined` or both `review` and `audit` for light; both `review` and `audit` for full) is PASS and the current Feature diff against the recorded base equals the recorded scope; otherwise it exits 1 with `no_receipt`, `kind_missing:<kind>`, `latest_round_blocked:<kind>` or `scope_changed`.
+`livespec delivery review verify --feature <feature> [--json]` exits 0 only when the latest round of every kind the current lane requires (the latest `combined` round or the latest `review` and `audit` rounds for light; both `review` and `audit` for full) is PASS and the current Feature diff against the recorded base equals the recorded scope; verify re-validates the stored report text against its SHA-256 and the record conditions, and requires a `review` and an `audit` from different agents and reports; otherwise it exits 1 with `no_receipt`, `kind_missing:<kind>`, `latest_round_blocked:<kind>`, `receipt_invalid:<kind>`, `reviewers_not_independent` or `scope_changed`.
 
 ### AC-007
 

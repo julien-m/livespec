@@ -1,119 +1,90 @@
 """One independent review of the complete feature diff (feature 086 FR-004 to FR-006).
 
 ``prepare`` hashes every path of the feature diff, ``record`` accepts a reviewer
-report only when it covers that exact scope, and ``verify`` checks that the latest
-round of every kind required by the lane passed and that nothing changed since.
+report only when it covers that exact scope, and ``verify`` re-validates the stored
+report of the latest round of every kind required by the lane against the diff.
 """
 
 from __future__ import annotations
 
 import hashlib
-import json
 import os
-import tempfile
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, cast
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import ValidationError
 
 from ..bugfix.diff import (
     DiffUnavailableError,
+    _git,  # pyright: ignore[reportPrivateUsage]
+    base_text,
     collect_diff,
+    is_ancestor,
     is_traceability_artifact,
     resolve_commit,
 )
+from ..normative_identity import normative_hash
 from .lane import DeliveryInputError, Lane, LaneReason
+from .review_models import (
+    DELETED,
+    KINDS,
+    MAX_BLOCKED_ROUNDS,
+    SCHEMA_VERSION,
+    DeliveryReport,
+    Kind,
+    ReviewOutcome,
+    read_json,
+    receipt_path,
+    report_reasons,
+    scope_path,
+    write_json,
+)
 
-Kind = Literal["combined", "review", "audit"]
-KINDS: tuple[Kind, ...] = ("combined", "review", "audit")
-SCHEMA_VERSION = "1"
-# Initial report plus two correction rounds (maintainer decision, feature 086).
-MAX_BLOCKED_ROUNDS = 3
-DELETED = "deleted"
+_LIFECYCLE = ("spec.md", "plan.md")
 
-
-class ReviewCheck(BaseModel):
-    """One required check the implementing agent ran and gave to the reviewer."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
-    command: str = Field(min_length=1)
-    exit_code: int
-
-
-class ReviewFinding(BaseModel):
-    """One reviewer finding with its evidence and proposed correction."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
-    severity: Literal["blocking", "warning", "info"]
-    file: str = ""
-    line: int | None = None
-    rule: str = ""
-    evidence: str = Field(min_length=1)
-    correction: str = ""
-
-
-class Reviewer(BaseModel):
-    """Identity of the independent native reviewer."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
-    agent: str = Field(min_length=1)
-    model: str = Field(min_length=1)
-    effort: str = Field(min_length=1)
+__all__ = [
+    "KINDS",
+    "Kind",
+    "ReviewOutcome",
+    "current_scope",
+    "prepare_scope",
+    "receipt_path",
+    "record_report",
+    "scope_path",
+    "verify_review",
+]
 
 
-class DeliveryReport(BaseModel):
-    """Actual reviewer output, recorded as returned."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
-    schema_version: str = SCHEMA_VERSION
-    reviewer: Reviewer
-    verdict: Literal["PASS", "BLOCKED"]
-    reviewed_files: list[str]
-    checks: list[ReviewCheck] = Field(default_factory=lambda: list[ReviewCheck]())
-    findings: list[ReviewFinding] = Field(default_factory=lambda: list[ReviewFinding]())
+def _lifecycle_document(relative: str) -> bool:
+    parts = Path(relative).parts
+    return len(parts) == 4 and parts[:2] == (".specs", "features") and parts[3] in _LIFECYCLE
 
 
-@dataclass
-class ReviewOutcome:
-    """Result of record or verify; no reason means accepted or current."""
-
-    feature: str
-    reasons: list[LaneReason] = field(default_factory=lambda: list[LaneReason]())
-    verdict: str = ""
-    receipt_path: str = ""
-
-    def to_json(self) -> dict[str, object]:
-        """Return the JSON object printed by the CLI."""
-        return {
-            "feature": self.feature,
-            "verdict": self.verdict,
-            "receipt_path": self.receipt_path,
-            "reasons": [{"code": r.code, "detail": r.detail} for r in self.reasons],
-        }
+def _lifecycle_only(root: Path, base_commit: str, relative: str) -> bool:
+    """A spec or plan whose normative content equals the base is not a change."""
+    path = root / relative
+    if not _lifecycle_document(relative) or path.is_symlink() or not path.is_file():
+        return False
+    before = base_text(root, base_commit, relative)
+    current = path.read_text(encoding="utf-8")
+    return before is not None and normative_hash(before, lifecycle_document=True) == normative_hash(
+        current, lifecycle_document=True
+    )
 
 
-def _feature_dir(root: Path, feature: str) -> Path:
-    from ..identity import SLUG_REGEX
-
-    directory = root / ".specs" / "features" / feature
-    if not SLUG_REGEX.fullmatch(feature) or not (directory / "spec.md").is_file():
-        raise DeliveryInputError(f"unknown feature {feature!r}")
-    return directory
-
-
-def scope_path(root: Path, feature: str) -> Path:
-    """Return the prepared scope location of a feature."""
-    return _feature_dir(root, feature) / ".reviews" / "delivery-scope.json"
-
-
-def receipt_path(root: Path, feature: str) -> Path:
-    """Return the delivery review receipt location of a feature."""
-    return _feature_dir(root, feature) / ".reviews" / "delivery.json"
-
-
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+def _identity(root: Path, relative: str) -> str:
+    """Hash a path without following links; lifecycle-only spec/plan edits keep their hash."""
+    path = root / relative
+    if path.is_symlink():
+        return "symlink:" + os.readlink(path)
+    if not os.path.lexists(path):
+        return DELETED
+    if path.is_dir():
+        return "directory"
+    data = path.read_bytes()
+    if _lifecycle_document(relative):
+        return "normative:" + normative_hash(data.decode(), lifecycle_document=True)
+    return hashlib.sha256(data).hexdigest()
 
 
 # @spec FR-004: Complete feature diff scope
@@ -122,37 +93,32 @@ def current_scope(root: Path, base_commit: str) -> dict[str, str]:
     """Hash every counted path of the feature diff against ``base_commit``.
 
     Raises:
-        DiffUnavailableError: The diff cannot be computed.
+        DiffUnavailableError: The diff or one of its paths cannot be read.
     """
-    files: dict[str, str] = {}
-    for entry in collect_diff(root, base_commit):
-        if is_traceability_artifact(entry.path):
-            continue
-        path = root / entry.path
-        files[entry.path] = _sha256(path) if path.is_file() else DELETED
-    return files
-
-
-def _write_json(path: Path, payload: dict[str, Any]) -> None:
-    if path.is_symlink():
-        raise DeliveryInputError(f"refusing to write through a link: {path}")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, temporary = tempfile.mkstemp(prefix=".delivery-", dir=path.parent)
     try:
-        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
-            stream.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
-        os.replace(temporary, path)
-    finally:
-        if os.path.exists(temporary):
-            os.unlink(temporary)
+        return {
+            entry.path: _identity(root, entry.path)
+            for entry in collect_diff(root, base_commit)
+            if not is_traceability_artifact(entry.path)
+            and not _lifecycle_only(root, base_commit, entry.path)
+        }
+    except (OSError, ValueError) as exc:
+        raise DiffUnavailableError(f"unreadable diff path: {exc}") from exc
 
 
-def _read_json(path: Path) -> dict[str, Any] | None:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-    return cast(dict[str, Any], data) if isinstance(data, dict) else None
+def _base_problem(root: Path, feature: str, commit: str) -> str:
+    """The base must precede the commit that created the feature spec, if committed."""
+    if not is_ancestor(root, commit, "HEAD"):
+        return f"{commit} is not an ancestor of HEAD"
+    spec = f".specs/features/{feature}/spec.md"
+    created = _git(root, "log", "--format=%H", "--diff-filter=A", "--", spec).decode().split()
+    if not created:
+        return ""
+    first = created[-1]
+    parents = _git(root, "rev-list", "--parents", "-n", "1", first).decode().split()[1:]
+    if (parents and is_ancestor(root, commit, parents[0])) or commit == first:
+        return ""
+    return f"{commit} is newer than the commit before {spec} was created ({first[:12]})"
 
 
 def prepare_scope(root: Path, feature: str, base: str, lane: Lane) -> tuple[dict[str, Any], str]:
@@ -160,9 +126,12 @@ def prepare_scope(root: Path, feature: str, base: str, lane: Lane) -> tuple[dict
     target = scope_path(root, feature)
     try:
         commit = resolve_commit(root, base)
-        files = current_scope(root, commit)
+        problem = _base_problem(root, feature, commit)
+        files = current_scope(root, commit) if not problem else {}
     except DiffUnavailableError as exc:
         return {"feature": feature, "detail": str(exc)}, "diff_unavailable"
+    if problem:
+        return {"feature": feature, "detail": problem}, "base_not_feature_start"
     if not files:
         return {"feature": feature, "base_commit": commit}, "empty_scope"
     scope = {
@@ -173,20 +142,8 @@ def prepare_scope(root: Path, feature: str, base: str, lane: Lane) -> tuple[dict
         "lane": lane,
         "files": files,
     }
-    _write_json(target, scope)
+    write_json(target, scope)
     return scope, ""
-
-
-def load_report(path: Path) -> DeliveryReport:
-    """Parse a reviewer report.
-
-    Raises:
-        DeliveryInputError: Unreadable or invalid report.
-    """
-    try:
-        return DeliveryReport.model_validate_json(path.read_text(encoding="utf-8"))
-    except (OSError, ValidationError) as exc:
-        raise DeliveryInputError(f"invalid review report {path}: {exc}") from exc
 
 
 def _trailing_blocked(rounds: list[dict[str, Any]]) -> int:
@@ -198,21 +155,24 @@ def _trailing_blocked(rounds: list[dict[str, Any]]) -> int:
     return count
 
 
-def _report_reasons(report: DeliveryReport, scope_files: dict[str, str]) -> list[LaneReason]:
-    reasons: list[LaneReason] = []
-    missing = sorted(set(scope_files) - set(report.reviewed_files))
-    if missing:
-        reasons.append(LaneReason("scope_not_covered", ", ".join(missing)))
-    if report.reviewer.effort.lower() != "high":
-        reasons.append(LaneReason("reviewer_effort_not_high", report.reviewer.effort))
-    blocking = [f for f in report.findings if f.severity == "blocking"]
-    failed = [c.command for c in report.checks if c.exit_code != 0]
-    if report.verdict == "PASS" and (blocking or failed):
-        detail = f"{len(blocking)} blocking finding(s), failed checks: {failed}"
-        reasons.append(LaneReason("verdict_inconsistent", detail))
-    if report.verdict == "BLOCKED" and not blocking:
-        reasons.append(LaneReason("verdict_inconsistent", "BLOCKED without a blocking finding"))
-    return reasons
+def _changed(now: dict[str, str], files: dict[str, str]) -> str:
+    return ", ".join(sorted(p for p in set(now) | set(files) if now.get(p) != files.get(p)))
+
+
+def _load_receipt(root: Path, feature: str) -> tuple[dict[str, Any], dict[str, Any]] | None:
+    """Return the receipt and its kinds map, or None when malformed."""
+    receipt = read_json(receipt_path(root, feature)) or {
+        "schema_version": SCHEMA_VERSION,
+        "feature": feature,
+        "kinds": {},
+    }
+    kinds = receipt.setdefault("kinds", {})
+    if receipt.get("feature") != feature or not isinstance(kinds, dict):
+        return None
+    for value in cast(dict[str, Any], kinds).values():
+        if not isinstance(value, dict) or not isinstance(value.get("rounds"), list):
+            return None
+    return receipt, cast(dict[str, Any], kinds)
 
 
 # @spec FR-005: Record a complete-scope report under the round cap
@@ -220,70 +180,91 @@ def _report_reasons(report: DeliveryReport, scope_files: dict[str, str]) -> list
 def record_report(root: Path, feature: str, kind: Kind, report_file: Path) -> ReviewOutcome:
     """Validate a report against the prepared scope and append it as a round."""
     outcome = ReviewOutcome(feature, receipt_path=str(receipt_path(root, feature)))
-    report = load_report(report_file)
-    outcome.verdict = report.verdict
-    scope = _read_json(scope_path(root, feature))
-    if scope is None or scope.get("feature") != feature:
-        detail = "run `livespec delivery review prepare`"
-        outcome.reasons.append(LaneReason("scope_missing", detail))
-        return outcome
-    prepared = cast(dict[str, str], scope.get("files") or {})
     try:
-        now = current_scope(root, str(scope["base_commit"]))
+        raw = report_file.read_text(encoding="utf-8")  # Read once: validated bytes are stored.
+        report = DeliveryReport.model_validate_json(raw)
+    except (OSError, ValueError, ValidationError) as exc:
+        raise DeliveryInputError(f"invalid review report {report_file}: {exc}") from exc
+    outcome.verdict = report.verdict
+    scope = read_json(scope_path(root, feature))
+    files = scope.get("files") if scope else None
+    if not scope or scope.get("feature") != feature or not isinstance(files, dict):
+        outcome.reasons.append(
+            LaneReason("scope_missing", "run `livespec delivery review prepare`")
+        )
+        return outcome
+    prepared = cast(dict[str, str], files)
+    try:
+        now = current_scope(root, str(scope.get("base_commit")))
     except DiffUnavailableError as exc:
         outcome.reasons.append(LaneReason("diff_unavailable", str(exc)))
         return outcome
     if now != prepared:
-        changed = sorted(p for p in set(now) | set(prepared) if now.get(p) != prepared.get(p))
-        outcome.reasons.append(LaneReason("scope_changed", ", ".join(changed)))
-    outcome.reasons.extend(_report_reasons(report, prepared))
-    receipt = _read_json(receipt_path(root, feature)) or {
-        "schema_version": SCHEMA_VERSION,
-        "feature": feature,
-        "kinds": {},
-    }
-    kinds = cast(dict[str, dict[str, Any]], receipt.setdefault("kinds", {}))
+        outcome.reasons.append(LaneReason("scope_changed", _changed(now, prepared)))
+    outcome.reasons.extend(report_reasons(report, prepared))
+    loaded = _load_receipt(root, feature)
+    if loaded is None:
+        outcome.reasons.append(LaneReason("receipt_invalid", outcome.receipt_path))
+        return outcome
+    receipt, kinds = loaded
     rounds = cast(list[dict[str, Any]], kinds.setdefault(kind, {"rounds": []})["rounds"])
     if _trailing_blocked(rounds) >= MAX_BLOCKED_ROUNDS:
-        outcome.reasons.append(
-            LaneReason(
-                "round_cap_reached",
-                f"{kind}: initial report and two corrections were BLOCKED; escalate to the "
-                "maintainer instead of reviewing again",
-            )
-        )
+        detail = f"{kind}: initial report and two corrections were BLOCKED; escalate"
+        outcome.reasons.append(LaneReason("round_cap_reached", detail))
     if outcome.reasons:
         return outcome
-    raw = report_file.read_bytes()
     rounds.append(
         {
             "verdict": report.verdict,
             "base_commit": scope["base_commit"],
             "files": prepared,
-            "report_sha256": hashlib.sha256(raw).hexdigest(),
-            "report": json.loads(raw),
+            "report_sha256": hashlib.sha256(raw.encode()).hexdigest(),
+            "report_raw": raw,
         }
     )
-    _write_json(receipt_path(root, feature), receipt)
+    write_json(receipt_path(root, feature), receipt)
     if report.verdict == "BLOCKED":
-        blocked = _trailing_blocked(rounds)
-        outcome.reasons.append(
-            LaneReason("review_blocked", f"{kind} round {blocked} of {MAX_BLOCKED_ROUNDS} BLOCKED")
-        )
+        detail = f"{kind} round {_trailing_blocked(rounds)} of {MAX_BLOCKED_ROUNDS} BLOCKED"
+        outcome.reasons.append(LaneReason("review_blocked", detail))
     return outcome
 
 
-def required_kinds(lane: Lane, recorded: set[str]) -> list[str]:
-    """Return the kinds whose latest round must pass for ``lane``.
+def _latest_pass(root: Path, kinds: dict[str, Any], kind: str) -> tuple[list[LaneReason], str]:
+    """Re-validate the stored report of the latest round; return reasons and reviewer id."""
+    rounds = cast(list[dict[str, Any]], (kinds.get(kind) or {}).get("rounds") or [])
+    if not rounds:
+        return [LaneReason(f"kind_missing:{kind}", f"no {kind} report")], ""
+    latest = rounds[-1]
+    raw = latest.get("report_raw")
+    files = latest.get("files")
+    try:
+        report = DeliveryReport.model_validate_json(str(raw))
+    except ValidationError:
+        return [LaneReason(f"receipt_invalid:{kind}", "stored report is not a valid report")], ""
+    sha = hashlib.sha256(str(raw).encode()).hexdigest()
+    if sha != latest.get("report_sha256") or not isinstance(files, dict):
+        return [LaneReason(f"receipt_invalid:{kind}", "stored report or scope altered")], ""
+    scoped = cast(dict[str, str], files)
+    if report.verdict != "PASS" or latest.get("verdict") != "PASS":
+        return [LaneReason(f"latest_round_blocked:{kind}", "latest is BLOCKED")], ""
+    if inconsistent := report_reasons(report, scoped):
+        return [LaneReason(f"receipt_invalid:{kind}", r.code) for r in inconsistent], ""
+    try:
+        now = current_scope(root, str(latest.get("base_commit")))
+    except DiffUnavailableError as exc:
+        return [LaneReason("diff_unavailable", str(exc))], ""
+    if now != scoped:
+        return [LaneReason("scope_changed", f"{kind}: {_changed(now, scoped)}")], ""
+    return [], f"{report.reviewer.agent}\0{sha}"
 
-    The full lane needs separate review and audit reports; the light lane accepts one
-    combined report, or separate review and audit reports when both were recorded.
-    """
-    if lane == "full":
-        return ["review", "audit"]
-    if "combined" not in recorded and {"review", "audit"} <= recorded:
-        return ["review", "audit"]
-    return ["combined"]
+
+def _pair(root: Path, kinds: dict[str, Any]) -> list[LaneReason]:
+    review, first = _latest_pass(root, kinds, "review")
+    audit, second = _latest_pass(root, kinds, "audit")
+    reasons = review + audit
+    if not reasons and set(first.split("\0")) & set(second.split("\0")):
+        reasons.append(LaneReason("reviewers_not_independent", "same agent or same report"))
+    return reasons
 
 
 # @spec FR-006: Current PASS for every required kind
@@ -291,33 +272,26 @@ def required_kinds(lane: Lane, recorded: set[str]) -> list[str]:
 def verify_review(
     root: Path, feature: str, lane: Lane, receipt: Path | None = None
 ) -> ReviewOutcome:
-    """Check that every required kind passed and the diff is unchanged since."""
+    """Full lane: review and audit. Light lane: combined, or review and audit."""
     path = receipt or receipt_path(root, feature)
     outcome = ReviewOutcome(feature, receipt_path=str(path))
-    data = _read_json(path)
-    if data is None or data.get("feature") != feature:
+    data = read_json(path)
+    kinds = data.get("kinds") if data else None
+    if not data or data.get("feature") != feature or not isinstance(kinds, dict):
         outcome.reasons.append(LaneReason("no_receipt", str(path)))
         outcome.verdict = "MISSING"
         return outcome
-    kinds = cast(dict[str, dict[str, Any]], data.get("kinds") or {})
-    recorded = {k for k, v in kinds.items() if v.get("rounds")}
-    for kind in required_kinds(lane, recorded):
-        rounds = cast(list[dict[str, Any]], (kinds.get(kind) or {}).get("rounds") or [])
-        if not rounds:
-            outcome.reasons.append(LaneReason(f"kind_missing:{kind}", f"no {kind} report"))
-            continue
-        latest = rounds[-1]
-        if latest.get("verdict") != "PASS":
-            outcome.reasons.append(LaneReason(f"latest_round_blocked:{kind}", "latest is BLOCKED"))
-            continue
-        try:
-            now = current_scope(root, str(latest.get("base_commit")))
-        except DiffUnavailableError as exc:
-            outcome.reasons.append(LaneReason("diff_unavailable", str(exc)))
-            continue
-        files = cast(dict[str, str], latest.get("files") or {})
-        if now != files:
-            changed = sorted(p for p in set(now) | set(files) if now.get(p) != files.get(p))
-            outcome.reasons.append(LaneReason("scope_changed", f"{kind}: {', '.join(changed)}"))
+    kinds_map = cast(dict[str, Any], kinds)
+    if lane == "full":
+        outcome.reasons = _pair(root, kinds_map)
+    else:
+        combined = _latest_pass(root, kinds_map, "combined")[0]
+        pair = _pair(root, kinds_map) if combined else []
+        if combined and pair:
+            pair_recorded = any(
+                (kinds_map.get(kind) or {}).get("rounds") for kind in ("review", "audit")
+            )
+            combined_recorded = bool((kinds_map.get("combined") or {}).get("rounds"))
+            outcome.reasons = combined if combined_recorded or not pair_recorded else pair
     outcome.verdict = "BLOCKED" if outcome.reasons else "PASS"
     return outcome

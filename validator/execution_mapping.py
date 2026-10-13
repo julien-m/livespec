@@ -9,14 +9,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .acceptance_anchors import Derivation, derive_acceptance
 from .acceptance_requirements import execution_acceptance_ids
 from .execution_reports import ExecutedAssertion, ExecutedTest, junit_test_id, resolve_test_id
 from .execution_rust_source import rust_assertions
 from .execution_scope import digest, read_regular
 from .normative_identity import normative_hash
 from .semantic.review_context import DEFAULT_MAX_CHARS, PreparedReview, prepare_review_context
-from .semantic.review_contract import ReviewReceipt, validate_review_result
+from .semantic.review_contract import ReviewReceipt, strictly_ready, validate_review_result
 from .semantic.review_receipts import save_review_receipt, verify_review_receipt
 
 
@@ -56,17 +55,6 @@ class AcceptanceMapping(BaseModel):
         if self.derivation == "anchors" and (self.reviewer_model or self.review_receipt_path):
             raise ValueError("An anchor-derived mapping has no reviewer or review receipt")
         return self
-
-
-def derived_mapping(
-    project_root: Path, feature: str
-) -> tuple[AcceptanceMapping | None, Derivation]:
-    """Derive the mapping from `@spec` anchors; None when no binding or a blocking issue."""
-    derivation = derive_acceptance(project_root, feature)
-    if derivation.blocking or not derivation.bindings:
-        return None, derivation
-    bindings = [AcceptanceBinding(**vars(item)) for item in derivation.bindings]
-    return AcceptanceMapping(feature=feature, bindings=bindings, derivation="anchors"), derivation
 
 
 def _load_mapping(project_root: Path, mapping_path: Path) -> AcceptanceMapping:
@@ -133,6 +121,10 @@ def ingest_mapping_review(
     from .mapping_review_validation import mapping_review_errors
 
     receipt = validate_review_result(prepared, raw_results, synthesis)
+    if receipt.ready and not strictly_ready(receipt):
+        receipt = receipt.model_copy(
+            update={"ready": False, "errors": [*receipt.errors, "mapping_requires_covered"]}
+        )
     if receipt.ready and (errors := mapping_review_errors(prepared, receipt)):
         receipt = receipt.model_copy(
             update={"complete": False, "ready": False, "errors": [*receipt.errors, *errors]}
@@ -264,9 +256,9 @@ def certify_mappings(
     if not current:
         return [], ["Governed acceptance input changed while being consumed"]
     if mapping.derivation == "anchors":
-        return _certify_anchored(
-            project_root, feature, mapping, tests, assertions, expected_sources
-        )
+        from .execution_mapping_anchors import certify_anchored
+
+        return certify_anchored(project_root, feature, mapping, tests, assertions, expected_sources)
     prepared = _prepare_mapping_review(
         project_root, feature, mapping_path, mapping, evidence_policy=evidence_policy
     )
@@ -276,7 +268,11 @@ def certify_mappings(
         return [], ["Consumed acceptance source differs from captured execution inputs"]
     receipt = ReviewReceipt.model_validate_json(raw)
     rebuilt = validate_review_result(prepared, receipt.raw_results, receipt.synthesis)
-    if not prepared.cacheable or not rebuilt.ready or not verify_review_receipt(receipt, prepared):
+    if (
+        not prepared.cacheable
+        or not strictly_ready(rebuilt)
+        or not verify_review_receipt(receipt, prepared)
+    ):
         return [], ["Independent acceptance review is missing, stale, incomplete or altered"]
     return _certified_bindings(mapping, prepared, rebuilt, project_root, tests, assertions)
 
@@ -349,57 +345,4 @@ def _certified_bindings(
             )
         else:
             certified.append(binding.requirement_id)
-    return sorted(set(certified)), gaps
-
-
-def _certify_anchored(
-    project_root: Path,
-    feature: str,
-    mapping: AcceptanceMapping,
-    tests: list[ExecutedTest],
-    assertions: list[ExecutedAssertion],
-    expected_sources: dict[str, str] | None,
-) -> tuple[list[str], list[str]]:
-    """Re-derive the anchors and certify only the same bindings observed passing."""
-    # @spec FR-005: Certify anchored bindings without review grounding
-    #   — .specs/features/087-anchor-derived-acceptance/spec.md#fr-005
-    if mapping.feature != feature:
-        return [], ["Foreign acceptance mapping"]
-    current, derivation = derived_mapping(project_root, feature)
-    if current is None:
-        codes = ", ".join(sorted({issue.code for issue in derivation.blocking})) or "no_binding"
-        return [], [f"Acceptance anchors do not derive a mapping: {codes}"]
-    if current.bindings != mapping.bindings:
-        return [], ["Anchored acceptance mapping differs from the current test anchors"]
-    spec = f".specs/features/{feature}/spec.md"
-    sources = {spec: read_regular(project_root / spec, project_root)}
-    for binding in mapping.bindings:
-        sources[binding.assertion_path] = read_regular(
-            project_root / binding.assertion_path, project_root
-        )
-    if expected_sources is not None and any(
-        expected_sources.get(name)
-        != (
-            normative_hash(data.decode(), lifecycle_document=True) if name == spec else digest(data)
-        )
-        for name, data in sources.items()
-    ):
-        return [], ["Consumed acceptance source differs from captured execution inputs"]
-    passing = {test.test_id for test in tests if test.status == "passed"}
-    certified: list[str] = []
-    gaps: list[str] = []
-    for binding in mapping.bindings:
-        text = sources[binding.assertion_path].decode()
-        test_id = resolve_test_id(binding.test_id, tests)
-        if (
-            digest(sources[binding.assertion_path]) == binding.source_sha256
-            and _assertion_span(binding, text)
-            and test_id in passing
-            and _observed_assertion(binding, test_id, assertions, project_root, text)
-        ):
-            certified.append(binding.requirement_id)
-        else:
-            gaps.append(
-                f"Unproven acceptance binding: {binding.requirement_id} / {binding.test_id}"
-            )
     return sorted(set(certified)), gaps

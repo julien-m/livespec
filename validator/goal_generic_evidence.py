@@ -144,7 +144,7 @@ def _delivery_review_missing_items(
             budget if isinstance(budget, int) else None,
         ).lane
         outcome = verify_review(root, feature, lane)
-    except DeliveryInputError as exc:
+    except (DeliveryInputError, OSError, ValueError) as exc:
         return [f"delivery_review_receipt_valid:{exc}"]
     return [f"delivery_review_receipt_valid:{reason.code}" for reason in outcome.reasons]
 

@@ -16,7 +16,7 @@ from validator.execution_scope import _excluded, _referenced_inputs
 from validator.normative_identity import normative_hash
 
 from .review_context import PreparedReview, prepare_review_context
-from .review_contract import ReviewReceipt, validate_review_result
+from .review_contract import ReviewReceipt, strictly_ready, validate_review_result
 from .review_files import prepare_feature_review, review_receipt_path
 from .review_receipts import load_review_receipt, save_review_receipt, verify_review_receipt
 
@@ -84,6 +84,10 @@ def ingest_acceptance_review(
     """Ingest actual reviewer output; no caller-written acceptance boolean is accepted."""
     prepared = prepare_acceptance_review(root, feature, model, max_chars)
     receipt = validate_review_result(prepared, raw_results, synthesis)
+    if receipt.ready and not strictly_ready(receipt):
+        receipt = receipt.model_copy(
+            update={"ready": False, "errors": [*receipt.errors, "acceptance_requires_covered"]}
+        )
     path = save_review_receipt(review_receipt_path(root, feature, "acceptance"), receipt)
     return receipt, path
 
@@ -94,7 +98,7 @@ def verify_acceptance_review(
     """Reconstruct purpose, declaration, source and policy freshness at every boundary."""
     receipt = load_review_receipt(path)
     prepared = prepare_acceptance_review(root, feature, model, max_chars)
-    return receipt.ready and verify_review_receipt(receipt, prepared)
+    return strictly_ready(receipt) and verify_review_receipt(receipt, prepared)
 
 
 def _manifest_sources(root: Path, feature: str, name: str) -> dict[str, str]:

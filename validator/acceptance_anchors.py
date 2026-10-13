@@ -19,9 +19,9 @@ import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
+from .acceptance_anchors_rust import rust_target
 from .acceptance_requirements import AcceptanceRequirement, acceptance_inventory
 from .execution_reports import junit_test_id
-from .execution_rust_source import rust_assertions, rust_functions
 from .execution_scope import digest, read_regular
 
 _AC = re.compile(r"\bAC-\d+\b")
@@ -35,6 +35,7 @@ BLOCKING_CODES = frozenset(
         "anchor_target_unresolved",
         "anchor_test_without_assert",
         "anchor_test_parametrized",
+        "anchor_source_unparsable",
     }
 )
 
@@ -125,13 +126,14 @@ def _candidate_files(root: Path) -> list[str]:
     """Test sources: Python `test_*.py`/`*_test.py` and every Rust file, outside dot dirs."""
     try:
         listed = subprocess.run(
-            ["git", "ls-files", "-co", "--exclude-standard"],
+            ["git", "--no-optional-locks", "ls-files", "-co", "--exclude-standard"],
             cwd=root,
             capture_output=True,
             text=True,
             check=True,
+            timeout=60,
         ).stdout.splitlines()
-    except (OSError, subprocess.CalledProcessError):
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
         listed = [path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()]
     selected = []
     for relative in sorted(set(listed)):
@@ -147,6 +149,28 @@ def _candidate_files(root: Path) -> list[str]:
     return selected
 
 
+def _entries(block: list[str]) -> list[str]:
+    """Split a comment block into `@spec` entries with their continuation lines."""
+    entries: list[str] = []
+    for line in block:
+        if "@spec" in line or not entries:
+            entries.append(line)
+        else:
+            entries[-1] += "\n" + line
+    return [entry for entry in entries if "@spec" in entry]
+
+
+def _feature_ids(entry: str, feature: str) -> tuple[str, ...] | None:
+    """AC ids an entry attributes to ``feature``; None when it names another feature."""
+    qualified = re.findall(rf"(?<![\w-]){re.escape(feature)}:(AC-\d+)\b", entry)
+    if qualified:
+        return tuple(qualified)
+    features = set(re.findall(r"\.specs/features/([^/\s#]+)/", entry))
+    if features == {feature}:
+        return tuple(_AC.findall(entry))
+    return None
+
+
 def _anchors(path: str, text: str, feature: str, rust: bool) -> list[_Anchor]:
     comment = _RS_COMMENT if rust else _PY_COMMENT
     lines = text.splitlines()
@@ -159,20 +183,18 @@ def _anchors(path: str, text: str, feature: str, rust: bool) -> list[_Anchor]:
         start = index
         while index < len(lines) and comment.match(lines[index]):
             index += 1
-        block = "\n".join(lines[start:index])
-        if "@spec" not in block or not _AC.search(block):
-            continue
-        if f".specs/features/{feature}/" not in block and f"{feature}:AC-" not in block:
-            continue  # Unqualified or another feature's anchor.
-        target = index
-        prefix = "#[" if rust else "@"
-        while target < len(lines) and lines[target].lstrip().startswith(prefix):
-            target += 1
-        ids = tuple(dict.fromkeys(_AC.findall(block)))
-        label = block.split(":", 1)[1].splitlines()[0].strip() if ":" in block else ""
-        anchors.append(
-            _Anchor(path, start + 1, target + 1 if target < len(lines) else 0, ids, label)
-        )
+        ids: list[str] = []
+        label = ""
+        for entry in _entries(lines[start:index]):
+            found = _feature_ids(entry, feature)
+            if found:
+                ids.extend(found)
+                label = label or (
+                    entry.split(":", 1)[1].splitlines()[0].strip() if ":" in entry else ""
+                )
+        if ids:
+            target = index + 1 if index < len(lines) else 0
+            anchors.append(_Anchor(path, start + 1, target, tuple(dict.fromkeys(ids)), label))
     return anchors
 
 
@@ -185,7 +207,7 @@ def _bind(
     rust: bool,
 ) -> None:
     where = f"{anchor.path}:{anchor.line}"
-    targets = _rust_target(anchor, text) if rust else _python_target(anchor, text)
+    targets = rust_target(anchor, text) if rust else _python_target(anchor, text)
     if isinstance(targets, AnchorIssue):
         result.issues.append(targets)
         return
@@ -217,85 +239,50 @@ def _bind(
 
 def _python_target(anchor: _Anchor, text: str) -> tuple[str, int, int] | AnchorIssue:
     where = f"{anchor.path}:{anchor.line}"
-    tree = ast.parse(text)
+    try:
+        tree = ast.parse(text)
+    except SyntaxError as exc:
+        return AnchorIssue("anchor_source_unparsable", f"{anchor.path}: {exc.msg}")
     for owner, function in _python_tests(tree):
         test_id = junit_test_id("::".join([anchor.path, *owner, function.name]))
         asserts = sorted(
             (node for node in ast.walk(function) if isinstance(node, ast.Assert)),
             key=lambda node: node.lineno,
         )
-        if function.lineno == anchor.target:
-            if any(_is_parametrize(item) for item in function.decorator_list):
-                return AnchorIssue("anchor_test_parametrized", f"{where} {function.name}")
-            if not asserts:
-                return AnchorIssue("anchor_test_without_assert", f"{where} {function.name}")
-            last = asserts[-1]
-            return test_id, last.lineno, last.end_lineno or last.lineno
+        header = min([item.lineno for item in function.decorator_list] + [function.lineno])
+        parametrized = any(_is_parametrize(item) for item in function.decorator_list)
         inside = function.lineno < anchor.line <= (function.end_lineno or function.lineno)
-        for node in asserts:
-            if inside and node.lineno == anchor.target:
-                if any(_is_parametrize(item) for item in function.decorator_list):
-                    return AnchorIssue("anchor_test_parametrized", f"{where} {function.name}")
-                return test_id, node.lineno, node.end_lineno or node.lineno
-    return AnchorIssue("anchor_target_unresolved", f"{where} precedes no test or assertion")
+        if header == anchor.target or inside:
+            if parametrized:
+                return AnchorIssue("anchor_test_parametrized", f"{where} {function.name}")
+            if header == anchor.target and asserts:
+                last = asserts[-1]
+                return test_id, last.lineno, last.end_lineno or last.lineno
+            if header == anchor.target:
+                return AnchorIssue("anchor_test_without_assert", f"{where} {function.name}")
+            for node in asserts:
+                if node.lineno == anchor.target:
+                    return test_id, node.lineno, node.end_lineno or node.lineno
+            return AnchorIssue("anchor_target_unresolved", f"{where} precedes no assertion")
+    return AnchorIssue("anchor_not_bound", f"{where} is outside any test function")
 
 
-def _python_tests(tree: ast.Module) -> list[tuple[tuple[str, ...], ast.FunctionDef]]:
-    found: list[tuple[tuple[str, ...], ast.FunctionDef]] = []
+_PythonTest = ast.FunctionDef | ast.AsyncFunctionDef
+
+
+def _python_tests(tree: ast.Module) -> list[tuple[tuple[str, ...], _PythonTest]]:
+    found: list[tuple[tuple[str, ...], _PythonTest]] = []
     for node in tree.body:
-        if isinstance(node, ast.FunctionDef) and node.name.startswith("test"):
+        if isinstance(node, _PythonTest) and node.name.startswith("test"):
             found.append(((), node))
         elif isinstance(node, ast.ClassDef) and node.name.startswith("Test"):
             found.extend(
                 ((node.name,), item)
                 for item in node.body
-                if isinstance(item, ast.FunctionDef) and item.name.startswith("test")
+                if isinstance(item, _PythonTest) and item.name.startswith("test")
             )
     return found
 
 
 def _is_parametrize(decorator: ast.expr) -> bool:
     return "parametrize" in ast.unparse(decorator)
-
-
-def _rust_target(anchor: _Anchor, text: str) -> tuple[str, int, int] | AnchorIssue | None:
-    where = f"{anchor.path}:{anchor.line}"
-    lines = text.splitlines()
-    attributes = "\n".join(lines[anchor.line - 1 : max(anchor.target - 1, 0)])
-    assertions = rust_assertions(text)
-    integration = "tests" in PurePosixPath(anchor.path).parts[:-1]
-    for function in rust_functions(text):
-        test_id = "::".join([*_rust_module(anchor.path), *function.modules, function.name])
-        owned = [
-            item
-            for item in assertions
-            if item.function == function.name and function.line <= item.line <= function.end_line
-        ]
-        if function.line == anchor.target:
-            if not re.search(r"#\[[\w:]*test\b", attributes):
-                break  # An anchor on a production function: not a test binding.
-            if not owned:
-                return AnchorIssue("anchor_test_without_assert", f"{where} {function.name}")
-            last = owned[-1]
-            return test_id, last.line, last.end_line
-        for item in owned:
-            if item.line == anchor.target:
-                return test_id, item.line, item.end_line
-    if integration:
-        return AnchorIssue("anchor_target_unresolved", f"{where} precedes no test or assertion")
-    return None
-
-
-def _rust_module(path: str) -> list[str]:
-    """Module path of a crate source file; integration test files are crate roots."""
-    parts = list(PurePosixPath(path).with_suffix("").parts)
-    for root_dir in ("src", "tests"):
-        if root_dir in parts:
-            index = len(parts) - 1 - parts[::-1].index(root_dir)
-            module = parts[index + 1 :]
-            if root_dir == "tests":
-                return []
-            if module in (["lib"], ["main"]):
-                return []
-            return module[:-1] if module and module[-1] == "mod" else module
-    return parts[-1:]

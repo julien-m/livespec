@@ -35,7 +35,8 @@ def record_round(
     if path.is_file() and not path.is_symlink():
         try:
             loaded = json.loads(path.read_text(encoding="utf-8")).get("rounds", [])
-            rounds = [item for item in loaded if isinstance(item, dict)]
+            if isinstance(loaded, list):
+                rounds = [item for item in loaded if isinstance(item, dict)]
         except (OSError, ValueError, AttributeError):
             rounds = []
     if receipt.complete:

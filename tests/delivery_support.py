@@ -120,11 +120,12 @@ def report(
     blocking: int = 0,
     effort: str = "high",
     failed_check: bool = False,
+    agent: str = "native-reviewer",
 ) -> dict[str, object]:
     """Return a reviewer report covering ``files``."""
     return {
         "schema_version": "1",
-        "reviewer": {"agent": "native-reviewer", "model": MODEL, "effort": effort},
+        "reviewer": {"agent": agent, "model": MODEL, "effort": effort},
         "verdict": verdict,
         "reviewed_files": files,
         "checks": [{"command": "pytest -q", "exit_code": 1 if failed_check else 0}],

@@ -32,8 +32,8 @@ status: Draft
 
 ## Definitions
 
-- **Anchor block:** consecutive comment lines (`#` in Python, `//` in Rust) containing `@spec`, at least one `AC-<n>` and the feature, as `.specs/features/<feature>/` or `<feature>:AC-<n>`. Blocks naming another feature or no feature are ignored.
-- **Anchor target:** the first line after the block, skipping Python decorators and Rust attributes. A test function header binds the function's last assertion; an assertion inside a test function binds that assertion.
+- **Anchor block:** consecutive comment lines (`#` in Python, `//` in Rust), split into `@spec` entries (an `@spec` line and its continuation lines). An entry belongs to the feature when it qualifies ids as `<feature>:AC-<n>` (only those ids count) or names exactly the path `.specs/features/<feature>/`. Entries naming another feature, several features or none are ignored.
+- **Anchor target:** the first line after the block. A test function whose first decorator or header is on that line (Python `def` or `async def`; Rust after its attributes) binds its last assertion; an assertion inside a test function binds that assertion. A Rust function binds only with a `#[...test]` attribute of its own.
 - **Test files:** Python `test_*.py` and `*_test.py`; every `.rs` file, where only `#[test]`-like functions and assertions bind. Files in dot directories and build directories are skipped.
 - **Derived mapping:** an acceptance mapping with `"derivation": "anchors"`, no reviewer model and no review receipt path, whose bindings are exactly those derived from the anchors.
 
@@ -130,7 +130,7 @@ An execution AC with no anchor (`orphan_acceptance`) or an anchor naming an AC t
 
 ### AC-003
 
-An anchor in a Python test file that precedes neither a test function nor an assertion of one (`anchor_target_unresolved`), a test function without assertion (`anchor_test_without_assert`) or a parametrized test (`anchor_test_parametrized`) makes the command exit 1.
+Inside a test function, an anchor that precedes no assertion (`anchor_target_unresolved`); above a test function, one without assertion (`anchor_test_without_assert`); a parametrized test, including a multi-line `parametrize` decorator (`anchor_test_parametrized`); or a test file that does not parse (`anchor_source_unparsable`) makes the command exit 1. An anchor outside any test function is reported as non-blocking `anchor_not_bound`; its AC is then an orphan unless anchored elsewhere.
 
 ### AC-004
 

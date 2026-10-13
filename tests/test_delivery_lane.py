@@ -1,10 +1,5 @@
 """Delivery lane from the reviewed QE classification (feature 086 AC-001, AC-002)."""
 
-# @spec AC-001: Light lane
-#   — .specs/features/086-risk-proportional-delivery/spec.md#ac-001
-# @spec AC-002: Full lane reasons
-#   — .specs/features/086-risk-proportional-delivery/spec.md#ac-002
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -105,3 +100,27 @@ def test_unknown_feature_exits_2(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     project = make_project(tmp_path)
     monkeypatch.chdir(project.root)
     assert project.run("delivery", "lane", "--feature", "999-none").exit_code == 2
+
+
+@pytest.mark.parametrize(
+    ("qe", "code"),
+    [
+        ("**Criticality:** Medium-High\n**Blast radius:** Local", "criticality_missing"),
+        (
+            "**Criticality:** Medium (High for the payment path)\nLocal blast radius",
+            "qe_classification_conflicting",
+        ),
+        ("```\n# Example\n```\n**Criticality:** High\nLocal blast radius", "criticality_high"),
+    ],
+)
+def test_ambiguous_or_fenced_values_fail_safe(qe: str, code: str) -> None:
+    decision = classify("001-calc", spec_text(qe))
+    assert decision.lane == "full"
+    assert code in [reason.code for reason in decision.reasons]
+
+
+# @spec AC-002: Full lane reasons
+#   — .specs/features/086-risk-proportional-delivery/spec.md#ac-002
+def test_a_second_qe_section_is_conflicting() -> None:
+    text = spec_text() + "\n## Quality Engineering\n\nLow criticality; Local blast radius\n"
+    assert "qe_classification_conflicting" in [r.code for r in classify("001-calc", text).reasons]

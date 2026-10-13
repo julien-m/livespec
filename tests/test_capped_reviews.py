@@ -118,8 +118,6 @@ def test_blockers_still_block(project: DeliveryProject, options: dict[str, objec
     assert not _ready(project, **options).ready
 
 
-# @spec AC-002: Justified technical necessity is approved
-#   — .specs/features/088-capped-reviews/spec.md#ac-002
 @pytest.mark.parametrize(
     ("scope", "ready"),
     [
@@ -138,6 +136,8 @@ def test_scope_kind_decides_approval(
         assert carry_over(receipt) == ["technical scope: Temp file then rename.: Atomic write."]
 
 
+# @spec AC-002: Justified technical necessity is approved
+#   — .specs/features/088-capped-reviews/spec.md#ac-002
 def test_legacy_scope_without_kind_is_business() -> None:
     finding = ScopeFinding.model_validate(
         {"description": "d", "justification": "j", "approved": True, "citations": []}
@@ -202,3 +202,52 @@ def test_vague_word_is_reported_but_never_critical(tmp_path: Path) -> None:
     vague = [item for item in items if item.category == "non-functional quality"]
     assert vague and not any(item.critical for item in vague)
     assert any(item.critical for item in items if item not in vague)
+
+
+def test_documentary_acceptance_still_requires_covered(tmp_path: Path) -> None:
+    from tests.acceptance_review_support import add_documentary_acceptance
+    from tests.review_support import grounded_response, reviewed_project
+    from validator.semantic.acceptance_review import (
+        ingest_acceptance_review,
+        prepare_acceptance_review,
+        verify_acceptance_review,
+    )
+
+    feature = "001-test"
+    reviewed_project(tmp_path, feature)
+    receipt = add_documentary_acceptance(tmp_path, feature)
+    assert verify_acceptance_review(tmp_path, feature, receipt, model="reviewer/v1")
+    prepared = prepare_acceptance_review(tmp_path, feature, "reviewer/v1")
+    raw = json.loads(grounded_response(prepared))
+    first = raw["conclusions"][0]
+    first["disposition"] = "ambiguous"
+    raw["ambiguities"] = [
+        {
+            "requirement_id": first["requirement_id"],
+            "decision_key": "scope",
+            "question": "Which sections?",
+            "critical": False,
+            "citations": first["source_citations"],
+        }
+    ]
+    ingested, path = ingest_acceptance_review(
+        tmp_path, feature, [json.dumps(raw)], model="reviewer/v1"
+    )
+    assert not ingested.ready and "acceptance_requires_covered" in ingested.errors
+    assert not verify_acceptance_review(tmp_path, feature, path, model="reviewer/v1")
+
+
+def test_plan_analysis_reports_only_blockers(project: DeliveryProject) -> None:
+    from validator.semantic.review_contract import RequirementConclusion, conclusion_blocks
+
+    ambiguous = RequirementConclusion.model_validate(
+        {
+            "requirement_id": f"{FEATURE}:AC-001",
+            "disposition": "ambiguous",
+            "rationale": "r",
+            "source_citations": [{"section_id": "s", "excerpt": "e"}],
+        }
+    )
+    receipt = _ready(project, disposition="ambiguous", ambiguity=False)
+    assert not conclusion_blocks(ambiguous, receipt.ambiguities)
+    assert conclusion_blocks(ambiguous, [])

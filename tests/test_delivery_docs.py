@@ -43,6 +43,13 @@ def test_implement_skill_runs_checks_per_step_and_one_review() -> None:
     assert "[lane-light]" in skill and "[lane-full]" in skill
 
 
+def test_supervisor_dispatches_no_reviewer_per_step() -> None:
+    prompt = _read(".agent-sync/agents/livespec-supervisor/prompt.md")
+    assert "Spin up a **Spec Reviewer** subagent" not in prompt
+    assert "Dispatch no Spec Reviewer, Code Quality Reviewer or audit for a step" in prompt
+    assert "delivery-review.md" in prompt
+
+
 def test_feature_and_ship_skills_reuse_the_single_review() -> None:
     feature = _read(".agent-sync/skills/spec-feature/SKILL.md")
     assert "livespec delivery review verify --feature NNN-feature-name" in feature

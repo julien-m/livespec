@@ -113,3 +113,22 @@ def base_text(root: Path, base: str, path: str) -> str | None:
         return _git(root, "show", f"{base}:./{path}").decode(errors="replace")
     except DiffUnavailableError:
         return None
+
+
+def is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
+    """True when ``ancestor`` is ``descendant`` or one of its ancestors."""
+    try:
+        _git(root, "merge-base", "--is-ancestor", ancestor, descendant)
+    except DiffUnavailableError:
+        return False
+    return True
+
+
+def default_branch_commit(root: Path) -> str | None:
+    """Commit of the remote default branch, else local `main` or `master`, else None."""
+    for name in ("refs/remotes/origin/HEAD", "refs/heads/main", "refs/heads/master"):
+        try:
+            return resolve_commit(root, name)
+        except DiffUnavailableError:
+            continue
+    return None

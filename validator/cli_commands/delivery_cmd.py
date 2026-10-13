@@ -93,7 +93,10 @@ def prepare_command(
     """Hash every path of the feature diff for the independent reviewer."""
     root = require_specs_root()
     decision = _lane(root, feature, model, max_chars)
-    scope, error = prepare_scope(root, feature, base, decision.lane)
+    try:
+        scope, error = prepare_scope(root, feature, base, decision.lane)
+    except DeliveryInputError as exc:
+        _usage(str(exc))
     payload = {**scope, "error": error, "protocol": "system/delivery-review.md"}
     if as_json:
         typer.echo(json.dumps(payload))

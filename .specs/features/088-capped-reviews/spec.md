@@ -113,7 +113,7 @@ flowchart TD
 
 ### AC-001
 
-A complete review is ready when no conclusion is `missing` or `contradictory`, every `ambiguous` conclusion has at least one ambiguity and only non-critical or resolved ones, no critical ambiguity is unresolved, no finding is `blocking` and every extra scope item is accepted; `carry_over(receipt)` lists the non-blocking findings, the unresolved non-critical ambiguities and the accepted unapproved technical scope.
+A complete review is ready when no conclusion is `missing` or `contradictory`, every `ambiguous` conclusion has at least one ambiguity and only non-critical or resolved ones, no critical ambiguity is unresolved, no finding is `blocking` and every extra scope item is accepted; `carry_over(receipt)` lists the non-blocking findings, the unresolved non-critical ambiguities and the accepted unapproved technical scope. Proof-bearing reviews keep the strict rule: documentary acceptance and acceptance mapping reviews need every conclusion `covered` and every extra scope item `approved` (`acceptance_requires_covered`, `mapping_requires_covered`).
 
 ### AC-002
 

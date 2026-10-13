@@ -13,8 +13,10 @@ Lane = Literal["light", "full"]
 
 _LIGHT_CRITICALITY = frozenset({"low", "medium"})
 _LIGHT_BLAST_RADIUS = frozenset({"local", "shared"})
-_CRITICALITY = r"(low|medium|high)"
-_BLAST_RADIUS = r"(local|shared|cross-system|external)"
+# A value must end at a delimiter: "Medium-High" is not "Medium".
+_CRITICALITY = r"(low|medium|high)(?![\w-])"
+_BLAST_RADIUS = r"(local|shared|cross-system|external)(?![\w-])"
+_FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,}).*?^ {0,3}\1[^\S\n]*$", re.MULTILINE | re.DOTALL)
 # Forms used by existing specs: prose ("High criticality; Shared blast radius"),
 # bold labels ("**Criticality:** High") and table rows ("| Criticality | High |").
 _CRITICALITY_PATTERNS = (
@@ -67,7 +69,11 @@ class LaneDecision:
 
 
 def qe_section(spec_text: str) -> str | None:
-    """Return the body of the first ``Quality Engineering`` section, or None."""
+    """Return the body of the only ``Quality Engineering`` section, or None.
+
+    Fenced code blocks are ignored, so an example cannot select or end the section.
+    """
+    spec_text = _FENCE.sub("", spec_text)
     match = _QE_HEADING.search(spec_text)
     if match is None:
         return None
@@ -78,8 +84,14 @@ def qe_section(spec_text: str) -> str | None:
     return rest[: end.start()] if end else rest
 
 
-def _values(section: str, patterns: tuple[re.Pattern[str], ...]) -> set[str]:
-    return {m.group(1).lower() for pattern in patterns for m in pattern.finditer(section)}
+def _values(section: str, patterns: tuple[re.Pattern[str], ...], value: str) -> set[str]:
+    """Every value of a field; any other value word on a field line counts as a conflict."""
+    found: set[str] = set()
+    word = re.compile(rf"\b{value}", re.IGNORECASE)
+    for line in section.splitlines():
+        if any(pattern.search(line) for pattern in patterns):
+            found.update(m.group(1).lower() for m in word.finditer(line))
+    return found
 
 
 # @spec FR-002: QE classification and lane rule
@@ -88,16 +100,20 @@ def classify(feature: str, spec_text: str) -> LaneDecision:
     """Parse the QE classification and collect every full-lane reason except review currency."""
     decision = LaneDecision(feature)
     section = qe_section(spec_text)
+    if len(_QE_HEADING.findall(_FENCE.sub("", spec_text))) > 1:
+        decision.reasons.append(
+            LaneReason("qe_classification_conflicting", "several Quality Engineering sections")
+        )
     if section is None:
         decision.reasons.append(
             LaneReason("qe_section_missing", "spec.md has no 'Quality Engineering' section")
         )
         return decision
-    for name, patterns, light in (
-        ("criticality", _CRITICALITY_PATTERNS, _LIGHT_CRITICALITY),
-        ("blast_radius", _BLAST_PATTERNS, _LIGHT_BLAST_RADIUS),
+    for name, patterns, light, value_pattern in (
+        ("criticality", _CRITICALITY_PATTERNS, _LIGHT_CRITICALITY, _CRITICALITY),
+        ("blast_radius", _BLAST_PATTERNS, _LIGHT_BLAST_RADIUS, _BLAST_RADIUS),
     ):
-        found = _values(section, patterns)
+        found = _values(section, patterns, value_pattern)
         if not found:
             decision.reasons.append(LaneReason(f"{name}_missing", f"no {name} value in QE"))
             continue

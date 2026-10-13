@@ -33,7 +33,7 @@ SCOPE = ["calc.py", "tests/test_calc.py"]
 
 def _prepare(project: DeliveryProject) -> tuple[int, dict[str, object]]:
     return project.json(
-        "delivery", "review", "prepare", "--feature", FEATURE, "--base", "HEAD", "--model", MODEL
+        "delivery", "review", "prepare", "--feature", FEATURE, "--base", "HEAD~1", "--model", MODEL
     )
 
 
@@ -68,15 +68,26 @@ def test_prepare_hashes_every_counted_path(project: DeliveryProject) -> None:
     assert (project.feature_dir / ".reviews" / "delivery-scope.json").is_file()
 
 
-def test_prepare_reports_empty_scope_and_unknown_base(project: DeliveryProject) -> None:
-    git(project.root, "add", "-A")
-    git(project.root, "commit", "-qm", "all")
-    code, scope = _prepare(project)
-    assert (code, scope["error"]) == (1, "empty_scope")
+def test_prepare_reports_empty_scope_and_unknown_base(
+    project: DeliveryProject, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     code, scope = project.json(
         "delivery", "review", "prepare", "--feature", FEATURE, "--base", "no-such-rev"
     )
     assert (code, scope["error"]) == (1, "diff_unavailable")
+    clean = make_project(tmp_path / "clean")
+    monkeypatch.chdir(clean.root)
+    code, scope = clean.json(
+        "delivery", "review", "prepare", "--feature", FEATURE, "--base", "HEAD"
+    )
+    assert (code, scope["error"]) == (1, "empty_scope")
+
+
+def test_base_newer_than_the_feature_start_is_refused(project: DeliveryProject) -> None:
+    code, scope = project.json(
+        "delivery", "review", "prepare", "--feature", FEATURE, "--base", "HEAD", "--model", MODEL
+    )
+    assert (code, scope["error"]) == (1, "base_not_feature_start")
 
 
 # @spec AC-004: Record conditions
@@ -172,7 +183,47 @@ def test_full_lane_requires_separate_review_and_audit(project: DeliveryProject) 
     assert _record(project, "review", report(scope))[0] == 0
     assert _verify(project) == (1, ["kind_missing:audit"])
     assert _record(project, "audit", report(scope))[0] == 0
+    assert _verify(project) == (1, ["reviewers_not_independent"])
+    assert _record(project, "audit", report(scope, agent="auditor"))[0] == 0
     assert _verify(project) == (0, [])
+
+
+def test_light_lane_accepts_review_and_audit_after_a_blocked_combined(
+    project: DeliveryProject,
+) -> None:
+    _prepare(project)
+    _record(project, "combined", report(SCOPE, verdict="BLOCKED", blocking=1))
+    assert _record(project, "review", report(SCOPE))[0] == 0
+    assert _record(project, "audit", report(SCOPE, agent="auditor"))[0] == 0
+    assert _verify(project) == (0, [])
+
+
+def test_edited_receipt_is_not_trusted(project: DeliveryProject) -> None:
+    _prepare(project)
+    _record(project, "combined", report(SCOPE, verdict="BLOCKED", blocking=1))
+    path = project.feature_dir / ".reviews" / "delivery.json"
+    data = json.loads(path.read_text())
+    data["kinds"]["combined"]["rounds"][-1]["verdict"] = "PASS"
+    path.write_text(json.dumps(data))
+    assert _verify(project) == (1, ["latest_round_blocked:combined"])
+    forged = json.dumps(report(SCOPE))
+    data["kinds"]["combined"]["rounds"][-1]["report_raw"] = forged
+    path.write_text(json.dumps(data))
+    assert _verify(project) == (1, ["receipt_invalid:combined"])
+    data["kinds"]["combined"]["rounds"][-1]["files"]["calc.py"] = "0" * 64
+    data["kinds"] = []
+    path.write_text(json.dumps(data))
+    assert _verify(project) == (1, ["no_receipt"])
+
+
+def test_lifecycle_status_change_keeps_the_review_current(project: DeliveryProject) -> None:
+    _prepare(project)
+    spec = project.feature_dir / "spec.md"
+    assert _record(project, "combined", report(SCOPE))[0] == 0
+    spec.write_text(spec.read_text().replace("**Status:** Planned", "**Status:** Implemented"))
+    assert _verify(project) == (0, [])
+    spec.write_text(spec.read_text().replace("their sum", "their product"))
+    assert _verify(project)[0] == 1  # A normative change invalidates the review.
 
 
 def test_verify_without_receipt(project: DeliveryProject) -> None:

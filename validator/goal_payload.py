@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from . import goal_contracts as _contracts
+from .delivery.goal import goal_delivery_lane
 from .goal_outcome import MAX_ATTEMPTS_PER_TASK, goal_requirement, stop_condition
 from .goal_tasks import finalize_required_tasks
 
@@ -133,7 +134,7 @@ def _goal_runtime(
         command, project_root, feature, normalized_flags
     )
     has_penflow = _contracts._detect_penflow(project_root)
-    delivery_lane = _delivery_lane(command, project_root, feature, normalized_flags)
+    delivery_lane = goal_delivery_lane(command, project_root, feature, normalized_flags)
     extra = frozenset({f"lane-{delivery_lane['lane']}"}) if delivery_lane else frozenset()
     execution_tasks = _contracts._extract_execution_tasks(
         skill_path,
@@ -167,33 +168,6 @@ def _goal_runtime(
         },
         execution_tasks,
         definition_of_done,
-    )
-
-
-# @spec FR-007: Delivery lane in the implement goal
-#   — .specs/features/086-risk-proportional-delivery/spec.md#fr-007
-def _delivery_lane(
-    command: str, project_root: Path, feature: str | None, normalized_flags: list[str]
-) -> dict[str, object] | None:
-    """Return the lane decision for an implement goal of an existing feature, else None."""
-    if command != "spec-implement" or not feature:
-        return None
-    from .delivery.lane import DeliveryInputError, evaluate_lane
-
-    model = _flag_value(normalized_flags, "--model") or ""
-    budget = _flag_value(normalized_flags, "--review-max-chars")
-    try:
-        decision = evaluate_lane(
-            project_root, feature, model, int(budget) if budget and budget.isdigit() else None
-        )
-    except DeliveryInputError:
-        return None
-    return decision.to_json()
-
-
-def _flag_value(normalized_flags: list[str], name: str) -> str | None:
-    return next(
-        (flag.split("=", 1)[1] for flag in normalized_flags if flag.startswith(f"{name}=")), None
     )
 
 

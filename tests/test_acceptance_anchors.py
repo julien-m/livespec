@@ -95,12 +95,11 @@ def test_unknown_anchor_refuses(project: Path) -> None:
     assert _derive(project)[0] == 1
 
 
-# @spec AC-003: Unresolved, assert-less and parametrized targets
-#   — .specs/features/087-anchor-derived-acceptance/spec.md#ac-003
 @pytest.mark.parametrize(
     ("body", "code"),
     [
-        ("def helper():\n    return 1\n", "anchor_target_unresolved"),
+        ("def helper():\n    return 1\n", "orphan_acceptance"),
+        ("def test_add():\n    x = add(1, 2)\n", "anchor_test_without_assert"),
         ("def test_add():\n    add(1, 2)\n", "anchor_test_without_assert"),
         (
             "import pytest\n@pytest.mark.parametrize('x', [1])\ndef test_add(x):\n    assert x\n",
@@ -251,3 +250,47 @@ def test_rust_integration_anchor_without_test_refuses(project: Path) -> None:
     )
     [binding] = derive_acceptance(project, FEATURE).bindings
     assert binding.test_id == "adds"
+
+
+def test_stacked_anchors_of_two_features_stay_separate(project: Path) -> None:
+    (project / "test_app.py").write_text(
+        "from app import add\n\n\n"
+        f"# @spec AC-001: three\n#   — {REF}#ac-001\n"
+        "# @spec AC-002: other\n#   — .specs/features/002-other/spec.md#ac-002\n"
+        f"# @spec {FEATURE}:AC-001, 002-other:AC-005 qualified\n"
+        "def test_add():\n    assert add(1, 2) == 3\n"
+    )
+    derivation = derive_acceptance(project, FEATURE)
+    assert derivation.issues == []
+    assert [b.requirement_id for b in derivation.bindings] == [AC]
+
+
+# @spec AC-003: Unresolved, assert-less and parametrized targets
+#   — .specs/features/087-anchor-derived-acceptance/spec.md#ac-003
+def test_multiline_decorators_async_and_syntax_errors(project: Path) -> None:
+    anchor = f"# @spec AC-001: three\n#   — {REF}#ac-001\n"
+    (project / "test_app.py").write_text(
+        "import pytest\n"
+        + anchor
+        + "@pytest.mark.parametrize(\n    'x',\n    [1],\n)\ndef test_add(x):\n    assert x\n"
+    )
+    assert "anchor_test_parametrized" in _codes(project)
+    (project / "test_app.py").write_text(
+        anchor + "@pytest.mark.skipif(\n    False, reason='never'\n)\nasync def test_add():\n"
+        "    assert True\n"
+    )
+    [binding] = derive_acceptance(project, FEATURE).bindings
+    assert binding.start_line == 7
+    (project / "test_app.py").write_text(anchor + "def test_add(:\n    assert True\n")
+    assert "anchor_source_unparsable" in _codes(project)
+
+
+def test_rust_assertion_in_production_code_is_not_bound(project: Path) -> None:
+    (project / "src").mkdir()
+    (project / "src/calc.rs").write_text(
+        "pub fn compute(x: i32) -> i32 {\n"
+        f"    // @spec AC-001: see #[test]\n    //   — {REF}#ac-001\n"
+        "    assert!(x > 0);\n    x\n}\n"
+    )
+    derivation = derive_acceptance(project, FEATURE)
+    assert all(b.assertion_path != "src/calc.rs" for b in derivation.bindings)

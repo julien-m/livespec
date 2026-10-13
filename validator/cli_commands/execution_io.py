@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import shlex
+import tempfile
 from pathlib import Path
 
 import typer
@@ -13,10 +14,10 @@ from validator.execution_capture import capture_execution
 from validator.execution_evidence import verify_execution_receipt
 from validator.execution_mapping import (
     AcceptanceMapping,
-    derived_mapping,
     ingest_mapping_review,
     prepare_mapping_review,
 )
+from validator.execution_mapping_anchors import derived_mapping
 from validator.semantic.review_contract import REVIEW_SCHEMA
 
 from .review_io import NativeReviewInput
@@ -67,10 +68,14 @@ def execution_io(
 
 def _derive(root: Path, feature: str, mapping_path: Path) -> None:
     """Write the anchor-derived mapping only when no blocking issue remains (087 FR-004)."""
+    if mapping_path.exists() or mapping_path.is_symlink():
+        try:
+            AcceptanceMapping.model_validate_json(mapping_path.read_bytes())
+        except (OSError, ValueError) as exc:
+            raise ValueError("derive_mapping_refuses_to_overwrite_a_non_mapping_file") from exc
     mapping, derivation = derived_mapping(root, feature)
     if mapping is not None:
-        mapping_path.parent.mkdir(parents=True, exist_ok=True)
-        mapping_path.write_text(mapping.model_dump_json(indent=2) + "\n", encoding="utf-8")
+        _publish(mapping_path, mapping.model_dump_json(indent=2) + "\n")
     payload = {
         "feature": feature,
         "mapping_path": mapping_path.relative_to(root).as_posix() if mapping else None,
@@ -80,6 +85,22 @@ def _derive(root: Path, feature: str, mapping_path: Path) -> None:
     }
     typer.echo(json.dumps(payload))
     raise typer.Exit(0 if mapping is not None else 1)
+
+
+def _publish(path: Path, text: str) -> None:
+    """Atomic write that never follows a link at the destination."""
+    if path.is_symlink():
+        raise ValueError("derive_mapping_refuses_a_linked_destination")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(prefix=".mapping-", dir=path.parent)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            stream.write(text)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        Path(temporary).unlink(missing_ok=True)
 
 
 def _capture(
