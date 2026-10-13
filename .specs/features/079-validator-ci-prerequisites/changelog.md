@@ -146,3 +146,39 @@ The event-policy test asserted the same facts three times regardless of its para
 - **Author:** spec-fix (claude-opus-5-5)
 
 <!-- finalize:spec-fix:2026-10-12:7208ea4d -->
+
+### 2026-10-13 — Spec Update: Penflow is a public pinned dependency
+
+- **Type:** Spec Update
+- **Spec modified:** Yes (sections: P1 Gherkin scenarios, FR-002, AC-002, Key Entities, Edge Cases); plan.md Workflow Interaction, sequence diagram, Implementation Step 2, Files in Scope and Risks synchronized
+- **Code modified:** None
+- **AC impacted:** AC-002 (IDs preserved, no renumbering)
+- **Reason:** julien-m/penflow was republished public (MIT) with a rewritten history; former private revision dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7 no longer exists upstream. Its commit-map equivalent dd356b95f8543d025b85632ce3998eed88fef07c (identical package code) is verified by anonymous fetch. Penflow therefore needs no credential; the pin stays immutable and the real CLI (no stub) stays required. The private normative corpus and its capability are unchanged.
+- **Downstream:** implementation.md exists; the CI workflow and its policy tests must follow through spec-fix FR-002.
+- **Author:** spec-refine (claude-opus-5-5)
+
+<!-- finalize:spec-refine:2026-10-13:7747cdfe -->
+
+### 2026-10-13 — Check: Spec-code alignment verified (FR-002 public Penflow pin gap)
+
+- **Type:** Spec Update
+- **Spec modified:** No
+- **Code modified:** None
+- **Coverage:** 6/11 verified (55%), 2 partial (FR-005, AC-002), 1 drifted (AC-006), 1 missing (FR-002), 1 pending (AC-005)
+- **Findings:** The workflow still checks out the nonexistent private Penflow revision dcbfea6 with PENFLOW_READONLY_DEPLOY_KEY and capability gates in both jobs. The real CLI from public dd356b9 passes 30 authority tests locally. The corpus sparse checkout supplies 7 documents, against 3 in the spec. AC-005 is still pending.
+- **Report:** `checks/2026-10-13.md`
+- **Author:** spec-check (claude-opus-5-5)
+
+<!-- finalize:spec-check:2026-10-13:4cb75000 -->
+
+## 2026-10-13 — [Fix]: 1 gap closed (1 functional, 0 visual) — public Penflow pin
+
+- **Type:** Bug Fix
+- **Spec modified:** No (refined earlier today by spec-refine)
+- **Code modified:** `.github/workflows/ci.yml`, `tests/test_generation_ci_selection.py`, `acceptance-mapping.json` (new)
+- **Gaps closed:** FR-002, AC-002 — both CI jobs check out public julien-m/penflow at dd356b95f8543d025b85632ce3998eed88fef07c without ssh-key or capability gate; new policy tests were RED (5 failed) before the workflow change and GREEN after.
+- **Evidence:** progression implement READY; runner receipt bf31deb16fdf4dde80242aeb31dd93ea certifies AC-002 (16 passed); local unit suite 3819 passed / 28 skipped; conventions PASS at feature and repo scope; independent post-fix check in [checks/2026-10-13.md](checks/2026-10-13.md).
+- **Remaining:** AC-005 (same-SHA CI stability, reset by this SHA); AC-006 corpus-count drift (7 shipped vs 3 specified), out of this fix's scope.
+- **Author:** spec-fix (claude-opus-5-5)
+
+<!-- finalize:spec-fix:2026-10-13:5a48c61f -->

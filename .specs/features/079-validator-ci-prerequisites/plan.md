@@ -24,7 +24,7 @@ Keep production validation types and authority boundaries intact. Tests use real
 ```gherkin
 Feature: Restore exact Validator CI checks
 Scenario: Run exact checks against immutable inputs
-  Given the reviewed repair commit and pinned private dependency are accessible
+  Given the reviewed repair commit, public pinned Penflow and the private pinned corpus are accessible
   When CI installs the existing toolchain and dependency
   Then each existing check receives those exact inputs
   And any failed check blocks delivery
@@ -33,7 +33,7 @@ Scenario: Reset stability after a source change
   When a repair changes that SHA
   Then the workflow returns to repair and requires new review and check evidence
 Scenario: Retain missing-capability state
-  Given a deterministic check lacks its authorized private dependency access
+  Given a deterministic check lacks its authorized private corpus access
   When it requests that capability
   Then CI enters WaitingCapability without claiming success
   And execution resumes only after the capability is actually available
@@ -42,10 +42,13 @@ Scenario: Retain missing-capability state
 ```mermaid
 sequenceDiagram
  participant W as Existing workflow
- participant P as Private dependency repository
+ participant P as Public Penflow repository
+ participant C as Private normative corpus repository
  participant T as Existing check commands
- W->>P: Authorized read of pinned revision
- P-->>W: Exact dependency bytes
+ W->>P: Anonymous read of pinned commit
+ P-->>W: Exact Penflow bytes
+ W->>C: Authorized read of pinned revision
+ C-->>W: Exact corpus documents
  W->>T: Install CLI and execute unchanged check selection
  T-->>W: Actual pass or fail receipts
 ```
@@ -67,7 +70,7 @@ stateDiagram-v2
 ## Implementation Steps
 
 1. FR-001 / AC-001: Move None last in the two recursive union declarations; run formatter only on rejected files; give negative-test dictionaries explicit types and narrow parsed JSON fixture shapes without relaxing production types. Use actual CliRunner Result return type. Preserve invalid values used by negative tests.
-2. FR-002 / AC-002: Install actual Penflow at verified Git revision dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7. Locally use an exact Git archive into isolated owned storage. CI uses a dedicated read-only private-repository access capability; absent capability remains a failure, never a stub or public vendoring.
+2. FR-002 / AC-002: Install actual Penflow at verified public commit dd356b95f8543d025b85632ce3998eed88fef07c of julien-m/penflow. It is the history-rewrite commit-map equivalent of former private revision dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7, with identical package code; the former SHA no longer exists upstream. Both CI jobs check out that full SHA with persist-credentials false, no ssh-key and no Penflow capability gate, install it, then remove the checkout. Locally use an exact Git archive of the same commit into isolated owned storage. Never a stub, mutable ref or vendored copy. Workflow-policy tests assert the exact pin, the absence of any Penflow credential and install ordering in both jobs.
 3. FR-003 / AC-003: Keep npm ci and Chromium install. Install the real AST backend with npm install --global @ast-grep/cli@0.44.0 after restoring Node26 and before full unit collection; assert sg --version equals ast-grep0.44.0. The Ubuntu sg command may refer to Unix group switching, so PATH presence alone does not prove the backend. Local parity uses the same package in an isolated owned npm prefix and prepends its bin directory, without changing the global Mac installation. Remove runner-only inherited PYTEST_ADDOPTS and isolate test temp storage outside ancestor spec/package roots. Re-run complete unchanged unit and integration commands, repairing only actual remaining causes.
 4. FR-004 / AC-004: Add correct and foreign healthy-symlink cases to visual-gate tests; retain the exact 94 percent threshold and existing coverage command.
 5. FR-005 / AC-005, AC-006: Remove generation-selection/generation-model jobs and unused model inputs/pins/secrets from GitHub; keep all deterministic check commands and local opt-in helpers. In unit-tests, require AIRESOURCES_READONLY_DEPLOY_KEY and sparse-checkout only code-conventions/javascript.md, rust.md and swift-kotlin.md from private julien-m/ai-ressources at11976242fc5b9ae5f3a574e19339b78ebd18a0c4 into .ci-deps/ai-ressources, persist-credentials:false. Set AIRESOURCES to the absolute checkout path before unit collection. Keep real source-hash checks; cleanup always after consumers, without private artifacts or caches. Test missing-capability failure, exact pins/files/env/order and cleanup. Local tests use the same isolated three Git blobs. Update the two existing workflow-policy test modules and078FR-014/AC-013 current docs; preserve historical reports. Inspect staged scope/diff, commit/push existing PR35, and collect exact same-SHA GitHub checks twice at least120seconds apart. Independent Validator/Reviewer and main delivery belong to Manager.
@@ -81,7 +84,7 @@ The implementation artifact records every actual changed file, including formatt
 | `.agent-sync/skills/spec-specify/SKILL.md` | Format rejected Python examples; preserve behavior and requirements |
 | `.github/workflows/ci.yml` | Preserve pinned Penflow/runtime/checks; remove model jobs; privately provide exact normative corpus for unit collection |
 | `tests/test_generation_ci_events.py` | Assert deterministic event/job policy and unchanged command set; no automatic model calls |
-| `tests/test_generation_ci_selection.py` | Verify private corpus pin, sparse paths, required capability, environment, ordering and cleanup |
+| `tests/test_generation_ci_selection.py` | Verify private corpus pin, sparse paths, required capability, environment, ordering and cleanup; verify the public credential-free Penflow pin in both jobs |
 | `.specs/features/078-requirement-evidence-integrity/spec.md` | Align FR-014 and AC-013 with user-authorized GitHub policy; preserve local evaluation |
 | `.specs/features/078-requirement-evidence-integrity/plan.md` | Synchronize Step8 policy implementation without changing other obligations |
 | `README.md` | Document deterministic CI and opt-in local evaluation |
@@ -159,4 +162,4 @@ The following commands reproduce the existing CI checks without importing unrela
 
 ## Risks & Considerations
 
-Private Penflow and normative-corpus access require separate authorized read-only CI capabilities; no source workaround can manufacture them. GitHub model credentials are removed by explicit user policy. Local generation remains opt-in. Formatting examples changes hashes used by source-backed reviews; finish formatting before final review/capture. Keep prior evidence immutable. Existing unrelated feature debts are not included merely because legacy implementation maps mention their modules.
+Penflow is a public MIT dependency read without any credential; the normative corpus still requires its authorized read-only CI capability, and no source workaround can manufacture it. An upstream history rewrite can orphan a pinned SHA; repin only to a verified content-equivalent commit. GitHub model credentials are removed by explicit user policy. Local generation remains opt-in. Formatting examples changes hashes used by source-backed reviews; finish formatting before final review/capture. Keep prior evidence immutable. Existing unrelated feature debts are not included merely because legacy implementation maps mention their modules.

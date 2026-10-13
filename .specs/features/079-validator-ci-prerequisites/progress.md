@@ -54,3 +54,13 @@ No final feature certification or implemented lifecycle promotion is claimed.
 |---|---|---|---|---|---|
 | Readiness gate | Done | `.reviews/{spec,plan}.json` (claude-opus-5-5, 150000) | `livespec validate --progression implement` | READY | 2026-10-12 08:30 |
 | Fix | Done | `tests/conventions_hermetic_catalogs.py`, `tests/test_conventions_generated_catalog.py`, `tests/test_conventions_source_decisions.py`, `tests/_conventions_source_decisions_serialization.py`, `tests/test_generation_ci_selection.py` | conventions + CI suites, with and without AIRESOURCES | Pass | 2026-10-12 08:30 |
+
+## 2026-10-13 — spec-fix: public Penflow pin (FR-002)
+
+| Step | Status | Files | Verification | Result | Date |
+|---|---|---|---|---|---|
+| Refine | Done | `spec.md`, `plan.md` | `livespec validate` 100/100; spec/plan reviews complete+ready (claude-opus-5-5, 150000) | READY | 2026-10-13 |
+| Gap report | Done | `checks/2026-10-13.md` | independent spec-check | FR-002 missing | 2026-10-13 |
+| RED | Done | `tests/test_generation_ci_selection.py` | targeted pytest | 5 failed / 6 passed | 2026-10-13 |
+| Fix | Done | `.github/workflows/ci.yml` | targeted pytest | 15 passed | 2026-10-13 |
+| Capture | Done | `acceptance-mapping.json` | `livespec test` receipt `bf31deb16fdf4dde80242aeb31dd93ea` | AC-002 certified | 2026-10-13 |

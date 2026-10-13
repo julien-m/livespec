@@ -7,6 +7,15 @@
 
 ---
 
+## 2026-10-13 — [Feature 079] Fix: 1/1 gaps closed (FR-002) — CI installs public Penflow pinned at dd356b9 without credential
+<!-- finalize:spec-fix:2026-10-13:5a48c61f -->
+
+## 2026-10-13 — [Feature 079] Check: 55% verified (3/5 FR, 3/6 AC) — FR-002 public Penflow pin missing in CI, AC-006 corpus drift, AC-005 pending
+<!-- finalize:spec-check:2026-10-13:4cb75000 -->
+
+## 2026-10-13 — [Feature 079] Spec refined: Penflow is a public dependency pinned to verified commit dd356b9 without credential — FR-002/AC-002 reworded, IDs preserved
+<!-- finalize:spec-refine:2026-10-13:7747cdfe -->
+
 ## 2026-10-12 — Bugfix: Stop conditions keep the caller runtime
 
 - Read [081's bugfix trace](features/081-lightweight-outcome-goals/changelog.md): a consumer-local `validator` package can no longer return a false successful outcome; both stop conditions retain the consumer working directory and their 300-second bound.
