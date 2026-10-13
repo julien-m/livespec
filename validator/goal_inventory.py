@@ -98,11 +98,7 @@ def _active_execution_task_branches(
     command: str | None = None,
     extra_branches: frozenset[str] = frozenset(),
 ) -> set[str]:
-    """Calculate which execution task branches are active based on context.
-
-    ``extra_branches`` carries context decided outside the flags, such as the
-    delivery lane of feature 086 (``lane-light`` or ``lane-full``).
-    """
+    """Active execution task branches; ``extra_branches`` adds the 086 delivery lane."""
     active: set[str] = {"always", *extra_branches}
     flag_names = _contracts._flag_names(normalized_flags)
     # Preview excludes generic visual scaffolding too, even with an existing UI feature.
@@ -223,7 +219,6 @@ def _extract_execution_tasks(
     if not skill_path.exists():
         return []
     text = skill_path.read_text(encoding="utf-8")
-    # Find the machine-readable execution task section heading
     match = re.search(r"^##\s+Execution Tasks\s*$", text, flags=re.MULTILINE)
     if match is None:
         return []

@@ -166,9 +166,11 @@ def _feature_ids(entry: str, feature: str) -> tuple[str, ...] | None:
     if qualified:
         return tuple(qualified)
     features = set(re.findall(r"\.specs/features/([^/\s#]+)/", entry))
-    if features == {feature}:
-        return tuple(_AC.findall(entry))
-    return None
+    if features != {feature}:
+        return None
+    # Bare ids come from the `@spec` line only, never from prose or other features' ids.
+    head = re.sub(r"[\w.-]+:AC-\d+\b", "", entry.splitlines()[0])
+    return tuple(_AC.findall(head))
 
 
 def _anchors(path: str, text: str, feature: str, rust: bool) -> list[_Anchor]:

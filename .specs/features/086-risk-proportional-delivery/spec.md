@@ -171,11 +171,11 @@ The lane is `full` with every applicable reason: `qe_section_missing`, `critical
 
 ### AC-003
 
-`livespec delivery review prepare --feature <feature> --base <rev>` writes `.reviews/delivery-scope.json` with the resolved base commit, the lane and every Feature diff path with its SHA-256 (or `deleted`), prints the scope, and exits 1 with `diff_unavailable`, `empty_scope`, or `base_not_feature_start` when the base is not an ancestor of HEAD or is newer than the commit before the one that created the feature `spec.md`; a feature `spec.md` or `plan.md` whose normative content equals the base is not in the scope, and changed ones are identified by their normative hash, so lifecycle metadata edits never change the scope.
+`livespec delivery review prepare --feature <feature> --base <rev>` writes `.reviews/delivery-scope.json` with the resolved base commit, the lane and every Feature diff path with its SHA-256 (or `deleted`), prints the scope, and exits 1 with `diff_unavailable`, `empty_scope`, or `base_not_feature_start` when the base is not an ancestor of HEAD, the feature `spec.md` was never committed, or the base is newer than the parent of the commit that created that `spec.md` (the creating commit itself is accepted only when it changes nothing outside the feature directory); each path is identified by its SHA-256, `deleted`, its link target or its submodule commit; a feature `spec.md` or `plan.md` whose normative content equals the base is not in the scope, and changed ones are identified by their normative hash, so lifecycle metadata edits never change the scope.
 
 ### AC-004
 
-`livespec delivery review record --feature <feature> --kind combined|review|audit --report <report.json>` records the report and exits 0 only for a PASS report when: the prepared scope exists (`scope_missing`), the current hashes equal the prepared ones and no path was added (`scope_changed`), `reviewed_files` contains every scoped path (`scope_not_covered`), reviewer effort is `high` (`reviewer_effort_not_high`), PASS has no blocking finding and no failed check while BLOCKED has at least one blocking finding (`verdict_inconsistent`); a valid BLOCKED report is recorded and exits 1; an invalid report writes nothing.
+`livespec delivery review record --feature <feature> --kind combined|review|audit --report <report.json>` records the report and exits 0 only for a PASS report when: the prepared scope exists (`scope_missing`), its base still satisfies the base rule of AC-003 (`base_not_feature_start`), the current hashes equal the prepared ones and no path was added (`scope_changed`), `reviewed_files` contains every scoped path (`scope_not_covered`), reviewer effort is `high` (`reviewer_effort_not_high`), PASS has no blocking finding and no failed check while BLOCKED has at least one blocking finding (`verdict_inconsistent`); a valid BLOCKED report is recorded and exits 1; an invalid report writes nothing.
 
 ### AC-005
 
@@ -183,7 +183,7 @@ When the initial report and two correction rounds of the same kind are all BLOCK
 
 ### AC-006
 
-`livespec delivery review verify --feature <feature> [--json]` exits 0 only when the latest round of every kind the current lane requires (the latest `combined` round or the latest `review` and `audit` rounds for light; both `review` and `audit` for full) is PASS and the current Feature diff against the recorded base equals the recorded scope; verify re-validates the stored report text against its SHA-256 and the record conditions, and requires a `review` and an `audit` from different agents and reports; otherwise it exits 1 with `no_receipt`, `kind_missing:<kind>`, `latest_round_blocked:<kind>`, `receipt_invalid:<kind>`, `reviewers_not_independent` or `scope_changed`.
+`livespec delivery review verify --feature <feature> [--json]` exits 0 only when the latest round of every kind the current lane requires (the latest `combined` round or the latest `review` and `audit` rounds for light; both `review` and `audit` for full) is PASS, its recorded base still satisfies the base rule of AC-003 and the current Feature diff against that base equals the recorded scope; verify re-validates the stored report text against its SHA-256 and the record conditions, and requires a `review` and an `audit` from different agents and reports; otherwise it exits 1 with `no_receipt`, `kind_missing:<kind>`, `latest_round_blocked:<kind>`, `receipt_invalid` (malformed receipt), `receipt_invalid:<kind>`, `base_not_feature_start`, `reviewers_not_independent` or `scope_changed`.
 
 ### AC-007
 

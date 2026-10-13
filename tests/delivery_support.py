@@ -108,8 +108,10 @@ def make_project(tmp_path: Path, spec: str | None = None) -> DeliveryProject:
     git(project.root, "init", "-q")
     git(project.root, "config", "user.email", "t@example.invalid")
     git(project.root, "config", "user.name", "t")
-    git(project.root, "add", "-A")
+    git(project.root, "add", "-A", "--", ".", f":!.specs/features/{FEATURE}")
     git(project.root, "commit", "-qm", "base")
+    git(project.root, "add", "-A")
+    git(project.root, "commit", "-qm", "spec")  # The feature starts after the base.
     return project
 
 

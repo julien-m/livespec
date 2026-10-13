@@ -32,8 +32,8 @@ status: Draft
 
 ## Definitions
 
-- **Anchor block:** consecutive comment lines (`#` in Python, `//` in Rust), split into `@spec` entries (an `@spec` line and its continuation lines). An entry belongs to the feature when it qualifies ids as `<feature>:AC-<n>` (only those ids count) or names exactly the path `.specs/features/<feature>/`. Entries naming another feature, several features or none are ignored.
-- **Anchor target:** the first line after the block. A test function whose first decorator or header is on that line (Python `def` or `async def`; Rust after its attributes) binds its last assertion; an assertion inside a test function binds that assertion. A Rust function binds only with a `#[...test]` attribute of its own.
+- **Anchor block:** consecutive comment lines (`#` in Python, `//` in Rust), split into `@spec` entries (an `@spec` line and its continuation lines). An entry belongs to the feature when it qualifies ids as `<feature>:AC-<n>` (only those ids count) or names exactly the path `.specs/features/<feature>/`; in path form, the bare `AC-<n>` ids of the `@spec` line count, never ids qualified for another feature or ids in later prose lines. Entries naming another feature, several features or none are ignored.
+- **Anchor target:** the first line after the block. A test function whose first decorator or header is on that line (Python `def` or `async def`; Rust after its attributes) binds its last assertion; an assertion inside a test function binds that assertion. A Rust function binds only with a test attribute of its own (`#[test]`, `#[<path>::test]`, `#[rstest]` or `#[test_case]`).
 - **Test files:** Python `test_*.py` and `*_test.py`; every `.rs` file, where only `#[test]`-like functions and assertions bind. Files in dot directories and build directories are skipped.
 - **Derived mapping:** an acceptance mapping with `"derivation": "anchors"`, no reviewer model and no review receipt path, whose bindings are exactly those derived from the anchors.
 

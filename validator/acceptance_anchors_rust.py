@@ -17,7 +17,7 @@ def _rust_is_test(lines: list[str], header: int) -> bool:
     index = header - 2
     while index >= 0 and lines[index].lstrip().startswith(("#[", "//")):
         line = lines[index].lstrip()
-        if line.startswith("#[") and re.match(r"#\[[\w:]*test\b", line):
+        if line.startswith("#[") and re.match(r"#\[(?:[\w:]*::)?(?:test|rstest|test_case)\b", line):
             return True
         index -= 1
     return False

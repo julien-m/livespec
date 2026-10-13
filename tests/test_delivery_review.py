@@ -211,9 +211,15 @@ def test_edited_receipt_is_not_trusted(project: DeliveryProject) -> None:
     path.write_text(json.dumps(data))
     assert _verify(project) == (1, ["receipt_invalid:combined"])
     data["kinds"]["combined"]["rounds"][-1]["files"]["calc.py"] = "0" * 64
-    data["kinds"] = []
-    path.write_text(json.dumps(data))
-    assert _verify(project) == (1, ["no_receipt"])
+    malformed: list[object] = [
+        {"combined": [1]},
+        {"combined": {"rounds": "x"}},
+        {"review": {"rounds": [5]}},
+    ]
+    for kinds in [[], *malformed]:
+        data["kinds"] = kinds
+        path.write_text(json.dumps(data))
+        assert _verify(project) == (1, ["receipt_invalid"]), kinds
 
 
 def test_lifecycle_status_change_keeps_the_review_current(project: DeliveryProject) -> None:

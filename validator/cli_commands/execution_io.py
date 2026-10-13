@@ -37,6 +37,8 @@ def execution_io(
     """Expose mapping derivation, reviewer preparation/ingestion and certified capture."""
     if not feature or mapping_path is None:
         raise ValueError("execution_feature_and_acceptance_mapping_required")
+    if derive and (root / mapping_path).is_symlink():
+        raise ValueError("derive_mapping_refuses_a_linked_destination")
     mapping_path = (root / mapping_path).resolve()
     mapping_path.relative_to(root)
     if derive:
