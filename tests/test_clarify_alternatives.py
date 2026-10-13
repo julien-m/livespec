@@ -39,7 +39,8 @@ def test_same_quality_alternative_metric_resolves_only_its_own_claim(
     assert item.evidence_text.strip() == vague
     assert item.requirement_id == "001-search:FR-001"
     assert item.decision_key == f"quality:speed:{vague.casefold()}"
-    assert item.critical and not item.resolution and inventory.blocking
+    assert not item.critical and not item.resolution
+    assert inventory.errors == ("missing_current_spec_review",)
 
 
 @pytest.mark.parametrize(

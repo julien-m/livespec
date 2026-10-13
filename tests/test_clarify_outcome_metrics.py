@@ -75,13 +75,13 @@ def test_quantified_security_and_reliability_outcomes_need_no_clarification(
         ("The export is secure with 0 critical users.", "security"),
     ],
 )
-def test_unrelated_quantities_rates_or_clauses_remain_critical(
+def test_unrelated_quantities_rates_or_clauses_remain_reported(
     tmp_path: Path, claim: str, group: str
 ) -> None:
     path = tmp_path / "spec.md"
     path.write_text(f"### FR-001\n{claim}\n")
     items = scan_clarification_opportunities(path)
     assert len(items) == 1
-    assert items[0].critical and not items[0].resolution
+    assert not items[0].critical and not items[0].resolution
     assert items[0].requirement_id == f"{tmp_path.name}:FR-001"
     assert items[0].decision_key.startswith(f"quality:{group}:")

@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -86,7 +87,8 @@ def test_missing_or_stale_review_keeps_the_full_lane(
     project = make_project(tmp_path)
     monkeypatch.chdir(project.root)
     _, payload = project.json("delivery", "lane", "--feature", FEATURE, "--model", MODEL)
-    assert [r["code"] for r in payload["reasons"]] == ["spec_review_not_current"]  # type: ignore[index]
+    reasons = cast(list[dict[str, Any]], payload["reasons"])
+    assert [r["code"] for r in reasons] == ["spec_review_not_current"]
     project.review_spec()
     # A downgrade after review changes the normative spec, so the receipt is stale.
     project.write(

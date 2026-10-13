@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -50,11 +51,11 @@ def _verify(project: DeliveryProject) -> tuple[int, list[str]]:
     code, payload = project.json(
         "delivery", "review", "verify", "--feature", FEATURE, "--model", MODEL
     )
-    return code, [r["code"] for r in payload["reasons"]]  # type: ignore[index, union-attr]
+    return code, [r["code"] for r in cast(list[dict[str, Any]], payload["reasons"])]
 
 
 def _codes(payload: dict[str, object]) -> list[str]:
-    return [r["code"] for r in payload["reasons"]]  # type: ignore[index, union-attr]
+    return [r["code"] for r in cast(list[dict[str, Any]], payload["reasons"])]
 
 
 # @spec AC-003: Scope of the complete diff
@@ -62,7 +63,7 @@ def _codes(payload: dict[str, object]) -> list[str]:
 def test_prepare_hashes_every_counted_path(project: DeliveryProject) -> None:
     code, scope = _prepare(project)
     assert code == 0 and scope["error"] == ""
-    assert sorted(scope["files"]) == SCOPE  # type: ignore[arg-type]
+    assert sorted(cast(dict[str, str], scope["files"])) == SCOPE
     assert scope["lane"] == "light" and len(str(scope["base_commit"])) == 40
     assert (project.feature_dir / ".reviews" / "delivery-scope.json").is_file()
 

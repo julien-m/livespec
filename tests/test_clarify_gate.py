@@ -181,4 +181,4 @@ def test_requirement_heading_qualifies_body_ambiguity(tmp_path: Path) -> None:
     spec = _write_spec(tmp_path, ["### FR-001", "**Requirement:** The API must be secure."])
     item = scan_clarification_opportunities(spec)[0]
     assert item.requirement_id == f"{tmp_path.name}:FR-001"
-    assert item.critical
+    assert not item.critical

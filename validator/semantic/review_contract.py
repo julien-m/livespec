@@ -56,6 +56,9 @@ class ScopeFinding(StrictModel):
     justification: str
     approved: bool
     citations: list[Citation] = Field(min_length=1)
+    # @spec FR-002: Justified technical necessity is approved
+    #   — .specs/features/088-capped-reviews/spec.md#fr-002
+    kind: Literal["business", "technical"] = "business"
 
 
 class GroundedFinding(StrictModel):
@@ -116,6 +119,43 @@ REVIEW_SCHEMA = {
     "strict": True,
     "schema": ReviewResponse.model_json_schema(),
 }
+
+
+def scope_accepted(scope: ScopeFinding) -> bool:
+    """Approved scope, or a technical necessity carrying a justification (088)."""
+    return scope.approved or (scope.kind == "technical" and bool(scope.justification.strip()))
+
+
+def conclusion_blocks(conclusion: RequirementConclusion, ambiguities: list[Ambiguity]) -> bool:
+    """Only an unexplained or critically ambiguous conclusion blocks besides non-coverage."""
+    # @spec FR-001: Non-critical ambiguity carries over
+    #   — .specs/features/088-capped-reviews/spec.md#fr-001
+    if conclusion.disposition == "covered":
+        return False
+    if conclusion.disposition != "ambiguous":
+        return True
+    own = [item for item in ambiguities if item.requirement_id == conclusion.requirement_id]
+    return not own or any(item.critical and not item.resolution for item in own)
+
+
+def carry_over(receipt: ReviewReceipt) -> list[str]:
+    """Non-blocking items the next phase must address: warnings, open ambiguities, scope."""
+    items = [
+        f"{finding.severity}: {finding.category}: {finding.description}"
+        for finding in receipt.findings
+        if finding.severity != "blocking"
+    ]
+    items.extend(
+        f"ambiguity: {item.requirement_id}: {item.question}"
+        for item in receipt.ambiguities
+        if not item.critical and not item.resolution
+    )
+    items.extend(
+        f"technical scope: {scope.description}: {scope.justification}"
+        for scope in receipt.extra_scope
+        if not scope.approved and scope_accepted(scope)
+    )
+    return items
 
 
 def _citation_errors(
@@ -229,9 +269,9 @@ def validate_review_result(
     ready = bool(
         complete
         and final
-        and all(c.disposition == "covered" for c in final.conclusions)
+        and not any(conclusion_blocks(c, final.ambiguities) for c in final.conclusions)
         and not any(a.critical and not a.resolution for a in final.ambiguities)
-        and not any(not scope.approved for scope in final.extra_scope)
+        and all(scope_accepted(scope) for scope in final.extra_scope)
         and not any(f.severity == "blocking" for f in final.findings)
     )
     return ReviewReceipt(

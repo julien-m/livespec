@@ -33,6 +33,7 @@ def analyze_semantic_readiness(
     prepared: PreparedReview | None,
 ) -> tuple[str, list[AnalyzeFinding]]:
     """Reject absent, stale or incomplete receipts; never interpret prose heuristically."""
+    from validator.semantic.review_contract import conclusion_blocks, scope_accepted
     from validator.semantic.review_receipts import load_review_receipt, verify_review_receipt
 
     path = receipt_path or feature_dir / ".reviews" / "plan.json"
@@ -64,10 +65,12 @@ def analyze_semantic_readiness(
             ),
         )
         for item in receipt.conclusions
-        if item.disposition != "covered"
+        if conclusion_blocks(item, receipt.ambiguities)
     ]
     findings.extend(
-        _finding("scope", item.description) for item in receipt.extra_scope if not item.approved
+        _finding("scope", item.description)
+        for item in receipt.extra_scope
+        if not scope_accepted(item)
     )
     if not receipt.ready and not findings:
         findings.append(_finding("semantic", "Semantic review has unresolved blocking findings"))

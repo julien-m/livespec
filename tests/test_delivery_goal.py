@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 from typer.testing import CliRunner
@@ -27,7 +28,7 @@ def _render(command: str, feature: str | None, flags: str) -> dict[str, object]:
 
 
 def _task_ids(canonical: dict[str, object]) -> list[str]:
-    return [str(task["id"]) for task in canonical["tasks"]]  # type: ignore[index, union-attr]
+    return [str(task["id"]) for task in cast(list[dict[str, Any]], canonical["tasks"])]
 
 
 @pytest.fixture
