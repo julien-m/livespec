@@ -3,9 +3,13 @@
 > Global changelog for LiveSpec. One entry per feature/bugfix/refactor.
 > Per-feature details live in `.specs/features/<feature-slug>/changelog.md`.
 >
-> Last updated: 2026-10-12
+> Last updated: 2026-10-13
 
 ---
+
+## 2026-10-13 — [Feature 050] Bugfix: native quality review
+
+- Read the [instruction correction](features/050-agent-sync-migration/changelog.md): successful steps and pre-commit finalization use an independent native reviewer with effort `high`, preserving check evidence, blocking findings and the index. Historical user-hook replacement is documented; typed LiveSpec gates remain required.
 
 ## 2026-10-13 — [Feature 079] Fix: 1/1 gaps closed (FR-002) — CI installs public Penflow pinned at dd356b9 without credential
 <!-- finalize:spec-fix:2026-10-13:5a48c61f -->

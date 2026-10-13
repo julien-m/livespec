@@ -394,7 +394,9 @@ def test_spec_feature_auto_mode_does_not_commit_without_explicit_authorization()
     assert "commit expectations" in expectations
     assert "none unless explicitly authorized" in expectations
     assert "/audit --fix" not in body
-    assert "current read-only skill and supported entry point" in body
+    assert "independent read-only native agent" in body
+    assert "reasoning effort `high`" in body
+    assert all(term not in body for term in ("Run `$audit`", "or `/audit`"))
     assert "authorized implementing agent applies necessary corrections" in body
     assert "reruns affected checks" in body
     assert "Record Done only for phases actually executed with successful evidence" in body

@@ -409,3 +409,9 @@ Canonical command names are `spec-check`, `spec-doctor`, `spec-explain`, `spec-f
 ---
 
 *LiveSpec Hooks Protocol v1.1 — adds Level 0 user integrations*
+
+## Native quality review
+
+Read the [canonical after-step protocol](hooks/after-implement-step.md) for the independent native `high` review after successful implementation steps and before finalization/commit. Both command skills load it directly; no installed user hook is required. Quality findings and custom checks stay blocking, alongside existing typed reviews and conventions gates. Reviews preserve the index.
+
+The canonical file belongs to LiveSpec. Historical global copies may still invoke the retired audit skill. Use `/spec-hooks implement --edit after --step --global` to replace that review hook with the canonical body after inspecting it; preserve unrelated custom instructions and keep a backup outside the active hook directory. This is an authorized user-hook edit, not a manual modification of generated agent-sync provider targets. Verify the installed bytes and the three-level step hook chain with `/spec-hooks implement --verbose`; inspect local overrides too. Installing a user hook does not change a project's locked LiveSpec runtime.

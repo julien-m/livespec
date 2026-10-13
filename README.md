@@ -176,6 +176,8 @@ specification (eligibility rule, override scope, template variables,
 chained-pipeline semantics, `--economy` mode limitation). Diagnostic:
 `livespec integrations list` or `/spec-hooks <command>`.
 
+Implementation steps and pre-commit finalization use an independent read-only native quality reviewer with effort `high`. Read the [review protocol and legacy user-hook replacement procedure](system/hooks.md#native-quality-review); the review preserves the index and blocks on unresolved findings or incomplete evidence. Existing Spec/Plan, conventions and acceptance gates remain required.
+
 This pattern is independent of `~/.config/livespec/provider.py` (the
 existing Python callable that overrides LLM routing).
 

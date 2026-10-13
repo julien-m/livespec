@@ -291,3 +291,49 @@ def test_all_documented_template_vars_handled(
 
     orphans = documented - feature_vars - commit_vars
     assert orphans == set(), f"documented {{var}} placeholders nobody resolves: {orphans}"
+
+
+def test_canonical_native_review_hook_is_resolved_without_index_changes(tmp_path: Path) -> None:
+    """Resolve the shipped standalone global hook with project extensions intact."""
+    source = Path(__file__).resolve().parents[1] / "system/hooks/after-implement-step.md"
+    global_dir = tmp_path / "global"
+    _write(global_dir / source.name, source.read_text(encoding="utf-8"))
+    _write(tmp_path / ".specs/hooks/after-implement-step.md", "PROJECT_STEP_CHECK\n")
+    _write(tmp_path / ".git/index", "USER_STAGED_BYTES\n")
+    index_before = (tmp_path / ".git/index").read_bytes()
+
+    chain = resolve_injection_chain(
+        "after",
+        "implement-step",
+        integrations_dir=tmp_path / "missing_integrations",
+        global_hooks_dir=global_dir,
+        project_root=tmp_path,
+    )
+
+    assert len(chain) == 2
+    assert "mode: extend" not in chain[0]
+    assert "independent read-only native agent" in chain[0]
+    assert "reasoning effort `high`" in chain[0]
+    assert chain[1] == "PROJECT_STEP_CHECK\n"
+    assert (tmp_path / ".git/index").read_bytes() == index_before
+
+
+def test_local_step_override_preserves_hook_resolution_semantics(tmp_path: Path) -> None:
+    """Local overrides remain explicit; core command review is outside this chain."""
+    source = Path(__file__).resolve().parents[1] / "system/hooks/after-implement-step.md"
+    global_dir = tmp_path / "global"
+    _write(global_dir / source.name, source.read_text(encoding="utf-8"))
+    _write(
+        tmp_path / ".specs/hooks/after-implement-step.local.md",
+        "---\nmode: override\n---\nLOCAL_STEP_CHECK\n",
+    )
+
+    chain = resolve_injection_chain(
+        "after",
+        "implement-step",
+        integrations_dir=tmp_path / "missing_integrations",
+        global_hooks_dir=global_dir,
+        project_root=tmp_path,
+    )
+
+    assert chain == ["LOCAL_STEP_CHECK\n"]

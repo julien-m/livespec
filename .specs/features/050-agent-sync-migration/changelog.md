@@ -56,3 +56,9 @@
 - **AC impacted:** AC-005, AC-006 remapped to test_agent_sync_scripts.py
 - **Author:** Claude Code (test-suite cleanup, lot 1)
 - The layout module owns the inventory through `discover_commands`; registry, expectations-identity and spec-migrate prose duplicates removed; script tests no longer depend on the working directory.
+
+## 2026-10-13 — Bugfix: native quality review
+
+- Replace the retired audit-skill call before finalization with independent native `high` review; load the same canonical protocol after each successful implementation step. Read the [protocol](../../../system/hooks/after-implement-step.md).
+- Preserve convention/custom-check coverage, real reports, bounded correction loops and blocking findings without temporary staging. Read the [user-hook replacement procedure](../../../system/hooks.md#native-quality-review).
+- This instruction correction does not certify application runtime or rewrite historical audit records.
