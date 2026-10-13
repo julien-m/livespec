@@ -31,8 +31,8 @@ status: Draft
 ## Definitions
 
 - **Reviewed context:** the prepared review a receipt was validated against (sections, requirements, batches without their prompts, identity fields), stored in the receipt at ingestion.
-- **Requirement projection:** for the feature `spec.md`, the lines of the `Functional Requirements` and `Acceptance Criteria` sections and of every `gherkin` fenced block, with Markdown emphasis, code marks and runs of whitespace removed; blank lines do not count.
-- **Stable identity:** feature, review kind, reviewer model, policy, schema and prompt versions, requirement scope, dependencies, and one hash per source: the requirement projection for the feature `spec.md`, the normative hash for every other source. It excludes the review budget.
+- **Requirement projection:** for the feature `spec.md`, the lines of the `Functional Requirements` and `Acceptance Criteria` sections (numbered or decorated titles and their French forms included), of every line or table row that starts with an FR or AC id, and of every `gherkin` fenced block, with Markdown emphasis, code marks and runs of whitespace removed; blank lines do not count.
+- **Stable identity:** feature, review kind, reviewer model, policy, schema and prompt versions, requirement scope, dependencies, the requirement ids under review (FR, AC and SC), and one hash per source: the requirement projection for the feature `spec.md`, the normative hash for every other source. It excludes the review budget.
 - **Spec revision:** a record `.specs/features/<feature>/.reviews/spec-revision.json` naming the context hashes of the spec and plan receipts that were current and ready when it was opened.
 
 ## User Scenarios & Testing
@@ -131,7 +131,7 @@ A change to the requirement projection of the feature `spec.md` (a functional re
 
 ### AC-003
 
-Acceptance, mapping and delivery reviews, and receipts without a stored reviewed context, keep the exact context comparison; a receipt whose stored reviewed context does not rebuild its own raw results is stale.
+Acceptance, mapping and delivery reviews, and receipts without a stored reviewed context, keep the exact context comparison; a receipt whose stored reviewed context does not prepare again, from its own section texts, to the receipt's context hash, or does not rebuild its own raw results, is stale.
 
 ### AC-004
 
@@ -164,8 +164,12 @@ While a spec revision is open, the `implement` and `test` progressions accept a 
 
 ## Edge Cases
 
+- **New Success Criteria id:** it adds a review obligation, so the review is stale.
 - **Requirement moved without change:** the projection keeps line order but not line numbers, so moving the Functional Requirements section is not a change; reordering acceptance criteria is.
 - **Lane classification after a QE edit:** a QE edit no longer makes the spec review stale, so the delivery lane reads the classification of the reviewed spec as well as the current one and keeps the stricter (feature 086).
+- **Review prepared with a larger budget:** the current preparation may not fit the default budget; its sections do not depend on the budget, so the stable comparison still applies.
+- **Receipt written before this feature:** it has no reviewed context; `revision open` refuses it with `spec_review_not_current`, so review again first.
+- **Malformed revision record:** progressions and `delivery review verify` are refused with `spec_revision_malformed`.
 - **Revision opened twice:** `open` refuses an existing record with `spec_revision_open`.
 - **Receipt replaced during a revision:** a receipt whose context hash is not in the record follows the normal rules.
 

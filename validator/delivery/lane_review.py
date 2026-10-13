@@ -24,12 +24,14 @@ def apply_review(decision: LaneDecision, receipt: ReviewReceipt, reviewed: Prepa
 
     A QE edit after the review never lowers the lane: every reason of the reviewed QE
     section is kept. The reviewer may raise the criticality to High, or lower an author's
-    High to Low or Medium; it never changes the blast radius.
+    High to Low or Medium, but only a High the reviewed spec declared: a High added after
+    the review stays. It never changes the blast radius.
     """
     text = _reviewed_spec(decision, reviewed)
-    if text is not None:
+    judged = classify(decision.feature, text) if text is not None else None
+    if judged is not None:
         seen = {(r.code, r.detail) for r in decision.reasons}
-        for reason in classify(decision.feature, text).reasons:
+        for reason in judged.reasons:
             if (reason.code, reason.detail) not in seen:
                 decision.reasons.append(reason)
     assessment = receipt.qe_assessment
@@ -40,7 +42,7 @@ def apply_review(decision: LaneDecision, receipt: ReviewReceipt, reviewed: Prepa
     if assessed == "high" and not high:
         detail = f"spec reviewer assessed High: {assessment.justification}"
         decision.reasons.append(LaneReason("criticality_high", detail))
-    elif assessed in ("low", "medium") and high:
+    elif assessed in ("low", "medium") and high and judged and judged.criticality == "high":
         decision.reasons = [r for r in decision.reasons if r.code != "criticality_high"]
         decision.contested = {
             "author": "high",

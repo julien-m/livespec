@@ -18,7 +18,7 @@ from validator.semantic.review_readiness import (
     strictly_ready as strictly_ready,
 )
 from validator.semantic.review_stability import reviewed_snapshot
-from validator.semantic.review_synthesis import validated_synthesis
+from validator.semantic.review_synthesis import strictest_assessment, validated_synthesis
 from validator.semantic.review_synthesis_transport import SYNTHESIS_TRANSPORT_VERSION
 
 
@@ -280,6 +280,6 @@ def validate_review_result(
         extra_scope=final.extra_scope if final else [],
         findings=final.findings if final else [],
         confidence=final.confidence if final else 0,
-        qe_assessment=final.qe_assessment if final else None,
+        qe_assessment=strictest_assessment(final, responses) if final else None,
         reviewed=reviewed_snapshot(prepared),
     )

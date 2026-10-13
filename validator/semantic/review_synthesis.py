@@ -9,7 +9,24 @@ from pydantic import ValidationError
 
 if TYPE_CHECKING:
     from validator.semantic.review_context import PreparedReview
-    from validator.semantic.review_contract import ReviewResponse
+    from validator.semantic.review_contract import QeAssessment, ReviewResponse
+
+
+_CRITICALITY_RANK = {"Low": 0, "Medium": 1, "High": 2}
+
+
+# @spec FR-009: Reviewer QE assessment
+#   — .specs/features/086-risk-proportional-delivery/spec.md#fr-009
+def strictest_assessment(
+    final: ReviewResponse | None, responses: list[ReviewResponse]
+) -> QeAssessment | None:
+    """The highest QE criticality of the final response or any batch; the final wins ties.
+
+    A batch that assessed High is never lost because the synthesis left the field out.
+    """
+    candidates = [r.qe_assessment for r in [*([final] if final else []), *responses]]
+    present = [a for a in candidates if a is not None]
+    return max(present, key=lambda a: _CRITICALITY_RANK[a.criticality], default=None)
 
 
 def _key(kind: str, identity: str) -> str:

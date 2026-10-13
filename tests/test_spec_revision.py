@@ -81,3 +81,37 @@ def test_close_needs_one_new_review_of_the_revised_sources(root: Path) -> None:
     review_both(root)
     assert _revision("close") == (0, {"feature": FEATURE, "open": False, "error": ""})
     require_progression(root, FEATURE, "complete", model="reviewer/v1")
+
+
+def test_malformed_record_blocks_verify_without_crashing(root: Path) -> None:
+    (root / ".specs/features" / FEATURE / ".reviews/spec-revision.json").write_text("{}")
+    args = ["delivery", "review", "verify", "--feature", FEATURE, "--json"]
+    result = CliRunner().invoke(app, args, catch_exceptions=False)
+    payload = json.loads(result.output)
+    assert result.exit_code == 1
+    assert [r["code"] for r in payload["reasons"]] == ["spec_revision_malformed"]
+    with pytest.raises(ProgressionBlocked, match="spec_revision_malformed"):
+        require_progression(root, FEATURE, "implement", model="reviewer/v1")
+
+
+def test_open_refuses_a_receipt_without_reviewed_context(root: Path) -> None:
+    path = root / ".specs/features" / FEATURE / ".reviews/spec.json"
+    data = json.loads(path.read_text())
+    del data["reviewed"]
+    path.write_text(json.dumps(data))
+    assert _revision("open")[1]["error"] == "spec_review_not_current"
+
+
+def test_open_revision_refuses_the_terminal_pipeline_update(root: Path) -> None:
+    from validator.pipeline import PHASE_MAP, PHASE_ORDER
+
+    rows = "\n".join(
+        f"| {PHASE_MAP[s]} | {'Pending' if s == 'test' else 'Done'} | — |" for s in PHASE_ORDER
+    )
+    pipeline = root / ".specs/features" / FEATURE / "pipeline.md"
+    pipeline.write_text(f"# Pipeline\n\n| Phase | Status | Completed At |\n|---|---|---|\n{rows}\n")
+    _revision("open")
+    edit_spec(root, *AC_EDIT)
+    args = ["pipeline", "update", "--feature", FEATURE, "--phase", "test", "--status", "done"]
+    result = CliRunner().invoke(app, [*args, "--model", "reviewer/v1"])
+    assert result.exit_code == 1 and "spec_revision_open" in result.output

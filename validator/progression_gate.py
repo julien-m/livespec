@@ -28,7 +28,10 @@ def require_progression(
     spec = project_root / ".specs/features" / feature / "spec.md"
     # @spec FR-005: Progressions during a spec revision
     #   — .specs/features/089-stable-review-identity/spec.md#fr-005
-    revision = accepted_reviews(project_root, feature)
+    try:
+        revision = accepted_reviews(project_root, feature)
+    except ValueError as exc:
+        raise ProgressionBlocked(f"spec_revision_malformed:{exc}") from exc
     if revision and destination == "complete":
         raise ProgressionBlocked("spec_revision_open")
     accepted = revision if destination in ("implement", "test") else frozenset()

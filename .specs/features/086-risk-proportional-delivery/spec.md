@@ -231,7 +231,7 @@ The spec-implement step gate requires only targeted tests, lint and format of to
 
 ### AC-009
 
-A spec review may carry one `qe_assessment` (`criticality` `Low`, `Medium` or `High`, a non-empty `justification` and at least one citation of the reviewed sources), stored in the receipt. When the spec review is current and ready, an assessed `High` adds `criticality_high`, and an assessed `Low` or `Medium` against an author `High` removes `criticality_high` and adds `criticality_contested` (author and reviewer values, justification) to the lane output without making the lane full; the lane classifies both the current QE section and the QE section of the reviewed spec and keeps every reason of either, so a QE edit after the review never lowers the lane.
+A spec review may carry one `qe_assessment` (`criticality` `Low`, `Medium` or `High`, a non-empty `justification` and at least one citation of the reviewed sources), stored in the receipt (the highest criticality of the batch and synthesis responses when there are several). When the spec review is current and ready, an assessed `High` adds `criticality_high`, and an assessed `Low` or `Medium` against an author `High` that the reviewed spec declared removes `criticality_high` and adds `criticality_contested` (author and reviewer values, justification) to the lane output without making the lane full; the lane classifies both the current QE section and the QE section of the reviewed spec and keeps every reason of either, so a QE edit after the review never lowers the lane, and a `High` added after the review is never contested.
 
 ## Functional Requirements
 

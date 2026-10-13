@@ -18,12 +18,20 @@ if TYPE_CHECKING:
     from validator.semantic.review_context import PreparedReview
     from validator.semantic.review_contract import ReviewReceipt
 
-_FENCE = re.compile(r"^\s*(`{3,}|~{3,})\s*(\S*)")
+_FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})\s*(\S*)")
 _HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
-_REQUIREMENT_SECTIONS = ("functional requirements", "acceptance criteria")
+_REQUIREMENT_SECTIONS = (
+    "functional requirements",
+    "acceptance criteria",
+    "exigences fonctionnelles",
+    "critères d'acceptation",
+)
+# Numbering before a title ("4.", "4)", "A.") and closing marks after it.
+_TITLE_NUMBER = re.compile(r"^(?:[0-9A-Za-z]{1,3}[.)]\s+)")
 _REQUIREMENT_ID = re.compile(r"\b(?:FR|AC)-\d+\b")
-# A requirement defined outside its section: "- **FR-001:** ..." or "**AC-002** ...".
-_DEFINITION = re.compile(r"^\s*(?:[-*]\s+)?\*\*(?:FR|AC)-\d+\b")
+# A requirement defined outside its section: "- **FR-001:** ...", "AC-002: ..." or a table
+# row whose first cell is an FR or AC id.
+_DEFINITION = re.compile(r"^\s*(?:[-*]\s+|\|\s*)?\**(?:FR|AC)-\d+\b")
 
 
 def reviewed_snapshot(prepared: PreparedReview) -> PreparedReview:
@@ -43,6 +51,12 @@ def reviewed_snapshot(prepared: PreparedReview) -> PreparedReview:
             "prompt_version": context.PROMPT_VERSION,
         }
     )
+
+
+def _requirement_title(title: str) -> bool:
+    """A Functional Requirements or Acceptance Criteria title, numbered or decorated."""
+    plain = _TITLE_NUMBER.sub("", re.sub(r"[*_`]", "", title).rstrip("#").strip()).casefold()
+    return plain.startswith(_REQUIREMENT_SECTIONS)
 
 
 def _normalized(line: str) -> str:
@@ -65,7 +79,8 @@ def requirement_projection(text: str) -> str:
     for line in text.splitlines():
         opening = _FENCE.match(line)
         if fence:
-            if opening and opening.group(1)[0] == fence[0] and len(opening.group(1)) >= len(fence):
+            mark = opening.group(1) if opening and not opening.group(2) else ""
+            if mark and mark[0] == fence[0] and len(mark) >= len(fence):
                 fence, gherkin = "", False
             elif level or gherkin:
                 kept.append(_normalized(line))
@@ -79,9 +94,7 @@ def requirement_projection(text: str) -> str:
             if level and depth <= level:
                 level = 0
             title = heading.group(2)
-            if title.lower() in _REQUIREMENT_SECTIONS or (
-                not level and _REQUIREMENT_ID.search(title)
-            ):
+            if _requirement_title(title) or (not level and _REQUIREMENT_ID.search(title)):
                 level = depth
         if level or _DEFINITION.match(line):
             kept.append(_normalized(line))
@@ -115,8 +128,69 @@ def stable_identity(prepared: PreparedReview) -> str:
         "dependencies": prepared.dependencies,
         "roles": roles,
         "sources": sources,
+        "obligations": sorted(r.requirement_id for r in prepared.requirements),
     }
     return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+
+
+# Preparation errors that only say the current budget cannot hold the context.
+_BUDGET_ERRORS = frozenset(
+    {
+        "indivisible_context_over_budget",
+        "indivisible_paired_context_over_budget",
+        "paired_review_batch_budget_exceeded",
+    }
+)
+
+
+def _comparable(prepared: PreparedReview) -> bool:
+    """Cacheable, or complete but for the budget: its sections do not depend on the budget."""
+    if prepared.cacheable:
+        return True
+    return (
+        prepared.reviewer_model not in ("", "default", "unknown")
+        and bool(prepared.errors)
+        and set(prepared.errors) <= _BUDGET_ERRORS
+    )
+
+
+def _authentic(reviewed: PreparedReview, context_hash: str) -> bool:
+    """Whether the stored context is what its sources prepare to, under ``context_hash``.
+
+    The source texts are rebuilt from the stored sections, checked against the stored
+    source hashes and prepared again, so an edited section or hash is refused.
+    """
+    from validator.semantic import review_context as context
+
+    texts = dict.fromkeys(reviewed.source_hashes, "")
+    roles: dict[str, str] = {}
+    for section in reviewed.sections:
+        if section.source not in texts:
+            return False
+        texts[section.source] += section.text
+        roles.setdefault(section.source, section.role)
+    if any(
+        context.content_hash(texts[name]) != hashed
+        for name, hashed in reviewed.source_hashes.items()
+    ):
+        return False
+    owners = {
+        name: parts[2] if parts[:2] == [".specs", "features"] else reviewed.feature
+        for name in texts
+        for parts in [name.split("/")]
+    }
+    rebuilt = context.prepare_review_context(
+        reviewed.feature,
+        texts,
+        kind=reviewed.kind,
+        model=reviewed.reviewer_model,
+        source_roles=roles,
+        source_features=owners,
+        dependencies=reviewed.dependencies,
+        max_chars=reviewed.max_chars,
+        requirement_scope=reviewed.requirement_scope,
+    )
+    return rebuilt.context_hash == context_hash and reviewed_snapshot(rebuilt) == reviewed
 
 
 def reviewed_against(
@@ -134,7 +208,11 @@ def reviewed_against(
     if verify_review_receipt(receipt, prepared):
         return prepared
     reviewed = receipt.reviewed
-    if reviewed is None or not prepared.cacheable or reviewed.context_hash != receipt.context_hash:
+    if (
+        reviewed is None
+        or not _comparable(prepared)
+        or reviewed.context_hash != receipt.context_hash
+    ):
         return None
     current = reviewed_snapshot(prepared)
     fields = (
@@ -146,6 +224,8 @@ def reviewed_against(
         "prompt_version",
     )
     if any(getattr(reviewed, name) != getattr(current, name) for name in fields):
+        return None
+    if not _authentic(reviewed, receipt.context_hash):
         return None
     if receipt.context_hash not in accepted and stable_identity(reviewed) != stable_identity(
         current

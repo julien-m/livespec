@@ -103,3 +103,39 @@ def test_projection_keeps_requirements_and_gherkin_only() -> None:
     assert "Then it is deleted" in projection
     assert "Clock skew" not in projection and "criticality" not in projection
     assert requirement_projection("## FR-002\nKeep it.\n## Notes\nFree.\n") == "## FR-002\nKeep it."
+
+
+def test_consistent_edit_of_the_stored_context_stays_stale(root: Path) -> None:
+    old, new = "older than 24 hours are absent", "older than 48 hours are absent"
+    edit_spec(root, old, new)
+    assert _current(root) == (False, False)
+    for kind in ("spec", "plan"):
+        path = review_receipt_path(root, FEATURE, kind)
+        path.write_text(path.read_text().replace(old, new))
+    assert _current(root) == (False, False)
+
+
+def test_review_with_a_larger_budget_stays_current_under_the_default(root: Path) -> None:
+    edit_spec(root, "- **Clock skew:** use the server clock.", "- " + "Long note. " * 7000)
+    review_both(root, max_chars=120000)
+    edit_spec(root, "Long note. Long", "Long remark. Long")
+    assert _current(root) == (True, True)
+
+
+def test_new_success_criterion_makes_the_review_stale(root: Path) -> None:
+    edit_spec(
+        root,
+        "## Edge Cases",
+        "## Success Criteria\n\n- **SC-001:** Disk stays small.\n\n## Edge Cases",
+    )
+    assert _current(root) == (False, False)
+
+
+@pytest.mark.parametrize(
+    "heading",
+    ["## 5. Acceptance Criteria", "## Acceptance Criteria (v2)", "## Critères d'acceptation"],
+)
+def test_projection_reads_decorated_requirement_headings(heading: str) -> None:
+    text = f"{heading}\n\n| AC-002 | Exports are listed. |\n\n## Notes\n\nFree.\n"
+    assert requirement_projection(text).endswith("| AC-002 | Exports are listed. |")
+    assert "AC-003: Kept anywhere." in requirement_projection("## Notes\nAC-003: Kept anywhere.\n")

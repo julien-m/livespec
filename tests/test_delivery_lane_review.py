@@ -66,6 +66,18 @@ def test_qe_edit_after_review_keeps_the_reviewed_classification(project: Deliver
     assert (lane, codes) == ("full", ["criticality_high"])  # The reviewed QE says High.
 
 
+def test_high_added_after_the_review_is_not_contested(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project = make_project(tmp_path)
+    monkeypatch.chdir(project.root)
+    project.review_spec(criticality="Medium")
+    spec = project.feature_dir / "spec.md"
+    spec.write_text(spec.read_text().replace("Medium criticality", "High criticality"))
+    lane, codes, contested = _lane(project)
+    assert (lane, codes, contested) == ("full", ["criticality_high"], None)
+
+
 def test_contest_needs_a_current_review(project: DeliveryProject) -> None:
     project.review_spec(criticality="Medium")
     spec = project.feature_dir / "spec.md"

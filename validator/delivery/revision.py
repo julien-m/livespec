@@ -47,7 +47,11 @@ def accepted_reviews(root: Path, feature: str) -> frozenset[str]:
 def _current(
     root: Path, feature: str, kind: Literal["spec", "plan"], model: str, max_chars: int | None
 ) -> str | None:
-    """Context hash of a current and ready receipt of ``kind``, else None."""
+    """Context hash of a current and ready receipt of ``kind``, else None.
+
+    A receipt without a stored reviewed context (written before 089) is refused: it
+    could not stay current once the spec changes.
+    """
     from ..semantic.review_files import prepare_feature_review, review_receipt_path
     from ..semantic.review_receipts import load_review_receipt
     from ..semantic.review_stability import reviewed_against
@@ -58,7 +62,7 @@ def _current(
         prepared = prepare_feature_review(root, feature, kind, model, max_chars)
     except (OSError, ValueError):
         return None
-    if receipt.ready and reviewed_against(receipt, prepared) is not None:
+    if receipt.ready and receipt.reviewed and reviewed_against(receipt, prepared) is not None:
         return receipt.context_hash
     return None
 

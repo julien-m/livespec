@@ -125,6 +125,11 @@ def _require_update_gates(
         require_progression(
             feature_dir.parents[2], feature, phase, model=model, max_chars=review_max_chars
         )
+    if terminal:  # An open spec revision keeps the feature from completing (089 FR-005).
+        from validator.delivery.revision import accepted_reviews
+
+        if accepted_reviews(feature_dir.parents[2], feature):
+            raise ValueError("spec_revision_open")
     # A terminal replay already has this authority; do not reopen mutable review files to publish.
     return None if terminal else review
 

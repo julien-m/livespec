@@ -46,4 +46,4 @@ updated: 2026-10-13
 | `system/hooks/after-implement-step.md` | Checks only per step. |
 | `.agent-sync/skills/spec-implement/SKILL.md` | STEP 0.95 lane, step gate without reviewers, Phase 6.8 delivery review. |
 | `validator/delivery/lane_review.py` | Reviewed QE union and contested criticality. |
-| `tests/delivery_support.py`, `tests/test_delivery_*.py` | Fixtures and 43 tests. |
+| `tests/delivery_support.py`, `tests/test_delivery_*.py` | Fixtures and 44 tests. |
