@@ -14,9 +14,10 @@ from __future__ import annotations
 
 from collections import defaultdict
 from pathlib import Path
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
-import yaml
+from validator.ai_resources import resolve_ai_resources_root
+from validator.exceptions import AiResourcesResolutionError
 
 
 class SourceClassification(TypedDict):
@@ -49,6 +50,7 @@ class CorpusManifest(TypedDict):
     excluded_sources: list[ExcludedSource]
     language_domain_matrix: dict[str, list[str]]
     domain_source_counts: dict[str, int]
+    resolution_error: NotRequired[str]
 
 
 _SOURCE_SUFFIXES = {".md", ".yaml", ".yml"}
@@ -113,25 +115,40 @@ _SUPPORTED_LANGUAGE_MARKERS: tuple[tuple[str, tuple[str, ...]], ...] = (
 )
 
 
+# @spec FR-004: Route corpus through shared resolution, FR-005: Empty manifest with error
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-004
 def ai_resources_root(project_root: Path | None = None) -> Path:
-    """Return the configured AI-resources root for a LiveSpec project."""
-    if project_root is None:
-        return Path.home() / "projects" / "ai-ressources"
-    manifest = project_root / ".conventions" / "manifest.yaml"
-    try:
-        raw: object = yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}
-    except (OSError, yaml.YAMLError):
-        return Path.home() / "projects" / "ai-ressources"
-    if isinstance(raw, dict) and isinstance(raw.get("ai_resources_path"), str):
-        return Path(raw["ai_resources_path"])
-    return Path.home() / "projects" / "ai-ressources"
+    """Return the AI-resources root of a LiveSpec project via the shared resolution.
+
+    Args:
+        project_root: Project whose ``.conventions/`` files may record a root, or
+            ``None`` to consult only the ``AIRESOURCES`` environment variable.
+
+    Returns:
+        The absolute AI-resources root.
+
+    Raises:
+        AiResourcesResolutionError: No root resolves for the project.
+    """
+    return resolve_ai_resources_root(project_root).path
 
 
 def build_corpus_manifest(project_root: Path) -> CorpusManifest:
-    """Build an exhaustive source classification manifest for AI-resources."""
-    root = ai_resources_root(project_root)
+    """Build an exhaustive source classification manifest for AI-resources.
+
+    Args:
+        project_root: Project whose AI-resources root is resolved.
+
+    Returns:
+        The manifest; empty with ``ai_resources_root == ""`` and ``resolution_error`` if unresolved.
+    """
+    try:
+        root = ai_resources_root(project_root)
+    except AiResourcesResolutionError as exc:
+        # Boundary: the manifest stays empty but carries the explicit message (FR-005).
+        return _empty_manifest("", resolution_error=str(exc))
     if not root.is_dir():
-        return _empty_manifest(root)
+        return _empty_manifest(root.as_posix())
     classified, unclassified, excluded = _scan_corpus_sources(root)
     total_sources = len(classified) + len(unclassified)
     return {
@@ -148,9 +165,9 @@ def build_corpus_manifest(project_root: Path) -> CorpusManifest:
     }
 
 
-def _empty_manifest(root: Path) -> CorpusManifest:
-    return {
-        "ai_resources_root": root.as_posix(),
+def _empty_manifest(root_text: str, *, resolution_error: str | None = None) -> CorpusManifest:
+    manifest: CorpusManifest = {
+        "ai_resources_root": root_text,
         "total_source_count": 0,
         "classified_count": 0,
         "unclassified_count": 0,
@@ -161,6 +178,9 @@ def _empty_manifest(root: Path) -> CorpusManifest:
         "language_domain_matrix": {},
         "domain_source_counts": {},
     }
+    if resolution_error is not None:
+        manifest["resolution_error"] = resolution_error
+    return manifest
 
 
 def _scan_corpus_sources(

@@ -7,6 +7,21 @@
 
 ---
 
+## 2026-10-13 — 085 ai-ressources located through AIRESOURCES or the recorded project path, without hard-coded fallback
+<!-- finalize:spec-feature:2026-10-13:72cf8076 -->
+
+## 2026-10-13 — [Feature 085] Test: 100% AC covered (11/11), 0 tests generated
+<!-- finalize:spec-test:2026-10-13:477becbc -->
+
+## 2026-10-13 — [Feature 085] Implemented in code: shared ai-ressources resolution (AIRESOURCES, then recorded path, else explicit error) routed through 7 consumers; certification pending
+<!-- finalize:spec-implement:2026-10-13:cedd6521 -->
+
+## 2026-10-13 — [Feature 085] Plan created: Locate ai-ressources Without Hard-Coded Paths — 6 implementation steps, 1 diagram
+<!-- finalize:spec-plan:2026-10-13:5f189e4f -->
+
+## 2026-10-13 — [Feature 085] Spec created: Locate ai-ressources Without Hard-Coded Paths — 4 stories, 11 AC, 7 FR
+<!-- finalize:spec-specify:2026-10-13:e8bcdd29 -->
+
 ## 2026-10-13 — [Feature 050] Bugfix: native quality review
 
 - Read the [instruction correction](features/050-agent-sync-migration/changelog.md): successful steps and pre-commit finalization use an independent native reviewer with effort `high`, preserving check evidence, blocking findings and the index. Historical user-hook replacement is documented; typed LiveSpec gates remain required.

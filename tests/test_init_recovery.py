@@ -319,7 +319,7 @@ def test_ac005_invalid_conventions_backed_up_and_repaired(tmp_path: Path) -> Non
     assert tree(backup / ".conventions") == before
     index = (project / ".conventions/index.md").read_text()
     assert "code-conventions/general.md" in index and "/conventions/code/" not in index
-    resources = Path(env.get("AIRESOURCES", str(ROOT.parent / "ai-ressources")))
+    resources = Path(env["AIRESOURCES"])
     assert (resources / "code-conventions/general.md").is_file()
 
 

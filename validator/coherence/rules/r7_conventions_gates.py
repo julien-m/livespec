@@ -5,15 +5,16 @@
 from __future__ import annotations
 
 import fnmatch
-import re
 import subprocess
 from hashlib import sha256
 from pathlib import Path
 
+from validator.ai_resources import resolve_ai_resources_root
 from validator.coherence.graph_builder import SpecGraph
 from validator.coherence.violation import Severity, Violation
 from validator.conventions_gates import gates_path, load_conventions_gates
 from validator.conventions_rules import load_conventions_rules, rulebook_path
+from validator.exceptions import AiResourcesResolutionError
 from validator.visual_evidence import sha256_file
 
 _CONSTITUTION_SIGNALS = ("conventions", "lint", "linter", "max file", "function lines", "ruff")
@@ -89,6 +90,8 @@ class R7_2_ConventionsExclusionTooBroad:
         return violations
 
 
+# @spec FR-004: Route R7.3 through shared resolution, FR-005: One explicit ERROR
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-004
 class R7_3_ConventionsRulebookSourcesStale:
     """Compiled rulebook source hashes must match ai-ressources."""
 
@@ -97,12 +100,20 @@ class R7_3_ConventionsRulebookSourcesStale:
     wave = 7
 
     def check(self, graph: SpecGraph, specs_root: Path) -> list[Violation]:
-        """Return ERROR when any recorded source hash is stale."""
+        """Return ERROR when any recorded source hash is stale or the root is unresolved."""
         try:
             rulebook = load_conventions_rules(rulebook_path(specs_root.parent))
         except (FileNotFoundError, OSError, ValueError):
             return []
-        ai_root = _airesources_root(specs_root.parent / ".conventions" / "index.md")
+        if not rulebook.sources:
+            return []
+        try:
+            ai_root = resolve_ai_resources_root(specs_root.parent).path
+        except AiResourcesResolutionError as exc:
+            # One explicit ERROR replaces one misleading stale violation per source.
+            return [
+                _violation(self.rule_id, f"conventions rulebook sources cannot be verified: {exc}")
+            ]
         violations: list[Violation] = []
         for source in rulebook.sources:
             source_path = _resolve_ai_source(source.path, ai_root)
@@ -156,20 +167,14 @@ def _is_source_denominator_path(rel: str) -> bool:
     return not any(segment in _DENOMINATOR_EXCLUDED_SEGMENTS for segment in rel.split("/"))
 
 
-def _airesources_root(index_path: Path) -> Path | None:
-    if not index_path.is_file():
-        return None
-    match = re.search(r"`?\$AIRESOURCES`?\s*=\s*`([^`]+)`", index_path.read_text(encoding="utf-8"))
-    return Path(match.group(1)).expanduser().resolve() if match else None
-
-
-def _resolve_ai_source(display_path: str, ai_root: Path | None) -> Path | None:
-    if ai_root is None or not display_path.startswith("$AIRESOURCES/"):
+def _resolve_ai_source(display_path: str, ai_root: Path) -> Path | None:
+    if not display_path.startswith("$AIRESOURCES/"):
         return None
     resolved = (ai_root / display_path.removeprefix("$AIRESOURCES/")).resolve()
     try:
         resolved.relative_to(ai_root)
     except ValueError:
+        # A display path escaping the resolved root is never hashed; it reports as stale.
         return None
     return resolved
 

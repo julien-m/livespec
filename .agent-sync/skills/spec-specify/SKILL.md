@@ -647,7 +647,7 @@ After generating spec.md, determine if the feature involves UI:
    3. `~/.claude/livespec/design.md` — if the frontmatter has a non-empty `default-direction`, use it.
    4. Otherwise → do NOT add the line. Never emit a placeholder.
 
-   When a value is resolved, insert `**Design direction:** <value>` directly under the `## Screens` heading, before the screens table. **Read** [`design-read-protocol.md`](/Users/julienm/projects/ai-ressources/design/references/design-read-protocol.md) for the format reference; do not restate or redefine the format here.
+   When a value is resolved, insert `**Design direction:** <value>` directly under the `## Screens` heading, before the screens table. **Read** `$AIRESOURCES/design/references/design-read-protocol.md` for the format reference; do not restate or redefine the format here.
    This value is carried for downstream context only. It MUST NOT be used to pass/fail mockups, screens, fidelity checks, or any validation — LiveSpec transports the direction; Penflow judges design (advisory).
 
 8. **Update design changelog:** Update `.specs/design/changelog.md` (screen-centric format):

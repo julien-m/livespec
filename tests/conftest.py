@@ -155,3 +155,16 @@ def valid_progress_path(specs_root: Path) -> Path:
 def default_config() -> ValidatorConfig:
     """Return a ValidatorConfig with all defaults."""
     return ValidatorConfig()
+
+
+# @spec FR-006: Fake-corpus tests ignore the caller's AIRESOURCES
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-006
+@pytest.fixture
+def without_airesources(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Remove ``AIRESOURCES`` so a test resolves the corpus recorded by its fixture project.
+
+    CI sets ``AIRESOURCES`` at job level and the environment wins over recorded paths
+    (feature 085), so tests that build a fake ``ai_resources_path`` or ``$AIRESOURCES``
+    declaration must not see the caller's corpus.
+    """
+    monkeypatch.delenv("AIRESOURCES", raising=False)

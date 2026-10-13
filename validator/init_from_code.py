@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import argparse
 import math
-import os
 import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from .ai_resources import resolve_ai_resources_root
+from .exceptions import AiResourcesResolutionError
 from .init_documents import render_documents, render_preflight, render_recap
 from .init_probes import require_success, run_command, run_probes
 from .init_profile import InitError, ObservedProfile, detect_profile
@@ -66,17 +67,8 @@ def _prepare_documents(profile: ObservedProfile, root: Path) -> dict[str, str]:
     if (root / ".specs/roadmap.md").is_file():
         documents.pop(".specs/roadmap.md")
     if not conventions_are_valid(root):
-        documents.update(
-            {
-                f".conventions/{path}": text
-                for path, text in render_conventions(
-                    Path(
-                        os.environ.get("AIRESOURCES", str(LIVESPEC_ROOT.parent / "ai-ressources"))
-                    ),
-                    profile.product_name,
-                ).items()
-            }
-        )
+        rendered = render_conventions(_ai_resources_for_init(root), profile.product_name)
+        documents.update({f".conventions/{path}": text for path, text in rendered.items()})
     for filename in ("AGENTS.md", "CLAUDE.md"):
         documents[filename] = merge_integration(_read_if_exists(root / filename))
     patterns = (
@@ -92,6 +84,16 @@ def _prepare_documents(profile: ObservedProfile, root: Path) -> dict[str, str]:
         + "".join(pattern + "\n" for pattern in patterns if pattern not in ignore.splitlines())
     )
     return documents
+
+
+# @spec FR-003: No init fallback, FR-005: Init ERROR exit 2 before any write
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-003
+def _ai_resources_for_init(root: Path) -> Path:
+    try:
+        return resolve_ai_resources_root(root).path
+    except AiResourcesResolutionError as exc:
+        # Runs before --dry-run returns and before any write, so main prints ERROR and exits 2.
+        raise InitError(str(exc)) from exc
 
 
 def _install(root: Path, options: InitOptions, deadline: float) -> None:

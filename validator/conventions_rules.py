@@ -1,7 +1,8 @@
 # @spec(AC-022)
 
 # LiveSpec traceability anchors
-# @spec FR-001: Rulebook schema, FR-002: Resolve sources, FR-003: Compile via provider, FR-004: Stale hashes — .specs/features/062-conventions-rulebook-semantic/spec.md#fr-001  # noqa: E501 - LiveSpec anchor paths must stay on one line.
+# @spec FR-001: Rulebook schema, FR-002: Resolve sources, FR-003: Compile via provider,
+#   FR-004: Stale hashes — .specs/features/062-conventions-rulebook-semantic/spec.md#fr-001
 
 """Conventions rulebook schema, loader, and compiler."""
 
@@ -16,14 +17,13 @@ from inspect import Parameter, signature
 from pathlib import Path
 from typing import Literal, cast
 
-import yaml  # type: ignore[import-untyped]  # PyYAML is a runtime dependency without stubs.
+import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from validator import llm_provider
+from validator.ai_resources import resolve_ai_resources_root
 
 RULEBOOK_RELATIVE_PATH = Path(".specs/conventions-rulebook.yaml")
-# Matches the `.conventions/index.md` declaration that binds `$AIRESOURCES` to a root path.
-_AIRESOURCES_RE = re.compile(r"`?\$AIRESOURCES`?\s*=\s*`([^`]+)`")
 # Matches convention source lines and supports both the Unicode and ASCII arrows.
 _SOURCE_LINE_RE = re.compile(r"^\s*(?:→|->)\s*(\$AIRESOURCES/[^\n]+)$")
 
@@ -159,6 +159,7 @@ def compile_conventions_rulebook(
 
     Raises:
         FileNotFoundError: If `.conventions/index.md` or a referenced source is missing.
+        AiResourcesResolutionError: If no ai-ressources root resolves (a ``ValueError``).
         RulebookStaleError: If an existing rulebook has stale source hashes and `force` is false.
         json.JSONDecodeError: If the provider response is not JSON.
     """
@@ -194,12 +195,14 @@ class _ResolvedSource(ConventionsRulesBase):
     content: str
 
 
+# @spec FR-004: Route compiler through shared resolution, FR-005: rulebook_error
+#   .specs/features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md#fr-004
 def _resolve_convention_sources(project_root: Path) -> list[_ResolvedSource]:
     index_path = project_root / ".conventions" / "index.md"
     if not index_path.is_file():
         raise FileNotFoundError(".conventions/index.md not found")
     index_text = index_path.read_text(encoding="utf-8")
-    resources_root = _airesources_root(index_text)
+    resources_root = resolve_ai_resources_root(project_root).path
     sources: list[_ResolvedSource] = []
     for raw_source in _source_entries(index_text):
         absolute = (resources_root / raw_source.removeprefix("$AIRESOURCES/")).resolve()
@@ -219,13 +222,6 @@ def _resolve_convention_sources(project_root: Path) -> list[_ResolvedSource]:
     if not sources:
         raise ValueError(".conventions/index.md contains no source entries")
     return sources
-
-
-def _airesources_root(index_text: str) -> Path:
-    match = _AIRESOURCES_RE.search(index_text)
-    if match:
-        return Path(match.group(1)).expanduser().resolve()
-    raise ValueError(".conventions/index.md must declare `$AIRESOURCES` root")
 
 
 def _source_entries(index_text: str) -> list[str]:

@@ -36,6 +36,8 @@ from validator.conventions_rules import (
 from validator.llm_provider import LLMProviderNotConfigured
 
 runner = CliRunner()
+# Every compile fixture declares its own fake corpus; the caller's AIRESOURCES would win.
+pytestmark = pytest.mark.usefixtures("without_airesources")
 
 
 def _write_conventions_project(tmp_path: Path) -> Path:
