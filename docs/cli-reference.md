@@ -562,7 +562,8 @@ livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature 
 ```
 
 - **install** writes `<home>/versions/<VERSION>-<sha12>/` (committed tree minus top-level
-  `.specs/` and `tests/`, read-only, `.livespec-runtime.json` manifest with a content digest),
+  `.specs/` and `tests/` except the conventions test evidence under `tests/` that
+  `conventions verify` reads, read-only, `.livespec-runtime.json` manifest with a content digest),
   rewrites `<home>/bin/livespec` for the installing interpreter and points `<home>/current` at
   the snapshot unless `--no-activate`. Re-installing reuses a verified snapshot; a corrupted
   one is refused, never overwritten. Without a working `livespec` yet, run it through the

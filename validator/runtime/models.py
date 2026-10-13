@@ -22,6 +22,27 @@ DIGEST_PREFIX = "sha256:"
 _DIGEST_RE = re.compile(r"\Asha256:[0-9a-f]{64}\Z")
 # Top-level directories of the LiveSpec repository that never ship in a snapshot (FR-001).
 EXCLUDED_TOP_LEVEL = frozenset({".specs", "tests"})
+# Runtime data under the excluded ``tests/`` tree: the AST detector fixtures and the
+# deterministic test files the bundled conventions catalogs cite as evidence. A
+# trailing slash covers a whole directory; other entries are exact files.
+SNAPSHOT_TEST_EVIDENCE = (
+    "tests/fixtures/conventions_ast/",
+    "tests/test_conventions_ars_rules.py",
+    "tests/test_conventions_ast_multilang.py",
+    "tests/test_conventions_source_family_checks.py",
+)
+
+
+def ships_in_snapshot(path: str) -> bool:
+    """Return whether a committed tree path belongs to a runtime snapshot (FR-001)."""
+    if path.split("/", 1)[0] not in EXCLUDED_TOP_LEVEL:
+        return True
+    return any(
+        path.startswith(entry) if entry.endswith("/") else path == entry
+        for entry in SNAPSHOT_TEST_EVIDENCE
+    )
+
+
 LOCK_RELPATH = Path(".specs") / "livespec.lock"
 LIVESPEC_PATH_RELPATH = Path(".specs") / ".livespec-path"
 PROJECT_VERSION_RELPATH = Path(".specs") / "livespec-version"

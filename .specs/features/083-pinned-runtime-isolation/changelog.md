@@ -125,3 +125,13 @@
 - **Cause:** `is_dir()`/`iterdir()` followed a symlinked link directory, so `runtime pin|upgrade|dev` could rewrite links outside the project; `read_text()` raised on invalid UTF-8 and hid the recovery diagnostics.
 - **Proof:** both regression tests fail without the fix and pass with it.
 - **Author:** spec-fix (claude-code)
+
+## 2026-10-13 — [Bugfix]: Snapshots ship the conventions test evidence
+
+- **Type:** Bugfix (Handy pinned runtime)
+- **Spec modified:** Yes (FR-001, AC-001 and its Gherkin scenario: the conventions test evidence under `tests/` is shipped; the rest of `tests/` and `.specs/` stay excluded)
+- **Code modified:** `validator/runtime/models.py` (`SNAPSHOT_TEST_EVIDENCE`, `ships_in_snapshot`), `validator/runtime/git_tree.py`, `docs/cli-reference.md`, `tests/test_runtime_snapshot_evidence.py`
+- **Cause:** the snapshot dropped every top-level `tests/` path. `livespec conventions verify` resolves the AST fixtures and the deterministic test files cited by the bundled catalogs from the runtime root, so a pinned runtime reported `fixture missing: tests/fixtures/conventions_ast/ts/no_as_any/pass.ts` and 1,130 `rule_decision_manifest_invalid` blockers: the conventions gate was always BLOCKED.
+- **Proof:** the regression test fails without the fix. A snapshot that holds only the shipped evidence reaches `Conventions verdict: PASS` on a TypeScript project where the installed `21-3c1e6a776500` snapshot is BLOCKED. A drift guard checks that every `tests/` path cited by the conventions catalogs and modules ships.
+- **AC impacted:** AC-001
+- **Author:** spec-fix (claude-code)

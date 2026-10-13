@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-13 — Bugfix: Pinned snapshots ship the conventions test evidence
+
+- [083](features/083-pinned-runtime-isolation/changelog.md): `livespec runtime install` keeps `tests/fixtures/conventions_ast/` and the deterministic test files the bundled catalogs cite, so `conventions verify` no longer reports `fixture missing` and is no longer always BLOCKED under a pinned runtime.
+
 ## 2026-10-13 — Bugfix: Execution capture stays inside the project
 
 - [078](features/078-requirement-evidence-integrity/changelog.md): `livespec test` no longer follows links that leave the project. Paths that git ignores and agent tooling directories (`.agent-sync.local`, `.claude`, `.agents`, `.codex`) are out of scope, and an external link is bound by its link text instead of invalidating the capture (scope policy 078.2).
