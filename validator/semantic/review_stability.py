@@ -154,6 +154,18 @@ def _comparable(prepared: PreparedReview) -> bool:
     )
 
 
+def _empty_source_role(name: str, feature: str) -> str:
+    """Role of a source without sections, as prepare_feature_review assigns it."""
+    canonical = {
+        f".specs/features/{feature}/spec.md": "spec",
+        f".specs/features/{feature}/plan.md": "plan",
+        ".specs/constitution.md": "constitution",
+        ".specs/stacks/_default.md": "stack",
+        ".specs/project.md": "project",
+    }
+    return canonical.get(name, "reference")
+
+
 def _authentic(reviewed: PreparedReview, context_hash: str) -> bool:
     """Whether the stored context is what its sources prepare to, under ``context_hash``.
 
@@ -169,6 +181,8 @@ def _authentic(reviewed: PreparedReview, context_hash: str) -> bool:
             return False
         texts[section.source] += section.text
         roles.setdefault(section.source, section.role)
+    for name in texts:  # An empty source has no section to carry its role.
+        roles.setdefault(name, _empty_source_role(name, reviewed.feature))
     if any(
         context.content_hash(texts[name]) != hashed
         for name, hashed in reviewed.source_hashes.items()

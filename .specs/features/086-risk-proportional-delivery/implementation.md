@@ -32,7 +32,7 @@ updated: 2026-10-13
 | AC-003 to AC-006 | `tests/test_delivery_review.py` | ✅ Pass 2026-10-13 |
 | AC-007 | `tests/test_delivery_goal.py` | ✅ Pass 2026-10-13 |
 | AC-008 | `tests/test_delivery_docs.py` | ✅ Pass 2026-10-13 |
-| AC-009 | `tests/test_delivery_lane_review.py` | ✅ Pass 2026-10-13 |
+| AC-009 | `tests/test_delivery_lane_review.py`, `tests/test_review_qe_assessment.py` | ✅ Pass 2026-10-13 |
 
 ## Files Created/Modified
 

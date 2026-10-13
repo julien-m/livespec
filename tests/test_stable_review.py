@@ -139,3 +139,10 @@ def test_projection_reads_decorated_requirement_headings(heading: str) -> None:
     text = f"{heading}\n\n| AC-002 | Exports are listed. |\n\n## Notes\n\nFree.\n"
     assert requirement_projection(text).endswith("| AC-002 | Exports are listed. |")
     assert "AC-003: Kept anywhere." in requirement_projection("## Notes\nAC-003: Kept anywhere.\n")
+
+
+def test_empty_source_keeps_the_stable_path(root: Path) -> None:
+    (root / ".specs/project.md").write_text("")
+    review_both(root)
+    edit_spec(root, "use the server clock", "use NTP time")
+    assert _current(root) == (True, True)

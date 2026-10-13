@@ -81,6 +81,14 @@ def _require_terminal_review_replay(root: Path, feature: str, review_result: Pat
         raise PenflowApprovalError("terminal_review_requires_reopen")
 
 
+def _refuse_open_revision(project_root: Path, feature: str) -> None:
+    """An open spec revision keeps the feature from completing (089 FR-005)."""
+    from validator.delivery.revision import accepted_reviews
+
+    if accepted_reviews(project_root, feature):
+        raise ValueError("spec_revision_open")
+
+
 def _require_update_gates(
     feature_dir: Path,
     feature: str,
@@ -125,11 +133,8 @@ def _require_update_gates(
         require_progression(
             feature_dir.parents[2], feature, phase, model=model, max_chars=review_max_chars
         )
-    if terminal:  # An open spec revision keeps the feature from completing (089 FR-005).
-        from validator.delivery.revision import accepted_reviews
-
-        if accepted_reviews(feature_dir.parents[2], feature):
-            raise ValueError("spec_revision_open")
+    if terminal:
+        _refuse_open_revision(feature_dir.parents[2], feature)
     # A terminal replay already has this authority; do not reopen mutable review files to publish.
     return None if terminal else review
 
