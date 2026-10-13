@@ -10,7 +10,8 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from .acceptance_requirements import execution_acceptance_ids
-from .execution_reports import ExecutedAssertion, ExecutedTest, junit_test_id
+from .execution_reports import ExecutedAssertion, ExecutedTest, junit_test_id, resolve_test_id
+from .execution_rust_source import rust_assertions
 from .execution_scope import digest, read_regular
 from .normative_identity import normative_hash
 from .semantic.review_context import DEFAULT_MAX_CHARS, PreparedReview, prepare_review_context
@@ -138,10 +139,37 @@ def _assertion_span(binding: AcceptanceBinding, text: str) -> str:
         ]
         if len(selected) != 1:
             raise ValueError("Binding does not cite an assertion inside the executed Python test")
+    elif binding.assertion_path.endswith(".rs"):
+        _rust_assertion_span(binding, text)
     return "".join(lines[binding.start_line - 1 : binding.end_line]).strip()
 
 
+def _rust_assertion_span(binding: AcceptanceBinding, text: str) -> None:
+    """Require exactly one complete assertion invocation, inside the executed Rust test."""
+    # @spec FR-004: Rust assertion bindings
+    #   — .specs/features/085-cargo-execution-runner/spec.md#fr-004
+    test_name = binding.test_id.rsplit("::", 1)[-1]
+    cited = [
+        item
+        for item in rust_assertions(text)
+        if binding.start_line <= item.line <= binding.end_line
+        or binding.start_line <= item.end_line <= binding.end_line
+    ]
+    if (
+        len(cited) != 1
+        or cited[0].function != test_name
+        or cited[0].line < binding.start_line
+        or cited[0].end_line > binding.end_line
+    ):
+        raise ValueError(
+            "Binding does not cite one complete assertion inside the executed Rust test"
+        )
+
+
 def _matches_expression(observed: ExecutedAssertion, source: str) -> bool:
+    if observed.path.endswith(".rs"):
+        invoked = [item for item in rust_assertions(source) if item.line == observed.line]
+        return len(invoked) == 1 and invoked[0].text == observed.assertion
     nodes = [
         node
         for node in ast.walk(ast.parse(source))
@@ -157,12 +185,16 @@ def _matches_expression(observed: ExecutedAssertion, source: str) -> bool:
 
 
 def _observed_assertion(
-    binding: AcceptanceBinding, assertions: list[ExecutedAssertion], project_root: Path, source: str
+    binding: AcceptanceBinding,
+    test_id: str,
+    assertions: list[ExecutedAssertion],
+    project_root: Path,
+    source: str,
 ) -> bool:
     """Match the actual assertion callback to the exact reviewed source expression."""
     return any(
         assertion.status == "passed"
-        and binding.test_id in (assertion.test_id, junit_test_id(assertion.test_id))
+        and test_id in (assertion.test_id, junit_test_id(assertion.test_id))
         and Path(assertion.path) == project_root / binding.assertion_path
         and binding.start_line <= assertion.line <= binding.end_line
         and _matches_expression(assertion, source)
@@ -272,12 +304,13 @@ def _certified_bindings(
                 for citation in conclusion.plan_citations
             )
         )
+        test_id = resolve_test_id(binding.test_id, tests)
         observed = _observed_assertion(
-            binding, assertions, project_root, sources[binding.assertion_path]
+            binding, test_id, assertions, project_root, sources[binding.assertion_path]
         )
         if (
             not observed
-            or binding.test_id not in passing
+            or test_id not in passing
             or not grounded
             or not binding.requirement_id.startswith(f"{prepared.feature}:AC-")
         ):

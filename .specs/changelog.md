@@ -7,6 +7,9 @@
 
 ---
 
+## 2026-10-13 — Feature: Cargo execution runner
+
+- [085](features/085-cargo-execution-runner/changelog.md): `livespec test --execution-command 'cargo test ...' --report-adapter junit` certifies Rust tests through a trusted Cargo runner (target runner + workspace wrapper, one process per test, stable LLVM coverage assertion trace, faithful failed/ignored/filtered outcomes, explicit gaps).
 ## 2026-10-13 — Bugfix: Generated eslint gate uses the local binary
 
 - [061](features/061-conventions-gates-engine/changelog.md): `conventions gates init` writes `node_modules/.bin/eslint . --format json` when eslint is installed or declared locally, instead of a bare `eslint` that fails with `command not found`.

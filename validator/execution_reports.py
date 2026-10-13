@@ -90,3 +90,24 @@ def junit_test_id(nodeid: str) -> str:
     parts = nodeid.split("::")
     module = parts[0].removesuffix(".py").replace("/", ".")
     return ".".join([module, *parts[1:-1]]) + "::" + parts[-1]
+
+
+_CARGO_KINDS = frozenset({"lib", "bin", "test", "bench", "example"})
+
+
+# @spec FR-006: Cargo test identity — .specs/features/085-cargo-execution-runner/spec.md#fr-006
+def cargo_test_path(test_id: str) -> str | None:
+    """The `module::test` path of a Cargo id `package/kind/target::module::test`."""
+    binary, separator, path = test_id.partition("::")
+    parts = binary.split("/")
+    if not separator or len(parts) != 3 or parts[1] not in _CARGO_KINDS or not all(parts):
+        return None
+    return path
+
+
+def resolve_test_id(test_id: str, tests: list[ExecutedTest]) -> str:
+    """Resolve a mapping's test id; a bare Cargo path must name exactly one executed test."""
+    if any(test.test_id == test_id for test in tests):
+        return test_id
+    matches = [test.test_id for test in tests if cargo_test_path(test.test_id) == test_id]
+    return matches[0] if len(matches) == 1 else test_id

@@ -2,7 +2,7 @@
 
 > Specification registry for LiveSpec. All artifacts produced by LiveSpec are indexed here.
 >
-> Last updated: 2026-10-12
+> Last updated: 2026-10-13
 
 
 ---
@@ -122,6 +122,7 @@
 | 082 | Conventions Gate Signal | Implemented | 2026-10-10 | 2026-10-11 | [spec](features/082-conventions-gate-signal/spec.md) |
 | 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-12 | [spec](features/083-pinned-runtime-isolation/spec.md) |
 | 084 | Bugfix Lane | Implemented | 2026-10-12 | 2026-10-12 | [spec](features/084-bugfix-lane/spec.md) |
+| 085 | Cargo Execution Runner | Implemented | 2026-10-13 | 2026-10-13 | [spec](features/085-cargo-execution-runner/spec.md), [plan](features/085-cargo-execution-runner/plan.md), [implementation](features/085-cargo-execution-runner/implementation.md) |
 <!-- readme:features:end -->
 
 ---
@@ -146,6 +147,7 @@
 <!-- readme:activity:start -->
 | Date | Type | Description |
 |---|---|---|
+| 2026-10-13 | Feature | [Feature 085] Cargo execution runner: trusted cargo test certification with per-test coverage assertion trace |
 | 2026-10-12 | Spec | Spec Update: registry statuses aligned after stabilization merges |
 | 2026-10-12 | Bugfix | Bugfix: audit bugs through the bugfix lane (084) |
 | 2026-10-12 | Bugfix | [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback) |
@@ -155,7 +157,6 @@
 | 2026-10-12 | Bugfix | Bugfix: [Feature 080] Unsupported manifests recorded, missing package manager warns; readiness gate closed |
 | 2026-10-12 | Spec | Spec Update: [Feature 077] AC-009 / FR-008 clarified, readiness gate closed |
 | 2026-10-12 | Feature | Refactor: test-suite cleanup lot 5 |
-| 2026-10-12 | Feature | Refactor: test cleanup lot 4 (legitimate assertions only) |
 <!-- readme:activity:end -->
 
 ---

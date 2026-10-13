@@ -9,10 +9,11 @@ import time
 import uuid
 from contextlib import suppress
 from pathlib import Path
+from typing import cast
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .execution_runner import prepare_runner
+from .execution_runner import CargoRunnerUnavailable, prepare_runner
 from .execution_scope import EXECUTION_SCOPE_POLICY, digest, read_from_directory, source_manifest
 from .goal_archive_file import acquire_archive_lock, release_archive_lock
 
@@ -117,9 +118,13 @@ def capture_execution(
     root = project_root.resolve(strict=True)
     directory, directory_identity = _run_directory(root)
     report = directory / "runner-report"
-    argv, provenance = prepare_runner(argv, adapter, report)
     gaps: list[str] = []
-    if not provenance:
+    try:
+        argv, provenance = prepare_runner(argv, adapter, report, root=root, env=env)
+    except CargoRunnerUnavailable as exc:
+        provenance = {}
+        gaps.append(f"Unsupported runner: {exc}")
+    if not provenance and not gaps:
         gaps.append("Unsupported runner: structured reports alone cannot certify execution")
     raw_before, before = _manifests(root, feature, gaps)
     started = time.time_ns()
@@ -250,6 +255,7 @@ def _publish(directory: Path, capture: ExecutionCapture, stdout: str, stderr: st
             capture.assertion_trace_sha256 = digest(assertions)
         except (OSError, ValueError) as exc:
             capture.gaps.append(f"Missing actual assertion execution trace: {exc}")
+        capture.gaps.extend(_runner_gaps(directory_fd))
         _write_new(directory_fd, "stdout", stdout.encode())
         _write_new(directory_fd, "stderr", stderr.encode())
         payload = capture.model_dump_json(indent=2).encode()
@@ -271,3 +277,16 @@ def _publish(directory: Path, capture: ExecutionCapture, stdout: str, stderr: st
         release_archive_lock(lock)
         os.close(storage_fd)
         os.close(specs_fd)
+
+
+def _runner_gaps(directory_fd: int) -> list[str]:
+    """Gaps the runner itself reported; their presence can only prevent certification."""
+    try:
+        reported = json.loads(read_from_directory(directory_fd, "runner-gaps"))
+    except FileNotFoundError:
+        return []
+    except (OSError, ValueError) as exc:
+        return [f"Unreadable runner gaps: {exc}"]
+    if not isinstance(reported, list):
+        return ["Unreadable runner gaps: expected a list"]
+    return [f"Runner: {gap}" for gap in cast("list[object]", reported)]
