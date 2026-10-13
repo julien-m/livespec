@@ -722,6 +722,8 @@ Unless the `--no-review` flag is set:
 2. Load reviewer models from `.specs/semantic/config.yaml` → `review_reviewers` list
 3. If no reviewers configured, use the provider's default model
 4. Prepare complete spec review context and ingest actual raw reviewer JSON through the shared protocol. Native and `call_llm()` transports use the same complete inventory and strict validator; reuse a current exact cache instead of another review.
+   <!-- @spec FR-009: Reviewer QE assessment — .specs/features/086-risk-proportional-delivery/spec.md#fr-009 -->
+   Ask the reviewer to judge the Quality Engineering criticality too: the optional `qe_assessment` (`criticality` Low, Medium or High, a `justification` and exact `citations`) in one batch response. An assessed High forces the full delivery lane; an assessed Low or Medium contests an author High, and `livespec delivery lane` reports it as `criticality_contested`. The blast radius is never contested.
 5. Display findings inline with severity markers:
    ```
    Spec Review (google/gemini-3.1-pro):

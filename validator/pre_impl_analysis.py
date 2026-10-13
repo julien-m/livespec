@@ -108,6 +108,7 @@ def analyze_feature_artifacts(
     review_receipt: Path | None = None,
     structural_only: bool = False,
     prepared_review: PreparedReview | None = None,
+    accepted_reviews: frozenset[str] = frozenset(),
 ) -> PreImplAnalysisReport:
     """Read structural coverage and semantic readiness without writing files.
 
@@ -117,6 +118,7 @@ def analyze_feature_artifacts(
         review_receipt: Plan receipt override; defaults to .reviews/plan.json.
         structural_only: Skip semantic checks; references cannot certify readiness.
         prepared_review: Prepared context to verify; otherwise prepare from disk.
+        accepted_reviews: Receipt context hashes accepted by an open spec revision (089).
     Returns:
         Separate reference coverage and semantic findings; invalid receipts are incomplete.
     Raises:
@@ -143,6 +145,7 @@ def analyze_feature_artifacts(
             constitution_path,
             review_receipt,
             prepared_review,
+            accepted_reviews,
         )
         findings.extend(semantic_findings)
 

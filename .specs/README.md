@@ -126,10 +126,11 @@
 | 086 | Risk-Proportional Delivery | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/086-risk-proportional-delivery/spec.md), [plan](features/086-risk-proportional-delivery/plan.md), [implementation](features/086-risk-proportional-delivery/implementation.md) |
 | 087 | Anchor-Derived Acceptance Mapping | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/087-anchor-derived-acceptance/spec.md), [plan](features/087-anchor-derived-acceptance/plan.md), [implementation](features/087-anchor-derived-acceptance/implementation.md) |
 | 088 | Capped Reviews | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/088-capped-reviews/spec.md), [plan](features/088-capped-reviews/plan.md), [implementation](features/088-capped-reviews/implementation.md) |
-| 089 | Stable Review Identity | Draft | 2026-10-13 | 2026-10-13 | [spec](features/089-stable-review-identity/spec.md), [plan](features/089-stable-review-identity/plan.md) |
+| 089 | Stable Review Identity | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/089-stable-review-identity/spec.md), [plan](features/089-stable-review-identity/plan.md), [implementation](features/089-stable-review-identity/implementation.md) |
 | 090 | Minimal Plan Scope | Draft | 2026-10-13 | 2026-10-13 | [spec](features/090-minimal-plan-scope/spec.md), [plan](features/090-minimal-plan-scope/plan.md) |
 | 091 | One-Command Specify Close | Draft | 2026-10-13 | 2026-10-13 | [spec](features/091-specify-close/spec.md), [plan](features/091-specify-close/plan.md) |
 | 092 | Existing Repository Onboarding | Draft | 2026-10-13 | 2026-10-13 | [spec](features/092-init-onboarding/spec.md), [plan](features/092-init-onboarding/plan.md) |
+| 093 | Configured Review Identity | Draft | 2026-10-13 | 2026-10-13 | [spec](features/093-configured-review-identity/spec.md), [plan](features/093-configured-review-identity/plan.md) |
 <!-- readme:features:end -->
 
 ---

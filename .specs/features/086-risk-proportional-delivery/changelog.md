@@ -18,3 +18,12 @@
 - Round 2 (review and audit BLOCKED): the commit that created the spec together with code was accepted as base; the stored base was not re-checked; a path-form anchor bound another feature's ids. Fixed in 0ca1107.
 - Round 3 (final): review PASS and audit PASS by two distinct native agents; `livespec delivery review verify` PASS on the full lane.
 - Carried-over warnings (follow-up): misleading message when the spec is added in a merge commit; feature start does not follow a renamed spec; a symlinked `test_*.py` blocks anchor derivation; an untracked symlink to a device is read by `collect_diff`; `record_report`, `certify_anchored` and `check_execution_options` exceed 50 lines; `execution_mapping.py` grows to 348 lines; Rust `rstest`/`test_case` are not refused as parametrized; `src/bin/*.rs` module path.
+
+## 2026-10-13 — [Feature]: Contestable criticality and reviewed QE
+
+- **Type:** Feature
+- **Spec modified:** Yes (Story 4, AC-009, FR-009)
+- **Code modified:** validator/semantic/review_contract.py, validator/delivery/lane.py, validator/delivery/lane_review.py (new), tests/delivery_support.py, spec-specify skill, system/review-protocol.md, system/delivery-review.md
+- **AC impacted:** AC-009
+- The spec reviewer may return a `qe_assessment`: an assessed High forces the full lane; an assessed Low or Medium contests an author High and `livespec delivery lane` reports `criticality_contested`. The lane keeps the reasons of both the current and the reviewed QE section, so a QE edit after the review never lowers it. The blast radius is never contested.
+

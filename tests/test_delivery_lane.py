@@ -85,10 +85,10 @@ def test_missing_or_stale_review_keeps_the_full_lane(
     reasons = cast(list[dict[str, Any]], payload["reasons"])
     assert [r["code"] for r in reasons] == ["spec_review_not_current"]
     project.review_spec()
-    # A downgrade after review changes the normative spec, so the receipt is stale.
+    # A requirement change after the review makes the receipt stale (feature 089).
     project.write(
         f".specs/features/{FEATURE}/spec.md",
-        spec_text("- **Risk:** Low criticality; Local blast radius."),
+        spec_text().replace("their sum", "their product"),
     )
     _, payload = project.json("delivery", "lane", "--feature", FEATURE, "--model", MODEL)
     assert payload["lane"] == "full"

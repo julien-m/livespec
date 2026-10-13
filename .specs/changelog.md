@@ -7,12 +7,18 @@
 
 ---
 
+## 2026-10-13 — Feature: Reviews that stay current and a contestable criticality
+
+- [089](features/089-stable-review-identity/changelog.md): spec and plan reviews become stale only when FR, AC or Gherkin change, never for edge cases, Quality Engineering, formatting or the review budget; `livespec delivery revision open|close|status` revises the spec during implementation with one new review at the end.
+- [086](features/086-risk-proportional-delivery/changelog.md): the spec reviewer's `qe_assessment` can contest an author High criticality (`criticality_contested`) or raise it; the reviewed QE section is never lowered by a later edit.
+- [093](features/093-configured-review-identity/changelog.md): specified with a plan, not implemented (configured reviewer model and budget, moved from 089).
+
 ## 2026-10-13 — Feature: Lighter delivery gates (Handy findings)
 
 - [086](features/086-risk-proportional-delivery/changelog.md): `livespec delivery lane` selects a light or full lane from the reviewed QE classification; steps run only tests, lint, format and conventions; one independent native review of the complete diff at the end of the feature (`livespec delivery review prepare|record|verify`), capped at two correction rounds.
 - [087](features/087-anchor-derived-acceptance/changelog.md): `livespec test --derive-mapping` derives the AC-to-assertion mapping from `@spec AC-xxx` test anchors; a derived mapping is certified without a mapping review.
 - [088](features/088-capped-reviews/changelog.md): spec and plan reviews are ready once no blocker remains, carry warnings over, approve justified technical scope and report `round_cap_reached`; vague words no longer block.
-- [089](features/089-stable-review-identity/changelog.md), [090](features/090-minimal-plan-scope/changelog.md), [091](features/091-specify-close/changelog.md), [092](features/092-init-onboarding/changelog.md): specified with a plan, not implemented.
+- [090](features/090-minimal-plan-scope/changelog.md), [091](features/091-specify-close/changelog.md), [092](features/092-init-onboarding/changelog.md): specified with a plan, not implemented.
 
 ## 2026-10-13 — Feature: Cargo execution runner
 

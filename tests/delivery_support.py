@@ -63,8 +63,11 @@ class DeliveryProject:
         result = self.run(*args, "--json")
         return result.exit_code, json.loads(result.output)
 
-    def review_spec(self) -> Path:
-        """Write a complete ready spec review receipt for the current spec."""
+    def review_spec(self, criticality: str | None = None) -> Path:
+        """Write a complete ready spec review receipt for the current spec.
+
+        ``criticality`` adds the reviewer's QE assessment (feature 086 AC-009).
+        """
         prepared = prepare_feature_review(self.root, FEATURE, "spec", MODEL)
         sections = {s.section_id: s for s in prepared.sections}
         batch = prepared.batches[0]
@@ -79,17 +82,23 @@ class DeliveryProject:
             }
             for r in prepared.requirements
         ]
-        raw = json.dumps(
-            {
-                "batch_id": batch.batch_id,
-                "reviewed_section_ids": list(batch.section_ids),
-                "conclusions": conclusions,
-                "ambiguities": [],
-                "extra_scope": [],
-                "findings": [],
-                "confidence": 5,
+        response: dict[str, object] = {
+            "batch_id": batch.batch_id,
+            "reviewed_section_ids": list(batch.section_ids),
+            "conclusions": conclusions,
+            "ambiguities": [],
+            "extra_scope": [],
+            "findings": [],
+            "confidence": 5,
+        }
+        if criticality:
+            first = prepared.sections[0]
+            response["qe_assessment"] = {
+                "criticality": criticality,
+                "justification": "Local arithmetic with no persisted data.",
+                "citations": [{"section_id": first.section_id, "excerpt": first.text}],
             }
-        )
+        raw = json.dumps(response)
         receipt = validate_review_result(prepared, [raw])
         assert receipt.ready, receipt.errors
         return save_review_receipt(review_receipt_path(self.root, FEATURE, "spec"), receipt)

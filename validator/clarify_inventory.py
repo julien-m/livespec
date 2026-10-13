@@ -123,6 +123,7 @@ def collect_clarification_inventory(
     review_receipt: Path | None = None,
     prepared_review: PreparedReview | None = None,
     limit: int = 5,
+    accepted_reviews: frozenset[str] = frozenset(),
 ) -> ClarificationInventory:
     """Merge only revalidated review ambiguities, retaining unresolved items beyond the UI cap."""
     from validator.clarify_decisions import apply_recorded_decisions
@@ -139,11 +140,12 @@ def collect_clarification_inventory(
     else:
         try:
             receipt = load_review_receipt(path)
-            complete = _current_review(receipt, prepared_review, spec_path)
-            if complete:
+            reviewed = _current_review(receipt, prepared_review, spec_path, accepted_reviews)
+            complete = reviewed is not None
+            if reviewed is not None:
                 if not receipt.ready:
                     errors.append("blocking_spec_review_findings")
-                semantic = _review_items(receipt, prepared_review, spec_path, source_hash)
+                semantic = _review_items(receipt, reviewed, spec_path, source_hash)
             else:
                 errors.append("stale_or_incomplete_spec_review")
                 if receipt.reviewer_model != prepared_review.reviewer_model:
@@ -165,15 +167,19 @@ def collect_clarification_inventory(
     )
 
 
-def _current_review(receipt: ReviewReceipt, prepared: PreparedReview, spec_path: Path) -> bool:
-    """Keep receipt and source checks together without changing short-circuit semantics."""
-    from validator.semantic.review_receipts import verify_review_receipt
+def _current_review(
+    receipt: ReviewReceipt,
+    prepared: PreparedReview,
+    spec_path: Path,
+    accepted: frozenset[str] = frozenset(),
+) -> PreparedReview | None:
+    """The context the receipt is valid against, when the current sources are the prepared ones."""
+    from validator.semantic.review_stability import reviewed_against
 
-    complete = verify_review_receipt(receipt, prepared) and receipt.complete
+    reviewed = reviewed_against(receipt, prepared, accepted) if receipt.complete else None
     feature_dir = spec_path.parent
     specs_root = (
         feature_dir.parent.parent if feature_dir.parent.name == "features" else feature_dir.parent
     )
-    return complete and prepared_sources_current(
-        prepared, feature_dir, specs_root / "constitution.md"
-    )
+    current = prepared_sources_current(prepared, feature_dir, specs_root / "constitution.md")
+    return reviewed if current else None

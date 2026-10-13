@@ -29,6 +29,7 @@ from .review_models import (
     write_json,
 )
 from .review_scope import base_problem, current_scope
+from .revision import read_revision
 
 __all__ = [
     "KINDS",
@@ -214,6 +215,10 @@ def verify_review(
     path = receipt or receipt_path(root, feature)
     outcome = ReviewOutcome(feature, receipt_path=str(path))
     data = read_json(path)
+    if read_revision(root, feature) is not None:
+        outcome.reasons.append(LaneReason("spec_revision_open", "close the spec revision first"))
+        outcome.verdict = "BLOCKED"
+        return outcome
     kinds_map = _kinds(data, feature) if data else None
     if kinds_map is None:
         code = "receipt_invalid" if data else "no_receipt"

@@ -53,8 +53,10 @@ def verify_review_receipt(receipt_or_path: ReviewReceipt | Path, prepared: Prepa
         return False
     rebuilt = validate_review_result(prepared, receipt.raw_results, receipt.synthesis)
     # Original raw hashes remain provenance when approved lifecycle metadata changes.
-    return rebuilt.complete and receipt.model_dump(exclude={"source_hashes"}) == rebuilt.model_dump(
-        exclude={"source_hashes"}
+    # The stored reviewed context is checked by rebuilding against it (feature 089).
+    excluded = {"source_hashes", "reviewed"}
+    return rebuilt.complete and receipt.model_dump(exclude=excluded) == rebuilt.model_dump(
+        exclude=excluded
     )
 
 

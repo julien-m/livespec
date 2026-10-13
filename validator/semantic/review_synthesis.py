@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 from typing import TYPE_CHECKING
 
+from pydantic import ValidationError
+
 if TYPE_CHECKING:
     from validator.semantic.review_context import PreparedReview
     from validator.semantic.review_contract import ReviewResponse
@@ -66,3 +68,25 @@ def validate_issue_ledger(
     for resolution in final.resolutions:
         errors.extend(_citation_errors(resolution.citations, prepared, allowed))
     return errors
+
+
+def validated_synthesis(
+    prepared: PreparedReview,
+    raws: list[str],
+    responses: list[ReviewResponse],
+    synthesis: str | None,
+) -> tuple[ReviewResponse | None, list[str]]:
+    """Native ingestion and provider execution enforce the same complete transport budget."""
+    from validator.semantic.review_contract import ReviewResponse, validate_response
+    from validator.semantic.review_synthesis_transport import synthesis_prompt
+
+    errors = []
+    if len(synthesis_prompt(prepared, raws)) > prepared.max_chars:
+        errors.append("synthesis_context_over_budget")
+    try:
+        final = ReviewResponse.model_validate_json(synthesis or "")
+    except ValidationError:
+        return None, [*errors, "missing_or_malformed_synthesis"]
+    errors.extend(validate_response(final, prepared))
+    errors.extend(validate_issue_ledger(responses, final, prepared))
+    return final, errors

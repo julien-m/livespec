@@ -5,9 +5,13 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from ..identity import SLUG_REGEX
+
+if TYPE_CHECKING:
+    from ..semantic.review_context import PreparedReview
+    from ..semantic.review_contract import ReviewReceipt
 
 Lane = Literal["light", "full"]
 
@@ -51,6 +55,7 @@ class LaneDecision:
     criticality: str | None = None
     blast_radius: str | None = None
     reasons: list[LaneReason] = field(default_factory=lambda: list[LaneReason]())
+    contested: dict[str, str] | None = None
 
     @property
     def lane(self) -> Lane:
@@ -65,6 +70,7 @@ class LaneDecision:
             "criticality": self.criticality,
             "blast_radius": self.blast_radius,
             "reasons": [{"code": r.code, "detail": r.detail} for r in self.reasons],
+            "criticality_contested": self.contested,
         }
 
 
@@ -134,36 +140,38 @@ def classify(feature: str, spec_text: str) -> LaneDecision:
 
 # @spec FR-003: Reviewed classification only
 #   — .specs/features/086-risk-proportional-delivery/spec.md#fr-003
-def spec_review_current(
+def spec_review_state(
     project_root: Path, feature: str, model: str = "", max_chars: int | None = None
-) -> tuple[bool, str]:
-    """Return whether the spec review receipt is current and ready, with a detail.
+) -> tuple[str, ReviewReceipt | None, PreparedReview | None]:
+    """Return '' with the receipt and the context it reviewed when current and ready.
 
-    Reads sources and the receipt only; never calls a reviewer.
+    Otherwise return the reason and no receipt. Reads sources and the receipt only.
     """
     from ..semantic.review_files import (
         current_review_model,
         prepare_feature_review,
         review_receipt_path,
     )
-    from ..semantic.review_receipts import load_review_receipt, verify_review_receipt
+    from ..semantic.review_receipts import load_review_receipt
+    from ..semantic.review_stability import reviewed_against
 
     resolved = current_review_model(project_root, model)
     if not resolved:
-        return False, "reviewer model unresolved (pass --model or configure review_model)"
+        return "reviewer model unresolved (pass --model or configure review_model)", None, None
     receipt_path = review_receipt_path(project_root, feature, "spec")
     if not receipt_path.is_file():
-        return False, f"no spec review receipt at {receipt_path.relative_to(project_root)}"
+        return f"no spec review receipt at {receipt_path.relative_to(project_root)}", None, None
     try:
         prepared = prepare_feature_review(project_root, feature, "spec", resolved, max_chars)
         receipt = load_review_receipt(receipt_path)
     except (OSError, ValueError) as exc:
-        return False, f"spec review unreadable: {exc}"
-    if not verify_review_receipt(receipt, prepared):
-        return False, f"spec review is stale or incomplete for model {resolved}"
+        return f"spec review unreadable: {exc}", None, None
+    reviewed = reviewed_against(receipt, prepared)
+    if reviewed is None:
+        return f"spec review is stale or incomplete for model {resolved}", None, None
     if not receipt.ready:
-        return False, "spec review is not ready"
-    return True, "current"
+        return "spec review is not ready", None, None
+    return "", receipt, reviewed
 
 
 def evaluate_lane(
@@ -182,7 +190,11 @@ def evaluate_lane(
     except (OSError, UnicodeDecodeError) as exc:
         raise DeliveryInputError(f"unreadable spec {spec}: {exc}") from exc
     decision = classify(feature, text)
-    current, detail = spec_review_current(project_root, feature, model, max_chars)
-    if not current:
-        decision.reasons.append(LaneReason("spec_review_not_current", detail))
+    problem, receipt, reviewed = spec_review_state(project_root, feature, model, max_chars)
+    if receipt is None or reviewed is None:
+        decision.reasons.append(LaneReason("spec_review_not_current", problem))
+        return decision
+    from .lane_review import apply_review
+
+    apply_review(decision, receipt, reviewed)
     return decision

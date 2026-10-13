@@ -7,8 +7,9 @@ codes: 0 evaluated or accepted, 1 refused or not current, 2 usage.
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from pathlib import Path
-from typing import Annotated, NoReturn
+from typing import Annotated, Any, NoReturn
 
 import typer
 
@@ -21,6 +22,8 @@ from validator.delivery.review import (
     record_report,
     verify_review,
 )
+from validator.delivery.revision import close_revision, open_revision, read_revision
+from validator.identity import SLUG_REGEX
 
 from ._common import require_specs_root
 
@@ -148,3 +151,67 @@ def verify_command(
         _usage(str(exc))
     _emit_outcome(f"Delivery review ({decision.lane} lane)", outcome, as_json)
     raise typer.Exit(1 if outcome.reasons else 0)
+
+
+revision_app = typer.Typer(name="revision", help="Revise the spec during implementation.")
+delivery_app.add_typer(revision_app, name="revision")
+
+
+def _emit_revision(payload: dict[str, object], error: str, as_json: bool) -> NoReturn:
+    if as_json:
+        typer.echo(json.dumps({**payload, "error": error}))
+    else:
+        state = "open" if payload.get("open") else "closed"
+        typer.echo(f"Spec revision: {state}" + (f" ({error})" if error else ""))
+    raise typer.Exit(1 if error else 0)
+
+
+# @spec FR-004: Spec revision commands
+#   — .specs/features/089-stable-review-identity/spec.md#fr-004
+@revision_app.command("open")
+def revision_open_command(
+    feature: FEATURE, model: MODEL = "", max_chars: MAX_CHARS = None, as_json: JSON_OUT = False
+) -> None:
+    """Record the current spec and plan reviews before revising the spec."""
+    payload, error = _revision(open_revision, feature, model, max_chars)
+    _emit_revision(payload, error, as_json)
+
+
+@revision_app.command("close")
+def revision_close_command(
+    feature: FEATURE, model: MODEL = "", max_chars: MAX_CHARS = None, as_json: JSON_OUT = False
+) -> None:
+    """Close the revision once the revised spec and plan are reviewed again."""
+    payload, error = _revision(close_revision, feature, model, max_chars)
+    _emit_revision(payload, error, as_json)
+
+
+@revision_app.command("status")
+def revision_status_command(feature: FEATURE, as_json: JSON_OUT = False) -> None:
+    """Print the open revision record, if any."""
+    root = require_specs_root()
+    _feature_or_usage(root, feature)
+    try:
+        record = read_revision(root, feature)
+    except ValueError as exc:
+        _usage(str(exc))
+    _emit_revision({**(record or {"feature": feature}), "open": record is not None}, "", as_json)
+
+
+def _feature_or_usage(root: Path, feature: str) -> None:
+    if not SLUG_REGEX.fullmatch(feature) or not (root / ".specs/features" / feature).is_dir():
+        _usage(f"unknown feature {feature!r}")
+
+
+def _revision(
+    action: Callable[[Path, str, str, int | None], tuple[dict[str, Any], str]],
+    feature: str,
+    model: str,
+    max_chars: int | None,
+) -> tuple[dict[str, Any], str]:
+    root = require_specs_root()
+    _feature_or_usage(root, feature)
+    try:
+        return action(root, feature, model, max_chars)
+    except ValueError as exc:
+        _usage(str(exc))

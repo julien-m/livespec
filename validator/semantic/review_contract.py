@@ -17,10 +17,9 @@ from validator.semantic.review_readiness import (
 from validator.semantic.review_readiness import (
     strictly_ready as strictly_ready,
 )
-from validator.semantic.review_synthesis_transport import (
-    SYNTHESIS_TRANSPORT_VERSION,
-    synthesis_prompt,
-)
+from validator.semantic.review_stability import reviewed_snapshot
+from validator.semantic.review_synthesis import validated_synthesis
+from validator.semantic.review_synthesis_transport import SYNTHESIS_TRANSPORT_VERSION
 
 
 class StrictModel(BaseModel):
@@ -89,6 +88,16 @@ class IssueResolution(StrictModel):
     citations: list[Citation] = Field(min_length=1)
 
 
+# @spec FR-009: Contestable criticality
+#   — .specs/features/086-risk-proportional-delivery/spec.md#fr-009
+class QeAssessment(StrictModel):
+    """The reviewer's own criticality of the feature, grounded in the reviewed sources."""
+
+    criticality: Literal["Low", "Medium", "High"]
+    justification: str = Field(min_length=1)
+    citations: list[Citation] = Field(min_length=1)
+
+
 class ReviewResponse(StrictModel):
     """One batch or final synthesis, with explicit exhaustive identities."""
 
@@ -101,6 +110,7 @@ class ReviewResponse(StrictModel):
     confidence: int = Field(ge=1, le=5)
     synthesized_batch_ids: list[str] = Field(default_factory=list)
     resolutions: list[IssueResolution] = Field(default_factory=list)
+    qe_assessment: QeAssessment | None = None
 
 
 class ReviewReceipt(StrictModel):
@@ -122,6 +132,10 @@ class ReviewReceipt(StrictModel):
     raw_results: list[str] = Field(default_factory=list)
     synthesis: str | None = None
     synthesis_transport_version: str | None = None
+    qe_assessment: QeAssessment | None = None
+    # @spec FR-001: Reviewed context in the receipt
+    #   — .specs/features/089-stable-review-identity/spec.md#fr-001
+    reviewed: PreparedReview | None = None
 
 
 REVIEW_SCHEMA = {
@@ -198,6 +212,8 @@ def validate_response(
     citation_groups = [issue.citations for issue in response.findings]
     citation_groups.extend(issue.citations for issue in response.ambiguities)
     citation_groups.extend(issue.citations for issue in response.extra_scope)
+    if response.qe_assessment is not None:
+        citation_groups.append(response.qe_assessment.citations)
     for citations in citation_groups:
         errors.extend(_citation_errors(citations, prepared, expected_sections))
     for ambiguity in response.ambiguities:
@@ -236,7 +252,7 @@ def validate_review_result(
         responses.append(response)
     final = responses[0] if len(prepared.batches) == 1 and responses else None
     if len(prepared.batches) > 1:
-        final, final_errors = _validated_synthesis(prepared, raw_results, responses, synthesis)
+        final, final_errors = validated_synthesis(prepared, raw_results, responses, synthesis)
         errors.extend(final_errors)
     complete = prepared.complete and not errors and final is not None
     ready = bool(
@@ -264,25 +280,6 @@ def validate_review_result(
         extra_scope=final.extra_scope if final else [],
         findings=final.findings if final else [],
         confidence=final.confidence if final else 0,
+        qe_assessment=final.qe_assessment if final else None,
+        reviewed=reviewed_snapshot(prepared),
     )
-
-
-def _validated_synthesis(
-    prepared: PreparedReview,
-    raws: list[str],
-    responses: list[ReviewResponse],
-    synthesis: str | None,
-) -> tuple[ReviewResponse | None, list[str]]:
-    """Native ingestion and provider execution enforce the same complete transport budget."""
-    from validator.semantic.review_synthesis import validate_issue_ledger
-
-    errors = []
-    if len(synthesis_prompt(prepared, raws)) > prepared.max_chars:
-        errors.append("synthesis_context_over_budget")
-    try:
-        final = ReviewResponse.model_validate_json(synthesis or "")
-    except ValidationError:
-        return None, [*errors, "missing_or_malformed_synthesis"]
-    errors.extend(validate_response(final, prepared))
-    errors.extend(validate_issue_ledger(responses, final, prepared))
-    return final, errors

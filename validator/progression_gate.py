@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .clarify_inventory import collect_clarification_inventory
+from .delivery.revision import accepted_reviews
 from .pre_impl_analysis import analyze_feature_artifacts, has_blocking_findings
 from .semantic.review_files import prepare_feature_review, review_receipt_path
 
@@ -25,11 +26,18 @@ def require_progression(
     if destination not in ("plan", "implement", "test", "complete", "clarify", "analyze"):
         raise ProgressionBlocked(f"unknown_progression_destination:{destination}")
     spec = project_root / ".specs/features" / feature / "spec.md"
+    # @spec FR-005: Progressions during a spec revision
+    #   — .specs/features/089-stable-review-identity/spec.md#fr-005
+    revision = accepted_reviews(project_root, feature)
+    if revision and destination == "complete":
+        raise ProgressionBlocked("spec_revision_open")
+    accepted = revision if destination in ("implement", "test") else frozenset()
     prepared = prepare_feature_review(project_root, feature, "spec", model, max_chars)
     inventory = collect_clarification_inventory(
         spec,
         review_receipt=review_receipt_path(project_root, feature, "spec"),
         prepared_review=prepared,
+        accepted_reviews=accepted,
     )
     if inventory.blocking:
         unresolved = [
@@ -43,6 +51,7 @@ def require_progression(
             project_root / ".specs/constitution.md",
             review_receipt=review_receipt_path(project_root, feature, "plan"),
             prepared_review=prepared_plan,
+            accepted_reviews=accepted,
         )
         if has_blocking_findings(report):
             raise ProgressionBlocked(f"analyze_not_ready:{report.semantic_status}")

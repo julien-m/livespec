@@ -31,10 +31,12 @@ def analyze_semantic_readiness(
     constitution_path: Path,
     receipt_path: Path | None,
     prepared: PreparedReview | None,
+    accepted_reviews: frozenset[str] = frozenset(),
 ) -> tuple[str, list[AnalyzeFinding]]:
     """Reject absent, stale or incomplete receipts; never interpret prose heuristically."""
     from validator.semantic.review_contract import conclusion_blocks, scope_accepted
-    from validator.semantic.review_receipts import load_review_receipt, verify_review_receipt
+    from validator.semantic.review_receipts import load_review_receipt
+    from validator.semantic.review_stability import reviewed_against
 
     path = receipt_path or feature_dir / ".reviews" / "plan.json"
     if not path.is_file():
@@ -48,7 +50,7 @@ def analyze_semantic_readiness(
         receipt = load_review_receipt(path)
         if (
             not prepared_sources_current(prepared, feature_dir, constitution_path)
-            or not verify_review_receipt(receipt, prepared)
+            or reviewed_against(receipt, prepared, accepted_reviews) is None
             or not receipt.complete
         ):
             return "incomplete", [
