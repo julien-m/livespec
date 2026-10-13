@@ -1,7 +1,9 @@
-"""The shipped CI privately supplies exact AST provenance and removes it after consumers."""
+"""The shipped CI supplies the private AST corpus and the public pinned Penflow CLI."""
 
 # @spec AC-006: Pinned private corpus, capability and cleanup
 # ../.specs/features/079-validator-ci-prerequisites/spec.md#ac-006
+# @spec AC-002: Public immutable Penflow pin without credential
+# ../.specs/features/079-validator-ci-prerequisites/spec.md#ac-002
 
 import os
 import shlex
@@ -27,14 +29,24 @@ CORPUS_FILES = (
     "rust.md",
     "swift-kotlin.md",
 )
+WORKFLOW = REPO / ".github/workflows/ci.yml"
+PENFLOW_PATH = ".ci-deps/penflow"
+# Commit-map equivalent of retired private revision dcbfea6 after the public republication.
+PENFLOW_COMMIT = "dd356b95f8543d025b85632ce3998eed88fef07c"
+PENFLOW_JOBS = ("unit-tests", "integration-3a")
+
+
+def _job(name: str) -> JsonFixture:
+    """Validate the workflow mapping before inspecting heterogeneous step fixtures."""
+    raw = yaml.load(WORKFLOW.read_text(), Loader=yaml.BaseLoader)
+    # Actions mappings vary by step; validate the JSON schema before fixture assertions.
+    workflow = cast(JsonFixture, TypeAdapter(dict[str, JsonValue]).validate_python(raw))
+    return cast(JsonFixture, workflow["jobs"][name])
 
 
 def _unit_job() -> JsonFixture:
-    """Validate the workflow mapping before inspecting heterogeneous step fixtures."""
-    raw = yaml.load((REPO / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader)
-    # Actions mappings vary by step; validate the JSON schema before fixture assertions.
-    workflow = cast(JsonFixture, TypeAdapter(dict[str, JsonValue]).validate_python(raw))
-    return cast(JsonFixture, workflow["jobs"]["unit-tests"])
+    """Return the unit-test job that consumes the private corpus."""
+    return _job("unit-tests")
 
 
 def _named_step(name: str) -> JsonFixture:
@@ -152,3 +164,40 @@ def test_ast_backend_identity_guard_rejects_unix_group_command(
         timeout=20,
     )
     assert result.returncode == expected_exit
+
+
+@pytest.mark.parametrize("job_name", PENFLOW_JOBS)
+def test_penflow_checkout_pins_public_commit_without_credential(job_name: str) -> None:
+    steps = _job(job_name)["steps"]
+    checkouts = [step for step in steps if step.get("name") == "Checkout pinned Penflow CLI"]
+    assert len(checkouts) == 1
+    assert checkouts[0]["uses"] == "actions/checkout@v4"
+    assert checkouts[0]["with"] == {
+        "repository": "julien-m/penflow",
+        "ref": PENFLOW_COMMIT,
+        "persist-credentials": "false",
+        "path": PENFLOW_PATH,
+    }
+
+
+def test_workflow_requests_no_penflow_credential_or_capability_gate() -> None:
+    text = WORKFLOW.read_text()
+    assert "PENFLOW_READONLY_DEPLOY_KEY" not in text
+    assert "PENFLOW_KEY" not in text
+    for job_name in PENFLOW_JOBS:
+        names = [step.get("name") for step in _job(job_name)["steps"]]
+        assert "Require read-only Penflow capability" not in names
+
+
+@pytest.mark.parametrize("job_name", PENFLOW_JOBS)
+def test_real_penflow_cli_is_installed_before_every_pytest_consumer(job_name: str) -> None:
+    steps = _job(job_name)["steps"]
+    names = [step.get("name") for step in steps]
+    install = names.index("Install pinned Penflow CLI")
+    cleanup = names.index("Remove Penflow dependency checkout")
+    assert steps[install]["run"] == f"uv pip install --no-cache --system ./{PENFLOW_PATH}"
+    assert names.index("Checkout pinned Penflow CLI") < install < cleanup
+    assert steps[cleanup]["if"] == "always()"
+    consumers = [i for i, step in enumerate(steps) if step.get("run", "").startswith("pytest ")]
+    assert consumers
+    assert cleanup < min(consumers)

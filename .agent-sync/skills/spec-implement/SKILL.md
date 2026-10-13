@@ -114,7 +114,7 @@ flowchart TD
 >
 > **Hooks — after completing:** Same resolution with `after-implement` at all 3 levels.
 > **Hooks — before each step:** Same resolution with `before-implement-step` at all 3 levels.
-> **Hooks — after each step:** Same resolution with `after-implement-step` at all 3 levels.
+> **Hooks — after each step:** Same resolution with `after-implement-step` at all 3 levels. Read and execute the [native quality review protocol](../../../system/hooks/after-implement-step.md) after tests and both step reviewers pass, even if no user hook is installed. An installed copy of that protocol uses the same scope-bound report; do not dispatch it twice. Custom hooks retain their normal inheritance but cannot waive the native review or require the retired audit skill/launcher. Unresolved blocking findings keep the step Blocked.
 
 ## Surface-Aware Test Directory Resolution
 

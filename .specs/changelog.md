@@ -30,6 +30,23 @@
 
 - [078](features/078-requirement-evidence-integrity/changelog.md): `livespec test` no longer follows links that leave the project. Paths that git ignores and agent tooling directories (`.agent-sync.local`, `.claude`, `.agents`, `.codex`) are out of scope, and an external link is bound by its link text instead of invalidating the capture (scope policy 078.2).
 
+## 2026-10-13 — [Feature 050] Bugfix: native quality review
+
+- Read the [instruction correction](features/050-agent-sync-migration/changelog.md): successful steps and pre-commit finalization use an independent native reviewer with effort `high`, preserving check evidence, blocking findings and the index. Historical user-hook replacement is documented; typed LiveSpec gates remain required.
+
+## 2026-10-13 — [Feature 079] Fix: 1/1 gaps closed (FR-002) — CI installs public Penflow pinned at dd356b9 without credential
+<!-- finalize:spec-fix:2026-10-13:5a48c61f -->
+
+## 2026-10-13 — [Feature 079] Check: 55% verified (3/5 FR, 3/6 AC) — FR-002 public Penflow pin missing in CI, AC-006 corpus drift, AC-005 pending
+<!-- finalize:spec-check:2026-10-13:4cb75000 -->
+
+## 2026-10-13 — [Feature 079] Spec refined: Penflow is a public dependency pinned to verified commit dd356b9 without credential — FR-002/AC-002 reworded, IDs preserved
+<!-- finalize:spec-refine:2026-10-13:7747cdfe -->
+
+## 2026-10-12 — Bugfix: Stop conditions keep the caller runtime
+
+- Read [081's bugfix trace](features/081-lightweight-outcome-goals/changelog.md): a consumer-local `validator` package can no longer return a false successful outcome; both stop conditions retain the consumer working directory and their 300-second bound.
+
 ## 2026-10-12 — Bugfix: CI parity on Python 3.12
 
 - [081](features/081-lightweight-outcome-goals/changelog.md): `goal prove --evidence '<json>'` no longer fails on Python 3.12 when the inline JSON exceeds the filename limit; the deadline test uses a real profile.

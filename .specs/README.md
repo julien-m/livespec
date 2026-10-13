@@ -116,7 +116,7 @@
 | 076 | Spec Init Goal Bootstrap | Implemented | 2026-09-04 | 2026-09-08 | Read [spec](features/076-spec-init-goal-bootstrap/spec.md), [plan](features/076-spec-init-goal-bootstrap/plan.md), and [implementation](features/076-spec-init-goal-bootstrap/implementation.md) |
 | 077 | Penflow cumulative verdict consumer | Implemented | 2026-09-05 | 2026-10-12 | [spec](features/077-penflow-cumulative-verdict-consumer/spec.md) |
 | 078 | Requirement Evidence Integrity | In Progress | 2026-09-06 | 2026-10-12 | [spec](features/078-requirement-evidence-integrity/spec.md) |
-| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-10-12 | [spec](features/079-validator-ci-prerequisites/spec.md) |
+| 079 | Validator CI Prerequisites | Approved | 2026-09-07 | 2026-10-13 | [spec](features/079-validator-ci-prerequisites/spec.md) |
 | 080 | Autonomous From-Code Recovery | In Progress | 2026-10-09 | 2026-10-12 | Read [spec](features/080-autonomous-from-code-recovery/spec.md), [plan](features/080-autonomous-from-code-recovery/plan.md), and [implementation](features/080-autonomous-from-code-recovery/implementation.md) |
 | 081 | Lightweight Outcome-Based Goals | Implemented | 2026-10-10 | 2026-10-10 | Read [spec](features/081-lightweight-outcome-goals/spec.md) |
 | 082 | Conventions Gate Signal | Implemented | 2026-10-10 | 2026-10-11 | [spec](features/082-conventions-gate-signal/spec.md) |
@@ -148,15 +148,15 @@
 | Date | Type | Description |
 |---|---|---|
 | 2026-10-13 | Feature | [Feature 085] Cargo execution runner: trusted cargo test certification with per-test coverage assertion trace |
+| 2026-10-13 | Bugfix | [Feature 079] Fix: 1/1 gaps closed (FR-002) — CI installs public Penflow pinned at dd356b9 without credential |
+| 2026-10-13 | Check | [Feature 079] Check: 55% verified (3/5 FR, 3/6 AC) — FR-002 public Penflow pin missing in CI, AC-006 corpus drift, AC-005 pending |
+| 2026-10-13 | Feature | [Feature 079] Spec refined: Penflow is a public dependency pinned to verified commit dd356b9 without credential — FR-002/AC-002 reworded, IDs preserved |
 | 2026-10-12 | Spec | Spec Update: registry statuses aligned after stabilization merges |
 | 2026-10-12 | Bugfix | Bugfix: audit bugs through the bugfix lane (084) |
 | 2026-10-12 | Bugfix | [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback) |
 | 2026-10-12 | Bugfix | Bugfix: declare unit-test dependencies (audit batch) |
 | 2026-10-12 | Bugfix | Bugfix: missing requirements of features 035 and 056 implemented |
 | 2026-10-12 | Feature | Refactor: dead-code resolution (wire or retire) |
-| 2026-10-12 | Bugfix | Bugfix: [Feature 080] Unsupported manifests recorded, missing package manager warns; readiness gate closed |
-| 2026-10-12 | Spec | Spec Update: [Feature 077] AC-009 / FR-008 clarified, readiness gate closed |
-| 2026-10-12 | Feature | Refactor: test-suite cleanup lot 5 |
 <!-- readme:activity:end -->
 
 ---
@@ -310,3 +310,9 @@
 <!-- finalize:spec-fix:2026-10-12:5728df60 -->
 
 <!-- finalize:spec-feature:2026-10-12:a6abad0a -->
+
+<!-- finalize:spec-refine:2026-10-13:7747cdfe -->
+
+<!-- finalize:spec-check:2026-10-13:4cb75000 -->
+
+<!-- finalize:spec-fix:2026-10-13:5a48c61f -->

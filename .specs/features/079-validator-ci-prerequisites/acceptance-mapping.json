@@ -1,0 +1,149 @@
+{
+  "schema_version": "1",
+  "feature": "079-validator-ci-prerequisites",
+  "reviewer_model": "claude-opus-5-5",
+  "review_max_chars": 150000,
+  "review_receipt_path": ".specs/features/079-validator-ci-prerequisites/.reviews/acceptance-mapping.json",
+  "bindings": [
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_penflow_contract_validation::test_real_c20_guard_is_readonly",
+      "expected": "real Penflow positive subprocess check passes with the pinned CLI",
+      "assertion_path": "tests/test_penflow_contract_validation.py",
+      "start_line": 17,
+      "end_line": 18,
+      "source_sha256": "137af850a66e3215d234f2c09804ba3413cbc8d6b9b135d4887c121c7c1de50a",
+      "justification": "validate_review_contract runs the real Penflow C20 subprocess on a valid contract without raising, and the contract bytes stay unchanged."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_penflow_contract_validation::test_real_c20_guard_rejects_unreviewable_contract[missing]",
+      "expected": "real Penflow negative subprocess check rejects a malformed contract",
+      "assertion_path": "tests/test_penflow_contract_validation.py",
+      "start_line": 34,
+      "end_line": 36,
+      "source_sha256": "137af850a66e3215d234f2c09804ba3413cbc8d6b9b135d4887c121c7c1de50a",
+      "justification": "The real CLI rejects a contract missing a test_id with review_contract_validation_failed, and the contract bytes stay unchanged."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_penflow_contract_validation::test_absent_penflow_cannot_approve_contract",
+      "expected": "missing CLI still rejects certification",
+      "assertion_path": "tests/test_penflow_contract_validation.py",
+      "start_line": 46,
+      "end_line": 48,
+      "source_sha256": "137af850a66e3215d234f2c09804ba3413cbc8d6b9b135d4887c121c7c1de50a",
+      "justification": "With no override, no penflow beside the interpreter and an empty PATH, approval raises review_contract_penflow_cli_required: penflow not found."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_penflow_checkout_pins_public_commit_without_credential[unit-tests]",
+      "expected": "unit-tests checkout pins the full public commit with no credential",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 175,
+      "end_line": 180,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "The single Penflow checkout step's with-mapping equals exactly repository julien-m/penflow, ref dd356b95..., persist-credentials false and path, so no ssh-key or token is present."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_penflow_checkout_pins_public_commit_without_credential[integration-3a]",
+      "expected": "integration-3a checkout pins the full public commit with no credential",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 175,
+      "end_line": 180,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "Same exact with-mapping assertion for the integration-3a job."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_workflow_requests_no_penflow_credential_or_capability_gate",
+      "expected": "workflow requests no Penflow credential",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 185,
+      "end_line": 185,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "The shipped workflow text contains no PENFLOW_READONLY_DEPLOY_KEY secret reference."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[unit-tests]",
+      "expected": "real pinned CLI is installed before unit pytest consumers",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 203,
+      "end_line": 203,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "The Penflow checkout cleanup, which follows checkout and install, precedes every pytest step, so tests run against the installed real CLI."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[integration-3a]",
+      "expected": "real pinned CLI is installed before integration pytest consumers",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 203,
+      "end_line": 203,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "Same ordering assertion for the integration-3a job."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[unit-tests]",
+      "expected": "real CLI is installed from the pinned checkout path",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 198,
+      "end_line": 198,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "The install step runs uv pip install on exactly the pinned .ci-deps/penflow checkout, not a stub or index package."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[unit-tests]",
+      "expected": "unit-tests checkout precedes install, which precedes cleanup",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 199,
+      "end_line": 199,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "Checkout, install and cleanup appear in that order in the unit-tests job."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[integration-3a]",
+      "expected": "integration-3a checkout precedes install, which precedes cleanup",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 199,
+      "end_line": 199,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "Same ordering assertion for the integration-3a job."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_real_penflow_cli_is_installed_before_every_pytest_consumer[integration-3a]",
+      "expected": "real CLI is installed from the pinned checkout path in integration-3a",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 198,
+      "end_line": 198,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "Same exact install command assertion for the integration-3a job."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_workflow_requests_no_penflow_credential_or_capability_gate",
+      "expected": "no job keeps a Penflow capability gate",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 189,
+      "end_line": 189,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "Neither Penflow job contains the former Require read-only Penflow capability step."
+    },
+    {
+      "requirement_id": "079-validator-ci-prerequisites:AC-002",
+      "test_id": "tests.test_generation_ci_selection::test_workflow_requests_no_penflow_credential_or_capability_gate",
+      "expected": "workflow references no Penflow key variable",
+      "assertion_path": "tests/test_generation_ci_selection.py",
+      "start_line": 186,
+      "end_line": 186,
+      "source_sha256": "862f0806206b65c423625d2bedd756dfb6ecd9af500e97db8997d5157c7834bf",
+      "justification": "The shipped workflow text contains no PENFLOW_KEY environment reference."
+    }
+  ]
+}

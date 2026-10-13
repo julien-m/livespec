@@ -920,7 +920,7 @@ No commits are made by `/spec-feature` unless the user explicitly asks for a com
 
 When `--auto` is active and Phase 3.5 (Test) completes successfully:
 
-1. Run `$audit` (Codex) or `/audit` (Claude Code) using its current read-only skill and supported entry point. Read the findings; the authorized implementing agent applies necessary corrections in scope, reruns affected checks, then reruns the read-only audit. Unresolved blocking findings prevent closure; never pass an unsupported fix flag or ask the auditor to modify files.
+1. Read and execute the [native quality review protocol](../../../system/hooks/after-implement-step.md) for the complete authorized feature diff before finalization. Dispatch an independent read-only native agent with reasoning effort `high`; the authorized implementing agent applies necessary corrections, reruns affected checks, then requests a fresh native review. Zero unresolved blocking findings, complete coverage and unchanged source identities are required. Record the actual report path; native quality review does not replace the typed Spec/Plan/acceptance or conventions gates.
 2. Verify all tests pass. Submit the current `spec_review_receipt_path`, runner-owned `execution_receipt_path`, and any required `acceptance_review_receipt_path` for the coordinator final acceptance task. Read the [reviewed-spec binding](../../../system/review-protocol.md#documentary-acceptance): every current criterion must be certified, even when the parent contract was compiled before the spec existed.
 3. Run: `livespec git stage --feature NNN-feature-name` only when the user explicitly requested staging; otherwise leave files unstaged.
 4. Resolve commit hook from 3 levels (global → project → local) only to prepare context, applying inheritance rules from `system/hooks.md`.
@@ -1170,7 +1170,7 @@ For UI certification closures, forward the same independent `--build-manifest <r
 
 ### Phase 4 — Git Finalization
 
-- [always] Run the read-only audit, apply required corrections through the authorized implementing agent, rerun affected checks and audit, and verify zero unresolved blocking findings <!-- evidence:documentary -->
+- [always] Run independent native quality review with reasoning effort high, apply required corrections through the authorized implementing agent, rerun affected checks and fresh native review, and verify complete coverage with zero unresolved blocking findings <!-- evidence:documentary -->
 - [always] Verify all tests pass after audit <!-- evidence:execution ac-scope:feature ac-binding:reviewed-spec -->
 - [always] Finalize registry via `livespec finalize apply` + `livespec finalize verify` and prove finalize.registry with the receipt path; append `--build-manifest <runner_build_manifest>` for UI Implemented certification as defined by the C51 stage contract, omit it for non-UI and nonterminal preparation <!-- evidence:documentary -->
 - [always] Refuse commit if `livespec visual-gate validate --feature <slug> --command spec-feature --target <t> --receipt <receipt-path>` exit_code != 0 (VISUAL features only) <!-- evidence:documentary -->

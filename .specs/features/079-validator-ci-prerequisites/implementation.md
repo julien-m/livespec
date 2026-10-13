@@ -15,7 +15,7 @@ Repairs are committed in PR #35. This complete file scope is retained for native
 | Requirement | Files | Status |
 |---|---|---|
 | FR-001 | Source/test paths below | Local lint and typing verified |
-| FR-002 | Read [CI](../../../.github/workflows/ci.yml) | Real local authority tests and native AC-002 verified; pinned CI dependency installation observed successful |
+| FR-002 | Read [CI](../../../.github/workflows/ci.yml) and [workflow policy tests](../../../tests/test_generation_ci_selection.py) | 2026-10-13: both jobs check out public julien-m/penflow at dd356b95f8543d025b85632ce3998eed88fef07c without credential or capability gate; real authority suites and native AC-002 verified |
 | FR-003 | Read [CI](../../../.github/workflows/ci.yml) | Full local unit and integration suites verified |
 | FR-004 | Read [visual tests](../../../tests/test_visual_gate.py) | Local branch coverage 94.41 percent at unchanged 94 percent threshold |
 | FR-005 | Read [CI](../../../.github/workflows/ci.yml) | Pending |
@@ -166,3 +166,19 @@ The six-module targeted suite passes, and the independent v5 post-check confirms
 | Requirement | Files | Status |
 |---|---|---|
 | FR-003 | `pyproject.toml`, `uv.lock`, `tests/test_declared_test_dependencies.py` | Fresh `uv sync --extra dev --frozen` environment collects the full unit suite |
+
+## 2026-10-13 — Public Penflow pin (spec-fix, FR-002 / AC-002)
+
+Penflow was republished as a public MIT repository with a rewritten history, so the former private revision `dcbfea6e2e6e6b359b1b0d80607670a4eb7ad6b7` no longer exists upstream. Its commit-map equivalent `dd356b95f8543d025b85632ce3998eed88fef07c` holds identical package code and was fetched anonymously.
+
+| File | Change |
+|---|---|
+| `.github/workflows/ci.yml` | `unit-tests` and `integration-3a`: removed the Penflow capability gate and `ssh-key`, pinned the public commit, renamed the cleanup step; the private corpus wiring is unchanged |
+| `tests/test_generation_ci_selection.py` | Asserts the exact public pin with no credential in both jobs, no Penflow secret or gate anywhere, and install from the pinned checkout before every pytest consumer |
+| `acceptance-mapping.json` | 14 single-assertion AC-002 bindings, independently reviewed (claude-opus-5-5, 150000) |
+
+| AC | Test File | Status |
+|---|---|---|
+| AC-002 | Read [Penflow authority](../../../tests/test_penflow_contract_validation.py) and [workflow policy](../../../tests/test_generation_ci_selection.py) | ✅ Native receipt `bf31deb16fdf4dde80242aeb31dd93ea`: 16 passed, valid, certifies AC-002 only |
+
+AC-005 resets with this new SHA and stays pending; AC-006 corpus-count drift (7 documents shipped versus 3 specified) is reported in [the 2026-10-13 gap report](checks/2026-10-13.md) and is outside this fix.

@@ -52,3 +52,7 @@ updated: 2026-05-20
 - Added migration 16 and bumped `VERSION` to `16`.
 - Updated tests and docs to treat `.agent-sync` as the canonical source.
 - Removed obsolete `.agent-sync/skills/` and `.agent-sync/agents/` source folders.
+
+## 2026-10-13 — Native quality review correction
+
+FR-009 active workflow instructions now use the [canonical native review protocol](../../../system/hooks/after-implement-step.md) from [spec-feature](../../../.agent-sync/skills/spec-feature/SKILL.md) and [spec-implement](../../../.agent-sync/skills/spec-implement/SKILL.md). User-level historical hook copies need the [documented replacement](../../../system/hooks.md#native-quality-review); generated provider targets are untouched.
