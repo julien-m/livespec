@@ -24,3 +24,7 @@ PHASE_RESULT: OK (fix) — implement gate READY, unit suite 0 failed, repo conve
 | Spec update | Done | `spec.md` (FR-005, AC-008, SC-004, Story 1, Clarifications) | `livespec validate spec.md` | OK | 2026-10-13 |
 | RED | Done | `tests/test_init_bootstrap_closure.py` | targeted suite | 3 failed | 2026-10-13 |
 | GREEN | Done | see changelog | targeted suite, full unit suite, ruff, pyright, mypy | PASS | 2026-10-13 |
+| Readiness gate | Done | `.reviews/spec.json`, `.reviews/plan.json` (plan: 2 batches + synthesis), claude-opus-5-5, 150000, fresh independent native reviewers (second round after FR-002 probe set and FR-005 Quick Start clarifications) | `livespec validate --progression implement` | READY | 2026-10-13 |
+| Conventions | Blocked (environment) | — | `livespec conventions verify --feature repo` | BLOCKED: `ai-ressources` corpus absent in this environment (`catalog_load_error`); 0 error-severity violation | 2026-10-13 |
+
+PHASE_RESULT: OK (fix) — implement gate READY; unit suite: only failures also present on the base branch (environment); repo conventions gate to rerun where the `ai-ressources` corpus exists.
