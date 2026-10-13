@@ -28,7 +28,7 @@
 
 ---
 
-### 2024-03-15 — Feature: Initial implementation of notification system
+## 2024-03-15 — [Feature]: Initial implementation of notification system
 
 - **Type:** Feature
 - **Spec modified:** Yes (sections: User Scenarios, Acceptance Criteria, FR)
@@ -47,7 +47,7 @@
 
 ---
 
-### 2024-03-18 — Bugfix: Badge count not updating on real-time notification
+## 2024-03-18 — [Bugfix]: Badge count not updating on real-time notification
 
 - **Type:** Bugfix
 - **Spec modified:** No
@@ -59,7 +59,7 @@
 
 ---
 
-### 2024-03-22 — Feature: Notification preferences and mark-all-read
+## 2024-03-22 — [Feature]: Notification preferences and mark-all-read
 
 - **Type:** Feature
 - **Spec modified:** No (spec was already correct)
@@ -75,7 +75,7 @@
 
 ---
 
-### 2024-03-25 — Spec Update: Clarified edge case for notification deletion
+## 2024-03-25 — [Spec Update]: Clarified edge case for notification deletion
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (sections: Edge Cases — added deleted notification handling)

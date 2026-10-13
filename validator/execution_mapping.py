@@ -7,14 +7,15 @@ import re
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .acceptance_requirements import execution_acceptance_ids
-from .execution_reports import ExecutedAssertion, ExecutedTest, junit_test_id
+from .execution_reports import ExecutedAssertion, ExecutedTest, junit_test_id, resolve_test_id
+from .execution_rust_source import rust_assertions
 from .execution_scope import digest, read_regular
 from .normative_identity import normative_hash
 from .semantic.review_context import DEFAULT_MAX_CHARS, PreparedReview, prepare_review_context
-from .semantic.review_contract import ReviewReceipt, validate_review_result
+from .semantic.review_contract import ReviewReceipt, strictly_ready, validate_review_result
 from .semantic.review_receipts import save_review_receipt, verify_review_receipt
 
 
@@ -38,10 +39,22 @@ class AcceptanceMapping(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     schema_version: str = "1"
     feature: str
-    reviewer_model: str = Field(min_length=1)
+    reviewer_model: str = ""
     review_max_chars: int = Field(default=DEFAULT_MAX_CHARS, ge=1000, le=200000)
-    review_receipt_path: str
+    review_receipt_path: str = ""
     bindings: list[AcceptanceBinding] = Field(min_length=1)
+    # @spec FR-002: Anchor derivation needs no mapping review
+    #   — .specs/features/087-anchor-derived-acceptance/spec.md#fr-002
+    derivation: Literal["review", "anchors"] = "review"
+
+    @model_validator(mode="after")
+    def _review_fields(self) -> AcceptanceMapping:
+        reviewed = bool(self.reviewer_model) and bool(self.review_receipt_path)
+        if self.derivation == "review" and not reviewed:
+            raise ValueError("A reviewed mapping requires reviewer_model and review_receipt_path")
+        if self.derivation == "anchors" and (self.reviewer_model or self.review_receipt_path):
+            raise ValueError("An anchor-derived mapping has no reviewer or review receipt")
+        return self
 
 
 def _load_mapping(project_root: Path, mapping_path: Path) -> AcceptanceMapping:
@@ -65,6 +78,8 @@ def _prepare_mapping_review(
     """Prepare from the same parsed mapping consumed by certification."""
     if mapping.schema_version != "1" or mapping.feature != feature:
         raise ValueError("Foreign or unsupported acceptance mapping")
+    if mapping.derivation == "anchors":
+        raise ValueError("anchored_mapping_needs_no_review")
     scope = tuple(sorted({binding.requirement_id for binding in mapping.bindings}))
     if any(not re.fullmatch(re.escape(feature) + r":AC-\d+", item) for item in scope):
         raise ValueError("Acceptance mapping scope requires qualified feature AC identities")
@@ -83,7 +98,7 @@ def _prepare_mapping_review(
         sources[binding.assertion_path] = source.decode()
         roles[binding.assertion_path] = "plan"
     key = mapping_path.relative_to(project_root).as_posix()
-    sources[key] = mapping.model_dump_json()
+    sources[key] = mapping.model_dump_json(exclude={"derivation"})  # Pre-087 review hashes.
     roles[key] = "plan"
     return prepare_review_context(
         feature,
@@ -106,6 +121,10 @@ def ingest_mapping_review(
     from .mapping_review_validation import mapping_review_errors
 
     receipt = validate_review_result(prepared, raw_results, synthesis)
+    if receipt.ready and not strictly_ready(receipt):
+        receipt = receipt.model_copy(
+            update={"ready": False, "errors": [*receipt.errors, "mapping_requires_covered"]}
+        )
     if receipt.ready and (errors := mapping_review_errors(prepared, receipt)):
         receipt = receipt.model_copy(
             update={"complete": False, "ready": False, "errors": [*receipt.errors, *errors]}
@@ -138,10 +157,37 @@ def _assertion_span(binding: AcceptanceBinding, text: str) -> str:
         ]
         if len(selected) != 1:
             raise ValueError("Binding does not cite an assertion inside the executed Python test")
+    elif binding.assertion_path.endswith(".rs"):
+        _rust_assertion_span(binding, text)
     return "".join(lines[binding.start_line - 1 : binding.end_line]).strip()
 
 
+def _rust_assertion_span(binding: AcceptanceBinding, text: str) -> None:
+    """Require exactly one complete assertion invocation, inside the executed Rust test."""
+    # @spec FR-004: Rust assertion bindings
+    #   — .specs/features/085-cargo-execution-runner/spec.md#fr-004
+    test_name = binding.test_id.rsplit("::", 1)[-1]
+    cited = [
+        item
+        for item in rust_assertions(text)
+        if binding.start_line <= item.line <= binding.end_line
+        or binding.start_line <= item.end_line <= binding.end_line
+    ]
+    if (
+        len(cited) != 1
+        or cited[0].function != test_name
+        or cited[0].line < binding.start_line
+        or cited[0].end_line > binding.end_line
+    ):
+        raise ValueError(
+            "Binding does not cite one complete assertion inside the executed Rust test"
+        )
+
+
 def _matches_expression(observed: ExecutedAssertion, source: str) -> bool:
+    if observed.path.endswith(".rs"):
+        invoked = [item for item in rust_assertions(source) if item.line == observed.line]
+        return len(invoked) == 1 and invoked[0].text == observed.assertion
     nodes = [
         node
         for node in ast.walk(ast.parse(source))
@@ -157,12 +203,16 @@ def _matches_expression(observed: ExecutedAssertion, source: str) -> bool:
 
 
 def _observed_assertion(
-    binding: AcceptanceBinding, assertions: list[ExecutedAssertion], project_root: Path, source: str
+    binding: AcceptanceBinding,
+    test_id: str,
+    assertions: list[ExecutedAssertion],
+    project_root: Path,
+    source: str,
 ) -> bool:
     """Match the actual assertion callback to the exact reviewed source expression."""
     return any(
         assertion.status == "passed"
-        and binding.test_id in (assertion.test_id, junit_test_id(assertion.test_id))
+        and test_id in (assertion.test_id, junit_test_id(assertion.test_id))
         and Path(assertion.path) == project_root / binding.assertion_path
         and binding.start_line <= assertion.line <= binding.end_line
         and _matches_expression(assertion, source)
@@ -178,13 +228,13 @@ def _mapping_inputs(
     """Read and check the exact governed bytes subsequently consumed by certification."""
     mapping_bytes = read_regular(mapping_path, project_root)
     mapping = AcceptanceMapping.model_validate_json(mapping_bytes)
-    raw = read_regular(project_root / mapping.review_receipt_path, project_root)
+    inputs = [(mapping_path.relative_to(project_root).as_posix(), mapping_bytes)]
+    raw = b""
+    if mapping.derivation == "review":
+        raw = read_regular(project_root / mapping.review_receipt_path, project_root)
+        inputs.append((mapping.review_receipt_path, raw))
     if expected_inputs is not None and any(
-        expected_inputs.get(key) != digest(value)
-        for key, value in (
-            (mapping_path.relative_to(project_root).as_posix(), mapping_bytes),
-            (mapping.review_receipt_path, raw),
-        )
+        expected_inputs.get(key) != digest(value) for key, value in inputs
     ):
         return mapping, raw, False
     return mapping, raw, True
@@ -205,6 +255,10 @@ def certify_mappings(
     mapping, raw, current = _mapping_inputs(project_root, mapping_path, expected_inputs)
     if not current:
         return [], ["Governed acceptance input changed while being consumed"]
+    if mapping.derivation == "anchors":
+        from .execution_mapping_anchors import certify_anchored
+
+        return certify_anchored(project_root, feature, mapping, tests, assertions, expected_sources)
     prepared = _prepare_mapping_review(
         project_root, feature, mapping_path, mapping, evidence_policy=evidence_policy
     )
@@ -214,7 +268,11 @@ def certify_mappings(
         return [], ["Consumed acceptance source differs from captured execution inputs"]
     receipt = ReviewReceipt.model_validate_json(raw)
     rebuilt = validate_review_result(prepared, receipt.raw_results, receipt.synthesis)
-    if not prepared.cacheable or not rebuilt.ready or not verify_review_receipt(receipt, prepared):
+    if (
+        not prepared.cacheable
+        or not strictly_ready(rebuilt)
+        or not verify_review_receipt(receipt, prepared)
+    ):
         return [], ["Independent acceptance review is missing, stale, incomplete or altered"]
     return _certified_bindings(mapping, prepared, rebuilt, project_root, tests, assertions)
 
@@ -272,12 +330,13 @@ def _certified_bindings(
                 for citation in conclusion.plan_citations
             )
         )
+        test_id = resolve_test_id(binding.test_id, tests)
         observed = _observed_assertion(
-            binding, assertions, project_root, sources[binding.assertion_path]
+            binding, test_id, assertions, project_root, sources[binding.assertion_path]
         )
         if (
             not observed
-            or binding.test_id not in passing
+            or test_id not in passing
             or not grounded
             or not binding.requirement_id.startswith(f"{prepared.feature}:AC-")
         ):

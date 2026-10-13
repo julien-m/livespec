@@ -96,7 +96,7 @@ Assemble the following payload for the current step:
 - Description must be < 50 chars, extracted from the FR text in `spec.md`.
 - When a single block implements multiple FRs, combine them: `// @spec FR-001: Fetch count, FR-003: Mark read — .specs/features/NNN-feature-name/spec.md#fr-001`
 - Anchor must be placed on the line immediately above the function/class/block that implements the requirement.
-- The Spec Reviewer must **block** approval if any anchor is missing or lacks the deep-link.
+- The step gate blocks the step if any anchor is missing or lacks the deep-link.
 
 **Strict TDD Protocol**
 - Tests **must** be written before production code (RED → GREEN → REFACTOR).
@@ -107,12 +107,12 @@ Assemble the following payload for the current step:
 
 **Definition of Done**
 
-The **Spec Reviewer** must confirm before approving:
+The **Implementer** confirms before marking the step done (no reviewer subagent per step; the single end-of-feature review follows `system/delivery-review.md`, feature 086):
 - [ ] All FR/AC assigned to this step are implemented
 - [ ] Every implemented FR has a `@spec FR-NNN: description — path/to/spec.md#fr-nnn` anchor (with deep-link) in the source file
 - [ ] No FR is implemented partially
 
-The **Code Quality Reviewer** must confirm before approving:
+The **Implementer** also confirms, with the real command output:
 - [ ] All resolved test commands pass (unit, integration, E2E, visual as applicable)
 - [ ] Lint and typecheck pass on all touched files
 - [ ] No God files (max 300 lines per file)
@@ -129,17 +129,18 @@ Spawn a subagent with the following instruction, passing the Task Payload built 
 
 ```
 Spawn subagent with prompt:
-  "Use the `superpowers:subagent-driven-development` skill to implement the following task.
+  "Use the `superpowers:subagent-driven-development` skill to implement the following task, without its per-task spec and code quality reviewer subagents (LiveSpec runs one review at the end of the feature).
 
    <Task Payload from step 1>"
 ```
 
 The subagent will auto-activate the `superpowers:subagent-driven-development` skill, which will:
 1. Spin up a fresh **Implementer** subagent (context-isolated) to write code + tests (TDD).
-2. Spin up a **Spec Reviewer** subagent to verify FR/AC compliance and `@spec` anchors.
-3. Spin up a **Code Quality Reviewer** subagent to verify test passage and code quality.
-4. Loop back to the Implementer if either review fails (with findings).
-5. Apply `systematic-debugging` if tests fail after the implementation loop.
+2. Run only the step checks: targeted tests, lint and format of the touched files, and `livespec conventions verify --json --feature <slug>`. Dispatch no Spec Reviewer, Code Quality Reviewer or audit for a step.
+3. Loop back to the Implementer if a check fails.
+4. Apply `systematic-debugging` if tests fail after the implementation loop.
+
+The spec compliance, code quality and audit review runs once at the end of the feature, on the complete diff, in spec-implement Phase 6.8 ([delivery review](../../../system/delivery-review.md)).
 
 Receive back: list of files created/modified, FR/AC addressed, test results.
 

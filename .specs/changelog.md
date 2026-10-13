@@ -7,6 +7,36 @@
 
 ---
 
+## 2026-10-13 — Feature: Lighter delivery gates (Handy findings)
+
+- [086](features/086-risk-proportional-delivery/changelog.md): `livespec delivery lane` selects a light or full lane from the reviewed QE classification; steps run only tests, lint, format and conventions; one independent native review of the complete diff at the end of the feature (`livespec delivery review prepare|record|verify`), capped at two correction rounds.
+- [087](features/087-anchor-derived-acceptance/changelog.md): `livespec test --derive-mapping` derives the AC-to-assertion mapping from `@spec AC-xxx` test anchors; a derived mapping is certified without a mapping review.
+- [088](features/088-capped-reviews/changelog.md): spec and plan reviews are ready once no blocker remains, carry warnings over, approve justified technical scope and report `round_cap_reached`; vague words no longer block.
+- [089](features/089-stable-review-identity/changelog.md), [090](features/090-minimal-plan-scope/changelog.md), [091](features/091-specify-close/changelog.md), [092](features/092-init-onboarding/changelog.md): specified with a plan, not implemented.
+
+## 2026-10-13 — Feature: Cargo execution runner
+
+- [085](features/085-cargo-execution-runner/changelog.md): `livespec test --execution-command 'cargo test ...' --report-adapter junit` certifies Rust tests through a trusted Cargo runner (target runner + workspace wrapper, one process per test, stable LLVM coverage assertion trace, faithful failed/ignored/filtered outcomes, explicit gaps).
+## 2026-10-13 — Bugfix: Generated eslint gate uses the local binary
+
+- [061](features/061-conventions-gates-engine/changelog.md): `conventions gates init` writes `node_modules/.bin/eslint . --format json` when eslint is installed or declared locally, instead of a bare `eslint` that fails with `command not found`.
+
+## 2026-10-13 — Bugfix: Finalized changelog entries pass validation
+
+- [058](features/058-deterministic-finalization/changelog.md): `finalize apply` writes `## YYYY-MM-DD — [Tag]: text`, the heading `livespec validate` requires, and the skill and template examples use it too; marked `###` entries from earlier finalizations stay valid.
+
+## 2026-10-13 — Bugfix: Review status keeps semantic reviews current
+
+- [078](features/078-requirement-evidence-integrity/changelog.md): a `finalize apply --status` transition to or from `Review` no longer makes spec and plan reviews stale; an AC change still does. A stale review caused by another reviewer model now reports `spec_review_model_mismatch`.
+
+## 2026-10-13 — Bugfix: Pinned snapshots ship the conventions test evidence
+
+- [083](features/083-pinned-runtime-isolation/changelog.md): `livespec runtime install` keeps `tests/fixtures/conventions_ast/` and the deterministic test files the bundled catalogs cite, so `conventions verify` no longer reports `fixture missing` and is no longer always BLOCKED under a pinned runtime.
+
+## 2026-10-13 — Bugfix: Execution capture stays inside the project
+
+- [078](features/078-requirement-evidence-integrity/changelog.md): `livespec test` no longer follows links that leave the project. Paths that git ignores and agent tooling directories (`.agent-sync.local`, `.claude`, `.agents`, `.codex`) are out of scope, and an external link is bound by its link text instead of invalidating the capture (scope policy 078.2).
+
 ## 2026-10-13 — [Feature 050] Bugfix: native quality review
 
 - Read the [instruction correction](features/050-agent-sync-migration/changelog.md): successful steps and pre-commit finalization use an independent native reviewer with effort `high`, preserving check evidence, blocking findings and the index. Historical user-hook replacement is documented; typed LiveSpec gates remain required.

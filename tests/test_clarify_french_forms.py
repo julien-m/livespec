@@ -29,12 +29,12 @@ def _spec(tmp_path: Path, text: str) -> Path:
 
 
 @pytest.mark.parametrize("adjective,group,metric", FORMS)
-def test_french_variant_is_critical_without_its_own_metric(
+def test_french_variant_is_reported_without_its_own_metric(
     tmp_path: Path, adjective: str, group: str, metric: str
 ) -> None:
     items = scan_clarification_opportunities(_spec(tmp_path, f"Exigence {adjective}."))
     assert len(items) == 1
-    assert items[0].critical
+    assert not items[0].critical
     assert items[0].decision_key.startswith(f"quality:{group}:")
     assert (
         scan_clarification_opportunities(_spec(tmp_path, f"Exigence {adjective}: {metric}.")) == []

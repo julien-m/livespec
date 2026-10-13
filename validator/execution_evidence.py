@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict
 
 from .acceptance_requirements import execution_acceptance_ids
 from .execution_capture import ExecutionCapture
+from .execution_cargo_toolchain import current_cargo_provenance
 from .execution_mapping import AcceptanceMapping, certify_mappings
 from .execution_reports import (
     AssertionTrace,
@@ -199,7 +200,9 @@ def _inspect(
         gaps.append("Unsupported runner acceptance evidence policy")
     if evidence_policy == "2" and capture.acceptance_evidence_policy != "2":
         gaps.append("Runner capture does not declare current acceptance evidence policy 2")
-    if capture.runner_provenance != runner_provenance():
+    if not capture.runner_provenance or capture.runner_provenance != _current_provenance(
+        capture.runner_provenance
+    ):
         gaps.append("Trusted runner provenance changed or missing")
     if capture.before != capture.after or (
         require_current and capture.after != source_manifest(root, feature)
@@ -209,6 +212,13 @@ def _inspect(
     if not capture.assertion_trace_sha256:
         gaps.append("No actual assertion execution trace")
     return _Inspection(capture, tests, assertions, gaps)
+
+
+def _current_provenance(recorded: dict[str, str]) -> dict[str, str]:
+    """Recompute the provenance of the runner kind the capture recorded."""
+    if recorded.get("runner") == "cargo":
+        return current_cargo_provenance(recorded)
+    return runner_provenance()
 
 
 def _passing_result_gaps(capture: ExecutionCapture, tests: list[ExecutedTest]) -> list[str]:
@@ -282,12 +292,12 @@ def _acceptance_input_gaps(capture: ExecutionCapture, root: Path) -> list[str]:
     mapping_path = root / capture.acceptance_mapping
     mapping_bytes = read_regular(mapping_path, root)
     mapping = AcceptanceMapping.model_validate_json(mapping_bytes)
-    review_path = root / mapping.review_receipt_path
+    inputs = [(mapping_path, mapping_bytes)]
+    if mapping.derivation == "review":
+        review_path = root / mapping.review_receipt_path
+        inputs.append((review_path, read_regular(review_path, root)))
     gaps = []
-    for path, current in (
-        (mapping_path, mapping_bytes),
-        (review_path, read_regular(review_path, root)),
-    ):
+    for path, current in inputs:
         relative = path.relative_to(root).as_posix()
         previous = capture.raw_before.get(relative)
         if (

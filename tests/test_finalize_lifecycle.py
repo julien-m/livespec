@@ -70,8 +70,8 @@ def test_new_entry_has_registry_history_without_mutating_spec_body(tmp_path: Pat
     assert spec.read_bytes() == before
     assert "spec_status" in result.skipped
     changelog = (spec.parent / "changelog.md").read_text()
-    assert request.entry_body.splitlines()[0] in changelog
-    assert changed.entry_body in changelog
+    assert "— [Feature]: Initial implementation" in changelog
+    assert "— [Fix]: correct a real behavior" in changelog
     assert changed.hash8() in changelog
     assert verify_finalize_receipt(result.receipt_path, project_root=tmp_path).payload_hash == (
         changed.payload_hash()

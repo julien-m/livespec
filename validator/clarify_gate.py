@@ -217,8 +217,9 @@ def _candidate_opportunities(
             evidence_text=evidence,
             requirement_id=f"{spec_path.parent.name}:{requirement_id}" if requirement_id else "",
             decision_key=decision,
-            critical=category == _CATEGORY_PLACEHOLDER
-            or (category == _CATEGORY_VAGUE and bool(requirement_id)),
+            # @spec FR-004: An isolated qualitative word does not block
+            #   — .specs/features/088-capped-reviews/spec.md#fr-004
+            critical=category == _CATEGORY_PLACEHOLDER,
             source_hash=source_hash,
         )
         for category, question, impact, uncertainty, evidence, decision in candidates

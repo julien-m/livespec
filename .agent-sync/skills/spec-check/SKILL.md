@@ -744,7 +744,7 @@ This enables historical comparison: "did the gap get worse or better since last 
 Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 
 ```markdown
-### YYYY-MM-DD — Check: Spec-code alignment verified
+## YYYY-MM-DD — [Check]: Spec-code alignment verified
 
 - **Type:** Spec Update
 - **Spec modified:** No

@@ -20,6 +20,7 @@ from . import (
     bugfix_cmd,
     command_audit_cmd,
     coverage_cmd,
+    delivery_cmd,
     design_alignment_cmd,
     device_cmd,
     doctor_cmd,
@@ -47,6 +48,7 @@ def register_unified_commands(app: typer.Typer) -> None:
     """
     test_cmd.register(app)
     bugfix_cmd.register(app)
+    delivery_cmd.register(app)
     coverage_cmd.register(app)
     design_alignment_cmd.register(app)
     device_cmd.register(app)

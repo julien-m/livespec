@@ -562,7 +562,8 @@ livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature 
 ```
 
 - **install** writes `<home>/versions/<VERSION>-<sha12>/` (committed tree minus top-level
-  `.specs/` and `tests/`, read-only, `.livespec-runtime.json` manifest with a content digest),
+  `.specs/` and `tests/` except the conventions test evidence under `tests/` that
+  `conventions verify` reads, read-only, `.livespec-runtime.json` manifest with a content digest),
   rewrites `<home>/bin/livespec` for the installing interpreter and points `<home>/current` at
   the snapshot unless `--no-activate`. Re-installing reuses a verified snapshot; a corrupted
   one is refused, never overwritten. Without a working `livespec` yet, run it through the
@@ -572,6 +573,12 @@ livespec runtime defect --command '<cmd>' --error '<verbatim error>' [--feature 
   `commit`), rewrites `.specs/.livespec-path` and retargets LiveSpec-owned links under
   `.agent-sync.local/{skills,rules}/` into the snapshot (missing targets are listed and left
   unchanged). It warns when `.specs/.livespec-path` is not git-ignored and never creates links.
+  `dev` retargets the same links into the checkout. These links leave the project by design:
+  the selected runtime serves the skills and rules. The `livespec test` execution capture never
+  follows them. It skips git-ignored paths and the agent tooling directories
+  (`.agent-sync.local`, `.claude`, `.agents`, `.codex`), and binds any other link that leaves
+  the project by its link text only. Copies in place of links are project-owned: `pin`, `upgrade`
+  and `dev` leave them untouched, so they stop following runtime changes.
 - **upgrade** requires a pinned lock (otherwise run `pin`) and refuses a runtime older than
   `.specs/livespec-version`; the same id is a no-op.
 - **status** / `livespec doctor` report: checkout references (WARNING clean, ERROR dirty),

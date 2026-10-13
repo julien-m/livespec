@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from . import goal_contracts as _contracts
+from .delivery.goal import goal_delivery_lane
 from .goal_outcome import MAX_ATTEMPTS_PER_TASK, goal_requirement, stop_condition
 from .goal_tasks import finalize_required_tasks
 
@@ -133,11 +134,14 @@ def _goal_runtime(
         command, project_root, feature, normalized_flags
     )
     has_penflow = _contracts._detect_penflow(project_root)
+    delivery_lane = goal_delivery_lane(command, project_root, feature, normalized_flags)
+    extra = frozenset({f"lane-{delivery_lane['lane']}"}) if delivery_lane else frozenset()
     execution_tasks = _contracts._extract_execution_tasks(
         skill_path,
         normalized_flags=normalized_flags,
         is_visual=is_visual,
         has_penflow=has_penflow,
+        extra_branches=extra,
     )
     active_branches = _contracts._active_execution_task_branches(
         normalized_flags=normalized_flags,
@@ -147,6 +151,7 @@ def _goal_runtime(
         has_penflow=has_penflow,
         audit_only="--audit-only" in normalized_flags,
         no_generate="--no-generate" in normalized_flags,
+        extra_branches=extra,
     )
     definition_of_done = [
         _contracts.strip_evidence_marker(item)
@@ -159,6 +164,7 @@ def _goal_runtime(
             "is_visual_feature": is_visual,
             "has_penflow": has_penflow,
             "visual_feature_slugs": visual_feature_slugs,
+            **({"delivery_lane": delivery_lane} if delivery_lane else {}),
         },
         execution_tasks,
         definition_of_done,
@@ -208,6 +214,7 @@ def _compiled_payload_tasks(
         tasks,
         stop=stop,
         conventions_gated=conventions_gated,
+        delivery_reviewed="delivery_lane" in runtime,
     )
     if command == "spec-fix":
         from .fix_acceptance_scope import _bind_fix_acceptance_scope

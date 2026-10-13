@@ -96,9 +96,10 @@ def _active_execution_task_branches(
     audit_only: bool,
     no_generate: bool,
     command: str | None = None,
+    extra_branches: frozenset[str] = frozenset(),
 ) -> set[str]:
-    """Calculate which execution task branches are active based on context."""
-    active: set[str] = {"always"}
+    """Active execution task branches; ``extra_branches`` adds the 086 delivery lane."""
+    active: set[str] = {"always", *extra_branches}
     flag_names = _contracts._flag_names(normalized_flags)
     # Preview excludes generic visual scaffolding too, even with an existing UI feature.
     if command == "spec-init" and flag_names.intersection({"--dry-run", "-d"}):
@@ -212,12 +213,12 @@ def _extract_execution_tasks(
     normalized_flags: list[str],
     is_visual: bool,
     has_penflow: bool,
+    extra_branches: frozenset[str] = frozenset(),
 ) -> list[str]:
     """Read task inventory and apply the documented execution branches."""
     if not skill_path.exists():
         return []
     text = skill_path.read_text(encoding="utf-8")
-    # Find the machine-readable execution task section heading
     match = re.search(r"^##\s+Execution Tasks\s*$", text, flags=re.MULTILINE)
     if match is None:
         return []
@@ -238,6 +239,7 @@ def _extract_execution_tasks(
         has_penflow=has_penflow,
         audit_only=audit_only,
         no_generate=no_generate,
+        extra_branches=extra_branches,
     )
 
     return _contracts._execution_section_tasks(section, active, skill_path)

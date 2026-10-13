@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .errors import RuntimeSourceError
-from .models import EXCLUDED_TOP_LEVEL
+from .models import ships_in_snapshot
 
 # Generous bound for local, network-free git queries on a large checkout (plan: 60 s).
 GIT_TIMEOUT_SECONDS = 60
@@ -146,6 +146,8 @@ def dirty_paths(repo: Path) -> list[str]:
 def list_snapshot_entries(source: Path, commit: str) -> list[TreeEntry]:
     """List the commit tree minus top-level ``.specs/`` and ``tests/``.
 
+    The conventions test evidence under ``tests/`` still ships (``ships_in_snapshot``).
+
     Args:
         source: Git working tree.
         commit: Full commit hash.
@@ -163,7 +165,7 @@ def list_snapshot_entries(source: Path, commit: str) -> list[TreeEntry]:
             continue
         meta, path = record.split("\t", 1)
         mode, _kind, oid = meta.split(" ")
-        if path.split("/", 1)[0] in EXCLUDED_TOP_LEVEL:
+        if not ships_in_snapshot(path):
             continue
         if mode == GITLINK_MODE:
             raise RuntimeSourceError(f"gitlink (submodule) refused in {commit}: {path}")

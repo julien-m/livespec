@@ -72,6 +72,8 @@ EXECUTION_TASK_BRANCHES: frozenset[str] = frozenset(
         "init-interactive",
         "init-install",
         "init-preview",
+        "lane-light",
+        "lane-full",
     }
 )
 ALLOWED_INTERNAL_INVOCATION_MODES: frozenset[str] = frozenset({"subagent", "suggestion"})
