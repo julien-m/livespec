@@ -223,6 +223,12 @@ cd your-project
 /spec-feature "User can receive real-time notifications"
 ```
 
+**Prerequisites for an existing codebase** (`/spec-init --from-code --auto`, autonomous backend):
+
+- `cc-hub` on `PATH` (step 2 requires it too).
+- A supported manifest in the project: `package.json`, `pyproject.toml`, `Cargo.toml` or `src-tauri/Cargo.toml`. Without one, the backend stops with `No supported package.json, pyproject.toml or Cargo.toml manifest found`.
+- The `ai-ressources` conventions corpus: a sibling checkout (`~/livespec` next to `~/ai-ressources`) or the `AIRESOURCES` environment variable pointing at it. Without it, the backend stops with `conventions source missing: …/code-conventions/general.md`.
+
 ### Other AI tools
 
 For any AI tool that reads Markdown, paste the content of `system/spec-system.md` into your tool's context. The spec system is tool-agnostic — any AI that can read `.specs/` will follow the rules.

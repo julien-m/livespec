@@ -117,7 +117,10 @@ Independent families:
 
 Read [testing strategy](testing/strategy.md).
 """
+    # @spec FR-005: Generated artifacts pass the structural validator
+    #   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-005
     stack = f"""---
+title: Default Stack
 updated: {today}
 ---
 
@@ -171,6 +174,10 @@ Run relevant unit, integration and native/frontend tests before claiming applica
 ## Authentication
 
 Unknown. No application authentication or deployment inferred.
+
+## Tokens
+
+Unknown. No application token or credential inferred.
 
 <!-- preflight:custom:start -->
 <!-- preflight:custom:end -->

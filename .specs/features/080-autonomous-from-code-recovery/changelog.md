@@ -86,3 +86,12 @@ Alias permutations that reach the same profile branch were dropped (19 -> 13 cas
 - **Author:** spec-fix (claude-opus-5-5)
 
 <!-- finalize:spec-fix:2026-10-12:7710d267 -->
+
+## 2026-10-13 — [Bugfix]: Fresh bootstrap passes validation, definition of done and archive
+
+- **Type:** Bug Fix
+- **Spec modified:** Yes (FR-005, AC-008, SC-004, Story 1 scenario, Clarifications)
+- **Code modified:** `scripts/init.sh`, `validator/init_documents.py`, `validator/init_recovery.py`, `validator/init_from_code.py`, `validator/penflow_contract.py`, `validator/cli_commands/penflow_contract_cmd.py`, `.agent-sync/skills/spec-init/SKILL.md`, `README.md`, `tests/test_init_bootstrap_closure.py` (new)
+- **Gaps closed:** `livespec validate` errors on `changelog.md`, `preflight.md` and `stacks/_default.md`; missing `.specs/design/`, ignore patterns and command list (installer output overwritten by the backend); first `goal archive` drift (`Penflow contract` marker, transcript protocol); Quick Start prerequisites.
+- **Remaining:** formal readiness/certification as for FR-001…FR-004.
+- **Author:** spec-fix (claude-opus-5-5)

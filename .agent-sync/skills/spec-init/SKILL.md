@@ -651,6 +651,7 @@ When generating `.specs/stacks/_default.md` from Phase B decisions, **always** i
 
 ```yaml
 ---
+title: Default Stack
 updated: {today's date YYYY-MM-DD}
 ---
 ```
@@ -990,7 +991,7 @@ flowchart TD
 
 ### Non-Interactive Autonomous From-Code Mode
 
-<!-- @spec FR-003: Preserve init flags, FR-004: Prove full autonomous closure — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-004 -->
+<!-- @spec FR-003: Preserve init flags, FR-004: Prove full autonomous closure, FR-005: Archive the backend transcript — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-004 -->
 
 Normalize autonomous intent to `--from-code --auto` at Step 0, before rendering the immutable goal. Use its `init-autonomous` tasks; interviews, inferred business defaults and stack confirmation belong to `init-interactive`. Do not rewrite historical goals to select a new branch.
 
@@ -1001,7 +1002,12 @@ Normalize autonomous intent to `--from-code --auto` at Step 0, before rendering 
    # Explicit flags preserve recovery/preview semantics after target resolution.
    if [[ "$INIT_FORCE" == "true" ]]; then INIT_ARGS+=(--force); fi
    if [[ "$INIT_DRY_RUN" == "true" ]]; then INIT_ARGS+=(--dry-run); fi
-   bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "${INIT_ARGS[@]}"
+   # The goal archive transcript must hold this output (verify contract markers).
+   T="$TMPDIR/livespec-goals/transcripts"; mkdir -p "$T"
+   set -o pipefail; set +e
+   bash "$LIVESPEC_ROOT/scripts/init-from-code-autonomous.sh" "${INIT_ARGS[@]}" \
+     2>>"$T/spec-init-<hash8>.err" | tee -a "$T/spec-init-<hash8>.out"
+   INIT_STATUS=${PIPESTATUS[0]}; set -e
    ```
    `REMAINING_SECONDS` is the positive remaining monotonic budget, initially 300 unless explicitly overridden; never reset it between calls. The backend bounds installer, `cc-hub` sync and actual allowlisted version probes, including child process groups.
 3. On nonzero exit, capture the exact exit code and stdout/stderr tail, report the failing manifest/tool/artifact, and stop without READY or command completion. Timeout reports `BLOCKED at step from-code-autonomous-timeout`. Do not substitute manual generation. For `--dry-run`, require no target tree change and an explicit preview; do not emit initialization success or run installation/integration/hook tasks.
@@ -1012,7 +1018,7 @@ Normalize autonomous intent to `--from-code --auto` at Step 0, before rendering 
    Record actual native/frontend families, product and technical names, package-manager evidence, explicit Unknown business fields, project-specific constitution, observed ADR, deduplicated testing tools and real probe results. Tooling READY certifies tool availability only.
 5. Verify integration markers, every required skill/provider output and project-local mutable agent copy. Check the unique local backup and retained feature/hook/run history for explicit force recovery. Preserve application/manifests/shared-source bytes; backend success never permits writes through shared links.
 6. Resolve the actual after-init hook chain at the selected target and apply its Markdown instructions in order. The backend does **not** execute these Markdown hooks. Preserve valid conventions; repair invalid generated conventions using backed-up content and actual ai-ressources sources. Every external command requested by a hook must use the same remaining global deadline through the bounded `validator.init_probes.run_command` API; no unbounded shell/CLI call or fresh 300-second allowance. Capture resolved context, applied instructions and actual subprocess outcomes. No hook is inferred executed from backend exit 0.
-7. Re-run current `--verify-only` after hooks and verify conventions/integration outputs; any content drift or required failure blocks completion. The deadline bounds each external command; once the current `--verify-only` passes (the goal stop condition), an elapsed deadline does not block completion. Do not manually rewrite `.specs/` artifacts to hide drift. Submit authentic task evidence through `livespec goal prove`, archive via `livespec goal archive`, prove `archive.run`, then check `livespec goal status` before command success. Backend `status: completed` describes its generated artifact; only this full goal closure completes `/spec-init`.
+7. Re-run current `--verify-only` after hooks and verify conventions/integration outputs; any content drift or required failure blocks completion. The deadline bounds each external command; once the current `--verify-only` passes (the goal stop condition), an elapsed deadline does not block completion. Do not manually rewrite `.specs/` artifacts to hide drift. Submit authentic task evidence through `livespec goal prove`, archive via `livespec goal archive --exit-code "$INIT_STATUS" --stdout-file "$T/spec-init-<hash8>.out" --stderr-file "$T/spec-init-<hash8>.err"`, prove `archive.run`, then check `livespec goal status` before command success. The transcript must contain the step 2 backend output: its `LiveSpec initialized` and `Penflow contract:` lines are `contains` rules of the verify contract, and a transcript without them archives as `drift`. Backend `status: completed` describes its generated artifact; only this full goal closure completes `/spec-init`.
 
 Do not create repository history changes, branches, tags or pushes without explicit user authorization. Interactive from-code scan/recap validation remains the flow below; autonomous mode does not use its speculative inference or interview phases.
 

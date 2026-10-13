@@ -25,9 +25,19 @@ from .init_recovery import (
     write_atomic,
 )
 from .init_verification import MANIFEST, render_manifest, verify_current_profile
+from .penflow_contract import contract_verdict, get_penflow_contract_status
 
 LIVESPEC_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TIMEOUT_SECONDS = 300.0
+IGNORE_PATTERNS = (
+    ".specs/hooks/*.local.md",
+    ".specs/.livespec-path",
+    ".specs/.runs/",
+    ".specs/preflight-report.md",
+    ".livespec-backups/",
+    "test-results/",
+    "playwright-report/",
+)
 INCOMPLETE_RECAP = """---
 status: blocked
 ---
@@ -77,19 +87,27 @@ def _prepare_documents(profile: ObservedProfile, root: Path) -> dict[str, str]:
                 ).items()
             }
         )
-    for filename in ("AGENTS.md", "CLAUDE.md"):
-        documents[filename] = merge_integration(_read_if_exists(root / filename))
-    patterns = (
-        ".specs/.livespec-path",
-        ".specs/.runs/",
-        ".specs/preflight-report.md",
-        ".livespec-backups/",
+    return documents
+
+
+# @spec FR-005: Merge integrations after the installer so its content is never overwritten
+#   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-005
+def _integration_documents(root: Path) -> dict[str, str]:
+    """Merge the instruction blocks and ignore patterns into the current integration files."""
+    commands = tuple(
+        path.name for path in (LIVESPEC_ROOT / ".agent-sync/skills").glob("spec-*") if path.is_dir()
     )
+    documents = {
+        filename: merge_integration(_read_if_exists(root / filename), commands)
+        for filename in ("AGENTS.md", "CLAUDE.md")
+    }
     ignore = _read_if_exists(root / ".gitignore")
     documents[".gitignore"] = (
         ignore
         + ("\n" if ignore and not ignore.endswith("\n") else "")
-        + "".join(pattern + "\n" for pattern in patterns if pattern not in ignore.splitlines())
+        + "".join(
+            pattern + "\n" for pattern in IGNORE_PATTERNS if pattern not in ignore.splitlines()
+        )
     )
     return documents
 
@@ -158,6 +176,7 @@ def _generate(
     )
     _install(root, options, deadline)
     _ensure_core(root)
+    documents.update(_integration_documents(root))
     for relative, content in documents.items():
         write_atomic(root, root / relative, content)
     # Hooks append ignore lines: complete their mutations before snapshotting integrations.
@@ -271,9 +290,13 @@ def main(argv: list[str] | None = None) -> int:
     elif options.verify_only:
         print(f"Current profile verified: {profile.product_name}; read-only")
     else:
+        # @spec FR-005: Print every stdout marker of the spec-init verify contract
+        #   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-005
+        penflow = get_penflow_contract_status(options.project.resolve())
         print(
             f"Autonomous from-code: enabled\nLiveSpec initialized: {profile.product_name}\n"
-            "Penflow Contract Verdict: ABSENT\n"
+            f"Penflow contract: {penflow.state}\n"
+            f"Penflow Contract Verdict: {contract_verdict(penflow)}\n"
             "Backend complete; prove native command goal and archive before command completion."
         )
     return 0

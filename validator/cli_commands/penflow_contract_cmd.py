@@ -15,9 +15,9 @@ import typer
 from yaml import YAMLError
 
 from validator.penflow_contract import (
-    PenflowContractStatus,
     PenflowTarget,
     bootstrap_penflow_workspace,
+    contract_verdict,
     get_penflow_contract_status,
 )
 from validator.penflow_verification import VerificationProfile
@@ -36,19 +36,6 @@ def register(app: typer.Typer) -> None:
         app: Top-level Typer app mutated with the Penflow command group.
     """
     app.add_typer(penflow_contract_app, name="penflow-contract")
-
-
-def _verdict_from_status(status: PenflowContractStatus) -> str:
-    """Return the observable Penflow contract verdict for CLI consumers."""
-    # @spec FR-001, FR-003: Readiness never certifies
-    # .specs/features/077-penflow-cumulative-verdict-consumer/spec.md#fr-001
-    if status.verification is not None:
-        return "PASS" if status.certified else status.verification.status
-    if status.state == "absent":
-        return "ABSENT"
-    if status.state == "incomplete" or status.runtime_comparison in {"BLOCKED", "FAIL"}:
-        return "BLOCKED"
-    return "READY"
 
 
 @penflow_contract_app.command("status")
@@ -136,7 +123,7 @@ def status_command(
         required_profile=required_profile,
         build_manifest=build_manifest,
     )
-    verdict = _verdict_from_status(status)
+    verdict = contract_verdict(status)
     if json_output:
         payload = status.to_dict()
         payload["verdict"] = verdict

@@ -1,7 +1,7 @@
 ---
 title: Autonomous From-Code Recovery
 priority: P1
-updated: 2026-10-12
+updated: 2026-10-13
 feature: 080-autonomous-from-code-recovery
 created: 2026-10-09
 status: In Progress
@@ -62,6 +62,12 @@ Scenario: Unsupported manifests are recorded without blocking supported ecosyste
   And the Python ecosystem is still initialized
   And the package.json fixture keeps its manager Unknown with an explicit warning and does not fail
   And a fixture containing only go.mod fails contextually and names the unsupported manifest
+Scenario: A fresh bootstrap satisfies its own validation and closure contracts
+  Given a fixture with one supported manifest and no prior LiveSpec files
+  When autonomous initialization completes
+  Then livespec validate reports no error on the generated .specs files
+  And the design inventory, the ignore patterns and the agent instructions of the init definition of done exist
+  And the backend output alone carries every stdout marker of the spec-init verify contract
 ```
 
 ```mermaid
@@ -137,12 +143,17 @@ Autonomous from-code goal inventory excludes interview/stack confirmation but re
 
 A fixture with supported manifests plus `go.mod`, `Gemfile` or `pom.xml` records each unsupported manifest as unsupported with unknown ecosystem in the observed profile (`.specs/bootstrap-profile.json`), the generated project profile (`.specs/project.md`) and the bootstrap report (`.specs/bootstrap-recap.md`), and initializes the supported ecosystems; a fixture with only unsupported manifests fails contextually and names them. A `package.json` without `packageManager`, lockfile or corroborated native manager command emits an explicit warning in the profile, the report and the command output, keeps the manager Unknown and does not fail.
 
+### AC-008
+
+After a fresh autonomous initialization, `livespec validate` reports zero errors on the generated `.specs/` files: the global changelog entry uses the `## YYYY-MM-DD — [Tag]:` heading, `preflight.md` has a `Tokens` section and `stacks/_default.md` has a `title` frontmatter. `.specs/design/screens/index.md` and `.specs/design/changelog.md` exist. `.gitignore` contains `.specs/hooks/*.local.md`, the provider outputs (`.agents/skills/spec-*`, `.claude/skills/spec-*`, `.claude/rules/*.md`, `.codex/agents/livespec-*.toml`), `.specs/preflight-report.md`, `.specs/.livespec-path`, `test-results/` and `playwright-report/`. `CLAUDE.md` and `AGENTS.md` carry the LiveSpec block with every `/spec-*` command of the source skills. The backend stdout contains `LiveSpec initialized` and `Penflow contract:`, so a goal archive given the backend transcript passes the `contains` rules of the spec-init verify contract.
+
 ## Functional Requirements
 
 - **FR-001:** Detect manifest families independently. The supported ecosystems, as implemented, are: JavaScript/TypeScript from `package.json` (React, Vite and TypeScript markers, plus `tsconfig.json`) with package manager bun, npm, pnpm or yarn; Python from `pyproject.toml`; Rust from root or `src-tauri/Cargo.toml`; Tauri from a `tauri` dependency in that Cargo manifest, with optional `src-tauri/tauri.conf.json`. Explicit package-manager declarations, corroborated native build commands and lockfiles establish manager evidence; contradictory manager evidence, an unsupported `packageManager` value and malformed manifests fail contextually. A recognized unsupported manifest (`go.mod`, `Gemfile`, `pom.xml`, `build.gradle`, `build.gradle.kts`, `composer.json`, `mix.exs`, `Package.swift`, `pubspec.yaml`, `requirements.txt`, `setup.py`, `Pipfile`, `src-tauri/tauri.conf.json5`, `src-tauri/Tauri.toml`) beside supported manifests is recorded as unsupported with unknown ecosystem in the observed profile, the generated project profile and the bootstrap report, and bootstrap continues with the supported ecosystems; when no supported manifest exists, initialization fails contextually and names the unsupported manifests found. A `package.json` without any package-manager evidence emits an explicit warning in the profile, the report and the command output, keeps the manager Unknown and does not fail. Unsupported product roles, growth, geography, budget and deployment remain explicitly unknown. **Maps to:** AC-001, AC-002, AC-003, AC-007.
 - **FR-002:** Generate project-specific constitution, observed stack ADR and testing strategy; execute bounded argv version probes for actual tooling preflight. Required failures prevent completed recap and READY. Validate current generated content against observed source identities through a read-only profile check; tooling availability never represents application runtime success. **Maps to:** AC-001, AC-002, AC-003.
 - **FR-003:** Autonomous dispatch preserves the selected --dir target and explicit --force, honors --dry-run without writes, and rejects unsupported --deep or flag combinations contextually before mutation. Force recovery is noninteractive and creates a unique local backup before overwriting generated specs, conventions or integration documents; retain features/hooks/run history and all source bytes. Reject escaping generated-artifact symlinks and copy mutable shared agents before local builds. Keep valid convention sources; back up and repair invalid generated conventions using actual ai-ressources paths. Resolve explicit AIRESOURCES configuration before the sibling checkout default. **Maps to:** AC-003, AC-004, AC-005.
 - **FR-004:** Compile a distinct autonomous from-code branch before generation, excluding interview/confirmation while retaining generation, current profile/output validation, integration verification, hooks and archive. Only current artifacts plus authentic goal proof/archive permit command completion; interactive and historical contracts retain their original obligations. **Maps to:** AC-006.
+- **FR-005:** The installer and the backend produce artifacts that pass the structural validator and the init definition of done: validated global changelog heading, preflight `Tokens` section, stack `title` frontmatter, design inventory, required ignore patterns and the LiveSpec instruction block with the command list. Integration documents (`.gitignore`, `CLAUDE.md`, `AGENTS.md`) are merged after the installer runs, so the backend never overwrites installer content with a stale snapshot. The backend prints the inspected Penflow contract state and verdict, and the skill captures the backend output in the transcript passed to `goal archive`. **Maps to:** AC-008.
 
 ## Key Entities
 
@@ -178,8 +189,11 @@ A fixture with supported manifests plus `go.mod`, `Gemfile` or `pom.xml` records
 - Missing business facts remain explicit unknowns; this correction does not authorize product assumptions.
 - 2026-10-12 — Decision `FR-001` (user, recorded through spec-fix): an unsupported manifest (`go.mod`, `Gemfile`, `pom.xml`…) beside supported manifests is recorded as unsupported/unknown in the profile and report and bootstrap continues with the supported ecosystems; total absence of package-manager evidence (for example `package.json` without `packageManager` or lockfile) produces an explicit warning, never a failure. The supported ecosystems are listed explicitly in FR-001 as implemented.
 
+- 2026-10-13 — Report `FR-005` (user, recorded through spec-fix): a fresh `/spec-init --from-code --auto` failed `livespec validate` on three backend-generated files, missed parts of the init definition of done (`.specs/design/`, ignore patterns, command list in `CLAUDE.md`) and its first `goal archive` drifted. The generated bootstrap must satisfy its own validator, definition of done and verify contract.
+
 ## Success Criteria
 
 - **SC-001:** All four fixture profiles (hybrid desktop, web/npm, Python, Cargo) match observed manifests with zero invented product or deployment facts.
 - **SC-002:** Every recovery fixture retains prior generated backup contents and application/shared-source hashes; all unsafe/error fixtures return nonzero without completed claims.
 - **SC-003:** Fresh autonomous goals retain every closure obligation and omit interview/confirmation; interactive and historical goal comparisons show no altered obligations.
+- **SC-004:** A fresh fixture bootstrap reports zero `livespec validate` errors and zero failed `contains` rules when archived with the backend transcript.

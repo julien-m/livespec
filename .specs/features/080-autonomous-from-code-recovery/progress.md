@@ -15,3 +15,12 @@
 Native goal: none was required for this spec-fix closure (optional since 081); the CLI contract `livespec validate` / `livespec conventions verify` provided every gate.
 
 PHASE_RESULT: OK (fix) — implement gate READY, unit suite 0 failed, repo conventions PASS.
+
+## 2026-10-13 — spec-fix: bootstrap validation and closure (FR-005)
+
+| Step | Status | Files | Verification | Result | Date |
+|---|---|---|---|---|---|
+| Reproduce | Done | temporary Python fixture, fake `cc-hub` | backend + `livespec validate` + `goal archive` with backend transcript | 3 validate errors, gaps of the definition of done, `contains: Penflow contract` FAIL | 2026-10-13 |
+| Spec update | Done | `spec.md` (FR-005, AC-008, SC-004, Story 1, Clarifications) | `livespec validate spec.md` | OK | 2026-10-13 |
+| RED | Done | `tests/test_init_bootstrap_closure.py` | targeted suite | 3 failed | 2026-10-13 |
+| GREEN | Done | see changelog | targeted suite, full unit suite, ruff, pyright, mypy | PASS | 2026-10-13 |

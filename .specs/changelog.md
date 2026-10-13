@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-13 — [Bugfix]: Fresh spec-init bootstrap passes its own checks
+
+- [080](features/080-autonomous-from-code-recovery/changelog.md): `/spec-init --from-code --auto` now passes `livespec validate` (changelog heading, preflight `Tokens`, stack `title`), keeps the installer's `.gitignore` patterns and `CLAUDE.md` command list instead of overwriting them, creates `.specs/design/`, prints the `Penflow contract:` marker the archive requires and archives the backend transcript; the Quick Start lists the autonomous prerequisites.
+
 ## 2026-10-13 — Feature: Lighter delivery gates (Handy findings)
 
 - [086](features/086-risk-proportional-delivery/changelog.md): `livespec delivery lane` selects a light or full lane from the reviewed QE classification; steps run only tests, lint, format and conventions; one independent native review of the complete diff at the end of the feature (`livespec delivery review prepare|record|verify`), capped at two correction rounds.

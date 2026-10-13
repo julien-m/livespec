@@ -13,6 +13,7 @@ feature: 080-autonomous-from-code-recovery
 | FR-002 | validator/init_documents.py, init_probes.py, init_verification.py | FR-002 | Functional tests PASS; formal certification pending | 2026-10-09 |
 | FR-003 | validator/init_from_code.py, init_recovery.py, scripts/init-from-code-autonomous.sh, init.sh, sync-agent-assets.sh | FR-003 | Functional tests PASS; formal certification pending | 2026-10-09 |
 | FR-004 | validator/goal_inventory.py, goal_contract_model.py, canonical spec-init skill | FR-004 | Functional tests PASS; formal certification pending | 2026-10-09 |
+| FR-005 | scripts/init.sh, validator/init_documents.py, init_recovery.py, init_from_code.py, penflow_contract.py, canonical spec-init skill, README.md | FR-005 | Functional tests PASS; formal certification pending | 2026-10-13 |
 
 ## Acceptance Criteria Mapping
 
@@ -25,6 +26,7 @@ feature: 080-autonomous-from-code-recovery
 | AC-005 | tests/test_init_recovery.py, test_init_agent_isolation.py | Observed targeted PASS |
 | AC-006 | tests/test_init_goal_profiles.py, test_goal_contracts.py | Observed targeted PASS |
 | AC-007 | tests/test_init_profile.py, test_init_documents.py, test_init_recovery.py | Observed targeted PASS |
+| AC-008 | tests/test_init_bootstrap_closure.py | Observed targeted PASS |
 
 ## Execution and Limits
 
@@ -51,3 +53,13 @@ Shipping also supplies the four required bootstrap convention documents through 
 - [init_profile.py](../../../validator/init_profile.py) records each recognized unsupported manifest (`UNSUPPORTED_MANIFESTS`, including the Tauri JSON5/TOML formats that previously failed) in `ObservedProfile.unsupported_manifests` without parsing it, and continues with the supported ecosystems; with no supported manifest the error names the unsupported files. A `package.json` without manager evidence adds `MISSING_MANAGER_WARNING` to `ObservedProfile.warnings` and never fails or defaults to npm.
 - [init_documents.py](../../../validator/init_documents.py) renders an `Observation Findings` section in `project.md` and in the completed recap (`render_recap`) only when findings exist, so profiles without findings keep identical bytes; [init_from_code.py](../../../validator/init_from_code.py) prints `WARNING:` lines on stderr in every mode. `bootstrap-profile.json` carries both new fields through `asdict`.
 - RED then GREEN: 10 new cases in [profile tests](../../../tests/test_init_profile.py), [document tests](../../../tests/test_init_documents.py) and a real subprocess run in [recovery tests](../../../tests/test_init_recovery.py) (dry-run and completed run, written profile/report, read-only verification).
+
+## 2026-10-13 — Bootstrap passes its own validator, definition of done and verify contract (spec-fix, FR-005)
+
+- [init.sh](../../../scripts/init.sh) writes the global changelog entry as `## YYYY-MM-DD — [Setup]: LiveSpec initialized`, gives the placeholder stack a `title`/`updated` frontmatter, creates `.specs/design/screens/index.md` and `.specs/design/changelog.md` from their templates without replacing existing ones, and adds `.specs/.livespec-path`, `.specs/.runs/`, `.specs/.previews/`, `.specs/preflight-report.md`, `test-results/` and `playwright-report/` to its ignore list.
+- [init_documents.py](../../../validator/init_documents.py) adds `title: Default Stack` to the observed stack and a `Tokens` section (Unknown) to the preflight manifest.
+- Cause of the missing ignore lines and the short `CLAUDE.md`: [init_from_code.py](../../../validator/init_from_code.py) prepared `.gitignore`, `AGENTS.md` and `CLAUDE.md` before running the installer, then overwrote the installer's versions with that stale snapshot. `_integration_documents` now merges them after the installer, and [merge_integration](../../../validator/init_recovery.py) writes the skill's LiveSpec block with every `/spec-*` command of the source skills.
+- Cause of the first `goal archive` drift: the verify contract requires `Penflow contract` while the backend printed only `Penflow Contract Verdict: ABSENT` (case-sensitive), and the skill did not say to put the backend output in the archived transcript. The backend now prints `Penflow contract: <state>` and the verdict from the inspected workspace (`contract_verdict`, moved from the CLI into [penflow_contract.py](../../../validator/penflow_contract.py)); the [skill](../../../.agent-sync/skills/spec-init/SKILL.md) tees the backend run into the transcript passed to `goal archive`.
+- [README](../../../README.md) Quick Start lists the autonomous prerequisites: `cc-hub`, a supported manifest and the `ai-ressources` corpus (`AIRESOURCES`).
+- RED then GREEN: 3 cases in [bootstrap closure tests](../../../tests/test_init_bootstrap_closure.py) run the real backend wrapper on a fresh fixture (validator 0 error, definition-of-done artifacts, verify-contract stdout markers).
+- An already initialized project keeps its old changelog heading: `--force` recovery preserves user history, so `## <date> — LiveSpec initialized` must be renamed once to `## <date> — [Setup]: LiveSpec initialized`.

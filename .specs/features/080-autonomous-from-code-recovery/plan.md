@@ -2,7 +2,7 @@
 title: Autonomous From-Code Recovery
 spec_ref: spec.md
 created: 2026-10-09
-updated: 2026-10-12
+updated: 2026-10-13
 status: Approved
 ---
 
@@ -183,6 +183,14 @@ stateDiagram-v2
 - Update feature `implementation.md`, `progress.md`, feature/global changelogs and registry with actual source/test mappings. Refresh stale spec/plan review after governed init-skill changes, then require current Analyze/progression and native child goal closure. Never repair an old immutable goal by rewriting it or declaring an incomplete session complete.
 - Parent orchestration resumes the real target session only after corrective validation. Its later target verification is the operational acceptance boundary; this feature does not modify Handy or certify application build/UI/runtime.
 
+### Step 7 — Make the bootstrap pass its own checks
+
+**FR covered:** FR-005.1: Validator-conformant artifacts, FR-005.2: Installer integration preserved, FR-005.3: Archive markers and transcript.
+- `scripts/init.sh` writes the `[Setup]` changelog heading, stack frontmatter, the design inventory (only when absent) and the ignore patterns of the definition of done. `init_documents` adds the stack `title` and the preflight `Tokens` section.
+- `init_from_code` merges `.gitignore`, `AGENTS.md` and `CLAUDE.md` after the installer runs (`_integration_documents`); `merge_integration` renders the skill's LiveSpec block with the source skill commands.
+- The backend prints `Penflow contract: <state>` and the verdict of the inspected workspace through `penflow_contract.contract_verdict`; the skill tees the backend run into the transcript given to `goal archive`. The README Quick Start lists `cc-hub`, a supported manifest and the `ai-ressources` corpus.
+- Evidence: `tests/test_init_bootstrap_closure.py` runs the real wrapper on a fresh fixture and checks `livespec validate`, the definition-of-done artifacts and the verify-contract `contains` needles.
+
 ## Resolved Test Commands
 
 | Action | Command | Availability |
@@ -205,6 +213,7 @@ stateDiagram-v2
 | P0 preservation | Bootstrap subprocess backup equality, custom history and source bytes; reject escaping generated paths before outside-target mutation | FR-003; AC-004 |
 | P0 shared isolation/conventions | `test_init_agent_isolation.py`: controlled executable mutates actual local copy only, legacy-link detachment, source hashes; valid routing unchanged/invalid repair resolves real files | FR-003; AC-005 |
 | P1 inventory compatibility | `test_init_goal_profiles.py`, existing goal tests: rendered branch/closure/aliases and unchanged historical+interactive obligations | FR-004; AC-006 |
+| P0 bootstrap self-consistency | `test_init_bootstrap_closure.py`: real wrapper on a fresh fixture; validator zero errors, design inventory, ignore patterns, command list, verify-contract stdout markers | FR-005; AC-008 |
 | P1 quality/semantic readiness | Scoped static checks, structural validation, current complete native spec/plan receipts, shared progression and repo conventions PASS | All FR/AC |
 
 - **Risk:** High criticality, shared blast radius, primary Data/Contract risk. Applicable functional/regression/compatibility/data/security/performance/operability dimensions; accessibility not applicable to a non-UI bootstrap.

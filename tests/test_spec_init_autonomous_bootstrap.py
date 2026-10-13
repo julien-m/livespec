@@ -90,11 +90,11 @@ def test_from_code_autonomous_bootstrap_script_completes_vite_react(
     assert (project / ".specs/spec-system.md").exists()
     assert (project / ".specs/project.md").exists()
     assert (project / ".specs/roadmap.md").exists()
-    assert (
-        (project / ".specs/stacks/_default.md")
-        .read_text(encoding="utf-8")
-        .startswith("---\nupdated:")
-    )
+    stack = (project / ".specs/stacks/_default.md").read_text(encoding="utf-8")
+    frontmatter = stack.split("---\n")[1]
+    assert stack.startswith("---\n")
+    assert "\nupdated: " in "\n" + frontmatter
+    assert "\ntitle: " in "\n" + frontmatter
     readme = (project / ".specs/README.md").read_text(encoding="utf-8")
     assert "<!-- readme:features:start -->" in readme
     assert "<!-- readme:decisions:start -->" in readme

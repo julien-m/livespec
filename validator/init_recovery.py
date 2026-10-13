@@ -109,14 +109,24 @@ def preserve_custom_block(previous: str, generated: str) -> str:
     )
 
 
-def merge_integration(previous: str) -> str:
-    """Replace only the LiveSpec marked section and preserve surrounding user bytes."""
-    section = """<!-- livespec:start -->
-## LiveSpec
+# @spec FR-005: Installer instruction block with the command list
+#   — .specs/features/080-autonomous-from-code-recovery/spec.md#fr-005
+def merge_integration(previous: str, commands: tuple[str, ...]) -> str:
+    """Replace only the LiveSpec marked section and preserve surrounding user bytes.
 
-Read [the specification system](.specs/spec-system.md) before any spec command or code modification.
-Use `$spec-init` (Codex) or `/spec-init` (Claude) for initialization.
-<!-- livespec:end -->"""
+    Args:
+        previous: Current document bytes, possibly already holding a LiveSpec section.
+        commands: Source skill names (``spec-*``) listed as slash commands.
+    Returns:
+        Document with exactly one LiveSpec section, as the init skill template defines it.
+    """
+    listed = " · ".join(f"`/{command}`" for command in sorted(commands))
+    section = (
+        "<!-- livespec:start -->\n## LiveSpec\n\n"
+        "This project uses [LiveSpec](https://github.com/julien-m/livespec). "
+        "**Read `.specs/spec-system.md` before any spec command or code modification.**\n\n"
+        f"Commands: {listed}\n<!-- livespec:end -->"
+    )
     pattern = r"<!-- livespec:start -->.*?<!-- livespec:end -->"
     if re.search(pattern, previous, flags=re.DOTALL):
         return re.sub(pattern, lambda _: section, previous, flags=re.DOTALL)

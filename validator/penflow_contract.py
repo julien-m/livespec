@@ -182,6 +182,19 @@ class PenflowBootstrapResult:
         }
 
 
+def contract_verdict(status: PenflowContractStatus) -> str:
+    """Return the observable Penflow contract verdict for CLI consumers."""
+    # @spec FR-001, FR-003: Readiness never certifies
+    # .specs/features/077-penflow-cumulative-verdict-consumer/spec.md#fr-001
+    if status.verification is not None:
+        return "PASS" if status.certified else status.verification.status
+    if status.state == "absent":
+        return "ABSENT"
+    if status.state == "incomplete" or status.runtime_comparison in {"BLOCKED", "FAIL"}:
+        return "BLOCKED"
+    return "READY"
+
+
 def get_penflow_contract_status(
     project_root: Path,
     *,
