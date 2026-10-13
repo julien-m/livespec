@@ -11,7 +11,7 @@ status: Approved
 - **Feature:** 080-autonomous-from-code-recovery
 - **Date:** 2026-10-09
 - **Status:** Approved
-- **Scope:** M — five FR, eight AC; local bootstrap metadata and subprocess boundaries.
+- **Scope:** M — six FR, nine AC; local bootstrap metadata and subprocess boundaries.
 
 ## Summary
 
@@ -193,11 +193,18 @@ Step 7 is a corrective increment after Step 6; its own evidence below replaces S
 - The backend prints `Penflow contract: <state>` and the verdict of the inspected workspace through `penflow_contract.contract_verdict`; the skill tees the backend run into the transcript given to `goal archive`. The README Quick Start lists `cc-hub`, a supported manifest and the `ai-ressources` corpus.
 - Evidence: `tests/test_init_bootstrap_closure.py` runs the real wrapper on a fresh fixture and checks `livespec validate`, the definition-of-done artifacts and the verify-contract `contains` needles.
 
+### Step 8 — Repair earlier bootstraps through migration v23
+
+**FR covered:** FR-006.1: Idempotent repair, FR-006.2: Migration delivery.
+- `validator/init_bootstrap_repair.py` applies each FR-005 artifact correction only where the old form is detected (legacy initial heading, missing Tokens section, missing title, absent design files and ignore patterns, command-less LiveSpec block), keeps file modes and refreshes the bootstrap profile identities of rewritten files.
+- `migrations/23/migrate.md` runs it through `scripts/migrate-init-bootstrap-repair.sh`, then `SET_VERSION 23`; `VERSION` becomes 23 so pending migration v22 runs first, by user decision.
+- Evidence: `tests/test_init_bootstrap_migration.py` builds a legacy fixture from a real bootstrap, migrates it with the real runner, then checks validation, `--verify-only`, preserved user bytes, idempotence and the migration plan.
+
 ## Resolved Test Commands
 
 | Action | Command | Availability |
 |---|---|---|
-| Unit/integration fixtures | `.venv/bin/pytest -q tests/test_init_profile.py tests/test_init_documents.py tests/test_spec_init_autonomous_bootstrap.py tests/test_init_agent_isolation.py tests/test_init_goal_profiles.py tests/test_init_recovery.py tests/test_init_bootstrap_closure.py` | pytest 9.1.1 verified; `test_init_bootstrap_closure.py` is the AC-008 evidence |
+| Unit/integration fixtures | `.venv/bin/pytest -q tests/test_init_profile.py tests/test_init_documents.py tests/test_spec_init_autonomous_bootstrap.py tests/test_init_agent_isolation.py tests/test_init_goal_profiles.py tests/test_init_recovery.py tests/test_init_bootstrap_closure.py tests/test_init_bootstrap_migration.py` | pytest 9.1.1 verified; AC-008 and AC-009 evidence |
 | Existing goal regressions | `.venv/bin/pytest -q tests/test_goal_contracts.py` | pytest verified; existing suite |
 | Lint | `.venv/bin/ruff check <changed Python files>` | Ruff 0.15.20 verified; resolve changed paths after implementation |
 | Format | `.venv/bin/ruff format --check <changed Python files>` | Ruff verified |
@@ -216,6 +223,7 @@ Step 7 is a corrective increment after Step 6; its own evidence below replaces S
 | P0 shared isolation/conventions | `test_init_agent_isolation.py`: controlled executable mutates actual local copy only, legacy-link detachment, source hashes; valid routing unchanged/invalid repair resolves real files | FR-003; AC-005 |
 | P1 inventory compatibility | `test_init_goal_profiles.py`, existing goal tests: rendered branch/closure/aliases and unchanged historical+interactive obligations | FR-004; AC-006 |
 | P0 bootstrap self-consistency | `test_init_bootstrap_closure.py`: real wrapper on a fresh fixture; validator zero errors, design inventory, ignore patterns, command list, verify-contract stdout markers | FR-005; AC-008 |
+| P0 migration repair | `test_init_bootstrap_migration.py`: legacy fixture migrated by the real runner; validation, verify-only, preserved bytes, idempotence, plan 22 then 23 | FR-006; AC-009 |
 | P1 quality/semantic readiness | Scoped static checks, structural validation, current complete native spec/plan receipts, shared progression and repo conventions PASS | All FR/AC |
 
 - **Risk:** High criticality, shared blast radius, primary Data/Contract risk. Applicable functional/regression/compatibility/data/security/performance/operability dimensions; accessibility not applicable to a non-UI bootstrap.

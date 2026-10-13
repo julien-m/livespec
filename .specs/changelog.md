@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-13 — [Feature]: Migration v23 repairs earlier spec-init bootstraps
+
+- [080](features/080-autonomous-from-code-recovery/changelog.md): `/spec-migrate` applies the bootstrap corrections to already initialized projects (changelog heading, preflight `Tokens`, stack `title`, design inventory, ignore patterns, command list) and keeps `--verify-only` green; VERSION 23 also delivers the pending migration v22.
+
 ## 2026-10-13 — [Bugfix]: Fresh spec-init bootstrap passes its own checks
 
 - [080](features/080-autonomous-from-code-recovery/changelog.md): `/spec-init --from-code --auto` now passes `livespec validate` (changelog heading, preflight `Tokens`, stack `title`), keeps the installer's `.gitignore` patterns and `CLAUDE.md` command list instead of overwriting them, creates `.specs/design/`, prints the `Penflow contract:` marker the archive requires and archives the backend transcript; the Quick Start lists the autonomous prerequisites.

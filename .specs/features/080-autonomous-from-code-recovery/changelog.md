@@ -95,3 +95,11 @@ Alias permutations that reach the same profile branch were dropped (19 -> 13 cas
 - **Gaps closed:** `livespec validate` errors on `changelog.md`, `preflight.md` and `stacks/_default.md`; missing `.specs/design/`, ignore patterns and command list (installer output overwritten by the backend); first `goal archive` drift (`Penflow contract` marker, transcript protocol); Quick Start prerequisites.
 - **Remaining:** formal readiness/certification as for FR-001…FR-004.
 - **Author:** spec-fix (claude-opus-5-5)
+
+## 2026-10-13 — [Feature]: Migration v23 repairs earlier bootstraps
+
+- **Type:** Feature
+- **Spec modified:** Yes (FR-006, AC-009, SC-005, Story 1 scenario, Clarifications)
+- **Code modified:** `validator/init_bootstrap_repair.py` (new), `scripts/migrate-init-bootstrap-repair.sh` (new), `migrations/23/migrate.md` (new), `VERSION`, `.specs/livespec-version`, `tests/test_init_bootstrap_migration.py` (new)
+- **AC impacted:** AC-009
+- **Author:** spec-fix (claude-opus-5-5)

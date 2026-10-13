@@ -13,6 +13,7 @@ feature: 080-autonomous-from-code-recovery
 | FR-002 | validator/init_documents.py, init_probes.py, init_verification.py | FR-002 | Functional tests PASS; formal certification pending | 2026-10-09 |
 | FR-003 | validator/init_from_code.py, init_recovery.py, scripts/init-from-code-autonomous.sh, init.sh, sync-agent-assets.sh | FR-003 | Functional tests PASS; formal certification pending | 2026-10-09 |
 | FR-004 | validator/goal_inventory.py, goal_contract_model.py, canonical spec-init skill | FR-004 | Functional tests PASS; formal certification pending | 2026-10-09 |
+| FR-006 | validator/init_bootstrap_repair.py, scripts/migrate-init-bootstrap-repair.sh, migrations/23/migrate.md, VERSION | FR-006 | Functional tests PASS; formal certification pending | 2026-10-13 |
 | FR-005 | scripts/init.sh, validator/init_documents.py, init_recovery.py, init_from_code.py, penflow_contract.py, canonical spec-init skill, README.md | FR-005 | Functional tests PASS; formal certification pending | 2026-10-13 |
 
 ## Acceptance Criteria Mapping
@@ -27,6 +28,7 @@ feature: 080-autonomous-from-code-recovery
 | AC-006 | tests/test_init_goal_profiles.py, test_goal_contracts.py | Observed targeted PASS |
 | AC-007 | tests/test_init_profile.py, test_init_documents.py, test_init_recovery.py | Observed targeted PASS |
 | AC-008 | tests/test_init_bootstrap_closure.py | Observed targeted PASS |
+| AC-009 | tests/test_init_bootstrap_migration.py | Observed targeted PASS |
 
 ## Execution and Limits
 
@@ -62,4 +64,9 @@ Shipping also supplies the four required bootstrap convention documents through 
 - Cause of the first `goal archive` drift: the verify contract requires `Penflow contract` while the backend printed only `Penflow Contract Verdict: ABSENT` (case-sensitive), and the skill did not say to put the backend output in the archived transcript. The backend now prints `Penflow contract: <state>` and the verdict from the inspected workspace (`contract_verdict`, moved from the CLI into [penflow_contract.py](../../../validator/penflow_contract.py)); the [skill](../../../.agent-sync/skills/spec-init/SKILL.md) tees the backend run into the transcript passed to `goal archive`.
 - [README](../../../README.md) Quick Start lists the autonomous prerequisites: `cc-hub`, a supported manifest and the `ai-ressources` corpus (`AIRESOURCES`).
 - RED then GREEN: 3 cases in [bootstrap closure tests](../../../tests/test_init_bootstrap_closure.py) run the real backend wrapper on a fresh fixture (validator 0 error, definition-of-done artifacts, verify-contract stdout markers).
-- An already initialized project keeps its old changelog heading: `--force` recovery preserves user history, so `## <date> — LiveSpec initialized` must be renamed once to `## <date> — [Setup]: LiveSpec initialized`.
+
+## 2026-10-13 — Migration v23 for already initialized projects (spec-fix, FR-006 decision)
+
+- [init_bootstrap_repair.py](../../../validator/init_bootstrap_repair.py) applies the FR-005 corrections to an existing project: only the legacy initial changelog heading is renamed, `Tokens` is inserted before the preflight custom block, `title` is added to the stack frontmatter, the design inventory and missing ignore patterns are created, and only a command-less LiveSpec block is replaced. File modes are kept and `.specs/bootstrap-profile.json` identities of rewritten files are refreshed so `--verify-only` stays green. A second run changes nothing.
+- [migrations/23](../../../migrations/23/migrate.md) runs it through [its wrapper](../../../scripts/migrate-init-bootstrap-repair.sh); `VERSION` and this repository's `.specs/livespec-version` become 23. Migration v22 (feature 065) had never been reachable (VERSION stayed 21); by user decision it now applies before v23.
+- RED then GREEN: 3 cases in [migration tests](../../../tests/test_init_bootstrap_migration.py) (legacy fixture repaired, validated and verified; idempotence and custom block preserved; plan applies 22 then 23).
