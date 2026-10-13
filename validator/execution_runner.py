@@ -1,14 +1,19 @@
-"""Resolve trusted local pytest transport and inject actual assertion capture."""
+"""Resolve trusted local pytest or Cargo transport and inject actual assertion capture."""
 
 from __future__ import annotations
 
 import importlib.util
+import os
 import shutil
 import sys
 import sysconfig
 from pathlib import Path
 
+from .execution_cargo_command import is_cargo, parse_cargo_test
+from .execution_cargo_toolchain import CargoRunnerUnavailable, cargo_provenance, runner_paths
 from .execution_scope import digest
+
+__all__ = ["CargoRunnerUnavailable", "prepare_runner", "runner_provenance"]
 
 
 def _pytest_args(argv: list[str]) -> list[str] | None:
@@ -47,8 +52,22 @@ def runner_provenance() -> dict[str, str]:
     }
 
 
-def prepare_runner(argv: list[str], adapter: str, report: Path) -> tuple[list[str], dict[str, str]]:
-    """Use explicit trusted import paths while preserving ordinary pytest arguments."""
+def prepare_runner(
+    argv: list[str],
+    adapter: str,
+    report: Path,
+    *,
+    root: Path | None = None,
+    env: dict[str, str] | None = None,
+) -> tuple[list[str], dict[str, str]]:
+    """Wrap a trusted pytest or `cargo test` command; other commands run unchanged.
+
+    Raises:
+        ValueError: The command uses an option the trusted runner owns.
+        CargoRunnerUnavailable: `cargo test` cannot be traced here (missing tools).
+    """
+    if is_cargo(argv):
+        return _prepare_cargo(argv, adapter, root or Path.cwd(), dict(env or os.environ))
     args = _pytest_args(argv)
     if args is None or adapter not in {"junit", "pytest-json"}:
         return argv, {}
@@ -80,4 +99,35 @@ def prepare_runner(argv: list[str], adapter: str, report: Path) -> tuple[list[st
         *report_args,
         "-o",
         "enable_assertion_pass_hook=true",
+    ], provenance
+
+
+# @spec FR-001: Route cargo test through the trusted Cargo runner
+#   — .specs/features/085-cargo-execution-runner/spec.md#fr-001
+def _prepare_cargo(
+    argv: list[str], adapter: str, root: Path, env: dict[str, str]
+) -> tuple[list[str], dict[str, str]]:
+    command = parse_cargo_test(argv)
+    if adapter != "junit":
+        raise CargoRunnerUnavailable("cargo test certification requires --report-adapter junit")
+    owned = ["RUSTC_WORKSPACE_WRAPPER"] + [
+        name for name in env if name.startswith("CARGO_TARGET_") and name.endswith("_RUNNER")
+    ]
+    if any(env.get(name) for name in owned):
+        raise ValueError(f"Runner owns {', '.join(sorted(n for n in owned if env.get(n)))}")
+    provenance = cargo_provenance(command.program, command.toolchain, root, env)
+    entry, _ = runner_paths()
+    return [
+        sys.executable,
+        "-I",
+        str(entry),
+        "drive",
+        "--cargo",
+        provenance["cargo_path"],
+        "--profdata",
+        provenance["llvm_profdata_path"],
+        "--cov",
+        provenance["llvm_cov_path"],
+        "--",
+        *argv,
     ], provenance
