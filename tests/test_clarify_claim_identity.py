@@ -46,7 +46,7 @@ def test_explicit_capacity_nouns_resolve_only_scale(tmp_path: Path, claim: str) 
 def test_concurrency_without_a_capacity_noun_remains_ambiguous(tmp_path: Path, claim: str) -> None:
     item = scan_clarification_opportunities(_spec(tmp_path, claim))
     assert len(item) == 1
-    assert item[0].critical
+    assert not item[0].critical
 
 
 @pytest.mark.parametrize(

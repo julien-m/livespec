@@ -20,8 +20,16 @@ All commands come from the **Resolved Test Commands** table. Never hardcode comm
 
 <!-- @spec FR-010: Runner-owned acceptance proof — .specs/features/078-requirement-evidence-integrity/spec.md#fr-010 -->
 
-- Generate the existing acceptance mapping with `feature`, actual `reviewer_model`, `review_receipt_path` and bindings: qualified AC, executed `test_id`, expected outcome, assertion path/line span/source SHA and justification. Read the strict [mapping schema](../../validator/execution_mapping.py). Names, anchors and a global percentage never establish the mapping's semantic truth.
-- Use the existing Code Quality Reviewer for mapping review, without adding a second mandatory reviewer:
+- <!-- @spec FR-006: Anchor-derived mapping — .specs/features/087-anchor-derived-acceptance/spec.md#fr-006 -->
+  **Preferred: derive the mapping from test anchors.** Put a `@spec AC-xxx` comment block naming the feature (`.specs/features/<feature>/spec.md#ac-xxx`) directly above the test function (it binds the function's last assertion) or above one assertion inside it (Python `#`, Rust `//`; decorators and attributes may sit between the block and the function). Then run:
+
+  ```bash
+  livespec test --feature <feature> --acceptance-mapping <mapping-path> --derive-mapping
+  ```
+
+  It writes a mapping with `"derivation": "anchors"` and exits 0, or writes nothing and exits 1 with `orphan_acceptance` (an execution AC without anchor), `unknown_anchor` (an AC the spec does not declare), `anchor_target_unresolved`, `anchor_test_without_assert` or `anchor_test_parametrized`. A derived mapping needs no mapping review: certification derives it again and requires identical bindings, then a passing test and the observed passing assertion. Whether the anchored assertion really proves its AC is judged once, in the end-of-feature [delivery review](../delivery-review.md), which reads the complete diff including the tests.
+- Otherwise generate the existing acceptance mapping by hand with `feature`, actual `reviewer_model`, `review_receipt_path` and bindings: qualified AC, executed `test_id`, expected outcome, assertion path/line span/source SHA and justification. Read the strict [mapping schema](../../validator/execution_mapping.py). Test names and a global percentage never establish the mapping's semantic truth.
+- A hand-written mapping keeps its mapping review by the existing Code Quality Reviewer, without adding a second mandatory reviewer:
 
   ```bash
   livespec test --feature <feature> --acceptance-mapping <mapping-path> --prepare-mapping-review
@@ -36,6 +44,8 @@ All commands come from the **Resolved Test Commands** table. Never hardcode comm
   livespec test --feature <feature> --acceptance-mapping <mapping-path> --execution-command '<resolved-test-command>' --report-adapter junit
   ```
 
+- <!-- @spec FR-001: Trusted Cargo runner — .specs/features/085-cargo-execution-runner/spec.md#fr-001 -->
+  Rust projects pass the resolved `cargo test ...` command with `--report-adapter junit`. Cargo still runs the exact command; LiveSpec installs itself as Cargo's target runner and `RUSTC_WORKSPACE_WRAPPER`, runs each selected test alone and reads its LLVM coverage profile to trace the assertions (`assert!`, `assert_eq!`, `assert_ne!`, `assert_matches!`) it executed. It needs stable Rust plus `llvm-profdata`/`llvm-cov` (`rustup component add llvm-tools`, or Xcode on macOS); without them the command runs uncertified with an `Unsupported runner` gap. Bind Rust tests as `<package>/<kind>/<target>::<module::test>` (a bare `module::test` is accepted when unique) and cite one complete assertion invocation inside that test function. Select test targets (`--test <name>`, `--tests`, `--lib`): doctests, `--no-run`, `--doc`, `--message-format`, `--config`, `-Z` and caller-set `RUSTC_WORKSPACE_WRAPPER`/`CARGO_TARGET_*_RUNNER` cannot be certified. Commit `Cargo.lock`, since a run that creates it changes the captured inputs.
 - Preserve the actual runner receipt path. The runner captures invocation, fresh report, stdout/stderr and before/after source/test/configuration identity; proof consumption revalidates these inputs and independently recomputes certified AC scope. Caller-supplied success fields cannot replace capture. JUnit case results do not invent fine-grained assertion counts.
 - Zero tests, entirely skipped results, failures, foreign or replaced reports, source mutation, malformed capture and insufficient mappings cannot certify execution even with exit code zero. Unsupported/manual drivers remain executable and return the exact missing certification scope.
 - Submit the runner-owned `execution_receipt_path` for execution tasks. Specialized visual, conventions, finalization and cumulative Penflow requirements remain additional obligations.

@@ -739,11 +739,11 @@ Unless the `--no-review` flag is set:
 
 **On findings — correction behavior:**
 
-- **`[ERROR]` / BLOCKING findings:** Regenerate `spec.md` with the findings injected as hard constraints (max 2 retries). On each retry, re-run the review. If BLOCKING findings remain after 2 retries → display all remaining findings and stop with:
+- **`[ERROR]` / BLOCKING findings:** Regenerate `spec.md` with the findings injected as hard constraints (max 2 retries). On each retry, re-run the review. Only blockers trigger a retry: ingestion reports `round` and `round_cap_reached` (feature 088). If BLOCKING findings remain after 2 retries (`round_cap_reached: true`) → display all remaining findings and stop with:
   ```
   ⚠ Spec still has blocking issues after 2 correction attempts. Review manually then re-run /spec-specify.
   ```
-- **`[WARNING]` / `[INFO]` findings only:** Display findings, reconcile the full Clarify inventory and require `livespec validate <feature-dir> --progression plan --model <resolved-model>` before Step 7 can present planning readiness.
+- **`[WARNING]` / `[INFO]` findings only:** The spec is ready; never regenerate for them. Pass the ingestion `carry_over` items to `/spec-plan`, which addresses them in the plan; display findings, reconcile the full Clarify inventory and require `livespec validate <feature-dir> --progression plan --model <resolved-model>` before Step 7 can present planning readiness.
 - **PASS:** Require a current complete ready receipt, reconcile Clarify, then check shared plan progression before Step 7. An empty findings list alone is insufficient.
 
 ### Step 7 — Present and Confirm
@@ -822,7 +822,7 @@ This step keeps the README's Recent Activity table in sync with the changelog af
 Add a first entry to `.specs/features/NNN-feature-name/changelog.md`:
 
 ```markdown
-### YYYY-MM-DD — Spec: Feature specification created
+## YYYY-MM-DD — [Spec]: Feature specification created
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (created — all sections)

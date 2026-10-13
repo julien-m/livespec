@@ -44,6 +44,21 @@ APPLY_TARGET_ORDER: tuple[RegistryTarget, ...] = (
 # Matches one global changelog entry heading: "## YYYY-MM-DD — <text>".
 _ENTRY_HEADING_RE = re.compile(r"^## (\d{4})-\d{2}-\d{2} — ", re.MULTILINE)
 _ARCHIVE_LINK_PREFIX = "> Archive: "
+# Feature changelog entry tags: an explicit "[Tag]: text" or "Tag: text" first line
+# (one to three capitalized words), else the finalizing command's default tag.
+_DATED_PREFIX_RE = re.compile(r"^(?:\d{4}-\d{2}-\d{2}|YYYY-MM-DD)\s+—\s+(?:#+\s+)?")
+_TAGGED_LINE_RE = re.compile(r"^\[([^\]\n]+)\]:\s*(.*)$")
+_TYPED_LINE_RE = re.compile(r"^([A-Z][A-Za-z]*(?: [A-Z][A-Za-z]*){0,2}):\s+(.+)$")
+_COMMAND_TAGS = {
+    "spec-specify": "Spec",
+    "spec-plan": "Plan",
+    "spec-implement": "Feature",
+    "spec-feature": "Feature",
+    "spec-fix": "Bugfix",
+    "spec-refine": "Spec Update",
+    "spec-test": "Test",
+    "spec-stack": "Stack",
+}
 
 
 @dataclass(frozen=True)
@@ -134,6 +149,26 @@ def is_target_marked(path: Path, command: str, hash8: str) -> bool:
     return bool(marker_pattern(command, hash8).search(path.read_text(encoding="utf-8")))
 
 
+def entry_heading(first_line: str, command: str, day: str) -> str:
+    """Render the validated ``## YYYY-MM-DD — [Tag]: text`` feature changelog heading.
+
+    An explicit ``[Tag]: text`` or ``Tag: text`` first line keeps its tag; otherwise
+    the finalizing command names it. Leading heading marks and a date are dropped, so
+    an entry file holding a complete dated heading is not dated twice.
+
+    @spec FR-002: one entry format shared with the changelog validator
+    — .specs/features/058-deterministic-finalization/spec.md#fr-002
+    """
+    title = _DATED_PREFIX_RE.sub("", first_line.strip().lstrip("#").strip())
+    match = _TAGGED_LINE_RE.match(title) or _TYPED_LINE_RE.match(title)
+    if match:
+        tag, text = match.group(1).strip(), match.group(2).strip()
+    else:
+        default = command.removeprefix("spec-").replace("-", " ").title() or "Update"
+        tag, text = _COMMAND_TAGS.get(command, default), title
+    return f"## {day} — [{tag}]: {text or tag}"
+
+
 def build_feature_changelog(path: Path, request: ApplyRequest, today: date, marker: str) -> str:
     """Append the date-rendered entry + marker to the feature changelog."""
     if path.is_file():
@@ -143,7 +178,7 @@ def build_feature_changelog(path: Path, request: ApplyRequest, today: date, mark
     # The entry body is date-free (FR-002); the first body line joins the
     # dated heading, remaining lines follow verbatim.
     lines = request.entry_body.strip().splitlines()
-    heading = f"### {today.isoformat()} — {lines[0] if lines else ''}"
+    heading = entry_heading(lines[0] if lines else "", request.command, today.isoformat())
     rest = "\n".join(lines[1:]).strip()
     entry = heading + (f"\n\n{rest}" if rest else "")
     return f"{existing.rstrip()}\n\n{entry}\n\n{marker}\n"

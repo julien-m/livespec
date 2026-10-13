@@ -1,5 +1,15 @@
 # Changelog - 061-conventions-gates-engine
 
+## 2026-10-13 — [Bugfix]: Generated eslint gate runs the project-local binary
+
+- **Type:** Bugfix (Handy report)
+- **Spec modified:** No
+- **Code modified:** validator/conventions_gates.py, tests/test_conventions_gates_local_eslint.py
+- **AC impacted:** AC-001
+- **Author:** spec-fix (claude-code)
+
+`livespec conventions gates init` wrote `run: eslint . --format json`, which failed with `eslint: command not found` when eslint was installed only in `node_modules/.bin`. The generated command now targets `node_modules/.bin/eslint` when that binary exists or when `package.json` declares eslint; a project without a local eslint keeps the global `eslint`. Existing gates files are not rewritten: run `livespec conventions gates init --force` to regenerate them.
+
 ## 2026-06-25 — [Bugfix]: Exclude generated dependency workspaces from conventions scanning
 
 - **Type:** Bugfix

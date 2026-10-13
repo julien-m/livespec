@@ -384,7 +384,7 @@ If `.specs/README.md` does not exist, create it by scanning existing artifacts (
 Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 
 ```markdown
-### YYYY-MM-DD — Plan: Technical plan generated
+## YYYY-MM-DD — [Plan]: Technical plan generated
 
 - **Type:** Feature
 - **Spec modified:** No
@@ -433,12 +433,12 @@ Unless the `--no-review` flag is set:
 
 **On findings — correction behavior:**
 
-- **`[ERROR]` / BLOCKING findings:** Regenerate `plan.md` with the findings injected as hard constraints (max 2 retries). On each retry, re-run the review. If BLOCKING findings remain after 2 retries → display all remaining findings and stop with:
+- **`[ERROR]` / BLOCKING findings:** Regenerate `plan.md` with the findings injected as hard constraints (max 2 retries). On each retry, re-run the review. Only blockers trigger a retry: ingestion reports `round` and `round_cap_reached` (feature 088). If BLOCKING findings remain after 2 retries (`round_cap_reached: true`) → display all remaining findings and stop with:
   ```
   ⚠ Plan still has blocking issues after 2 correction attempts. Review manually then re-run /spec-plan.
   ```
-- **`[WARNING]` / `[INFO]` findings only:** Display findings and proceed. These are informational — no regeneration triggered.
-- **PASS:** Require the validated receipt to be complete and ready. Missing/contradictory/ambiguous obligations, unapproved scope and stale inputs block even when a display summary is empty.
+- **`[WARNING]` / `[INFO]` findings only:** Display findings and proceed. These are informational — no regeneration triggered. Address the spec review `carry_over` items in the plan, and pass the plan review `carry_over` items to `/spec-implement`.
+- **PASS:** Require the validated receipt to be complete and ready. Missing or contradictory obligations, critically ambiguous obligations, unapproved business scope and stale inputs block even when a display summary is empty.
 
 ### Step 9.8 — Structural Validation
 

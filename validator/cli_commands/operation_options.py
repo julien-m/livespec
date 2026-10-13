@@ -120,6 +120,7 @@ def check_execution_options(
     mutation: bool,
     no_coverage: bool,
     debug: bool,
+    derive: bool = False,
 ) -> bool:
     """Validate native test selection before resolving project inputs.
 
@@ -133,6 +134,7 @@ def check_execution_options(
         mutation: Legacy driver mutation was requested.
         no_coverage: Legacy driver coverage suppression was requested.
         debug: Legacy driver tracebacks were requested.
+        derive: Anchor-derived mapping generation was requested (feature 087).
     Returns:
         True for a complete native request, False for an unchanged legacy request.
     Raises:
@@ -140,12 +142,14 @@ def check_execution_options(
     Side effects:
         None; supplied values and referenced files remain untouched.
     """
-    active = sum((command is not None, prepare, ingest is not None))
+    active = sum((command is not None, prepare, ingest is not None, derive))
     native = bool(active or mapping is not None or adapter != "junit")
     if not native:
         return False
     if active != 1:
-        raise ValueError("select exactly one native test operation: prepare, ingest or execution")
+        raise ValueError(
+            "select exactly one native test operation: derive, prepare, ingest or execution"
+        )
     if mapping is None or not feature or not feature.strip():
         raise ValueError("native test operations require --feature and --acceptance-mapping")
     if command is not None and not command.strip():

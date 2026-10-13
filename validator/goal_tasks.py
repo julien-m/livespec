@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from . import goal_contracts as _contracts
-from .goal_outcome import conventions_gate_task, outcome_task
+from .goal_outcome import conventions_gate_task, delivery_review_task, outcome_task
 
 __all__ = [
     "_build_goal_tasks",
@@ -56,6 +56,7 @@ def finalize_required_tasks(
     *,
     stop: Mapping[str, Any],
     conventions_gated: bool,
+    delivery_reviewed: bool = False,
 ) -> list[dict[str, Any]]:
     """Keep high-value tasks, append conventions/outcome/archive and renumber ordinals.
 
@@ -64,6 +65,7 @@ def finalize_required_tasks(
         tasks: Candidate tasks after evidence-policy classification.
         stop: Compiled stop condition.
         conventions_gated: Whether a feature-scope conventions receipt is required.
+        delivery_reviewed: Whether one end-of-feature delivery review is required (086).
 
     Returns:
         Required tasks with contiguous ordinals starting at 1.
@@ -76,6 +78,8 @@ def finalize_required_tasks(
     ]
     if conventions_gated:
         required.append(conventions_gate_task(command=command, ordinal=0))
+    if delivery_reviewed:
+        required.append(delivery_review_task(command=command, ordinal=0))
     required.append(outcome_task(command=command, ordinal=0, condition=stop))
     required.append(_contracts._archive_run_task(command=command, next_ordinal=0))
     for ordinal, task in enumerate(required, 1):

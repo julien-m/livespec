@@ -60,3 +60,13 @@
 - Read the [lifecycle regressions](../../../tests/test_finalize_lifecycle.py): first/new commands, metadata transitions and new entries preserve normative bytes; genuine normative edits invalidate proof; body examples cannot replace missing actual anchors; CRLF and stale receipts remain exact.
 - Validation: 243 locks/finalizer/lifecycle/Penflow/review/evidence tests pass in 15.75 seconds, including read-only real 001/077 copies and first-finalization CLI proof/archive. Scoped Ruff/format, Pyright and mypy pass. The shared writer now verifies raw persisted bytes, rejecting unexpected newline conversion. No feature078 status promotion or preparatory marker step performed.
 - Read the [shared metadata parser](../../../validator/lifecycle_metadata.py): explicit Header and bounded legacy H1 introduction share the same strict limits with Normative Identity v2. No migration of the 73 existing specs without Header is required.
+
+## 2026-10-13 — [Bugfix]: Finalized changelog entries use the validated heading
+
+- **Type:** Bugfix (Handy report)
+- **Spec modified:** No
+- **Code modified:** `validator/finalize_registry.py` (`entry_heading`), `validator/rules/changelog_entries.py`, the changelog examples of the `spec-check`, `spec-fix`, `spec-implement`, `spec-plan`, `spec-refine`, `spec-specify` and `spec-test` skills, `system/templates/changelog-template.md`, `tests/test_finalize_changelog_format.py`, `tests/test_finalize.py`, `tests/test_finalize_lifecycle.py`
+- **AC impacted:** AC-002 (idempotence markers unchanged)
+- **Author:** spec-fix (claude-code)
+
+`finalize apply` wrote `### YYYY-MM-DD — <first line>` while `livespec validate` requires `## YYYY-MM-DD — [Tag]:`, so a changelog created by finalization failed validation. The skill and template examples used the same rejected `###` form. Finalize now writes `## YYYY-MM-DD — [Tag]: text`. It keeps an explicit `[Tag]:` or `Tag:` first line, otherwise takes the tag from the command (`spec-plan` gives `Plan`), and drops a heading prefix or date already present in the entry file, which produced `### 2026-10-12 — ### Plan: ...` in Handy. To keep existing changelogs valid, validation still accepts a `### YYYY-MM-DD — ` entry closed by its finalize marker. A bare `###` entry without a marker stays invalid.

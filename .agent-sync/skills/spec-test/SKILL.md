@@ -1080,7 +1080,7 @@ Skip all persistence below in --dry-run and every --regenerate-missing mode (con
 3. Add entry to feature `changelog.md`:
 
 ```markdown
-### YYYY-MM-DD — Test: AC coverage validated
+## YYYY-MM-DD — [Test]: AC coverage validated
 
 - **Type:** Spec Update
 - **Spec modified:** No

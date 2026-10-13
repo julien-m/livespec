@@ -73,3 +73,7 @@ updated: 2026-06-25
 ## Visual Baselines
 
 Not applicable — CLI/backend verifier feature, no UI screens.
+
+## Local eslint resolution (spec-fix, 2026-10-13)
+
+FR-001: `_eslint_executable` in `validator/conventions_gates.py` writes `node_modules/.bin/eslint` into the generated lint command when that binary exists or `package.json` declares eslint, and keeps the global `eslint` otherwise. `tests/test_conventions_gates_local_eslint.py` runs the generated gate with `PATH` limited to `/usr/bin:/bin`.

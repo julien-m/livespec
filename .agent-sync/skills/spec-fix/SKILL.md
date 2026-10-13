@@ -393,7 +393,7 @@ livespec visual-gate validate --feature <slug> --command spec-fix --target <t> -
 4. **Update changelogs:**
    - Feature changelog entry:
      ```markdown
-     ### YYYY-MM-DD — Fix: [N] gaps closed ([M] functional, [K] visual)
+     ## YYYY-MM-DD — [Bugfix]: [N] gaps closed ([M] functional, [K] visual)
 
      - **Type:** Bug Fix
      - **Spec modified:** No

@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict
 
 from validator.semantic.review_api import ingest_feature_review, prepare_feature_review
 from validator.semantic.review_contract import REVIEW_SCHEMA
+from validator.semantic.review_rounds import record_round
 
 
 class NativeReviewInput(BaseModel):
@@ -57,7 +58,8 @@ def review_io(
         model=model,
         max_chars=max_chars,
     )
-    typer.echo(json.dumps({"receipt_path": str(path), **receipt.model_dump()}))
+    rounds = record_round(root, feature_dir.name, review_kind, receipt)
+    typer.echo(json.dumps({"receipt_path": str(path), **receipt.model_dump(), **rounds}))
     raise typer.Exit(0 if receipt.complete and receipt.ready else 1)
 
 

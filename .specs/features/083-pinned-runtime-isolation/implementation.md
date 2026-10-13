@@ -146,3 +146,7 @@ Execution certification is re-run after these corrections by `/spec-test`.
 ## 2026-10-12 — Executable migration command (spec-fix)
 
 The documented first install runs the checkout's own venv (`.venv/bin/python -m validator.cli runtime install …`, created once by `uv sync`). A bare `python3` lacks LiveSpec's dependencies and would also become the shim interpreter. [test_runtime_docs.py](../../../tests/test_runtime_docs.py) runs the exact documented block with `PATH` limited to git and `/usr/bin:/bin`, without venv activation; the fixture checkout venv is an `exec` wrapper. Restoring the `python3` wording makes it fail with `ModuleNotFoundError: typer`.
+
+## 2026-10-13 — Conventions test evidence in snapshots (spec-fix)
+
+FR-001 / AC-001: `ships_in_snapshot` in `validator/runtime/models.py` keeps `.specs/` and `tests/` out of a snapshot, except `SNAPSHOT_TEST_EVIDENCE`. That set is the AST fixtures and the three deterministic test files the bundled catalogs cite, which `conventions verify` reads from the runtime root. `validator/runtime/git_tree.py` applies it. [test_runtime_snapshot_evidence.py](../../../tests/test_runtime_snapshot_evidence.py) installs a snapshot and checks that the evidence ships and that other `tests/` files do not. Its drift guard fails when a catalog cites a `tests/` path the policy does not ship.

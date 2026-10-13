@@ -9,6 +9,7 @@ from typer.testing import CliRunner
 from validator.cli import app
 
 OPERATIONS = (
+    ("--derive-mapping",),
     ("--prepare-mapping-review",),
     ("--ingest-mapping-review", "raw.json"),
     ("--execution-command", "pytest"),

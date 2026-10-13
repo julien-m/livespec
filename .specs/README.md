@@ -122,7 +122,15 @@
 | 082 | Conventions Gate Signal | Implemented | 2026-10-10 | 2026-10-11 | [spec](features/082-conventions-gate-signal/spec.md) |
 | 083 | Pinned Runtime Isolation | Implemented | 2026-10-11 | 2026-10-12 | [spec](features/083-pinned-runtime-isolation/spec.md) |
 | 084 | Bugfix Lane | Implemented | 2026-10-12 | 2026-10-12 | [spec](features/084-bugfix-lane/spec.md) |
+| 085 | Cargo Execution Runner | Implemented | 2026-10-13 | 2026-10-13 | [spec](features/085-cargo-execution-runner/spec.md), [plan](features/085-cargo-execution-runner/plan.md), [implementation](features/085-cargo-execution-runner/implementation.md) |
 | 085 | Locate ai-ressources Without Hard-Coded Paths | Implemented | 2026-10-13 | 2026-10-13 | [spec](features/085-localiser-ai-ressources-sans-chemin-en-dur/spec.md) |
+| 086 | Risk-Proportional Delivery | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/086-risk-proportional-delivery/spec.md), [plan](features/086-risk-proportional-delivery/plan.md), [implementation](features/086-risk-proportional-delivery/implementation.md) |
+| 087 | Anchor-Derived Acceptance Mapping | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/087-anchor-derived-acceptance/spec.md), [plan](features/087-anchor-derived-acceptance/plan.md), [implementation](features/087-anchor-derived-acceptance/implementation.md) |
+| 088 | Capped Reviews | In Progress | 2026-10-13 | 2026-10-13 | [spec](features/088-capped-reviews/spec.md), [plan](features/088-capped-reviews/plan.md), [implementation](features/088-capped-reviews/implementation.md) |
+| 089 | Stable Review Identity | Draft | 2026-10-13 | 2026-10-13 | [spec](features/089-stable-review-identity/spec.md), [plan](features/089-stable-review-identity/plan.md) |
+| 090 | Minimal Plan Scope | Draft | 2026-10-13 | 2026-10-13 | [spec](features/090-minimal-plan-scope/spec.md), [plan](features/090-minimal-plan-scope/plan.md) |
+| 091 | One-Command Specify Close | Draft | 2026-10-13 | 2026-10-13 | [spec](features/091-specify-close/spec.md), [plan](features/091-specify-close/plan.md) |
+| 092 | Existing Repository Onboarding | Draft | 2026-10-13 | 2026-10-13 | [spec](features/092-init-onboarding/spec.md), [plan](features/092-init-onboarding/plan.md) |
 <!-- readme:features:end -->
 
 ---
@@ -157,6 +165,16 @@
 | 2026-10-13 | Check | [Feature 079] Check: 55% verified (3/5 FR, 3/6 AC) — FR-002 public Penflow pin missing in CI, AC-006 corpus drift, AC-005 pending |
 | 2026-10-13 | Feature | [Feature 079] Spec refined: Penflow is a public dependency pinned to verified commit dd356b9 without credential — FR-002/AC-002 reworded, IDs preserved |
 | 2026-10-12 | Bugfix | Bugfix: Stop conditions keep the caller runtime |
+| 2026-10-13 | Feature | [Feature 085] Cargo execution runner: trusted cargo test certification with per-test coverage assertion trace |
+| 2026-10-13 | Bugfix | [Feature 079] Fix: 1/1 gaps closed (FR-002) — CI installs public Penflow pinned at dd356b9 without credential |
+| 2026-10-13 | Check | [Feature 079] Check: 55% verified (3/5 FR, 3/6 AC) — FR-002 public Penflow pin missing in CI, AC-006 corpus drift, AC-005 pending |
+| 2026-10-13 | Feature | [Feature 079] Spec refined: Penflow is a public dependency pinned to verified commit dd356b9 without credential — FR-002/AC-002 reworded, IDs preserved |
+| 2026-10-12 | Spec | Spec Update: registry statuses aligned after stabilization merges |
+| 2026-10-12 | Bugfix | Bugfix: audit bugs through the bugfix lane (084) |
+| 2026-10-12 | Bugfix | [Feature 084] Bugfix lane: livespec bugfix capture/gate/record and /spec-fix --bugfix (scoped gate, explicit fallback) |
+| 2026-10-12 | Bugfix | Bugfix: declare unit-test dependencies (audit batch) |
+| 2026-10-12 | Bugfix | Bugfix: missing requirements of features 035 and 056 implemented |
+| 2026-10-12 | Feature | Refactor: dead-code resolution (wire or retire) |
 <!-- readme:activity:end -->
 
 ---

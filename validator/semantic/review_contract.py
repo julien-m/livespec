@@ -7,6 +7,16 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from validator.semantic.review_context import PreparedReview, ReviewBatch
+from validator.semantic.review_readiness import (
+    carry_over as carry_over,
+)
+from validator.semantic.review_readiness import (
+    conclusion_blocks,
+    scope_accepted,
+)
+from validator.semantic.review_readiness import (
+    strictly_ready as strictly_ready,
+)
 from validator.semantic.review_synthesis_transport import (
     SYNTHESIS_TRANSPORT_VERSION,
     synthesis_prompt,
@@ -56,6 +66,9 @@ class ScopeFinding(StrictModel):
     justification: str
     approved: bool
     citations: list[Citation] = Field(min_length=1)
+    # @spec FR-002: Justified technical necessity is approved
+    #   — .specs/features/088-capped-reviews/spec.md#fr-002
+    kind: Literal["business", "technical"] = "business"
 
 
 class GroundedFinding(StrictModel):
@@ -229,9 +242,9 @@ def validate_review_result(
     ready = bool(
         complete
         and final
-        and all(c.disposition == "covered" for c in final.conclusions)
+        and not any(conclusion_blocks(c, final.ambiguities) for c in final.conclusions)
         and not any(a.critical and not a.resolution for a in final.ambiguities)
-        and not any(not scope.approved for scope in final.extra_scope)
+        and all(scope_accepted(scope) for scope in final.extra_scope)
         and not any(f.severity == "blocking" for f in final.findings)
     )
     return ReviewReceipt(

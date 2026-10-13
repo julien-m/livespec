@@ -16,10 +16,12 @@ from typing import Any
 
 __all__ = [
     "CONVENTIONS_GATE_TASK_ID",
+    "DELIVERY_REVIEW_TASK_ID",
     "MAX_ATTEMPTS_PER_TASK",
     "OUTCOME_TASK_ID",
     "STOP_CONDITION_TIMEOUT_SECONDS",
     "conventions_gate_task",
+    "delivery_review_task",
     "goal_requirement",
     "outcome_task",
     "run_stop_condition",
@@ -29,6 +31,7 @@ __all__ = [
 
 OUTCOME_TASK_ID = "outcome.verified"
 CONVENTIONS_GATE_TASK_ID = "conventions.gate"
+DELIVERY_REVIEW_TASK_ID = "delivery.review"
 MAX_ATTEMPTS_PER_TASK = 3
 # Bounds one structural validation; it never applies once the condition has passed.
 STOP_CONDITION_TIMEOUT_SECONDS = 300.0
@@ -136,6 +139,30 @@ def conventions_gate_task(*, command: str, ordinal: int) -> dict[str, Any]:
         "repair_if_missing": [
             "run `livespec conventions verify --json --feature <slug>` and submit "
             "`conventions_receipt_path`",
+        ],
+        "completion_actor": "goal",
+        "expected_evidence": {"command": command, "feature_slug": None},
+    }
+
+
+# @spec FR-007: One end-of-feature delivery review task
+#   — .specs/features/086-risk-proportional-delivery/spec.md#fr-007
+def delivery_review_task(*, command: str, ordinal: int) -> dict[str, Any]:
+    """Build the single review-of-the-complete-diff task that replaces per-step reviews."""
+    return {
+        "id": DELIVERY_REVIEW_TASK_ID,
+        "ordinal": ordinal,
+        "category": "injected",
+        "description": (
+            "Review the complete feature diff once with independent native agents "
+            "(`system/delivery-review.md`) and submit the passing "
+            "`livespec delivery review verify --feature <slug>` receipt"
+        ),
+        "required_evidence": ["delivery_review_receipt_path"],
+        "invalid_substitutes": ["per_step_review_claims", "audit_skill_report"],
+        "repair_if_missing": [
+            "run `livespec delivery review prepare --feature <slug> --base <rev>`, dispatch the "
+            "independent review, `record` its report and submit `delivery_review_receipt_path`",
         ],
         "completion_actor": "goal",
         "expected_evidence": {"command": command, "feature_slug": None},

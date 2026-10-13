@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any, Literal, TypeAlias, cast
 
@@ -302,7 +303,7 @@ def gates_path(project_root: Path) -> Path:
 
 def _build_default_gates(project_root: Path, constitution: Path, stack: Path) -> ConventionsGates:
     stack_text = stack.read_text(encoding="utf-8").lower()
-    commands = _commands_for_stack(stack_text)
+    commands = _commands_for_stack(stack_text, project_root)
     coverage = _coverage_for_commands(commands)
     return ConventionsGates(
         schema_version=1,
@@ -342,7 +343,35 @@ def _build_ast_gates(
     )
 
 
-def _commands_for_stack(stack_text: str) -> list[GateCommand]:
+LOCAL_ESLINT = "node_modules/.bin/eslint"
+
+
+def _eslint_executable(project_root: Path) -> str:
+    """Prefer the project-local eslint the package manager installs over a global one.
+
+    The local binary is chosen when it exists or when ``package.json`` declares
+    eslint (an uninstalled dependency then fails with an explicit path).
+
+    @spec FR-001: Generated eslint gate resolves the local binary
+    — .specs/features/061-conventions-gates-engine/spec.md#fr-001
+    """
+    if (project_root / LOCAL_ESLINT).is_file():
+        return LOCAL_ESLINT
+    try:
+        manifest = json.loads((project_root / "package.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return "eslint"
+    if not isinstance(manifest, dict):
+        return "eslint"
+    sections = ("dependencies", "devDependencies", "optionalDependencies")
+    declared = any(
+        isinstance(section, dict) and "eslint" in section
+        for section in (cast(dict[str, Any], manifest).get(name) for name in sections)
+    )
+    return LOCAL_ESLINT if declared else "eslint"
+
+
+def _commands_for_stack(stack_text: str, project_root: Path) -> list[GateCommand]:
     commands: list[GateCommand] = []
     if "python" in stack_text:
         commands.append(
@@ -353,7 +382,8 @@ def _commands_for_stack(stack_text: str) -> list[GateCommand]:
             )
         )
     if any(marker in stack_text for marker in ("typescript", "react", "javascript", "node")):
-        commands.append(GateCommand(id="eslint", run="eslint . --format json"))
+        eslint = _eslint_executable(project_root)
+        commands.append(GateCommand(id="eslint", run=f"{eslint} . --format json"))
     if "swift" in stack_text:
         commands.append(
             GateCommand(

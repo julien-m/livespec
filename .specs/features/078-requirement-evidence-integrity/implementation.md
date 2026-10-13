@@ -164,3 +164,11 @@ The explicit user decision supersedes the earlier CI selector descriptions: GitH
 ## 2026-10-12 — Warm-cache regression environment (spec-fix, test only)
 
 The [warm-cache regression](../../../tests/test_execution_bytecode.py) removes `PYTHONDONTWRITEBYTECODE` from its own environment: the scenario needs real bytecode from both the warm-up and the runner subprocess. The production capture is unchanged.
+
+## 2026-10-13 — Project-confined execution scope (spec-fix)
+
+FR-011: read the [source scope](../../../validator/execution_scope.py) and its [link and ignore regressions](../../../tests/test_execution_scope_links.py). The manifest never reads outside the project root. It skips untracked paths that git ignores and the agent tooling directories, and binds external or dangling links by their link text. The scope policy is `078.2`.
+
+## 2026-10-13 — Review status as lifecycle metadata (spec-fix)
+
+FR-004 / AC-004: [normative identity](../../../validator/normative_identity.py) treats every spec-system status, now including `Review`, as lifecycle metadata. The [clarification inventory](../../../validator/clarify_inventory.py) names a reviewer model mismatch next to `stale_or_incomplete_spec_review`. [The finalize regression](../../../tests/test_finalize_status_review_identity.py) runs `finalize apply --status` through the CLI and then the implement progression: status transitions stay READY, and an AC change makes the review stale.
