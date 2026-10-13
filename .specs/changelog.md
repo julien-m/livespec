@@ -7,6 +7,10 @@
 
 ---
 
+## 2026-10-13 — Bugfix: Finalized changelog entries pass validation
+
+- [058](features/058-deterministic-finalization/changelog.md): `finalize apply` writes `## YYYY-MM-DD — [Tag]: text`, the heading `livespec validate` requires, and the skill and template examples use it too; marked `###` entries from earlier finalizations stay valid.
+
 ## 2026-10-13 — Bugfix: Review status keeps semantic reviews current
 
 - [078](features/078-requirement-evidence-integrity/changelog.md): a `finalize apply --status` transition to or from `Review` no longer makes spec and plan reviews stale; an AC change still does. A stale review caused by another reviewer model now reports `spec_review_model_mismatch`.

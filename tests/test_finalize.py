@@ -439,7 +439,7 @@ class TestApplyFinalization:
         global_changelog = (specs / "changelog.md").read_text()
         readme = (specs / "README.md").read_text()
         spec_md = (specs / "features/004-notifications/spec.md").read_text()
-        assert "Feature: Initial implementation" in feature_changelog
+        assert "— [Feature]: Initial implementation" in feature_changelog
         assert "[Feature 004] Implemented: Notifications" in global_changelog
         assert "| Implemented |" in readme
         assert "<!-- finalize:" not in spec_md
@@ -1025,7 +1025,7 @@ class TestFinalizeChaosFixtures:
         result = apply_finalization(tmp_path, _implement_request())
         assert result.outcome == "applied"
         created = (specs / "features/004-notifications/changelog.md").read_text(encoding="utf-8")
-        assert "Feature: Initial implementation" in created
+        assert "— [Feature]: Initial implementation" in created
 
 
 class TestFinalizeRoadmap:

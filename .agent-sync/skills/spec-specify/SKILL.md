@@ -822,7 +822,7 @@ This step keeps the README's Recent Activity table in sync with the changelog af
 Add a first entry to `.specs/features/NNN-feature-name/changelog.md`:
 
 ```markdown
-### YYYY-MM-DD — Spec: Feature specification created
+## YYYY-MM-DD — [Spec]: Feature specification created
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (created — all sections)

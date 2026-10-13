@@ -513,7 +513,7 @@ List all files created or modified.
 Add an entry to `.specs/features/NNN-feature-name/changelog.md`:
 
 ```markdown
-### 2024-03-15 — Feature: Initial implementation of notification system
+## 2024-03-15 — [Feature]: Initial implementation of notification system
 
 - **Type:** Feature
 - **Spec modified:** No

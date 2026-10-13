@@ -430,7 +430,7 @@ If `plan.md` exists, display:
 2. Add entry to `.specs/features/NNN-*/changelog.md`:
 
 ```markdown
-### YYYY-MM-DD — Spec Update: [description]
+## YYYY-MM-DD — [Spec Update]: [description]
 
 - **Type:** Spec Update
 - **Spec modified:** Yes (sections: [list modified sections])
@@ -525,7 +525,7 @@ Report any new gaps.
 2. Add entry to `.specs/features/NNN-*/changelog.md`:
 
 ```markdown
-### YYYY-MM-DD — Plan Update: [description]
+## YYYY-MM-DD — [Plan Update]: [description]
 
 - **Type:** Spec Update
 - **Spec modified:** No
