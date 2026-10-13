@@ -67,6 +67,11 @@ def test_command(
     prepare_mapping_review: bool = typer.Option(
         False, "--prepare-mapping-review", help="Prepare existing independent test review input"
     ),
+    derive_mapping: bool = typer.Option(
+        False,
+        "--derive-mapping",
+        help="Write the mapping derived from @spec AC-xxx test anchors (needs no review)",
+    ),
     ingest_mapping_review: Annotated[
         Path | None, typer.Option("--ingest-mapping-review", help="Actual raw test reviewer bundle")
     ] = None,
@@ -84,6 +89,8 @@ def test_command(
         execution_command: Shell-tokenized test argv captured by the runner, without a shell.
         acceptance_mapping: Project-confined mapping required by execution/review modes.
         prepare_mapping_review: Emit context/schema JSON; exclusive with ingestion and execution.
+        derive_mapping: Write the anchor-derived mapping to acceptance_mapping; exit 1 on
+            orphan ACs, unknown anchors or unresolved anchor targets (feature 087).
         ingest_mapping_review: Raw reviewer bundle to validate and persist before certification.
         report_adapter: Execution result format (default junit); unsupported proof cannot certify.
         debug: Print driver-mode exception tracebacks; not accepted in native modes.
@@ -121,6 +128,7 @@ def test_command(
             mutation=mutation,
             no_coverage=no_coverage,
             debug=debug,
+            derive=derive_mapping,
         )
     except ValueError as exc:
         typer.echo(f"Error: {exc}", err=True)
@@ -133,6 +141,7 @@ def test_command(
             prepare_mapping_review,
             ingest_mapping_review,
             report_adapter,
+            derive_mapping,
         )
 
     run_with_debug(
@@ -236,6 +245,7 @@ def _run_execution_io(
     prepare_mapping_review: bool,
     ingest_mapping_review: Path | None,
     report_adapter: str,
+    derive_mapping: bool = False,
 ) -> None:
     from .execution_io import execution_io
 
@@ -248,6 +258,7 @@ def _run_execution_io(
             prepare=prepare_mapping_review,
             ingest=ingest_mapping_review,
             adapter=report_adapter,
+            derive=derive_mapping,
         )
     except (OSError, ValueError) as exc:
         typer.echo(f"BLOCKED: {exc}", err=True)

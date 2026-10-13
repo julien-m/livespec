@@ -9,7 +9,7 @@ scope: M
 
 ## Summary, Implementation Plan, Testing Strategy, Risks
 
-New `validator/delivery/` package (`lane.py`, `scope.py`, `review.py`) and a thin Typer group `livespec delivery` on Python ≥3.11: frozen dataclasses and strict pydantic report models, read-only git through `validator/bugfix/diff.py`, spec review currency through `prepare_feature_review` and `verify_review_receipt`, pytest fixtures in `tmp_path` git repositories, ruff, pyright strict, mypy. No network, LLM or new dependency.
+New `validator/delivery/` package (`lane.py`, `review.py`) and a thin Typer group `livespec delivery` on Python ≥3.11: frozen dataclasses and strict pydantic report models, read-only git through `validator/bugfix/diff.py`, spec review currency through `prepare_feature_review` and `verify_review_receipt`, pytest fixtures in `tmp_path` git repositories, ruff, pyright strict, mypy. No network, LLM or new dependency.
 
 Constitution: ✅1 no new layer; ✅2 no LLM call (the reviewer is the caller's native agent); ✅3 reads `.specs/` and git, writes only the two `.reviews/` files; ✅4 arguments validated before any write, exits 0/1/2, every reason carries its detail; ✅5 one `delivery` group; ✅6 local only.
 
@@ -86,7 +86,7 @@ stateDiagram-v2
 **Implementation Plan, Testing Strategy, Risks**
 
 1. `validator/delivery/lane.py` — QE parsing, lane rule, review currency (FR-002, FR-003).
-2. `validator/delivery/scope.py`, `review.py` — scope, report model, record, verify (FR-004, FR-005, FR-006).
+2. `validator/delivery/review.py` — scope, report model, record, verify (FR-004, FR-005, FR-006).
 3. `validator/cli_commands/delivery_cmd.py` + registration (FR-001).
 4. `validator/goal_payload.py`, `goal_inventory.py`, `goal_contract_model.py`, `goal_tasks.py`, `goal_outcome.py`, `goal_generic_evidence.py` (FR-007).
 5. `system/delivery-review.md`, `system/hooks/after-implement-step.md`, spec-implement, spec-feature and spec-ship skills and expectations, both spec-system copies (FR-008).

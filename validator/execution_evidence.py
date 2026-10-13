@@ -292,12 +292,12 @@ def _acceptance_input_gaps(capture: ExecutionCapture, root: Path) -> list[str]:
     mapping_path = root / capture.acceptance_mapping
     mapping_bytes = read_regular(mapping_path, root)
     mapping = AcceptanceMapping.model_validate_json(mapping_bytes)
-    review_path = root / mapping.review_receipt_path
+    inputs = [(mapping_path, mapping_bytes)]
+    if mapping.derivation == "review":
+        review_path = root / mapping.review_receipt_path
+        inputs.append((review_path, read_regular(review_path, root)))
     gaps = []
-    for path, current in (
-        (mapping_path, mapping_bytes),
-        (review_path, read_regular(review_path, root)),
-    ):
+    for path, current in inputs:
         relative = path.relative_to(root).as_posix()
         previous = capture.raw_before.get(relative)
         if (

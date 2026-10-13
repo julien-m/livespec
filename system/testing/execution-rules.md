@@ -20,8 +20,16 @@ All commands come from the **Resolved Test Commands** table. Never hardcode comm
 
 <!-- @spec FR-010: Runner-owned acceptance proof — .specs/features/078-requirement-evidence-integrity/spec.md#fr-010 -->
 
-- Generate the existing acceptance mapping with `feature`, actual `reviewer_model`, `review_receipt_path` and bindings: qualified AC, executed `test_id`, expected outcome, assertion path/line span/source SHA and justification. Read the strict [mapping schema](../../validator/execution_mapping.py). Names, anchors and a global percentage never establish the mapping's semantic truth.
-- Use the existing Code Quality Reviewer for mapping review, without adding a second mandatory reviewer:
+- <!-- @spec FR-006: Anchor-derived mapping — .specs/features/087-anchor-derived-acceptance/spec.md#fr-006 -->
+  **Preferred: derive the mapping from test anchors.** Put a `@spec AC-xxx` comment block naming the feature (`.specs/features/<feature>/spec.md#ac-xxx`) directly above the test function (it binds the function's last assertion) or above one assertion inside it (Python `#`, Rust `//`; decorators and attributes may sit between the block and the function). Then run:
+
+  ```bash
+  livespec test --feature <feature> --acceptance-mapping <mapping-path> --derive-mapping
+  ```
+
+  It writes a mapping with `"derivation": "anchors"` and exits 0, or writes nothing and exits 1 with `orphan_acceptance` (an execution AC without anchor), `unknown_anchor` (an AC the spec does not declare), `anchor_target_unresolved`, `anchor_test_without_assert` or `anchor_test_parametrized`. A derived mapping needs no mapping review: certification derives it again and requires identical bindings, then a passing test and the observed passing assertion. Whether the anchored assertion really proves its AC is judged once, in the end-of-feature [delivery review](../delivery-review.md), which reads the complete diff including the tests.
+- Otherwise generate the existing acceptance mapping by hand with `feature`, actual `reviewer_model`, `review_receipt_path` and bindings: qualified AC, executed `test_id`, expected outcome, assertion path/line span/source SHA and justification. Read the strict [mapping schema](../../validator/execution_mapping.py). Test names and a global percentage never establish the mapping's semantic truth.
+- A hand-written mapping keeps its mapping review by the existing Code Quality Reviewer, without adding a second mandatory reviewer:
 
   ```bash
   livespec test --feature <feature> --acceptance-mapping <mapping-path> --prepare-mapping-review

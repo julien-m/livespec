@@ -13,6 +13,7 @@ from validator.execution_capture import capture_execution
 from validator.execution_evidence import verify_execution_receipt
 from validator.execution_mapping import (
     AcceptanceMapping,
+    derived_mapping,
     ingest_mapping_review,
     prepare_mapping_review,
 )
@@ -30,12 +31,23 @@ def execution_io(
     prepare: bool,
     ingest: Path | None,
     adapter: str,
+    derive: bool = False,
 ) -> None:
-    """Expose reviewer preparation/ingestion and actual capture, with strict certification."""
+    """Expose mapping derivation, reviewer preparation/ingestion and certified capture."""
     if not feature or mapping_path is None:
         raise ValueError("execution_feature_and_acceptance_mapping_required")
     mapping_path = (root / mapping_path).resolve()
     mapping_path.relative_to(root)
+    if derive:
+        _derive(root, feature, mapping_path)
+    anchored = (
+        mapping_path.is_file()
+        and AcceptanceMapping.model_validate_json(mapping_path.read_bytes()).derivation == "anchors"
+    )
+    if anchored and (prepare or ingest):
+        raise ValueError("anchored_mapping_needs_no_review")
+    if anchored:
+        _capture(root, feature, command, mapping_path, adapter)
     prepared = prepare_mapping_review(root, feature, mapping_path)
     if prepare:
         typer.echo(
@@ -50,6 +62,29 @@ def execution_io(
         receipt = ingest_mapping_review(prepared, raw.raw_results, receipt_path, raw.synthesis)
         typer.echo(json.dumps({"receipt_path": str(receipt_path), **receipt.model_dump()}))
         raise typer.Exit(0 if receipt.complete and receipt.ready else 1)
+    _capture(root, feature, command, mapping_path, adapter)
+
+
+def _derive(root: Path, feature: str, mapping_path: Path) -> None:
+    """Write the anchor-derived mapping only when no blocking issue remains (087 FR-004)."""
+    mapping, derivation = derived_mapping(root, feature)
+    if mapping is not None:
+        mapping_path.parent.mkdir(parents=True, exist_ok=True)
+        mapping_path.write_text(mapping.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    payload = {
+        "feature": feature,
+        "mapping_path": mapping_path.relative_to(root).as_posix() if mapping else None,
+        "bindings": len(derivation.bindings),
+        "acceptance": sorted({item.requirement_id for item in derivation.bindings}),
+        "issues": [issue.to_json() for issue in derivation.issues],
+    }
+    typer.echo(json.dumps(payload))
+    raise typer.Exit(0 if mapping is not None else 1)
+
+
+def _capture(
+    root: Path, feature: str, command: str | None, mapping_path: Path, adapter: str
+) -> None:
     if not command:
         raise ValueError("execution_command_required")
     capture = capture_execution(

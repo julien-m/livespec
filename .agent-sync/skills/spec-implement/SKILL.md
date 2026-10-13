@@ -394,7 +394,7 @@ Spec compliance:
 - [ ] Every implemented FR has a `@spec FR-NNN: description — path/to/spec.md#fr-nnn` anchor (with deep-link) in the source file
 - [ ] No FR from `spec.md` is implemented partially (all-or-nothing per FR)
 
-Acceptance mapping (once, before certification in Phase 6): **Read** [execution evidence](../../../system/testing/execution-rules.md#execution-evidence). A mapping derived from `@spec AC-xxx` test anchors needs no separate mapping review; a hand-written mapping keeps the independent mapping review (`--prepare-mapping-review`, then `--ingest-mapping-review <bundle>`), run within the Phase 6.8 review, never per step. Never manufacture covered conclusions from test names.
+Acceptance mapping (once, before certification in Phase 6): **Read** [execution evidence](../../../system/testing/execution-rules.md#execution-evidence). Prefer a mapping derived from `@spec AC-xxx` test anchors (`livespec test --feature <slug> --acceptance-mapping <path> --derive-mapping`, which refuses orphan ACs and unknown anchors); it needs no separate mapping review; a hand-written mapping keeps the independent mapping review (`--prepare-mapping-review`, then `--ingest-mapping-review <bundle>`), run within the Phase 6.8 review, never per step. Never manufacture covered conclusions from test names.
 
 Code quality:
 - [ ] All resolved test commands pass (unit, integration, E2E, visual as applicable)

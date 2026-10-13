@@ -69,6 +69,50 @@ def rust_assertions(source: str) -> list[RustAssertion]:
     return found
 
 
+@dataclass(frozen=True)
+class RustFunction:
+    """One `fn` with a body: its inline `mod` path and 1-based header and closing lines."""
+
+    name: str
+    modules: tuple[str, ...]
+    line: int
+    end_line: int
+
+
+def rust_functions(source: str) -> list[RustFunction]:
+    """Return every function with a body, with the inline modules that enclose it."""
+    # @spec FR-003: Rust anchor targets
+    #   — .specs/features/087-anchor-derived-acceptance/spec.md#fr-003
+    tokens = _tokens(source)
+    starts = _line_starts(source)
+    stack: list[tuple[str, str, int] | None] = []
+    pending: tuple[str, str, int, int] | None = None
+    found: list[RustFunction] = []
+    for index, token in enumerate(tokens):
+        if token.kind == "ident" and token.value in {"fn", "mod"} and index + 1 < len(tokens):
+            name = tokens[index + 1]
+            if name.kind == "ident":
+                line = _position(starts, token.start)[0]
+                pending = (token.value, name.value.removeprefix("r#"), len(stack), line)
+            continue
+        if token.kind != "punct":
+            continue
+        if token.value in _OPEN:
+            is_body = token.value == "{" and pending is not None and pending[2] == len(stack)
+            stack.append((pending[0], pending[1], pending[3]) if is_body and pending else None)
+            if is_body:
+                pending = None
+        elif token.value in _CLOSE and stack:
+            entry = stack.pop()
+            if entry and entry[0] == "fn":
+                modules = tuple(item[1] for item in stack if item and item[0] == "mod")
+                end = _position(starts, token.start)[0]
+                found.append(RustFunction(entry[1], modules, entry[2], end))
+        elif token.value == ";" and pending is not None and pending[2] == len(stack):
+            pending = None  # Body-less declaration such as `mod name;` or a trait method.
+    return sorted(found, key=lambda item: item.line)
+
+
 def _is_assertion(tokens: list[_Token], index: int) -> bool:
     token = tokens[index]
     return (
