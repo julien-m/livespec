@@ -37,5 +37,6 @@ PHASE_RESULT: OK (fix) — implement gate READY; unit suite: only failures also 
 | RED | Done | `tests/test_init_bootstrap_migration.py` | targeted suite | 3 failed | 2026-10-13 |
 | GREEN | Done | `validator/init_bootstrap_repair.py`, `scripts/migrate-init-bootstrap-repair.sh`, `migrations/23/migrate.md`, `VERSION`, `.specs/livespec-version` | targeted suite; full unit suite (same failures as the base branch, environment); ruff, pyright, mypy | PASS | 2026-10-13 |
 | Readiness gate | Done | `.reviews/spec.json`, `.reviews/plan.json` (plan: 3 batches + synthesis), claude-opus-5-5, 150000, fresh independent native reviewers | `livespec validate --progression implement` | READY | 2026-10-13 |
+| Conventions | Done | — | `livespec conventions verify --feature repo` with `ai-ressources` at the CI-pinned revision, after rebase on `a86b4ac` | PASS (0 error-severity violation) | 2026-10-13 |
 
-PHASE_RESULT: OK (fix) — implement gate READY; repo conventions gate still to rerun where the `ai-ressources` corpus exists.
+PHASE_RESULT: OK (fix) — implement gate READY; repo conventions PASS.
